@@ -1,6 +1,6 @@
 {
   "appId":"com.inspot-technology.novac",
-  "productName": "Novac System",
+  "productName": "Novac-System",
   "directories": {
     "output": "actualizacion/"
   },
@@ -9,22 +9,25 @@
     "**/*",
     "!**/*.ts",
     "!*.code-workspace",
-    "!LICENSE.md",
-    "!package.json",
-    "!package-lock.json",
-    "!e2e/",
-    "!hooks/",
-    "!angular.json",
-    "!_config.yml",
-    "!karma.conf.js",
-    "!tsconfig.json",
-    "!tslint.json",
-    "!actualizacion/**/*",
-    "!ADM-dataBase ER.mdj",
-    "!actualizacion.zip",
-    "!print",
-    "!log",
-    "!reload"
+    "!./LICENSE.md",
+    "!./package.json",
+    "!./package-lock.json",
+    "!./e2e/",
+    "!./config_setup/",
+    "!./angular.json",
+    "!./_config.yml",
+    "!./tsconfig.json",
+    "!./tslint.json",
+    "!./actualizacion/",
+    "!./actualizacion.zip",
+    "!./log/"
+  ],
+  "extraFiles": [
+    {
+      "from": "./print/",
+      "to": "resources/print/",
+      "filter": [ "**/*" ]
+    }
   ],
 
   "win": {

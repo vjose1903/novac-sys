@@ -31,6 +31,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 
   const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
   const configuration = configuraciones[tipo_pdf];
+  const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
 
   const dd = {
     pageSize: configuration.pageSize,
@@ -43,7 +44,9 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     styles: styles_,
   };
 
-  const obj = { doc: dd, file: file_name, type: 'file' };
+  console.log("dd ", dd);
+
+  const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: pageO };
   return obj;
 }
 
@@ -162,7 +165,7 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
 
   const innerTabla = { table: { headerRows: 0, widths: [160], body: [] } };
 
-  const entidades = ['realizado_por', 'cliente','recibido_por', 'entregado_por'];
+  const entidades = ['realizado_por', 'cliente', 'recibido_por', 'entregado_por'];
 
   entidades.forEach((entidad, index) => {
     if (firmas[tipo_pdf].includes(entidad)) {
@@ -177,8 +180,6 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
 
   return mainTable;
 }
-
-
 
 function parseTipoPdf(data, tipo_pdf) {
   const contenido = [];
@@ -259,8 +260,9 @@ function parseInfoFactura(data, tipo_pdf) {
       key: 'fecha',
       item: {
         alignment: 'left',
+        noWrap: true,
         text: [
-          { text: 'Fecha                  : ', style: 'letra10' },
+          { text: 'Fecha: ', bold: true, style: 'letra10' },
           { text: `${fun_.my_dateFormater(data?.fecha || '')} - ${fun_.my_houreFormater(data?.fecha || '')}`, style: 'letra10' },
         ],
       },
@@ -269,8 +271,9 @@ function parseInfoFactura(data, tipo_pdf) {
       key: 'fecha_vencimiento',
       item: {
         alignment: 'left',
+        noWrap: true,
         text: [
-          { text: 'Fecha vencimiento      : ', style: 'letra10' },
+          { text: 'Fecha vencimiento: ', bold: true, style: 'letra10' },
           { text: fun_.my_dateFormater(data?.fecha_vencimiento), style: 'letra10' },
         ],
       },
@@ -279,8 +282,9 @@ function parseInfoFactura(data, tipo_pdf) {
       key: 'ncf',
       item: {
         alignment: 'left',
+        noWrap: true,
         text: [
-          { text: 'NCF                     : ', bold: true, style: 'letra10' },
+          { text: 'NCF: ', bold: true, style: 'letra10' },
           { text: data?.numero_comprobante || '', style: 'letra10' },
         ],
       },
@@ -289,8 +293,9 @@ function parseInfoFactura(data, tipo_pdf) {
       key: 'no_documento',
       item: {
         alignment: 'left',
+        noWrap: true,
         text: [
-          { text: 'No. Documento : ', bold: true, style: 'letra10' },
+          { text: 'No. Documento: ', bold: true, style: 'letra10' },
           { text: fun_.my_padStart(data?.numero_documento || '', 8, '0'), style: 'letra10' },
         ],
       },
@@ -300,8 +305,9 @@ function parseInfoFactura(data, tipo_pdf) {
       key: 'valida',
       item: {
         alignment: 'left',
+        noWrap: true,
         text: [
-          { text: 'Válida Hasta       : ', bold: true, style: 'letra10' },
+          { text: 'Válida Hasta: ', bold: true, style: 'letra10' },
           { text: data.tipo_factura_id === 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida), style: 'letra10' },
         ],
       },
@@ -328,24 +334,27 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       key: 'nombre',
       item: {
         alignment: 'left',
+        noWrap: true,
         text: [
-          is_suplidor ? { text: 'Suplidor               : ', bold: true, style: 'letra10' } : { text: 'Cliente                : ', bold: true, style: 'letra10' },
+          is_suplidor ? { text: 'Suplidor: ', bold: true, style: 'letra10' } : { text: 'Cliente: ', bold: true, style: 'letra10' },
           is_suplidor ? { text: data?.suplidor.nombre || '', style: 'letra10' } : { text: `${data?.cliente.nombre || ''} ${data?.cliente.apellido || ''}`, style: 'letra10' },
         ],
       },
     },
     {
       key: 'doc_identidad',
+      noWrap: true,
       item: {
         alignment: 'left',
-        text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.rnc || '', style: 'letra10' } : { text: data?.cliente.rnc || '', style: 'letra10' }],
+        text: [{ text: 'Doc. identidad : ', bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.rnc || '', style: 'letra10' } : { text: data?.cliente.rnc || '', style: 'letra10' }],
       },
     },
     {
       key: 'direccion',
+      noWrap: true,
       item: {
         alignment: 'left',
-        text: [{ text: 'Dirección            : ', bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.direccion || '', style: 'letra10' } : { text: data?.cliente.direccion || '', style: 'letra10' }],
+        text: [{ text: 'Dirección: ', bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.direccion || '', style: 'letra10' } : { text: data?.cliente.direccion || '', style: 'letra10' }],
       },
     },
     {
@@ -353,18 +362,15 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       item: {
         alignment: 'left',
         text: [
-          { text: 'Recibido             : ', bold: true, style: 'letra10' },
+          { text: 'Recibido: ', bold: true, style: 'letra10' },
           { text: fun_.numFormatTwoDecimals(data?.total), style: 'letra10' },
           { text: ` - ${fun_.my_capitalize(numero_letra)}`, style: 'letra10' },
         ],
       },
     },
-
   ];
 
   partes.forEach((parte) => {
-    console.log('parte :', parte);
-
     if (infoPropietarioPartes[tipo_pdf].includes(parte.key)) {
       parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
       contenido.push(parte.item);

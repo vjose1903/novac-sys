@@ -20,7 +20,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   form: FormGroup;
   ARRAY_ROWFACTURAS;
 
-  UnidadesArticulo;
+  UnidadesArticulo = [];
   drop;
 
   precioDetalle;
@@ -30,7 +30,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   inputDrop;
   filasDetalle;
   DESCUENTO;
-  listaDeDescuentos;
+  listaDeDescuentos = [];
 
   sacos;
   indexRemove;
@@ -49,7 +49,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   articuloClass = new ArticuloC();
   minCodigo;
-  productosDevueltos: any;
+  productos_devueltos = [];
   dropRowConfig: any;
   configApp: ConfigI;
   constructor(private fb: FormBuilder) {
@@ -96,12 +96,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
 
     this.getCuerpoFactura.emit({ tipo: 'cuerpo', data: fun.duplicarJson(detalle_factura) });
-    this.getCuerpoFactura.emit({ tipo: 'devuelto', data: this.productosDevueltos });
+    this.getCuerpoFactura.emit({ tipo: 'devuelto', data: this.productos_devueltos });
   }
 
   async rellenarVariables() {
     return new Promise(async (resolve, reject) => {
-      [this.UnidadesArticulo, this.productosDevueltos, this.listaDeDescuentos] = Array(3).fill([]);
+      this.listaDeDescuentos.length = 0;
+      this.UnidadesArticulo.length = 0;
+      this.productos_devueltos.length = 0;
+
       [this.ARRAY_ROWFACTURAS, this.precioDetalle, this.inputDrop, this.filasDetalle, this.indexRemove] = Array(5).fill(undefined);
       [this.secuencia, this.DESCUENTO] = Array(2).fill(0);
       this.inputSecuencia = 'cod-0';
@@ -159,7 +162,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const producto = _.pick(data, ['articulo_id', 'cantidad', 'articulo', 'calcular_saco', 'cantidad_en_unidades', 'costo', 'descuento_valor', 'id', 'is_defectuoso', 'is_devuelto', 'itbis', 'precio', 'total', 'unidad']);
       producto['articulo_id'] = producto.articulo.id;
 
-      this.productosDevueltos.push(producto);
+      this.productos_devueltos.push(producto);
     }
     // if (action == 'remove') this.productosDevueltos.push(data);
   }
@@ -247,8 +250,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     this.inputSecuencia = 'cod-0';
     this.inputDrop = undefined;
     this.DESCUENTO = 0;
-    this.listaDeDescuentos = [];
-    this.productosDevueltos = [];
+    this.listaDeDescuentos.length = 0;
+    this.productos_devueltos.length = 0;
   }
 
   // =============================================
@@ -444,6 +447,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       _.filter(this.filasDetalle, (item) => item.controls.articulo?.value?.id == articulo.id),
       'value',
     );
+
     cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + item.cantidad_en_unidades, 0);
 
     if (lugar === 'saltar') i--;

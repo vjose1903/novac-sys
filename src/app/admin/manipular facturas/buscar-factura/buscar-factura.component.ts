@@ -40,7 +40,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   Para: string;
 
   lista_tipos_facturas: any;
-  existenComprobantes = false;
+  noExistenComprobantes = false;
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor: any;
@@ -101,7 +101,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     padding: '0.5rem',
     id_tabla: 'facturas_params',
     padre_functions: { data_request: (params) => this.pedirFactura(this.campo, this.valor, params) },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaComponent;
@@ -117,7 +117,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     filtrar: { local: false },
     id_tabla: 'lista_notas',
     padre_functions: { data_request: (params) => this.pedirNotas(params) },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaNotasComponent;
@@ -132,9 +132,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async necesarioStart() {
     await this.getTipoFacturas();
-
-    if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
-
     this.enfocarInput('campoI');
   }
 
@@ -206,7 +203,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         }
       }
     } catch (error) {
-      this.existenComprobantes = true;
+      this.noExistenComprobantes = true;
       console.error(error);
       // fun.toastError(error.error.msg, 'ERROR');
     }
@@ -515,9 +512,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  continuarANotas(idFactSelect?) {
-    const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${JSON.stringify(idFactSelect ? [idFactSelect] : this.idsFacturasSeleccionadas)}`;
-    this.router.navigateByUrl(url);
+  async continuarANotas(idFactSelect?) {
+    if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
+
+    if ((this.noExistenComprobantes = false)) {
+      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${JSON.stringify(idFactSelect ? [idFactSelect] : this.idsFacturasSeleccionadas)}`;
+      this.router.navigateByUrl(url);
+    }
   }
 
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {

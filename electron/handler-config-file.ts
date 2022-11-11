@@ -13,28 +13,41 @@ export default class HandlerConfigFile {
     direccion_empresa: 'El higuerito, frente a la escuela, La Vega Rep. Dom.',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Panaderia & Reposteria Brendy',
-    rnc_empresa: '132-35083-9',
-    telefono_empresa: '(829)-423-1678',
-    url_servidor: 'http://novac-brendy.ddns.net:9091',
-    url_servidor_descargas: 'http://novac-brendy.ddns.net:9091',
-    url_servidor_respaldo: 'http://localhost:9091',
-    usa_url_principal: false,
-    printer_caja_selected: undefined,
-    printer_reportes_selected: undefined,
-    is_db_local: true,
+    nombre_empresa: 'Agropecuaria Delia y Milo, S.R.L AGRODEMI',
+    rnc_empresa: '131-99603-5',
+    telefono_empresa: '(809)-573-0060',
+    url_servidor: 'http://admservidor.ddns.net:9090',
+    url_servidor_descargas: 'http://admservidor.ddns.net:9090',
+    url_servidor_respaldo: 'http://10.0.0.9:9090',
+    usa_url_principal: true,
+    is_db_local: false,
     calcular_itbis: false,
     is_produccion: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
     medida_producto_terminado: 'Producto',
 
+    printer_selected: {
+      venta_contado: 'Ninguna',
+      venta_credito: 'Ninguna',
+      pre_venta: 'Ninguna',
+      compra: 'Ninguna',
+      recibo_ingreso: 'Ninguna',
+      conduce: 'Ninguna',
+      nota: 'Ninguna',
+      cuadre_caja: 'Ninguna',
+      reporte: 'Ninguna',
+    },
+
     pages_sizes: {
-      recibo_ingreso: '80mm_roll',
-      nota: '80mm_roll',
-      conduce: '80mm_roll',
-      facturacion: '80mm_roll',
-      cuadre_caja: '80mm_roll',
+      venta_contado: '8.5x5.5',
+      venta_credito: '8.5x11',
+      pre_venta: '8.5x5.5',
+      compra: '8.5x5.5',
+      recibo_ingreso: '8.5x5.5',
+      conduce: '8.5x5.5',
+      nota: '8.5x5.5',
+      cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',
     },
 
@@ -55,10 +68,6 @@ export default class HandlerConfigFile {
         puts(existe_archivo_config, ':::::::: existe_archivo_config');
 
         if (!existe_archivo_config) {
-          // TODO: ver cual es el key que se necesita para utilizar una impresora por nombre
-          this.default_config.printer_caja_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : undefined;
-          this.default_config.printer_reportes_selected = Functions.hasValue(Functions.getDefaultPrinter(win)) ? Functions.getDefaultPrinter(win) : undefined;
-
           Functions.setConfigFile(JSON.stringify(this.default_config))
             .then(() => {
               console.log(' ');

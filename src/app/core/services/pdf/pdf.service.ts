@@ -28,18 +28,20 @@ export class PdfService {
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
       const config: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
 
-      let options, documento;
+      let options;
+      let printer_selected = config.printer_selected[type_oPdf];
+
       data['reimprimir'] = reimprimir;
 
       data.fecha = fun.hasValue(data.fecha_equivalente) ? data.fecha_equivalente : data.fecha;
       try {
         switch (type_oPdf) {
-          case 'recibo_ingreso': // SI SI
+          case 'recibo_ingreso':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
             obj = options[config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
 
-          case 'conduce': // SI SI
+          case 'conduce':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
             obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
@@ -52,13 +54,14 @@ export class PdfService {
 
             obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
             break;
-          case 'facturacion': // SI SI
+          case 'facturacion':
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
-
-            obj = options[config.pages_sizes.facturacion].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.pre_venta ? 'pre_venta' : 'ventas');
+            const tipo_documento = this.getFacturacionType(data);
+            printer_selected = config.printer_selected[tipo_documento];
+            obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.pre_venta ? 'pre_venta' : 'ventas');
             break;
 
-          case 'cuadre_caja': // SI SI
+          case 'cuadre_caja':
             options = { '80mm_roll': roll80mm, '8.5x5.5': cuadreCaja, '8.5x11': cuadreCaja };
 
             obj = options[config.pages_sizes.cuadre_caja].makePDF(data, 'cuadre.pdf', 'cuadre_caja');
@@ -74,15 +77,10 @@ export class PdfService {
         }
 
         if (todo_true) {
-          const dd = obj.doc;
-          const file = obj.file;
-          const type = obj.type;
-
-          this.createPdfFrombase64(dd, file, reimprimir, (res) => {
-            res['scale'] = obj.scale;
-
+          this.createPdfFromBase64(obj.doc, obj.file, reimprimir, (res) => {
+            res['pageOrientation'] = obj.pageOrientation;
             if (params.imprimir) {
-              this.imprimirBase64({ base64: res.base64, file: res.file, type: type_oPdf })
+              this.imprimirBase64({ base64: res.base64, file: res.file, type: type_oPdf, printer: printer_selected, pageOrientation: res['pageOrientation'] })
                 .then((res_impresion) => resolve(res_impresion))
                 .catch((err_impresion) => reject(err_impresion));
             } else {
@@ -105,7 +103,7 @@ export class PdfService {
     });
   }
 
-  static createPdfFrombase64(docDefinition, file_, reimprimir_, callback = (arg) => {}) {
+  static createPdfFromBase64(docDefinition, file_, reimprimir_, callback = (arg) => {}) {
     try {
       pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -128,7 +126,7 @@ export class PdfService {
     }
   }
 
-  static imprimirBase64(oBase: { base64: string; file: string; type: string }) {
+  static imprimirBase64(oBase: { base64: string; file: string; type: string; printer: string; pageOrientation: string }) {
     try {
       return new Promise<any>((resolve, reject) => {
         const task = new MessageTask(KEYWORD_ELECTRON_PRINT_BASE64, oBase);
@@ -137,7 +135,10 @@ export class PdfService {
           .sendTask(task)
           .then((res) => {
             if (res['status'] == 'no') reject(res);
-            else resolve(res);
+            else {
+              res['pageOrientation'] = oBase.pageOrientation;
+              resolve(res);
+            }
           })
           .catch((err) => reject(err));
       });
@@ -159,5 +160,9 @@ export class PdfService {
     if (oStatus.dd) obj['sDd'] = JSON.stringify(oStatus.dd);
 
     return obj;
+  }
+
+  static getFacturacionType(data) {
+    return data.tipo == 'pre_venta' ? 'pre_venta' : data.tipo == 'venta' ? (data.condicion == 'Crédito' ? 'venta_credito' : 'venta_contado') : 'compra';
   }
 }

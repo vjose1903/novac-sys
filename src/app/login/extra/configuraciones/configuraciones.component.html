@@ -96,18 +96,18 @@
                       </div>
                     </div>
 
-                    <div class="col-6 mb-2">
+                    <!-- <div class="col-6 mb-2">
                       <div [appMsgError]="'printer_caja_selected'" [form]="form">
                         <label class="control-label">Impresora facturación seleccionada: </label>
                         <p-dropdown [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
                           <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value.displayName">
-                              <div>{{ form.controls['printer_caja_selected'].value.displayName }}</div>
+                            <div class="d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value">
+                              <div>{{ form.controls['printer_caja_selected'].value }}</div>
                             </div>
                           </ng-template>
                           <ng-template let-printerItem pTemplate="item">
                             <div class="printerItem-item d-flex align-items-center">
-                              <div>{{ printerItem.displayName }}</div>
+                              <div>{{ printerItem }}</div>
                             </div>
                           </ng-template>
                         </p-dropdown>
@@ -120,19 +120,19 @@
                         <label class="control-label">Impresora reportes seleccionada: </label>
                         <p-dropdown [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
                           <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value.displayName">
-                              <div>{{ form.controls['printer_reportes_selected'].value.displayName }}</div>
+                            <div class="d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value">
+                              <div>{{ form.controls['printer_reportes_selected'].value }}</div>
                             </div>
                           </ng-template>
                           <ng-template let-printerItem pTemplate="item">
                             <div class="printerItem-item d-flex align-items-center">
-                              <div>{{ printerItem.displayName }}</div>
+                              <div>{{ printerItem }}</div>
                             </div>
                           </ng-template>
                         </p-dropdown>
                         <span id="msgContainer_printer_reportes_selected"></span>
                       </div>
-                    </div>
+                    </div> -->
 
                     <div class="col-4 mb-3">
                       <div [appMsgError]="'url_servidor'" [form]="form">
@@ -255,21 +255,64 @@
       </p-tabPanel>
 
       <!-- ============================ PLANTILLAS DE IMPRESION ============================ -->
-      <p-tabPanel header="Plantillas de impresión">
+      <p-tabPanel header="Impresiones">
         <div class="form">
           <div class="fantasma-form">
             <div class="row">
               <div class="col-12 p-0 mt-4">
                 <form *ngIf="config" [formGroup]="form">
                   <div class="row">
-                    <!-- ------------------------------------ tamaños de impresiones ------------------------------------ -->
                     <div class="col-12 mb-3">
                       <div class="row bg-dark-1 br-1 p-2">
                         <div class="col-12 p-0">
-                          <label class="control-label">Tamaños de impresión: </label>
+                          <label class="control-label">Documentos para imprimir: </label>
                         </div>
 
-                        <div class="col-2 pr-0 mb-2">
+                        <ng-container *ngFor="let item of impresiones">
+                          <div class="col-4 mb-3">
+                            <div class="box-impresion bg-dark-1">
+                              <div class="head bg-dark-1">
+                                <label class="control-label no-wrap mb-0 text-white">{{ item.label }}: </label>
+                                <i class="fa-solid fa-print c-pointer" (click)="printTest(item.key, form.controls[item.pageSizeFormControlName].value.descripcion)"></i>
+                              </div>
+                              <div class="body">
+                                <div [appMsgError]="item.pageSizeFormControlName" [form]="form" class="mb-2">
+                                  <div class="mb-0">Tamaño del PDF</div>
+                                  <p-dropdown [options]="paper_sizes" [formControlName]="item.pageSizeFormControlName" placeholder="Seleccione una tamaño de papel">
+                                    <ng-template pTemplate="selectedItem">
+                                      <div class="d-flex align-items-center" *ngIf="form.controls[item.pageSizeFormControlName].value.label">
+                                        <div>{{ form.controls[item.pageSizeFormControlName].value.label }}</div>
+                                      </div>
+                                    </ng-template>
+                                    <ng-template let-pageSize pTemplate="item">
+                                      <div class="pageSize-item d-flex align-items-center">
+                                        <div>{{ pageSize.label }}</div>
+                                      </div>
+                                    </ng-template>
+                                  </p-dropdown>
+                                  <span [id]="'msgContainer_' + item.pageSizeFormControlName"></span>
+                                </div>
+
+                                <div [appMsgError]="item.printerFormControlName" [form]="form" class="mb-2">
+                                  <div class="mb-0">Impresora:</div>
+                                  <p-dropdown appendTo="body" [options]="config.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-dropdown>
+                                  <span [id]="'msgContainer_' + item.printerFormControlName"></span>
+                                </div>
+
+                                <div *ngIf="item.plantillaFormControlName" class="mt-3">
+                                  <div [appMsgError]="item.plantillaFormControlName" [form]="form">
+                                    <div class="mb-0">Plantilla de impresion</div>
+
+                                    <p-dropdown appendTo="body" [options]="get_plantillas(item.key)" [formControlName]="item.plantillaFormControlName" placeholder="Seleccione una plantilla" optionLabel="value" optionValue="value"> </p-dropdown>
+                                    <span [id]="'msgContainer_' + item.plantillaFormControlName"></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+
+                        <!-- <div class="col-2 pr-0 mb-2">
                           <div [appMsgError]="'page_size_facturacion'" [form]="form">
                             <div class="d-flex align-items-center mb-2">
                               <label class="control-label no-wrap mr-2 mb-0">Facturacion: </label>
@@ -292,7 +335,7 @@
                         </div>
 
                         <div class="col-2 pr-0 mb-2">
-                          <div [appMsgError]="'page_size_facturacion'" [form]="form">
+                          <div [appMsgError]="'page_size_nota'" [form]="form">
                             <div class="d-flex align-items-center mb-2">
                               <label class="control-label no-wrap mr-2 mb-0">Notas: </label>
                               <i class="fa-solid fa-print c-pointer" (click)="printTest('nota', form.controls['page_size_nota'].value.descripcion)"></i>
@@ -317,7 +360,7 @@
                           <div [appMsgError]="'page_size_recibo_ingreso'" [form]="form">
                             <div class="d-flex align-items-center mb-2">
                               <label class="control-label no-wrap mr-2 mb-0">Recibos de ingreso: </label>
-                              <i class="fa-solid fa-print c-pointer" (click)="printTest('inggreso', form.controls['page_size_recibo_ingreso'].value.descripcion)"></i>
+                              <i class="fa-solid fa-print c-pointer" (click)="printTest('ingreso', form.controls['page_size_recibo_ingreso'].value.descripcion)"></i>
                             </div>
                             <p-dropdown [options]="paper_sizes" formControlName="page_size_recibo_ingreso" placeholder="Seleccione una tamaño de papel">
                               <ng-template pTemplate="selectedItem">
@@ -398,11 +441,11 @@
                             </p-dropdown>
                             <span id="msgContainer_page_size_reporte"></span>
                           </div>
-                        </div>
+                        </div> -->
                       </div>
                     </div>
                     <!-- ------------------------------------ plantillas de impresiones ------------------------------------ -->
-                    <div class="col-12">
+                    <!-- <div class="col-12">
                       <label class="control-label">Plantillas de impresión: </label>
                     </div>
                     <div class="col-3 mb-3">
@@ -410,7 +453,7 @@
                         <label class="control-label">Notas: </label>
                         <p-dropdown [options]="get_plantillas('nota')" formControlName="plantilla_impresion_nota" placeholder="Seleccione una plantilla" optionLabel="value" optionValue="value"> </p-dropdown>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                 </form>
               </div>
@@ -422,6 +465,8 @@
 
     <div class="buttons">
       <div class="d-flex justify-content-end align-items-center">
+        <a class="btn mr-2" id="btn-gris" (click)="test()">Test</a>
+
         <a class="btn mr-2" id="btn-blanco" (click)="salir()">Salir</a>
 
         <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="Guardar" id="btn-verde" />

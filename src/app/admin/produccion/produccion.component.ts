@@ -36,7 +36,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     ],
     colores: true,
     id_tabla: 'lista_produccion',
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
     botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
   };
   tablaComponent;

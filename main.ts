@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain, dialog, shell } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
@@ -47,7 +47,7 @@ function createSplash(type = 'splash') {
 
   splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
 
-  const splash_html = serve ? `src/${type}.html` : `dist/${type}.html`;
+  const splash_html = localFilePath(`${type}.html`);
 
   splash.loadURL(url.format({ pathname: path.join(__dirname, splash_html), protocol: 'file:', slashes: true }));
   splash.center();
@@ -259,18 +259,10 @@ function beforeCreateSplash(splash) {
 // continuar la carga de archivos necesarios
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function continuarCargandoArchivos(resolve) {
-  // -------- verificar el archivo para impresion --------
-  verificarSumastra()
-    .then((res_sumastra) => {
-      // -------------- remplazar en archivos ----------------
-      replace_in_file = new ReplaceInFile();
-      puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
-      setTimeout(() => resolve(true), 2000);
-    })
-    .catch((error) => {
-      puts(' -------- SUMASTRA NO EXISTE -------- ');
-      createSplash(`splash_sumastra_error`);
-    });
+  // -------------- remplazar en archivos ----------------
+  replace_in_file = new ReplaceInFile();
+  puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+  setTimeout(() => resolve(true), 2000);
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -337,10 +329,11 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
 
         const base64 = oPdf.base64;
         const fileName = oPdf.file;
+        const printer = oPdf.printer;
         const type = oPdf['type'] ? oPdf['type'] : 'reporte';
-        const scale = oPdf['scale'] ? oPdf['scale'] : 'noscale';
+        const pageOrientation = oPdf['pageOrientation'] ? oPdf['pageOrientation'] : 'portrait';
 
-        generatePdfFileFormBase64({ fileName, base64, type, scale })
+        generatePdfFileFormBase64({ fileName, base64, type, pageOrientation, printer })
           .then((res) => {
             arg.response = res;
             event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
@@ -396,6 +389,12 @@ function getActualGitUser() {
   });
 }
 
+function getPrinters() {
+  const printers_list = win.webContents.getPrinters().map((item) => item.name);
+
+  return printers_list;
+}
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER EL ARCHIVO APP.CONFIG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -407,10 +406,10 @@ function getConfigFile() {
     Functions.getConfigFile()
       .then(async (config: any) => {
         var config = JSON.parse(config);
-
+        const printer_list = getPrinters();
         config['is_development'] = serve_;
         config['gitUser'] = await getActualGitUser();
-        config['printersList'] = [{ displayName: 'Ninguna', name: 'Ninguna' }, { displayName: 'Otra', name: 'Otra' }, ...win.webContents.getPrinters()];
+        config['printersList'] = ['Ninguna', ...printer_list];
         config['app_version'] = pjson.version;
 
         resolve(config);
@@ -441,212 +440,6 @@ function borrarLogs() {
   });
 }
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// VEIRIFICA SI SUMASTRA ESTA INSTALADO
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function verificarSumastra() {
-  return new Promise<any>(async (resolve, reject) => {
-    const serve_ = await getServer_();
-
-    const print_path = serve_ ? await pathAdd('/print') : contruirPath('N:/sumastra');
-    if (!fs.existsSync(print_path)) {
-      reject(false);
-      return;
-    }
-
-    const lp_path = contruirPath(`${print_path}/lp.exe`);
-    if (fs.existsSync(lp_path)) resolve(true);
-    else reject(false);
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// FUNCION QUE SE EJECUTA AL TERMINAR LA DESCARGA DE UN ELEMENTO
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, callback) {
-  const command = isMacOs() ? `unzip "${await pathAdd(path_local_extension)}" -d "${await pathAdd()}"` : `powershell Expand-Archive "${await pathAdd(path_local_extension)}" -DestinationPath "${await pathAdd()}"`;
-
-  cmd(command, async (res) => {
-    if (res.status) {
-      const comando = await pathAdd(path_local_extension);
-      cmd(`del ${comando}`, async (res_borrado) => {
-        if (res_borrado.status) {
-          callback({
-            status: true,
-            msg: 'archivo descomprimido y borrado del zip correctamente',
-          });
-          // clearInterval(interval);
-        } else {
-          callback({
-            status: false,
-            msg: `error borrando ${path_local_extension}`,
-          });
-        }
-      });
-    } else {
-      callback({
-        status: false,
-        msg: 'error descomprimiendo archivo',
-      });
-    }
-  });
-  // }, 2000);
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// PARA BORRAR UN ELEMENTO QUE NO ESTE BIEN
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-async function borrado_de_archivos_malos(archivos, callback = (arg) => {}) {
-  const del = require('del');
-
-  // delete directory recursively
-
-  try {
-    await del(archivos);
-    callback({
-      status: true,
-      msg: 'Elementos borrado correctamente',
-    });
-  } catch (err) {
-    console.error(`Error borrando ${archivos} .`);
-    callback({
-      status: false,
-      msg: err,
-    });
-  }
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// PARA VERIFICAR SI LOS ELEMENTOS NECESARIOS FUNCIONAN
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-async function verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_no_extension, descomprimir, is_carpeta, nombre_err, counter) {
-  let descargar_archivo = false;
-  let md5_servidor;
-
-  cmd(`ssh novac@admservidor.ddns.net -p 24 "md5sum /home/novac/proyects/novac-system/public${paht_server}"`, async (res_servidor) => {
-    if (res_servidor.status) {
-      md5_servidor = res_servidor.STDOUT.split(' ')[0];
-      const element_path = await pathAdd(`${path_local_content}${is_carpeta ? `${path_local_no_extension}` : `${path_local_extension}`}`);
-      if (!fs.existsSync(element_path)) {
-        procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta);
-        descargar_archivo = true;
-      } else {
-        if (descomprimir) {
-          const command = isMacOs()
-            ? `zip -r "${await pathAdd(path_local_extension)}" "${await pathAdd(path_local_no_extension)}" -x "*.DS_Store"`
-            : `powershell Compress-Archive "${await pathAdd(`${path_local_no_extension}`)}"  -DestinationPath "${await pathAdd(`${path_local_no_extension}.zip`)}" -Update`;
-
-          cmd(command, (res_compresion) => {
-            if (!res_compresion.status) {
-              retornarMensajeErrorVeiricandoElementos(nombre_err);
-            } else {
-              compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
-            }
-          });
-        }
-      }
-
-      if (!descargar_archivo && !descomprimir) {
-        compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter);
-      }
-    } else {
-    }
-    return;
-  });
-}
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// PARA COMPARA MD5 DE ELEMENTOS A VER SI FUNCIONAN
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-async function compararMD5(aFiles_malos, path_local_content, path_local_extension, md5_servidor, path_local_no_extension, is_carpeta, nombre_err, paht_server, descomprimir, counter) {
-  const command = isMacOs() ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
-
-  cmd(command, (res_local) => {
-    if (res_local.status) {
-      const md5_local = isMacOs() ? res_local.STDOUT.split(' ')[0] : res_local.STDOUT.split('\r\n')[1];
-      if (md5_local !== md5_servidor) {
-        borrado_de_archivos_malos(aFiles_malos, (res_del) => {
-          if (res_del.status) {
-            procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta);
-          } else {
-            retornarMensajeErrorVeiricandoElementos(nombre_err);
-          }
-        });
-      }
-    } else {
-      retornarMensajeErrorVeiricandoElementos(nombre_err);
-    }
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// PROCESO DE DESCARGA
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-async function procesoDescarga(aFiles_malos, path_local_extension, path_local_content, paht_server, md5_servidor, descomprimir, path_local_no_extension, nombre_err, counter, is_carpeta) {
-  let descarga_exito = true;
-  const conf = await getConfig();
-
-  if (conf.url_servidor_descargas) {
-    await downloadFile(`${conf.url_servidor_descargas}${paht_server}`, path_local_content, path_local_extension, async (res) => {
-      if (res.status) {
-        const command = isMacOs() ? `md5sum "${await pathAdd(`${path_local_content}${path_local_extension}`)}"` : `CertUtil -hashfile "${await pathAdd(`${path_local_content}${path_local_extension}`)}" MD5`;
-
-        cmd(command, (res_local_before_descarga) => {
-          if (res_local_before_descarga.status) {
-            const md5_local = isMacOs() ? res_local_before_descarga.STDOUT.split(' ')[0] : res_local_before_descarga.STDOUT.split('\r\n')[1];
-            if (md5_servidor === md5_local) {
-              if (descomprimir) {
-                esperandoDescargaParaDescomprimirElemento(path_local_content, path_local_extension, path_local_no_extension, (res) => {
-                  if (res.status) {
-                  } else {
-                    win.webContents.send('err_descarga', {
-                      msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
-                      status: 'no',
-                    });
-                    return;
-                  }
-                });
-              }
-            } else {
-              descarga_exito = false;
-            }
-          } else {
-            retornarMensajeErrorVeiricandoElementos(nombre_err);
-          }
-        });
-      } else {
-        descarga_exito = false;
-      }
-    });
-
-    if (!descarga_exito) {
-      counter++;
-      if (counter <= 3) {
-        verificarElemento(aFiles_malos, paht_server, path_local_content, path_local_extension, path_local_no_extension, descomprimir, is_carpeta, nombre_err, counter);
-      } else {
-        win.webContents.send('err_descarga', {
-          msg: `Error descargando archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Victor Jose Vasquez Santos.`,
-          status: 'no',
-        });
-      }
-    }
-  }
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// MENSAJE DE FALLA EN EL VERIFICADO DE ELEMENTOS
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-function retornarMensajeErrorVeiricandoElementos(nombre_err) {
-  win.webContents.send('err_descarga', {
-    msg: `Error en el proceso de verificacion de archivo necesario para impresion << ${nombre_err} >>, Favor de comunicarse con Víctor José Vásquez Santos.`,
-    status: 'no',
-  });
-  return;
-}
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
@@ -665,49 +458,6 @@ export function cmd(command, callback = (arg) => {}) {
       callback(obj);
     }
   });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// FUNCION QUE SE ENCARGA DE DESCARGAR ARCHIVOS
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-async function downloadFile(archive_url, path, file_, callback = (arg) => {}) {
-  // Save variable to know progress
-
-  let received_bytes = 0;
-  let total_bytes = 0;
-
-  const req = request({ method: 'GET', uri: archive_url });
-  const element_path = await pathAdd(`${path}${file_}`);
-  const out = fs.createWriteStream(element_path);
-  req.pipe(out);
-
-  req.on('response', (data) => {
-    // Change the total bytes value to get progress later.
-    total_bytes = parseInt(data.headers['content-length']);
-  });
-
-  req.on('data', (chunk) => {
-    // Update the received bytes
-    received_bytes += chunk.length;
-
-    showProgress(received_bytes, total_bytes);
-  });
-
-  req.on('end', () => {
-    callback({
-      status: true,
-      msg: 'descarga finalizada',
-    });
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// PARA VER EL PROGRESO DE LA DESCARGA
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-function showProgress(received, total) {
-  const percentage = (received * 100) / total;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -757,13 +507,13 @@ async function escribirLogs(file, titulo, texto) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // GENERAR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; scale: string }) {
+function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; pageOrientation: string; printer: string }) {
   return new Promise(async (resolve, reject) => {
-    const FileName = await pathAdd('/' + params.fileName);
+    const pdfFileName = await pathAdd('/' + params.fileName);
 
     try {
-      fs.writeFile(FileName, params.base64, { encoding: 'base64' }, (err) => {
-        imprimir({ fileName: params.fileName, tipo: params.type, scale: params.scale })
+      fs.writeFile(pdfFileName, params.base64, { encoding: 'base64' }, (err) => {
+        imprimir({ fileName: params.fileName, tipo: params.type, pageOrientation: params.pageOrientation, printer: params.printer })
           .then((res) => resolve(res))
           .catch((err) => reject(err));
       });
@@ -776,33 +526,27 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // IMPRIMIR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function imprimir(params: { fileName: string; tipo: string; scale: string }) {
+function imprimir(params: { fileName: string; tipo: string; pageOrientation: string; printer: string }) {
   return new Promise(async (resolve, reject) => {
-    const serve_ = await getServer_();
-    const conf = await getConfig();
 
-    const sumatrapdf_path = serve_ ? await pathAdd('/print/lp.exe') : contruirPath('N:/sumastra/lp.exe');
+    const gsprint_path = await pathAdd(`/print/gsprint.exe`);
+    const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
+
     const file_path = await pathAdd(`/${params.fileName}`);
 
     puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
-
-    const orientation = params.tipo === 'reporte' ? 'Portrait' : 'landscape';
-    const paper_size = params.tipo === 'reporte' ? 'letter' : 'VJPOS';
-
-    const selected_printer = params.tipo === 'reporte' ? conf.printer_reportes_selected : conf.printer_caja_selected;
-    // noscale
-    let is_roll = false;
-    if (params.tipo != 'reporte') is_roll = conf.pages_sizes.facturacion.includes('roll');
-
-    const print_settings = is_roll ? '-print-settings "noscale"' : `-print-settings "${orientation},${params.scale},paper=${paper_size},simplex"`;
-    const comando = `"${sumatrapdf_path}" -print-to-default ${print_settings} -silent "${file_path}"`;
-    // const comando = `"${sumatrapdf_path}" -print-to ${selected_printer.name} -print-settings "${orientation},${params.scale},paper=${paper_size},simplex" -silent "${file_path}"`;
+    const comando = `${gsprint_path} -${params.pageOrientation} -ghostscript "${ghostscript_path}" -printer "${params.printer}" "${file_path}"`;
 
     cmd(comando, (res) => {
       if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
       else reject({ msg: 'Error imprimiento PDF!!', status: 'no', err: res });
     });
   });
+}
+
+function localFilePath(path) {
+  const local_path = serve ? `src/${path}` : `dist/${path}`;
+  return local_path;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -812,6 +556,7 @@ function imprimir(params: { fileName: string; tipo: string; scale: string }) {
 export function contruirPath(path_temp) {
   return isMacOs() ? path_temp : path_temp.split('/').join('\\');
 }
+
 export function pathAdd(addToPath = '', resource = true): Promise<string> {
   return new Promise<any>(async (resolve, reject) => {
     let path_temp;

@@ -32,7 +32,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     id_tabla: 'listado_marcas',
     padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.marca.update }, borrar: { show: true, permiso: this.permissions.marca.destroy } },
   };
   tablaMarcaComponent: any;
@@ -47,7 +47,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     id_tabla: 'listado_modelos',
     padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.modelo.update }, borrar: { show: true, permiso: this.permissions.modelo.destroy } },
   };
   tablaModeloComponent: any;

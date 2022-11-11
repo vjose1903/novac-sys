@@ -46,7 +46,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_viajes',
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaComponent;

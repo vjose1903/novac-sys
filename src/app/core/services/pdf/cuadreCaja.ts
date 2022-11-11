@@ -22,7 +22,7 @@ export function makePDF(data) {
       styles: styles_,
     };
 
-    const obj = { doc: dd, file: 'cuadre.pdf', type: 'base64' };
+    const obj = { doc: dd, file: 'cuadre.pdf', type: 'base64', pageOrientation:'portrait' };
     return obj;
   } catch (error) {
     return error;

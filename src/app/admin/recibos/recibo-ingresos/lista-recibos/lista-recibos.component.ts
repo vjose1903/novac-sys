@@ -11,6 +11,8 @@ import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
+import { ConfigI } from '../../../../core/typescript/config-interface';
+import { SingletonService } from '../../../../core/services/singleton.service';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
@@ -42,7 +44,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: (params) => this.getRecibos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
   tablaComponent;
 
@@ -51,13 +53,14 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   reciboClass = new ReciboC();
 
   permissions = Permisos;
-
+  configApp: ConfigI;
   constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
   async ngOnInit() {
     this._init_mixin({ component: 'lista_recibos', is_routing: true });
+    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.necesarioStart();
   }
 
@@ -200,6 +203,8 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         if (res.status === 'si') {
           const fileName = res.file;
           const base64 = res.base64;
+          const pageOrientation = res.pageOrientation;
+
           const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', height: '40rem', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           this.loadServ.isLoading.next(false);
@@ -219,7 +224,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
                 {
                   clase: 'btn btn-verde',
                   function: (instance) => {
-                    this.imprimir_base64(fileName, base64);
+                    this.imprimir_base64(fileName, base64, pageOrientation);
                     instance.closeModal(instance.id, 'cancel');
                   },
                   label: 'Imprimir',
@@ -238,8 +243,8 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     this.openNewModal(configModal);
   }
 
-  imprimir_base64(fileName, base64) {
-    const obj = { base64: base64, file: fileName, type: 'recibo_ingreso' };
+  imprimir_base64(fileName, base64, pageOrientation) {
+    const obj = { base64: base64, file: fileName, type: 'recibo_ingreso', printer: this.configApp.printer_selected.recibo_ingreso, pageOrientation: pageOrientation };
     try {
       PdfService.imprimirBase64(obj)
         .then(async (res) => {

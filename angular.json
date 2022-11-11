@@ -24,7 +24,6 @@
               "src/splash_config_error.html",
               "src/splash_db_error.html",
               "src/splash_docker_error.html",
-              "src/splash_sumastra_error.html",
               "src/splash.html",
               "src/favicon.ico",
               "src/favicon.icns",
@@ -49,7 +48,6 @@
               "node_modules/@fortawesome/fontawesome-free/css/regular.css",
               "node_modules/@fortawesome/fontawesome-free/css/brands.css",
               "node_modules/@fortawesome/fontawesome-free/css/fontawesome.css",
-
 
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/animate.css/animate.css",
