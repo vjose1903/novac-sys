@@ -20,23 +20,10 @@ import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.mo
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular.module';
 
 @NgModule({
-  declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent,  ReportesComponent],
-  imports: [
-    CommonModule,
-    LayoutRoutingModule,
-    PrimengModule,
-    TablasModule,
-    TabViewModule,
-    NgxBootstrapModule,
-    NgSelectModule,
-    FormsModule,
-    DirectivesModule,
-    PdfViewerModule,
-    ReactiveFormsModule,
-    NgxPermissionsModule.forChild(),
-
-  ],
+  declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
+  imports: [CommonModule, LayoutRoutingModule, PrimengModule, TablasModule, TabViewModule, NgxBootstrapModule, NgSelectModule, FormsModule, DirectivesModule, PdfViewerModule, ReactiveFormsModule, NgxPermissionsModule.forChild(), BtnIconModule],
 })
 export class LayoutModule {}

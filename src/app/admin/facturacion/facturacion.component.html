@@ -3,8 +3,26 @@
 </span>
 
 <div class="rowFacturacion">
-  <div class="colTitulo">
+  <div class="colTitulo d-flex">
     <h4 class="negrita mb-2">{{ titulo | titlecase }}</h4>
+
+    <div class="ml-3">
+      <btn-icon-circular [id]="'btnExtra'" [icon]="'fa-solid fa-ellipsis'" [size]="'size-md'" [tooltip]="'Opciones Extras'" [tooltipPosition]="'right'" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
+
+      <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs">
+        <ng-template pTemplate>
+          <div id="overlayExtra" class="containCamiones">
+            <ul class="overlayExtra" role="menu">
+              <li id="overlayExtra-{{ index_option }}" *ngFor="let option of optionesExtra; let index_option = index" role="menuitem" class="hoverlable">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span id="dropdown-item" class="mr-3 mb-0"> {{ option.label }} </span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </ng-template>
+      </p-overlayPanel>
+    </div>
     <!-- <h4 class="negrita mb-2">{{ modo_factura }}</h4> -->
   </div>
 
@@ -136,7 +154,17 @@
                   (blur)="checkCambiosModoyCondicionFactura($event.target)"
                 />
                 <div class="ml-3 position-relative">
-                  <i id="btnCamion" class="fas fa-truck-moving btn-circle-icon" (click)="openOverlay($event, overlayCamion)" style="z-index: 999999" pTooltip="Seleccionar camión" tooltipPosition="top"></i>
+                  <btn-icon-circular
+                    [id]="'btnCamion'"
+                    [icon_size]="'1.2rem'"
+                    [icon]="'fas fa-truck-moving'"
+                    [size]="'size-lg'"
+                    [tooltip]="'Seleccionar camión'"
+                    [tooltipPosition]="'top'"
+                    (clickFunction)="openOverlay($event, overlayCamion, 'camion')"
+                  >
+                  </btn-icon-circular>
+
                   <div class="indicadorCamion" [ngClass]="{ no_selected: !camionesSelected.length, selected: camionesSelected.length }">
                     <i class="fa-solid" [ngClass]="{ 'fa-x': !camionesSelected.length, 'fa-check': camionesSelected.length }"></i>
                   </div>

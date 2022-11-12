@@ -112,7 +112,17 @@
         </div>
       </div>
       <div class="col-6">
-        <i *ngIf="buscarPara.includes('nota')" class="fas fa-history btn-circle-icon" (click)="openSide()" [pTooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'" tooltipPosition="top"></i>
+        <btn-icon-circular
+          *ngIf="buscarPara.includes('nota')"
+          [id]="'btnNota'"
+          [icon]="'fas fa-history'"
+          [size]="'size-lg'"
+          [tooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
+          [tooltipPosition]="'top'"
+          (clickFunction)="openSide()"
+        >
+        </btn-icon-circular>
+
       </div>
     </div>
   </div>

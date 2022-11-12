@@ -12,9 +12,10 @@ import { TablasModule } from '../components/new_tablas/tablas.module';
 import { DetalleFacturaModule } from '../manipular facturas/detalle-factura/detalle-factura.module';
 import { BtncircularModule } from '../components/btncircular/btncircular.module';
 import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
+import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular.module';
 
 @NgModule({
   declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent],
-  imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, NgxBootstrapModule],
+  imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, NgxBootstrapModule, BtnIconModule],
 })
 export class FacturacionModule {}

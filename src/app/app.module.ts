@@ -25,6 +25,7 @@ import { ConfirmacionImprimirComponent } from './admin/facturacion/confirmacion-
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 
 
+
 defineLocale('es', esLocale);
 
 @NgModule({

@@ -46,13 +46,22 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   handleKeyboardEvent(event: any) {
     event.stopPropagation();
     const key = event.keyCode;
-    const secuenciasAceptadas = [teclasCode._control, teclasCode._P, teclasCode._G];
+    const secuenciasAceptadas = [teclasCode._control, teclasCode._P, teclasCode._G, teclasCode._E];
+    console.log('teclasCode._control ', teclasCode._control);
+    console.log('teclasCode._E ', teclasCode._E);
+
+    console.log('key ', key);
 
     if (event.type === 'keydown') {
       if (!this.secuenciaKeys.includes(key) && secuenciasAceptadas.includes(key)) this.secuenciaKeys.push(key);
     } else if (event.type === 'keyup') {
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
+
+      if (combinacion === `${teclasCode._control}_${teclasCode._E}`) {
+        if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
+        document.getElementById('btnExtra').click();
+      }
 
       if (combinacion === `${teclasCode._control}_${teclasCode._P}`) {
         if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
@@ -83,6 +92,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   condicion_fact;
   forma_pago;
 
+  optionesExtra = [];
   CuerpoFactura = [];
   DESCUENTO;
   BRUTO;
@@ -179,11 +189,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngAfterViewInit() {
-    console.log('ANDO AQUIII');
-
     Ss.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)).then((result) => (this.hasPermisoPreVenta = result));
     Ss.permissionsService.hasPermission(Object.values(this.permissions.cotizacion)).then((result) => (this.hasPermisoCotizacion = result));
-    Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermisoCamiones = result));
+    Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => {
+      this.hasPermisoCamiones = result;
+      if (this.hasPermisoCamiones) this.getCamiones();
+    });
   }
 
   verificateArchivo() {
@@ -245,7 +256,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         if (this.factServ.tipoDocumento == tipoDocFacturacion.venta) {
           this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
-          if (this.hasPermisoCamiones) this.getCamiones();
         } else {
           if (fun.hasValue(this.form)) this.form.reset();
         }
@@ -570,7 +580,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         if (sali_de == 'venta' && valor == 'adelantada' && nombre == 'Cliente contado') buscar = true;
 
-        if (sali_de == 'fecha_viaje') document.getElementById('btnCamion').click();
+        if (sali_de == 'fecha_viaje') {
+          this.getCamiones();
+          document.getElementById('btnCamion').click();
+        }
 
         if (buscar) this.abrirModalFiltro();
 
@@ -798,10 +811,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return res;
   }
 
-  openOverlay(event, overlay) {
+  openOverlay(event, overlay, tipo) {
+    console.log('event ', event);
+    console.log('overlay ', overlay);
+    console.log('tipo ', tipo);
+
     this.overlay = overlay;
     this.overlay.toggle(event);
-    setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+    if (tipo == 'camion') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
     if (event) event.stopPropagation();
   }
 
