@@ -172,18 +172,21 @@
                 </td>
                 <!--  ::::::::::::  PRECIO  ::::::::::::  -->
                 <td class="tiPRE p-0">
-                  <div class="form-group m-0" [pTooltip]="item_cuerpo.controls.bad_price.value ? (factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Costo' : 'Precio' + ' cambió') : ''" tooltipPosition="right">
-                    <input
-                      type="text"
-                      (blur)="revisarPrecio('pre', 'pre', index_cuerpo); calcularTotalRow(index_cuerpo)"
-                      (focus)="verificarSecuencia(index_cuerpo)"
-                      class="form-control entrada campoNumeros {{ factServ.tipoDocumento == tipoDocFacturacion.venta ? 'inPRE' : '' }}"
-                      (keyup.enter)="calcularTotalRow(index_cuerpo); fun.enfocarInput('cod-' + (index_cuerpo + 1))"
-                      id="pre-{{ index_cuerpo }}"
-                      formControlName="pre"
-                      [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.bad_price.value }"
-                      tabindex="-1"
-                    />
+                  <div class="form-group m-0" [pTooltip]="item_cuerpo.controls.bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
+                    <div class="precio-div">
+                      <i *ngIf="item_cuerpo.controls.bad_price.value" class="fa-solid {{ getInfoBadPrice(index_cuerpo).icon }} iconArrow"></i>
+                      <input
+                        type="text"
+                        (blur)="revisarPrecio('pre', 'pre', index_cuerpo); calcularTotalRow(index_cuerpo)"
+                        (focus)="verificarSecuencia(index_cuerpo)"
+                        class="form-control entrada campoNumeros {{ factServ.tipoDocumento == tipoDocFacturacion.venta ? 'inPRE' : '' }}"
+                        (keyup.enter)="calcularTotalRow(index_cuerpo); fun.enfocarInput('cod-' + (index_cuerpo + 1))"
+                        id="pre-{{ index_cuerpo }}"
+                        formControlName="pre"
+                        [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.bad_price.value }"
+                        tabindex="-1"
+                      />
+                    </div>
                   </div>
                 </td>
 

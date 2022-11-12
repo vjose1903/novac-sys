@@ -698,6 +698,18 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (event) event.stopPropagation();
   }
 
+  getInfoBadPrice(index) {
+    let res = { icon: undefined, tooltip: undefined };
+    const actual_price = (this.filasDetalle[index] as any).controls['actual_price'].value;
+    const precio = (this.filasDetalle[index] as any).controls['pre'].value;
+
+    res.icon = actual_price > precio ? 'fa-arrow-up' : 'fa-arrow-down';
+    const tipo = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Costo' : 'Precio';
+    res.tooltip = actual_price > precio ? `${tipo} subió` : `${tipo} bajó`;
+
+    return res;
+  }
+
   modalRemover(index, event?) {
     const name = (this.filasDetalle[index] as any).controls['des'].value;
     const cantidad = (this.filasDetalle[index] as any).controls['can'].value;
@@ -775,6 +787,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     (this.filasDetalle[params.index] as any).controls['can_ant'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['uni'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+
+    (this.filasDetalle[params.index] as any).controls['bad_price'].setValue(false);
+    (this.filasDetalle[params.index] as any).controls['actual_price'].setValue(undefined);
 
     setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
   }
