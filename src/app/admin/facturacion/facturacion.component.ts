@@ -47,33 +47,39 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     event.stopPropagation();
     const key = event.keyCode;
     const secuenciasAceptadas = [teclasCode._control, teclasCode._P, teclasCode._G, teclasCode._E];
-    console.log('teclasCode._control ', teclasCode._control);
-    console.log('teclasCode._E ', teclasCode._E);
 
-    console.log('key ', key);
-
-    if (event.type === 'keydown') {
+    if (event.type == 'keydown') {
       if (!this.secuenciaKeys.includes(key) && secuenciasAceptadas.includes(key)) this.secuenciaKeys.push(key);
-    } else if (event.type === 'keyup') {
+    } else if (event.type == 'keyup') {
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (combinacion === `${teclasCode._control}_${teclasCode._E}`) {
+      if (combinacion == `${teclasCode._control}_${teclasCode._E}`) {
         if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
         document.getElementById('btnExtra').click();
       }
 
-      if (combinacion === `${teclasCode._control}_${teclasCode._P}`) {
+      if (combinacion == `${teclasCode._control}_${teclasCode._P}`) {
         if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
         this.imprimirFactura();
       }
 
-      if (combinacion === `${teclasCode._control}_${teclasCode._G}`) {
+      if (combinacion == `${teclasCode._control}_${teclasCode._G}`) {
         if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
         this.archivarFactura();
       }
 
-      if (fun.hasValue(this.overlay)) this.mover_indicador_camion(key);
+      if (fun.hasValue(this.overlay?.item)) {
+        if (this.overlay.tipo == 'extra') {
+          if (this.optionesExtra.length > 0) {
+            const option = _.find(this.optionesExtra, { keyboardCode: key });
+            fun.desEnfocarInput(document.activeElement.id);
+
+            if (fun.hasValue(option)) this.selectOptionExtra(_.find(this.optionesExtra, { keyboardCode: key }), 'teclado');
+          }
+        }
+        if (this.overlay.tipo == 'camion') this.mover_indicador_camion(key);
+      }
     }
   }
 
@@ -93,6 +99,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   forma_pago;
 
   optionesExtra = [];
+  keyboardCodesEnabled = [];
   CuerpoFactura = [];
   DESCUENTO;
   BRUTO;
@@ -167,20 +174,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
-
-    this.rellenarVariables().then((res) => {
-      if (this.action == actionFacturacion.update) {
-        this.is_editando = true;
-        this.procesoRelleno({ id: this.idDocumento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.update });
-      } else if (this.action == actionFacturacion.bill_from_cotizacion) {
-        this.procesoRelleno({ id: this.idDocumento, tipo: 'venta', action: actionFacturacion.bill_from_cotizacion });
-      } else {
-        setTimeout(() => {
-          if (this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion) this.abrirModalFiltro();
-          else fun.enfocarInput('tipoFact');
-        }, 5);
-      }
-    });
   }
 
   ngOnDestroy(): void {
@@ -189,12 +182,83 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngAfterViewInit() {
-    Ss.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)).then((result) => (this.hasPermisoPreVenta = result));
-    Ss.permissionsService.hasPermission(Object.values(this.permissions.cotizacion)).then((result) => (this.hasPermisoCotizacion = result));
-    Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => {
-      this.hasPermisoCamiones = result;
-      if (this.hasPermisoCamiones) this.getCamiones();
+    this.validatePermisos().then((result) => {
+      this.rellenarVariables().then((res) => {
+        if (this.action == actionFacturacion.update) {
+          this.is_editando = true;
+          this.procesoRelleno({ id: this.idDocumento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.update });
+        } else if (this.action == actionFacturacion.bill_from_cotizacion) {
+          this.procesoRelleno({ id: this.idDocumento, tipo: 'venta', action: actionFacturacion.bill_from_cotizacion });
+        } else {
+          setTimeout(() => {
+            if (this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion) this.abrirModalFiltro();
+            else fun.enfocarInput('tipoFact');
+          }, 5);
+        }
+      });
+      //
+      this.makeOptionsExtra();
     });
+  }
+
+  validatePermisos() {
+    return new Promise<any>((resolve, reject) => {
+      const array_promises_permisos = [];
+
+      array_promises_permisos.push(Ss.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)));
+      array_promises_permisos.push(Ss.permissionsService.hasPermission(Object.values(this.permissions.cotizacion)));
+      array_promises_permisos.push(Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion));
+
+      Promise.all(array_promises_permisos).then((values) => {
+        for (let index = 0; index < values.length; index++) {
+          const has_permiso = values[index];
+
+          switch (index) {
+            case 0:
+              this.hasPermisoPreVenta = has_permiso;
+              break;
+            case 1:
+              this.hasPermisoCotizacion = has_permiso;
+              break;
+            case 2:
+              this.hasPermisoCamiones = has_permiso;
+              if (this.hasPermisoCamiones) this.getCamiones();
+              break;
+          }
+        }
+
+        resolve(true);
+      });
+    });
+  }
+
+  makeOptionsExtra() {
+    const config_options = [
+      { keyboardCode: undefined, key: undefined, code: tipoDocFacturacion.pre_venta, label: 'Seleccionar Pre-Venta', condition: this.hasPermisoPreVenta },
+      { keyboardCode: undefined, key: undefined, code: tipoDocFacturacion.cotizacion, label: 'Seleccionar Cotización', condition: this.hasPermisoCotizacion },
+    ];
+
+    for (let index = 0; index < config_options.length; index++) {
+      const config_option = config_options[index];
+
+      if (config_option.condition) {
+        config_option.key = this.optionesExtra.length + 1;
+        config_option.keyboardCode = teclasCode[`_${config_option.key}`];
+        this.keyboardCodesEnabled.push(teclasCode[`_${config_option.key}`]);
+        this.optionesExtra.push(config_option);
+      }
+    }
+  }
+
+  selectOptionExtra(option, where) {
+    console.log(' ');
+
+    console.log('option ', option);
+    console.log('this.keyboardCodesEnabled ', this.keyboardCodesEnabled);
+
+    if (this.keyboardCodesEnabled.includes(option.keyboardCode)) {
+      fun.logGreen('ENTROOO');
+    }
   }
 
   verificateArchivo() {
@@ -812,12 +876,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   openOverlay(event, overlay, tipo) {
-    console.log('event ', event);
-    console.log('overlay ', overlay);
-    console.log('tipo ', tipo);
+    this.overlay = {};
+    this.overlay['item'] = overlay;
+    this.overlay['tipo'] = tipo;
+    this.overlay['item'].toggle(event);
 
-    this.overlay = overlay;
-    this.overlay.toggle(event);
     if (tipo == 'camion') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
     if (event) event.stopPropagation();
   }
@@ -851,7 +914,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
           setTimeout(() => fun.enfocarInput('searchCamion'), 5);
         } else {
-          if (this.overlay) this.saliendoDeCamionOverlay();
+          if (fun.hasValue(this.overlay?.item)) this.saliendoDeCamionOverlay();
         }
       } else {
         setTimeout(() => fun.enfocarInput('searchCamion'), 5);
@@ -859,9 +922,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }, 250);
   }
 
-  cerrarOverlayCamion() {
+  cerrarOverlay() {
     this.filterCamion(this.copyCamiones);
-    this.overlay.hide();
+    this.overlay['item'].hide();
     this.camion_row = 0;
   }
 
@@ -892,12 +955,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura?.id)) this.abrirModalFiltro();
           else this.cuerpo.seleccionarCampoEnTurno();
 
-          this.cerrarOverlayCamion();
+          this.cerrarOverlay();
         } else {
           if (where == 'teclado') {
             fun.desEnfocarInput('searchCamion');
 
-            this.cerrarOverlayCamion();
+            this.cerrarOverlay();
           }
         }
       }

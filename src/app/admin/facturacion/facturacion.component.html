@@ -6,16 +6,18 @@
   <div class="colTitulo d-flex">
     <h4 class="negrita mb-2">{{ titulo | titlecase }}</h4>
 
-    <div class="ml-3">
+    <div *ngIf="optionesExtra.length > 0" class="ml-3">
       <btn-icon-circular [id]="'btnExtra'" [icon]="'fa-solid fa-ellipsis'" [size]="'size-md'" [tooltip]="'Opciones Extras'" [tooltipPosition]="'right'" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
       <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs">
         <ng-template pTemplate>
           <div id="overlayExtra" class="containCamiones">
             <ul class="overlayExtra" role="menu">
-              <li id="overlayExtra-{{ index_option }}" *ngFor="let option of optionesExtra; let index_option = index" role="menuitem" class="hoverlable">
+              <li id="overlayExtra-{{ option.key }}" *ngFor="let option of optionesExtra; let index_option = index" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
                 <div class="d-flex justify-content-between align-items-center">
-                  <span id="dropdown-item" class="mr-3 mb-0"> {{ option.label }} </span>
+                  <strong> {{ option.key }} - </strong> &nbsp;
+
+                  <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
                 </div>
               </li>
             </ul>
@@ -23,7 +25,6 @@
         </ng-template>
       </p-overlayPanel>
     </div>
-    <!-- <h4 class="negrita mb-2">{{ modo_factura }}</h4> -->
   </div>
 
   <div class="colCard">

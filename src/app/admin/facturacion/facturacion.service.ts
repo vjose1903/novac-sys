@@ -106,24 +106,25 @@ export class FacturacionService {
   }
 
   getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }, print?) {
-    if (print) console.log(' ');
-    if (print) console.log('params ', params);
-    if (print) console.log(' ');
-
+    const res = { descripcion: undefined, descripcion_short: undefined, has_Propietario: fun.hasValue(this.propietario_factura) };
     const actualPath = fun.getActualPath();
-    let documento;
 
     if ((params.metodo == tipoDocFacturacion.cotizacion || params.metodo == tipoDocFacturacion.pre_venta) && actualPath.includes('cotizacion')) {
-      documento = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre venta';
-    } else if (params.condicion_fact == 'Crédito') documento = 'Factura a Crédito';
-    else if (fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia == '01') documento = 'Factura con valor fiscal';
-    else if (params.modo_factura == 'adelantada') documento = 'Factura adelantada';
-    else if (params.is_viaje) documento = 'Factura de viaje';
+      res.descripcion = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre venta';
+    } else if (params.condicion_fact == 'Crédito') res.descripcion = 'Factura a Crédito';
+    else if (fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia == '01') res.descripcion = 'Factura con valor fiscal';
+    else if (params.modo_factura == 'adelantada') res.descripcion = 'Factura adelantada';
+    else if (params.is_viaje) res.descripcion = 'Factura de viaje';
     else {
-      if (params.metodo == tipoDocFacturacion.venta) documento = 'Factura de venta';
-      if (params.metodo == tipoDocFacturacion.compra) documento = 'Factura de compra';
+      if (params.metodo == tipoDocFacturacion.venta) {
+        res.descripcion = 'Factura de venta';
+        if (params.condicion_fact != 'Crédito') res.has_Propietario = true;
+      }
+      if (params.metodo == tipoDocFacturacion.compra) res.descripcion = 'Factura de compra';
     }
 
-    return { descripcion: documento, descripcion_short: documento?.split(' ')[0], has_Propietario: fun.hasValue(this.propietario_factura) };
+    if (fun.hasValue(res?.descripcion)) res.descripcion_short = res.descripcion.split(' ')[0];
+
+    return res;
   }
 }
