@@ -81,15 +81,19 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: 'string'; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean; fact_de: string }) {
+  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean; fact_de: string; pagada?: any }) {
     const valor_enc = btoa(args.valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
+    args.pagada ??= '0';
+
+    console.log('args ', args);
 
     const extra = {
-      afterPath: `params/${args.campo}/${VALOR_ENC}/${args.tipo_factura_id}/${args.adelantada}`,
-      parameters: { page: args.page, per_page: args.per_page, paginado: args.paginado, fact_de: args.fact_de },
+      afterPath: `custom/get_documentos/params`,
+      parameters: { page: args.page, per_page: args.per_page, paginado: args.paginado, fact_de: args.fact_de, pagada: args.pagada, campo: args.campo, valor: VALOR_ENC, tipo_factura_id: args.tipo_factura_id, is_adelantada: args.adelantada },
     };
-    return this.getAll(extra);
+
+    return this.dynamic(extra);
   }
 
   parseDataToPdf(data) {

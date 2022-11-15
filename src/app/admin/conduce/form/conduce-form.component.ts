@@ -2,8 +2,6 @@ import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
-
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
 import { FacturaC } from '../../facturacion/factura';

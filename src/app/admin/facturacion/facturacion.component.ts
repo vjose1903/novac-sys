@@ -1,3 +1,5 @@
+import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
+
 import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,7 +24,7 @@ import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
-import { ModalClass } from '../components/modal/modal-class';
+import { ButtonsI, ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
@@ -54,7 +56,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const combinacion = _.join(this.secuenciaKeys, '_');
       this.secuenciaKeys = [];
 
-      if (combinacion == `${teclasCode._control}_${teclasCode._E}`) {
+      if (this.factServ.tipoDocumento == tipoDocFacturacion.venta && combinacion == `${teclasCode._control}_${teclasCode._E}`) {
         if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
         document.getElementById('btnExtra').click();
       }
@@ -70,15 +72,18 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
 
       if (fun.hasValue(this.overlay?.item)) {
-        if (this.overlay.tipo == 'extra') {
+        console.log('key , ', key);
+
+        if (this.overlay?.tipo == 'extra') {
           if (this.optionesExtra.length > 0) {
             const option = _.find(this.optionesExtra, { keyboardCode: key });
+
             fun.desEnfocarInput(document.activeElement.id);
 
             if (fun.hasValue(option)) this.selectOptionExtra(_.find(this.optionesExtra, { keyboardCode: key }), 'teclado');
           }
         }
-        if (this.overlay.tipo == 'camion') this.mover_indicador_camion(key);
+        if (this.overlay?.tipo == 'camion') this.mover_indicador_camion(key);
       }
     }
   }
@@ -251,14 +256,34 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   selectOptionExtra(option, where) {
+    let openModal = true;
+    const modalConfig = { id: undefined, inputs: undefined, component: MenuOpcionesExtraComponent, header: undefined, botones: undefined, width: '57rem', height: '32rem' };
     console.log(' ');
 
     console.log('option ', option);
     console.log('this.keyboardCodesEnabled ', this.keyboardCodesEnabled);
 
     if (this.keyboardCodesEnabled.includes(option.keyboardCode)) {
+      modalConfig.id = 'factura_from_documento';
+
+      modalConfig.inputs = option;
+      modalConfig.botones = { cancelar: { show: true } };
+
+      if (option.code == tipoDocFacturacion.pre_venta) {
+        modalConfig.header = 'Seleccionar pre-venta';
+      }
+      if (option.code == tipoDocFacturacion.cotizacion) {
+        modalConfig.header = 'Seleccionar cotización';
+      }
+
       fun.logGreen('ENTROOO');
     }
+
+    if (openModal) {
+      this.openNewModal({ component: modalConfig.component, inputs: modalConfig.inputs, id: modalConfig.id, header: modalConfig.header, width: modalConfig.width, height: modalConfig.height, botones: modalConfig.botones });
+    }
+
+    if (fun.hasValue(this.overlay?.item)) this.cerrarOverlay();
   }
 
   verificateArchivo() {
@@ -313,7 +338,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         this.modo_factura = this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta ? this.factServ.tipoDocumento : this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion ? null : 'normal';
 
-        this.condicion_fact = this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta ? 'Crédito' : this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion ? null : 'Contado';
+        this.condicion_fact = this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta ? 'Crédito' : this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion ? 'Crédito' : 'Contado';
         this.forma_pago = this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta ? null : 'Efectivo';
 
         this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
@@ -616,14 +641,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  selectPreFactura(data, modalInstance) {
-    this.pre_factura_selected = data;
-
-    this.procesoRelleno(data, 'pre-factura');
-
-    modalInstance.closeModal(modalInstance.id, 'continuar');
-  }
-
   checkIfFacturacionEnProceso() {
     return this.CuerpoFactura.length > 0;
   }
@@ -858,21 +875,28 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   activarNombreDireccion() {
-    let res = false;
+    let is_disabled = false;
 
     if (this.factServ.tipoDocumento == tipoDocFacturacion.compra || (this.is_editando && (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.compra))) {
-      res = true;
+      is_disabled = true;
     } else {
-      res = false;
+      is_disabled = false;
 
-      if (this.is_adelantada || this.condicion_fact == 'Crédito' || this.modo_factura == 'viaje' || this.modo_factura == 'adelantada' || this.factServ.tipoFactura?.referencia == '01' || fun.hasValue(this.pre_factura_selected)) {
-        res = true;
+      if (
+        this.is_adelantada ||
+        (this.condicion_fact == 'Crédito' && this.factServ.tipoDocumento != tipoDocFacturacion.cotizacion) ||
+        this.modo_factura == 'viaje' ||
+        this.modo_factura == 'adelantada' ||
+        this.factServ.tipoFactura?.referencia == '01' ||
+        fun.hasValue(this.pre_factura_selected)
+      ) {
+        is_disabled = true;
       } else {
-        res = false;
+        is_disabled = false;
       }
     }
 
-    return res;
+    return is_disabled;
   }
 
   openOverlay(event, overlay, tipo) {
@@ -923,9 +947,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   cerrarOverlay() {
-    this.filterCamion(this.copyCamiones);
+    if (this.overlay['tipo'] == 'camion') {
+      this.filterCamion(this.copyCamiones);
+      this.camion_row = 0;
+    }
+
     this.overlay['item'].hide();
-    this.camion_row = 0;
+    this.overlay = undefined;
   }
 
   getCamionLabel(camion) {
@@ -1392,6 +1420,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async getDataFromModal(arg, search) {
+    console.log('arg ', arg);
+
     if (arg.modal_id === 'facturaPendiente') {
       this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -1418,6 +1448,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
 
       //
+    } else if (arg.modal_id == 'factura_from_documento') {
+      if (arg.tipo == tipoDocFacturacion.cotizacion) {
+        this.cotizacion_selected = arg.data;
+      } else if (arg.tipo == tipoDocFacturacion.pre_venta) {
+        this.pre_factura_selected = arg.data;
+      }
+
+      this.procesoRelleno(arg.data, arg.tipo);
+      //
     } else if (arg.modal_id == 'buscarCliente') {
       this.factServ.propietario_factura = arg.data;
 
@@ -1435,6 +1474,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       this.cuerpo.seleccionarCampoEnTurno();
     }
+  }
+
+  // TODO: borrar esto
+  selectPreFactura(data, modalInstance?) {
+    this.pre_factura_selected = data;
+
+    this.procesoRelleno(data, 'pre-factura');
+
+    if (fun.hasValue(modalInstance)) modalInstance.closeModal(modalInstance.id, 'continuar');
   }
 
   calcularNuevosPrecios(cant, precio) {
@@ -1474,7 +1522,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (this.condicion_fact == 'Crédito') {
       let fecha_venci;
 
-      if (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) {
+      if (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion) {
         fecha_venci = moment(new Date()).add(this.factServ.propietario_factura.limite_credito, 'days').format('YYYY-MM-DD');
       } else {
         fecha_venci = moment(this.fecha_vencimiento).format('YYYY-MM-DD');
@@ -1558,6 +1606,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
+
+    console.log('cabecera_fact ', cabecera_fact);
 
     if (this.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

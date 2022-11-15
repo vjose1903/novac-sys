@@ -6,6 +6,7 @@ $bodyfont: "Poppins";
 @import "./animateCss.scss";
 
 @import "./assets/my_styles/modal.scss";
+@import "./assets/my_styles/tablas.scss";
 @import "./assets/my_styles/forms.scss";
 @import "./assets/my_styles/btns.scss";
 @import "./assets/my_styles/overlayPanel.scss";
@@ -15,9 +16,12 @@ $bodyfont: "Poppins";
 * {
   font-family: "Poppins";
 }
+
 .h-inherit {
   max-height: inherit;
 }
+
+
 
 .si-wrap {
   flex-wrap: wrap;

@@ -6,7 +6,7 @@
   <div class="colTitulo d-flex">
     <h4 class="negrita mb-2">{{ titulo | titlecase }}</h4>
 
-    <div *ngIf="optionesExtra.length > 0" class="ml-3">
+    <div *ngIf="optionesExtra.length > 0 && factServ.tipoDocumento == tipoDocFacturacion.venta" class="ml-3">
       <btn-icon-circular [id]="'btnExtra'" [icon]="'fa-solid fa-ellipsis'" [size]="'size-md'" [tooltip]="'Opciones Extras'" [tooltipPosition]="'right'" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
       <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs">

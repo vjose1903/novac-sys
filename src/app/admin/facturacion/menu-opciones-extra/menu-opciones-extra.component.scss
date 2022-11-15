@@ -1,0 +1,19 @@
+.options_container {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-areas:
+    "options_filter"
+    "options_table";
+  grid-template-rows: min-content auto;
+
+  .options_filter {
+    grid-area: options_filter;
+    border-bottom: 1px solid #8080802b;
+  }
+
+  .options_table {
+    grid-area: options_table;
+    margin-top: 1rem;
+  }
+}

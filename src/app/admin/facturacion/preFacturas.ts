@@ -26,7 +26,7 @@ export class PreFacturaClass extends MixinClass {
   async buscarPreFactura(numero) {
     try {
       const result = { data: null, error: false };
-      const res = await this.facturaClass.getAll({ afterPath: `custom/pre_factura/${numero}`, parameters: { tipo: 'single', paginado: false } });
+      const res = await this.facturaClass.getAll({ afterPath: `custom/pre_venta/${numero}`, parameters: { tipo: 'single', paginado: false } });
       const pre_factura = res['data'];
 
       pre_factura.detalle_facturas = pre_factura.detalle_facturas.map((detalle) => {

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FacturacionComponent } from './facturacion.component';
+import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { RemoverArticuloComponent } from './cuerpo-factura/remover-articulo/remover-articulo.component';
 import { FacturacionRoutingModule } from './facturacion.routing';
@@ -15,7 +16,7 @@ import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
 import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular.module';
 
 @NgModule({
-  declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent],
+  declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent, MenuOpcionesExtraComponent],
   imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, NgxBootstrapModule, BtnIconModule],
 })
 export class FacturacionModule {}
