@@ -62,7 +62,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
         estilos: [{ width: '9%' }],
         iconsArray: [
           { key: 'view', tooltip: 'Ver Documento', text_color: 'viewColor' },
-          { key: 'rellenar_factura', tooltip: 'Crear Factura desde Cotización' },
+          { key: 'rellenar_factura', tooltip: 'Crear Factura desde Cotización', disable: [{ kind: 'has_value', target: 'fecha_completada' }] },
         ],
       },
     ],
@@ -236,7 +236,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
               this.tableClickIcon({ id_tabla: 'mostrar_documento', columnKey: 'actions', iconKey: 'rellenar_factura', data: dataFactura });
             },
             label: 'Facturar',
-            disable: false,
+            disable: { function: () => fun.hasValue(dataFactura.fecha_completada) },
           });
         }
 

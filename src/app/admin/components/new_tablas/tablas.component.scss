@@ -149,10 +149,10 @@
 
                 .span_icon {
                   &.icon_disable {
-                    pointer-events: none !important;
+                    // pointer-events: none !important;
                     > .iconPress {
-                      filter: brightness(0.6);
-                      cursor: pointer !important;
+                      color: #b1b1b15c !important;
+                      cursor: not-allowed !important;
                     }
                   }
                 }

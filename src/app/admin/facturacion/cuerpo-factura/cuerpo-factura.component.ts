@@ -40,7 +40,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   indexRemove;
 
   @Input() factura;
-  @Input() action;
   @Input() fechaFactura;
   @Input() modo_factura;
   @Input() pre_factura_selected;
@@ -307,7 +306,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   // =============================================
   //  MODIFICAR FACTURA
   // =============================================
-  async llenenarCuerpoFactura(rows) {
+  async rellenarCuerpoFactura(rows) {
     return new Promise<any>((resolve, reject) => {
       this.rellenarVariables()
         .then(async (res) => {
@@ -348,8 +347,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   llenarFilas(row, articulo, index) {
     const campos = (this.filasDetalle[index] as any).controls;
-    console.log(' ');
-    console.log('row ', row);
 
     campos['pre'].setValue(this.factServ.tipoDocumento == tipoDocFacturacion.compra ? fun.numFormatTwoDecimals(row.costo) : fun.numFormatTwoDecimals(row.precio));
     campos['costo'].setValue(fun.numFormatTwoDecimals(row.costo));
@@ -679,7 +676,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   getActualPrice(index, event?) {
     const actual_price = (this.filasDetalle[index] as any).controls['actual_price'].value;
-    console.log('actual_price ', actual_price);
 
     const siFunction = (instance) => {
       const campos = (this.filasDetalle[index] as any).controls;

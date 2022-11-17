@@ -116,6 +116,22 @@ export class NewModalComponent implements OnInit {
     // const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
   }
 
+  disabledButton(btnConfig) {
+    let res = false;
+
+    if (_.has(btnConfig, 'disable')) {
+      if (typeof btnConfig.disable == 'boolean') return btnConfig.disable;
+
+      res = btnConfig.disable['function']();
+    }
+
+    return res;
+  }
+
+  getButtonTooltip(btnConfig) {
+    return _.has(btnConfig, 'tooltip') && fun.hasValue(btnConfig.tooltip) ? btnConfig.tooltip : '';
+  }
+
   onHideModal(id_) {
     MODALCONFIG.next({ show: false, id: id_ });
   }

@@ -90,7 +90,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   fechaFactura;
   FechaFacturaMostrar: any;
-  action: any;
+
   idDocumento: any;
   factura_a_rellenar: FacturasI;
   form: FormGroup;
@@ -189,10 +189,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ngAfterViewInit() {
     this.validatePermisos().then((result) => {
       this.rellenarVariables().then((res) => {
-        if (this.action == actionFacturacion.update) {
+        if (this.factServ.action == actionFacturacion.update) {
           this.is_editando = true;
           this.procesoRelleno({ id: this.idDocumento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.update });
-        } else if (this.action == actionFacturacion.bill_from_cotizacion) {
+        } else if (this.factServ.action == actionFacturacion.bill_from_cotizacion) {
           this.procesoRelleno({ id: this.idDocumento, tipo: 'venta', action: actionFacturacion.bill_from_cotizacion });
         } else {
           setTimeout(() => {
@@ -318,7 +318,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando] = Array(4).fill(false);
         [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
-        [this.numero_pre_factura, this.NCFcompra, this.pre_factura_selected, this.cotizacion_selected, this.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] =
+        [this.numero_pre_factura, this.NCFcompra, this.pre_factura_selected, this.cotizacion_selected, this.factServ.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] =
           Array(10).fill(undefined);
 
         this.CuerpoFactura.length = 0;
@@ -329,7 +329,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.fechaFactura = {};
         this.CostoYgasto = '';
 
-        this.action = this.route.snapshot.params['action'];
+        this.factServ.action = this.route.snapshot.params['action'];
         this.idDocumento = this.route.snapshot.params['id'];
 
         this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
@@ -359,7 +359,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const actualPath = fun.getActualPath();
       const res = { same_modulo: true };
 
-      if (!actualPath.includes(factura.tipo) || !this.action.includes(factura.action)) {
+      if (!actualPath.includes(factura.tipo) || !this.factServ.action.includes(factura.action)) {
         const action_route = fun.hasValue(factura.action) ? factura?.action : 'new';
         const id_route = fun.hasValue(factura.cotizacion) ? factura?.cotizacion : '0';
 
@@ -381,9 +381,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       try {
         this.checkPath(factura).then((res) => {
           this.rellenarCabezaFactura(factura, action).then((factura_rellenada) => {
-            this.cuerpo.llenenarCuerpoFactura(factura_rellenada['detalle_facturas']).then((res) => {
+            this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas']).then((res) => {
               setTimeout(() => {
-                this.getCuerpoFactura({ tipo: 'cuerpo', data: factura_rellenada['detalle_facturas'] });
+                // this.getCuerpoFactura({ tipo: 'cuerpo', data: factura_rellenada['detalle_facturas'] });
                 this._sideBarOpened = false;
 
                 this.cuerpo.seleccionarCampoEnTurno();
@@ -447,7 +447,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.CostoYgasto = factura.tipo == 'compra' ? factura.costoYgasto : '';
 
           if (factura.tipo == 'pre_venta') this.modo_factura = tipoDocFacturacion.pre_venta;
-          else if (factura.tipo == 'cotizacion') this.modo_factura = this.action == actionFacturacion.bill_from_cotizacion ? 'normal' : tipoDocFacturacion.cotizacion;
+          else if (factura.tipo == 'cotizacion') this.modo_factura = this.factServ.action == actionFacturacion.bill_from_cotizacion ? 'normal' : tipoDocFacturacion.cotizacion;
           else if (factura.is_viaje) this.modo_factura = 'viaje';
           else if (factura.is_adelantada) this.modo_factura = 'adelantada';
           else this.modo_factura = 'normal';
@@ -1065,8 +1065,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
   cancelarFactura() {
     let si = (instance) => {
-      if (this.action !== actionFacturacion.update) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/new/0`).then((res_router) => this.resetVariables());
-      else if (this.action == actionFacturacion.update || this.action == actionFacturacion.bill_from_cotizacion) this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
+      if (this.factServ.action !== actionFacturacion.update) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/new/0`).then((res_router) => this.resetVariables());
+      else if (this.factServ.action == actionFacturacion.update || this.factServ.action == actionFacturacion.bill_from_cotizacion) this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
 
       this.closeModal(instance);
     };
@@ -1158,9 +1158,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               condicion_fact: this.condicion_fact,
               metodo: this.factServ.tipoDocumento,
               total_factura: this.TOTAL,
-              efectivo: this.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
+              efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
               tipo_modal: 'devuelta',
-              formaPago: this.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
+              formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
               factura_de: this.factServ.tipoDocumento,
               cambios_articulos: articulos_a_cambiar,
             };
@@ -1191,7 +1191,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   formarFacturaAGuardar() {
     const factura_a_guardar = this.formarData();
-    factura_a_guardar['action'] = this.action;
+    factura_a_guardar['action'] = this.factServ.action;
     factura_a_guardar['factura_pendiente'] = this.factura_pendiente;
     return factura_a_guardar;
   }
@@ -1273,6 +1273,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.CuerpoFactura = arg.data;
 
       // TODO: aqui tengo que revisar que pasa en facturacion con el itbis
+
       if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) {
         this.CuerpoFactura.map((detalle) => {
           detalle.itbis = this.configApp.calcular_itbis ? fun.desformatear(detalle.itbis) : 0;
@@ -1281,6 +1282,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
           return detalle;
         });
+
+        console.log("this.CuerpoFactura ", this.CuerpoFactura);
+
       }
     }
 
@@ -1466,9 +1470,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.factServ.tipoDocumento != tipoDocFacturacion.cotizacion) {
         if (balance > maxCred - 1000 && balance < maxCred) {
-          fun.toastWarning(`Credito actual RD$${this.formatoNumero(balance)}  limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
+          fun.toastWarning(`Credito actual RD$${this.formatoNumero(balance)} limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
         } else if (balance > maxCred) {
-          fun.toastError(`Credito actual RD$${this.formatoNumero(balance)}            limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
+          fun.toastError(`Credito actual RD$${this.formatoNumero(balance)} limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
         }
       }
 
@@ -1609,7 +1613,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     console.log('cabecera_fact ', cabecera_fact);
 
-    if (this.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
+    if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
 
     if (this.factura_guardada) this.revisarLocalStorage();
@@ -1621,7 +1625,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       this.layServ.nextCheckCuadreToday(true);
 
-      if (this.action == actionFacturacion.update) this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
+      if (this.factServ.action == actionFacturacion.update) this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
       else await this.resetVariables();
     });
   }

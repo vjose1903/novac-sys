@@ -7,6 +7,7 @@ import * as _ from 'lodash';
   providedIn: 'root',
 })
 export class FacturacionService {
+  action;
   tipoDocumento;
   tipoFacturaReferenciaSelected: string;
   tipoFactura: TipoFacturaI;

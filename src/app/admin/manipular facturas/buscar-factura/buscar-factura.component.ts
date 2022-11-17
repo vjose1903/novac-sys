@@ -296,6 +296,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       res['data'].forEach((fact) => {
         const pago_a_tiempo = this.getIsPagoAtiempo(fact);
         const estatus = this.getIsActiveInfo(fact);
+        const documento_descripcion = fact?.tipo == tipoDocFacturacion.cotizacion ? 'Cotización' : fact?.tipo == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
 
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
         fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
@@ -308,6 +309,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.view = 'far fa-eye-slash';
         fact.delete = 'far fa-trash-alt';
         fact.make_bill = 'fas fa-external-link-alt';
+
+        fact.coti_preventa_tooltip = fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`;
 
         fact.is_selected = this.idsFacturasSeleccionadas.includes(fact.id);
         fact.tooltip_select = 'Seleccionar Factura';
@@ -363,17 +366,27 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  getIsActiveInfo(factura) {
+  getIsActiveInfo(documento) {
     let res = { icon: null, tooltip: null, color: null };
 
     if (this.tipo_documento_selected == 'compra') {
-      res.icon = factura.estado ? (factura.balance < 1 ? 'fas fa-check' : 'fas fa-exclamation-triangle') : 'fas fa-times';
-      res.tooltip = factura.estado ? (factura.balance < 1 ? 'Factura saldada' : 'Factura pendiente de pago') : 'Factura anulada';
-      res.color = factura.estado ? (factura.balance < 1 ? 'green' : 'yellow') : 'red';
+      res.icon = documento.estado ? (documento.balance < 1 ? 'fas fa-check' : 'fas fa-exclamation-triangle') : 'fas fa-times';
+      res.tooltip = documento.estado ? (documento.balance < 1 ? 'Factura saldada' : 'Factura pendiente de pago') : 'Factura anulada';
+      res.color = documento.estado ? (documento.balance < 1 ? 'green' : 'yellow') : 'red';
     } else {
-      res.icon = factura.estado ? 'fas fa-check' : 'fas fa-times';
-      res.tooltip = factura.estado ? 'Factura Activa' : 'Factura Inactiva';
-      res.color = factura.estado ? 'green' : 'red';
+      if (documento.tipo == tipoDocFacturacion.cotizacion || documento.tipo == tipoDocFacturacion.pre_venta) {
+        const documento_descripcion = documento.tipo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre-Venta';
+
+        res.icon = documento.estado ? (fun.hasValue(documento.fecha_completada) ? 'fas fa-check' : 'fas fa-exclamation-triangle') : 'fas fa-times';
+        res.tooltip = documento.estado ? (fun.hasValue(documento.fecha_completada) ? `${documento_descripcion} facturada` : `${documento_descripcion} sin facturar`) : `${documento_descripcion} Inactiva`;
+        res.color = documento.estado ? (fun.hasValue(documento.fecha_completada) ? 'green' : 'yellow') : 'red';
+
+        //
+      } else {
+        res.icon = documento.estado ? 'fas fa-check' : 'fas fa-times';
+        res.tooltip = documento.estado ? 'Factura Activa' : 'Factura Inactiva';
+        res.color = documento.estado ? 'green' : 'red';
+      }
     }
     return res;
   }
@@ -642,8 +655,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
               instance.closeModal(instance.id, 'mostrarFactura');
               this.tableClickIcon({ id_tabla: 'facturas_params', columnKey: 'actions', iconKey: 'make_bill', data: dataFactura });
             },
+            tooltip: fun.hasValue(dataFactura.fecha_completada) ? 'Cotización ya ha sido facturada' : null,
             label: 'Facturar',
-            disable: false,
+            disable: {
+              function: () => fun.hasValue(dataFactura.fecha_completada),
+            },
           });
 
           // id_tabla == 'facturas_params'

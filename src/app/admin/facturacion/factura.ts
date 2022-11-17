@@ -109,6 +109,7 @@ export class FacturaC extends CrudG<FacturasI> {
         'numero_factura',
         'devuelta',
         'estado',
+        'fecha_completada',
         'fecha_equivalente',
         'fecha_valida',
         'fecha_vencimiento',

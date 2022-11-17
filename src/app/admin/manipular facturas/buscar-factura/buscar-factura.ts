@@ -82,7 +82,7 @@ export class BuscarFacturaC {
           estilos: [{ width: '9%' }],
           iconsArray: [
             { key: 'view', tooltip: 'Ver Cotización', text_color: 'viewColor' },
-            { key: 'make_bill', tooltip: 'Crear Factura desde Cotización' },
+            { key: 'make_bill', rowTooltip: 'coti_preventa_tooltip', disable: [{ kind: 'has_value', target: 'fecha_completada' }] },
             { key: 'delete', tooltip: 'Anular Cotización' },
           ],
         },
