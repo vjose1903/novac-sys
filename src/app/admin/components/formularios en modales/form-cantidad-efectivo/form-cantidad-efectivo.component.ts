@@ -6,7 +6,7 @@ import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { SharedService } from '../../../../core/services/shared.service';
 import { ConfigI } from '../../../../core/typescript/config-interface';
-import { SingletonService } from '../../../../core/services/singleton.service';
+import { Ss } from '../../../../core/services/singleton.service';
 import { teclasCode } from '../../../../core/typescript/constantes';
 
 @Component({
@@ -53,11 +53,11 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+      this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
       this.handleDefaultSwitch();
 
-      if (this.factura_de != 'compra') this.enfocarInput('inputEfectivo');
+      if (this.factura_de != 'compra') fun.enfocarInput('inputEfectivo');
 
       if (this.factura_de == 'compra' && !this.inputs.cambios_articulos) this.disableBtnConfirm(false);
       this.validarForm('init');
@@ -76,12 +76,12 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   saltar(campo, valor?) {
     if (campo === 'formaPago') {
-      this.enfocarInput(campo);
+      fun.enfocarInput(campo);
     }
     if (campo === 'send') {
       if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < fun.desformatear(this.inputs.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
-        this.enfocarInput('inputEfectivo');
+        fun.enfocarInput('inputEfectivo');
       } else {
         this.btn_aceptar();
       }

@@ -8,6 +8,19 @@ import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 
+export enum tipoDocFacturacion {
+  pre_venta = 'pre_venta',
+  venta = 'venta',
+  compra = 'compra',
+  cotizacion = 'cotizacion',
+}
+
+export enum actionFacturacion {
+  new = 'new',
+  update = 'update',
+  bill_from_cotizacion = 'bill_from_cotizacion',
+}
+
 export class FacturaC extends CrudG<FacturasI> {
   constructor() {
     super('cabecera_facturas');
@@ -64,20 +77,23 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   getFacturaById(id: number) {
-    return new Promise((resolve) => this.getOne(id).then((res) => resolve(res)));
+    const extra = { parameters: { actual_price: true } };
+    return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: 'string'; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean; fact_de: string }) {
-    // `params/${campo}/${VALOR_ENC}/${tipo_factura_id}/${adelantada}?page=${page}&per_page=${per_page}&paginado=${paginado}`
-
+  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean; fact_de: string; pagada?: any }) {
     const valor_enc = btoa(args.valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
+    args.pagada ??= '0';
+
+    console.log('args ', args);
 
     const extra = {
-      afterPath: `params/${args.campo}/${VALOR_ENC}/${args.tipo_factura_id}/${args.adelantada}`,
-      parameters: { page: args.page, per_page: args.per_page, paginado: args.paginado },
+      afterPath: `custom/get_documentos/params`,
+      parameters: { page: args.page, per_page: args.per_page, paginado: args.paginado, fact_de: args.fact_de, pagada: args.pagada, campo: args.campo, valor: VALOR_ENC, tipo_factura_id: args.tipo_factura_id, is_adelantada: args.adelantada },
     };
-    return this.getAll(extra);
+
+    return this.dynamic(extra);
   }
 
   parseDataToPdf(data) {
@@ -93,6 +109,7 @@ export class FacturaC extends CrudG<FacturasI> {
         'numero_factura',
         'devuelta',
         'estado',
+        'fecha_completada',
         'fecha_equivalente',
         'fecha_valida',
         'fecha_vencimiento',
@@ -120,12 +137,11 @@ export class FacturaC extends CrudG<FacturasI> {
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
 
-      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente);
+      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format();
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
       data_parsed.total = data_parsed.total_factura;
 
       data_parsed.contenido_reporte.map((detalle) => {
-
         detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
         return detalle;
       });
@@ -143,7 +159,7 @@ export class FacturaC extends CrudG<FacturasI> {
       width: '30rem',
       height: '10rem',
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
@@ -163,7 +179,7 @@ export class FacturaC extends CrudG<FacturasI> {
             header: 'MOSTRAR FACTURA',
             width: '900px',
             botones: {
-              ...ModalClass.noShowAceptarCancelarButtons,
+              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
             },
           };
@@ -189,26 +205,35 @@ export class FacturasAplicadasC extends CrudG<any> {
   }
 }
 
-export enum tipo_factura_id {
-  Factura_sin_comprobante = 1,
-  Factura_con_valor_fiscal = 2,
-  Factura_de_consumo = 3,
-  Nota_de_debito = 4,
-  Nota_de_credito = 5,
-  Comprobante_de_compras = 6,
-  Registro_de_unico_ingreso = 7,
-  Comprobante_para_gastos_menores = 8,
-  Comprobante_de_regimen_especiales = 9,
-  Comprobante_gubernamental = 10,
-  Comprobante_para_exportaciones = 11,
-  Comprobantes_para_pago_al_exterior = 12,
-  Venta_Contado = 13,
-  Compra = 14,
-  Conduce = 15,
-  Produccion = 16,
-  Recibo_ingreso = 17,
-  Venta_Credito = 18,
-  pre_venta = 19,
+export enum tFacturaD {
+  factura_sin_comprobante = 'Factura sin comprobante',
+  factura_con_valor_fiscal = 'Factura con valor fiscal',
+  factura_de_consumo = 'Factura de consumo',
+  nota_de_debito = 'Nota de debito',
+  nota_de_credito = 'Nota de credito',
+  comprobante_de_compras = 'Comprobante de compras',
+  registro_de_unico_ingreso = 'Registro de unico ingreso',
+  comprobante_para_gastos_menores = 'Comprobante para gastos menores',
+  comprobante_de_regimen_especiales = 'Comprobante de regimen especiales',
+  comprobante_gubernamental = 'Comprobante gubernamental',
+  comprobante_para_exportaciones = 'Comprobante para exportaciones',
+  comprobantes_para_pago_al_exterior = 'Comprobantes para pago al exterior',
+  venta_contado = 'Venta Contado',
+  compra = 'Compra',
+  conduce = 'Conduce',
+  produccion = 'Produccion',
+  recibo_ingreso = 'Recibo_ingreso',
+  venta_credito = 'Venta Credito',
+  pre_venta = 'pre_venta',
+  cotizacion = 'cotizacion',
+}
+
+export interface TipoFacturaI {
+  id: number;
+  descripcion: string;
+  referencia: string;
+  updated_at: any;
+  created_at: any;
 }
 export interface FacturasI {
   id: number;

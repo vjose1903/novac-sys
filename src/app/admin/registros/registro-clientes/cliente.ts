@@ -1,5 +1,5 @@
 import { Permisos } from './../../../core/typescript/permisos';
-import { SingletonService } from './../../../core/services/singleton.service';
+import { Ss } from './../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ConfigureModalI, ModalClass } from '../../components/modal/modal-class';
@@ -10,6 +10,8 @@ export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
   }
+
+
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
@@ -40,7 +42,7 @@ export class ClienteC extends CrudG<any> {
   }
 
   static async requestReporte(reporteParams, pdfParams) {
-    let hasPermisoPreVenta = await SingletonService.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
+    let hasPermisoPreVenta = await Ss.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
 
     let objTipo = { cuentas_cobrar_cliente: 1, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
     let tipo;
@@ -92,7 +94,7 @@ export class ClienteC extends CrudG<any> {
       component: BuscarClienteSuplidorComponent,
       width: '900px',
       height: '500px',
-      botones: { ...ModalClass.noShowAceptarCancelarButtons, cancelar: { show: true, disable: false } },
+      botones: { ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons), cancelar: { show: true, disable: false } },
     };
     return objModal;
   }

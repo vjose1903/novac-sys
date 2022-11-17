@@ -33,7 +33,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         estilos: [{ width: '5%' }, { color: 'var(--transparente00)' }],
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
-          { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' },
+          { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
         ],
       },
       { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '20%' }] },
@@ -46,7 +46,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_viajes',
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaComponent;
@@ -156,17 +156,17 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
       const fechaA = moment().format('YYYY-MM-DD');
       res.data.forEach((viaje) => {
-        const pago_a_tiempo = viaje.condicion === 'Contado' ? true : viaje.fecha_vencimiento > fechaA ? true : false;
+        const pago_a_tiempo = viaje.condicion == 'Contado' ? true : viaje.fecha_vencimiento > fechaA ? true : false;
 
         viaje.is_active = viaje.fecha_completada ? 'fas fa-check' : viaje.pagos.length > 0 ? 'far fa-check-square' : 'far fa-square';
-        viaje.colorIsActive = viaje.fecha_completada ? 'green' : viaje.pagos.length > 0 ? 'yellow' : 'red';
+        viaje.is_active_color = viaje.fecha_completada ? 'green' : viaje.pagos.length > 0 ? 'yellow' : 'red';
         viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.pagos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
         viaje.ver = 'far fa-eye';
 
         viaje.customStyles = {
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 5% !important; padding: 0.6rem 0rem !important' },
-            { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'colorIsActive' },
+            { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
             { key: 'ver', estilos: 'font-size: 1rem !important' },
           ],
           fecha: { width: '20%' },
@@ -290,7 +290,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           header: 'Cantidad de efectivo',
           width: '34.375rem',
           botones: {
-            ...ModalClass.noShowAceptarCancelarButtons,
+            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
               {
                 clase: 'btn btn-blanco mr-2',
@@ -336,7 +336,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         ${obj.texto}
       </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {

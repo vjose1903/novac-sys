@@ -12,7 +12,7 @@ import { Permisos } from '../../../../core/typescript/permisos';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { ConfigI } from '../../../../core/typescript/config-interface';
-import { SingletonService } from '../../../../core/services/singleton.service';
+import { Ss } from '../../../../core/services/singleton.service';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
@@ -60,7 +60,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   async ngOnInit() {
     this._init_mixin({ component: 'lista_recibos', is_routing: true });
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.necesarioStart();
   }
 
@@ -173,7 +173,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -217,7 +217,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
             width: '900px',
             height: obj_pdf.height,
             botones: {
-              ...ModalClass.noShowAceptarCancelarButtons,
+              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
                 { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },

@@ -1,5 +1,5 @@
 import { ConfigI } from './../../../core/typescript/config-interface';
-import { SingletonService } from './../../../core/services/singleton.service';
+import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
@@ -85,7 +85,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true });
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.getConfig({ isPromise: false });
 
     this.idsFacturas = JSON.parse(this.activeRoute.snapshot.params['ids']);
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
@@ -251,7 +251,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         if (this.tipoNota == 'credito') {
           if (cant_nota > params.data.cant) {
             fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
-            this.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
+            fun.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
           } else {
             params.data.cant_nota = cant_nota;
             this.sumarTotalRow(params);
@@ -272,7 +272,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
         if (fun.hasValue(msg)) {
           fun.toastInfo(msg, 'AVISO');
-          this.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
+          fun.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
 
           return;
         } else {
@@ -373,7 +373,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           header: 'Confirmación',
           width: '30rem',
           botones: {
-            ...ModalClass.noShowAceptarCancelarButtons,
+            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
               { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
               { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
@@ -433,7 +433,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           {

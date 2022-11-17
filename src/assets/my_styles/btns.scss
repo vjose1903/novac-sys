@@ -1,5 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
+button:disabled {
+  cursor: not-allowed !important;
+}
+
 // =====================================================================================================================================================================
 // ICONO             ===================================================================================================================================================
 // =====================================================================================================================================================================
@@ -34,25 +38,6 @@
       filter: brightness(0.6);
       cursor: pointer;
     }
-  }
-
-  &.disable {
-    background: #7a7a7a2e;
-    color: #b1b1b1a4;
-
-    pointer-events: none;
-  }
-}
-
-.btn-circle-icon {
-  font-size: 1.5rem;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.5s;
-  background-color: var(--primary02);
-  &:hover {
-    filter: brightness(0.6);
-    cursor: pointer;
   }
 
   &.disable {

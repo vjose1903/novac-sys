@@ -22,7 +22,7 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit, 
 
   ngOnInit(): void {
     this.createForm();
-    this.enfocarInput('pass');
+    fun.enfocarInput('pass');
   }
 
   createForm() {

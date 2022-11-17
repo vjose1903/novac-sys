@@ -17,7 +17,11 @@
           <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.codigo }}">{{ tipo.descripcion }}</option>
         </select>
 
-        <i class="fas fa-print btn-circle-icon ml-3 btnReporte" (click)="makeReporte()" style="z-index: 999999" pTooltip="Reporte de inventario" tooltipPosition="right"></i>
+        <div class="mr-3" style="margin-top: 0.2rem">
+          <btn-icon-circular [id]="'btnNota'" [icon]="'fas fa-print'" [size]="'size-lg'" [tooltip]="'Reporte de inventario'" [tooltipPosition]="'right'" (clickFunction)="makeReporte()"> </btn-icon-circular>
+        </div>
+
+        <!-- <i class=" btn-circle-icon size-lg  btnReporte" (click)="makeReporte()" style="z-index: 999999" pTooltip="" tooltipPosition="right"></i> -->
       </div>
     </div>
   </div>

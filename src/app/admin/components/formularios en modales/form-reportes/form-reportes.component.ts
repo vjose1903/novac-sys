@@ -1,5 +1,6 @@
+import { tFacturaD } from './../../../facturacion/factura';
 import { Permisos } from './../../../../core/typescript/permisos';
-import { SingletonService } from './../../../../core/services/singleton.service';
+import { Ss } from './../../../../core/services/singleton.service';
 import { EventEmitter } from '@angular/core';
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -12,7 +13,6 @@ import { ClienteC } from '../../../registros/registro-clientes/cliente';
 import { ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
-import { tipo_factura_id } from '../../../facturacion/factura';
 
 @Component({
   selector: 'app-form-reportes',
@@ -137,8 +137,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.tipos = [
-        { label: 'Crédito', id: tipo_factura_id.Nota_de_credito },
-        { label: 'Dédito', id: tipo_factura_id.Nota_de_debito },
+        { label: 'Crédito', id: Ss.factServ.tipoFacturaId(tFacturaD.nota_de_credito) },
+        { label: 'Dédito', id: Ss.factServ.tipoFacturaId(tFacturaD.nota_de_debito) },
         { label: 'Todas', id: 0 },
       ];
     } else if (this.tipo_reporte == 'ventas_productos') {
@@ -164,7 +164,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       this.setValidator('desde');
       this.setValidator('hasta');
 
-      SingletonService.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => {
+      Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => {
         this.tipos = [{ id: 'normal', label: 'Normal' }];
         this.form.controls.tipo.setValue('normal');
 

@@ -222,7 +222,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   saltar(campo) {
-    if (campo != 'send') this.enfocarInput(campo);
+    if (campo != 'send') fun.enfocarInput(campo);
     else {
       if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
     }
@@ -316,7 +316,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
         ${obj.texto}
       </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {

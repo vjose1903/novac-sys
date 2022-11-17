@@ -11,7 +11,7 @@ import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota
 import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
-import { SingletonService } from '../core/services/singleton.service';
+import { Ss } from '../core/services/singleton.service';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
 import { ConfigI } from '../core/typescript/config-interface';
@@ -33,7 +33,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   imgLogo;
 
   requestClass = new RequestC();
-  configServ = SingletonService.configServ;
+  configServ = Ss.configServ;
   configApp: ConfigI;
 
   constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {
@@ -50,7 +50,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
       this.form = this.fb.group({ usuario: config.is_development ? 'ADMIN' : null, password: config.is_development ? '1234567' : null });
     });
-    setTimeout(() => this.enfocarInput('Iusuario'), 5);
+    setTimeout(() => fun.enfocarInput('Iusuario'), 5);
     // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
   }
 
@@ -81,7 +81,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     if (input == 'send') {
       if (fun.hasValue(formulario.password)) this.login();
     } else {
-      if (fun.hasValue(formulario.usuario)) this.enfocarInput(input);
+      if (fun.hasValue(formulario.usuario)) fun.enfocarInput(input);
     }
   }
 
@@ -114,7 +114,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   openConfigsModal() {
     if (fun.hasValue(this.form)) this.form.reset();
-    this.enfocarInput('Iusuario');
+    fun.enfocarInput('Iusuario');
 
     this.openNewModal({
       inputs: {},

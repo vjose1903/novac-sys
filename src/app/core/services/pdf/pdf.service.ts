@@ -1,3 +1,4 @@
+import { tFacturaD } from './../../../admin/facturacion/factura';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 const pdfMake = require('pdfmake/build/pdfmake.js');
@@ -8,12 +9,11 @@ import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
-import { SingletonService } from '../singleton.service';
+import { Ss } from '../singleton.service';
 import { MessageTask } from '../../models/message-task';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
 import { ConfigI } from '../../typescript/config-interface';
 import { fun } from '../functions.service';
-import { tipo_factura_id } from '../../../admin/facturacion/factura';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
@@ -26,7 +26,7 @@ export class PdfService {
       const data = fun.duplicarJson(params.oPdf.data);
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
-      const config: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+      const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
       let options;
       let printer_selected = config.printer_selected[type_oPdf];
@@ -58,11 +58,17 @@ export class PdfService {
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
             const tipo_documento = this.getFacturacionType(data);
             printer_selected = config.printer_selected[tipo_documento];
+            // TODO: hacer un case para pre_venta
+            obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', data.tipo_factura_id == Ss.factServ.tipoFacturaId(tFacturaD.pre_venta) ? 'pre_venta' : 'ventas');
+            break;
 
-            console.log('tipo_documento ', tipo_documento);
-            console.log('printer_selected ', printer_selected);
+          case 'cotizacion':
+            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
+            data.tipo_pdf = 'COTIZACIÓN';
 
-            obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', data.tipo_factura_id == tipo_factura_id.pre_venta ? 'pre_venta' : 'ventas');
+            console.log('data ', data);
+
+            obj = options[config.pages_sizes.cotizacion].makePDF(data, 'cotizacion.pdf', 'cotizacion');
             break;
 
           case 'cuadre_caja':
@@ -135,7 +141,7 @@ export class PdfService {
       return new Promise<any>((resolve, reject) => {
         const task = new MessageTask(KEYWORD_ELECTRON_PRINT_BASE64, oBase);
 
-        SingletonService._ipc
+        Ss._ipc
           .sendTask(task)
           .then((res) => {
             if (res['status'] == 'no') reject(res);

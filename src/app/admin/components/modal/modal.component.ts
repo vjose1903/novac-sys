@@ -58,7 +58,7 @@ export class NewModalComponent implements OnInit {
 
     const data = { modal: modal, accion: accion };
 
-    if (modal && typeof modal.onHide == 'function') modal.onHide(data);
+    if (modal && typeof modal.onHide == 'function') setTimeout(() => modal.onHide(data), 250);
 
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
   }
@@ -114,6 +114,22 @@ export class NewModalComponent implements OnInit {
 
   checkModalStyle(config) {
     // const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
+  }
+
+  disabledButton(btnConfig) {
+    let res = false;
+
+    if (_.has(btnConfig, 'disable')) {
+      if (typeof btnConfig.disable == 'boolean') return btnConfig.disable;
+
+      res = btnConfig.disable['function']();
+    }
+
+    return res;
+  }
+
+  getButtonTooltip(btnConfig) {
+    return _.has(btnConfig, 'tooltip') && fun.hasValue(btnConfig.tooltip) ? btnConfig.tooltip : '';
   }
 
   onHideModal(id_) {

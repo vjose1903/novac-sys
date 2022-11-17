@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { TablaClass } from '../components/new_tablas/tabla-class';
 import * as _ from 'lodash';
 import { Permisos } from '../../core/typescript/permisos';
@@ -21,11 +21,12 @@ export class LayoutClass extends TablaClass {
   private static lastComponentInitLayout;
   private static layoutComponent;
 
-  allPermissionsObj = {
+  menuPermissionsObj = {
     facturacion: {
       venta: Object.values(Permisos.factura_venta),
       compra: Object.values(Permisos.factura_compra),
       pre_venta: Object.values(Permisos.pre_venta),
+      cotizacion: Object.values(Permisos.cotizacion),
       flatt: [],
     },
     manipularFacturas: {
@@ -68,7 +69,7 @@ export class LayoutClass extends TablaClass {
   };
 
   _init_layout(arg) {
-    this.layServ = SingletonService.layServ;
+    this.layServ = Ss.layServ;
     if (arg.component == 'layout') LayoutClass.layoutComponent ||= this;
 
     if (arg.component != 'layout' && arg.is_routing) {

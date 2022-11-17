@@ -1,11 +1,11 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { SingletonService } from '../../../core/services/singleton.service';
+import { Ss } from '../../../core/services/singleton.service';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { ModalI } from '../../components/modal/modal-class';
 import { SharedService } from '../../../core/services/shared.service';
 import { teclasCode } from '../../../core/typescript/constantes';
 import * as _ from 'lodash';
-import { fun } from '../../../core/services/functions.service';
+import { FacturacionService } from '../facturacion.service';
 
 @Component({
   selector: 'app-confirmacion-imprimir',
@@ -23,17 +23,20 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
     if (key == teclasCode._enter) this.btn_aceptar();
   }
 
-  constructor(private shServ: SharedService) {}
+  constructor(private shServ: SharedService, public factServ: FacturacionService) {}
+
   modal: any = {};
   inputs: any;
   configApp: ConfigI;
   documentos_a_imprimir = [];
+  documento;
 
   is_print: boolean;
 
   ngOnInit(): void {
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
+    this.documento = this.factServ.getDocumentoDescripcion(this.inputs, true);
 
     this.handleDefaultSwitch();
   }

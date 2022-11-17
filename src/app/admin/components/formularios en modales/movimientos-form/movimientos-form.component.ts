@@ -34,7 +34,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
     this.medidas = _.keys(this.inputs.cantidades);
   }
   ngAfterViewInit() {
-    this.enfocarInput('tipo_movimiento');
+    fun.enfocarInput('tipo_movimiento');
   }
 
   formatoNumero(arg) {
@@ -65,7 +65,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
 
   saltar(campo) {
     if (campo !== 'send') {
-      this.enfocarInput(campo);
+      fun.enfocarInput(campo);
     } else {
       this.btn_aceptar();
     }
@@ -114,6 +114,6 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
     this.medida = undefined;
     this.cantidad = undefined;
     this.motivo = undefined;
-    this.enfocarInput('tipo_movimiento');
+    fun.enfocarInput('tipo_movimiento');
   }
 }

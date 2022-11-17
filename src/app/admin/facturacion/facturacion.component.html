@@ -1,360 +1,404 @@
-<span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', metodo)">
+<span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', factServ.tipoDocumento)">
   <i id="triangualo" class="fas fa-caret-left text-white"></i>
 </span>
-<div class="cardPrincipal sinPadding cardFacturacion">
-  <div class="cabezaFactura">
-    <div class="row">
-      <div *ngIf="metodo != 'pre_venta'" class="col-3 divRight pl-0">
-        <div class="row">
-          <div class="col-3 p-0">
-            <span class="titulos"><strong>Tipo:</strong></span>
-            <input
-              #tipoFact
-              id="tipoFact"
-              placement="right"
-              triggers="focus"
-              type="text"
-              (keydown.enter)="saltar('tipo', tipoFact.value)"
-              class="form-control tipo inputE"
-              [(ngModel)]="tipoFactura"
-              (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
-              (focus)="tiposFacturas.toggle($event)"
-              tabindex="-1"
-              [readOnly]="!!factura_a_editar"
-              [ngClass]="{ disabled: !!factura_a_editar }"
-            />
 
-            <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
-              <div style="width: 18rem" [innerHtml]="TiposFacturas"></div>
-            </p-overlayPanel>
-          </div>
+<div class="rowFacturacion">
+  <div class="colTitulo d-flex">
+    <h4 class="negrita mb-2">{{ titulo | titlecase }}</h4>
 
-          <div class="{{ metodo === 'compra' ? 'col-6' : 'col-9' }} p-0">
-            <span class="titulos"><strong>Condición:</strong></span>
+    <div *ngIf="optionesExtra.length > 0 && factServ.tipoDocumento == tipoDocFacturacion.venta" class="ml-3">
+      <btn-icon-circular [id]="'btnExtra'" [icon]="'fa-solid fa-ellipsis'" [size]="'size-md'" [tooltip]="'Opciones Extras'" [tooltipPosition]="'right'" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
-            <select
-              #condicionInput
-              id="condicion"
-              (keydown.enter)="saltar($event.target.id, condicionInput.value)"
-              class="form-control inputE"
-              [(ngModel)]="condicion_fact"
-              (change)="cambiarTipoVenta($event.target.value)"
-              tabindex="-1"
-              [disabled]="!!factura_a_editar"
-              [ngClass]="{ disabled: !!factura_a_editar }"
-            >
-              <option value="Contado">Contado</option>
-              <option value="Crédito">Crédito</option>
-            </select>
-          </div>
+      <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs">
+        <ng-template pTemplate>
+          <div id="overlayExtra" class="containCamiones">
+            <ul class="overlayExtra" role="menu">
+              <li id="overlayExtra-{{ option.key }}" *ngFor="let option of optionesExtra; let index_option = index" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong> {{ option.key }} - </strong> &nbsp;
 
-          <div *ngIf="metodo === 'compra'" class="col-3 pr-0">
-            <span class="titulos"><strong>Gasto:</strong></span>
-            <input
-              #gastoDe
-              id="gastoDe"
-              placement="right"
-              triggers="focus"
-              type="text"
-              (keydown.enter)="saltar($event.target.id, gastoDe.value)"
-              class="form-control tipo inputE"
-              [(ngModel)]="CostoYgasto"
-              [readOnly]="!!factura_a_editar"
-              [ngClass]="{ disabled: !!factura_a_editar }"
-              (focus)="gastosFacturas.toggle($event)"
-              (blur)="gastosFacturas.hide()"
-              tabindex="-1"
-            />
-            <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #gastosFacturas appendTo="body">
-              <div style="width: 26rem" [innerHtml]="TiposCostosGastos"></div>
-            </p-overlayPanel>
-          </div>
-        </div>
-
-        <div *ngIf="metodo === 'venta'">
-          <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
-          <select
-            #ventaInput
-            id="venta"
-            (keydown.enter)="saltar($event.target.id, ventaInput.value)"
-            (change)="selectModoFactura($event.target.value)"
-            class="form-control inputE"
-            [(ngModel)]="modo_factura"
-            (blur)="checkCambiosModoyCondicionFactura($event.target)"
-            tabindex="-1"
-            [disabled]="!!factura_a_editar"
-            [ngClass]="{ disabled: !!factura_a_editar }"
-          >
-            <option value="" disabled selected>Modo de venta</option>
-            <option value="normal">Normal</option>
-            <option *ngxPermissionsOnly="permissions.factura_venta.seleccionar_camion_en_facturacion" value="viaje">Viaje</option>
-            <option *ngIf="condicion_fact == 'Contado'" value="adelantada">Adelantada</option>
-          </select>
-        </div>
-
-        <ng-container *ngxPermissionsOnly="permissions.pre_venta.create">
-          <div *ngIf="modo_factura === 'normal' && metodo === 'venta' && condicion_fact == 'Contado'">
-            <span class="mt-1"><strong>No. Pre-factura:</strong></span>
-
-            <p-inputMask
-              inputId="numero_pre_factura"
-              (keydown.enter)="saltar($event.target.id, $event.target.value)"
-              [(ngModel)]="numero_pre_factura"
-              mask="99999999"
-              tabindex="-1"
-              styleClass="form-control inputE"
-              placeholder="________"
-              [autoClear]="false"
-            ></p-inputMask>
-          </div>
-        </ng-container>
-
-        <div *ngIf="modo_factura === 'viaje'">
-          <span class="mt-1"><strong>Fecha viaje:</strong></span>
-          <div class="d-flex justify-content-between align-items-center">
-            <input
-              #fecha_viajeInput
-              id="fecha_viaje"
-              type="text"
-              (keydown.enter)="saltar($event.target.id, fecha_viajeInput.value)"
-              [bsConfig]="dpConfig"
-              placeholder="mm/dd/aaaa"
-              class="form-control inputE"
-              [(ngModel)]="fecha_viaje"
-              #dp="bsDatepicker"
-              placement="bottom"
-              bsDatepicker
-              tabindex="-1"
-              (blur)="checkCambiosModoyCondicionFactura($event.target)"
-            />
-            <div class="ml-3 position-relative">
-              <i id="btnCamion" class="fas fa-truck-moving btn-circle-icon" (click)="openOverlay($event, overlayCamion)" style="z-index: 999999" pTooltip="Seleccionar camión" tooltipPosition="top"></i>
-              <div class="indicadorCamion" [ngClass]="{ no_selected: !camionesSelected.length, selected: camionesSelected.length }">
-                <i class="fa-solid" [ngClass]="{ 'fa-x': !camionesSelected.length, 'fa-check': camionesSelected.length }"></i>
-              </div>
-            </div>
-          </div>
-          <p-overlayPanel [dismissable]="false" [showCloseIcon]="camionesSelected.length > 0" #overlayCamion styleClass="dropConfigs">
-            <ng-template pTemplate>
-              <div id="overlayCamion" class="containCamiones">
-                <div class="filterOverlay">
-                  <input
-                    id="searchCamion"
-                    class="search-input form-control"
-                    [filterTarget]="filterCamionesTargets"
-                    [DataFilter]="copyCamiones"
-                    (onFilter)="filterCamion($event)"
-                    (blur)="checkCamionSeleccionado()"
-                    (keydown.enter)="seleccionarCamion()"
-                  />
-                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
                 </div>
-
-                <ul class="overlayCamion" role="menu">
-                  <li id="overlayCamion-{{ index_camion }}" *ngFor="let camion of camiones; let index_camion = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion }">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span id="dropdown-item" class="mr-3 mb-0">
-                        {{ getCamionLabel(camion) }}
-                      </span>
-                      <input class="apple-switch" [ngClass]="{ disabled: action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion)" [checked]="checkCamionIsSelected(camion)" />
-                    </div>
-                  </li>
-
-                  <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
-                    <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
-                  </li>
-                </ul>
-              </div>
-            </ng-template>
-          </p-overlayPanel>
-        </div>
-
-        <div *ngIf="metodo === 'compra'">
-          <span class="mt-2"><strong>Número comprobante:</strong></span>
-
-          <p-inputMask
-            inputId="ncf"
-            (keydown.enter)="saltar($event.target.id, $event.target.value)"
-            [(ngModel)]="NCFcompra"
-            mask="B9999999999"
-            tabindex="-1"
-            styleClass="form-control inputE UPPERCASE"
-            placeholder="B__________"
-            [autoClear]="false"
-            (blur)="checkNumeroPreFactura()"
-          ></p-inputMask>
-
-          <div *ngIf="condicion_fact === 'Crédito'">
-            <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
-            <input
-              #fecha_vencimiento_input
-              id="fecha_vencimiento"
-              type="text"
-              (keydown.enter)="saltar('fecha_vencimiento', fecha_vencimiento_input.value)"
-              [bsConfig]="dpConfig"
-              placeholder="mm/dd/aaaa"
-              class="form-control inputE"
-              [(ngModel)]="fecha_vencimiento"
-              #dp="bsDatepicker"
-              placement="bottom"
-              bsDatepicker
-              tabindex="-1"
-            />
+              </li>
+            </ul>
           </div>
-        </div>
-      </div>
-      <!-- ======================================================================================================================================================================== -->
-      <!-- ======================================================================================================================================================================== -->
-      <div class="{{ metodo != 'pre_venta' ? 'col-5 divRight' : 'col-8' }}">
-        <form [formGroup]="form">
-          <div class="d-flex" style="height: 1.7rem">
-            <h5>
-              <strong>{{ metodo === 'venta' || metodo === 'pre_venta' ? 'Cliente' : 'Suplidor' }}:</strong>
-            </h5>
-            <i *ngIf="!!!factura_a_editar" (click)="abrirModalFiltro()" pTooltip="{{ metodo === 'venta' || metodo === 'pre_venta' ? 'Buscar cliente' : 'Buscar suplidor' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
-          </div>
-          <div class="row">
-            <div class="col-7 pl-0">
-              <span class="control-label titulos mr-2">Nombre:</span>
-              <input
-                #nombreInput
-                id="nom"
-                (keydown.enter)="saltar($event.target.id, nombreInput.value)"
-                type="text"
-                formControlName="nombre"
-                class="form-control inputE"
-                (focus)="$event.target.select()"
-                autocomplete="off"
-                [readOnly]="activarNombreDireccion()"
-                tabindex="-1"
-                [ngClass]="{ disabled: activarNombreDireccion() }"
-              />
-              <input id="id" type="hidden" formControlName="id" />
-              <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">Este Campo es obligatorio</div>
-            </div>
+        </ng-template>
+      </p-overlayPanel>
+    </div>
+  </div>
 
-            <div class="col-5 pr-0">
-              <div class="form-group">
-                <span class="control-label titulos">Telefono:</span>
-                <input type="text" class="form-control inputE disabled" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" [readOnly]="true" tabindex="-1" />
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)">Introduzca el numero de telefono</div>
-              </div>
-            </div>
-
-            <div class="col-12 p-0">
-              <div class="form-group">
-                <span class="control-label titulos mr-2">Direccion:</span>
+  <div class="colCard">
+    <div class="cardPrincipal cardFacturacion">
+      <div class="cabezaFactura">
+        <div class="row">
+          <div *ngIf="factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion" class="col-3 divRight pl-0">
+            <div class="row">
+              <div class="col-3 p-0">
+                <span class="titulos"><strong>Tipo:</strong></span>
                 <input
-                  #direccionInput
-                  id="dir"
-                  (keydown.enter)="saltar($event.target.id, direccionInput.value)"
+                  #tipoFact
+                  id="tipoFact"
+                  placement="right"
+                  triggers="focus"
                   type="text"
-                  formControlName="direccion"
+                  (keydown.enter)="saltar('tipo', tipoFact.value)"
+                  class="form-control tipo inputE"
+                  [(ngModel)]="factServ.tipoFacturaReferenciaSelected"
+                  (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
+                  (focus)="tiposFacturas.toggle($event)"
+                  tabindex="-1"
+                  [readOnly]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar)"
+                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
+                />
+
+                <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
+                  <div style="width: 18rem" [innerHtml]="factServ.htmlTiposFacturas"></div>
+                </p-overlayPanel>
+              </div>
+
+              <div class="{{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'col-6' : 'col-9' }} p-0">
+                <span class="titulos"><strong>Condición:</strong></span>
+
+                <select
+                  #condicionInput
+                  id="condicion"
+                  (keydown.enter)="saltar($event.target.id, condicionInput.value)"
                   class="form-control inputE"
-                  (focus)="$event.target.select()"
-                  autocomplete="off"
-                  [readOnly]=""
-                  [ngClass]="{ disabled: activarNombreDireccion() }"
+                  [(ngModel)]="condicion_fact"
+                  (change)="cambiarCondicion($event.target.value)"
+                  tabindex="-1"
+                  [disabled]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar)"
+                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
+                >
+                  <option value="Contado">Contado</option>
+                  <option value="Crédito">Crédito</option>
+                </select>
+              </div>
+
+              <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.compra" class="col-3 pr-0">
+                <span class="titulos"><strong>Gasto:</strong></span>
+                <input
+                  #gastoDe
+                  id="gastoDe"
+                  placement="right"
+                  triggers="focus"
+                  type="text"
+                  (keydown.enter)="saltar($event.target.id, gastoDe.value)"
+                  class="form-control tipo inputE"
+                  [(ngModel)]="CostoYgasto"
+                  [readOnly]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar)"
+                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
+                  (focus)="gastosFacturas.toggle($event)"
+                  (blur)="gastosFacturas.hide()"
                   tabindex="-1"
                 />
-                <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)">Este Campo es obligatorio</div>
+                <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #gastosFacturas appendTo="body">
+                  <div style="width: 26rem" [innerHtml]="factServ.htmlTiposCostosGastos"></div>
+                </p-overlayPanel>
+              </div>
+            </div>
+
+            <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.venta">
+              <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
+              <select
+                #ventaInput
+                id="venta"
+                (keydown.enter)="saltar($event.target.id, ventaInput.value)"
+                (change)="selectModoFactura($event.target.value)"
+                class="form-control inputE"
+                [(ngModel)]="modo_factura"
+                (blur)="checkCambiosModoyCondicionFactura($event.target)"
+                tabindex="-1"
+                [disabled]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar)"
+                [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
+              >
+                <option value="" disabled selected>Modo de venta</option>
+                <option value="normal">Normal</option>
+                <option *ngxPermissionsOnly="permissions.factura_venta.seleccionar_camion_en_facturacion" value="viaje">Viaje</option>
+                <option *ngIf="condicion_fact == 'Contado'" value="adelantada">Adelantada</option>
+              </select>
+            </div>
+
+            <ng-container *ngxPermissionsOnly="permissions.pre_venta.create">
+              <div *ngIf="modo_factura == 'normal' && factServ.tipoDocumento == tipoDocFacturacion.venta && condicion_fact == 'Contado'">
+                <span class="mt-1"><strong>No. Pre-factura:</strong></span>
+
+                <p-inputMask
+                  inputId="numero_pre_factura"
+                  (keydown.enter)="saltar($event.target.id, $event.target.value)"
+                  [(ngModel)]="numero_pre_factura"
+                  mask="99999999"
+                  tabindex="-1"
+                  styleClass="form-control inputE"
+                  placeholder="________"
+                  [autoClear]="false"
+                ></p-inputMask>
+              </div>
+            </ng-container>
+
+            <div *ngIf="modo_factura === 'viaje'">
+              <span class="mt-1"><strong>Fecha viaje:</strong></span>
+              <div class="d-flex justify-content-between align-items-center">
+                <input
+                  #fecha_viajeInput
+                  id="fecha_viaje"
+                  type="text"
+                  (keydown.enter)="saltar($event.target.id, fecha_viajeInput.value)"
+                  [bsConfig]="dpConfig"
+                  placeholder="mm/dd/aaaa"
+                  class="form-control inputE"
+                  [(ngModel)]="fecha_viaje"
+                  #dp="bsDatepicker"
+                  placement="bottom"
+                  bsDatepicker
+                  tabindex="-1"
+                  (blur)="checkCambiosModoyCondicionFactura($event.target)"
+                />
+                <div class="ml-3 position-relative">
+                  <btn-icon-circular
+                    [id]="'btnCamion'"
+                    [icon_size]="'1.2rem'"
+                    [icon]="'fas fa-truck-moving'"
+                    [size]="'size-lg'"
+                    [tooltip]="'Seleccionar camión'"
+                    [tooltipPosition]="'top'"
+                    (clickFunction)="openOverlay($event, overlayCamion, 'camion')"
+                  >
+                  </btn-icon-circular>
+
+                  <div class="indicadorCamion" [ngClass]="{ no_selected: !camionesSelected.length, selected: camionesSelected.length }">
+                    <i class="fa-solid" [ngClass]="{ 'fa-x': !camionesSelected.length, 'fa-check': camionesSelected.length }"></i>
+                  </div>
+                </div>
+              </div>
+              <p-overlayPanel [dismissable]="false" [showCloseIcon]="camionesSelected.length > 0" #overlayCamion styleClass="dropConfigs">
+                <ng-template pTemplate>
+                  <div id="overlayCamion" class="containCamiones">
+                    <div class="filterOverlay">
+                      <input
+                        id="searchCamion"
+                        class="search-input form-control"
+                        [filterTarget]="filterCamionesTargets"
+                        [DataFilter]="copyCamiones"
+                        (onFilter)="filterCamion($event)"
+                        (blur)="checkCamionSeleccionado()"
+                        (keydown.enter)="seleccionarCamion()"
+                      />
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+
+                    <ul class="overlayCamion" role="menu">
+                      <li id="overlayCamion-{{ index_camion }}" *ngFor="let camion of camiones; let index_camion = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion }">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span id="dropdown-item" class="mr-3 mb-0">
+                            {{ getCamionLabel(camion) }}
+                          </span>
+                          <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion)" [checked]="checkCamionIsSelected(camion)" />
+                        </div>
+                      </li>
+
+                      <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
+                        <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
+                      </li>
+                    </ul>
+                  </div>
+                </ng-template>
+              </p-overlayPanel>
+            </div>
+
+            <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.compra">
+              <span class="mt-2"><strong>Número comprobante:</strong></span>
+
+              <p-inputMask
+                inputId="ncf"
+                (keydown.enter)="saltar($event.target.id, $event.target.value)"
+                [(ngModel)]="NCFcompra"
+                mask="B9999999999"
+                tabindex="-1"
+                styleClass="form-control inputE UPPERCASE"
+                placeholder="B__________"
+                [autoClear]="false"
+                (blur)="checkNumeroPreFactura()"
+              ></p-inputMask>
+
+              <div *ngIf="condicion_fact === 'Crédito'">
+                <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
+                <input
+                  #fecha_vencimiento_input
+                  id="fecha_vencimiento"
+                  type="text"
+                  (keydown.enter)="saltar('fecha_vencimiento', fecha_vencimiento_input.value)"
+                  [bsConfig]="dpConfig"
+                  placeholder="mm/dd/aaaa"
+                  class="form-control inputE"
+                  [(ngModel)]="fecha_vencimiento"
+                  #dp="bsDatepicker"
+                  placement="bottom"
+                  bsDatepicker
+                  tabindex="-1"
+                />
               </div>
             </div>
           </div>
-        </form>
-      </div>
-      <!-- ======================================================================================================================================================================== -->
-      <!-- ======================================================================================================================================================================== -->
-      <div
-        class="col-4"
-        style="
-          display: grid;
-          grid-template-rows: min-content;
-          grid-template-areas:
-            '.'
-            '.'
-            '.';
-        "
-      >
-        <div class="encabezadoRigth fecha">
-          <span class="titulos w-100">
-            Fecha : <strong> {{ fecha }}</strong>
-          </span>
-        </div>
-        <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
-        <div *ngIf="FacturaAtrasada" class="encabezadoRight fechaA">
-          <span class="w-100 text-danger letrasT">
-            Factura atrasada, fecha: <strong> {{ FechaFacturaMostrar }}</strong>
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="cuerpoFactura mb-2">
-    <div class="fantasma-cuerpo">
-      <app-cuerpo-factura
-        [propietario]="propietario_factura"
-        [factura]="factura_a_editar"
-        [action]="action"
-        [modo_factura]="modo_factura"
-        [metodo]="metodo"
-        [fechaFactura]="fechaFactura?.front"
-        (getCuerpoFactura)="getCuerpoFactura($event)"
-        (getCalculosDinero)="getCalculosDinero($event)"
-      ></app-cuerpo-factura>
-    </div>
-  </div>
-  <div class="pieFactura">
-    <div class="row mx-0 w-100">
-      <div class="col-12">
-        <span class="titulos w-100">
-          Articulos a vender: <strong> {{ getCantidadArticulos() }}</strong>
-        </span>
-      </div>
-      <div class="col-7">
-        <div class="h-100 d-flex justify-content-around align-items-center">
-          <div *ngxPermissionsOnly="metodo == 'venta' ? permissions.factura_venta.create : permissions.factura_compra.create">
-            <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Imprimir Factura' : 'Editar Factura'" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
-          </div>
-          <div>
-            <app-btncircular [alto]="'100px'" [accion]="!!!factura_a_editar ? 'Cancelar Factura' : 'Cancelar Edición'" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
-          </div>
-          <div>
-            <app-btncircular [alto]="'100px'" [accion]="factura_guardada ? 'Factura ya está archivada' : 'Archivar Factura'" [nombreImg]="'guardarFactura'" (pulsar)="archivarFactura()"></app-btncircular>
-          </div>
+          <!-- ======================================================================================================================================================================== -->
+          <!-- ======================================================================================================================================================================== -->
+          <div class="{{ factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
+            <form [formGroup]="form">
+              <div class="d-flex" style="height: 1.7rem">
+                <h5>
+                  <strong>{{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Suplidor' : 'Cliente' }}:</strong>
+                </h5>
+                <i (click)="abrirModalFiltro()" pTooltip="{{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Buscar suplidor' : 'Buscar cliente' }}" tooltipPosition="right" class="fas fa-search ml-3 botonBuscar"></i>
+              </div>
+              <div class="row">
+                <div class="col-7 pl-0">
+                  <span class="control-label titulos mr-2">Nombre:</span>
+                  <input
+                    #nombreInput
+                    id="nom"
+                    (keydown.enter)="saltar($event.target.id, nombreInput.value)"
+                    type="text"
+                    formControlName="nombre"
+                    class="form-control inputE"
+                    (focus)="$event.target.select()"
+                    autocomplete="off"
+                    [readOnly]="activarNombreDireccion()"
+                    tabindex="-1"
+                    [ngClass]="{ disabled: activarNombreDireccion() }"
+                  />
+                  <input id="id" type="hidden" formControlName="id" />
+                  <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">Este Campo es obligatorio</div>
+                </div>
 
-          <div *ngIf="metodo === 'venta'">
-            <app-btncircular *ngIf="!!!factura_a_editar" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
-          </div>
+                <div class="col-5 pr-0">
+                  <div class="form-group">
+                    <span class="control-label titulos">Telefono:</span>
+                    <input type="text" class="form-control inputE disabled" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" [readOnly]="true" tabindex="-1" />
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)">Introduzca el numero de telefono</div>
+                  </div>
+                </div>
 
-          <!-- <div  *ngIf="metodo === 'venta'">
-          <app-btncircular
-            [alto]="'100px'"
-            [accion]="'PRUEBA'"
-            [nombreImg]="'calendar'"
-            (click)="prueba()"
-          ></app-btncircular>
-        </div> -->
+                <div class="col-12 p-0">
+                  <div class="form-group">
+                    <span class="control-label titulos mr-2">Direccion:</span>
+                    <input
+                      #direccionInput
+                      id="dir"
+                      (keydown.enter)="saltar($event.target.id, direccionInput.value)"
+                      type="text"
+                      formControlName="direccion"
+                      class="form-control inputE"
+                      (focus)="$event.target.select()"
+                      autocomplete="off"
+                      [readOnly]=""
+                      [ngClass]="{ disabled: activarNombreDireccion() }"
+                      tabindex="-1"
+                    />
+                    <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)">Este Campo es obligatorio</div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <!-- ======================================================================================================================================================================== -->
+          <!-- ======================================================================================================================================================================== -->
+          <div
+            class="col-4"
+            style="
+              display: grid;
+              grid-template-rows: min-content;
+              grid-template-areas:
+                '.'
+                '.'
+                '.';
+            "
+          >
+            <div class="encabezadoRigth fecha">
+              <span class="titulos w-100">
+                Fecha : <strong> {{ fecha }}</strong>
+              </span>
+            </div>
+            <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
+            <div *ngIf="factura_pendiente" class="encabezadoRight fechaA">
+              <span class="w-100 text-danger letrasT">
+                Factura atrasada, fecha: <strong> {{ FechaFacturaMostrar }}</strong>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="col-5 d-flex justify-content-end">
-        <div class="mostrarNumeros w-100">
-          <div class="row">
-            <div class="col-12 cuadroResumenTotal mb-2">
-              <span class="label text-poppins position-absolute left-0 top-0">BRUTO:</span>
-              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(BRUTO) }}</h5>
+      <div class="cuerpoFactura mb-2">
+        <div class="fantasma-cuerpo">
+          <app-cuerpo-factura [factura]="factura_a_rellenar" [modo_factura]="modo_factura" [fechaFactura]="fechaFactura?.front" (getCuerpoFactura)="getCuerpoFactura($event)" (getCalculosDinero)="getCalculosDinero($event)"></app-cuerpo-factura>
+        </div>
+      </div>
+      <div class="pieFactura">
+        <div class="row mx-0 w-100">
+          <div class="col-12">
+            <span class="titulos w-100">
+              Articulos: <strong> {{ getCantidadArticulos() }}</strong>
+            </span>
+          </div>
+          <div class="col-7">
+            <div class="h-100 d-flex justify-content-around align-items-center">
+              <div *ngxPermissionsOnly="factServ.tipoDocumento == tipoDocFacturacion.venta ? permissions.factura_venta.create : permissions.factura_compra.create">
+                <app-btncircular
+                  [alto]="'100px'"
+                  [accion]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) ? 'Editar ' + getDocumentoDescripcion().descripcion_short : 'Imprimir ' + getDocumentoDescripcion().descripcion_short"
+                  [nombreImg]="'printer'"
+                  (pulsar)="imprimirFactura()"
+                ></app-btncircular>
+              </div>
+              <div>
+                <app-btncircular
+                  [alto]="'100px'"
+                  [accion]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) ? 'Cancelar Edición' : 'Cancelar ' + getDocumentoDescripcion().descripcion_short"
+                  [nombreImg]="'cancelar'"
+                  (pulsar)="cancelarFactura()"
+                ></app-btncircular>
+              </div>
+              <div>
+                <app-btncircular
+                  [alto]="'100px'"
+                  [accion]="fun.hasValue(factura_guardada) ? getDocumentoDescripcion().descripcion_short + ' ya está archivada' : 'Archivar ' + getDocumentoDescripcion().descripcion_short"
+                  [nombreImg]="'guardarFactura'"
+                  (pulsar)="archivarFactura()"
+                ></app-btncircular>
+              </div>
+              <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.venta">
+                <app-btncircular *ngIf="fun.isEmpty(!!factura_a_rellenar)" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
+              </div>
+
+              <!-- <div  *ngIf="factServ.tipoDocumento === 'venta'">
+              <app-btncircular
+                [alto]="'100px'"
+                [accion]="'PRUEBA'"
+                [nombreImg]="'calendar'"
+                (click)="prueba()"
+              ></app-btncircular>
+            </div> -->
             </div>
-            <div *ngIf="configApp.calcular_itbis" class="col-12 cuadroResumenTotal mb-2">
-              <span class="label text-poppins position-absolute left-0 top-0">ITBIS:</span>
-              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(ITBIS) }}</h5>
-            </div>
-            <div class="col-12 cuadroResumenTotal mb-2">
-              <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
-              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(DESCUENTO) }}</h5>
-            </div>
-            <div class="col-12 cuadroResumenTotal mb-2">
-              <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
-              <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
+          </div>
+          <div class="col-5 d-flex justify-content-end">
+            <div class="mostrarNumeros w-100">
+              <div class="row">
+                <div class="col-12 cuadroResumenTotal mb-2">
+                  <span class="label text-poppins position-absolute left-0 top-0">BRUTO:</span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(BRUTO) }}</h5>
+                </div>
+                <div *ngIf="configApp.calcular_itbis" class="col-12 cuadroResumenTotal mb-2">
+                  <span class="label text-poppins position-absolute left-0 top-0">ITBIS:</span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(ITBIS) }}</h5>
+                </div>
+                <div class="col-12 cuadroResumenTotal mb-2">
+                  <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(DESCUENTO) }}</h5>
+                </div>
+                <div class="col-12 cuadroResumenTotal mb-2">
+                  <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -365,7 +409,7 @@
 
 <p-sidebar
   #my_sidebar
-  styleClass="my_sidebar  {{ _sideBarOpened ? 'side_open' : 'side_closed' }} {{ hasPermisoPreVenta ? 'large' : '' }}"
+  styleClass="my_sidebar  {{ _sideBarOpened ? 'side_open' : 'side_closed' }} {{ hasPermisoPreVenta ? (hasPermisoCotizacion ? 'x-large' : 'large') : hasPermisoCotizacion ? 'large' : '' }}"
   *ngIf="_sideBarOpened"
   [position]="'right'"
   [visible]="_sideBarOpened"
@@ -375,86 +419,59 @@
   [dismissible]="true"
   [closeOnEscape]="true"
   [blockScroll]="true"
-  (visibleChange)="_toggleSidebar('visibleChange', metodo)"
+  (visibleChange)="_toggleSidebar('visibleChange', factServ.tipoDocumento)"
 >
-  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', metodo)">
+  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', factServ.tipoDocumento)">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
   <div class="contendioSidebar w-100 h-100">
     <div class="head">
-      <span class="tituloSidebar negrita">Facturas guardadas</span>
+      <span class="tituloSidebar negrita">Documentos guardados</span>
     </div>
 
     <div class="cuerpoContenidoSidar w-100">
       <p-tabView [(activeIndex)]="index_fact_archivada" styleClass="my_tabView" (onChange)="clickTabView($event.index)">
         <p-tabPanel
-          [disabled]="countCantFactSaved('venta').disable"
-          tooltip="No tiene facturas de Venta guardadas"
-          headerStyleClass="{{ countCantFactSaved('venta').disable ? 'noTabView' : '' }}"
+          *ngFor="let docTab of sideBarTabs"
+          [disabled]="countCantFactSaved(docTab.key).disable"
+          [tooltip]="'No tiene ' + docTab.label + ' guardadas'"
+          headerStyleClass="{{ countCantFactSaved(docTab.key).disable ? 'noTabView' : '' }}"
           tooltipDisabled="true"
-          tooltipStyleClass="{{ countCantFactSaved('venta').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+          tooltipStyleClass="{{ countCantFactSaved(docTab.key).disable ? 'd-block' : 'd-none' }} tabViewTootip"
         >
           <ng-template pTemplate="header">
-            Venta
-            <span *ngIf="!countCantFactSaved('venta').disable"> &nbsp;({{ countCantFactSaved('venta').cant }})</span>
+            {{ docTab.title }}
+            <span *ngIf="!countCantFactSaved(docTab.key).disable"> &nbsp;({{ countCantFactSaved(docTab.key).cant }})</span>
           </ng-template>
 
-          <ng-container *ngTemplateOutlet="facturas_guardadas"> </ng-container>
-        </p-tabPanel>
-
-        <p-tabPanel
-          *ngIf="hasPermisoPreVenta"
-          [disabled]="countCantFactSaved('pre_venta').disable"
-          tooltip="No tiene facturas de Venta guardadas"
-          headerStyleClass="{{ countCantFactSaved('pre_venta').disable ? 'noTabView' : '' }}"
-          tooltipDisabled="true"
-          tooltipStyleClass="{{ countCantFactSaved('pre_venta').disable ? 'd-block' : 'd-none' }} tabViewTootip"
-        >
-          <ng-template pTemplate="header">
-            Pre-Venta
-            <span *ngIf="!countCantFactSaved('pre_venta').disable"> &nbsp;({{ countCantFactSaved('pre_venta').cant }})</span>
-          </ng-template>
-
-          <ng-container *ngTemplateOutlet="facturas_guardadas"> </ng-container>
-        </p-tabPanel>
-
-        <p-tabPanel
-          [disabled]="countCantFactSaved('compra').disable"
-          tooltip="No tiene facturas de Compra guardadas"
-          headerStyleClass="{{ countCantFactSaved('compra').disable ? 'noTabView' : '' }}"
-          tooltipDisabled="true"
-          tooltipStyleClass="{{ countCantFactSaved('compra').disable ? 'd-block' : 'd-none' }} tabViewTootip"
-        >
-          <ng-template pTemplate="header">
-            Compra
-            <span *ngIf="!countCantFactSaved('compra').disable"> &nbsp;({{ countCantFactSaved('compra').cant }})</span>
-          </ng-template>
-          <ng-container *ngTemplateOutlet="facturas_guardadas"> </ng-container>
+          <ng-container *ngTemplateOutlet="facturas_guardadas; context: { docTab: docTab }"> </ng-container>
         </p-tabPanel>
       </p-tabView>
 
-      <ng-template #facturas_guardadas>
-        <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene Facturas guardadas por el momento!!</h6>
+      <ng-template #facturas_guardadas let-docTab="docTab">
+        <h6 *ngIf="facturas_localStorage?.length === 0" class="mt-3 no_fact">No tiene {{ docTab.label }} guardadas por el momento!!</h6>
         <div *ngIf="facturas_localStorage?.length > 0" class="h-100">
-          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="setFacturaArchivada(fact)">
-            <div class="colorsito bg-raya-{{ fact?.tipo === 'venta' ? 'green' : fact?.tipo === 'pre_venta' ? 'blue' : 'yellow' }}{{ fact?.action === 'update' ? '-orange' : '' }}"></div>
+          <div class="factura_guardada mb-2" *ngFor="let fact of facturas_localStorage" (click)="rellenarFacturaArchivada(fact)">
+            <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
 
             <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
-              <i class="fas fa-history {{ fact.FacturaAtrasada ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}"></i>
-              <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}"></i>
-              <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar factura" tooltipPosition="left"></i>
-              <span
-                class="negrita text-mayuscula text-separado-2 texto-borde-{{ fact?.tipo === 'venta' ? 'green' : fact?.tipo === 'pre_venta' ? 'blue' : 'yellow' }}
-            texto-{{ fact?.tipo === 'venta' ? 'green' : fact?.tipo === 'pre_venta' ? 'blue' : 'yellow' }}"
-                >{{ my_capitalize(fact?.tipo) }}
-              </span>
+              <i class="fas fa-history {{ fact.factura_pendiente ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}" pTooltip="factura pendiente" tooltipPosition="left"></i>
+
+              <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura de viaje" tooltipPosition="left"></i>
+
+              <i class="fa-regular fa-copyright {{ fact.action == 'bill_from_cotizacion' ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura desde cotización" tooltipPosition="left"></i>
+
+              <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar documento" tooltipPosition="left"></i>
+
+              <span class="negrita text-mayuscula text-separado-2 texto-borde-{{ docTab.color }} texto-{{ docTab.color }}">{{ my_capitalize(fact?.tipo) }} </span>
               <span class="text-gris-oscuro" *ngIf="fact?.action == 'update'"> (Editando)</span>
               <br />
               <span class="clienteFactura">
-                <span class="negrita"> {{ fact?.tipo === 'venta' || fact?.tipo === 'pre_venta' ? 'Cliente' : 'Suplidor' }}:</span>
+                <span class="negrita"> {{ fact?.tipo === 'compra' ? 'Suplidor' : 'Cliente' }}:</span>
                 {{ getNombreFacturaGuardada(fact) }}
               </span>
               <br />
+              <!-- <i class="fa-regular fa-copyright"></i> -->
               <span class="info_factura"> <span class="negrita"> Condición:</span> {{ fact?.condicion }} </span>
               <br />
               <span class="info_factura"> <span class="negrita"> Articulos:</span> {{ fact?.detalle_facturas.length }} </span>

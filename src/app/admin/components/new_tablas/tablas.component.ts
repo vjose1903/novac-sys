@@ -582,9 +582,15 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         if (_.some(column.disable, (conf) => conf.kind === 'selected')) temp_res = Number(dato.id) !== Number(this.seleccionado || 0);
 
         if (temp_res) break;
+        // TODO: hacer que se pueda desabilitar si el campo especificado tiene valor
+        if (element.kind == 'has_value') {
+          temp_res = fun.hasValue(dato[element.target]);
+        }
 
-        if (element.kind === 'campo') {
-          if (element.value.length === 0) temp_res = dato[element.target] ? false : true;
+        if (temp_res) break;
+
+        if (element.kind == 'campo') {
+          if (element.value.length == 0) temp_res = dato[element.target] ? false : true;
           else temp_res = _.some(element.value, (value) => value == dato[element.target]);
         }
       }

@@ -1,3 +1,4 @@
+import { FacturacionService } from './facturacion.service';
 import * as _ from 'lodash';
 
 import { fun } from '../../core/services/functions.service';
@@ -25,7 +26,7 @@ export class PreFacturaClass extends MixinClass {
   async buscarPreFactura(numero) {
     try {
       const result = { data: null, error: false };
-      const res = await this.facturaClass.getAll({ afterPath: `custom/pre_factura/${numero}`, parameters: { tipo: 'single', paginado: false } });
+      const res = await this.facturaClass.getAll({ afterPath: `custom/pre_venta/${numero}`, parameters: { tipo: 'single', paginado: false } });
       const pre_factura = res['data'];
 
       pre_factura.detalle_facturas = pre_factura.detalle_facturas.map((detalle) => {
@@ -59,7 +60,7 @@ export class PreFacturaClass extends MixinClass {
             header: 'Pre-factura',
             width: '900px',
             botones: {
-              ...ModalClass.noShowAceptarCancelarButtons,
+              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false },
                 { clase: 'btn btn-verde ', function: (instance) => this.selectPreFactura(dataFactura, instance), label: 'Continuar', disable: false },

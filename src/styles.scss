@@ -6,6 +6,7 @@ $bodyfont: "Poppins";
 @import "./animateCss.scss";
 
 @import "./assets/my_styles/modal.scss";
+@import "./assets/my_styles/tablas.scss";
 @import "./assets/my_styles/forms.scss";
 @import "./assets/my_styles/btns.scss";
 @import "./assets/my_styles/overlayPanel.scss";
@@ -15,9 +16,12 @@ $bodyfont: "Poppins";
 * {
   font-family: "Poppins";
 }
+
 .h-inherit {
   max-height: inherit;
 }
+
+
 
 .si-wrap {
   flex-wrap: wrap;
@@ -64,7 +68,6 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 }
 
 .dropRowConfig {
-  max-width: 250px;
   min-width: 250px;
   list-style: none;
   margin: 0;
@@ -255,6 +258,26 @@ body {
   }
   100% {
     background-color: #e75454c3;
+  }
+}
+
+// ========================================================
+// WARNING ALERT
+// ========================================================
+
+.warningAlert {
+  animation: warning_alert 0.5s infinite;
+}
+
+@keyframes warning_alert {
+  0% {
+    background-color: #ecd28f9f;
+  }
+  50% {
+    background-color: #d8ad2ea2;
+  }
+  100% {
+    background-color: #e7c254a1;
   }
 }
 // ========================================================

@@ -24,10 +24,14 @@ export interface ConfigureModalI {
   contentStyleClass?: string;
   returnDataFromModal?: Function;
 }
+
+export interface btnDisabled {
+  function?: Function;
+}
 export interface ButtonsI {
-  aceptar: { show: boolean; disable?: boolean };
-  cancelar: { show: boolean; disable?: boolean };
-  dinamico?: Array<{ btn_id?: string; clase: string; label: string; function?: Function; function_in_other_component?: string; disable: boolean }>;
+  aceptar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string };
+  cancelar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string };
+  dinamico?: Array<{ btn_id?: string; clase: string; label: string; function?: Function; function_in_other_component?: string; disable: boolean | btnDisabled; tooltip?: string }>;
 }
 
 export class ModalClass extends LayoutClass {

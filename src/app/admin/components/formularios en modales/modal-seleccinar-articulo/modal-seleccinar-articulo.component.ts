@@ -13,7 +13,7 @@ import { table_config } from '../../new_tablas/tabla-class';
 export class ModalSeleccinarArticuloComponent extends MixinClass implements OnInit, ModalI {
   table_config: table_config = {
     info: [
-      { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'articulo_is_active', rowTooltip: 'articulo_is_active_tooltip', text_color: 'colorIsActive' }] },
+      { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'articulo_is_active', rowTooltip: 'articulo_is_active_tooltip', text_color: 'is_active_color' }] },
       { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ width: '44%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
       { titulo: 'Cantidad', tipo: 'text', key: 'cantidad', estilos: [{ width: '12%' }] },
       { titulo: 'Unidad', tipo: 'text', key: 'unidad', estilos: [{ width: '14%' }] },
@@ -45,7 +45,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
     this.inputs.map(async (arti) => {
       arti.articulo_is_active = arti.articulo_estado ? '' : 'fas fa-times';
       arti.articulo_is_active_tooltip = arti.articulo_estado ? '' : 'Articulo Inactivo';
-      arti.colorIsActive = 'red';
+      arti.is_active_color = 'red';
       arti.danger = !arti.articulo_estado;
       arti.customStyles = {
         estado: [

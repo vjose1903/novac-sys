@@ -1,3 +1,4 @@
+import { PrimengModule } from './../../../modules/primeng.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NewModalComponent } from './modal.component';
@@ -7,7 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [NewModalComponent, ModalDirective],
-  imports: [CommonModule, DialogModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, DialogModule, FormsModule, ReactiveFormsModule, PrimengModule],
   exports: [NewModalComponent],
 })
 export class NewModalModule {}

@@ -1,4 +1,4 @@
-import { SingletonService } from './../../core/services/singleton.service';
+import { Ss } from './../../core/services/singleton.service';
 import { PdfService } from './../../core/services/pdf/pdf.service';
 import { CuadreCajaC } from './../../core/typescript/cuadre_caja';
 import { fun } from './../../core/services/functions.service';
@@ -31,7 +31,7 @@ export class CuadreC {
         PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async (response) => {
           let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
           ReporteC.visualizarReporte(objPdfView);
-          SingletonService.layServ.nextCheckCuadreToday(true);
+          Ss.layServ.nextCheckCuadreToday(true);
         });
       });
     });

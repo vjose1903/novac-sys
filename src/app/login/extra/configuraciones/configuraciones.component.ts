@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { SingletonService } from '../../../core/services/singleton.service';
+import { Ss } from '../../../core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { MessageTask } from '../../../core/models/message-task';
@@ -17,7 +17,7 @@ import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
   styleUrls: ['./configuraciones.component.scss'],
 })
 export class ConfiguracionesComponent implements OnInit {
-  configServ = SingletonService.configServ;
+  configServ = Ss.configServ;
   config;
   form;
 
@@ -59,6 +59,7 @@ export class ConfiguracionesComponent implements OnInit {
     { printerFormControlName: 'printer_venta_contado', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_venta_contado', label: 'Venta Contado', key: 'venta_contado' },
     { printerFormControlName: 'printer_venta_credito', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_venta_credito', label: 'Venta Credito', key: 'venta_credito' },
     { printerFormControlName: 'printer_pre_venta', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_pre_venta', label: 'Pre venta', key: 'pre_venta' },
+    { printerFormControlName: 'printer_cotizacion', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_cotizacion', label: 'Cotización', key: 'cotizacion' },
     { printerFormControlName: 'printer_compra', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_compra', label: 'Factura compras', key: 'compra' },
     { printerFormControlName: 'printer_recibo_ingreso', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_recibo_ingreso', label: 'Recibos de ingreso', key: 'ingreso' },
     { printerFormControlName: 'printer_conduce', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_conduce', label: 'Conduce', key: 'conduce' },
@@ -110,6 +111,7 @@ export class ConfiguracionesComponent implements OnInit {
       page_size_venta_contado: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_contado'), disabled: false }, Validators.required],
       page_size_venta_credito: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_credito'), disabled: false }, Validators.required],
       page_size_pre_venta: [{ value: this.getValuePageSize(data, 'pages_sizes.pre_venta'), disabled: false }, Validators.required],
+      page_size_cotizacion: [{ value: this.getValuePageSize(data, 'pages_sizes.cotizacion'), disabled: false }, Validators.required],
       page_size_compra: [{ value: this.getValuePageSize(data, 'pages_sizes.compra'), disabled: false }, Validators.required],
       page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
       page_size_conduce: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
@@ -120,6 +122,7 @@ export class ConfiguracionesComponent implements OnInit {
       printer_venta_contado: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
       printer_venta_credito: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
       printer_pre_venta: [{ value: this.getValue(data, 'printer_selected.pre_venta'), disabled: false }, Validators.required],
+      printer_cotizacion: [{ value: this.getValue(data, 'printer_selected.cotizacion'), disabled: false }, Validators.required],
       printer_compra: [{ value: this.getValue(data, 'printer_selected.compra'), disabled: false }, Validators.required],
       printer_recibo_ingreso: [{ value: this.getValue(data, 'printer_selected.recibo_ingreso'), disabled: false }, Validators.required],
       printer_conduce: [{ value: this.getValue(data, 'printer_selected.conduce'), disabled: false }, Validators.required],
@@ -205,6 +208,7 @@ export class ConfiguracionesComponent implements OnInit {
       venta_contado: formulario.page_size_venta_contado.descripcion,
       venta_credito: formulario.page_size_venta_credito.descripcion,
       pre_venta: formulario.page_size_pre_venta.descripcion,
+      cotizacion: formulario.page_size_cotizacion.descripcion,
       compra: formulario.page_size_compra.descripcion,
       recibo_ingreso: formulario.page_size_recibo_ingreso.descripcion,
       conduce: formulario.page_size_conduce.descripcion,
@@ -217,6 +221,7 @@ export class ConfiguracionesComponent implements OnInit {
       venta_contado: formulario.printer_venta_contado,
       venta_credito: formulario.printer_venta_credito,
       pre_venta: formulario.printer_pre_venta,
+      cotizacion: formulario.printer_cotizacion,
       compra: formulario.printer_compra,
       recibo_ingreso: formulario.printer_recibo_ingreso,
       conduce: formulario.printer_conduce,

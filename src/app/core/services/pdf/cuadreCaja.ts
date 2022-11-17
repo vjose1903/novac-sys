@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
-import { SingletonService } from '../singleton.service';
+import { Ss } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface';
 
 // ==========================================================================================================================================================
@@ -9,7 +9,7 @@ import { ConfigI } from '../../typescript/config-interface';
 // ==========================================================================================================================================================
 
 export function makePDF(data) {
-  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
   try {
     const dd = {
       pageSize: { width: 600, height: 398 },

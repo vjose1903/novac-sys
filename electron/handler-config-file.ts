@@ -31,6 +31,7 @@ export default class HandlerConfigFile {
       venta_contado: 'Ninguna',
       venta_credito: 'Ninguna',
       pre_venta: 'Ninguna',
+      cotizacion: 'Ninguna',
       compra: 'Ninguna',
       recibo_ingreso: 'Ninguna',
       conduce: 'Ninguna',
@@ -40,14 +41,15 @@ export default class HandlerConfigFile {
     },
 
     pages_sizes: {
-      venta_contado: '80mm_roll',
-      venta_credito: '80mm_roll',
-      pre_venta: '80mm_roll',
-      compra: '80mm_roll',
-      recibo_ingreso: '80mm_roll',
-      conduce: '80mm_roll',
-      nota: '80mm_roll',
-      cuadre_caja: '80mm_roll',
+      venta_contado: '8.5x5.5',
+      venta_credito: '8.5x11',
+      pre_venta: '8.5x5.5',
+      cotizacion: '8.5x5.5',
+      compra: '8.5x5.5',
+      recibo_ingreso: '8.5x5.5',
+      conduce: '8.5x5.5',
+      nota: '8.5x5.5',
+      cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',
     },
 
@@ -55,7 +57,7 @@ export default class HandlerConfigFile {
       nota: 'Agrupada',
     },
 
-    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce',
+    documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota,cotizacion',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {

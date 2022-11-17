@@ -38,7 +38,7 @@ export interface Documentos {
   nota:            string;
   cuadre_caja:     string;
   reporte:         string;
-
+  cotizacion:      string;
 }
 export interface PlantiallasImpresion {
   nota:            string;

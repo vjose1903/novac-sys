@@ -2,8 +2,6 @@ import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
-
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
 import { FacturaC } from '../../facturacion/factura';
@@ -16,7 +14,7 @@ import { ModalService } from '../../components/modal/modal.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { ConfigI } from '../../../core/typescript/config-interface';
-import { SingletonService } from '../../../core/services/singleton.service';
+import { Ss } from '../../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '../../../core/typescript/constantes';
 import { ModalClass } from '../../components/modal/modal-class';
@@ -101,7 +99,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   ngOnInit() {
     this._init_mixin({ component: 'conduce', is_routing: true });
-    this.configApp = SingletonService.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -117,7 +115,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   async necesarioStar() {
     this.fechaConduce = this.formarFechaFactura(new Date())['FechaFactura'];
-    this.enfocarInput('clienteI');
+    fun.enfocarInput('clienteI');
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -132,10 +130,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   pressEscResponse(res) {
-    if (fun.hasValue(res)) {
-      this.enfocarInput('cod-' + res);
-      this.selectContenido('cod-' + res);
-    }
+    if (fun.hasValue(res)) fun.enfocarAndSelectInput('cod-' + res);
   }
 
   ngAfterViewInit() {
@@ -178,8 +173,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   async getDataFromModal(arg, search) {
     if (arg.modal_id == 'buscar_articulo') {
       if (arg?.tipo == 'data_no_found') {
-        this.enfocarInput(`cod-${arg.index}`);
-        this.selectContenido(`cod-${arg.index}`);
+        fun.enfocarAndSelectInput(`cod-${arg.index}`);
       } else {
         this.llenarRowDespuesDeFiltro(arg);
       }
@@ -187,11 +181,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
     if (arg.modal_id == 'buscarCliente') {
       if (arg?.tipo == 'data_no_found') {
-        setTimeout(() => this.enfocarInput('clienteI'), 10);
+        setTimeout(() => fun.enfocarInput('clienteI'), 10);
       } else {
         this.cliente = arg.data;
         (document.getElementById('clienteI') as any).value = arg.data.nombre;
-        setTimeout(() => this.enfocarInput('cod-0'), 10);
+        setTimeout(() => fun.enfocarInput('cod-0'), 10);
         this.buscarFacturasAdelantadas(arg.data.id);
       }
     }
@@ -222,11 +216,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
       if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) {
         const campo = fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
-        this.enfocarInput(campo);
+        fun.enfocarInput(campo);
       }
 
       if (input == 'cod-' && fun.hasValue(uni) && _.lowerCase(uni) != _.lowerCase('medida')) {
-        if (fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.ajustarSecuencia().then(() => this.enfocarInput(campo_siguiente));
+        if (fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.ajustarSecuencia().then(() => fun.enfocarInput(campo_siguiente));
       }
 
       if (input == 'can-' && fun.hasValue(cod)) {
@@ -240,11 +234,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
             header: 'BUSCAR ARTICULO',
             width: '56.25rem',
             height: '31.25rem',
-            botones: ModalClass.noShowAceptarCancelarButtons,
+            botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           });
-          this.enfocarInput('input_fantasma');
+          fun.enfocarInput('input_fantasma');
         } else {
-          this.enfocarInput(`can-${index}`);
+          fun.enfocarInput(`can-${index}`);
         }
       }
     }, 250);
@@ -264,10 +258,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       if (this.configApp.vende_sin_inventario) {
         this.continuarLlenarRow({ articulo: articulo, index: index });
       } else {
-        setTimeout(() => {
-          this.enfocarInput('cod-' + index);
-          this.selectContenido('cod-' + index);
-        }, 0);
+        setTimeout(() => fun.enfocarAndSelectInput('cod-' + index), 10);
       }
     } else {
       this.continuarLlenarRow({ articulo: articulo, index: index });
@@ -294,7 +285,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     (this.filasDetalle[params.index] as any).controls['uni'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
 
-    setTimeout(() => this.enfocarInput('can-' + params.index), 0);
+    setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
   }
 
   async llenarArrayUnidades(index) {
@@ -322,7 +313,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
       this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, _.isEqual);
 
-      if (this.inputDrop) setTimeout(() => this.enfocarInput(this.inputDrop), 0);
+      if (this.inputDrop) setTimeout(() => fun.enfocarInput(this.inputDrop), 0);
     }
   }
 
@@ -357,10 +348,10 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: ModalClass.noShowAceptarCancelarButtons,
+        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
       });
 
-      this.desEnfocarInput('clienteI');
+      fun.desEnfocarInput('clienteI');
     }
   }
 
@@ -411,8 +402,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               callback(false);
             } else {
               setTimeout(() => {
-                this.enfocarInput('can-' + i);
-                this.selectContenido('can-' + i);
+                fun.enfocarAndSelectInput('can-' + i);
                 this.calcularCantidadEnUnidades({ index: i, clean: true });
                 (this.filasDetalle[i] as any).controls['uni'].setValue(null);
                 (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
@@ -443,7 +433,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   verificarSecuencia(index, mover = true) {
-    if (this.secuencia < index && mover) this.enfocarInput(this.inputSecuencia);
+    if (this.secuencia < index && mover) fun.enfocarInput(this.inputSecuencia);
   }
 
   saliDeCantidad(i) {
@@ -465,7 +455,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     } else {
       this.checkCantidadExede(i, 'change', (excede) => {
         if (!excede) (this.filasDetalle[i] as any).controls['uni'].setValue(unidad);
-        this.ajustarSecuencia().then(() => this.enfocarInput(this.inputSecuencia));
+        this.ajustarSecuencia().then(() => fun.enfocarInput(this.inputSecuencia));
       });
     }
   }
@@ -635,7 +625,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               width: '900px',
               height: '400px',
               botones: {
-                ...ModalClass.noShowAceptarCancelarButtons,
+                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
                   { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
                   { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
@@ -756,7 +746,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         fun.toastError('No puede introducir una cantidad mayor a la cantidad de la factura ', 'ERROR');
       }
       (this.filasDetalle[i] as any).controls['can'].setValue(max_can);
-      this.enfocarInput('can-' + i);
+      fun.enfocarInput('can-' + i);
     }
   }
 
@@ -767,7 +757,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
@@ -798,7 +788,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       fun.toastWarning('Conduce no tiene cliente', 'Aviso');
     } else if (filas_ocupadas.length === 0) {
       fun.toastWarning('Conduce no tiene Articulos', 'Aviso');
-      this.enfocarInput('cod-1');
+      fun.enfocarInput('cod-1');
     } else {
       this.CuerpoConduce = [];
       for (let i = 0; i < filas_ocupadas.length; i++) {
@@ -824,7 +814,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         header: 'Confirmación',
         width: '30rem',
         botones: {
-          ...ModalClass.noShowAceptarCancelarButtons,
+          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
@@ -863,7 +853,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     for (let i = 0; i < this.filasDetalle.length; i++) {
       const control = this.filasDetalle[i].value;
 
-      if (control.des && control.cod) {
+      if (control.des || control.cod) {
         (this.filasDetalle[i] as any).controls['detalle_factura_id'].setValue(null);
         (this.filasDetalle[i] as any).controls['articulo'].setValue(null);
         (this.filasDetalle[i] as any).controls['cod'].setValue(null);
@@ -909,6 +899,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   cancelarConduce() {
     this.borrar();
     (document.getElementById('clienteI') as any).value = '';
-    setTimeout(() => this.enfocarInput('clienteI'), 10);
+    setTimeout(() => fun.enfocarInput('clienteI'), 10);
   }
 }

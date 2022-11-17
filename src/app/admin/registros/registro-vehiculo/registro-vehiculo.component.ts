@@ -73,7 +73,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
     this.boton = 'Registrar';
 
-    this.enfocarInput('user_id');
+    fun.enfocarInput('user_id');
     this.necesarioStart();
   }
 
@@ -160,10 +160,10 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     }
 
     if (campo !== 'send') {
-      this.enfocarInput(campo);
+      fun.enfocarInput(campo);
     } else {
       if (this.form.valid) {
-        this.enfocarInput('user_id');
+        fun.enfocarInput('user_id');
         setTimeout(() => {
           this.submit(this.form);
         }, 250);
@@ -177,7 +177,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.restartCampo('nombre_no_empleado');
     this.restartCampo('apellido_no_empleado');
     this.restartCampo('telefono_no_empleado');
-    this.enfocarInput('user_id');
+    fun.enfocarInput('user_id');
     if (reset) this.isCreando = true;
     this.boton = 'Registrar';
   }
@@ -280,7 +280,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       header: 'Mantenimiento marca & modelo',
       width: '1000px',
       height: '650px',
-      botones: ModalClass.noShowAceptarCancelarButtons,
+      botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
     });
   }
 

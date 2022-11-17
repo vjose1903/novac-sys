@@ -7,7 +7,7 @@ import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
 import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
 import { fun } from '../../core/services/functions.service';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { table_config } from '../components/new_tablas/tabla-class';
 import { Permisos } from '../../core/typescript/permisos';
 import { InventarioC } from './inventario';
@@ -132,7 +132,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
     setTimeout(() => {
       this.getArticulos(actualPagination);
-      SingletonService.cdRef.detectChanges();
+      Ss.cdRef.detectChanges();
     }, 500);
   }
 

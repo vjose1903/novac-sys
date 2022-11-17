@@ -3,7 +3,7 @@ import { fun } from './../functions.service';
 import { styles_ } from './utils/files';
 import { getContentWithTablaNormal } from './utils/tabla_normal';
 import { getContentWithTablaAgrupada } from './utils/tabla_agrupada';
-import { SingletonService } from '../singleton.service';
+import { Ss } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface';
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
 import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
@@ -42,7 +42,7 @@ export function makeReporte(data) {
   const configuration = configuraciones[data.tipo_reporte];
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
-  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
   const dd = {
     // pageSize: { width: 990, height: 398 },

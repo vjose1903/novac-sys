@@ -10,7 +10,7 @@ import { CurrentUserService } from '../../core/services/current-user.service';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
-import { SingletonService } from '../../core/services/singleton.service';
+import { Ss } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { fun } from '../../core/services/functions.service';
 
@@ -44,11 +44,12 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   cuadre_hoy;
   ant_event_change_visibility;
 
-  configServ = SingletonService.configServ;
+  configServ = Ss.configServ;
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
   chequiando_cuadre: boolean;
+  hasPermisosValidated: boolean;
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
     super();
@@ -88,6 +89,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
+      console.log('Layout > layServ.LOGOUT > res ', res);
+
       if (res && res.bool) this.logOut();
       else {
         if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
@@ -109,14 +112,21 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.parseMenu();
     this.checkRouteActiva();
     this.cdRef.detectChanges();
-    this.validateUserAndLoadPermisos();
+    this.validateUserAndLoadPermisos().then((result) => {
+      this.hasPermisosValidated = result;
+    });
   }
 
   validateUserAndLoadPermisos() {
-    fun.logOrange('VALIDANDO PERMISOS');
-    this.currentUserServ.validateUser().catch((error) => {
-      fun.logBlue('error: ', error);
-      if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
+    return new Promise<any>((resolve) => {
+      this.currentUserServ
+        .validateUser()
+        .then((result) => resolve(true))
+        .catch((error) => {
+          fun.logBlue('error: ', error);
+          if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
+          resolve(false);
+        });
     });
   }
 
@@ -160,10 +170,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   parseMenu() {
-    for (const keyFather in this.allPermissionsObj) {
-      for (const keyChild in this.allPermissionsObj[keyFather]) {
-        const subMenuProp = this.allPermissionsObj[keyFather][keyChild];
-        this.allPermissionsObj[keyFather].flatt = _.union(this.allPermissionsObj[keyFather].flatt, subMenuProp);
+    for (const keyFather in this.menuPermissionsObj) {
+      for (const keyChild in this.menuPermissionsObj[keyFather]) {
+        const subMenuProp = this.menuPermissionsObj[keyFather][keyChild];
+        this.menuPermissionsObj[keyFather].flatt = _.union(this.menuPermissionsObj[keyFather].flatt, subMenuProp);
       }
     }
   }
@@ -179,11 +189,21 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
+    fun.logPurple('Layout> logOut ');
     fun.logout().then(() => {
       this._destroy_layout(true);
       this.noServer = false;
+      console.log('navegando al inicio de sesion');
       this.router.navigateByUrl('/');
     });
+  }
+
+  // =================================================================================
+  // CHECK LAYOUT ACTIVE ROUTE
+  // =================================================================================
+
+  getLayoutActiveRoute(module, paths) {
+    return _.some(paths, (path) => this.actualRuta.includes(`${module}/${path}`));
   }
 
   // =================================================================================

@@ -269,10 +269,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         if (!_.endsWith(formulario[this.doc_principal], '_')) {
           const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
           if (this.doc_principal == 'cedula') {
-            if (fun.ValidaCedula(docSinGuiones)) this.enfocarInput(campo);
-          } else this.enfocarInput(campo);
+            if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
+          } else fun.enfocarInput(campo);
         }
-      } else this.enfocarInput(campo);
+      } else fun.enfocarInput(campo);
     } else {
       if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
     }
@@ -338,7 +338,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         const actualPagination = this.tServ.getPaginationById('lista_clientes');
         this.getClientes(actualPagination);
         this.borrar();
-        this.enfocarInput('cedula');
+        fun.enfocarInput('cedula');
       });
     }
   }
@@ -348,7 +348,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     setTimeout(() => {
       this.marcarCheck('cedula');
-      this.enfocarInput('cedula');
+      fun.enfocarInput('cedula');
     }, 200);
   }
 
@@ -363,7 +363,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.isCreando = true;
 
     setTimeout(() => {
-      this.enfocarInput('cedula');
+      fun.enfocarInput('cedula');
       this.marcarCheck('cedula');
     }, 2);
   }

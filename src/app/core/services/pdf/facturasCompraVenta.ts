@@ -2,7 +2,7 @@
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
 import * as numLetra from './utils/numero_letras';
-import { SingletonService } from '../singleton.service';
+import { Ss } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface';
 import { infoPagare } from './8.5x5.5/infoPdfs';
 // ==========================================================================================================================================================
@@ -24,7 +24,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const is_venta = data.tipo === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
 
-  const configApp: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
   const dd = {
     pageSize: is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 },
@@ -37,7 +37,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     styles: styles_,
   };
 
-  const obj = { doc: dd, file: file_name, type: 'file', pageOrientation:'portrait' };
+  const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };
 
   return obj;
 }
@@ -146,7 +146,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           table: {
             margin: [0, 0, 0, 0],
             headerRows: 1,
-            widths: [20, 230, '*', '*', '*', '*'],
+            widths: [20, 240, '*', '*', '*', '*'],
             body: [
               [
                 { text: ' #', style: 'letra11', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },

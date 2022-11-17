@@ -12,6 +12,7 @@
         <!-- THEAD -->
         <thead class="text-center position-relative thead letras {{ config.redondo ? 'redondo' : '' }} {{ config.colorTitulo ? 'colorTitulo' : '' }}">
           <tr id="titulosHeader-{{ config.id_tabla + post_id }}" class="titulosHeader">
+
             <th *ngFor="let row of config.info; let index_head = index" class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ config.id_tabla + post_id }}_{{ row.key }}">
               <span [ngSwitch]="row?.tipo">
                 <span *ngSwitchCase="'inputSwitch'">
@@ -29,11 +30,12 @@
                 </span>
 
                 <span *ngSwitchDefault>
-                  <span class="titulo"> {{ row.titulo }} </span>
+                  <span class="titulo" [pTooltip]="row.tooltip || ''" tooltipPosition="top"> {{ row.titulo }} </span>
                 </span>
               </span>
               <i *ngIf="row.alert_msg" class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
             </th>
+
             <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }">
               <span class="titulo"> Acciones </span>
             </th>

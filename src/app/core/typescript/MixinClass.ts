@@ -1,6 +1,6 @@
 import * as moment from '../javascript/moment';
 import { ModalClass } from '../../admin/components/modal/modal-class';
-import { SingletonService } from '../services/singleton.service';
+import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
 
 interface mixinInit {
@@ -18,7 +18,7 @@ export class MixinClass extends ModalClass {
     super();
   }
 
-  layServ = SingletonService.layServ;
+  layServ = Ss.layServ;
   arg_mixin;
 
   _init_mixin(arg?: mixinInit) {
@@ -61,28 +61,6 @@ export class MixinClass extends ModalClass {
   }
 
   // =========================================================================================================
-  clickInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    if (element) element.click();
-  }
-  // =========================================================================================================
-  enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-
-    if (element) element.focus();
-  }
-  // =========================================================================================================
-  desEnfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    if (element) element.blur();
-  }
-
-  // =========================================================================================================
-  selectContenido(arg) {
-    const element = document.getElementById(arg) as any;
-    if (element) element.select();
-  }
-  // =========================================================================================================
   formatoNumero(num) {
     return fun.numFormatTwoDecimals(num);
   }
@@ -121,7 +99,7 @@ export class MixinClass extends ModalClass {
       width: '510px',
       html: `<p> ${obj?.texto} </p>`,
       botones: {
-        ...ModalClass.noShowAceptarCancelarButtons,
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => noFunction(instance), label: 'NO', disable: false },
           {

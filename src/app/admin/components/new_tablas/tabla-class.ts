@@ -17,6 +17,7 @@ export interface table_info {
   inputType?: string;
   inputEvents?: string;
   textAlign?: 'start' | 'center' | 'end';
+  tooltip?: string;
   rowTooltip?: string;
   alerta?: boolean;
   tag_color?: string;
@@ -52,8 +53,14 @@ interface iconsI {
   rowTooltip?: string;
   tooltip?: string;
   text_color?: string;
+  disable?: Array<iconDisableItem>;
 }
 
+export interface iconDisableItem {
+  kind?: 'always' | 'selected' | 'has_value' | 'campo';
+  target?: string;
+  value?: Array<any>;
+}
 export interface paginateI {
   show?: boolean;
   showTotal?: boolean;

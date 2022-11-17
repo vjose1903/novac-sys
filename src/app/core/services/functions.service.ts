@@ -3,7 +3,7 @@ import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 
 import { ConfigI } from '../typescript/config-interface';
-import { SingletonService } from './singleton.service';
+import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
@@ -294,24 +294,8 @@ export class fun {
   static desformatear(sTnum: any) {
     const number = typeof sTnum == 'string' ? parseFloat(sTnum.replaceAll(',', '')) : sTnum;
     return number;
-
-    // let temp = 0;
-
-    // if (sTnum) {
-    //   const x = _.split(sTnum, ',');
-    //   if (x.length === 1) {
-    //     temp += parseFloat(x[0]);
-    //     return temp;
-    //   } else if (x.length >= 2) {
-    //     let joined = '';
-    //     joined = _.join(x, '');
-    //     temp += parseFloat(joined);
-    //     return temp;
-    //   }
-    // } else {
-    //   return sTnum;
-    // }
   }
+
   // __________________________________________________________________________________________________
   // Nombre: getPersonaByDocIdentidad
   // Descripcion : Esta funcion busca una persona sea empleado, cliente o suplidor por su documento de identidad
@@ -607,6 +591,32 @@ export class fun {
     if (element) element.select();
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: getActualPath
+  // Descripcion : Esta funcion returna en un string la ruta actual en la que estas posicionado
+  // __________________________________________________________________________________________________
+  static getActualPath() {
+    const actualPath = window.location.pathname;
+    return actualPath;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: enfocarAndSelectInput
+  // Descripcion : Esta funcion enfoca y selecciona el contenido de un elemento html
+  // __________________________________________________________________________________________________
+  static enfocarAndSelectInput(arg) {
+    fun.enfocarInput(arg);
+    setTimeout(() => this.selectContenido(arg), 10);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: getKeyByValue
+  // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
+  // __________________________________________________________________________________________________
+  static getKeyByValue(object, value): any {
+    return Object.keys(object).find((key) => object[key] == value);
+  }
+
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
@@ -614,6 +624,8 @@ export class fun {
   static async logout() {
     return new Promise((resolve) => {
       try {
+        console.log('inicio de borrado de localStorage');
+
         localStorage.removeItem('facturas_guardadas');
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
@@ -621,8 +633,9 @@ export class fun {
         localStorage.removeItem('expiry');
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
+        console.log('fin de borrado de localStorage');
 
-        SingletonService.layServ.nextLogOut(undefined);
+        Ss.layServ.nextLogOut(undefined);
         resolve(true);
       } catch (error) {
         resolve(false);
@@ -634,7 +647,7 @@ export class fun {
 
   static decryptConfigPassword(str) {
     const str_remplace = btoa(str);
-    const config: ConfigI = SingletonService.configServ.getConfig({ isPromise: false });
+    const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
     return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
   }
   // ----------------------------------------------------------------------------------------------------------
@@ -711,18 +724,18 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (SingletonService.sharedServ.canToast) SingletonService.toastr.info(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '');
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (SingletonService.sharedServ.canToast) SingletonService.toastr.success(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '');
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (SingletonService.sharedServ.canToast) SingletonService.toastr.error(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '');
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (SingletonService.sharedServ.canToast) SingletonService.toastr.warning(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '');
   }
 }

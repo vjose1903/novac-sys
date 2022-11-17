@@ -39,31 +39,24 @@ export const Permisos = {
     get_facturas_by_params: 'factura_compra_get_facturas_by_params',
     comprobar_serial: 'factura_compra_comprobar_serial',
     verificate_can_update_id: 'factura_compra_verificate_can_update_id',
-    cancelar_factura: 'factura_compra_cancelar_factura',
     get_facturas_by_suplidor_estado: 'factura_compra_get_facturas_by_suplidor_estado',
-  },
-  pre_venta: {
-    create: 'pre_venta_create',
-    read_all: 'pre_venta_read_all',
-    read_one: 'pre_venta_read_one',
-    update: 'pre_venta_update',
-    comprobar_serial: 'pre_venta_comprobar_serial',
+    cancelar_factura: 'factura_compra_cancelar_factura',
   },
   nota_credito: {
     create: 'nota_credito_create',
     read_all: 'nota_credito_read_all',
     read_one: 'nota_credito_read_one',
     update: 'nota_credito_update',
-    get_filtrados: 'nota_credito_get_filtrados',
     cancelar_nota: 'nota_credito_cancelar_nota',
+    get_filtrados: 'nota_credito_get_filtrados',
   },
   nota_debito: {
     create: 'nota_debito_create',
     read_all: 'nota_debito_read_all',
     read_one: 'nota_debito_read_one',
     update: 'nota_debito_update',
-    get_filtrados: 'nota_debito_get_filtrados',
     cancelar_nota: 'nota_debito_cancelar_nota',
+    get_filtrados: 'nota_debito_get_filtrados',
   },
   facturas_aplicadas: {
     get_cantidad_devuelto: 'facturas_aplicadas_get_cantidad_devuelto',
@@ -134,8 +127,8 @@ export const Permisos = {
     read_one: 'modelo_read_one',
     update: 'modelo_update',
     destroy: 'modelo_destroy',
-    get_filtrados: 'modelo_get_filtrados',
     get_modelos_by_marca: 'modelo_get_modelos_by_marca',
+    get_filtrados: 'modelo_get_filtrados',
   },
   movimiento_inventario: {
     create: 'movimiento_inventario_create',
@@ -175,7 +168,9 @@ export const Permisos = {
     get_filtrados: 'recibo_ingreso_get_filtrados',
     revertir_recibo: 'recibo_ingreso_revertir_recibo',
   },
-  reporte: { get_reportes: 'reporte_get_reportes' },
+  reporte: {
+    get_reportes: 'reporte_get_reportes',
+  },
   secuencia_comprobante: {
     create: 'secuencia_comprobante_create',
     read_all: 'secuencia_comprobante_read_all',
@@ -191,8 +186,8 @@ export const Permisos = {
     read_one: 'suplidor_read_one',
     update: 'suplidor_update',
     destroy: 'suplidor_destroy',
-    get_filtrados: 'suplidor_get_filtrados',
     get_nombres_suplidores: 'suplidor_get_nombres_suplidores',
+    get_filtrados: 'suplidor_get_filtrados',
   },
   tipo_articulo: {
     create: 'tipo_articulo_create',
@@ -231,7 +226,6 @@ export const Permisos = {
     destroy: 'vehiculo_destroy',
     get_filtrados: 'vehiculo_get_filtrados',
   },
-  device: { login: 'device_login' },
   role: {
     create: 'role_create',
     read_all: 'role_read_all',
@@ -239,5 +233,22 @@ export const Permisos = {
     update: 'role_update',
     destroy: 'role_destroy',
     get_filtrados: 'role_get_filtrados',
+  },
+  device: {
+    login: 'device_login',
+  },
+  cotizacion: {
+    create: 'cotizacion_create',
+    read_all: 'cotizacion_read_all',
+    read_one: 'cotizacion_read_one',
+    update: 'cotizacion_update',
+    destroy: 'cotizacion_destroy',
+  },
+  pre_venta: {
+    create: 'pre_venta_create',
+    read_all: 'pre_venta_read_all',
+    read_one: 'pre_venta_read_one',
+    update: 'pre_venta_update',
+    comprobar_serial: 'pre_venta_comprobar_serial',
   },
 };

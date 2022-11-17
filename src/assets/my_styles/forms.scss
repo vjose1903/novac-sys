@@ -47,6 +47,10 @@
     border-color: transparent !important;
     box-shadow: 0px 0px 6px var(--primary08) !important;
   }
+
+  .p-dropdown-clear-icon {
+    margin-right: 0.5rem !important;
+  }
 }
 
 .p-dropdown-panel {
@@ -59,7 +63,7 @@
     .p-dropdown-items {
       .p-dropdown-item {
         &.p-highlight {
-          background-color: var(--primary08) !important;
+          background-color: var(--transparente04) !important;
           color: black;
           font-weight: 600;
         }
@@ -95,6 +99,7 @@ textarea {
   height: calc(1.5em + 0.3rem + 2px) !important;
   padding: 0.2rem 0.7rem !important;
   width: 100%;
+  border: 1px solid #a6a6a6a6 !important;
   @include campos;
 }
 
