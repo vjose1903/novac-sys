@@ -17,7 +17,8 @@ export class FacturacionService {
   options_tipos_costos_gastos: string[];
   lista_tipos_facturas: TipoFacturaI[];
   propietario_factura;
-  pre_factura_selected;
+  pre_venta_selected;
+  cotizacion_selected;
 
   referencia_tipos_facturas = {
     'factura sin comprobante': '00',

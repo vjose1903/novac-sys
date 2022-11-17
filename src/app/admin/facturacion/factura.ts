@@ -19,6 +19,7 @@ export enum actionFacturacion {
   new = 'new',
   update = 'update',
   bill_from_cotizacion = 'bill_from_cotizacion',
+  bill_from_pre_venta = 'bill_from_pre_venta',
 }
 
 export class FacturaC extends CrudG<FacturasI> {
@@ -86,8 +87,6 @@ export class FacturaC extends CrudG<FacturasI> {
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
 
-    console.log('args ', args);
-
     const extra = {
       afterPath: `custom/get_documentos/params`,
       parameters: { page: args.page, per_page: args.per_page, paginado: args.paginado, fact_de: args.fact_de, pagada: args.pagada, campo: args.campo, valor: VALOR_ENC, tipo_factura_id: args.tipo_factura_id, is_adelantada: args.adelantada },
@@ -133,17 +132,21 @@ export class FacturaC extends CrudG<FacturasI> {
 
       const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [
         { old_key: 'tipo_factura', new_key: 'tipo_pdf' },
-        { old_key: 'detalle_facturas', new_key: 'contenido_reporte' },
+
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
 
       data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format();
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
+      if (data_parsed.tipo_pdf == 'COTIZACION') data_parsed.tipo_pdf = 'COTIZACIÓN';
       data_parsed.total = data_parsed.total_factura;
+      data_parsed.contenido_reporte = [];
 
-      data_parsed.contenido_reporte.map((detalle) => {
-        detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
-        return detalle;
+      data_parsed.detalle_facturas.forEach((detalle) => {
+        if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {
+          detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+          data_parsed.contenido_reporte.push(detalle);
+        }
       });
 
       resolve(data_parsed);

@@ -9,6 +9,7 @@ import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
+import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_pre_venta } from './configuraciones/pre_venta';
 import { config_notas } from './configuraciones/notas';
 
@@ -19,6 +20,7 @@ const configuraciones = {
   conduce: config_conduce,
   notas: config_notas,
   cuadre_caja: config_cuadre_caja,
+  cotizacion: config_cotizacion,
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
@@ -286,6 +288,8 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   const contenido = [];
 
   if (!infoPropietarioPartes[tipo_pdf].length) return [{ text: '' }];
+  const entidad_label = is_suplidor ? 'Suplidor               : ' : 'Cliente                : ';
+  const entidad = is_suplidor ? data.suplidor : data.cliente;
 
   const partes = [
     {
@@ -293,8 +297,8 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       item: {
         alignment: 'left',
         text: [
-          is_suplidor ? { text: 'Suplidor               : ', bold: true, style: 'letra8' } : { text: 'Cliente                : ', bold: true, style: 'letra8' },
-          is_suplidor ? { text: data.suplidor.nombre || '', style: 'letra8' } : { text: `${data.cliente.nombre || ''} ${data.cliente.apellido || ''}`, style: 'letra8' },
+          { text: entidad_label, bold: true, style: 'letra8' },
+          { text: entidad.nombre || '', style: 'letra8' },
         ],
       },
     },
@@ -302,14 +306,30 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       key: 'doc_identidad',
       item: {
         alignment: 'left',
-        text: [{ text: 'Doc. identidad   : ', bold: true, style: 'letra8' }, is_suplidor ? { text: data.suplidor.rnc || '', style: 'letra8' } : { text: data.cliente.rnc || '', style: 'letra8' }],
+        text: [
+          { text: 'Doc. identidad   : ', bold: true, style: 'letra8' },
+          { text: entidad.rnc || '', style: 'letra8' },
+        ],
       },
     },
     {
       key: 'telefono',
       item: {
         alignment: 'left',
-        text: [{ text: 'Telefono             : ', bold: true, style: 'letra8' }, is_suplidor ? { text: data.suplidor.telefono || '', style: 'letra8' } : { text: data.cliente.telefono || '', style: 'letra8' }],
+        text: [
+          { text: 'Telefono             : ', bold: true, style: 'letra8' },
+          { text: entidad.telefono || '', style: 'letra8' },
+        ],
+      },
+    },
+    {
+      key: 'direccion',
+      item: {
+        alignment: 'left',
+        text: [
+          { text: 'Direccion            : ', bold: true, style: 'letra8' },
+          { text: entidad.direccion || '', style: 'letra8' },
+        ],
       },
     },
   ];

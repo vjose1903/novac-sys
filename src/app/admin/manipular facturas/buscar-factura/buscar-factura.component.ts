@@ -286,6 +286,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async pedirFactura(params?: { per_page: number; page: number; search: string }) {
+    const documento_descripcion = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Cotización' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
+
     try {
       this.facturas.length = 0;
 
@@ -296,7 +298,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       res['data'].forEach((fact) => {
         const pago_a_tiempo = this.getIsPagoAtiempo(fact);
         const estatus = this.getIsActiveInfo(fact);
-        const documento_descripcion = fact?.tipo == tipoDocFacturacion.cotizacion ? 'Cotización' : fact?.tipo == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
 
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
         fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
@@ -338,8 +339,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       this.facturas = _.orderBy(this.facturas, ['fecha_equivalente'], ['desc']);
 
-      console.log('this.facturas ', this.facturas);
-
       if (this.facturas.length > 0) {
         if (this.buscar_por == this.campos.numeroComprobante || (this.buscar_por == this.campos.numeroFactura && this.tipo_factura_id != '0')) {
           this.facturaClass.parseDataToPdf(this.facturas[0]).then((factura_parsed) => {
@@ -350,18 +349,18 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         } else {
           setTimeout(() => this.tablaComponent.changeConfig([{ total_count: res.total_registros }]), 100);
         }
-      } else {
-        if (this.buscar_por == this.campos.cliente) {
-          fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
-        } else if (this.buscar_por == this.campos.suplidor) {
-          fun.toastError('Este suplidor no tiene facturas del tipo seleccionada', 'ERROR');
-        } else if (this.buscar_por == this.campos.numeroFactura) {
-          fun.toastError('No existen facturas con este número.', 'ERROR');
-        } else if (this.buscar_por == this.campos.numeroComprobante) {
-          fun.toastError('La factura buscada no existe', 'ERROR');
-        }
       }
     } catch (error) {
+      if (this.buscar_por == this.campos.cliente) {
+        fun.toastError(`Este cliente no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
+      } else if (this.buscar_por == this.campos.suplidor) {
+        fun.toastError(`Este suplidor no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
+      } else if (this.buscar_por == this.campos.numeroFactura) {
+        fun.toastError(`No existen ${documento_descripcion} con este número.`, 'ERROR');
+      } else if (this.buscar_por == this.campos.numeroComprobante) {
+        fun.toastError(`La ${documento_descripcion} buscada no existe`, 'ERROR');
+      }
+      fun.enfocarAndSelectInput('valorI');
       console.error(error);
     }
   }
@@ -369,7 +368,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   getIsActiveInfo(documento) {
     let res = { icon: null, tooltip: null, color: null };
 
-    if (this.tipo_documento_selected == 'compra') {
+    if (this.tipo_documento_selected == tipoDocFacturacion.compra) {
       res.icon = documento.estado ? (documento.balance < 1 ? 'fas fa-check' : 'fas fa-exclamation-triangle') : 'fas fa-times';
       res.tooltip = documento.estado ? (documento.balance < 1 ? 'Factura saldada' : 'Factura pendiente de pago') : 'Factura anulada';
       res.color = documento.estado ? (documento.balance < 1 ? 'green' : 'yellow') : 'red';
@@ -394,8 +393,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     let pago_a_tiempo = true;
 
     if (factura.condicion != 'Crédito' || factura.pagada) return pago_a_tiempo;
-    console.log(' ');
-    console.log('factura: ', factura);
 
     const fecha_actual = moment().format('YYYY-MM-DD');
 
@@ -430,7 +427,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (fun.hasValue(valorInput)) valorInput.value = null;
 
     this.resetFacturas();
-    const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura].map((item) => `${item}`);
+    const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura, this.campos.cliente].map((item) => `${item}`);
 
     if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
 
@@ -492,7 +489,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         if (params.iconKey == 'view') {
           this.facturaClass.parseDataToPdf(params.data).then((factura_parsed) => {
             this.facturaSelected = factura_parsed;
-            console.log('this.facturaSelected ', this.facturaSelected);
 
             this.mostrarFactura(factura_parsed, this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : 'facturacion');
           });
@@ -576,8 +572,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   editarFactura() {
     this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
-      console.log('===> ', `/admin/factura/venta/update/${this.facturaSelected.id}`);
-
       setTimeout(() => this.router.navigateByUrl(`/admin/factura/venta/update/${this.facturaSelected.id}`), 10);
     });
   }
@@ -603,7 +597,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
     const toPDFData = { data: dataFactura, type: type };
-    console.log('type ', type);
 
     let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
 
@@ -718,8 +711,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   getDataFromModal(arg, search) {
-    console.log('arg ', arg);
-
     if (arg.modal_id == 'buscarClienteOsuplidor') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('valorI');
@@ -728,7 +719,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         const actualPagination = this.tServ.getPaginationById('facturas_params', 'getDataFromModal');
 
-        this.buscar_por = this.tipo_documento_selected == 'compra' ? this.campos.suplidor : this.campos.cliente;
+        this.buscar_por = this.tipo_documento_selected == tipoDocFacturacion.compra ? this.campos.suplidor : this.campos.cliente;
         this.valor_a_buscar = arg.data.id;
 
         this.pedirFactura(actualPagination);

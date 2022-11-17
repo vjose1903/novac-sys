@@ -78,7 +78,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
   ngOnInit(): void {
     this.filter_key = this.filter_options.todos;
-    console.log('this.inputs ', this.inputs);
     this.buscarDocumentos(this.tServ.obj_paginate.default);
   }
 
@@ -103,8 +102,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   }
 
   async getClientes(arg) {
-    console.log('this.clienteSelected ', this.clienteSelected);
-
     if (typeof this.clienteSelected == 'string' && arg.value && arg.value !== '') {
       fun.awaitTyping().then((res) => {
         const extra = { afterPath: `filtro/${arg.value}`, parameters: { paginado: false } };
@@ -118,7 +115,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
           });
 
           this.listaClientes = res['data'];
-          console.log('this.listaClientes ', this.listaClientes);
         });
       });
     } else {
@@ -165,8 +161,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
       this.documentos = _.orderBy(this.documentos, ['fecha_equivalente'], ['desc']);
 
-      console.log('this.documentos ', this.documentos);
-
       if (this.documentos.length > 0) {
         setTimeout(() => this.tablaComponent.changeConfig([{ total_count: res.total_registros }]), 100);
       } else {
@@ -201,7 +195,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
   mostrarFactura(dataFactura, type) {
     const toPDFData = { data: dataFactura, type: type };
-    console.log('type ', type);
 
     let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
 
@@ -250,10 +243,8 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     modal.closeModal(this.modal.component_id);
 
     this.router.navigateByUrl('/').then((res) => {
-      this.router.navigateByUrl(`/admin/factura/venta/bill_from_cotizacion/${documento_selected.id}`);
+      this.router.navigateByUrl(`/admin/factura/venta/bill_from_${this.inputs.code}/${documento_selected.id}`);
     });
-
-    // modal.returnDataFromModal({ data: documento_selected, tipo: this.inputs.code, modal_id: this.modal.component_id });
   }
 
   btn_aceptar() {}

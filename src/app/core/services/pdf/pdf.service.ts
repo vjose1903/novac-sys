@@ -64,8 +64,6 @@ export class PdfService {
 
           case 'cotizacion':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            data.tipo_pdf = 'COTIZACIÓN';
-
             console.log('data ', data);
 
             obj = options[config.pages_sizes.cotizacion].makePDF(data, 'cotizacion.pdf', 'cotizacion');

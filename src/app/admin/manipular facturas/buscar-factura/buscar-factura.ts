@@ -66,7 +66,30 @@ export class BuscarFacturaC {
       obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     } as table_config,
 
-    pre_venta: {} as table_config,
+    pre_venta: {
+      info: [
+        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: 'No. Pre-venta', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
+        { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
+        { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre' },
+        { titulo: 'Total', tipo: 'formatoNumero', key: 'total_factura' },
+        {
+          titulo: 'Acciones',
+          tipo: 'icon',
+          key: 'actions',
+          estilos: [{ width: '9%' }],
+          iconsArray: [
+            { key: 'view', tooltip: 'Ver Pre-Venta', text_color: 'viewColor' },
+            { key: 'make_bill', rowTooltip: 'coti_preventa_tooltip', disable: [{ kind: 'has_value', target: 'fecha_completada' }] },
+            { key: 'delete', tooltip: 'Anular Pre-Venta' },
+          ],
+        },
+      ],
+      colores: true,
+      padding: '0.5rem',
+      id_tabla: 'facturas_params',
+      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    } as table_config,
 
     cotizacion: {
       info: [

@@ -22,7 +22,7 @@
               <h4
                 class="opcion"
                 *ngxPermissionsOnly="menuPermissionsObj.facturacion.venta"
-                [ngClass]="{ activa: getLayoutActiveRoute('venta', ['new', 'update', 'bill_from_cotizacion']) }"
+                [ngClass]="{ activa: getLayoutActiveRoute('venta', ['new', 'update', 'bill_from_cotizacion', 'bill_from_pre_venta']) }"
                 (click)="cambiarMenu({ url: 'factura/venta/new/0', navigate: true })"
               >
                 Venta

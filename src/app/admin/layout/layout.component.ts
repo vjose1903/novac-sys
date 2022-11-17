@@ -203,7 +203,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   getLayoutActiveRoute(module, paths) {
-    return _.some(paths, (path) => this.actualRuta.includes(`${module}/${path}`));
+    return _.some(paths, (path) => this.actualPath.includes(`/${module}/${path}`));
   }
 
   // =================================================================================
@@ -211,10 +211,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
-    const location = window.location.href;
-    const actualPath = location.slice(location.indexOf('/admin'), location.length);
-
-    this.actualPath = actualPath;
+    this.actualPath = fun.getActualPath();
 
     const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
 
