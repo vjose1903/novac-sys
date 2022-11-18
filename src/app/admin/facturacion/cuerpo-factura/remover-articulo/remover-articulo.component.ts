@@ -18,7 +18,6 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
   form;
   ngOnInit(): void {
     this.createForm();
-    console.log('====> ', this.inputs.data_detalle);
   }
 
   createForm() {

@@ -42,15 +42,22 @@
               <ul class="dropRowConfig" role="menu">
                 <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable">
                   <a class="" id="dropdown-item">
-                    <i class="far fa-trash-alt text-red btnConfig mr-1"></i>
+                    <i class="far fa-trash-alt text-gris-oscuro btnConfig mr-1"></i>
                     Quitar Producto
                   </a>
                 </li>
 
                 <li *ngIf="item_cuerpo.controls.is_bad_price.value" role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
                   <a class="" id="dropdown-item">
-                    <i class="fa-solid fa-triangle-exclamation text-yellow btnConfig mr-1"></i>
+                    <i class="fa-solid fa-triangle-exclamation text-gris-oscuro btnConfig mr-1"></i>
                     Obtener {{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio' }} actual
+                  </a>
+                </li>
+
+                <li *ngIf="hasArticulosDevueltos(index_cuerpo)" role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
+                  <a class="" id="dropdown-item">
+                    <i class="fa-solid fa-repeat text-gris-oscuro btnConfig mr-1"></i>
+                    Retornar articulos devueltos
                   </a>
                 </li>
               </ul>
