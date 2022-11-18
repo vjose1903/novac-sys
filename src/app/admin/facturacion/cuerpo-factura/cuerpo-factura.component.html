@@ -47,7 +47,7 @@
                   </a>
                 </li>
 
-                <li *ngIf="item_cuerpo.controls.bad_price.value" role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
+                <li *ngIf="item_cuerpo.controls.is_bad_price.value" role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
                   <a class="" id="dropdown-item">
                     <i class="fa-solid fa-triangle-exclamation text-yellow btnConfig mr-1"></i>
                     Obtener {{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio' }} actual
@@ -172,9 +172,9 @@
                 </td>
                 <!--  ::::::::::::  PRECIO  ::::::::::::  -->
                 <td class="tiPRE p-0">
-                  <div class="form-group m-0" [pTooltip]="item_cuerpo.controls.bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
+                  <div class="form-group m-0" [pTooltip]="item_cuerpo.controls.is_bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
                     <div class="precio-div">
-                      <i *ngIf="item_cuerpo.controls.bad_price.value" class="fa-solid {{ getInfoBadPrice(index_cuerpo).icon }} iconArrow"></i>
+                      <i *ngIf="item_cuerpo.controls.is_bad_price.value" class="fa-solid {{ getInfoBadPrice(index_cuerpo).icon }} iconArrow"></i>
                       <input
                         type="text"
                         (blur)="revisarPrecio('pre', 'pre', index_cuerpo); calcularTotalRow(index_cuerpo)"
@@ -183,7 +183,7 @@
                         (keyup.enter)="calcularTotalRow(index_cuerpo); fun.enfocarInput('cod-' + (index_cuerpo + 1))"
                         id="pre-{{ index_cuerpo }}"
                         formControlName="pre"
-                        [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.bad_price.value }"
+                        [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.is_bad_price.value }"
                         tabindex="-1"
                       />
                     </div>

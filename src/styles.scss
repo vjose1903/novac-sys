@@ -21,8 +21,6 @@ $bodyfont: "Poppins";
   max-height: inherit;
 }
 
-
-
 .si-wrap {
   flex-wrap: wrap;
 }
@@ -702,9 +700,9 @@ Not supports in Firefox and IE */
 }
 
 .inputOscuro {
-  background-color: rgba(194, 194, 194, 0.753) !important;
+  background-color: var(--transparente05) !important;
   > input {
-    background-color: rgba(194, 194, 194, 0.753) !important;
+    background-color: var(--transparente05) !important;
   }
 }
 
