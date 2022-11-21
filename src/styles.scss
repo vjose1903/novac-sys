@@ -204,11 +204,22 @@ body {
   max-height: 91% !important;
 }
 
-.rayaA {
+.rayaTop {
   margin-top: 0rem !important;
   margin-bottom: 1rem !important;
   border: 0 !important;
-  border-top: 2px solid rgba(0, 0, 0, 0.1) !important;
+  border-top: 2px solid #0000001a !important;
+}
+
+.rayaRight {
+  border-right: 2px solid #0000001a !important;
+}
+
+.rayaBottom {
+  margin-top: 1rem !important;
+  margin-bottom: 0rem !important;
+  border: 0 !important;
+  border-bottom: 2px solid #0000001a !important;
 }
 
 .p-tooltip {
@@ -392,6 +403,7 @@ body {
 /* BADGE */
 /* ====================================================== */
 .badge {
+  cursor: default !important;
   font-size: 1rem;
   padding: 0.5rem;
   box-shadow: 1px 1px 1px black;
@@ -414,6 +426,10 @@ body {
 
   &.yellow {
     background-color: #e9e61e;
+  }
+
+  &.disable {
+    filter: brightness(1.6) contrast(0.5);
   }
 }
 

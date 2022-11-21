@@ -1,3 +1,4 @@
+import { RetornarDevueltoComponent } from './retornar-devuelto/retornar-devuelto.component';
 import { FacturacionService } from './../facturacion.service';
 import { tipoDocFacturacion } from './../factura';
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
@@ -130,129 +131,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  procesoQuitarArticulo(key, data_remover) {
-    if (this.factServ.pre_venta_selected && data_remover) {
-      this.retirarArticuloPreFactura(key, data_remover);
-    } else {
-      this.pasosQuitarArticulo(key);
-    }
-  }
-
-  retirarArticuloPreFactura(key, data_remover) {
-    const current_detalle = _.find(this.filasDetalle, (detalle) => detalle.value.key == key);
-    const index_current_detalle = _.findIndex(this.filasDetalle, (detalle) => detalle.value.key == key);
-
-    const origin_current_detalle = fun.duplicarJson(current_detalle.value);
-    fun.logRed('origin_current_detalle.can ', origin_current_detalle.can);
-
-    const medida = current_detalle.value.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : current_detalle.value.articulo.medida;
-
-    current_detalle.controls.can.setValue(current_detalle.value.can - data_remover.cantidad);
-    current_detalle.controls.cantidad_en_unidades.setValue(current_detalle.value.can * current_detalle.value.articulo.contenido[medida]);
-    current_detalle.controls.descuento_valor.setValue((origin_current_detalle.descuento_valor / origin_current_detalle.can) * current_detalle.value.can);
-
-    this.calcularDescuento(index_current_detalle);
-    this.calcularTotalRow(index_current_detalle);
-
-    const detalles_llenos = this.getDetallesLlenos();
-
-    console.log(' ');
-    console.log(' ');
-    console.log('detalle_actual ', current_detalle.value);
-    console.log(' ');
-
-    if (data_remover.cantidad <= origin_current_detalle.can) {
-      if (data_remover.razon == razon_remover.producto_defectuoso) {
-        const articulo_ya_retirado = _.find(detalles_llenos, (detalle) => detalle.key_origin == current_detalle.value.key);
-        const articulo_retirado_index = fun.hasValue(articulo_ya_retirado) ? _.findIndex(this.filasDetalle, (detalle) => detalle.value.key == articulo_ya_retirado.key) : null;
-
-        const producto_defectuoso = this.parsearProductoDevueltos(origin_current_detalle, data_remover, true);
-
-        setTimeout(() => {
-          if (fun.hasValue(articulo_ya_retirado)) {
-            this.addToProductosDevueltos(producto_defectuoso, 'modify', { data: articulo_ya_retirado, tipo: 'producto_defectuoso', index: articulo_retirado_index });
-          } else {
-            this.llenarDetalles(producto_defectuoso, producto_defectuoso.articulo, this.secuencia);
-          }
-        }, 10);
-        //
-      } else if (data_remover.razon == razon_remover.no_venta) {
-        const articulo_ya_retirado = _.find(this.productos_devueltos, (detalle) => detalle.key_origin == current_detalle.value.key);
-        console.log('this.productos_devueltos ', this.productos_devueltos);
-
-        const producto_devuelto = this.parsearProductoDevueltos(origin_current_detalle, data_remover, false);
-
-        const action = fun.hasValue(articulo_ya_retirado) ? 'modify' : 'add';
-        setTimeout(() => this.addToProductosDevueltos(producto_devuelto, action, { data: articulo_ya_retirado, tipo: 'producto_devuelto' }), 10);
-        //
-      }
-    }
-    fun.logGreen('origin_current_detalle.can ', origin_current_detalle.can);
-    fun.logYellow('data_remover.cantidad ', data_remover.cantidad);
-
-    if (origin_current_detalle.can == data_remover.cantidad) this.pasosQuitarArticulo(origin_current_detalle.key);
-  }
-
-  addToProductosDevueltos(data, tipo: 'add' | 'modify', articulo_ya_retirado?) {
-    const producto = _.pick(data, ['key', 'articulo_id', 'cantidad', 'articulo', 'calcular_saco', 'cantidad_en_unidades', 'costo', 'descuento_valor', 'id', 'is_defectuoso', 'is_devuelto', 'itbis', 'precio', 'total', 'unidad', 'key_origin']);
-    producto['articulo_id'] = producto.articulo.id;
-
-    console.log('  ');
-    console.log('next_producto_retirar ', producto);
-
-    if (tipo == 'add') {
-      this.productos_devueltos.push(producto);
-    }
-
-    if (tipo == 'modify') {
-      console.log('articulo_ya_retirado.data ', articulo_ya_retirado.data);
-
-      if (articulo_ya_retirado.tipo == 'producto_devuelto') {
-        let producto_devuelto = _.find(this.productos_devueltos, { key: producto.key });
-        console.log('producto_devuelto ', producto_devuelto);
-      }
-
-      if (articulo_ya_retirado.tipo == 'producto_defectuoso') {
-        const campos = (this.filasDetalle[articulo_ya_retirado.index] as any).controls;
-
-        campos['can'].setValue(producto.cantidad + articulo_ya_retirado.data.can);
-        campos['cantidad_en_unidades'].setValue(producto.cantidad_en_unidades + articulo_ya_retirado.data.cantidad_en_unidades);
-
-        campos['tot'].setValue(fun.numFormatTwoDecimals(data.total));
-
-        this.calcularDescuento(articulo_ya_retirado.index);
-
-        fun.logOrange('campos ', campos);
-      }
-    }
-  }
-
-  parsearProductoDevueltos(producto_origin, data_remover, is_defectuoso) {
-    const articulo_a_retirar = fun.duplicarJson(producto_origin);
-
-    const medida = articulo_a_retirar.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo_a_retirar.articulo.medida;
-
-    articulo_a_retirar.descuento_valor = (articulo_a_retirar.descuento_valor / articulo_a_retirar.can) * data_remover.cantidad;
-
-    articulo_a_retirar.can = data_remover.cantidad;
-    articulo_a_retirar.cantidad = data_remover.cantidad;
-    articulo_a_retirar.cantidad_en_unidades = data_remover.cantidad * articulo_a_retirar.articulo.contenido[medida];
-
-    articulo_a_retirar.total = articulo_a_retirar.cantidad * articulo_a_retirar.precio;
-    articulo_a_retirar.key_origin = articulo_a_retirar.key;
-
-    articulo_a_retirar.id = null;
-    articulo_a_retirar.key = fun.generateKey();
-    articulo_a_retirar['is_defectuoso'] = is_defectuoso;
-    articulo_a_retirar['from_pre_factura'] = true;
-    articulo_a_retirar['is_devuelto'] = true;
-
-    if (is_defectuoso) articulo_a_retirar.precio /= 2;
-    if (is_defectuoso) articulo_a_retirar.total /= 2;
-
-    return articulo_a_retirar;
-  }
-
   async pasosQuitarArticulo(key) {
     await this.sacarDescuento(key);
     await this.removeItem(this.indexRemove);
@@ -315,7 +193,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const detalles = this.getDetallesLlenos();
 
-    return _.some(detalles, (detalle) => detalle.key_origin == current_detalle.key);
+    return _.some(detalles, (detalle) => detalle.key_origin == current_detalle.key) || _.some(this.productos_devueltos, (detalle) => detalle.key_origin == current_detalle.key);
   }
 
   getDetallesLlenos() {
@@ -673,15 +551,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   calcularDescuento(index: number) {
-    console.log('this.getDetallesLlenos ', this.getDetallesLlenos());
-
     const articulo = (this.filasDetalle[index] as any).controls['articulo'].value;
     const codido = (this.filasDetalle[index] as any).controls['cod'].value;
     const precioTEMP = (this.filasDetalle[index] as any).controls['pre'].value;
     const key = (this.filasDetalle[index] as any).controls['key'].value;
-
-    console.log('index ', index);
-    console.log('key ', key);
 
     const precio = fun.desformatear(precioTEMP);
     const itbis = articulo.calcular_itbis ? precio * 0.18 : 0;
@@ -702,14 +575,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (fun.hasValue(codido) && fun.hasValue(precio) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
         let nuevoTotal = 0;
         nuevoTotal = total - descuento;
-        // TODO: revisar por que cuando quito un producto de una prefactura el descuento se aumenta enves de dividirse
+
         if (nuevoTotal < 0) {
           fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
           fun.enfocarAndSelectInput(`desc-${index}`);
         } else {
           let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key == key);
 
-          if (fun.hasValue(currentDescuento)) currentDescuento.desc = descuento;
+          if (fun.hasValue(currentDescuento)) currentDescuento.valor = descuento;
           else this.listaDeDescuentos.push({ key: key, valor: descuento });
 
           (this.filasDetalle[index] as any).controls['tot'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
@@ -720,6 +593,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
     } else {
       if (descuento < 0) fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
+
       (this.filasDetalle[index] as any).controls['descuento_valor'].setValue(0);
       fun.enfocarInput(`desc-${index}`);
     }
@@ -811,11 +685,36 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       inputs: obj,
       id: 'removerArticulo',
       header: 'Confirmación',
-      width: this.modo_factura != 'pre_venta' ? '30rem' : '40rem',
-      botones: {
-        aceptar: { show: true, disable: false },
-        cancelar: { show: true, disable: false },
-      },
+      width: obj.is_prefactura_selected ? '40rem' : '30rem',
+      botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
+    });
+
+    if (this.dropRowConfig) this.dropRowConfig.hide();
+    if (event) event.stopPropagation();
+  }
+
+  retornarArticulosDevueltos(index, event) {
+    const current_detalle = this.filasDetalle[index].getRawValue();
+    const detalles = this.getDetallesLlenos();
+
+    const articulo_defectuoso = _.find(detalles, (detalle) => detalle.key_origin == current_detalle.key);
+    const articulo_solo_devuelto = _.find(this.productos_devueltos, (detalle) => detalle.key_origin == current_detalle.key);
+
+    const name = current_detalle.des;
+
+    const unidad = current_detalle.uni;
+    this.indexRemove = index;
+
+    const inputs = { data: current_detalle, articulo_defectuoso: articulo_defectuoso, articulo_solo_devuelto: articulo_solo_devuelto };
+    inputs['nombre'] = unidad ? `${name} (${unidad})` : name;
+
+    this.openNewModal({
+      component: RetornarDevueltoComponent,
+      inputs: inputs,
+      id: 'retornarDevuelto',
+      header: 'Confirmación',
+      width: '40rem',
+      botones: { aceptar: { show: true, disable: true }, cancelar: { show: true, disable: false } },
     });
 
     if (this.dropRowConfig) this.dropRowConfig.hide();
@@ -930,9 +829,124 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   async getDataFromModal(arg, search) {
     if (arg?.tipo == 'data_no_found') fun.enfocarAndSelectInput(`cod-${arg.index}`);
 
+    if (arg.modal_id == 'retornarDevuelto') this.retornarDevuelto(arg);
+
     if (arg.modal_id == 'removerArticulo') this.procesoQuitarArticulo(arg.key, arg.data);
 
     if (arg.modal_id == 'buscarArticulo') this.llenarRowDespuesDeFiltro(arg);
+  }
+
+  retornarDevuelto(arg) {
+    console.log('>>> arg ', arg);
+  }
+
+  procesoQuitarArticulo(key, data_remover) {
+    if (this.factServ.pre_venta_selected && data_remover) {
+      this.retirarArticuloPreFactura(key, data_remover);
+    } else {
+      this.pasosQuitarArticulo(key);
+    }
+  }
+
+  retirarArticuloPreFactura(key, data_remover) {
+    const current_detalle = _.find(this.filasDetalle, (detalle) => detalle.value.key == key);
+    const index_current_detalle = _.findIndex(this.filasDetalle, (detalle) => detalle.value.key == key);
+
+    const origin_current_detalle = fun.duplicarJson(current_detalle.value);
+
+    const medida = current_detalle.value.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : current_detalle.value.articulo.medida;
+
+    current_detalle.controls.can.setValue(current_detalle.value.can - data_remover.cantidad);
+    current_detalle.controls.cantidad_en_unidades.setValue(current_detalle.value.can * current_detalle.value.articulo.contenido[medida]);
+    current_detalle.controls.descuento_valor.setValue((origin_current_detalle.descuento_valor / origin_current_detalle.can) * current_detalle.value.can);
+
+    this.calcularDescuento(index_current_detalle);
+    this.calcularTotalRow(index_current_detalle);
+
+    const detalles_llenos = this.getDetallesLlenos();
+
+    if (data_remover.cantidad <= origin_current_detalle.can) {
+      if (data_remover.razon == razon_remover.producto_defectuoso) {
+        const articulo_ya_retirado = _.find(detalles_llenos, (detalle) => detalle.key_origin == current_detalle.value.key);
+        const articulo_retirado_index = fun.hasValue(articulo_ya_retirado) ? _.findIndex(this.filasDetalle, (detalle) => detalle.value.key == articulo_ya_retirado.key) : null;
+
+        const producto_defectuoso = this.parsearProductoDevueltos(origin_current_detalle, data_remover, true);
+
+        setTimeout(() => {
+          if (fun.hasValue(articulo_ya_retirado)) {
+            this.addToProductosDevueltos(producto_defectuoso, 'modify', { data: articulo_ya_retirado, tipo: 'producto_defectuoso', index: articulo_retirado_index });
+          } else {
+            this.llenarDetalles(producto_defectuoso, producto_defectuoso.articulo, this.secuencia);
+          }
+        }, 10);
+        //
+      } else if (data_remover.razon == razon_remover.no_venta) {
+        const articulo_ya_retirado = _.find(this.productos_devueltos, (detalle) => detalle.key_origin == current_detalle.value.key);
+
+        const producto_devuelto = this.parsearProductoDevueltos(origin_current_detalle, data_remover, false);
+
+        const action = fun.hasValue(articulo_ya_retirado) ? 'modify' : 'add';
+        setTimeout(() => this.addToProductosDevueltos(producto_devuelto, action, { data: articulo_ya_retirado, tipo: 'producto_devuelto' }), 10);
+        //
+      }
+    }
+
+    if (origin_current_detalle.can == data_remover.cantidad) this.pasosQuitarArticulo(origin_current_detalle.key);
+  }
+
+  addToProductosDevueltos(data, tipo: 'add' | 'modify', articulo_ya_retirado?) {
+    const producto = _.pick(data, ['key', 'articulo_id', 'cantidad', 'articulo', 'calcular_saco', 'cantidad_en_unidades', 'costo', 'descuento_valor', 'id', 'is_defectuoso', 'is_devuelto', 'itbis', 'precio', 'total', 'unidad', 'key_origin']);
+    producto['articulo_id'] = producto.articulo.id;
+
+    if (tipo == 'add') {
+      this.productos_devueltos.push(producto);
+    }
+
+    if (tipo == 'modify') {
+      if (articulo_ya_retirado.tipo == 'producto_devuelto') {
+        let producto_devuelto = _.find(this.productos_devueltos, { key: producto.key });
+      }
+
+      if (articulo_ya_retirado.tipo == 'producto_defectuoso') {
+        const campos = (this.filasDetalle[articulo_ya_retirado.index] as any).controls;
+
+        campos['can'].setValue(producto.cantidad + articulo_ya_retirado.data.can);
+        campos['cantidad_en_unidades'].setValue(producto.cantidad_en_unidades + articulo_ya_retirado.data.cantidad_en_unidades);
+        campos['descuento_valor'].setValue(producto.descuento_valor + articulo_ya_retirado.data.descuento_valor);
+
+        campos['tot'].setValue(fun.numFormatTwoDecimals(data.total));
+
+        this.calcularDescuento(articulo_ya_retirado.index);
+
+        fun.logOrange('campos ', campos);
+      }
+    }
+  }
+
+  parsearProductoDevueltos(producto_origin, data_remover, is_defectuoso) {
+    const articulo_a_retirar = fun.duplicarJson(producto_origin);
+
+    const medida = articulo_a_retirar.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo_a_retirar.articulo.medida;
+
+    articulo_a_retirar.descuento_valor = (articulo_a_retirar.descuento_valor / articulo_a_retirar.can) * data_remover.cantidad;
+
+    articulo_a_retirar.can = data_remover.cantidad;
+    articulo_a_retirar.cantidad = data_remover.cantidad;
+    articulo_a_retirar.cantidad_en_unidades = data_remover.cantidad * articulo_a_retirar.articulo.contenido[medida];
+
+    articulo_a_retirar.total = articulo_a_retirar.cantidad * articulo_a_retirar.precio;
+    articulo_a_retirar.key_origin = articulo_a_retirar.key;
+
+    articulo_a_retirar.id = null;
+    articulo_a_retirar.key = fun.generateKey();
+    articulo_a_retirar['is_defectuoso'] = is_defectuoso;
+    articulo_a_retirar['from_pre_factura'] = true;
+    articulo_a_retirar['is_devuelto'] = true;
+
+    if (is_defectuoso) articulo_a_retirar.precio /= 2;
+    if (is_defectuoso) articulo_a_retirar.total /= 2;
+
+    return articulo_a_retirar;
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {

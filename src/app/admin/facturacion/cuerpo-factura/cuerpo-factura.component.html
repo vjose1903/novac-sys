@@ -54,7 +54,7 @@
                   </a>
                 </li>
 
-                <li *ngIf="hasArticulosDevueltos(index_cuerpo)" role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
+                <li *ngIf="hasArticulosDevueltos(index_cuerpo)" role="menuitem" (click)="retornarArticulosDevueltos(index_cuerpo, $event)" class="hoverlable">
                   <a class="" id="dropdown-item">
                     <i class="fa-solid fa-repeat text-gris-oscuro btnConfig mr-1"></i>
                     Retornar articulos devueltos

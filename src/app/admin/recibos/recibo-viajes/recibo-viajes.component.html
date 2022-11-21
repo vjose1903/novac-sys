@@ -32,7 +32,7 @@
         <p-progressBar [value]="viajes_cant_porciento"></p-progressBar>
       </div>
     </div>
-    <hr class="rayaA mt-2" />
+    <hr class="rayaTop mt-2" />
 
     <div *ngIf="viaje_selected" class="mt-4 d-flex justify-content-center">
       <div class="card sombra" style="width: 29.5rem">
@@ -66,7 +66,7 @@
           </span>
 
           <div *ngIf="viaje_selected?.pagos?.length > 0">
-            <hr class="rayaA mt-2" />
+            <hr class="rayaTop mt-2" />
             <div class="d-flex justify-content-between">
               <span class="negrita">Restante</span>
               <div class="pagoPorcentaje">
@@ -77,7 +77,7 @@
             </div>
             <p-progressBar class="mb-2" [value]="totalPagadoPorciento"></p-progressBar>
 
-            <hr class="rayaA mt-2" />
+            <hr class="rayaTop mt-2" />
           </div>
 
           <form [formGroup]="form">
@@ -123,7 +123,7 @@
             </div>
           </form>
 
-          <hr class="rayaA mt-2" />
+          <hr class="rayaTop mt-2" />
 
           <div class="d-inline-flex flex-nowrap justify-content-end">
             <button (click)="accion(false, 'cancelar')" class="btn btn-blanco mr-2">Cancelar</button>
