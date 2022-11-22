@@ -19,10 +19,24 @@ export class RetornarDevueltoComponent implements OnInit, ModalI, DoCheck {
 
   ngOnInit(): void {
     this.createForm();
+
+    let input_enfocar;
+
+    if (this.inputs.data.is_devuelto) {
+      input_enfocar = 'devuelto';
+    } else {
+      if (fun.hasValue(this.inputs?.articulo_solo_devuelto?.cantidad)) {
+        input_enfocar = 'solo_devuelto';
+      } else {
+        input_enfocar = 'defectuoso';
+      }
+    }
+
+    fun.enfocarAndSelectInput(input_enfocar);
   }
 
   ngDoCheck(): void {
-    this.habilitarBtnAceptar();
+    this.btnAceptarIsDisabled();
   }
 
   createForm() {
@@ -33,13 +47,27 @@ export class RetornarDevueltoComponent implements OnInit, ModalI, DoCheck {
     });
   }
 
-  habilitarBtnAceptar() {
+  saltar(sali_de) {
+    if (this.checkCantidad(sali_de)) {
+      let nextFunction = this.btn_aceptar.bind(this);
+
+      if (sali_de == 'solo_devuelto' && fun.hasValue(this.inputs?.articulo_defectuoso?.cantidad)) {
+        fun.enfocarAndSelectInput('defectuoso');
+        nextFunction = undefined;
+      }
+
+      if (typeof nextFunction == 'function') nextFunction();
+    }
+  }
+
+  btnAceptarIsDisabled() {
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     const aceptar_btn = modal.botones.aceptar;
     const formulario = this.form.getRawValue();
     const valores = [formulario.solo_devuelto, formulario.defectuoso, formulario.devuelto];
 
     aceptar_btn.disable = _.every(valores, (valor) => fun.isEmpty(valor) || valor == 0);
+    return aceptar_btn.disable;
   }
 
   getCurrentDevuelto(cantidad) {
@@ -49,11 +77,13 @@ export class RetornarDevueltoComponent implements OnInit, ModalI, DoCheck {
 
   checkCantidad(tipo) {
     const formulario = this.form.getRawValue();
+    let todo_bien = true;
 
     if (formulario[tipo] < 0) {
       fun.toastWarning('La cantidad no puede ser menor a 0.');
       this.form.controls[tipo].setValue(0);
       fun.enfocarAndSelectInput(tipo);
+      todo_bien = false;
     }
 
     const entidades = { solo_devuelto: this.inputs.articulo_solo_devuelto?.cantidad || 0, defectuoso: this.inputs.articulo_defectuoso?.cantidad || 0, devuelto: this.inputs?.data?.cantidad || 0 };
@@ -61,10 +91,18 @@ export class RetornarDevueltoComponent implements OnInit, ModalI, DoCheck {
     if (formulario[tipo] > entidades[tipo]) {
       fun.toastWarning('La cantidad no puede ser mayor a la cantidad devuelta.');
       this.form.controls[tipo].setValue(entidades[tipo]);
+      fun.enfocarAndSelectInput(tipo);
+      todo_bien = false;
     }
+    return todo_bien;
   }
 
   btn_aceptar() {
+    if (this.btnAceptarIsDisabled()) {
+      fun.toastError('Complete los campos para retornar el articulo.', 'ERROR');
+      return;
+    }
+
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
     const obj = { key: this.inputs.data.key, modal_id: this.modal.component_id };

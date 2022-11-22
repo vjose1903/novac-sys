@@ -1087,11 +1087,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     } else {
       if (this.CuerpoFactura.length == 0) {
         fun.toastWarning(`${documento.descripcion} incompleta!!!`, 'Aviso');
-        fun.enfocarInput('cod-0');
+        fun.enfocarInput('codigo-0');
       } else {
         if (this.TOTAL == 0) {
           fun.toastWarning(`Total de la ${documento.descripcion} no puede ser 0`, 'Aviso');
-          fun.enfocarInput('cod-0');
+          fun.enfocarInput('codigo-0');
         } else {
           if (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion) {
             const obj = { metodo: this.factServ.tipoDocumento, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
@@ -1335,7 +1335,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       const contenido_articulo = articulo.contenido_articulos;
 
-      const costoRow = fun.desformatear(row.pre);
+      const costoRow = fun.desformatear(row.precio);
 
       const costoPrincipal = articulo.costo_principal;
 
@@ -1372,7 +1372,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.calculoMedidaPrincipal(costoA, costoR, articulo);
       }
 
-      temp = _.omit(row, ['costo', 'condicion', 'pre', 'cod']);
+      temp = _.omit(row, ['costo', 'condicion', 'codigo']);
       tempCuerpo.push(temp);
     }
     return tempCuerpo;
@@ -1388,8 +1388,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async getDataFromModal(arg, search) {
-    console.log('arg ', arg);
-
     if (arg.modal_id === 'facturaPendiente') {
       this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];

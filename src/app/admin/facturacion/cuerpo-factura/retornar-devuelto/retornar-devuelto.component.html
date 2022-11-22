@@ -20,13 +20,14 @@
         </div>
         <div class="col-12">
           <div class="form-group">
-            <label class="control-label">Retornar : </label>
+            <label class="control-label">Retornar: </label>
             <input
               id="devuelto"
               min="1"
               [max]="inputs?.data?.cantidad"
               (focus)="$event.target.select()"
               (blur)="checkCantidad('devuelto')"
+              (keydown.enter)="saltar($event.target.id)"
               type="number"
               class="form-control input_cantidad"
               formControlName="devuelto"
@@ -40,7 +41,11 @@
 
     <div *ngIf="!inputs.data.is_devuelto" class="col-12 p-0">
       <div class="row">
-        <div class="col-6 rayaRight"></div>
+        <div class="col-6 rayaRight">
+          <span class="w-100 badge bg-secondary text-shadow text-white" [ngClass]="{ disable: fun.isEmpty(inputs?.articulo_solo_devuelto?.cantidad) }">
+            <span>Cant. devuelto:</span> <span> {{ getCurrentDevuelto(inputs?.articulo_solo_devuelto?.cantidad) }}</span>
+          </span>
+        </div>
         <div class="col-6">
           <span class="w-100 badge bg-danger text-shadow text-white" [ngClass]="{ disable: fun.isEmpty(inputs?.articulo_defectuoso?.cantidad) }">
             <span>Cant. Defectuoso:</span> <span> {{ getCurrentDevuelto(inputs?.articulo_defectuoso?.cantidad) }}</span>
@@ -60,6 +65,7 @@
               [max]="inputs.articulo_solo_devuelto?.cantidad"
               (focus)="$event.target.select()"
               (blur)="checkCantidad('solo_devuelto')"
+              (keydown.enter)="saltar($event.target.id)"
               type="number"
               class="form-control input_cantidad"
               formControlName="solo_devuelto"
@@ -77,6 +83,7 @@
               [max]="inputs.articulo_solo_devuelto?.cantidad"
               (focus)="$event.target.select()"
               (blur)="checkCantidad('defectuoso')"
+              (keydown.enter)="saltar($event.target.id)"
               type="number"
               class="form-control input_cantidad"
               formControlName="defectuoso"
