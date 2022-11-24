@@ -19,6 +19,8 @@ export class FacturacionService {
   propietario_factura;
   pre_venta_selected;
   cotizacion_selected;
+  productos_devueltos = [];
+  filasDetalle;
 
   referencia_tipos_facturas = {
     'factura sin comprobante': '00',
@@ -129,5 +131,11 @@ export class FacturacionService {
     if (fun.hasValue(res?.descripcion)) res.descripcion_short = res.descripcion.split(' ')[0];
 
     return res;
+  }
+
+  getDetallesLlenos() {
+    const filasMap = this.filasDetalle.map((inner_detalle) => inner_detalle.value);
+
+    return _.filter(filasMap, (filter_detalle) => fun.hasValue(filter_detalle?.key));
   }
 }

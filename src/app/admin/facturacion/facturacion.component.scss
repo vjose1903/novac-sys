@@ -197,20 +197,6 @@
   border-right: 1px solid var(--transparente01);
 }
 
-.botonBuscar {
-  border: 1px solid var(--primary09);
-  border-radius: 5px;
-  padding: 4px 3px 2px 4px;
-  background-color: var(--primary03);
-  &:hover {
-    cursor: pointer;
-    background-color: var(--primary05);
-  }
-  &:active {
-    background-color: var(--primary09);
-  }
-}
-
 .mostrarNumeros {
   margin-right: 2rem;
   display: flex;

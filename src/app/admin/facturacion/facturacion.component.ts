@@ -1,3 +1,4 @@
+import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
 import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit } from '@angular/core';
@@ -37,7 +38,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   secuenciaKeys = [];
   info_cambio: any;
-  productosDevueltos: any[];
   hasPermisoPreVenta: boolean;
   hasPermisoCotizacion: boolean;
   hasPermisoCamiones: boolean;
@@ -236,14 +236,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   makeOptionsExtra() {
     const config_options = [
-      { keyboardCode: undefined, key: undefined, code: tipoDocFacturacion.pre_venta, label: 'Seleccionar Pre-Venta', condition: this.hasPermisoPreVenta },
-      { keyboardCode: undefined, key: undefined, code: tipoDocFacturacion.cotizacion, label: 'Seleccionar Cotización', condition: this.hasPermisoCotizacion },
+      { keyboardCode: undefined, key: undefined, code: tipoDocFacturacion.pre_venta, label: 'Seleccionar Pre-Venta', show: this.hasPermisoPreVenta, condition: () => true },
+      { keyboardCode: undefined, key: undefined, code: tipoDocFacturacion.cotizacion, label: 'Seleccionar Cotización', show: this.hasPermisoCotizacion, condition: () => true },
+      { keyboardCode: undefined, key: undefined, code: 'retornar_devueltos', label: 'Retornar articulos devueltos', show: true, condition: this.someArticuloHasDevuelto.bind(this) },
     ];
 
     for (let index = 0; index < config_options.length; index++) {
       const config_option = config_options[index];
 
-      if (config_option.condition) {
+      if (config_option.show) {
         config_option.key = this.optionesExtra.length + 1;
         config_option.keyboardCode = teclasCode[`_${config_option.key}`];
         this.keyboardCodesEnabled.push(teclasCode[`_${config_option.key}`]);
@@ -252,12 +253,19 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
+  someArticuloHasDevuelto() {
+    const detalles = this.factServ.getDetallesLlenos();
+
+    return _.some(detalles, (detalle) => detalle.is_devuelto) || this.factServ.productos_devueltos.length > 0;
+  }
+
   selectOptionExtra(option, where) {
     let openModal = true;
-    const modalConfig = { id: undefined, inputs: undefined, component: MenuOpcionesExtraComponent, header: undefined, botones: undefined, width: '57rem', height: '32rem' };
+    const modalConfig = { id: undefined, inputs: undefined, component: undefined, header: undefined, botones: undefined, width: '57rem', height: '32rem' };
 
-    if (this.keyboardCodesEnabled.includes(option.keyboardCode)) {
+    if (this.keyboardCodesEnabled.includes(option.keyboardCode) && option.condition()) {
       modalConfig.id = 'factura_from_documento';
+      modalConfig.component = MenuOpcionesExtraComponent;
 
       modalConfig.inputs = option;
       modalConfig.botones = { cancelar: { show: true } };
@@ -268,13 +276,21 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (option.code == tipoDocFacturacion.cotizacion) {
         modalConfig.header = 'Seleccionar cotización';
       }
-    }
 
-    if (openModal) {
-      this.openNewModal({ component: modalConfig.component, inputs: modalConfig.inputs, id: modalConfig.id, header: modalConfig.header, width: modalConfig.width, height: modalConfig.height, botones: modalConfig.botones });
-    }
+      if (option.code == 'retornar_devueltos') {
+        modalConfig.header = 'Retornar Articulos Devueltos';
+        modalConfig.id = 'retornarDevuelto';
+        modalConfig.component = RetornarDevueltoComponent;
+        modalConfig.height = '40rem';
+        modalConfig.botones = { aceptar: { show: true, disable: true }, cancelar: { show: true, disable: false } };
+      }
 
-    if (fun.hasValue(this.overlay?.item)) this.cerrarOverlay();
+      if (openModal) {
+        this.openNewModal({ component: modalConfig.component, inputs: modalConfig.inputs, id: modalConfig.id, header: modalConfig.header, width: modalConfig.width, height: modalConfig.height, botones: modalConfig.botones });
+      }
+
+      if (fun.hasValue(this.overlay?.item)) this.cerrarOverlay();
+    }
   }
 
   verificateArchivo() {
@@ -919,7 +935,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.camion_row = 0;
     }
 
-    this.overlay['item'].hide();
+    if (fun.hasValue(this.overlay)) this.overlay['item'].hide();
     this.overlay = undefined;
   }
 
@@ -1251,10 +1267,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         });
       }
     }
-
-    if (arg.tipo == 'devuelto') {
-      this.productosDevueltos = arg.data;
-    }
   }
 
   prueba() {}
@@ -1461,7 +1473,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   formarData() {
-    let cuerpo_fact = [...fun.duplicarJson(this.CuerpoFactura), ...this.productosDevueltos];
+    let cuerpo_fact = [...fun.duplicarJson(this.CuerpoFactura), ...this.factServ.productos_devueltos];
 
     const cabecera_fact = {};
     cabecera_fact['condicion'] = this.condicion_fact;

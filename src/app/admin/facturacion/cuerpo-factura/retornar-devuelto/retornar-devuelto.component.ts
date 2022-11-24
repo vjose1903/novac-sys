@@ -22,7 +22,7 @@ export class RetornarDevueltoComponent implements OnInit, ModalI, DoCheck {
 
     let input_enfocar;
 
-    if (this.inputs.data.is_devuelto) {
+    if (this.inputs?.data?.is_devuelto) {
       input_enfocar = 'devuelto';
     } else {
       if (fun.hasValue(this.inputs?.articulo_solo_devuelto?.cantidad)) {
