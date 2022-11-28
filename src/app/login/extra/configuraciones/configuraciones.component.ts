@@ -193,7 +193,6 @@ export class ConfiguracionesComponent implements OnInit {
 
   test() {
     const test = this.formIsInvalid();
-    console.log('test ', test);
   }
 
   salir() {
@@ -342,7 +341,6 @@ export class ConfiguracionesComponent implements OnInit {
     const value_target = tipoDato == 'string' ? `${key}: '${obj[key]}'` : `${key}: ${obj[key]}`;
 
     configReplacement[key] = { source: value_source, target: value_target };
-    console.log('configReplacement ', configReplacement);
   }
 
   submit() {
@@ -358,7 +356,6 @@ export class ConfiguracionesComponent implements OnInit {
     const objChange = { new_config: formulario, configReplacement: configReplacement };
 
     if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
-    console.log('objChange ', objChange);
 
     const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
 

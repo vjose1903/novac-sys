@@ -58,15 +58,17 @@ export class PdfService {
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
             const tipo_documento = this.getFacturacionType(data);
             printer_selected = config.printer_selected[tipo_documento];
-            // TODO: hacer un case para pre_venta
-            obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', data.tipo_factura_id == Ss.factServ.tipoFacturaId(tFacturaD.pre_venta) ? 'pre_venta' : 'ventas');
+            obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', 'ventas');
             break;
 
           case 'cotizacion':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            console.log('data ', data);
-
             obj = options[config.pages_sizes.cotizacion].makePDF(data, 'cotizacion.pdf', 'cotizacion');
+            break;
+
+          case 'pre_venta':
+            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
+            obj = options[config.pages_sizes.pre_venta].makePDF(data, 'pre-venta.pdf', 'pre_venta');
             break;
 
           case 'cuadre_caja':
@@ -171,6 +173,6 @@ export class PdfService {
   }
 
   static getFacturacionType(data) {
-    return data.tipo == 'pre_venta' ? 'pre_venta' : data.tipo == 'venta' ? (data.condicion == 'Crédito' ? 'venta_credito' : 'venta_contado') : 'compra';
+    return data.tipo == 'venta' ? (data.condicion == 'Crédito' ? 'venta_credito' : 'venta_contado') : 'compra';
   }
 }

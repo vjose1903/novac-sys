@@ -46,8 +46,6 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     styles: styles_,
   };
 
-  console.log('dd ', dd);
-
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: pageO };
   return obj;
 }

@@ -344,7 +344,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           this.facturaClass.parseDataToPdf(this.facturas[0]).then((factura_parsed) => {
             const continuar = this.buscarPara != 'solo_ver' && (this.buscar_por == this.campos.numeroComprobante || this.buscar_por == this.campos.numeroFactura);
             this.facturaSelected = factura_parsed;
-            this.mostrarFactura(factura_parsed, 'facturacion', null, continuar);
+            const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
+            this.mostrarFactura(factura_parsed, tipo, null, continuar);
           });
         } else {
           setTimeout(() => this.tablaComponent.changeConfig([{ total_count: res.total_registros }]), 100);
@@ -489,8 +490,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         if (params.iconKey == 'view') {
           this.facturaClass.parseDataToPdf(params.data).then((factura_parsed) => {
             this.facturaSelected = factura_parsed;
-
-            this.mostrarFactura(factura_parsed, this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : 'facturacion');
+            const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
+            this.mostrarFactura(factura_parsed, tipo);
           });
         }
 

@@ -204,22 +204,40 @@ body {
   max-height: 91% !important;
 }
 
-.rayaTop {
-  margin-top: 0rem !important;
-  margin-bottom: 1rem !important;
+.rayaHorizontal {
   border: 0 !important;
   border-top: 2px solid #0000001a !important;
+  border-bottom: 2px solid #0000001a !important;
+  margin: 0 !important;
+}
+
+.rayaTop {
+  border: 0 !important;
+  border-top: 2px solid #0000001a !important;
+  margin: 0 !important;
+}
+
+.rayaBottom {
+  border: 0 !important;
+  border-bottom: 2px solid #0000001a !important;
+  margin: 0 !important;
+}
+
+.rayaVertical {
+  border: 0 !important;
+  border-right: 2px solid #0000001a !important;
+  border-left: 2px solid #0000001a !important;
+  margin: 0 !important;
 }
 
 .rayaRight {
   border-right: 2px solid #0000001a !important;
+  margin: 0 !important;
 }
 
-.rayaBottom {
-  margin-top: 1rem !important;
-  margin-bottom: 0rem !important;
-  border: 0 !important;
-  border-bottom: 2px solid #0000001a !important;
+.rayaLeft {
+  border-left: 2px solid #0000001a !important;
+  margin: 0 !important;
 }
 
 .p-tooltip {

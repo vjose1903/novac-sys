@@ -140,8 +140,13 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
+
     this.getAppConfig().then((config) => {
-      this.getTiposFacturas();
+      this.getTiposFacturas().then((result) => {
+        setTimeout(() => {
+          this.configReady = true;
+        }, 250);
+      });
     });
   }
 
@@ -215,10 +220,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             this.configServ.setConfig = config;
             this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 
-            setTimeout(() => {
-              this.configReady = true;
-              resolve(config);
-            }, 500);
+            resolve(config);
           }
         })
         .catch((err) => {

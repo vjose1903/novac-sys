@@ -111,16 +111,26 @@ export class FacturacionService {
   }
 
   getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }, print?) {
-    const res = { descripcion: undefined, descripcion_short: undefined, has_Propietario: fun.hasValue(this.propietario_factura) };
+    const res = { descripcion: undefined, descripcion_short: undefined, has_Propietario: fun.hasValue(this.propietario_factura), tipo: 'facturacion' };
     const actualPath = fun.getActualPath();
 
-    if ((params.metodo == tipoDocFacturacion.cotizacion || params.metodo == tipoDocFacturacion.pre_venta) && actualPath.includes('cotizacion')) {
-      res.descripcion = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre venta';
-    } else if (params.condicion_fact == 'Crédito') res.descripcion = 'Factura a Crédito';
-    else if (fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia == '01') res.descripcion = 'Factura con valor fiscal';
-    else if (params.modo_factura == 'adelantada') res.descripcion = 'Factura adelantada';
-    else if (params.is_viaje) res.descripcion = 'Factura de viaje';
-    else {
+    if ((params.metodo == tipoDocFacturacion.cotizacion || params.metodo == tipoDocFacturacion.pre_venta) && (actualPath.includes('cotizacion') || actualPath.includes('pre_venta'))) {
+      res.descripcion = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre-venta';
+      res.tipo = params.metodo == tipoDocFacturacion.cotizacion ? tipoDocFacturacion.cotizacion : tipoDocFacturacion.pre_venta;
+      //
+    } else if (params.condicion_fact == 'Crédito') {
+      res.descripcion = 'Factura a Crédito';
+      //
+    } else if (fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia == '01') {
+      res.descripcion = 'Factura con valor fiscal';
+      //
+    } else if (params.modo_factura == 'adelantada') {
+      res.descripcion = 'Factura adelantada';
+      //
+    } else if (params.is_viaje) {
+      res.descripcion = 'Factura de viaje';
+      //
+    } else {
       if (params.metodo == tipoDocFacturacion.venta) {
         res.descripcion = 'Factura de venta';
         if (params.condicion_fact != 'Crédito') res.has_Propietario = true;

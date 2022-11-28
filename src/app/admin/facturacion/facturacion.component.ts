@@ -255,7 +255,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   someArticuloHasDevuelto() {
     const detalles = this.factServ.getDetallesLlenos();
-
     return _.some(detalles, (detalle) => detalle.is_devuelto) || this.factServ.productos_devueltos.length > 0;
   }
 
@@ -283,6 +282,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         modalConfig.component = RetornarDevueltoComponent;
         modalConfig.height = '40rem';
         modalConfig.botones = { aceptar: { show: true, disable: true }, cancelar: { show: true, disable: false } };
+        modalConfig.inputs = { data: null, articulo_defectuoso: null, articulo_solo_devuelto: null, tipo: null, nombre: null, is_articulo_selected: false, devueltos_list: this.getDevueltos(), detalles: this.factServ.getDetallesLlenos() };
       }
 
       if (openModal) {
@@ -291,6 +291,21 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (fun.hasValue(this.overlay?.item)) this.cerrarOverlay();
     }
+  }
+
+  getDevueltos() {
+    const detalles = this.factServ.getDetallesLlenos();
+    const articulos_defectuosos = _.filter(detalles, (detalle) => detalle.is_devuelto);
+    const articulos_solo_devueltos = this.factServ.productos_devueltos;
+    let acu = 1;
+    const list = [...articulos_defectuosos, ...articulos_solo_devueltos].map((articulo) => {
+      articulo['tipo'] = articulo.is_defectuoso ? 'Articulo Defectuoso' : 'Solo devuelto';
+      articulo['id'] = articulo.id = acu;
+      acu += 1;
+      return articulo;
+    });
+
+    return list;
   }
 
   verificateArchivo() {
@@ -930,13 +945,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   cerrarOverlay() {
-    if (this.overlay['tipo'] == 'camion') {
-      this.filterCamion(this.copyCamiones);
-      this.camion_row = 0;
-    }
+    if (fun.hasValue(this.overlay)) {
+      if (this.overlay['tipo'] == 'camion') {
+        this.filterCamion(this.copyCamiones);
+        this.camion_row = 0;
+      }
 
-    if (fun.hasValue(this.overlay)) this.overlay['item'].hide();
-    this.overlay = undefined;
+      this.overlay['item'].hide();
+      this.overlay = undefined;
+    }
   }
 
   getCamionLabel(camion) {
@@ -1424,6 +1441,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       } else {
         this.enviarABaseDatos();
       }
+    } else if (arg.modal_id == 'retornarDevuelto') {
+      this.cuerpo.getDataFromModal(arg, search);
     } else if (arg.modal_id == 'buscarCliente') {
       this.factServ.propietario_factura = arg.data;
 
@@ -1574,15 +1593,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let documento = this.getDocumentoDescripcion();
 
-    console.log('cabecera_fact ', cabecera_fact);
-
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
 
     if (this.factura_guardada) this.revisarLocalStorage();
 
     this.facturaClass.parseDataToPdf(res['data']).then(async (factura_parsed) => {
-      const obj = { data: factura_parsed, type: 'facturacion' };
+      const obj = { data: factura_parsed, type: documento.tipo };
 
       PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(`Error imprimiendo la ${documento.descripcion}.`, 'ERROR'));
 

@@ -64,6 +64,7 @@ export interface iconDisableItem {
 export interface paginateI {
   show?: boolean;
   showTotal?: boolean;
+  showDropDown?: boolean;
   page?: number;
   ant_page?: number;
   per_page?: number;
@@ -92,6 +93,10 @@ interface padreFunctionsI {
   handleBtnsDinamic?: Function;
   data_request?: Function;
 }
+interface filtarI {
+  show?: boolean;
+  local?: boolean;
+}
 
 export interface table_config {
   padding?: string;
@@ -102,7 +107,7 @@ export interface table_config {
   read?: Boolean;
   focusRow?: Boolean;
   extraCalculo?: Number;
-  filtrar?: any;
+  filtrar?: filtarI;
   localFilter?: Boolean;
   filterTargets?: any;
   id?: String;

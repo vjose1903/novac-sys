@@ -1,3 +1,5 @@
+import { MixinClass } from './../../../../core/typescript/MixinClass';
+import { table_config } from './../../../components/new_tablas/tabla-class';
 import { fun } from './../../../../core/services/functions.service';
 import { ModalI } from './../../../components/modal/modal-class';
 import { Component, DoCheck, OnInit } from '@angular/core';
@@ -9,34 +11,72 @@ import { FormBuilder, Validators } from '@angular/forms';
   templateUrl: './retornar-devuelto.component.html',
   styleUrls: ['./retornar-devuelto.component.scss'],
 })
-export class RetornarDevueltoComponent implements OnInit, ModalI, DoCheck {
-  constructor(private fb: FormBuilder) {}
+export class RetornarDevueltoComponent extends MixinClass implements OnInit, ModalI, DoCheck {
+  constructor(private fb: FormBuilder) {
+    super();
+  }
   modal: any = {};
   inputs: any;
 
   form;
   fun = fun;
 
-  ngOnInit(): void {
+  table_config: table_config = {
+    info: [
+      { titulo: 'Articulo', tipo: 'text', key: 'descripcion' },
+      { titulo: 'Tipo', tipo: 'text', key: 'tipo' },
+      { titulo: 'Cantidad', tipo: 'formatoNumero', key: 'cantidad' },
+    ],
+    colores: true,
+    id_tabla: 'retornar_articulo',
+    filtrar: { show: false, local: true },
+    obj_paginate: { show: true, showTotal: false, showDropDown: false, page: 1, per_page: 9999, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+  };
+
+  articuloSelected;
+
+  tablaComponent;
+
+  ngOnInit() {
     this.createForm();
-
-    let input_enfocar;
-
-    if (this.inputs?.data?.is_devuelto) {
-      input_enfocar = 'devuelto';
-    } else {
-      if (fun.hasValue(this.inputs?.articulo_solo_devuelto?.cantidad)) {
-        input_enfocar = 'solo_devuelto';
-      } else {
-        input_enfocar = 'defectuoso';
-      }
-    }
-
-    fun.enfocarAndSelectInput(input_enfocar);
   }
 
-  ngDoCheck(): void {
+  ngDoCheck() {
     this.btnAceptarIsDisabled();
+  }
+
+  tableClickRow(event) {
+    this.form.controls['defectuoso'].disable();
+    this.form.controls['solo_devuelto'].disable();
+
+    this.articuloSelected = fun.duplicarJson(event.data);
+
+    const currentControl = this.articuloSelected.is_defectuoso ? 'defectuoso' : 'solo_devuelto';
+    this.form.controls[currentControl].enable();
+
+    const currentKey = currentControl == 'defectuoso' ? 'articulo_defectuoso' : 'articulo_solo_devuelto';
+    this.inputs[currentKey] = fun.duplicarJson(event.data);
+    this.inputs['data'] = fun.duplicarJson(event.data.producto_origin);
+
+    this.enfocarInitInput();
+  }
+
+  enfocarInitInput() {
+    let input_enfocar;
+
+    if (fun.hasValue(this.inputs?.data) || fun.hasValue(this.inputs?.articulo_solo_devuelto) || fun.hasValue(this.inputs?.articulo_defectuoso)) {
+      if (this.inputs?.data?.is_devuelto) {
+        input_enfocar = 'devuelto';
+      } else {
+        if (fun.hasValue(this.inputs?.articulo_solo_devuelto?.cantidad)) {
+          input_enfocar = 'solo_devuelto';
+        } else {
+          input_enfocar = 'defectuoso';
+        }
+      }
+
+      fun.enfocarAndSelectInput(input_enfocar);
+    }
   }
 
   createForm() {

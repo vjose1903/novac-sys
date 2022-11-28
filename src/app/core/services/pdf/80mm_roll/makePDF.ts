@@ -52,8 +52,6 @@ export function makePDF(data, file_name, tipo_pdf?) {
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
   const configuration = configuraciones[tipo_pdf];
-  console.log(' ');
-  console.log('configuration ', configuration);
 
   data.tipo_tabla = 'normal';
 
@@ -207,6 +205,11 @@ function parseResumen(data, tipo_pdf) {
 
 function parseInfoFactura(data, tipo_pdf) {
   const contenido = [];
+  console.log(' ');
+  console.log(' tipo_pdf ', tipo_pdf);
+  console.log(' infoFacturaPartes[tipo_pdf] ', infoFacturaPartes[tipo_pdf]);
+  console.log(' ');
+
   if (!infoFacturaPartes[tipo_pdf].length) return [{ text: '' }];
 
   const partes = [

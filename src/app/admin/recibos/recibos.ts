@@ -95,7 +95,7 @@ export class ReciboC extends CrudG<ReciboI> {
         detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
         detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
         detalle['fecha'] = `${_.split(detalle.descripcion, ' ')[2]} ${_.split(detalle.descripcion, ' ')[3]}`;
-        console.log("detalle['fecha'] ", detalle['fecha']);
+        
 
       });
 

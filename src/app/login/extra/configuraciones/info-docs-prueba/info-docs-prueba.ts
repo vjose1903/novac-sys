@@ -11,11 +11,10 @@ const documentos = {
   '8.5x11': {
     venta_credito: { data: facturaPrueba, type: 'facturacion' },
   },
-
 };
 
 export function printTestPdf(params: { paper_size: string; documento: string }): any {
-  console.log("params ", params);
+  console.log('params ', params);
 
   PdfService.generatePdf({ oPdf: documentos[params.paper_size][params.documento], imprimir: true }).then(async (res) => {});
 }
