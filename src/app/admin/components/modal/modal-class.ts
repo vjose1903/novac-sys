@@ -60,7 +60,7 @@ export class ModalClass extends LayoutClass {
     modal_configuration['returnDataFromModal'] = _.has(params, 'returnDataFromModal') ? (arg) => params.returnDataFromModal(arg) : (arg) => this.getDataFromModal(arg, ' ');
     modal_configuration['onHide'] = (arg) => this.onHideModal(arg);
     modal_configuration['html'] = _.has(params, 'html') ? params.html : null;
-    modal_configuration['id'] = params.id;
+    modal_configuration['id'] = params?.id;
 
     MODALCONFIG.next(modal_configuration);
   }

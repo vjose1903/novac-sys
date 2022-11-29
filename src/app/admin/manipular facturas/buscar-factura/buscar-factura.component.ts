@@ -1,4 +1,4 @@
-import { tipoDocFacturacion } from './../../facturacion/factura';
+import { deleteDocumentosTypes, tipoDocFacturacion } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
@@ -311,7 +311,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.delete = 'far fa-trash-alt';
         fact.make_bill = 'fas fa-external-link-alt';
 
-        fact.coti_preventa_tooltip = fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`;
+        fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulado.`;
 
         fact.is_selected = this.idsFacturasSeleccionadas.includes(fact.id);
         fact.tooltip_select = 'Seleccionar Factura';
@@ -502,12 +502,52 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         }
 
         if (params.iconKey == 'delete') {
-          fun.logRed('BORRAR FACTURA ', params);
+          const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion || this.tipo_documento_selected == tipoDocFacturacion.compra ? deleteDocumentosTypes.delete : deleteDocumentosTypes.anular;
+          this.deleteRequest({ ids: params.data.id, tipo: tipo });
         }
 
         if (params.iconKey == 'make_bill') this.pasarCotizacionAfacturar(params.data);
       }
     }
+  }
+
+  deleteRequest(params: { ids: string; tipo: string }) {
+    // tipo
+    const extra = { afterPath: `custom/delete/${params.ids}`, parameters: { tipo: params.tipo } };
+
+    this.facturaClass.dynamic(extra).then((res) => {
+      console.log('res ', res);
+
+      const info = {
+        pre_venta: { label: { singular: 'Pre_Venta', plural: 'Pre_Ventas' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
+        venta: { label: { singular: 'Factura', plural: 'Facturas' }, key: 'numero_comprobante', key_label: { singular: 'número de comprobante', plural: 'números de comprobantes' } },
+        compra: { label: { singular: 'Factura', plural: 'Facturas' }, key: 'numero_comprobante', key_label: { singular: 'número de comprobante', plural: 'números de comprobantes' } },
+        cotizacion: { label: { singular: 'Cotización', plural: 'Cotizaciones' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
+      };
+
+      const current_info = info[this.tipo_documento_selected];
+      if (res.data.error.length > 0) {
+        const indicadores_temp = res.data.error.map((documento) => documento[current_info.key]);
+        const indicadores = _.join(indicadores_temp, ', ');
+
+        let msg = '';
+        if (res.data.error.length == 1) {
+          msg = `La ${current_info.label.singular} con el ${current_info.key_label.singular}: <<${indicadores}>> no pudo ser borrada.`;
+        } else {
+          msg = `Las ${current_info.label.plural} con los ${current_info.key_label.plural}: <<${indicadores}>> no pudieron ser borradas.`;
+        }
+
+        fun.toastError(msg, 'ERROR');
+      }
+
+      if (res.data.success.length > 0) {
+        const msg = res.data.error.length == 1 ? `La ${current_info.label.singular} fue borrada correctamente.` : `Las ${current_info.label.plural} fueron borradas correctamente.`;
+        fun.toastSuccess(msg, 'CORRECTO');
+      }
+
+      const actualPagination = this.tServ.getPaginationById('facturas_params', 'saltar');
+      this.pedirFactura(actualPagination);
+    });
   }
 
   pasarCotizacionAfacturar(cotizacion) {
@@ -573,7 +613,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   editarFactura() {
     this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
-      setTimeout(() => this.router.navigateByUrl(`/admin/factura/venta/update/${this.facturaSelected.id}`), 10);
+      setTimeout(() => this.router.navigateByUrl(`/admin/factura/${this.facturaSelected.tipo}/update/${this.facturaSelected.id}`), 10);
     });
   }
 
@@ -635,7 +675,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           },
         };
 
-        if (this.tipo_documento_selected != tipoDocFacturacion.cotizacion) {
+        if (this.tipo_documento_selected != tipoDocFacturacion.cotizacion && this.tipo_documento_selected != tipoDocFacturacion.pre_venta) {
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-gris ml-2',
             function: (instance) => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
@@ -655,10 +695,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
               function: () => fun.hasValue(dataFactura.fecha_completada),
             },
           });
-
-          // id_tabla == 'facturas_params'
-          // columnKey == 'actions'
-          // iconKey == 'make_bill'
         }
 
         if (this.para == 'Visualizar' || type == 'nota') {
@@ -672,14 +708,15 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             disable: false,
           };
 
-          obj_modal.botones.dinamico.push({
+          const rePrintButton = {
             clase: 'btn btn-amarillo ml-2',
             function: (instance) => this.reimprimirDocumento({ data: dataFactura, type: type }, instance),
             label: 'Reimprimir',
             disable: false,
-          });
+          };
 
-          if (this.buscarPara == 'solo_ver') obj_modal.botones.dinamico.push(editButton);
+          if (dataFactura.estado) obj_modal.botones.dinamico.push(rePrintButton);
+          if (this.buscarPara == 'solo_ver' && dataFactura.estado) obj_modal.botones.dinamico.push(editButton);
         }
 
         this.openNewModal(obj_modal);

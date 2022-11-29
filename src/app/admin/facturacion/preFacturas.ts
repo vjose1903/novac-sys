@@ -23,25 +23,6 @@ export class PreFacturaClass extends MixinClass {
     });
   }
 
-  async buscarPreFactura(numero) {
-    try {
-      const result = { data: null, error: false };
-      const res = await this.facturaClass.getAll({ afterPath: `custom/pre_venta/${numero}`, parameters: { tipo: 'single', paginado: false } });
-      const pre_factura = res['data'];
-
-      pre_factura.detalle_facturas = pre_factura.detalle_facturas.map((detalle) => {
-        detalle.from_pre_factura = true;
-        return detalle;
-      });
-
-      result.error = pre_factura && fun.hasValue(pre_factura.fecha_completada);
-      result.data = pre_factura;
-      return result;
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   // =============================================
   //  MODAL PARA BUSCAR PRE FACTURA
   // =============================================
