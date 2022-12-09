@@ -383,7 +383,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (!actualPath.includes(factura.tipo) || !this.factServ.action.includes(factura.action)) {
         const action_route = fun.hasValue(factura.action) ? factura?.action : 'new';
-        const id_route = fun.hasValue(factura.cotizacion) ? factura?.cotizacion : '0';
+        const id_route = fun.hasValue(factura.cotizacion) ? factura?.cotizacion : fun.hasValue(factura.pre_factura) ? factura.pre_factura : '0';
 
         res.same_modulo = false;
         this.router.navigateByUrl(`/admin/factura/${factura.tipo}/${action_route}/${id_route}`).then((result) => {
@@ -396,16 +396,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  procesoRelleno(factura, action?) {
-    action ??= factura.action;
-
+  procesoRelleno(factura) {
     return new Promise((resolve) => {
       try {
         this.checkPath(factura).then((res) => {
-          this.rellenarCabezaFactura(factura, action).then((factura_rellenada) => {
+          this.rellenarCabezaFactura(factura).then((factura_rellenada) => {
+            //
             this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas']).then((res) => {
               setTimeout(() => {
-                // this.getCuerpoFactura({ tipo: 'cuerpo', data: factura_rellenada['detalle_facturas'] });
+                if (_.has(factura, 'productos_devueltos')) {
+                  this.factServ.productos_devueltos = factura.productos_devueltos;
+                }
                 this._sideBarOpened = false;
 
                 this.cuerpo.seleccionarCampoEnTurno();
@@ -420,23 +421,25 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  rellenarCabezaFactura(factura: FacturasI, action?: string) {
+  rellenarCabezaFactura(factura: FacturasI) {
     return new Promise(async (resolve) => {
-      // this.factura_a_rellenar = factura;
+      const origin_productos_devueltos = fun.duplicarJson(factura.productos_devueltos);
+      const original_factura = fun.duplicarJson(factura);
+
       this.factServ.propietario_factura = {};
 
-      if (action == actionFacturacion.update || action == actionFacturacion.bill_from_cotizacion || action == actionFacturacion.bill_from_pre_venta) {
+      this.factServ.tipoDocumento = factura.tipo;
+      const value_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? '02' : factura.tipo_factura_id;
+      const by_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? 'referencia' : 'id';
+
+      if (original_factura.action == actionFacturacion.update || original_factura.action == actionFacturacion.bill_from_cotizacion || original_factura.action == actionFacturacion.bill_from_pre_venta) {
         const id = factura.id ? factura.id : factura.cotizacion ? factura.cotizacion : factura.pre_factura ? factura.pre_factura : null;
         const res = await this.facturaClass.getFacturaById(id);
+
         factura = res['data'];
       }
 
       this.setPropietario(factura);
-
-      this.factServ.tipoDocumento = action == actionFacturacion.bill_from_pre_venta || action == actionFacturacion.bill_from_cotizacion ? 'venta' : factura.tipo;
-
-      const value_buscar = action == actionFacturacion.bill_from_pre_venta || action == actionFacturacion.bill_from_cotizacion ? '02' : factura.tipo_factura_id;
-      const by_buscar = action == actionFacturacion.bill_from_pre_venta || action == actionFacturacion.bill_from_cotizacion ? 'referencia' : 'id';
 
       this.factServ
         .setTipoFacturaSelected(this.factServ.tipoDocumento, value_buscar, by_buscar)
@@ -463,7 +466,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           else this.fecha_vencimiento = new Date();
 
           this.is_viaje = factura.is_viaje;
-          this.condicion_fact = actionFacturacion.bill_from_pre_venta || action == actionFacturacion.bill_from_cotizacion ? this.condicion_fact : factura.condicion;
+          this.condicion_fact = actionFacturacion.bill_from_pre_venta || factura.action == actionFacturacion.bill_from_cotizacion ? this.condicion_fact : factura.condicion;
 
           this.NCFcompra = factura.tipo == 'compra' ? factura.numero_comprobante : undefined;
           this.CostoYgasto = factura.tipo == 'compra' ? factura.costoYgasto : '';
@@ -474,9 +477,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           else if (factura.is_adelantada) this.modo_factura = 'adelantada';
           else this.modo_factura = 'normal';
 
-          if (action == actionFacturacion.bill_from_cotizacion) {
+          if (original_factura.action == actionFacturacion.bill_from_cotizacion) {
             this.factServ.cotizacion_selected = factura;
-          } else if (action == actionFacturacion.bill_from_pre_venta) {
+          } else if (original_factura.action == actionFacturacion.bill_from_pre_venta) {
             this.factServ.pre_venta_selected = factura;
           } else {
             this.factura_a_rellenar = factura;
@@ -574,6 +577,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   rellenarFacturaArchivada(factura) {
+    console.log('factura ', factura);
+
     if (fun.hasValue(factura)) {
       if (this.factura_guardada && this.factura_guardada?.archivo_id == factura.archivo_id) {
         fun.toastWarning(`Ya esta ${this.getSideBarTabByKey(this.factura_guardada.tipo)['singleTitle']} esta seleccionada.`, 'AVISO');
@@ -589,7 +594,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 });
               };
 
-              let noSobreEscribir = (instance) => {
+              let noFunction = (instance) => {
                 this.procesoRelleno(factura).then((result) => {
                   this.actualizarLayServFactGuardada(factura);
                   this.closeModal(instance);
@@ -603,7 +608,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 texto: result.texto_modal,
                 header: 'Confirmación',
                 siFunction: (instance) => siFunction(instance),
-                noFunction: (instance) => noSobreEscribir(instance),
+                noFunction: (instance) => noFunction(instance),
                 cancelarFunction: (instance) => cancelarRelleno(instance),
                 width: '30rem',
               };
@@ -1193,6 +1198,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const factura_a_guardar = this.formarData();
     factura_a_guardar['action'] = this.factServ.action;
     factura_a_guardar['factura_pendiente'] = this.factura_pendiente;
+    factura_a_guardar['productos_devueltos'] = fun.duplicarJson(this.factServ.productos_devueltos);
+
     return factura_a_guardar;
   }
 
@@ -1286,7 +1293,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  prueba() {}
+  prueba() {
+    console.log('this.factServ.productos_devueltos ', this.factServ.productos_devueltos);
+  }
 
   resetVariables() {
     this.cuerpo.RESETCUERPO();
@@ -1460,15 +1469,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       this.cuerpo.seleccionarCampoEnTurno();
     }
-  }
-
-  // TODO: borrar esto
-  selectPreFactura(data, modalInstance?) {
-    this.factServ.pre_venta_selected = data;
-
-    this.procesoRelleno(data, 'pre-factura');
-
-    if (fun.hasValue(modalInstance)) modalInstance.closeModal(modalInstance.id, 'continuar');
   }
 
   calcularNuevosPrecios(cant, precio) {

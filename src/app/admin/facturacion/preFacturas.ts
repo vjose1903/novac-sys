@@ -23,37 +23,4 @@ export class PreFacturaClass extends MixinClass {
     });
   }
 
-  // =============================================
-  //  MODAL PARA BUSCAR PRE FACTURA
-  // =============================================
-
-  mostrarPreFactura(dataFactura) {
-    this.facturaClass.parseDataToPdf(dataFactura).then(async (factura_parsed) => {
-      const toPDFData = { data: factura_parsed, type: 'facturacion' };
-
-      PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
-        if (res.status === 'si') {
-          const inputs = { base64: res.base64, height: '40rem', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
-          const obj_modal = {
-            component: PdfViewerComponent,
-            inputs: inputs,
-            id: 'mostrarPreFactura',
-            header: 'Pre-factura',
-            width: '900px',
-            botones: {
-              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [
-                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false },
-                { clase: 'btn btn-verde ', function: (instance) => this.selectPreFactura(dataFactura, instance), label: 'Continuar', disable: false },
-              ],
-            },
-          };
-
-          this.openNewModal(obj_modal);
-        }
-      });
-    });
-  }
-
-  selectPreFactura(data, modalInstance) {}
 }
