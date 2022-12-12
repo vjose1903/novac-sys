@@ -55,6 +55,9 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     this.form.controls[currentControl].enable();
 
     const currentKey = currentControl == 'defectuoso' ? 'articulo_defectuoso' : 'articulo_solo_devuelto';
+    this.inputs['articulo_solo_devuelto'] = null;
+    this.inputs['articulo_defectuoso'] = null;
+
     this.inputs[currentKey] = fun.duplicarJson(event.data);
     this.inputs['data'] = fun.duplicarJson(event.data.producto_origin);
 

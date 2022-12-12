@@ -102,12 +102,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         this.sacos = [25, 50, 100];
 
         this.form = this.fb.group({
-          rowFactura: this.fb.array([this.createItem(0)]),
+          rowFactura: this.fb.array([this.createItem()]),
         });
 
         this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
 
-        for (let index = 1; index <= 25; index++) await this.addItem(index);
+        for (let index = 1; index <= 25; index++) await this.addItem();
 
         this.factServ.filasDetalle = (this.form.controls['rowFactura'] as FormArray).controls;
         this.escucharCambiosEnForm();
@@ -202,7 +202,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   //  CREAR MAS INPUTS PARA FACTURA
   // =============================================
 
-  createItem(i): FormGroup {
+  createItem(): FormGroup {
     return this.fb.group({
       key: [null],
       articulo: [null],
@@ -217,9 +217,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       descuento_valor: [null],
       total: [null],
       itbis: [null],
-      secuencia: [i],
       cantidad_en_unidades: [0],
-
       calcular_saco: [false],
       is_defectuoso: [false],
       is_devuelto: [false],
@@ -233,9 +231,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  addItem(index): void {
+  addItem(): void {
     this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
-    this.ARRAY_ROWFACTURAS.push(this.createItem(index));
+    this.ARRAY_ROWFACTURAS.push(this.createItem());
   }
 
   removeItem(key: string) {
@@ -252,7 +250,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         .then(async (res) => {
           if (res) {
             for (let index = 0; index < detalles.length; index++) {
-              if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem(index + 1);
+              if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem();
 
               const row = detalles[index];
 
@@ -351,7 +349,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (fun.hasValue(this.factServ.propietario_factura)) {
         const { articulo, codigo, cantidad, unidad } = this.factServ.filasDetalle[index].getRawValue();
 
-        if (index >= 10 && input === 'cantidad-') this.addItem(index);
+        if (index >= 10 && input === 'cantidad-') this.addItem();
 
         if (input == 'unidad-' && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(codigo)) fun.enfocarInput('unidad-' + index);
 

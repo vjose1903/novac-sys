@@ -172,7 +172,6 @@
                       (keyup.enter)="fun.enfocarInput('codigo-' + (index_cuerpo + 1))"
                       formControlName="descuento_valor"
                       (blur)="handleInputEvent('blur', 'descuento_valor', index_cuerpo); revisarPrecio('descuento_valor', 'desc', index_cuerpo); calcularMontosRow(index_cuerpo)"
-                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) }"
                       tabindex="-1"
                     />
                   </div>
