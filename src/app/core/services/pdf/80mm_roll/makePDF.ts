@@ -205,10 +205,6 @@ function parseResumen(data, tipo_pdf) {
 
 function parseInfoFactura(data, tipo_pdf) {
   const contenido = [];
-  console.log(' ');
-  console.log(' tipo_pdf ', tipo_pdf);
-  console.log(' infoFacturaPartes[tipo_pdf] ', infoFacturaPartes[tipo_pdf]);
-  console.log(' ');
 
   if (!infoFacturaPartes[tipo_pdf].length) return [{ text: '' }];
 

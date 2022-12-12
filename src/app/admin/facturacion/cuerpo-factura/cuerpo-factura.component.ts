@@ -78,17 +78,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (fun.hasValue(fila.articulo)) {
         fila.articulo_id = fila?.articulo?.id;
         fila.total = fun.desformatear(fila.total);
-        fila.descuento_valor = fila.descuento_valor ? (fun.hasValue(fila.descuento_valor) ? fun.desformatear(fila.descuento_valor) : 0) : 0;
+        fila.descuento_valor = fun.hasValue(fila.descuento_valor) ? fun.desformatear(fila.descuento_valor) : 0;
         fila.precio = fun.desformatear(fila.precio);
         fila.costo = fun.desformatear(fila.costo);
 
-        let omitir = ['codigo', 'key', 'secuencia'];
-
-        if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) omitir = ['key', 'secuencia'];
-
-        const obj = _.omit(fila, omitir);
-
-        if (fila.cantidad && fila.unidad) detalle_factura.push(fun.duplicarJson(obj));
+        if (fila.cantidad && fila.unidad) detalle_factura.push(fun.duplicarJson(fila));
       }
     });
 
@@ -100,7 +94,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       try {
         this.listaDeDescuentos.length = 0;
         this.UnidadesArticulo.length = 0;
-        this.factServ.productos_devueltos.length = 0;
         this.secuencia = 0;
 
         [this.ARRAY_ROWFACTURAS, this.precioDetalle, this.inputDrop, this.factServ.filasDetalle] = Array(4).fill(undefined);
@@ -203,7 +196,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     this.inputSecuencia = 'codigo-0';
     this.inputDrop = undefined;
     this.listaDeDescuentos.length = 0;
-    this.factServ.productos_devueltos.length = 0;
   }
 
   // =============================================
@@ -334,6 +326,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (data.is_defectuoso) {
       actual_price_monto = actual_price_monto / 2;
     }
+
+    current_monto = fun.numFormatTwoDecimals(current_monto);
+    actual_price_monto = fun.numFormatTwoDecimals(actual_price_monto);
 
     return { bool: current_monto != actual_price_monto, monto: fun.numFormatTwoDecimals(actual_price_monto) };
   }

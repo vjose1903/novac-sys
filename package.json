@@ -18,7 +18,7 @@
     "build:prod": "npm run build -- -c production",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
     "ng:serve": "ng serve --host 0.0.0.0 --port 5221 -c web",
-    "electron:serve": "wait-on tcp:5221 && npm run electron:serve-tsc && npx electron . --serve  --remote-debugging-port=9222",
+    "electron:serve": "wait-on tcp:5221 && npm run electron:serve-tsc && npx electron . --serve",
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "npm run build:prod && electron-builder build",
     "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64 -p always",

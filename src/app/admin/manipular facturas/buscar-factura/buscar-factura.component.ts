@@ -516,8 +516,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     const extra = { afterPath: `custom/delete/${params.ids}`, parameters: { tipo: params.tipo } };
 
     this.facturaClass.dynamic(extra).then((res) => {
-      console.log('res ', res);
-
       const info = {
         pre_venta: { label: { singular: 'Pre_Venta', plural: 'Pre_Ventas' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
         venta: { label: { singular: 'Factura', plural: 'Facturas' }, key: 'numero_comprobante', key_label: { singular: 'número de comprobante', plural: 'números de comprobantes' } },
