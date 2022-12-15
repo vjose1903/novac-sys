@@ -175,13 +175,22 @@
   top: 0.2rem;
   font-size: 1.3rem;
 }
+
 .fechaA {
   bottom: 0.2rem;
   font-weight: 500;
 }
+
+.fechaAtrasada {
+  background: #ffffff8a !important;
+  padding: 0.2rem !important;
+  border-radius: 0.4rem !important;
+}
+
 .letrasT {
   font-size: 0.9rem !important;
 }
+
 .numFac {
   top: 2rem;
   font-size: 1.3rem;

@@ -13,15 +13,7 @@
           <div *ngIf="buscarPara == 'solo_ver'" class="form-group">
             <label class="control-label mb-0">Tipo: </label>
 
-            <select
-              id="tipoI"
-              [(ngModel)]="tipo_documento_selected"
-              class="form-control inputE"
-              (keydown.enter)="saltar($event.target.id, $event.target.value)"
-              (change)="changeSelect('tipo_documento', $event.target.value)"
-              value=""
-              [ngClass]="{ disabled: noExistenComprobantes }"
-            >
+            <select id="tipoI" [(ngModel)]="tipo_documento_selected" class="form-control inputE" (keydown.enter)="saltar($event.target.id, $event.target.value)" (change)="changeSelect('tipo_documento', $event.target.value)" value="">
               <option [value]="null" selected disabled>Escoger tipo</option>
               <option *ngFor="let tipo of tipos_documentos" [value]="tipo.value">{{ tipo.label }}</option>
             </select>
@@ -38,7 +30,6 @@
               (keydown.enter)="saltar($event.target.id, $event.target.value)"
               (change)="changeSelect('buscar_por', $event.target.value)"
               value=""
-              [ngClass]="{ disabled: noExistenComprobantes }"
               [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected)"
             >
               <option [value]="null" selected disabled>Escoger tipo</option>
@@ -55,7 +46,7 @@
             <div *ngIf="buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected != 'cotizacion'" class="form-group mr-2">
               <label class="control-label mb-0">Tipo factura : </label>
 
-              <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar($event.target.id, $event.target.value)" [disabled]="noExistenComprobantes">
+              <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar($event.target.id, $event.target.value)">
                 <option [value]="null" selected disabled>Escoger tipo</option>
                 <option value="3">Factura de consumo</option>
                 <option value="2">Factura con Valor Fiscal</option>
@@ -122,7 +113,6 @@
           (clickFunction)="openSide()"
         >
         </btn-icon-circular>
-
       </div>
     </div>
   </div>

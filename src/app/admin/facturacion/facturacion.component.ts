@@ -424,8 +424,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factServ.propietario_factura = {};
 
       this.factServ.tipoDocumento = factura.tipo;
-      const value_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? '02' : factura.tipo_factura_id;
-      const by_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? 'referencia' : 'id';
 
       if (!_.has(factura, 'archivo_id') && (original_factura.action == actionFacturacion.update || original_factura.action == actionFacturacion.bill_from_cotizacion || original_factura.action == actionFacturacion.bill_from_pre_venta)) {
         const factura_archivada = _.find(fun.getFacturasguardadas(), { id_documento: factura?.id });
@@ -440,6 +438,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           factura = res['data'];
         }
       }
+
+      const value_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? '02' : factura.tipo_factura_id;
+      const by_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? 'referencia' : 'id';
 
       this.setPropietario(factura);
 
@@ -495,7 +496,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
           resolve(factura);
         })
-        .catch((error) => {});
+        .catch((error) => {
+          console.error(error);
+        });
     });
   }
 
@@ -1074,7 +1077,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    if (this.getCantidadArticulos() == 0) {
+    if (this.getCantidadArticulos() == 0 && this.factura_pendiente == false) {
       fun.toastWarning(`No existe factura iniciada para cancelar`, 'Aviso');
       return;
     }
@@ -1539,7 +1542,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     cabecera_fact['fecha_valida'] = fecha_valida;
-
     cabecera_fact['tipo_factura_id'] = this.factServ.tipoFactura.id;
     cabecera_fact['numero_comprobante'] = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? this.NCFcompra : null;
     cabecera_fact['costoYgasto'] = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? this.CostoYgasto : null;
