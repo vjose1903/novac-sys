@@ -48,8 +48,8 @@
                   (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
                   (focus)="tiposFacturas.toggle($event)"
                   tabindex="-1"
-                  [readOnly]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar)"
-                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
+                  [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
+                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
                 />
 
                 <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
@@ -68,8 +68,8 @@
                   [(ngModel)]="condicion_fact"
                   (change)="cambiarCondicion($event.target.value)"
                   tabindex="-1"
-                  [disabled]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar)"
-                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
+                  [disabled]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
+                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
                 >
                   <option value="Contado">Contado</option>
                   <option value="Crédito">Crédito</option>
@@ -87,8 +87,8 @@
                   (keydown.enter)="saltar($event.target.id, gastoDe.value)"
                   class="form-control tipo inputE"
                   [(ngModel)]="CostoYgasto"
-                  [readOnly]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar)"
-                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
+                  [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
+                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
                   (focus)="gastosFacturas.toggle($event)"
                   (blur)="gastosFacturas.hide()"
                   tabindex="-1"
@@ -110,8 +110,8 @@
                 [(ngModel)]="modo_factura"
                 (blur)="checkCambiosModoyCondicionFactura($event.target)"
                 tabindex="-1"
-                [disabled]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar)"
-                [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) }"
+                [disabled]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
+                [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
               >
                 <option value="" disabled selected>Modo de venta</option>
                 <option value="normal">Normal</option>
@@ -338,7 +338,7 @@
               <div *ngxPermissionsOnly="factServ.tipoDocumento == tipoDocFacturacion.venta ? permissions.factura_venta.create : permissions.factura_compra.create">
                 <app-btncircular
                   [alto]="'100px'"
-                  [accion]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) ? 'Editar ' + getDocumentoDescripcion().descripcion_short : 'Imprimir ' + getDocumentoDescripcion().descripcion_short"
+                  [accion]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar) ? 'Editar ' + getDocumentoDescripcion().descripcion_short : 'Imprimir ' + getDocumentoDescripcion().descripcion_short"
                   [nombreImg]="'printer'"
                   (pulsar)="imprimirFactura()"
                 ></app-btncircular>
@@ -346,7 +346,7 @@
               <div>
                 <app-btncircular
                   [alto]="'100px'"
-                  [accion]="factServ.action == 'update' && fun.hasValue(!!factura_a_rellenar) ? 'Cancelar Edición' : 'Cancelar ' + getDocumentoDescripcion().descripcion_short"
+                  [accion]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar) ? 'Cancelar Edición' : 'Cancelar ' + getDocumentoDescripcion().descripcion_short"
                   [nombreImg]="'cancelar'"
                   (pulsar)="cancelarFactura()"
                 ></app-btncircular>
@@ -360,16 +360,16 @@
                 ></app-btncircular>
               </div>
               <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.venta">
-                <app-btncircular *ngIf="fun.isEmpty(!!factura_a_rellenar)" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
+                <app-btncircular *ngIf="fun.isEmpty(factura_a_rellenar)" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
               </div>
 
               <div  *ngIf="factServ.tipoDocumento === 'venta'">
-              <app-btncircular
+              <!-- <app-btncircular
                 [alto]="'100px'"
                 [accion]="'PRUEBA'"
                 [nombreImg]="'calendar'"
                 (click)="prueba()"
-              ></app-btncircular>
+              ></app-btncircular> -->
             </div>
             </div>
           </div>

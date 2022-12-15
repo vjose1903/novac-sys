@@ -17,8 +17,8 @@
     "build:dev": "npm run build -- -c dev",
     "build:prod": "npm run build -- -c production",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
-    "ng:serve": "ng serve --host 0.0.0.0 --port 5221 -c web",
-    "electron:serve": "wait-on tcp:5221 && npm run electron:serve-tsc && npx electron . --serve",
+    "ng:serve": "ng serve --host 0.0.0.0 --port 5220 -c web",
+    "electron:serve": "wait-on tcp:5220 && npm run electron:serve-tsc && npx electron . --serve",
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "npm run build:prod && electron-builder build",
     "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64 -p always",
@@ -28,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vjose1903/novac-system-brendy.git"
+    "url": "https://github.com/vjose1903/novac-system-agrodemi.git"
   },
   "dependencies": {
     "@angular/animations": "^13.3.11",
     "@angular/cdk": "13.3.9",
-    "@fortawesome/fontawesome-free": "6.2.1",
+    "@fortawesome/fontawesome-free": "^6.0.0",
     "@ng-bootstrap/ng-bootstrap": "^12.1.2",
     "@ng-select/ng-select": "^8.0.0",
     "angular-resize-event": "3.1.1",
