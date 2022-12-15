@@ -146,7 +146,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
         { id: '1', label: 'Dia único' },
         { id: '2', label: 'Rango fechas' },
       ];
-    } else if (this.tipo_reporte == 'cuentas_con_pagos') {
+    } else if (this.tipo_reporte == 'cuentas_con_pagos' || this.tipo_reporte == 'ventas_cliente' ) {
       this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
       this.form.controls.hasta.setValue(new Date());
       this.setValidator('cliente_id');

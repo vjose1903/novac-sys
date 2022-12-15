@@ -8,6 +8,7 @@ import { ConfigI } from '../../typescript/config-interface';
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
 import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
 import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cxc_ant_preventa';
+import { config_ventas_cliente } from './8.5x5.5/configuraciones/reportes/ventas_cliente';
 import { config_cxc_preventa } from './8.5x5.5/configuraciones/reportes/cxc_preventa';
 import { config_cxc_ant } from './8.5x5.5/configuraciones/reportes/cxc_ant';
 import { config_inventario } from './8.5x5.5/configuraciones/reportes/inventario';
@@ -21,6 +22,7 @@ const configuraciones = {
   ventas: config_ventas,
   cxc: config_cxc,
   cxc_preventa: config_cxc_preventa,
+  ventas_cliente: config_ventas_cliente,
 
   cxc_ant_detallado: config_cxc_ant.detallado,
   cxc_ant_detallado_preventa: config_cxc_ant_preventa.detallado,
@@ -39,7 +41,10 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
+  console.log("data ", data);
   const configuration = configuraciones[data.tipo_reporte];
+  console.log("configuration ", configuration);
+
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });

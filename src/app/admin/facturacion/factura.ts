@@ -18,6 +18,8 @@ export enum tipoDocFacturacion {
   venta = 'venta',
   compra = 'compra',
   cotizacion = 'cotizacion',
+  nota_credito = 'nota_credito',
+  nota_debito = 'nota_debito',
 }
 
 export enum actionFacturacion {

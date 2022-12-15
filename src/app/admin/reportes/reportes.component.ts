@@ -20,16 +20,18 @@ import { NotaC } from '../manipular facturas/notas-cred-deb/notas';
 export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   reporteClass = new ReporteC();
 
+  // TODO: poner ventas_cliente y crear el metodo en su clase para el reporte
   instancesClases = {
     cuadre: CuadreC,
     ventas_diarias: FacturaC,
     ventas_rango: FacturaC,
     ventas_productos: ArticuloC,
-    cuentas_con_pagos: ClienteC,
     inventario: InventarioC,
     suplidor_prod: SuplidorC,
     cuentas_cobrar_cliente: ClienteC,
     cuentas_cobrar_ant_saldo: ClienteC,
+    cuentas_con_pagos: ClienteC,
+    ventas_cliente: ClienteC,
     recibos: ReciboC,
     notas: NotaC,
   };
@@ -40,7 +42,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._init_mixin({ component: 'reportes', is_routing: true });
-
   }
 
   iniciarCambioMenu(arg, callback) {

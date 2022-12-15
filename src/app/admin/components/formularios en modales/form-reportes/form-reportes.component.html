@@ -39,7 +39,7 @@
       </ng-select>
     </div>
 
-    <div *ngIf="tipo_reporte == 'cuentas_con_pagos'" class="col-12">
+    <div *ngIf="tipo_reporte == 'ventas_cliente' || tipo_reporte == 'cuentas_con_pagos'" class="col-12">
       <label class="control-label">Seleccione cliente: <span style="color: red">*</span> </label>
       <ng-select
         formControlName="cliente_id"
@@ -71,7 +71,15 @@
     <!-- ----- DESDE -----  -->
 
     <div
-      *ngIf="tipo_reporte == 'notas' || tipo_reporte == 'ventas_rango' || tipo_reporte == 'suplidor_prod' || tipo_reporte == 'recibos' || tipo_reporte == 'cuentas_con_pagos' || (tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')"
+      *ngIf="
+        tipo_reporte == 'notas' ||
+        tipo_reporte == 'ventas_rango' ||
+        tipo_reporte == 'suplidor_prod' ||
+        tipo_reporte == 'recibos' ||
+        tipo_reporte == 'cuentas_con_pagos' ||
+        tipo_reporte == 'ventas_cliente' ||
+        (tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')
+      "
       class="col-6 mt-3"
     >
       <label class="control-label">Desde: <span style="color: red">*</span> </label>
@@ -80,7 +88,15 @@
     </div>
     <!-- ----- HASTA -----  -->
     <div
-      *ngIf="tipo_reporte == 'notas' || tipo_reporte == 'ventas_rango' || tipo_reporte == 'suplidor_prod' || tipo_reporte == 'recibos' || tipo_reporte == 'cuentas_con_pagos' || (tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')"
+      *ngIf="
+        tipo_reporte == 'notas' ||
+        tipo_reporte == 'ventas_rango' ||
+        tipo_reporte == 'suplidor_prod' ||
+        tipo_reporte == 'recibos' ||
+        tipo_reporte == 'cuentas_con_pagos' ||
+        tipo_reporte == 'ventas_cliente' ||
+        (tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')
+      "
       class="col-6 mt-3"
     >
       <label class="control-label">Hasta: <span style="color: red">*</span> </label>

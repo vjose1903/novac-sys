@@ -11,8 +11,6 @@ export class ClienteC extends CrudG<any> {
     super('clientes');
   }
 
-
-
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
       let objModal;
@@ -22,6 +20,7 @@ export class ClienteC extends CrudG<any> {
           break;
         case 'cuentas_cobrar_ant_saldo':
         case 'cuentas_con_pagos':
+        case 'ventas_cliente':
           ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
           objModal = ReporteC.objReporte;
 
@@ -58,7 +57,13 @@ export class ClienteC extends CrudG<any> {
         break;
 
       case 'cuentas_con_pagos':
+      case 'ventas_cliente':
         requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), cliente_id: reporteParams.data.cliente_id };
+
+        if (pdfParams.tipo == 'ventas_cliente') {
+          requestParameters['condicion'] = 'todos';
+          requestParameters['formas_pago'] = "('Efectivo','Tarjeta','Cheque','Transferencia')";
+        }
 
         break;
 
@@ -75,7 +80,7 @@ export class ClienteC extends CrudG<any> {
     });
 
     function transformRequestResponse(requestResponse) {
-      if (hasPermisoPreVenta && objTipo['cuentas_cobrar_ant_saldo'] != 3) requestResponse['tipo_reporte'] += '_preventa';
+      if (hasPermisoPreVenta && objTipo['cuentas_cobrar_ant_saldo'] != 3 && pdfParams.tipo != 'ventas_cliente') requestResponse['tipo_reporte'] += '_preventa';
 
       return requestResponse;
     }

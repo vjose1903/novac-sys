@@ -628,7 +628,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async continuarANotas(idFactSelect?) {
     if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
 
-    if ((this.noExistenComprobantes = false)) {
+    if (this.noExistenComprobantes == false) {
       const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${JSON.stringify(idFactSelect ? [idFactSelect] : this.idsFacturasSeleccionadas)}`;
       this.router.navigateByUrl(url);
     }

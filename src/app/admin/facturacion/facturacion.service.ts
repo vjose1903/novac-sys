@@ -121,6 +121,10 @@ export class FacturacionService {
     } else if (params.condicion_fact == 'Crédito') {
       res.descripcion = 'Factura a Crédito';
       //
+    } else if (params.metodo == tipoDocFacturacion.nota_credito || params.metodo == tipoDocFacturacion.nota_debito) {
+      res.descripcion = tipoDocFacturacion.nota_credito ? 'Nota de Crédito' : 'Nota de Dédito';
+
+      //
     } else if (fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia == '01') {
       res.descripcion = 'Factura con valor fiscal';
       //
