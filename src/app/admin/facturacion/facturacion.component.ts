@@ -1074,7 +1074,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    if (this.getCantidadArticulos() == 0) {
+    if (this.getCantidadArticulos() == 0 && this.factura_pendiente == false) {
       fun.toastWarning(`No existe factura iniciada para cancelar`, 'Aviso');
       return;
     }

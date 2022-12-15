@@ -311,7 +311,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.delete = 'far fa-trash-alt';
         fact.make_bill = 'fas fa-external-link-alt';
 
-        fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulado.`;
+        fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
 
         fact.is_selected = this.idsFacturasSeleccionadas.includes(fact.id);
         fact.tooltip_select = 'Seleccionar Factura';

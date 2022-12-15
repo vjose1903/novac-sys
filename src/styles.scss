@@ -13,6 +13,10 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/height.scss";
 @import "./splash-styles.scss";
 
+.visually-hidden {
+  display: none !important;
+}
+
 * {
   font-family: "Poppins";
 }
