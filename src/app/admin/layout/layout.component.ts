@@ -1,3 +1,4 @@
+import { TiposFacturaC } from './../facturacion/factura';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit, ElementRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
@@ -48,6 +49,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
+  tipoFacturaClass = new TiposFacturaC();
+
   chequiando_cuadre: boolean;
   hasPermisosValidated: boolean;
 
@@ -89,7 +92,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
-
       if (res && res.bool) this.logOut();
       else {
         if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
@@ -111,8 +113,29 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.parseMenu();
     this.checkRouteActiva();
     this.cdRef.detectChanges();
+
     this.validateUserAndLoadPermisos().then((result) => {
-      this.hasPermisosValidated = result;
+      this.getTiposFacturas().then((res) => {
+        this.hasPermisosValidated = result;
+      });
+    });
+  }
+
+  getTiposFacturas() {
+    return new Promise((resolve) => {
+      this.tipoFacturaClass
+        .getAll()
+        .then((tiposFacturas) => {
+          tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
+          Ss.factServ.lista_tipos_facturas = tiposFacturas;
+
+          resolve(Ss.factServ.lista_tipos_facturas);
+        })
+        .catch((error) => {
+          fun.logBlue('error: ', error);
+          if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
+          resolve(false);
+        });
     });
   }
 
@@ -188,7 +211,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
-
     fun.logout().then(() => {
       this._destroy_layout(true);
       this.noServer = false;

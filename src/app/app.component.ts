@@ -49,8 +49,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   sub: Subscription;
   subModified: Subscription;
 
-  tipoFacturaClass = new TiposFacturaC();
-
   constructor(
     public _ipc: IpcService,
     public loaderServ: LoaderService,
@@ -142,23 +140,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     fun.setWindowSize(window);
 
     this.getAppConfig().then((config) => {
-      this.getTiposFacturas().then((result) => {
-        setTimeout(() => {
-          this.configReady = true;
-        }, 250);
-      });
-    });
-  }
-
-  getTiposFacturas() {
-    return new Promise((resolve) => {
-      this.tipoFacturaClass.getAll().then((tiposFacturas) => {
-        tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
-
-        this.factServ.lista_tipos_facturas = tiposFacturas;
-
-        resolve(this.factServ.lista_tipos_facturas);
-      });
+      setTimeout(() => (this.configReady = true), 250);
     });
   }
 

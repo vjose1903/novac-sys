@@ -108,6 +108,7 @@ export class CrudG<T> {
     const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
     const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
+    // const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;
   }
 
