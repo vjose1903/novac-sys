@@ -122,8 +122,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   getTiposFacturas() {
-    return new Promise((resolve) => {
-      this.tipoFacturaClass
+    return new Promise(async (resolve) => {
+      await this.tipoFacturaClass
         .getAll()
         .then((tiposFacturas) => {
           tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
@@ -140,10 +140,12 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   validateUserAndLoadPermisos() {
-    return new Promise<any>((resolve) => {
-      this.currentUserServ
+    return new Promise<any>(async (resolve) => {
+      await this.currentUserServ
         .validateUser()
-        .then((result) => resolve(true))
+        .then((result) => {
+          resolve(true);
+        })
         .catch((error) => {
           fun.logBlue('error: ', error);
           if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
