@@ -537,7 +537,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   async buscarFacturasAdelantadas(id) {
     try {
-      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, fact_de: 'venta' }).then(
+      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
         (res) => {
           this.facturas_adelantadas = res['data'];
           this.facturas_adelantadas.map((factura) => {

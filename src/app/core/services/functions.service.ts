@@ -624,8 +624,6 @@ export class fun {
   static async logout() {
     return new Promise((resolve) => {
       try {
-        console.log('inicio de borrado de localStorage');
-
         localStorage.removeItem('facturas_guardadas');
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
@@ -633,7 +631,6 @@ export class fun {
         localStorage.removeItem('expiry');
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
-        console.log('fin de borrado de localStorage');
 
         Ss.layServ.nextLogOut(undefined);
         resolve(true);

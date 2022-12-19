@@ -222,8 +222,4 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
     return hDisplay + mDisplay + sDisplay;
   }
-
-  logOut() {
-    this.layServ.nextLogOut({ bool: true, quien: 'appComponent' });
-  }
 }

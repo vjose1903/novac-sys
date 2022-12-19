@@ -257,10 +257,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   selectCamionesFactura(factura) {
     const camiones_selected = [];
 
-    factura.camiones.forEach((camion_viaje) => {
+    factura.camiones_viajes.forEach((camion_viaje) => {
       const camion_en_turno = _.find(this.camiones, { id: camion_viaje.vehiculo_id });
       if (fun.hasValue(camion_en_turno)) camiones_selected.push(camion_en_turno);
     });
+
     this.form.controls.camiones_viajes.setValue(camiones_selected);
   }
 

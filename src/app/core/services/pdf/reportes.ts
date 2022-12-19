@@ -41,10 +41,7 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
-  console.log("data ", data);
   const configuration = configuraciones[data.tipo_reporte];
-  console.log("configuration ", configuration);
-
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });

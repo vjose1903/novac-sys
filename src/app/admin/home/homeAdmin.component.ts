@@ -37,7 +37,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
     const filter_value = '';
     const params = { ant_page: null, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false };
 
-    const args = { campo: filter_options.todos, valor: filter_value, tipo_factura_id: 0, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, fact_de: tipoDocFacturacion.cotizacion, pagada: false };
+    const args = { campo: filter_options.todos, valor: filter_value, tipo_factura_id: 0, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, tipo: tipoDocFacturacion.cotizacion, pagada: false };
 
     const res = await new FacturaC().getFacturasByParams(args);
     console.log('res ', res);

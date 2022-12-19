@@ -38,7 +38,6 @@ export class InterceptorService implements HttpInterceptor {
     if (!spinner || spinner == 'no_hide') this.startRequest(spinner); // Activa el spinner
 
     if (token) {
-
       request = request.clone({
         setHeaders: {
           'access-token': `${localStorage.getItem('access-token')}`,
@@ -54,7 +53,6 @@ export class InterceptorService implements HttpInterceptor {
     return next.handle(request).pipe(
       map((event) => {
         if (event instanceof HttpResponse) {
-
           if (_.has(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
 
           ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
@@ -71,12 +69,12 @@ export class InterceptorService implements HttpInterceptor {
         console.log(' ');
         console.log('response ', response);
         console.log(' ');
-        if (response.error === null) {
+        if (fun.isEmpty(response.error)) {
           fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
-        } else if (response.error && _.has(response.error, 'action') && response.error.action === 'close_ssesion') {
+        } else if (response.error && _.has(response.error, 'action') && response.error.action == 'close_session') {
           fun.toastError(response.error.msg, 'ERROR');
           this.sharedServ.nextCanToast(false);
-          Ss.layServ.nextLogOut({ bool: true, quien: 'close_ssesion' });
+          Ss.layServ.nextLogOut({ bool: true, quien: 'close_session' });
         } else {
           if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 
@@ -89,8 +87,6 @@ export class InterceptorService implements HttpInterceptor {
         this.endRequest(spinner);
       }),
     );
-    // return next.handle(request).pipe(
-    // );
   }
 
   handler_msg(menssages, tipo_) {

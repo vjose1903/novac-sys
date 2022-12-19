@@ -252,10 +252,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
             for (let index = 0; index < detalles.length; index++) {
               if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem();
 
-              const row = detalles[index];
+              const detalle_en_turno = detalles[index];
 
-              await this.getArticuloToLlenar(row).then((articulo) => {
-                this.llenarDetalles(row, articulo, index);
+              if (detalle_en_turno.unidad.includes('Saco de')) {
+                detalle_en_turno.peso_saco = Number(detalle_en_turno.unidad.split(' ')[2]);
+              }
+
+              await this.getArticuloToLlenar(detalle_en_turno).then((articulo) => {
+                this.llenarDetalles(detalle_en_turno, articulo, index);
                 this.seleccionarCampoEnTurno();
               });
             }
@@ -289,7 +293,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     controls['codigo'].setValue(articulo.codigo);
     controls['precio'].setValue(this.factServ.tipoDocumento == tipoDocFacturacion.compra ? fun.numFormatTwoDecimals(data.costo) : fun.numFormatTwoDecimals(data.precio));
     controls['costo'].setValue(fun.numFormatTwoDecimals(data.costo));
-    controls['descuento_valor'].setValue(fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : data.descuento_valor);
+    controls['descuento_valor'].setValue(fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : fun.numFormatTwoDecimals(data.descuento_valor));
     controls['cantidad'].setValue(data.cantidad);
     controls['cantidad_en_unidades'].setValue(data.cantidad_en_unidades);
     controls['key_origin'].setValue(fun.hasValue(data?.key_origin) ? data.key_origin : null);
@@ -306,7 +310,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     controls['actual_price_value'].setValue(this.getBadPrice(data).monto);
     controls['producto_origin'].setValue(fun.hasValue(data?.producto_origin) ? data.producto_origin : null);
 
-    let unidad = data.peso_saco ? `Saco de ${data.peso_saco} libras` : data.unidad;
+    let unidad = fun.hasValue(data.peso_saco) ? `Saco de ${data.peso_saco} libras` : data.unidad;
 
     controls['unidad'].setValue(unidad);
 
@@ -316,14 +320,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   getBadPrice(data) {
-    const medida = data.peso_saco ? `Saco_${data.peso_saco}` : data.unidad;
-    let current_monto = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? data.costo : data.precio;
-    const tipo = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio';
-    let actual_price_monto = data.actual_price[medida][tipo];
+    const medida = data.peso_saco || data.unidad.includes('Saco de') ? `Saco_${data.peso_saco}` : data.unidad;
 
-    if (data.is_defectuoso) {
-      actual_price_monto = actual_price_monto / 2;
-    }
+    let current_monto = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? data.costo : data.precio;
+
+    const tipo = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio';
+    let actual_price_monto = fun.hasValue(data.actual_price) ? data.actual_price[medida][tipo] : current_monto;
+
+    if (data.is_defectuoso) actual_price_monto = actual_price_monto / 2;
 
     current_monto = fun.numFormatTwoDecimals(current_monto);
     actual_price_monto = fun.numFormatTwoDecimals(actual_price_monto);
@@ -809,7 +813,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           if (itemRetorno.tipo == 'defectuoso') {
             campos_devuelto['cantidad'].setValue(articulo_devuelto.cantidad - retornar_info['cantidad']);
             campos_devuelto['cantidad_en_unidades'].setValue(articulo_devuelto.cantidad_en_unidades - retornar_info['cantidad_en_unidades']);
-            campos_devuelto['descuento_valor'].setValue(articulo_devuelto.descuento_valor - retornar_info['descuento_valor']);
+            campos_devuelto['descuento_valor'].setValue(fun.numFormatTwoDecimals(articulo_devuelto.descuento_valor - retornar_info['descuento_valor']));
             this.calcularMontosRow(articulo_devuelto_index);
           } else {
             articulo_devuelto['cantidad'] -= retornar_info['cantidad'];
@@ -829,7 +833,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
           campos_origin['cantidad'].setValue(articulo_origin.value.cantidad + retornar_info['cantidad']);
           campos_origin['cantidad_en_unidades'].setValue(articulo_origin.value.cantidad_en_unidades + retornar_info['cantidad_en_unidades']);
-          campos_origin['descuento_valor'].setValue(articulo_origin.value.descuento_valor + retornar_info['descuento_valor']);
+          campos_origin['descuento_valor'].setValue(fun.numFormatTwoDecimals(articulo_origin.value.descuento_valor + retornar_info['descuento_valor']));
           this.calcularMontosRow(articulo_origin_index);
         } else {
           retornar_info.key = retornar_info.key_origin;
@@ -865,7 +869,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     } else {
       current_detalle.controls['cantidad'].setValue(current_detalle.value.cantidad - data_remover.cantidad);
       current_detalle.controls['cantidad_en_unidades'].setValue(current_detalle.value.cantidad * current_detalle.value.articulo.contenido[medida]);
-      current_detalle.controls['descuento_valor'].setValue((origin_current_detalle.descuento_valor / origin_current_detalle.cantidad) * current_detalle.value.cantidad);
+      current_detalle.controls['descuento_valor'].setValue(fun.numFormatTwoDecimals((origin_current_detalle.descuento_valor / origin_current_detalle.cantidad) * current_detalle.value.cantidad));
 
       promiseArray.push(this.calcularMontosRow(index_current_detalle).then((result) => {}));
     }
@@ -925,7 +929,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         const campos = (this.factServ.filasDetalle[articulo_ya_retirado.index] as any).controls;
 
         campos['cantidad'].setValue(producto.cantidad + articulo_ya_retirado.data.cantidad);
-        campos['descuento_valor'].setValue(producto.descuento_valor + articulo_ya_retirado.data.descuento_valor);
+        campos['descuento_valor'].setValue(fun.numFormatTwoDecimals(producto.descuento_valor + articulo_ya_retirado.data.descuento_valor));
 
         this.calcularMontosRow(articulo_ya_retirado.index);
       }

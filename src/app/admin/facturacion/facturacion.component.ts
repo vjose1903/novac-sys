@@ -382,7 +382,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (!actualPath.includes(factura.tipo) || !this.factServ.action.includes(factura.action)) {
         const action_route = fun.hasValue(factura.action) ? factura?.action : 'new';
-        const id_route = fun.hasValue(factura.cotizacion) ? factura?.cotizacion : fun.hasValue(factura.pre_factura) ? factura.pre_factura : '0';
+        const id_route = fun.hasValue(factura.cotizacion) ? factura?.cotizacion : fun.hasValue(factura.pre_factura) ? factura.pre_factura : fun.hasValue(factura.id_documento) ? factura.id_documento : '0';
 
         res.same_modulo = false;
         this.router.navigateByUrl(`/admin/factura/${factura.tipo}/${action_route}/${id_route}`).then((result) => {
@@ -400,6 +400,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.checkPath(factura).then((res) => {
           this.rellenarCabezaFactura(factura).then((factura_rellenada) => {
             //
+
             this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas']).then((res) => {
               setTimeout(() => {
                 this._sideBarOpened = false;
@@ -425,7 +426,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       this.factServ.tipoDocumento = factura.tipo;
 
-      if (!_.has(factura, 'archivo_id') && (original_factura.action == actionFacturacion.update || original_factura.action == actionFacturacion.bill_from_cotizacion || original_factura.action == actionFacturacion.bill_from_pre_venta)) {
+      if (!_.has(factura, 'archivo_id') && [actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action)) {
         const factura_archivada = _.find(fun.getFacturasguardadas(), { id_documento: factura?.id });
 
         if (fun.hasValue(factura_archivada)) {
@@ -469,7 +470,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           else this.fecha_vencimiento = new Date();
 
           this.is_viaje = factura.is_viaje;
-          this.condicion_fact = actionFacturacion.bill_from_pre_venta || factura.action == actionFacturacion.bill_from_cotizacion ? this.condicion_fact : factura.condicion;
+          this.condicion_fact = factura.action == actionFacturacion.bill_from_pre_venta || factura.action == actionFacturacion.bill_from_cotizacion ? this.condicion_fact : factura.condicion;
 
           this.NCFcompra = factura.tipo == 'compra' ? factura.numero_comprobante : undefined;
           this.CostoYgasto = factura.tipo == 'compra' ? factura.costoYgasto : '';
@@ -491,6 +492,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           }
 
           this.factServ.productos_devueltos = productos_devueltos;
+
+          if (_.has(factura, 'camiones_viajes')) {
+            factura.camiones_viajes.forEach((camion) => this.camionesSelected.push({ vehiculo_id: camion.vehiculo_id }));
+          }
 
           factura.detalle_facturas = _.filter(factura.detalle_facturas, (detalle) => !detalle.is_devuelto || (detalle.is_devuelto && detalle.is_defectuoso));
 
@@ -592,7 +597,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (this.factura_guardada && this.factura_guardada?.archivo_id == factura.archivo_id) {
         fun.toastWarning(`Ya esta ${this.getSideBarTabByKey(this.factura_guardada.tipo)['singleTitle']} esta seleccionada.`, 'AVISO');
       } else {
-        // TODO: en algun lugar de aqui abajo poner que si tiene un cotizacion y actionFacturacion.bill_from_cotizacion: busque la cotizacion...
         this.checkSituaciones().then((result) => {
           if (result.factura_en_proceso) {
             if (result.abrirModal) {
@@ -1139,7 +1143,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning(`Total de la ${documento.descripcion} no puede ser 0`, 'Aviso');
           fun.enfocarInput('codigo-0');
         } else {
-          if (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion) {
+          if (
+            this.factServ.tipoDocumento != tipoDocFacturacion.compra &&
+            (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion)
+          ) {
             const obj = { metodo: this.factServ.tipoDocumento, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
 
             this.openNewModal({
@@ -1302,7 +1309,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  prueba() {}
+  prueba(arg?) {}
 
   resetVariables() {
     this.cuerpo.RESETCUERPO();
@@ -1507,10 +1514,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['forma_pago'] = this.forma_pago;
 
     let fecha_equi;
-    if (this.factura_pendiente) fecha_equi = this.fechaFactura['front'];
+    if (this.factura_pendiente) fecha_equi = moment(this.fechaFactura['front']).format();
     else fecha_equi = null;
 
-    cabecera_fact['fecha_viaje'] = this.is_viaje ? this.fecha_viaje : null;
+    cabecera_fact['fecha_viaje'] = this.is_viaje ? moment(this.fecha_viaje).format() : null;
+
     cabecera_fact['fecha_equivalente'] = fecha_equi;
 
     if (this.condicion_fact == 'Crédito') {

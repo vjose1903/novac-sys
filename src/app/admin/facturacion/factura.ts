@@ -85,11 +85,11 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   getFacturaById(id: number) {
-    const extra = { parameters: { actual_price: true } };
+    const extra = { parameters: { actual_price: true, camiones_viajes: true } };
     return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; adelantada: boolean; page: number; per_page: number; paginado: boolean; fact_de: string; pagada?: any; estado?: boolean }) {
+  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean }) {
     const valor_enc = btoa(args.valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
@@ -100,12 +100,12 @@ export class FacturaC extends CrudG<FacturasI> {
         page: args.page,
         per_page: args.per_page,
         paginado: args.paginado,
-        fact_de: args.fact_de,
+        tipo: args.tipo,
         pagada: args.pagada,
         campo: args.campo,
         valor: VALOR_ENC,
         tipo_factura_id: args.tipo_factura_id,
-        is_adelantada: args.adelantada,
+        is_adelantada: _.has(args, 'adelantada') ? args.adelantada : '0',
         estado: _.has(args, 'estado') ? args.estado : '0',
       },
     };

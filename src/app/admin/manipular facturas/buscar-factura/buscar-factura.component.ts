@@ -291,25 +291,24 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     try {
       this.facturas.length = 0;
 
-      const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, fact_de: this.tipo_documento_selected };
+      const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected } ;
+      const res  = await this.facturaClass.getFacturasByParams(args) ;
 
-      const res = await this.facturaClass.getFacturasByParams(args);
-
-      res['data'].forEach((fact) => {
+      res['data'].forEach( (fact) => {
         const pago_a_tiempo = this.getIsPagoAtiempo(fact);
-        const estatus = this.getIsActiveInfo(fact);
+        const estatus       = this.getIsActiveInfo(fact);
 
-        fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
-        fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
-        fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
-        fact.is_active = estatus.icon;
+        fact.secuencia         = _.padStart(fact.numero_factura, 8, '0');
+        fact.fechaV            = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
+        fact.colorFechaV       = pago_a_tiempo ? 'black' : 'red';
+        fact.is_active         = estatus.icon;
         fact.is_active_tooltip = estatus.tooltip;
-        fact.is_active_color = estatus.color;
-        fact.monto = fun.numFormatTwoDecimals(fact.balance);
-        fact.viewColor = 'gris-claro';
-        fact.view = 'far fa-eye-slash';
-        fact.delete = 'far fa-trash-alt';
-        fact.make_bill = 'fas fa-external-link-alt';
+        fact.is_active_color   = estatus.color;
+        fact.monto             = fun.numFormatTwoDecimals(fact.balance);
+        fact.viewColor         = 'gris-claro';
+        fact.view              = 'far fa-eye-slash';
+        fact.delete            = 'far fa-trash-alt';
+        fact.make_bill         = 'fas fa-external-link-alt';
 
         fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
 
@@ -713,7 +712,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             disable: false,
           };
 
-          console.log('type ', type);
 
           if (dataFactura.estado) obj_modal.botones.dinamico.push(rePrintButton);
           if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(editButton);

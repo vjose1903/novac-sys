@@ -40,7 +40,9 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     super();
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    fun.logout();
+  }
 
   ngAfterViewInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
@@ -98,6 +100,8 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then((res) => {
+          console.log('res ', res);
+
           setTimeout(
             () =>
               this.currentUserServ.setUser(res.data).then(() => {

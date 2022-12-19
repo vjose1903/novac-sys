@@ -133,7 +133,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     try {
       this.documentos.length = 0;
 
-      const args = { campo: this.filter_key, valor: this.filter_value, tipo_factura_id: 0, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, fact_de: this.inputs.code, pagada: false, estado: true };
+      const args = { campo: this.filter_key, valor: this.filter_value, tipo_factura_id: 0, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, tipo: this.inputs.code, pagada: false, estado: true };
       const res = await this.facturaClass.getFacturasByParams(args);
 
       res['data'].forEach((fact) => {
