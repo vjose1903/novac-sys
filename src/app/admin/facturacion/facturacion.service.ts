@@ -15,25 +15,13 @@ export class FacturacionService {
   options_tipos_facturas: string[];
   htmlTiposCostosGastos: string;
   options_tipos_costos_gastos: string[];
+
   lista_tipos_facturas: TipoFacturaI[];
   propietario_factura;
   pre_venta_selected;
   cotizacion_selected;
   productos_devueltos = [];
   filasDetalle;
-
-  referencia_tipos_facturas = {
-    'factura sin comprobante': '00',
-    'factura con valor fiscal': '01',
-    'factura de consumo': '02',
-    'comprobante de compras': '11',
-    'registro de unico ingreso': '12',
-    'comprobante para gastos menores': '13',
-    'comprobante de regimen especiales': '14',
-    'comprobante gubernamental': '15',
-    'comprobante para exportaciones': '16',
-    'comprobantes para pago al exterior': '17',
-  };
 
   constructor() {}
 

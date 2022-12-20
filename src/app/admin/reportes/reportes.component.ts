@@ -20,7 +20,6 @@ import { NotaC } from '../manipular facturas/notas-cred-deb/notas';
 export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   reporteClass = new ReporteC();
 
-  // TODO: poner ventas_cliente y crear el metodo en su clase para el reporte
   instancesClases = {
     cuadre: CuadreC,
     ventas_diarias: FacturaC,

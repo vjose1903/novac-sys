@@ -39,7 +39,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   info = [];
   detalleNota = [];
   tipoFactura: any;
-  lista_tipos_facturas: any;
+
   paqueteComprobante;
   is_print = false;
 
@@ -117,8 +117,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
-
     this.getFacturas().then(async (datos) => {
       this.facturasConDetalles = datos as FacturasI[];
       await this.getPaqueteComprobante();
@@ -126,7 +124,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async getPaqueteComprobante() {
-    const TipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipoFactura);
+    const TipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipoFactura);
 
     this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` }).then((res) => {
       this.paqueteComprobante = res['data'];
@@ -478,7 +476,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async formarNota() {
-    const TipoFact = this.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
+    const TipoFact = Ss.factServ.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
     const fecha_valida = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
 
     let dataToSend;

@@ -32,7 +32,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   buscarPara: any;
   para: string;
 
-  lista_tipos_facturas: any;
   noExistenComprobantes = false;
   paqueteComprobante: any;
   tipo_factura_id = null;
@@ -103,7 +102,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.verificatePermisos().then(async (res) => {
       this.selectTableConfig();
       this.completarTituloPag();
-      await this.getTipoFacturas();
 
       fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
     });
@@ -149,7 +147,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = this.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.buscarPara]);
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.buscarPara]);
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
       this.paqueteComprobante = res['data'] as any;
@@ -216,16 +214,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     tipos.forEach((tipo) => {
       if (tipo.condition) this.tipos_documentos.push(tipo);
     });
-  }
-
-  async getTipoFacturas() {
-    try {
-      const res = await this.tiposFacturasClass.getAll();
-
-      this.lista_tipos_facturas = res;
-    } catch (error) {
-      console.error(error);
-    }
   }
 
   onHideSide() {

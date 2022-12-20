@@ -1,3 +1,4 @@
+import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
@@ -66,7 +67,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     id_tabla: 'lista_ncf',
     padre_functions: { data_request: (params) => this.getPaquetesNCF(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.secuencia_comprobante.update }, borrar: { show: true, permiso: this.permissions.secuencia_comprobante.destroy } },
   };
   tablaComponent;
@@ -122,21 +123,22 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async necesarioStart() {
-    await this.getTiposFacturas();
+    await this.parseTiposFacturas();
     await this.getPaquetesNCF(this.tServ.obj_paginate.default);
   }
 
-  async getTiposFacturas() {
+  async parseTiposFacturas() {
     try {
-      this.lista_tipos_facturas = await this.tiposFacturasClass.getAll();
-      const temp = fun.duplicarJson(this.lista_tipos_facturas);
-      for (let i = 0; i < temp.length; i++) {
-        const element = temp[i];
-        if (!element.referencia || element.referencia === '02' || element.referencia === '00') {
-          _.pullAt(temp, i);
+      const temp_tipos_facturas = fun.duplicarJson(Ss.factServ.lista_tipos_facturas);
+
+      for (let index = 0; index < temp_tipos_facturas.length; index++) {
+        const tipo_factura_en_turno = temp_tipos_facturas[index];
+        if (!tipo_factura_en_turno.referencia || tipo_factura_en_turno.referencia == '02' || tipo_factura_en_turno.referencia == '00') {
+          _.pullAt(temp_tipos_facturas, index);
         }
       }
-      this.lista_tipos_facturas = temp;
+
+      this.lista_tipos_facturas = temp_tipos_facturas;
     } catch (error) {}
   }
 

@@ -68,7 +68,9 @@ export class FacturaC extends CrudG<FacturasI> {
       });
 
       formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+
       requestParams.parameters = {
+        tipo_factura_id: params.reporte.data.tipo_factura_id,
         tipo: params.reporte.data.tipo,
         condicion: params.reporte.data.condicion,
         formas_pago: formas_pago,
@@ -115,36 +117,9 @@ export class FacturaC extends CrudG<FacturasI> {
 
   parseDataToPdf(data) {
     return new Promise((resolve) => {
-      const pick_factura = [
-        'Bruto',
-        'cliente',
-        'balance',
-        'condicion',
-        'descuento',
-        'identificador',
-        'detalle_facturas',
-        'numero_factura',
-        'devuelta',
-        'estado',
-        'fecha_completada',
-        'fecha_equivalente',
-        'fecha_valida',
-        'fecha_vencimiento',
-        'fecha_viaje',
-        'forma_pago',
-        'id',
-        'is_viaje',
-        'monto',
-        'numero_comprobante',
-        'tipo',
-        'tipo_factura_id',
-        'itbis',
-        'suplidor',
-        'tipo_factura',
-        'total_factura',
-        'usuario',
-        'vendedor',
-      ];
+      const pick_factura1 = ['Bruto', 'cliente', 'balance', 'condicion', 'descuento', 'identificador', 'detalle_facturas', 'numero_factura', 'devuelta', 'estado', 'fecha_completada', 'fecha_equivalente', 'fecha_valida', 'fecha_vencimiento'];
+      const pick_factura2 = ['fecha_viaje', 'forma_pago', 'id', 'is_viaje', 'monto', 'numero_comprobante', 'tipo', 'tipo_factura_id', 'itbis', 'suplidor', 'tipo_factura', 'total_factura', 'usuario', 'vendedor'];
+      const pick_factura = [...pick_factura1, ...pick_factura2];
 
       let temp_data_parsed = _.pick(fun.duplicarJson(data), pick_factura);
 

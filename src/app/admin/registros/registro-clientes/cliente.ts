@@ -61,7 +61,8 @@ export class ClienteC extends CrudG<any> {
         requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), cliente_id: reporteParams.data.cliente_id };
 
         if (pdfParams.tipo == 'ventas_cliente') {
-          requestParameters['condicion'] = 'todos';
+          requestParameters['tipo_factura_id'] = reporteParams.data.tipo_factura_id;
+          requestParameters['condicion'] = reporteParams.data.condicion;
           requestParameters['formas_pago'] = "('Efectivo','Tarjeta','Cheque','Transferencia')";
         }
 

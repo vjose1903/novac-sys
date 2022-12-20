@@ -1,7 +1,6 @@
 import { tFacturaD } from './../../../facturacion/factura';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { Ss } from './../../../../core/services/singleton.service';
-import { EventEmitter } from '@angular/core';
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
@@ -34,6 +33,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   ];
 
   tipos;
+  tipos_facturas;
 
   filtro_articulo;
   listaArticulos = [];
@@ -115,54 +115,54 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   agregateValidators() {
+    let tipo_selected = null;
+    let condicion_selected = null;
+    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos'];
+    const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente'];
+
     if (this.tipo_reporte == 'cuadre') {
       this.form.controls.fecha.setValue(new Date());
+      //
     } else if (this.tipo_reporte == 'ventas_diarias') {
-      this.form.controls.tipo.setValue(1);
-      this.setValidator('condicion');
-    } else if (this.tipo_reporte == 'ventas_rango') {
-      this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
-      this.form.controls.hasta.setValue(new Date());
-      this.form.controls.tipo.setValue(2);
+      tipo_selected = 1;
+      condicion_selected = 'todos';
 
-      this.setValidator('condicion');
-      this.setValidator('desde');
-      this.setValidator('hasta');
+      //
+    } else if (this.tipo_reporte == 'ventas_rango') {
+      tipo_selected = 2;
+      condicion_selected = 'todos';
+
+      //
     } else if (this.tipo_reporte == 'cuentas_cobrar_ant_saldo') {
       this.tipos = [
         { id: '2', label: 'Detallado' },
         { id: '3', label: 'Agrupado' },
       ];
+      //
     } else if (this.tipo_reporte == 'notas') {
-      this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
-      this.form.controls.hasta.setValue(new Date());
       this.tipos = [
         { label: 'Crédito', id: Ss.factServ.tipoFacturaId(tFacturaD.nota_de_credito) },
         { label: 'Dédito', id: Ss.factServ.tipoFacturaId(tFacturaD.nota_de_debito) },
         { label: 'Todas', id: 0 },
       ];
+      //
+    } else if (this.tipo_reporte == 'cuentas_con_pagos' || this.tipo_reporte == 'ventas_cliente') {
+      this.setValidator('cliente_id');
+
+      if (this.tipo_reporte == 'ventas_cliente') {
+        this.setValidator('tipo');
+        condicion_selected = 'todos';
+        this.form.controls.tipo.setValue('todos');
+      }
     } else if (this.tipo_reporte == 'ventas_productos') {
       this.tipos = [
         { id: '1', label: 'Dia único' },
         { id: '2', label: 'Rango fechas' },
       ];
-    } else if (this.tipo_reporte == 'cuentas_con_pagos' || this.tipo_reporte == 'ventas_cliente' ) {
-      this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
-      this.form.controls.hasta.setValue(new Date());
-      this.setValidator('cliente_id');
-      this.setValidator('desde');
-      this.setValidator('hasta');
-    } else if (this.tipo_reporte == 'suplidor_prod') {
-      this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
-      this.form.controls.hasta.setValue(new Date());
-      this.setValidator('desde');
-      this.setValidator('hasta');
+      //
     } else if (this.tipo_reporte == 'recibos') {
-      this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
-      this.form.controls.hasta.setValue(new Date());
       this.form.controls.tipo.setValue('todos');
-      this.setValidator('desde');
-      this.setValidator('hasta');
+      this.setValidator('tipo');
 
       Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => {
         this.tipos = [{ id: 'normal', label: 'Normal' }];
@@ -175,16 +175,66 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
         }
       });
     }
+
+    if (fun.hasValue(condicion_selected)) {
+      this.form.controls.condicion.setValue(condicion_selected);
+      this.setValidator('condicion');
+    }
+
+    if (fun.hasValue(tipo_selected)) {
+      this.form.controls.tipo.setValue(tipo_selected);
+      this.setValidator('tipo');
+    }
+
+    if (tipo_factura_includes.includes(this.tipo_reporte)) this.parseTipoFacturas();
+
+    if (desde_hasta_includes.includes(this.tipo_reporte)) this.setDesdeHastaControls();
+  }
+
+  setDesdeHastaControls() {
+    this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
+    this.form.controls.hasta.setValue(new Date());
+
+    this.setValidator('desde');
+    this.setValidator('hasta');
+  }
+
+  parseTipoFacturas() {
+    const tipos_aceptados = [
+      'Factura con valor fiscal',
+      'Factura de consumo',
+      'Comprobante de compras',
+      'Registro de unico ingreso',
+      'Comprobante para gastos menores',
+      'Comprobante de regimen especiales',
+      'Comprobante gubernamental',
+      'Comprobante para exportaciones',
+      'Comprobantes para pago al exterior',
+    ];
+
+    this.tipos_facturas = [{ label: 'Todos', id: 0 }];
+
+    fun.duplicarJson(Ss.factServ.lista_tipos_facturas).forEach((tipo_factura) => {
+      if (tipos_aceptados.includes(tipo_factura.descripcion)) {
+        this.tipos_facturas.push({ label: tipo_factura.descripcion, id: Number(tipo_factura.id) });
+      }
+    });
+
+    this.form.controls.tipo_factura_id.setValue(0);
+    this.setValidator('tipo_factura_id');
   }
 
   changeTipo() {
     const control = this.form.controls;
+
     if (this.tipo_reporte == 'ventas_productos') {
+      ['fecha', 'desde', 'hasta'].forEach((control) => this.removeValidator(control));
+
       if (control.tipo.value == '1') {
         this.form.controls.fecha.setValue(new Date());
+        this.setValidator('fecha');
       } else {
-        this.form.controls.desde.setValue(new Date(this.getFirstDayOfMoth()));
-        this.form.controls.hasta.setValue(new Date());
+        this.setDesdeHastaControls();
       }
     }
   }
@@ -194,11 +244,17 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     this.form.controls[control].updateValueAndValidity();
   }
 
+  removeValidator(control) {
+    this.form.controls[control].setValidators([]);
+    this.form.controls[control].updateValueAndValidity();
+  }
+
   createForm() {
     this.form = this.fb.group({
       cliente_id: [null],
       articulo_id: [null],
       tipo: [null],
+      tipo_factura_id: [null],
       condicion: [null],
       fecha: [null],
       desde: [null],
