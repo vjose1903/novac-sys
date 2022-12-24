@@ -15,6 +15,7 @@ import { BuscarClienteSuplidorComponent } from '../../../components/formularios 
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-ingresos',
@@ -110,7 +111,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService) {
+  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService, private router: Router) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }
@@ -219,7 +220,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   isOneFacturaWithMonto() {
-    const valid = _.some(this.facturasSelected, (factura) => factura.select && fun.desformatear(factura.monto) > 0);
+    const valid = this.facturasSelected.some((factura) => factura.select && fun.desformatear(factura.monto) > 0);
     return valid;
   }
 
@@ -270,6 +271,26 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
+  tableClickRow(event) {
+    if (event?.data?.is_viaje) {
+      const obj = {
+        id: 'move_to_vajes',
+        header: 'Confirmación',
+        texto: 'Seguro que desea dirigirse al modulo de viajes para continuar con el viaje seleccionado.',
+        siFunction: (instance) => {
+          this.goToViajes(event?.data);
+          instance.closeModal(instance.id, 'cancelar');
+        },
+      };
+
+      this.confirmationModal(obj);
+    }
+  }
+
+  goToViajes(factura) {
+    this.router.navigateByUrl(`/admin/recibos/viajes/${factura.id}`);
+  }
+
   pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
     if (fun.hasValue(this.clienteAdepositar)) {
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, params);
@@ -283,9 +304,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
-      html: `<p>
-      ${obj.texto}
-    </p>`,
+      html: `<p> ${obj.texto} </p>`,
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
@@ -472,7 +491,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
-    } else if (_.some(this.facturasSelected, (factura) => factura.monto == 0)) {
+    } else if (this.facturasSelected.some((factura) => factura.monto == 0)) {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();

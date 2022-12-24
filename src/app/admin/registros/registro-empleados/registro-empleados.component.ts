@@ -155,7 +155,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-        if (this.editando && _.some(this.documentos_de_identidad, (doc) => doc.documento === cedula)) {
+        if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === cedula)) {
           enable_campos = true;
           return;
         }

@@ -174,6 +174,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    console.dir(document.getElementById('nom'));
   }
 
   ngOnDestroy(): void {
@@ -255,7 +256,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   someArticuloHasDevuelto() {
     const detalles = this.factServ.getDetallesLlenos();
-    return _.some(detalles, (detalle) => detalle.is_devuelto) || this.factServ.productos_devueltos.length > 0;
+    return detalles.some((detalle) => detalle.is_devuelto) || this.factServ.productos_devueltos.length > 0;
   }
 
   selectOptionExtra(option, where) {
@@ -937,7 +938,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   checkCamionIsSelected(camion) {
-    return _.some(this.camionesSelected, { vehiculo_id: camion.id });
+    return this.camionesSelected.some((vehiculo) => vehiculo.vehiculo_id == camion.id);
   }
 
   checkCamionSeleccionado() {

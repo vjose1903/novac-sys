@@ -184,7 +184,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const detalles = this.factServ.getDetallesLlenos();
 
-    return _.some(detalles, (detalle) => detalle.key_origin == current_detalle.key) || _.some(this.factServ.productos_devueltos, (detalle) => detalle.key_origin == current_detalle.key);
+    return detalles.some((detalle) => detalle.key_origin == current_detalle.key) || this.factServ.productos_devueltos.some((detalle) => detalle.key_origin == current_detalle.key);
   }
 
   // =============================================

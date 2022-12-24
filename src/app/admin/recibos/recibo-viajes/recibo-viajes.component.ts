@@ -14,6 +14,7 @@ import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ModalClass } from '../../components/modal/modal-class';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -78,7 +79,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   form;
 
-  constructor(private tServ: TablasService, private reciboServ: RecibosService, private fb: FormBuilder) {
+  constructor(private tServ: TablasService, private reciboServ: RecibosService, private fb: FormBuilder, private route: ActivatedRoute) {
     super();
   }
 
@@ -98,22 +99,12 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     if (fun.hasValue(res)) this.reversarUltimaTransaccion();
   }
 
-  objDevueltoResponse(res) {
-    // TODO: ver si esto esta funcionando aqui
-    if (res && res.tipo_modal === 'cambio') {
-      this.devuelta = res.data.devuelta > 0 ? res.data.devuelta : 0;
-      this.forma_pago = res.data.forma_pago;
-      this.total_recibido = res.data.dinero;
-      this.IMPRIMIR();
-    }
-  }
-
   ngOnDestroy() {
     this._destroy_mixin();
   }
 
   necesarioStart() {
-    this.getViajes(this.tServ.obj_paginate.default);
+    this.checkRoute();
     this.getChoferes();
     this.getCamiones();
     this.createForm();
@@ -121,6 +112,28 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   createForm() {
     this.form = this.fb.group({ choferes_viajes: [null, Validators.required], camiones_viajes: [null, Validators.required] });
+  }
+
+  async checkRoute() {
+    this.getViajes(this.tServ.obj_paginate.default).then(async (result) => {
+      const id_documento = this.route.snapshot.params['id'];
+
+      if (id_documento != '0') {
+        const res = await this.facturaClass.getFacturaById(id_documento);
+        const factura = res['data'];
+
+        if (!this.viajes.some((viaje) => viaje.id == factura.id)) {
+          const inputSearch = document.getElementById('search-lista_viajes') as any;
+
+          if (fun.hasValue(inputSearch)) {
+            inputSearch.value = factura?.cliente?.nombre;
+            fun.keyboardEvent(inputSearch, 'keyup', ['Shift']);
+          }
+        }
+
+        this.verViaje(factura);
+      }
+    });
   }
 
   formatoNumero(num) {
@@ -146,7 +159,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     });
   }
   async getViajes(params?: { per_page: number; page: number; search: string }) {
-    try {
+    return new Promise<any>(async (resolve, reject) => {
       this.viajes_completados_cant = 0;
       this.viajes_pendientes_cant = 0;
       this.viajes.length = 0;
@@ -193,11 +206,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       }, 5);
 
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
-    } catch (error) {
-      console.error(error);
 
-      if (error.error) fun.toastError(error.error.msg, 'ERROR');
-    }
+      resolve(true);
+    });
   }
 
   formIsInvalid() {

@@ -205,7 +205,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const actualPage = this.getPaginatorPageByNumber(page);
       const clickeado_por = actualPage?.getAttribute('clickeado_por');
 
-      if ((page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
+      if (fun.hasValue(actualPagination) && (page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
         this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
         if (actualPagination.is_local) {
@@ -327,11 +327,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       for (let i = 0; i < backgroundConfig.length; i++) {
         const backConfig = backgroundConfig[i];
 
-        if (_.some(backConfig, (conf) => conf.kind === 'selected') && fun.hasValue(this.seleccionado)) temp_res = Number(dato.id) !== Number(this.seleccionado || 0);
+        if (backConfig.some((conf) => conf.kind === 'selected') && fun.hasValue(this.seleccionado)) temp_res = Number(dato.id) !== Number(this.seleccionado || 0);
 
         if (!temp_res && backConfig.kind === 'campo') {
           if (backConfig.value.length === 0) temp_res = dato[backConfig.target];
-          else temp_res = _.some(backConfig.value, (value) => value == dato[backConfig.target]);
+          else temp_res = backConfig.value.some((value) => value == dato[backConfig.target]);
         }
 
         if (temp_res) res = backConfig.color;
@@ -528,7 +528,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       for (let i = 0; i < objIcon.showCondition.length; i++) {
         const element = objIcon.showCondition[i];
 
-        if (_.some(objIcon.showCondition, (conf) => conf.kind === 'selected')) {
+        if (objIcon.showCondition.some((conf) => conf.kind === 'selected')) {
           const is_selected = data.id == (this.seleccionado || 0);
           res = element.value == is_selected;
         }
@@ -537,7 +537,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
         if (element.kind === 'campo') {
           if (element.value.length == 0) res = data[element.target] ? false : true;
-          else res = _.some(element.value, (value) => value == data[element.target]);
+          else res = element.value.some((value) => value == data[element.target]);
         }
       }
     } else {
@@ -577,11 +577,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       for (let i = 0; i < column.disable.length; i++) {
         const element = column.disable[i];
 
-        if (_.some(column.disable, (conf) => conf.kind === 'always')) temp_res = true;
+        if (column.disable.some((conf) => conf.kind === 'always')) temp_res = true;
 
         if (temp_res) break;
 
-        if (_.some(column.disable, (conf) => conf.kind === 'selected')) temp_res = Number(dato.id) !== Number(this.seleccionado || 0);
+        if (column.disable.some((conf) => conf.kind === 'selected')) temp_res = Number(dato.id) !== Number(this.seleccionado || 0);
 
         if (temp_res) break;
         // TODO: hacer que se pueda desabilitar si el campo especificado tiene valor
@@ -593,7 +593,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
         if (element.kind == 'campo') {
           if (element.value.length == 0) temp_res = dato[element.target] ? false : true;
-          else temp_res = _.some(element.value, (value) => value == dato[element.target]);
+          else temp_res = element.value.some((value) => value == dato[element.target]);
         }
       }
       res = temp_res;
@@ -644,7 +644,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   clickROW(data, index) {
-    const has_inputs = _.some(this.config.info, (info: any) => info.tipo == 'input');
+    const has_inputs = this.config.info.some((info: any) => info.tipo == 'input');
+
     const obj = { data, index, id_tabla: this.config.id_tabla + this.post_id };
     this.handle_table_events('clickRow', obj);
   }

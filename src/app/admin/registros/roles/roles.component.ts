@@ -186,8 +186,9 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   iconCantSelected(permiso) {
-    const almenos_uno = _.some(permiso.acciones, (item) => item.selected);
-    const todos = _.every(permiso.acciones, (item) => item.selected);
+    const almenos_uno = permiso.acciones.some((item) => item.selected);
+    const todos = permiso.acciones.every((item) => item.selected);
+
     let res = almenos_uno ? { tooltip: 'Algunos seleccionados', icon: 'far fa-check-square' } : { tooltip: 'Ninguno seleccionado', icon: 'far fa-square' };
 
     if (todos) res = { tooltip: 'Todos seleccionados', icon: 'fas fa-check' };
@@ -208,8 +209,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   selectOrDeselectAll(permiso) {
-    const some_true = _.some(permiso.acciones, (accion) => accion.selected);
-    const all_true = _.every(permiso.acciones, (accion) => accion.selected);
+    const some_true = permiso.acciones.some((accion) => accion.selected);
+    const all_true = permiso.acciones.every((accion) => accion.selected);
 
     permiso.acciones.map((accion) => (accion.selected = some_true ? false : !all_true));
   }

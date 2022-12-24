@@ -76,7 +76,7 @@ export class fun {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
-          const is_include = _.some(array_picked, (value: any) => value.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
+          const is_include = array_picked.some((value: any) => value.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
 
           return is_include;
         });
@@ -607,6 +607,16 @@ export class fun {
   static enfocarAndSelectInput(arg) {
     fun.enfocarInput(arg);
     setTimeout(() => this.selectContenido(arg), 10);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: keyboardEvent
+  // Descripcion : Esta funcion simula un evento de teclado
+  // __________________________________________________________________________________________________
+  static keyboardEvent(element: any, event: 'keyup' | 'keydown', keysArray: Array<string>): any {
+    keysArray.forEach((key) => {
+      element.dispatchEvent(new KeyboardEvent(event, { key: key }));
+    });
   }
 
   // __________________________________________________________________________________________________

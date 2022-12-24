@@ -67,8 +67,8 @@
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('recibos') }" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="cambiarMenu({ url: 'recibos', navigate: false })" />
 
             <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('recibos') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.ingresos.recibosIngresos" [ngClass]="{ activa: actualRuta == 'ingresos' }" (click)="cambiarMenu({ url: 'recibos/ingresos', navigate: true })">Recibo ingresos</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.ingresos.viajes" [ngClass]="{ activa: actualRuta == 'viajes' }" (click)="cambiarMenu({ url: 'recibos/viajes', navigate: true })">Viajes</h4>
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.ingresos.recibosIngresos" [ngClass]="{ activa: getLayoutActiveRoute('ingresos') }" (click)="cambiarMenu({ url: 'recibos/ingresos', navigate: true })">Recibo ingresos</h4>
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.ingresos.viajes" [ngClass]="{ activa: getLayoutActiveRoute('viajes') }" (click)="cambiarMenu({ url: 'recibos/viajes/0', navigate: true })">Viajes</h4>
             </div>
           </div>
 

@@ -188,7 +188,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-        if (this.editando && _.some(this.documentos_de_identidad, (doc) => doc.documento === documento)) {
+        if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === documento)) {
           enable_campos = true;
           return;
         }

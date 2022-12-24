@@ -573,7 +573,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         return detalle;
       });
 
-      const almenos_uno = _.some(item.detalle_facturas, (detalle) => detalle.select);
+      const almenos_uno = item.detalle_facturas.some((detalle) => detalle.select);
       const todos = _.every(item.detalle_facturas, (detalle) => detalle.select);
 
       item.detalles_selected = todos ? 'fas fa-check' : almenos_uno ? 'far fa-check-square' : 'far fa-square';

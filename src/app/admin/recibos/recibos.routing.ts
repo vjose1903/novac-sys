@@ -14,7 +14,7 @@ const routes: Routes = [
     component: IngresosComponent,
   },
   {
-    path: 'viajes',
+    path: 'viajes/:id',
     component: ReciboViajesComponent,
   },
 ];

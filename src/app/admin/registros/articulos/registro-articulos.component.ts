@@ -573,7 +573,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     if (this.form.valid && !this.articulo_no_paquete) {
       if (this.tipoArticuloSelected.codigo == 'producto_terminado') {
-        res = _.some(formulario.rowFormula, (fila) => fun.isEmpty(fila.articulo_id) || fun.isEmpty(fila.cantidad_formula));
+        res = formulario.rowFormula.some((fila) => fun.isEmpty(fila.articulo_id) || fun.isEmpty(fila.cantidad_formula));
 
         if (res) return res;
         else {
