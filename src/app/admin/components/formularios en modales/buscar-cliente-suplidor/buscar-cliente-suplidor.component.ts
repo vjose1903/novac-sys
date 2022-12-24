@@ -4,7 +4,6 @@ import { Component, OnInit } from '@angular/core';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
 import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
-import * as _ from 'lodash';
 import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../new_tablas/tabla-class';
@@ -75,7 +74,8 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
         res.data.map(async (entidad) => {
           entidad.nombre = fun.Capitalice(entidad.nombre);
           entidad.apellido = fun.Capitalice(entidad.apellido);
-          const doc = _.find(entidad.documentos_de_identidad, { principal: true });
+          const doc = entidad.documentos_de_identidad.find((documento) => documento.principal);
+
           entidad.documento_identidad = doc ? doc.documento : '----------';
           return entidad;
         });
@@ -86,7 +86,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
       const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
 
-      if (_.has(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
+      if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
 
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     } catch (error) {}
@@ -98,7 +98,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   closeThis(arg?) {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
     if (arg) modal.returnDataFromModal(arg);
     return modal;

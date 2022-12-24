@@ -31,14 +31,14 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         tipo: 'icon',
         key: 'actions',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '5%' }, { color: 'var(--transparente00)' }],
+        estilos: [{ width: '7%' }, { color: 'var(--transparente00)' }],
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
           { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
         ],
       },
-      { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '20%' }] },
-      { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar', estilos: [{ width: '35%' }] },
+      { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '13%' }] },
+      { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar', estilos: [{ width: '40%' }] },
       { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
     ],
@@ -178,12 +178,12 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
         viaje.customStyles = {
           actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 5% !important; padding: 0.6rem 0rem !important' },
+            { key: 'actions', isTd: true, estilos: 'width: 7% !important; padding: 0.6rem 0rem !important' },
             { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
             { key: 'ver', estilos: 'font-size: 1rem !important' },
           ],
-          fecha: { width: '20%' },
-          cliente_mostrar: { width: '35%' },
+          fecha_equivalente: { width: '13%' },
+          cliente_mostrar: { width: '40%' },
           numero_comprobante: { width: '15%' },
           total_factura: { width: '20%' },
         };

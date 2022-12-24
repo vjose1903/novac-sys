@@ -4,7 +4,6 @@ import { Observable, throwError } from 'rxjs';
 
 import { catchError, map, finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
-import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { Ss } from '../core/services/singleton.service';
 import { fun } from '../core/services/functions.service';
@@ -16,14 +15,14 @@ export class InterceptorService implements HttpInterceptor {
   requestCount: number = 0;
 
   private startRequest(args?): void {
-    if (this.requestCount <= 0 && args !== 'no_show') this.loadServ.isLoading.next(true);
+    if (this.requestCount <= 0 && args != 'no_show') this.loadServ.isLoading.next(true);
     this.requestCount++;
   }
 
   private endRequest(args?): void {
-    if (this.requestCount > 0 && args !== 'no_show') this.requestCount--;
+    if (this.requestCount > 0 && args != 'no_show') this.requestCount--;
 
-    if (this.requestCount == 0 && args !== 'no_hide') this.loadServ.isLoading.next(false);
+    if (this.requestCount == 0 && args != 'no_hide') this.loadServ.isLoading.next(false);
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -53,7 +52,7 @@ export class InterceptorService implements HttpInterceptor {
     return next.handle(request).pipe(
       map((event) => {
         if (event instanceof HttpResponse) {
-          if (_.has(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
+          if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
 
           ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
             const headerValue = event.headers.get(header);
@@ -71,14 +70,14 @@ export class InterceptorService implements HttpInterceptor {
         console.log(' ');
         if (fun.isEmpty(response.error)) {
           fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
-        } else if (response.error && _.has(response.error, 'action') && response.error.action == 'close_session') {
+        } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
           fun.toastError(response.error.msg, 'ERROR');
           this.sharedServ.nextCanToast(false);
           Ss.layServ.nextLogOut({ bool: true, quien: 'close_session' });
         } else {
-          if (_.has(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
+          if (fun.objHas(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 
-          if (_.has(response, 'error.msg')) this.handler_msg(response.error.msg, 'error');
+          if (fun.objHas(response, 'error.msg')) this.handler_msg(response.error.msg, 'error');
         }
 
         return throwError(response);

@@ -508,9 +508,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           dinamico: [
             {
               clase: 'btn btn-blanco mr-2',
-              function: (instance) => {
-                this.closeModal(instance);
-              },
+              function: (instance) => this.closeModal(instance),
               label: 'Cancelar',
               disable: false,
             },

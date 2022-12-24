@@ -36,7 +36,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     ],
     colores: true,
     id_tabla: 'lista_produccion',
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
     botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
   };
   tablaComponent;
@@ -130,10 +130,10 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   existenciaConTooltip(objeto) {
     let llevaTooltip = true;
 
-    if (_.has(objeto.existencia, 'Caja')) llevaTooltip = objeto.existencia.Unidad >= objeto.contenido.Caja && objeto.existencia.Caja > 0;
-    else if (_.has(objeto.existencia, 'Saco')) llevaTooltip = objeto.existencia.Libra >= objeto.contenido.Saco && objeto.existencia.Saco > 0;
-    else if (_.has(objeto.existencia, 'Unidad')) llevaTooltip = false;
-    else if (_.has(objeto.existencia, 'Galon')) llevaTooltip = objeto.existencia.Onza >= objeto.contenido.Galon && objeto.existencia.Galon > 0;
+    if (fun.objHas(objeto.existencia, 'Caja')) llevaTooltip = objeto.existencia.Unidad >= objeto.contenido.Caja && objeto.existencia.Caja > 0;
+    else if (fun.objHas(objeto.existencia, 'Saco')) llevaTooltip = objeto.existencia.Libra >= objeto.contenido.Saco && objeto.existencia.Saco > 0;
+    else if (fun.objHas(objeto.existencia, 'Unidad')) llevaTooltip = false;
+    else if (fun.objHas(objeto.existencia, 'Galon')) llevaTooltip = objeto.existencia.Onza >= objeto.contenido.Galon && objeto.existencia.Galon > 0;
     else llevaTooltip = objeto.existencia.Libra > 100;
 
     return llevaTooltip;
@@ -142,19 +142,19 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   lookprincipal(objeto) {
     let mostrar;
 
-    if (_.has(objeto.existencia, 'Caja')) {
+    if (fun.objHas(objeto.existencia, 'Caja')) {
       if (objeto.existencia.Unidad >= objeto.contenido.Caja && objeto.existencia.Caja > 0) {
         mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Caja)} ${objeto.existencia.Caja === 1 ? 'Caja' : 'Cajas'}`;
       } else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Unidad)} ${objeto.existencia.Unidad === 1 ? 'Unidad' : 'Unidades'}`;
-    } else if (_.has(objeto.existencia, 'Saco')) {
+    } else if (fun.objHas(objeto.existencia, 'Saco')) {
       if (objeto.existencia.Libra >= objeto.contenido.Saco && objeto.existencia.Saco > 0) {
         mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Saco)} ${objeto.existencia.Saco === 1 ? 'Saco' : 'sacos'}`;
       } else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Libra)} ${objeto.existencia.Libra === 1 ? 'Libra' : 'Libras'}`;
-    } else if (_.has(objeto.existencia, 'Galon')) {
+    } else if (fun.objHas(objeto.existencia, 'Galon')) {
       if (objeto.existencia.Onza >= objeto.contenido.Galon && objeto.existencia.Galon > 0) {
         mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Galon)} ${objeto.existencia.Galon === 1 ? 'Galon' : 'Galones'}`;
       } else mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Onza)} ${objeto.existencia.Onza === 1 ? 'Onza' : 'Onzas'}`;
-    } else if (_.has(objeto.existencia, 'Unidad')) {
+    } else if (fun.objHas(objeto.existencia, 'Unidad')) {
       mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Unidad)} ${objeto.existencia.Unidad === 1 ? 'Unidad' : 'Unidades'}`;
     } else {
       if (objeto.existencia.Libra >= 100) mostrar = `${fun.numFormatTwoDecimals(objeto.existencia.Quintal)} ${objeto.existencia.Quintal === 1 ? 'Quintal' : 'Quintales'}`;

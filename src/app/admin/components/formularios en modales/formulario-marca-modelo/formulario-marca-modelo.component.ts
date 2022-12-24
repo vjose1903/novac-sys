@@ -200,7 +200,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     const obj = fun.duplicarJson(formToSubmit.getRawValue());
     const metodo = fun.hasValue(obj?.id) ? 'actualizado' : 'creado';
 
-    if (this.isShowMarcas() && _.has(obj, 'marca_id')) delete obj['marca_id'];
+    if (this.isShowMarcas() && fun.objHas(obj, 'marca_id')) delete obj['marca_id'];
 
     const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
 
@@ -247,7 +247,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
     this.editando = true;
 
-    if (_.has(data, 'marca')) data.marca_id = data.marca.id;
+    if (fun.objHas(data, 'marca')) data.marca_id = data.marca.id;
 
     form.patchValue(data);
   }

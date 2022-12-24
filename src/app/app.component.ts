@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, Afte
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
 import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
-
+import * as _ from 'lodash';
 import { Ss } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from './admin/layout/layout.service';
@@ -10,7 +10,6 @@ import { ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
 
-import * as _ from 'lodash';
 import {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
   ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
@@ -81,6 +80,14 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     Ss.toastr = this.toastr;
     Ss.sharedServ = this.sharedServ;
     Ss.cdRef = this.cdRef;
+
+    // TODO: SEGIR MEJORANDO LA FUNCION DE PICK
+    const obj = { nombre: 'victor', edad: 10, ocupacion: 'ing', ciudad: 'la vega', algo: { por: 'aqui', mas: { otro: 'loco' } } };
+    const test = fun.pick(obj, ['nombre', 'edad', 'algo.mas']);
+    // const test = _.pick(obj, ['nombre', 'edad', 'algo.mas']);
+
+    console.log('obj ', obj);
+    console.log('test ', test);
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 
@@ -196,7 +203,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       this._ipc
         .sendTask(task)
         .then((config: ConfigI) => {
-          if (_.has(config, 'err')) {
+          if (fun.objHas(config, 'err')) {
           } else {
             this.themeService.setTheme(config.color_app);
             this.configServ.setConfig = config;

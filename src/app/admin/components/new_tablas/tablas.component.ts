@@ -100,14 +100,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   handleConfig() {
     if (!this.config.padding) this.config.padding = '0rem';
-    if (!_.has(this.config, 'redondo')) this.config.redondo = true;
-    if (_.has(this.config, 'filtrar') && !_.has(this.config, 'filtrar.show')) this.config.filtrar.show = true;
-    if (!_.has(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
-    if (!_.has(this.config, 'colorTitulo')) this.config.colorTitulo = true;
+    if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
+    if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
+    if (!fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
+    if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
     if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
 
     this.config.info.map((item) => {
-      if (!_.has(item, 'titulo_sm')) item.titulo_sm = item.titulo;
+      if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
     });
   }
 
@@ -145,7 +145,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   checkBackgroundTr(params: { tipo: string; dato: any }) {
     let res = false;
-    if (_.has(params.dato, params.tipo)) res = _.get(params.dato, params.tipo);
+    if (fun.objHas(params.dato, params.tipo)) res = _.get(params.dato, params.tipo);
 
     return res;
     // dato?.danger && config?.colores;
@@ -162,9 +162,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   filter(event) {
     const search = event.target.value;
 
-    if (_.has(this.config, 'filtrar') && !this.config.filtrar.local) {
+    if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
-        if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
+        if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
           const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id, 'filter');
 
           if (fun.hasValue(search)) {
@@ -211,7 +211,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         if (actualPagination.is_local) {
           this.localPagination(page, per_page, 'paginatorChange');
         } else {
-          if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
+          if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
             this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
           } else {
             fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
@@ -322,7 +322,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   changeBackGroundColor(dato) {
     const backgroundConfig = this.config.backgroundColor;
     let res = '#00000000';
-    if (_.has(this.config, 'backgroundColor') && fun.hasValue(this.config.backgroundColor)) {
+    if (fun.objHas(this.config, 'backgroundColor') && fun.hasValue(this.config.backgroundColor)) {
       let temp_res = false;
       for (let i = 0; i < backgroundConfig.length; i++) {
         const backConfig = backgroundConfig[i];
@@ -406,7 +406,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   handleInputsEvents(type, input, column, index_body) {
-    if (_.has(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
+    if (fun.objHas(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
       if (column.inputEvents == 'formatoNumero') {
         if (type == 'focus') {
           input.value = fun.is_number(input.value) ? fun.desformatear(input.value) : null;
@@ -524,7 +524,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   showIcon(objIcon, data) {
     let res = false;
 
-    if (_.has(objIcon, 'showCondition')) {
+    if (fun.objHas(objIcon, 'showCondition')) {
       for (let i = 0; i < objIcon.showCondition.length; i++) {
         const element = objIcon.showCondition[i];
 
@@ -571,7 +571,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   disabledInput(dato, column) {
     let res = false;
 
-    if (_.has(column, 'disable')) {
+    if (fun.objHas(column, 'disable')) {
       let temp_res = false;
 
       for (let i = 0; i < column.disable.length; i++) {
@@ -636,7 +636,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   functionsBtnDinamic(params) {
-    if (_.has(this.config, 'padre_functions') && this.config.padre_functions?.handleBtnsDinamic) {
+    if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.handleBtnsDinamic) {
       this.config.padre_functions.handleBtnsDinamic(params);
     } else {
       fun.logRed('----- Debe de implementar la funcion handleBtnsDinamic en el componente padre de la tabla ----');

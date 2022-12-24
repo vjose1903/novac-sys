@@ -427,7 +427,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       this.factServ.tipoDocumento = factura.tipo;
 
-      if (!_.has(factura, 'archivo_id') && [actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action)) {
+      if (!fun.objHas(factura, 'archivo_id') && [actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action)) {
         const factura_archivada = _.find(fun.getFacturasguardadas(), { id_documento: factura?.id });
 
         if (fun.hasValue(factura_archivada)) {
@@ -449,7 +449,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factServ
         .setTipoFacturaSelected(this.factServ.tipoDocumento, value_buscar, by_buscar)
         .then(async (result) => {
-          this.factura_pendiente = fun.hasValue(factura) && _.has(factura, 'factura_pendiente') ? factura?.factura_pendiente : false;
+          this.factura_pendiente = fun.hasValue(factura) && fun.objHas(factura, 'factura_pendiente') ? factura?.factura_pendiente : false;
 
           const fecha_facturacion = factura?.fecha_equivalente ? factura?.fecha_equivalente : fun.duplicarJson(this.fechaFactura['back']);
 
@@ -494,7 +494,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
           this.factServ.productos_devueltos = productos_devueltos;
 
-          if (_.has(factura, 'camiones_viajes')) {
+          if (fun.objHas(factura, 'camiones_viajes')) {
             factura.camiones_viajes.forEach((camion) => this.camionesSelected.push({ vehiculo_id: camion.vehiculo_id }));
           }
 
@@ -1107,13 +1107,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => (_.has(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
+          { clase: 'btn btn-blanco mr-2', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
           { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
         ],
       },
     };
 
-    if (_.has(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
+    if (fun.objHas(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
       fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
     }
 

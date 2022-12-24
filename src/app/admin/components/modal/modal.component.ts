@@ -119,7 +119,7 @@ export class NewModalComponent implements OnInit {
   disabledButton(btnConfig) {
     let res = false;
 
-    if (_.has(btnConfig, 'disable')) {
+    if (fun.objHas(btnConfig, 'disable')) {
       if (typeof btnConfig.disable == 'boolean') return btnConfig.disable;
 
       res = btnConfig.disable['function']();
@@ -129,7 +129,7 @@ export class NewModalComponent implements OnInit {
   }
 
   getButtonTooltip(btnConfig) {
-    return _.has(btnConfig, 'tooltip') && fun.hasValue(btnConfig.tooltip) ? btnConfig.tooltip : '';
+    return fun.objHas(btnConfig, 'tooltip') && fun.hasValue(btnConfig.tooltip) ? btnConfig.tooltip : '';
   }
 
   onHideModal(id_) {
@@ -155,7 +155,7 @@ export class NewModalComponent implements OnInit {
   dynamicFunction(configuration, btn) {
     const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
 
-    if (_.has(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
+    if (fun.objHas(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
     else btn['function'](modal);
   }
 

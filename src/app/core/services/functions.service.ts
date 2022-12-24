@@ -192,6 +192,64 @@ export class fun {
     }
   }
   // __________________________________________________________________________________________________
+  // Nombre: omit
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades
+  // _________________________________________________________________________________________________
+  static pick(obj, props) {
+    return props.reduce((result, prop) => {
+      result[prop] = obj[prop];
+      return result;
+    }, {});
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: omit
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades
+  // _________________________________________________________________________________________________
+
+  static omit(obj, props) {
+    const result = { ...obj };
+
+    props.forEach((prop) => delete result[prop]);
+
+    return result;
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: objHas
+  // Descripcion : Esta funcion retorna un valor booleano si el objeto evaluado contiene todas las propiedades evaluadas
+  // _________________________________________________________________________________________________
+
+  static objHas(obj, properties) {
+    let result = true;
+    const properties_split = properties.split('.');
+
+    function getCurrentObjLevel(mainObj, actualIndex, propertyIndex = 0) {
+      let obj_en_turno = mainObj;
+
+      if (propertyIndex < actualIndex) {
+        const current_object = actualIndex > 0 ? mainObj[properties_split[propertyIndex]] : mainObj;
+
+        if (propertyIndex < actualIndex) obj_en_turno = getCurrentObjLevel(current_object, actualIndex, (propertyIndex += 1));
+        else obj_en_turno = current_object;
+      }
+
+      return obj_en_turno;
+    }
+
+    for (let index = 0; index < properties_split.length; index++) {
+      const property = properties_split[index];
+
+      const current_object = getCurrentObjLevel(obj, index);
+
+      if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(property);
+      else result = false;
+
+      if (result == false) break;
+    }
+
+    return result;
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
@@ -502,11 +560,11 @@ export class fun {
       // es null o indefinido
       value == null ||
       // si tiene longitud 0
-      (value.hasOwnProperty('length') && value.length === 0) ||
+      (value.hasOwnProperty('length') && value.length == 0) ||
       // si es un string vacio o con lleno de espacios
-      (typeof value === 'string' && value.trim().length === 0) ||
+      (typeof value == 'string' && value.trim().length == 0) ||
       // si es un objeto y no tiene propiedades
-      (value.constructor === Object && Object.keys(value).length === 0)
+      (value.constructor == Object && Object.keys(value).length == 0)
     );
   }
 

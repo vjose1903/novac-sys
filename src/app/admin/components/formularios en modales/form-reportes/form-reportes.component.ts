@@ -10,7 +10,6 @@ import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
 import { ModalI } from '../../modal/modal-class';
-import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
 
 @Component({
@@ -250,20 +249,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   createForm() {
-    this.form = this.fb.group({
-      cliente_id: [null],
-      articulo_id: [null],
-      tipo: [null],
-      tipo_factura_id: [null],
-      condicion: [null],
-      fecha: [null],
-      desde: [null],
-      hasta: [null],
-    });
+    this.form = this.fb.group({ cliente_id: [null], articulo_id: [null], tipo: [null], tipo_factura_id: [null], condicion: [null], fecha: [null], desde: [null], hasta: [null] });
   }
 
   btn_aceptar() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id == this.modal.component_id);
+    const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
     modal.closeModal(this.modal.component_id);
     modal.returnDataFromModal({ data: { ...this.form.value, switches: { ...this.switches } }, modal_id: this.modal.component_id });
   }

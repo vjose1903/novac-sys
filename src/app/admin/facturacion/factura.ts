@@ -107,8 +107,8 @@ export class FacturaC extends CrudG<FacturasI> {
         campo: args.campo,
         valor: VALOR_ENC,
         tipo_factura_id: args.tipo_factura_id,
-        is_adelantada: _.has(args, 'adelantada') ? args.adelantada : '0',
-        estado: _.has(args, 'estado') ? args.estado : '0',
+        is_adelantada: fun.objHas(args, 'adelantada') ? args.adelantada : '0',
+        estado: fun.objHas(args, 'estado') ? args.estado : '0',
       },
     };
 

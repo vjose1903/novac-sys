@@ -49,7 +49,7 @@ export class CrudG<T> {
     const promise = new Promise((resolve, reject) => {
       if (Number(data.id) === 0 || !data.id) delete data.id;
 
-      if (_.has(data, 'id') && data.id !== 0) {
+      if (fun.objHas(data, 'id') && data.id !== 0) {
         this.updateOne(data, arg, tipo).then(
           (res) => resolve(res),
           (err) => reject(err),
@@ -120,8 +120,8 @@ export class CrudG<T> {
     if (tipo === 'externo') return `${proxyurl}${this.path}`;
 
     if (id) url += `/${id}`;
-    if (_.has(args, 'afterPath') && fun.hasValue(args.afterPath)) url += `/${args.afterPath}`;
-    if (_.has(args, 'parameters') && fun.hasValue(args.parameters)) url += this.parseParams(args.parameters);
+    if (fun.objHas(args, 'afterPath') && fun.hasValue(args.afterPath)) url += `/${args.afterPath}`;
+    if (fun.objHas(args, 'parameters') && fun.hasValue(args.parameters)) url += this.parseParams(args.parameters);
 
     return url;
   }

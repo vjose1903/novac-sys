@@ -1,6 +1,5 @@
-import { Component, OnInit, Output, EventEmitter, Input, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
@@ -14,8 +13,6 @@ import { ModalI } from '../../modal/modal-class';
 export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   form: FormGroup;
   element: HTMLElement;
-  // @Input() user;
-  // @Output() cancel = new EventEmitter<any>();
   empleadoClass = new EmpleadoC();
   modal: any = {};
   inputs: any;
@@ -40,13 +37,14 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
     if (objTemp.password === null) {
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
-      const objT = this.inputs;
-      const obj = _.omit(objT, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documentos_de_identidad', 'documento_identidad']);
+      const ids_roles = this.inputs.roles.map((rol) => rol.id);
+      const obj = fun.omit(this.inputs, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documento_identidad', 'nombreCompleto', 'nombre_completo', 'roles']);
+
       obj['password'] = objTemp.password;
-      obj['documentos_de_identidad_attributes'] = this.inputs.documentos_de_identidad;
+      obj['ids_roles'] = ids_roles;
 
       this.empleadoClass.createUpdateOne(obj).then(() => {
-        const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+        const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
         modal.closeModal(this.modal.component_id);
         modal.returnDataFromModal({ error: false });
       });
