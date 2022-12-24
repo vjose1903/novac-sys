@@ -219,7 +219,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         fun.enfocarInput(campo);
       }
 
-      if (input == 'cod-' && fun.hasValue(uni) && _.lowerCase(uni) != _.lowerCase('medida')) {
+      if (input == 'cod-' && fun.hasValue(uni) && uni.toLowerCase() != 'medida'.toLowerCase()) {
         if (fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.ajustarSecuencia().then(() => fun.enfocarInput(campo_siguiente));
       }
 
@@ -303,7 +303,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
-      if (_.lowerCase(articulo.vendido_en) == 'saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en.toLowerCase() == 'saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
 
       if (articulo.is_detallable) {
         articulo.contenido_articulos.forEach((element) => {
@@ -364,7 +364,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     const cantidad = fila_actual['can'];
 
     let cantidadMinima = 1;
-    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
+    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => uni.value.toLowerCase() == unidad.toLowerCase()).cantidad;
 
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
     control['cantidad_en_unidades'].setValue(cant_unidades);
@@ -470,7 +470,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
     let cantidadMinima = 1;
 
-    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
+    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => uni.value.toLowerCase() == unidad.toLowerCase()).cantidad;
 
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
 

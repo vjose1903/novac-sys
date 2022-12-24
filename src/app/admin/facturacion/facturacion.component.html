@@ -132,7 +132,6 @@
                   placeholder="mm/dd/aaaa"
                   class="form-control inputE"
                   [(ngModel)]="fecha_viaje"
-                  (ngModelChange)="prueba()"
                   #dp="bsDatepicker"
                   placement="bottom"
                   bsDatepicker
@@ -211,8 +210,8 @@
                   #fecha_vencimiento_input
                   id="fecha_vencimiento"
                   type="text"
-                  (keydown.enter)="saltar('fecha_vencimiento', fecha_vencimiento_input.value)"
                   [bsConfig]="dpConfig"
+                  (keydown.enter)="$event.target.blur()"
                   placeholder="mm/dd/aaaa"
                   class="form-control inputE"
                   [(ngModel)]="fecha_vencimiento"
@@ -220,6 +219,7 @@
                   placement="bottom"
                   bsDatepicker
                   tabindex="-1"
+                  (blur)="checkCambiosModoyCondicionFactura($event.target)"
                 />
               </div>
             </div>

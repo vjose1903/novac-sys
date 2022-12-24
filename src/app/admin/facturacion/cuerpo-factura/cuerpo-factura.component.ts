@@ -501,7 +501,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     let cantidadMinima = 1;
 
     if (unidad && this.UnidadesArticulo.length > 0) {
-      const unidad_find = this.UnidadesArticulo.find((_uni) => _.lowerCase(_uni.value) == _.lowerCase(unidad));
+      const unidad_find = this.UnidadesArticulo.find((_uni) => _uni.value.toLowerCase() == unidad.toLowerCase());
       if (unidad_find) cantidadMinima = unidad_find.cantidad;
     }
 
@@ -693,7 +693,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if ((this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
-      if (_.lowerCase(articulo.descripcion) === 'producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
+      if (articulo.descripcion.toLowerCase() == 'producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
       fun.toastError(msg, 'ERROR');
 
       if (this.configApp.vende_sin_inventario) {
@@ -714,7 +714,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       let msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
 
-      if (_.lowerCase(params.articulo.descripcion) === 'producto terminado') msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de producir mas!!!`;
+      if (params.articulo.descripcion.toLowerCase() == 'producto terminado') msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de producir mas!!!`;
       fun.toastWarning(msg, 'AVISO');
     }
 

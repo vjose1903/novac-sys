@@ -672,25 +672,27 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const tipo_factura_referencia = this.factServ.tipoFactura.referencia;
     let buscar = false;
 
-    if (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) {
-      setTimeout(() => {
-        const voy_a = document.activeElement.id;
-        const nombre = this.factServ.propietario_factura ? this.factServ.propietario_factura.nombre : 'Cliente contado';
+    setTimeout(() => {
+      const voy_a = document.activeElement.id;
+      const dont_have_propietario = fun.isEmpty(this.factServ?.propietario_factura) || fun.isEmpty(this.factServ?.propietario_factura?.id);
 
-        if (sali_de == 'venta' && (condicion == 'Crédito' || tipo_factura_referencia == '01') && nombre == 'Cliente contado' && (fun.isEmpty(voy_a) || voy_a != 'fecha_viaje')) buscar = true;
+      if (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) {
+        if (sali_de == 'venta' && (condicion == 'Crédito' || tipo_factura_referencia == '01') && dont_have_propietario && (fun.isEmpty(voy_a) || voy_a != 'fecha_viaje')) buscar = true;
 
-        if (sali_de == 'venta' && valor == 'adelantada' && nombre == 'Cliente contado') buscar = true;
+        if (sali_de == 'venta' && valor == 'adelantada' && dont_have_propietario) buscar = true;
 
         if (sali_de == 'fecha_viaje') {
           this.getCamiones();
           document.getElementById('btnCamion').click();
         }
 
-        if (buscar) this.abrirModalFiltro();
-
         if (this.modo_factura != 'viaje') this.camionesSelected = [];
-      }, 250);
-    }
+      } else {
+        if (sali_de == 'fecha_vencimiento' && dont_have_propietario) buscar = true;
+      }
+
+      if (buscar) this.abrirModalFiltro();
+    }, 250);
   }
 
   getCalculosDinero(arg) {
@@ -832,11 +834,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.enfocarInput('ncf');
           fun.toastWarning('Numero de comprobante incorrecto', 'Aviso');
         }
-        break;
-
-      case 'fecha_vencimiento':
-        is_enforcar = false;
-        is_buscar_cliente = true;
         break;
 
       case 'venta':
