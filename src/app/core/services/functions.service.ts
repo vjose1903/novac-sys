@@ -108,17 +108,6 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: pushAt
-  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
-  // _________________________________________________________________________________________________
-  static pushAt(arr, index, newItem) {
-    const copyArr = this.duplicarJson(arr);
-    arr.length = 0;
-    const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
-    newArr.forEach((item) => arr.push(item));
-  }
-
-  // __________________________________________________________________________________________________
   // Nombre: checkLongMillares
   // Descripcion : Esta funcion validad que los millares sean de 3 en 3
   // _________________________________________________________________________________________________
@@ -190,63 +179,6 @@ export class fun {
       }
       return x1 + x2;
     }
-  }
-  // __________________________________________________________________________________________________
-  // Nombre: omit
-  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades
-  // _________________________________________________________________________________________________
-  static pick(obj, props) {
-    return props.reduce((result, prop) => {
-      result[prop] = obj[prop];
-      return result;
-    }, {});
-  }
-  // __________________________________________________________________________________________________
-  // Nombre: omit
-  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades
-  // _________________________________________________________________________________________________
-
-  static omit(obj, props) {
-    const result = { ...obj };
-
-    props.forEach((prop) => delete result[prop]);
-
-    return result;
-  }
-  // __________________________________________________________________________________________________
-  // Nombre: objHas
-  // Descripcion : Esta funcion retorna un valor booleano si el objeto evaluado contiene todas las propiedades evaluadas
-  // _________________________________________________________________________________________________
-
-  static objHas(obj, properties) {
-    let result = true;
-    const properties_split = properties.split('.');
-
-    function getCurrentObjLevel(mainObj, actualIndex, propertyIndex = 0) {
-      let obj_en_turno = mainObj;
-
-      if (propertyIndex < actualIndex) {
-        const current_object = actualIndex > 0 ? mainObj[properties_split[propertyIndex]] : mainObj;
-
-        if (propertyIndex < actualIndex) obj_en_turno = getCurrentObjLevel(current_object, actualIndex, (propertyIndex += 1));
-        else obj_en_turno = current_object;
-      }
-
-      return obj_en_turno;
-    }
-
-    for (let index = 0; index < properties_split.length; index++) {
-      const property = properties_split[index];
-
-      const current_object = getCurrentObjLevel(obj, index);
-
-      if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(property);
-      else result = false;
-
-      if (result == false) break;
-    }
-
-    return result;
   }
 
   // __________________________________________________________________________________________________
@@ -802,5 +734,116 @@ export class fun {
 
   static toastWarning(msg?, titulo = 'AVISO') {
     if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '');
+  }
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // LODASH
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  // __________________________________________________________________________________________________
+  // Nombre: pushAt
+  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
+  // _________________________________________________________________________________________________
+  static pushAt(arr, index, newItem) {
+    const copyArr = this.duplicarJson(arr);
+    arr.length = 0;
+    const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
+    newArr.forEach((item) => arr.push(item));
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: objHas
+  // Descripcion : Esta funcion retorna un valor booleano si el objeto evaluado contiene todas las propiedades evaluadas
+  // _________________________________________________________________________________________________
+
+  static objHas(obj, props) {
+    let result = true;
+    const props_split = props.split('.');
+
+    for (let index = 0; index < props_split.length; index++) {
+      const property = props_split[index];
+
+      const current_object = fun.getCurrentObjLevel(obj, props_split, index);
+
+      if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(property);
+      else result = false;
+
+      if (result == false) break;
+    }
+
+    return result;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: pick
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
+  // _________________________________________________________________________________________________
+  static pick(obj, props) {
+    console.log('-----------------------------------');
+    console.log('props >> ', props);
+
+    console.log('-----------------------------------');
+
+    return props.reduce((result, prop, index) => {
+      console.log('=================================');
+
+      const props_split = prop.split('.');
+
+      if (props_split.length > 1) {
+        // TODO: seguir aqui jodiendo con esto
+        let next_target = {};
+
+        for (let i = 0; i < props_split.length; i++) {
+          const current_prop = props_split[i];
+
+          console.log('current_prop ', current_prop);
+          const position = i + 1;
+
+          console.log(' ');
+
+          const current_result = fun.getCurrentObjLevel(result, props_split, i);
+          console.log('current_result ', current_result);
+
+          if (fun.hasValue(current_result) && current_result.hasOwnProperty(current_prop)) next_target = current_result[current_prop];
+          console.log('next_target ', next_target);
+
+          if (position == props_split.length) {
+            const current_object = fun.getCurrentObjLevel(obj, props_split, i);
+            console.log('current_object ', current_object);
+            const next_value = next_target;
+            // result[props_split[0]] =
+          }
+        }
+      } else {
+        console.log('prop no tiene profundidad');
+
+        result[prop] = obj[prop];
+      }
+
+      return result;
+    }, {});
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: omit
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades omitidas
+  // _________________________________________________________________________________________________
+  static omit(obj, props) {
+    const result = { ...obj };
+    props.forEach((prop) => delete result[prop]);
+    return result;
+  }
+
+  static getCurrentObjLevel(mainObj, props_split, actualIndex, deepLevel = 0) {
+    let obj_en_turno = mainObj;
+
+    if (deepLevel < actualIndex) {
+      const current_object = actualIndex > 0 ? mainObj[props_split[deepLevel]] : mainObj;
+      deepLevel += 1;
+      if (deepLevel < actualIndex) obj_en_turno = fun.getCurrentObjLevel(current_object, actualIndex, deepLevel);
+      else obj_en_turno = current_object;
+    }
+
+    return obj_en_turno;
   }
 }

@@ -81,13 +81,22 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     Ss.sharedServ = this.sharedServ;
     Ss.cdRef = this.cdRef;
 
-    // TODO: SEGIR MEJORANDO LA FUNCION DE PICK
-    const obj = { nombre: 'victor', edad: 10, ocupacion: 'ing', ciudad: 'la vega', algo: { por: 'aqui', mas: { otro: 'loco' } } };
-    const test = fun.pick(obj, ['nombre', 'edad', 'algo.mas']);
-    // const test = _.pick(obj, ['nombre', 'edad', 'algo.mas']);
+    // // TODO: SEGIR MEJORANDO LA FUNCION DE PICK
+    const obj = { nombre: 'victor', edad: 10, ocupacion: 'ing', ciudad: 'la vega', algo: { por: 'aqui', coca: 'cola', mas: { otro: 'loco' } } };
+    const test = fun.pick(obj, ['nombre', 'algo.por']);
+    // const test = fun.pick(obj, ['nombre', 'algo.por', 'algo.coca']);
+    // // const test = _.pick(obj, ['nombre', 'edad', 'algo.mas']);
+    console.log(' ');
 
-    console.log('obj ', obj);
-    console.log('test ', test);
+    // fun.logYellow('obj ', obj);
+    // fun.logGreen('test ', test);
+    // fun.logRed('objHas(obj, "algo.coca") ', fun.objHas(obj, 'algo.coca'));
+    console.log(' ');
+    console.log(' ');
+    console.log(' ');
+    console.log(' ');
+    console.log(' ');
+    console.log(' ');
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 
