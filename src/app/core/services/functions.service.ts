@@ -759,13 +759,21 @@ export class fun {
   static objHas(obj, props) {
     let result = true;
     const props_split = props.split('.');
+    // fun.pushAt(props_split, 0, '');
 
     for (let index = 0; index < props_split.length; index++) {
-      const property = props_split[index];
+      // console.log('index ==> ', index);
+
+      const current_prop = props_split[index];
+      fun.logYellow('====================================');
+      console.log('property ==> ', current_prop);
+      fun.logYellow('====================================');
 
       const current_object = fun.getCurrentObjLevel(obj, props_split, index);
 
-      if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(property);
+      fun.logGreen('current_object ', current_object);
+
+      if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(current_prop);
       else result = false;
 
       if (result == false) break;
@@ -778,47 +786,61 @@ export class fun {
   // Nombre: pick
   // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
   // _________________________________________________________________________________________________
+  static getProperty(obj, prop) {
+    const props_split = prop.split('.');
+    return props_split.reduce((objeto, property) => (typeof objeto == 'undefined' || objeto === null ? objeto : objeto[property]), obj);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: pick
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
+  // _________________________________________________________________________________________________
   static pick(obj, props) {
     console.log('-----------------------------------');
     console.log('props >> ', props);
-
     console.log('-----------------------------------');
 
-    return props.reduce((result, prop, index) => {
-      console.log('=================================');
-
+    return props.reduce((result, prop, index_reduce) => {
+      fun.logRed('=================================');
+      // TODO: seguir jodiendo aqui
       const props_split = prop.split('.');
 
       if (props_split.length > 1) {
-        // TODO: seguir aqui jodiendo con esto
-        let next_target = {};
+        let next_source = {};
 
-        for (let i = 0; i < props_split.length; i++) {
-          const current_prop = props_split[i];
+        for (let index = 0; index < props_split.length; index++) {
+          const current_prop = props_split[index];
 
+          fun.logYellow('================================');
           console.log('current_prop ', current_prop);
-          const position = i + 1;
+          fun.logYellow('================================');
+          console.log('index ', index);
 
-          console.log(' ');
+          const current_picked_obj = fun.getCurrentObjLevel(result, props_split, index);
+          console.log('current_picked_obj ', current_picked_obj);
 
-          const current_result = fun.getCurrentObjLevel(result, props_split, i);
-          console.log('current_result ', current_result);
+          const current_source_obj = fun.getCurrentObjLevel(obj, props_split, index);
+          console.log('current_origin_obj ', current_source_obj);
 
-          if (fun.hasValue(current_result) && current_result.hasOwnProperty(current_prop)) next_target = current_result[current_prop];
-          console.log('next_target ', next_target);
+          if (fun.hasValue(current_picked_obj) && current_picked_obj.hasOwnProperty(current_prop)) {
+            next_source = current_picked_obj;
+            if (typeof current_picked_obj[current_prop] == 'object') next_source = current_picked_obj[current_prop];
+          }
 
-          if (position == props_split.length) {
-            const current_object = fun.getCurrentObjLevel(obj, props_split, i);
-            console.log('current_object ', current_object);
-            const next_value = next_target;
-            // result[props_split[0]] =
+          console.log('next_source ', next_source);
+
+          if (index == props_split.length - 1) {
+            next_source[current_prop] = current_source_obj[current_prop];
+            result[props_split[0]] = next_source;
           }
         }
       } else {
-        console.log('prop no tiene profundidad');
-
         result[prop] = obj[prop];
       }
+      console.log(' ');
+
+      fun.logGreen('result ', fun.duplicarJson(result));
+      console.log(' ');
 
       return result;
     }, {});
@@ -837,11 +859,10 @@ export class fun {
   static getCurrentObjLevel(mainObj, props_split, actualIndex, deepLevel = 0) {
     let obj_en_turno = mainObj;
 
-    if (deepLevel < actualIndex) {
-      const current_object = actualIndex > 0 ? mainObj[props_split[deepLevel]] : mainObj;
+    if (fun.hasValue(mainObj) && actualIndex > 0 && deepLevel < actualIndex) {
+      const nextLevel = mainObj[props_split[deepLevel]];
       deepLevel += 1;
-      if (deepLevel < actualIndex) obj_en_turno = fun.getCurrentObjLevel(current_object, actualIndex, deepLevel);
-      else obj_en_turno = current_object;
+      obj_en_turno = fun.getCurrentObjLevel(nextLevel, props_split, actualIndex, deepLevel);
     }
 
     return obj_en_turno;
