@@ -688,6 +688,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         }
 
         if (this.modo_factura != 'viaje') this.camionesSelected = [];
+        console.log('AMDO AQUIII');
       } else {
         if (sali_de == 'fecha_vencimiento' && dont_have_propietario) buscar = true;
       }
@@ -951,7 +952,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
           setTimeout(() => fun.enfocarInput('searchCamion'), 5);
         } else {
-          if (fun.hasValue(this.overlay?.item)) this.saliendoDeCamionOverlay();
+          this.saliendoDeCamionOverlay();
         }
       } else {
         setTimeout(() => fun.enfocarInput('searchCamion'), 5);
@@ -960,7 +961,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   cerrarOverlay() {
-    if (fun.hasValue(this.overlay)) {
+    if (fun.hasValue(this.overlay?.item)) {
       if (this.overlay['tipo'] == 'camion') {
         this.filterCamion(this.copyCamiones);
         this.camion_row = 0;
@@ -1535,9 +1536,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       cabecera_fact['balance'] = fun.parseFloatTwoDecimals(this.TOTAL);
       cabecera_fact['devuelta'] = 0;
     } else {
-      cabecera_fact['pagada'] = this.is_viaje ? false : true;
-      cabecera_fact['balance'] = this.is_viaje ? fun.parseFloatTwoDecimals(this.TOTAL) : 0;
-      cabecera_fact['devuelta'] = this.is_viaje ? 0 : this.Devuelta;
+      cabecera_fact['pagada'] = true;
+      cabecera_fact['balance'] = 0;
+      cabecera_fact['devuelta'] = this.Devuelta;
     }
 
     let fecha_valida = null;
