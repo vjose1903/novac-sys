@@ -617,6 +617,18 @@ export class fun {
     return Object.keys(object).find((key) => object[key] == value);
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: createNestedObject
+  // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
+  // __________________________________________________________________________________________________
+  static createNestedObject(base, names, value?) {
+    var lastName = arguments.length == 3 ? names.pop() : false;
+    for (var i = 0; i < names.length; i++) {
+      base = base[names[i]] = base[names[i]] || {};
+    }
+    if (lastName) base = base[lastName] = value;
+    return base;
+  }
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
@@ -759,19 +771,10 @@ export class fun {
   static objHas(obj, props) {
     let result = true;
     const props_split = props.split('.');
-    // fun.pushAt(props_split, 0, '');
 
     for (let index = 0; index < props_split.length; index++) {
-      // console.log('index ==> ', index);
-
       const current_prop = props_split[index];
-      fun.logYellow('====================================');
-      console.log('property ==> ', current_prop);
-      fun.logYellow('====================================');
-
       const current_object = fun.getCurrentObjLevel(obj, props_split, index);
-
-      fun.logGreen('current_object ', current_object);
 
       if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(current_prop);
       else result = false;
@@ -796,54 +799,17 @@ export class fun {
   // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
   // _________________________________________________________________________________________________
   static pick(obj, props) {
-    console.log('-----------------------------------');
-    console.log('props >> ', props);
-    console.log('-----------------------------------');
+    const result = {};
 
-    return props.reduce((result, prop, index_reduce) => {
-      fun.logRed('=================================');
-      // TODO: seguir jodiendo aqui
+    for (let index = 0; index < props.length; index++) {
+      const prop = props[index];
       const props_split = prop.split('.');
 
-      if (props_split.length > 1) {
-        let next_source = {};
-
-        for (let index = 0; index < props_split.length; index++) {
-          const current_prop = props_split[index];
-
-          fun.logYellow('================================');
-          console.log('current_prop ', current_prop);
-          fun.logYellow('================================');
-          console.log('index ', index);
-
-          const current_picked_obj = fun.getCurrentObjLevel(result, props_split, index);
-          console.log('current_picked_obj ', current_picked_obj);
-
-          const current_source_obj = fun.getCurrentObjLevel(obj, props_split, index);
-          console.log('current_origin_obj ', current_source_obj);
-
-          if (fun.hasValue(current_picked_obj) && current_picked_obj.hasOwnProperty(current_prop)) {
-            next_source = current_picked_obj;
-            if (typeof current_picked_obj[current_prop] == 'object') next_source = current_picked_obj[current_prop];
-          }
-
-          console.log('next_source ', next_source);
-
-          if (index == props_split.length - 1) {
-            next_source[current_prop] = current_source_obj[current_prop];
-            result[props_split[0]] = next_source;
-          }
-        }
-      } else {
-        result[prop] = obj[prop];
+      if (fun.hasValue(fun.getProperty(obj, prop))) {
+        fun.createNestedObject(result, [...props_split], fun.getProperty(obj, prop));
       }
-      console.log(' ');
-
-      fun.logGreen('result ', fun.duplicarJson(result));
-      console.log(' ');
-
-      return result;
-    }, {});
+    }
+    return result;
   }
 
   // __________________________________________________________________________________________________
@@ -851,9 +817,24 @@ export class fun {
   // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades omitidas
   // _________________________________________________________________________________________________
   static omit(obj, props) {
-    const result = { ...obj };
-    props.forEach((prop) => delete result[prop]);
-    return result;
+    for (let index = 0; index < props.length; index++) {
+      const prop = props[index];
+
+      if (fun.hasValue(fun.getProperty(obj, prop))) {
+        const props_split = prop.split('.');
+        let current_object = obj;
+
+        for (let innerIndex = 0; innerIndex < props_split.length; innerIndex++) {
+          const currentProp = props_split[innerIndex];
+
+          current_object = fun.getCurrentObjLevel(obj, props_split, innerIndex);
+
+          if (innerIndex == props_split.length - 1) delete current_object[currentProp];
+        }
+      }
+    }
+
+    return obj;
   }
 
   static getCurrentObjLevel(mainObj, props_split, actualIndex, deepLevel = 0) {

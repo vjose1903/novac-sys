@@ -81,26 +81,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     Ss.sharedServ = this.sharedServ;
     Ss.cdRef = this.cdRef;
 
-    // // TODO: SEGIR MEJORANDO LA FUNCION DE PICK
-    const obj = { nombre: 'victor', edad: 10, ocupacion: 'ing', ciudad: 'la vega', algo: { por: 'aqui', coca: 'cola', mas: { otro: 'loco', pura: 'fausto' } } };
-    // const test = fun.pick(obj, ['nombre', 'algo.por']);
-    // const test = fun.pick(obj, ['nombre', 'algo.por', 'algo.coca', 'algo.mas']);
-    console.log('(', obj.algo.mas.pura, ')');
 
-    // const test = fun.pick(obj, ['algo.mas.pura']);
-    const test = fun.pick(obj, ['algo.mas.pura']);
-    // const test = _.pick(obj, ['nombre', 'edad', 'algo.mas.pura']);
-    console.log(' ');
-    // fun.logYellow('obj ', obj);
-    fun.logPurple('test ', test);
-
-    // fun.logRed('objHas(obj, "algo.mas.pura") ', fun.objHas(obj, 'algo.mas.pura'));
-    console.log(' ');
-    console.log(' ');
-    console.log(' ');
-    console.log(' ');
-    console.log(' ');
-    console.log(' ');
 
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 
