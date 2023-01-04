@@ -23,25 +23,39 @@
   }
 }
 
-.overlayCamion {
-  max-width: 22rem;
-  max-height: 20rem;
-  overflow: auto;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  li {
-    padding: 0.5rem;
-    &:hover {
-      background-color: #e3e3e3;
-    }
+.containMovimientoViaje {
+  display: grid;
 
-    &.indicador {
-      background-color: #ebebeb;
-      &:hover {
-        background-color: #d0cfcf;
+  grid-template-areas: "camionSelector choferSelector";
+  grid-template-rows: auto auto;
+
+  .camionSelector {
+    grid-area: camionSelector;
+    .ulCamion {
+      max-width: 22rem;
+      max-height: 20rem;
+      overflow: auto;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      li {
+        padding: 0.5rem;
+        &:hover {
+          background-color: #e3e3e3;
+        }
+
+        &.indicador {
+          background-color: #ebebeb;
+          &:hover {
+            background-color: #d0cfcf;
+          }
+        }
       }
     }
+  }
+
+  .choferSelector {
+    grid-area: choferSelector;
   }
 }
 

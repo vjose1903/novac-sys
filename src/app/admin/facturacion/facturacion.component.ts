@@ -149,8 +149,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   vehiculoClass = new VehiculoC();
 
   overlay;
-  camionesSelected = [];
+  // camionesSelected = [];
+
   camiones = [];
+  choferes = [];
+  movimientosSelected = [];
+
   camion_row;
   filterCamionesTargets;
   copyCamiones;
@@ -174,7 +178,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
-    console.dir(document.getElementById('nom'));
+
+    this.test();
+  }
+
+  async test() {
+    const res = await this.facturaClass.getFacturaById(13060);
+    console.log('res ', res['data']);
   }
 
   ngOnDestroy(): void {
@@ -345,7 +355,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         this.cuerpoFactura.length = 0;
         this.articulosAcambiar.length = 0;
-        this.camionesSelected.length = 0;
+        this.movimientosSelected.length = 0;
 
         this.info_cambio = {};
         this.fechaFactura = {};
@@ -494,8 +504,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
           this.factServ.productos_devueltos = productos_devueltos;
 
-          if (fun.objHas(factura, 'camiones_viajes')) {
-            factura.camiones_viajes.forEach((camion) => this.camionesSelected.push({ vehiculo_id: camion.vehiculo_id }));
+          if (fun.objHas(factura, 'movimientos_viaje')) {
+            factura.movimientos_viaje.forEach((movimiento) => this.movimientosSelected.push({ vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id }));
           }
 
           factura.detalle_facturas = _.filter(factura.detalle_facturas, (detalle) => !detalle.is_devuelto || (detalle.is_devuelto && detalle.is_defectuoso));
@@ -687,8 +697,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           document.getElementById('btnCamion').click();
         }
 
-        if (this.modo_factura != 'viaje') this.camionesSelected = [];
-        console.log('AMDO AQUIII');
+        if (this.modo_factura != 'viaje') this.movimientosSelected = [];
       } else {
         if (sali_de == 'fecha_vencimiento' && dont_have_propietario) buscar = true;
       }
@@ -928,31 +937,31 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const camion_en_turno = fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
 
       if (this.checkCamionIsSelected(camion_en_turno)) {
-        _.pull(this.camionesSelected, _.find(this.camionesSelected, { vehiculo_id: camion_en_turno.id }));
+        _.pull(this.movimientosSelected, _.find(this.movimientosSelected, { vehiculo_id: camion_en_turno.id }));
       } else {
-        this.camionesSelected.push({ vehiculo_id: camion_en_turno.id });
+        this.movimientosSelected.push({ vehiculo_id: camion_en_turno.id, user_id: null });
       }
     } else {
-      if (this.camionesSelected.length) this.saliendoDeCamionOverlay();
-      else fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
+      if (this.movimientosSelected.length && !this.movimientosSelected.some((mov) => fun.isEmpty(mov.user_id))) this.saliendoDeCamionOverlay();
+      else fun.toastWarning('Debe de seleccionar almenos un camión y un chofer para el viaje, .', 'Aviso');
     }
   }
 
   checkCamionIsSelected(camion) {
-    return this.camionesSelected.some((vehiculo) => vehiculo.vehiculo_id == camion.id);
+    return this.movimientosSelected.some((movimiento) => movimiento.vehiculo_id == camion.id);
   }
 
   checkCamionSeleccionado() {
-    const containCamiones = document.getElementById('overlayCamion');
+    const containMovimientoViaje = document.getElementById('overlayMovimientoViaje');
     setTimeout(() => {
       const voy_a = document.activeElement;
 
-      if (!containCamiones.contains(voy_a)) {
-        if (!this.camionesSelected.length) {
-          fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
-          setTimeout(() => fun.enfocarInput('searchCamion'), 5);
-        } else {
+      if (!containMovimientoViaje.contains(voy_a)) {
+        if (this.movimientosSelected.length && !this.movimientosSelected.some((mov) => fun.isEmpty(mov.user_id))) {
           this.saliendoDeCamionOverlay();
+        } else {
+          fun.toastWarning('Debe de seleccionar almenos un camión y un chofer para el viaje.', 'Aviso');
+          setTimeout(() => fun.enfocarInput('searchCamion'), 5);
         }
       } else {
         setTimeout(() => fun.enfocarInput('searchCamion'), 5);
@@ -987,14 +996,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.saliendoDeCamionOverlay('teclado');
     }
 
-    fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
+    fun.scrollTo({ id: `ulCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   saliendoDeCamionOverlay(where?) {
     setTimeout(() => {
-      if (!this.camionesSelected.length) {
-        fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
-      } else {
+      if (this.movimientosSelected.length && !this.movimientosSelected.some((mov) => fun.isEmpty(mov.user_id))) {
         if (fun.isEmpty(where) || where != 'teclado') {
           if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura?.id)) this.abrirModalFiltro();
           else this.cuerpo.seleccionarCampoEnTurno();
@@ -1007,6 +1014,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             this.cerrarOverlay();
           }
         }
+      } else {
+        fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
       }
     }, 5);
   }
@@ -1028,7 +1037,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.camiones.length = 0;
     for (const camion of camionesFiltrados) this.camiones.push(camion);
     this.camion_row = 0;
-    fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
+    fun.scrollTo({ id: `ulCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   // =============================================
@@ -1276,7 +1285,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   selectModoFactura(arg) {
     this.is_viaje = false;
     this.is_adelantada = false;
-    this.camionesSelected = [];
+    this.movimientosSelected = [];
 
     if (arg === 'viaje') this.is_viaje = true;
     else if (arg === 'adelantada') this.is_adelantada = true;
@@ -1561,7 +1570,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['is_adelantada'] = this.is_adelantada;
     cabecera_fact['is_viaje'] = this.is_viaje;
     cabecera_fact['is_nota'] = false;
-    cabecera_fact['camiones_viajes'] = this.camionesSelected;
+    cabecera_fact['movimientos_viaje'] = this.movimientosSelected;
 
     cabecera_fact['pre_factura'] = fun.hasValue(this.factServ.pre_venta_selected) ? this.factServ.pre_venta_selected?.id : null;
 

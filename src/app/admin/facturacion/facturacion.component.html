@@ -11,7 +11,7 @@
 
       <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs" (onHide)="cerrarOverlay()">
         <ng-template pTemplate>
-          <div id="overlayExtra" class="containCamiones">
+          <div id="overlayExtra">
             <ul class="overlayExtra" role="menu">
               <ng-container *ngFor="let option of optionesExtra; let index_option = index">
                 <li *ngIf="option.condition()" id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
@@ -146,45 +146,51 @@
                     [size]="'size-lg'"
                     [tooltip]="'Seleccionar camión'"
                     [tooltipPosition]="'top'"
-                    (clickFunction)="openOverlay($event, overlayCamion, 'camion')"
+                    (clickFunction)="openOverlay($event, overlayMovimientoViaje, 'camion')"
                   >
                   </btn-icon-circular>
-
+                  <!-- TODO: seguir moficando esta mierda -->
                   <div class="indicadorCamion" [ngClass]="{ no_selected: !camionesSelected.length, selected: camionesSelected.length }">
                     <i class="fa-solid" [ngClass]="{ 'fa-x': !camionesSelected.length, 'fa-check': camionesSelected.length }"></i>
                   </div>
                 </div>
               </div>
-              <p-overlayPanel [dismissable]="false" [showCloseIcon]="camionesSelected.length > 0" #overlayCamion styleClass="dropConfigs" (onHide)="cerrarOverlay()">
+              <p-overlayPanel [dismissable]="false" [showCloseIcon]="camionesSelected.length > 0" #overlayMovimientoViaje styleClass="dropConfigs" (onHide)="cerrarOverlay()">
                 <ng-template pTemplate>
-                  <div id="overlayCamion" class="containCamiones">
-                    <div class="filterOverlay">
-                      <input
-                        id="searchCamion"
-                        class="search-input form-control"
-                        [filterTarget]="filterCamionesTargets"
-                        [DataFilter]="copyCamiones"
-                        (onFilter)="filterCamion($event)"
-                        (blur)="checkCamionSeleccionado()"
-                        (keydown.enter)="seleccionarCamion()"
-                      />
-                      <i class="fa-solid fa-magnifying-glass"></i>
+                  <div id="overlayMovimientoViaje" class="containMovimientoViaje">
+                    <div class="camionSelector pr-1">
+                      <span class="mb-2 titulos"><strong>Camion: </strong></span>
+                      <div class="filterOverlay">
+                        <input
+                          id="searchCamion"
+                          class="search-input form-control"
+                          [filterTarget]="filterCamionesTargets"
+                          [DataFilter]="copyCamiones"
+                          (onFilter)="filterCamion($event)"
+                          (blur)="checkCamionSeleccionado()"
+                          (keydown.enter)="seleccionarCamion()"
+                        />
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                      </div>
+
+                      <ul class="ulCamion" role="menu">
+                        <li id="ulCamion-{{ index_camion }}" *ngFor="let camion of camiones; let index_camion = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion }">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <span id="dropdown-item" class="mr-3 mb-0">
+                              {{ getCamionLabel(camion) }}
+                            </span>
+                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion)" [checked]="checkCamionIsSelected(camion)" />
+                          </div>
+                        </li>
+
+                        <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
+                          <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
+                        </li>
+                      </ul>
                     </div>
-
-                    <ul class="overlayCamion" role="menu">
-                      <li id="overlayCamion-{{ index_camion }}" *ngFor="let camion of camiones; let index_camion = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion }">
-                        <div class="d-flex justify-content-between align-items-center">
-                          <span id="dropdown-item" class="mr-3 mb-0">
-                            {{ getCamionLabel(camion) }}
-                          </span>
-                          <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion)" [checked]="checkCamionIsSelected(camion)" />
-                        </div>
-                      </li>
-
-                      <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
-                        <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
-                      </li>
-                    </ul>
+                    <div class="choferSelector rayaLeft pl-1">
+                      <span class="mb-2 titulos"><strong>Chofer: </strong></span>
+                    </div>
                   </div>
                 </ng-template>
               </p-overlayPanel>

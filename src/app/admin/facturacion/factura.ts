@@ -88,7 +88,8 @@ export class FacturaC extends CrudG<FacturasI> {
 
   getFacturaById(id: number) {
     // TODO: cambiar camiones_viajes por movimientos_viaje
-    const extra = { parameters: { actual_price: true, camiones_viajes: true } };
+    const extra = { parameters: { actual_price: true, movimientos_viaje: true } };
+    // const extra = { parameters: { actual_price: true, camiones_viajes: true } };
     return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
