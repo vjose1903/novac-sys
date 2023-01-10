@@ -1,3 +1,4 @@
+import { EmpleadoC } from './../registros/registro-empleados/empleado';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
@@ -25,7 +26,7 @@ import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
-import { ButtonsI, ModalClass } from '../components/modal/modal-class';
+import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
@@ -81,7 +82,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             if (fun.hasValue(option)) this.selectOptionExtra(_.find(this.optionesExtra, { keyboardCode: key }), 'teclado');
           }
         }
-        if (this.overlay?.tipo == 'camion') this.mover_indicador_camion(key);
+
+        if (this.overlay?.tipo == 'movimiento') this.mover_indicador_camion(`${this.entidad_en_turno}_row`, key);
       }
     }
   }
@@ -147,17 +149,23 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   vehiculoClass = new VehiculoC();
+  userClass = new EmpleadoC();
 
   overlay;
   // camionesSelected = [];
 
   camiones = [];
+  copyCamiones;
   choferes = [];
+  copyChoferes;
   movimientosSelected = [];
 
   camion_row;
+  chofer_row;
+  entidad_en_turno;
+
   filterCamionesTargets;
-  copyCamiones;
+  filterChoferesTargets;
   permissions = Permisos;
   configApp: ConfigI;
   timeInterval;
@@ -235,7 +243,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               break;
             case 2:
               this.hasPermisoCamiones = has_permiso;
-              if (this.hasPermisoCamiones) this.getCamiones();
+              if (this.hasPermisoCamiones) this.getersMovimientoViaje();
               break;
           }
         }
@@ -349,10 +357,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         //
         [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando] = Array(4).fill(false);
-        [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
+        [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row, this.chofer_row] = Array(6).fill(0);
         [this.NCFcompra, this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factServ.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] =
           Array(9).fill(undefined);
 
+        this.entidad_en_turno = 'camion';
         this.cuerpoFactura.length = 0;
         this.articulosAcambiar.length = 0;
         this.movimientosSelected.length = 0;
@@ -374,6 +383,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.forma_pago = this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta ? null : 'Efectivo';
 
         this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
+        this.filterChoferesTargets = ['nombre', 'apellido', 'nombre_completo'];
 
         if (this.factServ.tipoDocumento == tipoDocFacturacion.venta) {
           this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
@@ -693,7 +703,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         if (sali_de == 'venta' && valor == 'adelantada' && dont_have_propietario) buscar = true;
 
         if (sali_de == 'fecha_viaje') {
-          this.getCamiones();
+          this.getersMovimientoViaje();
           document.getElementById('btnCamion').click();
         }
 
@@ -928,31 +938,78 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.overlay['tipo'] = tipo;
     this.overlay['item'].toggle(event);
 
-    if (tipo == 'camion') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+    if (tipo == 'movimiento') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
     if (event) event.stopPropagation();
   }
 
-  seleccionarCamion(camion?) {
+  seleccionarCamion(camion?, index_camion?) {
     if (this.camiones.length) {
-      const camion_en_turno = fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
+      camion ??= fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
 
-      if (this.checkCamionIsSelected(camion_en_turno)) {
-        _.pull(this.movimientosSelected, _.find(this.movimientosSelected, { vehiculo_id: camion_en_turno.id }));
+      if (this.checkCamionIsSelected(camion)) {
+        _.pull(this.movimientosSelected, _.find(this.movimientosSelected, { vehiculo_id: camion.id }));
       } else {
-        this.movimientosSelected.push({ vehiculo_id: camion_en_turno.id, user_id: null });
+        this.movimientosSelected.push({ vehiculo_id: camion.id, user_id: null });
       }
+
+      if (this.checkCamionIsSelected(camion)) this.moverFocoMovimientoViaje('chofer');
+
+      if (fun.hasValue(index_camion) && this.camion_row != index_camion) this.camion_row = index_camion;
     } else {
       if (this.movimientosSelected.length && !this.movimientosSelected.some((mov) => fun.isEmpty(mov.user_id))) this.saliendoDeCamionOverlay();
-      else fun.toastWarning('Debe de seleccionar almenos un camión y un chofer para el viaje, .', 'Aviso');
+      else fun.toastWarning('Debe de seleccionar almenos un camión y su chofer para el viaje, .', 'Aviso');
     }
   }
 
-  checkCamionIsSelected(camion) {
+  seleccionarChofer(chofer?, index_chofer?) {
+    chofer ??= fun.duplicarJson(fun.hasValue(chofer) ? chofer : this.choferes[this.chofer_row]);
+
+    const camion_en_turno = fun.duplicarJson(this.camiones[this.camion_row]);
+    const movimiento_en_turno = this.movimientosSelected.find((movimiento) => movimiento.vehiculo_id == camion_en_turno.id);
+    movimiento_en_turno.user_id = this.checkChoferIsSelected(chofer) ? null : chofer.id;
+
+    if (fun.hasValue(index_chofer) && this.chofer_row != index_chofer) this.chofer_row = index_chofer;
+  }
+
+  moverFocoMovimientoViaje(voy_a) {
+    this.entidad_en_turno = voy_a;
+    const entidades = { camion: 'searchCamion', chofer: 'searchChofer' };
+    setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
+  }
+
+  checkCamionIsSelected(camion?) {
+    camion ??= fun.duplicarJson(this.camiones[this.camion_row]);
     return this.movimientosSelected.some((movimiento) => movimiento.vehiculo_id == camion.id);
   }
 
-  checkCamionSeleccionado() {
+  checkChoferIsSelected(chofer) {
+    const camion_en_turno = fun.duplicarJson(this.camiones[this.camion_row]);
+    const movimiento_en_turno = this.movimientosSelected.find((movimiento) => movimiento.vehiculo_id == camion_en_turno.id);
+
+    return fun.hasValue(movimiento_en_turno) ? movimiento_en_turno.user_id == chofer.id : false;
+  }
+
+  getIndicadorMovimientoViaje(tipo) {
+    let res;
+
+    const all_selected = this.movimientosSelected.length > 0 && this.movimientosSelected.every((mov) => fun.hasValue(mov.user_id));
+    const all_deselected = this.movimientosSelected.length == 0;
+
+    if (tipo == 'color') {
+      res = all_deselected ? 'no_selected' : all_selected ? 'selected' : 'incompleto';
+    } else if (tipo == 'icon') {
+      res = all_deselected ? 'fa-x' : all_selected ? 'fa-check' : 'fa-minus';
+    } else {
+      res = all_selected;
+    }
+
+    return res;
+  }
+
+  checkMovimientoIsCompleted() {
     const containMovimientoViaje = document.getElementById('overlayMovimientoViaje');
+    const entidades = { camion: 'searchCamion', chofer: 'searchChofer' };
+
     setTimeout(() => {
       const voy_a = document.activeElement;
 
@@ -961,10 +1018,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.saliendoDeCamionOverlay();
         } else {
           fun.toastWarning('Debe de seleccionar almenos un camión y un chofer para el viaje.', 'Aviso');
-          setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+          setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
         }
       } else {
-        setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+        setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
       }
     }, 250);
   }
@@ -985,18 +1042,26 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return `${camion.marca} ${camion.modelo} - ${camion.anio} (${camion.propietario.nombre} ${camion.propietario.apellido})`;
   }
 
-  mover_indicador_camion(key) {
+  mover_indicador_camion(tipo, key) {
+    const listados = { camion_row: this.camiones, chofer_row: this.choferes };
+
     if (key == teclasCode._arriba) {
-      if (this.camion_row == 0) this.camion_row = this.camiones.length - 1;
-      else this.camion_row--;
+      if (this[tipo] == 0) this[tipo] = listados[tipo].length - 1;
+      else this[tipo]--;
     } else if (key == teclasCode._abajo) {
-      if (this.camion_row == this.camiones.length - 1) this.camion_row = 0;
-      else this.camion_row++;
+      if (this[tipo] == listados[tipo].length - 1) this[tipo] = 0;
+      else this[tipo]++;
+    } else if (key == teclasCode._izquierda || key == teclasCode._derecha) {
+      if (key == teclasCode._derecha && !this.checkCamionIsSelected()) {
+        fun.toastWarning('Para seleccionar un chofer primero seleccione el camión', 'Aviso');
+        return;
+      }
+      this.moverFocoMovimientoViaje(key == teclasCode._derecha ? 'chofer' : 'camion');
     } else if (key == teclasCode._esc) {
       this.saliendoDeCamionOverlay('teclado');
     }
 
-    fun.scrollTo({ id: `ulCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
+    fun.scrollTo({ id: `ulCamion-${this[tipo]}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   saliendoDeCamionOverlay(where?) {
@@ -1009,28 +1074,44 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.cerrarOverlay();
         } else {
           if (where == 'teclado') {
-            fun.desEnfocarInput('searchCamion');
-
+            const entidades = { camion: 'searchCamion', chofer: 'searchChofer' };
+            fun.desEnfocarInput(entidades[this.entidad_en_turno]);
             this.cerrarOverlay();
           }
         }
+
+        this.entidad_en_turno = 'camion';
       } else {
-        fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
+        fun.toastWarning('Debe de seleccionar almenos un camión y su chofer para el viaje.', 'Aviso');
       }
     }, 5);
   }
 
+  async getersMovimientoViaje() {
+    await this.getCamiones();
+    await this.getChoferes();
+  }
+
   async getCamiones() {
     const extra = { afterPath: `filtro/ `, parameters: { paginado: false } };
-
     this.vehiculoClass.getAll(extra).then((res) => {
       this.camiones = res['data'].map((camion) => {
         camion.selected = false;
         return camion;
       });
-
       this.copyCamiones = fun.duplicarJson(this.camiones);
     });
+  }
+
+  async getChoferes() {
+    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'chofer' } };
+    this.userClass.getAll(extra).then((res) => {
+      this.choferes = res['data'].map((chofer) => {
+        chofer.selected = false;
+        return chofer;
+      });
+    });
+    this.copyChoferes = fun.duplicarJson(this.choferes);
   }
 
   filterCamion(camionesFiltrados) {
@@ -1038,6 +1119,16 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     for (const camion of camionesFiltrados) this.camiones.push(camion);
     this.camion_row = 0;
     fun.scrollTo({ id: `ulCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
+  }
+
+  filterMovimiento(tipo, entidades_filtradas) {
+    const conf = { camion: { lista: 'camiones', indicador: 'camion_row', ul: 'ulCamion' }, chofer: { lista: 'choferes', indicador: 'chofer_row', ul: 'ulChofer' } };
+
+    this[conf[tipo].lista].length = 0;
+
+    for (const entidad of entidades_filtradas) this[conf[tipo].lista].push(entidad);
+    this[conf[tipo].indicador] = 0;
+    fun.scrollTo({ id: `${conf[tipo].ul}-${this[conf[tipo].indicador]}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   // =============================================

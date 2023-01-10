@@ -15,9 +15,9 @@
     }
 
     &.indicador {
-      background-color: #ebebeb;
+      background-color: #e7e7e7;
       &:hover {
-        background-color: #d0cfcf;
+        background-color: #d6d6d6;
       }
     }
   }
@@ -31,31 +31,58 @@
 
   .camionSelector {
     grid-area: camionSelector;
-    .ulCamion {
-      max-width: 22rem;
-      max-height: 20rem;
-      overflow: auto;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      li {
-        padding: 0.5rem;
-        &:hover {
-          background-color: #e3e3e3;
-        }
-
-        &.indicador {
-          background-color: #ebebeb;
-          &:hover {
-            background-color: #d0cfcf;
-          }
-        }
-      }
-    }
   }
 
   .choferSelector {
     grid-area: choferSelector;
+    position: relative;
+    .overlayChofer.show {
+      z-index: 2;
+      left: 0.15rem;
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      background: #000000a8;
+      border-radius: 0.3rem;
+      display: grid;
+      place-content: center;
+      .label {
+        color: white;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        -webkit-text-stroke: 0.5px black;
+      }
+    }
+  }
+}
+
+.ulMovimientoViaje {
+  max-width: 22rem;
+  max-height: 20rem;
+  overflow: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  li {
+    padding: 0.5rem;
+    &:hover {
+      background-color: #d6d6d6;
+    }
+
+    &.indicador {
+      background-color: #e7e7e7;
+      &:hover {
+        background-color: #d6d6d6;
+      }
+    }
+
+    &.selected {
+      background-color: var(--transparente05);
+      &:hover {
+        background-color: var(--transparente01);
+      }
+    }
   }
 }
 
@@ -74,6 +101,11 @@
   &.no_selected {
     background-color: #ff4b4b;
   }
+
+  &.incompleto {
+    background-color: #ffd54b;
+  }
+
   &.selected {
     background-color: #028d02;
   }

@@ -21,8 +21,6 @@ import { Ss } from '../../../../core/services/singleton.service';
 export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestroy {
   table_config: table_config = {
     info: [
-      { titulo: '|', tipo: 'icon', key: 'tipo_', estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'tipo_recibo', rowTooltip: 'tooltip_tipo', text_color: 'colorEstado' }] },
-
       { titulo: 'No. recibo', estilos: [{ width: '8%' }], key: 'numero_recibo', tipo: 'text' },
       { titulo: 'Fecha recibo', estilos: [{ width: '10%' }], key: 'fecha_equivalente', tipo: 'date' },
       { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
@@ -77,12 +75,10 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   mapeoRecibos(data) {
     data.map((recibo) => {
-      recibo['tipo_recibo'] = recibo.choferes_viajes.length ? 'fas fa-truck-moving' : 'fas fa-comment-dollar';
       recibo['numero_recibo'] = _.padStart(recibo.numero_recibo, 8, '0');
       recibo['numero_factura'] = recibo.detalle_recibos.length === 1 ? recibo.detalle_recibos[0].descripcion.split(' ')[1] : 'Varios...';
       recibo['ver'] = 'far fa-eye';
       recibo['anular'] = 'far fa-trash-alt';
-      recibo['tooltip_tipo'] = recibo.choferes_viajes.length ? 'Factura de Viaje' : 'Factura a crédito';
       recibo['tooltip_ver'] = 'Ver';
       recibo['tooltip_anular'] = 'Anular';
 
@@ -92,10 +88,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       ];
 
       recibo['customStyles'] = {
-        tipo_: [
-          { key: 'tipo_', isTd: true, estilos: 'width: 3% !important; font-size: 1rem !important' },
-          { key: 'tipo_recibo', estilos: 'font-size: 1rem !important' },
-        ],
         'cliente.nombre_completo': { 'text-align': 'start', 'padding-left': '1.5rem' },
         numero_recibo: { width: '8%' },
         fecha_equivalente: { width: '10%' },

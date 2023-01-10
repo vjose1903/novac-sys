@@ -141,7 +141,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async getChoferes() {
-    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'C' } };
+    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'chofer' } };
     this.userClass.getAll(extra).then((res) => (this.choferes = res['data']));
   }
 
@@ -267,10 +267,14 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   selectCamionesFactura(factura) {
     const camiones_selected = [];
+    console.log('factura ', factura);
 
-    factura.camiones_viajes.forEach((camion_viaje) => {
-      const camion_en_turno = _.find(this.camiones, { id: camion_viaje.vehiculo_id });
+    factura.movimientos_viaje.forEach((movimiento_viaje) => {
+      const camion_en_turno = _.find(this.camiones, { id: movimiento_viaje.vehiculo_id });
       if (fun.hasValue(camion_en_turno)) camiones_selected.push(camion_en_turno);
+
+      // const camion_en_turno = _.find(this.camiones, { id: movimiento_viaje.vehiculo_id });
+      // if (fun.hasValue(camion_en_turno)) camiones_selected.push(camion_en_turno);
     });
 
     this.form.controls.camiones_viajes.setValue(camiones_selected);

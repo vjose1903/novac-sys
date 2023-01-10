@@ -117,7 +117,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   getVendedores() {
-    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'V' } };
+    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'vendedor' } };
     this.empleadosClass.getAll(extra).then((res) => (this.vendedores = res['data']));
   }
 
