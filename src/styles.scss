@@ -63,6 +63,14 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
   height: 96% !important;
 }
 
+.w-70 {
+  width: 70% !important;
+}
+
+.w-30 {
+  width: 30% !important;
+}
+
 .dropConfigs {
   .p-overlaypanel-content {
     padding: 5px !important;
@@ -347,12 +355,10 @@ body {
   right: 0 !important;
 }
 
-
 .c-help {
   &:hover {
     cursor: help !important;
   }
-
 }
 .c-pointer {
   &:hover {

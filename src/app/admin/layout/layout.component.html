@@ -63,12 +63,12 @@
           </div>
 
           <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.recibosIngresos" class="menuList">
-            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('ingresos') }" [innerText]="'Ingresos'"></h5>
+            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('ingresos') }" [innerText]="'Recibos de ingresos'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('ingresos') }" src="assets/img/reciboIngreso.png" alt="Recibo" (click)="cambiarMenu({ url: 'recibos/ingresos', navigate: true })" />
           </div>
 
           <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.viajes" class="menuList">
-            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('viajes') }" [innerText]="'Viajes'"></h5>
+            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('viajes') }" [innerText]="'Pedidos'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('viajes') }" src="assets/img/viaje.png" alt="Viajes" (click)="cambiarMenu({ url: 'recibos/viajes/0', navigate: true })" />
           </div>
 

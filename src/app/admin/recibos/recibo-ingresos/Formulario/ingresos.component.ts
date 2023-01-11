@@ -7,7 +7,6 @@ import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
-import { RecibosService } from '../../recibos.service';
 import { FacturaC } from '../../../facturacion/factura';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
@@ -111,7 +110,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService, private router: Router) {
+  constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }
@@ -334,7 +333,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
-        this.reciboServ.abrirModalHistorial(params.data.pagos, params.data.notas);
+        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal);
       }
       if (params.iconKey == 'ver') {
         this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {

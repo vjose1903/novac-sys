@@ -6,10 +6,8 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../registros/registro-empleados/empleado';
 import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
-import { RecibosService } from '../recibos.service';
 import { FacturaC } from '../../facturacion/factura';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
-import { FormCantidadEfectivoComponent } from '../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -50,7 +48,19 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
+  config_viaje_selected: table_config = {
+    info: [
+      { titulo: 'Camión', tipo: 'text', key: 'vehiculo.info_vehiculo' },
+      { titulo: 'Chofer', tipo: 'text', key: 'chofer.nombre_completo' },
+    ],
+    filtrar: { show: false },
+    padding: '0.5rem',
+    id_tabla: 'movimientos_viaje',
+    obj_paginate: { show: false },
+  };
+
   tablaComponent;
+  tablaMovimientosComponent;
 
   viajes = [];
   viaje_selected;
@@ -66,8 +76,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   viajes_cant: any;
   forma_pago: any;
   total_recibido: any;
-  totalPagado = 0;
-  totalPagadoPorciento: any = 0;
+
   monto_pendiente = 0;
   have_incidencia = false;
   incidencia = '';
@@ -79,7 +88,8 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   form;
 
-  constructor(private tServ: TablasService, private reciboServ: RecibosService, private fb: FormBuilder, private route: ActivatedRoute) {
+  fun = fun;
+  constructor(private tServ: TablasService, private fb: FormBuilder, private route: ActivatedRoute) {
     super();
   }
 
@@ -234,7 +244,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   verDetalles(data) {
-    const configModal = this.reciboClass.modalVerDetalles(data);
+    const configModal = this.facturaClass.modalVerDetalles(data);
     this.openNewModal(configModal);
   }
 
@@ -242,25 +252,19 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     const pagos = this.viaje_selected.pagos;
     const notas = this.viaje_selected.notas;
 
-    if (pagos.length || notas.length) this.reciboServ.abrirModalHistorial(pagos, notas);
+    if (pagos.length || notas.length) this.facturaClass.abrirModalHistorial(pagos, notas, this.openNewModal);
   }
 
   tableClickRow(event) {
-    this.verViaje(event.data);
+    if (event.id_tabla == 'lista_viajes') this.verViaje(event.data);
   }
 
   verViaje(data) {
     this.form.reset();
     this.monto_pendiente = 0;
-    this.totalPagado = 0;
-    this.totalPagadoPorciento = 0;
-
     this.selectCamionesFactura(data);
     this.viaje_selected = data;
-    this.totalPagado = _.reduce(this.viaje_selected.pagos, (acumulado, item) => acumulado + item.deposito, 0);
     this.monto_pendiente = this.viaje_selected.balance;
-    this.totalPagadoPorciento = (this.totalPagado / this.viaje_selected.total_factura) * 100;
-    this.totalPagadoPorciento = fun.numFormatTwoDecimals(this.totalPagadoPorciento);
 
     this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
   }
@@ -401,7 +405,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   resetVariables() {
     [this.ultimo_pago, this.viaje_selected, this.forma_pago, this.total_recibido] = Array(4).fill(undefined);
-    [this.monto_pendiente, this.totalPagado, this.totalPagadoPorciento] = Array(3).fill(0);
+    [this.monto_pendiente] = Array(1).fill(0);
     this.have_incidencia = false;
     this.incidencia = '';
   }

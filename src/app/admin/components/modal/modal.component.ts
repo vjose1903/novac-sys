@@ -58,7 +58,7 @@ export class NewModalComponent implements OnInit {
 
     const data = { modal: modal, accion: accion };
 
-    if (modal && typeof modal.onHide == 'function') setTimeout(() => modal.onHide(data), 250);
+    if (modal && typeof modal.onHide == 'function') modal.onHide(data);
 
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
   }
