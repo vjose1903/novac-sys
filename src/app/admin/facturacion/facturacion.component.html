@@ -174,16 +174,16 @@
                       </div>
                       <ul class="ulMovimientoViaje" role="menu">
                         <li
-                          id="ulChofer-{{ index_camion }}"
+                          id="ulCamion-{{ index_camion }}"
                           *ngFor="let camion of camiones; let index_camion = index"
                           role="menuitem"
                           class="hoverlable"
-                          [ngClass]="{ indicador: camion_row == index_camion && entidad_en_turno == 'camion', selected: checkCamionIsSelected(camion) && entidad_en_turno == 'chofer' }"
+                          [ngClass]="{ indicador: camion_row == index_camion && entidad_en_turno == 'camion', selected: camion_row == index_camion && entidad_en_turno == 'chofer' }"
                         >
                           <div class="d-flex justify-content-between align-items-center">
-                            <span id="dropdown-item" class="mr-3 mb-0">
-                              {{ getCamionLabel(camion) }}
-                            </span>
+                            <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' mr-1 c-help'"></i>
+
+                            <span id="dropdown-item" class="mb-0"> {{ getCamionInfo(camion, 'label') }} </span>
                             <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
                           </div>
                         </li>
@@ -215,12 +215,12 @@
                       </div>
 
                       <ul class="ulMovimientoViaje" role="menu">
-                        <li id="ulCamion-{{ index_chofer }}" *ngFor="let chofer of choferes; let index_chofer = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: chofer_row == index_chofer && entidad_en_turno == 'chofer' }">
+                        <li id="ulChofer-{{ index_chofer }}" *ngFor="let chofer of choferes; let index_chofer = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: chofer_row == index_chofer && entidad_en_turno == 'chofer' }">
                           <div class="d-flex justify-content-between align-items-center">
-                            <span id="dropdown-item" class="mr-3 mb-0">
+                            <span id="dropdown-item" class="mb-0">
                               {{ chofer.nombre_completo }}
                             </span>
-                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarCamion(chofer)" [checked]="checkChoferIsSelected(chofer)" />
+                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarChofer(chofer, index_chofer)" [checked]="checkChoferIsSelected(chofer)" />
                           </div>
                         </li>
 

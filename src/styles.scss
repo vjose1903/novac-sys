@@ -346,6 +346,14 @@ body {
 .right {
   right: 0 !important;
 }
+
+
+.c-help {
+  &:hover {
+    cursor: help !important;
+  }
+
+}
 .c-pointer {
   &:hover {
     cursor: pointer !important;

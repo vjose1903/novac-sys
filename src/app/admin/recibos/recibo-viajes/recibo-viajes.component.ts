@@ -165,7 +165,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       this.viajes.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const res = await this.facturaClass.getAll({ afterPath: `custom/viajes/true/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
+      const res = await this.facturaClass.getAll({ afterPath: `custom/viajes/true/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, movimientos_viaje: true } });
 
       const fechaA = moment().format('YYYY-MM-DD');
       res.data.forEach((viaje) => {
@@ -270,8 +270,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     console.log('factura ', factura);
 
     factura.movimientos_viaje.forEach((movimiento_viaje) => {
-      const camion_en_turno = _.find(this.camiones, { id: movimiento_viaje.vehiculo_id });
-      if (fun.hasValue(camion_en_turno)) camiones_selected.push(camion_en_turno);
+      console.log('movimiento_viaje ', movimiento_viaje);
+
+      // const camion_en_turno = _.find(this.camiones, { id: movimiento_viaje.vehiculo_id });
+      // if (fun.hasValue(camion_en_turno)) camiones_selected.push(camion_en_turno);
 
       // const camion_en_turno = _.find(this.camiones, { id: movimiento_viaje.vehiculo_id });
       // if (fun.hasValue(camion_en_turno)) camiones_selected.push(camion_en_turno);
@@ -289,57 +291,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       this.forma_pago = data.forma_pago;
       this.total_recibido = data.dinero;
       this.IMPRIMIR();
-    }
-  }
-
-  accion(bool, tipo) {
-    if (bool) {
-      let tipoModal = tipo;
-
-      if (tipo === 'cambio') {
-        const obj = { total_factura: this.monto_pendiente, devuelta: 0, tipo_modal: 'no_devuelta', factura_de: 'recibo_ingreso', formaPago: 'Efectivo' };
-
-        this.openNewModal({
-          component: FormCantidadEfectivoComponent,
-          inputs: obj,
-          id: 'cambioEfectivo_ReciboViajes',
-          header: 'Cantidad de efectivo',
-          width: '34.375rem',
-          botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [
-              {
-                clase: 'btn btn-blanco mr-2',
-                function: (instance) => {
-                  instance.closeModal(instance.id, 'd');
-                },
-                label: 'Cancelar',
-                disable: false,
-              },
-              { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
-            ],
-          },
-        });
-      } else if (tipo === 'dinamico_texto') {
-        tipoModal = 'reversar_transaccion';
-        const texto = 'Seguro de que desea reversar la ultima transaccion realizada a la factura ' + this.viaje_selected.numero_comprobante;
-
-        const objConfirmationModal = {
-          id: 'reversar_transaccion',
-          header: 'Confirmación',
-          siFunction: (instance) => {
-            this.reversarUltimaTransaccion();
-            instance.closeModal(instance.id, 'reversar_transaccion');
-          },
-          texto,
-        };
-
-        this.confirmationModal(objConfirmationModal);
-      }
-    } else {
-      if (tipo === 'cambio' || tipo === 'cancelar') {
-        this.resetVariables();
-      }
     }
   }
 

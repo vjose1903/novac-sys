@@ -12,8 +12,8 @@
 
   <div class="formulario">
     <div>
-      <span *ngIf="viajes?.length &&viajes_pendientes_cant > 0" class="badge text-shadow red text-white mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
-      <span *ngIf="viajes?.length &&viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge text-shadow blue text-white mb-3">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
+      <span *ngIf="viajes?.length && viajes_pendientes_cant > 0" class="badge text-shadow red text-white mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
+      <span *ngIf="viajes?.length && viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge text-shadow blue text-white mb-3">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
       <span *ngIf="viajes?.length == 0" class="badge text-shadow green text-white mb-3">No tiene viajes pendientes</span>
 
       <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant == 0" class="badge text-shadow green text-white mb-3">Todos los viajes fueron completados</span>
@@ -81,7 +81,7 @@
           </div>
 
           <form [formGroup]="form">
-            <div class="form-group mt-4 "[appMsgError]="'choferes_viajes'" [form]="form">
+            <div class="form-group mt-4" [appMsgError]="'choferes_viajes'" [form]="form">
               <label class="control-label">Viaje realizado por: <span style="color: red">*</span></label>
 
               <p-multiSelect
@@ -96,7 +96,7 @@
                 filterBy="nombreCompleto"
                 optionLabel="nombreCompleto"
                 display="chip"
-                >
+              >
               </p-multiSelect>
               <span id="msgContainer_choferes_viajes"></span>
             </div>
@@ -122,17 +122,6 @@
               <span id="msgContainer_camiones_viajes"></span>
             </div>
           </form>
-
-          <hr class="rayaTop mt-2" />
-
-          <div class="d-inline-flex flex-nowrap justify-content-end">
-            <button (click)="accion(false, 'cancelar')" class="btn btn-blanco mr-2">Cancelar</button>
-
-            <!-- <button [disabled]="(!is_chofer_selected && !is_camion_selected) || viaje_selected?.fecha_completada" (click)="accion(true, 'cambio')" class="btn btn-verde"> -->
-
-            <button [disabled]="formIsInvalid()" (click)="accion(true, 'cambio')" class="btn btn-verde">Recibir efectivo</button>
-            <button *ngIf="ultimo_pago?.is_ultimo" (click)="accion(true, 'dinamico_texto')" class="btn btn-amarillo ml-2">Reversar ultima transacción</button>
-          </div>
         </div>
       </div>
     </div>

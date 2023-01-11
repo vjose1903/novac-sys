@@ -942,6 +942,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (event) event.stopPropagation();
   }
 
+  getCamionInfo(camion, key) {
+    let res;
+    if (key == 'label') res = `${camion.marca} ${camion.modelo} - ${camion.anio} (${camion.propietario.nombre} ${camion.propietario.apellido})`;
+
+    const movimiento_en_turno = this.movimientosSelected.find((movimiento) => movimiento.vehiculo_id == camion.id);
+    if (key == 'icon') res = fun.isEmpty(movimiento_en_turno) ? 'far fa-square' : fun.isEmpty(movimiento_en_turno.user_id) ? 'fa-regular fa-square-minus' : 'fas fa-check';
+    if (key == 'tooltip') res = fun.isEmpty(movimiento_en_turno) ? 'Camión sin seleccionar' : fun.isEmpty(movimiento_en_turno.user_id) ? 'Chofer sin seleccionar' : 'Camión y chofer seleccionados';
+
+    return res;
+  }
+
   seleccionarCamion(camion?, index_camion?) {
     if (this.camiones.length) {
       camion ??= fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
@@ -1036,10 +1047,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.overlay['item'].hide();
       this.overlay = undefined;
     }
-  }
-
-  getCamionLabel(camion) {
-    return `${camion.marca} ${camion.modelo} - ${camion.anio} (${camion.propietario.nombre} ${camion.propietario.apellido})`;
   }
 
   mover_indicador_camion(tipo, key) {
@@ -1706,6 +1713,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
+
+    // console.log('cabecera_fact ', cabecera_fact);
 
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
