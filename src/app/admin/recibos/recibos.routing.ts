@@ -6,11 +6,11 @@ import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
 
 const routes: Routes = [
   {
-    path: 'ingresos',
+    path: 'lista_ingresos',
     component: ListaRecibosComponent,
   },
   {
-    path: 'ingresos/:metodo',
+    path: 'ingresos/:cliente_id',
     component: IngresosComponent,
   },
   {

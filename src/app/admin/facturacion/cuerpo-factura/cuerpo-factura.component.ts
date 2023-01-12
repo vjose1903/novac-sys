@@ -782,7 +782,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return fun.redondearNum(res);
   }
 
-  async getDataFromModal(arg, search) {
+  async getDataFromModal(arg, search?) {
     if (arg?.tipo == 'data_no_found') fun.enfocarAndSelectInput(`codigo-${arg.index}`);
 
     if (arg.modal_id == 'retornarDevuelto') this.retornarDevuelto(arg);

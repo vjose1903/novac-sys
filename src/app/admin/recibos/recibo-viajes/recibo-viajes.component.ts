@@ -12,7 +12,7 @@ import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ModalClass } from '../../components/modal/modal-class';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -27,23 +27,30 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       {
         titulo: '1',
         tipo: 'icon',
-        key: 'actions',
+        key: 'estado',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '7%' }, { color: 'var(--transparente00)' }],
-        iconsArray: [
-          { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
-          { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
-        ],
+        estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }],
+        iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
       },
       { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '13%' }] },
       { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar', estilos: [{ width: '40%' }] },
       { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
+      {
+        titulo: 'Acciones',
+        tipo: 'icon',
+        key: 'actions',
+        div_class: 'd-flex justify-content-around',
+        estilos: [{ width: '7%' }],
+        iconsArray: [
+          { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
+          { key: 'make_recipt', rowTooltip: 'make_recipt_tooltip' },
+        ],
+      },
     ],
     padre_functions: { data_request: (params) => this.getViajes(params) },
     filtrar: { local: false },
     colores: true,
-    padding: '0.5rem',
     id_tabla: 'lista_viajes',
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
@@ -89,7 +96,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   form;
 
   fun = fun;
-  constructor(private tServ: TablasService, private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private tServ: TablasService, private fb: FormBuilder, private route: ActivatedRoute, private router: Router) {
     super();
   }
 
@@ -185,17 +192,23 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         viaje.is_active_color = viaje.fecha_completada ? 'green' : viaje.pagos.length > 0 ? 'yellow' : 'red';
         viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.pagos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
         viaje.ver = 'far fa-eye';
+        viaje.make_recipt = 'fas fa-external-link-alt';
+        viaje.make_recipt_tooltip = 'Realizar recibo de ingreso';
 
         viaje.customStyles = {
-          actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 7% !important; padding: 0.6rem 0rem !important' },
+          estado: [
+            { key: 'estado', isTd: true, estilos: 'width: 3% !important; padding: 0.6rem 0rem !important' },
             { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
-            { key: 'ver', estilos: 'font-size: 1rem !important' },
           ],
           fecha_equivalente: { width: '13%' },
           cliente_mostrar: { width: '40%' },
           numero_comprobante: { width: '15%' },
           total_factura: { width: '20%' },
+          actions: [
+            { key: 'actions', isTd: true, estilos: 'width: 7% !important' },
+            { key: 'ver', estilos: 'font-size: 1rem !important' },
+            { key: 'make_recipt', estilos: 'font-size: 1rem !important' },
+          ],
         };
 
         viaje.cliente_mostrar = viaje.cliente.nombre;
@@ -240,7 +253,22 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           });
         });
       }
+      if (params.iconKey == 'make_recipt') this.redirectToIngresos(params.data);
     }
+  }
+
+  redirectToIngresos(factura) {
+    const obj = {
+      id: 'move_to_ingresos',
+      header: 'Confirmación',
+      texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para realizar el recibo de este pedido.',
+      siFunction: (instance) => {
+        this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}`);
+        instance.closeModal(instance.id, 'cancelar');
+      },
+    };
+
+    this.confirmationModal(obj);
   }
 
   verDetalles(data) {
@@ -286,7 +314,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.form.controls.camiones_viajes.setValue(camiones_selected);
   }
 
-  async getDataFromModal(arg, search) {
+  async getDataFromModal(arg, search?) {
     const data = arg.obj;
     if (arg.modal_id === 'cambioEfectivo_ReciboViajes') {
       this.devuelta = data.devuelta > 0 ? data.devuelta : 0;

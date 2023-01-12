@@ -170,7 +170,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     });
   }
 
-  async getDataFromModal(arg, search) {
+  async getDataFromModal(arg, search?) {
     if (arg.modal_id == 'buscar_articulo') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput(`cod-${arg.index}`);

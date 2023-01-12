@@ -68,6 +68,6 @@ export class ModalClass extends LayoutClass {
     MODALCONFIG.next(modal_configuration);
   }
 
-  getDataFromModal(arg, search) {}
+  getDataFromModal(arg, search?) {}
   onHideModal(arg) {}
 }
