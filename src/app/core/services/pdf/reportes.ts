@@ -46,8 +46,15 @@ export function makeReporte(data) {
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
+
+  console.log("pageO ", pageO);
+  console.log("data.tipo_reporte ", data.tipo_reporte);
+  console.log("configuration ", configuration);
+
+
+
   const dd = {
-    // pageSize: { width: 990, height: 398 },
+    pageSize: 'LETTER',
     pageMargins: [10, data.mostrar_sub_titulo ? 125 : 111.5, 10, 30],
     pageOrientation: pageO,
     header: cabeceraReporte(data, configuration, configApp),
@@ -152,7 +159,7 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
 function contenidoReporte(data, configuration) {
   let content = [];
 
-  if (data.tipo_tabla === 'agrupado') {
+  if (data.tipo_tabla == 'agrupado') {
     content = getContentWithTablaAgrupada(configuration, data);
   } else {
     content = getContentWithTablaNormal(configuration, data);

@@ -114,7 +114,7 @@ export const config_cxc_ant = {
     break: 26,
     only_titulo: false,
     // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
-    widths: [18, '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
     mostrar_bruto: false,
     info: [
