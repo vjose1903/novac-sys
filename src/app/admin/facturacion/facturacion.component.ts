@@ -186,13 +186,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
     this.localeService.use('es');
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
-
-    this.test();
-  }
-
-  async test() {
-    const res = await this.facturaClass.getFacturaById(13060);
-    console.log('res ', res['data']);
   }
 
   ngOnDestroy(): void {
@@ -1545,7 +1538,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  async getDataFromModal(arg, search) {
+  async getDataFromModal(arg, search?) {
     if (arg.modal_id === 'facturaPendiente') {
       this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];

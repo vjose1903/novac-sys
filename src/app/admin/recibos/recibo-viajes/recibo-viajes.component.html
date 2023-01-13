@@ -1,24 +1,17 @@
 <div class="divListadoViajes">
   <div class="titulo">
-    <h4 class="negrita">Listado de viajes</h4>
+    <h4 class="negrita p-0">Listado de viajes</h4>
   </div>
-  <div class="listado">
-    <div #cardTablaViaje id="cardTabla" class="card cardListados">
-      <div class="divTabla">
-        <dinamic-table [cardTabla]="cardTablaViaje" [seleccionado]="viaje_selected?.id" [(data)]="viajes" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+  <div class="tarjetas">
+    <div class="d-flex justify-content-between align-items-end rayaBottom mb-3 pb-2">
+      <div class="colores w-70">
+        <span *ngIf="viajes?.length && viajes_pendientes_cant > 0" class="badge text-shadow red text-white">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
+        <span *ngIf="viajes?.length && viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge text-shadow blue text-white">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
+        <span *ngIf="viajes?.length == 0" class="badge text-shadow green text-white">No tiene viajes pendientes</span>
+        <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant == 0" class="badge text-shadow green text-white">Todos los viajes fueron completados</span>
       </div>
-    </div>
-  </div>
 
-  <div class="formulario">
-    <div>
-      <span *ngIf="viajes?.length && viajes_pendientes_cant > 0" class="badge text-shadow red text-white mb-3">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
-      <span *ngIf="viajes?.length && viajes_pendientes_cant > 0 && viajes_completados_cant > 0" class="badge text-shadow blue text-white mb-3">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
-      <span *ngIf="viajes?.length == 0" class="badge text-shadow green text-white mb-3">No tiene viajes pendientes</span>
-
-      <span *ngIf="viajes?.length > 0 && viajes_pendientes_cant == 0" class="badge text-shadow green text-white mb-3">Todos los viajes fueron completados</span>
-
-      <div *ngIf="viajes?.length > 0 && viajes_completados_cant > 0">
+      <div *ngIf="viajes?.length > 0 && viajes_completados_cant > 0" class="w-30">
         <div class="d-flex justify-content-between">
           <span class="negrita">Porcentaje de viajes completos</span>
 
@@ -32,10 +25,18 @@
         <p-progressBar [value]="viajes_cant_porciento"></p-progressBar>
       </div>
     </div>
-    <hr class="rayaTop mt-2" />
+  </div>
+  <div class="listado-formulario {{ fun.hasValue(viaje_selected) ? 'list-form' : 'solo-list' }}">
+    <div class="listado {{ fun.hasValue(viaje_selected) ? 'list-form' : 'solo-list' }}">
+      <div #cardTablaViaje id="cardTabla" class="card cardListados">
+        <div class="divTabla">
+          <dinamic-table [cardTabla]="cardTablaViaje" [seleccionado]="viaje_selected?.id" [(data)]="viajes" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        </div>
+      </div>
+    </div>
 
-    <div *ngIf="viaje_selected" class="mt-4 d-flex justify-content-center">
-      <div class="card sombra" style="width: 29.5rem">
+    <div class="formulario {{ fun.hasValue(viaje_selected) ? 'list-form' : 'solo-list' }}">
+      <div class="card sombra w-100 h-100">
         <div class="card-header position-relative d-flex align-items-center">
           <h4 class="negrita mb-0">Viaje seleccionado</h4>
           <i
@@ -47,40 +48,45 @@
             (click)="abrir_historial()"
           ></i>
         </div>
-        <div class="card-body">
-          <span class="d-flex">
-            <h6 class="negrita">Viaje para:</h6>
-            &nbsp;&nbsp;
-            <h6>{{ viaje_selected?.cliente.nombre }}</h6>
-          </span>
-          <span class="d-flex">
-            <h6 class="negrita">Total facturado:</h6>
-            &nbsp;&nbsp;
-            <h6>{{ formatoNumero(viaje_selected?.total_factura) }}</h6>
-          </span>
+        <div class="card-body p-2">
+          <div class="d-flex info-viaje-selected">
+            <span class="d-flex align-items-center">
+              <h6 class="negrita p-0 mr-2">Cliente:</h6>
 
-          <span class="d-flex">
-            <h6 class="negrita text-red">Monto pendiente:</h6>
-            &nbsp;&nbsp;
-            <h6>{{ formatoNumero(monto_pendiente) }}</h6>
-          </span>
+              <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                <p class="text-black mb-0">{{ viaje_selected?.cliente.nombre }}</p>
+              </p-tag>
+            </span>
 
-          <div *ngIf="viaje_selected?.pagos?.length > 0">
-            <hr class="rayaTop mt-2" />
-            <div class="d-flex justify-content-between">
-              <span class="negrita">Restante</span>
-              <div class="pagoPorcentaje">
-                <span class="pagado negrita">RD${{ formatoNumero(totalPagado) }} </span>
-                <span class="divisor negrita">/</span>
-                <span class="total negrita gris">RD${{ formatoNumero(viaje_selected?.total_factura) }}</span>
-              </div>
-            </div>
-            <p-progressBar class="mb-2" [value]="totalPagadoPorciento"></p-progressBar>
+            <span class="d-flex align-items-center">
+              <h6 class="negrita p-0 mr-2">Total facturado:</h6>
 
-            <hr class="rayaTop mt-2" />
+              <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                <p class="text-black mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
+              </p-tag>
+            </span>
+
+            <span *ngIf="monto_pendiente > 0" class="d-flex align-items-center">
+              <h6 class="negrita p-0 mr-2 text-red">Monto pendiente:</h6>
+
+              <p-tag [rounded]="true" [style]="{ background: '#e9c1c1', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                <p class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
+              </p-tag>
+            </span>
           </div>
-
-          <form [formGroup]="form">
+          <div #cardTablaMovimientos id="cardTablaMovimientos" class="tabla">
+            <div class="divTabla">
+              <dinamic-table
+                *ngIf="fun.hasValue(viaje_selected)"
+                [cardTabla]="cardTablaMovimientos"
+                [(data)]="viaje_selected.movimientos_viaje"
+                [(TablasComponent)]="tablaMovimientosComponent"
+                [config]="config_viaje_selected"
+                (table_events)="handle_table_events($event)"
+              ></dinamic-table>
+            </div>
+          </div>
+          <!-- <form [formGroup]="form">
             <div class="form-group mt-4" [appMsgError]="'choferes_viajes'" [form]="form">
               <label class="control-label">Viaje realizado por: <span style="color: red">*</span></label>
 
@@ -121,7 +127,7 @@
 
               <span id="msgContainer_camiones_viajes"></span>
             </div>
-          </form>
+          </form> -->
         </div>
       </div>
     </div>

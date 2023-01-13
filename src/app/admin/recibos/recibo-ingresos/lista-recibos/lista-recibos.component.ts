@@ -125,7 +125,9 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   navegar() {
-    this.router.navigateByUrl('/admin/recibos/ingresos/new');
+    console.log("ando aquii");
+
+    this.router.navigateByUrl('/admin/recibos/ingresos/0');
   }
 
   tableClickIcon(event) {

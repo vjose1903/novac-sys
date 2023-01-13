@@ -127,7 +127,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     });
   }
 
-  getDataFromModal(arg, search) {
+  getDataFromModal(arg, search?) {
     this.router.navigateByUrl('/auth/config');
   }
 

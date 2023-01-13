@@ -102,7 +102,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (!this.config.padding) this.config.padding = '0rem';
     if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
     if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
-    if (!fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
+    if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
     if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
     if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
 

@@ -734,7 +734,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.openNewModal(configModal);
   }
 
-  getDataFromModal(arg, search) {
+  getDataFromModal(arg, search?) {
     if (arg.modal_id == 'buscarClienteOsuplidor') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('valorI');

@@ -338,7 +338,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.confirmationModal(confirmationObj);
   }
 
-  async getDataFromModal(arg, search) {
+  async getDataFromModal(arg, search?) {
     if (arg.modal_id === 'confirmacionImprimir') {
       this.is_print = arg.is_print;
       this.formarNota();

@@ -59,13 +59,15 @@ export class ModalClass extends LayoutClass {
     modal_configuration['transitionOptions'] = fun.objHas(params, 'transitionOptions') ? params.transitionOptions : '0ms';
     modal_configuration['contentStyleClass'] = fun.objHas(params, 'contentStyleClass') ? params.contentStyleClass : '';
     modal_configuration['returnDataFromModal'] = fun.objHas(params, 'returnDataFromModal') ? (arg) => params.returnDataFromModal(arg) : (arg) => this.getDataFromModal(arg, ' ');
-    modal_configuration['onHide'] = (arg) => this.onHideModal(arg);
+    modal_configuration['onHide'] = (arg) => {
+      if (fun.hasValue(this) && fun.objHas(this, 'onHideModal')) this.onHideModal(arg);
+    };
     modal_configuration['html'] = fun.objHas(params, 'html') ? params.html : null;
     modal_configuration['id'] = params?.id;
 
     MODALCONFIG.next(modal_configuration);
   }
 
-  getDataFromModal(arg, search) {}
+  getDataFromModal(arg, search?) {}
   onHideModal(arg) {}
 }
