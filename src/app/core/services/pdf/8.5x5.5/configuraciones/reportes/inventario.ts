@@ -1,8 +1,7 @@
 export const config_inventario = {
   margin_general: [0, 0, 0, 0],
-  isBreak: true,
+  isBreak: false,
   only_titulo: false,
-  break: 40,
   widths: [24, 35, '*', 'auto', 'auto'],
   info: [
     {

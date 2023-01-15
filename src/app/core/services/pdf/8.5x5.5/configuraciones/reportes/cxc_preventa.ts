@@ -1,11 +1,11 @@
 export const config_cxc_preventa = {
   margin_general: [0, 0, 0, 0],
-  isBreak: true,
-  break: 40,
+  isBreak: false,
   only_titulo: false,
   widths: [24, 60, 'auto', 'auto', 53, '*', 'auto'],
   mostrar_total: true,
   mostrar_bruto: false,
+  mensaje_contenido_vacio: 'El cliente buscado no tiene cuentas por cobrar.',
   info: [
     {
       text: '#',

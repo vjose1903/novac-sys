@@ -1,9 +1,9 @@
 export const config_suplidor_prod = {
   margin_general: [0, 0, 0, 0],
-  isBreak: true,
+  isBreak: false,
   only_titulo: false,
-  break: 40,
   widths: [24, 60, '*'],
+  mensaje_contenido_vacio: 'No se han realizado compras del producto especificado en el rango de fechas establecido.',
   info: [
     {
       text: '#',

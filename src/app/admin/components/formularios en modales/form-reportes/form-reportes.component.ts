@@ -159,20 +159,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
         { id: '2', label: 'Rango fechas' },
       ];
       //
-    } else if (this.tipo_reporte == 'recibos') {
-      this.form.controls.tipo.setValue('todos');
-      this.setValidator('tipo');
-
-      Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => {
-        this.tipos = [{ id: 'normal', label: 'Normal' }];
-        this.form.controls.tipo.setValue('normal');
-
-        if (result) {
-          fun.pushAt(this.tipos, 0, { id: 'viajes', label: 'Viajes' });
-          fun.pushAt(this.tipos, 2, { id: 'todos', label: 'Todos' });
-          this.form.controls.tipo.setValue('todos');
-        }
-      });
     }
 
     if (fun.hasValue(condicion_selected)) {

@@ -88,9 +88,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   getFacturaById(id: number) {
-    // TODO: cambiar camiones_viajes por movimientos_viaje
     const extra = { parameters: { actual_price: true, movimientos_viaje: true } };
-    // const extra = { parameters: { actual_price: true, camiones_viajes: true } };
     return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
@@ -137,6 +135,8 @@ export class FacturaC extends CrudG<FacturasI> {
       if (data_parsed.tipo_pdf == 'COTIZACION') data_parsed.tipo_pdf = 'COTIZACIÓN';
       data_parsed.total = data_parsed.total_factura;
       data_parsed.contenido_reporte = [];
+
+      if (fun.hasValue(data_parsed.cliente) && data_parsed.cliente.nombre.length > 80) data_parsed.cliente.nombre = `${data_parsed.cliente.nombre.substring(0, 80)}...`;
 
       data_parsed.detalle_facturas.forEach((detalle) => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {

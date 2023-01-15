@@ -8,7 +8,6 @@ import { tipoDocFacturacion } from './factura';
 export class FactsLocalStorage extends PreFacturaClass {
   constructor() {
     super();
-
     this.setActualModulo();
     this.setVariables();
   }

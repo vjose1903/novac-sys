@@ -46,16 +46,11 @@ export function makeReporte(data) {
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
-
-  console.log("pageO ", pageO);
-  console.log("data.tipo_reporte ", data.tipo_reporte);
-  console.log("configuration ", configuration);
-
-
-
+  const margin_top = data.mostrar_sub_titulo ? 125 : 111.5;
   const dd = {
     pageSize: 'LETTER',
-    pageMargins: [10, data.mostrar_sub_titulo ? 125 : 111.5, 10, 30],
+    pageMargins: [10, margin_top, 15, 40],
+
     pageOrientation: pageO,
     header: cabeceraReporte(data, configuration, configApp),
     content: contenidoReporte(data, configuration),
@@ -164,6 +159,10 @@ function contenidoReporte(data, configuration) {
   } else {
     content = getContentWithTablaNormal(configuration, data);
   }
+  // fun.pushAt(content, 0, '123456789 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52');
+  // fun.pushAt(content, 0, '111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111');
+  // fun.pushAt(content, 0, '..........................................................................................................................................');
+  // fun.pushAt(content, 0, '__________________________________________________________________________________________________________________________________________');
 
   return content;
 }

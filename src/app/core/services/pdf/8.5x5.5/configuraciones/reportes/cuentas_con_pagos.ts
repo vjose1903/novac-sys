@@ -2,9 +2,8 @@ export const config_cuentas_pagos = {
   info: [
     {
       margin_general: [0, 0, 0, 0],
-      isBreak: true,
+      isBreak: false,
       only_titulo: false,
-      break: 40,
       fill_rowIndex: 0,
       widths: [60, 73, '*', 'auto'],
       info: [
@@ -62,7 +61,6 @@ export const config_cuentas_pagos = {
       isLineLight: true,
       isBreak: false,
       only_titulo: false,
-      break: 40,
       widths: [24, 70, 'auto', 'auto', '*'],
       mensaje_contenido_vacio: 'Esta Factura no ha recibido ningun movimiento.',
       mostrar_total: false,

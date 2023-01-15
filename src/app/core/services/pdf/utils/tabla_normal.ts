@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './funciones';
 
-export function getContentWithTablaNormal(configuration, data) {
-  return makeTablaNormal(configuration, data);
-}
-
-export function getTablaNormal(configuration, data, index_data?, index_info?) {
+export function getContentWithTablaNormal(configuration, data, index_data?, index_info?) {
   return makeTablaNormal(configuration, data, index_data, index_info);
 }
 
@@ -42,7 +38,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
     }
   });
 
-  // if (contendio_.length > 0 || configuration.only_titulo) body.push(titulos as TablaRowPdfMake);
   body.push(titulos as TablaRowPdfMake);
 
   if (!configuration.only_titulo && Array.isArray(contendio_)) {
@@ -65,8 +60,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
           layout: {
             hLineWidth: (i, node) => {
               const brk = data.mostrar_sub_titulo ? configuration.break : configuration.break + 1;
-              // const brk = configuration.break;
-
               if (configuration.isBreak) {
                 return i != 0 && i % brk == 0 && node.table.body.length != brk ? 0 : i == node.table.body.length || i == 0 || i == 1 ? 1 : 0.5;
               } else {
@@ -82,14 +75,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
               }
             },
             vLineColor: (i, node) => 'black',
-
-            // {
-            //   hLineWidth: (i, node) => (i % _break == 0 && node.table.body.length != _break ? 0 : 1),
-            //   // hLineWidth: (i, node) =>  i % _break == 0 && node.table.body.length != _break ? 0 : i == node.table.body.length ? 2 : 1,
-            //   vLineWidth: (i, node) => 0,
-            //   hLineColor: (i, node) => (i == node.table.body.length ? 'black' : 'gray'),
-            //   vLineColor: (i, node) => 'white',
-            // }
           },
         } as TablaPdfMake)
       : { text: Array.isArray(contendio_) ? configuration.mensaje_contenido_vacio : '', margin: [0, 2, 0, 5] },

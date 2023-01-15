@@ -1,11 +1,11 @@
 export const config_recibos = {
   margin_general: [0, 0, 0, 0],
-  isBreak: true,
+  isBreak: false,
   only_titulo: false,
-  break: 40,
-  widths: [24, 60, '*', 50, 50, 'auto'],
+  widths: [24, 60, '*', 50, 'auto'],
   mostrar_total: true,
   mostrar_bruto: false,
+  mensaje_contenido_vacio: 'No existen recibos de ingresos en el rango de fechas introducido.',
   info: [
     {
       text: '#',
@@ -42,15 +42,6 @@ export const config_recibos = {
       noWrap: true,
       style_body: 'letra10',
       key: 'forma_pago',
-      alignment_body: 'center',
-    },
-    {
-      text: 'Tipo',
-      style: 'letra10',
-      alignment_titulo: 'center',
-      noWrap: true,
-      style_body: 'letra10',
-      key: 'tipo_recibo',
       alignment_body: 'center',
     },
 

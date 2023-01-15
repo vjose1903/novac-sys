@@ -33,7 +33,7 @@
     </div>
 
     <!-- ----- TIPO -----  -->
-    <div *ngIf="tipo_reporte == 'recibos' || tipo_reporte == 'ventas_productos' || tipo_reporte == 'cuentas_cobrar_ant_saldo' || tipo_reporte == 'notas'" class="col-12">
+    <div *ngIf=" tipo_reporte == 'ventas_productos' || tipo_reporte == 'cuentas_cobrar_ant_saldo' || tipo_reporte == 'notas'" class="col-12">
       <label class="control-label mb-0 mt-2">Tipo: <span style="color: red">*</span> </label>
       <select formControlName="tipo" class="form-control" (change)="changeTipo()">
         <option disabled>Seleccione</option>

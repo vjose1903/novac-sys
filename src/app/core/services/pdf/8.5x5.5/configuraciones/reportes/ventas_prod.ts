@@ -2,8 +2,7 @@ export const config_ventas_prod = {
   info: [
     {
       margin_general: [0, 0, 0, 0],
-      isBreak: true,
-      break: 40,
+      isBreak: false,
       only_titulo: true,
       fill_rowIndex: 0,
       widths: ['*'],
@@ -24,7 +23,6 @@ export const config_ventas_prod = {
     {
       margin_general: [0, 0, 0, 0],
       isBreak: false,
-      break: 40,
       only_titulo: false,
       widths: [24, '*', 'auto', 'auto', 'auto'],
       mensaje_contenido_vacio: 'No se vendió de este tipo de producto en la fecha indicada',
