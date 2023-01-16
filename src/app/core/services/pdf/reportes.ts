@@ -80,8 +80,8 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
         columns: [
           {
             width: '*',
-            margin: [45, 0, 0, 0],
-            stack: [{ image: 'logo', width: 52, opacity: 0.85 }],
+            margin: [30, 0, 0, 0],
+            stack: [{ image: 'logo', width: 75, opacity: 0.85 }],
           },
 
           {
@@ -119,7 +119,7 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
         ],
       },
       {
-        margin: [0, -45, 0, 0],
+        margin: [0, -65, 0, 0],
         stack: [
           { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
           { text: configApp.direccion_empresa, alignment: 'center', style: 'letra8' },

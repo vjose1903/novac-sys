@@ -265,7 +265,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   setCantPagView(width, tipo) {
     let actual = 1;
-    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id, 'setCantPagView');
+    const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id);
 
     if (tipo == 'width_page') {
       const divPaginator = document.getElementById('divPaginator');

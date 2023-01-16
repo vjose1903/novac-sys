@@ -1,3 +1,4 @@
+import { Ss } from './../../../../core/services/singleton.service';
 import { ClienteC } from './../../../registros/registro-clientes/cliente';
 import { NotaC } from './../../../manipular facturas/notas-cred-deb/notas';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -144,76 +145,93 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  pedirFacturasPorCliente(cliente_id, params?: { per_page: number; page: number; search: string }) {
-    return new Promise<any>(async (resolve, reject) => {
-      this.facturas.length = 0;
+  async pedirFacturasPorCliente(cliente_id, params?: { per_page: number; page: number; search: string; factura_a_buscar?: any }) {
+    this.facturas.length = 0;
 
-      this.totalFacturado = 0;
-      this.totalPagado = 0;
-      this.totalNotasCredito = 0;
-      this.totalNotasDebito = 0;
-      this.totalPagadoPorciento = 0;
+    this.totalFacturado = 0;
+    this.totalPagado = 0;
+    this.totalNotasCredito = 0;
+    this.totalNotasDebito = 0;
+    this.totalPagadoPorciento = 0;
 
-      const fechaA = moment().format('YYYY-MM-DD');
+    const fechaA = moment().format('YYYY-MM-DD');
+    const parameters = { page: params.page, per_page: params.per_page, paginado: true };
 
-      const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
+    if (fun.hasValue(params.factura_a_buscar)) parameters['factura_a_buscar'] = params.factura_a_buscar;
 
-      await res.data.facturas.data.map((factura) => {
-        const factura_is_selected = _.find(this.facturasSelected, { id: factura.id });
-        factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
+    const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
+    console.log('res ', res);
 
-        factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
-        factura.select = fun.hasValue(factura_is_selected);
-        factura.pagoT = fun.hasValue(factura_is_selected) ? factura_is_selected.pagoT : false;
-        factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
-        factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
-        factura.monto = fun.hasValue(factura_is_selected) ? factura_is_selected.monto : '0.00';
-        const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
+    await res.data.facturas.data.map((factura) => {
+      let factura_is_selected = _.find(this.facturasSelected, { id: factura.id });
+      if (fun.hasValue(params.factura_a_buscar) && factura.id == params.factura_a_buscar) {
+        factura_is_selected = factura;
+        factura_is_selected.monto = '0.00';
+        factura_is_selected.pagoT = false;
+      }
 
-        factura.tooltip_history = factura.is_viaje ? 'Modificar datos del pedido' : 'Movimientos realizados';
-        factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
-        factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
-        factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
-        factura.ver = 'far fa-eye';
+      factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
+      factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
+      factura.select = fun.hasValue(factura_is_selected);
+      factura.pagoT = fun.hasValue(factura_is_selected) ? factura_is_selected.pagoT : false;
+      factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
+      factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
+      factura.monto = fun.hasValue(factura_is_selected) ? factura_is_selected.monto : '0.00';
+      const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
 
-        factura.customStyles = {
-          actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 6% !important; padding: 0.6rem 0rem !important' },
-            { key: 'historyPagos', estilos: 'font-size: 1rem !important' },
-            { key: 'ver', estilos: 'font-size: 1rem !important' },
-          ],
-          select: { width: '6rem' },
-          pagoT: { width: '6rem' },
-          numero_comprobante: { width: '7rem' },
-        };
+      factura.tooltip_history = factura.is_viaje ? 'Modificar datos del pedido' : 'Movimientos realizados';
+      factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
+      factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
+      factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
+      factura.ver = 'far fa-eye';
 
-        this.facturas.push(factura);
+      factura.customStyles = {
+        actions: [
+          { key: 'actions', isTd: true, estilos: 'width: 6% !important; padding: 0.6rem 0rem !important' },
+          { key: 'historyPagos', estilos: 'font-size: 1rem !important' },
+          { key: 'ver', estilos: 'font-size: 1rem !important' },
+        ],
+        select: { width: '6rem' },
+        pagoT: { width: '6rem' },
+        numero_comprobante: { width: '7rem' },
+      };
 
-        return factura;
-      });
+      this.facturas.push(factura);
 
-      this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
-
-      this.totalFacturado = res.data.balances.total_facturado;
-
-      this.totalPagado = res.data.balances.abonado;
-      this.totalNotasCredito = res.data.balances.notas_credito;
-      this.totalNotasDebito = res.data.balances.notas_debito;
-
-      this.debiendo = res.data.balances.debiendo;
-
-      this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
-
-      this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
-      this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
-
-      setTimeout(() => {
-        this.tablaComponent.changeConfig([{ total_count: res.data.facturas.total_registros }]);
-        this.totalRegistros = res.data.facturas.total_registros;
-      }, 100);
-
-      resolve(true);
+      return factura;
     });
+
+    this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
+
+    this.totalFacturado = res.data.balances.total_facturado;
+
+    this.totalPagado = res.data.balances.abonado;
+    this.totalNotasCredito = res.data.balances.notas_credito;
+    this.totalNotasDebito = res.data.balances.notas_debito;
+
+    this.debiendo = res.data.balances.debiendo;
+
+    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
+
+    this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
+    this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
+
+    setTimeout(() => {
+      this.tablaComponent.changeConfig([{ total_count: res.data.facturas.total_registros }]);
+      this.totalRegistros = res.data.facturas.total_registros;
+
+      if (res.data.page != params.page) {
+        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
+
+        setTimeout(() => {
+          console.log('ANDO AQUIII');
+
+          Ss.cdRef.detectChanges();
+          const actualPagination = this.tServ.getPaginationById('listado_recibos');
+          console.log('actualPagination ', actualPagination);
+        }, 500);
+      }
+    }, 100);
   }
 
   async necesarioStart() {
@@ -222,11 +240,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   async checkRoute() {
     const cliente_id = this.route.snapshot.params['cliente_id'];
-    if (cliente_id != '0') {
+    const factura_id = this.route.snapshot.params['factura_id'];
+
+    console.log('factura_id ==> ', factura_id);
+
+    if (cliente_id != '0' && factura_id != '0') {
       const cliente_response = await this.clienteClass.getOne(cliente_id);
-      this.getDataFromModal({ data: cliente_response.data, modal_id: 'buscarCliente' }).then((result) => {
-        console.log('TERMINE');
-      });
+      this.getDataFromModal({ data: cliente_response.data, modal_id: 'buscarCliente', factura_a_buscar: factura_id });
+      console.log('----- TERMINE -----');
     } else {
       fun.enfocarInput('clienteI');
     }
@@ -266,29 +287,23 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async getDataFromModal(arg, search?) {
-    return new Promise<any>((resolve, reject) => {
-      let normal_result = true;
-      if (arg.modal_id == 'cambioEfectivo_IngresosComponent') {
-        this.devuelta = arg.obj.devuelta;
-        this.forma_pago = arg.obj.forma_pago;
-        this.is_print = arg.is_print;
-        this.sendIngreso();
+    if (arg.modal_id == 'cambioEfectivo_IngresosComponent') {
+      this.devuelta = arg.obj.devuelta;
+      this.forma_pago = arg.obj.forma_pago;
+      this.is_print = arg.is_print;
+      this.sendIngreso();
+    }
+
+    if (arg.modal_id == 'buscarCliente') {
+      if (arg?.tipo == 'data_no_found') {
+        fun.enfocarAndSelectInput('clienteI');
+      } else {
+        this.clienteAdepositar = arg.data;
+        (document.getElementById('clienteI') as any).value = arg.data.nombre_completo;
+        const parameters = { ...this.tServ.obj_paginate.default, factura_a_buscar: arg?.factura_a_buscar };
+        this.pedirFacturasPorCliente(arg.data.id, parameters);
       }
-
-      if (arg.modal_id == 'buscarCliente') {
-        if (arg?.tipo == 'data_no_found') {
-          fun.enfocarAndSelectInput('clienteI');
-        } else {
-          normal_result = false;
-          this.clienteAdepositar = arg.data;
-          (document.getElementById('clienteI') as any).value = arg.data.nombre_completo;
-
-          this.pedirFacturasPorCliente(arg.data.id, this.tServ.obj_paginate.default).then((result) => resolve(true));
-        }
-      }
-
-      if (normal_result) resolve(true);
-    });
+    }
   }
 
   pedirNuevaData(params?: { per_page: number; page: number; search: string }) {

@@ -98,7 +98,7 @@ export class FacturaC extends CrudG<FacturasI> {
     args.pagada ??= '0';
 
     const extra = {
-      afterPath: `custom/get_documentos/params`,
+      afterPath: `custom/get_documentos`,
       parameters: {
         page: args.page,
         per_page: args.per_page,

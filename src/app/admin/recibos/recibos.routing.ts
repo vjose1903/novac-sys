@@ -10,7 +10,7 @@ const routes: Routes = [
     component: ListaRecibosComponent,
   },
   {
-    path: 'ingresos/:cliente_id',
+    path: 'ingresos/:cliente_id/:factura_id',
     component: IngresosComponent,
   },
   {

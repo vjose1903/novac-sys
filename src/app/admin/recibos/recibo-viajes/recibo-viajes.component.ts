@@ -49,6 +49,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       },
     ],
     padre_functions: { data_request: (params) => this.getViajes(params) },
+    padding: '0.5rem',
     filtrar: { local: false },
     colores: true,
     id_tabla: 'lista_viajes',
@@ -182,7 +183,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       this.viajes.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const res = await this.facturaClass.getAll({ afterPath: `custom/viajes/true/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, movimientos_viaje: true } });
+      const res = await this.facturaClass.getAll({
+        afterPath: 'custom/viajes',
+        parameters: { page: params.page, per_page: params.per_page, paginado: true, movimientos_viaje: true, estado: true, palabra_a_buscar: palabra_a_buscar },
+      });
 
       const fechaA = moment().format('YYYY-MM-DD');
       res.data.forEach((viaje) => {
@@ -263,7 +267,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       header: 'Confirmación',
       texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para realizar el recibo de este pedido.',
       siFunction: (instance) => {
-        this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}`);
+        console.log('factura ', factura);
+
+        this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}/${factura.id}`);
         instance.closeModal(instance.id, 'cancelar');
       },
     };

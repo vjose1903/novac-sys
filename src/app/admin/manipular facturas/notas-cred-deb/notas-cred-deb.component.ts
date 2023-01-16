@@ -87,7 +87,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this._init_mixin({ component: 'notas', is_routing: true });
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
 
-    this.idsFacturas = JSON.parse(this.activeRoute.snapshot.params['ids']);
+    this.idsFacturas = this.activeRoute.snapshot.params['ids'];
+
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
     this.fecha = moment().format('DD/MM/YYYY');
 
@@ -158,7 +159,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getFacturas() {
     return new Promise(async (resolve) => {
-      this.facturaClass.getAll({ afterPath: `custom/get_group/${this.idsFacturas}` }).then((res_factura) => {
+      console.log('this.idsFacturas ', this.idsFacturas);
+      this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura) => {
         let tempFactData: FacturasI[] = res_factura['data'];
 
         this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.idsFacturas}` }).then((res) => {
