@@ -34,6 +34,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   seleccionado_id: any;
   altoTabla;
   altoTbody;
+  showPagination = true;
 
   @Input() TablasComponent;
   @Output() TablasComponentChange = new EventEmitter<any>();
@@ -168,11 +169,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           const actualPagination = this.tServ.getPaginationById(this.config.id_tabla + this.post_id, 'filter');
 
           if (fun.hasValue(search)) {
-            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ ant_page: actualPagination.page }]);
-            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ page: 1 }]);
+            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ ant_page: actualPagination.page }], this);
+            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ page: 1 }], this);
           } else if (fun.isEmpty(search) && fun.hasValue(actualPagination.ant_page)) {
-            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ page: actualPagination.ant_page }]);
-            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ ant_page: null }]);
+            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ page: actualPagination.ant_page }], this);
+            this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ ant_page: null }], this);
           }
 
           this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: search });
@@ -182,7 +183,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       });
     }
 
-    this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ search: search }]);
+    this.tServ.modifyPaginationById(this.config.id_tabla + this.post_id, [{ search: search }], this);
   }
 
   getPaginatorPageByNumber(number) {
@@ -206,7 +207,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const clickeado_por = actualPage?.getAttribute('clickeado_por');
 
       if (fun.hasValue(actualPagination) && (page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
-        this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
+        this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }], this);
 
         if (actualPagination.is_local) {
           this.localPagination(page, per_page, 'paginatorChange');
@@ -254,7 +255,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         const element = {};
         element[key] = new_obj_pagination[key];
 
-        this.tServ.modifyPaginationById(id, [element]);
+        this.tServ.modifyPaginationById(id, [element], this);
       }
     }
   }
@@ -449,6 +450,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       // ================================================
       setTimeout(() => this.changeStylesTitles(), 10);
       // ================================================
+
+      this.TablasComponent = this;
+      this.TablasComponentChange.emit(this.TablasComponent);
     }
     this.cdRef.detectChanges();
   }

@@ -221,14 +221,17 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.totalRegistros = res.data.facturas.total_registros;
 
       if (res.data.page != params.page) {
-        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
+        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }], this.tablaComponent);
+        console.log('this.tablaComponent ', this.tablaComponent);
 
         setTimeout(() => {
           console.log('ANDO AQUIII');
+          console.log('Ss.cdRef ', Ss.cdRef);
 
           Ss.cdRef.detectChanges();
           const actualPagination = this.tServ.getPaginationById('listado_recibos');
           console.log('actualPagination ', actualPagination);
+          Ss.cdRef.detectChanges();
         }, 500);
       }
     }, 100);

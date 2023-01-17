@@ -198,8 +198,11 @@
             </div>
 
             <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)">
+              <!-- ({{ tServ.getPaginationById(config.id_tabla + post_id)?.page }}) -->
               <p-paginator
+                *ngIf="showPagination"
                 id="paginator-{{ config.id_tabla + post_id }}"
+                [first]="tServ.getPaginationById(config.id_tabla + post_id)?.page"
                 [rows]="tServ.getPaginationById(config.id_tabla + post_id)?.per_page"
                 [pageLinkSize]="cantPagesView"
                 [totalRecords]="config.total_count"

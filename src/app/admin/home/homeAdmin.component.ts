@@ -35,6 +35,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
 
   async prueba() {
     new ClienteC().getAll({ afterPath: `custom/get_balances/10`, parameters: { page: 1, per_page: 20, paginado: true, factura_a_buscar: 21905 } }).then((res) => {
+    // new ClienteC().getAll({ afterPath: `custom/get_balances/10`, parameters: { page: 1, per_page: 20, paginado: true, factura_a_buscar: 219052222 } }).then((res) => {
       console.log('res ', res);
     });
 

@@ -122,13 +122,13 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
     if (this.filtro != 'todos') {
       if (fun.isEmpty(actualPagination['ant_page'])) {
-        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: actualPagination.page }]);
-        this.tServ.modifyPaginationById('lista_inventario', [{ page: 1 }]);
+        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: actualPagination.page }], this.tablaComponent);
+        this.tServ.modifyPaginationById('lista_inventario', [{ page: 1 }], this.tablaComponent);
       }
     } else {
       if (fun.hasValue(actualPagination['ant_page'])) {
-        this.tServ.modifyPaginationById('lista_inventario', [{ page: actualPagination['ant_page'] }]);
-        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: null }]);
+        this.tServ.modifyPaginationById('lista_inventario', [{ page: actualPagination['ant_page'] }], this.tablaComponent);
+        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: null }], this.tablaComponent);
       }
     }
 
