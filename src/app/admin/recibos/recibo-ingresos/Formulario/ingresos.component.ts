@@ -42,6 +42,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
           { key: 'historyPagos', rowTooltip: 'tooltip_history', text_color: 'colorEstado' },
+          { key: 'pedido', rowTooltip: 'tooltip_pedido', text_color: 'colorPedido', showCondition: [{ kind: 'campo', target: 'is_viaje', value: [true] }] },
         ],
       },
 
@@ -179,9 +180,13 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       factura.monto = fun.hasValue(factura_is_selected) ? factura_is_selected.monto : '0.00';
       const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
 
-      factura.tooltip_history = factura.is_viaje ? 'Modificar datos del pedido' : 'Movimientos realizados';
-      factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
-      factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
+      factura.tooltip_pedido = 'Modificar datos del pedido';
+      factura.colorPedido = 'green';
+      factura.pedido = 'fas fa-truck-moving';
+
+      factura.tooltip_history = 'Movimientos realizados';
+      factura.historyPagos = modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
+      factura.colorEstado = modalMoviemientos ? 'black' : 'gris-claro';
       factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
       factura.ver = 'far fa-eye';
 
@@ -189,6 +194,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         actions: [
           { key: 'actions', isTd: true, estilos: 'width: 6% !important; padding: 0.6rem 0rem !important' },
           { key: 'historyPagos', estilos: 'font-size: 1rem !important' },
+          { key: 'pedido', estilos: 'font-size: 1rem !important' },
           { key: 'ver', estilos: 'font-size: 1rem !important' },
         ],
         select: { width: '6rem' },
@@ -351,7 +357,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
-      if (params.iconKey == 'historyPagos') {
+      if (params.iconKey == 'pedido') {
         if (params.data.is_viaje) {
           const obj = {
             id: 'move_to_viajes',
@@ -363,9 +369,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
             },
           };
           this.confirmationModal(obj);
-        } else if (params.data.pagos.length || params.data.notas.length) {
-          this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal);
         }
+      }
+      if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
+        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal);
       }
 
       if (params.iconKey == 'ver') {

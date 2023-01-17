@@ -53,6 +53,7 @@ interface iconsI {
   rowTooltip?: string;
   tooltip?: string;
   text_color?: string;
+  showCondition?: Array<any>;
   disable?: Array<iconDisableItem>;
 }
 

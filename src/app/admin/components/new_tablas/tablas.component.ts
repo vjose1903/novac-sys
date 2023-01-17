@@ -530,18 +530,18 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     if (fun.objHas(objIcon, 'showCondition')) {
       for (let i = 0; i < objIcon.showCondition.length; i++) {
-        const element = objIcon.showCondition[i];
+        const conditionObj = objIcon.showCondition[i];
 
         if (objIcon.showCondition.some((conf) => conf.kind === 'selected')) {
           const is_selected = data.id == (this.seleccionado || 0);
-          res = element.value == is_selected;
+          res = conditionObj.value == is_selected;
         }
 
         if (res) break;
 
-        if (element.kind === 'campo') {
-          if (element.value.length == 0) res = data[element.target] ? false : true;
-          else res = element.value.some((value) => value == data[element.target]);
+        if (conditionObj.kind === 'campo') {
+          if (conditionObj.value.length == 0) res = data[conditionObj.target] ? false : true;
+          else res = conditionObj.value.some((value) => value == data[conditionObj.target]);
         }
       }
     } else {
