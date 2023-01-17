@@ -617,7 +617,6 @@ export class fun {
     return Object.keys(object).find((key) => object[key] == value);
   }
 
-
   // __________________________________________________________________________________________________
   // Nombre: createNestedObject
   // Descripcion : Esta funcion le crea al objeto pasado un valor anidado

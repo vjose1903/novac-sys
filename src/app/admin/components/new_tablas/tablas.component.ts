@@ -52,11 +52,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   @Output() dataChange = new EventEmitter<any>();
 
   cantPagesView: number = 5;
-
-  pagActual = 1;
-
   total_registros;
-
   subWidth: Subscription;
 
   fun = fun;
@@ -550,22 +546,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return res;
   }
 
-  cambiaMostrar(num: number) {
-    // this.IDROW = null;
-    // this.mostrar = num;
-    // this.paginate_info = {
-    //   page: this.pagActual,
-    //   per_page: this.mostrar,
-    //   search: this.search == '' ? ' ' : this.search,
-    // };
-    // this.paginateChange.emit(this.paginate_info);
-    // setTimeout(() => {
-    //   this.IDROW = temp;
-    // }, 250);
-  }
-
   getIndex(index) {
-    const pageIndex = (this.pagActual - 1) * this.config?.obj_paginate?.per_page + index;
+    const pageIndex = (this.config?.obj_paginate?.page - 1) * this.config?.obj_paginate?.per_page + index;
 
     const validate = fun.isEmpty(this.data[pageIndex]);
 
