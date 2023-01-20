@@ -54,6 +54,8 @@ interface iconsI {
   tooltip?: string;
   text_color?: string;
   showCondition?: Array<any>;
+  editing_buttons?: boolean;
+  table_component_function?: Function;
   disable?: Array<iconDisableItem>;
 }
 

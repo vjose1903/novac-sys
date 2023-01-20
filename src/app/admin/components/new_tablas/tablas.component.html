@@ -136,10 +136,10 @@
                     </span>
 
                     <span *ngSwitchCase="'input'">
-                      <span *ngIf="column.remplace && seleccionado != dato?.id" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
+                      <span *ngIf="column.remplace && seleccionado != dato?.id && !dato?.is_editing" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
                       </span>
-                      <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_input">
+                      <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace || dato?.is_editing" class="table_input">
                         <input
                           #inputTable
                           [ngStyle]="{ 'text-align': column.textAlign || 'start' }"

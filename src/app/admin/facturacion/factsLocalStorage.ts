@@ -142,7 +142,7 @@ export class FactsLocalStorage extends PreFacturaClass {
     e.stopPropagation();
   }
 
-  confirmationModal(obj) {}
+
 
   getNombreFacturaGuardada(fact: any) {
     let nombre = '';

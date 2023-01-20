@@ -7,7 +7,6 @@ import { EmpleadoC } from '../../registros/registro-empleados/empleado';
 import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
 import { FacturaC } from '../../facturacion/factura';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -33,7 +32,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
       },
       { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '13%' }] },
-      { titulo: 'Cliente', tipo: 'text', key: 'cliente_mostrar', estilos: [{ width: '40%' }] },
+      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre', estilos: [{ width: '40%' }] },
       { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
       {
@@ -58,8 +57,21 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   config_viaje_selected: table_config = {
     info: [
-      { titulo: 'Camión', tipo: 'text', key: 'vehiculo.info_vehiculo' },
-      { titulo: 'Chofer', tipo: 'text', key: 'chofer.nombre_completo' },
+      { titulo: 'Camión', tipo: 'input', key: 'vehiculo.info_vehiculo', remplace: { with: 'text' } },
+      { titulo: 'Chofer', tipo: 'input', key: 'chofer.nombre_completo', remplace: { with: 'text' } },
+      {
+        titulo: 'Acciones',
+        tipo: 'icon',
+        key: 'actions',
+        div_class: 'd-flex justify-content-around',
+        estilos: [{ width: '10%' }],
+
+        iconsArray: [
+          { key: 'editar_btn', editing_buttons: true, tooltip: 'Editar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
+          { key: 'cancelar_btn', editing_buttons: true, tooltip: 'Cancelar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [true] }] },
+          { key: 'guardar_btn', editing_buttons: true, tooltip: 'Guardar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [true] }] },
+        ],
+      },
     ],
     filtrar: { show: false },
     padding: '0.5rem',
@@ -72,6 +84,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   viajes = [];
   viaje_selected;
+  movimiento_viaje_selected;
   ultimo_pago;
   is_print = false;
 
@@ -133,10 +146,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       const id_documento = this.route.snapshot.params['id'];
 
       if (id_documento != '0') {
-        const res = await this.facturaClass.getFacturaById(id_documento);
-        const factura = res['data'];
+        const factura = this.viajes.find((viaje) => viaje.id == id_documento);
 
-        if (!this.viajes.some((viaje) => viaje.id == factura.id)) {
+        if (fun.isEmpty(factura)) {
           const inputSearch = document.getElementById('search-lista_viajes') as any;
 
           if (fun.hasValue(inputSearch)) {
@@ -197,7 +209,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
             { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
           ],
           fecha_equivalente: { width: '13%' },
-          cliente_mostrar: { width: '40%' },
+          'cliente.nombre': { width: '40%' },
           numero_comprobante: { width: '15%' },
           total_factura: { width: '20%' },
           actions: [
@@ -207,8 +219,25 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           ],
         };
 
-        viaje.cliente_mostrar = viaje.cliente.nombre;
         viaje['pago_a_tiempo'] = pago_a_tiempo;
+
+        viaje.movimientos_viaje.map((pedido) => {
+          pedido.editar_btn = 'fas fa-pencil-alt';
+          pedido.cancelar_btn = 'fa-solid fa-x';
+          pedido.guardar_btn = 'fa-regular fa-floppy-disk';
+
+          pedido.customStyles = {
+            'vehiculo.info_vehiculo': { padding: '0.5rem 0.5rem' },
+            'chofer.nombre_completo': { padding: '0.5rem 0.5rem' },
+            actions: [
+              { key: 'actions', isTd: true, estilos: 'width: 10% !important' },
+              { key: 'editar_btn', estilos: 'font-size: 1rem !important' },
+              { key: 'cancelar_btn', estilos: 'font-size: 1rem !important' },
+              { key: 'guardar_btn', estilos: 'font-size: 1rem !important' },
+            ],
+          };
+          return pedido;
+        });
 
         this.viajes.push(viaje);
       });
@@ -231,17 +260,47 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   tableClickIcon(params) {
-    if (params.columnKey == 'actions') {
-      if (params.iconKey == 'ver') {
-        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
-          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
-            const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
-            obj_modal.botones.dinamico.push(ver_datelles_btn);
-            this.openNewModal(obj_modal);
+    console.log('params ', params);
+
+    if (params.id_tabla == 'lista_viajes') {
+      if (params.columnKey == 'actions') {
+        if (params.iconKey == 'ver') {
+          this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+            this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
+              const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
+              obj_modal.botones.dinamico.push(ver_datelles_btn);
+              this.openNewModal(obj_modal);
+            });
           });
+        }
+        if (params.iconKey == 'make_recipt') this.redirectToIngresos(params.data);
+      }
+    }
+
+    if (params.id_tabla == 'movimientos_viaje') {
+      this.editMovimientoPedido(params);
+    }
+  }
+
+  editMovimientoPedido(params) {
+    if (params.columnKey == 'actions') {
+      if (params.iconKey == 'editar_btn') {
+        this.tServ.checkEditingRow({ listado: this.viaje_selected.movimientos_viaje, data: params.data }).then((result) => {
+          if (result.can_edit) {
+            params.data.is_editing = true;
+            // this.movimiento_viaje_selected = params.data.id;
+          } else {
+            fun.toastWarning('Existe una fila en estado de edición, debe de terminar ese proceso para editar otra fila.', 'Aviso');
+          }
+          console.log(result);
         });
       }
-      if (params.iconKey == 'make_recipt') this.redirectToIngresos(params.data);
+      if (params.iconKey == 'cancelar_btn') {
+        params.data.is_editing = false;
+      }
+      if (params.iconKey == 'guardar_btn') {
+        console.log('--- A GUARDAR ---');
+      }
     }
   }
 
@@ -291,21 +350,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     }, 500);
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
-          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'SI', disable: false },
-        ],
-      },
-    });
-  }
 
   // formarDetalle() {
   //   const temp = [];
@@ -363,11 +407,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   //       PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })
   //         .then(async (res) => {
   //           if (res.status === 'si') {
-  //           } else fun.toastError(res.msg, 'ERROR');
+  //           } else fun.toastError(res.msg, 'ERROR');('Existe una fila en estado de edición, debe de terminar ese proceso para editar otra fila.', 'Aviso');
 
   //           this.getCuadre();
   //         })
-  //         .catch((err) => fun.toastError(err.msg, 'ERROR'));
+  //         .catch((err) => fun.toastError(err.msg, 'ERROR'));('Existe una fila en estado de edición, debe de terminar ese proceso para editar otra fila.', 'Aviso');
   //     });
   //   });
   // }

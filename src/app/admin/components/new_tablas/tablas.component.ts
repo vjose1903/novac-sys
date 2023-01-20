@@ -1,3 +1,4 @@
+import { ModalClass } from './../modal/modal-class';
 import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
 
 import * as _ from 'lodash';
@@ -56,7 +57,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   subWidth: Subscription;
 
   fun = fun;
-  rowEditing;
+  rowsEditing = [];
   tablaInterval;
 
   constructor(public cdRef: ChangeDetectorRef, public tServ: TablasService, private zone: NgZone) {
@@ -244,7 +245,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (fun.isEmpty(actualPagination['ant_page'])) {
         new_obj_pagination = { ant_page: actualPagination.page, page: 1 };
       } else {
-        if (_.isEqual(this.data, this.copyData)) new_obj_pagination = { page: actualPagination.ant_page, ant_page: null };
+        if (fun.isEqual(this.data, this.copyData)) new_obj_pagination = { page: actualPagination.ant_page, ant_page: null };
       }
 
       for (const key in new_obj_pagination) {
@@ -419,13 +420,35 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   changeValorInput(key, index, value, data) {
     const newData = fun.duplicarJson(data);
-    newData[key] = value;
-
-    this.rowEditing = newData;
+    fun.setProperty(newData, key, value);
+    this.modifyRowsEditing(newData, 'add');
 
     const obj = { data, newData, index, key, value, id_tabla: this.config.id_tabla + this.post_id };
 
     this.handle_table_events('inputChange', obj);
+  }
+
+  modifyRowsEditing(newData, kind: 'add' | 'remove') {
+    newData = fun.duplicarJson(newData);
+    const row_editing = this.rowsEditing.find((item) => item.id == newData.id);
+
+    const index_editing = this.rowsEditing.findIndex((row_edit) => row_edit.id == row_editing.id);
+
+    if (kind == 'add') {
+      if (fun.hasValue(row_editing)) {
+        Object.assign(row_editing, newData);
+      } else {
+        this.rowsEditing.push(newData);
+      }
+    }
+
+    if (kind == 'remove') {
+      if (fun.hasValue(row_editing) && index_editing != -1) fun.pullAt(this.rowsEditing, index_editing);
+    }
+  }
+
+  checkIfRowIsEditing(id) {
+    return this.rowsEditing.some((row) => row.id == id);
   }
 
   updateDataCopy(data) {
@@ -489,14 +512,47 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
   }
 
-  iconBtn(key, i, data, e, objIcon) {
-    const obj = { id_tabla: this.config.id_tabla + this.post_id, index: i, idIcon: objIcon.id, columnKey: key, iconKey: objIcon.key, data: data, rowEditing: this.rowEditing };
+  iconBtn(key, index, data, e, objIcon) {
+    const obj = { id_tabla: this.config.id_tabla + this.post_id, index: index, idIcon: objIcon.id, columnKey: key, iconKey: objIcon.key, data: data, rowsEditing: this.rowsEditing };
 
     const is_disable = this.disabledInput(data, objIcon);
 
-    if (!is_disable) this.handle_table_events('clickIcon', obj);
+    if (!is_disable) {
+      if (objIcon.editing_buttons) {
+        if (objIcon.key == 'editar_btn') {
+          data.is_editing = true;
+          this.modifyRowsEditing(data, 'add');
+        }
+        if (objIcon.key == 'cancelar_btn') {
+          this.checkIfIsEdited(data);
+        }
+      } else {
+        this.handle_table_events('clickIcon', obj);
+      }
+    }
 
     e.stopPropagation();
+  }
+
+  checkIfIsEdited(data) {
+    const row_editing_id = data.id;
+    const original_row = this.data.find((item) => item.id == row_editing_id);
+    const editing_row = this.rowsEditing.find((item) => item.id == row_editing_id);
+
+    if (fun.isEqual(original_row, editing_row)) {
+      data.is_editing = false;
+      this.modifyRowsEditing(editing_row, 'remove');
+    } else {
+      const texto_modal = `¿Seguro que desea cancelar la edición?, al cancelar los cambios quedarán descartados.`;
+
+      const siFunction = (instance) => {
+        data.is_editing = false;
+        this.modifyRowsEditing(editing_row, 'remove');
+        new ModalClass().closeModal(instance);
+      };
+
+      new ModalClass().confirmationModal({ id: 'cancel_row_editing', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
+    }
   }
 
   getIconClass(objIcon, dato) {

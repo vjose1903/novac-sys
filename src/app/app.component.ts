@@ -81,8 +81,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     Ss.sharedServ = this.sharedServ;
     Ss.cdRef = this.cdRef;
 
-
-
     this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
 
     this.subModified = MODIFIED_CONFIG_FILE.subscribe((res) => {
@@ -135,6 +133,20 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
 
     window.onresize = (e) => this.resize.bind(this)(e);
+    // this.test();
+  }
+
+  test() {
+    const obj = { nombre: 'victor', edad: 35, direccion: { calle: 'las maras-higuero', apto: 'amarillo' }, estudios: ['colegio inmaculada', 'ucateci'] };
+
+    console.log(`obj ANTES => `, obj);
+
+    const obj2 = fun.duplicarJson(obj);
+    obj2.nombre = 'otro';
+    obj2.direccion.calle = 'el higuero-maras';
+
+    console.log(`obj DESPUES => `, obj);
+    console.log(`obj2 => `, obj2);
   }
 
   ngAfterViewInit(): void {

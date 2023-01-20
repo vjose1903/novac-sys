@@ -70,4 +70,51 @@ export class ModalClass extends LayoutClass {
 
   getDataFromModal(arg, search?) {}
   onHideModal(arg) {}
+
+  // confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+  //   this.openNewModal({
+  //     id: obj.id,
+  //     header: obj.header,
+  //     width: obj.width || '30rem',
+  //     html: `<p> ${obj.texto} </p>`,
+  //     botones: {
+  //       ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+  //       dinamico: [
+  //         { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+  //         {
+  //           clase: 'btn btn-verde',
+  //           function: (instance) => obj.siFunction(instance),
+  //           label: 'SI',
+  //           disable: false,
+  //         },
+  //       ],
+  //     },
+  //   });
+  // }
+
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function }) {
+    const config = {
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p> ${obj.texto} </p>`,
+      botones: {
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
+          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
+        ],
+      },
+    };
+
+    if (fun.objHas(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
+      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
+    }
+
+    this.openNewModal(config);
+  }
+
+  closeModal(modalInstance) {
+    modalInstance.closeModal(modalInstance.id, 'cancelar');
+  }
 }

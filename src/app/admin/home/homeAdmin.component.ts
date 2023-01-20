@@ -34,11 +34,10 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   }
 
   async prueba() {
-    new ClienteC().getAll({ afterPath: `custom/get_balances/10`, parameters: { page: 1, per_page: 20, paginado: true, factura_a_buscar: 21905 } }).then((res) => {
-    // new ClienteC().getAll({ afterPath: `custom/get_balances/10`, parameters: { page: 1, per_page: 20, paginado: true, factura_a_buscar: 219052222 } }).then((res) => {
-      console.log('res ', res);
-    });
-
+    // new ClienteC().getAll({ afterPath: `custom/get_balances/10`, parameters: { page: 1, per_page: 20, paginado: true, factura_a_buscar: 21905 } }).then((res) => {
+    // // new ClienteC().getAll({ afterPath: `custom/get_balances/10`, parameters: { page: 1, per_page: 20, paginado: true, factura_a_buscar: 219052222 } }).then((res) => {
+    //   console.log('res ', res);
+    // });
     // new FacturaC().getAll({ afterPath: `custom/can_update`, parameters: { id: 152 } }).then((res) => {
     //   console.log('res ', res);
     // });
@@ -46,12 +45,9 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
     // // const filter_value = '3';
     // const filter_value = '';
     // const params = { ant_page: null, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false };
-
     // const args = { campo: filter_options.todos, valor: filter_value, tipo_factura_id: 0, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, tipo: tipoDocFacturacion.cotizacion, pagada: false };
-
     // const res = await new FacturaC().getFacturasByParams(args);
     // console.log('res ', res);
-
     // const extra = { afterPath: `19417`, parameters: { actual_price: true } };
     // new FacturaC().dynamic(extra).then((res) => {
     //   console.log('res ', res);

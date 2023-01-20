@@ -78,6 +78,7 @@
             <div class="divTabla">
               <dinamic-table
                 *ngIf="fun.hasValue(viaje_selected)"
+                [seleccionado]="movimiento_viaje_selected"
                 [cardTabla]="cardTablaMovimientos"
                 [(data)]="viaje_selected.movimientos_viaje"
                 [(TablasComponent)]="tablaMovimientosComponent"

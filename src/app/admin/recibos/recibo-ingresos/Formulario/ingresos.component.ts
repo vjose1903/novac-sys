@@ -323,31 +323,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
-  }
-
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
-  }
-
   resetVariables() {
     this.forma_pago = null;
     this.devuelta = null;

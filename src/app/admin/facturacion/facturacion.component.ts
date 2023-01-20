@@ -547,7 +547,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           let abrirModal = true;
 
           if (this.factura_guardada && this.factura_guardada?.archivo_id) {
-            if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
+            if (fun.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
               fun.toastWarning(`La ${documento.descripcion} que estaba realizando esta archivada para poder utilizarla luego.`, 'AVISO');
               abrirModal = false;
             } else {
@@ -1199,31 +1199,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.confirmationModal(obj);
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function }) {
-    const config = {
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
-          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
-        ],
-      },
-    };
 
-    if (fun.objHas(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
-      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
-    }
-
-    this.openNewModal(config);
-  }
-
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
-  }
 
   // =============================================
   //  MODAL enviarABaseDatos

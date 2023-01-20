@@ -144,12 +144,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
             instance.closeModal(instance.id, 'anular_recibo');
           };
 
-          this.confirmationModal({
-            id: 'anular_recibo',
-            header: 'Confirmar',
-            texto: texto_modal,
-            siFunction: siFunction,
-          });
+          this.confirmationModal({ id: 'anular_recibo', header: 'Confirmar', texto: texto_modal, siFunction: siFunction, });
           break;
 
         default:
@@ -158,26 +153,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     }
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
-  }
 
   makeReciboPdf(arg) {
     const recibo_selected = _.find(this.lista_recibos, (recibo) => recibo.id === arg.id);

@@ -759,7 +759,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         });
       }
 
-      this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, _.isEqual);
+      this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, fun.isEqual);
 
       if (this.inputDrop) setTimeout(() => fun.enfocarInput(this.inputDrop), 0);
     }
@@ -968,30 +968,5 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (is_defectuoso) articulo_a_retirar.total /= 2;
 
     return articulo_a_retirar;
-  }
-
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
-  }
-
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 }

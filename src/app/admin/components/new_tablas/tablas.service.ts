@@ -66,4 +66,14 @@ export class TablasService {
     const style = { background: `linear-gradient(145deg, ${myColor}, ${oscuro})` };
     return style;
   }
+
+  checkEditingRow(params: { listado: Array<any>; data: any }) {
+    return new Promise<any>((resolve, reject) => {
+      let res = { can_edit: false };
+
+      const is_some_editing = params.listado.some((item) => item.is_editing);
+      res.can_edit = !is_some_editing;
+      resolve(res);
+    });
+  }
 }
