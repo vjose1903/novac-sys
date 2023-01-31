@@ -1104,7 +1104,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async getChoferes() {
-    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'chofer' } };
+    const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'chofer' } };
     this.userClass.getAll(extra).then((res) => {
       this.choferes = res['data'].map((chofer) => {
         chofer.selected = false;
@@ -1198,8 +1198,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     this.confirmationModal(obj);
   }
-
-
 
   // =============================================
   //  MODAL enviarABaseDatos

@@ -17,10 +17,10 @@
                 <div class="col-12 p-0">
                   <div class="form-group">
                     <label class="control-label">Propietario: <span style="color: red">*</span></label>
-                    <ng-select id="user_id" formControlName="user_id" (change)="selectPropietario()" [items]="listaPropietarios" bindLabel="nombreCompleto" bindValue="id" [clearable]="false">
+                    <ng-select id="user_id" formControlName="user_id" (change)="selectPropietario()" [items]="listaPropietarios" bindLabel="nombre_completo" bindValue="id" [clearable]="false">
                       <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                         <div>
-                          <span>{{ item.nombreCompleto }} </span>
+                          <span>{{ item.nombre_completo }} </span>
                         </div>
                       </ng-template>
                     </ng-select>

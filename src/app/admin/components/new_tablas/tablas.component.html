@@ -117,28 +117,38 @@
                     </span>
 
                     <span *ngSwitchCase="'dropDown'">
-                      <p-dropdown
-                        [virtualScroll]="true"
-                        [itemSize]="34"
-                        [dropdownIcon]="'pi pi-sort'"
-                        [disabled]="disabledInput(dato, column)"
-                        [options]="column.data"
-                        [filter]="true"
-                        filterBy="nombre_largo,hora_sorteo"
-                        [(ngModel)]="dato[column.key]"
-                        [placeholder]="getDropPlaceholder(column.placeholder)"
-                        [optionLabel]="column.optionLabel"
-                        [optionValue]="column.optionValue"
-                        styleClass="{{ disabledInput(dato, column) ? 'customD' : 'custom' }}"
-                        emptyFilterMessage="valor_buscado_no_se_encuentra"
-                      >
-                      </p-dropdown>
+                      <span *ngIf="column.remplace && seleccionado != dato?.id && !dato?.is_editing" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
+                        <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
+                      </span>
+
+                      <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace || dato?.is_editing">
+                        <p-dropdown
+                          #dropdown
+                          [virtualScroll]="true"
+                          [itemSize]="34"
+                          [dropdownIcon]="'pi pi-sort'"
+                          [disabled]="disabledInput(dato, column)"
+                          [options]="column.data"
+                          [filter]="true"
+                          filterBy="nombre_largo,hora_sorteo"
+                          [ngModel]="dato[column.dropdown_key]"
+                          [placeholder]="getDropPlaceholder(column.placeholder)"
+                          [optionLabel]="column.optionLabel"
+                          [optionValue]="column.optionValue"
+                          styleClass="form-control min {{ disabledInput(dato, column) ? 'customD' : 'custom' }}"
+                          appendTo="body"
+                          emptyFilterMessage="valor_buscado_no_se_encuentra"
+                          (onChange)="changeValorInput(column.dropdown_key, getIndex(index_body), dropdown.value, dato)"
+                        >
+                        </p-dropdown>
+                      </div>
                     </span>
 
                     <span *ngSwitchCase="'input'">
                       <span *ngIf="column.remplace && seleccionado != dato?.id && !dato?.is_editing" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
                       </span>
+
                       <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace || dato?.is_editing" class="table_input">
                         <input
                           #inputTable

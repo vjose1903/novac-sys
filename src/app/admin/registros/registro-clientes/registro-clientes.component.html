@@ -153,7 +153,7 @@
                     <label class="control-label">Vendedor: <span style="color: red">*</span></label>
                     <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
                       <option [value]="null" disabled>Seleccione</option>
-                      <option *ngFor="let item of vendedores" value="{{ item.id }}">{{ item.nombreCompleto }}</option>
+                      <option *ngFor="let item of vendedores" value="{{ item.id }}">{{ item.nombre_completo }}</option>
                     </select>
                     <span id="msgContainer_vendedor_id"></span>
                   </div>

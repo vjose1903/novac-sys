@@ -38,7 +38,7 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
       const ids_roles = this.inputs.roles.map((rol) => rol.id);
-      const obj = fun.omit(this.inputs, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documento_identidad', 'nombreCompleto', 'nombre_completo', 'roles']);
+      const obj = fun.omit(this.inputs, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documento_identidad',  'nombre_completo', 'roles']);
 
       obj['password'] = objTemp.password;
       obj['ids_roles'] = ids_roles;

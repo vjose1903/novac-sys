@@ -36,7 +36,7 @@
     </div>
 
     <div class="formulario {{ fun.hasValue(viaje_selected) ? 'list-form' : 'solo-list' }}">
-      <div class="card sombra w-100 h-100">
+      <div class="card sombra w-100 h-100 br-1 overflow-hidden">
         <div class="card-header position-relative d-flex align-items-center">
           <h4 class="negrita mb-0">Viaje seleccionado</h4>
           <i
@@ -49,30 +49,36 @@
           ></i>
         </div>
         <div class="card-body p-2">
-          <div class="d-flex info-viaje-selected">
-            <span class="d-flex align-items-center">
-              <h6 class="negrita p-0 mr-2">Cliente:</h6>
+          <div class="d-flex px-2 info-viaje-selected align-items-center justify-content-between">
+            <div class="d-flex">
+              <span class="d-flex align-items-center mr-3">
+                <h6 class="negrita p-0 mr-2">Cliente:</h6>
 
-              <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                <p class="text-black mb-0">{{ viaje_selected?.cliente.nombre }}</p>
-              </p-tag>
-            </span>
+                <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                  <p class="text-black mb-0">{{ viaje_selected?.cliente.nombre }}</p>
+                </p-tag>
+              </span>
 
-            <span class="d-flex align-items-center">
-              <h6 class="negrita p-0 mr-2">Total facturado:</h6>
+              <span class="d-flex align-items-center mr-3">
+                <h6 class="negrita p-0 mr-2">Total facturado:</h6>
 
-              <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                <p class="text-black mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
-              </p-tag>
-            </span>
+                <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                  <p class="text-black mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
+                </p-tag>
+              </span>
 
-            <span *ngIf="monto_pendiente > 0" class="d-flex align-items-center">
-              <h6 class="negrita p-0 mr-2 text-red">Monto pendiente:</h6>
+              <span *ngIf="monto_pendiente > 0" class="d-flex align-items-center mr-3">
+                <h6 class="negrita p-0 mr-2 text-red">Monto pendiente:</h6>
 
-              <p-tag [rounded]="true" [style]="{ background: '#e9c1c1', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                <p class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
-              </p-tag>
-            </span>
+                <p-tag [rounded]="true" [style]="{ background: '#e9c1c1', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                  <p class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
+                </p-tag>
+              </span>
+            </div>
+
+            <div>
+              <btn-icon-circular [id]="'btnAgregarMovimiento'" [icon]="'fa-solid fa-plus'" [size]="'size-md'" [tooltip]="'Agregar Movimiento'" [tooltipPosition]="'left'" (clickFunction)="addMovimiento()"> </btn-icon-circular>
+            </div>
           </div>
           <div #cardTablaMovimientos id="cardTablaMovimientos" class="tabla">
             <div class="divTabla">

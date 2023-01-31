@@ -1,3 +1,4 @@
+import { MovimientosC } from './../../components/formularios en modales/movimientos-form/movimiento-model';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
@@ -9,8 +10,7 @@ import { ReciboC } from '../recibos';
 import { FacturaC } from '../../facturacion/factura';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { FormBuilder, Validators } from '@angular/forms';
-import { ModalClass } from '../../components/modal/modal-class';
+import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -57,19 +57,19 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   config_viaje_selected: table_config = {
     info: [
-      { titulo: 'Camión', tipo: 'input', key: 'vehiculo.info_vehiculo', remplace: { with: 'text' } },
-      { titulo: 'Chofer', tipo: 'input', key: 'chofer.nombre_completo', remplace: { with: 'text' } },
+      { id: 'camion', titulo: 'Camión', tipo: 'dropDown', optionValue: 'id', optionLabel: 'info_vehiculo', data: [], key: 'vehiculo.info_vehiculo', dropdown_key: 'vehiculo_id', remplace: { with: 'text' } },
+      { id: 'chofer', titulo: 'Chofer', tipo: 'dropDown', optionValue: 'id', optionLabel: 'nombre_completo', data: [], key: 'chofer.nombre_completo', dropdown_key: 'user_id', remplace: { with: 'text' } },
       {
         titulo: 'Acciones',
         tipo: 'icon',
         key: 'actions',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '10%' }],
+        estilos: [{ width: '7%' }],
 
         iconsArray: [
-          { key: 'editar_btn', editing_buttons: true, tooltip: 'Editar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
-          { key: 'cancelar_btn', editing_buttons: true, tooltip: 'Cancelar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [true] }] },
-          { key: 'guardar_btn', editing_buttons: true, tooltip: 'Guardar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [true] }] },
+          { key: 'editar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Editar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
+          { key: 'cancelar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Cancelar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [true] }] },
+          { key: 'guardar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Guardar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [true] }] },
         ],
       },
     ],
@@ -134,6 +134,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.checkRoute();
     this.getChoferes();
     this.getCamiones();
+
     // this.createForm();
   }
 
@@ -163,23 +164,25 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async getChoferes() {
-    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'chofer' } };
-    this.userClass.getAll(extra).then((res) => (this.choferes = res['data']));
+    const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'chofer' } };
+    this.userClass.getAll(extra).then((res) => {
+      const config = this.config_viaje_selected.info.find((config) => config.id == 'chofer');
+      config.data = res['data'];
+      this.choferes = res['data'];
+    });
+    setTimeout(() => {}, 500);
   }
 
   async getCamiones() {
-    const extra = { afterPath: `filtro/ `, parameters: { paginado: false } };
-
+    const extra = { afterPath: `filtro/ `, parameters: { paginado: false, info_vehiculo: true } };
     this.vehiculoClass.getAll(extra).then((res) => {
+      const config = this.config_viaje_selected.info.find((config) => config.id == 'camion');
+      config.data = res['data'];
       this.camiones = res['data'];
-      this.camiones.map((camion) => {
-        // camion['selected_label'] = `${camion.marca} ${camion.modelo} de (${camion.propietario.nombre})`;
-        camion['item_label'] = `${camion.marca} ${camion.modelo} - ${camion.anio} (${camion.propietario.nombre} ${camion.propietario.apellido})`;
-
-        return camion;
-      });
     });
+    setTimeout(() => {}, 500);
   }
+
   async getViajes(params?: { per_page: number; page: number; search: string }) {
     return new Promise<any>(async (resolve, reject) => {
       this.viajes_completados_cant = 0;
@@ -221,22 +224,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
         viaje['pago_a_tiempo'] = pago_a_tiempo;
 
-        viaje.movimientos_viaje.map((pedido) => {
-          pedido.editar_btn = 'fas fa-pencil-alt';
-          pedido.cancelar_btn = 'fa-solid fa-x';
-          pedido.guardar_btn = 'fa-regular fa-floppy-disk';
-
-          pedido.customStyles = {
-            'vehiculo.info_vehiculo': { padding: '0.5rem 0.5rem' },
-            'chofer.nombre_completo': { padding: '0.5rem 0.5rem' },
-            actions: [
-              { key: 'actions', isTd: true, estilos: 'width: 10% !important' },
-              { key: 'editar_btn', estilos: 'font-size: 1rem !important' },
-              { key: 'cancelar_btn', estilos: 'font-size: 1rem !important' },
-              { key: 'guardar_btn', estilos: 'font-size: 1rem !important' },
-            ],
-          };
-          return pedido;
+        viaje.movimientos_viaje.map((movimiento_viaje) => {
+          this.parseMovimientosViaje(movimiento_viaje);
+          return movimiento_viaje;
         });
 
         this.viajes.push(viaje);
@@ -259,9 +249,24 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-  tableClickIcon(params) {
-    console.log('params ', params);
+  parseMovimientosViaje(movimiento_viaje) {
+    movimiento_viaje.editar_btn = 'fas fa-pencil-alt';
+    movimiento_viaje.cancelar_btn = 'fa-solid fa-x';
+    movimiento_viaje.guardar_btn = 'fa-regular fa-floppy-disk';
 
+    movimiento_viaje.customStyles = {
+      'vehiculo.info_vehiculo': { padding: '0.5rem' },
+      'chofer.nombre_completo': { padding: '0.5rem' },
+      actions: [
+        { key: 'actions', isTd: true, estilos: 'width: 7% !important' },
+        { key: 'editar_btn', estilos: 'font-size: 1rem !important' },
+        { key: 'cancelar_btn', estilos: 'font-size: 1rem !important' },
+        { key: 'guardar_btn', estilos: 'font-size: 1rem !important' },
+      ],
+    };
+  }
+
+  tableClickIcon(params) {
     if (params.id_tabla == 'lista_viajes') {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'ver') {
@@ -284,22 +289,41 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   editMovimientoPedido(params) {
     if (params.columnKey == 'actions') {
-      if (params.iconKey == 'editar_btn') {
-        this.tServ.checkEditingRow({ listado: this.viaje_selected.movimientos_viaje, data: params.data }).then((result) => {
-          if (result.can_edit) {
-            params.data.is_editing = true;
-            // this.movimiento_viaje_selected = params.data.id;
-          } else {
-            fun.toastWarning('Existe una fila en estado de edición, debe de terminar ese proceso para editar otra fila.', 'Aviso');
-          }
-          console.log(result);
-        });
-      }
       if (params.iconKey == 'cancelar_btn') {
-        params.data.is_editing = false;
+        if (`${params.data.id}`.includes('new_')) {
+          fun.pull(this.viaje_selected.movimientos_viaje, params.data);
+        }
       }
       if (params.iconKey == 'guardar_btn') {
-        console.log('--- A GUARDAR ---');
+        const row_edited = params.rowsEditing[0];
+
+        let index_row_en_turno = this.viaje_selected.movimientos_viaje.findIndex((movimiento) => movimiento.id == row_edited.id);
+
+        this.viaje_selected.movimientos_viaje[index_row_en_turno] = fun.duplicarJson(row_edited);
+
+        const new_movimiento_viaje = this.viaje_selected.movimientos_viaje.map((movimiento) => {
+          return { vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id };
+        });
+
+        const data_update = fun.pick(this.viaje_selected, ['id']);
+
+        data_update['movimientos_viaje'] = new_movimiento_viaje;
+
+        this.facturaClass
+          .updateOne(data_update, { afterPath: `update/movimientos_viaje` })
+          .then((res_factura) => {
+            const viaje_modificado = this.viaje_selected.movimientos_viaje.find((movimiento) => movimiento.id == row_edited.id);
+            const chofer = this.choferes.find((chofer) => chofer.id == row_edited.user_id);
+            const vehiculo = this.camiones.find((camion) => camion.id == row_edited.vehiculo_id);
+
+            viaje_modificado.chofer = fun.duplicarJson(chofer);
+            viaje_modificado.user_id = chofer.id;
+            viaje_modificado.vehiculo = fun.duplicarJson(vehiculo);
+            viaje_modificado.vehiculo_id = vehiculo.id;
+
+            delete viaje_modificado.is_editing;
+          })
+          .catch((error) => {});
       }
     }
   }
@@ -330,6 +354,14 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     if (pagos.length || notas.length) this.facturaClass.abrirModalHistorial(pagos, notas, this.openNewModal);
   }
 
+  addMovimiento() {
+    const movimiento_viaje = { vehiculo_id: null, user_id: null, is_editing: true, id: `new_${fun.generateKey()}` };
+    this.parseMovimientosViaje(movimiento_viaje);
+    this.viaje_selected.movimientos_viaje.push(movimiento_viaje);
+
+    this.tablaMovimientosComponent.modifyRowsEditing(movimiento_viaje, 'add');
+  }
+
   tableClickRow(event) {
     if (event.id_tabla == 'lista_viajes') this.verViaje(event.data);
   }
@@ -349,7 +381,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       fun.scrollTo({ id: `row-lista_viajes-${this.tablaComponent.getIndex(index_viaje)}`, behavior: 'smooth', block: 'center', inline: 'center' });
     }, 500);
   }
-
 
   // formarDetalle() {
   //   const temp = [];

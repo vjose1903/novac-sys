@@ -41,7 +41,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-      { titulo: 'Nombre', tipo: 'text', key: 'nombreCompleto' },
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre_completo' },
       { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
       { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
       { titulo: 'Role', tipo: 'textList', key: 'roles', key_value: 'nombre' },
@@ -122,7 +122,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       this.listaEmpleados.length = 0;
       this.empleadosClass.getAll(extra).then((res) => {
         res['data'].map((empleado) => {
-          empleado.nombreCompleto = empleado.nombre + ' ' + empleado.apellido;
           const doc = _.find(empleado.documentos_de_identidad, { principal: true });
           empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
 

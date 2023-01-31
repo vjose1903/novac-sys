@@ -419,32 +419,37 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorInput(key, index, value, data) {
-    const newData = fun.duplicarJson(data);
+    const newData = fun.duplicarJson(this.rowsEditing.find((item) => item.id == data.id));
+
     fun.setProperty(newData, key, value);
+
     this.modifyRowsEditing(newData, 'add');
 
     const obj = { data, newData, index, key, value, id_tabla: this.config.id_tabla + this.post_id };
-
     this.handle_table_events('inputChange', obj);
   }
 
   modifyRowsEditing(newData, kind: 'add' | 'remove') {
-    newData = fun.duplicarJson(newData);
-    const row_editing = this.rowsEditing.find((item) => item.id == newData.id);
+    return new Promise<any>((resolve, reject) => {
+      newData = fun.duplicarJson(newData);
+      const row_editing = this.rowsEditing.find((item) => item.id == newData.id);
 
-    const index_editing = this.rowsEditing.findIndex((row_edit) => row_edit.id == row_editing.id);
+      const index_editing = this.rowsEditing.findIndex((row_edit) => row_edit.id == row_editing?.id);
 
-    if (kind == 'add') {
-      if (fun.hasValue(row_editing)) {
-        Object.assign(row_editing, newData);
-      } else {
-        this.rowsEditing.push(newData);
+      if (kind == 'add') {
+        if (fun.hasValue(row_editing)) {
+          Object.assign(row_editing, newData);
+        } else {
+          this.rowsEditing.push(newData);
+        }
       }
-    }
 
-    if (kind == 'remove') {
-      if (fun.hasValue(row_editing) && index_editing != -1) fun.pullAt(this.rowsEditing, index_editing);
-    }
+      if (kind == 'remove') {
+        if (fun.hasValue(row_editing) && index_editing != -1) fun.pullAt(this.rowsEditing, index_editing);
+      }
+
+      resolve(true);
+    });
   }
 
   checkIfRowIsEditing(id) {
@@ -518,36 +523,39 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const is_disable = this.disabledInput(data, objIcon);
 
     if (!is_disable) {
-      if (objIcon.editing_buttons) {
+      if (!objIcon?.editing_buttons || objIcon.key == 'guardar_btn') {
+        this.handle_table_events('clickIcon', obj);
+      } else {
+        if (objIcon?.one_per_row && objIcon.key == 'editar_btn' && this.rowsEditing.length > 1) {
+          fun.toastInfo('Solo se puede editar una fila a la vez', 'AVISO');
+          return;
+        }
+
         if (objIcon.key == 'editar_btn') {
           data.is_editing = true;
-          this.modifyRowsEditing(data, 'add');
+          this.modifyRowsEditing(data, 'add').then(() => this.handle_table_events('clickIcon', obj));
         }
-        if (objIcon.key == 'cancelar_btn') {
-          this.checkIfIsEdited(data);
-        }
-      } else {
-        this.handle_table_events('clickIcon', obj);
+        if (objIcon.key == 'cancelar_btn') this.checkIfIsEdited(data, obj);
       }
     }
 
     e.stopPropagation();
   }
 
-  checkIfIsEdited(data) {
+  checkIfIsEdited(data, obj_click) {
     const row_editing_id = data.id;
     const original_row = this.data.find((item) => item.id == row_editing_id);
     const editing_row = this.rowsEditing.find((item) => item.id == row_editing_id);
 
     if (fun.isEqual(original_row, editing_row)) {
       data.is_editing = false;
-      this.modifyRowsEditing(editing_row, 'remove');
+      this.modifyRowsEditing(editing_row, 'remove').then(() => this.handle_table_events('clickIcon', obj_click));
     } else {
       const texto_modal = `¿Seguro que desea cancelar la edición?, al cancelar los cambios quedarán descartados.`;
 
       const siFunction = (instance) => {
         data.is_editing = false;
-        this.modifyRowsEditing(editing_row, 'remove');
+        this.modifyRowsEditing(editing_row, 'remove').then(() => this.handle_table_events('clickIcon', obj_click));
         new ModalClass().closeModal(instance);
       };
 

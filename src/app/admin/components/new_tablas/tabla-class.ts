@@ -1,7 +1,9 @@
 export interface table_info {
+  id?: string;
   titulo?: string;
   titulo_sm?: string;
   key?: string;
+  dropdown_key?: string;
   tipo?: string;
   tag_severity?: string;
   remplace?: any;
@@ -55,6 +57,7 @@ interface iconsI {
   text_color?: string;
   showCondition?: Array<any>;
   editing_buttons?: boolean;
+  one_per_row?: boolean;
   table_component_function?: Function;
   disable?: Array<iconDisableItem>;
 }
