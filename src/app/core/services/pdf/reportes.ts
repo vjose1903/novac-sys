@@ -17,9 +17,13 @@ import { config_ventas_prod } from './8.5x5.5/configuraciones/reportes/ventas_pr
 import { config_cuentas_pagos } from './8.5x5.5/configuraciones/reportes/cuentas_con_pagos';
 import { config_suplidor_prod } from './8.5x5.5/configuraciones/reportes/suplidor_prod';
 import { config_notas } from './8.5x5.5/configuraciones/reportes/notas';
+import { config_movimientos_vehiculo } from './8.5x5.5/configuraciones/reportes/movimientos_vehiculo';
 
 const configuraciones = {
-  ventas: config_ventas,
+  ventas_diarias: config_ventas.detallado,
+  ventas_rango: config_ventas.detallado,
+  ventas_rango_agrupado: config_ventas.agrupado,
+
   cxc: config_cxc,
   cxc_preventa: config_cxc_preventa,
   ventas_cliente: config_ventas_cliente,
@@ -29,11 +33,15 @@ const configuraciones = {
 
   cxc_ant_agrupado: config_cxc_ant.agrupado,
   inventario: config_inventario,
-  recibos: config_recibos,
-  ventas_prod: config_ventas_prod,
+
+  recibos: config_recibos.detallado,
+  recibos_agrupado: config_recibos.agrupado,
+
+  ventas_productos: config_ventas_prod,
   cuentas_con_pagos: config_cuentas_pagos,
   suplidor_prod: config_suplidor_prod,
   notas: config_notas,
+  movimientos_vehiculo: config_movimientos_vehiculo,
 };
 
 // ==========================================================================================================================================================
@@ -41,7 +49,9 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
+  console.log('data ', data);
   const configuration = configuraciones[data.tipo_reporte];
+  console.log('configuration ', configuration);
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });

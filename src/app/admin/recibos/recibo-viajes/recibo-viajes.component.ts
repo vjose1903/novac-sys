@@ -43,7 +43,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         estilos: [{ width: '7%' }],
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
-          { key: 'make_recipt', rowTooltip: 'make_recipt_tooltip' },
+          { key: 'make_recipt', rowTooltip: 'make_recipt_tooltip', disable: [{ kind: 'has_value', target: 'fecha_completada' }]  },
         ],
       },
     ],
@@ -66,8 +66,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         div_class: 'd-flex justify-content-around',
         estilos: [{ width: '7%' }],
 
+        // TODO: AGREGAR BOTON DE BORRAR MOVIMIENTO
         iconsArray: [
           { key: 'editar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Editar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
+          { key: 'borrar_btn', tooltip: 'Borrar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
           { key: 'cancelar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Cancelar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [true] }] },
           { key: 'guardar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Guardar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [true] }] },
         ],
@@ -204,7 +206,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.pagos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
         viaje.ver = 'far fa-eye';
         viaje.make_recipt = 'fas fa-external-link-alt';
-        viaje.make_recipt_tooltip = 'Realizar recibo de ingreso';
+        viaje.make_recipt_tooltip = fun.hasValue(viaje.fecha_completada) ? 'Pedido completado' : 'Realizar recibo de ingreso';
 
         viaje.customStyles = {
           estado: [
@@ -251,6 +253,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   parseMovimientosViaje(movimiento_viaje) {
     movimiento_viaje.editar_btn = 'fas fa-pencil-alt';
+    movimiento_viaje.borrar_btn = 'far fa-trash-alt';
     movimiento_viaje.cancelar_btn = 'fa-solid fa-x';
     movimiento_viaje.guardar_btn = 'fa-regular fa-floppy-disk';
 
@@ -260,6 +263,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       actions: [
         { key: 'actions', isTd: true, estilos: 'width: 7% !important' },
         { key: 'editar_btn', estilos: 'font-size: 1rem !important' },
+        { key: 'borrar_btn', estilos: 'font-size: 1rem !important' },
         { key: 'cancelar_btn', estilos: 'font-size: 1rem !important' },
         { key: 'guardar_btn', estilos: 'font-size: 1rem !important' },
       ],
@@ -283,11 +287,15 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     }
 
     if (params.id_tabla == 'movimientos_viaje') {
-      this.editMovimientoPedido(params);
+      if (params.iconKey != 'borrar_btn') {
+        this.editMovimientoViaje(params);
+      } else {
+        this.confirmDeleteMovimientoViaje(params);
+      }
     }
   }
 
-  editMovimientoPedido(params) {
+  editMovimientoViaje(params) {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'cancelar_btn') {
         if (`${params.data.id}`.includes('new_')) {
@@ -308,24 +316,60 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         const data_update = fun.pick(this.viaje_selected, ['id']);
 
         data_update['movimientos_viaje'] = new_movimiento_viaje;
-
-        this.facturaClass
-          .updateOne(data_update, { afterPath: `update/movimientos_viaje` })
-          .then((res_factura) => {
-            const viaje_modificado = this.viaje_selected.movimientos_viaje.find((movimiento) => movimiento.id == row_edited.id);
-            const chofer = this.choferes.find((chofer) => chofer.id == row_edited.user_id);
-            const vehiculo = this.camiones.find((camion) => camion.id == row_edited.vehiculo_id);
-
-            viaje_modificado.chofer = fun.duplicarJson(chofer);
-            viaje_modificado.user_id = chofer.id;
-            viaje_modificado.vehiculo = fun.duplicarJson(vehiculo);
-            viaje_modificado.vehiculo_id = vehiculo.id;
-
-            delete viaje_modificado.is_editing;
-          })
-          .catch((error) => {});
+        this.sendUpdateMovimientos(data_update, row_edited);
       }
     }
+  }
+
+  deleteMovimientoViaje(params) {
+    fun.pull(this.viaje_selected.movimientos_viaje, params.data);
+    let data_update = fun.pick(this.viaje_selected, ['id', 'movimientos_viaje']);
+
+    data_update.movimientos_viaje = this.viaje_selected.movimientos_viaje.map((movimiento) => {
+      return { vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id };
+    });
+
+    console.log('data_update ', data_update);
+
+    this.sendUpdateMovimientos(data_update);
+  }
+
+  confirmDeleteMovimientoViaje(params) {
+    let text = `Seguro que desea eliminar el movimiento realizado por: <strong>${params.data.chofer.nombre_completo}</strong>, con el camión: <strong>${params.data.vehiculo.info_vehiculo}</strong>.`;
+    if (fun.isEmpty(params.data.user_id)) text = `Seguro que desea eliminar el movimiento realizado con el camión: <strong>${params.data.vehiculo.info_vehiculo}</strong>.`;
+    if (fun.isEmpty(params.data.vehiculo_id)) text = `Seguro que desea eliminar el movimiento realizado por: <strong>${params.data.chofer.nombre_completo}</strong>.`;
+
+    const obj = {
+      id: 'delete_movimiento_viaje',
+      header: 'Confirmación',
+      texto: text,
+      siFunction: (instance) => {
+        this.deleteMovimientoViaje(params);
+        instance.closeModal(instance.id, 'cancelar');
+      },
+    };
+
+    this.confirmationModal(obj);
+  }
+
+  sendUpdateMovimientos(data_update, row_edited?) {
+    this.facturaClass
+      .updateOne(data_update, { afterPath: `update/movimientos_viaje` })
+      .then((res_factura) => {
+        if (fun.hasValue(row_edited)) {
+          const viaje_modificado = this.viaje_selected.movimientos_viaje.find((movimiento) => movimiento.id == row_edited.id);
+          const chofer = this.choferes.find((chofer) => chofer.id == row_edited.user_id);
+          const vehiculo = this.camiones.find((camion) => camion.id == row_edited.vehiculo_id);
+
+          viaje_modificado.chofer = fun.duplicarJson(chofer);
+          viaje_modificado.user_id = chofer.id;
+          viaje_modificado.vehiculo = fun.duplicarJson(vehiculo);
+          viaje_modificado.vehiculo_id = vehiculo.id;
+
+          delete viaje_modificado.is_editing;
+        }
+      })
+      .catch((error) => {});
   }
 
   redirectToIngresos(factura) {

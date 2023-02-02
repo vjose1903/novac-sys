@@ -1,3 +1,5 @@
+import { VehiculoC } from './../registros/registro-vehiculo/vehiculo';
+import { Validators } from '@angular/forms';
 import { ModalHistorialPagosComponent } from './../components/formularios en modales/modal-historial-pagos/modal-historial-pagos.component';
 import { CrudG } from '../../core/typescript/crud-g';
 import * as _ from 'lodash';
@@ -35,17 +37,35 @@ export class FacturaC extends CrudG<FacturasI> {
     super('cabecera_facturas');
   }
 
+  static inputsMovimientosViaje = [
+    {
+      label: 'Seleccione el camión',
+      formControl: 'vehiculo_id',
+      items: [],
+      bindLabel: 'info_vehiculo',
+      bindValue: 'id',
+      searchFunction: FacturaC.getCamiones,
+      notFoundText: 'Camión no encontrado',
+      disabledFunction: () => false,
+      validators: Validators.required,
+    },
+  ];
+
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
-      params.inputs['switches'] = {
-        title: 'Seleccione los metodos de pago deseados',
-        array: [
-          { label: 'Efectivo', value: true },
-          { label: 'Tarjeta', value: true },
-          { label: 'Cheque', value: true },
-          { label: 'Transferencia', value: false },
-        ],
-      };
+      if (params.tipo != 'movimientos_vehiculo') {
+        params.inputs['switches'] = {
+          title: 'Seleccione los metodos de pago deseados',
+          array: [
+            { label: 'Efectivo', value: true },
+            { label: 'Tarjeta', value: true },
+            { label: 'Cheque', value: true },
+            { label: 'Transferencia', value: false },
+          ],
+        };
+      } else {
+        params.inputs['dinamyc_selections'] = FacturaC.inputsMovimientosViaje;
+      }
 
       ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
 
@@ -57,27 +77,49 @@ export class FacturaC extends CrudG<FacturasI> {
     });
   }
 
+  static async getCamiones(event) {
+    if (fun.hasValue(event.term)) {
+      fun.awaitTyping().then((res) => {
+        const extra = { afterPath: `filtro/${event.term}`, parameters: { paginado: false, info_vehiculo: true } };
+        new VehiculoC().getAll(extra).then((res) => {
+          console.log('res ', res);
+          FacturaC.inputsMovimientosViaje[0].items = res['data'];
+        });
+      });
+    } else {
+      FacturaC.inputsMovimientosViaje[0].items = [];
+    }
+  }
+
   static requestReporte(params: { reporte; pdf }) {
-    if (_.every(params.reporte.data.switches.array, (item) => item.value === false)) {
+    if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switches.array, (item) => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
-      const requestParams = { afterPath: 'custom/ventas', parameters: null };
-      let formas_pago = '(';
+      const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
+      let formas_pago = '';
 
-      params.reporte.data.switches.array.forEach((item) => {
-        if (item.value) formas_pago += `'${item.label}',`;
-      });
+      if (params.pdf.tipo != 'movimientos_vehiculo') {
+        formas_pago = '(';
 
-      formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+        params.reporte.data.switches.array.forEach((item) => {
+          if (item.value) formas_pago += `'${item.label}',`;
+        });
 
-      requestParams.parameters = {
-        tipo_factura_id: params.reporte.data.tipo_factura_id,
-        tipo: params.reporte.data.tipo,
-        condicion: params.reporte.data.condicion,
-        formas_pago: formas_pago,
-        desde: fun.my_dateFormater(params.reporte.data.desde, false),
-        hasta: fun.my_dateFormater(params.reporte.data.hasta, false),
-      };
+        formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+      }
+
+      requestParams.parameters['tipo_factura_id'] = params.reporte.data.tipo_factura_id;
+      requestParams.parameters['tipo'] = params.reporte.data.tipo;
+      requestParams.parameters['condicion'] = params.reporte.data.condicion;
+      requestParams.parameters['desde'] = fun.my_dateFormater(params.reporte.data.desde, false);
+      requestParams.parameters['hasta'] = fun.my_dateFormater(params.reporte.data.hasta, false);
+
+      for (let index = 0; index < FacturaC.inputsMovimientosViaje.length; index++) {
+        const item = FacturaC.inputsMovimientosViaje[index];
+        requestParams.parameters[item.formControl] = params.reporte.data[item.formControl];
+      }
+
+      if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
         let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, height: '76vh', fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };

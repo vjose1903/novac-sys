@@ -469,7 +469,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         if (params.iconKey == 'view') {
           this.notaSelected = params.data;
 
-          this.notasClass.parseDataToPdf(params.data).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', params.data));
+          this.notasClass.parseDataToPdf(params.data).then((data_parsed) => {
+            fun.logGreen('data_parsed', data_parsed);
+
+            this.mostrarFactura(data_parsed, 'nota', params.data);
+          });
         }
       }
     } else if (params.id_tabla == 'facturas_params') {
@@ -499,8 +503,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   deleteRequest(params: { ids: string; tipo: string }) {
-    // tipo
-    console.log('params ', params);
 
     const extra = { afterPath: `custom/delete`, parameters: params };
 

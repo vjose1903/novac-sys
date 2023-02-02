@@ -81,6 +81,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
       let objModal;
       switch (params.tipo) {
         case 'ventas_productos':
+
           ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
           objModal = ReporteC.objReporte;
 

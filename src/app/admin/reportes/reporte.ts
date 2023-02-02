@@ -70,7 +70,7 @@ export class ReporteC extends CrudG<any> {
       objPdfView.openNewModal({
         component: PdfViewerComponent,
         inputs: objPdfView,
-        id: 'revision_recibo',
+        id: 'reporte_view',
         header: objPdfView.titulo,
         width: objPdfView.width ?? '57rem',
         height: objPdfView.height,

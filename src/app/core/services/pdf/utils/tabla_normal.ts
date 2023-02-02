@@ -91,7 +91,7 @@ function getTotalizacion(configuration, data) {
     unbreakable: true,
   };
 
-  if (data.total >= 1) {
+  if ((data.total >= 0 && (data?.contenido_grupo?.length > 0 || data?.contenido_reporte?.length > 0)) || data.total >= 1) {
     const array = [
       { bool: configuration.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.numFormatTwoDecimals(data?.bruto) },
       { bool: configuration.mostrar_bruto, title: 'DEVUELTO RD$ ', value: fun_.numFormatTwoDecimals(data?.devuelto) },

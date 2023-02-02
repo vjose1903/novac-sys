@@ -434,6 +434,8 @@ export class fun {
   // Descripcion : Esta formatea un date
   // _________________________________________________________________________________________________
   static my_dateFormater(str, front = true) {
+    console.log("str ", str);
+
     str = str + '';
     let dateObj = new Date(str);
 
@@ -844,7 +846,7 @@ export class fun {
   // Nombre: pick
   // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
   // _________________________________________________________________________________________________
-  static pick(obj, props) {
+  static pick(obj, props): any {
     const result = {};
 
     for (let index = 0; index < props.length; index++) {

@@ -21,6 +21,7 @@ export class PdfService {
 
   static generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
     return new Promise((resolve, reject) => {
+
       let obj;
       let todo_true = true;
       const data = fun.duplicarJson(params.oPdf.data);
@@ -51,6 +52,7 @@ export class PdfService {
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
             const tipo_pdf = `_${config.plantillas_impresion['nota'].toLowerCase()}`;
+
 
             obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
             break;
