@@ -102,6 +102,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           //
           case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
             this.visible = true;
+            fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, info);
             this.downloadProgression(info.body);
             break;
           //
