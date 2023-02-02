@@ -44,7 +44,7 @@ export default class AppUpdater {
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
-      puts(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
+      puts(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
       this.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, info: info });
 
       const dialogOpts = {
@@ -54,6 +54,10 @@ export default class AppUpdater {
         message: 'Novac System presenta una nueva actualizacion se empezará a descargar ahora.',
         detail: `Version a descargar: ${info.version}`,
       };
+
+      // TODO: hacer que esto sea decidido por el usuario
+      // Iniciar la descarga de la actualización
+      autoUpdater.downloadUpdate();
     });
 
     autoUpdater.on(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, (progress) => {
