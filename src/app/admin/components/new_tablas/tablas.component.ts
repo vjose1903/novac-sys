@@ -403,7 +403,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
-  handleInputsEvents(type, input, column, index_body) {
+  handleInputsEvents(type, input, column, index_body, data) {
     if (fun.objHas(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
       if (column.inputEvents == 'formatoNumero') {
         if (type == 'focus') {
@@ -416,10 +416,15 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }
       }
     }
+
+    const obj = { column, data, index: index_body, id_tabla: this.config.id_tabla + this.post_id };
+    this.handle_table_events('inputBlur', obj);
   }
 
-  changeValorInput(key, index, value, data) {
-    const newData = fun.duplicarJson(this.rowsEditing.find((item) => item.id == data.id));
+  changeValorInput(column, key, index, value, data) {
+    let newData = fun.duplicarJson(this.rowsEditing.find((item) => item.id == data.id));
+
+    if (fun.isEmpty(newData) || this.rowsEditing.length == 0) newData = fun.duplicarJson(data);
 
     fun.setProperty(newData, key, value);
 

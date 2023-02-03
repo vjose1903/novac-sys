@@ -45,6 +45,7 @@ export class FacturaC extends CrudG<FacturasI> {
       bindLabel: 'info_vehiculo',
       bindValue: 'id',
       searchFunction: FacturaC.getCamiones,
+      blurFunction: FacturaC.cleanCamiones,
       notFoundText: 'Camión no encontrado',
       disabledFunction: () => false,
       validators: Validators.required,
@@ -75,6 +76,10 @@ export class FacturaC extends CrudG<FacturasI> {
         FacturaC.requestReporte({ reporte: arg, pdf: params });
       }
     });
+  }
+
+  static async cleanCamiones() {
+    FacturaC.inputsMovimientosViaje[0].items = [];
   }
 
   static async getCamiones(event) {

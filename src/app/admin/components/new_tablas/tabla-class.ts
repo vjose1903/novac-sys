@@ -159,6 +159,10 @@ export class TablaClass {
         this.tableInputChange(event.info);
         break;
 
+      case 'inputBlur':
+        this.tableInputBlur(event.info);
+        break;
+
       default:
         break;
     }
@@ -168,4 +172,5 @@ export class TablaClass {
   tableClickRow(arg) {}
   tableClickIcon(arg) {}
   tableInputChange(arg) {}
+  tableInputBlur(arg) {}
 }

@@ -138,7 +138,7 @@
                           styleClass="form-control min {{ disabledInput(dato, column) ? 'customD' : 'custom' }}"
                           appendTo="body"
                           emptyFilterMessage="valor_buscado_no_se_encuentra"
-                          (onChange)="changeValorInput(column.dropdown_key, getIndex(index_body), dropdown.value, dato)"
+                          (onChange)="changeValorInput(column, column.dropdown_key, getIndex(index_body), dropdown.value, dato)"
                         >
                         </p-dropdown>
                       </div>
@@ -160,11 +160,11 @@
                           type="{{ column.inputType ? column.inputType : 'text' }}"
                           [value]="getValueForm(column, dato)"
                           [disabled]="disabledInput(dato, column)"
-                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(index_body))"
-                          (blur)="checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body))"
-                          (keyup)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
+                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(index_body), dato)"
+                          (blur)="checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)"
+                          (keyup)="changeValorInput(column, column.key, getIndex(index_body), $event.target.value, dato)"
                         />
-                        <!-- (blur)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body))" -->
+                        <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
 
                         <i *ngIf="column.can_reset" pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, dato)"></i>
                       </div>

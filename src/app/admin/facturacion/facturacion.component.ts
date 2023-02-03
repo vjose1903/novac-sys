@@ -993,7 +993,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return fun.hasValue(movimiento_en_turno) ? movimiento_en_turno.user_id == chofer.id : false;
   }
 
-  getIndicadorMovimientoViaje(tipo) {
+  getIndicadorMovimientoViaje(tipo?) {
     let res;
 
     const all_selected = this.movimientosSelected.length > 0 && this.movimientosSelected.every((mov) => fun.hasValue(mov.user_id));
@@ -1216,62 +1216,67 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning(`Total de la ${documento.descripcion} no puede ser 0`, 'Aviso');
           fun.enfocarInput('codigo-0');
         } else {
-          if (
-            this.factServ.tipoDocumento != tipoDocFacturacion.compra &&
-            (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion)
-          ) {
-            const obj = { metodo: this.factServ.tipoDocumento, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
-
-            this.openNewModal({
-              component: ConfirmacionImprimirComponent,
-              inputs: obj,
-              id: 'confirmacionImprimir',
-              header: 'Confirmación',
-              width: '30rem',
-              botones: {
-                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-                dinamico: [
-                  { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
-                ],
-              },
-            });
+          if (this.is_viaje && !this.getIndicadorMovimientoViaje()) {
+            fun.toastWarning(`Debe seleccionar al menos un camión y un chofer para el viaje.`, 'Aviso');
+            document.getElementById('btnCamion').click();
           } else {
-            let articulos_a_cambiar = false;
+            if (
+              this.factServ.tipoDocumento != tipoDocFacturacion.compra &&
+              (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion)
+            ) {
+              const obj = { metodo: this.factServ.tipoDocumento, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
 
-            if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
-              const cuerpo_fact = fun.duplicarJson(this.cuerpoFactura);
-              this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
+              this.openNewModal({
+                component: ConfirmacionImprimirComponent,
+                inputs: obj,
+                id: 'confirmacionImprimir',
+                header: 'Confirmación',
+                width: '30rem',
+                botones: {
+                  ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+                  dinamico: [
+                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
+                  ],
+                },
+              });
+            } else {
+              let articulos_a_cambiar = false;
+
+              if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
+                const cuerpo_fact = fun.duplicarJson(this.cuerpoFactura);
+                this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
+              }
+
+              if (this.articulosAcambiar.length > 0) articulos_a_cambiar = true;
+
+              const obj = {
+                modo_factura: this.modo_factura,
+                condicion_fact: this.condicion_fact,
+                metodo: this.factServ.tipoDocumento,
+                total_factura: this.TOTAL,
+                efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
+                tipo_modal: 'devuelta',
+                formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
+                factura_de: this.factServ.tipoDocumento,
+                cambios_articulos: articulos_a_cambiar,
+              };
+
+              this.openNewModal({
+                component: FormCantidadEfectivoComponent,
+                inputs: obj,
+                id: 'cambioEfectivo',
+                header: 'Cantidad de efectivo',
+                width: '34.375rem',
+                botones: {
+                  ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+                  dinamico: [
+                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+                  ],
+                },
+              });
             }
-
-            if (this.articulosAcambiar.length > 0) articulos_a_cambiar = true;
-
-            const obj = {
-              modo_factura: this.modo_factura,
-              condicion_fact: this.condicion_fact,
-              metodo: this.factServ.tipoDocumento,
-              total_factura: this.TOTAL,
-              efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
-              tipo_modal: 'devuelta',
-              formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
-              factura_de: this.factServ.tipoDocumento,
-              cambios_articulos: articulos_a_cambiar,
-            };
-
-            this.openNewModal({
-              component: FormCantidadEfectivoComponent,
-              inputs: obj,
-              id: 'cambioEfectivo',
-              header: 'Cantidad de efectivo',
-              width: '34.375rem',
-              botones: {
-                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-                dinamico: [
-                  { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
-                ],
-              },
-            });
           }
         }
       }

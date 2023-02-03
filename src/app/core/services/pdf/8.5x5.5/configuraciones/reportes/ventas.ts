@@ -100,7 +100,6 @@ export const config_ventas = {
         style_body: 'letra10',
         key: 'fecha',
         alignment_body: 'left',
-        formato_fecha: true,
       },
       {
         text: 'Ventas al contado',

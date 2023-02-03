@@ -43,7 +43,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         estilos: [{ width: '7%' }],
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
-          { key: 'make_recipt', rowTooltip: 'make_recipt_tooltip', disable: [{ kind: 'has_value', target: 'fecha_completada' }]  },
+          { key: 'make_recipt', rowTooltip: 'make_recipt_tooltip', disable: [{ kind: 'has_value', target: 'fecha_completada' }] },
         ],
       },
     ],

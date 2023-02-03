@@ -161,23 +161,23 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     if (fun.hasValue(params.factura_a_buscar)) parameters['factura_a_buscar'] = params.factura_a_buscar;
 
     const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
-    console.log('res ', res);
 
-    await res.data.facturas.data.map((factura) => {
-      let factura_is_selected = _.find(this.facturasSelected, { id: factura.id });
+    await res.data.facturas.data.map((factura, index) => {
+      let factura_selected = _.find(this.facturasSelected, { id: factura.id });
       if (fun.hasValue(params.factura_a_buscar) && factura.id == params.factura_a_buscar) {
-        factura_is_selected = factura;
-        factura_is_selected.monto = '0.00';
-        factura_is_selected.pagoT = false;
+        factura_selected = factura;
+        factura_selected.monto = '0.00';
+        factura_selected.pagoT = false;
+        this.verificateFacturasSelected(factura_selected, 'insert', index, true);
       }
 
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
       factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
-      factura.select = fun.hasValue(factura_is_selected);
-      factura.pagoT = fun.hasValue(factura_is_selected) ? factura_is_selected.pagoT : false;
+      factura.select = fun.hasValue(factura_selected);
+      factura.pagoT = fun.hasValue(factura_selected) ? factura_selected.pagoT : false;
       factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
       factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
-      factura.monto = fun.hasValue(factura_is_selected) ? factura_is_selected.monto : '0.00';
+      factura.monto = fun.hasValue(factura_selected) ? factura_selected.monto : '0.00';
       const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
 
       factura.tooltip_pedido = 'Modificar datos del pedido';
@@ -228,15 +228,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       if (res.data.page != params.page) {
         this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }], this.tablaComponent);
-        console.log('this.tablaComponent ', this.tablaComponent);
 
         setTimeout(() => {
-          console.log('ANDO AQUIII');
-          console.log('Ss.cdRef ', Ss.cdRef);
-
           Ss.cdRef.detectChanges();
           const actualPagination = this.tServ.getPaginationById('listado_recibos');
-          console.log('actualPagination ', actualPagination);
           Ss.cdRef.detectChanges();
         }, 500);
       }
@@ -251,12 +246,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const cliente_id = this.route.snapshot.params['cliente_id'];
     const factura_id = this.route.snapshot.params['factura_id'];
 
-    console.log('factura_id ==> ', factura_id);
-
     if (cliente_id != '0' && factura_id != '0') {
       const cliente_response = await this.clienteClass.getOne(cliente_id);
       this.getDataFromModal({ data: cliente_response.data, modal_id: 'buscarCliente', factura_a_buscar: factura_id });
-      console.log('----- TERMINE -----');
     } else {
       fun.enfocarInput('clienteI');
     }
@@ -390,6 +382,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   verificateFacturasSelected(factura, method, index, value) {
     const factura_en_turno = _.find(this.facturasSelected, { id: factura.id });
+
     const index_factura_en_turno = _.findIndex(this.facturasSelected, { id: factura.id });
 
     if (method == 'insert') {
@@ -408,6 +401,22 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.sumarTotalRecibo();
   }
 
+  tableInputBlur(params) {
+    const factura_en_turno = this.facturasSelected.find((factura) => factura.id == params.data.id);
+    if (fun.hasValue(factura_en_turno)) {
+      const total = factura_en_turno.balance;
+      const monto = fun.desformatear(factura_en_turno.monto);
+
+      if (monto > total) {
+        this.ExisteMontoMayor = true;
+        fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+        fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+      }
+    } else {
+      fun.desEnfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+    }
+  }
+
   tableInputChange(params) {
     if (params.key == 'pagoT' && params.value) {
       const monto = params.data.select ? fun.numFormatTwoDecimals(params.data.balance) : '0.00';
@@ -416,7 +425,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (params.key == 'monto' && params.value != params.data.monto) {
       if (params.data.select) {
-        if (!params.value) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+        if (fun.isEmpty(params.value)) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
 
         const total = params.data.balance;
         const monto_desformateado = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
@@ -432,7 +441,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.ExisteMontoMayor = false;
         }
 
-        this.verificateFacturasSelected(params.data, 'modify', params.index, monto_original);
+        this.verificateFacturasSelected(params.newData, 'modify', params.index, monto_original);
       }
     }
 
