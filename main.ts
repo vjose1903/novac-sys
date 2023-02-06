@@ -102,6 +102,7 @@ function createWindow() {
 
     win.setMenuBarVisibility(false);
 
+
     // if (serve) {
     //   win.webContents.openDevTools();
 
