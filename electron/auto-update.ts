@@ -29,6 +29,7 @@ export default class AppUpdater {
     this.checkForUpdates(win);
   }
 
+
   async checkUpdates(win) {
     try {
       puts(' . ');
