@@ -47,3 +47,9 @@ export interface PrintJob {
   printer: Printer;
   data: any[];
 }
+
+export default class SharedElectronAngular {
+  static sendEventToAngular(win, params: { event_name: string; info: any }) {
+    if (win) win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
+  }
+}

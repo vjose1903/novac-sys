@@ -120,6 +120,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             break;
           //
           case ELECTRON_EVENT_UPDATE_ERROR:
+            fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, info);
             fun.toastError(info.msg, 'ERRROR');
             this.visible = false;
             break;
