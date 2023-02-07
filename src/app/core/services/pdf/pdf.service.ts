@@ -91,7 +91,6 @@ export class PdfService {
           this.createPdfFromBase64(obj.doc, obj.file, reimprimir, (res) => {
             res['pageOrientation'] = obj.pageOrientation;
             if (params.imprimir) {
-              console.log('res ', res);
               this.imprimirBase64({ base64: res.base64, file: res.file, type: type_oPdf, printer: printer_selected, pageOrientation: res['pageOrientation'] })
                 .then((res_impresion) => resolve(res_impresion))
                 .catch((err_impresion) => reject(err_impresion));

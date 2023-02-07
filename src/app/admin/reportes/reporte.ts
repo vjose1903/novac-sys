@@ -96,7 +96,11 @@ export class ReporteC extends CrudG<any> {
     Ss.loadServ.isLoading.next(true);
     Ss.configServ.getConfig({ isPromise: true }).then((configApp: ConfigI) => {
       objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
-      objPdf['printer'] = configApp.printer_selected.reporte;
+
+      const entidad = objPdf['type'] == 'reporte' ? 'reporte' : 'cuadre_caja';
+      objPdf['printer'] = configApp.printer_selected[entidad];
+
+      console.log('objPdf ', objPdf);
 
       PdfService.imprimirBase64(objPdf)
         .then((res) => {

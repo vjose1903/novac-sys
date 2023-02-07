@@ -25,10 +25,9 @@ export default class AppUpdater {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
 
-    this.checkUpdates(win);
+    // this.checkUpdates(win);
     this.checkForUpdates(win);
   }
-
 
   async checkUpdates(win) {
     try {
@@ -55,7 +54,6 @@ export default class AppUpdater {
         puts(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
       }
     } catch (error) {
-
       puts(error, 'ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
 
       SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_ERROR, info: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
@@ -66,7 +64,7 @@ export default class AppUpdater {
 
   async checkForUpdates(win) {
     autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-agrodemi', token: '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', private: true, autoDownload: false, autoUpdate: true });
-    // autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdatesAndNotify();
 
     puts('-=-=-=-=- handleUpdateEvents -=-=-=-=-');
     SharedElectronAngular.sendEventToAngular(win, { event_name: 'init', info: { msg: '-=-=-=-=- handleUpdateEvents -=-=-=-=-' } });
@@ -86,7 +84,7 @@ export default class AppUpdater {
 
       // TODO: hacer que esto sea decidido por el usuario
       // Iniciar la descarga de la actualización
-      // autoUpdater.downloadUpdate();
+      autoUpdater.downloadUpdate();
 
       SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, info: info });
 
@@ -112,10 +110,13 @@ export default class AppUpdater {
         detail: 'Para que las actualizaciones sean efectivas debe de reiniciar la aplicacion.',
       };
 
-      dialog.showMessageBox(dialogOpts).then((returnValue) => {
-        SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, info: { msg: 'descarga finalizada...', body: returnValue } });
-        if (returnValue.response == 0) autoUpdater.quitAndInstall();
-      });
+      SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, info: { msg: 'descarga finalizada...' } });
+      autoUpdater.quitAndInstall();
+
+      // dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      //   SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, info: { msg: 'descarga finalizada...', body: returnValue } });
+      //   if (returnValue.response == 0) autoUpdater.quitAndInstall();
+      // });
 
       puts(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
     });
