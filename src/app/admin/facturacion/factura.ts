@@ -173,7 +173,6 @@ export class FacturaC extends CrudG<FacturasI> {
 
       const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [
         { old_key: 'tipo_factura', new_key: 'tipo_pdf' },
-
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
 
@@ -183,7 +182,8 @@ export class FacturaC extends CrudG<FacturasI> {
       data_parsed.total = data_parsed.total_factura;
       data_parsed.contenido_reporte = [];
 
-      if (fun.hasValue(data_parsed.cliente) && data_parsed.cliente.nombre.length > 80) data_parsed.cliente.nombre = `${data_parsed.cliente.nombre.substring(0, 80)}...`;
+      if (data_parsed.tipo == 'venta' && fun.hasValue(data_parsed.cliente) && data_parsed.cliente.nombre.length > 80) data_parsed.cliente.nombre = `${data_parsed.cliente.nombre.substring(0, 80)}...`;
+      if (data_parsed.tipo == 'compra' && fun.hasValue(data_parsed.suplidor) && data_parsed.suplidor.nombre.length > 80) data_parsed.suplidor.nombre = `${data_parsed.suplidor.nombre.substring(0, 80)}...`;
 
       data_parsed.detalle_facturas.forEach((detalle) => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {

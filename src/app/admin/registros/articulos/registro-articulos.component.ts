@@ -1,3 +1,4 @@
+import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,6 +14,8 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
+import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -61,9 +64,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     { backend: 'Funda', front: 'Funda' },
   ];
 
-  fechaFactura: string;
   articuloClass = new ArticuloC();
   tipoArticuloClass = new TipoArticuloC();
+  configArticuloClass = new ConfigArticuloC();
+
+  fechaFactura: string;
   permissions = Permisos;
   formPermissions = [Permisos.articulo.create, Permisos.articulo.update];
   hasPermissionUpdateFormula = false;
@@ -86,6 +91,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     botones: { editar: { show: true, permiso: this.permissions.articulo.update }, borrar: { show: true, permiso: this.permissions.articulo.destroy } },
   };
   tablaComponent;
+  cofig_articulos: ConfigArticuloI;
+
   constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
@@ -118,17 +125,20 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.borrar();
   }
 
-  // async filtrarArticulo(e) {
-  //   this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-  //   await this.getArticulos(e);
-  // }
-
   async necesarioStart() {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
     // await this.getArticulos(this.tServ.obj_paginate.default);
     await this.getArticulos({ page: 1, per_page: 20, search: ' ' });
     this.getTipoArticulos();
+    this.getConfiguracionArticulo();
+
     fun.enfocarInput('nombre');
+  }
+
+  getConfiguracionArticulo() {
+    this.configArticuloClass.getOne(1).then((cofig_articulos) => {
+      this.cofig_articulos = cofig_articulos.data;
+    });
   }
 
   getMateriasP() {
@@ -147,6 +157,37 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.tipoArticuloClass.getAll().then((res) => {
       this.listaTipoArticulos = fun.duplicarJson(res.data);
     });
+  }
+
+  openModalConfig() {
+    this.openNewModal({
+      component: ConfigArticulosComponent,
+      inputs: { cofig_articulos: this.cofig_articulos },
+      id: 'cofig_articulos',
+      header: 'Configuraciones de articulos',
+      width: '50rem',
+      botones: {
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [
+          {
+            clase: 'btn btn-blanco mr-2',
+            function: (instance) => this.closeModal(instance),
+            label: 'Cancelar',
+            disable: false,
+          },
+          { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+        ],
+      },
+    });
+  }
+
+  async getDataFromModal(arg, search?) {
+    if (arg.modal_id == 'cofig_articulos') {
+      this.cofig_articulos = arg.data;
+
+      const actualPagination = this.tServ.getPaginationById('lista_articulos');
+      this.getArticulos(actualPagination);
+    }
   }
 
   async getArticulos(params?: { per_page: number; page: number; search: string }) {
@@ -499,9 +540,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const costo = fun.desformatear(formulario.costo_principal);
 
     if (costo > 0 && fun.hasValue(costo)) {
-      const precio = costo / 0.9;
-      const precioLibra = precio / 100;
-      this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(precio));
+      // const precio = costo / 0.9;
+
+      const precio = costo / ((100 - this.cofig_articulos.porciento_ganancia) / 100);
+      const precio_rounded = fun.roundToNearestMultipleOf5(precio);
+      const precioLibra = fun.roundToNearestMultipleOf5(precio_rounded / 100);
+
+      this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(precio_rounded));
       this.form.controls.precio_libra.setValue(fun.numFormatTwoDecimals(precioLibra));
 
       this.calculatePriceLibra();

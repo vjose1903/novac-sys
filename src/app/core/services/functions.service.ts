@@ -260,6 +260,14 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: roundToNearestMultipleOf5
+  // Descripcion : Esta funcion redondea un numero dado al multiplo de 5 mas cercano
+  // _________________________________________________________________________________________________
+
+  static roundToNearestMultipleOf5(number: number): number {
+    return Math.ceil(number / 5) * 5;
+  }
+  // __________________________________________________________________________________________________
   // Nombre: parseFloatTwoDecimals
   // Descripcion : Esta funcion toma un string y lo vuelve entero y lo redondea a 2 decimales
   // _________________________________________________________________________________________________
@@ -434,7 +442,6 @@ export class fun {
   // Descripcion : Esta formatea un date
   // _________________________________________________________________________________________________
   static my_dateFormater(str, front = true) {
-
     str = str + '';
     let dateObj = new Date(str);
 

@@ -1,3 +1,4 @@
+import { BtnIconModule } from './../../components/btn-icon-circular/btn-icon-circular.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -11,10 +12,10 @@ import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 
 @NgModule({
-  declarations: [RegistroArticulosComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule],
+  declarations: [RegistroArticulosComponent, ConfigArticulosComponent],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
 })
-
 export class RegistroArticulosModule {}

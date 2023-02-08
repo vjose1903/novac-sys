@@ -29,6 +29,7 @@ import { fun } from './core/services/functions.service';
 import { MixinClass } from './core/typescript/MixinClass';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from './admin/facturacion/facturacion.service';
+import { ConfigArticuloC } from './admin/registros/articulos/configuracion_articulos/articulos_configuracion';
 import { TiposFacturaC } from './admin/facturacion/factura';
 
 @Component({
@@ -135,28 +136,36 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
 
     window.onresize = (e) => this.resize.bind(this)(e);
-    // this.test();
-  }
-
-  test() {
-    const obj = { nombre: 'victor', edad: 35, direccion: { calle: 'las maras-higuero', apto: 'amarillo' }, estudios: ['colegio inmaculada', 'ucateci'] };
-
-    console.log(`obj ANTES => `, obj);
-
-    const obj2 = fun.duplicarJson(obj);
-    obj2.nombre = 'otro';
-    obj2.direccion.calle = 'el higuero-maras';
-
-    console.log(`obj DESPUES => `, obj);
-    console.log(`obj2 => `, obj2);
   }
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
 
     this.getAppConfig().then((config) => {
-      setTimeout(() => (this.configReady = true), 250);
+      setTimeout(() => {
+        this.configReady = true;
+        setTimeout(() => {
+          this.test();
+        }, 2000);
+      }, 250);
     });
+  }
+
+  async test() {
+    // const obj = { nombre: 'victor', edad: 35, direccion: { calle: 'las maras-higuero', apto: 'amarillo' }, estudios: ['colegio inmaculada', 'ucateci'] };
+
+    // console.log(`obj ANTES => `, obj);
+
+    // const obj2 = fun.duplicarJson(obj);
+    // obj2.nombre = 'otro';
+    // obj2.direccion.calle = 'el higuero-maras';
+
+    // new ConfigArticuloC()
+    //   .updateOne({ id: 1, porciento_ganancia: 15 }, { parameters: { update_articulos: true } })
+    //   .then((res) => {
+    //     console.log('res ---> ', res);
+    //   })
+    //   .catch((err) => console.error(err));
   }
 
   getActualPath() {
