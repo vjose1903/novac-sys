@@ -127,8 +127,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async necesarioStart() {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
-    // await this.getArticulos(this.tServ.obj_paginate.default);
-    await this.getArticulos({ page: 1, per_page: 20, search: ' ' });
+
+    const actualPagination = this.tServ.getPaginationById('lista_articulos') || this.tServ.obj_paginate.default;
+
+    await this.getArticulos(actualPagination);
     this.getTipoArticulos();
     this.getConfiguracionArticulo();
 
@@ -238,7 +240,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(tipo));
     this.modificateValidators();
 
-    if (this.tipoArticuloSelected.codigo === 'materia_prima') {
+    if (this.tipoArticuloSelected.codigo == 'materia_prima') {
       this.form.controls.is_materia_prima.setValue(true);
     } else {
       this.form.controls.is_materia_prima.setValue(this.articuloSelected ? this.articuloSelected.is_materia_prima : false);
@@ -699,17 +701,18 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo));
 
     try {
-      const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
-      const arrayUnidades = Object.keys(unidades);
+      const unidades_minimas = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
+      const arrayUnidades = Object.keys(unidades_minimas);
 
       let costo_en_turno;
       let precio_en_turno;
       let medida_en_turno;
+
       for (const unidad_en_turno of arrayUnidades) {
         if (fun.hasValue(materiaPrima.costos[unidad_en_turno])) {
           costo_en_turno = materiaPrima.costos[unidad_en_turno].costo;
           precio_en_turno = materiaPrima.costos[unidad_en_turno].precio;
-          medida_en_turno = unidades[unidad_en_turno];
+          medida_en_turno = unidades_minimas[unidad_en_turno];
         }
       }
 

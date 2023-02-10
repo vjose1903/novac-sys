@@ -44,8 +44,6 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
   disableBtnConfirm(validate) {
     const modal = this.modal.instance.modalsConfig.find((modal) => modal.id == this.modal.component_id);
     const btn = modal.botones.dinamico.find((boton) => boton.btn_id == 'btnConfirmar');
-    console.log('validate ', validate);
-    console.log('btn ', btn);
 
     btn.disable = validate;
   }

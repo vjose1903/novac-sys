@@ -470,8 +470,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           this.notaSelected = params.data;
 
           this.notasClass.parseDataToPdf(params.data).then((data_parsed) => {
-            fun.logGreen('data_parsed', data_parsed);
-
             this.mostrarFactura(data_parsed, 'nota', params.data);
           });
         }
@@ -503,7 +501,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   deleteRequest(params: { ids: string; tipo: string }) {
-
     const extra = { afterPath: `custom/delete`, parameters: params };
 
     this.facturaClass.dynamic(extra).then((res) => {
