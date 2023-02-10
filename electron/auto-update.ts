@@ -60,6 +60,7 @@ export default class AppUpdater {
 
       puts('FINAL - ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
     }
+
   }
 
   async checkForUpdates(win) {
