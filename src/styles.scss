@@ -10,6 +10,7 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/forms.scss";
 @import "./assets/my_styles/btns.scss";
 @import "./assets/my_styles/overlayPanel.scss";
+@import "./assets/my_styles/inputs.scss";
 @import "./assets/my_styles/height.scss";
 @import "./splash-styles.scss";
 
@@ -61,6 +62,14 @@ html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
 
 .h-96 {
   height: 96% !important;
+}
+
+.w-70 {
+  width: 70% !important;
+}
+
+.w-30 {
+  width: 30% !important;
 }
 
 .dropConfigs {
@@ -345,6 +354,12 @@ body {
 
 .right {
   right: 0 !important;
+}
+
+.c-help {
+  &:hover {
+    cursor: help !important;
+  }
 }
 .c-pointer {
   &:hover {

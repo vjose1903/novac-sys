@@ -54,6 +54,7 @@ export class PdfService {
 
             obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
             break;
+
           case 'facturacion':
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
             const tipo_documento = this.getFacturacionType(data);

@@ -48,8 +48,24 @@ export class fun {
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
 
-  static duplicarJson(json: Object | Array<any>) {
-    return _.cloneDeep(json);
+  static duplicarJson(obj: Object | Array<any>) {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+    let copy;
+    if (Array.isArray(obj)) {
+      copy = [...obj];
+    } else {
+      copy = Object.create(Object.getPrototypeOf(obj));
+    }
+    Object.getOwnPropertyNames(obj).forEach(function (key) {
+      let descriptor = Object.getOwnPropertyDescriptor(obj, key);
+      if (descriptor.value && typeof descriptor.value === 'object') {
+        descriptor.value = fun.duplicarJson(descriptor.value);
+      }
+      Object.defineProperty(copy, key, descriptor);
+    });
+    return copy;
   }
 
   static my_filter_data(copyData, searchText, targets) {
@@ -76,7 +92,7 @@ export class fun {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
-          const is_include = _.some(array_picked, (value: any) => value.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
+          const is_include = array_picked.some((value: any) => value.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
 
           return is_include;
         });
@@ -105,17 +121,6 @@ export class fun {
       }
     }
     return res;
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: pushAt
-  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
-  // _________________________________________________________________________________________________
-  static pushAt(arr, index, newItem) {
-    const copyArr = this.duplicarJson(arr);
-    arr.length = 0;
-    const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
-    newArr.forEach((item) => arr.push(item));
   }
 
   // __________________________________________________________________________________________________
@@ -191,6 +196,7 @@ export class fun {
       return x1 + x2;
     }
   }
+
   // __________________________________________________________________________________________________
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
@@ -253,6 +259,14 @@ export class fun {
     }
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: roundToNearestMultipleOf5
+  // Descripcion : Esta funcion redondea un numero dado al multiplo de 5 mas cercano
+  // _________________________________________________________________________________________________
+
+  static roundToNearestMultipleOf5(number: number): number {
+    return Math.ceil(number / 5) * 5;
+  }
   // __________________________________________________________________________________________________
   // Nombre: parseFloatTwoDecimals
   // Descripcion : Esta funcion toma un string y lo vuelve entero y lo redondea a 2 decimales
@@ -502,11 +516,11 @@ export class fun {
       // es null o indefinido
       value == null ||
       // si tiene longitud 0
-      (value.hasOwnProperty('length') && value.length === 0) ||
+      (value.hasOwnProperty('length') && value.length == 0) ||
       // si es un string vacio o con lleno de espacios
-      (typeof value === 'string' && value.trim().length === 0) ||
+      (typeof value == 'string' && value.trim().length == 0) ||
       // si es un objeto y no tiene propiedades
-      (value.constructor === Object && Object.keys(value).length === 0)
+      (value.constructor == Object && Object.keys(value).length == 0)
     );
   }
 
@@ -610,6 +624,16 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: keyboardEvent
+  // Descripcion : Esta funcion simula un evento de teclado
+  // __________________________________________________________________________________________________
+  static keyboardEvent(element: any, event: 'keyup' | 'keydown', keysArray: Array<string>): any {
+    keysArray.forEach((key) => {
+      element.dispatchEvent(new KeyboardEvent(event, { key: key }));
+    });
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: getKeyByValue
   // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
   // __________________________________________________________________________________________________
@@ -617,6 +641,18 @@ export class fun {
     return Object.keys(object).find((key) => object[key] == value);
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: createNestedObject
+  // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
+  // __________________________________________________________________________________________________
+  static createNestedObject(base, names, value?) {
+    var lastName = arguments.length == 3 ? names.pop() : false;
+    for (var i = 0; i < names.length; i++) {
+      base = base[names[i]] = base[names[i]] || {};
+    }
+    if (lastName) base = base[lastName] = value;
+    return base;
+  }
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
@@ -734,5 +770,201 @@ export class fun {
 
   static toastWarning(msg?, titulo = 'AVISO') {
     if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '');
+  }
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // LODASH
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  // __________________________________________________________________________________________________
+  // Nombre: pushAt
+  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
+  // _________________________________________________________________________________________________
+  static pushAt(arr, index, newItem) {
+    const copyArr = fun.duplicarJson(arr);
+    arr.length = 0;
+    const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
+    newArr.forEach((item) => arr.push(item));
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: pull
+  // Descripcion : Esta funcion remueve un item  de un arreglo
+  // _________________________________________________________________________________________________
+  static pull(array, item_remove) {
+    console.log('item_remove ', item_remove);
+    console.log('array ', array);
+
+    const index = array.findIndex((item) => fun.isEqual(item, item_remove));
+    array.splice(index, 1);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: pullAt
+  // Descripcion : Esta funcion remueve un item en un indice especificado de un arreglo
+  // _________________________________________________________________________________________________
+  static pullAt(array, index) {
+    array.splice(index, 1);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: objHas
+  // Descripcion : Esta funcion retorna un valor booleano si el objeto evaluado contiene todas las propiedades evaluadas
+  // _________________________________________________________________________________________________
+
+  static objHas(obj, props) {
+    let result = true;
+    const props_split = props.split('.');
+
+    for (let index = 0; index < props_split.length; index++) {
+      const current_prop = props_split[index];
+      const current_object = fun.getCurrentObjLevel(obj, props_split, index);
+
+      if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(current_prop);
+      else result = false;
+
+      if (result == false) break;
+    }
+
+    return result;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: getProperty
+  // Descripcion : Esta funcion retorna el valor de una propiedad de un objeto
+  // _________________________________________________________________________________________________
+  static getProperty(obj, prop) {
+    const props_split = prop.split('.');
+    return props_split.reduce((objeto, property) => (typeof objeto == 'undefined' || objeto === null ? objeto : objeto[property]), obj);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setProperty
+  // Descripcion : Esta funcion setea una propiedad a un objeto
+  // _________________________________________________________________________________________________
+  static setProperty(obj, prop, valor) {
+    const props_split = prop.split('.');
+
+    fun.createNestedObject(obj, [...props_split], valor);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: pick
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
+  // _________________________________________________________________________________________________
+  static pick(obj, props): any {
+    const result = {};
+
+    for (let index = 0; index < props.length; index++) {
+      const prop = props[index];
+      const props_split = prop.split('.');
+
+      if (fun.hasValue(fun.getProperty(obj, prop))) {
+        fun.createNestedObject(result, [...props_split], fun.getProperty(obj, prop));
+      }
+    }
+    return result;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: omit
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades omitidas
+  // _________________________________________________________________________________________________
+  static omit(obj, props) {
+    for (let index = 0; index < props.length; index++) {
+      const prop = props[index];
+
+      if (fun.hasValue(fun.getProperty(obj, prop))) {
+        const props_split = prop.split('.');
+        let current_object = obj;
+
+        for (let innerIndex = 0; innerIndex < props_split.length; innerIndex++) {
+          const currentProp = props_split[innerIndex];
+
+          current_object = fun.getCurrentObjLevel(obj, props_split, innerIndex);
+
+          if (innerIndex == props_split.length - 1) delete current_object[currentProp];
+        }
+      }
+    }
+
+    return obj;
+  }
+
+  static getCurrentObjLevel(mainObj, props_split, actualIndex, deepLevel = 0) {
+    let obj_en_turno = mainObj;
+
+    if (fun.hasValue(mainObj) && actualIndex > 0 && deepLevel < actualIndex) {
+      const nextLevel = mainObj[props_split[deepLevel]];
+      deepLevel += 1;
+      obj_en_turno = fun.getCurrentObjLevel(nextLevel, props_split, actualIndex, deepLevel);
+    }
+
+    return obj_en_turno;
+  }
+
+  toString = Object.prototype.toString;
+
+  static createMap() {
+    return Object.create(null);
+  }
+  static isWindow(obj) {
+    return obj && obj.window === obj;
+  }
+  static isScope(obj) {
+    return obj && obj.$evalAsync && obj.$watch;
+  }
+  static isRegExp(value) {
+    return toString.call(value) === '[object RegExp]';
+  }
+  static simpleCompare(a, b) {
+    return a === b || (a !== a && b !== b);
+  }
+  static isDate(value) {
+    return toString.call(value) === '[object Date]';
+  }
+  static isArray(arr) {
+    return Array.isArray(arr) || arr instanceof Array;
+  }
+
+  static isEqual(obj1, obj2) {
+    if (obj1 === obj2) return true;
+    if (obj1 === null || obj2 === null) return false;
+    if (obj1 !== obj1 && obj2 !== obj2) return true; // NaN === NaN
+
+    let length, key, keySet;
+
+    if (typeof obj1 === typeof obj2 && typeof obj1 === 'object') {
+      if (fun.isArray(obj1)) {
+        if (!fun.isArray(obj2)) return false;
+
+        if ((length = obj1.length) === obj2.length) {
+          for (key = 0; key < length; key++) {
+            if (!fun.isEqual(obj1[key], obj2[key])) return false;
+          }
+
+          return true;
+        }
+      } else if (fun.isDate(obj1)) {
+        if (!fun.isDate(obj2)) return false;
+        return fun.simpleCompare(obj1.getTime(), obj2.getTime());
+      } else if (fun.isRegExp(obj1)) {
+        if (!fun.isRegExp(obj2)) return false;
+        return obj1.toString() === obj2.toString();
+      } else {
+        if (fun.isScope(obj1) || fun.isScope(obj2) || fun.isWindow(obj1) || fun.isWindow(obj2) || fun.isArray(obj2) || fun.isDate(obj2) || fun.isRegExp(obj2)) return false;
+        keySet = fun.createMap();
+        for (key in obj1) {
+          if (key.charAt(0) === '$' || fun.isFunction(obj1[key])) continue;
+          if (!fun.isEqual(obj1[key], obj2[key])) return false;
+          keySet[key] = true;
+        }
+        for (key in obj2) {
+          if (!(key in keySet) && key.charAt(0) !== '$' && fun.hasValue(obj2[key]) && !fun.isFunction(obj2[key])) return false;
+        }
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -12,9 +12,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { DirectivesModule } from '../../core/directive/directives.module';
 import { DetalleFacturaModule } from '../manipular facturas/detalle-factura/detalle-factura.module';
+import { BtnIconModule } from './../components/btn-icon-circular/btn-icon-circular.module';
 
 @NgModule({
   declarations: [IngresosComponent, ListaRecibosComponent, ReciboViajesComponent],
-  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule],
+  imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtnIconModule],
 })
 export class RecibosModule {}

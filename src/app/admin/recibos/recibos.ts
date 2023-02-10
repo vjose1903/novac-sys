@@ -20,8 +20,8 @@ export interface ReciboI {
   cliente?: any;
   user?: any;
   detalle_recibos?: any;
-  camiones_viajes?: any;
-  choferes_viajes?: any;
+  // camiones_viajes?: any;
+  // choferes_viajes?: any;
   total_registros?: any;
   data?: any;
 }
@@ -64,7 +64,12 @@ export class ReciboC extends CrudG<ReciboI> {
   static requestReporte(reporteParams, pdfParams) {
     let requestParameters;
 
-    requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), tipo_recibo: reporteParams.data.tipo, order: 'ASC' };
+    requestParameters = {};
+
+    requestParameters['desde'] = fun.my_dateFormater(reporteParams.data.desde, false);
+    requestParameters['hasta'] = fun.my_dateFormater(reporteParams.data.hasta, false);
+    requestParameters['order'] = 'ASC';
+    requestParameters['tipo'] = reporteParams.data.tipo;
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
@@ -95,8 +100,6 @@ export class ReciboC extends CrudG<ReciboI> {
         detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
         detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
         detalle['fecha'] = `${_.split(detalle.descripcion, ' ')[2]} ${_.split(detalle.descripcion, ' ')[3]}`;
-        
-
       });
 
       resolve(data_parsed);

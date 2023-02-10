@@ -1,6 +1,4 @@
-import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
-import { GLOBAL } from '../../../../core/typescript/GLOBAL';
-import * as _ from 'lodash';
+import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
@@ -120,7 +118,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const efectivo = fun.desformatear(this.efectivo);
     const obj = { dinero: efectivo, devuelta: this.devuelta ? devuelta_ : 0, forma_pago: this.formaPago, decision_cambio: this.cambiar_articulos === 'si' ? true : false };
 
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
 
     if (this.factura_de == 'compra') {
@@ -157,8 +155,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   disableBtnConfirm(validate) {
-    const modal = _.find(this.modal.instance.modalsConfig, { id: this.modal.component_id });
-    const btn = _.find(modal.botones.dinamico, { btn_id: 'btnConfirmar' });
+    const modal = this.modal.instance.modalsConfig.find((modal) => modal.id == this.modal.component_id);
+    const btn = modal.botones.dinamico.find((boton) => boton.btn_id == 'btnConfirmar');
 
     btn.disable = validate;
   }

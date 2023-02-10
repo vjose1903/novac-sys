@@ -1,6 +1,8 @@
 <div class="row rowResgitro">
-  <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita mb-0">Registro de articulos</h4>
+  <div class="col-12 p-0 colTitulo d-flex">
+    <h4 class="negrita mb-0 mr-3">Registro de articulos</h4>
+    <btn-icon-circular [id]="'btnConfiguracionArticulo'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" [tooltip]="'Configuraciones de articulos'" [tooltipPosition]="'right'" (clickFunction)="openModalConfig()">
+    </btn-icon-circular>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">

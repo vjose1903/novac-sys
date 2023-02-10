@@ -279,24 +279,24 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     try {
       this.facturas.length = 0;
 
-      const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected } ;
-      const res  = await this.facturaClass.getFacturasByParams(args) ;
+      const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected };
+      const res = await this.facturaClass.getFacturasByParams(args);
 
-      res['data'].forEach( (fact) => {
+      res['data'].forEach((fact) => {
         const pago_a_tiempo = this.getIsPagoAtiempo(fact);
-        const estatus       = this.getIsActiveInfo(fact);
+        const estatus = this.getIsActiveInfo(fact);
 
-        fact.secuencia         = _.padStart(fact.numero_factura, 8, '0');
-        fact.fechaV            = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
-        fact.colorFechaV       = pago_a_tiempo ? 'black' : 'red';
-        fact.is_active         = estatus.icon;
+        fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
+        fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
+        fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
+        fact.is_active = estatus.icon;
         fact.is_active_tooltip = estatus.tooltip;
-        fact.is_active_color   = estatus.color;
-        fact.monto             = fun.numFormatTwoDecimals(fact.balance);
-        fact.viewColor         = 'gris-claro';
-        fact.view              = 'far fa-eye-slash';
-        fact.delete            = 'far fa-trash-alt';
-        fact.make_bill         = 'fas fa-external-link-alt';
+        fact.is_active_color = estatus.color;
+        fact.monto = fun.numFormatTwoDecimals(fact.balance);
+        fact.viewColor = 'gris-claro';
+        fact.view = 'far fa-eye-slash';
+        fact.delete = 'far fa-trash-alt';
+        fact.make_bill = 'fas fa-external-link-alt';
 
         fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
 
@@ -469,7 +469,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         if (params.iconKey == 'view') {
           this.notaSelected = params.data;
 
-          this.notasClass.parseDataToPdf(params.data).then((data_parsed) => this.mostrarFactura(data_parsed, 'nota', params.data));
+          this.notasClass.parseDataToPdf(params.data).then((data_parsed) => {
+            this.mostrarFactura(data_parsed, 'nota', params.data);
+          });
         }
       }
     } else if (params.id_tabla == 'facturas_params') {
@@ -499,8 +501,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   deleteRequest(params: { ids: string; tipo: string }) {
-    // tipo
-    const extra = { afterPath: `custom/delete/${params.ids}`, parameters: { tipo: params.tipo } };
+    const extra = { afterPath: `custom/delete`, parameters: params };
 
     this.facturaClass.dynamic(extra).then((res) => {
       const info = {
@@ -597,7 +598,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   editarFactura() {
-    this.facturaClass.getAll({ afterPath: `custom/canUpdate/${this.facturaSelected.id}` }).then((res) => {
+    this.facturaClass.getAll({ afterPath: `custom/can_update`, parameters: { id: this.facturaSelected.id } }).then((res) => {
       setTimeout(() => this.router.navigateByUrl(`/admin/factura/${this.facturaSelected.tipo}/update/${this.facturaSelected.id}`), 10);
     });
   }
@@ -616,7 +617,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
 
     if (this.noExistenComprobantes == false) {
-      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${JSON.stringify(idFactSelect ? [idFactSelect] : this.idsFacturasSeleccionadas)}`;
+      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${idFactSelect ?? this.idsFacturasSeleccionadas.join(',')}`;
       this.router.navigateByUrl(url);
     }
   }
@@ -700,7 +701,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             disable: false,
           };
 
-
           if (dataFactura.estado) obj_modal.botones.dinamico.push(rePrintButton);
           if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(editButton);
         }
@@ -734,7 +734,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.openNewModal(configModal);
   }
 
-  getDataFromModal(arg, search) {
+  getDataFromModal(arg, search?) {
     if (arg.modal_id == 'buscarClienteOsuplidor') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('valorI');

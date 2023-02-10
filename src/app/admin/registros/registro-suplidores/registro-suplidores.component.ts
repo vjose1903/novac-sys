@@ -49,7 +49,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     id_tabla: 'lista_suplidores',
     padre_functions: { data_request: (params) => this.getSuplidores(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy } },
   };
   tablaComponent;
@@ -188,7 +188,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-        if (this.editando && _.some(this.documentos_de_identidad, (doc) => doc.documento === documento)) {
+        if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === documento)) {
           enable_campos = true;
           return;
         }
@@ -334,7 +334,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     ];
 
     documentos_identidad.map((element) => {
-      const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
+      const doc_backend = _.find(this.documentos_de_identidad, (doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;
       return element;

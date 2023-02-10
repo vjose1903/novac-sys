@@ -52,7 +52,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_clientes',
     padre_functions: { data_request: (params) => this.getClientes(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
   };
   tablaComponent;
@@ -117,7 +117,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   getVendedores() {
-    const extra = { parameters: { id: true, nombreCompleto: true, filter_key: 'role', filter_value: 'V' } };
+    const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'vendedor' } };
     this.empleadosClass.getAll(extra).then((res) => (this.vendedores = res['data']));
   }
 
@@ -207,7 +207,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-        if (this.editando && _.some(this.documentos_de_identidad, (doc) => doc.documento === documento)) {
+        if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === documento)) {
           enable_campos = true;
           return;
         }
@@ -308,7 +308,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     ];
 
     documentos_identidad.map((element) => {
-      const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
+      const doc_backend = _.find(this.documentos_de_identidad, (doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
 
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;

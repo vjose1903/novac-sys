@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/indent */
-import { getTablaNormal } from './tabla_normal';
+import { getContentWithTablaNormal } from './tabla_normal';
 
 export function getContentWithTablaAgrupada(configuracion, data) {
   const content = [];
@@ -11,7 +11,7 @@ export function getContentWithTablaAgrupada(configuracion, data) {
     for (let index_info = 0; index_info < configuracion.info.length; index_info++) {
       const config = configuracion.info[index_info];
 
-      const tabla = getTablaNormal(config, data, index_contenido, index_info);
+      const tabla = getContentWithTablaNormal(config, data, index_contenido, index_info);
 
       cont_.push(tabla);
     }
@@ -33,16 +33,7 @@ function getRaya(configuracion) {
   return {
     stack: [
       {
-        canvas: [
-          {
-            type: 'rect',
-            x: 0,
-            y: 0,
-            w: pageO === 'portrait' ? 575 : 823,
-            h: 2,
-            color: '#000000',
-          },
-        ],
+        canvas: [{ type: 'rect', x: 0, y: 0, w: pageO == 'portrait' ? 587 : 823, h: 2, color: '#000000' }],
       },
     ],
   };

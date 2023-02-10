@@ -1,9 +1,9 @@
 export const config_notas = {
   margin_general: [0, 0, 0, 0],
-  isBreak: true,
+  isBreak: false,
   only_titulo: false,
-  break: 40,
   widths: [24, 60, 'auto', 73, 73, '*'],
+  mensaje_contenido_vacio: 'No se han realizado notas en el rango de fechas establecido.',
   info: [
     {
       text: '#',

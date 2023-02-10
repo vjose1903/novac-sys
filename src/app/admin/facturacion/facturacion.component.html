@@ -11,7 +11,7 @@
 
       <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs" (onHide)="cerrarOverlay()">
         <ng-template pTemplate>
-          <div id="overlayExtra" class="containCamiones">
+          <div id="overlayExtra">
             <ul class="overlayExtra" role="menu">
               <ng-container *ngFor="let option of optionesExtra; let index_option = index">
                 <li *ngIf="option.condition()" id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
@@ -132,7 +132,6 @@
                   placeholder="mm/dd/aaaa"
                   class="form-control inputE"
                   [(ngModel)]="fecha_viaje"
-                  (ngModelChange)="prueba()"
                   #dp="bsDatepicker"
                   placement="bottom"
                   bsDatepicker
@@ -147,45 +146,89 @@
                     [size]="'size-lg'"
                     [tooltip]="'Seleccionar camión'"
                     [tooltipPosition]="'top'"
-                    (clickFunction)="openOverlay($event, overlayCamion, 'camion')"
+                    (clickFunction)="openOverlay($event, overlayMovimientoViaje, 'movimiento')"
                   >
                   </btn-icon-circular>
-
-                  <div class="indicadorCamion" [ngClass]="{ no_selected: !camionesSelected.length, selected: camionesSelected.length }">
-                    <i class="fa-solid" [ngClass]="{ 'fa-x': !camionesSelected.length, 'fa-check': camionesSelected.length }"></i>
+                  <div class="indicadorCamion {{ getIndicadorMovimientoViaje('color') }}">
+                    <i class="fa-solid {{ getIndicadorMovimientoViaje('icon') }}"></i>
                   </div>
                 </div>
               </div>
-              <p-overlayPanel [dismissable]="false" [showCloseIcon]="camionesSelected.length > 0" #overlayCamion styleClass="dropConfigs" (onHide)="cerrarOverlay()">
+              <p-overlayPanel [dismissable]="false" [showCloseIcon]="getIndicadorMovimientoViaje('close_icon')" #overlayMovimientoViaje styleClass="dropConfigs" (onHide)="cerrarOverlay()">
                 <ng-template pTemplate>
-                  <div id="overlayCamion" class="containCamiones">
-                    <div class="filterOverlay">
-                      <input
-                        id="searchCamion"
-                        class="search-input form-control"
-                        [filterTarget]="filterCamionesTargets"
-                        [DataFilter]="copyCamiones"
-                        (onFilter)="filterCamion($event)"
-                        (blur)="checkCamionSeleccionado()"
-                        (keydown.enter)="seleccionarCamion()"
-                      />
-                      <i class="fa-solid fa-magnifying-glass"></i>
+                  <div id="overlayMovimientoViaje" class="containMovimientoViaje">
+                    <div class="camionSelector pr-2">
+                      <span class="mb-2 titulos"><strong>Camion: </strong></span>
+                      <div class="filterOverlay">
+                        <input
+                          id="searchCamion"
+                          class="search-input form-control"
+                          [filterTarget]="filterCamionesTargets"
+                          [DataFilter]="copyCamiones"
+                          (onFilter)="filterMovimiento('camion', $event)"
+                          (blur)="checkMovimientoIsCompleted()"
+                          (focus)="moverFocoMovimientoViaje('camion')"
+                          (keydown.enter)="seleccionarCamion(null, camion_row)"
+                        />
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                      </div>
+                      <ul class="ulMovimientoViaje" role="menu">
+                        <li
+                          id="ulCamion-{{ index_camion }}"
+                          *ngFor="let camion of camiones; let index_camion = index"
+                          role="menuitem"
+                          class="hoverlable"
+                          [ngClass]="{ indicador: camion_row == index_camion && entidad_en_turno == 'camion', selected: camion_row == index_camion && entidad_en_turno == 'chofer' }"
+                        >
+                          <div class="d-flex justify-content-between align-items-center">
+                            <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' mr-1 c-help'"></i>
+
+                            <span id="dropdown-item" class="mb-0"> {{ getCamionInfo(camion, 'label') }} </span>
+                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
+                          </div>
+                        </li>
+
+                        <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
+                          <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
+                        </li>
+                      </ul>
                     </div>
+                    <div class="choferSelector rayaLeft pl-2">
+                      <div class="overlayChofer {{ checkCamionIsSelected(null) ? 'd-none' : 'show' }}">
+                        <span class="label"> Seleccione primero el camión </span>
+                      </div>
 
-                    <ul class="overlayCamion" role="menu">
-                      <li id="overlayCamion-{{ index_camion }}" *ngFor="let camion of camiones; let index_camion = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion }">
-                        <div class="d-flex justify-content-between align-items-center">
-                          <span id="dropdown-item" class="mr-3 mb-0">
-                            {{ getCamionLabel(camion) }}
-                          </span>
-                          <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion)" [checked]="checkCamionIsSelected(camion)" />
-                        </div>
-                      </li>
+                      <span class="mb-2 titulos"><strong>Chofer: </strong></span>
 
-                      <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
-                        <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
-                      </li>
-                    </ul>
+                      <div class="filterOverlay">
+                        <input
+                          id="searchChofer"
+                          class="search-input form-control"
+                          [filterTarget]="filterChoferesTargets"
+                          [DataFilter]="copyChoferes"
+                          (onFilter)="filterMovimiento('chofer', $event)"
+                          (blur)="checkMovimientoIsCompleted()"
+                          (focus)="moverFocoMovimientoViaje('chofer')"
+                          (keydown.enter)="seleccionarChofer(null, chofer_row)"
+                        />
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                      </div>
+
+                      <ul class="ulMovimientoViaje" role="menu">
+                        <li id="ulChofer-{{ index_chofer }}" *ngFor="let chofer of choferes; let index_chofer = index" role="menuitem" class="hoverlable" [ngClass]="{ indicador: chofer_row == index_chofer && entidad_en_turno == 'chofer' }">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <span id="dropdown-item" class="mb-0">
+                              {{ chofer.nombre_completo }}
+                            </span>
+                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarChofer(chofer, index_chofer)" [checked]="checkChoferIsSelected(chofer)" />
+                          </div>
+                        </li>
+
+                        <li *ngIf="camiones.length == 0" role="menuitem" class="hoverlable">
+                          <span id="dropdown-item"> No existen choferes con las especificaciones introducidas. </span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </ng-template>
               </p-overlayPanel>
@@ -211,8 +254,8 @@
                   #fecha_vencimiento_input
                   id="fecha_vencimiento"
                   type="text"
-                  (keydown.enter)="saltar('fecha_vencimiento', fecha_vencimiento_input.value)"
                   [bsConfig]="dpConfig"
+                  (keydown.enter)="$event.target.blur()"
                   placeholder="mm/dd/aaaa"
                   class="form-control inputE"
                   [(ngModel)]="fecha_vencimiento"
@@ -220,6 +263,7 @@
                   placement="bottom"
                   bsDatepicker
                   tabindex="-1"
+                  (blur)="checkCambiosModoyCondicionFactura($event.target)"
                 />
               </div>
             </div>

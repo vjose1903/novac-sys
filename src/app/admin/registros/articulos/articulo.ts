@@ -63,8 +63,8 @@ export class ArticuloC extends CrudG<ArticuloI> {
       extra['parameters'] = {
         page: arg.page || 1,
         per_page: arg.per_page || 20,
-        paginado: _.has(arg, 'paginado') ? arg.paginado : true,
-        is_compra: _.has(arg, 'is_compra') ? arg.is_compra : false,
+        paginado: fun.objHas(arg, 'paginado') ? arg.paginado : true,
+        is_compra: fun.objHas(arg, 'is_compra') ? arg.is_compra : false,
         tipo: arg.tipo || 'todos',
         fecha: arg.fecha,
         ...arg.parameters,
@@ -81,6 +81,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
       let objModal;
       switch (params.tipo) {
         case 'ventas_productos':
+
           ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
           objModal = ReporteC.objReporte;
 

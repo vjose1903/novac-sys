@@ -34,7 +34,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     id_tabla: 'lista_inventario',
     padre_functions: { data_request: (params) => this.getArticulos(params), handleBtnsDinamic: (params) => this.movimientoInventario(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { dinamico: [{ show: true, icon: 'fas fa-dolly', permiso: this.permissions.movimiento_inventario.create, name: 'movimiento_inventario', tooltip: 'Movimientos de inventario' }] },
   };
 
@@ -118,15 +118,17 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     const actualPagination = this.tServ.getPaginationById('lista_inventario');
     actualPagination['search'] = this.palabra_buscar;
 
+    console.log('this.filtro ', this.filtro);
+
     if (this.filtro != 'todos') {
       if (fun.isEmpty(actualPagination['ant_page'])) {
-        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: actualPagination.page }]);
-        this.tServ.modifyPaginationById('lista_inventario', [{ page: 1 }]);
+        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: actualPagination.page }], this.tablaComponent);
+        this.tServ.modifyPaginationById('lista_inventario', [{ page: 1 }], this.tablaComponent);
       }
     } else {
       if (fun.hasValue(actualPagination['ant_page'])) {
-        this.tServ.modifyPaginationById('lista_inventario', [{ page: actualPagination['ant_page'] }]);
-        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: null }]);
+        this.tServ.modifyPaginationById('lista_inventario', [{ page: actualPagination['ant_page'] }], this.tablaComponent);
+        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: null }], this.tablaComponent);
       }
     }
 
@@ -157,7 +159,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     }
   }
 
-  async getDataFromModal(arg, search) {
+  async getDataFromModal(arg, search?) {
     if (arg.modal_id === 'inventario') {
       const actualPagination = this.tServ.getPaginationById('lista_inventario');
       actualPagination['search'] = this.palabra_buscar;

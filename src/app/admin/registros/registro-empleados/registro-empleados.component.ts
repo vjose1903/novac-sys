@@ -41,7 +41,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-      { titulo: 'Nombre', tipo: 'text', key: 'nombreCompleto' },
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre_completo' },
       { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
       { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
       { titulo: 'Role', tipo: 'textList', key: 'roles', key_value: 'nombre' },
@@ -52,7 +52,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     id_tabla: 'lista_empleados',
     padre_functions: { data_request: (params) => this.getEmpleados(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.user.update }, borrar: { show: true, permiso: this.permissions.user.destroy } },
   };
   tablaComponent;
@@ -122,7 +122,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       this.listaEmpleados.length = 0;
       this.empleadosClass.getAll(extra).then((res) => {
         res['data'].map((empleado) => {
-          empleado.nombreCompleto = empleado.nombre + ' ' + empleado.apellido;
           const doc = _.find(empleado.documentos_de_identidad, { principal: true });
           empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
 
@@ -155,7 +154,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-        if (this.editando && _.some(this.documentos_de_identidad, (doc) => doc.documento === cedula)) {
+        if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === cedula)) {
           enable_campos = true;
           return;
         }
@@ -176,7 +175,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
               const documento_persona = _.find(persona.documentos_de_identidad, (item) => item.principal);
 
               if (fun.hasValue(documento_persona)) this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
-
 
               persona.id = id_anterior;
               this.form.patchValue(persona);
@@ -321,7 +319,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     documentos_identidad.map((element) => {
       // haciendo la estructura para mandar los documentos a la base de datos
-      const doc_backend = _.find(this.documentos_de_identidad, (doc) => _.lowerCase(doc.descripcion) === _.lowerCase(element.descripcion));
+      const doc_backend = _.find(this.documentos_de_identidad, (doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = true;
       return element;

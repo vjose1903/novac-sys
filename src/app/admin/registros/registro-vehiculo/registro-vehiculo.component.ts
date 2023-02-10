@@ -44,7 +44,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   permissions = Permisos;
   table_config: table_config = {
     info: [
-      { titulo: 'Propietario', key: 'nombreCompleto', tipo: 'text' },
+      { titulo: 'Propietario', key: 'nombre_completo_propietario', tipo: 'text' },
       { titulo: 'Marca', key: 'marca', tipo: 'text' },
       { titulo: 'Modelo', key: 'modelo', tipo: 'text' },
       { titulo: 'Cant. viajes', key: 'cantidad_viajes', tipo: 'text' },
@@ -55,7 +55,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_vehiculos',
     padre_functions: { data_request: (params) => this.getVehiculos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true,showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.vehiculo.update }, borrar: { show: true, permiso: this.permissions.vehiculo.destroy } },
   };
   tablaComponent;
@@ -101,9 +101,9 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   async getPropietarios() {
-    this.empleadosClass.getAll({ parameters: { id: true, nombreCompleto: true } }).then(
+    this.empleadosClass.getAll({ parameters: { id: true } }).then(
       (res) => {
-        res['data'].unshift({ id: -1, nombreCompleto: 'No empleado' });
+        res['data'].unshift({ id: -1, nombre_completo: 'No empleado' });
         this.listaPropietarios = res['data'];
       },
       (err: any) => {},
@@ -112,12 +112,13 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   async getVehiculos(params?: { per_page: number; page: number; search: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, nombre_completo_propietario: true } };
     this.listaVehiculos.length = 0;
     const res = await this.vehiculosClass.getAll(extra);
+    console.log('res ', res);
 
     res.data.map((val) => {
-      val.nombreCompleto = `${val.propietario.nombre} ${val.propietario.apellido}`;
+      // val.nombre_completo = `${val.propietario.nombre} ${val.propietario.apellido}`;
       return val;
     });
 
@@ -224,11 +225,11 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   eliminarReg(regisData) {
     const objToSend = {
       data: regisData,
-      texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n Propietario: <b> ${regisData.nombreCompleto} </b>?`,
+      texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n Propietario: <b> ${regisData.nombre_completo} </b>?`,
       siFunction: () => {
         this.vehiculosClass.deleteOne(regisData.id).then((res) => {
           this.listaVehiculos = null;
-          fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombreCompleto}` + ' borrado.', 'CORRECTO');
+          fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombre_completo}` + ' borrado.', 'CORRECTO');
           const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
           this.getVehiculos(actualPagination);
           this.borrar();

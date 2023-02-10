@@ -279,7 +279,7 @@ export class ConfiguracionesComponent implements OnInit {
           if (typeof this.configCopy[keyC] == 'string') {
             if (this.configCopy[keyC] != formulario[keyC]) cambios.push(keyC);
           } else {
-            if (!_.isEqual(this.configCopy[keyC], formulario[keyC])) cambios.push(keyC);
+            if (!fun.isEqual(this.configCopy[keyC], formulario[keyC])) cambios.push(keyC);
           }
         });
 

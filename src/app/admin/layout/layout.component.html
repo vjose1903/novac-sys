@@ -62,14 +62,15 @@
             </div>
           </div>
 
-          <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.flatt" class="menuList">
-            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('recibos') }" [innerText]="'Ingresos'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('recibos') }" src="assets/img/reciboIngreso.png" alt="Facturacion" (click)="cambiarMenu({ url: 'recibos', navigate: false })" />
 
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('recibos') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.ingresos.recibosIngresos" [ngClass]="{ activa: actualRuta == 'ingresos' }" (click)="cambiarMenu({ url: 'recibos/ingresos', navigate: true })">Recibo ingresos</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.ingresos.viajes" [ngClass]="{ activa: actualRuta == 'viajes' }" (click)="cambiarMenu({ url: 'recibos/viajes', navigate: true })">Viajes</h4>
-            </div>
+          <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.recibosIngresos" class="menuList">
+            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('lista_ingresos') }" [innerText]="'Recibos de ingresos'"></h5>
+            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('lista_ingresos') }" src="assets/img/reciboIngreso.png" alt="Recibo" (click)="cambiarMenu({ url: 'recibos/lista_ingresos', navigate: true })" />
+          </div>
+
+          <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.viajes" class="menuList">
+            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('viajes') }" [innerText]="'Pedidos'"></h5>
+            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('viajes') }" src="assets/img/viaje.png" alt="Viajes" (click)="cambiarMenu({ url: 'recibos/viajes/0', navigate: true })" />
           </div>
 
           <div *ngxPermissionsOnly="menuPermissionsObj.conduce.flatt" class="menuList">

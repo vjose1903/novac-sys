@@ -17,9 +17,13 @@ import { config_ventas_prod } from './8.5x5.5/configuraciones/reportes/ventas_pr
 import { config_cuentas_pagos } from './8.5x5.5/configuraciones/reportes/cuentas_con_pagos';
 import { config_suplidor_prod } from './8.5x5.5/configuraciones/reportes/suplidor_prod';
 import { config_notas } from './8.5x5.5/configuraciones/reportes/notas';
+import { config_movimientos_vehiculo } from './8.5x5.5/configuraciones/reportes/movimientos_vehiculo';
 
 const configuraciones = {
-  ventas: config_ventas,
+  ventas_diarias: config_ventas.detallado,
+  ventas_rango: config_ventas.detallado,
+  ventas_rango_agrupado: config_ventas.agrupado,
+
   cxc: config_cxc,
   cxc_preventa: config_cxc_preventa,
   ventas_cliente: config_ventas_cliente,
@@ -29,11 +33,15 @@ const configuraciones = {
 
   cxc_ant_agrupado: config_cxc_ant.agrupado,
   inventario: config_inventario,
-  recibos: config_recibos,
-  ventas_prod: config_ventas_prod,
+
+  recibos: config_recibos.detallado,
+  recibos_agrupado: config_recibos.agrupado,
+
+  ventas_productos: config_ventas_prod,
   cuentas_con_pagos: config_cuentas_pagos,
   suplidor_prod: config_suplidor_prod,
   notas: config_notas,
+  movimientos_vehiculo: config_movimientos_vehiculo,
 };
 
 // ==========================================================================================================================================================
@@ -41,14 +49,18 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
+  console.log('data ', data);
   const configuration = configuraciones[data.tipo_reporte];
+  console.log('configuration ', configuration);
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
+  const margin_top = data.mostrar_sub_titulo ? 125 : 111.5;
   const dd = {
-    // pageSize: { width: 990, height: 398 },
-    pageMargins: [10, data.mostrar_sub_titulo ? 125 : 111.5, 10, 30],
+    pageSize: 'LETTER',
+    pageMargins: [10, margin_top, 15, 40],
+
     pageOrientation: pageO,
     header: cabeceraReporte(data, configuration, configApp),
     content: contenidoReporte(data, configuration),
@@ -78,8 +90,8 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
         columns: [
           {
             width: '*',
-            margin: [45, 0, 0, 0],
-            stack: [{ image: 'logo', width: 52, opacity: 0.85 }],
+            margin: [30, 0, 0, 0],
+            stack: [{ image: 'logo', width: 75, opacity: 0.85 }],
           },
 
           {
@@ -117,7 +129,7 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
         ],
       },
       {
-        margin: [0, -45, 0, 0],
+        margin: [0, -65, 0, 0],
         stack: [
           { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
           { text: configApp.direccion_empresa, alignment: 'center', style: 'letra8' },
@@ -152,11 +164,15 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
 function contenidoReporte(data, configuration) {
   let content = [];
 
-  if (data.tipo_tabla === 'agrupado') {
+  if (data.tipo_tabla == 'agrupado') {
     content = getContentWithTablaAgrupada(configuration, data);
   } else {
     content = getContentWithTablaNormal(configuration, data);
   }
+  // fun.pushAt(content, 0, '123456789 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52');
+  // fun.pushAt(content, 0, '111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111');
+  // fun.pushAt(content, 0, '..........................................................................................................................................');
+  // fun.pushAt(content, 0, '__________________________________________________________________________________________________________________________________________');
 
   return content;
 }

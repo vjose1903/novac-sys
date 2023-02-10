@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
-import * as _ from 'lodash';
 
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { table_config } from '../../new_tablas/tabla-class';
@@ -30,7 +29,7 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
     focusRow: true,
     id_tabla: 'buscar_articulo',
     padre_functions: { data_request: (params) => this.buscarArticulos(params) },
-    obj_paginate: { show: true, showTotal:true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
   tablaComponent;
@@ -44,7 +43,6 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
 
     const is_compra = this.inputs.metodo === 'compra';
-
 
     try {
       const res = await this.articuloClass
@@ -71,7 +69,8 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
   }
 
   closeThis(arg?) {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id == this.modal.component_id);
+    const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
+
     modal.closeModal(this.modal.component_id);
     if (arg) modal.returnDataFromModal(arg);
 

@@ -117,29 +117,39 @@
                     </span>
 
                     <span *ngSwitchCase="'dropDown'">
-                      <p-dropdown
-                        [virtualScroll]="true"
-                        [itemSize]="34"
-                        [dropdownIcon]="'pi pi-sort'"
-                        [disabled]="disabledInput(dato, column)"
-                        [options]="column.data"
-                        [filter]="true"
-                        filterBy="nombre_largo,hora_sorteo"
-                        [(ngModel)]="dato[column.key]"
-                        [placeholder]="getDropPlaceholder(column.placeholder)"
-                        [optionLabel]="column.optionLabel"
-                        [optionValue]="column.optionValue"
-                        styleClass="{{ disabledInput(dato, column) ? 'customD' : 'custom' }}"
-                        emptyFilterMessage="valor_buscado_no_se_encuentra"
-                      >
-                      </p-dropdown>
+                      <span *ngIf="column.remplace && seleccionado != dato?.id && !dato?.is_editing" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
+                        <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
+                      </span>
+
+                      <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace || dato?.is_editing">
+                        <p-dropdown
+                          #dropdown
+                          [virtualScroll]="true"
+                          [itemSize]="34"
+                          [dropdownIcon]="'pi pi-sort'"
+                          [disabled]="disabledInput(dato, column)"
+                          [options]="column.data"
+                          [filter]="true"
+                          filterBy="nombre_largo,hora_sorteo"
+                          [ngModel]="dato[column.dropdown_key]"
+                          [placeholder]="getDropPlaceholder(column.placeholder)"
+                          [optionLabel]="column.optionLabel"
+                          [optionValue]="column.optionValue"
+                          styleClass="form-control min {{ disabledInput(dato, column) ? 'customD' : 'custom' }}"
+                          appendTo="body"
+                          emptyFilterMessage="valor_buscado_no_se_encuentra"
+                          (onChange)="changeValorInput(column, column.dropdown_key, getIndex(index_body), dropdown.value, dato)"
+                        >
+                        </p-dropdown>
+                      </div>
                     </span>
 
                     <span *ngSwitchCase="'input'">
-                      <span *ngIf="column.remplace && seleccionado != dato?.id" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
+                      <span *ngIf="column.remplace && seleccionado != dato?.id && !dato?.is_editing" class="w-100" [ngStyle]="getStyle(column.key, getIndex(index_body))">
                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: dato, column: column }"></ng-container>
                       </span>
-                      <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace" class="table_input">
+
+                      <div *ngIf="(column.remplace && seleccionado == dato?.id) || !column.remplace || dato?.is_editing" class="table_input">
                         <input
                           #inputTable
                           [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
@@ -150,11 +160,11 @@
                           type="{{ column.inputType ? column.inputType : 'text' }}"
                           [value]="getValueForm(column, dato)"
                           [disabled]="disabledInput(dato, column)"
-                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(index_body))"
-                          (blur)="checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body))"
-                          (keyup)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato)"
+                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(index_body), dato)"
+                          (blur)="checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)"
+                          (keyup)="changeValorInput(column, column.key, getIndex(index_body), $event.target.value, dato)"
                         />
-                        <!-- (blur)="changeValorInput(column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body))" -->
+                        <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
 
                         <i *ngIf="column.can_reset" pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, dato)"></i>
                       </div>
@@ -198,8 +208,11 @@
             </div>
 
             <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)">
+              <!-- ({{ tServ.getPaginationById(config.id_tabla + post_id)?.page }}) -->
               <p-paginator
+                *ngIf="showPagination"
                 id="paginator-{{ config.id_tabla + post_id }}"
+                [first]="tServ.getPaginationById(config.id_tabla + post_id)?.page"
                 [rows]="tServ.getPaginationById(config.id_tabla + post_id)?.per_page"
                 [pageLinkSize]="cantPagesView"
                 [totalRecords]="config.total_count"

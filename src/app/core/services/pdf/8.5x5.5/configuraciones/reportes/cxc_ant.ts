@@ -4,14 +4,13 @@ export const config_cxc_ant = {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   detallado: {
     margin_general: [0, 0, 0, 0],
-    isBreak: true,
+    isBreak: false,
     pageOrient: 'landscape',
     only_titulo: false,
-    break: 26,
-    // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
-    widths: [18, '*', 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
+    widths: ['auto', 278, 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
     mostrar_bruto: false,
+    mensaje_contenido_vacio: 'No existen cuentas por cobrar.',
     info: [
       {
         text: '#',
@@ -109,14 +108,13 @@ export const config_cxc_ant = {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   agrupado: {
     margin_general: [0, 0, 0, 0],
-    isBreak: true,
+    isBreak: false,
     pageOrient: 'landscape',
-    break: 26,
     only_titulo: false,
-    // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
-    widths: [18, '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
     mostrar_bruto: false,
+    mensaje_contenido_vacio: 'No existen cuentas por cobrar.',
     info: [
       {
         text: '#',

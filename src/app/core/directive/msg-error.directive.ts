@@ -84,9 +84,12 @@ export class MsgErrorDirective {
 
           if (fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
             response.render = true;
+            console.log('errors ', errors);
 
             if (errors.required) response.msg = 'Este campo es requerido.';
             else if (errors.minlength) response.msg = `Cant. mínima de letras es: ${errors.minlength.requiredLength}.`;
+            else if (errors.max) response.msg = `Valor maximo requerido es: ${errors.max.max} - actualmente tiene: ${errors.max.actual}.`;
+            else if (errors.min) response.msg = `Valor mínimo requerido es: ${errors.min.min} - actualmente tiene: ${errors.min.actual}.`;
             else if (errors.ip) response.msg = `Intoduzca una ip valida.`;
             else if (errors.compares) response.msg = `Las contraseñas no coinciden.`;
             else if (errors.invalidCedula) response.msg = `Ingrese una cédula válida.`;

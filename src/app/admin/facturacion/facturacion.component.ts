@@ -1,3 +1,4 @@
+import { EmpleadoC } from './../registros/registro-empleados/empleado';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
@@ -25,7 +26,7 @@ import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
-import { ButtonsI, ModalClass } from '../components/modal/modal-class';
+import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 
 @Component({
@@ -81,7 +82,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             if (fun.hasValue(option)) this.selectOptionExtra(_.find(this.optionesExtra, { keyboardCode: key }), 'teclado');
           }
         }
-        if (this.overlay?.tipo == 'camion') this.mover_indicador_camion(key);
+
+        if (this.overlay?.tipo == 'movimiento') this.mover_indicador_camion(`${this.entidad_en_turno}_row`, key);
       }
     }
   }
@@ -147,13 +149,23 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   vehiculoClass = new VehiculoC();
+  userClass = new EmpleadoC();
 
   overlay;
-  camionesSelected = [];
+  // camionesSelected = [];
+
   camiones = [];
-  camion_row;
-  filterCamionesTargets;
   copyCamiones;
+  choferes = [];
+  copyChoferes;
+  movimientosSelected = [];
+
+  camion_row;
+  chofer_row;
+  entidad_en_turno;
+
+  filterCamionesTargets;
+  filterChoferesTargets;
   permissions = Permisos;
   configApp: ConfigI;
   timeInterval;
@@ -224,7 +236,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               break;
             case 2:
               this.hasPermisoCamiones = has_permiso;
-              if (this.hasPermisoCamiones) this.getCamiones();
+              if (this.hasPermisoCamiones) this.getersMovimientoViaje();
               break;
           }
         }
@@ -255,7 +267,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   someArticuloHasDevuelto() {
     const detalles = this.factServ.getDetallesLlenos();
-    return _.some(detalles, (detalle) => detalle.is_devuelto) || this.factServ.productos_devueltos.length > 0;
+    return detalles.some((detalle) => detalle.is_devuelto) || this.factServ.productos_devueltos.length > 0;
   }
 
   selectOptionExtra(option, where) {
@@ -338,13 +350,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         //
         [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando] = Array(4).fill(false);
-        [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row] = Array(5).fill(0);
+        [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row, this.chofer_row] = Array(6).fill(0);
         [this.NCFcompra, this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factServ.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] =
           Array(9).fill(undefined);
 
+        this.entidad_en_turno = 'camion';
         this.cuerpoFactura.length = 0;
         this.articulosAcambiar.length = 0;
-        this.camionesSelected.length = 0;
+        this.movimientosSelected.length = 0;
 
         this.info_cambio = {};
         this.fechaFactura = {};
@@ -363,6 +376,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.forma_pago = this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta ? null : 'Efectivo';
 
         this.filterCamionesTargets = ['marca', 'modelo', 'anio', 'propietario.nombre', 'propietario.apellido'];
+        this.filterChoferesTargets = ['nombre', 'apellido', 'nombre_completo'];
 
         if (this.factServ.tipoDocumento == tipoDocFacturacion.venta) {
           this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
@@ -426,7 +440,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       this.factServ.tipoDocumento = factura.tipo;
 
-      if (!_.has(factura, 'archivo_id') && [actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action)) {
+      if (!fun.objHas(factura, 'archivo_id') && [actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action)) {
         const factura_archivada = _.find(fun.getFacturasguardadas(), { id_documento: factura?.id });
 
         if (fun.hasValue(factura_archivada)) {
@@ -448,7 +462,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factServ
         .setTipoFacturaSelected(this.factServ.tipoDocumento, value_buscar, by_buscar)
         .then(async (result) => {
-          this.factura_pendiente = fun.hasValue(factura) && _.has(factura, 'factura_pendiente') ? factura?.factura_pendiente : false;
+          this.factura_pendiente = fun.hasValue(factura) && fun.objHas(factura, 'factura_pendiente') ? factura?.factura_pendiente : false;
 
           const fecha_facturacion = factura?.fecha_equivalente ? factura?.fecha_equivalente : fun.duplicarJson(this.fechaFactura['back']);
 
@@ -493,8 +507,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
           this.factServ.productos_devueltos = productos_devueltos;
 
-          if (_.has(factura, 'camiones_viajes')) {
-            factura.camiones_viajes.forEach((camion) => this.camionesSelected.push({ vehiculo_id: camion.vehiculo_id }));
+          if (fun.objHas(factura, 'movimientos_viaje')) {
+            factura.movimientos_viaje.forEach((movimiento) => this.movimientosSelected.push({ vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id }));
           }
 
           factura.detalle_facturas = _.filter(factura.detalle_facturas, (detalle) => !detalle.is_devuelto || (detalle.is_devuelto && detalle.is_defectuoso));
@@ -533,7 +547,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           let abrirModal = true;
 
           if (this.factura_guardada && this.factura_guardada?.archivo_id) {
-            if (_.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
+            if (fun.isEqual(this.objArchivo.factura_en_turno, this.objArchivo.factura_en_turno_storage)) {
               fun.toastWarning(`La ${documento.descripcion} que estaba realizando esta archivada para poder utilizarla luego.`, 'AVISO');
               abrirModal = false;
             } else {
@@ -672,25 +686,27 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const tipo_factura_referencia = this.factServ.tipoFactura.referencia;
     let buscar = false;
 
-    if (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) {
-      setTimeout(() => {
-        const voy_a = document.activeElement.id;
-        const nombre = this.factServ.propietario_factura ? this.factServ.propietario_factura.nombre : 'Cliente contado';
+    setTimeout(() => {
+      const voy_a = document.activeElement.id;
+      const dont_have_propietario = fun.isEmpty(this.factServ?.propietario_factura) || fun.isEmpty(this.factServ?.propietario_factura?.id);
 
-        if (sali_de == 'venta' && (condicion == 'Crédito' || tipo_factura_referencia == '01') && nombre == 'Cliente contado' && (fun.isEmpty(voy_a) || voy_a != 'fecha_viaje')) buscar = true;
+      if (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) {
+        if (sali_de == 'venta' && (condicion == 'Crédito' || tipo_factura_referencia == '01') && dont_have_propietario && (fun.isEmpty(voy_a) || voy_a != 'fecha_viaje')) buscar = true;
 
-        if (sali_de == 'venta' && valor == 'adelantada' && nombre == 'Cliente contado') buscar = true;
+        if (sali_de == 'venta' && valor == 'adelantada' && dont_have_propietario) buscar = true;
 
         if (sali_de == 'fecha_viaje') {
-          this.getCamiones();
+          this.getersMovimientoViaje();
           document.getElementById('btnCamion').click();
         }
 
-        if (buscar) this.abrirModalFiltro();
+        if (this.modo_factura != 'viaje') this.movimientosSelected = [];
+      } else {
+        if (sali_de == 'fecha_vencimiento' && dont_have_propietario) buscar = true;
+      }
 
-        if (this.modo_factura != 'viaje') this.camionesSelected = [];
-      }, 250);
-    }
+      if (buscar) this.abrirModalFiltro();
+    }, 250);
   }
 
   getCalculosDinero(arg) {
@@ -834,11 +850,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         }
         break;
 
-      case 'fecha_vencimiento':
-        is_enforcar = false;
-        is_buscar_cliente = true;
-        break;
-
       case 'venta':
         if (this.modo_factura == 'normal') {
           if (this.condicion_fact == 'Contado') {
@@ -920,49 +931,107 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.overlay['tipo'] = tipo;
     this.overlay['item'].toggle(event);
 
-    if (tipo == 'camion') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+    if (tipo == 'movimiento') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
     if (event) event.stopPropagation();
   }
 
-  seleccionarCamion(camion?) {
-    if (this.camiones.length) {
-      const camion_en_turno = fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
+  getCamionInfo(camion, key) {
+    let res;
+    if (key == 'label') res = `${camion.marca} ${camion.modelo} - ${camion.anio} (${camion.propietario.nombre} ${camion.propietario.apellido})`;
 
-      if (this.checkCamionIsSelected(camion_en_turno)) {
-        _.pull(this.camionesSelected, _.find(this.camionesSelected, { vehiculo_id: camion_en_turno.id }));
+    const movimiento_en_turno = this.movimientosSelected.find((movimiento) => movimiento.vehiculo_id == camion.id);
+    if (key == 'icon') res = fun.isEmpty(movimiento_en_turno) ? 'far fa-square' : fun.isEmpty(movimiento_en_turno.user_id) ? 'fa-regular fa-square-minus' : 'fas fa-check';
+    if (key == 'tooltip') res = fun.isEmpty(movimiento_en_turno) ? 'Camión sin seleccionar' : fun.isEmpty(movimiento_en_turno.user_id) ? 'Chofer sin seleccionar' : 'Camión y chofer seleccionados';
+
+    return res;
+  }
+
+  seleccionarCamion(camion?, index_camion?) {
+    if (this.camiones.length) {
+      camion ??= fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
+
+      if (this.checkCamionIsSelected(camion)) {
+        _.pull(this.movimientosSelected, _.find(this.movimientosSelected, { vehiculo_id: camion.id }));
       } else {
-        this.camionesSelected.push({ vehiculo_id: camion_en_turno.id });
+        this.movimientosSelected.push({ vehiculo_id: camion.id, user_id: null });
       }
+
+      if (this.checkCamionIsSelected(camion)) this.moverFocoMovimientoViaje('chofer');
+
+      if (fun.hasValue(index_camion) && this.camion_row != index_camion) this.camion_row = index_camion;
     } else {
-      if (this.camionesSelected.length) this.saliendoDeCamionOverlay();
-      else fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
+      if (this.movimientosSelected.length && !this.movimientosSelected.some((mov) => fun.isEmpty(mov.user_id))) this.saliendoDeCamionOverlay();
+      else fun.toastWarning('Debe de seleccionar almenos un camión y su chofer para el viaje, .', 'Aviso');
     }
   }
 
-  checkCamionIsSelected(camion) {
-    return _.some(this.camionesSelected, { vehiculo_id: camion.id });
+  seleccionarChofer(chofer?, index_chofer?) {
+    chofer ??= fun.duplicarJson(fun.hasValue(chofer) ? chofer : this.choferes[this.chofer_row]);
+
+    const camion_en_turno = fun.duplicarJson(this.camiones[this.camion_row]);
+    const movimiento_en_turno = this.movimientosSelected.find((movimiento) => movimiento.vehiculo_id == camion_en_turno.id);
+    movimiento_en_turno.user_id = this.checkChoferIsSelected(chofer) ? null : chofer.id;
+
+    if (fun.hasValue(index_chofer) && this.chofer_row != index_chofer) this.chofer_row = index_chofer;
   }
 
-  checkCamionSeleccionado() {
-    const containCamiones = document.getElementById('overlayCamion');
+  moverFocoMovimientoViaje(voy_a) {
+    this.entidad_en_turno = voy_a;
+    const entidades = { camion: 'searchCamion', chofer: 'searchChofer' };
+    setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
+  }
+
+  checkCamionIsSelected(camion?) {
+    camion ??= fun.duplicarJson(this.camiones[this.camion_row]);
+    return this.movimientosSelected.some((movimiento) => movimiento.vehiculo_id == camion.id);
+  }
+
+  checkChoferIsSelected(chofer) {
+    const camion_en_turno = fun.duplicarJson(this.camiones[this.camion_row]);
+    const movimiento_en_turno = this.movimientosSelected.find((movimiento) => movimiento.vehiculo_id == camion_en_turno.id);
+
+    return fun.hasValue(movimiento_en_turno) ? movimiento_en_turno.user_id == chofer.id : false;
+  }
+
+  getIndicadorMovimientoViaje(tipo?) {
+    let res;
+
+    const all_selected = this.movimientosSelected.length > 0 && this.movimientosSelected.every((mov) => fun.hasValue(mov.user_id));
+    const all_deselected = this.movimientosSelected.length == 0;
+
+    if (tipo == 'color') {
+      res = all_deselected ? 'no_selected' : all_selected ? 'selected' : 'incompleto';
+    } else if (tipo == 'icon') {
+      res = all_deselected ? 'fa-x' : all_selected ? 'fa-check' : 'fa-minus';
+    } else {
+      res = all_selected;
+    }
+
+    return res;
+  }
+
+  checkMovimientoIsCompleted() {
+    const containMovimientoViaje = document.getElementById('overlayMovimientoViaje');
+    const entidades = { camion: 'searchCamion', chofer: 'searchChofer' };
+
     setTimeout(() => {
       const voy_a = document.activeElement;
 
-      if (!containCamiones.contains(voy_a)) {
-        if (!this.camionesSelected.length) {
-          fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
-          setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+      if (!containMovimientoViaje.contains(voy_a)) {
+        if (this.movimientosSelected.length && !this.movimientosSelected.some((mov) => fun.isEmpty(mov.user_id))) {
+          this.saliendoDeCamionOverlay();
         } else {
-          if (fun.hasValue(this.overlay?.item)) this.saliendoDeCamionOverlay();
+          fun.toastWarning('Debe de seleccionar almenos un camión y un chofer para el viaje.', 'Aviso');
+          setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
         }
       } else {
-        setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+        setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
       }
     }, 250);
   }
 
   cerrarOverlay() {
-    if (fun.hasValue(this.overlay)) {
+    if (fun.hasValue(this.overlay?.item)) {
       if (this.overlay['tipo'] == 'camion') {
         this.filterCamion(this.copyCamiones);
         this.camion_row = 0;
@@ -973,29 +1042,31 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  getCamionLabel(camion) {
-    return `${camion.marca} ${camion.modelo} - ${camion.anio} (${camion.propietario.nombre} ${camion.propietario.apellido})`;
-  }
+  mover_indicador_camion(tipo, key) {
+    const listados = { camion_row: this.camiones, chofer_row: this.choferes };
 
-  mover_indicador_camion(key) {
     if (key == teclasCode._arriba) {
-      if (this.camion_row == 0) this.camion_row = this.camiones.length - 1;
-      else this.camion_row--;
+      if (this[tipo] == 0) this[tipo] = listados[tipo].length - 1;
+      else this[tipo]--;
     } else if (key == teclasCode._abajo) {
-      if (this.camion_row == this.camiones.length - 1) this.camion_row = 0;
-      else this.camion_row++;
+      if (this[tipo] == listados[tipo].length - 1) this[tipo] = 0;
+      else this[tipo]++;
+    } else if (key == teclasCode._izquierda || key == teclasCode._derecha) {
+      if (key == teclasCode._derecha && !this.checkCamionIsSelected()) {
+        fun.toastWarning('Para seleccionar un chofer primero seleccione el camión', 'Aviso');
+        return;
+      }
+      this.moverFocoMovimientoViaje(key == teclasCode._derecha ? 'chofer' : 'camion');
     } else if (key == teclasCode._esc) {
       this.saliendoDeCamionOverlay('teclado');
     }
 
-    fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
+    fun.scrollTo({ id: `ulCamion-${this[tipo]}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   saliendoDeCamionOverlay(where?) {
     setTimeout(() => {
-      if (!this.camionesSelected.length) {
-        fun.toastWarning('Debe de seleccionar almenos un camión para el viaje.', 'Aviso');
-      } else {
+      if (this.movimientosSelected.length && !this.movimientosSelected.some((mov) => fun.isEmpty(mov.user_id))) {
         if (fun.isEmpty(where) || where != 'teclado') {
           if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura?.id)) this.abrirModalFiltro();
           else this.cuerpo.seleccionarCampoEnTurno();
@@ -1003,33 +1074,61 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.cerrarOverlay();
         } else {
           if (where == 'teclado') {
-            fun.desEnfocarInput('searchCamion');
-
+            const entidades = { camion: 'searchCamion', chofer: 'searchChofer' };
+            fun.desEnfocarInput(entidades[this.entidad_en_turno]);
             this.cerrarOverlay();
           }
         }
+
+        this.entidad_en_turno = 'camion';
+      } else {
+        fun.toastWarning('Debe de seleccionar almenos un camión y su chofer para el viaje.', 'Aviso');
       }
     }, 5);
   }
 
+  async getersMovimientoViaje() {
+    await this.getCamiones();
+    await this.getChoferes();
+  }
+
   async getCamiones() {
     const extra = { afterPath: `filtro/ `, parameters: { paginado: false } };
-
     this.vehiculoClass.getAll(extra).then((res) => {
       this.camiones = res['data'].map((camion) => {
         camion.selected = false;
         return camion;
       });
-
       this.copyCamiones = fun.duplicarJson(this.camiones);
     });
+  }
+
+  async getChoferes() {
+    const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'chofer' } };
+    this.userClass.getAll(extra).then((res) => {
+      this.choferes = res['data'].map((chofer) => {
+        chofer.selected = false;
+        return chofer;
+      });
+    });
+    this.copyChoferes = fun.duplicarJson(this.choferes);
   }
 
   filterCamion(camionesFiltrados) {
     this.camiones.length = 0;
     for (const camion of camionesFiltrados) this.camiones.push(camion);
     this.camion_row = 0;
-    fun.scrollTo({ id: `overlayCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
+    fun.scrollTo({ id: `ulCamion-${this.camion_row}`, behavior: 'smooth', block: 'center', inline: 'center' });
+  }
+
+  filterMovimiento(tipo, entidades_filtradas) {
+    const conf = { camion: { lista: 'camiones', indicador: 'camion_row', ul: 'ulCamion' }, chofer: { lista: 'choferes', indicador: 'chofer_row', ul: 'ulChofer' } };
+
+    this[conf[tipo].lista].length = 0;
+
+    for (const entidad of entidades_filtradas) this[conf[tipo].lista].push(entidad);
+    this[conf[tipo].indicador] = 0;
+    fun.scrollTo({ id: `${conf[tipo].ul}-${this[conf[tipo].indicador]}`, behavior: 'smooth', block: 'center', inline: 'center' });
   }
 
   // =============================================
@@ -1100,32 +1199,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.confirmationModal(obj);
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function }) {
-    const config = {
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => (_.has(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
-          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
-        ],
-      },
-    };
-
-    if (_.has(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
-      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
-    }
-
-    this.openNewModal(config);
-  }
-
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
-  }
-
   // =============================================
   //  MODAL enviarABaseDatos
   // =============================================
@@ -1143,62 +1216,67 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           fun.toastWarning(`Total de la ${documento.descripcion} no puede ser 0`, 'Aviso');
           fun.enfocarInput('codigo-0');
         } else {
-          if (
-            this.factServ.tipoDocumento != tipoDocFacturacion.compra &&
-            (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion)
-          ) {
-            const obj = { metodo: this.factServ.tipoDocumento, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
-
-            this.openNewModal({
-              component: ConfirmacionImprimirComponent,
-              inputs: obj,
-              id: 'confirmacionImprimir',
-              header: 'Confirmación',
-              width: '30rem',
-              botones: {
-                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-                dinamico: [
-                  { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
-                ],
-              },
-            });
+          if (this.is_viaje && !this.getIndicadorMovimientoViaje()) {
+            fun.toastWarning(`Debe seleccionar al menos un camión y un chofer para el viaje.`, 'Aviso');
+            document.getElementById('btnCamion').click();
           } else {
-            let articulos_a_cambiar = false;
+            if (
+              this.factServ.tipoDocumento != tipoDocFacturacion.compra &&
+              (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta || this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion)
+            ) {
+              const obj = { metodo: this.factServ.tipoDocumento, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
 
-            if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
-              const cuerpo_fact = fun.duplicarJson(this.cuerpoFactura);
-              this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
+              this.openNewModal({
+                component: ConfirmacionImprimirComponent,
+                inputs: obj,
+                id: 'confirmacionImprimir',
+                header: 'Confirmación',
+                width: '30rem',
+                botones: {
+                  ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+                  dinamico: [
+                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
+                  ],
+                },
+              });
+            } else {
+              let articulos_a_cambiar = false;
+
+              if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
+                const cuerpo_fact = fun.duplicarJson(this.cuerpoFactura);
+                this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
+              }
+
+              if (this.articulosAcambiar.length > 0) articulos_a_cambiar = true;
+
+              const obj = {
+                modo_factura: this.modo_factura,
+                condicion_fact: this.condicion_fact,
+                metodo: this.factServ.tipoDocumento,
+                total_factura: this.TOTAL,
+                efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
+                tipo_modal: 'devuelta',
+                formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
+                factura_de: this.factServ.tipoDocumento,
+                cambios_articulos: articulos_a_cambiar,
+              };
+
+              this.openNewModal({
+                component: FormCantidadEfectivoComponent,
+                inputs: obj,
+                id: 'cambioEfectivo',
+                header: 'Cantidad de efectivo',
+                width: '34.375rem',
+                botones: {
+                  ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+                  dinamico: [
+                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+                  ],
+                },
+              });
             }
-
-            if (this.articulosAcambiar.length > 0) articulos_a_cambiar = true;
-
-            const obj = {
-              modo_factura: this.modo_factura,
-              condicion_fact: this.condicion_fact,
-              metodo: this.factServ.tipoDocumento,
-              total_factura: this.TOTAL,
-              efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
-              tipo_modal: 'devuelta',
-              formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
-              factura_de: this.factServ.tipoDocumento,
-              cambios_articulos: articulos_a_cambiar,
-            };
-
-            this.openNewModal({
-              component: FormCantidadEfectivoComponent,
-              inputs: obj,
-              id: 'cambioEfectivo',
-              header: 'Cantidad de efectivo',
-              width: '34.375rem',
-              botones: {
-                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-                dinamico: [
-                  { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
-                ],
-              },
-            });
           }
         }
       }
@@ -1277,7 +1355,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   selectModoFactura(arg) {
     this.is_viaje = false;
     this.is_adelantada = false;
-    this.camionesSelected = [];
+    this.movimientosSelected = [];
 
     if (arg === 'viaje') this.is_viaje = true;
     else if (arg === 'adelantada') this.is_adelantada = true;
@@ -1439,7 +1517,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  async getDataFromModal(arg, search) {
+  async getDataFromModal(arg, search?) {
     if (arg.modal_id === 'facturaPendiente') {
       this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -1537,9 +1615,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       cabecera_fact['balance'] = fun.parseFloatTwoDecimals(this.TOTAL);
       cabecera_fact['devuelta'] = 0;
     } else {
-      cabecera_fact['pagada'] = this.is_viaje ? false : true;
-      cabecera_fact['balance'] = this.is_viaje ? fun.parseFloatTwoDecimals(this.TOTAL) : 0;
-      cabecera_fact['devuelta'] = this.is_viaje ? 0 : this.Devuelta;
+      cabecera_fact['pagada'] = true;
+      cabecera_fact['balance'] = 0;
+      cabecera_fact['devuelta'] = this.Devuelta;
     }
 
     let fecha_valida = null;
@@ -1562,7 +1640,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['is_adelantada'] = this.is_adelantada;
     cabecera_fact['is_viaje'] = this.is_viaje;
     cabecera_fact['is_nota'] = false;
-    cabecera_fact['camiones_viajes'] = this.camionesSelected;
+    cabecera_fact['movimientos_viaje'] = this.movimientosSelected;
 
     cabecera_fact['pre_factura'] = fun.hasValue(this.factServ.pre_venta_selected) ? this.factServ.pre_venta_selected?.id : null;
 
@@ -1607,6 +1685,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
+
+    // console.log('cabecera_fact ', cabecera_fact);
 
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

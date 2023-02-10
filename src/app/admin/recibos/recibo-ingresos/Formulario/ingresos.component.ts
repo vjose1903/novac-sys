@@ -1,3 +1,4 @@
+import { Ss } from './../../../../core/services/singleton.service';
 import { ClienteC } from './../../../registros/registro-clientes/cliente';
 import { NotaC } from './../../../manipular facturas/notas-cred-deb/notas';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -7,7 +8,6 @@ import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
-import { RecibosService } from '../../recibos.service';
 import { FacturaC } from '../../../facturacion/factura';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
@@ -15,6 +15,7 @@ import { BuscarClienteSuplidorComponent } from '../../../components/formularios 
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-ingresos',
@@ -41,6 +42,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
           { key: 'historyPagos', rowTooltip: 'tooltip_history', text_color: 'colorEstado' },
+          { key: 'pedido', rowTooltip: 'tooltip_pedido', text_color: 'colorPedido', showCondition: [{ kind: 'campo', target: 'is_viaje', value: [true] }] },
         ],
       },
 
@@ -56,7 +58,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         key: 'select',
         select_all: false,
         estilos: [{ width: '7rem', padding: '0.6rem 0rem' }],
-        disable: [{ kind: 'campo', target: 'is_viaje', value: [true] }],
       },
       {
         titulo: 'Pago Total',
@@ -110,7 +111,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private reciboServ: RecibosService) {
+  constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router, private route: ActivatedRoute) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }
@@ -145,7 +146,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  async pedirFacturasPorCliente(cliente_id, params?: { per_page: number; page: number; search: string }) {
+  async pedirFacturasPorCliente(cliente_id, params?: { per_page: number; page: number; search: string; factura_a_buscar?: any }) {
     this.facturas.length = 0;
 
     this.totalFacturado = 0;
@@ -155,24 +156,37 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalPagadoPorciento = 0;
 
     const fechaA = moment().format('YYYY-MM-DD');
+    const parameters = { page: params.page, per_page: params.per_page, paginado: true };
 
-    const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
+    if (fun.hasValue(params.factura_a_buscar)) parameters['factura_a_buscar'] = params.factura_a_buscar;
 
-    res.data.facturas.data.map((factura) => {
-      const factura_is_selected = _.find(this.facturasSelected, { id: factura.id });
+    const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
+
+    await res.data.facturas.data.map((factura, index) => {
+      let factura_selected = _.find(this.facturasSelected, { id: factura.id });
+      if (fun.hasValue(params.factura_a_buscar) && factura.id == params.factura_a_buscar) {
+        factura_selected = factura;
+        factura_selected.monto = '0.00';
+        factura_selected.pagoT = false;
+        this.verificateFacturasSelected(factura_selected, 'insert', index, true);
+      }
+
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
-
       factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
-      factura.select = fun.hasValue(factura_is_selected);
-      factura.pagoT = fun.hasValue(factura_is_selected) ? factura_is_selected.pagoT : false;
+      factura.select = fun.hasValue(factura_selected);
+      factura.pagoT = fun.hasValue(factura_selected) ? factura_selected.pagoT : false;
       factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
       factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
-      factura.monto = fun.hasValue(factura_is_selected) ? factura_is_selected.monto : '0.00';
+      factura.monto = fun.hasValue(factura_selected) ? factura_selected.monto : '0.00';
       const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
 
-      factura.tooltip_history = factura.is_viaje ? null : 'Movimientos realizados';
-      factura.historyPagos = factura.is_viaje ? 'fas fa-truck-moving' : modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
-      factura.colorEstado = factura.is_viaje ? 'green' : modalMoviemientos ? 'black' : 'gris-claro';
+      factura.tooltip_pedido = 'Modificar datos del pedido';
+      factura.colorPedido = 'green';
+      factura.pedido = 'fas fa-truck-moving';
+
+      factura.tooltip_history = 'Movimientos realizados';
+      factura.historyPagos = modalMoviemientos ? 'fas fa-comment-dollar' : 'far fa-comment';
+      factura.colorEstado = modalMoviemientos ? 'black' : 'gris-claro';
       factura.iconHover = factura.is_viaje ? false : modalMoviemientos ? true : false;
       factura.ver = 'far fa-eye';
 
@@ -180,6 +194,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         actions: [
           { key: 'actions', isTd: true, estilos: 'width: 6% !important; padding: 0.6rem 0rem !important' },
           { key: 'historyPagos', estilos: 'font-size: 1rem !important' },
+          { key: 'pedido', estilos: 'font-size: 1rem !important' },
           { key: 'ver', estilos: 'font-size: 1rem !important' },
         ],
         select: { width: '6rem' },
@@ -187,7 +202,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         numero_comprobante: { width: '7rem' },
       };
 
-      factura.subrayar = factura.is_viaje;
       this.facturas.push(factura);
 
       return factura;
@@ -211,15 +225,37 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     setTimeout(() => {
       this.tablaComponent.changeConfig([{ total_count: res.data.facturas.total_registros }]);
       this.totalRegistros = res.data.facturas.total_registros;
+
+      if (res.data.page != params.page) {
+        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }], this.tablaComponent);
+
+        setTimeout(() => {
+          Ss.cdRef.detectChanges();
+          const actualPagination = this.tServ.getPaginationById('listado_recibos');
+          Ss.cdRef.detectChanges();
+        }, 500);
+      }
     }, 100);
   }
 
   async necesarioStart() {
-    fun.enfocarInput('clienteI');
+    this.checkRoute();
+  }
+
+  async checkRoute() {
+    const cliente_id = this.route.snapshot.params['cliente_id'];
+    const factura_id = this.route.snapshot.params['factura_id'];
+
+    if (cliente_id != '0' && factura_id != '0') {
+      const cliente_response = await this.clienteClass.getOne(cliente_id);
+      this.getDataFromModal({ data: cliente_response.data, modal_id: 'buscarCliente', factura_a_buscar: factura_id });
+    } else {
+      fun.enfocarInput('clienteI');
+    }
   }
 
   isOneFacturaWithMonto() {
-    const valid = _.some(this.facturasSelected, (factura) => factura.select && fun.desformatear(factura.monto) > 0);
+    const valid = this.facturasSelected.some((factura) => factura.select && fun.desformatear(factura.monto) > 0);
     return valid;
   }
 
@@ -238,7 +274,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const obj = {
       id: 'cancelar_ingreso',
       header: 'Confirmación',
-      texto: 'Seguro de que desea cancelar la operacion.',
+      texto: '¿Seguro de que desea cancelar la operacion?.',
       siFunction: (instance) => {
         this.cancelarIgreso();
         instance.closeModal(instance.id, 'cancelar');
@@ -251,21 +287,22 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return this.facturasSelected.length;
   }
 
-  async getDataFromModal(arg, search) {
-    if (arg.modal_id === 'cambioEfectivo_IngresosComponent') {
+  async getDataFromModal(arg, search?) {
+    if (arg.modal_id == 'cambioEfectivo_IngresosComponent') {
       this.devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
       this.is_print = arg.is_print;
       this.sendIngreso();
     }
 
-    if (arg.modal_id === 'buscarCliente') {
+    if (arg.modal_id == 'buscarCliente') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('clienteI');
       } else {
         this.clienteAdepositar = arg.data;
-        (document.getElementById('clienteI') as any).value = `${arg.data.nombre} ${arg.data.apellido}`;
-        this.pedirFacturasPorCliente(arg.data.id, this.tServ.obj_paginate.default);
+        (document.getElementById('clienteI') as any).value = arg.data.nombre_completo;
+        const parameters = { ...this.tServ.obj_paginate.default, factura_a_buscar: arg?.factura_a_buscar };
+        this.pedirFacturasPorCliente(arg.data.id, parameters);
       }
     }
   }
@@ -278,33 +315,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p>
-      ${obj.texto}
-    </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
-  }
-
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
-  }
-
   resetVariables() {
     this.forma_pago = null;
     this.devuelta = null;
@@ -314,9 +324,24 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
-      if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
-        this.reciboServ.abrirModalHistorial(params.data.pagos, params.data.notas);
+      if (params.iconKey == 'pedido') {
+        if (params.data.is_viaje) {
+          const obj = {
+            id: 'move_to_viajes',
+            header: 'Confirmación',
+            texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
+            siFunction: (instance) => {
+              this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
+              instance.closeModal(instance.id, 'cancelar');
+            },
+          };
+          this.confirmationModal(obj);
+        }
       }
+      if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
+        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal);
+      }
+
       if (params.iconKey == 'ver') {
         this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
           this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
@@ -357,6 +382,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   verificateFacturasSelected(factura, method, index, value) {
     const factura_en_turno = _.find(this.facturasSelected, { id: factura.id });
+
     const index_factura_en_turno = _.findIndex(this.facturasSelected, { id: factura.id });
 
     if (method == 'insert') {
@@ -375,6 +401,22 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.sumarTotalRecibo();
   }
 
+  tableInputBlur(params) {
+    const factura_en_turno = this.facturasSelected.find((factura) => factura.id == params.data.id);
+    if (fun.hasValue(factura_en_turno)) {
+      const total = factura_en_turno.balance;
+      const monto = fun.desformatear(factura_en_turno.monto);
+
+      if (monto > total) {
+        this.ExisteMontoMayor = true;
+        fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+        fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+      }
+    } else {
+      fun.desEnfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
+    }
+  }
+
   tableInputChange(params) {
     if (params.key == 'pagoT' && params.value) {
       const monto = params.data.select ? fun.numFormatTwoDecimals(params.data.balance) : '0.00';
@@ -383,7 +425,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (params.key == 'monto' && params.value != params.data.monto) {
       if (params.data.select) {
-        if (!params.value) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+        if (fun.isEmpty(params.value)) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
 
         const total = params.data.balance;
         const monto_desformateado = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
@@ -399,7 +441,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.ExisteMontoMayor = false;
         }
 
-        this.verificateFacturasSelected(params.data, 'modify', params.index, monto_original);
+        this.verificateFacturasSelected(params.newData, 'modify', params.index, monto_original);
       }
     }
 
@@ -472,7 +514,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
-    } else if (_.some(this.facturasSelected, (factura) => factura.monto == 0)) {
+    } else if (this.facturasSelected.some((factura) => factura.monto == 0)) {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
@@ -489,9 +531,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           dinamico: [
             {
               clase: 'btn btn-blanco mr-2',
-              function: (instance) => {
-                this.closeModal(instance);
-              },
+              function: (instance) => this.closeModal(instance),
               label: 'Cancelar',
               disable: false,
             },

@@ -6,6 +6,8 @@ export const pattern = {
 
 export enum teclasCode {
   _esc = 27,
+  _derecha = 39,
+  _izquierda = 37,
   _arriba = 38,
   _abajo = 40,
   _enter = 13,
@@ -77,6 +79,4 @@ export enum teclasCode {
   _x = 120,
   _y = 121,
   _z = 122,
-
-
 }

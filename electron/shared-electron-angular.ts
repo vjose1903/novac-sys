@@ -9,7 +9,6 @@ export const KEYWORD_ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
 export const KEYWORD_ELECTRON_PRINT_BASE64 = 'electron-print-base64';
 export const KEYWORD_ELECTRON_CHANGE_CONFIG_FILE = 'electron-change-config-file';
 
-
 export const ELECTRON_EVENT_CHECK_UPDATE = 'check-update';
 export const ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE = 'checking-for-update';
 export const ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE = 'update-available';
@@ -47,4 +46,10 @@ export interface PrintJob {
   name: string;
   printer: Printer;
   data: any[];
+}
+
+export default class SharedElectronAngular {
+  static sendEventToAngular(win, params: { event_name: string; info: any }) {
+    if (win) win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
+  }
 }

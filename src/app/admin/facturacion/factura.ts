@@ -1,3 +1,6 @@
+import { VehiculoC } from './../registros/registro-vehiculo/vehiculo';
+import { Validators } from '@angular/forms';
+import { ModalHistorialPagosComponent } from './../components/formularios en modales/modal-historial-pagos/modal-historial-pagos.component';
 import { CrudG } from '../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import { fun } from '../../core/services/functions.service';
@@ -34,17 +37,36 @@ export class FacturaC extends CrudG<FacturasI> {
     super('cabecera_facturas');
   }
 
+  static inputsMovimientosViaje = [
+    {
+      label: 'Seleccione el camión',
+      formControl: 'vehiculo_id',
+      items: [],
+      bindLabel: 'info_vehiculo',
+      bindValue: 'id',
+      searchFunction: FacturaC.getCamiones,
+      blurFunction: FacturaC.cleanCamiones,
+      notFoundText: 'Camión no encontrado',
+      disabledFunction: () => false,
+      validators: Validators.required,
+    },
+  ];
+
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
-      params.inputs['switches'] = {
-        title: 'Seleccione los metodos de pago deseados',
-        array: [
-          { label: 'Efectivo', value: true },
-          { label: 'Tarjeta', value: true },
-          { label: 'Cheque', value: true },
-          { label: 'Transferencia', value: false },
-        ],
-      };
+      if (params.tipo != 'movimientos_vehiculo') {
+        params.inputs['switches'] = {
+          title: 'Seleccione los metodos de pago deseados',
+          array: [
+            { label: 'Efectivo', value: true },
+            { label: 'Tarjeta', value: true },
+            { label: 'Cheque', value: true },
+            { label: 'Transferencia', value: false },
+          ],
+        };
+      } else {
+        params.inputs['dinamyc_selections'] = FacturaC.inputsMovimientosViaje;
+      }
 
       ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
 
@@ -56,27 +78,53 @@ export class FacturaC extends CrudG<FacturasI> {
     });
   }
 
+  static async cleanCamiones() {
+    FacturaC.inputsMovimientosViaje[0].items = [];
+  }
+
+  static async getCamiones(event) {
+    if (fun.hasValue(event.term)) {
+      fun.awaitTyping().then((res) => {
+        const extra = { afterPath: `filtro/${event.term}`, parameters: { paginado: false, info_vehiculo: true } };
+        new VehiculoC().getAll(extra).then((res) => {
+          console.log('res ', res);
+          FacturaC.inputsMovimientosViaje[0].items = res['data'];
+        });
+      });
+    } else {
+      FacturaC.inputsMovimientosViaje[0].items = [];
+    }
+  }
+
   static requestReporte(params: { reporte; pdf }) {
-    if (_.every(params.reporte.data.switches.array, (item) => item.value === false)) {
+    if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switches.array, (item) => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
-      const requestParams = { afterPath: 'custom/ventas', parameters: null };
-      let formas_pago = '(';
+      const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
+      let formas_pago = '';
 
-      params.reporte.data.switches.array.forEach((item) => {
-        if (item.value) formas_pago += `'${item.label}',`;
-      });
+      if (params.pdf.tipo != 'movimientos_vehiculo') {
+        formas_pago = '(';
 
-      formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+        params.reporte.data.switches.array.forEach((item) => {
+          if (item.value) formas_pago += `'${item.label}',`;
+        });
 
-      requestParams.parameters = {
-        tipo_factura_id: params.reporte.data.tipo_factura_id,
-        tipo: params.reporte.data.tipo,
-        condicion: params.reporte.data.condicion,
-        formas_pago: formas_pago,
-        desde: fun.my_dateFormater(params.reporte.data.desde, false),
-        hasta: fun.my_dateFormater(params.reporte.data.hasta, false),
-      };
+        formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+      }
+
+      requestParams.parameters['tipo_factura_id'] = params.reporte.data.tipo_factura_id;
+      requestParams.parameters['tipo'] = params.reporte.data.tipo;
+      requestParams.parameters['condicion'] = params.reporte.data.condicion;
+      requestParams.parameters['desde'] = fun.my_dateFormater(params.reporte.data.desde, false);
+      requestParams.parameters['hasta'] = fun.my_dateFormater(params.reporte.data.hasta, false);
+
+      for (let index = 0; index < FacturaC.inputsMovimientosViaje.length; index++) {
+        const item = FacturaC.inputsMovimientosViaje[index];
+        requestParams.parameters[item.formControl] = params.reporte.data[item.formControl];
+      }
+
+      if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
         let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, height: '76vh', fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
@@ -87,7 +135,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   getFacturaById(id: number) {
-    const extra = { parameters: { actual_price: true, camiones_viajes: true } };
+    const extra = { parameters: { actual_price: true, movimientos_viaje: true } };
     return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
@@ -97,7 +145,7 @@ export class FacturaC extends CrudG<FacturasI> {
     args.pagada ??= '0';
 
     const extra = {
-      afterPath: `custom/get_documentos/params`,
+      afterPath: `custom/get_documentos`,
       parameters: {
         page: args.page,
         per_page: args.per_page,
@@ -107,8 +155,8 @@ export class FacturaC extends CrudG<FacturasI> {
         campo: args.campo,
         valor: VALOR_ENC,
         tipo_factura_id: args.tipo_factura_id,
-        is_adelantada: _.has(args, 'adelantada') ? args.adelantada : '0',
-        estado: _.has(args, 'estado') ? args.estado : '0',
+        is_adelantada: fun.objHas(args, 'adelantada') ? args.adelantada : '0',
+        estado: fun.objHas(args, 'estado') ? args.estado : '0',
       },
     };
 
@@ -125,7 +173,6 @@ export class FacturaC extends CrudG<FacturasI> {
 
       const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [
         { old_key: 'tipo_factura', new_key: 'tipo_pdf' },
-
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
 
@@ -134,6 +181,9 @@ export class FacturaC extends CrudG<FacturasI> {
       if (data_parsed.tipo_pdf == 'COTIZACION') data_parsed.tipo_pdf = 'COTIZACIÓN';
       data_parsed.total = data_parsed.total_factura;
       data_parsed.contenido_reporte = [];
+
+      if (fun.hasValue(data_parsed.cliente) && data_parsed.cliente.nombre.length > 80) data_parsed.cliente.nombre = `${data_parsed.cliente.nombre.substring(0, 80)}...`;
+      if (fun.hasValue(data_parsed.suplidor) && data_parsed.suplidor.nombre.length > 80) data_parsed.suplidor.nombre = `${data_parsed.suplidor.nombre.substring(0, 80)}...`;
 
       data_parsed.detalle_facturas.forEach((detalle) => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {
@@ -186,6 +236,33 @@ export class FacturaC extends CrudG<FacturasI> {
         }
       });
     });
+  }
+
+  abrirModalHistorial(pagos, notas, openNewModal) {
+    if (pagos.length > 0 || notas.length > 0) {
+      for (let i = 0; i < pagos.length; i++) {
+        const pago = pagos[i];
+        pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
+        pago.fecha_equivalente = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
+      }
+
+      for (let i = 0; i < notas.length; i++) {
+        const nota = notas[i];
+        nota.total = Math.abs(nota.total);
+        nota.fecha_equivalente = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
+      }
+
+      const obj = { abonos: pagos, notas: notas };
+      openNewModal({
+        component: ModalHistorialPagosComponent,
+        inputs: obj,
+        id: 'historial_pago',
+        header: 'Historial de moviemientos a balance de factura',
+        width: '700px',
+        height: '400px',
+        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+      });
+    }
   }
 }
 

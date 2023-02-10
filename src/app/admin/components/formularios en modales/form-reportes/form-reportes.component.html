@@ -1,7 +1,27 @@
 <form [formGroup]="form">
   <div class="row">
+    <!-- ----- DINAMYC SELECTION -----  -->
+    <ng-container *ngIf="dinamycSelectionReady && inputs.tipo_reporte == 'movimientos_vehiculo'">
+      <div *ngFor="let dinamyc_selection of inputs.dinamyc_selections" class="col-12">
+        <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
+
+        <ng-select
+          [formControlName]="dinamyc_selection.formControl"
+          [items]="dinamyc_selection.items"
+          bindLabel="{{ dinamyc_selection.bindLabel }}"
+          bindValue="{{ dinamyc_selection.bindValue }}"
+          [clearable]="true"
+          [appendTo]="'body'"
+          (search)="dinamyc_selection.searchFunction($event)"
+          [notFoundText]="dinamyc_selection.notFoundText"
+          [disabled]="dinamyc_selection.disabledFunction()"
+          (blur)="dinamyc_selection.blurFunction()"
+        >
+        </ng-select>
+      </div>
+    </ng-container>
     <!-- ----- SELECCION DE CLIENTE -----  -->
-    <div *ngIf="tipo_reporte == 'ventas_cliente' || tipo_reporte == 'cuentas_con_pagos'" class="col-12">
+    <div *ngIf="inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'cuentas_con_pagos'" class="col-12">
       <label class="control-label mb-0 mt-2">Seleccione cliente: <span style="color: red">*</span> </label>
       <ng-select
         formControlName="cliente_id"
@@ -24,7 +44,7 @@
     </div>
 
     <!-- ----- CONDICION -----  -->
-    <div *ngIf="tipo_reporte == 'ventas_cliente' || tipo_reporte == 'ventas_rango' || tipo_reporte == 'ventas_diarias'" class="col-12">
+    <div *ngIf="inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_diarias'" class="col-12">
       <label class="control-label mb-0 mt-2">Condicion: <span style="color: red">*</span> </label>
       <select formControlName="condicion" class="form-control">
         <option disabled>Seleccione</option>
@@ -33,7 +53,7 @@
     </div>
 
     <!-- ----- TIPO -----  -->
-    <div *ngIf="tipo_reporte == 'recibos' || tipo_reporte == 'ventas_productos' || tipo_reporte == 'cuentas_cobrar_ant_saldo' || tipo_reporte == 'notas'" class="col-12">
+    <div *ngIf="inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'ventas_productos' || inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'notas'" class="col-12">
       <label class="control-label mb-0 mt-2">Tipo: <span style="color: red">*</span> </label>
       <select formControlName="tipo" class="form-control" (change)="changeTipo()">
         <option disabled>Seleccione</option>
@@ -42,7 +62,7 @@
     </div>
 
     <!-- ----- TIPO FACTURAS -----  -->
-    <div *ngIf="tipo_reporte == 'ventas_diarias' || tipo_reporte == 'ventas_rango' || tipo_reporte == 'ventas_cliente'" class="col-12">
+    <div *ngIf="inputs.tipo_reporte == 'ventas_diarias' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_cliente'" class="col-12">
       <label class="control-label mb-0 mt-2">Tipo de factura: <span style="color: red">*</span> </label>
       <select formControlName="tipo_factura_id" class="form-control">
         <option disabled>Seleccione</option>
@@ -51,7 +71,7 @@
     </div>
 
     <!-- ----- SELECCION DE ARTICULO -----  -->
-    <div *ngIf="tipo_reporte == 'suplidor_prod'" class="col-12 mb-3">
+    <div *ngIf="inputs.tipo_reporte == 'suplidor_prod'" class="col-12 mb-3">
       <label class="control-label mb-0 mt-2">Seleccione articulo: <span style="color: red">*</span> </label>
 
       <ng-select
@@ -75,7 +95,7 @@
 
     <!-- ----- FECHA -----  -->
 
-    <div *ngIf="(tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '1') || tipo_reporte == 'cuadre'" class="col-12">
+    <div *ngIf="(inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '1') || inputs.tipo_reporte == 'cuadre'" class="col-12">
       <label class="control-label mb-0 mt-2">Fecha: <span style="color: red">*</span> </label>
       <input type="text" [bsConfig]="dpConfig" placeholder="dd/mm/aaaa" class="form-control" formControlName="fecha" #dp="bsDatepicker" placement="bottom" bsDatepicker />
       <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)">Este campo es obligatorio</div>
@@ -84,13 +104,14 @@
 
     <div
       *ngIf="
-        tipo_reporte == 'notas' ||
-        tipo_reporte == 'ventas_rango' ||
-        tipo_reporte == 'suplidor_prod' ||
-        tipo_reporte == 'recibos' ||
-        tipo_reporte == 'cuentas_con_pagos' ||
-        tipo_reporte == 'ventas_cliente' ||
-        (tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')
+        inputs.tipo_reporte == 'notas' ||
+        inputs.tipo_reporte == 'ventas_rango' ||
+        inputs.tipo_reporte == 'suplidor_prod' ||
+        inputs.tipo_reporte == 'recibos' ||
+        inputs.tipo_reporte == 'cuentas_con_pagos' ||
+        inputs.tipo_reporte == 'ventas_cliente' ||
+        inputs.tipo_reporte == 'movimientos_vehiculo' ||
+        (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')
       "
       class="col-6"
     >
@@ -101,13 +122,14 @@
     <!-- ----- HASTA -----  -->
     <div
       *ngIf="
-        tipo_reporte == 'notas' ||
-        tipo_reporte == 'ventas_rango' ||
-        tipo_reporte == 'suplidor_prod' ||
-        tipo_reporte == 'recibos' ||
-        tipo_reporte == 'cuentas_con_pagos' ||
-        tipo_reporte == 'ventas_cliente' ||
-        (tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')
+        inputs.tipo_reporte == 'notas' ||
+        inputs.tipo_reporte == 'ventas_rango' ||
+        inputs.tipo_reporte == 'suplidor_prod' ||
+        inputs.tipo_reporte == 'recibos' ||
+        inputs.tipo_reporte == 'cuentas_con_pagos' ||
+        inputs.tipo_reporte == 'ventas_cliente' ||
+        inputs.tipo_reporte == 'movimientos_vehiculo' ||
+        (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')
       "
       class="col-6"
     >
@@ -118,12 +140,12 @@
   </div>
 </form>
 
-<div *ngIf="switches">
+<div *ngIf="inputs.switches">
   <br />
-  <label *ngIf="switches && switches?.title && fun.hasValue(switches.title)" class="control-label">{{ switches.title }} </label>
+  <label *ngIf="inputs.switches && inputs.switches?.title && fun.hasValue(inputs.switches.title)" class="control-label">{{ inputs.switches.title }} </label>
 
   <div>
-    <div class="form-group mb-2 switchDiv" *ngFor="let switch of switches.array">
+    <div class="form-group mb-2 switchDiv" *ngFor="let switch of inputs.switches.array">
       <input [(ngModel)]="switch.value" class="apple-switch ml-2" type="checkbox" />
       <span class="ml-2">{{ switch.label }}</span>
     </div>

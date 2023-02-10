@@ -1,12 +1,11 @@
 export const config_cxc = {
   margin_general: [0, 0, 0, 0],
-  isBreak: true,
-  break: 40,
+  isBreak: false,
   only_titulo: false,
-  // widths: [24, 65, 75, 55, '*', 'auto', 'auto'],
   widths: [24, 60, 73, 53, '*', 'auto'],
   mostrar_total: true,
   mostrar_bruto: false,
+  mensaje_contenido_vacio: 'El cliente buscado no tiene cuentas por cobrar.',
   info: [
     {
       text: '#',
@@ -54,17 +53,6 @@ export const config_cxc = {
       key: 'cliente_nombre',
       alignment_body: 'left',
     },
-    // {
-    //   text: 'Descuento',
-    //   alignment_titulo: 'right',
-    //   margin_titulo: [0, 0, 20, 0],
-    //   margin_body: [0, 0, 20, 0],
-    //   style: 'letra10',
-    //   style_body: 'letra10',
-    //   key: 'descuento',
-    //   alignment_body: 'right',
-    //   formato_numero: true,
-    // },
     {
       text: 'Pendiente',
       margin_titulo: [0, 0, 10, 0],

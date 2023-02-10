@@ -170,7 +170,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     });
   }
 
-  async getDataFromModal(arg, search) {
+  async getDataFromModal(arg, search?) {
     if (arg.modal_id == 'buscar_articulo') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput(`cod-${arg.index}`);
@@ -219,7 +219,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         fun.enfocarInput(campo);
       }
 
-      if (input == 'cod-' && fun.hasValue(uni) && _.lowerCase(uni) != _.lowerCase('medida')) {
+      if (input == 'cod-' && fun.hasValue(uni) && uni.toLowerCase() != 'medida'.toLowerCase()) {
         if (fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.ajustarSecuencia().then(() => fun.enfocarInput(campo_siguiente));
       }
 
@@ -303,7 +303,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
-      if (_.lowerCase(articulo.vendido_en) == 'saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en.toLowerCase() == 'saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
 
       if (articulo.is_detallable) {
         articulo.contenido_articulos.forEach((element) => {
@@ -311,7 +311,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         });
       }
 
-      this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, _.isEqual);
+      this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, fun.isEqual);
 
       if (this.inputDrop) setTimeout(() => fun.enfocarInput(this.inputDrop), 0);
     }
@@ -364,7 +364,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     const cantidad = fila_actual['can'];
 
     let cantidadMinima = 1;
-    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
+    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => uni.value.toLowerCase() == unidad.toLowerCase()).cantidad;
 
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
     control['cantidad_en_unidades'].setValue(cant_unidades);
@@ -470,7 +470,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
     let cantidadMinima = 1;
 
-    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => _.lowerCase(uni.value) === _.lowerCase(unidad)).cantidad;
+    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => uni.value.toLowerCase() == unidad.toLowerCase()).cantidad;
 
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
 
@@ -573,7 +573,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         return detalle;
       });
 
-      const almenos_uno = _.some(item.detalle_facturas, (detalle) => detalle.select);
+      const almenos_uno = item.detalle_facturas.some((detalle) => detalle.select);
       const todos = _.every(item.detalle_facturas, (detalle) => detalle.select);
 
       item.detalles_selected = todos ? 'fas fa-check' : almenos_uno ? 'far fa-check-square' : 'far fa-square';
@@ -750,26 +750,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     }
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
-  }
+
 
   getMaxCan(i) {
     const fila_actual = this.filasDetalle[i].getRawValue();

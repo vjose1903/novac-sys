@@ -275,7 +275,7 @@ function beforeCreateWindow(win) {
   setTimeout(() => {
     puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
     auto_updater = new AppUpdater(win);
-  }, 1000);
+  }, 2000);
   // ---------------------------------------
 }
 
@@ -535,7 +535,7 @@ function imprimir(params: { fileName: string; tipo: string; pageOrientation: str
     const file_path = await pathAdd(`/${params.fileName}`);
 
     puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
-    const comando = `${gsprint_path} -${params.pageOrientation} -ghostscript "${ghostscript_path}" -printer "${params.printer}" "${file_path}"`;
+    const comando = `${gsprint_path} -${params.pageOrientation} -colour -ghostscript "${ghostscript_path}" -dPDFFitPage -printer "${params.printer}" "${file_path}"`;
 
     cmd(comando, (res) => {
       if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
