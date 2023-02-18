@@ -1,3 +1,4 @@
+import { Ss } from './../../core/services/singleton.service';
 import { VehiculoC } from './../registros/registro-vehiculo/vehiculo';
 import { Validators } from '@angular/forms';
 import { ModalHistorialPagosComponent } from './../components/formularios en modales/modal-historial-pagos/modal-historial-pagos.component';
@@ -126,11 +127,31 @@ export class FacturaC extends CrudG<FacturasI> {
 
       if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
 
-      ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
+      ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then((response) => {
         let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, height: '76vh', fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
 
         ReporteC.visualizarReporte(objPdfView);
       });
+    }
+
+    function transformRequestResponse(requestResponse) {
+      const configApp = Ss.configServ.getConfig({ isPromise: false });
+
+      requestResponse.contenido_reporte = requestResponse.contenido_reporte.map((item) => {
+        const largo_nombre = configApp.calcular_itbis ? 48 : 48;
+
+        if (item.cliente_nombre.length > largo_nombre) item.cliente_nombre = `${item.cliente_nombre.substring(0, largo_nombre)} ...`;
+
+        return item;
+      });
+
+      if (params.pdf.tipo != 'movimientos_vehiculo') {
+        if (configApp.calcular_itbis) requestResponse.tipo_reporte += '_itbis';
+      }
+
+      console.log('requestResponse ', requestResponse);
+
+      return requestResponse;
     }
   }
 

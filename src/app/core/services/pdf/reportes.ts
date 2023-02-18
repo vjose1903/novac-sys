@@ -20,9 +20,17 @@ import { config_notas } from './8.5x5.5/configuraciones/reportes/notas';
 import { config_movimientos_vehiculo } from './8.5x5.5/configuraciones/reportes/movimientos_vehiculo';
 
 const configuraciones = {
+  // ventas_diarias
+  // ventas_rango
+
   ventas_diarias: config_ventas.detallado,
+  ventas_diarias_itbis: config_ventas.detallado_itbis,
+
   ventas_rango: config_ventas.detallado,
+  ventas_rango_itbis: config_ventas.detallado_itbis,
+
   ventas_rango_agrupado: config_ventas.agrupado,
+  ventas_rango_agrupado_itbis: config_ventas.agrupado_itbis,
 
   cxc: config_cxc,
   cxc_preventa: config_cxc_preventa,

@@ -50,7 +50,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
       this.versionApp = config.app_version;
 
-      this.form = this.fb.group({ usuario: config.is_development ? 'ADMIN' : null, password: config.is_development ? '1234567' : null });
+      this.form = this.fb.group({ usuario: config.is_development ? 'novac' : null, password: config.is_development ? '1234567' : null });
     });
     setTimeout(() => fun.enfocarInput('Iusuario'), 5);
     // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
