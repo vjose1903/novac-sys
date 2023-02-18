@@ -95,13 +95,12 @@ function createWindow() {
         electron: require(`${__dirname}/node_modules/electron`),
       });
 
-      win.loadURL('http://localhost:5220');
+      win.loadURL('http://localhost:5221');
     } else {
       win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
     }
 
     win.setMenuBarVisibility(false);
-
 
     // if (serve) {
     //   win.webContents.openDevTools();
@@ -110,7 +109,7 @@ function createWindow() {
     //     electron: require(path.join(__dirname, '/node_modules/electron')),
     //   });
 
-    //   win.loadURL('http://localhost:5220');
+    //   win.loadURL('http://localhost:5221');
     // } else {
     //   // Path when running electron executable
     //   let pathIndex = pathAdd('/dist/index.html');
@@ -121,7 +120,7 @@ function createWindow() {
     //   //   pathIndex = '../dist/index.html';
     //   //   baseDirectory = '../dist';
     //   // }
-    //   var httpPort = 5220;
+    //   var httpPort = 5221;
     //   const app = express();
 
     //   app.use(express.static(path.resolve(baseDirectory)));
@@ -150,7 +149,7 @@ function createWindow() {
     //   //   });
     //   // }
 
-    //   app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
+    //   app.listen(httpPort, () => win.loadURL('http://localhost:5221'));
 
     //   // win.loadURL(url.format({
     //   //   pathname: path.join(__dirname, pathIndex),
@@ -274,7 +273,7 @@ function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
 
   setTimeout(() => {
-
+    puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
     auto_updater = new AppUpdater(win);
   }, 2000);
   // ---------------------------------------

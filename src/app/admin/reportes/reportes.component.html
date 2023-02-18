@@ -16,7 +16,7 @@
           <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_productos', titulo: 'Reporte de productos vendidos por dia' })"> <i class="fas fa-shopping-basket"></i> Relación de productos vendidos </span>
           <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_con_pagos', titulo: 'Reporte de facturas a crédito con sus pagos' })"> <i class="fas fa-file-invoice-dollar"></i> Relación de ventas a crédito con sus movimientos </span>
           <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_cliente', titulo: 'Reporte de venta por cliente' })"> <i class="fas fa-user-tag"></i> Relación de ventas por cliente </span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"> <i class="fas fa-truck-moving"></i> Relación de viajes por camión </span>
+          <span *ngIf="hasPermisoCamiones" class="btnLetra" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"> <i class="fas fa-truck-moving"></i> Relación de viajes por camión </span>
         </div>
       </div>
       <div class="col-12 p-0 pr-2 mt-3">

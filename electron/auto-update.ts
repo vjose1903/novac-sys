@@ -35,7 +35,7 @@ export default class AppUpdater {
       puts('-=-=-=-=- checkUpdates -=-=-=-=-');
       puts(' . ');
 
-      autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-agrodemi', token: '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', private: true, autoDownload: false, autoUpdate: true });
+      autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-brendy', token: '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', private: true, autoDownload: false, autoUpdate: true });
       puts(autoUpdater, 'autoUpdater >>>>>>>>>>>>');
       const updateInfo = await autoUpdater.checkForUpdatesPromise();
 
@@ -60,11 +60,10 @@ export default class AppUpdater {
 
       puts('FINAL - ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
     }
-
   }
 
   async checkForUpdates(win) {
-    autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-agrodemi', token: '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', private: true, autoDownload: false, autoUpdate: true });
+    autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-brendy', token: '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', private: true, autoDownload: false, autoUpdate: true });
     autoUpdater.checkForUpdatesAndNotify();
 
     puts('-=-=-=-=- handleUpdateEvents -=-=-=-=-');
