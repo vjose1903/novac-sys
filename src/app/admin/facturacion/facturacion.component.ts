@@ -450,7 +450,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         } else {
           const id = factura.id ? factura.id : factura.cotizacion ? factura.cotizacion : factura.pre_factura ? factura.pre_factura : null;
           const res = await this.facturaClass.getFacturaById(id);
+
           factura = res['data'];
+          if ([actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action)) factura.condicion = 'Contado';
         }
       }
 
@@ -1685,8 +1687,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
-
-    // console.log('cabecera_fact ', cabecera_fact);
 
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
