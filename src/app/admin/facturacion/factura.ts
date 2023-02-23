@@ -88,7 +88,6 @@ export class FacturaC extends CrudG<FacturasI> {
       fun.awaitTyping().then((res) => {
         const extra = { afterPath: `filtro/${event.term}`, parameters: { paginado: false, info_vehiculo: true } };
         new VehiculoC().getAll(extra).then((res) => {
-          console.log('res ', res);
           FacturaC.inputsMovimientosViaje[0].items = res['data'];
         });
       });
@@ -138,18 +137,18 @@ export class FacturaC extends CrudG<FacturasI> {
       const configApp = Ss.configServ.getConfig({ isPromise: false });
 
       requestResponse.contenido_reporte = requestResponse.contenido_reporte.map((item) => {
-        const largo_nombre = configApp.calcular_itbis ? 48 : 48;
+        const largo_nombre = configApp.calcular_itbis && params.pdf.tipo != 'movimientos_vehiculo' ? 60 : 48;
 
-        if (item.cliente_nombre.length > largo_nombre) item.cliente_nombre = `${item.cliente_nombre.substring(0, largo_nombre)} ...`;
+        if (fun.objHas(item, 'cliente_nombre') && item.cliente_nombre.length > largo_nombre) item.cliente_nombre = `${item.cliente_nombre.substring(0, largo_nombre)} ...`;
 
         return item;
       });
 
       if (params.pdf.tipo != 'movimientos_vehiculo') {
-        if (configApp.calcular_itbis) requestResponse.tipo_reporte += '_itbis';
+        if (configApp.calcular_itbis) {
+          requestResponse.tipo_reporte += '_itbis';
+        }
       }
-
-      console.log('requestResponse ', requestResponse);
 
       return requestResponse;
     }

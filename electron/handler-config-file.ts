@@ -7,24 +7,24 @@ const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config: any = {
-    cliente: 'brendy',
-    color_app: 'red',
+    cliente: 'vasquez',
+    color_app: 'green',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-    direccion_empresa: 'El higuerito, frente a la escuela, La Vega Rep. Dom.',
+    direccion_empresa: 'C. Juana Saltitopa No. 37, Villa Real, La Vega. R.D.',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Panaderia & Reposteria Brendy',
-    rnc_empresa: '132-35083-9',
-    telefono_empresa: '(829)-423-1678',
-    url_servidor: 'http://novac-brendy.ddns.net:9091',
-    url_servidor_descargas: 'http://novac-brendy.ddns.net:9091',
-    url_servidor_respaldo: 'http://localhost:9091',
-    usa_url_principal: false,
-    is_db_local: true,
-    calcular_itbis: false,
-    is_produccion: true,
-    facturacion_editar_precio: true,
-    vende_sin_inventario: true,
+    nombre_empresa: 'D` Vásquez Services y Asociados, S.R.L',
+    rnc_empresa: '130-74935-3',
+    telefono_empresa: '(809) 573-3934',
+    url_servidor: 'http://novac-vasquez.ddns.net:9092',
+    url_servidor_descargas: 'http://novac-vasquez.ddns.net:9092',
+    url_servidor_respaldo: 'http://10.0.0.9:9092',
+    usa_url_principal: true,
+    is_db_local: false,
+    calcular_itbis: true,
+    is_produccion: false,
+    facturacion_editar_precio: false,
+    vende_sin_inventario: false,
     medida_producto_terminado: 'Producto',
 
     printer_selected: {
@@ -41,15 +41,15 @@ export default class HandlerConfigFile {
     },
 
     pages_sizes: {
-      venta_contado: '80mm_roll',
-      venta_credito: '80mm_roll',
-      pre_venta: '80mm_roll',
-      cotizacion: '80mm_roll',
-      compra: '80mm_roll',
-      recibo_ingreso: '80mm_roll',
-      conduce: '80mm_roll',
-      nota: '80mm_roll',
-      cuadre_caja: '80mm_roll',
+      venta_contado: '8.5x5.5',
+      venta_credito: '8.5x11',
+      pre_venta: '8.5x5.5',
+      cotizacion: '8.5x5.5',
+      compra: '8.5x5.5',
+      recibo_ingreso: '8.5x5.5',
+      conduce: '8.5x5.5',
+      nota: '8.5x5.5',
+      cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',
     },
 
@@ -57,7 +57,7 @@ export default class HandlerConfigFile {
       nota: 'Detallada',
     },
 
-    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cotizacion',
+    documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota,cotizacion',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {

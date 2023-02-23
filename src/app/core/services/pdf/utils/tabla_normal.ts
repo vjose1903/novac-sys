@@ -93,9 +93,10 @@ function getTotalizacion(configuration, data) {
 
   if ((data.total >= 0 && (data?.contenido_grupo?.length > 0 || data?.contenido_reporte?.length > 0)) || data.total >= 1) {
     const array = [
-      { bool: configuration.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.numFormatTwoDecimals(data?.bruto) },
-      { bool: configuration.mostrar_bruto, title: 'DEVUELTO RD$ ', value: fun_.numFormatTwoDecimals(data?.devuelto) },
-      { bool: configuration.mostrar_total, title: 'TOTAL RD$ ', value: fun_.numFormatTwoDecimals(data?.total) },
+      { bool: configuration?.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.numFormatTwoDecimals(data?.bruto) },
+      { bool: configuration?.mostrar_itbis, title: 'ITBIS RD$ ', value: fun_.numFormatTwoDecimals(data?.itbis) },
+      { bool: configuration?.mostrar_bruto, title: 'DEVUELTO RD$ ', value: fun_.numFormatTwoDecimals(data?.devuelto) },
+      { bool: configuration?.mostrar_total, title: 'TOTAL RD$ ', value: fun_.numFormatTwoDecimals(data?.total) },
     ];
 
     for (const item of array) {
