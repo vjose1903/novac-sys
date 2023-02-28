@@ -137,7 +137,7 @@ export class FacturaC extends CrudG<FacturasI> {
       const configApp = Ss.configServ.getConfig({ isPromise: false });
 
       requestResponse.contenido_reporte = requestResponse.contenido_reporte.map((item) => {
-        const largo_nombre = configApp.calcular_itbis && params.pdf.tipo != 'movimientos_vehiculo' ? 60 : 48;
+        const largo_nombre = configApp.calcular_itbis && params.pdf.tipo != 'movimientos_vehiculo' ? 58 : 48;
 
         if (fun.objHas(item, 'cliente_nombre') && item.cliente_nombre.length > largo_nombre) item.cliente_nombre = `${item.cliente_nombre.substring(0, largo_nombre)} ...`;
 

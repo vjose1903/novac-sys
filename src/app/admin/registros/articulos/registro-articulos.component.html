@@ -1,8 +1,7 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo d-flex">
     <h4 class="negrita mb-0 mr-3">Registro de articulos</h4>
-    <btn-icon-circular [id]="'btnConfiguracionArticulo'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" [tooltip]="'Configuraciones de articulos'" [tooltipPosition]="'right'" (clickFunction)="openModalConfig()">
-    </btn-icon-circular>
+    <btn-icon-circular [id]="'btnConfiguracionArticulo'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" [tooltip]="'Configuraciones de articulos'" [tooltipPosition]="'right'" (clickFunction)="openModalConfig()"> </btn-icon-circular>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
@@ -235,9 +234,9 @@
                     <div class="col-1"></div>
                   </div>
                   <div class="SCROLLFORMULA">
-                    <div [ngClass]="{ 'd-none': formula['controls']['_destroy'].value === '1' }" formArrayName="rowFormula" *ngFor="let formula of ARRAY_FORMULA.controls; let j = index">
-                      <div [formGroupName]="j">
-                        <hr *ngIf="j > 0" style="margin: 0.5rem 0rem 0.5rem 0rem; border: 0.5px solid #979797" />
+                    <div [ngClass]="{ 'd-none': formula['controls']['_destroy'].value === '1' }" formArrayName="rowFormula" *ngFor="let formula of ARRAY_FORMULA.controls; let index_formula = index">
+                      <div [formGroupName]="index_formula">
+                        <hr *ngIf="index_formula > 0" style="margin: 0.5rem 0rem 0.5rem 0rem; border: 0.5px solid #979797" />
                         <div class="row mb-2">
                           <div class="col-5 p-0">
                             <div class="form-group mb-0">
@@ -252,15 +251,15 @@
                                   [filter]="true"
                                   optionDisabled="optionDisabled"
                                   filterBy="nombre"
-                                  (onHide)="saltar('ingrediente_producir', j)"
-                                  (keydown.enter)="saltar('ingrediente_producir', j)"
-                                  (onChange)="getCosto(j, dropdown)"
+                                  (onHide)="saltar('ingrediente_producir', index_formula)"
+                                  (keydown.enter)="saltar('ingrediente_producir', index_formula)"
+                                  (onChange)="getCosto(index_formula, dropdown)"
                                   styleClass="form-control min"
                                   panelStyleClass="ingredienteDrop"
                                   [virtualScroll]="true"
                                   appendTo="body"
                                   [itemSize]="30"
-                                  id="articulo_id-{{ j }}"
+                                  id="articulo_id-{{ index_formula }}"
                                 ></p-dropdown>
                               </div>
                             </div>
@@ -271,9 +270,9 @@
                               <input
                                 (focus)="$event.target.select()"
                                 type="text"
-                                (keydown.enter)="saltar('cantidad_formula', j)"
+                                (keydown.enter)="saltar('cantidad_formula', index_formula)"
                                 (blur)="calculateCostoPT()"
-                                [id]="'cantidad_formula-' + j"
+                                [id]="'cantidad_formula-' + index_formula"
                                 formControlName="cantidad_formula"
                                 class="form-control"
                                 style="border-radius: 0.25rem 0rem 0rem 0.25rem !important"
@@ -284,21 +283,28 @@
                           </div>
                           <!--  -->
                           <div class="col-1 p-0">
-                            <input type="text" id="medida_formula-{{ j }}" tabindex="-1" formControlName="medida_formula" style="border-radius: 0rem 0.25rem 0.25rem 0rem !important; padding: 0.2rem" class="form-control disabled" autocomplete="off" />
+                            <input
+                              type="text"
+                              id="medida_formula-{{ index_formula }}"
+                              tabindex="-1"
+                              formControlName="medida_formula"
+                              style="border-radius: 0rem 0.25rem 0.25rem 0rem !important; padding: 0.2rem"
+                              class="form-control disabled"
+                              autocomplete="off"
+                            />
                           </div>
                           <!--  -->
                           <div class="col-3 pr-0">
                             <div class="form-group mb-0">
-                              <input type="text" id="costo_formula-{{ j }}" tabindex="-1" formControlName="costo_formula" [ngClass]="{ badAlert: checkCostoFormula(formula) }" class="form-control disabled" autocomplete="off" />
+                              <input type="text" id="costo_formula-{{ index_formula }}" tabindex="-1" formControlName="costo_formula" [ngClass]="{ badAlert: checkCostoFormula(formula) }" class="form-control disabled" autocomplete="off" />
                             </div>
                           </div>
-                          <div *ngxPermissionsOnly="permissions.articulo.update_formula" class="col-1 pl-2 p-0">
-                            <div *ngIf="j === 0" class="d-flex align-items-center h-100">
-                              <i (click)="addItem()" pTooltip="Agregar Ingrediente" tooltipPosition="top" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
+                          <div *ngxPermissionsOnly="permissions.articulo.update_formula" class="col-1 p-0">
+                            <div  class="btns-formula">
+                              <i *ngIf="index_formula == 0" (click)="addItem()" pTooltip="Agregar Ingrediente" tooltipPosition="top" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
+                              <i *ngIf="(index_formula == 0 && ARRAY_FORMULA.controls.length > 1) || index_formula > 0" (click)="removeItem(index_formula)" pTooltip="Quitar Ingrediente" tooltipPosition="top" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
                             </div>
-                            <div *ngIf="j !== 0" class="d-flex align-items-center h-100">
-                              <i (click)="removeItem(j)" pTooltip="Quitar Ingrediente" tooltipPosition="top" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
-                            </div>
+
                           </div>
                         </div>
                       </div>
