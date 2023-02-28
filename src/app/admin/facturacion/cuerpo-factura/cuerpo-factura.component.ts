@@ -2,7 +2,7 @@ import { RetornarDevueltoComponent } from './retornar-devuelto/retornar-devuelto
 import { FacturacionService } from './../facturacion.service';
 import { tipoDocFacturacion } from './../factura';
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
@@ -20,7 +20,7 @@ import { ModalClass } from '../../components/modal/modal-class';
   styleUrls: ['./cuerpo-factura.component.scss'],
 })
 export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDestroy {
-  form: FormGroup;
+  form: UntypedFormGroup;
   ARRAY_ROWFACTURAS;
 
   UnidadesArticulo = [];
@@ -51,7 +51,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   dropRowConfig: any;
   configApp: ConfigI;
-  constructor(private fb: FormBuilder, public factServ: FacturacionService) {
+  constructor(private fb: UntypedFormBuilder, public factServ: FacturacionService) {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
   }
@@ -105,11 +105,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           rowFactura: this.fb.array([this.createItem()]),
         });
 
-        this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as FormArray;
+        this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as UntypedFormArray;
 
         for (let index = 1; index <= 25; index++) await this.addItem();
 
-        this.factServ.filasDetalle = (this.form.controls['rowFactura'] as FormArray).controls;
+        this.factServ.filasDetalle = (this.form.controls['rowFactura'] as UntypedFormArray).controls;
         this.escucharCambiosEnForm();
 
         resolve(true);
@@ -202,7 +202,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   //  CREAR MAS INPUTS PARA FACTURA
   // =============================================
 
-  createItem(): FormGroup {
+  createItem(): UntypedFormGroup {
     return this.fb.group({
       key: [null],
       articulo: [null],
@@ -234,13 +234,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   addItem(): void {
-    this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
+    this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as UntypedFormArray;
     this.ARRAY_ROWFACTURAS.push(this.createItem());
   }
 
   removeItem(key: string) {
     const index = _.findIndex(this.factServ.filasDetalle, (detalle) => detalle.value.key == key);
-    (this.form.get('rowFactura') as FormArray).removeAt(index);
+    (this.form.get('rowFactura') as UntypedFormArray).removeAt(index);
   }
 
   // =============================================

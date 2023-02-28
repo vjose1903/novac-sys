@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
@@ -22,8 +22,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
   tituloTabla;
   @Output() accion_ = new EventEmitter<any>();
-  formMarca: FormGroup;
-  formModelo: FormGroup;
+  formMarca: UntypedFormGroup;
+  formModelo: UntypedFormGroup;
   permissions = Permisos;
   table_marca_config: table_config = {
     info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }],
@@ -78,7 +78,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   hasPermissionsMarcaCreate: boolean;
   hasPermissionsModeloCreate: boolean;
 
-  constructor(private fb: FormBuilder, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
 

@@ -1,6 +1,6 @@
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
@@ -52,7 +52,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   cliente;
   facturas_adelantadas = [];
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   ARRAY_ROWARTICULOS: any;
   indexRemove: any;
   filasDetalle;
@@ -93,7 +93,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
   configApp: ConfigI;
-  constructor(private fb: FormBuilder, public mServ: ModalService) {
+  constructor(private fb: UntypedFormBuilder, public mServ: ModalService) {
     super();
   }
 
@@ -104,7 +104,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       rowFactura: this.fb.array([this.createItem(0)]),
     });
 
-    this.ARRAY_ROWARTICULOS = this.form['rowFactura'] as FormArray;
+    this.ARRAY_ROWARTICULOS = this.form['rowFactura'] as UntypedFormArray;
 
     for (let index = 1; index <= 22; index++) {
       this.addItem(index);
@@ -134,7 +134,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   ngAfterViewInit() {
-    this.filasDetalle = (this.form.controls['rowFactura'] as FormArray).controls;
+    this.filasDetalle = (this.form.controls['rowFactura'] as UntypedFormArray).controls;
   }
 
   async procesoQuitarArticulo() {
@@ -424,12 +424,12 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   addItem(index): void {
-    this.ARRAY_ROWARTICULOS = this.form.get('rowFactura') as FormArray;
+    this.ARRAY_ROWARTICULOS = this.form.get('rowFactura') as UntypedFormArray;
     this.ARRAY_ROWARTICULOS.push(this.createItem(index));
   }
 
   removeItem(i: number) {
-    (this.form.get('rowFactura') as FormArray).removeAt(i);
+    (this.form.get('rowFactura') as UntypedFormArray).removeAt(i);
   }
 
   verificarSecuencia(index, mover = true) {
@@ -486,7 +486,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     }
   }
 
-  createItem(i): FormGroup {
+  createItem(i): UntypedFormGroup {
     return this.fb.group({
       id: [],
       articulo: [null],
@@ -565,7 +565,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   checkFacturasAdelantadasSelection() {
     this.facturas_adelantadas.map((item) => {
       item.detalle_facturas.map((detalle) => {
-        const formArray = this.form.get('rowFactura') as FormArray;
+        const formArray = this.form.get('rowFactura') as UntypedFormArray;
         const existe = formArray.value.find((d) => d.detalle_factura_id == detalle.id);
 
         detalle.select = fun.hasValue(existe);

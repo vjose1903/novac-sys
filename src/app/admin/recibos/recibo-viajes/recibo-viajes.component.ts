@@ -10,7 +10,7 @@ import { ReciboC } from '../recibos';
 import { FacturaC } from '../../facturacion/factura';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -112,7 +112,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   // form;
 
   fun = fun;
-  constructor(private tServ: TablasService, private fb: FormBuilder, private route: ActivatedRoute, private router: Router) {
+  constructor(private tServ: TablasService, private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router) {
     super();
   }
 

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
@@ -16,7 +16,7 @@ import { ModalClass } from '../../components/modal/modal-class';
 })
 export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   titulo;
-  form: FormGroup;
+  form: UntypedFormGroup;
   listaRoles = [];
   listaPermisos = [];
 
@@ -65,7 +65,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   TablasComponent;
   palabra_buscar: any;
 
-  constructor(private fb: FormBuilder, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();
   }
 

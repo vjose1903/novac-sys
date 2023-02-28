@@ -1,6 +1,6 @@
 import { fun } from './../../../../../core/services/functions.service';
 import { ModalI } from './../../../../components/modal/modal-class';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ConfigArticuloC } from '../articulos_configuracion';
 
@@ -10,13 +10,13 @@ import { ConfigArticuloC } from '../articulos_configuracion';
   styleUrls: ['./config-articulos.component.scss'],
 })
 export class ConfigArticulosComponent implements OnInit, ModalI {
-  form: FormGroup;
+  form: UntypedFormGroup;
   modal: any = {};
   inputs: any;
   update_articulos = true;
   configArticuloClass = new ConfigArticuloC();
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
     this.createForm(this.inputs.cofig_articulos).then(() => {

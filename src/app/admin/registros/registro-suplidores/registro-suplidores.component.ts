@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -17,7 +17,7 @@ import { Permisos } from '../../../core/typescript/permisos';
   styleUrls: ['./registro-suplidores.component.scss'],
 })
 export class RegistroSuplidoresComponent extends MixinClass implements OnInit, OnDestroy {
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   boton = '';
   metodo;
@@ -55,7 +55,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   tablaComponent;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
     super();
   }
 

@@ -2,7 +2,7 @@ import { tFacturaD } from './../../../facturacion/factura';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { Ss } from './../../../../core/services/singleton.service';
 import { Component, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as moment from '../../../../core/javascript/moment';
 
@@ -20,7 +20,7 @@ import { fun } from '../../../../core/services/functions.service';
 export class FormReportesComponent extends MixinClass implements OnInit, ModalI {
   fun = fun;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
   condiciones = [
@@ -42,7 +42,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   clienteClass = new ClienteC();
   dinamycSelectionReady: boolean = false;
 
-  constructor(private fb: FormBuilder, private localeService: BsLocaleService) {
+  constructor(private fb: UntypedFormBuilder, private localeService: BsLocaleService) {
     super();
     this.dpConfig = Object.assign({}, { showWeekNumbers: false, maxDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
   }

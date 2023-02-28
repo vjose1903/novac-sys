@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalI } from '../../../../admin/components/modal/modal-class';
 import * as _ from 'lodash';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '../../../../core/services/functions.service';
 import { timeStamp } from 'console';
 
@@ -11,7 +11,7 @@ import { timeStamp } from 'console';
   styleUrls: ['./remover-articulo.component.scss'],
 })
 export class RemoverArticuloComponent implements OnInit, ModalI {
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: UntypedFormBuilder) {}
   modal: any = {};
   inputs: any;
 

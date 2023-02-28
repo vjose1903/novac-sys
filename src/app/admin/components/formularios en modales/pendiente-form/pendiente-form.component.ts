@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as moment from '../../../../core/javascript/moment';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
@@ -20,7 +20,7 @@ export class PendienteFormComponent implements OnInit, ModalI {
   fecha;
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private localeService: BsLocaleService) {
+  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private localeService: BsLocaleService) {
     this.dpConfig = Object.assign(
       {},
       {

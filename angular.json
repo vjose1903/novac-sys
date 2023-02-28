@@ -171,7 +171,6 @@
       }
     }
   },
-  "defaultProject": "novac-system",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",

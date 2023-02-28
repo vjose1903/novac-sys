@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { Ss } from '../../../core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
@@ -70,7 +70,7 @@ export class ConfiguracionesComponent implements OnInit {
 
   configCopy;
 
-  constructor(private fb: FormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
+  constructor(private fb: UntypedFormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {

@@ -3,7 +3,7 @@ import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/re
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
 import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
@@ -93,7 +93,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   id_documento: any;
   factura_a_rellenar: FacturasI;
-  form: FormGroup;
+  form: UntypedFormGroup;
   fecha;
   modo_factura;
   is_adelantada;
@@ -172,7 +172,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   tipoDocFacturacion = tipoDocFacturacion;
   fun = fun;
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService) {
+  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService) {
     super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });

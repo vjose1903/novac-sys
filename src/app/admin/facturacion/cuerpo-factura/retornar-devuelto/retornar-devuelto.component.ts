@@ -4,7 +4,7 @@ import { fun } from './../../../../core/services/functions.service';
 import { ModalI } from './../../../components/modal/modal-class';
 import { Component, DoCheck, OnInit } from '@angular/core';
 import * as _ from 'lodash';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-retornar-devuelto',
@@ -12,7 +12,7 @@ import { FormBuilder, Validators } from '@angular/forms';
   styleUrls: ['./retornar-devuelto.component.scss'],
 })
 export class RetornarDevueltoComponent extends MixinClass implements OnInit, ModalI, DoCheck {
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: UntypedFormBuilder) {
     super();
   }
   modal: any = {};

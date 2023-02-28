@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 import { ModalI } from '../../../admin/components/modal/modal-class';
 import { fun } from '../../../core/services/functions.service';
@@ -16,7 +16,7 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit, 
   inputs;
   form;
 
-  constructor(private fb: FormBuilder, private sharedServ: SharedService) {
+  constructor(private fb: UntypedFormBuilder, private sharedServ: SharedService) {
     super();
   }
 

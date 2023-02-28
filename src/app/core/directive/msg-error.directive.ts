@@ -1,5 +1,5 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import * as _ from 'lodash';
 import { fun } from '../services/functions.service';
 import { Ss } from '../services/singleton.service';
@@ -9,7 +9,7 @@ import { Ss } from '../services/singleton.service';
 })
 export class MsgErrorDirective {
   @Input('appMsgError') id;
-  @Input() form: FormGroup;
+  @Input() form: UntypedFormGroup;
 
   id_content;
   id_msg;

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, FormArray, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -18,7 +18,7 @@ import { Permisos } from '../../../core/typescript/permisos';
 })
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   listaClientes = [];
   FORM: any;
@@ -57,7 +57,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   };
   tablaComponent;
 
-  constructor(private fb: FormBuilder, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();
   }
 

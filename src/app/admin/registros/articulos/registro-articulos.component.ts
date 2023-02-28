@@ -1,6 +1,6 @@
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
-import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -28,7 +28,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   // =============================================
 
   boton = '';
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   isDetallable = false;
   medida: boolean;
@@ -48,7 +48,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   isCreando: boolean = false;
 
-  ARRAY_FORMULA: FormArray;
+  ARRAY_FORMULA: UntypedFormArray;
   COMPRADOEN: any;
   MEDIDACAJA: any;
   is_combo = false;
@@ -93,7 +93,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   tablaComponent;
   cofig_articulos: ConfigArticuloI;
 
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
 
@@ -324,7 +324,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       otros_costos: [null],
     });
 
-    this.ARRAY_FORMULA = this.form.controls['rowFormula'] as FormArray;
+    this.ARRAY_FORMULA = this.form.controls['rowFormula'] as UntypedFormArray;
   }
 
   saltar(campo, i?) {
@@ -420,7 +420,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   //  CREAR MAS INPUTS PARA DETALLE
   // =============================================
 
-  createItem(): FormGroup {
+  createItem(): UntypedFormGroup {
     const permission = this.hasPermissionUpdateFormula;
     return this.fb.group({
       id: [{ value: null, disabled: !permission }],
@@ -434,18 +434,18 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   resetArray() {
-    this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
+    this.ARRAY_FORMULA = this.form.get('rowFormula') as UntypedFormArray;
 
     this.ARRAY_FORMULA.value.forEach((element) => this.removeItem(0));
   }
 
   addItem(): void {
-    this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
+    this.ARRAY_FORMULA = this.form.get('rowFormula') as UntypedFormArray;
     this.ARRAY_FORMULA.push(this.createItem());
   }
 
   removeItem(i: number) {
-    const control = this.form.controls['rowFormula'] as FormArray;
+    const control = this.form.controls['rowFormula'] as UntypedFormArray;
     control.removeAt(i);
   }
 
@@ -475,7 +475,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async getCosto(index, dropdown) {
-    const control = this.form.controls['rowFormula'] as FormArray;
+    const control = this.form.controls['rowFormula'] as UntypedFormArray;
     const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
     const arrayUnidades = Object.keys(unidades);
     (control.controls[index] as any).controls['costo_formula'].setValue(null);
@@ -696,7 +696,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   fillFormula(ingredient, i, recalcular = false) {
-    const control = this.form.controls['rowFormula'] as FormArray;
+    const control = this.form.controls['rowFormula'] as UntypedFormArray;
 
     const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo));
 

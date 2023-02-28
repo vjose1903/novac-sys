@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../core/typescript/GLOBAL';
@@ -22,7 +22,7 @@ import { ModalClass } from '../../components/modal/modal-class';
 })
 export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
-  form: FormGroup;
+  form: UntypedFormGroup;
   phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
   listaVehiculos = [];
   FORM: any;
@@ -62,7 +62,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   formPermissions = [Permisos.vehiculo.create, Permisos.vehiculo.update];
   hasPermissionsMarca: boolean;
   hasPermissionsModelo: boolean;
-  constructor(private cdRef: ChangeDetectorRef, private fb: FormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
 

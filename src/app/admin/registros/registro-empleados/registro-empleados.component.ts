@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
@@ -20,7 +20,7 @@ import { Permisos } from '../../../core/typescript/permisos';
   styleUrls: ['./registro-empleados.component.scss'],
 })
 export class RegistroEmpleadosComponent extends MixinClass implements OnInit, OnDestroy {
-  form: FormGroup;
+  form: UntypedFormGroup;
   boton = '';
   pattern = pattern;
 
@@ -58,7 +58,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   tablaComponent;
   formPermissions = [Permisos.user.create, Permisos.user.update];
 
-  constructor(private fb: FormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
     super();
     this.dpConfig = Object.assign({}, { showWeekNumbers: false, maxDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
   }

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
 import { IpcService } from '../core/services/ipc.service';
@@ -25,7 +25,7 @@ import { FacturaC } from '../admin/facturacion/factura';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
-  form: FormGroup;
+  form: UntypedFormGroup;
   errorC = '';
   errorU = '';
   versionApp = '';
@@ -36,7 +36,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   configServ = Ss.configServ;
   configApp: ConfigI;
 
-  constructor(private fb: FormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {
+  constructor(private fb: UntypedFormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {
     super();
   }
 

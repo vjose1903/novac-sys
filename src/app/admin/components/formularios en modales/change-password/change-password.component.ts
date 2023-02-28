@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
@@ -11,13 +11,13 @@ import { ModalI } from '../../modal/modal-class';
   styleUrls: ['./change-password.component.scss'],
 })
 export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
-  form: FormGroup;
+  form: UntypedFormGroup;
   element: HTMLElement;
   empleadoClass = new EmpleadoC();
   modal: any = {};
   inputs: any;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: UntypedFormBuilder) {
     super();
   }
 
