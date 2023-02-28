@@ -33,6 +33,17 @@ export class fun {
       else btn_side.removeAttribute('data-cant-facturas');
     }
   }
+  // __________________________________________________________________________________________________
+  // Nombre: crearContador
+  // Descripcion : Esta funcion crea una variable contador para poder utilizarla en otras funciones
+  // _________________________________________________________________________________________________
+  static crearContador() {
+    let count = 0;
+    return () => {
+      count++;
+      console.log(count);
+    };
+  }
 
   // __________________________________________________________________________________________________
   // Nombre: date_formater
