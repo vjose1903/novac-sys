@@ -344,11 +344,15 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       if (params.iconKey == 'ver') {
         this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
-          this.facturaClass.handleMostrarFactura(dataFactura).then((obj_modal) => {
-            const ver_datelles_btn = { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false };
-            obj_modal.botones.dinamico.push(ver_datelles_btn);
-            this.openNewModal(obj_modal);
-          });
+          let botonesDinamicos = [
+            { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
+          ];
+          const toPDFData = { data: dataFactura, type: 'facturacion' };
+
+          const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA' };
+
+          this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then((obj_modal) => this.openNewModal(obj_modal));
         });
       }
     }

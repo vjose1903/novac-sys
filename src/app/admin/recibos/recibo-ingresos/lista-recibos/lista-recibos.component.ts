@@ -144,7 +144,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
             instance.closeModal(instance.id, 'anular_recibo');
           };
 
-          this.confirmationModal({ id: 'anular_recibo', header: 'Confirmar', texto: texto_modal, siFunction: siFunction, });
+          this.confirmationModal({ id: 'anular_recibo', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
           break;
 
         default:
@@ -152,7 +152,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       }
     }
   }
-
 
   makeReciboPdf(arg) {
     const recibo_selected = _.find(this.lista_recibos, (recibo) => recibo.id === arg.id);
@@ -172,7 +171,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
           const base64 = res.base64;
           const pageOrientation = res.pageOrientation;
 
-          const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', height: '40rem', reimprimir: true, fileName: _.first(res.file.split('.')) };
+          const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           this.loadServ.isLoading.next(false);
 
@@ -182,7 +181,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
             id: 'revision_recibo',
             header: obj_pdf.titulo,
             width: '900px',
-            height: obj_pdf.height,
+            height: '40rem',
             botones: {
               ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [

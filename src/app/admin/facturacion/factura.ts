@@ -127,7 +127,7 @@ export class FacturaC extends CrudG<FacturasI> {
       if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then((response) => {
-        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal};
+        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
 
         ReporteC.visualizarReporte(objPdfView);
       });
@@ -231,18 +231,19 @@ export class FacturaC extends CrudG<FacturasI> {
     };
   }
 
-  handleMostrarFactura(dataFactura, botones_dinamicos?) {
+  handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?) {
     return new Promise<any>((resolve, reject) => {
-      const toPDFData = { data: dataFactura, type: 'facturacion' };
+      // const toPDFData = { data: dataFactura, type: 'facturacion' };
 
       PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
         if (res.status === 'si') {
-          const inputs = { base64: res.base64, height: '40rem', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')), viewerOptions: { height: '40rem' } };
+
           const obj_modal = {
             component: PdfViewerComponent,
             inputs: inputs,
-            id: 'mostrarFactura',
-            header: 'MOSTRAR FACTURA',
+            id: dataModal.id,
+            header: dataModal.header,
             width: '900px',
             botones: {
               ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),

@@ -196,46 +196,23 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   mostrarFactura(dataFactura, type) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any }];
 
-    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
-      if (res.status === 'si') {
-        const inputs = {
-          show_estado: true,
-          estado_documento: dataFactura.estado,
-          base64: res.base64,
-          height: '40rem',
-          reimprimir: res.reimprimir,
-          fileName: _.first(res.file.split('.')),
-        };
+    if (this.inputs.code == tipoDocFacturacion.cotizacion) {
+      botonesDinamicos.push({
+        clase: 'btn btn-gris ml-2',
+        function: (instance) => {
+          instance.closeModal(instance.id, 'mostrarFactura');
+          this.tableClickIcon({ id_tabla: 'mostrar_documento', columnKey: 'actions', iconKey: 'rellenar_factura', data: dataFactura });
+        },
+        label: 'Facturar',
+        disable: { function: () => fun.hasValue(dataFactura.fecha_completada) },
+      });
+    }
 
-        const obj_modal = {
-          component: PdfViewerComponent,
-          inputs: inputs,
-          id: 'mostrarDocumento',
-          header: 'MOSTRAR DOCUMENTO',
-          width: '900px',
-          botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: botonesDinamicos,
-          },
-        };
+    const dataModal = { id: 'mostrarDocumento', header: 'MOSTRAR DOCUMENTO' };
 
-        if (this.inputs.code == tipoDocFacturacion.cotizacion) {
-          obj_modal.botones.dinamico.push({
-            clase: 'btn btn-gris ml-2',
-            function: (instance) => {
-              instance.closeModal(instance.id, 'mostrarFactura');
-              this.tableClickIcon({ id_tabla: 'mostrar_documento', columnKey: 'actions', iconKey: 'rellenar_factura', data: dataFactura });
-            },
-            label: 'Facturar',
-            disable: { function: () => fun.hasValue(dataFactura.fecha_completada) },
-          });
-        }
-
-        this.openNewModal(obj_modal);
-      }
-    });
+    this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then((obj_modal) => this.openNewModal(obj_modal));
   }
 
   pasar_a_facturacion(documento_selected) {

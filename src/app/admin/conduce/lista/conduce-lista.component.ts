@@ -172,17 +172,17 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
           const base64 = res.base64;
           const pageOrientation = res.pageOrientation;
 
-          const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', height: '40rem', reimprimir: true, fileName: _.first(res.file.split('.')) };
+          const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           this.loadServ.isLoading.next(false);
 
           this.openNewModal({
             component: PdfViewerComponent,
             inputs: obj_pdf,
-            id: 'revision_recibo',
+            id: 'revision_conduce',
             header: obj_pdf.titulo,
             width: '900px',
-            height: obj_pdf.height,
+            height: '40rem',
             botones: {
               ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
