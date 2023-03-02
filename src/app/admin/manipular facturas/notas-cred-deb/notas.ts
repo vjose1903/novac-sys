@@ -1,3 +1,4 @@
+import { inputViewerOptions } from './../../components/pdf-viewer/pdf-viewer';
 import { ConfigI } from './../../../core/typescript/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
@@ -115,6 +116,8 @@ export class NotaC extends CrudG<any> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
+      console.log('response ', response);
+
       let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
 
       ReporteC.visualizarReporte(objPdfView);

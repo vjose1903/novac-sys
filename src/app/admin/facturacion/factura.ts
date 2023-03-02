@@ -127,7 +127,7 @@ export class FacturaC extends CrudG<FacturasI> {
       if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then((response) => {
-        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, height: '76vh', fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
+        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal};
 
         ReporteC.visualizarReporte(objPdfView);
       });

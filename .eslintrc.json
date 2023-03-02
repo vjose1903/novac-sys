@@ -14,6 +14,7 @@
         // "plugin:@typescript-eslint/recommended",
         // "plugin:@typescript-eslint/recommended-requiring-type-checking"
       ],
+
       "parser": "@typescript-eslint/parser",
       // "parserOptions": {
       //   "ecmaVersion": 10,
@@ -24,6 +25,7 @@
       //   }
       // },
       "plugins": ["@typescript-eslint", "@angular-eslint/eslint-plugin"],
+
       "rules": {
         "@typescript-eslint/indent": [
           "error",

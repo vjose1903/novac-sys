@@ -1,3 +1,4 @@
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -24,6 +25,21 @@ import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular
 
 @NgModule({
   declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
-  imports: [CommonModule, LayoutRoutingModule, PrimengModule, TablasModule, TabViewModule, NgxBootstrapModule, NgSelectModule, FormsModule, DirectivesModule, PdfViewerModule, ReactiveFormsModule, NgxPermissionsModule.forChild(), BtnIconModule],
+  imports: [
+    CommonModule,
+    LayoutRoutingModule,
+    PrimengModule,
+    TablasModule,
+    TabViewModule,
+    NgxBootstrapModule,
+    NgSelectModule,
+    FormsModule,
+    DirectivesModule,
+    PdfViewerModule,
+    ReactiveFormsModule,
+    NgxPermissionsModule.forChild(),
+    BtnIconModule,
+    NgxExtendedPdfViewerModule,
+  ],
 })
 export class LayoutModule {}

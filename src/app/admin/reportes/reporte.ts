@@ -1,3 +1,4 @@
+import { inputViewerOptions, viewerOptions } from './../components/pdf-viewer/pdf-viewer';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { Ss } from '../../core/services/singleton.service';
 import { fun } from '../../core/services/functions.service';
@@ -64,7 +65,10 @@ export class ReporteC extends CrudG<any> {
     });
   }
 
-  static visualizarReporte(objPdfView: { openNewModal: Function; status: string; pageOrientation: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; height: string; width: string }) {
+  static visualizarReporte(objPdfView: { openNewModal: Function; status: string; pageOrientation: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; viewerOptions: viewerOptions }) {
+
+    objPdfView['viewerOptions'] ??= {};
+
     if (objPdfView.status == 'no') fun.toastError(objPdfView.msg, 'ERROR');
     else {
       objPdfView.openNewModal({
@@ -72,8 +76,8 @@ export class ReporteC extends CrudG<any> {
         inputs: objPdfView,
         id: 'reporte_view',
         header: objPdfView.titulo,
-        width: objPdfView.width ?? '57rem',
-        height: objPdfView.height,
+        width: objPdfView?.viewerOptions?.width ?? '57rem',
+        height: objPdfView?.viewerOptions?.height ?? '76vh',
         botones: {
           ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [

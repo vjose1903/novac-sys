@@ -389,9 +389,9 @@ function getActualGitUser() {
   });
 }
 
-function getPrinters() {
-  const printers_list = win.webContents.getPrinters().map((item) => item.name);
-
+async function getPrinters() {
+  const printerPromise = await win.webContents.getPrintersAsync();
+  const printers_list = printerPromise.map((item) => item.name);
   return printers_list;
 }
 
@@ -406,7 +406,7 @@ function getConfigFile() {
     Functions.getConfigFile()
       .then(async (config: any) => {
         var config = JSON.parse(config);
-        const printer_list = getPrinters();
+        const printer_list = await getPrinters();
         config['is_development'] = serve_;
         config['gitUser'] = await getActualGitUser();
         config['printersList'] = ['Ninguna', ...printer_list];
@@ -439,7 +439,6 @@ function borrarLogs() {
     setTimeout(() => resolve(true), 1000);
   });
 }
-
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
@@ -528,7 +527,6 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function imprimir(params: { fileName: string; tipo: string; pageOrientation: string; printer: string }) {
   return new Promise(async (resolve, reject) => {
-
     const gsprint_path = await pathAdd(`/print/gsprint.exe`);
     const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
 

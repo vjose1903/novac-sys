@@ -13,11 +13,10 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
-import { AngularResizeEventModule } from 'angular-resize-event';
 
 @NgModule({
   declarations: [NewTablasComponent, NewBTNACCIONESComponent],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, DropdownModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule, InputSwitchModule, NgxPermissionsModule.forChild(), AngularResizeEventModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, DropdownModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule, InputSwitchModule, NgxPermissionsModule.forChild()],
   exports: [NewTablasComponent, NewBTNACCIONESComponent],
 })
 export class TablasModule {}

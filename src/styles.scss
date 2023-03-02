@@ -55,10 +55,10 @@ $bodyfont: "Poppins";
   z-index: 9999999 !important;
 }
 
-html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
-  right: 2px !important;
-  top: 0 !important;
-}
+// html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
+//   right: 2px !important;
+//   top: 0 !important;
+// }
 
 .h-96 {
   height: 96% !important;

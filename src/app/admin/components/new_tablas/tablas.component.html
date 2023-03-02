@@ -207,7 +207,8 @@
               <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
             </div>
 
-            <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)">
+            <!-- <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)"> -->
+            <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center">
               <!-- ({{ tServ.getPaginationById(config.id_tabla + post_id)?.page }}) -->
               <p-paginator
                 *ngIf="showPagination"

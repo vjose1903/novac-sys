@@ -9,7 +9,7 @@ export class InventarioC {
       const requestParams = { afterPath: `custom/${params.tipo}`, parameters: null };
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
-        let objPdfView = { ...response, titulo: params.inputs.titulo, height: '76vh', fileName: _.first(response.file.split('.')), openNewModal: params.openNewModal };
+        let objPdfView = { ...response, titulo: params.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: params.openNewModal };
 
         ReporteC.visualizarReporte(objPdfView);
       });

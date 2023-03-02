@@ -15,3 +15,18 @@ span.canceladaContent {
     text-shadow: 2px 2px 12px #585858eb;
   }
 }
+
+::ng-deep {
+  ngx-extended-pdf-viewer * {
+    -webkit-box-sizing: content-box !important;
+    -moz-box-sizing: content-box !important;
+    box-sizing: content-box !important;
+  }
+
+  ngx-extended-pdf-viewer .pdfViewer .canvasWrapper {
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+}

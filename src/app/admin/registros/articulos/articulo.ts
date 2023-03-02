@@ -81,7 +81,6 @@ export class ArticuloC extends CrudG<ArticuloI> {
       let objModal;
       switch (params.tipo) {
         case 'ventas_productos':
-
           ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
           objModal = ReporteC.objReporte;
 
@@ -101,7 +100,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
   }
 
   static requestReporte(reporteParams, pdfParams) {
-    let tipo;
+
     let requestParameters;
 
     switch (pdfParams.tipo) {
@@ -118,7 +117,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
-      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem', fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal};
 
       ReporteC.visualizarReporte(objPdfView);
     });

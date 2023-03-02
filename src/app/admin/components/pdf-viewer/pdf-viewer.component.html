@@ -1,21 +1,21 @@
 <div class="position-relative">
-    <span *ngIf="inputs?.show_estado && !inputs?.estado_documento" class="canceladaContent">
-    <span class="canceladaContent">
-      FACTURA ANULADA
-    </span>
+  <span *ngIf="inputs?.show_estado && !inputs?.estado_documento" class="canceladaContent">
+    <span class="canceladaContent"> FACTURA ANULADA </span>
   </span>
+
   <ngx-extended-pdf-viewer
-    [showDownloadButton]="false"
-    [showOpenFileButton]="false"
-    [filenameForDownload]="inputs?.fileName"
-    [showSecondaryToolbarButton]="false"
-    [showZoomButtons]="true"
-    [showRotateButton]="false"
-    [showBookmarkButton]="false"
-    [enablePrint]="false"
     [base64Src]="inputs?.base64"
-    [useBrowserLocale]="true"
-    [height]="inputs?.height"
-    [textLayer]="false"
+    [filenameForDownload]="inputs?.fileName"
+    [height]="inputs?.viewerOptions?.height || ''"
+    [showDownloadButton]="inputs?.viewerOptions?.showDownloadButton || false"
+    [showOpenFileButton]="inputs?.viewerOptions?.showOpenFileButton || false"
+    [showSecondaryToolbarButton]="inputs?.viewerOptions?.showSecondaryToolbarButton || false"
+    [showZoomButtons]="inputs?.viewerOptions?.showZoomButtons || true"
+    [showRotateButton]="inputs?.viewerOptions?.showRotateButton || false"
+    [enablePrint]="inputs?.viewerOptions?.enablePrint || false"
+    [useBrowserLocale]="inputs?.viewerOptions?.useBrowserLocale || true"
+    [textLayer]="inputs?.viewerOptions?.textLayer || false"
+    [showTextEditor]="false"
+    [showDrawEditor]="false"
   ></ngx-extended-pdf-viewer>
 </div>

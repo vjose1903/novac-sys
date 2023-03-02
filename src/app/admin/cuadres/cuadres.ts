@@ -29,7 +29,7 @@ export class CuadreC {
         const obj = { data: cuadre_parsed, type: 'cuadre_caja' };
 
         PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async (response) => {
-          let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal, height: '40rem' };
+          let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal, viewerOptions: { height: '40rem' } };
           ReporteC.visualizarReporte(objPdfView);
           Ss.layServ.nextCheckCuadreToday(true);
         });
