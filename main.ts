@@ -89,74 +89,85 @@ function createWindow() {
       webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
     });
 
-    if (serve) {
-      win.webContents.openDevTools();
-      require('electron-reload')(__dirname, {
-        electron: require(`${__dirname}/node_modules/electron`),
-      });
-
-      win.loadURL('http://localhost:5220');
-    } else {
-      win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
-    }
-
-    win.setMenuBarVisibility(false);
-
     // if (serve) {
     //   win.webContents.openDevTools();
-
     //   require('electron-reload')(__dirname, {
-    //     electron: require(path.join(__dirname, '/node_modules/electron')),
+    //     electron: require(`${__dirname}/node_modules/electron`),
     //   });
 
     //   win.loadURL('http://localhost:5220');
     // } else {
-    //   // Path when running electron executable
-    //   let pathIndex = pathAdd('/dist/index.html');
-    //   let baseDirectory = pathAdd('/dist/');
-
-    //   // if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-    //   //   // Path when running electron in local folder
-    //   //   pathIndex = '../dist/index.html';
-    //   //   baseDirectory = '../dist';
-    //   // }
-    //   var httpPort = 5220;
-    //   const app = express();
-
-    //   app.use(express.static(path.resolve(baseDirectory)));
-
-    //   app.get('/', (req, res) => {
-    //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
-    //   });
-
-    //   app.get('*', (req, res) => {
-    //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
-    //   });
-
-    //   // if (fs.existsSync('resources/app/index.html')) {
-    //   //   // Path when running electron in local folder
-    //   //   pathIndex = 'resources/app/index.html';
-    //   //   baseDirectory = 'resources/app';
-    //   // } else {
-    //   //   app.use(express.static(path.join(__dirname, baseDirectory)));
-
-    //   //   app.get('/', (req, res) => {
-    //   //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
-    //   //   });
-
-    //   //   app.get('*', (req, res) => {
-    //   //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
-    //   //   });
-    //   // }
-
-    //   app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
-
-    //   // win.loadURL(url.format({
-    //   //   pathname: path.join(__dirname, pathIndex),
-    //   //   protocol: 'file:',
-    //   //   slashes: true
-    //   // }));
+    //   win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
     // }
+
+    // win.setMenuBarVisibility(false);
+
+    if (serve) {
+      win.webContents.openDevTools();
+
+      require('electron-reload')(__dirname, {
+        electron: require(path.join(__dirname, '/node_modules/electron')),
+      });
+
+      win.loadURL('http://localhost:5220');
+    } else {
+      // Path when running electron executable
+      let pathIndex = await pathAdd('/dist/index.html');
+      let baseDirectory = await pathAdd('/dist/');
+
+      // if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
+      //   // Path when running electron in local folder
+      //   pathIndex = '../dist/index.html';
+      //   baseDirectory = '../dist';
+      // }
+
+      cmd(`ls ${baseDirectory}`, (res) => {
+        puts(res.toString(), 'baseDirectory');
+      });
+
+      cmd(`ls ${pathIndex}`, (res) => {
+        puts(res.toString(), 'pathIndex');
+      });
+
+      var httpPort = 5220;
+      const app = express();
+
+      app.use(express.static(path.resolve(baseDirectory)));
+
+      app.get('/', (req, res) => {
+        res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
+      });
+
+      app.get('*', (req, res) => {
+        res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
+      });
+
+      // if (fs.existsSync('resources/app/index.html')) {
+      //   // Path when running electron in local folder
+      //   pathIndex = 'resources/app/index.html';
+      //   baseDirectory = 'resources/app';
+      // } else {
+      //   app.use(express.static(path.join(__dirname, baseDirectory)));
+
+      //   app.get('/', (req, res) => {
+      //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
+      //   });
+
+      //   app.get('*', (req, res) => {
+      //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
+      //   });
+      // }
+
+      app.listen(httpPort, () => win.loadURL('http://localhost:5220'));
+
+      // win.loadURL(url.format({
+      //   pathname: path.join(__dirname, pathIndex),
+      //   protocol: 'file:',
+      //   slashes: true
+      // }));
+    }
+
+    win.setMenuBarVisibility(false);
 
     // Emitted when the window is closed.
     win.on('closed', (event) => {
