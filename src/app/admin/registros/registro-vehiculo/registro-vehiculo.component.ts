@@ -115,7 +115,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, nombre_completo_propietario: true } };
     this.listaVehiculos.length = 0;
     const res = await this.vehiculosClass.getAll(extra);
-    console.log('res ', res);
 
     res.data.map((val) => {
       // val.nombre_completo = `${val.propietario.nombre} ${val.propietario.apellido}`;

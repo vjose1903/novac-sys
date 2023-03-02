@@ -38,7 +38,6 @@ export class TablasService {
       this.obj_paginate[id][key] = param[key];
       if (key == 'page') {
         const id_paginador = `paginator-${id + tablaComponent.post_id}`;
-        // console.log('id_paginador ', id_paginador);
         tablaComponent.showPagination = false;
 
         setTimeout(() => (tablaComponent.showPagination = true), 100);
@@ -48,11 +47,9 @@ export class TablasService {
         // paginator.changePage(Number(params[key]));
 
         // console.dir(paginator);
-        // console.log('>>>>>>>>>>>>>>>> ', paginator);
       }
     });
 
-    // console.log('this.obj_paginate ', this.obj_paginate);
   }
 
   deletePaginationById(id) {

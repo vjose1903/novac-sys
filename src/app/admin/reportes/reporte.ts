@@ -66,7 +66,6 @@ export class ReporteC extends CrudG<any> {
   }
 
   static visualizarReporte(objPdfView: { openNewModal: Function; status: string; pageOrientation: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; viewerOptions: viewerOptions }) {
-
     objPdfView['viewerOptions'] ??= {};
 
     if (objPdfView.status == 'no') fun.toastError(objPdfView.msg, 'ERROR');
@@ -103,8 +102,6 @@ export class ReporteC extends CrudG<any> {
 
       const entidad = objPdf['type'] == 'reporte' ? 'reporte' : 'cuadre_caja';
       objPdf['printer'] = configApp.printer_selected[entidad];
-
-      console.log('objPdf ', objPdf);
 
       PdfService.imprimirBase64(objPdf)
         .then((res) => {

@@ -118,7 +118,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     const actualPagination = this.tServ.getPaginationById('lista_inventario');
     actualPagination['search'] = this.palabra_buscar;
 
-    console.log('this.filtro ', this.filtro);
+    
 
     if (this.filtro != 'todos') {
       if (fun.isEmpty(actualPagination['ant_page'])) {

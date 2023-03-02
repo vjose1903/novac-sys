@@ -15,7 +15,5 @@ export class PdfViewerComponent implements OnInit, ModalI {
 
   ngOnInit(): void {}
 
-  onEvent(eventName, event): void {
-    console.log(`${eventName} -->`, event);
-  }
+  
 }

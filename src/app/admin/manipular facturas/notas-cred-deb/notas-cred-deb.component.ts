@@ -159,7 +159,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getFacturas() {
     return new Promise(async (resolve) => {
-      console.log('this.idsFacturas ', this.idsFacturas);
+      
       this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura) => {
         let tempFactData: FacturasI[] = res_factura['data'];
 

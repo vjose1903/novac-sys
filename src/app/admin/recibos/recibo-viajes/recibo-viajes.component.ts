@@ -329,7 +329,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       return { vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id };
     });
 
-    console.log('data_update ', data_update);
 
     this.sendUpdateMovimientos(data_update);
   }
