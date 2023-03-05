@@ -34,6 +34,13 @@ export class fun {
     }
   }
   // __________________________________________________________________________________________________
+  // Nombre: getTypeNavigation
+  // Descripcion : Esta funcion retorna cual es el tipo de navegacion que acaba de ocurrir
+  // _________________________________________________________________________________________________
+  static getTypeNavigation() {
+    return window.performance.navigation.type;
+  }
+  // __________________________________________________________________________________________________
   // Nombre: crearContador
   // Descripcion : Esta funcion crea una variable contador para poder utilizarla en otras funciones
   // _________________________________________________________________________________________________
