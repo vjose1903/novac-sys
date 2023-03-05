@@ -41,7 +41,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   onKeyDown(event: KeyboardEvent) {
     if ((event.metaKey || event.ctrlKey) && event.key == 'r') {
       event.preventDefault();
-      this.reloadElectron();
+      fun.reloadElectron();
     }
   }
 
@@ -158,14 +158,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
-  reloadElectron() {
-    const task = new MessageTask(KEYWORD_ELECTRON_RELOAD);
 
-    this._ipc
-      .sendTask(task)
-      .then((res) => {})
-      .catch((err) => console.error(err));
-  }
 
   async test() {
     // const obj = { nombre: 'victor', edad: 35, direccion: { calle: 'las maras-higuero', apto: 'amarillo' }, estudios: ['colegio inmaculada', 'ucateci'] };
