@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "3.6.0",
+  "version": "3.6.5",
   "description": "Sistema facturacion e inventario NOVAC.",
   "author": {
     "name": "Victor Jose Vásquez Santos",
@@ -22,7 +22,7 @@
     "electron:local": "npm run build:prod && npx electron .",
     "electron:build": "npm run build:prod && electron-builder build",
     "electron:windows64": "tsc -p tsconfig.serve.json && npm run build:prod && electron-builder build --windows --x64 -p always",
-    "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64 -p always",
+    "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "bundle-report": "webpack-bundle-analyzer dist/stats.json"
   },
