@@ -158,8 +158,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
-
-
   async test() {
     // const obj = { nombre: 'victor', edad: 35, direccion: { calle: 'las maras-higuero', apto: 'amarillo' }, estudios: ['colegio inmaculada', 'ucateci'] };
     // console.log(`obj ANTES => `, obj);

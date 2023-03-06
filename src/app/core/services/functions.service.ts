@@ -40,13 +40,20 @@ export class fun {
   // Nombre: reloadElectron
   // Descripcion : Esta funcion recarga el electron
   // _________________________________________________________________________________________________
-  static   reloadElectron() {
+  static reloadElectron() {
     const task = new MessageTask(KEYWORD_ELECTRON_RELOAD);
 
     Ss._ipc
       .sendTask(task)
       .then((res) => {})
       .catch((err) => console.error(err));
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: removerDuplicados
+  // Descripcion : Esta funcion retorna un arreglo sin duplicados
+  // _________________________________________________________________________________________________
+  static removerDuplicados<T>(arr: T[]): T[] {
+    return Array.from(new Set(arr));
   }
   // __________________________________________________________________________________________________
   // Nombre: getTypeNavigation
