@@ -126,7 +126,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   objArchivo: {
     factura_en_turno: any;
-    facturas_localStorage?: any;
     factura_en_turno_storage?: any;
   };
 
@@ -322,11 +321,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   verificateArchivo() {
     return new Promise((resolve) => {
-      this.objArchivo = { factura_en_turno: undefined, facturas_localStorage: fun.getFacturasguardadas() };
+      this.objArchivo = { factura_en_turno: undefined };
 
       if (this.checkIfFacturacionEnProceso()) {
         this.objArchivo.factura_en_turno = this.formarFacturaAGuardar();
-        let comparar_con_localStorage = _.find(this.objArchivo.facturas_localStorage, (item) => item.archivo_id == this.factura_guardada?.archivo_id);
+        let comparar_con_localStorage = _.find(fun.getFacturasguardadas(), (item) => item.archivo_id == this.factura_guardada?.archivo_id);
 
         const factura_en_turno_storage = comparar_con_localStorage ? _.omit(comparar_con_localStorage, ['archivo_id', 'cliente', 'suplidor']) : undefined;
         this.objArchivo['factura_en_turno_storage'] = factura_en_turno_storage;
@@ -408,6 +407,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
+  // procesoRelleno(factura, is_archivada = false) {
   procesoRelleno(factura) {
     return new Promise((resolve) => {
       try {
@@ -415,7 +415,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.rellenarCabezaFactura(factura).then((factura_rellenada) => {
             //
 
-            this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas']).then((res) => {
+            this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas'], fun.objHas(factura_rellenada, 'archivo_id')).then((res) => {
               setTimeout(() => {
                 this._sideBarOpened = false;
 
@@ -439,6 +439,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factServ.propietario_factura = {};
 
       this.factServ.tipoDocumento = factura.tipo;
+      this.id_documento ??= factura.id_documento;
 
       if (!fun.objHas(factura, 'archivo_id') && [actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action)) {
         const factura_archivada = _.find(fun.getFacturasguardadas(), { id_documento: factura?.id });
@@ -1301,7 +1302,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   agregarFacturaALocalStorage() {
     if (!this.factServ.propietario_factura) this.factServ.propietario_factura = this.form.value;
 
-    let facturas_localStorage = fun.duplicarJson(this.objArchivo.facturas_localStorage);
+    let facturas_localStorage = fun.getFacturasguardadas();
 
     const factura_a_guardar = fun.duplicarJson(this.objArchivo.factura_en_turno);
 
@@ -1341,7 +1342,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.verificateArchivo().then(() => {
         let is_guardada = false;
 
-        if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
+        if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = _.find(fun.getFacturasguardadas(), (fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
 
         const texto_modal = is_guardada ? `Esta ${documento.descripcion} ya esta archivada ¿desea sobreescribirla?` : `¿Seguro que desea archivar esta ${documento.descripcion} para continuarla luego?`;
 
@@ -1580,7 +1581,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   revisarLocalStorage() {
-    const is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id === this.factura_guardada?.archivo_id);
+    const is_guardada = _.find(fun.getFacturasguardadas(), (fact: any) => fact.archivo_id === this.factura_guardada?.archivo_id);
 
     if (fun.hasValue(is_guardada)) this.quitarFacturaGuardada(this.factura_guardada?.archivo_id);
   }
@@ -1688,7 +1689,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let documento = this.getDocumentoDescripcion();
 
-    if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
+    if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
 
     if (this.factura_guardada) this.revisarLocalStorage();

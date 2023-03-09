@@ -4,6 +4,12 @@ export const pattern = {
   rnc: [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/],
 };
 
+export enum TypeNavigation {
+  first_access = 0,
+  reload = 1,
+  back_forward = 2,
+}
+
 export enum teclasCode {
   _esc = 27,
   _derecha = 39,

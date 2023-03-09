@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
 import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
@@ -19,6 +19,7 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
   KEYWORD_ELECTRON_QUIT_APP,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
+  KEYWORD_ELECTRON_RELOAD,
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';
@@ -36,6 +37,14 @@ import { FacturacionService } from './admin/facturacion/facturacion.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if ((event.metaKey || event.ctrlKey) && event.key == 'r') {
+      event.preventDefault();
+      fun.reloadElectron();
+    }
+  }
+
   loading = false;
   objProgress;
   visible = false;

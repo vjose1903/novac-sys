@@ -8,7 +8,7 @@ export const KEYWORD_ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
 export const KEYWORD_ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
 export const KEYWORD_ELECTRON_PRINT_BASE64 = 'electron-print-base64';
 export const KEYWORD_ELECTRON_CHANGE_CONFIG_FILE = 'electron-change-config-file';
-
+export const KEYWORD_ELECTRON_RELOAD = 'electron-reload';
 export const ELECTRON_EVENT_CHECK_UPDATE = 'check-update';
 export const ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE = 'checking-for-update';
 export const ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE = 'update-available';
