@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
-import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { FacturacionService } from './facturacion.service';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { tipoDocFacturacion, FacturasI, tFacturaD, actionFacturacion } from './factura';
@@ -43,6 +42,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   hasPermisoCotizacion: boolean;
   hasPermisoCamiones: boolean;
   titulo: string;
+
+  datesAvailable = {
+    viaje: {
+      minDate: new Date(),
+    },
+  };
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -123,7 +128,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     Saco: 'Sacos',
   };
 
-  public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   objArchivo: {
     factura_en_turno: any;
     factura_en_turno_storage?: any;
@@ -171,19 +175,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   tipoDocFacturacion = tipoDocFacturacion;
   fun = fun;
 
-  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService) {
+  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, public factServ: FacturacionService) {
     super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
-
-    this.dpConfig = Object.assign({}, { showWeekNumbers: false, minDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
 
     this.timeInterval = setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
-    this.localeService.use('es');
+
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
   }
 
@@ -243,6 +245,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         resolve(true);
       });
     });
+  }
+
+  setMinMaxDateCalendar(date?): Date {
+    return date ? new Date(date) : new Date();
   }
 
   makeOptionsExtra() {
@@ -682,11 +688,21 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return this.cuerpoFactura.length > 0;
   }
 
-  checkCambiosModoyCondicionFactura(arg) {
-    const sali_de = arg.id;
-    const valor = arg.value;
+  checkCambiosModoyCondicionFactura(arg: { elemento_html?; id?; value? }) {
+    console.log(' ');
+    console.log('---------------- HACIENDO BLUR ----------------');
+
+    const sali_de = fun.hasValue(arg.elemento_html) ? arg.elemento_html.id : arg.id;
+    const valor = fun.hasValue(arg.elemento_html) ? arg.elemento_html.value : arg.value;
+
     const condicion = this.condicion_fact;
     const tipo_factura_referencia = this.factServ.tipoFactura.referencia;
+
+    console.log('checkCambiosModoyCondicionFactura > sali_de:', sali_de);
+    console.log('checkCambiosModoyCondicionFactura > valor:', valor);
+    console.log('checkCambiosModoyCondicionFactura > condicion:', condicion);
+    console.log('checkCambiosModoyCondicionFactura > tipo_factura_referencia:', tipo_factura_referencia);
+
     let buscar = false;
 
     setTimeout(() => {
