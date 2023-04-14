@@ -23,7 +23,6 @@ export class PendienteFormComponent implements OnInit, ModalI {
   inputs: any;
   btn_aceptar() {
     const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
-    console.log('fechaTemp ', fechaTemp);
 
     const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
 

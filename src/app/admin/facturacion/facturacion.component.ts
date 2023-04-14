@@ -689,19 +689,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   checkCambiosModoyCondicionFactura(arg: { elemento_html?; id?; value? }) {
-    console.log(' ');
-    console.log('---------------- HACIENDO BLUR ----------------');
 
     const sali_de = fun.hasValue(arg.elemento_html) ? arg.elemento_html.id : arg.id;
     const valor = fun.hasValue(arg.elemento_html) ? arg.elemento_html.value : arg.value;
 
     const condicion = this.condicion_fact;
     const tipo_factura_referencia = this.factServ.tipoFactura.referencia;
-
-    console.log('checkCambiosModoyCondicionFactura > sali_de:', sali_de);
-    console.log('checkCambiosModoyCondicionFactura > valor:', valor);
-    console.log('checkCambiosModoyCondicionFactura > condicion:', condicion);
-    console.log('checkCambiosModoyCondicionFactura > tipo_factura_referencia:', tipo_factura_referencia);
 
     let buscar = false;
 
@@ -1199,10 +1192,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    if (this.getCantidadArticulos() == 0 && this.factura_pendiente == false) {
-      fun.toastWarning(`No existe factura iniciada para cancelar`, 'Aviso');
-      return;
-    }
 
     let si = (instance) => {
       if (this.factServ.action !== actionFacturacion.update) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/new/0`).then((res_router) => this.resetVariables());
@@ -1704,6 +1693,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
+
 
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

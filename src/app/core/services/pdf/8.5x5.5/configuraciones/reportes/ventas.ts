@@ -8,6 +8,7 @@ export const config_ventas = {
     only_titulo: false,
     widths: [24, 60, 73, 53, '*', 'auto'],
     mostrar_total: true,
+    mostrar_descuento: true,
     mostrar_bruto: true,
     mensaje_contenido_vacio: 'No se han realizado ventas en el rango de fechas introducido.',
     info: [
@@ -80,6 +81,7 @@ export const config_ventas = {
     only_titulo: false,
     widths: [20, 60, 73, 53, '*', 'auto', 'auto', 'auto'],
     mostrar_total: true,
+    mostrar_descuento: true,
     mostrar_itbis: true,
     mostrar_bruto: true,
     pageOrient: 'landscape',
@@ -179,6 +181,7 @@ export const config_ventas = {
     only_titulo: false,
     widths: [24, '*', '*', '*', '*', '*', '*'],
     mostrar_total: true,
+    mostrar_descuento: true,
     mostrar_bruto: true,
     mensaje_contenido_vacio: 'No se han realizado ventas en el rango de fechas introducido.',
     info: [
@@ -262,6 +265,7 @@ export const config_ventas = {
     widths: [24, '*', '*', '*', '*', '*', '*', '*'],
     mostrar_total: true,
     mostrar_itbis: true,
+    mostrar_descuento: true,
     mostrar_bruto: true,
     pageOrient: 'landscape',
     mensaje_contenido_vacio: 'No se han realizado ventas en el rango de fechas introducido.',

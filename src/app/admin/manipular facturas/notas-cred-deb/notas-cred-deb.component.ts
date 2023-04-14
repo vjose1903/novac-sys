@@ -159,7 +159,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getFacturas() {
     return new Promise(async (resolve) => {
-      
+
       this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura) => {
         let tempFactData: FacturasI[] = res_factura['data'];
 
@@ -397,34 +397,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return result;
   }
 
-  formarDetallesNota(dataFact: FacturasI) {
-    const temp = [];
-    for (let i = 0; i < dataFact.detalle_facturas.length; i++) {
-      const element = dataFact.detalle_facturas[i];
-
-      let unidad_ = element.unidad;
-      if (element.select) {
-        if (unidad_ == 'Saco') unidad_ = this.obtenerSaco(element.descripcion, 'descripcion');
-
-        const fila = {
-          detalle_factura_nota: element.id,
-          articulo_id: element.articulo_id,
-          cantidad: element.cant_nota,
-          cantidad_en_unidades: element.cantidad_en_unidades_nota,
-          total: fun.desformatear(element.total_nota),
-          descuento_valor: element.descuento_valor ? (element.descuento_valor !== null ? element.descuento_valor : 0) : 0,
-          descuento_porciento: element.descuento_porciento ? (element.descuento_porciento !== null ? element.descuento_porciento : 0) : 0,
-          itbis: element.itbis,
-          unidad: unidad_,
-          precio: fun.desformatear(element.precio),
-          calcular_saco: element.calcular_saco,
-        };
-
-        temp.push(fila);
-      }
-    }
-    return temp;
-  }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
     this.openNewModal({
