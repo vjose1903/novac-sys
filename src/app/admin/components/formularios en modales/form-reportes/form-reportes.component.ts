@@ -1,9 +1,9 @@
 import { tFacturaD } from './../../../facturacion/factura';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { Ss } from './../../../../core/services/singleton.service';
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
+
 import * as moment from '../../../../core/javascript/moment';
 
 import { MixinClass } from '../../../../core/typescript/MixinClass';
@@ -21,7 +21,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   fun = fun;
 
   form: UntypedFormGroup;
-  public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
   condiciones = [
     { id: 'Crédito', label: 'Crédito' },
@@ -42,16 +41,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   clienteClass = new ClienteC();
   dinamycSelectionReady: boolean = false;
 
-  constructor(private fb: UntypedFormBuilder, private localeService: BsLocaleService) {
+  constructor(private fb: UntypedFormBuilder) {
     super();
-    this.dpConfig = Object.assign({}, { showWeekNumbers: false, maxDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
   }
 
   modal: any = {};
   inputs: any;
 
   ngOnInit() {
-    this.localeService.use('es');
     this.necesarioStart();
   }
 

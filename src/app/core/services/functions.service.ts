@@ -5,6 +5,8 @@ import * as _ from 'lodash';
 import { ConfigI } from '../typescript/config-interface';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
+import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
+import { MessageTask } from '../models/message-task';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun {
@@ -33,6 +35,34 @@ export class fun {
       else btn_side.removeAttribute('data-cant-facturas');
     }
   }
+
+  // __________________________________________________________________________________________________
+  // Nombre: reloadElectron
+  // Descripcion : Esta funcion recarga el electron
+  // _________________________________________________________________________________________________
+  static reloadElectron() {
+    const task = new MessageTask(KEYWORD_ELECTRON_RELOAD);
+
+    Ss._ipc
+      .sendTask(task)
+      .then((res) => {})
+      .catch((err) => console.error(err));
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: removerDuplicados
+  // Descripcion : Esta funcion retorna un arreglo sin duplicados
+  // _________________________________________________________________________________________________
+  static removerDuplicados<T>(arr: T[]): T[] {
+    return Array.from(new Set(arr));
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: getTypeNavigation
+  // Descripcion : Esta funcion retorna cual es el tipo de navegacion que acaba de ocurrir
+  // _________________________________________________________________________________________________
+  static getTypeNavigation() {
+    return window.performance.navigation.type;
+  }
+
   // __________________________________________________________________________________________________
   // Nombre: crearContador
   // Descripcion : Esta funcion crea una variable contador para poder utilizarla en otras funciones

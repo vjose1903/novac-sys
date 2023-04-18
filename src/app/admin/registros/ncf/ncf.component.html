@@ -42,38 +42,23 @@
               <div class="col-6 p-0 pr-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Fecha compra: <span style="color: red">*</span></label>
-                  <input
-                    type="text"
-                    id="campoFechaCompra"
-                    (keydown.enter)="saltar('campoFechaValida')"
-                    [bsConfig]="dpConfig"
-                    placeholder="dd/mm/aaaa"
-                    class="form-control"
-                    [value]="fechaCompra"
+
+                  <p-calendar
+                    inputId="campoFechaCompra"
                     [(ngModel)]="fechaCompra"
-                    #dp="bsDatepicker"
-                    placement="bottom"
-                    bsDatepicker
-                    (ngModelChange)="setDateInputs(fechaCompra)"
-                  />
+                    dateFormat="dd/mm/yy"
+                    placeholder="dd/mm/aaaa"
+                    (onSelect)="setDateInputs(fechaCompra)"
+                    (onClose)="setDateInputs(fechaCompra)"
+                    (keydown.enter)="saltar('campoFechaValida')"
+                  ></p-calendar>
                 </div>
               </div>
               <div class="col-6 p-0 pl-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Fecha validez: </label>
-                  <input
-                    type="text"
-                    id="campoFechaValida"
-                    (keydown.enter)="saltar('send')"
-                    [bsConfig]="dpConfigValidez"
-                    placeholder="dd/mm/aaaa"
-                    [value]="fechaValidez"
-                    class="form-control"
-                    [(ngModel)]="fechaValidez"
-                    #dp="bsDatepicker"
-                    placement="bottom"
-                    bsDatepicker
-                  />
+
+                  <p-calendar inputId="campoFechaValida" [(ngModel)]="fechaValidez" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('send')"></p-calendar>
                 </div>
               </div>
               <div *ngIf="is_editando" class="col-12 p-0">

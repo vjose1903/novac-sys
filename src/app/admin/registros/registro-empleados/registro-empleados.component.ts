@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -23,8 +22,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   form: UntypedFormGroup;
   boton = '';
   pattern = pattern;
-
-  public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
 
   isCreando: boolean = false;
   listaEmpleados = [];
@@ -57,14 +54,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   };
   tablaComponent;
   formPermissions = [Permisos.user.create, Permisos.user.update];
+  maxDateBirth = new Date();
 
-  constructor(private fb: UntypedFormBuilder, private localeService: BsLocaleService, private tServ: TablasService) {
+
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();
-    this.dpConfig = Object.assign({}, { showWeekNumbers: false, maxDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
   }
 
   ngOnInit() {
-    this.localeService.use('es');
     this.boton = 'Registrar';
 
     this._init_mixin({ component: 'reg_empleados', is_routing: true });

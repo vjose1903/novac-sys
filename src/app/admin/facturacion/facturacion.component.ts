@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
-import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { FacturacionService } from './facturacion.service';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { tipoDocFacturacion, FacturasI, tFacturaD, actionFacturacion } from './factura';
@@ -43,6 +42,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   hasPermisoCotizacion: boolean;
   hasPermisoCamiones: boolean;
   titulo: string;
+
+  datesAvailable = {
+    viaje: {
+      minDate: new Date(),
+    },
+  };
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -123,10 +128,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     Saco: 'Sacos',
   };
 
-  public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
   objArchivo: {
     factura_en_turno: any;
-    facturas_localStorage?: any;
     factura_en_turno_storage?: any;
   };
 
@@ -172,19 +175,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   tipoDocFacturacion = tipoDocFacturacion;
   fun = fun;
 
-  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private localeService: BsLocaleService, public factServ: FacturacionService) {
+  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, public factServ: FacturacionService) {
     super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
-
-    this.dpConfig = Object.assign({}, { showWeekNumbers: false, minDate: new Date(), dateInputFormat: 'DD/MM/YYYY' });
 
     this.timeInterval = setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
-    this.localeService.use('es');
+
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
   }
 
@@ -244,6 +245,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         resolve(true);
       });
     });
+  }
+
+  setMinMaxDateCalendar(date?): Date {
+    return date ? new Date(date) : new Date();
   }
 
   makeOptionsExtra() {
@@ -322,11 +327,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   verificateArchivo() {
     return new Promise((resolve) => {
-      this.objArchivo = { factura_en_turno: undefined, facturas_localStorage: fun.getFacturasguardadas() };
+      this.objArchivo = { factura_en_turno: undefined };
 
       if (this.checkIfFacturacionEnProceso()) {
         this.objArchivo.factura_en_turno = this.formarFacturaAGuardar();
-        let comparar_con_localStorage = _.find(this.objArchivo.facturas_localStorage, (item) => item.archivo_id == this.factura_guardada?.archivo_id);
+        let comparar_con_localStorage = _.find(fun.getFacturasguardadas(), (item) => item.archivo_id == this.factura_guardada?.archivo_id);
 
         const factura_en_turno_storage = comparar_con_localStorage ? _.omit(comparar_con_localStorage, ['archivo_id', 'cliente', 'suplidor']) : undefined;
         this.objArchivo['factura_en_turno_storage'] = factura_en_turno_storage;
@@ -408,6 +413,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
+  // procesoRelleno(factura, is_archivada = false) {
   procesoRelleno(factura) {
     return new Promise((resolve) => {
       try {
@@ -415,7 +421,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.rellenarCabezaFactura(factura).then((factura_rellenada) => {
             //
 
-            this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas']).then((res) => {
+            this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas'], fun.objHas(factura_rellenada, 'archivo_id')).then((res) => {
               setTimeout(() => {
                 this._sideBarOpened = false;
 
@@ -439,6 +445,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factServ.propietario_factura = {};
 
       this.factServ.tipoDocumento = factura.tipo;
+      this.id_documento ??= factura.id_documento;
 
       if (!fun.objHas(factura, 'archivo_id') && [actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action)) {
         const factura_archivada = _.find(fun.getFacturasguardadas(), { id_documento: factura?.id });
@@ -681,11 +688,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return this.cuerpoFactura.length > 0;
   }
 
-  checkCambiosModoyCondicionFactura(arg) {
-    const sali_de = arg.id;
-    const valor = arg.value;
+  checkCambiosModoyCondicionFactura(arg: { elemento_html?; id?; value? }) {
+
+    const sali_de = fun.hasValue(arg.elemento_html) ? arg.elemento_html.id : arg.id;
+    const valor = fun.hasValue(arg.elemento_html) ? arg.elemento_html.value : arg.value;
+
     const condicion = this.condicion_fact;
     const tipo_factura_referencia = this.factServ.tipoFactura.referencia;
+
     let buscar = false;
 
     setTimeout(() => {
@@ -1182,10 +1192,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    if (this.getCantidadArticulos() == 0 && this.factura_pendiente == false) {
-      fun.toastWarning(`No existe factura iniciada para cancelar`, 'Aviso');
-      return;
-    }
 
     let si = (instance) => {
       if (this.factServ.action !== actionFacturacion.update) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/new/0`).then((res_router) => this.resetVariables());
@@ -1301,7 +1307,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   agregarFacturaALocalStorage() {
     if (!this.factServ.propietario_factura) this.factServ.propietario_factura = this.form.value;
 
-    let facturas_localStorage = fun.duplicarJson(this.objArchivo.facturas_localStorage);
+    let facturas_localStorage = fun.getFacturasguardadas();
 
     const factura_a_guardar = fun.duplicarJson(this.objArchivo.factura_en_turno);
 
@@ -1341,7 +1347,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.verificateArchivo().then(() => {
         let is_guardada = false;
 
-        if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
+        if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = _.find(fun.getFacturasguardadas(), (fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
 
         const texto_modal = is_guardada ? `Esta ${documento.descripcion} ya esta archivada ¿desea sobreescribirla?` : `¿Seguro que desea archivar esta ${documento.descripcion} para continuarla luego?`;
 
@@ -1580,7 +1586,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   revisarLocalStorage() {
-    const is_guardada = _.find(this.objArchivo.facturas_localStorage, (fact: any) => fact.archivo_id === this.factura_guardada?.archivo_id);
+    const is_guardada = _.find(fun.getFacturasguardadas(), (fact: any) => fact.archivo_id === this.factura_guardada?.archivo_id);
 
     if (fun.hasValue(is_guardada)) this.quitarFacturaGuardada(this.factura_guardada?.archivo_id);
   }
@@ -1688,7 +1694,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let documento = this.getDocumentoDescripcion();
 
-    if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.factura_a_rellenar.id}` });
+
+    if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
 
     if (this.factura_guardada) this.revisarLocalStorage();

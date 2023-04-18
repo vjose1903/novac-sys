@@ -246,32 +246,51 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   // =============================================
   //  MODIFICAR FACTURA
   // =============================================
-  async rellenarCuerpoFactura(detalles) {
+  async rellenarCuerpoFactura(detalles, is_archivada) {
     return new Promise<any>((resolve, reject) => {
-      this.rellenarVariables()
-        .then(async (res) => {
-          if (res) {
-            for (let index = 0; index < detalles.length; index++) {
-              if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem();
+      this.getActualPriceDetalles(detalles, is_archivada).then((actual_prices_db) => {
+        this.rellenarVariables()
+          .then(async (res) => {
+            if (res) {
+              for (let index = 0; index < detalles.length; index++) {
+                if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem();
 
-              const detalle_en_turno = detalles[index];
+                const detalle_en_turno = detalles[index];
 
-              if (detalle_en_turno.unidad.includes('Saco de')) {
-                detalle_en_turno.peso_saco = Number(detalle_en_turno.unidad.split(' ')[2]);
+                if (is_archivada) {
+                  const actual_price_db = actual_prices_db.find((item) => item.id == detalle_en_turno.articulo_id);
+                  detalle_en_turno.actual_price = actual_price_db.costos;
+                }
+
+                if (detalle_en_turno.unidad.includes('Saco de')) {
+                  detalle_en_turno.peso_saco = Number(detalle_en_turno.unidad.split(' ')[2]);
+                }
+
+                await this.getArticuloToLlenar(detalle_en_turno).then((articulo) => {
+                  this.llenarDetalles(detalle_en_turno, articulo, index);
+                  this.seleccionarCampoEnTurno();
+                });
               }
 
-              await this.getArticuloToLlenar(detalle_en_turno).then((articulo) => {
-                this.llenarDetalles(detalle_en_turno, articulo, index);
-                this.seleccionarCampoEnTurno();
-              });
+              resolve(true);
+            } else {
+              resolve(false);
             }
+          })
+          .catch((error) => {});
+      });
+    });
+  }
 
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        })
-        .catch((error) => {});
+  getActualPriceDetalles(detalles, is_archivada) {
+    return new Promise<any>((resolve, reject) => {
+      if (is_archivada) {
+        const extra = { afterPath: `custom/get_actual_price_detalles`, parameters: { ids: fun.removerDuplicados(detalles.map((detalle) => detalle.articulo_id)).join(','), costos: true } };
+
+        this.articuloClass.dynamic(extra).then((res) => resolve(res.data));
+      } else {
+        resolve(null);
+      }
     });
   }
 

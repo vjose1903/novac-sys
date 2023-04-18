@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as moment from '../../../../core/javascript/moment';
-import { UntypedFormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 
-import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';
 
@@ -18,23 +15,15 @@ export class PendienteFormComponent implements OnInit, ModalI {
   minutos;
   meridian = true;
   fecha;
-  public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
+  maxDate = new Date();
 
-  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private localeService: BsLocaleService) {
-    this.dpConfig = Object.assign(
-      {},
-      {
-        // locale:'es',
-        showWeekNumbers: false,
-        maxDate: new Date(),
-        dateInputFormat: 'DD/MM/YYYY',
-      },
-    );
-  }
+  constructor() {}
+
   modal: any = {};
   inputs: any;
   btn_aceptar() {
     const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
+
     const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
 
     const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
@@ -43,7 +32,6 @@ export class PendienteFormComponent implements OnInit, ModalI {
   }
 
   ngOnInit() {
-    this.localeService.use('es');
     this.hora = moment().hour();
     this.minutos = moment().minutes();
 

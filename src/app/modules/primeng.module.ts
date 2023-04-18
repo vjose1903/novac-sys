@@ -10,8 +10,9 @@ import { TagModule } from 'primeng/tag';
 import { TabViewModule } from 'primeng/tabview';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { CalendarModule } from 'primeng/calendar';
 
-const modulos = [DialogModule, ProgressBarModule, SidebarModule, TooltipModule, DropdownModule, InputMaskModule, TagModule, TabViewModule, MultiSelectModule, OverlayPanelModule];
+const modulos = [DialogModule, ProgressBarModule, SidebarModule, TooltipModule, DropdownModule, InputMaskModule, TagModule, TabViewModule, MultiSelectModule, OverlayPanelModule, CalendarModule];
 
 @NgModule({
   declarations: [],

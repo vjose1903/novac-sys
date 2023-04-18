@@ -204,7 +204,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // Refrescar el programa
   // =================================================================================
   refreshPage() {
-    location.reload();
+    fun.reloadElectron();
   }
 
   // =================================================================================

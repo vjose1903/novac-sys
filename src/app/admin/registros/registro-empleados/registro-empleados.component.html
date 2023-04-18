@@ -74,7 +74,7 @@
                   <div class="form-group" [appMsgError]="'telefono'" [form]="form">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
-                    <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono"[autoClear]="false" ></p-inputMask>
+                    <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
 
                     <span id="msgContainer_telefono"></span>
                   </div>
@@ -102,7 +102,9 @@
 
                 <div class="col-6 p-0 pr-2" [appMsgError]="'fecha_nacimiento'" [form]="form">
                   <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
-                  <input type="text" id="campoFecha" [bsConfig]="dpConfig" (keydown.enter)="saltar('campoRole')" placeholder="dd/mm/aaaa" class="form-control" formControlName="fecha_nacimiento" #dp="bsDatepicker" placement="top" bsDatepicker />
+
+                  <p-calendar inputId="campoFecha" formControlName="fecha_nacimiento" dateFormat="dd/mm/yy" [maxDate]="maxDateBirth" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('campoRole')"></p-calendar>
+
                   <span id="msgContainer_fecha_nacimiento"></span>
                 </div>
 

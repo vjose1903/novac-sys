@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
 import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
@@ -9,6 +9,7 @@ import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
+import { PrimeNGConfig } from 'primeng/api';
 
 import {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
@@ -19,6 +20,7 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
   KEYWORD_ELECTRON_QUIT_APP,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
+  KEYWORD_ELECTRON_RELOAD,
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';
@@ -36,6 +38,14 @@ import { FacturacionService } from './admin/facturacion/facturacion.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if ((event.metaKey || event.ctrlKey) && event.key == 'r') {
+      event.preventDefault();
+      fun.reloadElectron();
+    }
+  }
+
   loading = false;
   objProgress;
   visible = false;
@@ -62,6 +72,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public toastr: ToastrService,
     public sharedServ: SharedService,
     public permissionsService: NgxPermissionsService,
+
+    private config: PrimeNGConfig,
   ) {
     super();
   }
@@ -134,6 +146,54 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
 
     window.onresize = (e) => this.resize.bind(this)(e);
+
+    this.config.setTranslation({
+      startsWith: 'Empieza con',
+      contains: 'Contiene',
+      notContains: 'No contiene',
+      endsWith: 'Termina con',
+      equals: 'Igual',
+      notEquals: 'No igual',
+      noFilter: 'No Filtrar',
+      lt: 'Menos que',
+      lte: 'Menos o igual que',
+      gt: 'Mayor que',
+      gte: 'Mayor o igual que',
+      is: 'Es',
+      isNot: 'No es',
+      before: 'Antes',
+      after: 'Despues',
+      dateIs: 'Fecha es',
+      dateIsNot: 'Fecha no es',
+      dateBefore: 'Fecha es anterior',
+      dateAfter: 'Fecha es posterior',
+      clear: 'Limpiar',
+      apply: 'APlicar',
+      matchAll: 'Todos concuerdan',
+      matchAny: 'Nunguno concuerda',
+      addRule: 'Añadir regla',
+      removeRule: 'Remover regla',
+      accept: 'Si',
+      reject: 'No',
+      choose: 'Elegir',
+      upload: 'Subir',
+      cancel: 'Cancelar',
+      dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'sabado'],
+      dayNamesShort: ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'],
+      dayNamesMin: ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'],
+      monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+      monthNamesShort: ['Ene.', 'Feb.', 'Mar.', 'Abr.', 'May', 'Jun.', 'Jul.', 'Ago.', 'Sep.', 'Oct.', 'Nov.', 'Dic.'],
+      dateFormat: 'dd/mm/yy',
+      firstDayOfWeek: 1,
+      today: 'Hoy',
+      weekHeader: 'Wk',
+      weak: 'Semana',
+      medium: 'Medio',
+      strong: 'Fuerte',
+      passwordPrompt: 'Ingrese contraseña',
+      emptyMessage: 'No hay registros',
+      emptyFilterMessage: 'No registros encontrados',
+    });
   }
 
   ngAfterViewInit(): void {

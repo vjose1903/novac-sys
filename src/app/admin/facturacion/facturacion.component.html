@@ -108,7 +108,7 @@
                 (change)="selectModoFactura($event.target.value)"
                 class="form-control inputE"
                 [(ngModel)]="modo_factura"
-                (blur)="checkCambiosModoyCondicionFactura($event.target)"
+                (blur)="checkCambiosModoyCondicionFactura({ elemento_html: $event.target })"
                 tabindex="-1"
                 [disabled]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
                 [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
@@ -123,21 +123,16 @@
             <div *ngIf="modo_factura === 'viaje'">
               <span class="mt-1"><strong>Fecha viaje:</strong></span>
               <div class="d-flex justify-content-between align-items-center">
-                <input
-                  #fecha_viajeInput
-                  id="fecha_viaje"
-                  type="text"
-                  (keydown.enter)="saltar($event.target.id, fecha_viajeInput.value)"
-                  [bsConfig]="dpConfig"
-                  placeholder="mm/dd/aaaa"
-                  class="form-control inputE"
+                <p-calendar
+                  inputId="fecha_viaje"
+                  inputStyleClass="minSize"
                   [(ngModel)]="fecha_viaje"
-                  #dp="bsDatepicker"
-                  placement="bottom"
-                  bsDatepicker
-                  tabindex="-1"
-                  (blur)="checkCambiosModoyCondicionFactura($event.target)"
-                />
+                  dateFormat="dd/mm/yy"
+                  placeholder="dd/mm/aaaa"
+                  [minDate]="datesAvailable.viaje.minDate"
+                  (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
+                ></p-calendar>
+
                 <div class="ml-3 position-relative">
                   <btn-icon-circular
                     [id]="'btnCamion'"
@@ -250,21 +245,16 @@
 
               <div *ngIf="condicion_fact === 'Crédito'">
                 <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
-                <input
-                  #fecha_vencimiento_input
-                  id="fecha_vencimiento"
-                  type="text"
-                  [bsConfig]="dpConfig"
-                  (keydown.enter)="$event.target.blur()"
-                  placeholder="mm/dd/aaaa"
-                  class="form-control inputE"
+
+                <p-calendar
+                  inputId="fecha_vencimiento"
+                  inputStyleClass="minSize"
                   [(ngModel)]="fecha_vencimiento"
-                  #dp="bsDatepicker"
-                  placement="bottom"
-                  bsDatepicker
-                  tabindex="-1"
-                  (blur)="checkCambiosModoyCondicionFactura($event.target)"
-                />
+                  dateFormat="dd/mm/yy"
+                  placeholder="dd/mm/aaaa"
+                  [minDate]="datesAvailable.viaje.minDate"
+                  (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_vencimiento', value: fecha_vencimiento })"
+                ></p-calendar>
               </div>
             </div>
           </div>

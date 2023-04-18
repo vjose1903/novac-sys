@@ -62,7 +62,6 @@
             </div>
           </div>
 
-
           <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.recibosIngresos" class="menuList">
             <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('lista_ingresos') }" [innerText]="'Recibos de ingresos'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('lista_ingresos') }" src="assets/img/reciboIngreso.png" alt="Recibo" (click)="cambiarMenu({ url: 'recibos/lista_ingresos', navigate: true })" />
@@ -114,9 +113,10 @@
     </div>
 
     <div class="content">
-      <div class="navBar drag">
+      <!-- <div class="navBar drag"> -->
+      <div class="navBar">
         <div class="right">
-          <div class="btn-group" id="dropCuenta">
+          <div class="btn-group dropCuenta" id="dropCuenta">
             <span class="dropdown-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
               <img class="rounded-circle" [src]="imgUser" alt="Admin" />
               Cuenta <span class="caret"></span>
@@ -128,9 +128,9 @@
                   <h3>{{ usuario?.nombre }}</h3>
                   <p>{{ usuario?.email }}</p>
                 </div>
-                <!-- <li role="menuitem">
-                <a class="dropdown-item" id="dropdown-item" (click)="refreshPage(); dropdownCuenta.hide()"><i class="fas fa-undo-alt"></i>Recargar pagina</a>
-              </li> -->
+                <li role="menuitem">
+                  <a class="dropdown-item" id="dropdown-item" (click)="refreshPage(); dropdownCuenta.hide()"><i class="fas fa-undo-alt"></i>Recargar aplicación</a>
+                </li>
                 <li class="divider dropdown-divider"></li>
 
                 <li role="menuitem">

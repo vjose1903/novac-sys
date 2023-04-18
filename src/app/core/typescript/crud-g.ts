@@ -35,17 +35,17 @@ export class CrudG<T> {
     return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
-  async getOne(id: number, arg = null, tipo: 'backend' | 'externo' = 'backend') {
+  async getOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
     return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
-  async deleteOne(id: number, arg = null, tipo: 'backend' | 'externo' = 'backend') {
+  async deleteOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
     return (await this.request(url, 'delete', null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
-  createUpdateOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
+  createUpdateOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     const promise = new Promise((resolve, reject) => {
       if (Number(data.id) === 0 || !data.id) delete data.id;
 
@@ -64,13 +64,12 @@ export class CrudG<T> {
     return promise;
   }
 
-  async createOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
+  async createOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
-
     return (await this.request(url, 'post', data, tipo, arg?.requestParams).toPromise()) as T;
   }
 
-  async updateOne(data, arg = null, tipo: 'backend' | 'externo' = 'backend') {
+  async updateOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, data.id);
     return (await this.request(url, 'patch', data, tipo, arg?.requestParams).toPromise()) as T;
   }
@@ -106,7 +105,6 @@ export class CrudG<T> {
 
   private getUrlInUse() {
     const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
-
 
     const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     // const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;

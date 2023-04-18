@@ -1,7 +1,7 @@
 <h4 class="mb-3">Introduzca fecha y hora de factura pendiente:</h4>
 <div class="row">
   <div class="col-5 rowFecha">
-    <input type="text" [bsConfig]="dpConfig" placeholder="mm/dd/aaaa" class="form-control" [(ngModel)]="fecha" #dp="bsDatepicker" placement="bottom" bsDatepicker />
+    <p-calendar inputId="fecha" [(ngModel)]="fecha" [maxDate]="maxDate" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
   </div>
   <div class="col-7">
     <ngb-timepicker id="timepiker_______" [(ngModel)]="time" [size]="'small'" [meridian]="meridian"></ngb-timepicker>

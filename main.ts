@@ -4,10 +4,7 @@ import * as fs from 'fs';
 import * as url from 'url';
 import { ConfigI } from './src/app/core/typescript/config-interface';
 
-const request = require('request');
 const { exec } = require('child_process');
-
-const express = require('express');
 
 import Functions from './electron/functions.js';
 import HandlerConfigFile from './electron/handler-config-file';
@@ -23,6 +20,7 @@ import {
   KEYWORD_ELECTRON_SENDER,
   KEYWORD_ELECTRON_SET_APP_CONFIG,
   KEYWORD_ELECTRON_TEST,
+  KEYWORD_ELECTRON_RELOAD,
   MessageTaskInterface,
 } from './electron/shared-electron-angular.js';
 import AppUpdater from './electron/auto-update.js';
@@ -38,6 +36,7 @@ let replace_in_file: ReplaceInFile;
 
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
+const appFilePath: any = url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true });
 
 function createSplash(type = 'splash') {
   if (splash) {
@@ -91,101 +90,30 @@ function createWindow() {
 
     if (serve) {
       win.webContents.openDevTools();
-      require('electron-reload')(__dirname, {
-        electron: require(`${__dirname}/node_modules/electron`),
-      });
+      require('electron-reload')(__dirname, { electron: require(`${__dirname}/node_modules/electron`) });
 
       win.loadURL('http://localhost:5221');
     } else {
-      win.loadURL(url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true }));
+      win.loadURL(appFilePath);
     }
 
     win.setMenuBarVisibility(false);
 
-    // if (serve) {
-    //   win.webContents.openDevTools();
-
-    //   require('electron-reload')(__dirname, {
-    //     electron: require(path.join(__dirname, '/node_modules/electron')),
-    //   });
-
-    //   win.loadURL('http://localhost:5221');
-    // } else {
-    //   // Path when running electron executable
-    //   let pathIndex = pathAdd('/dist/index.html');
-    //   let baseDirectory = pathAdd('/dist/');
-
-    //   // if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-    //   //   // Path when running electron in local folder
-    //   //   pathIndex = '../dist/index.html';
-    //   //   baseDirectory = '../dist';
-    //   // }
-    //   var httpPort = 5221;
-    //   const app = express();
-
-    //   app.use(express.static(path.resolve(baseDirectory)));
-
-    //   app.get('/', (req, res) => {
-    //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
-    //   });
-
-    //   app.get('*', (req, res) => {
-    //     res.sendFile(path.resolve(pathIndex), { redirect: false, maxage: '1d', etag: false });
-    //   });
-
-    //   // if (fs.existsSync('resources/app/index.html')) {
-    //   //   // Path when running electron in local folder
-    //   //   pathIndex = 'resources/app/index.html';
-    //   //   baseDirectory = 'resources/app';
-    //   // } else {
-    //   //   app.use(express.static(path.join(__dirname, baseDirectory)));
-
-    //   //   app.get('/', (req, res) => {
-    //   //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
-    //   //   });
-
-    //   //   app.get('*', (req, res) => {
-    //   //     res.sendFile(path.join(__dirname, pathIndex), { redirect: false, maxage: '1d', etag: false });
-    //   //   });
-    //   // }
-
-    //   app.listen(httpPort, () => win.loadURL('http://localhost:5221'));
-
-    //   // win.loadURL(url.format({
-    //   //   pathname: path.join(__dirname, pathIndex),
-    //   //   protocol: 'file:',
-    //   //   slashes: true
-    //   // }));
-    // }
-
     // Emitted when the window is closed.
-    win.on('closed', (event) => {
-      // Dereference the window object, usually you would store window
-      // in an array if your app supports multi windows, this is the time
-      // when you should delete the corresponding element.
-      win = emptyWin;
-    });
+    win.on('closed', (event) => (win = emptyWin));
 
     resolve(win);
   });
 }
 
 try {
-  // This method will be called when Electron has finished
-  // initialization and is ready to create browser windows.
-  // Some APIs can only be used after this event occurs.
-  // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.on('ready', () => createSplash());
 
   // Quit when all windows are closed.
-  app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd +
-    app.quit();
-  });
+  app.on('window-all-closed', () => app.quit());
 } catch (e) {
   // Catch Error
-  // throw e;
+  throw e;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -294,6 +222,11 @@ async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
       case KEYWORD_ELECTRON_TEST:
         // test function
         break;
+      //
+      case KEYWORD_ELECTRON_RELOAD:
+        puts('RECARGANDO ELECTRON');
+        win.reload();
+        if (!serve) win.loadURL(appFilePath);
       //
       case KEYWORD_ELECTRON_CHANGE_CONFIG_FILE:
         const obj = JSON.parse(arg.data);
