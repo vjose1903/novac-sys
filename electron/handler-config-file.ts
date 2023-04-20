@@ -29,7 +29,7 @@ export default class HandlerConfigFile {
     medida_producto_terminado: 'Producto',
 
     printer_selected: {
-      venta_contado: 'EPSON TM-T88IV',
+      venta_contado: 'Ninguna',
       venta_credito: 'Ninguna',
       pre_venta: 'Ninguna',
       cotizacion: 'Ninguna',
