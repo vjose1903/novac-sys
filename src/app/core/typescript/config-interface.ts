@@ -15,6 +15,7 @@ export interface ConfigI {
   usa_url_principal:           boolean;
   is_produccion:               boolean;
   calcular_itbis:              boolean;
+  se_calcula_saco:             boolean;
   pages_sizes:                 Documentos;
   printer_selected:            Documentos;
   plantillas_impresion:        PlantiallasImpresion;

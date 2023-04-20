@@ -31,9 +31,9 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
   const dd = {
-    pageSize: { width: 200, height: 'auto' },
+    pageSize: { width: 220, height: 'auto' },
     pageOrientation: 'portrait',
-    pageMargins: [5, 20, 5, 20],
+    pageMargins: [15, 20, 15, 20],
     content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,

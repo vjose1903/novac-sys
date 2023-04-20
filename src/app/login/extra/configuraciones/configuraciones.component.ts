@@ -102,6 +102,7 @@ export class ConfiguracionesComponent implements OnInit {
       // printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
       is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
       calcular_itbis: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
+      se_calcula_saco: [{ value: this.getValue(data, 'se_calcula_saco'), disabled: false }, Validators.required],
       is_produccion: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
       facturacion_editar_precio: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       vende_sin_inventario: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],

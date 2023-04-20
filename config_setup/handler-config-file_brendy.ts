@@ -22,6 +22,7 @@ export default class HandlerConfigFile {
     usa_url_principal: false,
     is_db_local: true,
     calcular_itbis: false,
+    se_calcula_saco: false,
     is_produccion: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
