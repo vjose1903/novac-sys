@@ -92,7 +92,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async getIngredients() {
-    this.ingredientes = _.orderBy(this.producto_terminado_en_turno.formulas_productos_terminados, ['articulo_combo'], ['asc']);
+    this.ingredientes = _.orderBy(this.producto_terminado_en_turno.formulas_productos_terminados, ['articulo_combo_id'], ['asc']);
     this.ingredientesParaProduccion.length = 0;
     [this.cantidad_producir, this.medida_producir] = Array(2).fill(null);
   }
@@ -201,6 +201,9 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     this.ingredientesParaProduccion = [];
     if (this.cantidad_producir && this.medida_producir) {
       this.ingredientes.forEach(async (ingrediente) => {
+
+        console.log("ingrediente ", ingrediente);
+
         let cantidad_formula = ingrediente.cantidad;
         let contenidos_ingrediente = ingrediente.contenido;
         const contenido_a_producir = {};
@@ -221,12 +224,12 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
               return producto_distinto_en_lista;
             }),
           );
-          const ingredientesIguales = _.filter(all_ingredientes, (item) => item.articulo_combo == ingrediente.articulo_combo);
+          const ingredientesIguales = _.filter(all_ingredientes, (item) => item.articulo_combo_id == ingrediente.articulo_combo_id);
 
           if (ingredientesIguales.length) cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
         }
 
-        const extra = { afterPath: `check_excede/${ingrediente.articulo_combo}`, parameters: { cantidad: cantidad_calculada } };
+        const extra = { afterPath: `check_excede/${ingrediente.articulo_combo_id}`, parameters: { cantidad: cantidad_calculada } };
 
         await this.articuloClass.getAll(extra).then((res) => {
           const excede = res['data'];
@@ -242,11 +245,11 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
               existencia: contenido_a_producir,
               articulo_id: ingrediente.articulo_id,
               contenido: ingrediente.contenido,
-              articulo_combo: ingrediente.articulo_combo,
+              articulo_combo_id: ingrediente.articulo_combo_id,
               cantidad_en_unidades: contenido_a_producir[ingrediente.medida],
               medida: ingrediente.medida,
             });
-            this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_combo'], ['asc']);
+            this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_combo_id'], ['asc']);
           }
         });
       });
@@ -365,7 +368,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       const ingrediente = ingredientes[i];
 
       const obj = {
-        articulo_combo: ingrediente.articulo_combo,
+        articulo_combo_id: ingrediente.articulo_combo_id,
         cantidad_en_unidades: ingrediente.cantidad_en_unidades,
       };
       ingredientes_format.push(obj);

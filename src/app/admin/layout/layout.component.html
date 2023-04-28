@@ -89,6 +89,7 @@
               <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.camiones" [ngClass]="{ activa: actualRuta == 'camiones' }" (click)="cambiarMenu({ url: 'registros/camiones', navigate: true })">Camiones</h4>
               <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.roles" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'registros/roles', navigate: true })">Roles</h4>
               <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.ncf" [ngClass]="{ activa: actualRuta == 'ncf' }" (click)="cambiarMenu({ url: 'registros/ncf', navigate: true })">NCF</h4>
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.periodo_fiscal" [ngClass]="{ activa: actualRuta == 'periodo_fiscal' }" (click)="cambiarMenu({ url: 'registros/periodo_fiscal', navigate: true })">Periodo Fiscal</h4>
             </div>
           </div>
 

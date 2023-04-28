@@ -20,6 +20,7 @@ export interface table_info {
   inputEvents?: string;
   textAlign?: 'start' | 'center' | 'end';
   tooltip?: string;
+  column_gap?: string;
   rowTooltip?: string;
   alerta?: boolean;
   tag_color?: string;

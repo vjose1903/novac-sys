@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'empleados', loadChildren: () => import('./registro-empleados/registro-empleados.module').then((m) => m.RegistroEmpleadosModule) },
   { path: 'camiones', loadChildren: () => import('./registro-vehiculo/registro-vehiculo.module').then((m) => m.RegistroVehiculoModule) },
   { path: 'roles', loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule) },
+  { path: 'periodo_fiscal', loadChildren: () => import('./periodo-fiscal/periodo-fiscal.module').then((m) => m.PeriodoFiscalModule) },
 ];
 
 @NgModule({

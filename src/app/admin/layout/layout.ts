@@ -52,6 +52,7 @@ export class LayoutClass extends TablaClass {
       camiones: Object.values(Permisos.vehiculo),
       roles: Object.values(Permisos.role),
       ncf: Object.values(Permisos.secuencia_comprobante),
+      periodo_fiscal: Object.values(Permisos.periodo_fiscal),
       flatt: [],
     },
     produccion: {

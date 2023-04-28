@@ -82,8 +82,8 @@
                       <img width="100%" height="auto" alt="{{ dato[column.alt] }}" [src]="getValueForm(column, dato)" class="img-fluid" />
                     </span>
 
-                    <span *ngSwitchCase="'icon'" class="d-flex {{ column.div_class ? column.div_class : 'justify-content-center align-items-center ' }} w-100">
-                      <ng-container *ngFor="let objIcon of column.iconsArray">
+                    <span *ngSwitchCase="'icon'" class="d-flex {{ column.div_class ? column.div_class : 'justify-content-center align-items-center ' }} w-100" [ngStyle]="{ 'column-gap': column.column_gap || 0 }">
+                      <div *ngFor="let objIcon of column.iconsArray">
                         <span *ngIf="showIcon(objIcon, dato)" class="span_icon" [ngClass]="{ icon_disable: disabledInput(dato, objIcon) }">
                           <i
                             id="{{ config.id_tabla + post_id }}-{{ getIconKey(objIcon) }}-{{ getIndex(index_body) }}"
@@ -95,7 +95,7 @@
                             (mouseleave)="mouseMoveEvent('leave', dato, objIcon.key, $event.target.id)"
                           ></i>
                         </span>
-                      </ng-container>
+                      </div>
                     </span>
 
                     <div *ngSwitchCase="'tag'" (click)="checkHasClickFuntion(column, dato, getIndex(index_body), $event)" class="d-flex justify-content-center align-items-center">

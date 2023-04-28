@@ -152,7 +152,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.colorUsado = ncf.usado ? 'green' : 'red';
           ncf.colorEstado = ncf.estado ? 'green' : 'red';
-          ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
 
           ncf.customStyles = { codigo: { width: '5rem' }, tipoC: { width: '3rem' }, usado_: { width: '4rem' }, estado_: { width: '4rem' } };
