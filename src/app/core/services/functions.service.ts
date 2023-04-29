@@ -679,6 +679,7 @@ export class fun {
   // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
   // __________________________________________________________________________________________________
   static getKeyByValue(object, value): any {
+
     return Object.keys(object).find((key) => object[key] == value);
   }
 

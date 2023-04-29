@@ -6,7 +6,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
-import { PeriodoFiscalC } from './periodo-fiscal';
+import { PeriodoFiscalC, PeriodoFiscalI } from './periodo-fiscal';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 
@@ -38,7 +38,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
           { key: 'cierre_mensual', tooltip: 'Cierre Mensual', text_color: 'colorNegro' },
           {
             key: 'cierre_anual',
-            tooltip: 'Cierre Anual',
+            rowTooltip: 'cierre_anual_tooltip',
             text_color: 'colorNegro',
             disable: [{ kind: 'campo', target: 'ready_to_anual_close', value: [false] }],
           },
@@ -88,19 +88,22 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
 
       const tempLista = [];
 
-      res.data.forEach((periodo) => {
-        periodo.fecha_inicio = moment(periodo.fecha_inicio, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
-        periodo.fecha_cierre = moment(periodo.fecha_cierre, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
+      res.data.forEach((periodo: PeriodoFiscalI) => {
+        const periodo_parsed = fun.duplicarJson(periodo);
 
-        periodo.estado_ = periodo.estado ? 'fas fa-check' : 'fas fa-times';
-        periodo.colorEstado = periodo.estado ? 'green' : 'red';
+        periodo_parsed.fecha_inicio = moment(periodo.fecha_inicio, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
+        periodo_parsed.fecha_cierre = moment(periodo.fecha_cierre, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
 
-        periodo.ready_to_anual_close = this.periodo_puede_cerrar(periodo);
+        periodo_parsed.estado_ = periodo.estado ? 'fas fa-check' : 'fas fa-times';
+        periodo_parsed.colorEstado = periodo.estado ? 'green' : 'red';
 
-        periodo.cierre_mensual = 'fa-regular fa-calendar-xmark';
-        periodo.cierre_anual = 'fa-solid fa-calendar-days';
+        periodo_parsed.ready_to_anual_close = this.periodo_puede_cerrar(periodo);
 
-        periodo.customStyles = {
+        periodo_parsed.cierre_mensual = 'fa-regular fa-calendar-xmark';
+        periodo_parsed.cierre_anual = 'fa-solid fa-calendar-days';
+        periodo_parsed.cierre_anual_tooltip = this.periodo_puede_cerrar(periodo) ? 'Cierre Anual' : '';
+
+        periodo_parsed.customStyles = {
           estado_: { width: '5rem', 'font-size': '1.1rem' },
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 10% !important;' },
@@ -108,8 +111,10 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
             { key: 'cierre_anual', estilos: 'font-size: 1.2rem !important' },
           ],
         };
+        console.log('periodo', periodo);
+        console.log('periodo_parsed', periodo_parsed);
 
-        tempLista.push(periodo);
+        tempLista.push(periodo_parsed);
       });
 
       this.listaPeriodosFiscales = tempLista;
@@ -122,26 +127,23 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  periodo_puede_cerrar(args) {
+  periodo_puede_cerrar(periodo: PeriodoFiscalI) {
     let res = false;
 
-    const fecha_actual = new Date(moment().format());
-    const fecha_actual_month = Number(fecha_actual.getMonth() + 1);
-    const fecha_actual_year = Number(fecha_actual.getFullYear());
+    const only_meses = fun.duplicarJson(periodo.detalle_periodo_fiscal);
+    delete only_meses.id;
 
-    console.log('Args', args);
+    const is_periodo_months_all_close = Object.values(only_meses).every((item) => item == false);
 
-    // args.fecha_cierre = '01/12/2022';
-    // TODO: hacer una funcion que me devuelva el numero del mes pasandole el mes en letras
-    // TODO: agregar una condicion de que si todos los meses estan cerrados para poder cerrar el año
-
-    const fecha_cierre = new Date(moment(args.fecha_cierre, 'DD/MM/YYYY').format());
-    const fecha_cierre_month = Number(fecha_cierre.getMonth() + 1);
-    const fecha_cierre_year = Number(fecha_cierre.getFullYear());
-
-    if (args.estado && ((fecha_actual_month == fecha_cierre_month && fecha_actual_year == fecha_cierre_year) || (fecha_cierre_year < fecha_actual_year && fecha_cierre_month == 12))) res = true;
+    if (periodo.estado && periodo.is_open && is_periodo_months_all_close) res = true;
 
     return res;
+  }
+
+  actual_month_is_december() {
+    const fecha_actual = new Date(moment().format());
+
+    return fecha_actual.getMonth() + 1 == PeriodoFiscalC.numbers.diciembre;
   }
 
   saltar(campo) {

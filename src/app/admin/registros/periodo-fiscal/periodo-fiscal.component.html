@@ -8,7 +8,9 @@
       <div class="list onlyList">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado de periodos fiscales</h4>
-          <button *ngxPermissionsOnly="permissions.periodo_fiscal.open_new_periodo" (click)="abrirNuevoPeriodo()" class="btn btn-tema">Abrir nuevo Periodo</button>
+          <div [pTooltip]="actual_month_is_december() ? 'Abrir nuevo periodo fiscal' : 'Solo se puede abrir un nuevo periodo fiscal en diciembre'" tooltipPosition="left">
+            <button *ngxPermissionsOnly="permissions.periodo_fiscal.open_new_periodo" [disabled]="!actual_month_is_december()" (click)="abrirNuevoPeriodo()" class="btn btn-tema">Abrir nuevo Periodo</button>
+          </div>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">
