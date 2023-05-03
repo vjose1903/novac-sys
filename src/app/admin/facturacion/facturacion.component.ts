@@ -937,15 +937,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return is_disabled;
   }
 
-  openOverlay(event, overlay, tipo) {
-    this.overlay = {};
-    this.overlay['item'] = overlay;
-    this.overlay['tipo'] = tipo;
-    this.overlay['item'].toggle(event);
 
-    if (tipo == 'movimiento') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
-    if (event) event.stopPropagation();
-  }
 
   getCamionInfo(camion, key) {
     let res;
@@ -1040,6 +1032,16 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
       }
     }, 250);
+  }
+
+  openOverlay(event, overlay, tipo) {
+    this.overlay = {};
+    this.overlay['item'] = overlay;
+    this.overlay['tipo'] = tipo;
+    this.overlay['item'].toggle(event);
+
+    if (tipo == 'movimiento') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+    if (event) event.stopPropagation();
   }
 
   cerrarOverlay() {

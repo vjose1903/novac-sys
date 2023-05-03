@@ -12,9 +12,10 @@ import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { CierreMensualComponent } from './cierre-mensual/cierre-mensual.component';
 
 @NgModule({
-  declarations: [PeriodoFiscalComponent],
+  declarations: [PeriodoFiscalComponent, CierreMensualComponent],
   imports: [CommonModule, PeriodoFiscalRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
 })
 export class PeriodoFiscalModule {}

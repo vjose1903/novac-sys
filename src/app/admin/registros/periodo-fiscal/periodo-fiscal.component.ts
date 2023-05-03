@@ -5,10 +5,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
-import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { PeriodoFiscalC, PeriodoFiscalI } from './periodo-fiscal';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
+import { CierreMensualComponent } from './cierre-mensual/cierre-mensual.component';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-periodo-fiscal',
@@ -111,15 +112,13 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
             { key: 'cierre_anual', estilos: 'font-size: 1.2rem !important' },
           ],
         };
-        console.log('periodo', periodo);
-        console.log('periodo_parsed', periodo_parsed);
 
         tempLista.push(periodo_parsed);
       });
 
       this.listaPeriodosFiscales = tempLista;
 
-      // this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error(error);
 
@@ -159,6 +158,29 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   }
 
   atras() {}
+
+  tableClickIcon(params) {
+    if (params.columnKey == 'actions') {
+      if (params.iconKey == 'cierre_mensual') {
+        this.openNewModal({
+          component: CierreMensualComponent,
+          inputs: params.data,
+          id: 'cierre_mensual_modal',
+          header: 'Cierre Mensual',
+          width: '70rem',
+          height: '20rem',
+          botones: {
+            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false }],
+          },
+        });
+      }
+
+      if (params.iconKey == 'cierre_anual') {
+        fun.logYellow('Cierre Anual');
+      }
+    }
+  }
 
   tableClick_action(params) {
     if (params.action == 'delete') this.eliminarReg(params.data);

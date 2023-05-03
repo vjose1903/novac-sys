@@ -1,0 +1,36 @@
+<h5 class="mb-0">
+  Periodo Fiscal <strong>{{ inputs.fecha_inicio }}</strong> - <strong>{{ inputs.fecha_cierre }}</strong>
+</h5>
+
+<div class="meses-container">
+  <div
+    *ngFor="let mes of meses"
+    class="mes-item"
+    [ngClass]="{ closed: inputs.detalle_periodo_fiscal[mes] == false, open: inputs.detalle_periodo_fiscal[mes] == true, hold: inputs.detalle_periodo_fiscal[mes] == null }"
+    (click)="openOverlay($event, overlayCierreMensual, mes, inputs.detalle_periodo_fiscal[mes])"
+  >
+    {{ mes }}
+  </div>
+
+  <p-overlayPanel [dismissable]="true" [showCloseIcon]="false" #overlayCierreMensual styleClass="dropConfigs" (onHide)="cerrarOverlay()" styleClass="cierreMensualOverlay">
+    <ng-template pTemplate>
+      <div id="overlayCierreMensual">
+        <ul class="overlayCierreMensual" role="menu">
+          <li id="overlayCierreMensual-open" role="menuitem" class="c-pointer" [ngClass]="{ disable: disableOverlayOption('open') }" (click)="actionMonth('open')">
+            <div class="d-flex align-items-center">
+              <i class="fa-solid fa-folder-open mr-3"></i>
+              <p id="dropdown-item" class="mr-3 mb-0">{{ overlay?.month_status == null ? 'Aperturar' : 'Reaperturar' }}</p>
+            </div>
+          </li>
+
+          <li id="overlayCierreMensual-close" role="menuitem" class="c-pointer" [ngClass]="{ disable: disableOverlayOption('close') }" (click)="actionMonth('close')">
+            <div class="d-flex align-items-center">
+              <i class="fa-regular fa-folder mr-3"></i>
+              <p id="dropdown-item" class="mr-3 mb-0">Cerrar</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </ng-template>
+  </p-overlayPanel>
+</div>
