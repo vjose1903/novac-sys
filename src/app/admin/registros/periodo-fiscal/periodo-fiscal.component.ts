@@ -177,30 +177,25 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
       }
 
       if (params.iconKey == 'cierre_anual') {
-        fun.logYellow('Cierre Anual');
+        this.modalCierreAnual(params.data);
       }
     }
   }
 
-  tableClick_action(params) {
-    if (params.action == 'delete') this.eliminarReg(params.data);
-  }
-
-  eliminarReg(data?) {
-    const comprobanteData = data;
-    comprobanteData.nombre = 'comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo;
-
+  modalCierreAnual(data?) {
     const objConfirmationModal = {
-      id: 'eliminar_comprobante',
+      id: 'cerrar_anio',
       header: 'Confirmar',
-      texto: `Desea eliminar comprobante para <b>${comprobanteData.tipoC_}</b> numero: <b>${comprobanteData.codigo}</b>`,
-      width: '510px',
+      texto: `Estas seguro de que deseas cerrar el Periodo Fiscal: <b>${data.fecha_inicio} - ${data.fecha_cierre}</b>`,
+      width: '500px',
       siFunction: (instance) => {
-        this.periodoFiscalClass.deleteOne(comprobanteData.id).then((res) => {
-          const actualPagination = this.tServ.getPaginationById('lista_periodos');
-          this.getPeriodosFiscales(actualPagination);
-          instance.closeModal(instance.id, 'eliminar_comprobante');
-        });
+        console.log('Peticion de cerrar año');
+
+        // this.periodoFiscalClass.deleteOne(comprobanteData.id).then((res) => {
+        //   const actualPagination = this.tServ.getPaginationById('lista_periodos');
+        //   this.getPeriodosFiscales(actualPagination);
+        //   instance.closeModal(instance.id, 'cerrar_anio');
+        // });
       },
     };
     this.confirmationModal(objConfirmationModal);
