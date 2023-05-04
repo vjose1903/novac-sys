@@ -7,7 +7,7 @@
   </div>
 
   <div class="cuerpo p-0">
-    <div #cardTabla id="cardTabla" class="card cardListados">
+    <div #cardTabla id="cardTabla" class="cardListados inventario">
       <dinamic-table [cardTabla]="cardTabla" [(data)]="listaArticulos" [(TablasComponent)]="tablaComponent" [config]="table_roles_config" (table_events)="handle_table_events($event)"></dinamic-table>
 
       <div class="divFiltro">

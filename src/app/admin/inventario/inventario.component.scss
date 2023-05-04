@@ -29,24 +29,20 @@
     grid-area: cuerpo;
 
     position: relative;
-    > .cardListados {
+
+    .divFiltro {
+      top: 0;
       position: absolute;
-      height: 100%;
+      display: flex;
+      justify-content: space-between;
       width: 100%;
+      padding-left: 18rem;
 
-      > .divFiltro {
-        position: absolute;
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        padding-left: 18rem;
-
-        > .filtroArticulos {
-          margin-top: 0.6rem;
-        }
-        > .btnReporte {
-          margin: 0.15rem 0.5rem 0rem 0rem;
-        }
+      > .filtroArticulos {
+        margin-top: 0.6rem;
+      }
+      > .btnReporte {
+        margin: 0.15rem 0.5rem 0rem 0rem;
       }
     }
   }

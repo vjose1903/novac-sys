@@ -28,8 +28,8 @@
   </div>
   <div class="listado-formulario {{ fun.hasValue(viaje_selected) ? 'list-form' : 'solo-list' }}">
     <div class="listado {{ fun.hasValue(viaje_selected) ? 'list-form' : 'solo-list' }}">
-      <div #cardTablaViaje id="cardTabla" class="card cardListados">
-        <div class="divTabla">
+      <div class="divTabla">
+        <div #cardTablaViaje id="cardTabla" class="cardListados">
           <dinamic-table [cardTabla]="cardTablaViaje" [seleccionado]="viaje_selected?.id" [(data)]="viajes" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
       </div>

@@ -1,0 +1,25 @@
+.catalogo-cuentas-container {
+  height: 100%;
+  width: 100%;
+
+  display: grid;
+  grid-template-areas:
+    "catalogo-cuentas-filter"
+    "catalogo-cuentas-body";
+
+  grid-template-rows: min-content auto;
+
+  .catalogo-cuentas-filter {
+    grid-area: catalogo-cuentas-filter;
+  }
+
+  .catalogo-cuentas-body {
+    grid-area: catalogo-cuentas-body;
+    position: relative;
+    .catalogo-cuentas-fantasma {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+  }
+}

@@ -961,6 +961,9 @@ Not supports in Firefox and IE */
 
 .cardListados {
   @include my_cards;
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
 .input_fantasma {
@@ -970,3 +973,13 @@ Not supports in Firefox and IE */
   height: 0;
   position: absolute;
 }
+
+// ==============================================================================================================
+// PRIME TREE TABLE
+// ==============================================================================================================
+
+
+.p-treetable-scrollable-header-box {
+  // padding-right: 0 !important;
+}
+

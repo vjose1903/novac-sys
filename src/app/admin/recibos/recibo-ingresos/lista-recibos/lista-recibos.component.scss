@@ -16,10 +16,5 @@
   .divTabla {
     grid-area: divTabla;
     position: relative;
-    > .cardListados {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
   }
 }

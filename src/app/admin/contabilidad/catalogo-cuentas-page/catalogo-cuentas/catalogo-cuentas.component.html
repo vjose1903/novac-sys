@@ -1,1 +1,25 @@
-<p>catalogo-cuentas works!</p>
+<div class="catalogo-cuentas-container">
+  <div class="catalogo-cuentas-filter">filter aqui</div>
+
+  <div class="catalogo-cuentas-body">
+    <div #catalogoCuentasBody class="catalogo-cuentas-fantasma">
+      <p-treeTable *ngIf="treeNodes.length" [value]="treeNodes" [columns]="cols" [scrollable]="true" scrollHeight="{{ treeTableScrollHeight }}" [resizableColumns]="true">
+        <ng-template pTemplate="header" let-columns>
+          <tr #trTreeHead>
+            <th *ngFor="let col of columns" [ngStyle]="col.style">
+              {{ col.header }}
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-columns="columns">
+          <tr #trTreeBody [ttRow]="rowNode">
+            <td *ngFor="let col of columns; let i = index" [ngStyle]="col.style" [ngClass]="{ negrita: rowData.is_control }">
+              <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0"></p-treeTableToggler>
+              {{ rowData[col.field] }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-treeTable>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+.catalogo-page-grid {
+  display: grid;
+  grid-template-areas:
+    "catalogo-page-title"
+    "catalogo-page-body";
+
+  grid-template-rows: min-content auto;
+  height: 100%;
+
+  row-gap: 1rem;
+
+  .catalogo-page-title {
+    grid-area: catalogo-page-title;
+  }
+  .catalogo-page-body {
+    grid-area: catalogo-page-body;
+    .inner-body {
+      height: 100%;
+      width: 100%;
+      position: relative;
+      .fantasma {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+}
