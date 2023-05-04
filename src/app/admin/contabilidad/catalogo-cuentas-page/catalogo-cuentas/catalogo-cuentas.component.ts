@@ -51,7 +51,6 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
   async getCuentasContables() {
     try {
       const res = await this.cuentaContableClass.getAll({ parameters: { is_for_tree_table: true } });
-      console.log('res.data --> ', res.data);
 
       this.listaCuentasContables.length = 0;
       this.copyListaCuentasContables.length = 0;
@@ -62,9 +61,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
       this.copyListaCuentasContables = fun.duplicarJson(this.listaCuentasContables);
       this.treeNodes = this.cuentasContablesServ.cuentasIterator(this.listaCuentasContables);
-      // console.log('this.treeNodes--> ', this.treeNodes);
 
-      // console.log('this.listaCuentasContables --> ', this.listaCuentasContables);
       setTimeout(() => this.calculateScroll(), 500);
     } catch (e) {}
   }
@@ -74,5 +71,13 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
     this.treeTableScrollHeight = `${calculo}px`;
     console.log('this.treeTableScrollHeight ', this.treeTableScrollHeight);
+  }
+
+  filter(event) {
+    const search = event.target.value;
+
+    fun.awaitTyping(event).then(() => {
+      console.log('search ', search);
+    });
   }
 }
