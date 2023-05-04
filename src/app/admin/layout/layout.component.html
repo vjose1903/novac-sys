@@ -103,6 +103,15 @@
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('inventario') }" src="assets/img/inventario.png" alt="Inventario" (click)="cambiarMenu({ url: 'inventario', navigate: true })" />
           </div>
 
+          <div *ngxPermissionsOnly="menuPermissionsObj.contabilidad.flatt" class="menuList">
+            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('contabilidad') }" [innerText]="'Contabilidad'"></h5>
+            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('contabilidad') }" src="assets/img/contabilidad.png" alt="Contabilidad" (click)="cambiarMenu({ url: 'contabilidad', navigate: false })" />
+
+            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('contabilidad') }">
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.catalogo_cuentas" [ngClass]="{ activa: actualRuta == 'catalogo_cuentas' }" (click)="cambiarMenu({ url: 'contabilidad/catalogo_cuentas', navigate: true })">Catalogo de cuentas</h4>
+            </div>
+          </div>
+
           <div *ngxPermissionsOnly="menuPermissionsObj.reportes.flatt" class="menuList">
             <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('reportes') }" [innerText]="'Reportes'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('reportes') }" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu({ url: 'reportes', navigate: true })" />

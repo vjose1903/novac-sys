@@ -41,6 +41,10 @@ const routes: Routes = [
         path: 'recibos',
         loadChildren: () => import('../recibos/recibos.module').then((m) => m.RecibosModule),
       },
+      {
+        path: 'contabilidad',
+        loadChildren: () => import('../contabilidad/contabilidad.module').then((m) => m.ContabilidadModule),
+      },
 
       {
         path: 'inventario',
