@@ -18,7 +18,6 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
   cuentaContableClass = new CuentaContableC();
 
   listaCuentasContables: Array<CuentaContableI> = [];
-  copyListaCuentasContables: Array<CuentaContableI> = [];
 
   cols: any[];
 
@@ -48,18 +47,16 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     ];
   }
 
-  async getCuentasContables() {
+  async getCuentasContables(filter_target: string | null = null) {
     try {
-      const res = await this.cuentaContableClass.getAll({ parameters: { is_for_tree_table: true } });
+      const res = await this.cuentaContableClass.getAll({ parameters: { filter_target: filter_target, include_fathers_tree: true } });
 
       this.listaCuentasContables.length = 0;
-      this.copyListaCuentasContables.length = 0;
 
       res.data.forEach((cuenta: CuentaContableI) => {
         this.listaCuentasContables.push(cuenta);
       });
 
-      this.copyListaCuentasContables = fun.duplicarJson(this.listaCuentasContables);
       this.treeNodes = this.cuentasContablesServ.cuentasIterator(this.listaCuentasContables);
 
       setTimeout(() => this.calculateScroll(), 500);
@@ -77,7 +74,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     const search = event.target.value;
 
     fun.awaitTyping(event).then(() => {
-      console.log('search ', search);
+      this.getCuentasContables(search);
     });
   }
 }
