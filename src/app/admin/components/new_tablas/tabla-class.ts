@@ -12,6 +12,7 @@ export interface table_info {
   optionLabel?: any;
   optionValue?: any;
   estilos?: Array<any>;
+  style?: any;
   select_all?: boolean;
   alert_msg?: string;
   checkNumber?: boolean;
@@ -55,6 +56,7 @@ interface iconsI {
   key: string | keySource;
   rowTooltip?: string;
   tooltip?: string;
+  style?: any;
   text_color?: string;
   showCondition?: Array<any>;
   editing_buttons?: boolean;

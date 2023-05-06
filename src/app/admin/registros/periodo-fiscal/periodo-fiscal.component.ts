@@ -160,6 +160,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   atras() {}
 
   tableClickIcon(params) {
+
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'cierre_mensual') {
         this.openNewModal({

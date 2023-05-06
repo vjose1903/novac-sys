@@ -30,13 +30,13 @@ export interface btnDisabled {
   function?: Function;
 }
 export interface ButtonsI {
-  aceptar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string };
-  cancelar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string };
+  aceptar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string; btn_id?: string };
+  cancelar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string; btn_id?: string };
   dinamico?: Array<{ btn_id?: string; clase: string; label: string; function?: Function; function_in_other_component?: string; disable: boolean | btnDisabled; tooltip?: string }>;
 }
 
 export class ModalClass extends LayoutClass {
-  static noShowAceptarCancelarButtons = { aceptar: { show: false }, cancelar: { show: false } };
+  static noShowAceptarCancelarButtons: ButtonsI = { aceptar: { show: false }, cancelar: { show: false } };
 
   constructor() {
     super();

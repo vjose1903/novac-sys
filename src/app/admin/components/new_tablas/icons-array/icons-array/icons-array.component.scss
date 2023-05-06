@@ -1,0 +1,10 @@
+.span_icon {
+  cursor: pointer;
+  &.icon_disable {
+    // pointer-events: none !important;
+    > .iconPress {
+      color: #b1b1b15c !important;
+      cursor: not-allowed !important;
+    }
+  }
+}
