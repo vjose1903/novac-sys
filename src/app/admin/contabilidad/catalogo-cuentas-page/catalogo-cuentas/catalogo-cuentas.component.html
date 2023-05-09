@@ -18,11 +18,33 @@
           <tr #trTreeBody [ttRow]="rowNode">
             <td *ngFor="let column of columns; let indexBody = index" [ngStyle]="tServ.getStyle(rowData, column, rowData.index, table_config.id_tabla)" [ngClass]="{ negrita: rowData.is_control }">
               <p-treeTableToggler [rowNode]="rowNode" *ngIf="indexBody === 0"></p-treeTableToggler>
-              {{ fun.hasValue(column?.key) ? rowData[column.key] : '' }}
 
-              <ng-container *ngIf="fun.hasValue(column.iconsArray)">
-                <icons-array [column]="column" [indexBody]="rowData.index" [realIdTabla]="table_config.id_tabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="rowData" [rowsEditing]="[]" (icon_click)="iconsClick($event)"></icons-array>
-              </ng-container>
+              <span [ngSwitch]="column?.tipo">
+                <ng-container *ngSwitchCase="'text'">
+                  {{ fun.hasValue(column?.key) ? rowData[column.key] : '' }}
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'tag'">
+                  <p-tag
+                    [value]="getValueForm(column, rowData)"
+                    [rounded]="true"
+                    [severity]="rowData[column.tag_severity]"
+                    [ngClass]="{ tag_clickable: !!column.click }"
+                    [style]="{
+                      background: rowData[column.row_tag_color],
+                      'white-space': 'nowrap',
+                      width: column.tag_apretada ? 'auto' : '-webkit-fill-available',
+                      overflow: 'hidden',
+                      'text-overflow': 'ellipsis',
+                      display: 'inline-block'
+                    }"
+                  ></p-tag>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'icons'">
+                  <icons-array [column]="column" [indexBody]="rowData.index" [realIdTabla]="table_config.id_tabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="rowData" [rowsEditing]="[]" (icon_click)="iconsClick($event)"></icons-array>
+                </ng-container>
+              </span>
             </td>
           </tr>
         </ng-template>

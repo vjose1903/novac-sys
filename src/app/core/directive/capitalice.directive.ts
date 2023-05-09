@@ -7,8 +7,6 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 export class CapitaliceDirective {
   @Input('appCapitalice') type: 'formGroup' | 'input';
 
-  isSubscription = false;
-
   constructor(private element: ElementRef) {}
   @HostListener('focusin', ['$event'])
   @HostListener('input', ['$event.target.value'])

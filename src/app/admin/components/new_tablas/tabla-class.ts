@@ -24,7 +24,7 @@ export interface table_info {
   column_gap?: string;
   rowTooltip?: string;
   alerta?: boolean;
-  tag_color?: string;
+  row_tag_color?: string;
   tag_apretada?: boolean;
   con_hora?: boolean;
   disable?: any;

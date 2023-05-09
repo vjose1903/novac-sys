@@ -1,5 +1,5 @@
 import { TablasService } from './../../../components/new_tablas/tablas.service';
-import { table_config } from './../../../components/new_tablas/tabla-class';
+import { table_config, table_info } from './../../../components/new_tablas/tabla-class';
 import { CuentasContablesService } from './utils/cuentas-contables.service';
 import { TreeNode } from 'primeng/api';
 import { fun } from './../../../../core/services/functions.service';
@@ -7,6 +7,7 @@ import { MixinClass } from './../../../../core/typescript/MixinClass';
 import { CuentaContableC, CuentaContableI } from './../cuentas_contables';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CuentasContablesFormComponent } from './cuentas-contables-form/cuentas-contables-form.component';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'catalogo-cuentas',
@@ -25,24 +26,27 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
   treeNodes: TreeNode[] = [];
   treeTableScrollHeight;
   seleccionado;
+  filter_target;
 
   fun = fun;
 
   table_config: table_config = {
     info: [
-      { key: 'codigo', titulo: 'No. Cuenta', style: {} },
-      { key: 'descripcion', titulo: 'Cuenta', style: {} },
-      { key: 'origen', titulo: 'Origen', style: { 'text-align': 'center', width: '10%' } },
-      { key: 'tipo', titulo: 'Tipo', style: { 'text-align': 'center', width: '10%' } },
+      { key: 'codigo', titulo: 'No. Cuenta', tipo: 'text', style: {} },
+      { key: 'descripcion', titulo: 'Cuenta', tipo: 'text', style: {} },
+      { key: 'origen', titulo: 'Origen', tipo: 'text', style: { 'text-align': 'center', width: '10%' } },
+      { key: 'tipo', titulo: 'Tipo', tipo: 'text', style: { 'text-align': 'center', width: '10%' } },
+      { key: 'status', titulo: 'Activo', tipo: 'tag', row_tag_color: 'status_tag_color', style: { 'text-align': 'center', width: '10%' } },
       {
         key: 'actions',
         titulo: 'Acciones',
         column_gap: '1rem',
+        tipo: 'icons',
         style: { 'text-align': 'center', width: '15%' },
         iconsArray: [
           { key: 'add_account', rowTooltip: 'add_account_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'is_control', value: [false] }] },
           { key: 'edit_account', tooltip: 'Editar Cuenta', text_color: 'colorNegro' },
-          { key: 'delete_account', tooltip: 'Eliminar Cuenta', text_color: 'colorNegro' },
+          { key: 'deactivate_reactivate_account', rowTooltip: 'deactivate_reactivate_account_tooltip', text_color: 'colorNegro' },
         ],
       },
     ],
@@ -65,7 +69,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
   async getCuentasContables(filter_target: string | null = null) {
     try {
-      const res = await this.cuentaContableClass.getAll({ parameters: { filter_target: filter_target, include_fathers_tree: true, cuenta_control: true } });
+      const res = await this.cuentaContableClass.getAll({ parameters: { filter_target: filter_target, include_fathers_tree: true, cuenta_control: true, cuenta_control_id: true } });
 
       this.listaCuentasContables.length = 0;
       let utils = { current_index: 0 };
@@ -85,18 +89,27 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
   parseCuentasContables(cuentaParsed, utils) {
     cuentaParsed.add_account = 'fa-solid fa-plus';
     cuentaParsed.edit_account = 'fas fa-pencil-alt';
-    cuentaParsed.delete_account = 'far fa-trash-alt';
+
+    cuentaParsed.deactivate_reactivate_account = cuentaParsed.estado ? 'fa-solid fa-ban' : 'fa-regular fa-circle-check';
+    cuentaParsed.deactivate_reactivate_account_tooltip = cuentaParsed.estado ? 'Desactivar Cuenta' : 'Reactivar Cuenta';
+
+    cuentaParsed.status = cuentaParsed.estado ? 'ACTIVA' : 'DESACTIVA';
+    cuentaParsed.status_tag_color = cuentaParsed.estado ? 'green' : 'red';
 
     cuentaParsed.add_account_tooltip = cuentaParsed.is_control ? 'Añadir Cuenta' : 'Solo se pueden añadir cuentas a las cuentas control';
     cuentaParsed.index = utils.current_index;
+    console.log('cuentaParsed ', cuentaParsed);
 
     cuentaParsed.customStyles = {
-      estado_: { width: '5rem', 'font-size': '1.1rem' },
+      status: [
+        { key: 'status', isTd: true, estilos: 'width: 10% !important;' },
+        { key: 'status_cuenta', estilos: 'font-size: 1.2rem !important;' },
+      ],
       actions: [
         { key: 'actions', isTd: true, estilos: 'width: 15% !important;' },
         { key: 'add_account', estilos: 'font-size: 1.2rem !important;' },
         { key: 'edit_account', estilos: 'font-size: 1.2rem !important' },
-        { key: 'delete_account', estilos: 'font-size: 1.2rem !important' },
+        { key: 'deactivate_reactivate_account', estilos: 'font-size: 1.2rem !important' },
       ],
     };
 
@@ -110,6 +123,31 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     return cuentaParsed;
   }
 
+  // deactivate_or_reactivate
+  async getDataFromModal(arg, search?) {
+    console.log('arg ', arg);
+    if (arg.modal_id == 'form_cuenta_contable') {
+      this.requests(arg.obj);
+    }
+  }
+
+  getValueForm(column: table_info, data) {
+    switch (column.tipo) {
+      case 'textList':
+        return _.reduce(_.get(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${_.get(item, column.key_value)}`, '');
+
+      case 'formatoNumero':
+        return this.formatoNumero(_.get(data, column.key));
+
+      case 'date':
+        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
+        return fecha;
+
+      default:
+        return _.get(data, column.key);
+    }
+  }
+
   calculateScroll() {
     const calculo = this.catalogoCuentasBody?.nativeElement?.offsetHeight - this.trTreeHead?.nativeElement?.offsetHeight;
 
@@ -117,8 +155,8 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
   }
 
   filter(event) {
-    const search = event.target.value;
-    fun.awaitTyping(event).then(() => this.getCuentasContables(search));
+    this.filter_target = event.target.value;
+    fun.awaitTyping(event).then(() => this.getCuentasContables(this.filter_target));
   }
 
   iconsClick(event) {
@@ -149,9 +187,31 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
         });
       }
 
-      if (params.iconKey == 'delete_account') {
-        console.log('ELIMINAR CUENTA');
+      if (params.iconKey == 'deactivate_reactivate_account') {
+        this.confirmationModal({
+          id: 'deactivate_or_reactivate_account',
+          header: 'Confirmar',
+          texto: params.data.estado
+            ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la cuenta <b class="negrita">${params.data.descripcion}</b>`
+            : `Seguro que desea <b class="negrita"> REACTIVAR </b> la cuenta <b class="negrita">${params.data.descripcion}</b>`,
+          siFunction: (instance) => {
+            this.deactivateOrReactivateAccount(params.data);
+            instance.closeModal(instance.id, 'deactivate_or_reactivate_account');
+          },
+        });
       }
     }
+  }
+
+  deactivateOrReactivateAccount(data) {
+    this.cuentaContableClass.updateOne({ id: data.id }, { afterPath: 'deactivate_or_reactivate', parameters: { status: !data.estado } }).then((res) => {
+      this.getCuentasContables(this.filter_target);
+    });
+  }
+
+  requests(data) {
+    this.cuentaContableClass.createUpdateOne(data).then((res) => {
+      this.getCuentasContables(this.filter_target);
+    });
   }
 }

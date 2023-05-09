@@ -137,6 +137,7 @@ textarea {
   &.disabled,
   &:disabled {
     background-color: #e9ecef;
+    color: #6c757d !important;
     touch-action: none !important;
     pointer-events: none !important;
   }

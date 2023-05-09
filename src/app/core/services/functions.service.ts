@@ -453,12 +453,20 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: Capitalice
+  // Nombre: capitalice
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
   static capitalice(str) {
     const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
     return fun.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: uppercase
+  // Descripcion : Esta poner en mayusculas un string
+  // _________________________________________________________________________________________________
+  static uppercase(str) {
+    return fun.hasValue(str) ? _.upperCase(str) : str;
   }
 
   // __________________________________________________________________________________________________
@@ -586,7 +594,7 @@ export class fun {
   // Nombre: remplaceKeyFromJson
   // Descripcion : Esta funcion cambia los key especificados de un objeto json
   // __________________________________________________________________________________________________
-  static remplaceKeyFromJson(json, params) {
+  static remplaceKeyFromJson(json, params: Array<{ old_key: string; new_key: string }>) {
     let jsonString = JSON.stringify(json);
 
     for (let i = 0; i < params.length; i++) {
@@ -679,7 +687,6 @@ export class fun {
   // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
   // __________________________________________________________________________________________________
   static getKeyByValue(object, value): any {
-
     return Object.keys(object).find((key) => object[key] == value);
   }
 

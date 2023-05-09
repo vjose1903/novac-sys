@@ -1,7 +1,10 @@
 <div class="row">
   <div class="col-12 p-0">
-    <h5 class="mb-3" *ngIf="fun.hasValue(inputs.data) && inputs.method == 'edit'">
+    <h5 class="mb-5" *ngIf="fun.hasValue(inputs.data) && inputs.method == 'edit'">
       Cuenta Contable: <strong> {{ inputs.data.descripcion }}</strong>
+    </h5>
+    <h5 class="mb-5" *ngIf="inputs.method == 'add'">
+      Añadir Cuenta Contable en: <strong> {{ inputs.data.descripcion }}</strong>
     </h5>
   </div>
   <div class="col-12 p-0">
@@ -36,7 +39,17 @@
         <div class="p-0 col-12">
           <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
             <label class="control-label">Descripción: <span style="color: red">*</span></label>
-            <input [appCapitalice]="'formGroup'" id="campoDescripcon" type="text" formControlName="descripcion" placeholder="Introduzca la descripción de la cuenta" class="form-control" autocomplete="off" autofocus />
+            <input
+              [appCapitalice]="'formGroup'"
+              id="campoDescripcon"
+              type="text"
+              formControlName="descripcion"
+              placeholder="Introduzca la descripción de la cuenta"
+              class="form-control"
+              [ngClass]="{ UPPERCASE: form.controls.cuenta_is_control.value }"
+              autocomplete="off"
+              autofocus
+            />
             <span id="msgContainer_descripcion"></span>
           </div>
         </div>

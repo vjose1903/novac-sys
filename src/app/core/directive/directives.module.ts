@@ -1,3 +1,4 @@
+import { UppercaseDirective } from './uppercase.directive';
 import { CapitaliceDirective } from './capitalice.directive';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -6,7 +7,7 @@ import { PaswordConfirmDirective } from './pasword-confirm-directive.directive';
 import { OnScrollDirective } from './on-scroll.directive';
 import { DataFilterDirective } from './data-filter.directive';
 
-const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, CapitaliceDirective];
+const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, CapitaliceDirective, UppercaseDirective];
 
 @NgModule({
   declarations: directives,

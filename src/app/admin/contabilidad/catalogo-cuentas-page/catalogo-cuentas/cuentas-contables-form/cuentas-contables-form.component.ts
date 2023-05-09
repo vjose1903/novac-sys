@@ -38,19 +38,34 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
     this.form.valueChanges.subscribe((res) => {
       if (fun.hasValue(res)) {
         form_is_invalid = !this.form.valid;
-        this.disableBtnConfirm(form_is_invalid);
+
+        const something_is_different = this.checkIfSomethingIsDiferrent();
+
+        this.disableBtnConfirm(form_is_invalid || (!form_is_invalid && !something_is_different));
       }
     });
 
-    this.disableBtnConfirm(form_is_invalid);
+    const something_is_different = this.checkIfSomethingIsDiferrent();
+
+    this.disableBtnConfirm(form_is_invalid || (!form_is_invalid && !something_is_different));
+  }
+
+  checkIfSomethingIsDiferrent() {
+    const formValue = this.parseData(this.form.getRawValue());
+    const originalValue = this.parseData(this.inputs.dataOriginal);
+    originalValue['origen'] = this.getValueOrigenOrTipo(originalValue.origen);
+    originalValue['tipo'] = this.getValueOrigenOrTipo(originalValue.tipo);
+
+    return !fun.isEqual(formValue, originalValue);
   }
 
   createForm(data?) {
     return new Promise<any>((resolve, reject) => {
-      console.log('>>>>>> ', data);
-
       this.form = this.fb.group({
         id: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.id : null) : null, disabled: false }],
+        grupo_cuenta_id: [{ value: data.grupo_cuenta_id, disabled: false }],
+        cuenta_control_id: [{ value: data.cuenta_control_id, disabled: false }],
+
         cuenta_is_control: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.is_control : false) : false, disabled: false }, Validators.required],
         cuenta_is_auxiliar: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? !data.is_control : true) : true, disabled: false }, Validators.required],
         descripcion: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.descripcion : '') : '', disabled: false }, Validators.required],
@@ -99,8 +114,6 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
       const formValue = this.form.getRawValue();
       const selects = ['origen', 'tipo'];
 
-      console.log('this.inputs.dataOriginal ', this.inputs.dataOriginal);
-
       selects.forEach((select) => {
         formValue.cuenta_is_control ? this.form.controls[select].enable() : this.form.controls[select].disable();
 
@@ -116,7 +129,25 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
     btn.disable = validate;
   }
 
+  parseData(data) {
+    data = fun.remplaceKeyFromJson(data, [{ old_key: 'cuenta_is_control', new_key: 'is_control' }]);
+
+    if (this.inputs.method == 'add') {
+      data.cuenta_control_id = this.inputs.dataOriginal.id;
+    }
+
+    const keys_to_pick = ['descripcion', 'id', 'is_control', 'origen', 'tipo', 'grupo_cuenta_id', 'cuenta_control_id'];
+    data = fun.pick(data, keys_to_pick);
+
+    return data;
+  }
+
   btn_aceptar() {
-    console.log('boton aceptar');
+    const dataToSend = this.parseData(this.form.getRawValue());
+
+    const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
+    modal.closeModal(this.modal.component_id);
+
+    modal.returnDataFromModal({ obj: dataToSend, modal_id: this.modal.component_id });
   }
 }
