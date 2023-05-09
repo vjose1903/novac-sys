@@ -72,8 +72,8 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
       if (res.data && res.data.length > 0) {
         res.data.map(async (entidad) => {
-          entidad.nombre = fun.Capitalice(entidad.nombre);
-          entidad.apellido = fun.Capitalice(entidad.apellido);
+          entidad.nombre = fun.capitalice(entidad.nombre);
+          entidad.apellido = fun.capitalice(entidad.apellido);
           const doc = entidad.documentos_de_identidad.find((documento) => documento.principal);
 
           entidad.documento_identidad = doc ? doc.documento : '----------';

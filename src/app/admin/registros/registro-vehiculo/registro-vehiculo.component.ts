@@ -267,10 +267,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.isCreando = true;
   }
 
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
-  }
 
   abrirModalMarcasYModelos(tipo) {
     this.openNewModal({

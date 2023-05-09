@@ -161,7 +161,7 @@ export class ConfiguracionesComponent implements OnInit {
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   saltar(input) {}

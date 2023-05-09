@@ -10,14 +10,26 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CuentasContablesFormComponent implements OnInit, ModalI {
   modal: any = {};
-  inputs: any;
+  inputs: { data: any; dataOriginal: any; method: 'edit' | 'add'; cuenta_control: any };
 
   form: UntypedFormGroup;
   fun = fun;
+
+  origenList = [
+    { value: 'D', label: 'Débito' },
+    { value: 'C', label: 'Crédito' },
+  ];
+
+  tipoList = [
+    { value: 'R', label: 'Real' },
+    { value: 'N', label: 'Nominal' },
+  ];
+
   constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
     this.createForm(this.inputs.data).then(() => this.escucharCambiosEnForm());
+    this.disableSelects();
   }
 
   escucharCambiosEnForm() {
@@ -35,14 +47,24 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
 
   createForm(data?) {
     return new Promise<any>((resolve, reject) => {
-      this.form = this.fb.group({
-        id: [null],
+      console.log('>>>>>> ', data);
 
-        cuenta_is_control: [{ value: fun.hasValue(data) ? data.is_control : false, disabled: false }, Validators.required],
-        cuenta_is_auxiliar: [{ value: fun.hasValue(data) ? !data.is_control : true, disabled: false }, Validators.required],
+      this.form = this.fb.group({
+        id: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.id : null) : null, disabled: false }],
+        cuenta_is_control: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.is_control : false) : false, disabled: false }, Validators.required],
+        cuenta_is_auxiliar: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? !data.is_control : true) : true, disabled: false }, Validators.required],
+        descripcion: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.descripcion : '') : '', disabled: false }, Validators.required],
+        codigo: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.codigo : '') : '', disabled: true }],
+        origen: [{ value: fun.hasValue(data) ? this.getValueOrigenOrTipo(data.origen) : '', disabled: false }, Validators.required],
+        tipo: [{ value: fun.hasValue(data) ? this.getValueOrigenOrTipo(data.tipo) : '', disabled: false }, Validators.required],
       });
       resolve(true);
     });
+  }
+
+  getValueOrigenOrTipo(value) {
+    const objValues = { débito: 'D', debito: 'D', crédito: 'C', credito: 'C', real: 'R', nominal: 'N' };
+    return objValues[value.toLowerCase()];
   }
 
   checkTypeAccount(formControlName) {
@@ -55,6 +77,14 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
     }
 
     this.form.controls[campo_opuesto[formControlName]].setValue(!this.form.controls[campo_opuesto[formControlName]].value);
+
+    this.disableSelects();
+  }
+
+  saltar(sali_de) {
+    if (sali_de != 'send') {
+    } else {
+    }
   }
 
   getCuentaControlLabel(cuenta_control) {
@@ -62,6 +92,21 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
 
     if (fun.isEmpty(cuenta_control)) label = ' - No Aplica - ';
     return label;
+  }
+
+  disableSelects() {
+    setTimeout(() => {
+      const formValue = this.form.getRawValue();
+      const selects = ['origen', 'tipo'];
+
+      console.log('this.inputs.dataOriginal ', this.inputs.dataOriginal);
+
+      selects.forEach((select) => {
+        formValue.cuenta_is_control ? this.form.controls[select].enable() : this.form.controls[select].disable();
+
+        if (formValue.cuenta_is_auxiliar) this.form.controls[select].setValue(this.getValueOrigenOrTipo(this.inputs.dataOriginal[select]));
+      });
+    }, 1);
   }
 
   disableBtnConfirm(validate) {

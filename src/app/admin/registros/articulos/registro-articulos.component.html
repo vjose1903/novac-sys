@@ -50,17 +50,7 @@
                 <div class="col-12 p-0">
                   <div class="form-group">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                    <input
-                      (keydown.enter)="saltar('tipo')"
-                      (focus)="$event.target.select()"
-                      type="text"
-                      formControlName="nombre"
-                      (keyup)="capitalice('nombre', $event.target.value)"
-                      placeholder="Introduzca nombre"
-                      class="form-control"
-                      autocomplete="off"
-                      id="nombre"
-                    />
+                    <input (keydown.enter)="saltar('tipo')" (focus)="$event.target.select()" type="text" formControlName="nombre" [appCapitalice]="'formGroup'" placeholder="Introduzca nombre" class="form-control" autocomplete="off" id="nombre" />
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">Este Campo es obligatorio</div>
                   </div>
                 </div>
@@ -300,11 +290,16 @@
                             </div>
                           </div>
                           <div *ngxPermissionsOnly="permissions.articulo.update_formula" class="col-1 p-0">
-                            <div  class="btns-formula">
+                            <div class="btns-formula">
                               <i *ngIf="index_formula == 0" (click)="addItem()" pTooltip="Agregar Ingrediente" tooltipPosition="top" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
-                              <i *ngIf="(index_formula == 0 && ARRAY_FORMULA.controls.length > 1) || index_formula > 0" (click)="removeItem(index_formula)" pTooltip="Quitar Ingrediente" tooltipPosition="top" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
+                              <i
+                                *ngIf="(index_formula == 0 && ARRAY_FORMULA.controls.length > 1) || index_formula > 0"
+                                (click)="removeItem(index_formula)"
+                                pTooltip="Quitar Ingrediente"
+                                tooltipPosition="top"
+                                class="fas btnArray fa-minus-square text-danger btnQuitar"
+                              ></i>
                             </div>
-
                           </div>
                         </div>
                       </div>

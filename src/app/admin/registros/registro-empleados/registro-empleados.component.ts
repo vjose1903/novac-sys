@@ -106,10 +106,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     fun.enfocarInput('cedula');
   }
 
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
-  }
   async getEmpleados(params?: { per_page: number; page: number; search: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;

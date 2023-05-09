@@ -322,7 +322,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     controls['cantidad_en_unidades'].setValue(0);
     controls['key_origin'].setValue(fun.hasValue(data?.key_origin) ? data.key_origin : null);
     controls['key'].setValue(fun.hasValue(data?.key) ? data.key : fun.generateKey());
-    controls['descripcion'].setValue(`${_.capitalize(articulo.nombre)} ${data.is_defectuoso ? ' (defectuoso)' : ''}`);
+    controls['descripcion'].setValue(`${fun.capitalice(articulo.nombre)} ${data.is_defectuoso ? ' (defectuoso)' : ''}`);
     controls['calcular_saco'].setValue(data.calcular_saco);
     controls['is_defectuoso'].setValue(data.is_defectuoso);
     controls['is_devuelto'].setValue(data.is_devuelto || false);

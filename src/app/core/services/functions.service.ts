@@ -456,7 +456,7 @@ export class fun {
   // Nombre: Capitalice
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
-  static Capitalice(str) {
+  static capitalice(str) {
     const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
     return fun.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
   }

@@ -28,8 +28,65 @@
               [rounded]="true"
               [style]="{ background: '#d3eaf5', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block', 'font-size': '0.9rem', 'box-shadow': '1px 1px 3px #00000047', 'padding-left': '1rem' }"
             >
-              <p class="text-black mb-0">{{ getCuentaControlLabel(inputs.data.cuenta_control) }}</p>
+              <p class="text-black mb-0">{{ getCuentaControlLabel(inputs.cuenta_control) }}</p>
             </p-tag>
+          </div>
+        </div>
+
+        <div class="p-0 col-12">
+          <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
+            <label class="control-label">Descripción: <span style="color: red">*</span></label>
+            <input [appCapitalice]="'formGroup'" id="campoDescripcon" type="text" formControlName="descripcion" placeholder="Introduzca la descripción de la cuenta" class="form-control" autocomplete="off" autofocus />
+            <span id="msgContainer_descripcion"></span>
+          </div>
+        </div>
+
+        <div class="p-0 col-12" *ngIf="inputs.method == 'edit'">
+          <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
+            <label class="control-label">Cuenta Contable: </label>
+            <input [appCapitalice]="'formGroup'" id="campoCodigo" type="text" formControlName="codigo" class="form-control" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="p-0 col-12">
+          <div class="form-group" [appMsgError]="'origen'" [form]="form">
+            <label class="control-label">Origen: <span style="color: red">*</span></label>
+            <p-dropdown
+              [placeholder]="'Seleccione el origen de la cuenta'"
+              [options]="origenList"
+              formControlName="origen"
+              optionLabel="label"
+              optionValue="value"
+              [appendTo]="'body'"
+              (onHide)="saltar('tipo')"
+              (keydown.enter)="saltar('tipo')"
+              styleClass="form-control"
+              [virtualScroll]="true"
+              [itemSize]="30"
+              id="campoOrigen"
+            ></p-dropdown>
+            <span id="msgContainer_origen"></span>
+          </div>
+        </div>
+
+        <div class="p-0 col-12">
+          <div class="form-group" [appMsgError]="'tipo'" [form]="form">
+            <label class="control-label">Tipo: <span style="color: red">*</span></label>
+            <p-dropdown
+              [placeholder]="'Seleccione el tipo de cuenta'"
+              [options]="tipoList"
+              formControlName="tipo"
+              optionLabel="label"
+              optionValue="value"
+              [appendTo]="'body'"
+              (onHide)="saltar('send')"
+              (keydown.enter)="saltar('send')"
+              styleClass="form-control"
+              [virtualScroll]="true"
+              [itemSize]="30"
+              id="campoTipo"
+            ></p-dropdown>
+            <span id="msgContainer_tipo"></span>
           </div>
         </div>
       </div>

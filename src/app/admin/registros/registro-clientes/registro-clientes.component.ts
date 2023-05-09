@@ -103,11 +103,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.getVendedores();
   }
 
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
-  }
-
   marcarCheck(arg) {
     const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
     if (radio) (radio as any).checked = true;
@@ -220,7 +215,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
               const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_cliente) && is_cliente?.persona?.estado) {
-                fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
+                fun.toastError(`${fun.capitalice(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
                 return;
               }

@@ -83,7 +83,16 @@
                     </span>
 
                     <span *ngSwitchCase="'icon'">
-                      <icons-array [column]="column" [indexBody]="getIndex(indexBody)" [realIdTabla]="realIdTabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="data" [rowsEditing]="rowsEditing" (icon_click)="iconsClick($event)"></icons-array>
+                      <icons-array
+                        [column]="column"
+                        [indexBody]="getIndex(indexBody)"
+                        [realIdTabla]="realIdTabla"
+                        [seleccionado]="seleccionado"
+                        [rowData]="rowData"
+                        [data]="data"
+                        [rowsEditing]="rowsEditing"
+                        (icon_click)="iconsClick($event)"
+                      ></icons-array>
                     </span>
 
                     <div *ngSwitchCase="'tag'" (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
@@ -123,7 +132,7 @@
                           [placeholder]="getDropPlaceholder(column.placeholder)"
                           [optionLabel]="column.optionLabel"
                           [optionValue]="column.optionValue"
-                          styleClass="form-control min {{ disableInput(rowData, column) ? 'customD' : 'custom' }}"
+                          styleClass="form-control min"
                           appendTo="body"
                           emptyFilterMessage="valor_buscado_no_se_encuentra"
                           (onChange)="changeValorInput(column, column.dropdown_key, getIndex(indexBody), dropdown.value, rowData)"

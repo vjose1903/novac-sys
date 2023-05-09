@@ -130,12 +130,12 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'add_account') {
         header = 'Registro cuenta contable';
-        inputs = { data: params.data, method: 'add' };
+        inputs = { data: params.data, dataOriginal: fun.duplicarJson(params.data), method: 'add', cuenta_control: params.data.cuenta_control };
       }
 
       if (params.iconKey == 'edit_account') {
         header = 'Actualizar cuenta contable';
-        inputs = { data: params.data, method: 'edit' };
+        inputs = { data: params.data, dataOriginal: fun.duplicarJson(params.data), method: 'edit', cuenta_control: params.data.cuenta_control };
       }
 
       if (params.iconKey == 'add_account' || params.iconKey == 'edit_account') {

@@ -40,7 +40,7 @@
                 <div class="col-6 p-0 pr-2">
                   <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                    <input type="text" formControlName="nombre" (keyup)="capitalice('nombre', $event.target.value)" id="campoNombre" (keydown.enter)="saltar('campoApellido')" placeholder="Introduzca nombre" class="form-control" autocomplete="off" />
+                    <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" id="campoNombre" (keydown.enter)="saltar('campoApellido')" placeholder="Introduzca nombre" class="form-control" autocomplete="off" />
                     <span id="msgContainer_nombre"></span>
                   </div>
                 </div>
@@ -48,16 +48,7 @@
                 <div class="col-6 p-0 pl-2">
                   <div class="form-group" [appMsgError]="'apellido'" [form]="form">
                     <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                    <input
-                      type="text"
-                      id="campoApellido"
-                      formControlName="apellido"
-                      (keyup)="capitalice('apellido', $event.target.value)"
-                      (keydown.enter)="saltar('campoUsuario')"
-                      placeholder="Introduzca apellido"
-                      class="form-control"
-                      autocomplete="off"
-                    />
+                    <input type="text" id="campoApellido" formControlName="apellido" [appCapitalice]="'formGroup'" (keydown.enter)="saltar('campoUsuario')" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
                     <span id="msgContainer_apellido"></span>
                   </div>
                 </div>

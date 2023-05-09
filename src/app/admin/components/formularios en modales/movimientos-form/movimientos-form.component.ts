@@ -98,7 +98,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
     const obj = { articulo_id: this.inputs.id, cantidad: this.cantidad, cantidad_en_unidades: this.inputs.contenido[this.medida] * this.cantidad, accion: this.tipo_movimiento, motivo: this.motivo, medida: this.medida, tipo_salida: this.tipo_salida };
 
     this.movimientosC.createOne(obj).then((res) => {
-      fun.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
+      fun.toastSuccess(fun.capitalice(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
       this.resetForm();
 
       const obj = { bool: true, body: res.articulo };

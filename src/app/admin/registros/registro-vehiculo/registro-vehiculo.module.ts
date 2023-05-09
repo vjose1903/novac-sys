@@ -1,3 +1,4 @@
+import { DirectivesModule } from './../../../core/directive/directives.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -21,6 +22,7 @@ import { PrimengModule } from '../../../modules/primeng.module';
     PrimengModule,
     // TODO: quitar el ngSelect de aqui cuando se sustituya el ng select del html
     NgxPermissionsModule.forChild(),
+    DirectivesModule,
   ],
 })
 export class RegistroVehiculoModule {}

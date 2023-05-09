@@ -96,11 +96,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.marcarCheck('rnc');
   }
 
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
-  }
-
   async getSuplidores(params?: { per_page: number; page: number; search: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -201,7 +196,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
               const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_suplidor) && is_suplidor?.persona?.estado) {
-                fun.toastError(`${_.capitalize(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
+                fun.toastError(`${fun.capitalice(tipo)} pertenece a un suplidor ya existente. << ${is_suplidor.persona.nombre} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
                 return;
               }

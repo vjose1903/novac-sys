@@ -51,6 +51,17 @@
   .p-dropdown-clear-icon {
     margin-right: 0.5rem !important;
   }
+
+  &.p-disabled {
+    background-color: #e9ecef !important;
+    touch-action: none !important;
+    pointer-events: none !important;
+    opacity: 1 !important;
+
+    .p-dropdown-label {
+      color: #6c757d !important;
+    }
+  }
 }
 
 .p-dropdown-panel {

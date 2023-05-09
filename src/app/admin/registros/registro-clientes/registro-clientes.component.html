@@ -73,33 +73,14 @@
                     <div class="pr-0 col-12">
                       <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                         <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                        <input
-                          id="campoNombre"
-                          (keyup)="capitalice('nombre', $event.target.value)"
-                          (keydown.enter)="saltar('campoApellido')"
-                          type="text"
-                          formControlName="nombre"
-                          placeholder="Introduzca nombre"
-                          class="form-control"
-                          autocomplete="off"
-                          autofocus
-                        />
+                        <input id="campoNombre" [appCapitalice]="'formGroup'" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
                         <span id="msgContainer_nombre"></span>
                       </div>
                     </div>
                     <div class="pr-0 col-12 mb-3">
                       <div class="form-group" [appMsgError]="'apellido'" [form]="form">
                         <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                        <input
-                          id="campoApellido"
-                          (keyup)="capitalice('apellido', $event.target.value)"
-                          (keydown.enter)="saltar('campoTelefono')"
-                          type="text"
-                          formControlName="apellido"
-                          placeholder="Introduzca apellido"
-                          class="form-control"
-                          autocomplete="off"
-                        />
+                        <input id="campoApellido" [appCapitalice]="'formGroup'" (keydown.enter)="saltar('campoTelefono')" type="text" formControlName="apellido" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
                         <span id="msgContainer_apellido"></span>
                       </div>
                     </div>
@@ -162,7 +143,7 @@
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="'direccion'" [form]="form">
                     <label class="control-label">Direccion <span style="color: red">*</span></label>
-                    <textarea id="campoDir" (keyup)="capitalice('direccion', $event.target.value)" formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
+                    <textarea id="campoDir" [appCapitalice]="'formGroup'" formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
                     <span id="msgContainer_direccion"></span>
                   </div>
                 </div>

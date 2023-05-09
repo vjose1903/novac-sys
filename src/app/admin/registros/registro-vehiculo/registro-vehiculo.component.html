@@ -30,16 +30,7 @@
                 <div class="col-6 p-0 pr-2" *ngIf="form.controls['user_id'].value === -1">
                   <div class="form-group">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                    <input
-                      (keyup)="capitalice('nombre_no_empleado', $event.target.value)"
-                      (focus)="$event.target.select()"
-                      type="text"
-                      formControlName="nombre_no_empleado"
-                      placeholder="Introduzca nombre"
-                      class="form-control"
-                      autocomplete="off"
-                      id="nombre"
-                    />
+                    <input [appCapitalice]="'formGroup'" (focus)="$event.target.select()" type="text" formControlName="nombre_no_empleado" placeholder="Introduzca nombre" class="form-control" autocomplete="off" id="nombre" />
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre_no_empleado'].valid && (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)">
                       Introduzca el nombre
                     </div>
@@ -49,16 +40,7 @@
                 <div class="col-6 p-0 pl-2" *ngIf="form.controls['user_id'].value === -1">
                   <div class="form-group">
                     <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                    <input
-                      (keyup)="capitalice('apellido_no_empleado', $event.target.value)"
-                      (focus)="$event.target.select()"
-                      type="text"
-                      formControlName="apellido_no_empleado"
-                      placeholder="Introduzca apellido"
-                      class="form-control"
-                      autocomplete="off"
-                      id="apellido"
-                    />
+                    <input [appCapitalice]="'formGroup'" (focus)="$event.target.select()" type="text" formControlName="apellido_no_empleado" placeholder="Introduzca apellido" class="form-control" autocomplete="off" id="apellido" />
 
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['apellido_no_empleado'].valid && (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)">
                       Introduzca el apellido

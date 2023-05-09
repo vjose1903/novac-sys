@@ -282,11 +282,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
-  }
-
   createForm() {
     this.form = this.fb.group({
       nombre: [null, Validators.required],

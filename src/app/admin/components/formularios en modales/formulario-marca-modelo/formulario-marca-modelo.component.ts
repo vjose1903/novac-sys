@@ -152,11 +152,6 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     });
   }
 
-  capitalice(control, arg, form) {
-    const campo = form.get(control);
-    campo.setValue(fun.Capitalice(arg));
-  }
-
   createForm() {
     this.formMarca = this.fb.group({ descripcion: [null], marca_id: [null], id: [null] });
 
