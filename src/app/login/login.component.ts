@@ -109,7 +109,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
           );
         })
         .catch((error) => {
-          if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
+          if (error.status === 0) fun.toastError('Ha ocurrido un error, por favor comunicarse con el soporte de Novac System.', 'ERROR SERVIDOR');
         });
     }
   }

@@ -32,11 +32,11 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
   table_config: table_config = {
     info: [
-      { key: 'codigo', titulo: 'No. Cuenta', tipo: 'text', style: {} },
+      { key: 'codigo', titulo: 'No. Cuenta', tipo: 'text', style: { width: '23%' } },
       { key: 'descripcion', titulo: 'Cuenta', tipo: 'text', style: {} },
       { key: 'origen', titulo: 'Origen', tipo: 'text', style: { 'text-align': 'center', width: '10%' } },
       { key: 'tipo', titulo: 'Tipo', tipo: 'text', style: { 'text-align': 'center', width: '10%' } },
-      { key: 'status', titulo: 'Activo', tipo: 'tag', row_tag_color: 'status_tag_color', style: { 'text-align': 'center', width: '10%' } },
+      { key: 'status', titulo: 'Estado', tipo: 'tag', row_tag_color: 'status_tag_color', style: { 'text-align': 'center', width: '10%' } },
       {
         key: 'actions',
         titulo: 'Acciones',
@@ -101,6 +101,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     console.log('cuentaParsed ', cuentaParsed);
 
     cuentaParsed.customStyles = {
+      codigo: { width: '23%' },
       status: [
         { key: 'status', isTd: true, estilos: 'width: 10% !important;' },
         { key: 'status_cuenta', estilos: 'font-size: 1.2rem !important;' },

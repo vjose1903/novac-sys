@@ -16,6 +16,6 @@ import { ConfigArticulosComponent } from './configuracion_articulos/config-artic
 
 @NgModule({
   declarations: [RegistroArticulosComponent, ConfigArticulosComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule],
 })
 export class RegistroArticulosModule {}

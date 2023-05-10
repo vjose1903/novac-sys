@@ -108,7 +108,19 @@
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('contabilidad') }" src="assets/img/contabilidad.png" alt="Contabilidad" (click)="cambiarMenu({ url: 'contabilidad', navigate: false })" />
 
             <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('contabilidad') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.catalogo_cuentas" [ngClass]="{ activa: actualRuta == 'catalogo_cuentas' }" (click)="cambiarMenu({ url: 'contabilidad/catalogo_cuentas', navigate: true })">Catalogo de cuentas</h4>
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.catalogo_cuentas" [ngClass]="{ activa: actualRuta == 'catalogo_cuentas' }" (click)="cambiarMenu({ url: 'contabilidad/catalogo_cuentas', navigate: true })">
+                Catalogo de cuentas
+              </h4>
+              <h4
+                class="opcion"
+                *ngxPermissionsOnly="menuPermissionsObj.contabilidad.configuracion_entidad_cuenta"
+                [ngClass]="{ activa: actualRuta == 'configuracion_entidad_cuenta' }"
+                (click)="cambiarMenu({ url: 'contabilidad/configuracion_entidad_cuenta', navigate: true })"
+                pTooltip="Configuración de cuentas contables"
+                tooltipPosition="right"
+              >
+                Config. de cuentas
+              </h4>
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { UntypedFormGroup, FormArray, UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/new_tablas/tablas.service';

@@ -12,6 +12,6 @@ import { TablasModule } from '../../components/new_tablas/tablas.module';
 
 @NgModule({
   declarations: [RegistroClientesComponent],
-  imports: [CommonModule, RegistroClientesRoutingModule, UploadImgModule, TablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule],
+  imports: [CommonModule, RegistroClientesRoutingModule, UploadImgModule, TablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild()],
 })
 export class RegistroClientesModule {}

@@ -16,6 +16,6 @@ import { CierreMensualComponent } from './cierre-mensual/cierre-mensual.componen
 
 @NgModule({
   declarations: [PeriodoFiscalComponent, CierreMensualComponent],
-  imports: [CommonModule, PeriodoFiscalRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
+  imports: [CommonModule, PeriodoFiscalRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule],
 })
 export class PeriodoFiscalModule {}
