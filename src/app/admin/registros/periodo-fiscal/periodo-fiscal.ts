@@ -45,6 +45,7 @@ export interface PeriodoFiscalI {
   estado: boolean;
   is_open: boolean;
   detalle_periodo_fiscal: DetallePeriodoFiscal;
+  [nombrePropiedad: string]: any;
 }
 
 export interface DetallePeriodoFiscal {

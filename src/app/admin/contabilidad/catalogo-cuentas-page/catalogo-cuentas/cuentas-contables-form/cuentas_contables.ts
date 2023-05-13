@@ -1,4 +1,4 @@
-import { CrudG } from '../../../core/typescript/crud-g';
+import { CrudG } from '../../../../../core/typescript/crud-g';
 
 export class CuentaContableC extends CrudG<any> {
   constructor() {
@@ -18,6 +18,7 @@ export interface CuentaContableI {
   estado: boolean;
   tipo: Tipo;
   cuentas_contables?: CuentaContableI[];
+  [nombrePropiedad: string]: any;
 }
 
 export enum Origen {

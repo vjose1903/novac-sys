@@ -4,7 +4,7 @@ import { CuentasContablesService } from './utils/cuentas-contables.service';
 import { TreeNode } from 'primeng/api';
 import { fun } from './../../../../core/services/functions.service';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { CuentaContableC, CuentaContableI } from './../cuentas_contables';
+import { CuentaContableC, CuentaContableI } from './cuentas-contables-form/cuentas_contables';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CuentasContablesFormComponent } from './cuentas-contables-form/cuentas-contables-form.component';
 import * as _ from 'lodash';
@@ -69,7 +69,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
   async getCuentasContables(filter_target: string | null = null) {
     try {
-      const res = await this.cuentaContableClass.getAll({ parameters: { filter_target: filter_target, include_fathers_tree: true, cuenta_control: true, cuenta_control_id: true } });
+      const res = await this.cuentaContableClass.getAll({ parameters: { filter_target: filter_target, include_fathers_tree: true, cuenta_control: true, cuenta_control_id: true, iterator: true } });
 
       this.listaCuentasContables.length = 0;
       let utils = { current_index: 0 };

@@ -52,31 +52,33 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
     for (const key in this.botones) {
       const boton = this.botones[key];
 
-      if (key == 'dinamico') {
-        if (boton.length) {
-          for (const btn_dinamic of boton) {
-            this.items.push({
-              icon: btn_dinamic['icon'],
-              command: (arg) => {
-                const index = this.getSpeedDial(arg);
-                const dato = this.data[index];
-                this.handleFunctionsBtnDinamic(null, btn_dinamic, dato);
-              },
-              tooltipOptions: { tooltipLabel: btn_dinamic['tooltip'] || this.dato[btn_dinamic['tooltipKey']], tooltipPosition: 'left' },
-            });
+      if (key != 'styles') {
+        if (key == 'dinamico') {
+          if (boton.length) {
+            for (const btn_dinamic of boton) {
+              this.items.push({
+                icon: btn_dinamic['icon'],
+                command: (arg) => {
+                  const index = this.getSpeedDial(arg);
+                  const dato = this.data[index];
+                  this.handleFunctionsBtnDinamic(null, btn_dinamic, dato);
+                },
+                tooltipOptions: { tooltipLabel: btn_dinamic['tooltip'] || this.dato[btn_dinamic['tooltipKey']], tooltipPosition: 'left' },
+              });
+            }
           }
-        }
-      } else {
-        this.items.push({
-          icon: this.btnList[key].icon,
-          command: (arg) => {
-            const index = this.getSpeedDial(arg);
-            const dato = this.data[index];
+        } else {
+          this.items.push({
+            icon: this.btnList[key].icon,
+            command: (arg) => {
+              const index = this.getSpeedDial(arg);
+              const dato = this.data[index];
 
-            this.btnList[key].func(null, dato, this.btnList[key].action, this.this_);
-          },
-          tooltipOptions: { tooltipLabel: this.btnList[key].tooltip, tooltipPosition: 'left' },
-        });
+              this.btnList[key].func(null, dato, this.btnList[key].action, this.this_);
+            },
+            tooltipOptions: { tooltipLabel: this.btnList[key].tooltip, tooltipPosition: 'left' },
+          });
+        }
       }
     }
   }

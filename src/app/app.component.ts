@@ -20,7 +20,6 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
   KEYWORD_ELECTRON_QUIT_APP,
   KEYWORD_ELECTRON_GET_APP_CONFIG,
-  KEYWORD_ELECTRON_RELOAD,
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';

@@ -26,10 +26,12 @@
             [editable]="true"
             (onChange)="getClientes($event)"
             optionLabel="nombre_completo"
-            (onFocus)="dropdownCliente.show(); dropdownCliente.focus()"
+            (onFocus)="dropdownCliente.show()"
+            (onclick)="dropdownCliente.focus(); dropdownCliente.show()"
             emptyMessage="Escriba el nombre del cliente"
             [showClear]="true"
-            (onClear)="clearClienteFilter(); dropdownCliente.show(); dropdownCliente.focus()"
+            (onClear)="clearClienteFilter(); dropdownCliente.focus(); dropdownCliente.show()"
+
           >
             <ng-template let-cliente pTemplate="item">
               <div class="cliente-item">

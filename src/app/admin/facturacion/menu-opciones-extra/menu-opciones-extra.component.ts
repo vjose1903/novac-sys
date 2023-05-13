@@ -102,7 +102,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   }
 
   async getClientes(arg) {
-    if (typeof this.clienteSelected == 'string' && arg.value && arg.value !== '') {
+    if (typeof this.clienteSelected == 'string' && fun.hasValue(arg.value)) {
       fun.awaitTyping().then((res) => {
         const extra = { afterPath: `filtro/${arg.value}`, parameters: { paginado: false } };
 

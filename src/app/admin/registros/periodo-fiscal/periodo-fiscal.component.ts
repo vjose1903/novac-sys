@@ -17,7 +17,7 @@ import { ModalClass } from '../../components/modal/modal-class';
   styleUrls: ['./periodo-fiscal.component.scss'],
 })
 export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDestroy {
-  listaPeriodosFiscales = [];
+  listaPeriodosFiscales: Array<PeriodoFiscalI> = [];
 
   periodoSelected;
 
@@ -90,21 +90,19 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
       const tempLista = [];
 
       res.data.forEach((periodo: PeriodoFiscalI) => {
-        const periodo_parsed = fun.duplicarJson(periodo);
+        periodo.fecha_inicio = moment(periodo.fecha_inicio, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
+        periodo.fecha_cierre = moment(periodo.fecha_cierre, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
 
-        periodo_parsed.fecha_inicio = moment(periodo.fecha_inicio, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
-        periodo_parsed.fecha_cierre = moment(periodo.fecha_cierre, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
+        periodo.estado_ = periodo.estado ? 'fas fa-check' : 'fas fa-times';
+        periodo.colorEstado = periodo.estado ? 'green' : 'red';
 
-        periodo_parsed.estado_ = periodo.estado ? 'fas fa-check' : 'fas fa-times';
-        periodo_parsed.colorEstado = periodo.estado ? 'green' : 'red';
+        periodo.ready_to_anual_close = this.periodo_puede_cerrar(periodo);
 
-        periodo_parsed.ready_to_anual_close = this.periodo_puede_cerrar(periodo);
+        periodo.cierre_mensual = 'fa-regular fa-calendar-xmark';
+        periodo.cierre_anual = 'fa-solid fa-calendar-days';
+        periodo.cierre_anual_tooltip = this.periodo_puede_cerrar(periodo) ? 'Cierre Anual' : '';
 
-        periodo_parsed.cierre_mensual = 'fa-regular fa-calendar-xmark';
-        periodo_parsed.cierre_anual = 'fa-solid fa-calendar-days';
-        periodo_parsed.cierre_anual_tooltip = this.periodo_puede_cerrar(periodo) ? 'Cierre Anual' : '';
-
-        periodo_parsed.customStyles = {
+        periodo.customStyles = {
           estado_: { width: '5rem', 'font-size': '1.1rem' },
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 10% !important;' },
@@ -113,7 +111,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
           ],
         };
 
-        tempLista.push(periodo_parsed);
+        tempLista.push(periodo);
       });
 
       this.listaPeriodosFiscales = tempLista;
@@ -160,7 +158,6 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   atras() {}
 
   tableClickIcon(params) {
-
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'cierre_mensual') {
         this.openNewModal({

@@ -1,5 +1,5 @@
 import { TiposFacturaC } from './../facturacion/factura';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -178,10 +178,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.chequiando_cuadre = false;
       });
     }
-  }
-
-  ngAfterContentChecked() {
-    this.cdRef.detectChanges();
   }
 
   setUser(usuario) {

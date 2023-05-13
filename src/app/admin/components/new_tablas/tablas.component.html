@@ -35,7 +35,7 @@
               <i *ngIf="row.alert_msg" class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
             </th>
 
-            <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }">
+            <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" [ngStyle]="config?.botones?.styles">
               <span class="titulo"> Acciones </span>
             </th>
           </tr>
@@ -181,7 +181,7 @@
                   </span>
                 </td>
 
-                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))">
+                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
                   <span class="titulo_sm"> Acciones </span>
                   <app-btnacciones
                     [index_body]="getIndex(indexBody)"

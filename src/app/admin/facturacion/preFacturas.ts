@@ -10,6 +10,7 @@ import { PdfService } from '../../core/services/pdf/pdf.service';
 
 export class PreFacturaClass extends MixinClass {
   facturaClass = new FacturaC();
+  una_variable = '';
   constructor() {
     super();
   }
@@ -22,5 +23,4 @@ export class PreFacturaClass extends MixinClass {
       }, 5);
     });
   }
-
 }

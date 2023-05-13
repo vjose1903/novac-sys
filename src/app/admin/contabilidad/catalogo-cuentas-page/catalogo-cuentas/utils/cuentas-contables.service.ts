@@ -2,7 +2,7 @@ import { TreeNode } from 'primeng/api';
 
 import { fun } from '../../../../../core/services/functions.service';
 import { Injectable } from '@angular/core';
-import { CuentaContableI } from '../../cuentas_contables';
+import { CuentaContableI } from '../cuentas-contables-form/cuentas_contables';
 
 @Injectable({
   providedIn: 'root',

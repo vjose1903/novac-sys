@@ -96,6 +96,7 @@ export interface botonesTableI {
   borrar?: inner_btn;
   editar?: inner_btn;
   mostrar?: inner_btn;
+  styles?: any;
 }
 
 interface padreFunctionsI {
