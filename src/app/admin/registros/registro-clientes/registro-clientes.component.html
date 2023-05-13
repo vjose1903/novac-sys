@@ -15,7 +15,7 @@
             <form [formGroup]="form">
               <div class="row">
                 <div class="col-6 p-0">
-                  <app-upload-img (getPhotoData)="getPhotoData($event)" [id]="'img'"></app-upload-img>
+                  <img-viewer-edit (getPhotoData)="getPhotoData($event)" [id]="'img'"></img-viewer-edit>
                 </div>
                 <div class="col-6 p-0">
                   <div class="row">
@@ -152,7 +152,7 @@
                   <div>
                     <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
 
-                    <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+                    <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ botonLabel }}" id="btn-verde" />
                   </div>
                   <div>
                     <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />

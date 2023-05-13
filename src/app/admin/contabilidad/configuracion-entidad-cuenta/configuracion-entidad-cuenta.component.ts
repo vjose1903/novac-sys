@@ -48,7 +48,6 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
 
   ngOnInit(): void {
     this._init_mixin({ component: 'config_entidad_cuenta', is_routing: true });
-    this._init_mixin({ component: 'config_entidad_cuenta', is_routing: true });
 
     this.necesarioStart();
   }
@@ -158,7 +157,7 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
   }
 
   editarItem(config: ConfiguracionEntidadCuentaI) {
-    this.form.patchValue(config);
+    this.createForm(config);
 
     this.configuracionSelected = fun.duplicarJson(config);
   }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { RegistroClientesRoutingModule } from './registro-clientes.routing';
 import { RegistroClientesComponent } from './registro-clientes.component';
-import { UploadImgModule } from '../../components/upload-img/upload-img.module';
+import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer-edit.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PrimengModule } from '../../../modules/primeng.module';
@@ -12,6 +12,6 @@ import { TablasModule } from '../../components/new_tablas/tablas.module';
 
 @NgModule({
   declarations: [RegistroClientesComponent],
-  imports: [CommonModule, RegistroClientesRoutingModule, UploadImgModule, TablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, RegistroClientesRoutingModule, ImgViewerEditModule, TablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild()],
 })
 export class RegistroClientesModule {}

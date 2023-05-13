@@ -15,11 +15,12 @@ export class CuentasContablesService {
 
     for (let index = 0; index < cuentasContables.length; index++) {
       const cuenta: CuentaContableI = cuentasContables[index];
+
       const treeItem: TreeNode = {};
       treeItem['data'] = cuenta;
       treeItem['expanded'] = true;
 
-      if (fun.objHas(cuenta, 'cuentas_contables')) {
+      if (fun.objHas(cuenta, 'cuentas_contables') && fun.hasValue(cuenta.cuentas_contables)) {
         treeItem['children'] = this.cuentasIterator(cuenta.cuentas_contables);
       }
 

@@ -7,6 +7,7 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
+import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
 
 @Component({
   selector: 'app-divisa',
@@ -15,7 +16,7 @@ import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 })
 export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;
-  botonLabel: string = 'Editar';
+  botonLabel: string = 'Guardar';
   isCreando: boolean = false;
   permissions = Permisos;
   formPermissions = [Permisos.configuracion_entidad_cuenta.update];
@@ -29,25 +30,37 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Imagen', tipo: 'img', key: 'img_divisa', estilos: [{ 'padding-left': '1rem' }, { 'padding-right': '1rem' }, { width: '6rem' }] },
-      { titulo: 'Simbolo', tipo: 'text', key: 'simbolo', estilos: [{ width: '7rem' }] },
+      { titulo: '', tipo: 'tag', key: 'es_principal', tag_color: 'green', estilos: [{ width: '5rem' }] },
+      { titulo: 'Imagen', tipo: 'img', key: 'img_divisa', estilos: [{ 'padding-left': '0.5rem' }, { 'padding-right': '0.5rem' }, { width: '5rem' }] },
+      { titulo: 'Simbolo', tipo: 'text', key: 'simbolo', estilos: [{ width: '12%' }] },
       { titulo: 'Nombre', tipo: 'text', key: 'nombre', estilos: [{ 'text-align': 'left' }] },
-      { titulo: '', tipo: 'tag', key: 'es_principal', tag_color: 'green', estilos: [{ width: '7rem' }] },
+      { titulo: 'Tasa actual', tipo: 'text', key: 'tasa_actual', estilos: [{ 'text-align': 'center' }, { width: '8%' }] },
+      { titulo: 'Estado', tipo: 'tag', key: 'status', row_tag_color: 'status_tag_color', estilos: [{ 'text-align': 'center' }, { width: '10%' }] },
+      {
+        key: 'actions',
+        titulo: 'Acciones',
+        column_gap: '0.8rem',
+        tipo: 'icon',
+        estilos: [{ 'text-align': 'center' }, { width: '13%' }],
+        iconsArray: [
+          { key: 'edit_divisa', tooltip: 'Editar Divisa', text_color: 'colorNegro' },
+          { key: 'deactivate_reactivate_divisa', rowTooltip: 'deactivate_reactivate_divisa_tooltip', text_color: 'colorNegro' },
+        ],
+      },
     ],
     colores: true,
     padding: '0.5rem',
-    id_tabla: 'lista_config_entidad_cuenta',
-    botones: { editar: { show: true, permiso: this.permissions.configuracion_entidad_cuenta.update }, borrar: { show: false }, styles: { width: '5rem' } },
+    id_tabla: 'lista_divisa',
   };
   tablaComponent;
+  photoData: PhotoDataI;
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();
   }
 
   ngOnInit(): void {
-    this._init_mixin({ component: 'config_entidad_cuenta', is_routing: true });
-    this._init_mixin({ component: 'config_entidad_cuenta', is_routing: true });
+    this._init_mixin({ component: 'divisa', is_routing: true });
 
     this.necesarioStart();
   }
@@ -65,19 +78,28 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.createForm();
-    await this.getConfiguraciones();
+    await this.getDivisas();
     fun.enfocarInput('cedula');
   }
 
   createForm(data?) {
     this.form = this.fb.group({
       id: [{ value: fun.hasValue(data) ? data.id : null, disabled: false }],
-      descripcion: [{ value: fun.hasValue(data) ? data.descripcion : '', disabled: true }],
-      cuenta_contable_id: [{ value: fun.hasValue(data) ? data.cuenta_contable_id : '', disabled: false }, Validators.required],
+      simbolo: [{ value: fun.hasValue(data) ? data.simbolo : '', disabled: false }, Validators.required],
+      nombre: [{ value: fun.hasValue(data) ? data.nombre : '', disabled: false }, Validators.required],
+      is_principal: [{ value: fun.hasValue(data) ? data.is_principal : false, disabled: false }, Validators.required],
+      current_tasa: [{ value: fun.hasValue(data) ? data.current_tasa : '', disabled: false }],
     });
+    this.checkFormValidator();
   }
 
-  async getConfiguraciones() {
+  checkFormValidator() {
+    const validators = this.botonLabel == 'Guardar' ? Validators.required : null;
+    this.form.controls.current_tasa.setValidators(validators);
+    console.log('this.form.controls ', this.form.controls);
+  }
+
+  async getDivisas() {
     try {
       const extra = { parameters: { cuenta_contable_id: true } };
 
@@ -87,18 +109,36 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
         res['data'].map((divisa: DivisaI) => {
           divisa.img_divisa = getImgUrlServer(divisa.imagen.file_name);
           divisa.es_principal = divisa.is_principal ? 'Principal' : null;
+          divisa.tasa_actual = `$ ${divisa.current_tasa}`;
+
+          divisa.edit_divisa = 'fas fa-pencil-alt';
+          divisa.deactivate_reactivate_divisa = divisa.estado ? 'fa-solid fa-ban' : 'fa-regular fa-circle-check';
+          divisa.deactivate_reactivate_divisa_tooltip = divisa.estado ? 'Desactivar Divisa' : 'Reactivar Divisa';
+
+          divisa.status = divisa.estado ? 'ACTIVA' : 'DESACTIVA';
+          divisa.status_tag_color = divisa.estado ? 'green' : 'red';
 
           divisa.customStyles = {
-            img_divisa: { 'padding-left': '1rem', 'padding-right': '1rem', width: '6rem' },
-            simbolo: { width: '7rem' },
-            es_principal: { width: '7rem' },
+            es_principal: { padding: 0, width: '5rem' },
+            img_divisa: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '5rem' },
+            simbolo: { width: '12%' },
             nombre: { 'text-align': 'start' },
+            tasa_actual: { width: '8%' },
+            status: [
+              { key: 'status', isTd: true, estilos: 'width: 10% !important;' },
+              { key: 'status_cuenta', estilos: 'font-size: 1.2rem !important;' },
+            ],
+            actions: [
+              { key: 'actions', isTd: true, estilos: 'width: 13% !important;' },
+              { key: 'edit_divisa', estilos: 'font-size: 1.2rem !important' },
+              { key: 'deactivate_reactivate_divisa', estilos: 'font-size: 1.2rem !important' },
+            ],
           };
           return divisa;
         });
 
         this.listaDivisas = res['data'];
-        console.log('this.listaConfiguraciones ', this.listaDivisas);
+        console.log('this.listaDivisas ', this.listaDivisas);
 
         this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
       });
@@ -117,11 +157,17 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     return res;
   }
 
+  getPhotoData(img: PhotoDataI) {
+    this.photoData = img;
+    console.log('this.photoData ', this.photoData);
+  }
+
   checkIfSomethingIsDiferrent() {
-    const formValue = fun.pick(this.form.getRawValue(), ['id', 'cuenta_contable_id']);
+    const pick_values = ['simbolo', 'nombre', 'current_tasa'];
+    const formValue = fun.pick(this.form.getRawValue(), pick_values);
     const originalValue = fun.pick(
       this.listaDivisas.find((cuenta) => cuenta.id == formValue.id),
-      ['id', 'cuenta_contable_id'],
+      pick_values,
     );
 
     return !fun.isEqual(formValue, originalValue);
@@ -138,20 +184,26 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  tableClick_action(params) {
-    if (params.action == 'update') this.editarItem(params.data);
+  tableClickIcon(params) {
+    console.log('params ', params);
+
+    if (params.columnKey == 'actions') {
+      if (params.iconKey == 'edit_divisa') this.editarItem(params.data);
+    }
   }
 
   editarItem(divisa: DivisaI) {
-    this.form.patchValue(divisa);
-
+    this.form.reset();
+    this.botonLabel = 'Editar';
     this.divisaSelected = fun.duplicarJson(divisa);
+    this.createForm(divisa);
   }
 
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
     this.isCreando = false;
     this.divisaSelected = undefined;
+    this.botonLabel = 'Guardar';
   }
 
   requests() {
@@ -159,7 +211,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     console.log('formValue ', formValue);
 
     this.divisaClass.createUpdateOne(formValue).then((res) => {
-      this.getConfiguraciones();
+      this.getDivisas();
       this.borrar();
     });
   }

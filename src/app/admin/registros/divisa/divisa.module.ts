@@ -12,9 +12,10 @@ import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
+import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer-edit.module';
 
 @NgModule({
   declarations: [DivisaComponent],
-  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule],
+  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule],
 })
 export class DivisaModule {}

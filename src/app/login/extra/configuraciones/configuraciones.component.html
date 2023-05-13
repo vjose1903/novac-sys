@@ -33,12 +33,12 @@
 
                     <div class="col-6">
                       <label class="control-label">Logo de la empresa: </label>
-                      <app-upload-img [src_img]="logo_empresa" (getPhotoData)="getPhotoData($event)" [id]="'logo_empresa'"></app-upload-img>
+                      <img-viewer-edit [src_img]="logo_empresa" (getPhotoData)="getPhotoData($event)" [id]="'logo_empresa'"></img-viewer-edit>
                     </div>
 
                     <div class="col-6">
                       <label class="control-label">Logo de la empresa ( para impresión ): </label>
-                      <app-upload-img [src_img]="logo_impresion" (getPhotoData)="getPhotoData($event)" [id]="'logo_impresion'"></app-upload-img>
+                      <img-viewer-edit [src_img]="logo_impresion" (getPhotoData)="getPhotoData($event)" [id]="'logo_impresion'"></img-viewer-edit>
                     </div>
 
                     <div class="col-6 mb-2">

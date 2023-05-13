@@ -1,4 +1,4 @@
-type tipos = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'icons' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
+type tipos = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' |  'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
 
 export interface table_info {
   id?: string;

@@ -17,7 +17,7 @@ import { Permisos } from '../../../core/typescript/permisos';
   styleUrls: ['./registro-clientes.component.scss'],
 })
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
-  boton = '';
+  botonLabel = '';
   form: UntypedFormGroup;
 
   listaClientes = [];
@@ -63,7 +63,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_cliente', is_routing: true });
-    this.boton = 'Guardar';
+    this.botonLabel = 'Guardar';
 
     this.createForm();
 
@@ -153,7 +153,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.form.controls.maximo_credito.setValue(fun.numFormatTwoDecimals(data.maximo_credito));
     this.clienteSelected = fun.duplicarJson(data);
 
-    this.boton = 'Editar';
+    this.botonLabel = 'Editar';
     this.editando = true;
     this.changeStateCampos(true);
   }
@@ -351,7 +351,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     if (fun.hasValue(this.form)) this.form.reset();
     this.doc_is_cedula = true;
     this.documentos_de_identidad = undefined;
-    this.boton = 'Guardar';
+    this.botonLabel = 'Guardar';
     this.editando = false;
     this.changeStateCampos(false);
     this.clienteSelected = undefined;

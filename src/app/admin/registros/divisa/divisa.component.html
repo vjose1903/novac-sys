@@ -15,16 +15,40 @@
             <form [formGroup]="form">
               <div class="row">
                 <div class="col-12 p-0">
-                  <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
-                    <label class="control-label">Descripcion: <span style="color: red">*</span></label>
-                    <input type="text" formControlName="descripcion" [appCapitalice]="'formGroup'" id="campoDescripcion" class="form-control" autocomplete="off" />
+                  <div class="form-group switchDiv d-flex align-items-center">
+                    <input formControlName="is_principal" class="apple-switch" type="checkbox" />
+                    <span class="ml-2 mb-0">Es divisa principal</span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
-                <div class="col-12 p-0">
-                  <div class="form-group" [appMsgError]="'cuenta_contable_id'" [form]="form">
-                    <label class="control-label">Cuenta Contable: <span style="color: red">*</span></label>
+                <div class="col-5 p-0">
+                  <img-viewer-edit [src_img]="divisaSelected?.img_divisa || null" (getPhotoData)="getPhotoData($event)" [id]="'img'"></img-viewer-edit>
+                </div>
+                <div class="col-7">
+                  <div class="row">
+                    <div class="col-12 p-0">
+                      <div class="form-group" [appMsgError]="'simbolo'" [form]="form">
+                        <label class="control-label">Simbolo: <span style="color: red">*</span></label>
+                        <input type="text" formControlName="simbolo" id="campoSimbolo" class="form-control" autocomplete="off" />
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
 
-                    <span id="msgContainer"></span>
+                    <div class="col-12 p-0">
+                      <div class="form-group" [appMsgError]="'nombre'" [form]="form">
+                        <label class="control-label">Nombre: <span style="color: red">*</span></label>
+                        <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" id="campoNombre" class="form-control" autocomplete="off" />
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="botonLabel == 'Guardar'" class="col-12 p-0">
+                      <div class="form-group" [appMsgError]="'current_tasa'" [form]="form">
+                        <label class="control-label">Tasa actual: <span style="color: red">*</span></label>
+                        <input type="text" formControlName="current_tasa" [appCapitalice]="'formGroup'" id="campoNombre" class="form-control" autocomplete="off" />
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -46,7 +70,7 @@
       <div class="list {{ isCreando || divisaSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado de divisas</h4>
-          <button ngIf="false" *ngxPermissionsOnly="permissions.user.create" [disabled]="divisaSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <button *ngxPermissionsOnly="permissions.user.create" [disabled]="divisaSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">

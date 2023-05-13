@@ -41,8 +41,8 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
         key: 'actions',
         titulo: 'Acciones',
         column_gap: '1rem',
-        tipo: 'icons',
-        style: { 'text-align': 'center', width: '15%' },
+        tipo: 'icon',
+        style: { 'text-align': 'center', width: '11%' },
         iconsArray: [
           { key: 'add_account', rowTooltip: 'add_account_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'is_control', value: [false] }] },
           { key: 'edit_account', tooltip: 'Editar Cuenta', text_color: 'colorNegro' },
@@ -98,16 +98,12 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
     cuentaParsed.add_account_tooltip = cuentaParsed.is_control ? 'Añadir Cuenta' : 'Solo se pueden añadir cuentas a las cuentas control';
     cuentaParsed.index = utils.current_index;
-    console.log('cuentaParsed ', cuentaParsed);
 
     cuentaParsed.customStyles = {
       codigo: { width: '23%' },
-      status: [
-        { key: 'status', isTd: true, estilos: 'width: 10% !important;' },
-        { key: 'status_cuenta', estilos: 'font-size: 1.2rem !important;' },
-      ],
+      status: { width: '10%' },
       actions: [
-        { key: 'actions', isTd: true, estilos: 'width: 15% !important;' },
+        { key: 'actions', isTd: true, estilos: 'width: 11% !important;' },
         { key: 'add_account', estilos: 'font-size: 1.2rem !important;' },
         { key: 'edit_account', estilos: 'font-size: 1.2rem !important' },
         { key: 'deactivate_reactivate_account', estilos: 'font-size: 1.2rem !important' },
@@ -126,7 +122,6 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
   // deactivate_or_reactivate
   async getDataFromModal(arg, search?) {
-    console.log('arg ', arg);
     if (arg.modal_id == 'form_cuenta_contable') {
       this.requests(arg.obj);
     }
@@ -164,7 +159,6 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     const params = event.arg;
     let header = '';
     let inputs = null;
-    console.log('params ', params);
 
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'add_account') {

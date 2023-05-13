@@ -248,7 +248,7 @@
     [value]="getValueForm(column, dato)"
     [rounded]="true"
     [severity]="dato[column.tag_severity]"
-    [ngClass]="{ tag_clickable: !!column.click }"
+    [ngClass]="{ tag_clickable: !!column.click, tag_all_widtht: !column.tag_apretada }"
     [style]="{
       background: column.tag_color || dato[column.row_tag_color],
       'white-space': 'nowrap',
