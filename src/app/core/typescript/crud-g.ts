@@ -1,11 +1,8 @@
 import { Observable } from 'rxjs';
-
 import { Ss } from '../services/singleton.service';
-
 import * as _ from 'lodash';
-import { AppConfig } from '../../../environments/environment';
-import { ConfigI } from './config-interface';
 import { fun } from '../services/functions.service';
+import { getUrlInUse } from './url-server.uitls';
 
 export interface extraArgs {
   afterPath?: any;
@@ -103,16 +100,8 @@ export class CrudG<T> {
     return params;
   }
 
-  private getUrlInUse() {
-    const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
-
-    const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
-    // const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
-    return url;
-  }
-
   private makeUrl(tipo, args?, id = null) {
-    let url = `${this.getUrlInUse()}${fun.hasValue(this.path) ? `/${this.path}` : ''}`;
+    let url = `${getUrlInUse()}${fun.hasValue(this.path) ? `/${this.path}` : ''}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
 

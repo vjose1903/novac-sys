@@ -1,5 +1,5 @@
-import { CuentaContableC } from './../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables';
-import { CuentaContableI } from '../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables';
+import { CuentaContableC } from '../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
+import { CuentaContableI } from '../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
@@ -75,7 +75,7 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
     this.form = this.fb.group({
       id: [{ value: fun.hasValue(data) ? data.id : null, disabled: false }],
       descripcion: [{ value: fun.hasValue(data) ? data.descripcion : '', disabled: true }],
-      cuenta_contable_id: [{ value: fun.hasValue(data) ? data.cuenta_contable_id : '', disabled: false }],
+      cuenta_contable_id: [{ value: fun.hasValue(data) ? data.cuenta_contable_id : '', disabled: false }, Validators.required],
     });
   }
 

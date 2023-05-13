@@ -1,4 +1,4 @@
-import { ConfigI } from './../../../core/typescript/config-interface';
+import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';

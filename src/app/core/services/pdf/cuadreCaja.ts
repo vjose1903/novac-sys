@@ -2,7 +2,7 @@
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
 import { Ss } from '../singleton.service';
-import { ConfigI } from '../../typescript/config-interface';
+import { ConfigI } from '../../typescript/config-interface.utils';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA

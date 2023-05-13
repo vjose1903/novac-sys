@@ -7,7 +7,7 @@ import { fun } from './../../../core/services/functions.service';
 import { Ss } from './../../../core/services/singleton.service';
 import { ModalService } from './../../components/modal/modal.service';
 import { table_config } from './../../components/new_tablas/tabla-class';
-import { ConfigI } from './../../../core/typescript/config-interface';
+import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { Permisos } from './../../../core/typescript/permisos';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from './../../../core/typescript/MixinClass';

@@ -31,7 +31,7 @@
                           [autoClear]="false"
                         ></p-inputMask>
 
-                        <span id="msgContainer_cedula"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
                   </div>
@@ -41,7 +41,7 @@
                   <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
                     <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" id="campoNombre" (keydown.enter)="saltar('campoApellido')" placeholder="Introduzca nombre" class="form-control" autocomplete="off" />
-                    <span id="msgContainer_nombre"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -49,7 +49,7 @@
                   <div class="form-group" [appMsgError]="'apellido'" [form]="form">
                     <label class="control-label">Apellido: <span style="color: red">*</span></label>
                     <input type="text" id="campoApellido" formControlName="apellido" [appCapitalice]="'formGroup'" (keydown.enter)="saltar('campoUsuario')" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
-                    <span id="msgContainer_apellido"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -57,7 +57,7 @@
                   <div class="form-group" [appMsgError]="'usuario'" [form]="form">
                     <label class="control-label">Usuario: <span style="color: red">*</span></label>
                     <input (keydown.enter)="saltar('campoTelefono')" type="text" id="campoUsuario" formControlName="usuario" placeholder="Introduzca usuario" class="form-control" autocomplete="off" />
-                    <span id="msgContainer_usuario"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -67,7 +67,7 @@
 
                     <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
 
-                    <span id="msgContainer_telefono"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -75,7 +75,7 @@
                   <div class="form-group" [appMsgError]="'email'" [form]="form">
                     <label class="control-label">Email: <span style="color: red">*</span> </label>
                     <input id="campoEmail" (keydown.enter)="saltar('campoSexo')" type="text" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
-                    <span id="msgContainer_email"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -87,7 +87,7 @@
                       <option value="M">Masculino</option>
                       <option value="F">Femenino</option>
                     </select>
-                    <span id="msgContainer_sexo"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -96,7 +96,7 @@
 
                   <p-calendar inputId="campoFecha" formControlName="fecha_nacimiento" dateFormat="dd/mm/yy" [maxDate]="maxDateBirth" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('campoRole')"></p-calendar>
 
-                  <span id="msgContainer_fecha_nacimiento"></span>
+                  <span id="msgContainer"></span>
                 </div>
 
                 <div class="col-6 p-0 pl-2">
@@ -125,7 +125,7 @@
                       <option value="C">Chofer</option>
                     </select> -->
 
-                    <span id="msgContainer_ids_roles"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -133,14 +133,14 @@
                   <div *ngIf="!editando" class="form-group" [appMsgError]="'password'" [form]="form">
                     <label class="control-label">Contraseña:<span style="color: red">*</span></label>
                     <input (keydown.enter)="saltar('campoConfirmPassword')" id="campoPassword" type="password" formControlName="password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
-                    <span id="msgContainer_password"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
                 <div class="col-6 p-0 pl-2">
                   <div *ngIf="!editando" class="form-group" [appMsgError]="'confirm_password'" [form]="form">
                     <label class="control-label">Confirmar Contraseña:<span style="color: red">*</span></label>
                     <input type="password" id="campoConfirmPassword" compare="password" (keydown.enter)="saltar('send')" formControlName="confirm_password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
-                    <span id="msgContainer_confirm_password"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
               </div>

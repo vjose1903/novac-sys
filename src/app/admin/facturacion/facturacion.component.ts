@@ -1,4 +1,4 @@
-import { EmpleadoC } from './../registros/registro-empleados/empleado';
+import { EmpleadoC } from '../registros/registro-empleados/empleado.utils';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
@@ -22,7 +22,7 @@ import { fun } from '../../core/services/functions.service';
 import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
 import { teclasCode } from '../../core/typescript/constantes';
 import { Permisos } from '../../core/typescript/permisos';
-import { ConfigI } from '../../core/typescript/config-interface';
+import { ConfigI } from '../../core/typescript/config-interface.utils';
 import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../components/modal/modal-class';

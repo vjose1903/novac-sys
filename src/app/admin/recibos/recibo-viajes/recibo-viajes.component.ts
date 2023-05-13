@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import { EmpleadoC } from '../../registros/registro-empleados/empleado';
+import { EmpleadoC } from '../../registros/registro-empleados/empleado.utils';
 import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
 import { FacturaC } from '../../facturacion/factura';

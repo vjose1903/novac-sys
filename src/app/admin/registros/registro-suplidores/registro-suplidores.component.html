@@ -41,7 +41,7 @@
                         <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                       </div>
                     </div>
-                    <span id="msgContainer_cedula"></span>
+                    <span id="msgContainer"></span>
                   </div>
 
                   <div *ngIf="!doc_is_cedula" class="form-group" [appMsgError]="'rnc'" [form]="form">
@@ -62,7 +62,7 @@
                         <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                       </div>
                     </div>
-                    <span id="msgContainer_rnc"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -71,7 +71,7 @@
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
                     <p-inputMask (keydown.enter)="saltar('campoNombre')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
 
-                    <span id="msgContainer_telefono"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -79,7 +79,7 @@
                   <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
                     <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" placeholder="Introduzca nombre" class="form-control" (keydown.enter)="saltar('campoEmail')" id="campoNombre" autocomplete="off" autofocus />
-                    <span id="msgContainer_nombre"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -88,7 +88,7 @@
                     <label class="control-label">Email:</label>
                     <input type="text" id="campoEmail" (keydown.enter)="saltar('campoDir')" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
 
-                    <span id="msgContainer_email"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -96,7 +96,7 @@
                   <div class="form-group" [appMsgError]="'direccion'" [form]="form">
                     <label class="control-label">Direccion: <span style="color: red">*</span></label>
                     <textarea id="campoDir" formControlName="direccion" [appCapitalice]="'formGroup'" placeholder="Ingrese la direccion" cols="100" rows="3" class="form-control"></textarea>
-                    <span id="msgContainer_direccion"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 

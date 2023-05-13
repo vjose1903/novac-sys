@@ -2,7 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
-import { ConfigI } from './src/app/core/typescript/config-interface';
+import { ConfigI } from './src/app/core/typescript/config-interface.utils';
 
 const { exec } = require('child_process');
 

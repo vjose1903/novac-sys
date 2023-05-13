@@ -10,6 +10,7 @@ const routes: Routes = [
   { path: 'camiones', loadChildren: () => import('./registro-vehiculo/registro-vehiculo.module').then((m) => m.RegistroVehiculoModule) },
   { path: 'roles', loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule) },
   { path: 'periodo_fiscal', loadChildren: () => import('./periodo-fiscal/periodo-fiscal.module').then((m) => m.PeriodoFiscalModule) },
+  { path: 'divisa', loadChildren: () => import('./divisa/divisa.module').then((m) => m.DivisaModule) },
 ];
 
 @NgModule({

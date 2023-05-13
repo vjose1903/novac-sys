@@ -10,7 +10,7 @@ import { BuscarArticuloComponent } from '../../components/formularios en modales
 import { fun } from '../../../core/services/functions.service';
 import { RemoverArticuloComponent } from './remover-articulo/remover-articulo.component';
 import { razon_remover } from './remover-articulo/contantes';
-import { ConfigI } from '../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/typescript/config-interface.utils';
 import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
 

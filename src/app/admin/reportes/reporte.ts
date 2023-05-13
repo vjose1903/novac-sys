@@ -7,7 +7,7 @@ import { FormReportesComponent } from '../components/formularios en modales/form
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import * as _ from 'lodash';
-import { ConfigI } from '../../core/typescript/config-interface';
+import { ConfigI } from '../../core/typescript/config-interface.utils';
 
 export class ReporteC extends CrudG<any> {
   private static _objReporte;

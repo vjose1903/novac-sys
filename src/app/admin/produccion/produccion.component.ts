@@ -7,7 +7,7 @@ import { ProduccionC } from './produccion';
 import * as $ from 'jquery';
 import { fun } from '../../core/services/functions.service';
 import { medidas, table_config } from '../components/new_tablas/tabla-class';
-import { ConfigI } from '../../core/typescript/config-interface';
+import { ConfigI } from '../../core/typescript/config-interface.utils';
 import { Ss } from '../../core/services/singleton.service';
 import { ModalClass } from '../components/modal/modal-class';
 @Component({

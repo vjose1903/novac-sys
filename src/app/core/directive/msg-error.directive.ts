@@ -54,7 +54,7 @@ export class MsgErrorDirective {
 
   checkErrors(value?) {
     const childrens = this.el.nativeElement.childNodes;
-    const id_content = `msgContainer_${this.id}`;
+    const id_content = `msgContainer`;
     const id_msg = `msg_text_${this.id}`;
 
     const msgContainer = _.find(childrens, (child) => child.id === id_content);
@@ -84,7 +84,7 @@ export class MsgErrorDirective {
 
           if (fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
             response.render = true;
-            console.log('errors ', errors);
+            console.error('errors ', errors);
 
             if (errors.required) response.msg = 'Este campo es requerido.';
             else if (errors.minlength) response.msg = `Cant. mínima de letras es: ${errors.minlength.requiredLength}.`;

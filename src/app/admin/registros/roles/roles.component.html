@@ -24,7 +24,7 @@
                   <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
                     <input type="text" class="form-control" formControlName="nombre" id="campo_nombre" (keydown.enter)="saltar('campoVendedor')" placeholder="Introduzca nombre" autocomplete="off" />
-                    <span id="msgContainer_nombre"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
@@ -32,7 +32,7 @@
                   <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
                     <label class="control-label">Descripción: <span style="color: red">*</span></label>
                     <textarea id="motivo" formControlName="descripcion" class="form-control" rows="3"></textarea>
-                    <span id="msgContainer_descripcion"></span>
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
               </div>

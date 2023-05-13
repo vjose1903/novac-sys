@@ -27,7 +27,7 @@
                           autocomplete="off"
                           autofocus
                         />
-                        <span id="msgContainer_nombre_empresa"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -45,7 +45,7 @@
                       <div [appMsgError]="'rnc_empresa'" [form]="form">
                         <label class="control-label">Rnc: </label>
                         <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
-                        <span id="msgContainer_rnc_empresa"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -53,7 +53,7 @@
                       <div [appMsgError]="'telefono_empresa'" [form]="form">
                         <label class="control-label">Telefono: </label>
                         <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>
-                        <span id="msgContainer_telefono_empresa"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -71,7 +71,7 @@
                           autocomplete="off"
                           autofocus
                         />
-                        <span id="msgContainer_direccion_empresa"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -92,7 +92,7 @@
                             </div>
                           </ng-template>
                         </p-dropdown>
-                        <span id="msgContainer_color_app"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -111,7 +111,7 @@
                             </div>
                           </ng-template>
                         </p-dropdown>
-                        <span id="msgContainer_printer_caja_selected"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -130,7 +130,7 @@
                             </div>
                           </ng-template>
                         </p-dropdown>
-                        <span id="msgContainer_printer_reportes_selected"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div> -->
 
@@ -138,7 +138,7 @@
                       <div [appMsgError]="'url_servidor'" [form]="form">
                         <label class="control-label">Url Servidor: </label>
                         <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor" placeholder="Introduzca url del servidor" class="form-control" autocomplete="off" autofocus />
-                        <span id="msgContainer_url_servidor"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -146,7 +146,7 @@
                       <div [appMsgError]="'url_servidor_respaldo'" [form]="form">
                         <label class="control-label">Url Servidor Respaldo: </label>
                         <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor_respaldo" placeholder="Introduzca url del servidor de respaldo" class="form-control" autocomplete="off" autofocus />
-                        <span id="msgContainer_url_servidor_respaldo"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -154,7 +154,7 @@
                       <div [appMsgError]="'url_servidor_descargas'" [form]="form">
                         <label class="control-label">Url Servidor Descargas: </label>
                         <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor_descargas" placeholder="Introduzca url servidor de descargas" class="form-control" autocomplete="off" autofocus />
-                        <span id="msgContainer_url_servidor_descargas"></span>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
@@ -290,13 +290,13 @@
                                       </div>
                                     </ng-template>
                                   </p-dropdown>
-                                  <span [id]="'msgContainer_' + item.pageSizeFormControlName"></span>
+                                  <span [id]="'msgContainer' + item.pageSizeFormControlName"></span>
                                 </div>
 
                                 <div [appMsgError]="item.printerFormControlName" [form]="form" class="mb-2">
                                   <div class="mb-0">Impresora:</div>
                                   <p-dropdown appendTo="body" [options]="config.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-dropdown>
-                                  <span [id]="'msgContainer_' + item.printerFormControlName"></span>
+                                  <span [id]="'msgContainer' + item.printerFormControlName"></span>
                                 </div>
 
                                 <div *ngIf="item.plantillaFormControlName" class="mt-3">
@@ -304,7 +304,7 @@
                                     <div class="mb-0">Plantilla de impresion</div>
 
                                     <p-dropdown appendTo="body" [options]="get_plantillas(item.key)" [formControlName]="item.plantillaFormControlName" placeholder="Seleccione una plantilla" optionLabel="value" optionValue="value"> </p-dropdown>
-                                    <span [id]="'msgContainer_' + item.plantillaFormControlName"></span>
+                                    <span [id]="'msgContainer' + item.plantillaFormControlName"></span>
                                   </div>
                                 </div>
                               </div>

@@ -13,7 +13,7 @@ import { fun } from '../../../core/services/functions.service';
 import { ModalService } from '../../components/modal/modal.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { ConfigI } from '../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/typescript/config-interface.utils';
 import { Ss } from '../../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '../../../core/typescript/constantes';

@@ -6,7 +6,7 @@ import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC } from './cliente';
-import { EmpleadoC } from '../registro-empleados/empleado';
+import { EmpleadoC } from '../registro-empleados/empleado.utils';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';

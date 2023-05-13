@@ -2,7 +2,7 @@
 import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
 import { Ss } from '../../singleton.service';
-import { ConfigI } from '../../../typescript/config-interface';
+import { ConfigI } from '../../../typescript/config-interface.utils';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
 import { config_ventas } from './configuraciones/ventas';

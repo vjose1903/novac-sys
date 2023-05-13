@@ -1,0 +1,20 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { DivisaRoutingModule } from './divisa.routing';
+import { DivisaComponent } from './divisa.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPermissionsModule } from 'ngx-permissions';
+
+import { TablasModule } from '../../components/new_tablas/tablas.module';
+import { PrimengModule } from '../../../modules/primeng.module';
+import { PipesModule } from '../../../core/pipe/pipes.module';
+import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
+import { DirectivesModule } from '../../../core/directive/directives.module';
+import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
+
+@NgModule({
+  declarations: [DivisaComponent],
+  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule],
+})
+export class DivisaModule {}

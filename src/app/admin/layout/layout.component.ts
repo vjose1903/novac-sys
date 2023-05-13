@@ -6,13 +6,13 @@ import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
+import { CuadreCajaC } from '../../core/typescript/cuadre_caja.utils';
 import { CurrentUserService } from '../../core/services/current-user.service';
 import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
 import { Ss } from '../../core/services/singleton.service';
-import { ConfigI } from '../../core/typescript/config-interface';
+import { ConfigI } from '../../core/typescript/config-interface.utils';
 import { fun } from '../../core/services/functions.service';
 
 @Component({

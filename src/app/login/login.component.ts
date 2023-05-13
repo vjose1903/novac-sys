@@ -14,7 +14,7 @@ import { MixinClass } from '../core/typescript/MixinClass';
 import { Ss } from '../core/services/singleton.service';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
-import { ConfigI } from '../core/typescript/config-interface';
+import { ConfigI } from '../core/typescript/config-interface.utils';
 import { fun } from '../core/services/functions.service';
 import { CurrentUserService } from '../core/services/current-user.service';
 import { FacturaC } from '../admin/facturacion/factura';

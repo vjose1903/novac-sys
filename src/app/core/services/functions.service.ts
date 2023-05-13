@@ -1,8 +1,8 @@
 import * as moment from '../javascript/moment';
-import { DocumentosC } from '../typescript/documentos_de_identidad';
+import { DocumentosC } from '../typescript/documentos_de_identidad.utils';
 import * as _ from 'lodash';
 
-import { ConfigI } from '../typescript/config-interface';
+import { ConfigI } from '../typescript/config-interface.utils';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
 import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';

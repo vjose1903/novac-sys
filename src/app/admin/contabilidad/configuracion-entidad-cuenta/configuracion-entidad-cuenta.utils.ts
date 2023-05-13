@@ -1,4 +1,4 @@
-import { CuentaContableI } from '../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables';
+import { CuentaContableI } from '../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
 import { CrudG } from '../../../core/typescript/crud-g';
 
 export class ConfiguracionEntidadCuentaC extends CrudG<any> {

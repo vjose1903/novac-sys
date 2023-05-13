@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
+import { EmpleadoC } from '../../../registros/registro-empleados/empleado.utils';
 import { ModalI } from '../../modal/modal-class';
 
 @Component({

@@ -6,7 +6,7 @@ import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { MarcaC, ModeloC } from '../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import { EmpleadoC } from '../registro-empleados/empleado';
+import { EmpleadoC } from '../registro-empleados/empleado.utils';
 import { VehiculoC } from './vehiculo';
 import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { fun } from '../../../core/services/functions.service';

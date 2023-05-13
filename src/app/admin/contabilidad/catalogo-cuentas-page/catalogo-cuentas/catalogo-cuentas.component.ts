@@ -4,7 +4,7 @@ import { CuentasContablesService } from './utils/cuentas-contables.service';
 import { TreeNode } from 'primeng/api';
 import { fun } from './../../../../core/services/functions.service';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { CuentaContableC, CuentaContableI } from './cuentas-contables-form/cuentas_contables';
+import { CuentaContableC, CuentaContableI } from './cuentas-contables-form/cuentas_contables.utils';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CuentasContablesFormComponent } from './cuentas-contables-form/cuentas-contables-form.component';
 import * as _ from 'lodash';

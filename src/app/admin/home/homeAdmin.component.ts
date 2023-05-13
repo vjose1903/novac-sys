@@ -4,7 +4,7 @@ import { fun } from './../../core/services/functions.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { Ss } from '../../core/services/singleton.service';
-import { ConfigI } from '../../core/typescript/config-interface';
+import { ConfigI } from '../../core/typescript/config-interface.utils';
 
 @Component({
   selector: 'app-homeAdmin',
