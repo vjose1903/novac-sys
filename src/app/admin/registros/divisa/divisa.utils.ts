@@ -15,4 +15,5 @@ export interface DivisaI {
   is_principal: boolean;
   estado: boolean;
   imagenes: ImagenI[];
+  [nombrePropiedad: string]: any;
 }

@@ -1,10 +1,12 @@
+type tipos = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'icons' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
+
 export interface table_info {
   id?: string;
   titulo?: string;
   titulo_sm?: string;
   key?: string;
   dropdown_key?: string;
-  tipo?: string;
+  tipo?: tipos;
   tag_severity?: string;
   remplace?: any;
   data?: any;
@@ -24,6 +26,7 @@ export interface table_info {
   column_gap?: string;
   rowTooltip?: string;
   alerta?: boolean;
+  tag_color?: string;
   row_tag_color?: string;
   tag_apretada?: boolean;
   con_hora?: boolean;

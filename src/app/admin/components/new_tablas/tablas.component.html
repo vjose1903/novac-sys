@@ -96,7 +96,9 @@
                     </span>
 
                     <div *ngSwitchCase="'tag'" (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
-                      <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: rowData, column: column }"></ng-container>
+                      <ng-container *ngIf="fun.hasValue(getValueForm(column, rowData))">
+                        <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: rowData, column: column }"></ng-container>
+                      </ng-container>
                     </div>
 
                     <span *ngSwitchCase="'color'" class="d-flex justify-content-center align-items-center">
@@ -248,7 +250,7 @@
     [severity]="dato[column.tag_severity]"
     [ngClass]="{ tag_clickable: !!column.click }"
     [style]="{
-      background: dato[column.row_tag_color],
+      background: column.tag_color || dato[column.row_tag_color],
       'white-space': 'nowrap',
       width: column.tag_apretada ? 'auto' : '-webkit-fill-available',
       overflow: 'hidden',

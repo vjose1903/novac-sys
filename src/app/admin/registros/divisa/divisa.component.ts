@@ -32,7 +32,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
       { titulo: 'Imagen', tipo: 'img', key: 'img_divisa', estilos: [{ 'padding-left': '1rem' }, { 'padding-right': '1rem' }, { width: '6rem' }] },
       { titulo: 'Simbolo', tipo: 'text', key: 'simbolo', estilos: [{ width: '7rem' }] },
       { titulo: 'Nombre', tipo: 'text', key: 'nombre', estilos: [{ 'text-align': 'left' }] },
-      { titulo: 'Princial', tipo: 'text', key: 'nombre', estilos: [{ 'text-align': 'left' }] },
+      { titulo: '', tipo: 'tag', key: 'es_principal', tag_color: 'green', estilos: [{ width: '7rem' }] },
     ],
     colores: true,
     padding: '0.5rem',
@@ -84,12 +84,14 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
       this.listaDivisas.length = 0;
 
       this.divisaClass.getAll(extra).then((res) => {
-        res['data'].map((divisa) => {
+        res['data'].map((divisa: DivisaI) => {
           divisa.img_divisa = getImgUrlServer(divisa.imagen.file_name);
+          divisa.es_principal = divisa.is_principal ? 'Principal' : null;
 
           divisa.customStyles = {
             img_divisa: { 'padding-left': '1rem', 'padding-right': '1rem', width: '6rem' },
             simbolo: { width: '7rem' },
+            es_principal: { width: '7rem' },
             nombre: { 'text-align': 'start' },
           };
           return divisa;
