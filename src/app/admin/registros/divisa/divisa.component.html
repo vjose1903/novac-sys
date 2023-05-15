@@ -1,6 +1,6 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita mb-0">Divisas</h4>
+    <h4 class="negrita mb-0">Registro de Divisas</h4>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
@@ -12,17 +12,21 @@
           </div>
 
           <div class="card cardFormClass">
-            <form [formGroup]="form">
+            <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
               <div class="row">
                 <div class="col-12 p-0">
-                  <div class="form-group switchDiv d-flex align-items-center">
-                    <input formControlName="is_principal" class="apple-switch" type="checkbox" />
-                    <span class="ml-2 mb-0">Es divisa principal</span>
-                    <span id="msgContainer"></span>
+                  <div class="tag-principal">
+                    <p-tag
+                      *ngIf="divisaSelected?.is_principal"
+                      [value]="' Divisa Principal '"
+                      [rounded]="true"
+                      [severity]="'success'"
+                      [style]="{ 'white-space': 'nowrap', width: 'auto', overflow: 'hidden', 'text-overflow': 'ellipsis', display: 'inline-block' }"
+                    ></p-tag>
                   </div>
                 </div>
                 <div class="col-5 p-0">
-                  <img-viewer-edit [src_img]="divisaSelected?.img_divisa || null" (getPhotoData)="getPhotoData($event)" [id]="'img'"></img-viewer-edit>
+                  <img-viewer-edit [src_img]="photoData?.src_img" (getPhotoData)="getPhotoData($event)" [id]="photoData?.id || null"></img-viewer-edit>
                 </div>
                 <div class="col-7">
                   <div class="row">
@@ -45,7 +49,12 @@
                     <div *ngIf="botonLabel == 'Guardar'" class="col-12 p-0">
                       <div class="form-group" [appMsgError]="'current_tasa'" [form]="form">
                         <label class="control-label">Tasa actual: <span style="color: red">*</span></label>
-                        <input type="text" formControlName="current_tasa" [appCapitalice]="'formGroup'" id="campoNombre" class="form-control" autocomplete="off" />
+
+                        <div class="input-group">
+                          <span class="input-group-text prefijo" id="currency">$</span>
+                          <input type="Number" min="1" formControlName="current_tasa" id="campoNombre" class="form-control input_cantidad" autocomplete="off" aria-describedby="currency" />
+                        </div>
+
                         <span id="msgContainer"></span>
                       </div>
                     </div>
@@ -53,11 +62,11 @@
                 </div>
               </div>
             </form>
-            <div class="col-12 form-group p-0" style="display: flex; justify-content: space-between">
+            <div class="col-12 form-group p-0 mt-5" style="display: flex; justify-content: space-between">
               <div>
-                <a *ngIf="checkIfSomethingIsDiferrent()" class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
 
-                <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="requests()" class="btn ml-2" value="{{ botonLabel }}" id="btn-verde" />
+                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn ml-2 btn-verde" style="max-width: 6rem">{{ botonLabel }}</button>
               </div>
               <div>
                 <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
@@ -73,7 +82,7 @@
           <button *ngxPermissionsOnly="permissions.user.create" [disabled]="divisaSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <div class="divTabla">
+          <div *ngIf="listaDivisas.length" class="divTabla">
             <dinamic-table [cardTabla]="cardTabla" [(data)]="listaDivisas" [seleccionado]="divisaSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
           </div>
         </div>

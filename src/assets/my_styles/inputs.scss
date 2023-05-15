@@ -1,12 +1,30 @@
 .input-group {
-  > input {
+  > .prefijo {
     border-top-right-radius: 0rem !important;
     border-bottom-right-radius: 0rem !important;
+    z-index: 10;
+    transform: translate(5px, -0.8px);
+    box-shadow: -1px 1px 4px 0px #1d253b4f !important;
   }
 
   > .sufijo {
     border-top-left-radius: 0rem !important;
     border-bottom-left-radius: 0rem !important;
+    z-index: 10;
+    transform: translate(-5px, -0.3px);
+    box-shadow: 1px 1px 4px 0px #1d253b4f !important;
+  }
+
+  &:focus-within .prefijo {
+    box-shadow: -1px 1px 4px var(--primary08) !important;
+  }
+
+  input {
+    &:focus {
+      ~ .sufijo {
+        box-shadow: 1px 1px 4px var(--primary08) !important;
+      }
+    }
   }
 }
 @media (min-width: 992px) {

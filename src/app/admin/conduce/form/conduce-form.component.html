@@ -72,7 +72,7 @@
           </table>
 
           <div class="body">
-            <form *ngIf="ARRAY_ROWARTICULOS" [formGroup]="form" action="">
+            <form *ngIf="ARRAY_ROWARTICULOS" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
               <div formArrayName="rowFactura" *ngFor="let item of ARRAY_ROWARTICULOS.controls; let i = index">
                 <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
                   <ng-template pTemplate>

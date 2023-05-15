@@ -12,7 +12,7 @@
           </div>
 
           <div class="card cardFormClass">
-            <form [formGroup]="form">
+            <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
               <div class="row">
                 <div class="col-12 p-0 mb-3">
                   <div class="row">

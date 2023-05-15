@@ -5,51 +5,46 @@
 }
 
 [type="file"] + label {
-  background: #f15d22;
   border: none;
   border-radius: 5px;
   color: #fff;
   cursor: pointer;
   display: inline-block;
-
   font-size: inherit;
   font-weight: 500;
-  margin-top: 1rem;
   outline: none;
   padding: 0.2rem 30px;
   position: relative;
   transition: all 0.3s;
   vertical-align: middle;
 
-  &:hover {
-    background-color: darken(#f15d22, 10%);
-  }
-
   &.btn-file {
     background-color: var(--primary03);
     border-radius: 22px;
     overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
 
-    &::before {
-      font-family: "Font Awesome 5 Free";
-      color: #fff;
-      content: "\f093" !important;
-      font-size: 1.5rem;
-      height: 25%;
-      right: 130%;
-      line-height: 1.6;
+    & .icon {
       position: absolute;
-      top: 0px;
-      transition: all 0.3s;
+      right: 130%;
+      font-size: 0.1rem;
+      transition: all 0.7s;
     }
 
     &:hover {
-      filter: brightness(0.6);
+      filter: brightness(0.8);
+      transform: scale(1.05);
 
-      &::before {
-        top: 0;
+      & .icon {
         right: 5%;
+        font-size: 1.2rem;
       }
+    }
+
+    &:active {
+      transform: scale(0.9);
     }
   }
 }

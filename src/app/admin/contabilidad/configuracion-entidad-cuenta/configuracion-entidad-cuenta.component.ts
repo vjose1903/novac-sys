@@ -70,11 +70,11 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
     fun.enfocarInput('cedula');
   }
 
-  createForm(data?) {
+  createForm() {
     this.form = this.fb.group({
-      id: [{ value: fun.hasValue(data) ? data.id : null, disabled: false }],
-      descripcion: [{ value: fun.hasValue(data) ? data.descripcion : '', disabled: true }],
-      cuenta_contable_id: [{ value: fun.hasValue(data) ? data.cuenta_contable_id : '', disabled: false }, Validators.required],
+      id: [{ value: null, disabled: false }],
+      descripcion: [{ value: '', disabled: true }],
+      cuenta_contable_id: [{ value: '', disabled: false }, Validators.required],
     });
   }
 
@@ -157,7 +157,7 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
   }
 
   editarItem(config: ConfiguracionEntidadCuentaI) {
-    this.createForm(config);
+    this.form.patchValue(config);
 
     this.configuracionSelected = fun.duplicarJson(config);
   }

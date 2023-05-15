@@ -22,13 +22,10 @@ export class ImgViewerEdit implements OnInit {
 
   ngOnInit() {}
 
-  borrar() {
-    this.src_img = null;
-    this.BASE_64 = null;
-    this.FILE_NAME = null;
+  borrar(event?) {
+    [this.src_img, this.BASE_64, this.FILE_NAME] = Array(3).fill(null);
 
-    const data: PhotoDataI = { fileName: this.FILE_NAME, base_64: this.BASE_64, src_img: this.src_img, id: this.id };
-    this.getPhotoData.emit(data);
+    this.emitChanges();
   }
 
   onFileChange(ev) {
@@ -41,13 +38,19 @@ export class ImgViewerEdit implements OnInit {
 
       reader.onload = (e) => {
         const base64 = reader.result.toString().split(',')[1];
-        this.FILE_NAME = files[0].name;
+
+        const fileNameWithoutExtension = file.name.split('.').slice(0, -1).join('.');
+
+        this.FILE_NAME = fileNameWithoutExtension;
         this.BASE_64 = base64;
         this.src_img = `data:image/png;base64,${base64}`;
-
-        const data = { fileName: this.FILE_NAME, base_64: this.BASE_64, src_img: this.src_img, id: this.id };
-        this.getPhotoData.emit(data);
+        this.emitChanges();
       };
     }
+  }
+
+  emitChanges() {
+    const data = { fileName: this.FILE_NAME, base_64: this.BASE_64, src_img: this.src_img, id: this.id };
+    this.getPhotoData.emit(data);
   }
 }

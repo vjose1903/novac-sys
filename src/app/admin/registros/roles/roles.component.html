@@ -11,7 +11,7 @@
             <h4 class="mb-0">Formulario</h4>
           </div>
           <div class="card cardFormClass">
-            <form [formGroup]="form">
+            <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
               <div class="row">
                 <div class="col-12 p-0">
                   <div class="form-group switchDiv">

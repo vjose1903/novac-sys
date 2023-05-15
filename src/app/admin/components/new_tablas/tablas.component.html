@@ -245,6 +245,8 @@
 <!-- tag -->
 <ng-template #tagTemplate let-dato="dato" let-column="column" let-index="index">
   <p-tag
+    [pTooltip]="column.tooltip || ''"
+    tooltipPosition="left"
     [value]="getValueForm(column, dato)"
     [rounded]="true"
     [severity]="dato[column.tag_severity]"

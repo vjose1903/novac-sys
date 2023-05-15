@@ -8,7 +8,7 @@
     </h5>
   </div>
   <div class="col-12 p-0">
-    <form [formGroup]="form">
+    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
       <div class="row">
         <div class="col-6 p-0">
           <div class="form-group switchDiv d-flex justify-content-center align-items-center">
