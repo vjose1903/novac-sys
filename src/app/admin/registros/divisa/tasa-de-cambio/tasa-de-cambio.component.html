@@ -1,0 +1,67 @@
+<div class="row">
+  <div class="col-12 p-0">
+    <h5>
+      Divisa: <strong>{{ inputs.divisa.nombre }}</strong>
+    </h5>
+    <div class="row">
+      <div class="col-6">
+        <img [src]="inputs.divisa.img_divisa" class="img-fluid" />
+      </div>
+      <div class="col-6 p-0">
+        <div class="d-flex justify-content-center align-items-center w-100 h-100">
+          <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+            <div class="form-group" [appMsgError]="'tasa'" [form]="form">
+              <label class="control-label">Tasa actual: <span style="color: red">*</span></label>
+
+              <div class="input-group">
+                <span class="input-group-text prefijo" id="currency">$</span>
+                <input type="Number" min="1" formControlName="tasa" id="campoNombre" class="form-control input_cantidad" autocomplete="off" aria-describedby="currency" />
+              </div>
+
+              <span id="msgContainer"></span>
+            </div>
+
+            <div class="w-100 d-flex justify-content-end align-items-center">
+              <div [pTooltip]="inputs.divisa.is_principal ? 'No puede cambiar la tasa de cambio de la divisa principal.' : verificateChangeOfCurrency() ? 'El valor de la nueva tasa no puede ser el mismo actual.' : ''" tooltipPosition="left">
+                <button [disabled]="inputs.divisa.is_principal || verificateChangeOfCurrency()" type="submit" (click)="btn_aceptar()" class="btn ml-2 btn-verde">Actualizar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 p-0 mt-5">
+    <div class="card">
+      <div class="card-header position-relative d-flex align-items-center p-2">
+        <div class="d-flex justify-content-between align-items-center w-100">
+          <h5 class="title margin mb-0">Historial de cambios</h5>
+        </div>
+      </div>
+
+      <div class="card-body p-1">
+        <div class="row">
+          <div class="col-5">
+            <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
+            <p-calendar inputId="fecha_desde" [(ngModel)]="desde" inputStyleClass="minSize" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+          </div>
+          <div class="col-5">
+            <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
+            <p-calendar inputId="fecha_hasta" [(ngModel)]="hasta" inputStyleClass="minSize" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+          </div>
+          <div class="col-1">
+            <div class="h-100 d-flex align-items-end pb-1">
+              <btn-icon-circular [id]="'btnBuscarHistorial'" [icon]="'fas fa-search'" [size]="'size-md'" [icon_size]="'1rem'" [tooltip]="'Buscar Historial'" [tooltipPosition]="'right'" (clickFunction)="getHistorialCambiosTasas()">
+              </btn-icon-circular>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="divContainerHistorial">
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

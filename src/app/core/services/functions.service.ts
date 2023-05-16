@@ -694,6 +694,17 @@ export class fun {
   // Nombre: createNestedObject
   // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
   // __________________________________________________________________________________________________
+  static getFirstDayOfMoth(date?) {
+    const month = moment(date).month() + 1;
+    const year = moment(date).year();
+    const temp = `${year}-${month}-01`;
+    return temp;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: createNestedObject
+  // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
+  // __________________________________________________________________________________________________
   static createNestedObject(base, names, value?) {
     var lastName = arguments.length == 3 ? names.pop() : false;
     for (var i = 0; i < names.length; i++) {

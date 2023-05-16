@@ -109,13 +109,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     }
   }
 
-  getFirstDayOfMoth(date?) {
-    const month = moment(date).month() + 1;
-    const year = moment(date).year();
-    const temp = `${year}-${month}-01`;
-    return temp;
-  }
-
   agregateValidators() {
     let tipo_selected = null;
     let condicion_selected = null;
@@ -195,7 +188,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     let desde_temp = new Date();
     desde_temp.setDate(desde_temp.getDate() - 1);
 
-    const desde = new Date(this.getFirstDayOfMoth(desde_temp));
+    const desde = new Date(fun.getFirstDayOfMoth(desde_temp));
 
     this.form.controls.desde.setValue(desde);
     this.form.controls.hasta.setValue(new Date());

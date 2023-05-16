@@ -4,10 +4,11 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../..//core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
+import { TasaDeCambioComponent } from './tasa-de-cambio/tasa-de-cambio.component';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-divisa',
@@ -56,7 +57,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   tablaComponent;
   photoData: PhotoDataI;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder) {
     super();
   }
 
@@ -150,6 +151,18 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
         this.listaDivisas = res['data'];
 
+        this.openNewModal({
+          component: TasaDeCambioComponent,
+          inputs: { divisa: this.listaDivisas[0] },
+          id: 'tasa_de_cambio',
+          header: 'Actualizar Tasa de cambio',
+          width: '30rem',
+          botones: {
+            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+          },
+        });
+
         console.log('this.listaDivisas ', this.listaDivisas);
       });
     } catch (error) {
@@ -204,6 +217,19 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'edit_divisa') this.editarItem(params.data);
+      if (params.iconKey == 'currency_change') {
+        this.openNewModal({
+          component: TasaDeCambioComponent,
+          inputs: { divisa: params.data },
+          id: 'tasa_de_cambio',
+          header: 'Actualizar Tasa de cambio',
+          width: '30rem',
+          botones: {
+            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+          },
+        });
+      }
       if (params.iconKey == 'deactivate_reactivate_divisa') {
         this.confirmationModal({
           id: 'deactivate_or_reactivate_divisa',

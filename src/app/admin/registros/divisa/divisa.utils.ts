@@ -15,5 +15,7 @@ export interface DivisaI {
   is_principal: boolean;
   estado: boolean;
   imagenes: ImagenI[];
+  img_divisa?: string;
+  current_tasa: number;
   [nombrePropiedad: string]: any;
 }
