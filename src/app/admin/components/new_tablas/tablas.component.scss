@@ -72,6 +72,11 @@
           &.colorTitulo {
             background: var(--primary06);
           }
+
+          &.noColorTitulo {
+            background: #c6c6c6a8;
+          }
+
           .thHead {
             &:first-child {
               padding-left: 0.7rem;

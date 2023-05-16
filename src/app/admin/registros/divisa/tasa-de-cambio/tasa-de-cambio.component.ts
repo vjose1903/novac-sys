@@ -1,9 +1,13 @@
+import { table_config } from './../../../components/new_tablas/tabla-class';
+import { TasaDeCambioC, TasaDeCambioI } from './tasa_de_cambio.utils';
 import { fun } from './../../../../core/services/functions.service';
 import { ModalI } from './../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
+import * as moment from '../../../../core/javascript/moment';
 
 import { DivisaI } from '../divisa.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { DivisaService } from '../divisa.service';
 
 @Component({
   selector: 'app-tasa-de-cambio',
@@ -18,8 +22,23 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
 
   desde;
   hasta;
+  hastaMaxDate;
 
-  constructor(private fb: UntypedFormBuilder) {}
+  tasaDeCambioClass = new TasaDeCambioC();
+  listaHistorial: Array<TasaDeCambioI> = [];
+
+  table_config: table_config = {
+    info: [
+      { titulo: 'Fecha', tipo: 'text', key: 'fecha_equivalente', estilos: [{ 'text-align': 'left' }] },
+      { titulo: 'Valor', tipo: 'text', key: 'valor' },
+    ],
+    colores: false,
+    padding: '0rem',
+    colorTitulo: false,
+    id_tabla: 'lista_tasas_cambio',
+  };
+
+  constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService) {}
 
   ngOnInit(): void {
     this.setDefaultRange();
@@ -40,6 +59,7 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
 
     this.desde = desde;
     this.hasta = new Date();
+    this.hastaMaxDate = new Date();
   }
 
   verificateChangeOfCurrency() {
@@ -47,7 +67,33 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
     return formValue.tasa == this.inputs.divisa.current_tasa;
   }
 
-  getHistorialCambiosTasas() {}
+  async getHistorialCambiosTasas() {
+    try {
+      this.listaHistorial.length = 0;
+      const extra = { afterPath: 'custom/get_history_changes', parameters: { desde: fun.my_dateFormater(this.desde, false), hasta: fun.my_dateFormater(this.hasta, false), divisa_id: this.inputs.divisa.id } };
+      this.tasaDeCambioClass.getAll(extra).then((res) => {
+        res['data'].map((historial: TasaDeCambioI) => {
+          historial.fecha_equivalente = moment(historial.fecha_equivalente).format('DD/MM/YYYY');
 
-  btn_aceptar() {}
+          historial.customStyles = { fecha_equivalente: { 'text-align': 'start' } };
+          this.listaHistorial.push(historial);
+        });
+      });
+    } catch (error) {
+      fun.toastError('Error Buscando el historial de cambios de tasas de cambios.', 'ERROR');
+    }
+  }
+
+  btn_aceptar() {
+    const formValue = this.form.getRawValue();
+
+    const dataToSend = { id: this.inputs.divisa.id, divisa_id: this.inputs.divisa.id, valor: formValue.tasa, fecha_equivalente: fun.my_dateFormater(this.hastaMaxDate, false) };
+
+    this.tasaDeCambioClass.updateOne(dataToSend).then((res) => {
+      this.getHistorialCambiosTasas();
+      this.divisaServ.getDivisas();
+
+      this.inputs.divisa.current_tasa = formValue.tasa;
+    });
+  }
 }

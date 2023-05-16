@@ -82,8 +82,8 @@
           <button *ngxPermissionsOnly="permissions.user.create" [disabled]="divisaSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <div *ngIf="listaDivisas.length" class="divTabla">
-            <dinamic-table [cardTabla]="cardTabla" [(data)]="listaDivisas" [seleccionado]="divisaSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          <div *ngIf="divisaServ.listaDivisas.length" class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="divisaServ.listaDivisas" [seleccionado]="divisaSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
           </div>
         </div>
       </div>

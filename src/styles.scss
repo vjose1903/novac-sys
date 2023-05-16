@@ -352,6 +352,10 @@ body {
   box-shadow: 0px 4px 14px -6px black;
 }
 
+.sombra-light {
+  box-shadow: 0px 1px 5px 1px #00000014;
+}
+
 .sinPadding {
   padding: 0 !important;
 }
@@ -755,7 +759,6 @@ Not supports in Firefox and IE */
   color: var(--primary07) !important;
   cursor: pointer;
 }
-
 .inputOscuro {
   background-color: var(--transparente05) !important;
   > input {
@@ -981,8 +984,6 @@ Not supports in Firefox and IE */
 // PRIME TREE TABLE
 // ==============================================================================================================
 
-
 .p-treetable-scrollable-header-box {
   // padding-right: 0 !important;
 }
-

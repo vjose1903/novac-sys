@@ -547,7 +547,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   handle_table_events(type, arg) {
-
     this.table_events.emit({ type: type, info: arg, id_tabla: this.realIdTabla });
   }
 

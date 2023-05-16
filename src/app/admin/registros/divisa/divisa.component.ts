@@ -1,3 +1,4 @@
+import { DivisaService } from './divisa.service';
 import { DivisaC, DivisaI } from './divisa.utils';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
@@ -5,7 +6,6 @@ import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../..//core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
 import { TasaDeCambioComponent } from './tasa-de-cambio/tasa-de-cambio.component';
 import { ModalClass } from '../../components/modal/modal-class';
@@ -22,7 +22,6 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   permissions = Permisos;
   formPermissions = [Permisos.configuracion_entidad_cuenta.update];
 
-  listaDivisas: Array<DivisaI> = [];
   divisaSelected: any;
 
   divisaClass = new DivisaC();
@@ -57,7 +56,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   tablaComponent;
   photoData: PhotoDataI;
 
-  constructor(private fb: UntypedFormBuilder) {
+  constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService) {
     super();
   }
 
@@ -80,7 +79,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.createForm();
-    await this.getDivisas();
+    await this.divisaServ.getDivisas();
     fun.enfocarInput('cedula');
   }
 
@@ -103,71 +102,6 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     this.botonLabel == 'Guardar' ? this.form.controls.current_tasa.enable() : this.form.controls.current_tasa.disable();
 
     this.form.controls.current_tasa.updateValueAndValidity();
-  }
-
-  async getDivisas() {
-    try {
-      const extra = { parameters: { cuenta_contable_id: true } };
-
-      this.listaDivisas.length = 0;
-
-      this.divisaClass.getAll(extra).then((res) => {
-        res['data'].map((divisa: DivisaI) => {
-          divisa.img_divisa = getImgUrlServer(divisa.imagen.file_name);
-          divisa.es_principal = divisa.is_principal ? 'P' : null;
-          divisa.tasa_actual = `$ ${divisa.current_tasa}`;
-
-          divisa.currency_change = 'fa-solid fa-coins';
-          divisa.currency_change_tooltip = divisa.estado ? 'Tasa de cambio' : 'No puede cambiar la tasa de cambio, por que está desactivada.';
-
-          divisa.edit_divisa = 'fas fa-pencil-alt';
-          divisa.edit_divisa_tooltip = divisa.estado ? 'Editar divisa' : 'No puede editar la divisa, por que está desactivada.';
-
-          divisa.deactivate_reactivate_divisa = divisa.estado ? 'fa-solid fa-ban' : 'fa-regular fa-circle-check';
-          divisa.deactivate_reactivate_divisa_tooltip = divisa.estado ? 'Desactivar Divisa' : 'Reactivar Divisa';
-
-          divisa.status = divisa.estado ? 'ACTIVA' : 'DESACTIVA';
-          divisa.status_tag_color = divisa.estado ? 'green' : 'red';
-
-          divisa.customStyles = {
-            es_principal: { padding: 0, width: '2rem' },
-            img_divisa: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '5rem' },
-            simbolo: { width: '10%' },
-            nombre: { 'text-align': 'start', 'padding-left': '0.3rem' },
-            tasa_actual: { width: '8%' },
-            status: [
-              { key: 'status', isTd: true, estilos: 'width: 10% !important;' },
-              { key: 'status_cuenta', estilos: 'font-size: 1.2rem !important;' },
-            ],
-            actions: [
-              { key: 'actions', isTd: true, estilos: 'width: 7rem !important;' },
-              { key: 'edit_divisa', estilos: 'font-size: 1.2rem !important' },
-              { key: 'currency_change', estilos: 'font-size: 1.2rem !important' },
-              { key: 'deactivate_reactivate_divisa', estilos: 'font-size: 1.2rem !important' },
-            ],
-          };
-          return divisa;
-        });
-
-        this.listaDivisas = res['data'];
-
-        this.openNewModal({
-          component: TasaDeCambioComponent,
-          inputs: { divisa: this.listaDivisas[0] },
-          id: 'tasa_de_cambio',
-          header: 'Actualizar Tasa de cambio',
-          width: '30rem',
-          botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
-          },
-        });
-
-        console.log('this.listaDivisas ', this.listaDivisas);
-      });
-    } catch (error) {
-      fun.toastError('Error buscando empleados registrados.', 'ERROR');
-    }
   }
 
   formIsInvalid() {
@@ -193,11 +127,11 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
 
     const originalValue = fun.pick(
-      this.listaDivisas.find((cuenta) => cuenta.id == formValue.id),
+      this.divisaServ.listaDivisas.find((cuenta) => cuenta.id == formValue.id),
       pick_values,
     );
 
-    originalValue['img'] = this.listaDivisas.find((cuenta) => cuenta.id == formValue.id).img_divisa;
+    originalValue['img'] = this.divisaServ.listaDivisas.find((cuenta) => cuenta.id == formValue.id).img_divisa;
 
     return !fun.isEqual(formValue, originalValue);
   }
@@ -271,7 +205,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   deactivateOrReactivateAccount(data) {
     this.divisaClass.updateOne({ id: data.id }, { afterPath: 'deactivate_or_reactivate', parameters: { status: !data.estado } }).then((res) => {
-      this.getDivisas();
+      this.divisaServ.getDivisas();
     });
   }
 
@@ -291,7 +225,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     this.divisaClass.createUpdateOne(formValue).then((res) => {
-      this.getDivisas();
+      this.divisaServ.getDivisas();
       this.borrar();
     });
   }
