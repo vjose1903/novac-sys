@@ -10,9 +10,10 @@ import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { CategoriaEntidadContableModule } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.module';
 
 @NgModule({
   declarations: [RegistroEmpleadosComponent],
-  imports: [CommonModule, RegistroEmpleadosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, DirectivesModule, PipesModule, NgxBootstrapModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, RegistroEmpleadosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, DirectivesModule, PipesModule, NgxBootstrapModule, NgxPermissionsModule.forChild(), CategoriaEntidadContableModule],
 })
 export class RegistroEmpleadosModule {}

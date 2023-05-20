@@ -1,3 +1,4 @@
+import { CategoriaEntidadContableService } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
@@ -10,6 +11,8 @@ import { EmpleadoC } from '../registro-empleados/empleado.utils';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
+import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
+import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -21,6 +24,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   form: UntypedFormGroup;
 
   listaClientes = [];
+  listaConfigClientes: Array<ConfiguracionEntidadCuentaI> = [];
   FORM: any;
   isCreando: boolean = false;
   doc_is_cedula = true;
@@ -37,6 +41,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   clienteSelected;
   clienteClass = new ClienteC();
   empleadosClass = new EmpleadoC();
+  configEntContableClass = new ConfiguracionEntidadCuentaC();
   permissions = Permisos;
   formPermissions = [Permisos.cliente.create, Permisos.cliente.update];
 
@@ -57,7 +62,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   };
   tablaComponent;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
     super();
   }
 
@@ -100,6 +105,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   necesarioStart() {
     this.getClientes(this.tServ.obj_paginate.default);
+    this.getConfigEntidadCliente();
     this.getVendedores();
   }
 
@@ -132,6 +138,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
+  }
+
+  getConfigEntidadCliente() {
+    const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.cliente } };
+    this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigClientes = res['data']));
   }
 
   getPhotoData(img) {
@@ -345,6 +356,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       this.marcarCheck('cedula');
       fun.enfocarInput('cedula');
     }, 200);
+  }
+
+  openModalCategorias() {
+    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.cliente, id_modal: 'categorias_clientes', inputs: { configsEntCuentas: this.listaConfigClientes }, openNewModal: this.openNewModal });
   }
 
   borrar() {

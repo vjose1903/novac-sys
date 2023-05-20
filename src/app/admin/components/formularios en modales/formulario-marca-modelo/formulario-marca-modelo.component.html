@@ -1,5 +1,5 @@
 <div style="height: 100%">
-  <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView panelsStyle anularPadding" (onChange)="clickTabView()">
+  <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView panelsStyle p-0" (onChange)="clickTabView()">
     <p-tabPanel header="Marcas">
       <form [formGroup]="formMarca" class="h-100" (keydown.enter)="$event.preventDefault()">
         <div class="row h-100">

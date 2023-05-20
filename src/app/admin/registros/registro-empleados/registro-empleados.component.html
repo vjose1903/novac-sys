@@ -166,7 +166,10 @@
       <div class="list {{ isCreando || empleadoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado empleados</h4>
-          <button *ngxPermissionsOnly="permissions.user.create" [disabled]="empleadoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <div class="btn-wrapper">
+            <button *ngxPermissionsOnly="categoriaEntidadServ.allPermisosCategoriaEnt" (click)="openModalCategorias()" class="btn btn-gris mr-3">Categorias</button>
+            <button *ngxPermissionsOnly="permissions.user.create" [disabled]="empleadoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          </div>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">

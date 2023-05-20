@@ -518,7 +518,8 @@ body {
       border: 1px solid #c8c8c8 !important;
       border-color: #c8c8c866 !important;
       background: transparent !important;
-      color: #333333;
+      color: #a5a5a5 !important;
+      font-weight: 500;
       padding: 0.5rem 2rem !important;
       border-bottom: 2px solid #b6b6b6 !important;
       &:focus {
@@ -530,6 +531,7 @@ body {
       background: #007ad900 !important;
       border-color: #c8c8c866 !important;
       color: var(--primary07) !important;
+      font-weight: 700;
       border-bottom: 2px solid var(--primary06) !important;
     }
   }

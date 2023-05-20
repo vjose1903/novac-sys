@@ -10,6 +10,9 @@ import { SuplidorC } from './suplidores';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
+import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
+import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
+import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -24,6 +27,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   pattern = pattern;
 
   listaSuplidores = [];
+  listaConfigSuplidores: Array<ConfiguracionEntidadCuentaI> = [];
 
   suplidorSelected;
   doc_is_cedula = false;
@@ -36,6 +40,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   camposDisabled: boolean = true;
   editando: boolean = false;
   suplidorClass = new SuplidorC();
+  configEntContableClass = new ConfiguracionEntidadCuentaC();
+
   permissions = Permisos;
   table_config: table_config = {
     info: [
@@ -55,7 +61,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   tablaComponent;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
-  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
     super();
   }
 
@@ -92,6 +98,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   async nesesarioStart() {
     await this.getSuplidores(this.tServ.obj_paginate.default);
+    await this.getConfigEntidadSuplidores();
     fun.enfocarInput('rnc');
     this.marcarCheck('rnc');
   }
@@ -114,6 +121,11 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       this.listaSuplidores = res['data'];
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
+  }
+
+  getConfigEntidadSuplidores() {
+    const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.suplidor } };
+    this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigSuplidores = res['data']));
   }
 
   marcarCheck(arg) {
@@ -243,6 +255,10 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       this.marcarCheck('rnc');
       fun.enfocarInput('rnc');
     }, 200);
+  }
+
+  openModalCategorias() {
+    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.suplidor, id_modal: 'categorias_suplidores', inputs: { configsEntCuentas: this.listaConfigSuplidores }, openNewModal: this.openNewModal });
   }
 
   changeStateCampos(enable = false) {

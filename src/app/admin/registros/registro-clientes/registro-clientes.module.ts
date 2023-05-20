@@ -1,3 +1,4 @@
+import { CategoriaEntidadContableModule } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -12,6 +13,6 @@ import { TablasModule } from '../../components/new_tablas/tablas.module';
 
 @NgModule({
   declarations: [RegistroClientesComponent],
-  imports: [CommonModule, RegistroClientesRoutingModule, ImgViewerEditModule, TablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, RegistroClientesRoutingModule, ImgViewerEditModule, TablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild(), CategoriaEntidadContableModule],
 })
 export class RegistroClientesModule {}

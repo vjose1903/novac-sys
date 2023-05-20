@@ -1,3 +1,5 @@
+import { CategoriaEntidadContableC } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
+import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
@@ -13,6 +15,7 @@ import { RolesC } from '../roles/roles';
 import { table_config } from '../../components/new_tablas/tabla-class';
 
 import { Permisos } from '../../../core/typescript/permisos';
+import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -25,6 +28,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   isCreando: boolean = false;
   listaEmpleados = [];
+  listaConfigEmpleados: Array<ConfiguracionEntidadCuentaI> = [];
+
   editando = false;
   empleadoSelected: any;
   indexBorrar: any;
@@ -32,6 +37,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   camposDisabled = true;
   empleadosClass = new EmpleadoC();
+  configEntContableClass = new ConfiguracionEntidadCuentaC();
   rolesClass = new RolesC();
   listRoles: [];
   permissions = Permisos;
@@ -56,8 +62,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   formPermissions = [Permisos.user.create, Permisos.user.update];
   maxDateBirth = new Date();
 
-
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
     super();
   }
 
@@ -103,6 +108,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     await this.createForm();
     await this.getEmpleados(this.tServ.obj_paginate.default);
     await this.getRoles();
+    await this.getConfigEntidadCliente();
     fun.enfocarInput('cedula');
   }
 
@@ -127,6 +133,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     } catch (error) {
       fun.toastError('Error buscando empleados registrados.', 'ERROR');
     }
+  }
+
+  getConfigEntidadCliente() {
+    const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.user } };
+    this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigEmpleados = res['data']));
   }
 
   async getRoles() {
@@ -337,6 +348,10 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   nuevoRegistro() {
     this.isCreando = true;
+  }
+
+  openModalCategorias() {
+    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.user, id_modal: 'categorias_suplidores', inputs: { configsEntCuentas: this.listaConfigEmpleados }, openNewModal: this.openNewModal });
   }
 
   showModal() {

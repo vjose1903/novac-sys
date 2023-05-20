@@ -110,11 +110,7 @@
   justify-content: flex-end;
 }
 
-::ng-deep .anularPadding {
-  & .p-tabview-panels {
-    padding: 0 !important;
-  }
-}
+
 
 ::ng-deep .notaVaciaStyle {
   background: #efc2c2 !important;
