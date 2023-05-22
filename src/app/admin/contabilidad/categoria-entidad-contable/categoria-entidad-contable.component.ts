@@ -43,6 +43,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
 
   categoriaSelected: CategoriaEntidadContableI;
   listadoCategorias: Array<CategoriaEntidadContableI> = [];
+
   categoriaEntContClass = new CategoriaEntidadContableC();
 
   constructor(private permissionsService: NgxPermissionsService, private fb: UntypedFormBuilder, private tServ: TablasService) {
@@ -54,8 +55,6 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     this.createForm();
     this.selectCurrentConfig();
     this.getCategorias(this.tServ.obj_paginate.default);
-
-    console.log('selectedConfig ', this.selectedConfig);
   }
 
   async getCategorias(params?: { per_page: number; page: number; search: string }) {
@@ -76,10 +75,14 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
   }
 
   createForm() {
-    this.form = this.fb.group({
-      id: [{ value: null, disabled: false }],
-      descripcion: [{ value: null, disabled: false }, Validators.required],
-      same_in_all_config: [{ value: false, disabled: false }],
+    return new Promise<any>((resolve, reject) => {
+      this.form = this.fb.group({
+        id: [{ value: null, disabled: false }],
+        descripcion: [{ value: null, disabled: false }, Validators.required],
+        same_in_all_config: [{ value: false, disabled: false }],
+      });
+
+      resolve(true);
     });
   }
 
@@ -146,8 +149,6 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     } else {
       formValue['configuracion_entidad_cuenta_id'] = this.selectedConfig.id;
       dataParsed.categorias.push(fun.duplicarJson(formValue));
-
-      if (fun.hasValue(this.categoriaSelected)) dataParsed = formValue;
     }
 
     return dataParsed;
@@ -155,14 +156,11 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
 
   requests() {
     const dataToSend = this.formarData();
-    const requestFunction = fun.hasValue(this.categoriaSelected) ? 'updateOne' : 'createOne';
 
-    this.categoriaEntContClass[requestFunction](dataToSend).then((res) => {
+    this.categoriaEntContClass.createOne(dataToSend).then((res) => {
       this.borrar();
 
       const actualPagination = this.tServ.getPaginationById(`listado_categorias-${this.selectedConfig.id}`);
-      console.log('actualPagination ', actualPagination);
-
       this.getCategorias(actualPagination);
     });
   }

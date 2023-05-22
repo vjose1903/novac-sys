@@ -589,7 +589,7 @@ body {
 /* CHECK APPLE */
 /* ====================================================== */
 
-input.apple-switch {
+.apple-switch {
   position: relative;
   appearance: none;
   outline: none;
@@ -605,28 +605,34 @@ input.apple-switch {
     filter: brightness(0.9) !important;
     pointer-events: none !important;
   }
-}
 
-input.apple-switch:after {
-  content: "";
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 21.5px;
-  height: 21.5px;
-  background-color: transparent;
-  border-radius: 50%;
-  box-shadow: 1px 1px 6px #48484833;
-  transition-duration: 500ms;
-}
+  &:after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 21.5px;
+    height: 21.5px;
+    background-color: transparent;
+    border-radius: 50%;
+    box-shadow: 1px 1px 6px #48484833;
+    transition-duration: 500ms;
+  }
 
-input.apple-switch:checked {
-  border-color: var(--primary07);
-  box-shadow: inset 15px 0px 0 0 var(--primary07);
-}
-input.apple-switch:checked:after {
-  left: 16px;
-  box-shadow: 1px 4px 1px #0000000f;
+  &:checked {
+    border-color: var(--primary07);
+    box-shadow: inset 15px 0px 0 0 var(--primary07);
+  }
+
+  &:checked:after {
+    left: 16px;
+    box-shadow: 1px 4px 1px #0000000f;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+  }
 }
 
 .popover-body {
