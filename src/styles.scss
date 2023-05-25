@@ -15,6 +15,7 @@ $bodyfont: "Poppins";
 @import "./assets/my_styles/height.scss";
 @import "./assets/my_styles/p-calendar.scss";
 @import "./assets/my_styles/p-tag.scss";
+@import "./assets/my_styles/p-accordion.scss";
 @import "./assets/my_styles/cards.scss";
 @import "./splash-styles.scss";
 
@@ -934,6 +935,7 @@ Not supports in Firefox and IE */
           height: min-content;
           background-color: white;
           box-shadow: 0px 4px 14px -6px black;
+          max-height: 85vh;
         }
       }
 

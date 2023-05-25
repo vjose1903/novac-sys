@@ -63,6 +63,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   maxDateBirth = new Date();
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
+    console.log("ANDO AQUIII");
+
     super();
   }
 

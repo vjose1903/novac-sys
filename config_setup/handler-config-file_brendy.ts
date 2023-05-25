@@ -9,6 +9,7 @@ export default class HandlerConfigFile {
   static default_config: any = {
     cliente: 'brendy',
     color_app: 'red',
+    mode_app: 'light',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
     direccion_empresa: 'El higuerito, frente a la escuela, La Vega Rep. Dom.',
     logo_empresa: logos.logo_empresa,

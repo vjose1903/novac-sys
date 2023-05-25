@@ -1,3 +1,4 @@
+import { EntidadCuentaContableModule } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -14,6 +15,19 @@ import { CategoriaEntidadContableModule } from '../../contabilidad/categoria-ent
 
 @NgModule({
   declarations: [RegistroEmpleadosComponent],
-  imports: [CommonModule, RegistroEmpleadosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, DirectivesModule, PipesModule, NgxBootstrapModule, NgxPermissionsModule.forChild(), CategoriaEntidadContableModule],
+  imports: [
+    CommonModule,
+    RegistroEmpleadosRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    PrimengModule,
+    TablasModule,
+    DirectivesModule,
+    PipesModule,
+    NgxBootstrapModule,
+    NgxPermissionsModule.forChild(),
+    CategoriaEntidadContableModule,
+    EntidadCuentaContableModule,
+  ],
 })
 export class RegistroEmpleadosModule {}

@@ -6,22 +6,49 @@ import { Injectable } from '@angular/core';
 export class ThemeService {
   constructor() {}
 
-  setTheme(newTreme) {
+  static getProperty(property) {
+    return document.documentElement.style.getPropertyValue(property);
+  }
+  // ================================================================================================================================================
+  static setMode(newMode) {
+    localStorage.setItem('appMode', newMode);
+
+    const availableModes = { dark: this.darkMode, light: this.lightMode };
+    availableModes[newMode]();
+  }
+
+  static getMode() {
+    return localStorage.getItem('appMode') || 'light';
+  }
+
+  static lightMode() {
+    const documentElement = document.documentElement.style;
+
+    documentElement.setProperty('--mode00', '#98767612');
+    documentElement.setProperty('--mode01', '#f5f5f5');
+  }
+
+  static darkMode() {
+    const documentElement = document.documentElement.style;
+
+    documentElement.setProperty('--mode01', '#98767612');
+    documentElement.setProperty('--mode01', '#e5e5e5');
+  }
+
+  // ================================================================================================================================================
+
+  static setTheme(newTreme) {
     localStorage.setItem('theme', newTreme);
 
     const availableThemes = { red: this.themeRed, blue: this.themeBlue, green: this.themeGreen };
     availableThemes[newTreme]();
   }
 
-  getProperty(property) {
-    return document.documentElement.style.getPropertyValue(property);
-  }
-
-  getTheme() {
+  static getTheme() {
     return localStorage.getItem('theme') || 'red';
   }
 
-  themeRed() {
+  static themeRed() {
     const documentElement = document.documentElement.style;
 
     documentElement.setProperty('--transparente00', '#98767612');
@@ -49,7 +76,7 @@ export class ThemeService {
     documentElement.setProperty('--secondary05', '#4d433dd6');
   }
 
-  themeBlue() {
+  static themeBlue() {
     const documentElement = document.documentElement.style;
 
     documentElement.setProperty('--transparente00', '#76889812');
@@ -77,7 +104,7 @@ export class ThemeService {
     documentElement.setProperty('--secondary05', '#384d52d6');
   }
 
-  themeGreen() {
+  static themeGreen() {
     const documentElement = document.documentElement.style;
 
     documentElement.setProperty('--transparente00', '#76987b0f');

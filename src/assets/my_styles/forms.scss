@@ -1,6 +1,36 @@
-@mixin primengFocus {
+@mixin noPrimengFocus {
   box-shadow: none !important;
   outline: 0 !important;
+}
+
+@mixin primengFocus {
+  outline: 0 none !important;
+  outline-offset: 0 !important;
+  box-shadow: 0 0 0 0.2rem var(--transparente04) !important;
+}
+
+.formContainer {
+  display: grid;
+
+  grid-template-areas:
+    "formulario"
+    "botones";
+  grid-template-rows: 1fr auto;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0.8rem;
+  overflow: hidden;
+
+  .formulario {
+    grid-area: formulario;
+    overflow: auto;
+    padding: 0.4rem;
+  }
+
+  .botones {
+    grid-area: botones;
+  }
 }
 
 .p-checkbox-box {

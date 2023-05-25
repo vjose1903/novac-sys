@@ -67,7 +67,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public factServ: FacturacionService,
     public layServ: LayoutService,
     public configServ: ConfigurationService,
-    public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
     public permissionsService: NgxPermissionsService,
@@ -276,7 +275,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
         .then((config: ConfigI) => {
           if (fun.objHas(config, 'err')) {
           } else {
-            this.themeService.setTheme(config.color_app);
+            ThemeService.setTheme(config.color_app);
+            ThemeService.setMode(config.mode_app);
+
             this.configServ.setConfig = config;
             this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 

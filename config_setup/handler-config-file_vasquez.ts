@@ -9,6 +9,7 @@ export default class HandlerConfigFile {
   static default_config: any = {
     cliente: 'vasquez',
     color_app: 'green',
+    mode_app: 'light',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
     direccion_empresa: 'C. Juana Saltitopa No. 37, Villa Real, La Vega. R.D.',
     logo_empresa: logos.logo_empresa,
