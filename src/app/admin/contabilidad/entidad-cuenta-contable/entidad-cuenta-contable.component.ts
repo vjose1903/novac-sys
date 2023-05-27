@@ -14,16 +14,14 @@ export class EntidadCuentaContableComponent implements OnInit {
   @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
 
   ngOnInit(): void {
-    fun.logOrange('this.configuration ', this.configuration);
-
     this.checkConfig();
   }
 
   checkConfig() {
     if (!fun.objHas(this.configuration, 'btn')) this.configuration.btn = {};
 
-    if (!fun.objHas(this.configuration.btn, 'btnIndividual')) this.configuration.btn.individual = true;
-    if (!fun.objHas(this.configuration.btn, 'btnCategoria')) this.configuration.btn.categoria = true;
-    if (!fun.objHas(this.configuration.btn, 'btnSubCategoria')) this.configuration.btn.subCategoria = true;
+    if (!fun.objHas(this.configuration.btn, 'individual')) this.configuration.btn.individual = true;
+    if (!fun.objHas(this.configuration.btn, 'categoria')) this.configuration.btn.categoria = true;
+    if (!fun.objHas(this.configuration.btn, 'subCategoria')) this.configuration.btn.subCategoria = true;
   }
 }

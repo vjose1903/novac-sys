@@ -18,6 +18,7 @@ export interface CuentaContableI {
   estado: boolean;
   tipo: Tipo;
   cuentas_contables?: CuentaContableI[];
+  label?: string;
   [nombrePropiedad: string]: any;
 }
 

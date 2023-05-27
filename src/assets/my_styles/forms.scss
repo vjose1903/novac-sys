@@ -4,9 +4,9 @@
 }
 
 @mixin primengFocus {
-  outline: 0 none !important;
-  outline-offset: 0 !important;
-  box-shadow: 0 0 0 0.2rem var(--transparente04) !important;
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem var(--transparente04);
 }
 
 .formContainer {
@@ -19,7 +19,7 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  padding: 0.8rem;
+  padding: 0.6rem;
   overflow: hidden;
 
   .formulario {
@@ -90,6 +90,8 @@
 
     .p-dropdown-label {
       color: #6c757d !important;
+
+      @include noPrimengFocus;
     }
   }
 }

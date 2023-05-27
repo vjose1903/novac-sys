@@ -24,6 +24,7 @@
         &.p-highlight {
           .p-accordion-header-link {
             background: var(--primary07) !important;
+            box-shadow: 0px 4px 4px #69696940;
           }
         }
       }
@@ -31,6 +32,7 @@
       .p-toggleable-content {
         .p-accordion-content {
           border: 1px solid #e5e5e5;
+          padding: 0.4rem;
           background: var(--mode01);
           box-shadow: 0px 1px 5px 1px #00000014;
         }

@@ -1,7 +1,7 @@
 <p-accordion [activeIndex]="activeIndex">
   <p-accordionTab header="Cuentas Contables">
     <div class="row p-0 rowCuentasContables">
-      <div class="col-6 p-0 {{ index % 2 == 0 ? 'pr-2' : 'pl-2' }}" *ngFor="let config of this.inputs.configsEntCuentas; let index = index">
+      <div class="col-12 p-0" *ngFor="let config of this.inputs.configsEntCuentas; let index = index">
         <cuenta-contable-form [inputs]="{ selectedConfig: config, entidad: inputs.entidad }" [configuration]="configuration"></cuenta-contable-form>
       </div>
     </div>
