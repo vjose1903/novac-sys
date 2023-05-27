@@ -1,4 +1,4 @@
-import { CategoriaEntidadContableC } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
+import { CategoriaEntidadContableC, entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
@@ -62,9 +62,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   formPermissions = [Permisos.user.create, Permisos.user.update];
   maxDateBirth = new Date();
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
-    console.log("ANDO AQUIII");
+  entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.user;
 
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
     super();
   }
 
@@ -138,7 +138,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   getConfigEntidadCliente() {
-    const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.user } };
+    const extra = { parameters: { filter_target: this.entidadContable } };
     this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigEmpleados = res['data']));
   }
 

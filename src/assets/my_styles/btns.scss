@@ -1,51 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+@import "./forms.scss";
 
 button:disabled {
   cursor: not-allowed !important;
-}
-
-// =====================================================================================================================================================================
-// ICONO             ===================================================================================================================================================
-// =====================================================================================================================================================================
-.btnIcon {
-  border-radius: 0.4rem;
-  color: #adb7be;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &::before {
-    position: absolute;
-  }
-
-  &.sm {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  &:hover {
-    background: #cfcfcf2e;
-    cursor: pointer;
-  }
-
-  &.bg-red {
-    background: #fc2c2ca8;
-    color: #3a0303e0 !important;
-
-    &:hover {
-      filter: brightness(0.6);
-      cursor: pointer;
-    }
-  }
-
-  &.disable {
-    background: #7a7a7a2e;
-    color: #b1b1b1a4;
-
-    pointer-events: none;
-  }
 }
 
 // ========================================================
@@ -165,6 +121,26 @@ input[type="text"] {
     &:hover {
       cursor: pointer;
       color: var(--primary05);
+    }
+  }
+}
+
+.p-button {
+  &.btn-theme {
+    background: var(--transparente04);
+    border: 1px solid var(--transparente05);
+
+    &:hover {
+      background: var(--primary04);
+      border: 1px solid var(--primary04);
+    }
+
+    &:focus {
+      @include primengFocus;
+    }
+
+    &.selected {
+      background: var(--primary08);
     }
   }
 }

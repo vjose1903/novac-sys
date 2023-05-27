@@ -1,3 +1,4 @@
+import { CuentaContableFormComponent } from './cuenta-contable-form/cuenta-contable-form.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DirectivesModule } from './../../../core/directive/directives.module';
 import { TablasModule } from './../../components/new_tablas/tablas.module';
@@ -8,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { EntidadCuentaContableComponent } from './entidad-cuenta-contable.component';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
-const components = [EntidadCuentaContableComponent];
+const components = [EntidadCuentaContableComponent, CuentaContableFormComponent];
 
 @NgModule({
   declarations: components,

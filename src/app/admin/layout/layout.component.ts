@@ -258,8 +258,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     return res;
   }
 
-  cambiarMenu(args: { url; navigate }) {
+  cambiarMenu(args: { url: string; navigate: boolean; id_h5?: string }) {
     let next_cambio_menu = '';
+
+    if (fun.hasValue(args.id_h5)) fun.scrollTo({ id: args.id_h5, behavior: 'smooth', block: 'start', inline: 'center' });
 
     if (args.navigate) {
       next_cambio_menu = `/admin/${args.url}`;

@@ -1,0 +1,38 @@
+<div class="cuentaContableForm">
+  <h6>{{ configEntContableClass.getConfigLabel(inputs.selectedConfig) }}</h6>
+
+  <span class="p-buttonset">
+    <button
+      *ngIf="configuration.btn.individual"
+      pButton
+      pRipple
+      label="Individual"
+      styleClass="p-button-sm"
+      class="btn-theme"
+      (click)="changeAgrupacion('individual')"
+      [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'individual' }"
+    ></button>
+
+    <button
+      *ngIf="configuration.btn.categoria"
+      pButton
+      pRipple
+      label="Categoria"
+      styleClass="p-button-sm"
+      class="btn-theme"
+      (click)="changeAgrupacion('categoria')"
+      [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'categoria' }"
+    ></button>
+
+    <button
+      *ngIf="configuration.btn.subCategoria"
+      pButton
+      pRipple
+      label="Sub Categoria"
+      styleClass="p-button-sm"
+      class="btn-theme"
+      (click)="changeAgrupacion('sub_categoria')"
+      [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'sub_categoria' }"
+    ></button>
+  </span>
+</div>
