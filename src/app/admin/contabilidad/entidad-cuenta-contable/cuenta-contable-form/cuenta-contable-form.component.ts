@@ -1,10 +1,11 @@
 import { fun } from './../../../../core/services/functions.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CategoriaEntidadContableService } from '../../categoria-entidad-contable/categoria-entidad-contable.service';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableI, entidadesContables } from '../../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { agrupacionContable } from './cuenta-contable-form.utils';
+import { agrupacionContable, agrupacionesContables } from './cuenta-contable-form.utils';
+import { EntidadCuentaContableI } from './cuenta-contable-form.utils';
 
 @Component({
   selector: 'cuenta-contable-form',
@@ -15,29 +16,43 @@ export class CuentaContableFormComponent implements OnInit {
   @Input() inputs: { selectedConfig: ConfiguracionEntidadCuentaI; entidad: entidadesContables };
   @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
 
+  @Input() cuentaContableData: EntidadCuentaContableI;
+  @Output() cuentaContableDataChange = new EventEmitter<EntidadCuentaContableI>();
+
   form: UntypedFormGroup;
   listadoCategorias: Array<CategoriaEntidadContableI> = [];
   configEntContableClass = new ConfiguracionEntidadCuentaC();
+
+  lastChange: EntidadCuentaContableI;
 
   fun = fun;
   constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
     this.necesarioStart();
+    console.log('cuentaContableData --> ', this.cuentaContableData);
   }
 
   async necesarioStart() {
     await this.getCategorias();
-    await this.createForm();
+    await this.createForm().then((form) => {
+      form.valueChanges.subscribe((changes) => {
+        if (!fun.isEqual(changes, this.lastChange)) this.returnData();
+      });
+    });
   }
 
   createForm() {
-    this.form = this.fb.group({
-      id: [null],
-      tipo_agrupacion_contable: [{ value: 'individual', disabled: false }, Validators.required],
-      tipo_categoria_id: [{ value: null, disabled: false }],
-      is_comun: [{ value: false, disabled: false }],
-      configuracion_entidad_cuenta_id: [{ value: this.inputs.selectedConfig.id, disabled: false }],
+    return new Promise<UntypedFormGroup>((resolve, reject) => {
+      this.form = this.fb.group({
+        id: [null],
+        tipo_agrupacion_contable: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable : 'individual', disabled: false }, Validators.required],
+        tipo_categoria: [{ value: null, disabled: false }],
+        tipo_categoria_id: [{ value: null, disabled: false }],
+        is_comun: [{ value: false, disabled: false }],
+        configuracion_entidad_cuenta_id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.configuracion_entidad_cuenta_id : this.inputs.selectedConfig.id, disabled: false }],
+      });
+      resolve(this.form);
     });
   }
 
@@ -51,7 +66,9 @@ export class CuentaContableFormComponent implements OnInit {
     const formValue = this.form.getRawValue();
     this.form.controls.tipo_agrupacion_contable.setValue(tipo);
     this.form.controls.tipo_categoria_id.setValue(null);
+
     fun.hasValue(formValue.tipo_categoria_id) ? this.form.controls.is_comun.enable() : this.form.controls.is_comun.disable();
+    if (tipo == agrupacionesContables.individual) this.form.controls.is_comun.setValue(false);
   }
 
   selectCategoria() {
@@ -87,5 +104,12 @@ export class CuentaContableFormComponent implements OnInit {
     if (tipo == 'placeholder') res = `Seleccione la ${formulario.tipo_agrupacion_contable == 'categoria' ? 'categoria' : 'sub categoria'}.`;
     if (tipo == 'description') res = formulario.tipo_agrupacion_contable == 'categoria' ? 'Categoria' : 'Sub Categoria';
     return res;
+  }
+
+  returnData() {
+    const formulario = this.form.getRawValue();
+    this.lastChange = formulario;
+
+    this.cuentaContableDataChange.emit(formulario);
   }
 }

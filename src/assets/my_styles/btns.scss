@@ -141,6 +141,9 @@ input[type="text"] {
 
     &.selected {
       background: var(--primary08);
+      &:hover {
+        background: var(--primary09);
+      }
     }
   }
 }

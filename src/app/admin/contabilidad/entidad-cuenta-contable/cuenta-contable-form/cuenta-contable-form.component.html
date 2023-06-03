@@ -46,7 +46,7 @@
       </div>
 
       <div *ngIf="form.controls.tipo_agrupacion_contable.value != 'individual'" class="row mt-3 w-100 rowCategoria">
-        <div class="col-7 p-0">
+        <div class="col-8 p-0">
           <div class="form-group mb-0" [appMsgError]="'tipo_agrupacion_contable'" [form]="form">
             <label class="mb-0 " for="search">{{ getDropDownInfo('description') }} </label>
             <input *ngIf="form.controls.tipo_agrupacion_contable.value == 'individual'" id="cuentaControlInput" class="search-input form-control min" [value]="inputs.selectedConfig.cuenta_contable.label" disabled />
@@ -78,7 +78,7 @@
             <span id="msgContainer"></span>
           </div>
         </div>
-        <div class="col-5 p-0">
+        <div class="col-4 p-0">
           <div class="form-group mb-0 switchDiv h-100 align-items-end">
             <div class="d-flex align-items-center ml-4">
               <div [pTooltip]="fun.isEmpty(form.controls.tipo_categoria_id.value) ? 'Primero ' + getDropDownInfo('placeholder').toLowerCase() : ''" tooltipPosition="left" class="h-100 d-flex align-items-center">

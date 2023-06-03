@@ -1,8 +1,8 @@
 <p-accordion [activeIndex]="activeIndex">
   <p-accordionTab header="Cuentas Contables">
-    <div class="row p-0 rowCuentasContables">
+    <div *ngIf="is_initialized" class="row p-0 rowCuentasContables">
       <div class="col-12 p-0" *ngFor="let config of this.inputs.configsEntCuentas; let index = index">
-        <cuenta-contable-form [inputs]="{ selectedConfig: config, entidad: inputs.entidad }" [configuration]="configuration"></cuenta-contable-form>
+        <cuenta-contable-form [inputs]="{ selectedConfig: config, entidad: inputs.entidad }" [configuration]="configuration" [cuentaContableData]="getData(config.id)" (cuentaContableDataChange)="parseData($event)"></cuenta-contable-form>
       </div>
     </div>
   </p-accordionTab>

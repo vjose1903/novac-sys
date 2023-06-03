@@ -5,3 +5,5 @@ export interface entidadCuentaContableInputsI {
   configsEntCuentas: Array<ConfiguracionEntidadCuentaI>;
   entidad: entidadesContables;
 }
+
+
