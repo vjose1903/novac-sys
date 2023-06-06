@@ -1,3 +1,4 @@
+import { ConfigI } from './../src/app/core/typescript/config-interface.utils';
 import * as fs from 'fs';
 import { pathAdd, puts } from '../main';
 import Functions from './functions.js';
@@ -6,7 +7,7 @@ import { BrowserWindow } from 'electron';
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
-  static default_config: any = {
+  static default_config: ConfigI = {
     cliente: 'brendy',
     color_app: 'red',
     mode_app: 'light',
@@ -21,6 +22,7 @@ export default class HandlerConfigFile {
     url_servidor_descargas: 'http://novac-brendy.ddns.net:9091',
     url_servidor_respaldo: 'http://localhost:9091',
     usa_url_principal: false,
+    has_contabilidad: false,
     is_db_local: true,
     calcular_itbis: false,
     is_produccion: true,

@@ -1,3 +1,4 @@
+import { ConfigI } from './../src/app/core/typescript/config-interface.utils';
 import * as fs from 'fs';
 import { pathAdd, puts } from '../main';
 import Functions from './functions.js';
@@ -6,7 +7,7 @@ import { BrowserWindow } from 'electron';
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
-  static default_config: any = {
+  static default_config: ConfigI = {
     cliente: 'vasquez',
     color_app: 'green',
     mode_app: 'light',
@@ -21,6 +22,7 @@ export default class HandlerConfigFile {
     url_servidor_descargas: 'http://novac-vasquez.ddns.net:9092',
     url_servidor_respaldo: 'http://10.0.0.9:9092',
     usa_url_principal: true,
+    has_contabilidad: true,
     is_db_local: false,
     calcular_itbis: true,
     is_produccion: false,

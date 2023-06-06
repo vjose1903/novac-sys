@@ -7,16 +7,39 @@ export const agrupacionesContables = {
 };
 
 export interface EntidadCuentaContableI {
-  id?: number;
-  tipo_categoria_id: number;
-  tipo_categoria?: string;
+  id: number;
+  configuracion_entidad_cuenta_id: number;
+  key: string;
   tipo_agrupacion_contable: string;
   is_comun: boolean;
-  configuracion_entidad_cuenta_id: number;
+  cuenta_contable: CuentaContable;
+  origen_categoria: OrigenCategoria;
   [nombrePropiedad: string]: any;
 }
 
-export const entidadCuentaContableBlank = {
+export interface CuentaContable {
+  id: number;
+  descripcion: string;
+  codigo: string;
+}
+
+export interface OrigenCategoria {
+  id: number;
+  descripcion: string;
+}
+
+export interface FormEntidadCuentaContableI {
+  id?: number;
+  tipo_categoria_id: number | null;
+  tipo_categoria?: string | null;
+  tipo_agrupacion_contable: string;
+  is_comun: boolean;
+  configuracion_entidad_cuenta_id: number;
+  cuenta_contable?: CuentaContable;
+  [nombrePropiedad: string]: any;
+}
+
+export const entidadCuentaContableBlank: FormEntidadCuentaContableI = {
   id: null,
   tipo_categoria_id: null,
   tipo_categoria: null,

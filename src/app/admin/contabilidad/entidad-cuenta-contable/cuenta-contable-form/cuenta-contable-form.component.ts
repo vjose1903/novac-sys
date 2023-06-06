@@ -1,36 +1,39 @@
 import { fun } from './../../../../core/services/functions.service';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CategoriaEntidadContableService } from '../../categoria-entidad-contable/categoria-entidad-contable.service';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableI, entidadesContables } from '../../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { agrupacionContable, agrupacionesContables } from './cuenta-contable-form.utils';
-import { EntidadCuentaContableI } from './cuenta-contable-form.utils';
+import { FormEntidadCuentaContableI } from './cuenta-contable-form.utils';
 
 @Component({
   selector: 'cuenta-contable-form',
   templateUrl: './cuenta-contable-form.component.html',
   styleUrls: ['./cuenta-contable-form.component.scss'],
 })
-export class CuentaContableFormComponent implements OnInit {
+export class CuentaContableFormComponent implements OnInit, OnChanges {
   @Input() inputs: { selectedConfig: ConfiguracionEntidadCuentaI; entidad: entidadesContables };
   @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
 
-  @Input() cuentaContableData: EntidadCuentaContableI;
-  @Output() cuentaContableDataChange = new EventEmitter<EntidadCuentaContableI>();
+  @Input() cuentaContableData: FormEntidadCuentaContableI;
+  @Output() cuentaContableDataChange = new EventEmitter<FormEntidadCuentaContableI>();
 
   form: UntypedFormGroup;
   listadoCategorias: Array<CategoriaEntidadContableI> = [];
   configEntContableClass = new ConfiguracionEntidadCuentaC();
 
-  lastChange: EntidadCuentaContableI;
+  lastChange: FormEntidadCuentaContableI;
 
   fun = fun;
   constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
     this.necesarioStart();
-    console.log('cuentaContableData --> ', this.cuentaContableData);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.cuentaContableData.currentValue && !changes.cuentaContableData.firstChange) this.form.patchValue(this.cuentaContableData);
   }
 
   async necesarioStart() {
@@ -45,11 +48,11 @@ export class CuentaContableFormComponent implements OnInit {
   createForm() {
     return new Promise<UntypedFormGroup>((resolve, reject) => {
       this.form = this.fb.group({
-        id: [null],
+        id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.id : null, disabled: false }],
         tipo_agrupacion_contable: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable : 'individual', disabled: false }, Validators.required],
-        tipo_categoria: [{ value: null, disabled: false }],
-        tipo_categoria_id: [{ value: null, disabled: false }],
-        is_comun: [{ value: false, disabled: false }],
+        tipo_categoria: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_categoria : null, disabled: false }],
+        tipo_categoria_id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_categoria_id : null, disabled: false }],
+        is_comun: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.is_comun : false, disabled: false }],
         configuracion_entidad_cuenta_id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.configuracion_entidad_cuenta_id : this.inputs.selectedConfig.id, disabled: false }],
       });
       resolve(this.form);

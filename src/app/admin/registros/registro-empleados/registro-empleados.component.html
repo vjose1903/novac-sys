@@ -149,7 +149,11 @@
                     </div>
 
                     <div class="col-12 p-0">
-                      <entidad-cuenta-contable [inputs]="{ configsEntCuentas: listaConfigEmpleados, entidad: entidadContable }" [configuration]="{ btn: { subCategoria: false } }"></entidad-cuenta-contable>
+                      <entidad-cuenta-contable
+                        [inputs]="{ configsEntCuentas: listaConfigEmpleados, entidad: entidadContable }"
+                        [configuration]="{ btn: { subCategoria: false } }"
+                        [(cuentasContablesData)]="listaEntidadCuentasContables"
+                      ></entidad-cuenta-contable>
                     </div>
                   </div>
                 </form>
@@ -158,17 +162,14 @@
               <div class="botones">
                 <div class="p-0 mt-3" style="display: flex; justify-content: space-between">
                   <div>
-                    <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar()">
-                      {{ 'Borrar' }}
-                    </button>
+                    <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar()">Borrar</button>
+
                     <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde">{{ boton }}</button>
-                    <!-- [value]="boton"  -->
-                    <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="showModal()">Cambiar contraseña</a>
+                    <button *ngIf="editando" (click)="showModal()" class="btn ml-2 btn-blanco">Cambiar contraseña</button>
                   </div>
                   <div>
-                    <button class="btn mr-2" value="" id="btn-blanco" (click)="borrar(); isCreando = false">
-                      {{ 'Cerrar' }}
-                    </button>
+                    <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button>
+                    <button class="btn mr-2" value="" id="btn-blanco" (click)="borrar(); isCreando = false">Cerrar</button>
                   </div>
                 </div>
               </div>

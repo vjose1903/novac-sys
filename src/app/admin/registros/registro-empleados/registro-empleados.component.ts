@@ -1,3 +1,7 @@
+import { Ss } from './../../../core/services/singleton.service';
+import { ConfigI } from './../../../core/typescript/config-interface.utils';
+import { FormEntidadCuentaContableI } from './../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
+import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { CategoriaEntidadContableC, entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -29,6 +33,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   isCreando: boolean = false;
   listaEmpleados = [];
   listaConfigEmpleados: Array<ConfiguracionEntidadCuentaI> = [];
+  listaEntidadCuentasContables: Array<FormEntidadCuentaContableI> = [];
 
   editando = false;
   empleadoSelected: any;
@@ -64,7 +69,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.user;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
+  configApp: ConfigI;
+
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
   }
 
@@ -107,6 +114,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   async necesarioStart() {
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     await this.createForm();
     await this.getEmpleados(this.tServ.obj_paginate.default);
     await this.getRoles();
@@ -251,30 +259,32 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.borrar();
   }
 
+  test() {
+    console.log(this.listaEntidadCuentasContables);
+  }
+
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
 
     fun.enfocarInput('cedula');
     this.boton = 'Registrar';
     this.editando = false;
-    this.documentos_de_identidad = undefined;
-    // this.camposDisabled = true;
+    this.isCreando = true;
+    [this.documentos_de_identidad, this.empleadoSelected] = Array(2).fill(undefined);
+
+    this.listaEntidadCuentasContables.length = 0;
+    console.log('this.listaEntidadCuentasContables ', this.listaEntidadCuentasContables);
+
     this.changeStateCampos(false);
 
     this.form.controls.password.setValidators(Validators.compose([Validators.minLength(6), Validators.required]));
     this.form.controls.confirm_password.setValidators(Validators.required);
 
-    this.form.controls.password.updateValueAndValidity();
-    this.form.controls.confirm_password.updateValueAndValidity();
-
-    this.empleadoSelected = undefined;
-    this.isCreando = true;
+    ['password', 'confirm_password'].forEach((formControl) => this.form.controls[formControl].updateValueAndValidity());
   }
 
   fecha(a: any) {
-    // moment.locale('es');
     const fechaFormato = moment(a).format('DD/MM/YYYY');
-
     return fechaFormato;
   }
 
@@ -297,6 +307,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   editarItem(data) {
+    this.borrar();
     if (fun.hasValue(this.form)) this.form.reset();
     this.documentos_de_identidad = data.documentos_de_identidad;
 
@@ -307,6 +318,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map((rol) => rol.id) });
     this.form.patchValue(objPerson);
+
+    this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
     this.empleadoSelected = data;
     this.editando = true;
@@ -319,12 +332,30 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   submit() {
+    if (this.configApp.has_contabilidad && !this.editando) {
+      const confirmationObj = {
+        id: 'aviso_cuentas',
+        texto: '<b class="negrita">Confirme las CUENTAS CONTABLES</b>, una vez registrado el empleado no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
+        header: 'Confirmación',
+        siFunction: async (instance) => {
+          this.sendData();
+          instance.closeModal('aviso_cuentas', 'cancelar');
+        },
+        width: '30rem',
+      };
+
+      this.confirmationModal(confirmationObj);
+    } else {
+      this.sendData();
+    }
+  }
+
+  sendData() {
     const formulario = this.form.getRawValue();
 
     const documentos_identidad = [{ documento: formulario.cedula, descripcion: 'cedula' }];
 
     documentos_identidad.map((element) => {
-      // haciendo la estructura para mandar los documentos a la base de datos
       const doc_backend = _.find(this.documentos_de_identidad, (doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = true;
