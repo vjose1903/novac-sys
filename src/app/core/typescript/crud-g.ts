@@ -1,3 +1,4 @@
+import { MetodoHttp } from './../../../../electron/shared-electron-angular';
 import { Observable } from 'rxjs';
 import { Ss } from '../services/singleton.service';
 import * as _ from 'lodash';
@@ -20,10 +21,10 @@ export interface responseModel<T> {
 export class CrudG<T> {
   constructor(private path: string) {}
 
-  async dynamic(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
+  async dynamic(arg?: extraArgs, httpMethod: MetodoHttp = 'get', tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
 
-    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
+    return (await this.request(url, httpMethod, null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {

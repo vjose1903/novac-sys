@@ -64,7 +64,7 @@
             </form>
             <div class="col-12 form-group p-0 mt-5" style="display: flex; justify-content: space-between">
               <div>
-                <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                <button (click)="borrar()" class="btn mr-2 btn-blanco" style="max-width: 6rem">Borrar</button>
 
                 <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn ml-2 btn-verde" style="max-width: 6rem">{{ botonLabel }}</button>
               </div>

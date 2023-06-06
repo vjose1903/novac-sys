@@ -5,7 +5,7 @@ import { ModalI } from './../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
 import * as moment from '../../../../core/javascript/moment';
 
-import { DivisaI } from '../divisa.utils';
+import { DivisaC, DivisaI } from '../divisa.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { DivisaService } from '../divisa.service';
 
@@ -25,12 +25,13 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
   hastaMaxDate;
 
   tasaDeCambioClass = new TasaDeCambioC();
+  divisaClass = new DivisaC();
   listaHistorial: Array<TasaDeCambioI> = [];
 
   table_config: table_config = {
     info: [
       { titulo: 'Fecha', tipo: 'text', key: 'fecha_equivalente', estilos: [{ 'text-align': 'left' }] },
-      { titulo: 'Valor', tipo: 'text', key: 'valor' },
+      { titulo: 'Valor', tipo: 'text', key: 'monto' },
     ],
     colores: false,
     padding: '0rem',
@@ -38,9 +39,11 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
     id_tabla: 'lista_tasas_cambio',
   };
 
+  divisaPrincipal: DivisaI;
   constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService) {}
 
   ngOnInit(): void {
+    this.getDivisaPrincipal();
     this.setDefaultRange();
     this.createForm(this.inputs.divisa);
     this.getHistorialCambiosTasas();
@@ -74,14 +77,21 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
       this.tasaDeCambioClass.getAll(extra).then((res) => {
         res['data'].map((historial: TasaDeCambioI) => {
           historial.fecha_equivalente = moment(historial.fecha_equivalente).format('DD/MM/YYYY');
+          historial.monto = `${this.divisaPrincipal.simbolo} ${fun.numFormatTwoDecimals(historial.valor)}`;
 
           historial.customStyles = { fecha_equivalente: { 'text-align': 'start' } };
+
           this.listaHistorial.push(historial);
         });
       });
     } catch (error) {
       fun.toastError('Error Buscando el historial de cambios de tasas de cambios.', 'ERROR');
     }
+  }
+
+  getDivisaPrincipal() {
+    const extra = { afterPath: 'custom/get_principal' };
+    this.divisaClass.dynamic(extra).then((res) => (this.divisaPrincipal = res['data'] as DivisaI));
   }
 
   btn_aceptar() {
