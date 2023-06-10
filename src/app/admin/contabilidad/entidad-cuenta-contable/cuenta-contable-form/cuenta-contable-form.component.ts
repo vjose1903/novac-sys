@@ -49,7 +49,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     return new Promise<UntypedFormGroup>((resolve, reject) => {
       this.form = this.fb.group({
         id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.id : null, disabled: false }],
-        tipo_agrupacion_contable: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable : 'individual', disabled: false }, Validators.required],
+        tipo_agrupacion_contable: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable : null, disabled: false }, Validators.required],
         tipo_categoria: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_categoria : null, disabled: false }],
         tipo_categoria_id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_categoria_id : null, disabled: false }],
         is_comun: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.is_comun : false, disabled: false }],

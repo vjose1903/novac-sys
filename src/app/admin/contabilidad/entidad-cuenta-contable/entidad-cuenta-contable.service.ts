@@ -12,10 +12,11 @@ export class EntidadCuentaContableService {
   constructor() {}
 
   validateEntidades(params: { configsEntCuentas: ConfiguracionEntidadCuentaI[]; entidad_cuentas_contables: FormEntidadCuentaContableI[] }) {
-    return new Promise<{ error: boolean; msg: string }>((resolve, reject) => {
-      let result = { error: false, msg: '' };
+    let result = { error: false, valid: true, msg: '' };
 
-      if (params.configsEntCuentas.length == params.entidad_cuentas_contables.length) {
+    if (params.configsEntCuentas.length == params.entidad_cuentas_contables.length) {
+      const all_has_agrupacion = params.entidad_cuentas_contables.every((cuenta) => cuenta.tipo_agrupacion_contable != null);
+      if (all_has_agrupacion) {
         for (let index = 0; index < params.entidad_cuentas_contables.length; index++) {
           const cuenta_contable = params.entidad_cuentas_contables[index];
           const current_config = params.configsEntCuentas.find((config) => config.id == cuenta_contable.configuracion_entidad_cuenta_id) as ConfiguracionEntidadCuentaI;
@@ -27,11 +28,14 @@ export class EntidadCuentaContableService {
         }
       } else {
         result.error = true;
-        result.msg = `Debe de agregar todas las cuentas pertenecientes para la entidad: ${this.configEntContableClass.getConfigLabel(params.configsEntCuentas[0])}`;
+        result.valid = false;
       }
+    } else {
+      result.error = true;
+      result.msg = `Debe de agregar todas las cuentas pertenecientes para la entidad: ${this.configEntContableClass.getConfigLabel(params.configsEntCuentas[0])}`;
+    }
 
-      resolve(result);
-    });
+    return result;
   }
 
   parseCuentasFromBackend(cuentas_cuentables: EntidadCuentaContableI[]): FormEntidadCuentaContableI[] {

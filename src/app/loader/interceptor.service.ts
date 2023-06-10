@@ -1,3 +1,4 @@
+import { ConfigI } from './../core/typescript/config-interface.utils';
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -28,6 +29,7 @@ export class InterceptorService implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     this.sharedServ.nextCanToast(false);
     const token = fun.getAuthToken();
+    const configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
 
     let spinner = request.params.get('spinner');
 
@@ -44,6 +46,8 @@ export class InterceptorService implements HttpInterceptor {
           expiry: `${localStorage.getItem('expiry')}`,
           uid: `${localStorage.getItem('uid')}`,
           'token-type': `${localStorage.getItem('token-type')}`,
+          'has-contabilidad': `false`,
+          // 'has-contabilidad': `${configApp.has_contabilidad}`,
         },
         params: sendParams,
       });

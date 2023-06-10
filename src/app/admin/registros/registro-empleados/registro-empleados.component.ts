@@ -238,7 +238,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     } else {
       res = true;
     }
-    return res;
+
+    const entidades_validation = this.validate_cuentas();
+
+    const result = entidades_validation.valid ? res : !entidades_validation.valid;
+
+    return result;
   }
 
   changeStateCampos(enable = false) {
@@ -273,7 +278,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     [this.documentos_de_identidad, this.empleadoSelected] = Array(2).fill(undefined);
 
     this.listaEntidadCuentasContables.length = 0;
-    console.log('this.listaEntidadCuentasContables ', this.listaEntidadCuentasContables);
 
     this.changeStateCampos(false);
 
@@ -331,20 +335,30 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.changeStateCampos(true);
   }
 
-  submit() {
-    if (this.configApp.has_contabilidad && !this.editando) {
-      const confirmationObj = {
-        id: 'aviso_cuentas',
-        texto: '<b class="negrita">Confirme las CUENTAS CONTABLES</b>, una vez registrado el empleado no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
-        header: 'Confirmación',
-        siFunction: async (instance) => {
-          this.sendData();
-          instance.closeModal('aviso_cuentas', 'cancelar');
-        },
-        width: '30rem',
-      };
+  validate_cuentas() {
+    return this.entCuentaContServ.validateEntidades({ configsEntCuentas: this.listaConfigEmpleados, entidad_cuentas_contables: this.listaEntidadCuentasContables });
+  }
 
-      this.confirmationModal(confirmationObj);
+  async submit() {
+    if (this.configApp.has_contabilidad && !this.editando) {
+      const entidades_validation = this.validate_cuentas();
+
+      if (!entidades_validation.error) {
+        const confirmationObj = {
+          id: 'aviso_cuentas',
+          texto: 'Confirme las <b class="negrita">CUENTAS CONTABLES</b>, una vez registrado el empleado, no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
+          header: 'Confirmación',
+          siFunction: async (instance) => {
+            this.sendData();
+            instance.closeModal('aviso_cuentas', 'cancelar');
+          },
+          width: '30rem',
+        };
+
+        this.confirmationModal(confirmationObj);
+      } else {
+        fun.toastError(entidades_validation.msg, 'Error');
+      }
     } else {
       this.sendData();
     }

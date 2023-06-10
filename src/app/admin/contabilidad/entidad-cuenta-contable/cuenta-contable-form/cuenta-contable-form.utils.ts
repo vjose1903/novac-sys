@@ -43,7 +43,7 @@ export const entidadCuentaContableBlank: FormEntidadCuentaContableI = {
   id: null,
   tipo_categoria_id: null,
   tipo_categoria: null,
-  tipo_agrupacion_contable: 'individual',
+  tipo_agrupacion_contable: null,
   is_comun: false,
   configuracion_entidad_cuenta_id: null,
 };
