@@ -1,22 +1,28 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
 
-
-.home{
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.home {
+  background-color: var(--primary02);
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.version{
-    color: #b3b3b3;
-    font-size: 0.8rem;
+.svg-background {
+  height: 100%;
+  width: 100%;
+}
+
+.version {
+  color: #b3b3b3;
+  font-size: 0.8rem;
 }
 // #boton{
 //     margin: auto;
 // }
 
-.formulario__label{
-    font-family: Poppins;
+.formulario__label {
+  font-family: Poppins;
 }

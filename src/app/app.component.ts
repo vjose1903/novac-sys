@@ -275,8 +275,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
         .then((config: ConfigI) => {
           if (fun.objHas(config, 'err')) {
           } else {
-            ThemeService.setTheme(config.color_app);
-            ThemeService.setMode(config.mode_app);
+            ThemeService.setTheme(config.color_app || 'green');
+            ThemeService.setMode(config.mode_app || 'light');
 
             this.configServ.setConfig = config;
             this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;

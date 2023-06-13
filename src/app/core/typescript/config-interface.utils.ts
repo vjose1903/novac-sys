@@ -1,3 +1,5 @@
+export type modeAppT = 'dark' | 'light';
+export type colorAppT = 'red' | 'blue' |'green';
 export interface ConfigI {
   cliente:                     string;
   nombre_empresa:              string;
@@ -6,8 +8,8 @@ export interface ConfigI {
   telefono_empresa:            string;
   logo_empresa:                string;
   logo_impresion:              string;
-  color_app:                   string;
-  mode_app:                    string;
+  color_app:                   colorAppT;
+  mode_app:                    modeAppT;
   gitUser?:                    string;
   url_servidor:                string;
   url_servidor_respaldo:       string;
@@ -31,26 +33,26 @@ export interface ConfigI {
 }
 
 export interface Documentos {
-  venta_contado:   string;
-  venta_credito:   string;
-  pre_venta:       string;
-  compra:          string;
-  recibo_ingreso:  string;
-  conduce:         string;
-  nota:            string;
-  cuadre_caja:     string;
-  reporte:         string;
-  cotizacion:      string;
+  venta_contado:               string;
+  venta_credito:               string;
+  pre_venta:                   string;
+  compra:                      string;
+  recibo_ingreso:              string;
+  conduce:                     string;
+  nota:                        string;
+  cuadre_caja:                 string;
+  reporte:                     string;
+  cotizacion:                  string;
 }
 export interface PlantiallasImpresion {
-  nota:            string;
+  nota:                        string;
 }
 
 export interface Printer {
-  name:            string;
-  displayName:     string;
-  description:     string;
-  status:          number;
-  isDefault:       boolean;
-  options:         { [key: string]: string };
+  name:                        string;
+  displayName:                 string;
+  description:                 string;
+  status:                      number;
+  isDefault:                   boolean;
+  options:                     { [key: string]: string };
 }

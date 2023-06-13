@@ -1,0 +1,28 @@
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+
+@Component({
+  selector: 'svg-background',
+  templateUrl: './svg-background.component.html',
+  styleUrls: ['./svg-background.component.scss'],
+})
+export class SvgBackgroundComponent implements AfterViewInit {
+  @ViewChild('svgContainer', { static: true }) svgContainer: ElementRef;
+
+  initComponent: boolean = false;
+
+  constructor(public cdRef: ChangeDetectorRef) {}
+
+  ngAfterViewInit(): void {
+    this.initComponent = true;
+    this.cdRef.detectChanges();
+  }
+
+  getSvgSize(prop: 'offsetWidth' | 'offsetHeight') {
+    return `${this.svgContainer[prop]}px`;
+  }
+
+  getduration(number = 0) {
+    const base = 5;
+    return `${base + number}s`;
+  }
+}

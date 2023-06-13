@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { colorAppT, modeAppT } from '../typescript/config-interface.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ export class ThemeService {
     return document.documentElement.style.getPropertyValue(property);
   }
   // ================================================================================================================================================
-  static setMode(newMode) {
+  static setMode(newMode: modeAppT) {
     localStorage.setItem('appMode', newMode);
 
     const availableModes = { dark: this.darkMode, light: this.lightMode };
@@ -41,7 +42,7 @@ export class ThemeService {
 
   // ================================================================================================================================================
 
-  static setTheme(newTreme) {
+  static setTheme(newTreme: colorAppT) {
     localStorage.setItem('theme', newTreme);
 
     const availableThemes = { red: this.themeRed, blue: this.themeBlue, green: this.themeGreen };
