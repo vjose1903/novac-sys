@@ -15,9 +15,7 @@ export class CierreMensualComponent implements OnInit, ModalI {
   meses = Object.values(PeriodoFiscalC.labels);
   overlay: any;
 
-  ngOnInit(): void {
-    console.log('this.inputs ', this.inputs);
-  }
+  ngOnInit(): void {}
 
   openOverlay(event, overlay, month_label, month_status) {
     this.overlay = {};
@@ -54,9 +52,7 @@ export class CierreMensualComponent implements OnInit, ModalI {
 
   actionMonth(tipo) {
     if (!this.disableOverlayOption(tipo)) {
-
       console.log('tipo ', tipo);
-
     } else {
       fun.toastWarning(`El mes de: ${this.overlay.month_label.toUpperCase()} no puede ser ${tipo == 'open' ? 'Abierto' : 'Cerrado'}.`, 'AVISO');
     }

@@ -201,9 +201,6 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     this.ingredientesParaProduccion = [];
     if (this.cantidad_producir && this.medida_producir) {
       this.ingredientes.forEach(async (ingrediente) => {
-
-        console.log("ingrediente ", ingrediente);
-
         let cantidad_formula = ingrediente.cantidad;
         let contenidos_ingrediente = ingrediente.contenido;
         const contenido_a_producir = {};

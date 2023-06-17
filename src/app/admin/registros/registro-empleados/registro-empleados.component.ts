@@ -115,6 +115,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   async necesarioStart() {
     this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+
     await this.createForm();
     await this.getEmpleados(this.tServ.obj_paginate.default);
     await this.getRoles();
@@ -231,9 +232,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   formIsInvalid() {
     let res = true;
+    const formulario = this.form.getRawValue();
+
     if (this.form.valid && !this.camposDisabled) {
       res = false;
-      if (this.form.controls['cedula'].value) res = false;
+      if (fun.hasValue(formulario.cedula)) res = false;
       else res = true;
     } else {
       res = true;
@@ -277,7 +280,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.isCreando = true;
     [this.documentos_de_identidad, this.empleadoSelected] = Array(2).fill(undefined);
 
-    this.listaEntidadCuentasContables.length = 0;
+    this.listaEntidadCuentasContables = [];
 
     this.changeStateCampos(false);
 
@@ -326,6 +329,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
     this.empleadoSelected = data;
+
     this.editando = true;
     this.boton = 'Editar';
 
@@ -380,6 +384,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     formulario.estado = true;
 
     const objSend = _.omit(formulario, ['cedula']);
+
+    if (this.configApp.has_contabilidad) objSend['cuentas_contables'] = this.listaEntidadCuentasContables;
 
     if (!this.editando && fun.isEmpty(objSend.password)) {
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');

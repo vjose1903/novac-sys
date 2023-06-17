@@ -692,11 +692,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   fillFormula(ingredient, i, recalcular = false) {
     const control = this.form.controls['rowFormula'] as UntypedFormArray;
-    console.log('ingredient ', ingredient);
 
     const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo_id));
-    console.log('this.listaMateriasPrimas ', this.listaMateriasPrimas);
-    console.log('materiaPrima ', materiaPrima);
 
     try {
       const unidades_minimas = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
@@ -730,7 +727,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
       control_en_turno['cantidad_formula'].setValue(fun.formatearNumero(fun.redondearNum(ingredient.cantidad, 4)));
     } catch (error) {
-      console.log('error ', error);
 
       fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
     }

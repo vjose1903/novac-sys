@@ -15,6 +15,7 @@
             class="btn-theme p-1 px-2"
             (click)="changeAgrupacion('individual')"
             [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'individual' }"
+            [disabled]="camposDisabled"
           ></button>
 
           <button
@@ -26,6 +27,7 @@
             class="btn-theme p-1 px-2"
             (click)="changeAgrupacion('categoria')"
             [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'categoria' }"
+            [disabled]="camposDisabled"
           ></button>
 
           <button
@@ -37,6 +39,7 @@
             class="btn-theme p-1 px-2"
             (click)="changeAgrupacion('sub_categoria')"
             [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'sub_categoria' }"
+            [disabled]="camposDisabled"
           ></button>
         </span>
       </div>
@@ -44,8 +47,13 @@
       <div *ngIf="form.controls.tipo_agrupacion_contable.value != null; else elseBlock" class="col-12 p-0">
         <div class="row">
           <div class="col-12 p-0">
-            <label class="mb-0 mt-3" for="search">{{ form.controls.is_comun.value ? 'Cuenta Contable' : 'Cuenta Control' }} </label>
-            <input id="cuentaControlInput" class="search-input form-control min" [value]="getCuentaControlLabel()" disabled />
+            <label class="mb-0 mt-3" for="search">Cuenta Control </label>
+            <input id="cuentaControlInput" class="search-input form-control min" [value]="getCuentaLabel('control')" disabled />
+          </div>
+
+          <div *ngIf="form.controls.is_comun.value || fun.hasValue(form.controls.id.value)" class="col-12 p-0">
+            <label class="mb-0 mt-1" for="search"> <strong>Cuenta Contable</strong> </label>
+            <input id="cuentaContableInput" class="search-input form-control min font-bold" [value]="getCuentaLabel('contable')" disabled />
           </div>
 
           <div *ngIf="form.controls.tipo_agrupacion_contable.value != 'individual'" class="row mt-3 w-100 rowCategoria">

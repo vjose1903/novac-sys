@@ -112,7 +112,6 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
         });
 
         this.listaConfiguraciones = res['data'];
-        console.log('this.listaConfiguraciones ', this.listaConfiguraciones);
 
         this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
       });
@@ -175,7 +174,6 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
 
   requests() {
     const formValue = this.form.value;
-    console.log('formValue ', formValue);
 
     this.configruacionClass.createUpdateOne(formValue).then((res) => {
       this.getConfiguraciones();

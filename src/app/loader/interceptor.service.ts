@@ -46,8 +46,7 @@ export class InterceptorService implements HttpInterceptor {
           expiry: `${localStorage.getItem('expiry')}`,
           uid: `${localStorage.getItem('uid')}`,
           'token-type': `${localStorage.getItem('token-type')}`,
-          'has-contabilidad': `false`,
-          // 'has-contabilidad': `${configApp.has_contabilidad}`,
+          'has-contabilidad': `${configApp.has_contabilidad}`,
         },
         params: sendParams,
       });

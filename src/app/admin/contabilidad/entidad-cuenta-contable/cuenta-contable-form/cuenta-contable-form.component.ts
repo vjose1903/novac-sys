@@ -4,7 +4,7 @@ import { CategoriaEntidadContableService } from '../../categoria-entidad-contabl
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableI, entidadesContables } from '../../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { agrupacionContable, agrupacionesContables } from './cuenta-contable-form.utils';
+import { EntidadCuentaContableI, agrupacionContable, agrupacionesContables } from './cuenta-contable-form.utils';
 import { FormEntidadCuentaContableI } from './cuenta-contable-form.utils';
 
 @Component({
@@ -15,6 +15,9 @@ import { FormEntidadCuentaContableI } from './cuenta-contable-form.utils';
 export class CuentaContableFormComponent implements OnInit, OnChanges {
   @Input() inputs: { selectedConfig: ConfiguracionEntidadCuentaI; entidad: entidadesContables };
   @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
+  @Input() camposDisabled: boolean;
+
+  @Input() cuentaContableDataCruda: EntidadCuentaContableI;
 
   @Input() cuentaContableData: FormEntidadCuentaContableI;
   @Output() cuentaContableDataChange = new EventEmitter<FormEntidadCuentaContableI>();
@@ -33,7 +36,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.cuentaContableData.currentValue && !changes.cuentaContableData.firstChange) this.form.patchValue(this.cuentaContableData);
+    if (changes?.cuentaContableData?.currentValue && !changes?.cuentaContableData?.firstChange) this.form.patchValue(this.cuentaContableData);
   }
 
   async necesarioStart() {
@@ -82,22 +85,31 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     if (fun.isEmpty(formValue.tipo_categoria_id)) this.form.controls.is_comun.setValue(false);
   }
 
-  getCuentaControlLabel() {
+  getCuentaLabel(tipo: 'control' | 'contable') {
     const formulario = this.form.getRawValue();
-    let cuentaControl;
+    let cuenta;
 
-    if (formulario.tipo_agrupacion_contable == 'individual') cuentaControl = this.inputs.selectedConfig.cuenta_contable.label;
+    if (formulario.tipo_agrupacion_contable == 'individual') cuenta = this.inputs.selectedConfig.cuenta_contable.label;
+
     if (formulario.tipo_agrupacion_contable != 'individual') {
       const categoriaSelected = this.listadoCategorias.find((categoria) => categoria.id == formulario.tipo_categoria_id);
 
       if (formulario.is_comun) {
-        cuentaControl = categoriaSelected?.cuenta_contable_auxiliar.label;
+        if (tipo == 'control') {
+          cuenta = categoriaSelected?.cuenta_contable_control.label;
+        } else {
+          cuenta = categoriaSelected?.cuenta_contable_auxiliar.label;
+        }
       } else {
-        cuentaControl = categoriaSelected?.cuenta_contable_control.label;
+        cuenta = categoriaSelected?.cuenta_contable_control.label;
       }
     }
 
-    return cuentaControl || `Seleccione la ${this.getDropDownInfo('description')}`;
+    if (fun.hasValue(this.cuentaContableDataCruda) && tipo == 'contable') {
+      cuenta = this.cuentaContableDataCruda?.cuenta_contable.label;
+    }
+
+    return cuenta || `Seleccione la ${this.getDropDownInfo('description')}`;
   }
 
   getDropDownInfo(tipo: 'placeholder' | 'emptyMessage' | 'description') {

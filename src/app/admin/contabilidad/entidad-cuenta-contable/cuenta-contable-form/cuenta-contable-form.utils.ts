@@ -21,6 +21,7 @@ export interface CuentaContable {
   id: number;
   descripcion: string;
   codigo: string;
+  label: string;
 }
 
 export interface OrigenCategoria {

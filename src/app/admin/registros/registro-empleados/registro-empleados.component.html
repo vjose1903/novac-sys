@@ -152,7 +152,9 @@
                       <entidad-cuenta-contable
                         [inputs]="{ configsEntCuentas: listaConfigEmpleados, entidad: entidadContable }"
                         [configuration]="{ btn: { subCategoria: false } }"
+                        [cuentasContablesDataCruda]="empleadoSelected ? empleadoSelected?.cuentas_contables : []"
                         [(cuentasContablesData)]="listaEntidadCuentasContables"
+                        [camposDisabled]="camposDisabled"
                       ></entidad-cuenta-contable>
                     </div>
                   </div>
@@ -163,7 +165,6 @@
                 <div class="p-0 mt-3" style="display: flex; justify-content: space-between">
                   <div>
                     <button [disabled]="!nombreHasValue()" class="btn mr-2" value="" id="btn-blanco" (click)="borrar()">Borrar</button>
-
                     <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde">{{ boton }}</button>
                     <button *ngIf="editando" (click)="showModal()" class="btn ml-2 btn-blanco">Cambiar contraseña</button>
                   </div>
