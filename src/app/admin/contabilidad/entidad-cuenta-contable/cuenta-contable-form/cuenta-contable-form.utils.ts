@@ -1,9 +1,10 @@
-export type agrupacionContable = 'categoria' | 'individual' | 'sub_categoria';
+export type agrupacionContable = 'categoria' | 'individual' | 'sub_categoria' | 'sin_cuenta';
 
 export const agrupacionesContables = {
   categoria: 'categoria' as agrupacionContable,
   individual: 'individual' as agrupacionContable,
   sub_categoria: 'sub_categoria' as agrupacionContable,
+  sin_cuenta: 'sin_cuenta' as agrupacionContable,
 };
 
 export interface EntidadCuentaContableI {
@@ -34,6 +35,7 @@ export interface FormEntidadCuentaContableI {
   tipo_categoria_id: number | null;
   tipo_categoria?: string | null;
   tipo_agrupacion_contable: string;
+  has_cuenta: boolean;
   is_comun: boolean;
   configuracion_entidad_cuenta_id: number;
   cuenta_contable?: CuentaContable;
@@ -45,6 +47,7 @@ export const entidadCuentaContableBlank: FormEntidadCuentaContableI = {
   tipo_categoria_id: null,
   tipo_categoria: null,
   tipo_agrupacion_contable: null,
+  has_cuenta: true,
   is_comun: false,
   configuracion_entidad_cuenta_id: null,
 };

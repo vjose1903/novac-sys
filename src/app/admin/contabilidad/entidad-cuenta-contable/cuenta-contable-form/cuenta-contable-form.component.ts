@@ -27,16 +27,23 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   configEntContableClass = new ConfiguracionEntidadCuentaC();
 
   lastChange: FormEntidadCuentaContableI;
+  agrupacionesContables = agrupacionesContables;
 
   fun = fun;
-  constructor(private fb: UntypedFormBuilder) {}
+
+  dataOriginal: FormEntidadCuentaContableI;
+
+  constructor(private fb: UntypedFormBuilder, public catEntContServ: CategoriaEntidadContableService) {}
 
   ngOnInit(): void {
     this.necesarioStart();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes?.cuentaContableData?.currentValue && !changes?.cuentaContableData?.firstChange) this.form.patchValue(this.cuentaContableData);
+    if (changes?.cuentaContableData?.currentValue && !changes?.cuentaContableData?.firstChange) {
+      this.form.patchValue(this.cuentaContableData);
+      this.updateOriginalData();
+    }
   }
 
   async necesarioStart() {
@@ -46,6 +53,11 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
         if (!fun.isEqual(changes, this.lastChange)) this.returnData();
       });
     });
+    this.updateOriginalData();
+  }
+
+  updateOriginalData() {
+    this.dataOriginal = fun.duplicarJson(this.cuentaContableData);
   }
 
   createForm() {
@@ -56,6 +68,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
         tipo_categoria: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_categoria : null, disabled: false }],
         tipo_categoria_id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_categoria_id : null, disabled: false }],
         is_comun: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.is_comun : false, disabled: false }],
+        has_cuenta: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable != agrupacionesContables.sin_cuenta : true, disabled: false }],
         configuracion_entidad_cuenta_id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.configuracion_entidad_cuenta_id : this.inputs.selectedConfig.id, disabled: false }],
       });
       resolve(this.form);
@@ -66,6 +79,27 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad }).then((res) => {
       this.listadoCategorias = res['data'];
     });
+  }
+
+  showRevertBtn() {
+    const formulario = this.form?.getRawValue();
+    return !fun.isEqual(this.dataOriginal, formulario);
+  }
+
+  revertChanges() {
+    this.form.patchValue(this.dataOriginal);
+    this.selectCategoria();
+  }
+
+  changeHasCuenta() {
+    const formValue = this.form.getRawValue();
+    const tipo_agrupacion = formValue.has_cuenta ? null : agrupacionesContables.sin_cuenta;
+
+    this.form.controls.tipo_agrupacion_contable.setValue(tipo_agrupacion);
+
+    this.form.controls.tipo_categoria.setValue(null);
+    this.form.controls.tipo_categoria_id.setValue(null);
+    this.form.controls.is_comun.setValue(false);
   }
 
   changeAgrupacion(tipo: agrupacionContable) {
@@ -105,7 +139,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
       }
     }
 
-    if (fun.hasValue(this.cuentaContableDataCruda) && tipo == 'contable') {
+    if (fun.hasValue(this.cuentaContableDataCruda) && tipo == 'contable' && !this.showRevertBtn()) {
       cuenta = this.cuentaContableDataCruda?.cuenta_contable.label;
     }
 

@@ -15,13 +15,15 @@ export class CategoriaEntidadContableService {
   allPermisosCategoriaEnt = Object.values(this.permissions.categoria_entidad_contable);
 
   static categoriaEntContClass = new CategoriaEntidadContableC();
+  static entidades = {
+    plural: { cliente: 'clientes', user: 'empleados', articulo: 'articulos', suplidor: 'suplidores', cuenta_bancaria: 'cuentas bancarias' },
+    singular: { cliente: 'cliente', user: 'empleado', articulo: 'articulo', suplidor: 'suplidor', cuenta_bancaria: 'cuenta bancaria' },
+  };
 
   constructor() {}
 
   openModalCategorias(params: { entidad: entidadesContables; openNewModal: Function; inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI> }; id_modal: string }) {
-    const entidades = { cliente: 'clientes', user: 'empleados', articulo: 'articulos', suplidor: 'suplidores', cuenta_bancaria: 'cuentas bancarias' };
-
-    const header = `Categorias de ${entidades[params.entidad]}`;
+    const header = `Categorias de ${CategoriaEntidadContableService.entidades.plural[params.entidad]}`;
     params.inputs['entidad'] = params.entidad;
 
     params.openNewModal({
@@ -51,5 +53,9 @@ export class CategoriaEntidadContableService {
         resolve(res);
       });
     });
+  }
+
+  getEntidadContableLabel(key: entidadesContables, tipo = 'singular') {
+    return CategoriaEntidadContableService.entidades[tipo][key];
   }
 }

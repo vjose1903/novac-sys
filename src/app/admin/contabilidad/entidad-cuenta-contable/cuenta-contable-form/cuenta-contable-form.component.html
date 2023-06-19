@@ -1,101 +1,116 @@
 <div class="cuentaContableForm">
+  <div *ngIf="showRevertBtn()" class="btnRevertChanges">
+    <div class="circle" (click)="revertChanges()" [pTooltip]="'Revertir cambios'" tooltipPosition="left">
+      <i class="fa-solid fa-arrow-rotate-left"></i>
+    </div>
+  </div>
+
   <form *ngIf="form" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
     <div class="row p-0">
-      <div class="col-12 p-0">
-        <h6>{{ configEntContableClass.getConfigLabel(inputs.selectedConfig) }}</h6>
-      </div>
-      <div class="col-12 p-0">
-        <span class="p-buttonset">
-          <button
-            *ngIf="configuration.btn.individual"
-            pButton
-            pRipple
-            label="Individual"
-            styleClass="p-button-sm"
-            class="btn-theme p-1 px-2"
-            (click)="changeAgrupacion('individual')"
-            [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'individual' }"
-            [disabled]="camposDisabled"
-          ></button>
+      <div class="col-12 p-0 mb-3">
+        <div class="d-flex align-items-center">
+          <h6 class="mb-0 c-default">{{ configEntContableClass.getConfigLabel(inputs.selectedConfig) }}</h6>
 
-          <button
-            *ngIf="configuration.btn.categoria"
-            pButton
-            pRipple
-            label="Categoria"
-            styleClass="p-button-sm"
-            class="btn-theme p-1 px-2"
-            (click)="changeAgrupacion('categoria')"
-            [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'categoria' }"
-            [disabled]="camposDisabled"
-          ></button>
-
-          <button
-            *ngIf="configuration.btn.subCategoria"
-            pButton
-            pRipple
-            label="Sub Categoria"
-            styleClass="p-button-sm"
-            class="btn-theme p-1 px-2"
-            (click)="changeAgrupacion('sub_categoria')"
-            [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == 'sub_categoria' }"
-            [disabled]="camposDisabled"
-          ></button>
-        </span>
+          <input formControlName="has_cuenta" class="apple-switch ml-2" type="checkbox" (change)="changeHasCuenta()" [ngClass]="{ disabled: camposDisabled }" />
+        </div>
       </div>
 
-      <div *ngIf="form.controls.tipo_agrupacion_contable.value != null; else elseBlock" class="col-12 p-0">
+      <div *ngIf="form.controls.has_cuenta.value; else elseBlock" class="col-12 p-0">
         <div class="row">
-          <div class="col-12 p-0">
-            <label class="mb-0 mt-3" for="search">Cuenta Control </label>
-            <input id="cuentaControlInput" class="search-input form-control min" [value]="getCuentaLabel('control')" disabled />
+          <div class="col-12 p-0 mb-3">
+            <span class="p-buttonset">
+              <button
+                *ngIf="configuration.btn.individual"
+                pButton
+                pRipple
+                label="Individual"
+                styleClass="p-button-sm"
+                class="btn-theme p-1 px-2"
+                (click)="changeAgrupacion(agrupacionesContables.individual)"
+                [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == agrupacionesContables.individual }"
+                [disabled]="camposDisabled"
+              ></button>
+
+              <button
+                *ngIf="configuration.btn.categoria"
+                pButton
+                pRipple
+                label="Categoria"
+                styleClass="p-button-sm"
+                class="btn-theme p-1 px-2"
+                (click)="changeAgrupacion(agrupacionesContables.categoria)"
+                [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == agrupacionesContables.categoria }"
+                [disabled]="camposDisabled"
+              ></button>
+
+              <button
+                *ngIf="configuration.btn.subCategoria"
+                pButton
+                pRipple
+                label="Sub Categoria"
+                styleClass="p-button-sm"
+                class="btn-theme p-1 px-2"
+                (click)="changeAgrupacion(agrupacionesContables.sub_categoria)"
+                [ngClass]="{ selected: form.controls.tipo_agrupacion_contable.value == agrupacionesContables.sub_categoria }"
+                [disabled]="camposDisabled"
+              ></button>
+            </span>
           </div>
 
-          <div *ngIf="form.controls.is_comun.value || fun.hasValue(form.controls.id.value)" class="col-12 p-0">
-            <label class="mb-0 mt-1" for="search"> <strong>Cuenta Contable</strong> </label>
-            <input id="cuentaContableInput" class="search-input form-control min font-bold" [value]="getCuentaLabel('contable')" disabled />
-          </div>
-
-          <div *ngIf="form.controls.tipo_agrupacion_contable.value != 'individual'" class="row mt-3 w-100 rowCategoria">
-            <div class="col-8 p-0">
-              <div class="form-group mb-0" [appMsgError]="'tipo_agrupacion_contable'" [form]="form">
-                <label class="mb-0" for="search">{{ getDropDownInfo('description') }} </label>
-                <input *ngIf="form.controls.tipo_agrupacion_contable.value == 'individual'" id="cuentaControlInput" class="search-input form-control min" [value]="inputs.selectedConfig.cuenta_contable.label" disabled />
-
-                <p-dropdown
-                  #dropdownCuentaControl
-                  inputId="cuentaControlSelect"
-                  appendTo="body"
-                  formControlName="tipo_categoria_id"
-                  [options]="listadoCategorias"
-                  [itemSize]="34"
-                  optionLabel="descripcion"
-                  optionValue="id"
-                  styleClass="form-control min"
-                  [emptyMessage]="getDropDownInfo('emptyMessage')"
-                  [placeholder]="getDropDownInfo('placeholder')"
-                  [showClear]="true"
-                  (onClear)="dropdownCuentaControl.focus(); dropdownCuentaControl.show()"
-                  (onChange)="selectCategoria()"
-                >
-                  <ng-template let-cuenta_control pTemplate="item">
-                    <div class="cuenta_control-item">
-                      <span class="d-block" style="font-size: 0.9rem">
-                        <strong>{{ getDropDownInfo('description') }}: </strong> {{ cuenta_control.descripcion }}
-                      </span>
-                    </div>
-                  </ng-template>
-                </p-dropdown>
-                <span id="msgContainer"></span>
+          <div *ngIf="form.controls.tipo_agrupacion_contable.value != null; else elseBlock" class="col-12 p-0">
+            <div class="row">
+              <div class="col-12 p-0">
+                <label class="mb-0 mt-1" for="search">Cuenta Control </label>
+                <input id="cuentaControlInput" class="search-input form-control min" [value]="getCuentaLabel('control')" disabled />
               </div>
-            </div>
-            <div class="col-4 p-0">
-              <div class="form-group mb-0 switchDiv h-100 align-items-end">
-                <div class="d-flex align-items-center ml-4">
-                  <div [pTooltip]="fun.isEmpty(form.controls.tipo_categoria_id.value) ? 'Primero ' + getDropDownInfo('placeholder').toLowerCase() : ''" tooltipPosition="left" class="h-100 d-flex align-items-center">
-                    <input formControlName="is_comun" class="apple-switch" type="checkbox" />
+
+              <div *ngIf="form.controls.is_comun.value || (fun.hasValue(form.controls.id.value) && !this.showRevertBtn())" class="col-12 p-0">
+                <label class="mb-0 mt-1" for="search"> <strong>Cuenta Contable</strong> </label>
+                <input id="cuentaContableInput" class="search-input form-control min font-bold" [value]="getCuentaLabel('contable')" disabled />
+              </div>
+
+              <div *ngIf="form.controls.tipo_agrupacion_contable.value != agrupacionesContables.individual" class="row mt-3 w-100 rowCategoria">
+                <div class="col-8 p-0">
+                  <div class="form-group mb-0" [appMsgError]="'tipo_agrupacion_contable'" [form]="form">
+                    <label class="mb-0" for="search">{{ getDropDownInfo('description') }} </label>
+                    <input *ngIf="form.controls.tipo_agrupacion_contable.value == agrupacionesContables.individual" id="cuentaControlInput" class="search-input form-control min" [value]="inputs.selectedConfig.cuenta_contable.label" disabled />
+
+                    <p-dropdown
+                      #dropdownCuentaControl
+                      inputId="cuentaControlSelect"
+                      appendTo="body"
+                      formControlName="tipo_categoria_id"
+                      [options]="listadoCategorias"
+                      [itemSize]="34"
+                      optionLabel="descripcion"
+                      optionValue="id"
+                      styleClass="form-control min"
+                      [emptyMessage]="getDropDownInfo('emptyMessage')"
+                      [placeholder]="getDropDownInfo('placeholder')"
+                      [showClear]="true"
+                      (onClear)="dropdownCuentaControl.focus(); dropdownCuentaControl.show()"
+                      (onChange)="selectCategoria()"
+                    >
+                      <ng-template let-cuenta_control pTemplate="item">
+                        <div class="cuenta_control-item">
+                          <span class="d-block" style="font-size: 0.9rem">
+                            <strong>{{ getDropDownInfo('description') }}: </strong> {{ cuenta_control.descripcion }}
+                          </span>
+                        </div>
+                      </ng-template>
+                    </p-dropdown>
+                    <span id="msgContainer"></span>
                   </div>
-                  <span class="ml-2 mb-0">Cuenta Común</span>
+                </div>
+                <div class="col-4 p-0">
+                  <div class="form-group mb-0 switchDiv h-100 align-items-end">
+                    <div class="d-flex align-items-center ml-4">
+                      <div [pTooltip]="fun.isEmpty(form.controls.tipo_categoria_id.value) ? 'Primero ' + getDropDownInfo('placeholder').toLowerCase() : ''" tooltipPosition="left" class="h-100 d-flex align-items-center">
+                        <input formControlName="is_comun" class="apple-switch" type="checkbox" />
+                      </div>
+                      <span class="ml-2 mb-0">Cuenta Común</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -104,8 +119,9 @@
       </div>
 
       <ng-template #elseBlock>
-        <div class="w-100 rowCategoria mt-3">
-          <span>Debe seleccinar un tipo de agrupación para la cuenta contable.</span>
+        <div class="w-100 rowCategoria">
+          <span *ngIf="form.controls.has_cuenta.value">Debe seleccinar un tipo de agrupación para la cuenta contable.</span>
+          <span *ngIf="!form.controls.has_cuenta.value">{{ catEntContServ.getEntidadContableLabel(inputs.entidad) | titlecase }} no contará con este tipo de cuenta contable.</span>
         </div>
       </ng-template>
     </div>

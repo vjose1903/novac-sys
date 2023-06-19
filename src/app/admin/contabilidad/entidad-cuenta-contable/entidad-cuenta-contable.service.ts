@@ -44,6 +44,7 @@ export class EntidadCuentaContableService {
 
       const cuentaParsed: FormEntidadCuentaContableI = fun.pick(fun.duplicarJson(cuenta), values_pick);
 
+      cuentaParsed.has_cuenta = cuenta?.tipo_agrupacion_contable != agrupacionesContables.sin_cuenta;
       cuentaParsed.tipo_categoria_id = cuenta?.origen_categoria?.id || null;
       cuentaParsed.tipo_categoria = null; //TODO: ver como hacer esta parte para articulos.
 
