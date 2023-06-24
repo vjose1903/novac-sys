@@ -5,5 +5,5 @@ export interface ImagenI {
 }
 
 export function getImgUrlServer(fileName: string) {
-  return `${getUrlInUse()}/img/${fileName}`;
+  return fileName ? `${getUrlInUse()}/img/${fileName}` : null;
 }

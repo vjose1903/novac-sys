@@ -19,7 +19,7 @@ export class DivisaService {
 
       this.divisaClass.getAll(extra).then((res) => {
         res['data'].map((divisa: DivisaI) => {
-          divisa.img_divisa = getImgUrlServer(divisa.imagen.file_name);
+          divisa.img_divisa = getImgUrlServer(divisa?.imagen?.file_name);
           divisa.es_principal = divisa.is_principal ? 'P' : null;
           divisa.tasa_actual = `$ ${divisa.current_tasa}`;
 

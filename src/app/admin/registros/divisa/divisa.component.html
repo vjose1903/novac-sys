@@ -26,7 +26,7 @@
                   </div>
                 </div>
                 <div class="col-5 p-0">
-                  <img-viewer-edit [src_img]="photoData?.src_img" (getPhotoData)="getPhotoData($event)" [id]="photoData?.id || null"></img-viewer-edit>
+                  <img-viewer-edit [src_img]="photoData?.src_img" (getPhotoData)="getPhotoData($event)" [id]="'divisa-img-' + (photoData?.id || 0)"></img-viewer-edit>
                 </div>
                 <div class="col-7">
                   <div class="row">

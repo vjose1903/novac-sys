@@ -1,3 +1,5 @@
+import { entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
+import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { CategoriaEntidadContableService } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
@@ -6,6 +8,7 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
+import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado.utils';
@@ -14,6 +17,8 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
+import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
+import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -26,11 +31,13 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   listaClientes = [];
   listaConfigClientes: Array<ConfiguracionEntidadCuentaI> = [];
+  listaEntidadCuentasContables: Array<FormEntidadCuentaContableI> = [];
+
   FORM: any;
   isCreando: boolean = false;
   doc_is_cedula = true;
 
-  PhotoData: any;
+  photoData: PhotoDataI;
   doc_principal = 'cedula';
 
   vendedores;
@@ -64,8 +71,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   tablaComponent;
 
   configApp: ConfigI = ConfigService.config;
+  entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.cliente;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
   }
 
@@ -83,7 +91,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       id: [null],
       rnc: [{ value: null, disabled: false }],
       cedula: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.cedulaValidator(), this.myValidators.ValidateRayaAbajo()])],
-
+      balance: [{ value: 0, disabled: false }],
       nombre: [{ value: null, disabled: true }, Validators.required],
       apellido: [{ value: null, disabled: true }, Validators.required],
       direccion: [{ value: null, disabled: true }, Validators.required],
@@ -92,6 +100,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       limite_credito: [{ value: null, disabled: true }, Validators.required],
       maximo_credito: [{ value: null, disabled: true }, Validators.required],
       vendedor_id: [{ value: null, disabled: true }, Validators.required],
+      img: [{ value: null, disabled: false }],
     });
   }
 
@@ -132,6 +141,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.listaClientes.length = 0;
     this.clienteClass.getAll(extra).then((res) => {
       res['data'].map((cliente) => {
+        cliente.img_cliente = getImgUrlServer(cliente?.imagen?.file_name);
         const doc = _.find(cliente.documentos_de_identidad, { principal: true });
         cliente.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         return cliente;
@@ -148,8 +158,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigClientes = res['data']));
   }
 
-  getPhotoData(img) {
-    this.PhotoData = img;
+  getPhotoData(img: PhotoDataI) {
+    this.photoData = img;
+    this.form.controls.img.setValue(img.src_img);
   }
 
   tableClick_action(params) {
@@ -161,10 +172,15 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.documentos_de_identidad = data.documentos_de_identidad;
 
     this.form.patchValue(data);
-
     this.patchDocumentos(data.documentos_de_identidad);
-
     this.form.controls.maximo_credito.setValue(fun.numFormatTwoDecimals(data.maximo_credito));
+
+    this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
+
+    this.photoData = { src_img: data?.img_cliente, id: data?.imagen?.id };
+    this.form.controls.img.setValue(data.img_cliente);
+    console.log('this.photoData ', this.photoData);
+
     this.clienteSelected = fun.duplicarJson(data);
 
     this.botonLabel = 'Editar';
@@ -296,7 +312,12 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     } else {
       res = true;
     }
-    return res;
+
+    const entidades_validation = this.validate_cuentas();
+
+    const result = entidades_validation.valid ? res : !entidades_validation.valid;
+
+    return result;
   }
 
   revisarPrecio(id) {
@@ -306,9 +327,40 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     });
   }
 
-  p() {}
+  validate_cuentas() {
+    return this.entCuentaContServ.validateEntidades({ configsEntCuentas: this.listaConfigClientes, entidad_cuentas_contables: this.listaEntidadCuentasContables });
+  }
 
   submit() {
+    if (ConfigService.config.has_contabilidad) {
+      const entidades_validation = this.validate_cuentas();
+
+      if (!entidades_validation.error) {
+        if (!this.editando) {
+          const confirmationObj = {
+            id: 'aviso_cuentas',
+            texto: 'Confirme las <b class="negrita">CUENTAS CONTABLES</b>, una vez registrado el cliente, no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
+            header: 'Confirmación',
+            siFunction: async (instance) => {
+              this.sendData();
+              instance.closeModal('aviso_cuentas', 'cancelar');
+            },
+            width: '30rem',
+          };
+
+          this.confirmationModal(confirmationObj);
+        } else {
+          this.sendData();
+        }
+      } else {
+        fun.toastError(entidades_validation.msg, 'Error');
+      }
+    } else {
+      this.sendData();
+    }
+  }
+
+  sendData() {
     const formulario = this.form.getRawValue();
 
     const documentos_identidad = [
@@ -333,17 +385,21 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     } else {
       formulario.documentos_de_identidad = documentos_identidad;
 
-      if (this.PhotoData !== undefined) {
-        formulario.imagen_attributes = null;
-        formulario.imagen_attributes = this.PhotoData;
+      if (fun.hasValue(this.photoData?.fileName) && fun.hasValue(this.photoData?.base_64)) {
+        let idImg = Number(this.photoData.id.replaceAll('cliente-img-', ''));
+        idImg = idImg > 0 ? idImg : null;
+
+        formulario['imagenes'] = [{ file_name: this.photoData.fileName, base_64: this.photoData.src_img, id: idImg }];
       }
 
       formulario.estado = true;
-
-      formulario['balance'] = 0;
       formulario.maximo_credito = fun.desformatear(formulario.maximo_credito);
 
-      this.clienteClass.createUpdateOne(formulario).then((res) => {
+      if (ConfigService.config.has_contabilidad) formulario['cuentas_contables'] = this.listaEntidadCuentasContables;
+
+      const objSend = _.omit(formulario, ['img']);
+
+      this.clienteClass.createUpdateOne(objSend).then((res) => {
         const actualPagination = this.tServ.getPaginationById('lista_clientes');
         this.getClientes(actualPagination);
         this.borrar();
@@ -367,13 +423,15 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
-    this.doc_is_cedula = true;
-    this.documentos_de_identidad = undefined;
+    this.form.controls.balance.setValue(0);
+
+    [this.doc_is_cedula, this.isCreando] = Array(2).fill(true);
+    [this.documentos_de_identidad, this.clienteSelected, this.photoData] = Array(3).fill(undefined);
     this.botonLabel = 'Guardar';
     this.editando = false;
     this.changeStateCampos(false);
-    this.clienteSelected = undefined;
-    this.isCreando = true;
+
+    this.listaEntidadCuentasContables = [];
 
     setTimeout(() => {
       fun.enfocarInput('cedula');

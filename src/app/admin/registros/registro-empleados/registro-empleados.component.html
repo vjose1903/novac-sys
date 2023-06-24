@@ -12,7 +12,7 @@
           </div>
 
           <div #divCard class="card cardFormClass p-0">
-            <!-- <div class="formContainer" [ngStyle]="{ height: divCard.offsetHeight + 'px', width: divCard.offsetWidth + 'px' }"> -->
+
             <div class="formContainer">
               <div class="formulario">
                 <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
@@ -150,7 +150,7 @@
 
                     <div *ngIf="configApp.has_contabilidad" class="col-12 p-0">
                       <entidad-cuenta-contable
-                        *ngxPermissionsOnly="cuentasContablesPermissions"
+                        *ngxPermissionsOnly="entCuentaContServ.permissions"
                         [inputs]="{ configsEntCuentas: listaConfigEmpleados, entidad: entidadContable }"
                         [configuration]="{ btn: { subCategoria: false } }"
                         [cuentasContablesDataCruda]="empleadoSelected ? empleadoSelected?.cuentas_contables : []"
@@ -170,7 +170,7 @@
                     <button *ngIf="editando" (click)="showModal()" class="btn ml-2 btn-blanco">Cambiar contraseña</button>
                   </div>
                   <div>
-                    <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button>
+                    <!-- <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button> -->
                     <button class="btn mr-2" value="" id="btn-blanco" (click)="borrar(); isCreando = false">Cerrar</button>
                   </div>
                 </div>

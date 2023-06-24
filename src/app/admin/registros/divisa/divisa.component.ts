@@ -111,9 +111,6 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
       res = true;
     }
 
-    // if (fun.hasValue(this.photoData) && fun.hasValue(this.photoData?.src_img)) res = false;
-    // else res = true;
-
     return res;
   }
 
@@ -221,7 +218,10 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     if (fun.hasValue(this.photoData?.fileName) && fun.hasValue(this.photoData?.base_64)) {
-      formValue['imagenes'] = [{ file_name: this.photoData.fileName, base_64: this.photoData.src_img, id: this.photoData.id }];
+      let idImg = Number(this.photoData.id.replaceAll('divisa-img-', ''));
+      idImg = idImg > 0 ? idImg : null;
+
+      formValue['imagenes'] = [{ file_name: this.photoData.fileName, base_64: this.photoData.src_img, id: idImg }];
     }
 
     this.divisaClass.createUpdateOne(formValue).then((res) => {

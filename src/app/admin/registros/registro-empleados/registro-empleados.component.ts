@@ -68,7 +68,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   maxDateBirth = new Date();
 
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.user;
-  cuentasContablesPermissions = [Permisos.entidad_cuenta_contable.create, Permisos.entidad_cuenta_contable.update];
 
   configApp: ConfigI = ConfigService.config;
 
@@ -266,10 +265,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.borrar();
   }
 
-  test() {
-    console.log(this.listaEntidadCuentasContables);
-  }
-
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
 
@@ -327,7 +322,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
-    this.empleadoSelected = data;
+    this.empleadoSelected = fun.duplicarJson(data);
 
     this.editando = true;
     this.boton = 'Editar';

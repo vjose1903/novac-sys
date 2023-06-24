@@ -1,3 +1,4 @@
+import { Permisos } from './../../../core/typescript/permisos';
 import { Injectable } from '@angular/core';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { EntidadCuentaContableI, FormEntidadCuentaContableI, agrupacionesContables } from './cuenta-contable-form/cuenta-contable-form.utils';
@@ -8,6 +9,7 @@ import { fun } from '../../../core/services/functions.service';
 })
 export class EntidadCuentaContableService {
   configEntContableClass = new ConfiguracionEntidadCuentaC();
+  permissions = [Permisos.entidad_cuenta_contable.create, Permisos.entidad_cuenta_contable.update];
 
   constructor() {}
 
@@ -38,8 +40,6 @@ export class EntidadCuentaContableService {
 
     return result;
   }
-
-  'En la cuenta contable para: Cuentas por cobrar, seleccionaste que tiene una agrupación por sin_cuenta, pero no seleccionaste la agrupación.';
 
   parseCuentasFromBackend(cuentas_cuentables: EntidadCuentaContableI[]): FormEntidadCuentaContableI[] {
     return cuentas_cuentables.map((cuenta: EntidadCuentaContableI) => {
