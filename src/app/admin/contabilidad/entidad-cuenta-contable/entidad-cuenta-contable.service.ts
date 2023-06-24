@@ -20,8 +20,9 @@ export class EntidadCuentaContableService {
         for (let index = 0; index < params.entidad_cuentas_contables.length; index++) {
           const cuenta_contable = params.entidad_cuentas_contables[index];
           const current_config = params.configsEntCuentas.find((config) => config.id == cuenta_contable.configuracion_entidad_cuenta_id) as ConfiguracionEntidadCuentaI;
+          const tiposSinComprobacion = [agrupacionesContables.sin_cuenta, agrupacionesContables.individual];
 
-          if (cuenta_contable.tipo_agrupacion_contable != agrupacionesContables.individual && fun.isEmpty(cuenta_contable.tipo_categoria_id)) {
+          if (!tiposSinComprobacion.includes(cuenta_contable.tipo_agrupacion_contable) && fun.isEmpty(cuenta_contable.tipo_categoria_id)) {
             result.error = true;
             result.msg = `En la cuenta contable para: ${this.configEntContableClass.getConfigLabel(current_config)}, seleccionaste que tiene una agrupación por ${cuenta_contable.tipo_agrupacion_contable}, pero no seleccionaste la agrupación.`;
           }
@@ -37,6 +38,8 @@ export class EntidadCuentaContableService {
 
     return result;
   }
+
+  'En la cuenta contable para: Cuentas por cobrar, seleccionaste que tiene una agrupación por sin_cuenta, pero no seleccionaste la agrupación.';
 
   parseCuentasFromBackend(cuentas_cuentables: EntidadCuentaContableI[]): FormEntidadCuentaContableI[] {
     return cuentas_cuentables.map((cuenta: EntidadCuentaContableI) => {

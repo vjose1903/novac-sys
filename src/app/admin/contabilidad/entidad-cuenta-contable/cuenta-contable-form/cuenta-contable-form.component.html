@@ -119,7 +119,7 @@
       </div>
 
       <ng-template #elseBlock>
-        <div class="w-100 rowCategoria">
+        <div class="w-100 rowCategoria danger">
           <span *ngIf="form.controls.has_cuenta.value">Debe seleccinar un tipo de agrupación para la cuenta contable.</span>
           <span *ngIf="!form.controls.has_cuenta.value">{{ catEntContServ.getEntidadContableLabel(inputs.entidad) | titlecase }} no contará con este tipo de cuenta contable.</span>
         </div>

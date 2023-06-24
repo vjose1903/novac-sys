@@ -11,7 +11,7 @@ export interface EntidadCuentaContableI {
   id: number;
   configuracion_entidad_cuenta_id: number;
   key: string;
-  tipo_agrupacion_contable: string;
+  tipo_agrupacion_contable: agrupacionContable;
   is_comun: boolean;
   cuenta_contable: CuentaContable;
   origen_categoria: OrigenCategoria;
@@ -34,7 +34,7 @@ export interface FormEntidadCuentaContableI {
   id?: number;
   tipo_categoria_id: number | null;
   tipo_categoria?: string | null;
-  tipo_agrupacion_contable: string;
+  tipo_agrupacion_contable: agrupacionContable;
   has_cuenta: boolean;
   is_comun: boolean;
   configuracion_entidad_cuenta_id: number;

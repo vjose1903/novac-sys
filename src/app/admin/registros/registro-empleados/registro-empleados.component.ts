@@ -344,22 +344,26 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   async submit() {
-    if (this.configApp.has_contabilidad && !this.editando) {
+    if (this.configApp.has_contabilidad) {
       const entidades_validation = this.validate_cuentas();
 
       if (!entidades_validation.error) {
-        const confirmationObj = {
-          id: 'aviso_cuentas',
-          texto: 'Confirme las <b class="negrita">CUENTAS CONTABLES</b>, una vez registrado el empleado, no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
-          header: 'Confirmación',
-          siFunction: async (instance) => {
-            this.sendData();
-            instance.closeModal('aviso_cuentas', 'cancelar');
-          },
-          width: '30rem',
-        };
+        if (!this.editando) {
+          const confirmationObj = {
+            id: 'aviso_cuentas',
+            texto: 'Confirme las <b class="negrita">CUENTAS CONTABLES</b>, una vez registrado el empleado, no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
+            header: 'Confirmación',
+            siFunction: async (instance) => {
+              this.sendData();
+              instance.closeModal('aviso_cuentas', 'cancelar');
+            },
+            width: '30rem',
+          };
 
-        this.confirmationModal(confirmationObj);
+          this.confirmationModal(confirmationObj);
+        } else {
+          this.sendData();
+        }
       } else {
         fun.toastError(entidades_validation.msg, 'Error');
       }
