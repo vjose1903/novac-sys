@@ -10,9 +10,22 @@ import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
+import { EntidadCuentaContableModule } from '../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.module';
 
 @NgModule({
   declarations: [RegistroClientesComponent],
-  imports: [CommonModule, RegistroClientesRoutingModule, ImgViewerEditModule, TablasModule, ReactiveFormsModule, FormsModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild(), CategoriaEntidadContableModule],
+  imports: [
+    CommonModule,
+    RegistroClientesRoutingModule,
+    ImgViewerEditModule,
+    TablasModule,
+    ReactiveFormsModule,
+    FormsModule,
+    DirectivesModule,
+    PrimengModule,
+    NgxPermissionsModule.forChild(),
+    CategoriaEntidadContableModule,
+    EntidadCuentaContableModule,
+  ],
 })
 export class RegistroClientesModule {}

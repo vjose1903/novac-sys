@@ -1,10 +1,9 @@
+import { ConfigService } from './../../core/services/configuration.service';
 import { ClienteC } from './../registros/registro-clientes/cliente';
 import { FacturaC, tipoDocFacturacion } from './../facturacion/factura';
 import { fun } from './../../core/services/functions.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { Ss } from '../../core/services/singleton.service';
-import { ConfigI } from '../../core/typescript/config-interface.utils';
 
 @Component({
   selector: 'app-homeAdmin',
@@ -17,7 +16,6 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   }
 
   imgLogo;
-  configServ = Ss.configServ;
 
   initCambioMenu(arg) {
     if (arg.bool) this.runFinalizarCambioMenu(arg);
@@ -26,10 +24,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   cedula = null;
   ngOnInit() {
     this._init_mixin({ component: 'home', is_routing: true });
-
-    this.configServ.getConfig().then((config: ConfigI) => {
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-    });
+    this.imgLogo = `data:image/png;base64,${ConfigService.config.logo_empresa}`;
     this.prueba();
   }
 

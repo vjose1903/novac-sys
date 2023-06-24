@@ -1,3 +1,5 @@
+import { ConfigI } from './../../../core/typescript/config-interface.utils';
+import { ConfigService } from './../../../core/services/configuration.service';
 import { RetornarDevueltoComponent } from './retornar-devuelto/retornar-devuelto.component';
 import { FacturacionService } from './../facturacion.service';
 import { tipoDocFacturacion } from './../factura';
@@ -10,8 +12,6 @@ import { BuscarArticuloComponent } from '../../components/formularios en modales
 import { fun } from '../../../core/services/functions.service';
 import { RemoverArticuloComponent } from './remover-articulo/remover-articulo.component';
 import { razon_remover } from './remover-articulo/contantes';
-import { ConfigI } from '../../../core/typescript/config-interface.utils';
-import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
@@ -34,6 +34,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   listaDeDescuentos = [];
   fun = fun;
+  configApp: ConfigI = ConfigService.config;
+
   tipoDocFacturacion = tipoDocFacturacion;
 
   sacos;
@@ -50,7 +52,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   minCodigo;
 
   dropRowConfig: any;
-  configApp: ConfigI;
   constructor(private fb: UntypedFormBuilder, public factServ: FacturacionService) {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
@@ -58,7 +59,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   ngOnInit() {
     this._init_mixin({ component: 'cuerpo_factura', is_routing: false });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.rellenarVariables();
   }
 
@@ -141,7 +141,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
         res = false;
       } else {
-        res = !this.configApp.facturacion_editar_precio;
+        res = !ConfigService.config.facturacion_editar_precio;
       }
     }
 
@@ -327,7 +327,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     controls['is_defectuoso'].setValue(data.is_defectuoso);
     controls['is_devuelto'].setValue(data.is_devuelto || false);
     controls['from_pre_factura'].setValue(data.from_pre_factura || false);
-    controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+    controls['vende_sin_inventario'].setValue(ConfigService.config.vende_sin_inventario);
 
     controls['is_bad_price'].setValue(this.getBadPrice(data).bool);
     controls['actual_price'].setValue(data?.actual_price);
@@ -459,7 +459,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (this.factServ.tipoDocumento == tipoDocFacturacion.venta && !from_pre_factura && excede) {
           fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
-          if (this.configApp.vende_sin_inventario) {
+          if (ConfigService.config.vende_sin_inventario) {
             callback(false);
           } else {
             setTimeout(() => {
@@ -715,7 +715,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (articulo.descripcion.toLowerCase() == 'producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
       fun.toastError(msg, 'ERROR');
 
-      if (this.configApp.vende_sin_inventario) {
+      if (ConfigService.config.vende_sin_inventario) {
         this.continuarLlenarRow({ articulo: articulo, index: index });
       } else {
         setTimeout(() => fun.enfocarAndSelectInput('codigo-' + index), 10);
@@ -745,7 +745,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     (this.factServ.filasDetalle[params.index] as any).controls['cantidad'].setValue(null);
     (this.factServ.filasDetalle[params.index] as any).controls['cantidad_ant'].setValue(null);
     (this.factServ.filasDetalle[params.index] as any).controls['unidad'].setValue(null);
-    (this.factServ.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+    (this.factServ.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(ConfigService.config.vende_sin_inventario);
 
     (this.factServ.filasDetalle[params.index] as any).controls['is_bad_price'].setValue(false);
     (this.factServ.filasDetalle[params.index] as any).controls['actual_price'].setValue(null);

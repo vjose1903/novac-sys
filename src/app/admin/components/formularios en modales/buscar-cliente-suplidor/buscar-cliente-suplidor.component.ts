@@ -1,5 +1,5 @@
+import { ConfigService } from './../../../../core/services/configuration.service';
 import { tipoDocFacturacion } from './../../../facturacion/factura';
-import { Ss } from './../../../../core/services/singleton.service';
 import { Component, OnInit } from '@angular/core';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
 import { ModalI } from '../../modal/modal-class';
@@ -59,7 +59,6 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
-    const configApp = Ss.configServ.getConfig({ isPromise: false });
     const copyData = fun.duplicarJson(this.dataFiltro);
 
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
@@ -84,7 +83,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
         this.dataFiltro = copyData;
       }
 
-      const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
+      const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: ConfigService.config.direccion_empresa, telefono: null };
 
       if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
 

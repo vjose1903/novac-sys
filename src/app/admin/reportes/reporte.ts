@@ -1,4 +1,5 @@
-import { inputViewerOptions, viewerOptions } from './../components/pdf-viewer/pdf-viewer';
+import { ConfigService } from './../../core/services/configuration.service';
+import { viewerOptions } from './../components/pdf-viewer/pdf-viewer';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { Ss } from '../../core/services/singleton.service';
 import { fun } from '../../core/services/functions.service';
@@ -7,7 +8,6 @@ import { FormReportesComponent } from '../components/formularios en modales/form
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import * as _ from 'lodash';
-import { ConfigI } from '../../core/typescript/config-interface.utils';
 
 export class ReporteC extends CrudG<any> {
   private static _objReporte;
@@ -97,25 +97,24 @@ export class ReporteC extends CrudG<any> {
 
   static imprimirPDF(objPdf, modalInstance?) {
     Ss.loadServ.isLoading.next(true);
-    Ss.configServ.getConfig({ isPromise: true }).then((configApp: ConfigI) => {
-      objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
 
-      const entidad = objPdf['type'] == 'reporte' ? 'reporte' : 'cuadre_caja';
-      objPdf['printer'] = configApp.printer_selected[entidad];
+    objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
 
-      PdfService.imprimirBase64(objPdf)
-        .then((res) => {
-          Ss.loadServ.isLoading.next(false);
+    const entidad = objPdf['type'] == 'reporte' ? 'reporte' : 'cuadre_caja';
+    objPdf['printer'] = ConfigService.config.printer_selected[entidad];
 
-          if (res.status === 'si') {
-            fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-            if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
-          } else fun.toastError(res.msg, 'ERROR');
-        })
-        .catch((err) => {
-          Ss.loadServ.isLoading.next(false);
-          fun.toastError(err.msg, 'ERROR');
-        });
-    });
+    PdfService.imprimirBase64(objPdf)
+      .then((res) => {
+        Ss.loadServ.isLoading.next(false);
+
+        if (res.status === 'si') {
+          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
+        } else fun.toastError(res.msg, 'ERROR');
+      })
+      .catch((err) => {
+        Ss.loadServ.isLoading.next(false);
+        fun.toastError(err.msg, 'ERROR');
+      });
   }
 }

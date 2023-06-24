@@ -1,3 +1,4 @@
+import { ConfigService } from './../core/services/configuration.service';
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,7 +12,6 @@ import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota
 import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
-import { Ss } from '../core/services/singleton.service';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
 import { ConfigI } from '../core/typescript/config-interface.utils';
@@ -33,7 +33,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   imgLogo;
 
   requestClass = new RequestC();
-  configServ = Ss.configServ;
   configApp: ConfigI;
 
   constructor(private fb: UntypedFormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {
@@ -45,13 +44,11 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   ngAfterViewInit(): void {
-    this.configServ.getConfig().then((config: ConfigI) => {
-      this.configApp = config;
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-      this.versionApp = config.app_version;
+    this.imgLogo = `data:image/png;base64,${ConfigService.config.logo_empresa}`;
+    this.versionApp = ConfigService.config.app_version;
 
-      this.form = this.fb.group({ usuario: config.is_development ? 'novac' : null, password: config.is_development ? '1234567' : null });
-    });
+    this.form = this.fb.group({ usuario: ConfigService.config.is_development ? 'novac' : null, password: ConfigService.config.is_development ? '1234567' : null });
+
     setTimeout(() => fun.enfocarInput('Iusuario'), 5);
     // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
   }

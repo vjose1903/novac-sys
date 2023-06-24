@@ -1,3 +1,4 @@
+import { ConfigService } from './../../../core/services/configuration.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray } from '@angular/forms';
@@ -13,8 +14,6 @@ import { fun } from '../../../core/services/functions.service';
 import { ModalService } from '../../components/modal/modal.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { ConfigI } from '../../../core/typescript/config-interface.utils';
-import { Ss } from '../../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '../../../core/typescript/constantes';
 import { ModalClass } from '../../components/modal/modal-class';
@@ -92,14 +91,13 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   permissions = Permisos;
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
-  configApp: ConfigI;
   constructor(private fb: UntypedFormBuilder, public mServ: ModalService) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'conduce', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+
     this.form = this.fb.group({
       rowFactura: this.fb.array([this.createItem(0)]),
     });
@@ -255,7 +253,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       if (articulo.descripcion === 'Producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
       fun.toastError(msg, 'ERROR');
 
-      if (this.configApp.vende_sin_inventario) {
+      if (ConfigService.config.vende_sin_inventario) {
         this.continuarLlenarRow({ articulo: articulo, index: index });
       } else {
         setTimeout(() => fun.enfocarAndSelectInput('cod-' + index), 10);
@@ -283,7 +281,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     (this.filasDetalle[params.index] as any).controls['can'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['can_ant'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['uni'].setValue(null);
-    (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+    (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(ConfigService.config.vende_sin_inventario);
 
     setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
   }
@@ -398,7 +396,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
           if (excede) {
             fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
 
-            if (this.configApp.vende_sin_inventario) {
+            if (ConfigService.config.vende_sin_inventario) {
               callback(false);
             } else {
               setTimeout(() => {
@@ -708,7 +706,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         (this.filasDetalle[i] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
         (this.filasDetalle[i] as any).controls['articulo'].setValue(articulo);
 
-        (this.filasDetalle[i] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+        (this.filasDetalle[i] as any).controls['vende_sin_inventario'].setValue(ConfigService.config.vende_sin_inventario);
 
         (this.filasDetalle[i] as any).controls['des'].setValue(articulo.nombre);
         let uni = '';
@@ -749,8 +747,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       fun.enfocarInput('can-' + i);
     }
   }
-
-
 
   getMaxCan(i) {
     const fila_actual = this.filasDetalle[i].getRawValue();

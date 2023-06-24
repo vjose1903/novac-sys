@@ -1,4 +1,4 @@
-import { ConfigI } from './../../../core/typescript/config-interface.utils';
+import { ConfigService } from './../../../core/services/configuration.service';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
@@ -30,7 +30,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   facturasConDetalles: Array<FacturasI>;
   tipoNota: any;
   tituloPag = '';
-  configApp: ConfigI;
 
   tipos = { credito: 'crédito', debito: 'débito' };
 
@@ -85,7 +84,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
 
     this.idsFacturas = this.activeRoute.snapshot.params['ids'];
 
@@ -101,7 +99,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       this.tipoFactura = '03';
     }
 
-    if (this.configApp.calcular_itbis) this.agregarItbisEnTabla();
+    if (ConfigService.config.calcular_itbis) this.agregarItbisEnTabla();
 
     this.necesarioStart();
   }
@@ -230,7 +228,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         params.data.cant_nota = 0;
         params.data.precio_real = fun.numFormatTwoDecimals(params.data.precio);
 
-        const itbis = this.configApp.calcular_itbis ? params.data.precio_real * 0.18 : 0;
+        const itbis = ConfigService.config.calcular_itbis ? params.data.precio_real * 0.18 : 0;
         params.data.itbis_real = fun.numFormatTwoDecimals(itbis);
 
         const index = _.findIndex(this.detalleNota, { id: params.data.id });
@@ -276,7 +274,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
           return;
         } else {
-          const itbis = this.configApp.calcular_itbis ? precio_real * 0.18 : 0;
+          const itbis = ConfigService.config.calcular_itbis ? precio_real * 0.18 : 0;
 
           params.data.precio_real = precio_real;
           params.data.itbis_real = fun.numFormatTwoDecimals(itbis);

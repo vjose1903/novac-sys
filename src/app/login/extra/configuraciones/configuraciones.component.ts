@@ -1,11 +1,10 @@
+import { ConfigService } from './../../../core/services/configuration.service';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { Ss } from '../../../core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { MessageTask } from '../../../core/models/message-task';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
-import { ConfigI } from '../../../core/typescript/config-interface.utils';
 import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
 import { Router } from '@angular/router';
@@ -17,7 +16,6 @@ import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
   styleUrls: ['./configuraciones.component.scss'],
 })
 export class ConfiguracionesComponent implements OnInit {
-  configServ = Ss.configServ;
   config;
   form;
 
@@ -73,13 +71,12 @@ export class ConfiguracionesComponent implements OnInit {
   constructor(private fb: UntypedFormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
 
   ngOnInit(): void {
-    this.configServ.getConfig().then((config: ConfigI) => {
-      this.config = config;
-      this.configCopy = fun.duplicarJson(config);
-      this.parseDocumentosAImprimir(config).then(() => this.createForm(config));
+    this.config = ConfigService.config;
+    this.configCopy = fun.duplicarJson(ConfigService.config);
 
-      fun.logGreen('this.config', this.config);
-    });
+    this.parseDocumentosAImprimir(this.config).then(() => this.createForm(this.config));
+
+    fun.logGreen('this.config', this.config);
   }
 
   createForm(data) {

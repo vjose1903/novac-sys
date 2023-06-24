@@ -2,7 +2,6 @@
 import * as _ from 'lodash';
 import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
-import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface.utils';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes, infoTipoPdf, firmas } from './infoPdfs';
@@ -13,6 +12,7 @@ import { config_conduce } from './configuraciones/conduce';
 import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { fun } from '../../functions.service';
+import { ConfigService } from '../../configuration.service';
 import * as numLetra from '../utils/numero_letras';
 
 const configuraciones = {
@@ -31,17 +31,16 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 
   const is_suplidor = is_compra;
 
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
   const configuration = configuraciones[tipo_pdf];
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
 
   const dd = {
     pageSize: configuration.pageSize,
     pageMargins: configuration.pageMargins,
-    header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf: base_tipo_pdf }),
-    content: contenidoPDF({ data, configApp, configuration, tipo_pdf: base_tipo_pdf }),
+    header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp: ConfigService.config, tipo_pdf: base_tipo_pdf }),
+    content: contenidoPDF({ data, configApp: ConfigService.config, configuration, tipo_pdf: base_tipo_pdf }),
     images: {
-      logo: `data:image/png;base64,${configApp.logo_impresion}`,
+      logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
     },
     styles: styles_,
   };

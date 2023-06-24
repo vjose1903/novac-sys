@@ -1,7 +1,7 @@
+import { ConfigService } from './../../configuration.service';
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
-import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../typescript/config-interface.utils';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
@@ -28,15 +28,13 @@ export function makePDF(data, file_name, tipo_pdf?) {
 
   const is_suplidor = is_compra;
 
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
-
   const dd = {
     pageSize: { width: 200, height: 'auto' },
     pageOrientation: 'portrait',
     pageMargins: [5, 20, 5, 20],
-    content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf),
+    content: contenidoPDF(data, is_suplidor, ConfigService.config, tipo_pdf),
     images: {
-      logo: `data:image/png;base64,${configApp.logo_impresion}`,
+      logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
       barcode: fun_.my_barcode(data.identificador),
     },
     styles: styles_,

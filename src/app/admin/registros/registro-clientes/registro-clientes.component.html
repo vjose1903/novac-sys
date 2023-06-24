@@ -148,6 +148,17 @@
                   </div>
                 </div>
 
+                <div *ngIf="configApp.has_contabilidad" class="col-12 p-0">
+                  <!-- <entidad-cuenta-contable
+                    *ngxPermissionsOnly="cuentasContablesPermissions"
+                    [inputs]="{ configsEntCuentas: listaConfigEmpleados, entidad: entidadContable }"
+                    [configuration]="{ btn: { subCategoria: false } }"
+                    [cuentasContablesDataCruda]="empleadoSelected ? empleadoSelected?.cuentas_contables : []"
+                    [(cuentasContablesData)]="listaEntidadCuentasContables"
+                    [camposDisabled]="camposDisabled"
+                  ></entidad-cuenta-contable> -->
+                </div>
+
                 <div class="col-12 form-group p-0" style="display: flex; justify-content: space-between">
                   <div>
                     <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>

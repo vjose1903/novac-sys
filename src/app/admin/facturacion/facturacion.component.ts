@@ -1,3 +1,5 @@
+import { ConfigI } from './../../core/typescript/config-interface.utils';
+import { ConfigService } from './../../core/services/configuration.service';
 import { EmpleadoC } from '../registros/registro-empleados/empleado.utils';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
@@ -22,7 +24,6 @@ import { fun } from '../../core/services/functions.service';
 import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
 import { teclasCode } from '../../core/typescript/constantes';
 import { Permisos } from '../../core/typescript/permisos';
-import { ConfigI } from '../../core/typescript/config-interface.utils';
 import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../components/modal/modal-class';
@@ -170,10 +171,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   filterCamionesTargets;
   filterChoferesTargets;
   permissions = Permisos;
-  configApp: ConfigI;
   timeInterval;
   tipoDocFacturacion = tipoDocFacturacion;
   fun = fun;
+  configApp: ConfigI = ConfigService.config;
 
   constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, public factServ: FacturacionService) {
     super();
@@ -185,8 +186,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   ngOnInit() {
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
-
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
   }
 
   ngOnDestroy(): void {
@@ -384,7 +383,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.filterChoferesTargets = ['nombre', 'apellido', 'nombre_completo'];
 
         if (this.factServ.tipoDocumento == tipoDocFacturacion.venta) {
-          this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
+          this.form.patchValue({ id: null, nombre: 'Cliente contado', direccion: ConfigService.config.direccion_empresa, telefono: null });
         } else {
           if (fun.hasValue(this.form)) this.form.reset();
         }
@@ -689,7 +688,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   checkCambiosModoyCondicionFactura(arg: { elemento_html?; id?; value? }) {
-
     const sali_de = fun.hasValue(arg.elemento_html) ? arg.elemento_html.id : arg.id;
     const valor = fun.hasValue(arg.elemento_html) ? arg.elemento_html.value : arg.value;
 
@@ -936,8 +934,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     return is_disabled;
   }
-
-
 
   getCamionInfo(camion, key) {
     let res;
@@ -1194,7 +1190,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-
     let si = (instance) => {
       if (this.factServ.action !== actionFacturacion.update) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/new/0`).then((res_router) => this.resetVariables());
       else if (this.factServ.action == actionFacturacion.update || this.factServ.action == actionFacturacion.bill_from_cotizacion) this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
@@ -1387,7 +1382,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) {
         this.cuerpoFactura.map((detalle) => {
-          detalle.itbis = this.configApp.calcular_itbis ? fun.desformatear(detalle.itbis) : 0;
+          detalle.itbis = ConfigService.config.calcular_itbis ? fun.desformatear(detalle.itbis) : 0;
           detalle.retirado = this.modo_factura === 'adelantada' ? 0 : detalle.cantidad_en_unidades;
           detalle.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : detalle.cantidad_en_unidades;
 
@@ -1695,7 +1690,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
-
 
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

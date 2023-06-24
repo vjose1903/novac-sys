@@ -1,4 +1,4 @@
-import { Ss } from './../../../core/services/singleton.service';
+import { ConfigService } from './../../../core/services/configuration.service';
 import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { FormEntidadCuentaContableI } from './../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
@@ -68,8 +68,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   maxDateBirth = new Date();
 
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.user;
+  cuentasContablesPermissions = [Permisos.entidad_cuenta_contable.create, Permisos.entidad_cuenta_contable.update];
 
-  configApp: ConfigI;
+  configApp: ConfigI = ConfigService.config;
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
@@ -114,8 +115,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   async necesarioStart() {
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
-
     await this.createForm();
     await this.getEmpleados(this.tServ.obj_paginate.default);
     await this.getRoles();
@@ -344,7 +343,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   async submit() {
-    if (this.configApp.has_contabilidad) {
+    if (ConfigService.config.has_contabilidad) {
       const entidades_validation = this.validate_cuentas();
 
       if (!entidades_validation.error) {
@@ -389,7 +388,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     const objSend = _.omit(formulario, ['cedula']);
 
-    if (this.configApp.has_contabilidad) objSend['cuentas_contables'] = this.listaEntidadCuentasContables;
+    if (ConfigService.config.has_contabilidad) objSend['cuentas_contables'] = this.listaEntidadCuentasContables;
 
     if (!this.editando && fun.isEmpty(objSend.password)) {
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');

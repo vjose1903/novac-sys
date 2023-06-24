@@ -1,13 +1,12 @@
+import { ConfigService } from './../../../core/services/configuration.service';
 import { ModalClass } from './../../components/modal/modal-class';
 import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from './../../../core/services/pdf/pdf.service';
 import { LoaderService } from './../../../loader/loader.service';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
-import { Ss } from './../../../core/services/singleton.service';
 import { ModalService } from './../../components/modal/modal.service';
 import { table_config } from './../../components/new_tablas/tabla-class';
-import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { Permisos } from './../../../core/typescript/permisos';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from './../../../core/typescript/MixinClass';
@@ -51,7 +50,6 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
   tablaComponent;
 
   permissions = Permisos;
-  configApp: ConfigI;
 
   conduceClass = new ConduceC();
 
@@ -61,7 +59,6 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnInit() {
     this._init_mixin({ component: 'lista_conduce', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.necesarioStart();
   }
 
@@ -226,7 +223,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
   }
 
   imprimir_base64(fileName, base64, pageOrientation) {
-    const obj = { base64: base64, file: fileName, type: 'conduce', printer: this.configApp.printer_selected.conduce, pageOrientation: pageOrientation };
+    const obj = { base64: base64, file: fileName, type: 'conduce', printer: ConfigService.config.printer_selected.conduce, pageOrientation: pageOrientation };
     try {
       PdfService.imprimirBase64(obj)
         .then(async (res) => {

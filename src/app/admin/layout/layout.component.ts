@@ -1,3 +1,4 @@
+import { ConfigService } from './../../core/services/configuration.service';
 import { TiposFacturaC } from './../facturacion/factura';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -12,7 +13,6 @@ import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
 import { Ss } from '../../core/services/singleton.service';
-import { ConfigI } from '../../core/typescript/config-interface.utils';
 import { fun } from '../../core/services/functions.service';
 
 @Component({
@@ -45,7 +45,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   cuadre_hoy;
   ant_event_change_visibility;
 
-  configServ = Ss.configServ;
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
@@ -102,10 +101,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (res) this.setUser(res);
     });
 
-    this.configServ.getConfig().then((config: ConfigI) => {
-      fun.logYellow('config ', config);
-      this.versionApp = config.app_version;
-    });
+
+    fun.logYellow('config ', ConfigService.config);
+    this.versionApp = ConfigService.config.app_version;
   }
 
   ngAfterViewInit() {

@@ -1,4 +1,4 @@
-import { tFacturaD } from './../../../admin/facturacion/factura';
+import { ConfigService } from './../configuration.service';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 const pdfMake = require('pdfmake/build/pdfmake.js');
@@ -12,7 +12,6 @@ import * as reportes from './reportes';
 import { Ss } from '../singleton.service';
 import { MessageTask } from '../../models/message-task';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
-import { ConfigI } from '../../typescript/config-interface.utils';
 import { fun } from '../functions.service';
 
 @Injectable({ providedIn: 'root' })
@@ -26,10 +25,9 @@ export class PdfService {
       const data = fun.duplicarJson(params.oPdf.data);
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
-      const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
       let options;
-      let printer_selected = config.printer_selected[type_oPdf];
+      let printer_selected = ConfigService.config.printer_selected[type_oPdf];
 
       data['reimprimir'] = reimprimir;
 
@@ -38,44 +36,44 @@ export class PdfService {
         switch (type_oPdf) {
           case 'recibo_ingreso':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            obj = options[config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
+            obj = options[ConfigService.config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
 
           case 'conduce':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
-            obj = options[config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
+            obj = options[ConfigService.config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
             break;
 
           case 'nota':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
-            const tipo_pdf = `_${config.plantillas_impresion['nota'].toLowerCase()}`;
+            const tipo_pdf = `_${ConfigService.config.plantillas_impresion['nota'].toLowerCase()}`;
 
-            obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
+            obj = options[ConfigService.config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
             break;
 
           case 'facturacion':
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
             const tipo_documento = this.getFacturacionType(data);
-            printer_selected = config.printer_selected[tipo_documento];
-            obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', 'ventas');
+            printer_selected = ConfigService.config.printer_selected[tipo_documento];
+            obj = options[ConfigService.config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', 'ventas');
             break;
 
           case 'cotizacion':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            obj = options[config.pages_sizes.cotizacion].makePDF(data, 'cotizacion.pdf', 'cotizacion');
+            obj = options[ConfigService.config.pages_sizes.cotizacion].makePDF(data, 'cotizacion.pdf', 'cotizacion');
             break;
 
           case 'pre_venta':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-            obj = options[config.pages_sizes.pre_venta].makePDF(data, 'pre-venta.pdf', 'pre_venta');
+            obj = options[ConfigService.config.pages_sizes.pre_venta].makePDF(data, 'pre-venta.pdf', 'pre_venta');
             break;
 
           case 'cuadre_caja':
             options = { '80mm_roll': roll80mm, '8.5x5.5': cuadreCaja, '8.5x11': cuadreCaja };
 
-            obj = options[config.pages_sizes.cuadre_caja].makePDF(data, 'cuadre.pdf', 'cuadre_caja');
+            obj = options[ConfigService.config.pages_sizes.cuadre_caja].makePDF(data, 'cuadre.pdf', 'cuadre_caja');
             break;
 
           case 'reporte':

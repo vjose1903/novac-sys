@@ -1,6 +1,5 @@
+import { ConfigService } from './../../../core/services/configuration.service';
 import { Component, HostListener, OnInit } from '@angular/core';
-import { Ss } from '../../../core/services/singleton.service';
-import { ConfigI } from '../../../core/typescript/config-interface.utils';
 import { ModalI } from '../../components/modal/modal-class';
 import { SharedService } from '../../../core/services/shared.service';
 import { teclasCode } from '../../../core/typescript/constantes';
@@ -27,15 +26,13 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
 
   modal: any = {};
   inputs: any;
-  configApp: ConfigI;
   documentos_a_imprimir = [];
   documento;
 
   is_print: boolean;
 
   ngOnInit(): void {
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
-    this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
+    this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(ConfigService.config.documentos_a_imprimir);
     this.documento = this.factServ.getDocumentoDescripcion(this.inputs, true);
 
     this.handleDefaultSwitch();

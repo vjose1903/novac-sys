@@ -1,6 +1,4 @@
-import { inputViewerOptions } from './../../components/pdf-viewer/pdf-viewer';
-import { ConfigI } from './../../../core/typescript/config-interface.utils';
-import { Ss } from './../../../core/services/singleton.service';
+import { ConfigService } from './../../../core/services/configuration.service';
 import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
@@ -26,7 +24,6 @@ export class NotaC extends CrudG<any> {
 
   parseDataToPdf(data) {
     return new Promise((resolve) => {
-      const configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
 
       const pick_nota = ['cliente', 'estado', 'fecha_equivalente', 'fecha_valida', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'usuario', 'facturas_aplicadas', 'tipo_factura_id'];
 
@@ -40,9 +37,9 @@ export class NotaC extends CrudG<any> {
       data_parsed.contenido_reporte = [];
 
       data_parsed.facturas_aplicadas.forEach((factura_aplicada) => {
-        if (configApp.plantillas_impresion.nota == 'Agrupada') data_parsed.contenido_reporte.push(this.parseContentAgrupadoNota(factura_aplicada));
+        if (ConfigService.config.plantillas_impresion.nota == 'Agrupada') data_parsed.contenido_reporte.push(this.parseContentAgrupadoNota(factura_aplicada));
 
-        if (configApp.plantillas_impresion.nota == 'Detallada') data_parsed.contenido_reporte.push(...this.parseContentDetalladoNota(factura_aplicada));
+        if (ConfigService.config.plantillas_impresion.nota == 'Detallada') data_parsed.contenido_reporte.push(...this.parseContentDetalladoNota(factura_aplicada));
       });
 
       data_parsed.contenido_reporte.map((factura_aplicada) => {

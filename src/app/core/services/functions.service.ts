@@ -1,9 +1,8 @@
+import { ConfigService } from './configuration.service';
 import { CustomLodash } from './custom_lodash.service';
 import * as moment from '../javascript/moment';
 import { DocumentosC } from '../typescript/documentos_de_identidad.utils';
 import * as _ from 'lodash';
-
-import { ConfigI } from '../typescript/config-interface.utils';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
 import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
@@ -743,8 +742,7 @@ export class fun extends CustomLodash {
 
   static decryptConfigPassword(str) {
     const str_remplace = btoa(str);
-    const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
-    return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
+    return str_remplace == _.replace(ConfigService.config.config_password, 'VMj$pt30r=', '=');
   }
   // ----------------------------------------------------------------------------------------------------------
 

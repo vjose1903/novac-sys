@@ -1,10 +1,9 @@
+import { ConfigService } from './../../../../core/services/configuration.service';
 import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { SharedService } from '../../../../core/services/shared.service';
-import { ConfigI } from '../../../../core/typescript/config-interface.utils';
-import { Ss } from '../../../../core/services/singleton.service';
 import { teclasCode } from '../../../../core/typescript/constantes';
 
 @Component({
@@ -32,7 +31,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   cambiar_articulos = undefined;
   is_print: boolean;
   documentos_a_imprimir = [];
-  configApp: ConfigI;
 
   constructor(private shServ: SharedService) {
     super();
@@ -51,8 +49,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
-      this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
+      this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(ConfigService.config.documentos_a_imprimir);
       this.handleDefaultSwitch();
 
       if (this.factura_de != 'compra') fun.enfocarInput('inputEfectivo');

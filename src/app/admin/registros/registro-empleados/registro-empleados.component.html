@@ -148,8 +148,9 @@
                       </div>
                     </div>
 
-                    <div class="col-12 p-0">
+                    <div *ngIf="configApp.has_contabilidad" class="col-12 p-0">
                       <entidad-cuenta-contable
+                        *ngxPermissionsOnly="cuentasContablesPermissions"
                         [inputs]="{ configsEntCuentas: listaConfigEmpleados, entidad: entidadContable }"
                         [configuration]="{ btn: { subCategoria: false } }"
                         [cuentasContablesDataCruda]="empleadoSelected ? empleadoSelected?.cuentas_contables : []"

@@ -1,8 +1,8 @@
+import { ConfigService } from './../configuration.service';
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
 import * as numLetra from './utils/numero_letras';
-import { Ss } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface.utils';
 import { infoPagare } from './8.5x5.5/infoPdfs';
 // ==========================================================================================================================================================
@@ -24,15 +24,14 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const is_venta = data.tipo === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
 
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
   const dd = {
     pageSize: is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 },
     pageMargins: getPageMargin(is_contado),
-    header: (currentPage, pageCount, pageSize) => cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp),
-    content: contenidoFacturaVenta(data, is_contado, is_venta, configApp),
+    header: (currentPage, pageCount, pageSize) => cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, ConfigService.config),
+    content: contenidoFacturaVenta(data, is_contado, is_venta, ConfigService.config),
     images: {
-      logo: `data:image/png;base64,${configApp.logo_impresion}`,
+      logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
     },
     styles: styles_,
   };

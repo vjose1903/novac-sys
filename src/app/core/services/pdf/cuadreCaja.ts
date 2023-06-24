@@ -1,7 +1,7 @@
+import { ConfigService } from './../configuration.service';
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
-import { Ss } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface.utils';
 
 // ==========================================================================================================================================================
@@ -9,15 +9,14 @@ import { ConfigI } from '../../typescript/config-interface.utils';
 // ==========================================================================================================================================================
 
 export function makePDF(data) {
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
   try {
     const dd = {
       pageSize: { width: 600, height: 398 },
       pageMargins: [15, 159.5, 15, 15],
-      header: (currentPage, pageCount, pageSize) => cabeceraReporte(data, configApp, currentPage, pageCount),
+      header: (currentPage, pageCount, pageSize) => cabeceraReporte(data, ConfigService.config, currentPage, pageCount),
       content: contenidoReporte(data),
       images: {
-        logo: `data:image/png;base64,${configApp.logo_impresion}`,
+        logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
       },
       styles: styles_,
     };

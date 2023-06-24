@@ -1,3 +1,5 @@
+import { ConfigI } from './../../../core/typescript/config-interface.utils';
+import { ConfigService } from './../../../core/services/configuration.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators } from '@angular/forms';
@@ -12,8 +14,6 @@ import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { ConfigI } from '../../../core/typescript/config-interface.utils';
-import { Ss } from '../../../core/services/singleton.service';
 import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
 import { ModalClass } from '../../components/modal/modal-class';
 
@@ -72,7 +72,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   permissions = Permisos;
   formPermissions = [Permisos.articulo.create, Permisos.articulo.update];
   hasPermissionUpdateFormula = false;
-  configApp: ConfigI;
   medida_config: string;
 
   table_config: table_config = {
@@ -92,6 +91,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   };
   tablaComponent;
   cofig_articulos: ConfigArticuloI;
+  configApp: ConfigI = ConfigService.config;
 
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
@@ -100,8 +100,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   ngOnInit() {
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.createForm();
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
-    this.medida_config = this.configApp.medida_producto_terminado;
+
+    this.medida_config = ConfigService.config.medida_producto_terminado;
 
     this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then((result) => {
       this.hasPermissionUpdateFormula = result;
@@ -727,7 +727,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
       control_en_turno['cantidad_formula'].setValue(fun.formatearNumero(fun.redondearNum(ingredient.cantidad, 4)));
     } catch (error) {
-
       fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
     }
   }

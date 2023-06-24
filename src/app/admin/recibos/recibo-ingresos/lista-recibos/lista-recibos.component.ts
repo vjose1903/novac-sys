@@ -1,3 +1,4 @@
+import { ConfigService } from './../../../../core/services/configuration.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
@@ -11,8 +12,6 @@ import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
-import { ConfigI } from '../../../../core/typescript/config-interface.utils';
-import { Ss } from '../../../../core/services/singleton.service';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
@@ -51,14 +50,12 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   reciboClass = new ReciboC();
 
   permissions = Permisos;
-  configApp: ConfigI;
   constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
   async ngOnInit() {
     this._init_mixin({ component: 'lista_recibos', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.necesarioStart();
   }
 
@@ -210,7 +207,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   imprimir_base64(fileName, base64, pageOrientation) {
-    const obj = { base64: base64, file: fileName, type: 'recibo_ingreso', printer: this.configApp.printer_selected.recibo_ingreso, pageOrientation: pageOrientation };
+    const obj = { base64: base64, file: fileName, type: 'recibo_ingreso', printer: ConfigService.config.printer_selected.recibo_ingreso, pageOrientation: pageOrientation };
     try {
       PdfService.imprimirBase64(obj)
         .then(async (res) => {

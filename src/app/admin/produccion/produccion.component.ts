@@ -1,3 +1,4 @@
+import { ConfigService } from './../../core/services/configuration.service';
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../core/typescript/MixinClass';
@@ -7,8 +8,6 @@ import { ProduccionC } from './produccion';
 import * as $ from 'jquery';
 import { fun } from '../../core/services/functions.service';
 import { medidas, table_config } from '../components/new_tablas/tabla-class';
-import { ConfigI } from '../../core/typescript/config-interface.utils';
-import { Ss } from '../../core/services/singleton.service';
 import { ModalClass } from '../components/modal/modal-class';
 @Component({
   selector: 'app-produccion',
@@ -41,7 +40,6 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   };
   tablaComponent;
 
-  configApp: ConfigI;
   listaProductos = [];
   articuloEditando: any;
   articuloClass = new ArticuloC();
@@ -53,8 +51,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   ngOnInit() {
     this._init_mixin({ component: 'produccion', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
-    this.optionsMedidas[0] = this.configApp.medida_producto_terminado;
+    this.optionsMedidas[0] = ConfigService.config.medida_producto_terminado;
 
     this.getProductosTerminados();
   }

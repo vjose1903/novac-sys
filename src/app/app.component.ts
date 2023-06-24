@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Ss } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from './admin/layout/layout.service';
-import { ConfigurationService } from './core/services/configuration.service';
+import { ConfigService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
 import { PrimeNGConfig } from 'primeng/api';
@@ -66,7 +66,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
     public factServ: FacturacionService,
     public layServ: LayoutService,
-    public configServ: ConfigurationService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
     public permissionsService: NgxPermissionsService,
@@ -79,7 +78,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   ngOnInit(): void {
     Ss.http = this.http;
     Ss.zone = this.zone;
-    Ss.configServ = this.configServ;
     Ss._ipc = this._ipc;
     Ss.factServ = this.factServ;
 
@@ -278,7 +276,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             ThemeService.setTheme(config.color_app || 'green');
             ThemeService.setMode(config.mode_app || 'light');
 
-            this.configServ.setConfig = config;
+            ConfigService.setConfig = config;
             this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 
             resolve(config);

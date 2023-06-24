@@ -1,9 +1,9 @@
+import { ConfigService } from './../configuration.service';
 import { fun } from './../functions.service';
 /* eslint-disable @typescript-eslint/indent */
 import { styles_ } from './utils/files';
 import { getContentWithTablaNormal } from './utils/tabla_normal';
 import { getContentWithTablaAgrupada } from './utils/tabla_agrupada';
-import { Ss } from '../singleton.service';
 import { ConfigI } from '../../typescript/config-interface.utils';
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
 import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
@@ -60,7 +60,6 @@ export function makeReporte(data) {
   const configuration = configuraciones[data.tipo_reporte];
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
   const margin_top = data.mostrar_sub_titulo ? 125 : 111.5;
   const dd = {
@@ -68,13 +67,13 @@ export function makeReporte(data) {
     pageMargins: [10, margin_top, 15, 40],
 
     pageOrientation: pageO,
-    header: cabeceraReporte(data, configuration, configApp),
+    header: cabeceraReporte(data, configuration, ConfigService.config),
     content: contenidoReporte(data, configuration),
     footer: (currentPage, pageCount) => {
       return [{ text: ' ', alignment: 'right', style: 'letra10', margin: [0, 0, 20, 0] }];
     },
     images: {
-      logo: `data:image/png;base64,${configApp.logo_impresion}`,
+      logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
     },
     styles: styles_,
   };

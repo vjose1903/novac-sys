@@ -1,8 +1,9 @@
+import { ConfigService } from './../../../core/services/configuration.service';
+import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { CategoriaEntidadContableService } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
@@ -61,6 +62,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
   };
   tablaComponent;
+
+  configApp: ConfigI = ConfigService.config;
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
     super();
