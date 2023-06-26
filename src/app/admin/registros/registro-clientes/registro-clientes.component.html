@@ -184,12 +184,12 @@
               <div class="botones">
                 <div class="p-0 mt-3" style="display: flex; justify-content: space-between">
                   <div>
-                    <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-
-                    <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ botonLabel }}" id="btn-verde" />
+                    <button class="btn mr-2 btn-blanco" id="borrarBtn" (click)="borrar()">Borrar</button>
+                    <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2 btn-verde" id="sendBtn">{{ botonLabel }}</button>
                   </div>
                   <div>
-                    <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
+                    <!-- <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button> -->
+                    <button class="btn btn-blanco"  id="btnCerrar" (click)="borrar(); isCreando = false">Cerrar</button>
                   </div>
                 </div>
               </div>

@@ -218,7 +218,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     if (fun.hasValue(this.photoData?.fileName) && fun.hasValue(this.photoData?.base_64)) {
-      let idImg = Number(this.photoData.id.replaceAll('divisa-img-', ''));
+      let idImg = Number(`${this.photoData.id}`.replaceAll('divisa-img-', ''));
       idImg = idImg > 0 ? idImg : null;
 
       formValue['imagenes'] = [{ file_name: this.photoData.fileName, base_64: this.photoData.src_img, id: idImg }];

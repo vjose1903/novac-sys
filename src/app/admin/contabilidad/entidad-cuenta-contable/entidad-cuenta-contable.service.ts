@@ -42,7 +42,7 @@ export class EntidadCuentaContableService {
   }
 
   parseCuentasFromBackend(cuentas_cuentables: EntidadCuentaContableI[]): FormEntidadCuentaContableI[] {
-    return cuentas_cuentables.map((cuenta: EntidadCuentaContableI) => {
+    return cuentas_cuentables?.map((cuenta: EntidadCuentaContableI) => {
       const values_pick = ['id', 'configuracion_entidad_cuenta_id', 'tipo_agrupacion_contable', 'is_comun'];
 
       const cuentaParsed: FormEntidadCuentaContableI = fun.pick(fun.duplicarJson(cuenta), values_pick);

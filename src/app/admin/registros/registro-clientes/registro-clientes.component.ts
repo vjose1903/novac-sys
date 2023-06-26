@@ -1,3 +1,4 @@
+import { DocumentoDeIdentidadI } from './../../../core/typescript/documentos_de_identidad.utils';
 import { entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { ConfigService } from './../../../core/services/configuration.service';
@@ -10,7 +11,7 @@ import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 import { customValidators } from '../../../core/typescript/custom-validators';
-import { ClienteC } from './cliente';
+import { ClienteC, ClienteI } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado.utils';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
@@ -29,7 +30,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   botonLabel = '';
   form: UntypedFormGroup;
 
-  listaClientes = [];
+  listaClientes: ClienteI[] = [];
   listaConfigClientes: Array<ConfiguracionEntidadCuentaI> = [];
   listaEntidadCuentasContables: Array<FormEntidadCuentaContableI> = [];
 
@@ -41,12 +42,12 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   doc_principal = 'cedula';
 
   vendedores;
-  documentos_de_identidad: any;
+  documentos_de_identidad: DocumentoDeIdentidadI[];
 
   camposDisabled: boolean = true;
   editando: boolean = false;
   myValidators = new customValidators();
-  clienteSelected;
+  clienteSelected: ClienteI;
   clienteClass = new ClienteC();
   empleadosClass = new EmpleadoC();
   configEntContableClass = new ConfiguracionEntidadCuentaC();
@@ -168,7 +169,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     if (params.action == 'delete') this.eliminarReg(params.data);
   }
 
-  editarItem(data) {
+  editarItem(data: ClienteI) {
     this.documentos_de_identidad = data.documentos_de_identidad;
 
     this.form.patchValue(data);
@@ -179,7 +180,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.photoData = { src_img: data?.img_cliente, id: data?.imagen?.id };
     this.form.controls.img.setValue(data.img_cliente);
-    console.log('this.photoData ', this.photoData);
 
     this.clienteSelected = fun.duplicarJson(data);
 
@@ -317,8 +317,29 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     const result = entidades_validation.valid ? res : !entidades_validation.valid;
 
-    return result;
+    return result || !this.checkIfSomethingIsDiferrent();
   }
+
+  checkIfSomethingIsDiferrent() {
+    const pick_values = ['cedula', 'rnc', 'nombre', 'apellido', 'telefono', 'sexo', 'limite_credito', 'maximo_credito', 'vendedor_id', 'direccion', 'id', 'img'];
+    const formValue = fun.pick(this.form.getRawValue(), pick_values);
+    formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
+    formValue['cuentas_contables'] = fun.duplicarJson(this.listaEntidadCuentasContables);
+
+    const originalCliente = this.listaClientes.find((cliente) => cliente.id == formValue.id);
+    const originalValue = fun.pick(originalCliente, pick_values);
+
+    originalValue['img'] = originalCliente.img_cliente;
+    originalValue['cedula'] = originalCliente?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
+    originalValue['rnc'] = originalCliente?.documentos_de_identidad.find((doc) => doc.descripcion == 'rnc')?.documento;
+    originalValue['cuentas_contables'] = fun.duplicarJson(this.entCuentaContServ.parseCuentasFromBackend(originalCliente?.cuentas_contables));
+
+    return !fun.isEqual(formValue, originalValue);
+  }
+
+  // test() {
+  //   console.log(this.checkIfSomethingIsDiferrent());
+  // }
 
   revisarPrecio(id) {
     const input = this.form.controls[id];
@@ -386,7 +407,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       formulario.documentos_de_identidad = documentos_identidad;
 
       if (fun.hasValue(this.photoData?.fileName) && fun.hasValue(this.photoData?.base_64)) {
-        let idImg = Number(this.photoData.id.replaceAll('cliente-img-', ''));
+        let idImg = Number(`${this.photoData.id}`.replaceAll('cliente-img-', ''));
         idImg = idImg > 0 ? idImg : null;
 
         formulario['imagenes'] = [{ file_name: this.photoData.fileName, base_64: this.photoData.src_img, id: idImg }];

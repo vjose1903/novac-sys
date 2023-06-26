@@ -14,6 +14,7 @@ export interface DivisaI {
   simbolo: string;
   is_principal: boolean;
   estado: boolean;
+  imagen: ImagenI;
   imagenes: ImagenI[];
   img_divisa?: string;
   current_tasa: number;

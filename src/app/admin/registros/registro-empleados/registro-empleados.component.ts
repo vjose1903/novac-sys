@@ -244,7 +244,27 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     const result = entidades_validation.valid ? res : !entidades_validation.valid;
 
-    return result;
+    return result || !this.checkIfSomethingIsDiferrent();
+  }
+
+  checkIfSomethingIsDiferrent() {
+    const pick_values = ['cedula', 'nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles', 'id'];
+    const formValue = fun.pick(this.form.getRawValue(), pick_values);
+    formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
+    formValue['cuentas_contables'] = fun.duplicarJson(this.listaEntidadCuentasContables);
+
+    const originalEmpleado = this.listaEmpleados.find((empleado) => empleado.id == formValue.id);
+    const originalValue = fun.pick(originalEmpleado, pick_values);
+
+    originalValue['cedula'] = originalEmpleado?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
+    originalValue['ids_roles'] = originalEmpleado?.roles?.map((rol) => rol.id);
+    originalValue['cuentas_contables'] = fun.duplicarJson(this.entCuentaContServ.parseCuentasFromBackend(originalEmpleado?.cuentas_contables));
+
+    return !fun.isEqual(formValue, originalValue);
+  }
+
+  test() {
+    const a = this.checkIfSomethingIsDiferrent();
   }
 
   changeStateCampos(enable = false) {
@@ -318,7 +338,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     }
 
     const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map((rol) => rol.id) });
-    this.form.patchValue(objPerson);
+    this.form.patchValue(fun.duplicarJson(objPerson));
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 

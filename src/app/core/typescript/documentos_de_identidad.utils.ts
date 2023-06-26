@@ -5,3 +5,10 @@ export class DocumentosC extends CrudG<any> {
     super('documentos_de_identidad');
   }
 }
+
+export interface DocumentoDeIdentidadI {
+  descripcion: 'cedula' | 'rnc';
+  documento: string;
+  principal: boolean;
+  id: number;
+}

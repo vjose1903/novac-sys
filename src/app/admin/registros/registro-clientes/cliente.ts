@@ -6,6 +6,9 @@ import { ConfigureModalI, ModalClass } from '../../components/modal/modal-class'
 import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
+import { ImagenI } from '../../../core/typescript/imagen.utils';
+import { EntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
+import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
@@ -110,4 +113,32 @@ export class ClienteC extends CrudG<any> {
     };
     return objModal;
   }
+}
+
+export interface ClienteI {
+  id: number;
+  nombre: string;
+  estado: boolean;
+  apellido: string;
+  limite_credito: number;
+  telefono: string;
+  direccion: string;
+  sexo: string;
+  maximo_credito: number;
+  vendedor_id: number;
+  balance: number;
+  vendedor: Vendedor;
+  nombre_completo?: string;
+  documentos_de_identidad: DocumentoDeIdentidadI[];
+  cuentas_contables?: EntidadCuentaContableI[];
+  imagenes?: ImagenI[];
+  imagen?: ImagenI;
+  img_cliente: string;
+  [nombreProp: string]: any;
+}
+
+export interface Vendedor {
+  nombre: string;
+  apellido: string;
+  nombre_completo: string;
 }
