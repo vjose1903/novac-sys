@@ -10,7 +10,7 @@ import { NgxBootstrapModule } from './modules/ngx-bootstrap.module';
 import { ToastrModule } from 'ngx-toastr';
 import { NgInitDirective } from './directives/ngInit';
 import { PrimengModule } from './modules/primeng.module';
-import { InterceptorService } from './loader/interceptor.service';
+import { InterceptorService } from './core/services/interceptor.service';
 import { AppRoutingModule } from './app.routing';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';

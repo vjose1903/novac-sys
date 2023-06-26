@@ -9,12 +9,12 @@ const routes: Routes = [
   {
     path: '',
     component: RegistroSuplidoresComponent,
-    canActivate: [NgxPermissionsGuard],
-    data: {
-      permissions: {
-        only: Object.values(Permisos.suplidor),
-      },
-    },
+    // canActivate: [NgxPermissionsGuard],
+    // data: {
+    //   permissions: {
+    //     only: Object.values(Permisos.suplidor),
+    //   },
+    // },
   },
 ];
 

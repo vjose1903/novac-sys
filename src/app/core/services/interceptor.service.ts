@@ -1,4 +1,4 @@
-import { ConfigService } from './../core/services/configuration.service';
+import { ConfigService } from './configuration.service';
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -6,24 +6,24 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map, finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
 import * as _ from 'lodash';
-import { Ss } from '../core/services/singleton.service';
-import { fun } from '../core/services/functions.service';
-import { SharedService } from '../core/services/shared.service';
+import { Ss } from './singleton.service';
+import { fun } from './functions.service';
+import { SharedService } from './shared.service';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
-  constructor(public loadServ: LoaderService, public sharedServ: SharedService) {}
+  constructor(public sharedServ: SharedService) {}
   requestCount: number = 0;
 
   private startRequest(args?): void {
-    if (this.requestCount <= 0 && args != 'no_show') this.loadServ.isLoading.next(true);
+    if (this.requestCount <= 0 && args != 'no_show') Ss.loadServ.isLoading.next(true);
     this.requestCount++;
   }
 
   private endRequest(args?): void {
     if (this.requestCount > 0 && args != 'no_show') this.requestCount--;
 
-    if (this.requestCount == 0 && args != 'no_hide') this.loadServ.isLoading.next(false);
+    if (this.requestCount == 0 && args != 'no_hide') Ss.loadServ.isLoading.next(false);
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -31,8 +31,10 @@ export class InterceptorService implements HttpInterceptor {
     const token = fun.getAuthToken();
 
     let spinner = request.params.get('spinner');
+    let msgs = request.params.get('msgs');
+    let show_msgs = fun.hasValue(msgs) ? (msgs == 'no_show' ? false : true) : true;
 
-    let sendParams;
+    let sendParams = request.params.delete('msgs', msgs);
     if (spinner) sendParams = request.params.delete('spinner', spinner); // creando la nueva instancia de HttpParams sin el parametro spinner
 
     if (!spinner || spinner == 'no_hide') this.startRequest(spinner); // Activa el spinner
@@ -54,7 +56,7 @@ export class InterceptorService implements HttpInterceptor {
     return next.handle(request).pipe(
       map((event) => {
         if (event instanceof HttpResponse) {
-          if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
+          if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, show_msgs, 'success');
 
           ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
             const headerValue = event.headers.get(header);
@@ -77,9 +79,9 @@ export class InterceptorService implements HttpInterceptor {
           this.sharedServ.nextCanToast(false);
           Ss.layServ.nextLogOut({ bool: true, quien: 'close_session' });
         } else {
-          if (fun.objHas(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
+          if (fun.objHas(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, show_msgs, 'warning');
 
-          if (fun.objHas(response, 'error.msg')) this.handler_msg(response.error.msg, 'error');
+          if (fun.objHas(response, 'error.msg')) this.handler_msg(response.error.msg, show_msgs, 'error');
         }
 
         return throwError(response);
@@ -90,17 +92,17 @@ export class InterceptorService implements HttpInterceptor {
     );
   }
 
-  handler_msg(menssages, tipo_) {
+  handler_msg(menssages, show_msgs, tipo) {
     // console.warn('MENSAJE DESDE EL INTERCEPTOR');
     // console.warn('menssages ', menssages);
 
-    if (menssages && Array.isArray(menssages)) {
+    if (show_msgs && menssages && Array.isArray(menssages)) {
       for (let i = 0; i < menssages.length; i++) {
         const menssage = menssages[i];
 
-        if (tipo_ === 'success') fun.toastSuccess(menssage, 'CORRECTO');
-        if (tipo_ === 'warning') fun.toastWarning(menssage, 'AVISO');
-        if (tipo_ === 'error') fun.toastError(menssage, 'ERROR');
+        if (tipo === 'success') fun.toastSuccess(menssage, 'CORRECTO');
+        if (tipo === 'warning') fun.toastWarning(menssage, 'AVISO');
+        if (tipo === 'error') fun.toastError(menssage, 'ERROR');
       }
     }
   }

@@ -6,7 +6,6 @@ import * as moment from '../../../core/javascript/moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import { LoaderService } from '../../../loader/loader.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
@@ -87,7 +86,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
 
-  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService) {
     super();
   }
 
@@ -711,17 +710,17 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   reimprimirDocumento(obj, modalInstance) {
-    this.loadServ.isLoading.next(true);
+    Ss.loadServ.isLoading.next(true);
     PdfService.generatePdf({ oPdf: obj, imprimir: true })
       .then(async (res) => {
-        this.loadServ.isLoading.next(false);
+        Ss.loadServ.isLoading.next(false);
         if (res.status === 'si') {
           fun.toastSuccess(res.msg, 'CORRECTO');
           modalInstance.closeModal(modalInstance.id, 'imprimir');
         } else fun.toastError(res.msg, 'ERROR');
       })
       .catch((err) => {
-        this.loadServ.isLoading.next(false);
+        Ss.loadServ.isLoading.next(false);
         fun.toastError(err.msg, 'ERROR');
       });
   }

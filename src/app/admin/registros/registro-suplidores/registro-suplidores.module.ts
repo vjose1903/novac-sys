@@ -1,3 +1,4 @@
+import { EntidadCuentaContableModule } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -12,6 +13,6 @@ import { CategoriaEntidadContableModule } from '../../contabilidad/categoria-ent
 
 @NgModule({
   declarations: [RegistroSuplidoresComponent],
-  imports: [CommonModule, RegistroSuplidoresRoutingModule, ReactiveFormsModule, FormsModule, TablasModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild(), CategoriaEntidadContableModule],
+  imports: [CommonModule, RegistroSuplidoresRoutingModule, ReactiveFormsModule, FormsModule, TablasModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild(), CategoriaEntidadContableModule, EntidadCuentaContableModule],
 })
 export class RegistroSuplidoresModule {}

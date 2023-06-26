@@ -76,7 +76,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   async getCategorias() {
-    CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad }).then((res) => {
+    CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad, showMsgs: false }).then((res) => {
       this.listadoCategorias = res['data'];
     });
   }

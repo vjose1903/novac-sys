@@ -1,10 +1,10 @@
+import { Ss } from './../../../../core/services/singleton.service';
 import { ConfigService } from './../../../../core/services/configuration.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
@@ -50,7 +50,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   reciboClass = new ReciboC();
 
   permissions = Permisos;
-  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(private router: Router, private tServ: TablasService) {
     super();
   }
 
@@ -159,7 +159,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   generarPdf(obj) {
-    this.loadServ.isLoading.next(true);
+    Ss.loadServ.isLoading.next(true);
 
     PdfService.generatePdf({ oPdf: obj, imprimir: false })
       .then(async (res) => {
@@ -170,7 +170,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
           const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
-          this.loadServ.isLoading.next(false);
+          Ss.loadServ.isLoading.next(false);
 
           this.openNewModal({
             component: PdfViewerComponent,
@@ -198,7 +198,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
           });
         }
       })
-      .catch(() => this.loadServ.isLoading.next(false));
+      .catch(() => Ss.loadServ.isLoading.next(false));
   }
 
   verDetalles(data) {

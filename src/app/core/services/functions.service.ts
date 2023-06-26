@@ -812,24 +812,4 @@ export class fun extends CustomLodash {
     amount = parseInt(`${(255 * amount) / 100}`);
     return (color = `#${this.subtractLight(color.substring(0, 2), amount)}${this.subtractLight(color.substring(2, 4), amount)}${this.subtractLight(color.substring(4, 6), amount)}`);
   }
-
-  // =====================================================================
-  // TOASTS
-  // =====================================================================
-
-  static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '');
-  }
-
-  static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '');
-  }
-
-  static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '');
-  }
-
-  static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '');
-  }
 }

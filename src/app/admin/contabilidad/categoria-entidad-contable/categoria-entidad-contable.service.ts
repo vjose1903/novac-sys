@@ -1,3 +1,4 @@
+import { ToastService } from './../../../core/services/toast.service';
 import { ConfiguracionEntidadCuentaI } from './../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { fun } from './../../../core/services/functions.service';
 import { CategoriaEntidadContableC, CategoriaEntidadContableI, entidadesContables } from './categoria-entidad-contable.utils';
@@ -39,11 +40,14 @@ export class CategoriaEntidadContableService {
     });
   }
 
-  static getCategoriasByEntidad(params: { entidad: entidadesContables; config_id: number; search?: string; per_page?: number; page?: number; paginado?: boolean }) {
+  static getCategoriasByEntidad(params: { entidad: entidadesContables; config_id: number; search?: string; per_page?: number; page?: number; paginado?: boolean; showMsgs?: boolean }) {
     return new Promise<any>((resolve, reject) => {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+      if (!fun.objHas(params, 'showMsgs') || fun.isEmpty(params.showMsgs)) params.showMsgs = true;
 
       const extra = { parameters: { page: params.page, per_page: params.per_page, paginado: params.paginado, filter_target: palabra_a_buscar, configuracion_id: params.config_id } };
+
+      if (!params.showMsgs) extra['requestParams'] = [ToastService.noShowMsgs];
 
       this.categoriaEntContClass.getAll(extra).then((res) => {
         res['data'].map((categoria: CategoriaEntidadContableI) => {

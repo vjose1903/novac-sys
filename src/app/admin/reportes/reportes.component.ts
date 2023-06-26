@@ -1,7 +1,6 @@
 import { Permisos } from './../../core/typescript/permisos';
 import { Ss } from './../../core/services/singleton.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { LoaderService } from '../../loader/loader.service';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import * as _ from 'lodash';
 import { ReporteC } from './reporte';
@@ -41,14 +40,13 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     notas: NotaC,
   };
 
-  constructor(public loadServ: LoaderService) {
+  constructor() {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'reportes', is_routing: true });
     Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermisoCamiones = result));
-    
   }
 
   iniciarCambioMenu(arg, callback) {

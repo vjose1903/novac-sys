@@ -1,3 +1,7 @@
+import { entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
+import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
+import { ConfigService } from './../../../core/services/configuration.service';
+import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -6,13 +10,14 @@ import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
-import { SuplidorC } from './suplidores';
+import { SuplidorC, SuplidorI } from './suplidores';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
+import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -22,12 +27,13 @@ import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-
 export class RegistroSuplidoresComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;
 
-  boton = '';
+  botonLabel = '';
   metodo;
   pattern = pattern;
 
-  listaSuplidores = [];
+  listaSuplidores: SuplidorI[] = [];
   listaConfigSuplidores: Array<ConfiguracionEntidadCuentaI> = [];
+  listaEntidadCuentasContables: Array<FormEntidadCuentaContableI> = [];
 
   suplidorSelected;
   doc_is_cedula = false;
@@ -61,14 +67,17 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   tablaComponent;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
-  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService) {
+  entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.suplidor;
+  configApp: ConfigI = ConfigService.config;
+
+  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_suplidores', is_routing: true });
 
-    this.boton = 'Registrar';
+    this.botonLabel = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
 
     this.form = this.fb.group({
@@ -137,14 +146,14 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
-    this.boton = 'Registrar';
 
+    this.botonLabel = 'Registrar';
     this.doc_is_cedula = false;
-    this.documentos_de_identidad = undefined;
-
-    this.suplidorSelected = undefined;
+    [this.documentos_de_identidad, this.suplidorSelected] = Array(2).fill(undefined);
     this.isCreando = true;
     this.changeStateCampos(false);
+
+    this.listaEntidadCuentasContables = [];
 
     setTimeout(() => {
       this.marcarCheck('rnc');
@@ -297,16 +306,18 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   editarItem(data) {
-    this.boton = 'Editar';
+    this.botonLabel = 'Editar';
     this.form.patchValue(data);
     this.documentos_de_identidad = data.documentos_de_identidad;
     this.editando = true;
+    this.patchDocumentos(data.documentos_de_identidad);
+
+    this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
+
     this.suplidorSelected = fun.duplicarJson(data);
 
-    this.changeStateCampos(true);
-
-    this.patchDocumentos(data.documentos_de_identidad);
     setTimeout(() => fun.enfocarInput('rnc'), 1);
+    this.changeStateCampos(true);
   }
 
   patchDocumentos(documentos) {
@@ -333,10 +344,65 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     } else {
       res = true;
     }
-    return res;
+
+    const entidades_validation = this.validate_cuentas();
+
+    const result = entidades_validation.valid ? res : !entidades_validation.valid;
+
+    // return result || !this.checkIfSomethingIsDiferrent();
+    return result;
+  }
+
+  checkIfSomethingIsDiferrent() {
+    const pick_values = ['cedula', 'rnc', 'nombre', 'telefono', 'direccion', 'email', 'id'];
+    const formValue = fun.pick(this.form.getRawValue(), pick_values);
+
+    const originalCliente = this.listaSuplidores.find((suplidor) => suplidor.id == formValue.id);
+    const originalValue = fun.pick(originalCliente, pick_values);
+
+    originalValue['cedula'] = originalCliente?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
+
+    return !fun.isEqual(formValue, originalValue);
+  }
+
+  test() {
+    console.log('--> ', this.checkIfSomethingIsDiferrent());
+  }
+
+  validate_cuentas() {
+    return this.entCuentaContServ.validateEntidades({ configsEntCuentas: this.listaConfigSuplidores, entidad_cuentas_contables: this.listaEntidadCuentasContables });
   }
 
   submit() {
+    if (ConfigService.config.has_contabilidad) {
+      const entidades_validation = this.validate_cuentas();
+
+      if (!entidades_validation.error) {
+        if (!this.editando) {
+          const confirmationObj = {
+            id: 'aviso_cuentas',
+            texto: 'Confirme las <b class="negrita">CUENTAS CONTABLES</b>, una vez registrado el suplidor, no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
+            header: 'Confirmación',
+            siFunction: async (instance) => {
+              this.sendData();
+              instance.closeModal('aviso_cuentas', 'cancelar');
+            },
+            width: '30rem',
+          };
+
+          this.confirmationModal(confirmationObj);
+        } else {
+          this.sendData();
+        }
+      } else {
+        fun.toastError(entidades_validation.msg, 'Error');
+      }
+    } else {
+      this.sendData();
+    }
+  }
+
+  sendData() {
     let formulario = this.form.getRawValue();
 
     const documentos_identidad = [
@@ -353,6 +419,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     formulario.documentos_de_identidad = _.filter(documentos_identidad, (doc) => fun.hasValue(doc.documento));
     formulario.estado = true;
+
+    if (ConfigService.config.has_contabilidad) formulario['cuentas_contables'] = this.listaEntidadCuentasContables;
 
     if (!this.form.controls[this.doc_principal].value) {
       fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');

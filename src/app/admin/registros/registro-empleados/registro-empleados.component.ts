@@ -12,7 +12,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { TablasService } from '../../components/new_tablas/tablas.service';
-import { EmpleadoC } from './empleado.utils';
+import { EmpleadoC, EmpleadoI } from './empleado.utils';
 import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 import { fun } from '../../../core/services/functions.service';
 import { RolesC } from '../roles/roles';
@@ -20,6 +20,7 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 
 import { Permisos } from '../../../core/typescript/permisos';
 import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
+import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -31,14 +32,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   pattern = pattern;
 
   isCreando: boolean = false;
-  listaEmpleados = [];
+  listaEmpleados: EmpleadoI[] = [];
   listaConfigEmpleados: Array<ConfiguracionEntidadCuentaI> = [];
   listaEntidadCuentasContables: Array<FormEntidadCuentaContableI> = [];
 
   editando = false;
-  empleadoSelected: any;
+  empleadoSelected: EmpleadoI;
   indexBorrar: any;
-  documentos_de_identidad: any;
+  documentos_de_identidad: DocumentoDeIdentidadI[];
 
   camposDisabled = true;
   empleadosClass = new EmpleadoC();
@@ -328,6 +329,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   editarItem(data) {
+
     this.borrar();
     if (fun.hasValue(this.form)) this.form.reset();
     this.documentos_de_identidad = data.documentos_de_identidad;

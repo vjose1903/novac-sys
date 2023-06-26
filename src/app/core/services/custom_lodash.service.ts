@@ -1,7 +1,11 @@
+import { ToastService } from './toast.service';
 import { fun } from './functions.service';
 
-export class CustomLodash {
-  constructor() {}
+export class CustomLodash extends ToastService {
+
+  constructor() {
+    super();
+  }
   // __________________________________________________________________________________________________
   // Nombre: pushAt
   // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo

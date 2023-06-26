@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/co
 import * as _ from 'lodash';
 import { TablasService } from '../components/new_tablas/tablas.service';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { LoaderService } from '../../../app/loader/loader.service';
 import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
 import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
@@ -56,7 +55,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   tipoArticuloClass = new TipoArticuloC();
   reporteClass = new ReporteC();
 
-  constructor(private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(private tServ: TablasService) {
     super();
   }
 
@@ -117,8 +116,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   filtrarArticulos() {
     const actualPagination = this.tServ.getPaginationById('lista_inventario');
     actualPagination['search'] = this.palabra_buscar;
-
-    
 
     if (this.filtro != 'todos') {
       if (fun.isEmpty(actualPagination['ant_page'])) {

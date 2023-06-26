@@ -6,5 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class LoaderService {
   public isLoading = new BehaviorSubject(false);
+  static noShowSppiner = { key: 'spinner', value: 'no_show' };
+
   constructor() {}
 }

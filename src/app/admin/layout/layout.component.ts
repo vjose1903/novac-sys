@@ -1,3 +1,4 @@
+import { LoaderService } from './../../core/services/loader.service';
 import { ConfigService } from './../../core/services/configuration.service';
 import { TiposFacturaC } from './../facturacion/factura';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
@@ -101,7 +102,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (res) this.setUser(res);
     });
 
-
     fun.logYellow('config ', ConfigService.config);
     this.versionApp = ConfigService.config.app_version;
   }
@@ -169,7 +169,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   checkCuadre() {
     if (!this.chequiando_cuadre) {
-      let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [{ key: 'spinner', value: 'no_show' }] };
+      let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [LoaderService.noShowSppiner] };
       this.chequiando_cuadre = true;
       new CuadreCajaC().getAll(extra).then((res) => {
         this.cuadre_hoy = res['data'].existe_cuadre_hoy;

@@ -1,8 +1,8 @@
+import { Ss } from './../../../core/services/singleton.service';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { ModalClass } from './../../components/modal/modal-class';
 import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from './../../../core/services/pdf/pdf.service';
-import { LoaderService } from './../../../loader/loader.service';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { ModalService } from './../../components/modal/modal.service';
@@ -53,7 +53,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   conduceClass = new ConduceC();
 
-  constructor(public mServ: ModalService, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(public mServ: ModalService, private router: Router, private tServ: TablasService) {
     super();
   }
 
@@ -160,7 +160,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   makeConducePdf(conduce_selected) {
     const obj = { data: conduce_selected, type: 'conduce', retunBase64: true };
-    this.loadServ.isLoading.next(true);
+    Ss.loadServ.isLoading.next(true);
 
     PdfService.generatePdf({ oPdf: obj, imprimir: false })
       .then(async (res) => {
@@ -171,7 +171,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
           const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
-          this.loadServ.isLoading.next(false);
+          Ss.loadServ.isLoading.next(false);
 
           this.openNewModal({
             component: PdfViewerComponent,
@@ -198,7 +198,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
           });
         }
       })
-      .catch(() => this.loadServ.isLoading.next(false));
+      .catch(() => Ss.loadServ.isLoading.next(false));
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {

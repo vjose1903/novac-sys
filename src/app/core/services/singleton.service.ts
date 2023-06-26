@@ -1,7 +1,7 @@
+import { LoaderService } from './loader.service';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Injectable, NgZone } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { LoaderService } from '../../loader/loader.service';
 import { LayoutService } from '../../admin/layout/layout.service';
 import { IpcService } from './ipc.service';
 import { SharedService } from './shared.service';

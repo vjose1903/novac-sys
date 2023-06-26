@@ -1,5 +1,6 @@
+import { LoaderService } from './core/services/loader.service';
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener } from '@angular/core';
-import { LoaderService } from './loader/loader.service';
+
 import { IpcService } from './core/services/ipc.service';
 import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
 import * as _ from 'lodash';
