@@ -61,4 +61,8 @@ export class DivisaService {
       fun.toastError('Error buscando empleados registrados.', 'ERROR');
     }
   }
+
+  getDivisaInfoById(id: number) {
+    return this.listaDivisas.find((divisa) => divisa.id == id);
+  }
 }

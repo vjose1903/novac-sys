@@ -215,7 +215,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   changeStateCampos(enable = false) {
-    const actual_state = this.form.controls.nombre.status;
 
     ['nombre', 'apellido', 'direccion', 'sexo', 'telefono', 'limite_credito', 'maximo_credito', 'vendedor_id'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();

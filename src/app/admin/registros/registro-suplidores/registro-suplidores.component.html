@@ -33,6 +33,7 @@
                             mask="999-9999999-9"
                             tabindex="-1"
                             styleClass="form-control with-right-btn"
+                            class="w-100"
                             inputId="cedula"
                             placeholder="___-_______-_"
                             formControlName="cedula"
@@ -40,7 +41,7 @@
                           ></p-inputMask>
 
                           <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                            <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                            <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                           </div>
                         </div>
                         <span id="msgContainer"></span>
@@ -54,6 +55,7 @@
                             mask="999-99999-9"
                             tabindex="-1"
                             styleClass="form-control with-right-btn"
+                            class="w-100"
                             inputId="rnc"
                             placeholder="___-_____-_"
                             formControlName="rnc"
@@ -61,7 +63,7 @@
                           ></p-inputMask>
 
                           <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                            <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                            <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                           </div>
                         </div>
                         <span id="msgContainer"></span>
@@ -75,6 +77,7 @@
                           (keydown.enter)="saltar('campoNombre')"
                           mask="(999) 999-9999"
                           tabindex="-1"
+                          class="w-100"
                           styleClass="form-control"
                           inputId="campoTelefono"
                           placeholder="(___) ___-____"
@@ -94,11 +97,32 @@
                       </div>
                     </div>
 
-                    <div class="col-12 p-0">
+                    <div class="col-6 p-0">
                       <div class="form-group" [appMsgError]="'email'" [form]="form">
                         <label class="control-label">Email:</label>
                         <input type="text" id="campoEmail" (keydown.enter)="saltar('campoDir')" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
 
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-6 pr-0">
+                      <div class="form-group" [appMsgError]="'divisa_id'" [form]="form">
+                        <label class="control-label">Divisa:</label>
+                        <p-dropdown [options]="divisaServ.listaDivisas" appendTo="body" formControlName="divisa_id" optionLabel="nombre" optionValue="id" placeholder="Selecciona la divisa" styleClass="form-control">
+                          <ng-template pTemplate="selectedItem">
+                            <div class="d-flex align-items-center" *ngIf="fun.hasValue(suplidorSelected) || fun.hasValue(form.controls.divisa_id.value)">
+                              <img [src]="getImgUrlServer(getDivisaInfoById(form.controls.divisa_id.value, 'imagen.file_name'))" style="width: 2rem" class="mr-2" />
+                              <div>{{ getDivisaInfoById(form.controls.divisa_id.value, 'nombre') }}</div>
+                            </div>
+                          </ng-template>
+                          <ng-template let-divisa pTemplate="item">
+                            <div class="d-flex align-items-center">
+                              <img [src]="getImgUrlServer(divisa.imagen.file_name)" style="width: 2rem" class="mr-2" />
+                              <div>{{ divisa.nombre }}</div>
+                            </div>
+                          </ng-template>
+                        </p-dropdown>
                         <span id="msgContainer"></span>
                       </div>
                     </div>
@@ -132,6 +156,7 @@
                     <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2 btn-verde" id="sendBtn">{{ botonLabel }}</button>
                   </div>
                   <div>
+                    <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button>
                     <button class="btn btn-blanco" id="btnCerrar" (click)="borrar(); isCreando = false">Cerrar</button>
                   </div>
                 </div>

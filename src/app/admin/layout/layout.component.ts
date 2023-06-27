@@ -1,3 +1,4 @@
+import { DivisaService } from './../registros/divisa/divisa.service';
 import { LoaderService } from './../../core/services/loader.service';
 import { ConfigService } from './../../core/services/configuration.service';
 import { TiposFacturaC } from './../facturacion/factura';
@@ -54,7 +55,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   chequiando_cuadre: boolean;
   hasPermisosValidated: boolean;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
+  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService, public divisaServ: DivisaService) {
     super();
 
     this.subRouter = this.router.events.subscribe((routerEvent: Event) => {
@@ -71,7 +72,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
           setTimeout(() => {
             const token = fun.getAuthToken();
-            if (token) this.checkCuadre();
+            if (token) {
+              this.checkCuadre();
+              this.divisaServ.getDivisas();
+            }
           }, 500);
 
           this.initNavigate = false;
@@ -111,7 +115,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.parseMenu();
     this.checkRouteActiva();
     this.cdRef.detectChanges();
-
+    this.divisaServ.getDivisas();
     this.validateUserAndLoadPermisos().then((result) => {
       this.getTiposFacturas().then((res) => {
         this.hasPermisosValidated = result;

@@ -38,14 +38,15 @@
                                 mask="999-9999999-9"
                                 tabindex="-1"
                                 styleClass="form-control with-right-btn"
+                                class="w-100"
                                 inputId="cedula"
                                 placeholder="___-_______-_"
                                 formControlName="cedula"
                                 [autoClear]="false"
                               ></p-inputMask>
 
-                              <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                                <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                              <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append " pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
+                                <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                               </div>
                             </div>
                             <span id="msgContainer"></span>
@@ -58,6 +59,7 @@
                                 (keyup)="checkDocumento('rnc', $event)"
                                 mask="999-99999-9"
                                 tabindex="-1"
+                                class="w-100"
                                 styleClass="form-control with-right-btn"
                                 inputId="rnc"
                                 placeholder="___-_____-_"
@@ -66,7 +68,7 @@
                               ></p-inputMask>
 
                               <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                                <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                                <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                               </div>
                             </div>
                             <span id="msgContainer"></span>
@@ -97,6 +99,7 @@
                           (keydown.enter)="saltar('campoSexo')"
                           mask="(999) 999-9999"
                           tabindex="-1"
+                          class="w-100"
                           styleClass="form-control"
                           inputId="campoTelefono"
                           placeholder="(___) ___-____"

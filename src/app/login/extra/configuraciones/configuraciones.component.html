@@ -44,7 +44,7 @@
                     <div class="col-6 mb-2">
                       <div [appMsgError]="'rnc_empresa'" [form]="form">
                         <label class="control-label">Rnc: </label>
-                        <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
+                        <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="rnc_empresa" mask="999-99999-9" [autoClear]="false" class="w-100"></p-inputMask>
                         <span id="msgContainer"></span>
                       </div>
                     </div>
@@ -52,7 +52,7 @@
                     <div class="col-6 mb-2">
                       <div [appMsgError]="'telefono_empresa'" [form]="form">
                         <label class="control-label">Telefono: </label>
-                        <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>
+                        <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="telefono_empresa" mask="(999)-999-9999" class="w-100" [autoClear]="false"></p-inputMask>
                         <span id="msgContainer"></span>
                       </div>
                     </div>

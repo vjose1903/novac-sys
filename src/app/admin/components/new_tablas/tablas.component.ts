@@ -325,8 +325,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     for (let i = 0; i < this.config.info.length; i++) {
       const info: any = this.config.info[i];
 
+      let list_estilos_titulos = '';
       if (info.estilos && info.estilos.length > 0) {
-        let list_estilos_titulos = '';
         for (let j = 0; j < info.estilos.length; j++) {
           const estilos = info.estilos[j];
           const key = Object.keys(estilos)[0];
@@ -334,9 +334,21 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
           list_estilos_titulos += `${key}: ${value} !important; `;
         }
+      }
 
+      if (fun.hasValue(info.style)) {
+        const keys = Object.keys(info.style);
+
+        for (let index = 0; index < keys.length; index++) {
+          const key = keys[index];
+          const value = info.style[key];
+
+          list_estilos_titulos += `${key}: ${value} !important; `;
+        }
+      }
+
+      if (fun.hasValue(list_estilos_titulos)) {
         const columna = document.getElementById(`titulo_${this.realIdTabla}_${info.key}`) as any;
-
         if (columna) columna.setAttribute('style', list_estilos_titulos);
       }
     }

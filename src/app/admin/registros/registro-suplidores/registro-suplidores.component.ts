@@ -1,3 +1,4 @@
+import { DivisaService } from './../divisa/divisa.service';
 import { entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { ConfigService } from './../../../core/services/configuration.service';
@@ -18,6 +19,7 @@ import { CategoriaEntidadContableService } from '../../contabilidad/categoria-en
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
+import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -51,9 +53,10 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   permissions = Permisos;
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo' },
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-      { titulo: 'Rnc', tipo: 'text', key: 'documento_identidad' },
+      { titulo: 'Divisa', tipo: 'img', key: 'img_divisa', style: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '4.3rem' } },
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', style: { width: '8%' } },
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre', style: { 'text-align': 'start', 'padding-left': '1rem' } },
+      { titulo: 'Rnc', tipo: 'text', key: 'documento_identidad', style: { width: '17.5%' } },
     ],
 
     colores: true,
@@ -62,15 +65,22 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     padre_functions: { data_request: (params) => this.getSuplidores(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy } },
+    botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy }, styles: { width: '5.5rem' } },
   };
   tablaComponent;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.suplidor;
   configApp: ConfigI = ConfigService.config;
-
-  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
+  fun = fun;
+  constructor(
+    private fb: UntypedFormBuilder,
+    private route: ActivatedRoute,
+    private tServ: TablasService,
+    public categoriaEntidadServ: CategoriaEntidadContableService,
+    public entCuentaContServ: EntidadCuentaContableService,
+    public divisaServ: DivisaService,
+  ) {
     super();
   }
 
@@ -79,17 +89,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     this.botonLabel = 'Registrar';
     this.metodo = this.route.snapshot.params['metodo'];
-
-    this.form = this.fb.group({
-      id: [null],
-      nombre: [{ value: null, disabled: true }, Validators.required],
-      telefono: [{ value: null, disabled: true }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
-      direccion: [{ value: null, disabled: true }, Validators.required],
-      email: [{ value: null, disabled: true }, Validators.compose([Validators.email])],
-
-      rnc: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
-      cedula: [null],
-    });
 
     this.nesesarioStart();
   }
@@ -106,10 +105,26 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   async nesesarioStart() {
+    await this.createForm();
     await this.getSuplidores(this.tServ.obj_paginate.default);
     await this.getConfigEntidadSuplidores();
+
     fun.enfocarInput('rnc');
     this.marcarCheck('rnc');
+  }
+
+  async createForm() {
+    this.form = this.fb.group({
+      id: [null],
+      nombre: [{ value: null, disabled: true }, Validators.required],
+      divisa_id: [{ value: null, disabled: true }, Validators.required],
+      telefono: [{ value: null, disabled: true }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
+      direccion: [{ value: null, disabled: true }, Validators.required],
+      email: [{ value: null, disabled: true }, Validators.compose([Validators.email])],
+
+      rnc: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
+      cedula: [null],
+    });
   }
 
   async getSuplidores(params?: { per_page: number; page: number; search: string }) {
@@ -122,14 +137,29 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       res['data'].map((suplidor) => {
         const doc = _.find(suplidor.documentos_de_identidad, { principal: true });
         suplidor.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
-
+        suplidor.img_divisa = getImgUrlServer(suplidor?.divisa?.imagen?.file_name);
         suplidor.codigo = _.padStart(suplidor.id, 5, '0');
+
+        suplidor.customStyles = {
+          img_divisa: { 'padding-left': '1rem', 'padding-right': '1rem' },
+        };
+
         return suplidor;
       });
 
       this.listaSuplidores = res['data'];
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
+  }
+
+  getImgUrlServer(fileName) {
+    return getImgUrlServer(fileName);
+  }
+
+  getDivisaInfoById(id: number, property?: string) {
+    const divisa = this.divisaServ.getDivisaInfoById(id);
+
+    return fun.hasValue(property) ? fun.getProperty(divisa, property) : divisa;
   }
 
   getConfigEntidadSuplidores() {
@@ -250,7 +280,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       } else {
         if (!_.endsWith(documento, '_')) {
           this.documentos_de_identidad = undefined;
-          // this.camposDisabled = true;
           this.changeStateCampos(false);
         }
       }
@@ -271,9 +300,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   changeStateCampos(enable = false) {
-    const actual_state = this.form.controls.nombre.status;
-
-    ['nombre', 'telefono', 'direccion', 'email'].forEach((campo) => {
+    ['nombre', 'telefono', 'direccion', 'email', 'divisa_id'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
@@ -308,6 +335,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   editarItem(data) {
     this.botonLabel = 'Editar';
     this.form.patchValue(data);
+    this.form.controls.divisa_id.setValue(data?.divisa?.id);
+
     this.documentos_de_identidad = data.documentos_de_identidad;
     this.editando = true;
     this.patchDocumentos(data.documentos_de_identidad);
@@ -366,7 +395,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   test() {
-    console.log('--> ', this.checkIfSomethingIsDiferrent());
+    console.log('-----> ', this.form.getRawValue());
   }
 
   validate_cuentas() {

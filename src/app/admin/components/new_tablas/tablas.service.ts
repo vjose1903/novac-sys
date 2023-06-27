@@ -155,8 +155,13 @@ export class TablasService {
   getStyle(rowData, column, index, realIdTabla) {
     let styles = {};
 
+    if (fun.hasValue(column?.style)) {
+      Object.assign(styles, column.style);
+    }
+
     if (fun.hasValue(rowData?.customStyles)) {
       const estilos = rowData.customStyles[column.key];
+      // console.log('estilos ', estilos);
 
       if (Array.isArray(estilos)) {
         for (const item of estilos) {
@@ -167,12 +172,10 @@ export class TablasService {
           if (elemento) elemento.setAttribute('style', item.estilos);
         }
       } else {
-        if (typeof estilos == 'object') styles = estilos;
+        if (typeof estilos == 'object') {
+          Object.assign(styles, estilos);
+        }
       }
-    }
-
-    if (fun.hasValue(column?.style)) {
-      styles = column.style;
     }
 
     return styles;
