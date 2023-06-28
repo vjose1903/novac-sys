@@ -49,13 +49,20 @@ export class CategoriaEntidadContableService {
 
       if (!params.showMsgs) extra['requestParams'] = [ToastService.noShowMsgs];
 
-      this.categoriaEntContClass.getAll(extra).then((res) => {
-        res['data'].map((categoria: CategoriaEntidadContableI) => {
-          categoria.customStyles = { descripcion: { 'text-align': 'start', width: '80%' } };
-          return categoria;
+      this.categoriaEntContClass
+        .getAll(extra)
+        .then((res) => {
+          console.log('ANDO AQUIIIIII');
+
+          res['data'].map((categoria: CategoriaEntidadContableI) => {
+            categoria.customStyles = { descripcion: { 'text-align': 'start', width: '80%' } };
+            return categoria;
+          });
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
         });
-        resolve(res);
-      });
     });
   }
 

@@ -35,7 +35,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   listaSuplidores: SuplidorI[] = [];
   listaConfigSuplidores: Array<ConfiguracionEntidadCuentaI> = [];
+  listaConfigSuplidoresCopy: Array<ConfiguracionEntidadCuentaI> = [];
   listaEntidadCuentasContables: Array<FormEntidadCuentaContableI> = [];
+  currentDivisaNacional: boolean = false;
 
   suplidorSelected;
   doc_is_cedula = false;
@@ -73,6 +75,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.suplidor;
   configApp: ConfigI = ConfigService.config;
   fun = fun;
+
   constructor(
     private fb: UntypedFormBuilder,
     private route: ActivatedRoute,
@@ -164,7 +167,17 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   getConfigEntidadSuplidores() {
     const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.suplidor } };
-    this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigSuplidores = res['data']));
+    this.configEntContableClass.getAll(extra).then((res) => {
+      this.listaConfigSuplidoresCopy = res['data'];
+      this.listaConfigSuplidores = fun.duplicarJson(this.listaConfigSuplidoresCopy);
+    });
+  }
+
+  filterConfig() {
+    const copyList = fun.duplicarJson(this.listaConfigSuplidoresCopy);
+
+    if (this.currentDivisaNacional) this.listaConfigSuplidores = copyList.filter((config) => config.is_nacional);
+    else this.listaConfigSuplidores = fun.duplicarJson(copyList);
   }
 
   marcarCheck(arg) {
@@ -210,6 +223,13 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         setTimeout(() => this.submit(), 250);
       }
     }
+  }
+
+  changeDivisa() {
+    const formulario = this.form.getRawValue();
+    const current_divisa = this.getDivisaInfoById(formulario.divisa_id);
+    this.currentDivisaNacional = current_divisa.is_principal;
+    this.filterConfig();
   }
 
   changeIdent(arg) {
@@ -344,6 +364,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
     this.suplidorSelected = fun.duplicarJson(data);
+    this.changeDivisa();
 
     setTimeout(() => fun.enfocarInput('rnc'), 1);
     this.changeStateCampos(true);
@@ -378,24 +399,28 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     const result = entidades_validation.valid ? res : !entidades_validation.valid;
 
-    // return result || !this.checkIfSomethingIsDiferrent();
-    return result;
+    return result || !this.checkIfSomethingIsDiferrent();
+    // return result;
   }
 
   checkIfSomethingIsDiferrent() {
     const pick_values = ['cedula', 'rnc', 'nombre', 'telefono', 'direccion', 'email', 'id'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
+    formValue['cuentas_contables'] = fun.duplicarJson(this.listaEntidadCuentasContables);
 
-    const originalCliente = this.listaSuplidores.find((suplidor) => suplidor.id == formValue.id);
-    const originalValue = fun.pick(originalCliente, pick_values);
+    const originalSuplidor = this.listaSuplidores.find((suplidor) => suplidor.id == formValue.id);
+    const originalValue = fun.pick(originalSuplidor, pick_values);
 
-    originalValue['cedula'] = originalCliente?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
+    originalValue['cedula'] = originalSuplidor?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
+    originalValue['rnc'] = originalSuplidor?.documentos_de_identidad.find((doc) => doc.descripcion == 'rnc')?.documento;
+    originalValue['cuentas_contables'] = fun.duplicarJson(this.entCuentaContServ.parseCuentasFromBackend(originalSuplidor?.cuentas_contables));
 
     return !fun.isEqual(formValue, originalValue);
   }
 
   test() {
     console.log('-----> ', this.form.getRawValue());
+    console.log('-----> ', this.listaEntidadCuentasContables);
   }
 
   validate_cuentas() {

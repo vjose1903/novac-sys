@@ -32,6 +32,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   fun = fun;
 
   dataOriginal: FormEntidadCuentaContableI;
+  hasCategories: boolean = true;
 
   constructor(private fb: UntypedFormBuilder, public catEntContServ: CategoriaEntidadContableService) {}
 
@@ -47,12 +48,12 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   async necesarioStart() {
-    await this.getCategorias();
     await this.createForm().then((form) => {
       form.valueChanges.subscribe((changes) => {
         if (!fun.isEqual(changes, this.lastChange)) this.returnData();
       });
     });
+    await this.getCategorias();
     this.updateOriginalData();
   }
 
@@ -76,9 +77,14 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   async getCategorias() {
-    CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad, showMsgs: false }).then((res) => {
-      this.listadoCategorias = res['data'];
-    });
+    CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad, showMsgs: false })
+      .then((res) => (this.listadoCategorias = res['data']))
+      .catch((err) => {
+        this.hasCategories = false;
+        // this.cuentaContableData.tipo_agrupacion_contable = agrupacionesContables.individual;
+        // this.updateOriginalData();
+        // if (fun.hasValue(this.form)) this.form.controls.tipo_agrupacion_contable.setValue(agrupacionesContables.individual);
+      });
   }
 
   showRevertBtn() {

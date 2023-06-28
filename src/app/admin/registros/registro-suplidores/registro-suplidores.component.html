@@ -109,7 +109,7 @@
                     <div class="col-6 pr-0">
                       <div class="form-group" [appMsgError]="'divisa_id'" [form]="form">
                         <label class="control-label">Divisa:</label>
-                        <p-dropdown [options]="divisaServ.listaDivisas" appendTo="body" formControlName="divisa_id" optionLabel="nombre" optionValue="id" placeholder="Selecciona la divisa" styleClass="form-control">
+                        <p-dropdown [options]="divisaServ.listaDivisas" appendTo="body" formControlName="divisa_id" optionLabel="nombre" optionValue="id" placeholder="Selecciona la divisa" styleClass="form-control" (onChange)="changeDivisa()">
                           <ng-template pTemplate="selectedItem">
                             <div class="d-flex align-items-center" *ngIf="fun.hasValue(suplidorSelected) || fun.hasValue(form.controls.divisa_id.value)">
                               <img [src]="getImgUrlServer(getDivisaInfoById(form.controls.divisa_id.value, 'imagen.file_name'))" style="width: 2rem" class="mr-2" />

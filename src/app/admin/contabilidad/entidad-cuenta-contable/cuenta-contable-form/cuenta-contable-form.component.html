@@ -32,7 +32,7 @@
               ></button>
 
               <button
-                *ngIf="configuration.btn.categoria"
+                *ngIf="configuration.btn.categoria && hasCategories"
                 pButton
                 pRipple
                 label="Categoria"
@@ -44,7 +44,7 @@
               ></button>
 
               <button
-                *ngIf="configuration.btn.subCategoria"
+                *ngIf="configuration.btn.subCategoria && hasCategories"
                 pButton
                 pRipple
                 label="Sub Categoria"

@@ -1,5 +1,5 @@
 import { MetodoHttp } from './../../../../electron/shared-electron-angular';
-import { Observable } from 'rxjs';
+import { Observable, lastValueFrom } from 'rxjs';
 import { Ss } from '../services/singleton.service';
 import * as _ from 'lodash';
 import { fun } from '../services/functions.service';
@@ -28,9 +28,17 @@ export class CrudG<T> {
   }
 
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
-    let url = this.makeUrl(tipo, arg);
+    return new Promise<any>(async (resolve, reject) => {
+      try {
+        const url = this.makeUrl(tipo, arg);
 
-    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
+        const response = await lastValueFrom(this.request(url, 'get', null, tipo, arg?.requestParams));
+
+        resolve(response as T);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   async getOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {

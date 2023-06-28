@@ -30,6 +30,8 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
       this.is_initialized = false;
       this.initEntidadCuentasContables();
     }
+
+    if (fun.objHas(changes, 'inputs')) this.initEntidadCuentasContables();
   }
 
   checkConfig() {
@@ -50,6 +52,9 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
         this.cuentasContablesData.push(entidad_cuenta);
       }
     }
+
+    const ids_current_configs = this.inputs.configsEntCuentas.map((config) => config.id);
+    this.cuentasContablesData = this.cuentasContablesData.filter((cuenta) => ids_current_configs.includes(cuenta.configuracion_entidad_cuenta_id));
 
     this.is_initialized = true;
     this.emitChanges();
