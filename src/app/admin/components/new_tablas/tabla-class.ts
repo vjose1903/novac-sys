@@ -1,4 +1,4 @@
-type tipos = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' |  'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
+type tipos = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
 
 export interface table_info {
   id?: string;
@@ -35,8 +35,11 @@ export interface table_info {
   text_color?: string;
   dateFormat?: any;
   hours?: any;
+  imgStyle?: 'circular' | 'cuadrada';
+  rowImgStyle?: 'circular' | 'cuadrada';
   src?: any;
   alt?: any;
+  rowAlt?: any;
   click?: Function;
   iconsArray?: Array<iconsI>;
   key_value?: string;

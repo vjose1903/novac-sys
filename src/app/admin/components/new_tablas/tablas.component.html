@@ -69,7 +69,7 @@
                 >
                   <span class="titulo_sm"> {{ column?.titulo_sm }} </span>
 
-                  <span [ngSwitch]="column.tipo">
+                  <span [ngSwitch]="column.tipo" [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
                     <span *ngSwitchCase="'index'" class="d-flex justify-content-center align-items-center">
                       <span class="text-bold-700">{{ (tServ.getPaginationById(realIdTabla).page - 1) * tServ.getPaginationById(realIdTabla).per_page + (getIndex(indexBody) + 1) }}</span>
                     </span>
@@ -79,7 +79,11 @@
                     </span>
 
                     <span *ngSwitchCase="'img'" class="d-flex justify-content-center align-items-center">
-                      <img width="100%" height="auto" alt="{{ rowData[column.alt] }}" [src]="getValueForm(column, rowData)" class="img-fluid" />
+                      <img-component
+                        [alt]="column.alt ? column.alt : rowData[column.rowAlt] ? rowData[column.rowAlt] : ''"
+                        [imagenSrc]="getValueForm(column, rowData)"
+                        [imgStyle]="column.imgStyle ? column.imgStyle : rowData[column.rowImgStyle] ? rowData[column.rowImgStyle] : 'circular'"
+                      ></img-component>
                     </span>
 
                     <span *ngSwitchCase="'icon'">
@@ -169,14 +173,7 @@
                       </div>
                     </span>
 
-                    <span
-                      *ngSwitchDefault
-                      id="{{ column.key }}-{{ getIndex(indexBody) }}"
-                      class=" {{ rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'text-black' }}"
-                      style="width: 100%"
-                      [pTooltip]="rowData[column.rowTooltip] || ''"
-                      tooltipPosition="left"
-                    >
+                    <span *ngSwitchDefault id="{{ column.key }}-{{ getIndex(indexBody) }}" class=" {{ rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'text-black' }}" style="width: 100%">
                       {{ getValueForm(column, rowData) }}
                       {{ column.alerta && config?.colores && rowData.danger ? '(Inactivo)' : '' }}
                     </span>

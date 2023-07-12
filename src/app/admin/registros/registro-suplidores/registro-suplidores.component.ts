@@ -55,7 +55,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   permissions = Permisos;
   table_config: table_config = {
     info: [
-      { titulo: 'Divisa', tipo: 'img', key: 'img_divisa', style: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '4.3rem' } },
+      { titulo: 'Divisa', tipo: 'img', key: 'img_divisa', rowTooltip: 'img_divisa_tooltip', style: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '4.3rem' } },
       { titulo: 'Cod.', tipo: 'text', key: 'codigo', style: { width: '8%' } },
       { titulo: 'Nombre', tipo: 'text', key: 'nombre', style: { 'text-align': 'start', 'padding-left': '1rem' } },
       { titulo: 'Rnc', tipo: 'text', key: 'documento_identidad', style: { width: '17.5%' } },
@@ -138,9 +138,12 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.listaSuplidores.length = 0;
     this.suplidorClass.getAll(extra).then((res) => {
       res['data'].map((suplidor) => {
+        console.log('suplidor?.divisa?.imagen --> ', suplidor?.divisa);
+
         const doc = _.find(suplidor.documentos_de_identidad, { principal: true });
         suplidor.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
-        suplidor.img_divisa = getImgUrlServer(suplidor?.divisa?.imagen?.file_name);
+        suplidor.img_divisa = suplidor?.divisa?.imagen?.file_name ? getImgUrlServer(suplidor?.divisa?.imagen?.file_name) : 'assets/img/no-divisa.png';
+        suplidor.img_divisa_tooltip = suplidor?.divisa?.nombre ? suplidor?.divisa?.nombre : 'Divisa no registrada';
         suplidor.codigo = _.padStart(suplidor.id, 5, '0');
 
         suplidor.customStyles = {

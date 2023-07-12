@@ -2,6 +2,7 @@ import { IconsArrayModule } from './icons-array/icons-array.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NewTablasComponent } from './tablas.component';
+import { ImgModule } from '../img-component/img.module';
 import { NewBTNACCIONESComponent } from './btnacciones/btnacciones.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -17,7 +18,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [NewTablasComponent, NewBTNACCIONESComponent],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, DropdownModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule, InputSwitchModule, NgxPermissionsModule.forChild(), IconsArrayModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, DropdownModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule, InputSwitchModule, NgxPermissionsModule.forChild(), IconsArrayModule, ImgModule],
   exports: [NewTablasComponent, NewBTNACCIONESComponent],
 })
 export class TablasModule {}
