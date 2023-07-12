@@ -4,7 +4,7 @@
       <form [formGroup]="formMarca" class="h-100" (keydown.enter)="$event.preventDefault()">
         <div class="row h-100">
           <div *ngIf="hasPermissionsMarcaCreate" class="col-6 contenedorRegistro" style="padding-left: 0 !important">
-            <div class="card card-padding sombra">
+            <div class="card card-padding sombra-light">
               <div>
                 <div class="form-group">
                   <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
@@ -42,7 +42,7 @@
       <form [formGroup]="formModelo" class="h-100" (keydown.enter)="$event.preventDefault()">
         <div class="row h-100">
           <div *ngIf="hasPermissionsModeloCreate" class="col-6 contenedorRegistro" style="padding-left: 0 !important">
-            <div class="row card card-padding sombra">
+            <div class="row card card-padding sombra-light">
               <div class="col-12">
                 <div class="form-group">
                   <label class="control-label">Marca: <span style="color: red">*</span></label>

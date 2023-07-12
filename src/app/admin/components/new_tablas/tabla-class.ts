@@ -93,7 +93,7 @@ interface inner_btn {
   name?: string;
   tooltip?: string;
   tooltipKey?: string;
-  permiso?: string;
+  permiso?: string | string[];
   icon?: string;
 }
 

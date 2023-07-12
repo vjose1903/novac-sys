@@ -2,7 +2,8 @@ import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/co
 import * as _ from 'lodash';
 import { TablasService } from '../components/new_tablas/tablas.service';
 import { MixinClass } from '../../core/typescript/MixinClass';
-import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
+import { ArticuloC } from '../registros/articulos/articulo';
+import { TipoArticuloC } from '../registros/articulos/tipo-articulo/tipo-articulo';
 import { ReporteC } from '../reportes/reporte';
 import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
 import { fun } from '../../core/services/functions.service';

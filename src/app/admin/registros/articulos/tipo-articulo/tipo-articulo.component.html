@@ -1,0 +1,49 @@
+<div class="catArticuloContainer">
+  <div class="row h-100 w-100">
+    <div *ngIf="hasPermissionsCreateUpdate" class="col-6 pl-0 pt-3">
+      <form [formGroup]="form" class="h-100" (keydown.enter)="$event.preventDefault()">
+        <div class="card card-padding sombra-light">
+          <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
+            <label class="control-label mb-0">Descripcion: <span style="color: red">*</span></label>
+            <input (focus)="$event.target.select()" type="text" id="campoDescripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
+            <span id="msgContainer"></span>
+          </div>
+
+          <div class="form-group" [appMsgError]="'tipo'" [form]="form">
+            <label class="control-label mb-0">Tipo: <span style="color: red">*</span></label>
+            <p-dropdown
+              [placeholder]="'Seleccione el tipo'"
+              [options]="tiposDeCategoria"
+              formControlName="tipo"
+              optionLabel="label"
+              optionValue="key"
+              [appendTo]="'body'"
+              styleClass="form-control"
+              [virtualScroll]="true"
+              [itemSize]="30"
+              id="campoTipo"
+            ></p-dropdown>
+
+            <span id="msgContainer"></span>
+          </div>
+
+          <div class="mt-3">
+            <div class="form-group d-flex">
+              <button *ngIf="categoriaSelected" (click)="borrar()" class="btn mr-2 btn-blanco">Cancelar</button>
+
+              <div [pTooltip]="fun.hasValue(categoriaSelected) ? (!checkIfSomethingIsDiferrent() ? 'Para editar debe de tener un valor distinto al original' : '') : ''" tooltipPosition="right">
+                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde">{{ categoriaSelected ? 'Editar' : 'Guardar' }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="{{ hasPermissionsCreateUpdate ? 'col-6' : 'col-12' }} p-0">
+      <div #cardMarca class="h-100">
+        <dinamic-table [cardTabla]="cardMarca" [(data)]="listaTipoArticulos" [seleccionado]="categoriaSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      </div>
+    </div>
+  </div>
+</div>

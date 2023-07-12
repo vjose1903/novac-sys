@@ -209,6 +209,12 @@ export const Permisos = {
     update: 'tipo_articulo_update',
     destroy: 'tipo_articulo_destroy',
   },
+  sub_tipo_articulo: {
+    create: 'sub_tipo_articulo_create',
+    read_all: 'sub_tipo_articulo_read_all',
+    read_one: 'sub_tipo_articulo_read_one',
+    update: 'sub_tipo_articulo_update',
+  },
   tipo_factura: {
     create: 'tipo_factura_create',
     read_all: 'tipo_factura_read_all',

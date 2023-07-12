@@ -52,8 +52,6 @@ export class CategoriaEntidadContableService {
       this.categoriaEntContClass
         .getAll(extra)
         .then((res) => {
-          console.log('ANDO AQUIIIIII');
-
           res['data'].map((categoria: CategoriaEntidadContableI) => {
             categoria.customStyles = { descripcion: { 'text-align': 'start', width: '80%' } };
             return categoria;

@@ -1,3 +1,4 @@
+import { TipoArticuloComponent } from './tipo-articulo/tipo-articulo.component';
 import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
@@ -8,7 +9,8 @@ import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import * as moment from '../../../core/javascript/moment';
-import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
+import { ArticuloC } from './articulo';
+import { TipoArticuloC, tipos_articulos } from './tipo-articulo/tipo-articulo';
 import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
@@ -71,6 +73,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   fechaFactura: string;
   permissions = Permisos;
   formPermissions = [Permisos.articulo.create, Permisos.articulo.update];
+  allPermisosTipoArticulo = Object.values(Permisos.tipo_articulo);
   hasPermissionUpdateFormula = false;
   medida_config: string;
 
@@ -161,11 +164,28 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     });
   }
 
+  openModalCategorias() {
+    const header = `Categorias de articulos`;
+    const inputs = {};
+
+    this.openNewModal({
+      component: TipoArticuloComponent,
+      inputs: inputs,
+      id: 'categoria-articulos',
+      header: header,
+      width: '70rem',
+      botones: {
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+      },
+    });
+  }
+
   openModalConfig() {
     this.openNewModal({
       component: ConfigArticulosComponent,
       inputs: { cofig_articulos: this.cofig_articulos },
-      id: 'cofig_articulos',
+      id: 'cofig-articulos',
       header: 'Configuraciones de articulos',
       width: '50rem',
       botones: {
@@ -184,7 +204,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'cofig_articulos') {
+    if (arg.modal_id == 'cofig-articulos') {
       this.cofig_articulos = arg.data;
 
       const actualPagination = this.tServ.getPaginationById('lista_articulos');
@@ -943,10 +963,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       obj['otros_costos'] = formulario.otros_costos;
       obj['formulas_productos_terminados'] = this.formarFormula();
     }
-
-    this.articuloClass.createUpdateOne(obj).then((res) => {
-      this.necesarioStart();
-      this.borrar();
-    });
+    console.log('obj --> ', obj);
+    // this.articuloClass.createUpdateOne(obj).then((res) => {
+    //   this.necesarioStart();
+    //   this.borrar();
+    // });
   }
 }

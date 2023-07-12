@@ -3,23 +3,6 @@ import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
 
-export enum tipos_articulos {
-  veterinaria = 'veterinaria',
-  materia_prima = 'materia_prima',
-  producto_terminado = 'producto_terminado',
-  otro = 'otro',
-  materiales_de_oficina = 'materiales_de_oficina',
-  servicios_legales = 'servicios_legales',
-  servicios_contables = 'servicios_contables',
-  dulces = 'dulces',
-}
-
-export class TipoArticuloC extends CrudG<any> {
-  constructor() {
-    super('tipo_articulos');
-  }
-}
-
 export interface ArticuloI {
   data?: any;
   id?: number;
@@ -101,7 +84,6 @@ export class ArticuloC extends CrudG<ArticuloI> {
   }
 
   static requestReporte(reporteParams, pdfParams) {
-
     let requestParameters;
 
     switch (pdfParams.tipo) {
@@ -118,7 +100,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
-      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal};
+      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
 
       ReporteC.visualizarReporte(objPdfView);
     });
