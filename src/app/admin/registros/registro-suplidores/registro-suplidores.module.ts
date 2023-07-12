@@ -10,9 +10,10 @@ import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { CategoriaEntidadContableModule } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.module';
+import { ImgModule } from '../../components/img-component/img.module';
 
 @NgModule({
   declarations: [RegistroSuplidoresComponent],
-  imports: [CommonModule, RegistroSuplidoresRoutingModule, ReactiveFormsModule, FormsModule, TablasModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild(), CategoriaEntidadContableModule, EntidadCuentaContableModule],
+  imports: [CommonModule, RegistroSuplidoresRoutingModule, ReactiveFormsModule, FormsModule, TablasModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild(), CategoriaEntidadContableModule, EntidadCuentaContableModule, ImgModule],
 })
 export class RegistroSuplidoresModule {}

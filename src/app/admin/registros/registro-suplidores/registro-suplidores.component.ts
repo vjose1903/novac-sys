@@ -228,11 +228,15 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     }
   }
 
-  changeDivisa() {
+  changeDivisa(event?) {
     const formulario = this.form.getRawValue();
     const current_divisa = this.getDivisaInfoById(formulario.divisa_id);
-    this.currentDivisaNacional = current_divisa.is_principal;
+    this.currentDivisaNacional = current_divisa ? current_divisa?.is_principal : false;
     this.filterConfig();
+
+    if (fun.hasValue(event) && fun.hasValue(event?.originalEvent) && fun.hasValue(event?.originalEvent?.type) && event?.originalEvent?.type == 'click') {
+      setTimeout(() => fun.enfocarInput('campoDir'), 100);
+    }
   }
 
   changeIdent(arg) {
@@ -421,9 +425,10 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     return !fun.isEqual(formValue, originalValue);
   }
 
-  test() {
-    console.log('-----> ', this.form.getRawValue());
-    console.log('-----> ', this.listaEntidadCuentasContables);
+  test(e?) {}
+
+  showDivisaDrop(event, dropdown) {
+    if (fun.hasValue(event.relatedTarget)) dropdown.show();
   }
 
   validate_cuentas() {

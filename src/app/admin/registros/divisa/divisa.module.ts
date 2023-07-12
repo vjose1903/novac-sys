@@ -14,9 +14,10 @@ import { DirectivesModule } from '../../../core/directive/directives.module';
 import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
 import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer-edit.module';
 import { TasaDeCambioComponent } from './tasa-de-cambio/tasa-de-cambio.component';
+import { ImgModule } from '../../components/img-component/img.module';
 
 @NgModule({
   declarations: [DivisaComponent, TasaDeCambioComponent],
-  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule],
+  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule],
 })
 export class DivisaModule {}
