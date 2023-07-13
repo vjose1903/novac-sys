@@ -1,17 +1,17 @@
 <div class="cuentaContableForm">
-  <div *ngIf="showRevertBtn()" class="btnRevertChanges">
-    <div class="circle" (click)="revertChanges()" [pTooltip]="'Revertir cambios'" tooltipPosition="left">
-      <i class="fa-solid fa-arrow-rotate-left"></i>
-    </div>
-  </div>
-
   <form *ngIf="form" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+    <div class="actions">
+      <div *ngIf="showRevertBtn()" class="circle" (click)="revertChanges()" [pTooltip]="'Revertir cambios'" tooltipPosition="left">
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+      </div>
+
+      <input formControlName="has_cuenta" class="apple-switch ml-2" type="checkbox" (change)="changeHasCuenta()" [ngClass]="{ disabled: camposDisabled }" />
+    </div>
+
     <div class="row p-0">
       <div class="col-12 p-0 mb-3">
         <div class="d-flex align-items-center">
           <h6 class="mb-0 c-default">{{ configEntContableClass.getConfigLabel(inputs.selectedConfig) }}</h6>
-
-          <input formControlName="has_cuenta" class="apple-switch ml-2" type="checkbox" (change)="changeHasCuenta()" [ngClass]="{ disabled: camposDisabled }" />
         </div>
       </div>
 

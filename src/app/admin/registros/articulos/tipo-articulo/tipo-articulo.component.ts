@@ -1,5 +1,5 @@
 import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { ModalI } from './../../../components/modal/modal-class';
+import { ModalClass, ModalI } from './../../../components/modal/modal-class';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
@@ -8,6 +8,7 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { TipoArticuloI, TipoArticuloC } from './tipo-articulo';
 import { table_config } from '../../../components/new_tablas/tabla-class';
+import { SubTipoArticuloComponent } from './sub-tipo-articulo/sub-tipo-articulo.component';
 
 @Component({
   selector: 'app-tipo-articulo',
@@ -30,7 +31,10 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
   tiposDeCategoria = TipoArticuloC.tipos;
 
   table_config: table_config = {
-    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text', style: { 'text-align': 'left', width: '80%' } }],
+    info: [
+      { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', style: { 'text-align': 'left', width: '55%' } },
+      { titulo: 'Tipo', key: 'tipo_', tipo: 'text', style: { 'text-align': 'left', width: '25%' } },
+    ],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_tipo_articulos',
@@ -64,6 +68,11 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
 
     this.listaTipoArticulos.length = 0;
     this.tipoArticuloClass.getAll(extra).then((res) => {
+      res.data.map((tipo_articulo) => {
+        tipo_articulo.tipo_ = this.tiposDeCategoria.find((tipo) => tipo.key == tipo_articulo.tipo).label;
+        return tipo_articulo;
+      });
+
       this.listaTipoArticulos = fun.duplicarJson(res.data);
 
       console.log('res ', res);
@@ -73,7 +82,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
   }
 
   checkPermissions() {
-    this.permissionsService.hasPermission([this.permissions.categoria_entidad_contable.create, this.permissions.categoria_entidad_contable.update]).then((result) => (this.hasPermissionsCreateUpdate = result));
+    this.permissionsService.hasPermission([this.permissions.tipo_articulo.create, this.permissions.tipo_articulo.update]).then((result) => (this.hasPermissionsCreateUpdate = result));
   }
 
   createForm() {
@@ -81,10 +90,27 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
       this.form = this.fb.group({
         id: [{ value: null, disabled: false }],
         descripcion: [{ value: null, disabled: false }, Validators.required],
-        tipo: [{ value: false, disabled: false }, Validators.required],
+        tipo: [{ value: null, disabled: false }, Validators.required],
       });
 
       resolve(true);
+    });
+  }
+
+  openModalSubCategorias(data) {
+    const header = `Sub Categorias de tipo articulo: ${data.descripcion}`;
+    const inputs = { tipo_articulo: data };
+
+    this.openNewModal({
+      component: SubTipoArticuloComponent,
+      inputs: inputs,
+      id: 'sub-categoria-articulos',
+      header: header,
+      width: '70rem',
+      botones: {
+        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+      },
     });
   }
 
@@ -98,7 +124,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
   }
 
   handleBtnsDinamic(params) {
-    console.log('params --> ', params);
+    if (params.id_tabla == 'listado_tipo_articulos' && params.name == 'subTipoArticulo') this.openModalSubCategorias(params.data);
   }
 
   editarItem(data) {
@@ -121,40 +147,22 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
   formIsInvalid() {
     let res = false;
 
-    if (!this.form.valid || !this.checkIfSomethingIsDiferrent()) {
+    if (!this.form.valid || (this.categoriaSelected && !this.checkIfSomethingIsDiferrent())) {
       res = true;
     }
 
     return res;
   }
 
-  formarData() {
-    let dataParsed = { categorias: [] };
-    // const same_in_all_config = this.form.controls.same_in_all_config.value;
-    // const formValue = fun.pick(this.form.getRawValue(), ['id', 'descripcion']);
-
-    // if (same_in_all_config) {
-    //   this.inputs.configsEntCuentas.forEach((config: ConfiguracionEntidadCuentaI) => {
-    //     formValue['configuracion_entidad_cuenta_id'] = config.id;
-    //     dataParsed.categorias.push(fun.duplicarJson(formValue));
-    //   });
-    // } else {
-    //   formValue['configuracion_entidad_cuenta_id'] = this.selectedConfig.id;
-    //   dataParsed.categorias.push(fun.duplicarJson(formValue));
-    // }
-
-    return dataParsed;
-  }
-
   requests() {
-    const dataToSend = this.formarData();
+    const formulario = this.form.getRawValue();
 
-    // this.tipoArticuloClass.createOne(dataToSend).then((res) => {
-    //   this.borrar();
+    this.tipoArticuloClass.createOne(formulario).then((res) => {
+      this.borrar();
 
-    //   const actualPagination = this.tServ.getPaginationById(`listado_categorias-${this.selectedConfig.id}`);
-    //   this.fillArrayWithCategorias({ ...actualPagination });
-    // });
+      const actualPagination = this.tServ.getPaginationById('listado_tipo_articulos');
+      this.getTipoArticulos(actualPagination);
+    });
   }
 
   btn_aceptar() {}

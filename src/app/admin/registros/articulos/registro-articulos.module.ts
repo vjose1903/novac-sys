@@ -1,3 +1,4 @@
+import { EntidadCuentaContableModule } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.module';
 import { BtnIconModule } from './../../components/btn-icon-circular/btn-icon-circular.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -18,6 +19,6 @@ import { SubTipoArticuloComponent } from './tipo-articulo/sub-tipo-articulo/sub-
 
 @NgModule({
   declarations: [RegistroArticulosComponent, ConfigArticulosComponent, TipoArticuloComponent, SubTipoArticuloComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, EntidadCuentaContableModule],
 })
 export class RegistroArticulosModule {}

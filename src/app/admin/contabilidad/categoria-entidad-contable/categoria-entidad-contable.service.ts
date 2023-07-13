@@ -1,3 +1,4 @@
+import { SubTipoArticuloC } from './../../registros/articulos/tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 import { ToastService } from './../../../core/services/toast.service';
 import { ConfiguracionEntidadCuentaI } from './../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { fun } from './../../../core/services/functions.service';
@@ -16,6 +17,8 @@ export class CategoriaEntidadContableService {
   allPermisosCategoriaEnt = Object.values(this.permissions.categoria_entidad_contable);
 
   static categoriaEntContClass = new CategoriaEntidadContableC();
+  static subTipoArticuloClass = new SubTipoArticuloC();
+
   static entidades = {
     plural: { cliente: 'clientes', user: 'empleados', articulo: 'articulos', suplidor: 'suplidores', cuenta_bancaria: 'cuentas bancarias' },
     singular: { cliente: 'cliente', user: 'empleado', articulo: 'articulo', suplidor: 'suplidor', cuenta_bancaria: 'cuenta bancaria' },
@@ -40,7 +43,37 @@ export class CategoriaEntidadContableService {
     });
   }
 
-  static getCategoriasByEntidad(params: { entidad: entidadesContables; config_id: number; search?: string; per_page?: number; page?: number; paginado?: boolean; showMsgs?: boolean }) {
+  static getCategoriasByEntidad(params: { entidad: entidadesContables; config_id: number; tipo_articulo_id?: number; search?: string; per_page?: number; page?: number; paginado?: boolean; showMsgs?: boolean }) {
+    return new Promise<any>((resolve, reject) => {
+      if ((params.entidad == CategoriaEntidadContableC.entidad.articulo)) {
+        this.getSubTipoArticulo(params)
+          .then((result) => resolve(result))
+          .catch((err) => reject(err));
+      } else {
+        this.getCategoriasContables(params)
+          .then((result) => resolve(result))
+          .catch((err) => reject(err));
+      }
+    });
+  }
+
+  static getSubTipoArticulo(params: { entidad: entidadesContables; config_id: number; tipo_articulo_id?: number; search?: string; per_page?: number; page?: number; paginado?: boolean; showMsgs?: boolean }) {
+    return new Promise<any>((resolve, reject) => {
+      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+      const extra = { parameters: { page: params.page, per_page: params.per_page, paginado: true, filter_target: palabra_a_buscar, tipo_articulo_id: params.tipo_articulo_id } };
+
+      this.subTipoArticuloClass
+        .getAll(extra)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  }
+
+  static getCategoriasContables(params: { entidad: entidadesContables; config_id: number; search?: string; per_page?: number; page?: number; paginado?: boolean; showMsgs?: boolean }) {
     return new Promise<any>((resolve, reject) => {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
       if (!fun.objHas(params, 'showMsgs') || fun.isEmpty(params.showMsgs)) params.showMsgs = true;

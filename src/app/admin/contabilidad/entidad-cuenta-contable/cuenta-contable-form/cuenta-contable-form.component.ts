@@ -2,10 +2,11 @@ import { fun } from './../../../../core/services/functions.service';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CategoriaEntidadContableService } from '../../categoria-entidad-contable/categoria-entidad-contable.service';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
-import { CategoriaEntidadContableI, entidadesContables } from '../../categoria-entidad-contable/categoria-entidad-contable.utils';
+import { CategoriaEntidadContableC, CategoriaEntidadContableI, entidadesContables } from '../../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { EntidadCuentaContableI, agrupacionContable, agrupacionesContables } from './cuenta-contable-form.utils';
 import { FormEntidadCuentaContableI } from './cuenta-contable-form.utils';
+import { SubTipoArticuloI } from '../../../registros/articulos/tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 
 @Component({
   selector: 'cuenta-contable-form',
@@ -24,6 +25,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
 
   form: UntypedFormGroup;
   listadoCategorias: Array<CategoriaEntidadContableI> = [];
+  listadoSubCategorias: Array<SubTipoArticuloI> = [];
   configEntContableClass = new ConfiguracionEntidadCuentaC();
 
   lastChange: FormEntidadCuentaContableI;
@@ -78,7 +80,13 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
 
   async getCategorias() {
     CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad, showMsgs: false })
-      .then((res) => (this.listadoCategorias = res['data']))
+      .then((res) => {
+        if (this.inputs.entidad == CategoriaEntidadContableC.entidad.articulo) {
+          this.listadoSubCategorias = res['data'];
+        } else {
+          this.listadoCategorias = res['data'];
+        }
+      })
       .catch((err) => {
         this.hasCategories = false;
         // this.cuentaContableData.tipo_agrupacion_contable = agrupacionesContables.individual;

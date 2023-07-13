@@ -13,7 +13,7 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
   activeIndex = 0;
   @Input() inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI>; entidad: entidadesContables };
   @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
-  @Input() camposDisabled: boolean;
+  @Input() camposDisabled: boolean = false;
 
   @Input() cuentasContablesDataCruda: EntidadCuentaContableI[] = [];
 
@@ -44,11 +44,15 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
 
   initEntidadCuentasContables() {
     for (const config of this.inputs.configsEntCuentas) {
-      let entidad_cuenta: FormEntidadCuentaContableI = this.cuentasContablesData.find((cuenta) => cuenta.configuracion_entidad_cuenta_id == config.id);
+      let entidad_cuenta: FormEntidadCuentaContableI = this.cuentasContablesData?.find((cuenta) => cuenta.configuracion_entidad_cuenta_id == config.id);
 
       if (fun.isEmpty(entidad_cuenta)) {
         entidad_cuenta = fun.duplicarJson(entidadCuentaContableBlank);
+        console.log('entidad_cuenta ', entidad_cuenta);
+
         entidad_cuenta.configuracion_entidad_cuenta_id = config.id;
+        console.log('entidad_cuenta ', entidad_cuenta);
+        console.log('this.cuentasContablesData ', this.cuentasContablesData);
         this.cuentasContablesData.push(entidad_cuenta);
       }
     }

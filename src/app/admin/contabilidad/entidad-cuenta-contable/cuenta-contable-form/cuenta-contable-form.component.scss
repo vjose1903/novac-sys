@@ -16,11 +16,12 @@
     }
   }
 
-  .btnRevertChanges {
+  .actions {
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
     z-index: 10;
+    display: flex;
 
     .circle {
       width: 1.5rem;
@@ -38,7 +39,7 @@
 
       i {
         position: absolute;
-        transform: translate(1px, 1px);
+        transform: translate(0px, 1px);
       }
     }
   }

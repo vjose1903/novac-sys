@@ -4,6 +4,7 @@ export enum tipos_articulos {
   veterinaria = 'veterinaria',
   materia_prima = 'materia_prima',
   producto_terminado = 'producto_terminado',
+  nucleo = 'nucleo',
   otro = 'otro',
   materiales_de_oficina = 'materiales_de_oficina',
   servicios_legales = 'servicios_legales',
@@ -14,9 +15,9 @@ export enum tipos_articulos {
 export interface TipoArticuloI {
   id: number;
   descripcion: string;
-  tipo: string;
-  codigo: string;
-  cuentas_contables: TipoArticuloCuentasContable[];
+  tipo?: string;
+  codigo?: string;
+  cuentas_contables?: TipoArticuloCuentasContable[];
   [propName: string]: any;
 }
 

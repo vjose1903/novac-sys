@@ -1,3 +1,4 @@
+import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { TipoArticuloComponent } from './tipo-articulo/tipo-articulo.component';
 import { ConfigI } from './../../../core/typescript/config-interface.utils';
 import { ConfigService } from './../../../core/services/configuration.service';
@@ -18,6 +19,9 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
 import { ModalClass } from '../../components/modal/modal-class';
+import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
+import { CategoriaEntidadContableC, entidadesContables } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
+import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -29,7 +33,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   //  TABLAS
   // =============================================
 
-  boton = '';
+  botonLabel = '';
   form: UntypedFormGroup;
 
   isDetallable = false;
@@ -69,6 +73,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   articuloClass = new ArticuloC();
   tipoArticuloClass = new TipoArticuloC();
   configArticuloClass = new ConfigArticuloC();
+  configEntContableClass = new ConfiguracionEntidadCuentaC();
 
   fechaFactura: string;
   permissions = Permisos;
@@ -76,6 +81,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   allPermisosTipoArticulo = Object.values(Permisos.tipo_articulo);
   hasPermissionUpdateFormula = false;
   medida_config: string;
+
+  listaConfigArticulos: Array<ConfiguracionEntidadCuentaI> = [];
+  listaEntidadCuentasContables: Array<FormEntidadCuentaContableI> = [];
 
   table_config: table_config = {
     info: [
@@ -92,11 +100,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.articulo.update }, borrar: { show: true, permiso: this.permissions.articulo.destroy } },
   };
+
   tablaComponent;
   cofig_articulos: ConfigArticuloI;
   configApp: ConfigI = ConfigService.config;
+  entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.articulo;
 
-  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
   }
 
@@ -112,7 +122,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     this.FORM = this.form.controls;
 
-    this.boton = 'Registrar';
+    this.botonLabel = 'Registrar';
     this.necesarioStart();
   }
 
@@ -136,8 +146,17 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     await this.getArticulos(actualPagination);
     this.getTipoArticulos();
     this.getConfiguracionArticulo();
+    this.getConfigEntidadCliente();
 
     fun.enfocarInput('nombre');
+  }
+
+  getConfigEntidadCliente() {
+    const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.articulo } };
+    this.configEntContableClass.getAll(extra).then((res) => {
+      this.listaConfigArticulos = res['data'];
+      console.log('this.listaConfigArticulos ', this.listaConfigArticulos);
+    });
   }
 
   getConfiguracionArticulo() {
@@ -216,7 +235,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     this.listaArticulos.length = 0;
-    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true, parameters: { cuentas_contables: true } }).then((res) => {
       res.data.map(async (arti) => {
         arti.customStyles = {
           codigo: { width: '12%' },
@@ -389,19 +408,20 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   borrar(reset = false) {
-    this.articuloSelected = undefined;
-    if (fun.hasValue(this.form)) this.form.reset();
     fun.enfocarInput('nombre');
+
+    [this.articuloSelected, this.tipoArticuloSelected] = Array(2).fill(undefined);
+
+    if (fun.hasValue(this.form)) this.form.reset();
     if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
     if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
-    this.boton = 'Registrar';
-    this.tipoArticuloSelected = undefined;
-    this.recalcular = false;
+
+    this.listaEntidadCuentasContables = [];
+    this.botonLabel = 'Registrar';
+    [this.recalcular, this.is_combo] = Array(2).fill(false);
+
     if (this.is_combo) this.resetArray();
-
-    this.is_combo = false;
     if (fun.hasValue(this.form)) this.form.controls['rowFormula'].reset();
-
     if (reset) this.isCreando = true;
   }
 
@@ -766,12 +786,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.borrar();
     this.form.patchValue(articulo);
     this.articuloSelected = articulo;
-    this.boton = 'Editar';
+    this.botonLabel = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
 
     this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(articulo.tipo_articulo_id));
     this.is_combo = articulo.is_combo;
+    console.log('Articulo ', articulo);
+
+    this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(articulo.cuentas_contables);
 
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
       this.COMPRADOEN = 'Quintal';
@@ -835,6 +858,23 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   nuevoRegistro() {
     this.isCreando = true;
+  }
+
+  checkIfSomethingIsDiferrent() {
+    const pick_values = ['cedula', 'rnc', 'nombre', 'apellido', 'telefono', 'sexo', 'limite_credito', 'maximo_credito', 'vendedor_id', 'direccion', 'id', 'img'];
+    const formValue = fun.pick(this.form.getRawValue(), pick_values);
+    formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
+    formValue['cuentas_contables'] = fun.duplicarJson(this.listaEntidadCuentasContables);
+
+    const originalArticulo = this.listaArticulos.find((cliente) => cliente.id == formValue.id);
+    const originalValue = fun.pick(originalArticulo, pick_values);
+
+    originalValue['img'] = originalArticulo.img_cliente;
+    originalValue['cedula'] = originalArticulo?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
+    originalValue['rnc'] = originalArticulo?.documentos_de_identidad.find((doc) => doc.descripcion == 'rnc')?.documento;
+    originalValue['cuentas_contables'] = fun.duplicarJson(this.entCuentaContServ.parseCuentasFromBackend(originalArticulo?.cuentas_contables));
+
+    return !fun.isEqual(formValue, originalValue);
   }
 
   formarContenido() {
@@ -928,6 +968,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.eliminarRegistro(objToSend);
   }
 
+  validate_cuentas() {
+    return this.entCuentaContServ.validateEntidades({ configsEntCuentas: this.listaConfigArticulos, entidad_cuentas_contables: this.listaEntidadCuentasContables });
+  }
+
   // =============================================
   //  Crear articulo
   // =============================================
@@ -955,6 +999,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       is_materia_prima: formulario.is_materia_prima,
       calcular_saco: formulario.calcular_saco,
     };
+
+    if (ConfigService.config.has_contabilidad) obj['cuentas_contables'] = this.listaEntidadCuentasContables;
 
     const array = this.ARRAY_FORMULA.value;
 
