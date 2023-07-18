@@ -69,7 +69,7 @@
                 <input id="cuentaContableInput" class="search-input form-control min font-bold" [value]="getCuentaLabel('contable')" disabled />
               </div>
 
-              <div *ngIf="form.controls.tipo_agrupacion_contable.value != agrupacionesContables.individual" class="row mt-3 w-100 rowCategoria">
+              <div *ngIf="form.controls.tipo_agrupacion_contable.value != agrupacionesContables.individual && inputs?.entidad != categoriasContables.articulo" class="row mt-3 w-100 rowCategoria">
                 <div class="col-8 p-0">
                   <div class="form-group mb-0" [appMsgError]="'tipo_agrupacion_contable'" [form]="form">
                     <label class="mb-0" for="search">{{ getDropDownInfo('description') }} </label>

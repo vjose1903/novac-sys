@@ -1,7 +1,7 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo d-flex">
     <h4 class="negrita mb-0 mr-3">Registro de articulos</h4>
-    <btn-icon-circular [id]="'btnConfiguracionArticulo'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" [tooltip]="'Configuraciones de articulos'" [tooltipPosition]="'right'" (clickFunction)="openModalConfig()"> </btn-icon-circular>
+    <btn-icon-circular [id]="'btnConfiguracionArticulo'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" pTooltip="Configuraciones de articulos" tooltipPosition="right" (clickFunction)="openModalConfig()"> </btn-icon-circular>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
@@ -56,13 +56,15 @@
                         <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)">Este Campo es obligatorio</div>
                       </div>
                     </div>
-                    <div class="col-6 p-0">
-                      <div class="form-group">
+
+                    <div class="{{ tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado' ? 'col-4' : 'col-6' }} p-0">
+                      <div class="form-group" [appMsgError]="'tipo_articulo_id'" [form]="form">
                         <label class="control-label">Tipo: <span style="color: red">*</span></label>
                         <select
                           (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
                           id="tipo"
                           formControlName="tipo_articulo_id"
+                          b
                           (change)="selectTipoArticulo($event.target.value)"
                           class="form-control"
                           value=""
@@ -72,13 +74,38 @@
                             <option [disabled]="tipo.codigo == 'producto_terminado' ? !hasPermissionUpdateFormula : false" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
                           </ng-container>
                         </select>
-                        <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)">
-                          Seleccione tipo de articulo
-                        </div>
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
 
-                    <div *ngIf="tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado'" class="col-6 pr-0">
+                    <div class="{{ tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado' ? 'col-4' : 'col-6' }} pr-0">
+                      <div
+                        class="form-group"
+                        [appMsgError]="'sub_tipo_articulo_id'"
+                        [form]="form"
+                        [pTooltip]="fun.isEmpty(tipoArticuloSelected) ? 'Debe seleccionar un tipo de articulo primero.' : listaSubTipoArticulos.length == 0 ? 'No existen sub tipo articulos para el tipo de articulo seleccionado.' : ''"
+                        tooltipPosition="left"
+                      >
+                        <label class="control-label">Sub tipo: <span style="color: red">*</span></label>
+                        <select
+                          (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
+                          id="campoSubTipo"
+                          formControlName="sub_tipo_articulo_id"
+                          (change)="selectSubTipoArticulo($event.target.value)"
+                          class="form-control"
+                          value=""
+                        >
+                          <option [value]="null" disabled>Sub tipo de articulo</option>
+                          <ng-container *ngFor="let tipo of listaSubTipoArticulos">
+                            <option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+                          </ng-container>
+                        </select>
+
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado'" class="col-4 pr-0">
                       <div class="form-group">
                         <label class="control-label">Vendido en: <span style="color: red">*</span></label>
                         <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">
@@ -111,8 +138,8 @@
                     </div>
                   </div>
 
-                  <div *ngIf="!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado'" class="row">
-                    <div *ngIf="articuloIsComprado()" class="col-6 p-0">
+                  <div *ngIf="articuloIsComprado() && (!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado')" class="row">
+                    <div class="col-6 p-0">
                       <div class="form-group">
                         <label class="control-label">Comprado en: <span style="color: red">*</span></label>
                         <!-- (keydown.enter)="saltar(tipoArticuloSelected?.descripcion === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
@@ -130,7 +157,8 @@
                       </div>
                     </div>
                     <!--  -->
-                    <div *ngIf="articuloIsComprado()" class="col-6 pr-0">
+
+                    <div class="col-6 pr-0">
                       <div class="form-group">
                         <label class="control-label">Vendido en: <span style="color: red">*</span></label>
                         <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
@@ -141,7 +169,7 @@
                       </div>
                     </div>
                     <!--  -->
-                    <div *ngIf="articuloIsComprado()" class="col-6 p-0">
+                    <div class="col-6 p-0">
                       <div class="form-group">
                         <label class="control-label">Costo: <span style="color: red">*</span></label>
                         <input
@@ -161,7 +189,8 @@
                         </div>
                       </div>
                     </div>
-                    <div *ngIf="articuloIsComprado()" class="col-6 pr-0">
+
+                    <div class="col-6 pr-0">
                       <div class="form-group">
                         <label class="control-label">Precio venta: <span style="color: red">*</span></label>
                         <input
@@ -181,7 +210,8 @@
                         </div>
                       </div>
                     </div>
-                    <div *ngIf="articuloIsComprado()" class="col-6 p-0">
+
+                    <div class="col-6 p-0">
                       <div class="form-group">
                         <label class="control-label">Alertar existencia: <span style="color: red">*</span></label>
                         <div class="row">
@@ -539,12 +569,13 @@
                     </div>
                   </div>
 
-
                   <div *ngIf="configApp.has_contabilidad" class="col-12 p-0">
                     <entidad-cuenta-contable
                       *ngxPermissionsOnly="entCuentaContServ.permissions"
                       [inputs]="{ configsEntCuentas: listaConfigArticulos, entidad: entidadContable }"
+                      [configuration]="{ btn: { categoria: fun.hasValue(tipoArticuloSelected), subCategoria: fun.hasValue(subTipoArticuloSelected) } }"
                       [cuentasContablesDataCruda]="articuloSelected ? articuloSelected?.cuentas_contables : []"
+                      [infoTipoArticulo]="{ categoria: tipoArticuloSelected, sub_categoria: subTipoArticuloSelected }"
                       [(cuentasContablesData)]="listaEntidadCuentasContables"
                     ></entidad-cuenta-contable>
                   </div>
@@ -574,7 +605,9 @@
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado articulos</h4>
           <div class="d-flex">
-            <button *ngxPermissionsOnly="allPermisosTipoArticulo" (click)="openModalCategorias()" class="btn btn-gris mr-3">Categorias</button>
+            <span [pTooltip]="articuloSelected || isCreando ? 'Para abrir el formulario de categorias, debe de cerrar el formulario de articulos.' : ''" tooltipPosition="left">
+              <button *ngxPermissionsOnly="allPermisosTipoArticulo" [disabled]="articuloSelected || isCreando" (click)="openModalCategorias()" class="btn btn-gris mr-3">Categorias</button>
+            </span>
             <button *ngxPermissionsOnly="permissions.articulo.create" [disabled]="articuloSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
           </div>
         </div>

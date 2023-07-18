@@ -7,6 +7,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms
 import { EntidadCuentaContableI, agrupacionContable, agrupacionesContables } from './cuenta-contable-form.utils';
 import { FormEntidadCuentaContableI } from './cuenta-contable-form.utils';
 import { SubTipoArticuloI } from '../../../registros/articulos/tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
+import { TipoArticuloI } from '../../../registros/articulos/tipo-articulo/tipo-articulo';
 
 @Component({
   selector: 'cuenta-contable-form',
@@ -17,6 +18,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   @Input() inputs: { selectedConfig: ConfiguracionEntidadCuentaI; entidad: entidadesContables };
   @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
   @Input() camposDisabled: boolean;
+  @Input() infoTipoArticulo: { categoria?: TipoArticuloI; sub_categoria?: SubTipoArticuloI };
 
   @Input() cuentaContableDataCruda: EntidadCuentaContableI;
 
@@ -25,7 +27,6 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
 
   form: UntypedFormGroup;
   listadoCategorias: Array<CategoriaEntidadContableI> = [];
-  listadoSubCategorias: Array<SubTipoArticuloI> = [];
   configEntContableClass = new ConfiguracionEntidadCuentaC();
 
   lastChange: FormEntidadCuentaContableI;
@@ -35,6 +36,9 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
 
   dataOriginal: FormEntidadCuentaContableI;
   hasCategories: boolean = true;
+  currentEntidad: entidadesContables;
+
+  categoriasContables = CategoriaEntidadContableC.entidad;
 
   constructor(private fb: UntypedFormBuilder, public catEntContServ: CategoriaEntidadContableService) {}
 
@@ -50,12 +54,15 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   async necesarioStart() {
+    this.currentEntidad = this.inputs.entidad;
+
     await this.createForm().then((form) => {
       form.valueChanges.subscribe((changes) => {
         if (!fun.isEqual(changes, this.lastChange)) this.returnData();
       });
     });
-    await this.getCategorias();
+
+    if (this.currentEntidad != this.categoriasContables.articulo) await this.getCategorias();
     this.updateOriginalData();
   }
 
@@ -81,11 +88,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   async getCategorias() {
     CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad, showMsgs: false })
       .then((res) => {
-        if (this.inputs.entidad == CategoriaEntidadContableC.entidad.articulo) {
-          this.listadoSubCategorias = res['data'];
-        } else {
-          this.listadoCategorias = res['data'];
-        }
+        this.listadoCategorias = res['data'];
       })
       .catch((err) => {
         this.hasCategories = false;
@@ -150,6 +153,12 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
         }
       } else {
         cuenta = categoriaSelected?.cuenta_contable_control.label;
+      }
+
+      if (this.currentEntidad == this.categoriasContables.articulo) {
+        const cuenta_per_config = this.infoTipoArticulo[formulario.tipo_agrupacion_contable].cuentas_contables.find((cuenta_per_config) => cuenta_per_config.key == this.inputs.selectedConfig.key);
+        const tipo_cuenta = formulario.tipo_agrupacion_contable == agrupacionesContables.categoria ? 'control' : 'auxiliar';
+        cuenta = cuenta_per_config[`label_${tipo_cuenta}`];
       }
     }
 

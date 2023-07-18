@@ -11,7 +11,7 @@ import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import * as moment from '../../../core/javascript/moment';
 import { ArticuloC } from './articulo';
-import { TipoArticuloC, tipos_articulos } from './tipo-articulo/tipo-articulo';
+import { TipoArticuloC, TipoArticuloI, tipos_articulos } from './tipo-articulo/tipo-articulo';
 import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
@@ -22,6 +22,7 @@ import { ModalClass } from '../../components/modal/modal-class';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC, entidadesContables } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
+import { SubTipoArticuloC, SubTipoArticuloI } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -44,13 +45,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   vendersePorSelected;
   listaArticulos = [];
   FORM: any;
-  listaTipoArticulos: any;
+  listaTipoArticulos: TipoArticuloI[] = [];
+  listaSubTipoArticulos: SubTipoArticuloI[] = [];
 
   optionsAlerta: any[];
   alertaMedida: any;
 
   articulo_no_paquete = false;
-  tipoArticuloSelected: any;
+  tipoArticuloSelected: TipoArticuloI;
+  subTipoArticuloSelected: SubTipoArticuloI;
 
   isCreando: boolean = false;
 
@@ -74,6 +77,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   tipoArticuloClass = new TipoArticuloC();
   configArticuloClass = new ConfigArticuloC();
   configEntContableClass = new ConfiguracionEntidadCuentaC();
+  subTipoArticuloClass = new SubTipoArticuloC();
 
   fechaFactura: string;
   permissions = Permisos;
@@ -105,6 +109,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   cofig_articulos: ConfigArticuloI;
   configApp: ConfigI = ConfigService.config;
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.articulo;
+  fun = fun;
 
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
@@ -177,9 +182,25 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   getTipoArticulos() {
-    this.listaTipoArticulos = [];
+    this.listaTipoArticulos.length = 0;
     this.tipoArticuloClass.getAll().then((res) => {
       this.listaTipoArticulos = fun.duplicarJson(res.data);
+    });
+  }
+
+  getSubTipoArticulos() {
+    return new Promise<void>((resolve, reject) => {
+      const parameters = { paginado: false, tipo_articulo_id: this.tipoArticuloSelected.id, showMsgs: false };
+      this.listaSubTipoArticulos.length = 0;
+
+      this.subTipoArticuloClass
+        .getSubTipoArticulos(parameters)
+        .then((res) => {
+          this.listaSubTipoArticulos = fun.duplicarJson(res.data);
+          this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+          resolve();
+        })
+        .catch(() => reject());
     });
   }
 
@@ -275,9 +296,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
-  async selectTipoArticulo(tipo) {
-    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(tipo));
-    this.modificateValidators();
+  async selectTipoArticulo(tipo_id) {
+    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(tipo_id));
+
+    this.getSubTipoArticulos().finally(() => this.modificateValidators());
 
     if (this.tipoArticuloSelected.codigo == 'materia_prima') {
       this.form.controls.is_materia_prima.setValue(true);
@@ -304,6 +326,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
+  async selectSubTipoArticulo(subTipo_id) {
+    this.subTipoArticuloSelected = this.listaSubTipoArticulos.find((val) => val.id == _.parseInt(subTipo_id));
+    console.log('this.subTipoArticuloSelected ', this.subTipoArticuloSelected);
+
+  }
+
   modificateValidators() {
     const objValidators = {
       costo_principal: { venta_normal: [Validators.required], servicio: null },
@@ -319,12 +347,15 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
       this.form.controls[key].updateValueAndValidity();
     }
+
+    this.listaSubTipoArticulos.length > 0 ? this.form.controls.sub_tipo_articulo_id.enable() : this.form.controls.sub_tipo_articulo_id.disable();
   }
 
   createForm() {
     this.form = this.fb.group({
       nombre: [null, Validators.required],
       tipo_articulo_id: [null, Validators.required],
+      sub_tipo_articulo_id: [{ value: null, disabled: true }],
       medida: [null, Validators.required],
       costo_principal: [null, Validators.required],
       precio_principal: [null, Validators.required],
@@ -410,13 +441,14 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   borrar(reset = false) {
     fun.enfocarInput('nombre');
 
-    [this.articuloSelected, this.tipoArticuloSelected] = Array(2).fill(undefined);
+    [this.articuloSelected, this.tipoArticuloSelected, this.subTipoArticuloSelected] = Array(3).fill(undefined);
 
     if (fun.hasValue(this.form)) this.form.reset();
     if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
     if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
 
-    this.listaEntidadCuentasContables = [];
+    this.listaEntidadCuentasContables.length = 0;
+    this.listaSubTipoArticulos.length = 0;
     this.botonLabel = 'Registrar';
     [this.recalcular, this.is_combo] = Array(2).fill(false);
 

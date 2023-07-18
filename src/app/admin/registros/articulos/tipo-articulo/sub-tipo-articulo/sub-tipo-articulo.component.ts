@@ -58,11 +58,10 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
   }
 
   getSubTipoArticulos(params?: { per_page: number; page: number; search: string }) {
-    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
-    const extra = { parameters: { page: params.page, per_page: params.per_page, paginado: true, filter_target: palabra_a_buscar, tipo_articulo_id: this.inputs.tipo_articulo.id } };
-
+    const parameters = { ...params, paginado: true, tipo_articulo_id: this.inputs.tipo_articulo.id };
     this.listaSubTipoArticulos.length = 0;
-    this.subTipoArticuloClass.getAll(extra).then((res) => {
+
+    this.subTipoArticuloClass.getSubTipoArticulos(parameters).then((res) => {
       this.listaSubTipoArticulos = fun.duplicarJson(res.data);
       this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
     });
@@ -77,7 +76,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
       this.form = this.fb.group({
         id: [{ value: null, disabled: false }],
         descripcion: [{ value: null, disabled: false }, Validators.required],
-        tipo_articulo_id: [{ value: null, disabled: false }, Validators.required],
+        tipo_articulo_id: [{ value: this.inputs.tipo_articulo.id, disabled: false }, Validators.required],
       });
 
       resolve(true);
@@ -86,6 +85,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
 
   borrar() {
     this.form.reset();
+    this.form.controls.tipo_articulo_id.setValue(this.inputs.tipo_articulo.id);
     this.subCategoriaSelected = undefined;
   }
 

@@ -3,6 +3,8 @@ import { ConfiguracionEntidadCuentaI } from './../configuracion-entidad-cuenta/c
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { entidadesContables } from '../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { EntidadCuentaContableI, FormEntidadCuentaContableI, entidadCuentaContableBlank } from './cuenta-contable-form/cuenta-contable-form.utils';
+import { TipoArticuloI } from '../../registros/articulos/tipo-articulo/tipo-articulo';
+import { SubTipoArticuloI } from '../../registros/articulos/tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 
 @Component({
   selector: 'entidad-cuenta-contable',
@@ -14,6 +16,7 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
   @Input() inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI>; entidad: entidadesContables };
   @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
   @Input() camposDisabled: boolean = false;
+  @Input() infoTipoArticulo: { categoria?: TipoArticuloI; sub_categoria?: SubTipoArticuloI };
 
   @Input() cuentasContablesDataCruda: EntidadCuentaContableI[] = [];
 
@@ -32,6 +35,7 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
     }
 
     if (fun.objHas(changes, 'inputs')) this.initEntidadCuentasContables();
+    if (fun.objHas(changes, 'configuration')) this.checkConfig();
   }
 
   checkConfig() {
@@ -48,11 +52,11 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
 
       if (fun.isEmpty(entidad_cuenta)) {
         entidad_cuenta = fun.duplicarJson(entidadCuentaContableBlank);
-        console.log('entidad_cuenta ', entidad_cuenta);
+        // console.log('entidad_cuenta ', entidad_cuenta);
 
         entidad_cuenta.configuracion_entidad_cuenta_id = config.id;
-        console.log('entidad_cuenta ', entidad_cuenta);
-        console.log('this.cuentasContablesData ', this.cuentasContablesData);
+        // console.log('entidad_cuenta ', entidad_cuenta);
+        // console.log('this.cuentasContablesData ', this.cuentasContablesData);
         this.cuentasContablesData.push(entidad_cuenta);
       }
     }
