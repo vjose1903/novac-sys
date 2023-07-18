@@ -54,6 +54,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   chequiando_cuadre: boolean;
   hasPermisosValidated: boolean;
+  currentYear: number;
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService, public divisaServ: DivisaService) {
     super();
@@ -160,7 +161,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.noServer = false;
     this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
     this.activeIndex = 0;
-
+    this.currentYear = new Date().getFullYear();
     this.cuadre_hoy = false;
   }
 

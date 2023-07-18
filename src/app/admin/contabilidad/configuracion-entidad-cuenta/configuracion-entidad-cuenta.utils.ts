@@ -32,6 +32,8 @@ export interface ConfiguracionEntidadCuentaI {
   entidad: string;
   key: string;
   is_nacional: boolean;
+  has_individual: boolean;
+  has_comun: boolean;
   cuenta_contable: CuentaContableI;
   [nombrePropiedad: string]: any;
 }

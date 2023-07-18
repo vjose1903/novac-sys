@@ -38,7 +38,9 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   hasCategories: boolean = true;
   currentEntidad: entidadesContables;
 
-  categoriasContables = CategoriaEntidadContableC.entidad;
+  is_articulo: boolean = false;
+
+  individualConfig: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } };
 
   constructor(private fb: UntypedFormBuilder, public catEntContServ: CategoriaEntidadContableService) {}
 
@@ -51,10 +53,14 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
       this.form.patchValue(this.cuentaContableData);
       this.updateOriginalData();
     }
+
+    if (fun.objHas(changes, 'configuration')) this.checkConfig();
+    // console.log('changes ', changes);
   }
 
   async necesarioStart() {
     this.currentEntidad = this.inputs.entidad;
+    this.is_articulo = this.inputs?.entidad == CategoriaEntidadContableC.entidad.articulo;
 
     await this.createForm().then((form) => {
       form.valueChanges.subscribe((changes) => {
@@ -62,8 +68,15 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
       });
     });
 
-    if (this.currentEntidad != this.categoriasContables.articulo) await this.getCategorias();
+    if (!this.is_articulo) await this.getCategorias();
     this.updateOriginalData();
+    this.checkConfig();
+  }
+
+  checkConfig() {
+    this.individualConfig = fun.duplicarJson(this.configuration);
+
+    if (!this.inputs.selectedConfig.has_individual) this.individualConfig.btn.individual = false;
   }
 
   updateOriginalData() {
@@ -72,17 +85,28 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
 
   createForm() {
     return new Promise<UntypedFormGroup>((resolve, reject) => {
+      console.log('fun.hasValue(this.cuentaContableData) ', fun.hasValue(this.cuentaContableData));
+      console.log('this.cuentaContableData ', this.cuentaContableData);
+      console.log('  ');
+
       this.form = this.fb.group({
         id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.id : null, disabled: false }],
         tipo_agrupacion_contable: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable : null, disabled: false }, Validators.required],
         tipo_categoria: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_categoria : null, disabled: false }],
         tipo_categoria_id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_categoria_id : null, disabled: false }],
-        is_comun: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.is_comun : false, disabled: false }],
+        is_comun: [{ value: fun.hasValue(this.cuentaContableData) ? this.getDefaultValueIsComun(this.cuentaContableData.is_comun) : this.getDefaultValueIsComun(), disabled: false }],
         has_cuenta: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable != agrupacionesContables.sin_cuenta : true, disabled: false }],
         configuracion_entidad_cuenta_id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.configuracion_entidad_cuenta_id : this.inputs.selectedConfig.id, disabled: false }],
       });
       resolve(this.form);
     });
+  }
+
+  getDefaultValueIsComun(currentValue?: boolean) {
+    console.log('this.inputs.selectedConfig --> ', this.inputs.selectedConfig);
+    const has_comun = this.inputs.selectedConfig.has_comun;
+
+    return has_comun ? currentValue : !has_comun;
   }
 
   async getCategorias() {
@@ -155,7 +179,9 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
         cuenta = categoriaSelected?.cuenta_contable_control.label;
       }
 
-      if (this.currentEntidad == this.categoriasContables.articulo) {
+      if (this.is_articulo) {
+        console.log('this.infoTipoArticulo ', this.infoTipoArticulo);
+
         const cuenta_per_config = this.infoTipoArticulo[formulario.tipo_agrupacion_contable].cuentas_contables.find((cuenta_per_config) => cuenta_per_config.key == this.inputs.selectedConfig.key);
         const tipo_cuenta = formulario.tipo_agrupacion_contable == agrupacionesContables.categoria ? 'control' : 'auxiliar';
         cuenta = cuenta_per_config[`label_${tipo_cuenta}`];

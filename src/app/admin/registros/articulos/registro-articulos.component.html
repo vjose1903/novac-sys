@@ -86,7 +86,7 @@
                         [pTooltip]="fun.isEmpty(tipoArticuloSelected) ? 'Debe seleccionar un tipo de articulo primero.' : listaSubTipoArticulos.length == 0 ? 'No existen sub tipo articulos para el tipo de articulo seleccionado.' : ''"
                         tooltipPosition="left"
                       >
-                        <label class="control-label">Sub tipo: <span style="color: red">*</span></label>
+                        <label class="control-label">Sub tipo:</label>
                         <select
                           (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
                           id="campoSubTipo"
