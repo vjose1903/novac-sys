@@ -77,6 +77,8 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     this.individualConfig = fun.duplicarJson(this.configuration);
 
     if (!this.inputs.selectedConfig.has_individual) this.individualConfig.btn.individual = false;
+    if (!this.inputs.selectedConfig.has_categoria) this.individualConfig.btn.categoria = false;
+    if (!this.inputs.selectedConfig.has_sub_categoria) this.individualConfig.btn.subCategoria = false;
   }
 
   updateOriginalData() {
