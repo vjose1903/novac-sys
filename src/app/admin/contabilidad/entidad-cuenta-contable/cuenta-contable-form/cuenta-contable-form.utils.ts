@@ -1,3 +1,7 @@
+import { fun } from './../../../../core/services/functions.service';
+import { entidadesContables } from './../../categoria-entidad-contable/categoria-entidad-contable.utils';
+import { ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
+
 export type agrupacionContable = 'categoria' | 'individual' | 'sub_categoria' | 'sin_cuenta';
 
 export const agrupacionesContables = {
@@ -51,3 +55,15 @@ export const entidadCuentaContableBlank: FormEntidadCuentaContableI = {
   is_comun: false,
   configuracion_entidad_cuenta_id: null,
 };
+
+export function enableIsComunSwitch(params: { selectedConfig: ConfiguracionEntidadCuentaI; entidad: entidadesContables; isArticulo: boolean; formValue: any }) {
+  let res = true;
+
+  if (params.isArticulo) {
+    res = params.selectedConfig.has_comun;
+  } else {
+    res = fun.hasValue(params.formValue.tipo_categoria_id)
+  }
+
+  return res;
+}

@@ -105,7 +105,7 @@
                 <div class="{{ !is_articulo ? 'col-4' : 'col-12' }} p-0">
                   <div class="form-group mb-0 switchDiv h-100 align-items-end justify-content-end">
                     <div class="d-flex align-items-center ml-4">
-                      <div [pTooltip]="!is_articulo && fun.isEmpty(form.controls.tipo_categoria_id.value) ? 'Primero ' + getDropDownInfo('placeholder').toLowerCase() : ''" tooltipPosition="left" class="h-100 d-flex align-items-center">
+                      <div [pTooltip]="getIsComunSwitchTooltip()" tooltipPosition="left" class="h-100 d-flex align-items-center">
                         <input formControlName="is_comun" class="apple-switch" type="checkbox" />
                       </div>
                       <span class="ml-2 mb-0">Cuenta Común</span>

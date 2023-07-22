@@ -4,7 +4,7 @@ import { CategoriaEntidadContableService } from '../../categoria-entidad-contabl
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC, CategoriaEntidadContableI, entidadesContables } from '../../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { EntidadCuentaContableI, agrupacionContable, agrupacionesContables } from './cuenta-contable-form.utils';
+import { EntidadCuentaContableI, agrupacionContable, agrupacionesContables, enableIsComunSwitch } from './cuenta-contable-form.utils';
 import { FormEntidadCuentaContableI } from './cuenta-contable-form.utils';
 import { SubTipoArticuloI } from '../../../registros/articulos/tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 import { TipoArticuloI } from '../../../registros/articulos/tipo-articulo/tipo-articulo';
@@ -55,7 +55,6 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     }
 
     if (fun.objHas(changes, 'configuration')) this.checkConfig();
-    // console.log('changes ', changes);
   }
 
   async necesarioStart() {
@@ -66,31 +65,35 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
       form.valueChanges.subscribe((changes) => {
         if (!fun.isEqual(changes, this.lastChange)) this.returnData();
       });
+
+      this.updateOriginalData();
     });
 
     if (!this.is_articulo) await this.getCategorias();
-    this.updateOriginalData();
     this.checkConfig();
   }
 
   checkConfig() {
     this.individualConfig = fun.duplicarJson(this.configuration);
+    let cuenta_per_config_categoria;
+    let cuenta_per_config_sub_categoria;
+
+    if (this.is_articulo) {
+      cuenta_per_config_categoria = this.infoTipoArticulo?.categoria?.cuentas_contables.find((cuenta_per_config) => cuenta_per_config.key == this.inputs.selectedConfig.key);
+      cuenta_per_config_sub_categoria = this.infoTipoArticulo?.sub_categoria?.cuentas_contables.find((cuenta_per_config) => cuenta_per_config.key == this.inputs.selectedConfig.key);
+    }
 
     if (!this.inputs.selectedConfig.has_individual) this.individualConfig.btn.individual = false;
-    if (!this.inputs.selectedConfig.has_categoria) this.individualConfig.btn.categoria = false;
-    if (!this.inputs.selectedConfig.has_sub_categoria) this.individualConfig.btn.subCategoria = false;
+    if (!this.inputs.selectedConfig.has_categoria || fun.isEmpty(cuenta_per_config_categoria)) this.individualConfig.btn.categoria = false;
+    if (!this.inputs.selectedConfig.has_sub_categoria || fun.isEmpty(cuenta_per_config_sub_categoria)) this.individualConfig.btn.subCategoria = false;
   }
 
   updateOriginalData() {
-    this.dataOriginal = fun.duplicarJson(this.cuentaContableData);
+    this.dataOriginal = fun.duplicarJson(this.form.getRawValue());
   }
 
   createForm() {
     return new Promise<UntypedFormGroup>((resolve, reject) => {
-      console.log('fun.hasValue(this.cuentaContableData) ', fun.hasValue(this.cuentaContableData));
-      console.log('this.cuentaContableData ', this.cuentaContableData);
-      console.log('  ');
-
       this.form = this.fb.group({
         id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.id : null, disabled: false }],
         tipo_agrupacion_contable: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable : null, disabled: false }, Validators.required],
@@ -105,9 +108,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   getDefaultValueIsComun(currentValue?: boolean) {
-    console.log('this.inputs.selectedConfig --> ', this.inputs.selectedConfig);
     const has_comun = this.inputs.selectedConfig.has_comun;
-
     return has_comun ? currentValue : !has_comun;
   }
 
@@ -150,16 +151,23 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     this.form.controls.tipo_agrupacion_contable.setValue(tipo);
     this.form.controls.tipo_categoria_id.setValue(null);
 
-    fun.hasValue(formValue.tipo_categoria_id) ? this.form.controls.is_comun.enable() : this.form.controls.is_comun.disable();
-    if (tipo == agrupacionesContables.individual) this.form.controls.is_comun.setValue(false);
+    const isComunSwitchEnable = enableIsComunSwitch({ selectedConfig: this.inputs.selectedConfig, entidad: this.currentEntidad, isArticulo: this.is_articulo, formValue: formValue });
+    isComunSwitchEnable ? this.form.controls.is_comun.enable() : this.form.controls.is_comun.disable();
+
+    if (tipo == agrupacionesContables.individual) {
+      this.form.controls.is_comun.setValue(false);
+      this.form.controls.is_comun.disable();
+    }
   }
 
   selectCategoria() {
     const formValue = this.form.getRawValue();
 
-    fun.hasValue(formValue.tipo_categoria_id) ? this.form.controls.is_comun.enable() : this.form.controls.is_comun.disable();
+    const isComunSwitchEnable = enableIsComunSwitch({ selectedConfig: this.inputs.selectedConfig, entidad: this.currentEntidad, isArticulo: this.is_articulo, formValue: formValue });
+    isComunSwitchEnable ? this.form.controls.is_comun.enable() : this.form.controls.is_comun.disable();
 
-    if (fun.isEmpty(formValue.tipo_categoria_id)) this.form.controls.is_comun.setValue(false);
+    if (!this.is_articulo && fun.isEmpty(formValue.tipo_categoria_id)) this.form.controls.is_comun.setValue(false);
+    this.checkConfig();
   }
 
   getCuentaLabel(tipo: 'control' | 'contable') {
@@ -182,10 +190,9 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
       }
 
       if (this.is_articulo) {
-        console.log('this.infoTipoArticulo ', this.infoTipoArticulo);
-
         const cuenta_per_config = this.infoTipoArticulo[formulario.tipo_agrupacion_contable].cuentas_contables.find((cuenta_per_config) => cuenta_per_config.key == this.inputs.selectedConfig.key);
-        const tipo_cuenta = formulario.tipo_agrupacion_contable == agrupacionesContables.categoria ? 'control' : 'auxiliar';
+        const tipo_cuenta = tipo == 'control' ? 'control' : formulario.is_comun ? 'auxiliar' : 'control';
+
         cuenta = cuenta_per_config[`label_${tipo_cuenta}`];
       }
     }
@@ -204,6 +211,19 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     if (tipo == 'placeholder') res = `Seleccione la ${formulario.tipo_agrupacion_contable == 'categoria' ? 'categoria' : 'sub categoria'}.`;
     if (tipo == 'description') res = formulario.tipo_agrupacion_contable == 'categoria' ? 'Categoria' : 'Sub Categoria';
     return res;
+  }
+
+  getIsComunSwitchTooltip() {
+    let tooltip = '';
+    const formValue = this.form.getRawValue();
+
+    if (this.is_articulo) {
+      if (!enableIsComunSwitch({ selectedConfig: this.inputs.selectedConfig, entidad: this.currentEntidad, isArticulo: this.is_articulo, formValue: formValue })) tooltip = 'Solo acepta cuenta común.';
+    } else {
+      if (fun.isEmpty(formValue.tipo_categoria_id)) tooltip = `Primero ${this.getDropDownInfo('placeholder').toLowerCase()}`;
+    }
+
+    return tooltip;
   }
 
   returnData() {
