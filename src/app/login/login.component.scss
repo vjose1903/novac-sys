@@ -8,6 +8,25 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  .power-by-div {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 0.3rem;
+
+    .label {
+      white-space: nowrap;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .inspot {
+      width: 8rem !important;
+    }
+  }
 }
 
 .svg-background {
@@ -19,9 +38,6 @@
   color: #b3b3b3;
   font-size: 0.8rem;
 }
-// #boton{
-//     margin: auto;
-// }
 
 .formulario__label {
   font-family: Poppins;

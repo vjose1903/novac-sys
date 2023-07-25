@@ -298,7 +298,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async selectTipoArticulo(tipo_id) {
     this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(tipo_id));
-
+    this.subTipoArticuloSelected = undefined;
+    this.form.controls.sub_tipo_articulo_id.setValue(null);
     this.getSubTipoArticulos().finally(() => this.modificateValidators());
 
     if (this.tipoArticuloSelected.codigo == 'materia_prima') {
@@ -328,24 +329,24 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async selectSubTipoArticulo(subTipo_id) {
     this.subTipoArticuloSelected = this.listaSubTipoArticulos.find((val) => val.id == _.parseInt(subTipo_id));
-    console.log('this.subTipoArticuloSelected ', this.subTipoArticuloSelected);
-
   }
 
   modificateValidators() {
-    const objValidators = {
-      costo_principal: { venta_normal: [Validators.required], servicio: null },
-      aviso_existencia: { venta_normal: [Validators.required], servicio: null },
-      vendido_en: { venta_normal: [Validators.required], servicio: null },
-      medida_alerta: { venta_normal: [Validators.required], servicio: null },
-      medida: { venta_normal: [Validators.required], servicio: null },
-    };
+    if (fun.hasValue(this.tipoArticuloSelected)) {
+      const objValidators = {
+        costo_principal: { venta_normal: [Validators.required], servicio: null },
+        aviso_existencia: { venta_normal: [Validators.required], servicio: null },
+        vendido_en: { venta_normal: [Validators.required], servicio: null },
+        medida_alerta: { venta_normal: [Validators.required], servicio: null },
+        medida: { venta_normal: [Validators.required], servicio: null },
+      };
 
-    for (const key in objValidators) {
-      const element = objValidators[key];
+      for (const key in objValidators) {
+        const element = objValidators[key];
 
-      this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
-      this.form.controls[key].updateValueAndValidity();
+        this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
+        this.form.controls[key].updateValueAndValidity();
+      }
     }
 
     this.listaSubTipoArticulos.length > 0 ? this.form.controls.sub_tipo_articulo_id.enable() : this.form.controls.sub_tipo_articulo_id.disable();
@@ -438,6 +439,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
+  test() {
+    console.log('this.listaEntidadCuentasContables ', this.listaEntidadCuentasContables);
+  }
+
   borrar(reset = false) {
     fun.enfocarInput('nombre');
 
@@ -455,6 +460,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (this.is_combo) this.resetArray();
     if (fun.hasValue(this.form)) this.form.controls['rowFormula'].reset();
     if (reset) this.isCreando = true;
+    this.modificateValidators();
   }
 
   resetCompradoEn(value) {

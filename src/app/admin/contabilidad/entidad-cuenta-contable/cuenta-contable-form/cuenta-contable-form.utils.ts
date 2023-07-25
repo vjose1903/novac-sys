@@ -11,6 +11,10 @@ export const agrupacionesContables = {
   sin_cuenta: 'sin_cuenta' as agrupacionContable,
 };
 
+export const tipoCategoria = {
+  tipoArticulo: 'tipo_articulo',
+  subTipoArticulo: 'sub_tipo_articulo',
+};
 export interface EntidadCuentaContableI {
   id: number;
   configuracion_entidad_cuenta_id: number;
@@ -62,7 +66,7 @@ export function enableIsComunSwitch(params: { selectedConfig: ConfiguracionEntid
   if (params.isArticulo) {
     res = params.selectedConfig.has_comun;
   } else {
-    res = fun.hasValue(params.formValue.tipo_categoria_id)
+    res = fun.hasValue(params.formValue.tipo_categoria_id);
   }
 
   return res;

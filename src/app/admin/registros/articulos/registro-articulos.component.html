@@ -69,7 +69,7 @@
                           class="form-control"
                           value=""
                         >
-                          <option [value]="null" disabled>Tipo de articulo</option>
+                          <option [value]="null" disabled>Seleccione</option>
                           <ng-container *ngFor="let tipo of listaTipoArticulos">
                             <option [disabled]="tipo.codigo == 'producto_terminado' ? !hasPermissionUpdateFormula : false" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
                           </ng-container>
@@ -95,7 +95,7 @@
                           class="form-control"
                           value=""
                         >
-                          <option [value]="null" disabled>Sub tipo de articulo</option>
+                          <option [value]="null" disabled>Seleccione</option>
                           <ng-container *ngFor="let tipo of listaSubTipoArticulos">
                             <option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
                           </ng-container>
@@ -592,6 +592,8 @@
                     </ng-container>
                   </div>
                   <div>
+                    <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button>
+
                     <button class="btn btn-blanco" id="btnCerrar" (click)="borrar(); isCreando = false">Cerrar</button>
                   </div>
                 </div>
