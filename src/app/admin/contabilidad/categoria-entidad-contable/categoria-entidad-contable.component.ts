@@ -37,7 +37,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     id_tabla: 'listado_categorias',
     padre_functions: { data_request: (params) => this.fillArrayWithCategorias({ ...params }) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.categoria_entidad_contable.update } },
   };
   tablaComponent: any;

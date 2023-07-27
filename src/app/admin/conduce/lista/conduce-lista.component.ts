@@ -44,7 +44,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_conduces',
     padre_functions: { data_request: (params) => this.getConduces(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
   };
 
   tablaComponent;
@@ -81,7 +81,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     this.router.navigateByUrl('/admin/conduce/formulario');
   }
 
-  async getConduces(params?: { per_page: number; page: number; search: string }) {
+  async getConduces(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };

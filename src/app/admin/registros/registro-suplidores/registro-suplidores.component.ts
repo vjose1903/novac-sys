@@ -66,7 +66,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     id_tabla: 'lista_suplidores',
     padre_functions: { data_request: (params) => this.getSuplidores(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy }, styles: { width: '5.5rem' } },
   };
   tablaComponent;
@@ -130,7 +130,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     });
   }
 
-  async getSuplidores(params?: { per_page: number; page: number; search: string }) {
+  async getSuplidores(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };

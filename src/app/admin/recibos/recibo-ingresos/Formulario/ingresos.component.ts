@@ -83,7 +83,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     padding: '0.5rem',
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
-    obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: false,  is_local: false },
   };
 
   tablaComponent;
@@ -145,7 +145,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  async pedirFacturasPorCliente(cliente_id, params?: { per_page: number; page: number; search: string; factura_a_buscar?: any }) {
+  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any }) {
     this.facturas.length = 0;
 
     this.totalFacturado = 0;
@@ -306,7 +306,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
+  pedirNuevaData(params?: { per_page?: number; page?: number; search?: string }) {
     if (fun.hasValue(this.clienteAdepositar)) {
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, params);
     } else {

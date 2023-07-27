@@ -30,7 +30,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     colores: true,
     id_tabla: 'retornar_articulo',
     filtrar: { show: false, local: true },
-    obj_paginate: { show: true, showTotal: false, showDropDown: false, page: 1, per_page: 9999, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    obj_paginate: { show: true, showTotal: false, showDropDown: false, per_page: 9999, is_local: true },
   };
 
   articuloSelected;

@@ -41,7 +41,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: (params) => this.getRecibos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
   };
   tablaComponent;
 
@@ -106,7 +106,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     await this.getRecibos(this.tServ.obj_paginate.default);
   }
 
-  async getRecibos(params?: { per_page: number; page: number; search: string }) {
+  async getRecibos(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 

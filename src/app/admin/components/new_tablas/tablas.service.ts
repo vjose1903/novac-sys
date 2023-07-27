@@ -17,6 +17,7 @@ export class TablasService {
     default: {
       ant_page: null,
       page: 1,
+      page_front: 0,
       per_page: 20,
       per_page_options: [10, 15, 20, 30],
       search: ' ',
@@ -28,7 +29,7 @@ export class TablasService {
     if (this.obj_paginate[id] == undefined) this.obj_paginate[id] = params;
   }
 
-  getPaginationById(id, quien?) {
+  getPaginationById(id): paginateI {
     return this.obj_paginate[id];
   }
 
@@ -36,17 +37,10 @@ export class TablasService {
     params.forEach((param) => {
       const key = _.keys(param)[0];
       this.obj_paginate[id][key] = param[key];
+
       if (key == 'page') {
-        const id_paginador = `paginator-${id + tablaComponent.post_id}`;
-        tablaComponent.showPagination = false;
-
-        setTimeout(() => (tablaComponent.showPagination = true), 100);
-
-        // const paginator = document.getElementById(id_paginador) as unknown as Paginator;
-
-        // paginator.changePage(Number(params[key]));
-
-        // console.dir(paginator);
+        const pageFromCero = param[key] > 0 ? param[key] - 1 : param[key];
+        this.obj_paginate[id].page_front = pageFromCero * this.obj_paginate[id].per_page;
       }
     });
   }

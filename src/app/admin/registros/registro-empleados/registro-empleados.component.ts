@@ -61,7 +61,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     id_tabla: 'lista_empleados',
     padre_functions: { data_request: (params) => this.getEmpleados(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.user.update }, borrar: { show: true, permiso: this.permissions.user.destroy } },
   };
   tablaComponent;
@@ -122,7 +122,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     fun.enfocarInput('cedula');
   }
 
-  async getEmpleados(params?: { per_page: number; page: number; search: string }) {
+  async getEmpleados(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 

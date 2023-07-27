@@ -65,7 +65,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     id_tabla: 'lista_ncf',
     padre_functions: { data_request: (params) => this.getPaquetesNCF(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.secuencia_comprobante.update }, borrar: { show: true, permiso: this.permissions.secuencia_comprobante.destroy } },
   };
   tablaComponent;
@@ -131,7 +131,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  async getPaquetesNCF(params?: { per_page: number; page: number; search: string }) {
+  async getPaquetesNCF(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 

@@ -38,7 +38,7 @@ export class BuscarFacturaC {
       colores: true,
       padding: '0.5rem',
       id_tabla: 'facturas_params',
-      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+      obj_paginate: { show: true, showTotal: true,  is_local: false },
     } as table_config,
 
     compra: {
@@ -63,7 +63,7 @@ export class BuscarFacturaC {
       colores: true,
       padding: '0.5rem',
       id_tabla: 'facturas_params',
-      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+      obj_paginate: { show: true, showTotal: true,  is_local: false },
     } as table_config,
 
     pre_venta: {
@@ -95,7 +95,7 @@ export class BuscarFacturaC {
       colores: true,
       padding: '0.5rem',
       id_tabla: 'facturas_params',
-      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+      obj_paginate: { show: true, showTotal: true,  is_local: false },
     } as table_config,
 
     cotizacion: {
@@ -120,7 +120,7 @@ export class BuscarFacturaC {
       colores: true,
       padding: '0.5rem',
       id_tabla: 'facturas_params',
-      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+      obj_paginate: { show: true, showTotal: true, is_local: false },
     } as table_config,
   };
 }

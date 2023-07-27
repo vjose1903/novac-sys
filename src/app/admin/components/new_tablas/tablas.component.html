@@ -205,11 +205,11 @@
 
             <!-- <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)"> -->
             <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center">
-              <!-- ({{ tServ.getPaginationById(realIdTabla)?.page }}) -->
+              <!-- <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button> -->
+
               <p-paginator
-                *ngIf="showPagination"
                 id="paginator-{{ realIdTabla }}"
-                [first]="tServ.getPaginationById(realIdTabla)?.page"
+                [first]="tServ.getPaginationById(realIdTabla)?.page_front"
                 [rows]="tServ.getPaginationById(realIdTabla)?.per_page"
                 [pageLinkSize]="cantPagesView"
                 [totalRecords]="config.total_count"

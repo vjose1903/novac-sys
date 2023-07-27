@@ -70,7 +70,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     colores: true,
     id_tabla: 'lista_documentos',
     padre_functions: { data_request: (params) => this.buscarDocumentos(params) },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
   };
 
   facturaClass = new FacturaC();
@@ -129,7 +129,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     this.listaClientes.length = 0;
   }
 
-  async buscarDocumentos(params?: { per_page: number; page: number; search: string }) {
+  async buscarDocumentos(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       this.documentos.length = 0;
 

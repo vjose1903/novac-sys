@@ -35,7 +35,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   seleccionado_id: any;
   altoTabla;
   altoTbody;
-  showPagination = true;
 
   @Input() TablasComponent;
   @Output() TablasComponentChange = new EventEmitter<any>();
@@ -90,6 +89,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   checkPagination() {
+    if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
+    }
+
     this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || this.tServ.obj_paginate.default);
   }
 
@@ -166,7 +173,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
         if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-          const actualPagination = this.tServ.getPaginationById(this.realIdTabla, 'filter');
+          const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
 
           if (fun.hasValue(search)) {
             if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.realIdTabla, [{ ant_page: actualPagination.page }], this);
@@ -199,29 +206,36 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   paginatorChange(event, id) {
     setTimeout(() => {
-      const page = event.page + 1;
-      const per_page = event.rows;
-      const actualPagination = this.tServ.getPaginationById(this.realIdTabla, 'paginatorChange');
+      this.zone.run(() => {
+        const page = event.page + 1;
+        const per_page = event.rows;
+        const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
 
-      const actualPage = this.getPaginatorPageByNumber(page);
-      const clickeado_por = actualPage?.getAttribute('clickeado_por');
+        const actualPage = this.getPaginatorPageByNumber(page);
 
-      if (fun.hasValue(actualPagination) && (page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
-        this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }], this);
+        const clickeado_por = actualPage?.getAttribute('clickeado_por');
 
-        if (actualPagination.is_local) {
-          this.localPagination(page, per_page, 'paginatorChange');
-        } else {
-          if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-            this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
+        if (fun.hasValue(actualPagination) && (page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
+          this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }], this);
+
+          if (actualPagination.is_local) {
+            this.localPagination(page, per_page, 'paginatorChange');
           } else {
-            fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
+            if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
+              this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
+            } else {
+              fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
+            }
           }
         }
-      }
 
-      this.cdRef.detectChanges();
+        this.cdRef.detectChanges();
+      });
     }, 150);
+  }
+
+  test() {
+    console.log('paginator --> ', fun.duplicarJson(this.tServ.getPaginationById(this.realIdTabla)));
   }
 
   localPagination(page, per_page, desde = '') {
@@ -240,7 +254,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.data.length = 0;
     newData.forEach((dato) => this.data.push(dato));
     const id = this.realIdTabla;
-    const actualPagination = this.tServ.getPaginationById(id, 'dataLocalFilter');
+    const actualPagination = this.tServ.getPaginationById(id);
 
     let new_obj_pagination = { ant_page: null, page: null };
 

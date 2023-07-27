@@ -51,7 +51,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
     id_tabla: 'lista_periodos',
     padre_functions: { data_request: (params) => this.getPeriodosFiscales(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
   };
   tablaComponent;
 
@@ -79,7 +79,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
     await this.getPeriodosFiscales(this.tServ.obj_paginate.default);
   }
 
-  async getPeriodosFiscales(params?: { per_page: number; page: number; search: string }) {
+  async getPeriodosFiscales(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 

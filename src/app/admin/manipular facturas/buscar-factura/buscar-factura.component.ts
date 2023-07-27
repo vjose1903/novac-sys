@@ -79,7 +79,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     filtrar: { local: false },
     id_tabla: 'lista_notas',
     padre_functions: { data_request: (params) => this.pedirNotas(params) },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
   };
 
   tablaNotasComponent;
@@ -224,7 +224,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.showSide = true;
   }
 
-  async pedirNotas(params?: { per_page: number; page: number; search: string }) {
+  async pedirNotas(params?: { per_page?: number; page?: number; search?: string }) {
     return new Promise(async (resolve) => {
       this.notas.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
@@ -272,7 +272,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     return res;
   }
 
-  async pedirFactura(params?: { per_page: number; page: number; search: string }) {
+  async pedirFactura(params?: { per_page?: number; page?: number; search?: string }) {
     const documento_descripcion = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Cotización' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
 
     try {
@@ -530,7 +530,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fun.toastSuccess(msg, 'CORRECTO');
       }
 
-      const actualPagination = this.tServ.getPaginationById('facturas_params', 'saltar');
+      const actualPagination = this.tServ.getPaginationById('facturas_params');
       this.pedirFactura(actualPagination);
     });
   }
@@ -541,7 +541,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   saltar(salioDe, valor) {
     this.resetFacturas();
-    const actualPagination = this.tServ.getPaginationById('facturas_params', 'saltar');
+    const actualPagination = this.tServ.getPaginationById('facturas_params');
 
     let siguiente_input;
     this.valor_a_buscar = valor;
@@ -605,7 +605,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async AnularFactura() {
     try {
       const res = await this.facturaClass.createOne(null, { afterPath: `anular_factura/${this.facturaSelected.id}` });
-      const actualPagination = this.tServ.getPaginationById('facturas_params', 'CancelarFactura');
+      const actualPagination = this.tServ.getPaginationById('facturas_params');
       this.pedirFactura(actualPagination);
     } catch (error) {
       console.error(error);
@@ -740,7 +740,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       } else {
         (document.getElementById('valorI') as any).value = arg.data.nombre_completo;
 
-        const actualPagination = this.tServ.getPaginationById('facturas_params', 'getDataFromModal');
+        const actualPagination = this.tServ.getPaginationById('facturas_params');
 
         this.buscar_por = this.tipo_documento_selected == tipoDocFacturacion.compra ? this.campos.suplidor : this.campos.cliente;
         this.valor_a_buscar = arg.data.id;

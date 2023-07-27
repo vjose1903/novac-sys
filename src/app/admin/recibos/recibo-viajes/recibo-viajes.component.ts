@@ -52,7 +52,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     filtrar: { local: false },
     colores: true,
     id_tabla: 'lista_viajes',
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
   };
 
   config_viaje_selected: table_config = {
@@ -185,7 +185,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     setTimeout(() => {}, 500);
   }
 
-  async getViajes(params?: { per_page: number; page: number; search: string }) {
+  async getViajes(params?: { per_page?: number; page?: number; search?: string }) {
     return new Promise<any>(async (resolve, reject) => {
       this.viajes_completados_cant = 0;
       this.viajes_pendientes_cant = 0;

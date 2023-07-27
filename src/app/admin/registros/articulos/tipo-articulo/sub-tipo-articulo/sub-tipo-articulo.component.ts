@@ -36,7 +36,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
     id_tabla: 'listado_sub_tipo_articulos',
     padre_functions: { data_request: (params) => this.getSubTipoArticulos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
     botones: {
       editar: { show: true, permiso: this.permissions.categoria_entidad_contable.update },
     },
@@ -57,7 +57,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
     await this.createForm();
   }
 
-  getSubTipoArticulos(params?: { per_page: number; page: number; search: string }) {
+  getSubTipoArticulos(params?: { per_page?: number; page?: number; search?: string }) {
     const parameters = { ...params, paginado: true, tipo_articulo_id: this.inputs.tipo_articulo.id };
     this.listaSubTipoArticulos.length = 0;
 

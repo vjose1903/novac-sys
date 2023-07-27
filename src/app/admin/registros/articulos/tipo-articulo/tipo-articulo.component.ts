@@ -40,7 +40,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     id_tabla: 'listado_tipo_articulos',
     padre_functions: { data_request: (params) => this.getTipoArticulos(params), handleBtnsDinamic: (params) => this.handleBtnsDinamic(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
     botones: {
       editar: { show: true, permiso: this.permissions.categoria_entidad_contable.update },
       dinamico: [{ show: true, icon: 'fa-solid fa-diagram-next', permiso: Object.values(this.permissions.sub_tipo_articulo), name: 'subTipoArticulo', tooltip: 'Sub Categorias' }],
@@ -62,7 +62,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     await this.createForm();
   }
 
-  getTipoArticulos(params?: { per_page: number; page: number; search: string }) {
+  getTipoArticulos(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { parameters: { page: params.page, per_page: params.per_page, paginado: true, filter_target: palabra_a_buscar } };
 

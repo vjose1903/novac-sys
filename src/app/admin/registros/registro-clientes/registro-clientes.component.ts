@@ -66,7 +66,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_clientes',
     padre_functions: { data_request: (params) => this.getClientes(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true,  is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
   };
   tablaComponent;
@@ -135,7 +135,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.empleadosClass.getAll(extra).then((res) => (this.vendedores = res['data']));
   }
 
-  async getClientes(params?: { per_page: number; page: number; search: string }) {
+  async getClientes(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
