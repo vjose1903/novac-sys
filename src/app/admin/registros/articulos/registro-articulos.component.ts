@@ -1048,6 +1048,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       obj['otros_costos'] = formulario.otros_costos;
       obj['formulas_productos_terminados'] = this.formarFormula();
     }
+
     console.log('obj --> ', obj);
     // this.articuloClass.createUpdateOne(obj).then((res) => {
     //   this.necesarioStart();
