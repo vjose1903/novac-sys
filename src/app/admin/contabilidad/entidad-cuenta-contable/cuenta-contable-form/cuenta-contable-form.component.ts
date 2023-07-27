@@ -184,8 +184,6 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   getCuentaLabel(tipo: 'control' | 'contable') {
-    console.log(' ');
-    console.log('----------------------------------------------------------------');
     const formulario = this.form.getRawValue();
     let cuenta;
 
@@ -208,16 +206,6 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
         const cuenta_per_config = this.getCuentaPerConfig();
         const tipo_cuenta = tipo == 'control' ? 'control' : formulario.is_comun ? 'auxiliar' : 'control';
 
-
-
-        console.log('cuenta_per_config ', cuenta_per_config);
-        console.log('tipo_cuenta ', tipo_cuenta);
-        console.log('formValue.tipo_agrupacion_contable ', formulario.tipo_agrupacion_contable);
-        console.log('this.infoTipoArticulo ', this.infoTipoArticulo);
-        console.log('this.inputs.selectedConfig.key ', this.inputs.selectedConfig.key);
-        console.log(' ');
-        console.log(' ');
-
         let temp_cuenta = cuenta_per_config[`label_${tipo_cuenta}`];
 
         if (fun.isEmpty(temp_cuenta)) temp_cuenta = this.inputs.selectedConfig.cuenta_contable.label;
@@ -230,7 +218,6 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
       cuenta = this.cuentaContableDataCruda?.cuenta_contable.label;
     }
 
-    console.log('----------------------------------------------------------------');
     return cuenta || `Seleccione la ${this.getDropDownInfo('description')}`;
   }
 

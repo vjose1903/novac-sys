@@ -52,11 +52,8 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
 
       if (fun.isEmpty(entidad_cuenta)) {
         entidad_cuenta = fun.duplicarJson(entidadCuentaContableBlank);
-        // console.log('entidad_cuenta ', entidad_cuenta);
-
         entidad_cuenta.configuracion_entidad_cuenta_id = config.id;
-        // console.log('entidad_cuenta ', entidad_cuenta);
-        // console.log('this.cuentasContablesData ', this.cuentasContablesData);
+
         this.cuentasContablesData.push(entidad_cuenta);
       }
     }

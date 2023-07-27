@@ -64,7 +64,6 @@
                           (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
                           id="tipo"
                           formControlName="tipo_articulo_id"
-                          b
                           (change)="selectTipoArticulo($event.target.value)"
                           class="form-control"
                           value=""

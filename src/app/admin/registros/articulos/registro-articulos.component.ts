@@ -21,7 +21,7 @@ import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/arti
 import { ModalClass } from '../../components/modal/modal-class';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC, entidadesContables } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
-import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
+import { FormEntidadCuentaContableI, tipoCategoria } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { SubTipoArticuloC, SubTipoArticuloI } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 
 @Component({
@@ -158,10 +158,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   getConfigEntidadCliente() {
     const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.articulo } };
-    this.configEntContableClass.getAll(extra).then((res) => {
-      this.listaConfigArticulos = res['data'];
-      console.log('this.listaConfigArticulos ', this.listaConfigArticulos);
-    });
+    this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigArticulos = res['data']));
   }
 
   getConfiguracionArticulo() {
@@ -197,7 +194,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         .getSubTipoArticulos(parameters)
         .then((res) => {
           this.listaSubTipoArticulos = fun.duplicarJson(res.data);
-          this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
           resolve();
         })
         .catch(() => reject());
@@ -300,6 +296,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(tipo_id));
     this.subTipoArticuloSelected = undefined;
     this.form.controls.sub_tipo_articulo_id.setValue(null);
+    this.checkCuentasContables();
+
     this.getSubTipoArticulos().finally(() => this.modificateValidators());
 
     if (this.tipoArticuloSelected.codigo == 'materia_prima') {
@@ -325,6 +323,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.is_combo = false;
       this.form.controls.calcular_saco.setValue(false);
     }
+  }
+
+  checkCuentasContables() {
+    this.listaEntidadCuentasContables = this.listaEntidadCuentasContables.filter((cuenta) => ![tipoCategoria.tipoArticulo, tipoCategoria.subTipoArticulo].includes(cuenta.tipo_categoria));
   }
 
   async selectSubTipoArticulo(subTipo_id) {
@@ -830,7 +832,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(articulo.tipo_articulo_id));
     this.is_combo = articulo.is_combo;
-    console.log('Articulo ', articulo);
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(articulo.cuentas_contables);
 
