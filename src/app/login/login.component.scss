@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
-
+@import "../../assets/my_styles/global-font.scss";
 .home {
   background-color: var(--primary02);
   position: relative;
@@ -40,5 +39,5 @@
 }
 
 .formulario__label {
-  font-family: Poppins;
+  font-family: $globalFont;
 }

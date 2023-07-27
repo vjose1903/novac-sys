@@ -1,6 +1,5 @@
-/* You can add global styles to this file, and also import other style files */
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
-$bodyfont: "Poppins";
+
+@import "./assets/my_styles/global-font.scss";
 
 @import "~@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
@@ -24,7 +23,7 @@ $bodyfont: "Poppins";
 }
 
 * {
-  font-family: "Poppins";
+  font-family: "global-font";
 }
 
 .h-inherit {
@@ -50,10 +49,6 @@ $bodyfont: "Poppins";
 
 .text-end {
   text-align: end;
-}
-
-.text-poppins {
-  font-family: "Poppins" !important;
 }
 
 .ng-dropdown-panel {
@@ -125,7 +120,7 @@ $bodyfont: "Poppins";
   color: #333;
   padding: 15px 25px;
   font-size: 14px;
-  font-family: $bodyfont;
+  font-family: $globalFont;
 }
 
 .dropdown-item:hover {
@@ -181,7 +176,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: $bodyfont;
+  font-family: $globalFont;
 }
 
 .backnegro {

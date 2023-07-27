@@ -1,0 +1,48 @@
+// Definir una variable para la ruta de la fuente
+$font-path: "../fonts/";
+
+// Lista de variaciones que deseas generar
+$font-variations: (
+  ("Poppins-Black", bold, normal),
+  ("Poppins-BlackItalic", bold, italic),
+  ("Poppins-Bold", bold, normal),
+  ("Poppins-BoldItalic", bold, italic),
+  ("Poppins-ExtraBold", bolder, normal),
+  ("Poppins-ExtraBoldItalic", bolder, italic),
+  ("Poppins-ExtraLight", lighter, normal),
+  ("Poppins-ExtraLightItalic", lighter, italic),
+  ("Poppins-Italic", normal, italic),
+  ("Poppins-Light", light, normal),
+  ("Poppins-LightItalic", light, italic),
+  ("Poppins-Medium", normal, normal)
+);
+
+// Definir el @font-face utilizando un @for
+@for $i from 1 through length($font-variations) {
+  $font-variation: nth($font-variations, $i);
+  $font-name: nth($font-variation, 1);
+  $font-weight: nth($font-variation, 2);
+  $font-style: nth($font-variation, 3);
+
+  @font-face {
+    font-family: "global-font";
+    src: url("#{$font-path}#{$font-name}.ttf") format("truetype");
+    font-display: swap;
+    font-weight: $font-weight;
+    font-style: $font-style;
+  }
+}
+
+$globalFont: "global-font";
+
+// =================================================================
+// LETRA DE MAQUINA DE ESCRIBIR
+// =================================================================
+
+@font-face {
+  font-family: "machine-font";
+  src: url("#{$font-path}Orbitron.ttf") format("truetype");
+  font-display: swap;
+}
+
+$machineFont: "machine-font";

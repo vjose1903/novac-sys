@@ -1,4 +1,4 @@
-
+@import "../assets/my_styles/global-font.scss";
 
 .logoLoading {
   height: 14rem;
@@ -7,7 +7,7 @@
 }
 
 .gris {
-  color: var(--transparente01)
+  color: var(--transparente01);
 }
 
 .letraCargando {
@@ -17,8 +17,6 @@
   color: w;
   margin: 21rem -1rem 0rem 0rem;
 }
-
-$font: "Poppins", sans-serif;
 
 ::selection {
   background-color: #c3cfe2;

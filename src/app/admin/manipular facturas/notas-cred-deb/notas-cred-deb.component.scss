@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
+@import "../../../../assets/my_styles/global-font.scss";
 
 .cardNota {
   display: grid;
@@ -49,6 +49,7 @@
   font-weight: 500;
   text-transform: uppercase;
 }
+
 .cuadroTotal {
   display: -webkit-box;
   display: flex;
@@ -60,7 +61,7 @@
   width: 100%;
   background-color: var(--primary10);
   border-radius: 0.5rem;
-  font-family: "Orbitron", sans-serif;
+  font-family: $machineFont, sans-serif;
   font-size: 2rem;
   color: white;
   margin: 3rem 3rem 0rem auto !important;
@@ -69,19 +70,6 @@
 .encabezadoRight {
   position: absolute;
   right: 4rem;
-}
-
-.cuadroResumenTotal {
-  background-color: var(--transparente05);
-  display: flex;
-  position: relative;
-  color: black;
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.5rem;
-  > .label {
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
 }
 
 .mostrarNumeros {
@@ -93,11 +81,21 @@
   height: 100%;
 
   > .cuadroResumenTotal {
+    position: relative;
     margin-right: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    background-color: var(--transparente05);
+    color: black;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.5rem;
+
+    > .label {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
   }
 }
 
@@ -109,8 +107,6 @@
 .numerosCalculos {
   justify-content: flex-end;
 }
-
-
 
 ::ng-deep .notaVaciaStyle {
   background: #efc2c2 !important;

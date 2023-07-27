@@ -1,5 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
+@import "../../../assets/my_styles/global-font.scss";
 
 // .drag {
 //   -webkit-app-region: drag;
@@ -64,8 +63,6 @@
     box-shadow: 0 0 0 0 #ff000000;
   }
 }
-
-$bodyfont: "Poppins";
 
 .fantasma {
   position: relative;
@@ -189,7 +186,7 @@ $bodyfont: "Poppins";
                 font-size: 1rem !important;
                 padding: 0.5rem;
                 background-color: var(--primary04);
-                font-family: $bodyfont;
+                font-family: $globalFont;
                 &.activa {
                   background-color: var(--primary09) !important;
                 }
