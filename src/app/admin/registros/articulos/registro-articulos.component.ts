@@ -1050,6 +1050,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
 
     console.log('obj --> ', obj);
+
+
     // this.articuloClass.createUpdateOne(obj).then((res) => {
     //   this.necesarioStart();
     //   this.borrar();
