@@ -11,6 +11,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { NgInitDirective } from './directives/ngInit';
 import { PrimengModule } from './modules/primeng.module';
 import { InterceptorService } from './core/services/interceptor.service';
+import { PdfViewerModule } from './admin/components/pdf-viewer/pdf-viewer.module';
 import { AppRoutingModule } from './app.routing';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
@@ -22,7 +23,7 @@ import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { ConfirmacionImprimirComponent } from './admin/facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
-import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
+
 
 defineLocale('es', esLocale);
 
@@ -44,8 +45,9 @@ defineLocale('es', esLocale);
     NewModalModule,
     NgSelectModule,
     FormulariosEnModalesModule,
+    PdfViewerModule,
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }, NgxExtendedPdfViewerService],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }],
 
   bootstrap: [AppComponent],
   exports: [NgxPermissionsModule],

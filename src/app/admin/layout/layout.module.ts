@@ -1,4 +1,3 @@
-import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -17,7 +16,6 @@ import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
 import { TabViewModule } from 'primeng/tabview';
 import { ReportesComponent } from '../reportes/reportes.component';
-import { PdfViewerModule } from '../../admin/components/pdf-viewer/pdf-viewer.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -35,11 +33,9 @@ import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular
     NgSelectModule,
     FormsModule,
     DirectivesModule,
-    PdfViewerModule,
     ReactiveFormsModule,
     NgxPermissionsModule.forChild(),
     BtnIconModule,
-    NgxExtendedPdfViewerModule,
   ],
 })
 export class LayoutModule {}
