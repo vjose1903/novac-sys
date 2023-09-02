@@ -171,7 +171,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const search = event.target.value;
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
-      fun.awaitTyping(event).then(() => {
+      fun.awaitTyping({evento: event}).then(() => {
         if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
           const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
 

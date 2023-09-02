@@ -69,5 +69,6 @@ export function enableIsComunSwitch(params: { selectedConfig: ConfiguracionEntid
     res = fun.hasValue(params.formValue.tipo_categoria_id);
   }
 
+
   return res;
 }

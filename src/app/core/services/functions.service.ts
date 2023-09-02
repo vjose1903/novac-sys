@@ -536,12 +536,12 @@ export class fun extends CustomLodash {
   // _________________________________________________________________________________________________
 
   static timeout;
-  static awaitTyping(event?) {
+  static awaitTyping(params?: { evento?: any; awaitTime?: number }) {
     const promise = new Promise((resolve) => {
       clearTimeout(fun.timeout);
       fun.timeout = setTimeout(() => {
-        if (!event || event.keyCode != 13) resolve(event);
-      }, 700);
+        if (!params.evento || params.evento.keyCode != 13) resolve(params.evento);
+      }, params.awaitTime ?? 700);
     });
     return promise;
   }

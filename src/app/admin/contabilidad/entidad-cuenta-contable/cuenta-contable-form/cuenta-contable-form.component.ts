@@ -52,6 +52,8 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     if (changes?.cuentaContableData?.currentValue && !changes?.cuentaContableData?.firstChange) {
       this.form.patchValue(this.cuentaContableData);
       this.updateOriginalData();
+
+      this.enableDisableIsComunSwitch();
     }
 
     if (fun.objHas(changes, 'configuration') || fun.objHas(changes, 'infoTipoArticulo')) this.checkConfig();
@@ -63,7 +65,10 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
 
     await this.createForm().then((form) => {
       form.valueChanges.subscribe((changes) => {
-        if (!fun.isEqual(changes, this.lastChange)) this.returnData();
+
+        fun.awaitTyping({ awaitTime: 250 }).then(() => {
+          if (!fun.isEqual(changes, this.lastChange)) this.returnData();
+        });
       });
 
       this.updateOriginalData();
@@ -152,12 +157,10 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   changeAgrupacion(tipo: agrupacionContable) {
-    const formValue = this.form.getRawValue();
     this.form.controls.tipo_agrupacion_contable.setValue(tipo);
     this.form.controls.tipo_categoria_id.setValue(null);
 
-    const isComunSwitchEnable = enableIsComunSwitch({ selectedConfig: this.inputs.selectedConfig, entidad: this.currentEntidad, isArticulo: this.isArticulo, formValue: formValue });
-    isComunSwitchEnable ? this.form.controls.is_comun.enable() : this.form.controls.is_comun.disable();
+    this.enableDisableIsComunSwitch();
 
     if (tipo == agrupacionesContables.individual) {
       this.form.controls.is_comun.setValue(false);
@@ -176,8 +179,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   selectCategoria() {
     const formValue = this.form.getRawValue();
 
-    const isComunSwitchEnable = enableIsComunSwitch({ selectedConfig: this.inputs.selectedConfig, entidad: this.currentEntidad, isArticulo: this.isArticulo, formValue: formValue });
-    isComunSwitchEnable ? this.form.controls.is_comun.enable() : this.form.controls.is_comun.disable();
+    this.enableDisableIsComunSwitch();
 
     if (!this.isArticulo && fun.isEmpty(formValue.tipo_categoria_id)) this.form.controls.is_comun.setValue(false);
     this.checkConfig();
@@ -230,6 +232,11 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     return res;
   }
 
+  enableDisableIsComunSwitch() {
+    const isComunSwitchEnable = enableIsComunSwitch({ selectedConfig: this.inputs.selectedConfig, entidad: this.currentEntidad, isArticulo: this.isArticulo, formValue: this.form.getRawValue() });
+    isComunSwitchEnable ? this.form.controls.is_comun.enable() : this.form.controls.is_comun.disable();
+  }
+
   getIsComunSwitchTooltip() {
     let tooltip = '';
     const formValue = this.form.getRawValue();
@@ -246,7 +253,6 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   returnData() {
     const formulario = this.form.getRawValue();
     this.lastChange = formulario;
-
     this.cuentaContableDataChange.emit(formulario);
   }
 }

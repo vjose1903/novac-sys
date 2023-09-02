@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import * as moment from '../../../core/javascript/moment';
-import { ArticuloC } from './articulo';
+import { ArticuloC, ArticuloI } from './articulo';
 import { TipoArticuloC, TipoArticuloI, tipos_articulos } from './tipo-articulo/tipo-articulo';
 import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
@@ -101,7 +101,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     id_tabla: 'lista_articulos',
     padre_functions: { data_request: (params) => this.getArticulos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.articulo.update }, borrar: { show: true, permiso: this.permissions.articulo.destroy } },
   };
 
@@ -441,9 +441,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
-  test() {
-    console.log('this.listaEntidadCuentasContables ', this.listaEntidadCuentasContables);
-  }
+  test() {}
 
   borrar(reset = false) {
     fun.enfocarInput('nombre');
@@ -822,7 +820,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     return fun.isEmpty(this.tipoArticuloSelected) ? true : articulos_comprados.includes(this.tipoArticuloSelected.tipo);
   }
 
-  async editarItem(articulo) {
+  async editarItem(articulo: ArticuloI) {
     this.borrar();
     this.form.patchValue(articulo);
     this.articuloSelected = articulo;
@@ -830,7 +828,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
 
-    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(articulo.tipo_articulo_id));
+    await this.selectTipoArticulo(articulo.tipo_articulo_id);
+    await this.selectSubTipoArticulo(articulo.sub_tipo_articulo_id);
+
     this.is_combo = articulo.is_combo;
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(articulo.cuentas_contables);
@@ -1021,6 +1021,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const obj = {
       id: fun.hasValue(formulario.id) ? _.parseInt(formulario.id) : null,
       tipo_articulo_id: _.parseInt(formulario.tipo_articulo_id),
+      sub_tipo_articulo_id: _.parseInt(formulario.sub_tipo_articulo_id),
       nombre: formulario.nombre,
       costo_principal: this.tipoArticuloSelected.tipo != 'servicio' ? fun.desformatear(formulario.costo_principal) : 0,
       precio_principal: fun.desformatear(formulario.precio_principal),
@@ -1051,10 +1052,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     console.log('obj --> ', obj);
 
-
-    // this.articuloClass.createUpdateOne(obj).then((res) => {
-    //   this.necesarioStart();
-    //   this.borrar();
-    // });
+    this.articuloClass.createUpdateOne(obj).then((res) => {
+      this.necesarioStart();
+      this.borrar();
+    });
   }
 }

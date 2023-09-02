@@ -2,12 +2,15 @@ import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
+import { SubTipoArticuloI } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 
 export interface ArticuloI {
   data?: any;
   id?: number;
   imagen_id?: null;
   tipo_articulo_id?: number;
+  sub_tipo_articulo_id?: number;
+  sub_tipo_articulo?: SubTipoArticuloI;
   nombre?: string;
   costo_principal?: number;
   precio_principal?: number;

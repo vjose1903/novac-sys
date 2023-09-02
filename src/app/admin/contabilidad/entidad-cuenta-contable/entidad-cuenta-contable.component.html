@@ -3,7 +3,7 @@
     <div *ngIf="is_initialized" class="row p-0 rowCuentasContables">
       <div class="col-12 p-0" *ngFor="let config of this.inputs.configsEntCuentas; let index = index">
         <cuenta-contable-form
-          [inputs]="{ selectedConfig: config, entidad: inputs.entidad }"
+          [inputs]="{ selectedConfig: fun.duplicarJson(config), entidad: inputs.entidad }"
           [configuration]="configuration"
           [cuentaContableDataCruda]="getData(config.id, 'cruda')"
           [cuentaContableData]="getData(config.id, 'form')"

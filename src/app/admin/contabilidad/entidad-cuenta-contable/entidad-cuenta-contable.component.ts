@@ -23,7 +23,7 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
   @Input() cuentasContablesData: FormEntidadCuentaContableI[] = [];
   @Output() cuentasContablesDataChange = new EventEmitter<Array<FormEntidadCuentaContableI>>();
   is_initialized: boolean = false;
-
+  fun = fun;
   ngOnInit(): void {
     this.checkConfig();
   }
