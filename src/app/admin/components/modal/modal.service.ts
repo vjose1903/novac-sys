@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as _ from 'lodash';
+import { IModalConfiguration } from './modal-class';
+export const modalsConfigurations = new BehaviorSubject<IModalConfiguration>({});
 
-export const MODALCONFIG = new BehaviorSubject<any>({});
 
 @Injectable({
   providedIn: 'root',
 })
 export class ModalService {
-  modalsConfig = [];
   constructor() {}
+  modalsConfig = [];
+
 
   isModalOpen(type: 'least_one') {
     let res = false;

@@ -1,10 +1,10 @@
-<div class="row rowResgitro">
-  <div class="col-12 p-0 colTitulo d-flex">
+<div class="rowResgitro">
+  <div class="colTitulo d-flex">
     <h4 class="negrita mb-0 mr-3">Registro de articulos</h4>
     <btn-icon-circular [id]="'btnConfiguracionArticulo'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" pTooltip="Configuraciones de articulos" tooltipPosition="right" (clickFunction)="openModalConfig()"> </btn-icon-circular>
   </div>
 
-  <div class="col-12 p-0 colFormularioListado">
+  <div class="colFormularioListado">
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
         <div class="contenedorRegistro" *ngIf="isCreando || articuloSelected" class="form {{ isCreando || articuloSelected ? 'showForm' : 'hideForm' }} ">
@@ -12,9 +12,9 @@
             <h4 class="mb-0">Formulario</h4>
           </div>
 
-          <div class="card cardFormClass p-0">
-            <div class="formContainer">
-              <div class="formulario">
+          <div #cardFormClass class="card cardFormClass p-0">
+            <div  class="formContainer" [sizeCatcher]="cardFormClass">
+              <div class="formulario" >
                 <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
                   <div class="row">
                     <div class="col-12 p-0">

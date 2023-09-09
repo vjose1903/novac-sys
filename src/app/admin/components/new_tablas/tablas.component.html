@@ -1,4 +1,4 @@
-<div #dinamicTable class="dinamicTable position-relative" [ngStyle]="{ height: cardTabla?.offsetHeight + 'px', width: cardTabla?.offsetWidth + 'px', padding: config.padding }">
+<div #dinamicTable class="dinamicTable position-relative" [sizeCatcher]="cardTabla" [ngStyle]="{ padding: config.padding }">
   <!-- FILTER -->
   <div id="searchDiv-{{ realIdTabla }}" *ngIf="config?.filtrar?.show" class="searchDiv d-flex align-items-center" style="max-width: 17rem; z-index: 9">
     <label class="search-label mr-2" for="search">Busqueda </label>
@@ -7,7 +7,7 @@
   </div>
   <!-- TABLA -->
   <div #fantasma class="divTableFantasma h-100">
-    <div #divTable class="divTable" [ngStyle]="{ height: fantasma.offsetHeight + 'px', width: fantasma.offsetWidth + 'px' }">
+    <div #divTable class="divTable" [sizeCatcher]="fantasma">
       <table *ngIf="config.info" class="myTable" id="content_{{ realIdTabla }}">
         <!-- THEAD -->
         <thead class="text-center position-relative thead letras {{ config.redondo ? 'redondo' : '' }} {{ config.colorTitulo ? 'colorTitulo' : 'noColorTitulo' }}">

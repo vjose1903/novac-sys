@@ -1,9 +1,10 @@
 import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { MODALCONFIG, ModalService } from './modal.service';
+import { modalsConfigurations, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
 import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
+import { IModalConfiguration } from './modal-class';
 
 @Component({
   selector: 'app-new-modal',
@@ -17,7 +18,7 @@ export class NewModalComponent implements OnInit {
 
   subConfig: Subscription;
 
-  defaultModalConfig: any = {
+  defaultModalConfig: IModalConfiguration = {
     show: false,
     component: undefined,
     width: '40rem',
@@ -26,7 +27,7 @@ export class NewModalComponent implements OnInit {
     header: '',
     html: undefined,
     position: 'center',
-    instance: undefined,
+    componentInstance: undefined,
     closable: true,
     closableEsc: false,
     transitionOptions: '0ms',
@@ -34,8 +35,8 @@ export class NewModalComponent implements OnInit {
     botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
     returnDataFromModal: (arg?) => {},
 
-    closeModal: (id, accion) => {
-      this.cancelarAndAceptar(false, id, accion);
+    dismissModal: (id, reason) => {
+      this.cancelarOrAceptar(id, reason);
     },
   };
 
@@ -44,28 +45,28 @@ export class NewModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subConfig = MODALCONFIG.subscribe((res) => {
+    this.subConfig = modalsConfigurations.subscribe((res) => {
       if (res && res.show) {
         this.renderizarComponente(res);
       } else {
-        this.resetConfig(res.id, res.accion);
+        this.resetConfig(res.id);
       }
     });
   }
 
-  resetConfig(id_, accion) {
+  resetConfig(id_) {
     const modal = _.find(this.modalsConfig, (config) => config.id === id_);
 
-    const data = { modal: modal, accion: accion };
+    const data = { modal: modal };
 
     if (modal && typeof modal.onHide == 'function') modal.onHide(data);
 
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
   }
 
-  handleConfig(config) {
+  handleConfig(config: IModalConfiguration) {
     const modalConfig = config;
-    modalConfig['closeModal'] = this.defaultModalConfig.closeModal;
+    modalConfig.dismissModal = this.defaultModalConfig.dismissModal;
     this.modalsConfig.push(modalConfig);
   }
 
@@ -102,18 +103,13 @@ export class NewModalComponent implements OnInit {
 
         const componente = viewContainerRef.createComponent(componentFactory);
 
-        componente['instance'].inputs = config['inputs'];
+        componente['instance'].inputs = config.inputs;
 
         if (componente['instance'].modal) componente['instance'].modal = { instance: this, component_id: config.id };
 
-        currentConfig['instance'] = componente['instance'];
+        currentConfig.componentInstance = componente.componentInstance;
       }, 1);
     }
-    // setTimeout(() => this.checkModalStyle(config.id), 2500);
-  }
-
-  checkModalStyle(config) {
-    // const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
   }
 
   disabledButton(btnConfig) {
@@ -121,7 +117,6 @@ export class NewModalComponent implements OnInit {
 
     if (fun.objHas(btnConfig, 'disable')) {
       if (typeof btnConfig.disable == 'boolean') return btnConfig.disable;
-
       res = btnConfig.disable['function']();
     }
 
@@ -133,29 +128,30 @@ export class NewModalComponent implements OnInit {
   }
 
   onHideModal(id_) {
-    MODALCONFIG.next({ show: false, id: id_ });
+    modalsConfigurations.next({ show: false, id: id_ });
   }
 
-  cancelarAndAceptar(bool, id_, accion?) {
-    if (!bool) {
-      MODALCONFIG.next({ show: false, id: id_, accion: accion ? accion : 'cancelar' });
+  cancelarOrAceptar( id_, reason:'aceptar'|'cancelar') {
+    if (reason=='cancelar') {
+      modalsConfigurations.next({ show: false, id: id_ });
       return;
     }
 
-    const modal = _.find(this.modalsConfig, (config) => config.id === id_);
+    const modal: IModalConfiguration = _.find(this.modalsConfig, (config) => config.id === id_);
 
-    if (modal['instance']) {
-      modal['instance'].btn_aceptar();
+    if (modal.componentInstance) {
+      modal.componentInstance.btn_aceptar();
     } else {
+      const bool = reason == "aceptar";
       modal.returnDataFromModal({ bool: bool, inputs: modal.inputs, id: modal.id });
-      modal.closeModal(modal.id, 'aceptar');
+      modal.dismissModal(modal.id, 'aceptar');
     }
   }
 
   dynamicFunction(configuration, btn) {
     const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
 
-    if (fun.objHas(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
+    if (fun.objHas(btn, 'function_in_other_component')) modal['componentInstance'][btn['function_in_other_component']]();
     else btn['function'](modal);
   }
 

@@ -120,8 +120,6 @@
 }
 
 .rowFacturacion {
-  max-height: calc(100vh - 4rem);
-  height: 100%;
   display: grid;
   grid-template-areas:
     "colTitulo"

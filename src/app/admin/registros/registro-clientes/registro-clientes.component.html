@@ -11,8 +11,8 @@
             <h4 class="mb-0">Formulario</h4>
           </div>
 
-          <div class="card cardFormClass p-0">
-            <div class="formContainer">
+          <div #cardFormClass class="card cardFormClass p-0">
+            <div class="formContainer" [sizeCatcher]="cardFormClass">
               <div class="formulario">
                 <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
                   <div class="row">

@@ -1,7 +1,7 @@
 
 @import "./assets/my_styles/global-font.scss";
 
-@import "~@ng-select/ng-select/themes/default.theme.css";
+@import "../node_modules/@ng-select/ng-select/themes/default.theme.css";
 @import "./animateCss.scss";
 
 @import "./assets/my_styles/modal.scss";
@@ -641,28 +641,6 @@ body {
   min-width: var(--popInfo);
 }
 
-.bs-datepicker {
-  box-shadow: 0 0 10px 0 #000c;
-  .bs-datepicker-container {
-    padding: 0px !important;
-  }
-  .bs-datepicker-head {
-    border-radius: 0 !important;
-    background: var(--primary02) !important;
-    button[disabled] {
-      background: var(--transparente05);
-    }
-  }
-  .bs-datepicker-body table td span.selected {
-    background: var(--primary02) !important;
-  }
-}
-
-bs-datepicker-container,
-bs-daterangepicker-container {
-  z-index: 9999999 !important;
-}
-
 .btn.btn-link {
   margin: 0 !important;
   padding: 0.3rem !important;
@@ -883,7 +861,6 @@ Not supports in Firefox and IE */
 }
 
 .rowResgitro {
-  max-height: calc(100vh - 4rem);
   height: 100%;
   display: grid;
   grid-template-areas:
@@ -899,11 +876,12 @@ Not supports in Firefox and IE */
   .colFormularioListado {
     grid-area: colFormularioListado;
     > div {
+      justify-content: end;
+      gap: 0.5rem;
       > .form {
         transition: all 0.3s;
         &.showForm {
           width: 50%;
-          margin-right: 0.5rem;
         }
 
         &.hideForm {
@@ -929,10 +907,16 @@ Not supports in Firefox and IE */
           grid-area: card_content_area;
           padding: 0.8rem;
           border-radius: 1rem !important;
-          height: min-content;
           background-color: white;
           box-shadow: 0px 4px 14px -6px black;
-          max-height: 85vh;
+          height: 100%;
+          position: relative;
+          > .formContainer {
+            position: absolute;
+
+            > .formulario {
+            }
+          }
         }
       }
 

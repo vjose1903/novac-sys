@@ -2,7 +2,7 @@ import { Permisos } from './../../../core/typescript/permisos';
 import { Ss } from './../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
-import { ConfigureModalI, ModalClass } from '../../components/modal/modal-class';
+import { IModalConfiguration, ModalClass } from '../../components/modal/modal-class';
 import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
@@ -102,7 +102,7 @@ export class ClienteC extends CrudG<any> {
     params.inputs['metodo'] = 'venta';
     params.inputs['palabra_a_buscar'] = ' ';
 
-    let objModal: ConfigureModalI = {
+    let objModal: IModalConfiguration = {
       id: params.tipo,
       inputs: params.inputs,
       header: params.inputs.titulo,

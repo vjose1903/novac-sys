@@ -10,9 +10,6 @@ export class ResizeEventDirective {
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-
     event.target.innerWidth;
-
-
   }
 }

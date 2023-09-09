@@ -1,22 +1,25 @@
 import { fun } from './../../../core/services/functions.service';
 import * as _ from 'lodash';
 import { LayoutClass } from '../../layout/layout';
-import { MODALCONFIG } from './modal.service';
+import { modalsConfigurations } from './modal.service';
 
 export interface ModalI {
   modal: any;
   inputs: any;
   btn_aceptar(): any;
+  [prop: string]: any;
 }
 
-export interface ConfigureModalI {
+export interface IModalConfiguration {
   id?: string;
+  show?: boolean;
   header?: string;
   inputs?: any;
   component?: any;
   width?: string;
   height?: string;
   botones?: ButtonsI;
+  componentInstance?: ModalI;
   closable?: boolean;
   closableEsc?: boolean;
   html?: any;
@@ -24,6 +27,7 @@ export interface ConfigureModalI {
   transitionOptions?: string;
   contentStyleClass?: string;
   returnDataFromModal?: Function;
+  dismissModal?: Function;
 }
 
 export interface btnDisabled {
@@ -42,7 +46,7 @@ export class ModalClass extends LayoutClass {
     super();
   }
 
-  openNewModal(params: ConfigureModalI) {
+  openNewModal(params: IModalConfiguration) {
     const modal_configuration = {};
     modal_configuration['show'] = true;
 
@@ -65,35 +69,14 @@ export class ModalClass extends LayoutClass {
     modal_configuration['html'] = fun.objHas(params, 'html') ? params.html : null;
     modal_configuration['id'] = params?.id;
 
-    MODALCONFIG.next(modal_configuration);
+    modalsConfigurations.next(modal_configuration);
   }
 
   getDataFromModal(arg, search?) {}
   onHideModal(arg) {}
 
-  // confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-  //   this.openNewModal({
-  //     id: obj.id,
-  //     header: obj.header,
-  //     width: obj.width || '30rem',
-  //     html: `<p> ${obj.texto} </p>`,
-  //     botones: {
-  //       ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-  //       dinamico: [
-  //         { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
-  //         {
-  //           clase: 'btn btn-verde',
-  //           function: (instance) => obj.siFunction(instance),
-  //           label: 'SI',
-  //           disable: false,
-  //         },
-  //       ],
-  //     },
-  //   });
-  // }
-
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function }) {
-    const config = {
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function }) {
+    const config: IModalConfiguration = {
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -107,14 +90,10 @@ export class ModalClass extends LayoutClass {
       },
     };
 
-    if (fun.objHas(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
-      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
-    }
-
     this.openNewModal(config);
   }
 
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
+  closeModal(modalObject: IModalConfiguration) {
+    modalObject.dismissModal(modalObject.id, 'cancelar');
   }
 }
