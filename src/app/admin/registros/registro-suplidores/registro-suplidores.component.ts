@@ -447,7 +447,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
             header: 'Confirmación',
             siFunction: async (instance) => {
               this.sendData();
-              instance.closeModal('aviso_cuentas', 'cancelar');
+              instance.dismissModal(instance.id);
             },
             width: '30rem',
           };

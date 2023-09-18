@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ArticuloC } from '../../../registros/articulos/articulo';
-import { ModalI } from '../../modal/modal-class';
+import { IModalConfiguration, ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 
 import { MixinClass } from '../../../../core/typescript/MixinClass';
@@ -55,7 +55,7 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
           is_compra: is_compra,
         })
         .catch((error) => {
-          this.closeThis({ tipo: 'data_no_found', modal_id: this.modal.component_id, index: this.inputs.index });
+          this.closeThis({ tipo: 'data_no_found', modalId: this.modal.component_id, index: this.inputs.index });
         });
 
       this.dataFiltro = res?.data;
@@ -64,16 +64,10 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
   }
 
   tableClickRow(event) {
-    const modal = this.closeThis();
-    modal.returnDataFromModal({ data: event.data, modal_id: this.modal.component_id, index: this.inputs.index });
+    this.closeThis({ data: event.data, modalId: this.modal.component_id, index: this.inputs.index });
   }
 
-  closeThis(arg?) {
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
-
-    modal.closeModal(this.modal.component_id);
-    if (arg) modal.returnDataFromModal(arg);
-
-    return modal;
+  closeThis(dataToReturn?) {
+    this.modal.instance.resetConfig(this.modal.component_id, dataToReturn);
   }
 }

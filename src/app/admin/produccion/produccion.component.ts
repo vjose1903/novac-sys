@@ -318,17 +318,17 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     const functions = {
       confirmar: (instance, data?) => {
         this.confirmarProduccion();
-        this.closeModal(instance);
+        this.dismissModal(instance);
       },
       borrar: (instance, data) => {
         this.eliminarReg(data);
-        this.closeModal(instance);
+        this.dismissModal(instance);
       },
       cancelarP: (instance, data) => {
         this.borrarForm();
         this.activateAllOptions();
         this.lista_produccion.length = 0;
-        this.closeModal(instance);
+        this.dismissModal(instance);
       },
     };
 
@@ -340,7 +340,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
           {
             clase: 'btn btn-verde',
             function: (instance) => functions[tipo](instance, data),
@@ -352,8 +352,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     });
   }
 
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
+  dismissModal(modalInstance) {
+    modalInstance.dismissModal(modalInstance.id);
   }
 
   formarIngredientes(ingredientes) {

@@ -169,7 +169,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'buscar_articulo') {
+    if (arg.modalId == 'buscar_articulo') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput(`cod-${arg.index}`);
       } else {
@@ -177,7 +177,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       }
     }
 
-    if (arg.modal_id == 'buscarCliente') {
+    if (arg.modalId == 'buscarCliente') {
       if (arg?.tipo == 'data_no_found') {
         setTimeout(() => fun.enfocarInput('clienteI'), 10);
       } else {
@@ -188,14 +188,14 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       }
     }
 
-    if (arg.modal_id === 'seleccionar_articulos_adelantados') {
+    if (arg.modalId === 'seleccionar_articulos_adelantados') {
       this.ajustarSecuencia();
       this.llenarConduce(arg.data).then((res) => {
         this.checkFacturasAdelantadasSelection();
       });
     }
 
-    if (arg.modal_id === 'confirmacionImprimir') {
+    if (arg.modalId === 'confirmacionImprimir') {
       this.is_print = arg.is_print;
       this.sendData();
     }
@@ -362,9 +362,14 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     const cantidad = fila_actual['can'];
 
     let cantidadMinima = 1;
-    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => uni.value.toLowerCase() == unidad.toLowerCase()).cantidad;
 
-    const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
+    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => {
+
+      return uni.value.toLowerCase() == unidad.toLowerCase();
+    })?.cantidad;
+
+
+    const cant_unidades = params.clean && cantidadMinima ? 0 : cantidad * cantidadMinima;
     control['cantidad_en_unidades'].setValue(cant_unidades);
   }
 
@@ -518,7 +523,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       texto: `Seguro que desea remover el articulo <b class="negrita">${name}</b>`,
       siFunction: (instance) => {
         this.procesoQuitarArticulo();
-        instance.closeModal(instance.id, 'removerArticulo');
+        instance.dismissModal(instance.id);
       },
     });
 
@@ -625,7 +630,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               botones: {
                 ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
-                  { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
+                  { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
                   { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
                 ],
               },
@@ -793,7 +798,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         botones: {
           ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+            { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
           ],
         },
@@ -801,8 +806,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     }
   }
 
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
+  dismissModal(modalInstance) {
+    modalInstance.dismissModal(modalInstance.id);
   }
 
   getCantidadArticulos() {
@@ -865,7 +870,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       header: 'Confirmación',
       siFunction: async (instance) => {
         this.cancelarConduce();
-        instance.closeModal('cancelar_conduce', 'cancelar');
+        this.dismissModal(instance);
       },
       width: '30rem',
     };

@@ -184,11 +184,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.accion_.emit(arg);
   }
 
-  closeThis() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-
-    return modal;
+  closeModal() {
+    this.modal.instance.resetConfig(this.modal.component_id);
   }
 
   async submit(formToSubmit) {

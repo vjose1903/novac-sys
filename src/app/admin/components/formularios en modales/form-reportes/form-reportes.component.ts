@@ -9,7 +9,7 @@ import * as moment from '../../../../core/javascript/moment';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
-import { ModalI } from '../../modal/modal-class';
+import { IModalConfiguration, ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 
 @Component({
@@ -248,12 +248,19 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   createForm() {
-    this.form = this.fb.group({ cliente_id: [null], articulo_id: [null], tipo: [null], tipo_factura_id: [null], condicion: [null], fecha: [null], desde: [null], hasta: [null] });
+    this.form = this.fb.group({
+      cliente_id: [null],
+      articulo_id: [null],
+      tipo: [null],
+      tipo_factura_id: [null],
+      condicion: [null],
+      fecha: [null],
+      desde: [null],
+      hasta: [null]
+    });
   }
 
   btn_aceptar() {
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.returnDataFromModal({ data: { ...this.form.value, switches: { ...this.inputs.switches } }, modal_id: this.modal.component_id });
+    this.modal.instance.resetConfig(this.modal.component_id, { data: { ...this.form.value, switches: { ...this.inputs.switches } }, modalId: this.modal.component_id });
   }
 }

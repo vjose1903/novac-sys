@@ -1,6 +1,6 @@
 import { fun } from './../../../../../core/services/functions.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { ModalI } from './../../../../components/modal/modal-class';
+import { IModalConfiguration, ModalI } from './../../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -145,9 +145,6 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
   btn_aceptar() {
     const dataToSend = this.parseData(this.form.getRawValue());
 
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-
-    modal.returnDataFromModal({ obj: dataToSend, modal_id: this.modal.component_id });
+    this.modal.instance.resetConfig(this.modal.component_id, { obj: dataToSend, modalId: this.modal.component_id });
   }
 }

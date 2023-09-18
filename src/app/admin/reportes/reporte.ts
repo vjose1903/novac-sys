@@ -80,7 +80,7 @@ export class ReporteC extends CrudG<any> {
         botones: {
           ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
             {
               clase: 'btn btn-verde',
               function: (instance) => this.imprimirPDF(objPdfView, instance),
@@ -109,7 +109,7 @@ export class ReporteC extends CrudG<any> {
 
         if (res.status === 'si') {
           fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
+          if (modalInstance) modalInstance.dismissModal(modalInstance.id);
         } else fun.toastError(res.msg, 'ERROR');
       })
       .catch((err) => {

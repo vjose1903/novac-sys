@@ -19,4 +19,9 @@ export class ModalService {
     if (type == 'least_one') res = this.modalsConfig.length >= 1;
     return res;
   }
+
+  findModalConfigById(modalId: string): IModalConfiguration {
+    const modal: IModalConfiguration = this.modalsConfig.find((config: IModalConfiguration) => config.id == modalId) ?? {};
+    return modal;
+  }
 }

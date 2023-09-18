@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalI } from '../../../../admin/components/modal/modal-class';
+import { IModalConfiguration, ModalI } from '../../../../admin/components/modal/modal-class';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '../../../../core/services/functions.service';
@@ -59,13 +59,11 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
 
   btn_aceptar() {
     if (this.form.valid || this.inputs.data_detalle.is_defectuoso || !this.inputs.is_prefactura_selected) {
-      const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-      modal.closeModal(this.modal.component_id);
-      const obj = { key: this.inputs.key, modal_id: this.modal.component_id };
 
-      if (this.inputs.is_prefactura_selected) obj['data'] = this.form.getRawValue();
+      const dataToReturn = { key: this.inputs.key, modalId: this.modal.component_id };
+      if (this.inputs.is_prefactura_selected) dataToReturn['data'] = this.form.getRawValue();
 
-      modal.returnDataFromModal(obj);
+      this.modal.instance.resetConfig(this.modal.component_id, dataToReturn);
     } else {
       fun.toastError('Complete los campos para retirar el articulo.', 'ERROR');
     }

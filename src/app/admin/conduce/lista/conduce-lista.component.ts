@@ -146,7 +146,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
           const texto_modal = `Seguro de que desea anular el conduce <b class="negrita"> #${conduce_selected.numero_conduce} </b>`;
           const siFunction = (instance) => {
             this.anularRecibo(conduce_selected.id);
-            instance.closeModal(instance.id, 'anular_conduce');
+            instance.dismissModal(instance.id);
           };
 
           this.confirmationModal({ id: 'anular_conduce', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
@@ -183,12 +183,12 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
             botones: {
               ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
-                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
                 {
                   clase: 'btn btn-verde',
                   function: (instance) => {
                     this.imprimir_base64(fileName, base64, pageOrientation);
-                    instance.closeModal(instance.id, 'cancel');
+                    instance.dismissModal(instance.id);
                   },
                   label: 'Imprimir',
                   disable: false,
@@ -199,27 +199,6 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         }
       })
       .catch(() => Ss.loadServ.isLoading.next(false));
-  }
-
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
   }
 
   imprimir_base64(fileName, base64, pageOrientation) {

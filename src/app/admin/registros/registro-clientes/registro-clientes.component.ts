@@ -363,7 +363,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
             header: 'Confirmación',
             siFunction: async (instance) => {
               this.sendData();
-              instance.closeModal('aviso_cuentas', 'cancelar');
+              instance.dismissModal(instance.id);
             },
             width: '30rem',
           };

@@ -44,9 +44,7 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
       obj['ids_roles'] = ids_roles;
 
       this.empleadoClass.createUpdateOne(obj).then(() => {
-        const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
-        modal.closeModal(this.modal.component_id);
-        modal.returnDataFromModal({ error: false });
+        this.modal.instance.resetConfig(this.modal.component_id, {error: false});
       });
     }
   }

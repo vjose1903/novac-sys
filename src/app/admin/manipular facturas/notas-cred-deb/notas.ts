@@ -86,7 +86,7 @@ export class NotaC extends CrudG<any> {
       height: '30rem',
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
       },
     };
   }

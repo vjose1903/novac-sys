@@ -277,7 +277,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
             let botonesDinamicos = [
               { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-              { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
+              { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any },
             ];
 
             const toPDFData = { data: dataFactura, type: 'facturacion' };
@@ -347,7 +347,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       texto: text,
       siFunction: (instance) => {
         this.deleteMovimientoViaje(params);
-        instance.closeModal(instance.id, 'cancelar');
+        instance.dismissModal(instance.id);
       },
     };
 
@@ -381,7 +381,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para realizar el recibo de este pedido.',
       siFunction: (instance) => {
         this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}/${factura.id}`);
-        instance.closeModal(instance.id, 'cancelar');
+        instance.dismissModal(instance.id);
       },
     };
 

@@ -1,7 +1,7 @@
 import { MixinClass } from './../../../../core/typescript/MixinClass';
 import { table_config } from './../../../components/new_tablas/tabla-class';
 import { fun } from './../../../../core/services/functions.service';
-import { ModalI } from './../../../components/modal/modal-class';
+import { IModalConfiguration, ModalI } from './../../../components/modal/modal-class';
 import { Component, DoCheck, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
@@ -146,20 +146,18 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
       return;
     }
 
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    const obj = { key: this.inputs.data.key, modal_id: this.modal.component_id };
+    const dataToReturn = { key: this.inputs.data.key, modalId: this.modal.component_id };
     const informacion_retornar = this.form.getRawValue();
 
-    obj['data'] = {
+    dataToReturn['data'] = {
       solo_devuelto: { key: this.inputs.articulo_solo_devuelto?.key, cantidad: informacion_retornar.solo_devuelto, origin: this.inputs?.articulo_solo_devuelto?.producto_origin },
       defectuoso: { key: this.inputs.articulo_defectuoso?.key, cantidad: informacion_retornar.defectuoso, origin: this.inputs?.articulo_defectuoso?.producto_origin },
     };
 
     if (this.inputs.data.is_devuelto) {
-      obj['data'][this.inputs.tipo] = { key: this.inputs.data?.key, cantidad: informacion_retornar.devuelto, origin: this.inputs?.data?.producto_origin };
+      dataToReturn['data'][this.inputs.tipo] = { key: this.inputs.data?.key, cantidad: informacion_retornar.devuelto, origin: this.inputs?.data?.producto_origin };
     }
 
-    modal.returnDataFromModal(obj);
+    this.modal.instance.resetConfig(this.modal.component_id, dataToReturn);
   }
 }

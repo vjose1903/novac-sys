@@ -624,14 +624,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }];
 
     if (continuar)
       botonesDinamicos.push({
         clase: 'btn btn-verde mr-2',
         function: (instance) => {
           this.continuarANotas(dataFactura.id);
-          instance.closeModal(instance.id, 'cancelar');
+          instance.dismissModal(instance.id);
         },
         label: 'Continuar',
         disable: false,
@@ -671,7 +671,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-gris ml-2',
             function: (instance) => {
-              instance.closeModal(instance.id, 'mostrarFactura');
+              instance.dismissModal(instance.id);
               this.tableClickIcon({ id_tabla: 'facturas_params', columnKey: 'actions', iconKey: 'make_bill', data: dataFactura });
             },
             tooltip: fun.hasValue(dataFactura.fecha_completada) ? 'Cotización ya ha sido facturada' : null,
@@ -687,7 +687,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             clase: 'btn btn-verde ml-2',
             function: (instance) => {
               this.editarFactura();
-              instance.closeModal(instance.id, 'mostrarFactura');
+              instance.dismissModal(instance.id);
             },
             label: 'Editar',
             disable: false,
@@ -716,7 +716,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         Ss.loadServ.isLoading.next(false);
         if (res.status === 'si') {
           fun.toastSuccess(res.msg, 'CORRECTO');
-          modalInstance.closeModal(modalInstance.id, 'imprimir');
+          modalInstance.dismissModal(modalInstance.id);
         } else fun.toastError(res.msg, 'ERROR');
       })
       .catch((err) => {
@@ -734,7 +734,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'buscarClienteOsuplidor') {
+    if (arg.modalId == 'buscarClienteOsuplidor') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('valorI');
       } else {

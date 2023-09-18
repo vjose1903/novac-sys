@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as moment from '../../../../core/javascript/moment';
 
-import { ModalI } from '../../modal/modal-class';
+import { IModalConfiguration, ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';
 
 @Component({
@@ -21,14 +21,13 @@ export class PendienteFormComponent implements OnInit, ModalI {
 
   modal: any = {};
   inputs: any;
+
   btn_aceptar() {
     const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
 
     const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
 
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.returnDataFromModal({ fecha, modal_id: this.modal.component_id });
+    this.modal.instance.resetConfig(this.modal.component_id, { fecha, modalId: this.modal.component_id });
   }
 
   ngOnInit() {

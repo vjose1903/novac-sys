@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { ModalClass } from './../../components/modal/modal-class';
+import { IModalConfiguration, ModalClass } from './../../components/modal/modal-class';
 import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from './../../../core/services/pdf/pdf.service';
 import { ClienteC } from './../../registros/registro-clientes/cliente';
@@ -196,13 +196,13 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   mostrarFactura(dataFactura, type) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any }];
 
     if (this.inputs.code == tipoDocFacturacion.cotizacion) {
       botonesDinamicos.push({
         clase: 'btn btn-gris ml-2',
         function: (instance) => {
-          instance.closeModal(instance.id, 'mostrarFactura');
+          instance.dismissModal(instance.id);
           this.tableClickIcon({ id_tabla: 'mostrar_documento', columnKey: 'actions', iconKey: 'rellenar_factura', data: dataFactura });
         },
         label: 'Facturar',
@@ -216,8 +216,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   }
 
   pasar_a_facturacion(documento_selected) {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
+    this.modal.instance.resetConfig(this.modal.component_id);
 
     this.router.navigateByUrl('/').then((res) => {
       this.router.navigateByUrl(`/admin/factura/venta/bill_from_${this.inputs.code}/${documento_selected.id}`);

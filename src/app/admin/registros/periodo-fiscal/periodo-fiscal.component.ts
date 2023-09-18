@@ -169,7 +169,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
           height: '20rem',
           botones: {
             ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false }],
+            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
           },
         });
       }
@@ -192,7 +192,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
         // this.periodoFiscalClass.deleteOne(comprobanteData.id).then((res) => {
         //   const actualPagination = this.tServ.getPaginationById('lista_periodos');
         //   this.getPeriodosFiscales(actualPagination);
-        //   instance.closeModal(instance.id, 'cerrar_anio');
+        //   instance.dismissModal(instance.id);
         // });
       },
     };

@@ -53,7 +53,7 @@ export class ClienteC extends CrudG<any> {
     switch (pdfParams.tipo) {
       case 'cuentas_cobrar_cliente':
       case 'cuentas_cobrar_ant_saldo':
-        requestParameters = { tipo: objTipo[reporteParams.modal_id] };
+        requestParameters = { tipo: objTipo[reporteParams.modalId] };
         tipo = requestParameters['tipo'];
         if (tipo == 1) requestParameters['cliente_id'] = reporteParams.data.id;
         pdfParams.tipo = 'cuentas_cobrar';

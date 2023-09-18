@@ -115,12 +115,11 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const efectivo = fun.desformatear(this.efectivo);
     const obj = { dinero: efectivo, devuelta: this.devuelta ? devuelta_ : 0, forma_pago: this.formaPago, decision_cambio: this.cambiar_articulos === 'si' ? true : false };
 
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
+    let dataToReturn;
 
     if (this.factura_de == 'compra') {
       if (this.cambiar_articulos != undefined) {
-        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
+        dataToReturn = { obj, is_print: this.is_print, modalId: this.modal.component_id };
       } else {
         fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
       }
@@ -128,9 +127,11 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       if (this.validarForm()) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
       } else {
-        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
+        dataToReturn = { obj, is_print: this.is_print, modalId: this.modal.component_id };
       }
     }
+
+    this.modal.instance.resetConfig(this.modal.component_id, dataToReturn);
   }
 
   cambiosEnArticulos(lugar) {

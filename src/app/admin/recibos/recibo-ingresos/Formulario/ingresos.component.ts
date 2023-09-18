@@ -247,7 +247,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (cliente_id != '0' && factura_id != '0') {
       const cliente_response = await this.clienteClass.getOne(cliente_id);
-      this.getDataFromModal({ data: cliente_response.data, modal_id: 'buscarCliente', factura_a_buscar: factura_id });
+      this.getDataFromModal({ data: cliente_response.data, modalId: 'buscarCliente', factura_a_buscar: factura_id });
     } else {
       fun.enfocarInput('clienteI');
     }
@@ -276,7 +276,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       texto: '¿Seguro de que desea cancelar la operacion?.',
       siFunction: (instance) => {
         this.cancelarIgreso();
-        instance.closeModal(instance.id, 'cancelar');
+        instance.dismissModal(instance.id);
       },
     };
     this.confirmationModal(obj);
@@ -287,14 +287,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'cambioEfectivo_IngresosComponent') {
+    if (arg.modalId == 'cambioEfectivo_IngresosComponent') {
       this.devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
       this.is_print = arg.is_print;
       this.sendIngreso();
     }
 
-    if (arg.modal_id == 'buscarCliente') {
+    if (arg.modalId == 'buscarCliente') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('clienteI');
       } else {
@@ -331,7 +331,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
             texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
             siFunction: (instance) => {
               this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
-              instance.closeModal(instance.id, 'cancelar');
+              instance.dismissModal(instance.id);
             },
           };
           this.confirmationModal(obj);
@@ -345,7 +345,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
           let botonesDinamicos = [
             { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
+            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any },
           ];
           const toPDFData = { data: dataFactura, type: 'facturacion' };
 
@@ -534,7 +534,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           dinamico: [
             {
               clase: 'btn btn-blanco mr-2',
-              function: (instance) => this.closeModal(instance),
+              function: (instance) => this.dismissModal(instance),
               label: 'Cancelar',
               disable: false,
             },

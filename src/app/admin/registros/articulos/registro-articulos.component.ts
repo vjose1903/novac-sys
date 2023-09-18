@@ -209,7 +209,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       width: '70rem',
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
       },
     });
   }
@@ -226,7 +226,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         dinamico: [
           {
             clase: 'btn btn-blanco mr-2',
-            function: (instance) => this.closeModal(instance),
+            function: (instance) => this.dismissModal(instance),
             label: 'Cancelar',
             disable: false,
           },
@@ -237,7 +237,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'cofig-articulos') {
+    if (arg.modalId == 'cofig-articulos') {
       this.cofig_articulos = arg.data;
 
       const actualPagination = this.tServ.getPaginationById('lista_articulos');

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { ModalI } from '../../../admin/components/modal/modal-class';
+import { IModalConfiguration, ModalI } from '../../../admin/components/modal/modal-class';
 import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -38,9 +38,7 @@ export class ModalPasswordConfigComponent extends MixinClass implements OnInit, 
     const is_correct = fun.decryptConfigPassword(data.password);
 
     if (is_correct) {
-      const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-      modal.closeModal(this.modal.component_id);
-      modal.returnDataFromModal({ error: false });
+      this.modal.instance.resetConfig(this.modal.component_id, { error: false });
 
       setTimeout(() => this.sharedServ.nextCanToast(false), 2000);
     } else {

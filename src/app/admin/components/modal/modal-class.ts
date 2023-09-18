@@ -26,8 +26,18 @@ export interface IModalConfiguration {
   position?: string;
   transitionOptions?: string;
   contentStyleClass?: string;
-  returnDataFromModal?: Function;
-  dismissModal?: Function;
+  returnDataFromModal?: (args: IReturnData) => void;
+  dismissModal?: (id: string, dataToReturn?: IReturnData) => void;
+  onHideModal?: (args: IReturnData) => void;
+}
+
+export interface IReturnData {
+  data?: any;
+  inputs?: any;
+  modalId?: string;
+  extra?: object;
+  bool?: boolean;
+  [prop: string]: any;
 }
 
 export interface btnDisabled {
@@ -75,7 +85,7 @@ export class ModalClass extends LayoutClass {
   getDataFromModal(arg, search?) {}
   onHideModal(arg) {}
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function }) {
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function;}) {
     const config: IModalConfiguration = {
       id: obj.id,
       header: obj.header,
@@ -84,16 +94,20 @@ export class ModalClass extends LayoutClass {
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
+          { clase: 'btn btn-blanco mr-2', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.dismissModal(instance)), label: 'No', disable: false },
           { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
         ],
       },
     };
 
+    if (fun.objHas(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
+      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
+    }
+
     this.openNewModal(config);
   }
 
-  closeModal(modalObject: IModalConfiguration) {
-    modalObject.dismissModal(modalObject.id, 'cancelar');
+  dismissModal(modalInstance: IModalConfiguration) {
+    if (modalInstance.dismissModal && modalInstance.id) modalInstance.dismissModal(modalInstance.id);
   }
 }

@@ -623,7 +623,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       campos['is_bad_price'].setValue(false);
       campos['precio'].setValue(actual_price_value);
-      this.calcularMontosRow(index).then((result) => instance.closeModal(instance.id, 'get_actual_price'));
+      this.calcularMontosRow(index).then((result) => instance.dismissModal(instance.id));
     };
 
     const label = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio';
@@ -804,11 +804,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   async getDataFromModal(arg, search?) {
     if (arg?.tipo == 'data_no_found') fun.enfocarAndSelectInput(`codigo-${arg.index}`);
 
-    if (arg.modal_id == 'retornarDevuelto') this.retornarDevuelto(arg);
+    if (arg.modalId == 'retornarDevuelto') this.retornarDevuelto(arg);
 
-    if (arg.modal_id == 'removerArticulo') this.procesoQuitarArticulo(arg.key, arg.data);
+    if (arg.modalId == 'removerArticulo') this.procesoQuitarArticulo(arg.key, arg.data);
 
-    if (arg.modal_id == 'buscarArticulo') this.llenarRowDespuesDeFiltro(arg);
+    if (arg.modalId == 'buscarArticulo') this.llenarRowDespuesDeFiltro(arg);
   }
 
   retornarDevuelto(arg) {

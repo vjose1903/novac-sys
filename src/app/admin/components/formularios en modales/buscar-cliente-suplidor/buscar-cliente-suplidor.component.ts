@@ -66,7 +66,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     const classDinamic = this.inputs.metodo == tipoDocFacturacion.compra ? 'suplidorClass' : 'clienteClass';
     try {
       const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } }).catch((error) => {
-        if (where === 'init') this.closeThis({ tipo: 'data_no_found', modal_id: this.modal.component_id });
+        if (where === 'init') this.closeThis({ tipo: 'data_no_found', modalId: this.modal.component_id });
       });
 
       if (res.data && res.data.length > 0) {
@@ -92,14 +92,10 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   tableClickRow(event) {
-    const modal = this.closeThis();
-    modal.returnDataFromModal({ data: event.data, modal_id: this.modal.component_id });
+    this.closeThis({ data: event.data, modalId: this.modal.component_id });
   }
 
-  closeThis(arg?) {
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    if (arg) modal.returnDataFromModal(arg);
-    return modal;
+  closeThis(dataToReturn?) {
+    this.modal.instance.resetConfig(this.modal.component_id, dataToReturn);
   }
 }

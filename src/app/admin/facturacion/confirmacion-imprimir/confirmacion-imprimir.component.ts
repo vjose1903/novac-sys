@@ -1,6 +1,6 @@
 import { ConfigService } from './../../../core/services/configuration.service';
 import { Component, HostListener, OnInit } from '@angular/core';
-import { ModalI } from '../../components/modal/modal-class';
+import { IModalConfiguration, ModalI } from '../../components/modal/modal-class';
 import { SharedService } from '../../../core/services/shared.service';
 import { teclasCode } from '../../../core/typescript/constantes';
 import * as _ from 'lodash';
@@ -48,8 +48,6 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
   }
 
   btn_aceptar() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.returnDataFromModal({ is_print: this.is_print, modal_id: this.modal.component_id });
+    this.modal.instance.resetConfig(this.modal.component_id, { is_print: this.is_print, modalId: this.modal.component_id });
   }
 }

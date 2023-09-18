@@ -371,7 +371,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
             header: 'Confirmación',
             siFunction: async (instance) => {
               this.sendData();
-              instance.closeModal('aviso_cuentas', 'cancelar');
+              instance.dismissModal(instance.id);
             },
             width: '30rem',
           };

@@ -1,5 +1,5 @@
 import { fun } from './../../../../../core/services/functions.service';
-import { ModalI } from './../../../../components/modal/modal-class';
+import { IModalConfiguration, ModalI } from './../../../../components/modal/modal-class';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ConfigArticuloC } from '../articulos_configuracion';
@@ -53,9 +53,7 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
     this.configArticuloClass
       .updateOne(formulario, { parameters: { update_articulos: this.update_articulos } })
       .then((res) => {
-        const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
-        modal.closeModal(this.modal.component_id);
-        modal.returnDataFromModal({ data: { ...res.data }, modal_id: this.modal.component_id });
+        this.modal.instance.resetConfig(this.modal.component_id, { data: { ...res.data }, modalId: this.modal.component_id });
       })
       .catch((err) => console.error(err));
   }

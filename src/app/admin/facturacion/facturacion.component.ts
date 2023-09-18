@@ -579,19 +579,19 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.agregarFacturaALocalStorage();
         this.info_cambio['bool'] = true;
         this.runFinalizarCambioMenu(this.info_cambio);
-        this.closeModal(instance);
+        this.dismissModal(instance);
       };
 
       let noGuardar = (instance) => {
         this.info_cambio['bool'] = true;
         this.runFinalizarCambioMenu(this.info_cambio);
-        this.closeModal(instance);
+        this.dismissModal(instance);
       };
 
       let cancelarFunction = (instance) => {
         this.info_cambio['bool'] = false;
         this.runFinalizarCambioMenu(this.info_cambio);
-        this.closeModal(instance);
+        this.dismissModal(instance);
       };
 
       const confirmationObj = {
@@ -632,11 +632,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               let noFunction = (instance) => {
                 this.procesoRelleno(factura).then((result) => {
                   this.actualizarLayServFactGuardada(factura);
-                  this.closeModal(instance);
+                  this.dismissModal(instance);
                 });
               };
 
-              const cancelarRelleno = (instance) => this.closeModal(instance);
+              const cancelarRelleno = (instance) => this.dismissModal(instance);
 
               const confirmationObj = {
                 id: 'archivar_factura',
@@ -1157,7 +1157,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) {
         const label = `Salir de ${this.factServ.tipoDocumento == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre venta'}`;
-        botones['dinamico'] = [{ clase: 'btn btn-gris mr-2', function: (instance) => this.router.navigateByUrl('/admin/dashboard') && this.closeModal(instance), label: label, disable: false }];
+        botones['dinamico'] = [{ clase: 'btn btn-gris mr-2', function: (instance) => this.router.navigateByUrl('/admin/dashboard') && this.dismissModal(instance), label: label, disable: false }];
       }
 
       if (fun.hasValue(input_activo)) fun.desEnfocarInput(input_activo);
@@ -1194,7 +1194,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (this.factServ.action !== actionFacturacion.update) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/new/0`).then((res_router) => this.resetVariables());
       else if (this.factServ.action == actionFacturacion.update || this.factServ.action == actionFacturacion.bill_from_cotizacion) this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
 
-      this.closeModal(instance);
+      this.dismissModal(instance);
     };
 
     let documento = this.getDocumentoDescripcion();
@@ -1240,7 +1240,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 botones: {
                   ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
                   dinamico: [
-                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
                     { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
                   ],
                 },
@@ -1276,7 +1276,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 botones: {
                   ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
                   dinamico: [
-                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
                     { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
                   ],
                 },
@@ -1332,7 +1332,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   procesoArchivarFactura(modalInstance, reset = false) {
     this.agregarFacturaALocalStorage();
     this.getFacturasGuardadas();
-    this.closeModal(modalInstance);
+    this.dismissModal(modalInstance);
 
     if (reset) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/new/0`).then((res_router) => this.resetVariables());
   }
@@ -1523,18 +1523,18 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id === 'facturaPendiente') {
+    if (arg.modalId === 'facturaPendiente') {
       this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(arg.fecha)['FechaFacturaMostrar'];
       this.factura_pendiente = true;
 
       //
-    } else if (arg.modal_id == 'confirmacionImprimir') {
+    } else if (arg.modalId == 'confirmacionImprimir') {
       this.is_print = arg.is_print;
       this.enviarABaseDatos();
       //
-    } else if (arg.modal_id == 'cambioEfectivo') {
+    } else if (arg.modalId == 'cambioEfectivo') {
       this.is_print = arg.is_print;
       this.Devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
@@ -1547,9 +1547,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       } else {
         this.enviarABaseDatos();
       }
-    } else if (arg.modal_id == 'retornarDevuelto') {
+    } else if (arg.modalId == 'retornarDevuelto') {
       this.cuerpo.getDataFromModal(arg, search);
-    } else if (arg.modal_id == 'buscarCliente') {
+    } else if (arg.modalId == 'buscarCliente') {
       this.factServ.propietario_factura = arg.data;
 
       this.form.patchValue(this.factServ.propietario_factura);

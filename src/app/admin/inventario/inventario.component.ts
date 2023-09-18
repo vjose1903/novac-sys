@@ -158,7 +158,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id === 'inventario') {
+    if (arg.modalId === 'inventario') {
       const actualPagination = this.tServ.getPaginationById('lista_inventario');
       actualPagination['search'] = this.palabra_buscar;
       this.getArticulos(actualPagination);

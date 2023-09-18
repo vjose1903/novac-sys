@@ -122,7 +122,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
   // deactivate_or_reactivate
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'form_cuenta_contable') {
+    if (arg.modalId == 'form_cuenta_contable') {
       this.requests(arg.obj);
     }
   }
@@ -191,7 +191,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
             : `Seguro que desea <b class="negrita"> REACTIVAR </b> la cuenta <b class="negrita">${params.data.descripcion}</b>`,
           siFunction: (instance) => {
             this.deactivateOrReactivateAccount(params.data);
-            instance.closeModal(instance.id, 'deactivate_or_reactivate_account');
+            instance.dismissModal(instance.id);
           },
         });
       }

@@ -36,9 +36,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   inputs: any;
 
   btn_aceptar() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.returnDataFromModal({ data: this.articulos_selected, modal_id: this.modal.component_id });
+    this.modal.instance.resetConfig(this.modal.component_id, { data: this.articulos_selected, modalId: this.modal.component_id });
   }
 
   ngOnInit() {

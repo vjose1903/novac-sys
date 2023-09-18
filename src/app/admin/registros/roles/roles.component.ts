@@ -257,7 +257,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'aceptar'), label: 'NO', disable: false },
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'NO', disable: false },
           {
             clase: 'btn btn-verde',
             function: (instance) => this.eliminarRole(instance, data),
@@ -274,7 +274,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
       const actualPagination = this.tServ.getPaginationById('lista_roles');
       actualPagination['searchText'] = this.palabra_buscar;
       this.getRoles(actualPagination);
-      modalInstance.closeModal(modalInstance.id, 'borrar');
+      modalInstance.dismissModal(modalInstance.id);
     });
   }
 

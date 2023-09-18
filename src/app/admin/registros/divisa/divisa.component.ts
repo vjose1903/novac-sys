@@ -129,7 +129,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
       pick_values,
     );
 
-    originalValue['img'] = this.divisaServ.listaDivisas.find((cuenta) => cuenta.id == formValue.id).img_divisa;
+    originalValue['img'] = this.divisaServ.listaDivisas.find((cuenta) => cuenta.id == formValue.id)?.img_divisa;
 
     return !fun.isEqual(formValue, originalValue);
   }
@@ -158,7 +158,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
           width: '30rem',
           botones: {
             ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
           },
         });
       }
@@ -171,7 +171,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
             : `Seguro que desea <b class="negrita"> REACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`,
           siFunction: (instance) => {
             this.deactivateOrReactivateAccount(params.data);
-            instance.closeModal(instance.id, 'deactivate_or_reactivate_divisa');
+            instance.dismissModal(instance.id);
           },
         });
       }

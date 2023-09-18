@@ -331,7 +331,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       header: 'Confirmación',
       siFunction: (instance) => {
         this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
-        this.closeModal(instance);
+        this.dismissModal(instance);
       },
       width: '30rem',
     };
@@ -339,7 +339,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id === 'confirmacionImprimir') {
+    if (arg.modalId === 'confirmacionImprimir') {
       this.is_print = arg.is_print;
       this.formarNota();
     }
@@ -373,7 +373,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           botones: {
             ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
-              { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+              { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
               { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
             ],
           },
@@ -405,7 +405,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
           {
             clase: 'btn btn-verde',
             function: (instance) => obj.siFunction(instance),
@@ -417,8 +417,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-  closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
+  dismissModal(modalInstance) {
+    modalInstance.dismissModal(modalInstance.id);
   }
 
   totalIndividual(dataFact) {

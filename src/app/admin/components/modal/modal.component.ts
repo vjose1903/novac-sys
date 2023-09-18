@@ -4,7 +4,7 @@ import { modalsConfigurations, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
 import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
-import { IModalConfiguration } from './modal-class';
+import { IModalConfiguration, IReturnData } from './modal-class';
 
 @Component({
   selector: 'app-new-modal',
@@ -35,8 +35,8 @@ export class NewModalComponent implements OnInit {
     botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
     returnDataFromModal: (arg?) => {},
 
-    dismissModal: (id, reason) => {
-      this.cancelarOrAceptar(id, reason);
+    dismissModal: (modalId: string, dataToReturn?: IReturnData) => {
+      this.resetConfig(modalId, dataToReturn);
     },
   };
 
@@ -54,14 +54,18 @@ export class NewModalComponent implements OnInit {
     });
   }
 
-  resetConfig(id_) {
-    const modal = _.find(this.modalsConfig, (config) => config.id === id_);
+  findModalConfigById(modalId): IModalConfiguration {
+    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+    return modal;
+  }
 
-    const data = { modal: modal };
+  resetConfig(modalId, dataToReturn?: IReturnData) {
+    if (dataToReturn) {
+      const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+      if (fun.hasValue(modal) && fun.hasValue(modal.returnDataFromModal)) modal.returnDataFromModal(dataToReturn);
+    }
 
-    if (modal && typeof modal.onHide == 'function') modal.onHide(data);
-
-    this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
+    this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== modalId);
   }
 
   handleConfig(config: IModalConfiguration) {
@@ -94,7 +98,7 @@ export class NewModalComponent implements OnInit {
       setTimeout(() => {
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentConfig.component as any);
 
-        const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
+        const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modalId', config.id);
 
         let viewContainerRef = currentReceptor.viewContainerRef;
 
@@ -107,7 +111,7 @@ export class NewModalComponent implements OnInit {
 
         if (componente['instance'].modal) componente['instance'].modal = { instance: this, component_id: config.id };
 
-        currentConfig.componentInstance = componente.componentInstance;
+        currentConfig.componentInstance = componente['instance'];
       }, 1);
     }
   }
@@ -131,20 +135,26 @@ export class NewModalComponent implements OnInit {
     modalsConfigurations.next({ show: false, id: id_ });
   }
 
-  cancelarOrAceptar( id_, reason:'aceptar'|'cancelar') {
-    if (reason=='cancelar') {
+  cancelarOrAceptar(id_, reason: 'aceptar' | 'cancelar') {
+    console.log("id_ ", id_);
+    console.log("reason ", reason);
+
+    if (reason == 'cancelar') {
       modalsConfigurations.next({ show: false, id: id_ });
       return;
     }
 
     const modal: IModalConfiguration = _.find(this.modalsConfig, (config) => config.id === id_);
+    console.log("modal ", modal);
 
-    if (modal.componentInstance) {
+    if (modal.componentInstance && modal?.componentInstance?.btn_aceptar) {
+      console.log("-------------------- 1 --------------------");
+
       modal.componentInstance.btn_aceptar();
     } else {
-      const bool = reason == "aceptar";
-      modal.returnDataFromModal({ bool: bool, inputs: modal.inputs, id: modal.id });
-      modal.dismissModal(modal.id, 'aceptar');
+      console.log("-------------------- 2 --------------------");
+      const bool = reason == 'aceptar';
+      modal.dismissModal(modal.id, { bool: bool, inputs: modal.inputs, modalId: modal.id });
     }
   }
 

@@ -112,7 +112,7 @@ export class IconsArrayComponent {
       const siFunction = (instance) => {
         data.is_editing = false;
         this.tServ.modifyRowsEditing(editing_row, 'remove', this.rowsEditing).then(() => this.handle_table_events('clickIcon', obj_click));
-        new ModalClass().closeModal(instance);
+        new ModalClass().dismissModal(instance);
       };
 
       new ModalClass().confirmationModal({ id: 'cancel_row_editing', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
