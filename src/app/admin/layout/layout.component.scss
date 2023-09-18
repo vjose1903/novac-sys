@@ -157,6 +157,7 @@
               filter: grayscale(50%);
               height: 4.5rem;
               width: 4.5rem;
+              cursor: pointer;
               &.iconosMenuA {
                 background: var(--primary10);
                 filter: grayscale(10%) contrast(-20%);

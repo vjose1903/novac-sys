@@ -1,12 +1,12 @@
 <div *ngIf="!configReady" class="h-100 w-100 splash-container">
   <h2 class="msg">Cargando archivo de configuración</h2>
-  <img class="logo" src="assets/img/logo_splash.png" />
-  <img class="rayas" src="assets/img/splash_screen_rayas.png" />
-  <img class="inspot" src="assets/img/inspot_logo.png" />
+  <img class="logo" src="assets/img/logo_splash.png"  draggable="false"/>
+  <img class="rayas" src="assets/img/splash_screen_rayas.png"  draggable="false"/>
+  <img class="inspot" src="assets/img/inspot_logo.png"  draggable="false"/>
 </div>
 
 <div id="fondoC" *ngIf="loading && configReady" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
-  <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
+  <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt=""  draggable="false"/>
   <span class="text"> CARGANDO ... </span>
 </div>
 

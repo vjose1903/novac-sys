@@ -90,6 +90,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
       nombre: [{ value: null, disabled: false }, Validators.required],
       is_principal: [{ value: false, disabled: false }],
       current_tasa: [{ value: null, disabled: false }],
+      predeterminado: [{ value: false, disabled: false }],
       img: [{ value: null, disabled: false }],
     });
     this.checkFormValidator();
