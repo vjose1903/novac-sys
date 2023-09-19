@@ -124,7 +124,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
 
   editarItem(data) {
     this.form.patchValue(data);
-    this.categoriaSelected = fun.duplicarJson(data);
+    this.categoriaSelected = fun.deepCloning(data);
     this.form.controls.same_in_all_config.setValue(false);
   }
 
@@ -136,11 +136,11 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     if (same_in_all_config) {
       this.inputs.configsEntCuentas.forEach((config: ConfiguracionEntidadCuentaI) => {
         formValue['configuracion_entidad_cuenta_id'] = config.id;
-        dataParsed.categorias.push(fun.duplicarJson(formValue));
+        dataParsed.categorias.push(fun.deepCloning(formValue));
       });
     } else {
       formValue['configuracion_entidad_cuenta_id'] = this.selectedConfig.id;
-      dataParsed.categorias.push(fun.duplicarJson(formValue));
+      dataParsed.categorias.push(fun.deepCloning(formValue));
     }
 
     return dataParsed;

@@ -11,7 +11,7 @@ export class CustomLodash extends ToastService {
   // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
   // _________________________________________________________________________________________________
   static pushAt(arr, index, newItem) {
-    const copyArr = fun.duplicarJson(arr);
+    const copyArr = fun.deepCloning(arr);
     arr.length = 0;
     const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
     newArr.forEach((item) => arr.push(item));

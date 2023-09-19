@@ -73,7 +73,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
         return tipo_articulo;
       });
 
-      this.listaTipoArticulos = fun.duplicarJson(res.data);
+      this.listaTipoArticulos = fun.deepCloning(res.data);
 
       console.log('res ', res);
 
@@ -108,7 +108,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
       header: header,
       width: '70rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
       },
     });
@@ -129,7 +129,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
 
   editarItem(data) {
     this.form.patchValue(data);
-    this.categoriaSelected = fun.duplicarJson(data);
+    this.categoriaSelected = fun.deepCloning(data);
   }
 
   checkIfSomethingIsDiferrent() {

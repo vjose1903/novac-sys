@@ -49,7 +49,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     this.form.controls['defectuoso'].disable();
     this.form.controls['solo_devuelto'].disable();
 
-    this.articuloSelected = fun.duplicarJson(event.data);
+    this.articuloSelected = fun.deepCloning(event.data);
 
     const currentControl = this.articuloSelected.is_defectuoso ? 'defectuoso' : 'solo_devuelto';
     this.form.controls[currentControl].enable();
@@ -58,8 +58,8 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     this.inputs['articulo_solo_devuelto'] = null;
     this.inputs['articulo_defectuoso'] = null;
 
-    this.inputs[currentKey] = fun.duplicarJson(event.data);
-    this.inputs['data'] = fun.duplicarJson(event.data.producto_origin);
+    this.inputs[currentKey] = fun.deepCloning(event.data);
+    this.inputs['data'] = fun.deepCloning(event.data.producto_origin);
 
     this.enfocarInitInput();
   }

@@ -109,7 +109,7 @@ export class ClienteC extends CrudG<any> {
       component: BuscarClienteSuplidorComponent,
       width: '900px',
       height: '500px',
-      botones: { ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons), cancelar: { show: true, disable: false } },
+      botones: { ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons), cancelar: { show: true, disable: false } },
     };
     return objModal;
   }

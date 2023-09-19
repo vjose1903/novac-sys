@@ -75,7 +75,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
       let utils = { current_index: 0 };
 
       res.data.forEach((cuenta: CuentaContableI) => {
-        const cuentaParsed: any = this.parseCuentasContables(fun.duplicarJson(cuenta), utils);
+        const cuentaParsed: any = this.parseCuentasContables(fun.deepCloning(cuenta), utils);
         utils.current_index += 1;
         this.listaCuentasContables.push(cuentaParsed);
       });
@@ -163,12 +163,12 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'add_account') {
         header = 'Registro cuenta contable';
-        inputs = { data: params.data, dataOriginal: fun.duplicarJson(params.data), method: 'add', cuenta_control: params.data.cuenta_control };
+        inputs = { data: params.data, dataOriginal: fun.deepCloning(params.data), method: 'add', cuenta_control: params.data.cuenta_control };
       }
 
       if (params.iconKey == 'edit_account') {
         header = 'Actualizar cuenta contable';
-        inputs = { data: params.data, dataOriginal: fun.duplicarJson(params.data), method: 'edit', cuenta_control: params.data.cuenta_control };
+        inputs = { data: params.data, dataOriginal: fun.deepCloning(params.data), method: 'edit', cuenta_control: params.data.cuenta_control };
       }
 
       if (params.iconKey == 'add_account' || params.iconKey == 'edit_account') {

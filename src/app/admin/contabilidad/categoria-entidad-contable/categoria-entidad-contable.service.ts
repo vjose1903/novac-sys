@@ -7,11 +7,20 @@ import { Permisos } from './../../../core/typescript/permisos';
 import { Injectable } from '@angular/core';
 import { CategoriaEntidadContableComponent } from './categoria-entidad-contable.component';
 import { ModalClass } from '../../components/modal/modal-class';
+import { BehaviorSubject, filter, finalize, first, take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoriaEntidadContableService {
+  private _categoriasChange = new BehaviorSubject<boolean>(false);
+
+  get categoriasChange$() {
+    return this._categoriasChange.asObservable().pipe(
+      filter(value => value != false)
+    );
+  }
+
   permissions = Permisos;
 
   allPermisosCategoriaEnt = Object.values(this.permissions.categoria_entidad_contable);
@@ -26,6 +35,11 @@ export class CategoriaEntidadContableService {
 
   constructor() {}
 
+  setCategoriaChange() {
+    this._categoriasChange.next(true);
+    this._categoriasChange.next(false);
+  }
+
   openModalCategorias(params: { entidad: entidadesContables; openNewModal: Function; inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI> }; id_modal: string }) {
     const header = `Categorias de ${CategoriaEntidadContableService.entidades.plural[params.entidad]}`;
     params.inputs['entidad'] = params.entidad;
@@ -37,7 +51,7 @@ export class CategoriaEntidadContableService {
       header: header,
       width: '70rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
       },
     });

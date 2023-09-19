@@ -158,12 +158,12 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
   editarItem(config: ConfiguracionEntidadCuentaI) {
     this.form.patchValue(config);
 
-    this.configuracionSelected = fun.duplicarJson(config);
+    this.configuracionSelected = fun.deepCloning(config);
   }
 
   reset() {
     const originalValue = this.listaConfiguraciones.find((cuenta) => cuenta.id == this.configuracionSelected.id);
-    this.form.patchValue(fun.duplicarJson(originalValue));
+    this.form.patchValue(fun.deepCloning(originalValue));
   }
 
   borrar() {

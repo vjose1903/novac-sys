@@ -170,6 +170,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
     if (this.subLogOut) this.subLogOut.unsubscribe();
     if (this.subRouter) this.subRouter.unsubscribe();
+    if (this.subCurrentUser) this.subCurrentUser.unsubscribe();
   }
 
   checkCuadre() {

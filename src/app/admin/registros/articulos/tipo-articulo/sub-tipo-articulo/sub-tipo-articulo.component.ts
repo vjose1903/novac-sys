@@ -62,7 +62,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
     this.listaSubTipoArticulos.length = 0;
 
     this.subTipoArticuloClass.getSubTipoArticulos(parameters).then((res) => {
-      this.listaSubTipoArticulos = fun.duplicarJson(res.data);
+      this.listaSubTipoArticulos = fun.deepCloning(res.data);
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
@@ -95,7 +95,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
 
   editarItem(data) {
     this.form.patchValue(data);
-    this.subCategoriaSelected = fun.duplicarJson(data);
+    this.subCategoriaSelected = fun.deepCloning(data);
   }
 
   checkIfSomethingIsDiferrent() {

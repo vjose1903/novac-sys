@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { modalsConfigurations, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
@@ -11,7 +11,7 @@ import { IModalConfiguration, IReturnData } from './modal-class';
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class NewModalComponent implements OnInit {
+export class NewModalComponent implements OnInit, OnDestroy {
   @ViewChildren(ModalDirective) modal_receptor: ModalDirective;
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef, public mServ: ModalService) {}
@@ -54,17 +54,22 @@ export class NewModalComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    if(this.subConfig) this.subConfig.unsubscribe();
+  }
+
   findModalConfigById(modalId): IModalConfiguration {
     const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
     return modal;
   }
 
   closeModal(modalId, dataToReturn?: IReturnData) {
+    this.onHideModal(modalId);
+
     if (dataToReturn) {
       const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
       if (fun.hasValue(modal) && fun.hasValue(modal.returnDataFromModal)) modal.returnDataFromModal(dataToReturn);
     }
-
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== modalId);
   }
 
@@ -132,8 +137,9 @@ export class NewModalComponent implements OnInit {
     return fun.objHas(btnConfig, 'tooltip') && fun.hasValue(btnConfig.tooltip) ? btnConfig.tooltip : '';
   }
 
-  onHideModal(id_) {
-    modalsConfigurations.next({ show: false, id: id_ });
+  onHideModal(modalId) {
+    const modal: IModalConfiguration = _.find(this.modalsConfig, (config) => config.id === modalId);
+    if (modal) modal.onHideModal(modal);
   }
 
   cancelarOrAceptar(id_, reason: 'aceptar' | 'cancelar') {

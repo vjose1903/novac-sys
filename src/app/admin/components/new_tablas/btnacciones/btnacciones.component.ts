@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import * as _ from 'lodash';
@@ -10,7 +10,7 @@ import { botonesTableI } from '../tabla-class';
   templateUrl: './btnacciones.component.html',
   styleUrls: ['./btnacciones.component.scss'],
 })
-export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
+export class NewBTNACCIONESComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() botones: botonesTableI;
 
   btnList = {
@@ -36,6 +36,10 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.subWidth = new fun().getWindowSize.subscribe((res) => this.handleWidth(res));
+  }
+
+  ngOnDestroy(): void {
+    if(this.subWidth) this.subWidth.unsubscribe();
   }
 
   ngAfterViewInit(): void {

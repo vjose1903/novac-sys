@@ -59,7 +59,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   async buscarClientesOrSuplidor(params?: { per_page?: number; page?: number; search?: string }, where?) {
-    const copyData = fun.duplicarJson(this.dataFiltro);
+    const copyData = fun.deepCloning(this.dataFiltro);
 
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
 

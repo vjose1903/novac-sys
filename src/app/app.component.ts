@@ -1,5 +1,5 @@
 import { LoaderService } from './core/services/loader.service';
-import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 
 import { IpcService } from './core/services/ipc.service';
 import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
@@ -37,7 +37,7 @@ import { FacturacionService } from './admin/facturacion/facturacion.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
+export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit, OnDestroy {
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
     if ((event.metaKey || event.ctrlKey) && event.key == 'r') {
@@ -75,6 +75,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   ) {
     super();
   }
+
 
   ngOnInit(): void {
     Ss.http = this.http;
@@ -193,6 +194,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
+  ngOnDestroy(): void {
+    if(this.sub) this.sub.unsubscribe();
+    if(this.subModified) this.subModified.unsubscribe();
+  }
+
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
 
@@ -209,7 +215,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   async test() {
     // const obj = { nombre: 'victor', edad: 35, direccion: { calle: 'las maras-higuero', apto: 'amarillo' }, estudios: ['colegio inmaculada', 'ucateci'] };
     // console.log(`obj ANTES => `, obj);
-    // const obj2 = fun.duplicarJson(obj);
+    // const obj2 = fun.deepCloning(obj);
     // obj2.nombre = 'otro';
     // obj2.direccion.calle = 'el higuero-maras';
     // new ConfigArticuloC()

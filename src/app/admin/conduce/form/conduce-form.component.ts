@@ -232,7 +232,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
             header: 'BUSCAR ARTICULO',
             width: '56.25rem',
             height: '31.25rem',
-            botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           });
           fun.enfocarInput('input_fantasma');
         } else {
@@ -346,7 +346,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
       });
 
       fun.desEnfocarInput('clienteI');
@@ -628,7 +628,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               width: '900px',
               height: '400px',
               botones: {
-                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+                ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
                   { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
                   { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'SI', disable: true },
@@ -796,7 +796,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         header: 'Confirmación',
         width: '30rem',
         botones: {
-          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
             { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },

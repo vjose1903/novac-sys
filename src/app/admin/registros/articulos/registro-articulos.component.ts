@@ -169,7 +169,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
 
       this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.materia_prima }).then((res) => {
-        this.listaMateriasPrimas = fun.duplicarJson(res['data']);
+        this.listaMateriasPrimas = fun.deepCloning(res['data']);
         resolve(true);
       });
     });
@@ -178,7 +178,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   getTipoArticulos() {
     this.listaTipoArticulos.length = 0;
     this.tipoArticuloClass.getAll().then((res) => {
-      this.listaTipoArticulos = fun.duplicarJson(res.data);
+      this.listaTipoArticulos = fun.deepCloning(res.data);
     });
   }
 
@@ -190,7 +190,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.subTipoArticuloClass
         .getSubTipoArticulos(parameters)
         .then((res) => {
-          this.listaSubTipoArticulos = fun.duplicarJson(res.data);
+          this.listaSubTipoArticulos = fun.deepCloning(res.data);
           resolve();
         })
         .catch(() => reject());
@@ -208,7 +208,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       header: header,
       width: '70rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
       },
     });
@@ -222,7 +222,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       header: 'Configuraciones de articulos',
       width: '50rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           {
             clase: 'btn btn-blanco mr-2',
@@ -518,7 +518,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   checkCostoFormula(fila) {
     let res = false;
-    const fila_formulario = fun.duplicarJson(fila.value);
+    const fila_formulario = fun.deepCloning(fila.value);
     const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
 
     if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
@@ -744,7 +744,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async recalcularFunc() {
-    const temp = fun.duplicarJson(this.tipoArticuloSelected);
+    const temp = fun.deepCloning(this.tipoArticuloSelected);
     this.tipoArticuloSelected = undefined;
     this.resetArray();
 
@@ -895,7 +895,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const pick_values = ['cedula', 'rnc', 'nombre', 'apellido', 'telefono', 'sexo', 'limite_credito', 'maximo_credito', 'vendedor_id', 'direccion', 'id', 'img'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
     formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
-    formValue['cuentas_contables'] = fun.duplicarJson(this.listaEntidadCuentasContables);
+    formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
     const originalArticulo = this.listaArticulos.find((cliente) => cliente.id == formValue.id);
     const originalValue = fun.pick(originalArticulo, pick_values);
@@ -903,7 +903,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     originalValue['img'] = originalArticulo.img_cliente;
     originalValue['cedula'] = originalArticulo?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
     originalValue['rnc'] = originalArticulo?.documentos_de_identidad.find((doc) => doc.descripcion == 'rnc')?.documento;
-    originalValue['cuentas_contables'] = fun.duplicarJson(this.entCuentaContServ.parseCuentasFromBackend(originalArticulo?.cuentas_contables));
+    originalValue['cuentas_contables'] = fun.deepCloning(this.entCuentaContServ.parseCuentasFromBackend(originalArticulo?.cuentas_contables));
 
     return !fun.isEqual(formValue, originalValue);
   }

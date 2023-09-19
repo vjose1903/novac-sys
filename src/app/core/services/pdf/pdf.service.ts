@@ -22,7 +22,7 @@ export class PdfService {
     return new Promise((resolve, reject) => {
       let obj;
       let todo_true = true;
-      const data = fun.duplicarJson(params.oPdf.data);
+      const data = fun.deepCloning(params.oPdf.data);
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
 

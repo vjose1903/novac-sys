@@ -157,7 +157,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
           header: 'Actualizar Tasa de cambio',
           width: '30rem',
           botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
           },
         });
@@ -183,7 +183,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.botonLabel = 'Editar';
-      this.divisaSelected = fun.duplicarJson(divisa);
+      this.divisaSelected = fun.deepCloning(divisa);
       this.form.patchValue(divisa);
 
       this.photoData = { src_img: divisa.img_divisa, id: divisa.imagen.id };

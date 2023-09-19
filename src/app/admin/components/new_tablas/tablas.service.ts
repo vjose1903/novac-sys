@@ -103,7 +103,7 @@ export class TablasService {
 
   modifyRowsEditing(newData, kind: 'add' | 'remove', rowsEditing) {
     return new Promise<any>((resolve, reject) => {
-      newData = fun.duplicarJson(newData);
+      newData = fun.deepCloning(newData);
       const row_editing = rowsEditing.find((item) => item.id == newData.id);
 
       const index_editing = rowsEditing.findIndex((row_edit) => row_edit.id == row_editing?.id);

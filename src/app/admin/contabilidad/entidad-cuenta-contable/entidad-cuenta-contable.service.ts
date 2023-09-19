@@ -45,7 +45,7 @@ export class EntidadCuentaContableService {
     return cuentas_cuentables?.map((cuenta: EntidadCuentaContableI) => {
       const values_pick = ['id', 'configuracion_entidad_cuenta_id', 'tipo_agrupacion_contable', 'is_comun'];
 
-      const cuentaParsed: FormEntidadCuentaContableI = fun.pick(fun.duplicarJson(cuenta), values_pick);
+      const cuentaParsed: FormEntidadCuentaContableI = fun.pick(fun.deepCloning(cuenta), values_pick);
 
       cuentaParsed.has_cuenta = cuenta?.tipo_agrupacion_contable != agrupacionesContables.sin_cuenta;
       cuentaParsed.tipo_categoria_id = cuenta?.origen_categoria?.id || null;

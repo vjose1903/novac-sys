@@ -87,11 +87,11 @@ export class fun extends CustomLodash {
     return fecha;
   }
   // __________________________________________________________________________________________________
-  // Nombre: duplicarJson
+  // Nombre: deepCloning
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
 
-  static duplicarJson(obj: Object | Array<any>) {
+  static deepCloning(obj: Object | Array<any>) {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
@@ -104,7 +104,7 @@ export class fun extends CustomLodash {
     Object.getOwnPropertyNames(obj).forEach(function (key) {
       let descriptor = Object.getOwnPropertyDescriptor(obj, key);
       if (descriptor.value && typeof descriptor.value === 'object') {
-        descriptor.value = fun.duplicarJson(descriptor.value);
+        descriptor.value = fun.deepCloning(descriptor.value);
       }
       Object.defineProperty(copy, key, descriptor);
     });
@@ -131,7 +131,7 @@ export class fun extends CustomLodash {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (this.isEmpty(searchText)) resolve(copyData);
 
-        const data_filtered = fun.duplicarJson(copyData).filter((obj) => {
+        const data_filtered = fun.deepCloning(copyData).filter((obj) => {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 

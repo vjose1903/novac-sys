@@ -109,7 +109,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
         arti.customStyles = { codigo: { width: '5.5rem', 'text-align': 'left' }, nombre: { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
       });
 
-      this.listaArticulos = fun.duplicarJson(res.data);
+      this.listaArticulos = fun.deepCloning(res.data);
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }

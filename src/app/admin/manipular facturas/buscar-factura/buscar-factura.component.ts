@@ -588,7 +588,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       header: this.tipo_documento_selected == 'compra' ? 'Buscar Suplidor' : 'Buscar Cliente',
       width: '900px',
       height: '500px',
-      botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+      botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
     });
   }
 
@@ -655,7 +655,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
           botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: botonesDinamicos,
           },
         };

@@ -51,7 +51,7 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
       let entidad_cuenta: FormEntidadCuentaContableI = this.cuentasContablesData?.find((cuenta) => cuenta.configuracion_entidad_cuenta_id == config.id);
 
       if (fun.isEmpty(entidad_cuenta)) {
-        entidad_cuenta = fun.duplicarJson(entidadCuentaContableBlank);
+        entidad_cuenta = fun.deepCloning(entidadCuentaContableBlank);
         entidad_cuenta.configuracion_entidad_cuenta_id = config.id;
 
         this.cuentasContablesData.push(entidad_cuenta);

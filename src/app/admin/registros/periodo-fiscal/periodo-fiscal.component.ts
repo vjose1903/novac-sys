@@ -127,7 +127,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   periodo_puede_cerrar(periodo: PeriodoFiscalI) {
     let res = false;
 
-    const only_meses = fun.duplicarJson(periodo.detalle_periodo_fiscal);
+    const only_meses = fun.deepCloning(periodo.detalle_periodo_fiscal);
     delete only_meses.id;
 
     const is_periodo_months_all_close = Object.values(only_meses).every((item) => item == false);
@@ -143,18 +143,6 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
     return fecha_actual.getMonth() + 1 == PeriodoFiscalC.numbers.diciembre;
   }
 
-  saltar(campo) {
-    if (campo != 'send') fun.enfocarInput(campo);
-    else {
-      if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
-    }
-  }
-
-  formIsInvalid() {
-    let res = true;
-    return res;
-  }
-
   atras() {}
 
   tableClickIcon(params) {
@@ -168,7 +156,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
           width: '70rem',
           height: '20rem',
           botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
           },
         });

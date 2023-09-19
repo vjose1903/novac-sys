@@ -1,4 +1,3 @@
-import { Subscription } from 'rxjs';
 import { Ss } from '../../core/services/singleton.service';
 import { TablaClass } from '../components/new_tablas/tabla-class';
 import * as _ from 'lodash';
@@ -10,10 +9,6 @@ export class LayoutClass extends TablaClass {
 
   ruta_a_cambiar = '';
   url_actual = '';
-
-  subDeciMenu: Subscription;
-
-  subRefresh: Subscription;
 
   layServ;
 

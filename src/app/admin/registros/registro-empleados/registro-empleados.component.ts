@@ -21,6 +21,7 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
+import { IModalConfiguration } from '../../components/modal/modal-class';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -252,14 +253,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     const pick_values = ['cedula', 'nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles', 'id'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
     formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
-    formValue['cuentas_contables'] = fun.duplicarJson(this.listaEntidadCuentasContables);
+    formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
     const originalEmpleado = this.listaEmpleados.find((empleado) => empleado.id == formValue.id);
     const originalValue = fun.pick(originalEmpleado, pick_values);
 
     originalValue['cedula'] = originalEmpleado?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
     originalValue['ids_roles'] = originalEmpleado?.roles?.map((rol) => rol.id);
-    originalValue['cuentas_contables'] = fun.duplicarJson(this.entCuentaContServ.parseCuentasFromBackend(originalEmpleado?.cuentas_contables));
+    originalValue['cuentas_contables'] = fun.deepCloning(this.entCuentaContServ.parseCuentasFromBackend(originalEmpleado?.cuentas_contables));
 
     return !fun.isEqual(formValue, originalValue);
   }
@@ -315,6 +316,21 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     if (params.action == 'delete') this.eliminarReg(params.data);
   }
 
+
+  openModalCategorias() {
+    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.user, id_modal: 'categorias_empleados', inputs: { configsEntCuentas: this.listaConfigEmpleados }, openNewModal: this.openNewModal.bind(this) });
+  }
+
+  onHideModal(modalConfig: IModalConfiguration) {
+    if (modalConfig.id == "categorias_empleados") {
+      this.categoriaEntidadServ.setCategoriaChange();
+    }
+  }
+
+  showModal() {
+    this.openNewModal({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
+  }
+
   eliminarReg(regisData) {
     const objToSend = {
       data: regisData,
@@ -340,11 +356,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     }
 
     const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map((rol) => rol.id) });
-    this.form.patchValue(fun.duplicarJson(objPerson));
+    this.form.patchValue(fun.deepCloning(objPerson));
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
-    this.empleadoSelected = fun.duplicarJson(data);
+    this.empleadoSelected = fun.deepCloning(data);
 
     this.editando = true;
     this.boton = 'Editar';
@@ -423,11 +439,4 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.isCreando = true;
   }
 
-  openModalCategorias() {
-    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.user, id_modal: 'categorias_suplidores', inputs: { configsEntCuentas: this.listaConfigEmpleados }, openNewModal: this.openNewModal });
-  }
-
-  showModal() {
-    this.openNewModal({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
-  }
 }

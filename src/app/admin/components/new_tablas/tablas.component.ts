@@ -235,11 +235,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   test() {
-    console.log('paginator --> ', fun.duplicarJson(this.tServ.getPaginationById(this.realIdTabla)));
+    console.log('paginator --> ', fun.deepCloning(this.tServ.getPaginationById(this.realIdTabla)));
   }
 
   localPagination(page, per_page, desde = '') {
-    const copyData = fun.duplicarJson(this.copyData);
+    const copyData = fun.deepCloning(this.copyData);
 
     const inicio = (page - 1) * per_page;
     const final = inicio + per_page;
@@ -408,9 +408,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorInput(column, key, index, value, data) {
-    let newData = fun.duplicarJson(this.rowsEditing.find((item) => item.id == data.id));
+    let newData = fun.deepCloning(this.rowsEditing.find((item) => item.id == data.id));
 
-    if (fun.isEmpty(newData) || this.rowsEditing.length == 0) newData = fun.duplicarJson(data);
+    if (fun.isEmpty(newData) || this.rowsEditing.length == 0) newData = fun.deepCloning(data);
 
     fun.setProperty(newData, key, value);
 
@@ -421,7 +421,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   updateDataCopy(data) {
-    this.copyData = fun.duplicarJson(data);
+    this.copyData = fun.deepCloning(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
@@ -525,7 +525,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (referencia === 'especificar') {
       input['value'] = especifico;
     } else {
-      const copia = fun.duplicarJson(this.data[index][referencia]);
+      const copia = fun.deepCloning(this.data[index][referencia]);
 
       if (formatear) {
         input['value'] = fun.numFormatTwoDecimals(copia);

@@ -114,7 +114,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
       this.reciboClass.getAll(extra).then((res) => {
         res['data'] = this.mapeoRecibos(res['data']);
-        this.lista_recibos = fun.duplicarJson(res['data']);
+        this.lista_recibos = fun.deepCloning(res['data']);
 
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       });
@@ -180,7 +180,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
             width: '900px',
             height: '40rem',
             botones: {
-              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
                 { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
                 { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },

@@ -276,7 +276,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       header: 'Mantenimiento marca & modelo',
       width: '1000px',
       height: '650px',
-      botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+      botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
     });
   }
 

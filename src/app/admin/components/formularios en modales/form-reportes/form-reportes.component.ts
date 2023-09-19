@@ -212,7 +212,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
     this.tipos_facturas = [{ label: 'Todos', id: 0 }];
 
-    fun.duplicarJson(Ss.factServ.lista_tipos_facturas).forEach((tipo_factura) => {
+    fun.deepCloning(Ss.factServ.lista_tipos_facturas).forEach((tipo_factura) => {
       if (tipos_aceptados.includes(tipo_factura.descripcion)) {
         this.tipos_facturas.push({ label: tipo_factura.descripcion, id: Number(tipo_factura.id) });
       }

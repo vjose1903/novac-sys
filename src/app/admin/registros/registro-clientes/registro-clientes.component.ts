@@ -20,6 +20,7 @@ import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../
 import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
+import { IModalConfiguration } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -181,7 +182,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.photoData = { src_img: data?.img_cliente, id: data?.imagen?.id };
     this.form.controls.img.setValue(data.img_cliente);
 
-    this.clienteSelected = fun.duplicarJson(data);
+    this.clienteSelected = fun.deepCloning(data);
 
     this.botonLabel = 'Editar';
     this.editando = true;
@@ -323,22 +324,18 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     const pick_values = ['cedula', 'rnc', 'nombre', 'apellido', 'telefono', 'sexo', 'limite_credito', 'maximo_credito', 'vendedor_id', 'direccion', 'id', 'img'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
     formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
-    formValue['cuentas_contables'] = fun.duplicarJson(this.listaEntidadCuentasContables);
+    formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
     const originalCliente = this.listaClientes.find((cliente) => cliente.id == formValue.id);
     const originalValue = fun.pick(originalCliente, pick_values);
 
-    originalValue['img'] = originalCliente.img_cliente;
+    originalValue['img'] = originalCliente?.img_cliente;
     originalValue['cedula'] = originalCliente?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
     originalValue['rnc'] = originalCliente?.documentos_de_identidad.find((doc) => doc.descripcion == 'rnc')?.documento;
-    originalValue['cuentas_contables'] = fun.duplicarJson(this.entCuentaContServ.parseCuentasFromBackend(originalCliente?.cuentas_contables));
+    originalValue['cuentas_contables'] = fun.deepCloning(this.entCuentaContServ.parseCuentasFromBackend(originalCliente?.cuentas_contables));
 
     return !fun.isEqual(formValue, originalValue);
   }
-
-  // test() {
-  //   console.log(this.checkIfSomethingIsDiferrent());
-  // }
 
   revisarPrecio(id) {
     const input = this.form.controls[id];
@@ -438,7 +435,13 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   openModalCategorias() {
-    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.cliente, id_modal: 'categorias_clientes', inputs: { configsEntCuentas: this.listaConfigClientes }, openNewModal: this.openNewModal });
+    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.cliente, id_modal: 'categorias_clientes', inputs: { configsEntCuentas: this.listaConfigClientes }, openNewModal: this.openNewModal.bind(this) });
+  }
+
+  onHideModal(modalConfig: IModalConfiguration) {
+    if (modalConfig.id == "categorias_clientes") {
+      this.categoriaEntidadServ.setCategoriaChange();
+    }
   }
 
   borrar() {

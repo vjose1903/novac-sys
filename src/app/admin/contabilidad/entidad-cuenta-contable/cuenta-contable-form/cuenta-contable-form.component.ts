@@ -1,5 +1,5 @@
 import { fun } from './../../../../core/services/functions.service';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CategoriaEntidadContableService } from '../../categoria-entidad-contable/categoria-entidad-contable.service';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC, CategoriaEntidadContableI, entidadesContables } from '../../categoria-entidad-contable/categoria-entidad-contable.utils';
@@ -8,13 +8,14 @@ import { EntidadCuentaContableI, agrupacionContable, agrupacionesContables, enab
 import { FormEntidadCuentaContableI } from './cuenta-contable-form.utils';
 import { SubTipoArticuloI } from '../../../registros/articulos/tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 import { TipoArticuloI } from '../../../registros/articulos/tipo-articulo/tipo-articulo';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'cuenta-contable-form',
   templateUrl: './cuenta-contable-form.component.html',
   styleUrls: ['./cuenta-contable-form.component.scss'],
 })
-export class CuentaContableFormComponent implements OnInit, OnChanges {
+export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() inputs: { selectedConfig: ConfiguracionEntidadCuentaI; entidad: entidadesContables };
   @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
   @Input() camposDisabled: boolean;
@@ -26,6 +27,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   @Output() cuentaContableDataChange = new EventEmitter<FormEntidadCuentaContableI>();
 
   form: UntypedFormGroup;
+  subCategoriaChange: Subscription;
   listadoCategorias: Array<CategoriaEntidadContableI> = [];
   configEntContableClass = new ConfiguracionEntidadCuentaC();
 
@@ -46,6 +48,13 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.necesarioStart();
+    this.subCategoriaChange = this.catEntContServ.categoriasChange$.subscribe((value: boolean)=>{
+      if (value && !this.isArticulo) this.getCategorias();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if(this.subCategoriaChange) this.subCategoriaChange.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -79,7 +88,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
   }
 
   checkConfig() {
-    this.individualConfig = fun.duplicarJson(this.configuration);
+    this.individualConfig = fun.deepCloning(this.configuration);
     let cuenta_per_config_categoria;
     let cuenta_per_config_sub_categoria;
 
@@ -89,12 +98,12 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     }
 
     if (!this.inputs.selectedConfig.has_individual) this.individualConfig.btn.individual = false;
-    if (!this.inputs.selectedConfig.has_categoria || fun.isEmpty(cuenta_per_config_categoria)) this.individualConfig.btn.categoria = false;
-    if (!this.inputs.selectedConfig.has_sub_categoria || fun.isEmpty(cuenta_per_config_sub_categoria)) this.individualConfig.btn.subCategoria = false;
+    if (!this.inputs.selectedConfig.has_categoria || (this.isArticulo && fun.isEmpty(cuenta_per_config_categoria))) this.individualConfig.btn.categoria = false;
+    if (!this.inputs.selectedConfig.has_sub_categoria || (this.isArticulo && fun.isEmpty(cuenta_per_config_sub_categoria))) this.individualConfig.btn.subCategoria = false;
   }
 
   updateOriginalData() {
-    this.dataOriginal = fun.duplicarJson(this.form.getRawValue());
+    this.dataOriginal = fun.deepCloning(this.form.getRawValue());
   }
 
   createForm() {
@@ -126,12 +135,10 @@ export class CuentaContableFormComponent implements OnInit, OnChanges {
     CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad, showMsgs: false })
       .then((res) => {
         this.listadoCategorias = res['data'];
+        this.hasCategories = true;
       })
       .catch((err) => {
         this.hasCategories = false;
-        // this.cuentaContableData.tipo_agrupacion_contable = agrupacionesContables.individual;
-        // this.updateOriginalData();
-        // if (fun.hasValue(this.form)) this.form.controls.tipo_agrupacion_contable.setValue(agrupacionesContables.individual);
       });
   }
 

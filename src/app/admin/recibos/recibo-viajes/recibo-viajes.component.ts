@@ -311,7 +311,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
         let index_row_en_turno = this.viaje_selected.movimientos_viaje.findIndex((movimiento) => movimiento.id == row_edited.id);
 
-        this.viaje_selected.movimientos_viaje[index_row_en_turno] = fun.duplicarJson(row_edited);
+        this.viaje_selected.movimientos_viaje[index_row_en_turno] = fun.deepCloning(row_edited);
 
         const new_movimiento_viaje = this.viaje_selected.movimientos_viaje.map((movimiento) => {
           return { vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id };
@@ -363,9 +363,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           const chofer = this.choferes.find((chofer) => chofer.id == row_edited.user_id);
           const vehiculo = this.camiones.find((camion) => camion.id == row_edited.vehiculo_id);
 
-          viaje_modificado.chofer = fun.duplicarJson(chofer);
+          viaje_modificado.chofer = fun.deepCloning(chofer);
           viaje_modificado.user_id = chofer.id;
-          viaje_modificado.vehiculo = fun.duplicarJson(vehiculo);
+          viaje_modificado.vehiculo = fun.deepCloning(vehiculo);
           viaje_modificado.vehiculo_id = vehiculo.id;
 
           delete viaje_modificado.is_editing;

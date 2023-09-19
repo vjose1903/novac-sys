@@ -20,6 +20,7 @@ import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../
 import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
+import { IModalConfiguration } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -138,7 +139,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.listaSuplidores.length = 0;
     this.suplidorClass.getAll(extra).then((res) => {
       res['data'].map((suplidor) => {
-        console.log('suplidor?.divisa?.imagen --> ', suplidor?.divisa);
 
         const doc = _.find(suplidor.documentos_de_identidad, { principal: true });
         suplidor.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
@@ -172,15 +172,15 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.suplidor } };
     this.configEntContableClass.getAll(extra).then((res) => {
       this.listaConfigSuplidoresCopy = res['data'];
-      this.listaConfigSuplidores = fun.duplicarJson(this.listaConfigSuplidoresCopy);
+      this.listaConfigSuplidores = fun.deepCloning(this.listaConfigSuplidoresCopy);
     });
   }
 
   filterConfig() {
-    const copyList = fun.duplicarJson(this.listaConfigSuplidoresCopy);
+    const copyList = fun.deepCloning(this.listaConfigSuplidoresCopy);
 
     if (this.currentDivisaNacional) this.listaConfigSuplidores = copyList.filter((config) => config.is_nacional);
-    else this.listaConfigSuplidores = fun.duplicarJson(copyList);
+    else this.listaConfigSuplidores = fun.deepCloning(copyList);
   }
 
   marcarCheck(arg) {
@@ -197,6 +197,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.doc_is_cedula = false;
     [this.documentos_de_identidad, this.suplidorSelected] = Array(2).fill(undefined);
     this.isCreando = true;
+    this.editando = false;
     this.changeStateCampos(false);
 
     this.listaEntidadCuentasContables = [];
@@ -261,6 +262,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
+
         if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === documento)) {
           enable_campos = true;
           return;
@@ -323,7 +325,13 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   openModalCategorias() {
-    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.suplidor, id_modal: 'categorias_suplidores', inputs: { configsEntCuentas: this.listaConfigSuplidores }, openNewModal: this.openNewModal });
+    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.suplidor, id_modal: 'categorias_suplidores', inputs: { configsEntCuentas: this.listaConfigSuplidores }, openNewModal: this.openNewModal.bind(this) });
+  }
+
+  onHideModal(modalConfig: IModalConfiguration) {
+    if (modalConfig.id == "categorias_suplidores") {
+      this.categoriaEntidadServ.setCategoriaChange();
+    }
   }
 
   changeStateCampos(enable = false) {
@@ -370,7 +378,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
-    this.suplidorSelected = fun.duplicarJson(data);
+    this.suplidorSelected = fun.deepCloning(data);
     this.changeDivisa();
 
     setTimeout(() => fun.enfocarInput('rnc'), 1);
@@ -413,14 +421,14 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   checkIfSomethingIsDiferrent() {
     const pick_values = ['cedula', 'rnc', 'nombre', 'telefono', 'direccion', 'email', 'id'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
-    formValue['cuentas_contables'] = fun.duplicarJson(this.listaEntidadCuentasContables);
+    formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
     const originalSuplidor = this.listaSuplidores.find((suplidor) => suplidor.id == formValue.id);
     const originalValue = fun.pick(originalSuplidor, pick_values);
 
     originalValue['cedula'] = originalSuplidor?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
     originalValue['rnc'] = originalSuplidor?.documentos_de_identidad.find((doc) => doc.descripcion == 'rnc')?.documento;
-    originalValue['cuentas_contables'] = fun.duplicarJson(this.entCuentaContServ.parseCuentasFromBackend(originalSuplidor?.cuentas_contables));
+    originalValue['cuentas_contables'] = fun.deepCloning(this.entCuentaContServ.parseCuentasFromBackend(originalSuplidor?.cuentas_contables));
 
     return !fun.isEqual(formValue, originalValue);
   }
