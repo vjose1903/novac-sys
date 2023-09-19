@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalI } from '../../components/modal/modal-class';
+import { ModalComponentI, ModalI } from '../../components/modal/modal-class';
 import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
 
@@ -10,7 +10,7 @@ import { fun } from '../../../core/services/functions.service';
 })
 export class DetalleFacturaComponent implements OnInit, ModalI {
   constructor() {}
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   detalles = [{ label: 'Forma de pago', key: 'forma_pago', tipo: 'string' }];

@@ -9,7 +9,7 @@ import * as moment from '../../../../core/javascript/moment';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
-import { IModalConfiguration, ModalI } from '../../modal/modal-class';
+import { IModalConfiguration, ModalComponentI, ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 
 @Component({
@@ -45,7 +45,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     super();
   }
 
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   ngOnInit() {
@@ -261,6 +261,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   btn_aceptar() {
-    this.modal.instance.resetConfig(this.modal.component_id, { data: { ...this.form.value, switches: { ...this.inputs.switches } }, modalId: this.modal.component_id });
+    this.modalComponent.closeModal(this.modalComponent.id, { data: { ...this.form.value, switches: { ...this.inputs.switches } }, modalId: this.modalComponent.id });
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { fun } from '../../../core/services/functions.service';
-import { ModalI } from '../../components/modal/modal-class';
+import { ModalComponentI, ModalI } from '../../components/modal/modal-class';
 import { table_config } from '../../components/new_tablas/tabla-class';
 @Component({
   selector: 'app-detalle-nota',
@@ -13,7 +13,7 @@ export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
     super();
   }
 
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
   tabIndex = 0;
 

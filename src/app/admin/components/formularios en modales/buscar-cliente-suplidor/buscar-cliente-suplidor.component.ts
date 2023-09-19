@@ -2,7 +2,7 @@ import { ConfigService } from './../../../../core/services/configuration.service
 import { tipoDocFacturacion } from './../../../facturacion/factura';
 import { Component, OnInit } from '@angular/core';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
-import { ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
@@ -21,7 +21,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   dataFiltro;
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
   paraFiltroClientes;
 
@@ -66,7 +66,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     const classDinamic = this.inputs.metodo == tipoDocFacturacion.compra ? 'suplidorClass' : 'clienteClass';
     try {
       const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } }).catch((error) => {
-        if (where === 'init') this.closeThis({ tipo: 'data_no_found', modalId: this.modal.component_id });
+        if (where === 'init') this.closeThis({ tipo: 'data_no_found', modalId: this.modalComponent.id });
       });
 
       if (res.data && res.data.length > 0) {
@@ -87,15 +87,15 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
       if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {}
   }
 
   tableClickRow(event) {
-    this.closeThis({ data: event.data, modalId: this.modal.component_id });
+    this.closeThis({ data: event.data, modalId: this.modalComponent.id });
   }
 
   closeThis(dataToReturn?) {
-    this.modal.instance.resetConfig(this.modal.component_id, dataToReturn);
+    this.modalComponent.closeModal(this.modalComponent.id, dataToReturn);
   }
 }

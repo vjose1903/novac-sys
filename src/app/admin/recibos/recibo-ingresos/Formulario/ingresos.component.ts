@@ -222,7 +222,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
 
     setTimeout(() => {
-      this.tablaComponent.changeConfig([{ total_count: res.data.facturas.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.data.facturas.total_registros }]);
       this.totalRegistros = res.data.facturas.total_registros;
 
       if (res.data.page != params.page) {
@@ -538,7 +538,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
               label: 'Cancelar',
               disable: false,
             },
-            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+            { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
           ],
         },
       });

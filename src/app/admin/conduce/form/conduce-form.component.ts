@@ -631,7 +631,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
                 ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
                   { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
+                  { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'SI', disable: true },
                 ],
               },
             });
@@ -799,7 +799,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
           ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
-            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
+            { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
           ],
         },
       });

@@ -116,7 +116,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
 
       this.listaPeriodosFiscales = tempLista;
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error(error);
 

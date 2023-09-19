@@ -3,7 +3,7 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../../registros/registro-empleados/empleado.utils';
-import { ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 
 @Component({
   selector: 'app-change-password',
@@ -14,7 +14,7 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
   form: UntypedFormGroup;
   element: HTMLElement;
   empleadoClass = new EmpleadoC();
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   constructor(private fb: UntypedFormBuilder) {
@@ -44,7 +44,7 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
       obj['ids_roles'] = ids_roles;
 
       this.empleadoClass.createUpdateOne(obj).then(() => {
-        this.modal.instance.resetConfig(this.modal.component_id, {error: false});
+        this.modalComponent.closeModal(this.modalComponent.id, {error: false});
       });
     }
   }

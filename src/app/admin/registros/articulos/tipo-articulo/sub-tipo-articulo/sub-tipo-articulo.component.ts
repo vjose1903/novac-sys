@@ -2,7 +2,7 @@ import { TipoArticuloI } from './../tipo-articulo';
 import { TablasService } from './../../../../components/new_tablas/tablas.service';
 import { table_config } from './../../../../components/new_tablas/tabla-class';
 import { Permisos } from './../../../../../core/typescript/permisos';
-import { ModalI } from './../../../../components/modal/modal-class';
+import { ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
 import { MixinClass } from './../../../../../core/typescript/MixinClass';
 import { Component, OnInit } from '@angular/core';
 import { SubTipoArticuloC, SubTipoArticuloI } from './sub-tipo-articulo';
@@ -16,7 +16,7 @@ import { NgxPermissionsService } from 'ngx-permissions';
   styleUrls: ['./sub-tipo-articulo.component.scss'],
 })
 export class SubTipoArticuloComponent extends MixinClass implements OnInit, ModalI {
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: { tipo_articulo: TipoArticuloI };
 
   listaSubTipoArticulos: SubTipoArticuloI[] = [];
@@ -63,7 +63,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
 
     this.subTipoArticuloClass.getSubTipoArticulos(parameters).then((res) => {
       this.listaSubTipoArticulos = fun.duplicarJson(res.data);
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

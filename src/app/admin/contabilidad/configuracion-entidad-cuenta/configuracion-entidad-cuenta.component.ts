@@ -113,7 +113,7 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
 
         this.listaConfiguraciones = res['data'];
 
-        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       });
     } catch (error) {
       fun.toastError('Error buscando empleados registrados.', 'ERROR');

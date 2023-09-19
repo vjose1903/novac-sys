@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
 @Component({
   selector: 'app-modal-historial-pagos',
@@ -38,7 +38,7 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
   constructor() {
     super();
   }
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
   btn_aceptar() {
     throw new Error('Method not implemented.');

@@ -3,8 +3,20 @@ import * as _ from 'lodash';
 import { LayoutClass } from '../../layout/layout';
 import { modalsConfigurations } from './modal.service';
 
+export interface ModalComponentI {
+  id?: any;
+  modalsConfig?: Array<IModalConfiguration>;
+  findModalConfigById?: (modalId: any) =>  IModalConfiguration;
+  closeModal?: (modalId: any, dataToReturn?: IReturnData) =>  void;
+  changeModalConfig?: (changes: Array<IModalConfiguration>, modalId: any) =>  void;
+  disabledButton?: (btnConfig: IModalButton | IButtonDynamic) =>  boolean;
+  getButtonTooltip?: (btnConfig: IModalButton | IButtonDynamic) =>  string;
+  hasAnyBtn?: (modalId: any) =>  boolean;
+  [prop: string]: any;
+}
+
 export interface ModalI {
-  modal: any;
+  modalComponent: ModalComponentI;
   inputs: any;
   btn_aceptar(): any;
   [prop: string]: any;
@@ -28,7 +40,7 @@ export interface IModalConfiguration {
   contentStyleClass?: string;
   returnDataFromModal?: (args: IReturnData) => void;
   dismissModal?: (id: string, dataToReturn?: IReturnData) => void;
-  onHideModal?: (args: IReturnData) => void;
+  onHideModal?: (dataToReturn: IReturnData) => void;
 }
 
 export interface IReturnData {
@@ -43,10 +55,31 @@ export interface IReturnData {
 export interface btnDisabled {
   function?: Function;
 }
+
+export interface IBtnDisableFunction {
+  function: () => boolean;
+}
+export interface IButtonDynamic {
+  show?: boolean;
+  btnId?: string
+  clase: string;
+  label: string;
+  tooltip?: string;
+  disable?: boolean | IBtnDisableFunction;
+  function?: (modalComponent: IModalConfiguration) => any;
+  functioInOtherComponent?: string;
+}
+export interface IModalButton {
+  show?: boolean;
+  disable?: boolean | IBtnDisableFunction;
+  tooltip?: string;
+  btnId?: string
+}
+
 export interface ButtonsI {
-  aceptar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string; btn_id?: string };
-  cancelar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string; btn_id?: string };
-  dinamico?: Array<{ btn_id?: string; clase: string; label: string; function?: Function; function_in_other_component?: string; disable: boolean | btnDisabled; tooltip?: string }>;
+  aceptar: IModalButton;
+  cancelar: IModalButton;
+  dinamico?: Array<IButtonDynamic>;
 }
 
 export class ModalClass extends LayoutClass {

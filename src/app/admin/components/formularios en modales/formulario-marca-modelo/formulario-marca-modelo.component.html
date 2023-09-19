@@ -18,7 +18,7 @@
               <div class="row">
                 <div class="col-12 mt-3">
                   <div class="form-group">
-                    <a class="btn mr-2" id="btn-gris" (click)="closeModal()">Salir</a>
+                    <a class="btn mr-2" id="btn-gris" (click)="dismissModal()">Salir</a>
                     <a *ngIf="marcaSelected" class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
                     <input [disabled]="!formMarca.valid" (click)="submit(formMarca)" type="submit" class="btn" value="{{ marcaSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
                   </div>
@@ -67,7 +67,7 @@
               <div class="row">
                 <div class="col-12 mt-3">
                   <div class="form-group">
-                    <a class="btn mr-2" id="btn-gris" (click)="closeModal()">Salir</a>
+                    <a class="btn mr-2" id="btn-gris" (click)="dismissModal()">Salir</a>
                     <a *ngIf="modeloSelected" class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
                     <input [disabled]="!formModelo.valid" (click)="submit(formModelo)" type="submit" class="btn" value="{{ modeloSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
                   </div>

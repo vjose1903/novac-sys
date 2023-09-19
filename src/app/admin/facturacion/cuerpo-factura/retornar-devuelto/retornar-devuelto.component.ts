@@ -1,7 +1,7 @@
 import { MixinClass } from './../../../../core/typescript/MixinClass';
 import { table_config } from './../../../components/new_tablas/tabla-class';
 import { fun } from './../../../../core/services/functions.service';
-import { IModalConfiguration, ModalI } from './../../../components/modal/modal-class';
+import { IModalConfiguration, ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { Component, DoCheck, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
@@ -15,7 +15,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   constructor(private fb: UntypedFormBuilder) {
     super();
   }
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   form;
@@ -104,7 +104,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   }
 
   btnAceptarIsDisabled() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    const modal = _.find(this.modalComponent.modalsConfig, (config) => config.id === this.modalComponent.id);
     const aceptar_btn = modal.botones.aceptar;
     const formulario = this.form.getRawValue();
     const valores = [formulario.solo_devuelto, formulario.defectuoso, formulario.devuelto];
@@ -146,7 +146,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
       return;
     }
 
-    const dataToReturn = { key: this.inputs.data.key, modalId: this.modal.component_id };
+    const dataToReturn = { key: this.inputs.data.key, modalId: this.modalComponent.id };
     const informacion_retornar = this.form.getRawValue();
 
     dataToReturn['data'] = {
@@ -158,6 +158,6 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
       dataToReturn['data'][this.inputs.tipo] = { key: this.inputs.data?.key, cantidad: informacion_retornar.devuelto, origin: this.inputs?.data?.producto_origin };
     }
 
-    this.modal.instance.resetConfig(this.modal.component_id, dataToReturn);
+    this.modalComponent.closeModal(this.modalComponent.id, dataToReturn);
   }
 }

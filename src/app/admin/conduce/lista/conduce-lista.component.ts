@@ -87,14 +87,14 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
       this.lista_conduces = [];
-      if (fun.hasValue(this.tablaComponent)) this.tablaComponent.changeConfig([{ total_count: 0 }]);
+      if (fun.hasValue(this.tablaComponent)) this.tablaComponent.changeTableConfig([{ total_count: 0 }]);
 
       this.conduceClass.getAll(extra).then((res) => {
         res['data'] = this.mapeoRecibos(res['data']);
 
         this.lista_conduces = fun.duplicarJson(res['data']);
 
-        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       });
     } catch (error) {}
   }

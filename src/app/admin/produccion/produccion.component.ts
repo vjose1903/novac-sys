@@ -59,7 +59,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   ngAfterViewInit(): void {
     this.enfocarSelect();
-    this.tablaComponent.changeConfig([{ total_count: 0 }]);
+    this.tablaComponent.changeTableConfig([{ total_count: 0 }]);
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -277,7 +277,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       };
 
       this.lista_produccion.push(obj);
-      setTimeout(() => this.tablaComponent.changeConfig([{ total_count: this.lista_produccion.length }]), 100);
+      setTimeout(() => this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion.length }]), 100);
     }
 
     this.disableOption(this.producto_terminado_en_turno.id, true);
@@ -311,7 +311,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   eliminarReg(data) {
     this.disableOption(data.id, false);
     _.remove(this.lista_produccion, { articulo_id: data.id });
-    this.tablaComponent.changeConfig([{ total_count: this.lista_produccion.length }]);
+    this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion.length }]);
   }
 
   abrirModalDinamicText(tipo, texto_modal, data) {

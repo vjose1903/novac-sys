@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { ModalI } from '../modal/modal-class';
+import { ModalComponentI, ModalI } from '../modal/modal-class';
 import { inputViewerOptions } from './pdf-viewer';
 @Component({
   selector: 'app-pdf-viewer',
@@ -9,11 +9,11 @@ import { inputViewerOptions } from './pdf-viewer';
 })
 export class PdfViewerComponent implements OnInit, ModalI {
   constructor() {}
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: inputViewerOptions;
   btn_aceptar() {}
 
   ngOnInit(): void {}
 
-  
+
 }

@@ -110,7 +110,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       });
 
       this.listaArticulos = fun.duplicarJson(res.data);
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

@@ -1,6 +1,6 @@
 import { fun } from './../../../../core/services/functions.service';
 import { PeriodoFiscalC } from './../periodo-fiscal';
-import { ModalI } from './../../../components/modal/modal-class';
+import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./cierre-mensual.component.scss'],
 })
 export class CierreMensualComponent implements OnInit, ModalI {
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   meses = Object.values(PeriodoFiscalC.labels);

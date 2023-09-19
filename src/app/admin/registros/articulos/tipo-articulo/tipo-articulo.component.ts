@@ -1,5 +1,5 @@
 import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { ModalClass, ModalI } from './../../../components/modal/modal-class';
+import { ModalClass, ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
@@ -16,7 +16,7 @@ import { SubTipoArticuloComponent } from './sub-tipo-articulo/sub-tipo-articulo.
   styleUrls: ['./tipo-articulo.component.scss'],
 })
 export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI {
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs;
 
   listaTipoArticulos: TipoArticuloI[] = [];
@@ -77,7 +77,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
 
       console.log('res ', res);
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

@@ -1,6 +1,6 @@
 import { fun } from './../../../../../core/services/functions.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { IModalConfiguration, ModalI } from './../../../../components/modal/modal-class';
+import { IModalConfiguration, ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./cuentas-contables-form.component.scss'],
 })
 export class CuentasContablesFormComponent implements OnInit, ModalI {
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: { data: any; dataOriginal: any; method: 'edit' | 'add'; cuenta_control: any };
 
   form: UntypedFormGroup;
@@ -123,7 +123,7 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modal.instance.modalsConfig.find((modal) => modal.id == this.modal.component_id);
+    const modal = this.modalComponent.modalsConfig.find((modal) => modal.id == this.modalComponent.id);
     const btn = modal.botones.aceptar;
 
     btn.disable = validate;
@@ -145,6 +145,6 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
   btn_aceptar() {
     const dataToSend = this.parseData(this.form.getRawValue());
 
-    this.modal.instance.resetConfig(this.modal.component_id, { obj: dataToSend, modalId: this.modal.component_id });
+    this.modalComponent.closeModal(this.modalComponent.id, { obj: dataToSend, modalId: this.modalComponent.id });
   }
 }

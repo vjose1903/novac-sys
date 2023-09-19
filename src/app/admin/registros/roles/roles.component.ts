@@ -105,12 +105,12 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
         });
 
         this.listaRoles = res['data'];
-        this.tablaRolesComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaRolesComponent.changeTableConfig([{ total_count: res.total_registros }]);
       })
       .catch((err) => {
         if (err.error.total_registros == 0) {
           this.listaRoles = [];
-          this.tablaRolesComponent.changeConfig([{ total_count: 0 }]);
+          this.tablaRolesComponent.changeTableConfig([{ total_count: 0 }]);
         }
       });
   }

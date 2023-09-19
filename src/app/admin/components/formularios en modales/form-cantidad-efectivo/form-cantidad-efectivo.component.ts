@@ -1,7 +1,7 @@
 import { ConfigService } from './../../../../core/services/configuration.service';
 import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { SharedService } from '../../../../core/services/shared.service';
 import { teclasCode } from '../../../../core/typescript/constantes';
@@ -36,7 +36,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     super();
   }
 
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   ngOnInit() {
@@ -119,7 +119,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
     if (this.factura_de == 'compra') {
       if (this.cambiar_articulos != undefined) {
-        dataToReturn = { obj, is_print: this.is_print, modalId: this.modal.component_id };
+        dataToReturn = { obj, is_print: this.is_print, modalId: this.modalComponent.id };
       } else {
         fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
       }
@@ -127,11 +127,11 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       if (this.validarForm()) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
       } else {
-        dataToReturn = { obj, is_print: this.is_print, modalId: this.modal.component_id };
+        dataToReturn = { obj, is_print: this.is_print, modalId: this.modalComponent.id };
       }
     }
 
-    this.modal.instance.resetConfig(this.modal.component_id, dataToReturn);
+    this.modalComponent.closeModal(this.modalComponent.id, dataToReturn);
   }
 
   cambiosEnArticulos(lugar) {
@@ -153,8 +153,9 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modal.instance.modalsConfig.find((modal) => modal.id == this.modal.component_id);
-    const btn = modal.botones.dinamico.find((boton) => boton.btn_id == 'btnConfirmar');
+    // TODO: revisar
+    const modal = this.modalComponent.modalsConfig.find((modal) => modal.id == this.modalComponent.id);
+    const btn = modal.botones.dinamico.find((boton) => boton.btnId == 'btnConfirmar');
 
     btn.disable = validate;
   }

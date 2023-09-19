@@ -36,7 +36,7 @@ export class NewModalComponent implements OnInit {
     returnDataFromModal: (arg?) => {},
 
     dismissModal: (modalId: string, dataToReturn?: IReturnData) => {
-      this.resetConfig(modalId, dataToReturn);
+      this.closeModal(modalId, dataToReturn);
     },
   };
 
@@ -49,7 +49,7 @@ export class NewModalComponent implements OnInit {
       if (res && res.show) {
         this.renderizarComponente(res);
       } else {
-        this.resetConfig(res.id);
+        this.closeModal(res.id);
       }
     });
   }
@@ -59,7 +59,7 @@ export class NewModalComponent implements OnInit {
     return modal;
   }
 
-  resetConfig(modalId, dataToReturn?: IReturnData) {
+  closeModal(modalId, dataToReturn?: IReturnData) {
     if (dataToReturn) {
       const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
       if (fun.hasValue(modal) && fun.hasValue(modal.returnDataFromModal)) modal.returnDataFromModal(dataToReturn);
@@ -71,15 +71,15 @@ export class NewModalComponent implements OnInit {
   handleConfig(config: IModalConfiguration) {
     const modalConfig = config;
     modalConfig.dismissModal = this.defaultModalConfig.dismissModal;
-    this.modalsConfig.push(modalConfig);
+    this.mServ.modalsConfig.push(modalConfig);
   }
 
   searchInArray(array, source, target) {
     return _.find(array, (config) => config[source] === target);
   }
 
-  changeConfig(array, id_modal) {
-    const modal = _.find(this.modalsConfig, (config) => config.id === id_modal);
+  changeModalConfig(array, modalId) {
+    const modal = _.find(this.modalsConfig, (config) => config.id === modalId);
 
     array.forEach((element) => {
       const key = _.keys(element)[0];
@@ -109,7 +109,8 @@ export class NewModalComponent implements OnInit {
 
         componente['instance'].inputs = config.inputs;
 
-        if (componente['instance'].modal) componente['instance'].modal = { instance: this, component_id: config.id };
+        componente['instance'].modalComponent = this;
+        componente['instance'].modalComponent.id = config.id;
 
         currentConfig.componentInstance = componente['instance'];
       }, 1);
@@ -136,41 +137,34 @@ export class NewModalComponent implements OnInit {
   }
 
   cancelarOrAceptar(id_, reason: 'aceptar' | 'cancelar') {
-    console.log("id_ ", id_);
-    console.log("reason ", reason);
-
     if (reason == 'cancelar') {
       modalsConfigurations.next({ show: false, id: id_ });
       return;
     }
 
     const modal: IModalConfiguration = _.find(this.modalsConfig, (config) => config.id === id_);
-    console.log("modal ", modal);
 
     if (modal.componentInstance && modal?.componentInstance?.btn_aceptar) {
-      console.log("-------------------- 1 --------------------");
-
       modal.componentInstance.btn_aceptar();
     } else {
-      console.log("-------------------- 2 --------------------");
       const bool = reason == 'aceptar';
       modal.dismissModal(modal.id, { bool: bool, inputs: modal.inputs, modalId: modal.id });
     }
   }
 
-  dynamicFunction(configuration, btn) {
-    const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
+  dynamicFunction(modalId, btnConfig) {
+    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
 
-    if (fun.objHas(btn, 'function_in_other_component')) modal['componentInstance'][btn['function_in_other_component']]();
-    else btn['function'](modal);
+    if (fun.objHas(btnConfig, 'functioInOtherComponent')) modal['componentInstance'][btnConfig['functioInOtherComponent']]();
+    else btnConfig['function'](modal);
   }
 
   hasValue(arg) {
     return fun.hasValue(arg);
   }
 
-  hasAnyBtn(configuration) {
-    const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
+  hasAnyBtn(modalId: any) {
+    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
     const botones_show = modal?.botones?.aceptar?.show || modal?.botones?.cancelar?.show || modal?.botones?.dinamico;
     return botones_show;
   }

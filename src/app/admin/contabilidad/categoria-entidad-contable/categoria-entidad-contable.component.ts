@@ -2,7 +2,7 @@ import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnInit } from '@angular/core';
-import { ModalI } from '../../components/modal/modal-class';
+import { ModalComponentI, ModalI } from '../../components/modal/modal-class';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { Permisos } from '../../../core/typescript/permisos';
@@ -23,7 +23,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
   permissions = Permisos;
   hasPermissionsCreateUpdate;
 
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI>; entidad: entidadesContables };
 
   tabIndex = 0;
@@ -118,7 +118,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     this.listadoCategorias.length = 0;
     CategoriaEntidadContableService.getCategoriasByEntidad({ ...paginationOptions, config_id: this.selectedConfig.id, entidad: this.inputs.entidad }).then((res) => {
       this.listadoCategorias = res['data'];
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

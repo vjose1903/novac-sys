@@ -112,27 +112,27 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
-    this.ready = true;
     this.parseMenu();
     this.checkRouteActiva();
     this.cdRef.detectChanges();
-    this.divisaServ.getDivisas();
+
     this.validateUserAndLoadPermisos().then((result) => {
-      this.getTiposFacturas().then((res) => {
+      this.getTiposFacturas().then(() => {
+        this.divisaServ.getDivisas();
+
         this.hasPermisosValidated = result;
       });
     });
   }
 
   getTiposFacturas() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       await this.tipoFacturaClass
         .getAll()
         .then((tiposFacturas) => {
           tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
           Ss.factServ.lista_tipos_facturas = tiposFacturas;
-
-          resolve(Ss.factServ.lista_tipos_facturas);
+          resolve();
         })
         .catch((error) => {
           fun.logBlue('error: ', error);

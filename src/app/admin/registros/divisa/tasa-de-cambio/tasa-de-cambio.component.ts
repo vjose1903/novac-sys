@@ -1,7 +1,7 @@
 import { table_config } from './../../../components/new_tablas/tabla-class';
 import { TasaDeCambioC, TasaDeCambioI } from './tasa_de_cambio.utils';
 import { fun } from './../../../../core/services/functions.service';
-import { ModalI } from './../../../components/modal/modal-class';
+import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
 import * as moment from '../../../../core/javascript/moment';
 
@@ -15,7 +15,7 @@ import { DivisaService } from '../divisa.service';
   styleUrls: ['./tasa-de-cambio.component.scss'],
 })
 export class TasaDeCambioComponent implements OnInit, ModalI {
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: { divisa: DivisaI };
 
   form: UntypedFormGroup;

@@ -78,8 +78,6 @@ function createWindow() {
 
     // Create the browser window.
     win = new BrowserWindow({
-      x: 0,
-      y: 0,
       width: size.width,
       minWidth: size.width,
       height: size.height,
@@ -89,15 +87,19 @@ function createWindow() {
     });
 
     if (serve) {
-      win.webContents.openDevTools();
       require('electron-reload')(__dirname, { electron: require(`${__dirname}/node_modules/electron`) });
-
       win.loadURL('http://localhost:5220');
     } else {
       win.loadURL(appFilePath);
     }
 
+    win.maximize();
+
     win.setMenuBarVisibility(false);
+
+    setTimeout(() => {
+      if (serve)  win.webContents.openDevTools();
+    }, 250);
 
     // Emitted when the window is closed.
     win.on('closed', (event) => (win = emptyWin));

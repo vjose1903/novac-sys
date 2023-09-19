@@ -119,7 +119,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     });
   }
 
-  changeConfig(array) {
+  changeTableConfig(array) {
     this.zone.run(() => {
       array.forEach((element) => {
         const key = _.keys(element)[0];

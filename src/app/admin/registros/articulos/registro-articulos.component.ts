@@ -230,7 +230,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
             label: 'Cancelar',
             disable: false,
           },
-          { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+          { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
         ],
       },
     });
@@ -260,7 +260,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       });
 
       this.listaArticulos = res.data;
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

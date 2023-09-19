@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { IModalConfiguration, ModalI } from '../../modal/modal-class';
+import { IModalConfiguration, ModalComponentI, ModalI } from '../../modal/modal-class';
 import { MovimientosC } from './movimiento-model';
 
 @Component({
@@ -27,7 +27,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   constructor() {
     super();
   }
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   ngOnInit() {
@@ -103,7 +103,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
       this.resetForm();
 
       const obj = { bool: true, body: res.articulo };
-      this.modal.instance.resetConfig(this.modal.component_id, { data: obj, modalId: this.modal.component_id });
+      this.modalComponent.closeModal(this.modalComponent.id, { data: obj, modalId: this.modalComponent.id });
     });
   }
 

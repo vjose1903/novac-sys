@@ -26,11 +26,11 @@
       </ng-template>
     </div>
 
-    <ng-template *ngIf="hasAnyBtn(modalConfig)" pTemplate="footer">
+    <ng-template *ngIf="hasAnyBtn(modalConfig.id)" pTemplate="footer">
       <div class="d-flex justify-content-end align-items-center mt-2">
         <ng-container *ngFor="let dynamic_boton of modalConfig?.botones?.dinamico">
           <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
-            <button [disabled]="disabledButton(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig, dynamic_boton)">
+            <button [disabled]="disabledButton(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig.id, dynamic_boton)">
               {{ dynamic_boton.label }}
             </button>
           </span>

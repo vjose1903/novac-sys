@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { IModalConfiguration, ModalClass } from './../../components/modal/modal-class';
+import { IModalConfiguration, ModalClass, ModalComponentI } from './../../components/modal/modal-class';
 import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from './../../../core/services/pdf/pdf.service';
 import { ClienteC } from './../../registros/registro-clientes/cliente';
@@ -22,7 +22,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     super();
   }
 
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   filter_key;
@@ -162,7 +162,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
       this.documentos = _.orderBy(this.documentos, ['fecha_equivalente'], ['desc']);
 
       if (this.documentos.length > 0) {
-        setTimeout(() => this.tablaComponent.changeConfig([{ total_count: res.total_registros }]), 100);
+        setTimeout(() => this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]), 100);
       } else {
         if (this.filter_key == this.filter_options.cliente) {
           fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
@@ -216,7 +216,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   }
 
   pasar_a_facturacion(documento_selected) {
-    this.modal.instance.resetConfig(this.modal.component_id);
+    this.modalComponent.closeModal(this.modalComponent.id);
 
     this.router.navigateByUrl('/').then((res) => {
       this.router.navigateByUrl(`/admin/factura/venta/bill_from_${this.inputs.code}/${documento_selected.id}`);

@@ -1,5 +1,5 @@
 import { fun } from './../../../../../core/services/functions.service';
-import { IModalConfiguration, ModalI } from './../../../../components/modal/modal-class';
+import { IModalConfiguration, ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ConfigArticuloC } from '../articulos_configuracion';
@@ -11,7 +11,7 @@ import { ConfigArticuloC } from '../articulos_configuracion';
 })
 export class ConfigArticulosComponent implements OnInit, ModalI {
   form: UntypedFormGroup;
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
   update_articulos = true;
   configArticuloClass = new ConfigArticuloC();
@@ -42,8 +42,8 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modal.instance.modalsConfig.find((modal) => modal.id == this.modal.component_id);
-    const btn = modal.botones.dinamico.find((boton) => boton.btn_id == 'btnConfirmar');
+    const modal = this.modalComponent.modalsConfig.find((modal) => modal.id == this.modalComponent.id);
+    const btn = modal.botones.dinamico.find((boton) => boton.btnId == 'btnConfirmar');
 
     btn.disable = validate;
   }
@@ -53,7 +53,7 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
     this.configArticuloClass
       .updateOne(formulario, { parameters: { update_articulos: this.update_articulos } })
       .then((res) => {
-        this.modal.instance.resetConfig(this.modal.component_id, { data: { ...res.data }, modalId: this.modal.component_id });
+        this.modalComponent.closeModal(this.modalComponent.id, { data: { ...res.data }, modalId: this.modalComponent.id });
       })
       .catch((err) => console.error(err));
   }

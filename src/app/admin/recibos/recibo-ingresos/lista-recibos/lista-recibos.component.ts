@@ -116,7 +116,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         res['data'] = this.mapeoRecibos(res['data']);
         this.lista_recibos = fun.duplicarJson(res['data']);
 
-        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       });
     } catch (error) {}
   }

@@ -2,7 +2,7 @@ import { EventEmitter } from '@angular/core';
 import { Component, OnInit, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
 
 @Component({
@@ -32,11 +32,11 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
     super();
   }
 
-  modal: any = {};
+  modalComponent: ModalComponentI= {};
   inputs: any;
 
   btn_aceptar() {
-    this.modal.instance.resetConfig(this.modal.component_id, { data: this.articulos_selected, modalId: this.modal.component_id });
+    this.modalComponent.closeModal(this.modalComponent.id, { data: this.articulos_selected, modalId: this.modalComponent.id });
   }
 
   ngOnInit() {
@@ -65,7 +65,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   parseCantidades() {}
 
   tableInputChange(event) {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    const modal = _.find(this.modalComponent.modalsConfig, (config) => config.id === this.modalComponent.id);
     if (event.key == 'select') this.articulos_selected = _.filter(this.inputs, { select: true, disable: false });
 
     setTimeout(() => (modal.botones.dinamico[1].disable = this.articulos_selected.length == 0), 50);

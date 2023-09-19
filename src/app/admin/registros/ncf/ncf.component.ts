@@ -163,7 +163,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       this.listaNCF = tempNCF;
       this.listaNCFBack = fun.duplicarJson(tempNCF);
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error(error);
 

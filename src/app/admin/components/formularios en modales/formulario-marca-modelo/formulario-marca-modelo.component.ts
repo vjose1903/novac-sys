@@ -1,11 +1,10 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
-import { ModalI } from '../../modal/modal-class';
+import {   ModalComponentI, ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../new_tablas/tabla-class';
 import { Permisos } from '../../../../core/typescript/permisos';
@@ -82,7 +81,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     super();
   }
 
-  modal: any = {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
   btn_aceptar() {}
 
@@ -131,7 +130,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       if (!params.paginado) this.listaMarcas = fun.duplicarJson(res);
       if (params.paginado) {
         this.listadoMarcas = res.data;
-        this.tablaMarcaComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaMarcaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       }
     });
   }
@@ -148,7 +147,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       });
 
       this.listadoModelos = res.data;
-      this.tablaModeloComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaModeloComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -184,8 +183,9 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.accion_.emit(arg);
   }
 
-  closeModal() {
-    this.modal.instance.resetConfig(this.modal.component_id);
+  dismissModal() {
+    // this.modalComponent.
+    this.modalComponent.closeModal(this.modalComponent.id);
   }
 
   async submit(formToSubmit) {
