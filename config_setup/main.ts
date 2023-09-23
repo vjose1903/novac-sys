@@ -2,7 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
-import { ConfigI } from './src/app/core/typescript/config-interface';
+import { ConfigI } from './src/app/core/typescript/config-interface.utils';
 
 const { exec } = require('child_process');
 
@@ -78,8 +78,6 @@ function createWindow() {
 
     // Create the browser window.
     win = new BrowserWindow({
-      x: 0,
-      y: 0,
       width: size.width,
       minWidth: size.width,
       height: size.height,
@@ -97,7 +95,12 @@ function createWindow() {
       win.loadURL(appFilePath);
     }
 
+    win.maximize();
     win.setMenuBarVisibility(false);
+
+    setTimeout(() => {
+      if (serve)  win.webContents.openDevTools();
+    }, 250);
 
     // Emitted when the window is closed.
     win.on('closed', (event) => (win = emptyWin));

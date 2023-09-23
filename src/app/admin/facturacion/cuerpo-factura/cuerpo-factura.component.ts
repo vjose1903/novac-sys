@@ -13,6 +13,7 @@ import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
+import { OverlayOptions } from 'primeng/api/overlayoptions';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -38,6 +39,24 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   sacos;
 
+  overlayOptions: OverlayOptions = {
+    onShow: (event) => this.changeStateDropDownMedida(true),
+    onHide: (event) => {
+      this.changeStateDropDownMedida(false);
+      this.setInputDrop(false);
+      const dropId = Array.from(event.target.classList).find((clase) => clase.includes('drop-'));
+      if (dropId) {
+        const index = Number(dropId.replaceAll('drop-', ''));
+        this.selectMedidaChange(index).then((response) => {
+          if (!response.excede) {
+            this.saltar(this.factServ.isCompra ? 'precioOCompra-' : 'codigo-', index);
+          }
+        });
+      }
+    },
+  };
+
+  @Input() isInitialized;
   @Input() factura;
   @Input() fechaFactura;
   @Input() modo_factura;
@@ -51,6 +70,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   dropRowConfig: any;
   configApp: ConfigI;
+  dropdownMedidaOpen: boolean = false;
+
   constructor(private fb: UntypedFormBuilder, public factServ: FacturacionService) {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
@@ -63,8 +84,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   escucharCambiosEnForm() {
-    this.form.valueChanges.subscribe((res) => {
-      if (fun.hasValue(res)) this.emitirCambiosForm(res);
+    this.form.valueChanges.subscribe((changes) => {
+      if (fun.hasValue(changes)) this.emitirCambiosForm(changes);
     });
   }
 
@@ -125,6 +146,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       await this.removeItem(key);
       await this.enviarTotalesGenerales();
       await this.ajustarSecuencia();
+      await this.setInputDrop(undefined);
       resolve(true);
     });
   }
@@ -138,7 +160,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     let res = true;
 
     if (fun.hasValue(this.factServ.propietario_factura)) {
-      if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
+      if (this.factServ.isCompra) {
         res = false;
       } else {
         res = !this.configApp.facturacion_editar_precio;
@@ -149,7 +171,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   readDescuento() {
-    const res = (this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento === tipoDocFacturacion.pre_venta) && this.factServ.propietario_factura ? false : true;
+    const res = (this.factServ.isVenta || this.factServ.tipoDocumento === tipoDocFacturacion.pre_venta) && this.factServ.propietario_factura ? false : true;
     return res;
   }
 
@@ -161,7 +183,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   selectedRow(i, bool) {
-    const lista = ['codigo-' + i, 'cantidad-' + i, 'unidad-' + i, 'descripcion-' + i, 'precio-' + i, 'desc-' + i, 'total-' + i];
+    const lista = [`codigo-${i}`, `cantidad-${i}`, `unidad-${i}`, `descripcion-${i}`, `precio-${i}`, `costo-${i}`, `desc-${i}`, `total-${i}`];
     lista.forEach((row) => {
       if (this.checkIfRowContainArticulo(i)) {
         const action = bool ? 'add' : 'remove';
@@ -247,14 +269,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   //  MODIFICAR FACTURA
   // =============================================
   async rellenarCuerpoFactura(detalles, is_archivada) {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       this.getActualPriceDetalles(detalles, is_archivada).then((actual_prices_db) => {
         this.rellenarVariables()
           .then(async (res) => {
             if (res) {
               for (let index = 0; index < detalles.length; index++) {
                 if (index + 1 >= this.ARRAY_ROWFACTURAS.value.length) this.addItem();
-
                 const detalle_en_turno = detalles[index];
 
                 if (is_archivada) {
@@ -272,9 +293,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
                 });
               }
 
-              resolve(true);
+              resolve();
             } else {
-              resolve(false);
+              resolve();
             }
           })
           .catch((error) => {});
@@ -283,10 +304,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   getActualPriceDetalles(detalles, is_archivada) {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<any>((resolve) => {
       if (is_archivada) {
         const extra = { afterPath: `custom/get_actual_price_detalles`, parameters: { ids: fun.removerDuplicados(detalles.map((detalle) => detalle.articulo_id)).join(','), costos: true } };
-
         this.articuloClass.dynamic(extra).then((res) => resolve(res.data));
       } else {
         resolve(null);
@@ -295,7 +315,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   getArticuloToLlenar(row) {
-    return new Promise<any>(async (resolve, reject) => {
+    return new Promise<any>(async (resolve) => {
       let articulo = row.articulo;
 
       if (fun.isEmpty(articulo) || fun.isEmpty(row.articulo.id)) {
@@ -313,7 +333,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     controls['detalle_id'].setValue(fun.hasValue(data?.id) ? data?.id : null);
     controls['articulo'].setValue(articulo);
     controls['codigo'].setValue(articulo.codigo);
-    controls['precio'].setValue(this.factServ.tipoDocumento == tipoDocFacturacion.compra ? fun.numFormatTwoDecimals(data.costo) : fun.numFormatTwoDecimals(data.precio));
+    controls['precio'].setValue(fun.numFormatTwoDecimals(data.precio));
     controls['costo'].setValue(fun.numFormatTwoDecimals(data.costo));
     controls['descuento_valor'].setValue(fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : fun.numFormatTwoDecimals(data.descuento_valor));
     controls['cantidad'].setValue(data.cantidad);
@@ -345,11 +365,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   getBadPrice(data) {
+    const response = { bool: false, monto: '' };
+
     const medida = data.peso_saco || data.unidad.includes('Saco de') ? `Saco_${data.peso_saco}` : data.unidad;
 
-    let current_monto = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? data.costo : data.precio;
+    let current_monto = this.factServ.isCompra ? data.costo : data.precio;
 
-    const tipo = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio';
+    const tipo = this.factServ.isCompra ? 'costo' : 'precio';
     let actual_price_monto = fun.hasValue(data.actual_price) ? data.actual_price[medida][tipo] : current_monto;
 
     if (data.is_defectuoso) actual_price_monto = actual_price_monto / 2;
@@ -357,7 +379,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     current_monto = fun.numFormatTwoDecimals(current_monto);
     actual_price_monto = fun.numFormatTwoDecimals(actual_price_monto);
 
-    return { bool: current_monto != actual_price_monto, monto: fun.numFormatTwoDecimals(actual_price_monto) };
+    response.bool = this.factServ.isCompra ? false : current_monto != actual_price_monto;
+    response.monto = this.factServ.isCompra ? current_monto : actual_price_monto;
+    return response;
   }
 
   // =============================================
@@ -375,6 +399,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async saltar(input, index) {
     setTimeout(() => {
+      if (input == 'precioOCompra-') input = this.factServ.isCompra ? 'costo-' : 'precio-';
+
       if (fun.hasValue(this.factServ.propietario_factura)) {
         const { articulo, codigo, cantidad, unidad } = this.factServ.filasDetalle[index].getRawValue();
 
@@ -382,15 +408,19 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (input == 'unidad-' && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(codigo)) fun.enfocarInput('unidad-' + index);
 
-        if ((input === 'codigo-' || input === 'precio-') && fun.hasValue(codigo) && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(unidad)) {
+        if ((input === 'codigo-' || input === 'precio-' || input === 'costo-') && fun.hasValue(codigo) && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(unidad)) {
           if (input === 'codigo-') index++;
 
-          this.ajustarSecuencia().then((res) => fun.enfocarInput(input == 'codigo-' ? this.inputSecuencia : `${input}${index}`));
+          if (input === 'costo-') {
+            fun.enfocarInput(`${input}${index}`);
+          } else {
+            this.ajustarSecuencia().then((res) => fun.enfocarInput(`${input}${index}`));
+          }
         }
 
         if (input === 'cantidad-' && fun.hasValue(codigo)) {
           if (fun.isEmpty(articulo) || codigo !== articulo.codigo) {
-            const metodo = this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta ? tipoDocFacturacion.venta : this.factServ.tipoDocumento;
+            const metodo = this.factServ.isPreVenta ? tipoDocFacturacion.venta : this.factServ.tipoDocumento;
             const obj = { palabra_a_buscar: codigo, index, metodo: metodo, data: [], fecha_articulo: this.fechaFactura };
             this.openNewModal({
               component: BuscarArticuloComponent,
@@ -410,7 +440,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           }
         }
       }
-    }, 0);
+    }, 10);
   }
 
   ajustarSecuencia() {
@@ -424,93 +454,143 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  saliDeCantidad(i) {
-    const { unidad, cantidad, cantidad_ant } = this.factServ.filasDetalle[i].getRawValue();
+  saliDeCantidad(index) {
+    const { unidad, cantidad, cantidad_ant } = this.factServ.filasDetalle[index].getRawValue();
 
-    if (cantidad != cantidad_ant) {
-      if (this.factServ.tipoDocumento == tipoDocFacturacion.venta && !this.factServ.pre_venta_selected && fun.hasValue(unidad)) this.checkCantidadExede(i, 'change', () => {});
-      (this.factServ.filasDetalle[i] as any).controls['cantidad_ant'].setValue(cantidad);
-    }
-  }
-
-  async checkCantidadExede(i, lugar, callback = (arg) => {}) {
-    let cantidad = 0;
-    this.llenarArrayUnidades(i);
-    this.calcularCantidadEnUnidades({ index: i });
-
-    const articulo = (this.factServ.filasDetalle[i] as any).controls['articulo'].value;
-    const from_pre_factura = (this.factServ.filasDetalle[i] as any).controls['from_pre_factura'].value;
-
-    const rowsIgual = _.map(
-      _.filter(this.factServ.filasDetalle, (item) => item.value?.articulo?.id == articulo.id),
-      'value',
-    );
-
-    cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + (item.cantidad_en_unidades - item.cantidad_en_unidades_origin), 0);
-
-    if (lugar === 'saltar') i--;
-
-    try {
-      let excede = true;
-
-      const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
-      await this.articuloClass.getAll(extra).then((res) => {
-        excede = res['data'];
-
-        if (this.factServ.tipoDocumento == tipoDocFacturacion.venta && !from_pre_factura && excede) {
-          fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
-          if (this.configApp.vende_sin_inventario) {
-            callback(false);
+    if (cantidad != cantidad_ant && fun.hasValue(unidad)) {
+      if (this.factServ.isVenta && !this.factServ.pre_venta_selected && fun.hasValue(unidad))
+        this.checkCantidadExede(index, 'change').then((excede) => {
+          if (excede) {
+            (this.factServ.filasDetalle[index] as any).controls['cantidad'].setValue(cantidad_ant);
           } else {
-            setTimeout(() => {
-              fun.enfocarAndSelectInput('cantidad-' + i);
-              this.calcularCantidadEnUnidades({ index: i, clean: true });
-              (this.factServ.filasDetalle[i] as any).controls['unidad'].setValue(null);
-              (this.factServ.filasDetalle[i] as any).controls['cantidad_ant'].setValue(null);
-            }, 250);
-            callback(true);
+            (this.factServ.filasDetalle[index] as any).controls['cantidad_ant'].setValue(cantidad);
           }
-        } else {
-          callback(false);
-        }
-      });
-    } catch (error) {
-      if (error.error) fun.toastError(error.error.msg, 'ERROR');
-      callback(false);
+        });
     }
   }
 
-  async selectMedidaChange(arg, index) {
-    const medidaSelected = _.find(this.UnidadesArticulo, (unidad) => unidad.value === arg);
+  async checkCantidadExede(index, lugar) {
+    return new Promise<boolean>(async (resolve) => {
+      let cantidad = 0;
+      this.llenarArrayUnidades(index);
+      this.calcularCantidadEnUnidades({ index: index });
 
-    this.precioDetalle = medidaSelected.precio;
-    const costoDetalle = medidaSelected.costo;
-    const unidad = medidaSelected.value;
+      if (this.configApp.vende_sin_inventario) {
+        resolve(false);
+        return;
+      }
 
-    if (unidad.toLowerCase() === 'medida') {
-      (this.factServ.filasDetalle[index] as any).controls['unidad'].setValue(null);
-    } else {
-      this.checkCantidadExede(index, 'change', (excede) => {
-        if (!excede) {
-          (this.factServ.filasDetalle[index] as any).controls['unidad'].setValue(unidad);
-          (this.factServ.filasDetalle[index] as any).controls['precio'].setValue(fun.numFormatTwoDecimals(this.factServ.tipoDocumento == tipoDocFacturacion.compra ? costoDetalle : this.precioDetalle));
-          (this.factServ.filasDetalle[index] as any).controls['costo'].setValue(costoDetalle);
+      const articulo = (this.factServ.filasDetalle[index] as any).controls['articulo'].value;
+      const from_pre_factura = (this.factServ.filasDetalle[index] as any).controls['from_pre_factura'].value;
 
-          this.calcularMontosRow(index).then((result) => {
-            this.ajustarSecuencia().then(() => {
-              if (this.factServ.tipoDocumento == tipoDocFacturacion.compra) fun.enfocarInput(`precio-${index}`);
-              else fun.enfocarInput(this.inputSecuencia);
-            });
-          });
+      const rowsIgual = _.map(
+        _.filter(this.factServ.filasDetalle, (item) => item.value?.articulo?.id == articulo.id),
+        'value',
+      );
+
+      cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + (item.cantidad_en_unidades - item.cantidad_en_unidades_origin), 0);
+
+      if (lugar === 'saltar') index--;
+
+      try {
+        let excede = true;
+
+        const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
+
+        await this.articuloClass.getAll(extra).then((res) => {
+          excede = res['data'];
+
+          if (!excede || from_pre_factura || this.factServ.isCompra || this.factServ.isCotizacion) {
+            resolve(false);
+          } else if (this.factServ.isVenta && !from_pre_factura) {
+            fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');
+
+            setTimeout(() => {
+              fun.enfocarAndSelectInput('cantidad-' + index);
+              this.calcularCantidadEnUnidades({ index: index, clean: true });
+              (this.factServ.filasDetalle[index] as any).controls['unidad'].setValue(null);
+              (this.factServ.filasDetalle[index] as any).controls['cantidad_ant'].setValue(null);
+              resolve(true);
+            }, 250);
+          }
+        });
+      } catch (error) {
+        if (error.error) fun.toastError(error.error.msg, 'ERROR');
+        resolve(false);
+      }
+    });
+  }
+
+  test(selectMedida, index) {
+    const input = document.querySelector(`#unidad-${index}`);
+
+    console.log('input ', input);
+    console.log('anquii');
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Enter'
+    });
+
+    // Disparar el evento en el input
+    input.dispatchEvent(event);
+  }
+
+  changeStateDropDownMedida(open) {
+    this.dropdownMedidaOpen = open;
+  }
+
+  hideDropdownMedida(event, index) {
+    if (event.type == 'blur') {
+      this.selectMedidaChange(index).then((response) => {
+        if (!response.excede) {
+          this.saltar(this.factServ.isCompra ? 'precioOCompra-' : 'codigo-', index);
         }
       });
     }
   }
 
-  verificarSecuencia(index, mover = true) {
-    if (this.secuencia < index && mover) fun.enfocarInput(this.inputSecuencia);
-    else {
-      if (mover) (document.activeElement as any).select();
+  showDropdownMedida(event, dropdown) {
+    if (!this.dropdownMedidaOpen && event.type == 'focus') {
+      setTimeout(() => dropdown.show(), 10);
+    }
+  }
+  async selectMedidaChange(index) {
+    return new Promise<{ unidadSelected: boolean; excede: boolean }>((resolve) => {
+      const response = { unidadSelected: false, excede: true };
+
+      let { unidad: unidadaSelected } = this.factServ.filasDetalle[index].getRawValue();
+
+      if (unidadaSelected) {
+        response.unidadSelected = true;
+
+        const medidaSelected = _.find(this.UnidadesArticulo, (unidad) => unidad.value === unidadaSelected);
+
+        this.precioDetalle = medidaSelected.precio;
+        const costoDetalle = medidaSelected.costo;
+        const unidad = medidaSelected.value;
+
+        this.checkCantidadExede(index, 'change').then((excede) => {
+          if (!excede) {
+            (this.factServ.filasDetalle[index] as any).controls['unidad'].setValue(unidad);
+            (this.factServ.filasDetalle[index] as any).controls['precio'].setValue(fun.numFormatTwoDecimals(this.precioDetalle));
+            (this.factServ.filasDetalle[index] as any).controls['costo'].setValue(fun.numFormatTwoDecimals(costoDetalle));
+
+            this.calcularMontosRow(index).then(() => this.setInputDrop(undefined));
+          }
+
+          response.excede = excede;
+          resolve(response);
+        });
+      } else {
+        resolve(response);
+      }
+    });
+  }
+
+  verificarSecuencia(index) {
+    if (this.secuencia < index) {
+      fun.enfocarInput(this.inputSecuencia);
     }
   }
 
@@ -543,10 +623,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       let { cantidad, articulo, codigo, key } = value;
 
       const precio = fun.desformatear(value['precio']);
+      const costo = fun.desformatear(value['costo']);
       let descuento = fun.desformatear(value['descuento_valor']);
 
-      const itbis = articulo?.calcular_itbis ? precio * 0.18 : 0;
-      const total = (precio + itbis) * cantidad;
+      const precioOcosto = this.factServ.isCompra ? costo : precio;
+
+      const itbis = articulo?.calcular_itbis ? precioOcosto * 0.18 : 0;
+      const total = (precioOcosto + itbis) * cantidad;
 
       if (descuento >= 0 || fun.isEmpty(descuento)) {
         if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
@@ -560,7 +643,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fun.enfocarInput(`desc-${index}`);
       }
 
-      if (fun.hasValue(codigo) && fun.hasValue(precio) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
+      if (fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
         let nuevoTotal = 0;
         nuevoTotal = total - descuento;
 
@@ -601,6 +684,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   revisarPrecio(formControlName, input_id, index) {
     let input = (this.factServ.filasDetalle[index] as any).controls[formControlName];
+
     fun.revisarPrecio(input, `${input_id}-${index}`).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
@@ -620,13 +704,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const siFunction = (instance) => {
       const campos = (this.factServ.filasDetalle[index] as any).controls;
-
+      const campoToSolve = this.factServ.isCompra ? 'costo' : 'precio';
       campos['is_bad_price'].setValue(false);
-      campos['precio'].setValue(actual_price_value);
+      campos[campoToSolve].setValue(actual_price_value);
       this.calcularMontosRow(index).then((result) => instance.closeModal(instance.id, 'get_actual_price'));
     };
 
-    const label = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'costo' : 'precio';
+    const label = this.factServ.isCompra ? 'costo' : 'precio';
     this.confirmationModal({ id: 'get_actual_price', header: 'Confirmar', texto: `Seguro que desea obtener el ${label} actual`, siFunction: siFunction });
 
     if (this.dropRowConfig) this.dropRowConfig.hide();
@@ -639,11 +723,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const formulario_data = this.factServ.filasDetalle[index].getRawValue();
 
     const actual_price_value = fun.desformatear(formulario_data.actual_price_value);
-    const precio = fun.desformatear(formulario_data.precio);
-    const tipo = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Costo' : 'Precio';
+    const tipo = this.factServ.isCompra ? 'Costo' : 'Precio';
 
-    res.icon = actual_price_value > precio ? 'fa-arrow-up' : 'fa-arrow-down';
-    res.tooltip = actual_price_value > precio ? `${tipo} subió` : `${tipo} bajó`;
+    const precio = fun.desformatear(formulario_data.precio);
+    const costo = fun.desformatear(formulario_data.costo);
+    const valorToCompare = this.factServ.isCompra ? costo : precio;
+
+    res.icon = actual_price_value > valorToCompare ? 'fa-arrow-up' : 'fa-arrow-down';
+    res.tooltip = actual_price_value > valorToCompare ? `${tipo} subió` : `${tipo} bajó`;
 
     return res;
   }
@@ -701,6 +788,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (fun.hasValue(articulo)) this.inputDrop = `unidad-${index}`;
     } else {
       this.inputDrop = undefined;
+      this.dropdownMedidaOpen = false;
     }
   }
 
@@ -709,7 +797,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const index = obj.index;
 
-    if ((this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
+    if ((this.factServ.isVenta || this.factServ.isPreVenta) && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
       let msg = 'Producto agotado, debe de comprar mas!!!';
 
       if (articulo.descripcion.toLowerCase() == 'producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
@@ -728,7 +816,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   continuarLlenarRow(params: { articulo: any; index: number }) {
     const cantidades = params.articulo.cantidades;
 
-    if ((this.factServ.tipoDocumento == tipoDocFacturacion.venta || this.factServ.tipoDocumento == tipoDocFacturacion.pre_venta) && params.articulo.existencia > 0 && params.articulo.aviso_existencia > cantidades[params.articulo.medida_alerta]) {
+    if ((this.factServ.isVenta || this.factServ.isPreVenta) && params.articulo.existencia > 0 && params.articulo.aviso_existencia > cantidades[params.articulo.medida_alerta]) {
       let cant_restante = fun.numFormatTwoDecimals(cantidades[params.articulo.medida_alerta]);
 
       let msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
@@ -760,19 +848,17 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (codigo && articulo) {
       const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
-      const precioPrincipal = this.factServ.tipoDocumento == tipoDocFacturacion.compra ? articulo.costo_principal : articulo.precio_principal;
+      const precioPrincipal = this.factServ.isCompra ? articulo.costo_principal : articulo.precio_principal;
       const costoPrincipal = articulo.costo_principal;
       this.UnidadesArticulo = [];
 
-      this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: articulo.contenido[articulo.medida] });
-
-      if (medida != 'Quintal' || this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
+      if (medida != 'Quintal' || this.factServ.isCompra) {
         this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
       if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.factServ.tipoDocumento != tipoDocFacturacion.compra) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
 
-      if (articulo.is_detallable || this.factServ.tipoDocumento == tipoDocFacturacion.compra) {
+      if (articulo.is_detallable || this.factServ.isCompra) {
         articulo.contenido_articulos.forEach((element) => {
           this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
         });

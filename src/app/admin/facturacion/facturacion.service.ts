@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 })
 export class FacturacionService {
   action;
-  tipoDocumento;
+  tipoDocumento: tipoDocFacturacion;
   tipoFacturaReferenciaSelected: string;
   tipoFactura: TipoFacturaI;
   htmlTiposFacturas: string;
@@ -23,6 +23,23 @@ export class FacturacionService {
   productos_devueltos = [];
   filasDetalle;
 
+
+  public get isCompra(): boolean {
+    return this.tipoDocumento == tipoDocFacturacion.compra;;
+  }
+
+  public get isVenta(): boolean {
+    return this.tipoDocumento == tipoDocFacturacion.venta;;
+  }
+
+  public get isCotizacion(): boolean {
+    return this.tipoDocumento == tipoDocFacturacion.cotizacion;;
+  }
+
+  public get isPreVenta(): boolean {
+    return this.tipoDocumento == tipoDocFacturacion.pre_venta;;
+  }
+
   constructor() {}
 
   setTipos(metodo) {
@@ -31,7 +48,8 @@ export class FacturacionService {
         this.tipoFactura = _.find(this.lista_tipos_facturas, { referencia: '01' });
         // this.tipoFactura = '01';
 
-        this.htmlTiposFacturas = '<div style=" max-width: 21rem;" > \
+        this.htmlTiposFacturas =
+          '<div style=" max-width: 21rem;" > \
         <span>01 Valor fiscal</span><br>\
         <span>02 Factura de consumo</span><br>\
         </div>';
