@@ -526,12 +526,12 @@ export class fun {
   // _________________________________________________________________________________________________
 
   static timeout;
-  static awaitTyping(event?) {
+  static awaitTyping(event?, waitingTime = 700) {
     const promise = new Promise((resolve) => {
       clearTimeout(fun.timeout);
       fun.timeout = setTimeout(() => {
         if (!event || event.keyCode != 13) resolve(event);
-      }, 700);
+      }, waitingTime);
     });
     return promise;
   }
@@ -632,9 +632,14 @@ export class fun {
   // Nombre: desEnfocarInput
   // Descripcion : Esta funcion desenfoca un elemento html
   // __________________________________________________________________________________________________
-  static desEnfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    if (element) element.blur();
+  static desEnfocarInput(inputId?: string) {
+    const element = document.getElementById('input_fantasma');
+    if (element) element.click();
+
+    if (inputId) {
+      const input = document.getElementById(inputId);
+      if (input) input.blur();
+    }
   }
 
   // __________________________________________________________________________________________________

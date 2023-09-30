@@ -101,7 +101,7 @@
                 <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
                 <td class="tiCAN p-0">
                   <!-- <div class="position-absolute" style="width: 20px; height: 20px; background:red; z-index:999999" (click)="$event.stopPropagation(); test()"></div> -->
-                  <div class="form-group m-0">
+                  <div class="form-group m-0" class="position-relative">
                     <input
                       [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       type="number"
@@ -111,9 +111,10 @@
                       (keyup.enter)="saltar('unidad-', index_cuerpo)"
                       formControlName="cantidad"
                       (focus)="verificarSecuencia(index_cuerpo)"
-                      (blur)="calcularMontosRow(index_cuerpo); saliDeCantidad(index_cuerpo)"
+                      (blur)="calcularMontosRow(index_cuerpo)"
                       tabindex="-1"
                     />
+                    <!-- <div style="background-color: red; width: 20px; height: 20px; top:0" class="position-absolute" (click)="probando(index_cuerpo)"></div> -->
                   </div>
                 </td>
 
@@ -124,76 +125,41 @@
                       [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       *ngIf="inputDrop !== 'unidad-' + index_cuerpo"
                       type="text"
-                      class="form-control entrada"
+                      class="form-control entrada input-unidad"
                       id="unidad-{{ index_cuerpo }}"
-                      (mouseenter)="llenarArrayUnidades(index_cuerpo); setInputDrop(index_cuerpo)"
                       (focus)="setInputDrop(index_cuerpo); llenarArrayUnidades(index_cuerpo); verificarSecuencia(index_cuerpo)"
                       (blur)="calcularMontosRow(index_cuerpo)"
+                      [pTooltip]="factServ.filasDetalle[index_cuerpo].value.unidad ?? ''"
+                      tooltipPosition="top"
                       formControlName="unidad"
                       tabindex="-1"
                     />
 
-                    <div *ngIf="inputDrop === 'unidad-' + index_cuerpo">
-                      <select
-                        #selectMedida
-                        value="Medida"
-                        formControlName="unidad"
-                        (change)="selectMedidaChange(index_cuerpo)"
-                        class="form-control entrada"
-                        style="border-radius: 0"
-                        id="unidad-{{ index_cuerpo }}"
-                        (keyup.enter)="saltar(factServ.tipoDocumento == tipoDocFacturacion.compra ? 'precio-' : 'codigo-', index_cuerpo)"
-                        (blur)="setInputDrop(undefined); calcularMontosRow(index_cuerpo)"
-                        (focus)="selectMedida.click()"
-                        tabindex="-1"
-                        >
-                        <!-- (mouseleave)="setInputDrop(undefined); calcularMontosRow(index_cuerpo)" -->
-                        <option disabled>Medida</option>
-                        <option *ngFor="let item of UnidadesArticulo" value="{{ item.value }}">{{ item.value }}</option>
-                      </select>
-                      <!-- <p-dropdown
-                        #pDropdownMedida
-                        inputId="unidad-{{ index_cuerpo }}"
-                        [options]="UnidadesArticulo"
-                        [placeholder]="inputDrop === 'unidad-' + index_cuerpo ? 'medida' : ''"
-                        [filter]="false"
-                        [virtualScroll]="true"
-                        [itemSize]="30"
-                        [autoDisplayFirst]="false"
-                        [overlayOptions]="overlayOptions"
-                        formControlName="unidad"
-                        appendTo="body"
-                        optionLabel="value"
-                        optionValue="value"
-                        styleClass="form-control entrada drop-{{ index_cuerpo }}"
-                        (keyup.enter)="fun.desEnfocarInput('unidad-' + index_cuerpo)"
-                        (onFocus)="showDropdownMedida($event, pDropdownMedida)"
-                        (onBlur)="hideDropdownMedida($event, index_cuerpo)"
-
-                        >
-                      </p-dropdown> -->
-                    </div>
+                    <p-dropdown
+                      #pDropdownMedida
+                      *ngIf="inputDrop === 'unidad-' + index_cuerpo"
+                      panelStyleClass="panel-dropdown-unidad"
+                      styleClass="form-control entrada dropdown-unidad"
+                      inputId="unidad-{{ index_cuerpo }}"
+                      formControlName="unidad"
+                      appendTo="body"
+                      optionLabel="value"
+                      optionValue="value"
+                      [options]="UnidadesArticulo"
+                      [placeholder]="inputDrop === 'unidad-' + index_cuerpo ? 'medida' : ''"
+                      [filter]="false"
+                      [virtualScroll]="true"
+                      [itemSize]="30"
+                      [autoDisplayFirst]="false"
+                      (onChange)="selectMedidaChange($event, index_cuerpo)"
+                      (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                      (keyup.enter)="selectMedida(index_cuerpo)"
+                      (onFocus)="showDropdownMedida($event, pDropdownMedida)"
+                      (onBlur)="hideDropdownMedida()"
+                    >
+                    </p-dropdown>
                   </div>
                 </td>
-
-                <!-- <p-dropdown
-                #pDropdownMedida
-                inputId="unidad-{{ index_cuerpo }}"
-                [options]="UnidadesArticulo"
-                [placeholder]="inputDrop === 'unidad-' + index_cuerpo ? 'medida' : ''"
-                [filter]="false"
-                [virtualScroll]="true"
-                [itemSize]="30"
-                [autoDisplayFirst]="false"
-                formControlName="unidad"
-                appendTo="body"
-                optionLabel="value"
-                optionValue="value"
-                styleClass="form-control entrada"
-                (onFocus)="showDropdownMedida($event, pDropdownMedida)"
-                (keyup.enter)="fun.desEnfocarInput('unidad-' + index_cuerpo)"
-                (onBlur)="hideDropdownMedida($event, pDropdownMedida, index_cuerpo)"
-              > -->
 
                 <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
                 <td class="tiDES p-0">
