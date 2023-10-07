@@ -121,7 +121,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.empleadosClass.getAll(extra).then((res) => (this.vendedores = res['data']));
   }
 
-  async getClientes(params?: { per_page: number; page: number; search: string }) {
+  async getClientes(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
@@ -135,7 +135,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
       this.listaClientes = res['data'];
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

@@ -109,7 +109,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     await this.getRecibos(this.tServ.obj_paginate.default);
   }
 
-  async getRecibos(params?: { per_page: number; page: number; search: string }) {
+  async getRecibos(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -119,7 +119,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         res['data'] = this.mapeoRecibos(res['data']);
         this.lista_recibos = fun.duplicarJson(res['data']);
 
-        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       });
     } catch (error) {}
   }

@@ -110,7 +110,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     const campo = this.form.get(control);
     campo.setValue(fun.Capitalice(arg));
   }
-  async getEmpleados(params?: { per_page: number; page: number; search: string }) {
+  async getEmpleados(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -126,7 +126,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         });
 
         this.listaEmpleados = res['data'];
-        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       });
     } catch (error) {
       fun.toastError('Error buscando empleados registrados.', 'ERROR');

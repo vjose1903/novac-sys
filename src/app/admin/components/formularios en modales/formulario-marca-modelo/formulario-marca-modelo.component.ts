@@ -131,7 +131,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       if (!params.paginado) this.listaMarcas = fun.duplicarJson(res);
       if (params.paginado) {
         this.listadoMarcas = res.data;
-        this.tablaMarcaComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaMarcaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       }
     });
   }
@@ -148,7 +148,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       });
 
       this.listadoModelos = res.data;
-      this.tablaModeloComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaModeloComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -175,7 +175,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     }
   }
 
-  async pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
+  async pedirNuevaData(params?: { per_page?: number; page?: number; search?: string }) {
     if (!this.isShowMarcas()) {
       this.getModelos(params);
     } else if (this.isShowMarcas()) {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import * as _ from 'lodash';
@@ -10,7 +10,7 @@ import { botonesTableI } from '../tabla-class';
   templateUrl: './btnacciones.component.html',
   styleUrls: ['./btnacciones.component.scss'],
 })
-export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
+export class NewBTNACCIONESComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() botones: botonesTableI;
 
   btnList = {
@@ -38,6 +38,10 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
     this.subWidth = new fun().getWindowSize.subscribe((res) => this.handleWidth(res));
   }
 
+  ngOnDestroy(): void {
+    if(this.subWidth) this.subWidth.unsubscribe();
+  }
+
   ngAfterViewInit(): void {
     this.parseSpeedDialButtons();
   }
@@ -52,31 +56,33 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit {
     for (const key in this.botones) {
       const boton = this.botones[key];
 
-      if (key == 'dinamico') {
-        if (boton.length) {
-          for (const btn_dinamic of boton) {
-            this.items.push({
-              icon: btn_dinamic['icon'],
-              command: (arg) => {
-                const index = this.getSpeedDial(arg);
-                const dato = this.data[index];
-                this.handleFunctionsBtnDinamic(null, btn_dinamic, dato);
-              },
-              tooltipOptions: { tooltipLabel: btn_dinamic['tooltip'] || this.dato[btn_dinamic['tooltipKey']], tooltipPosition: 'left' },
-            });
+      if (key != 'styles') {
+        if (key == 'dinamico') {
+          if (boton.length) {
+            for (const btn_dinamic of boton) {
+              this.items.push({
+                icon: btn_dinamic['icon'],
+                command: (arg) => {
+                  const index = this.getSpeedDial(arg);
+                  const dato = this.data[index];
+                  this.handleFunctionsBtnDinamic(null, btn_dinamic, dato);
+                },
+                tooltipOptions: { tooltipLabel: btn_dinamic['tooltip'] || this.dato[btn_dinamic['tooltipKey']], tooltipPosition: 'left' },
+              });
+            }
           }
-        }
-      } else {
-        this.items.push({
-          icon: this.btnList[key].icon,
-          command: (arg) => {
-            const index = this.getSpeedDial(arg);
-            const dato = this.data[index];
+        } else {
+          this.items.push({
+            icon: this.btnList[key].icon,
+            command: (arg) => {
+              const index = this.getSpeedDial(arg);
+              const dato = this.data[index];
 
-            this.btnList[key].func(null, dato, this.btnList[key].action, this.this_);
-          },
-          tooltipOptions: { tooltipLabel: this.btnList[key].tooltip, tooltipPosition: 'left' },
-        });
+              this.btnList[key].func(null, dato, this.btnList[key].action, this.this_);
+            },
+            tooltipOptions: { tooltipLabel: this.btnList[key].tooltip, tooltipPosition: 'left' },
+          });
+        }
       }
     }
   }

@@ -98,7 +98,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this.articuloClass.getAll(extra).then((result) => (this.cant_inventario = result['data'].stock));
   }
 
-  async getArticulos(params?: { per_page: number; page: number; search: string }) {
+  async getArticulos(params?: { per_page?: number; page?: number; search?: string }) {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
 
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
@@ -110,7 +110,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       });
 
       this.listaArticulos = fun.duplicarJson(res.data);
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -118,17 +118,17 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     const actualPagination = this.tServ.getPaginationById('lista_inventario');
     actualPagination['search'] = this.palabra_buscar;
 
-    
+
 
     if (this.filtro != 'todos') {
       if (fun.isEmpty(actualPagination['ant_page'])) {
-        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: actualPagination.page }], this.tablaComponent);
-        this.tServ.modifyPaginationById('lista_inventario', [{ page: 1 }], this.tablaComponent);
+        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: actualPagination.page }]);
+        this.tServ.modifyPaginationById('lista_inventario', [{ page: 1 }]);
       }
     } else {
       if (fun.hasValue(actualPagination['ant_page'])) {
-        this.tServ.modifyPaginationById('lista_inventario', [{ page: actualPagination['ant_page'] }], this.tablaComponent);
-        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: null }], this.tablaComponent);
+        this.tServ.modifyPaginationById('lista_inventario', [{ page: actualPagination['ant_page'] }]);
+        this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: null }]);
       }
     }
 

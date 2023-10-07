@@ -131,7 +131,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  async getPaquetesNCF(params?: { per_page: number; page: number; search: string }) {
+  async getPaquetesNCF(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -164,7 +164,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       this.listaNCF = tempNCF;
       this.listaNCFBack = fun.duplicarJson(tempNCF);
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error(error);
 

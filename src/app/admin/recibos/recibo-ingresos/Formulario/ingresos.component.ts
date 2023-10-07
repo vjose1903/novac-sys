@@ -146,7 +146,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  async pedirFacturasPorCliente(cliente_id, params?: { per_page: number; page: number; search: string; factura_a_buscar?: any }) {
+  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any }) {
     this.facturas.length = 0;
 
     this.totalFacturado = 0;
@@ -223,11 +223,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
 
     setTimeout(() => {
-      this.tablaComponent.changeConfig([{ total_count: res.data.facturas.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.data.facturas.total_registros }]);
       this.totalRegistros = res.data.facturas.total_registros;
 
       if (res.data.page != params.page) {
-        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }], this.tablaComponent);
+        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
 
         setTimeout(() => {
           Ss.cdRef.detectChanges();

@@ -6,7 +6,7 @@ import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
-import { table_config } from '../../new_tablas/tabla-class';
+import { table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 @Component({
   selector: 'app-buscar-cliente-suplidor',
@@ -35,7 +35,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   };
   tablaComponent: any;
 
-  ventaInfo = [
+  ventaInfo: table_info[] = [
     { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
     { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
     { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
@@ -43,7 +43,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
 
-  compraInfo = [
+  compraInfo: table_info[] = [
     { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
     { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
@@ -88,7 +88,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
       if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {}
   }
 

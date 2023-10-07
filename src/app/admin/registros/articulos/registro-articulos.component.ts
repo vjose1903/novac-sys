@@ -192,7 +192,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
-  async getArticulos(params?: { per_page: number; page: number; search: string }) {
+  async getArticulos(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     this.listaArticulos.length = 0;
@@ -207,7 +207,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       });
 
       this.listaArticulos = res.data;
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
