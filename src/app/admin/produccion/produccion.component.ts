@@ -98,8 +98,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   lookOters(objeto) {
-    const keys = _.keys(objeto);
-    const values = _.values(objeto);
+    const keys = Object.keys(objeto);
+    const values = Object.values(objeto) as Array<number>;
 
     const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
     const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
@@ -112,16 +112,21 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
     let cantiTootip = ``;
     if (keys.length > 1) {
-      if (keys.length == 2) cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
-      else cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
-    } else cantiTootip = `<div style=" max-width: 21rem;" > <span> ${principal} </span><br></div>`;
+      if (keys.length == 2) {
+        cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br></div>`;
+      } else {
+        cantiTootip = `<div style=" max-width: 21rem;" > <span> ${padre} </span><br> <span>${hijo}</span><br> </div>`;
+      }
+    } else {
+      cantiTootip = `<div style=" max-width: 21rem;" > <span> ${principal} </span><br></div>`;
+    }
 
     return cantiTootip;
   }
 
   ingredientesScroll(arg) {
     const divs = ['inventario_scroll', 'produccion_scroll'];
-    let div_opuesto_id = _.find(divs, (item) => item != arg.element_id);
+    let div_opuesto_id = divs.find((item) => item != arg.element_id);
     const div_opuesto = document.getElementById(div_opuesto_id);
 
     if (fun.hasValue(div_opuesto)) div_opuesto.scrollTop = arg.element.scrollTop;
@@ -176,12 +181,12 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   disableOption(id, boolean) {
-    let optionSelected = _.find(this.listaProductos, (item) => item.id == id);
+    let optionSelected = this.listaProductos.find((item) => item.id == id);
     optionSelected.optionDisabled = boolean;
   }
 
   activateAllOptions() {
-    const deactivated = _.filter(this.listaProductos, { optionDisabled: true });
+    const deactivated = this.listaProductos.filter((item) => (item.optionDisabled = true));
     for (const iterator of deactivated) this.disableOption(iterator.id, false);
   }
 
@@ -217,11 +222,11 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
         if (this.lista_produccion.length > 0) {
           const all_ingredientes = _.flattenDeep(
             _.map(this.lista_produccion, (producto) => {
-              const producto_distinto_en_lista = producto.articulo_id != ingrediente.articulo_id ? _.get(producto, 'ingredientes') : [];
+              const producto_distinto_en_lista = producto.articulo_id != ingrediente.articulo_id ? fun.getProperty(producto, 'ingredientes') : [];
               return producto_distinto_en_lista;
             }),
           );
-          const ingredientesIguales = _.filter(all_ingredientes, (item) => item.articulo_combo == ingrediente.articulo_combo);
+          const ingredientesIguales = all_ingredientes.filter((item) => item.articulo_combo == ingrediente.articulo_combo);
 
           if (ingredientesIguales.length) cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
         }
@@ -260,7 +265,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   agregarAlista() {
-    const prod_en_lista = _.find(this.lista_produccion, { id: this.producto_terminado_en_turno.id });
+    const prod_en_lista = this.lista_produccion.find((product) => product.id == this.producto_terminado_en_turno.id);
     if (prod_en_lista) {
       prod_en_lista.cantidad = this.cantidad_producir;
       prod_en_lista.cantidad_en_unidades = this.cantidad_producir * this.producto_terminado_en_turno.contenido[this.medida_producir];
@@ -272,8 +277,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
         cantidad: this.cantidad_producir,
         cantidad_en_unidades: this.cantidad_producir * this.producto_terminado_en_turno.contenido[this.medida_producir],
         medida: this.medida_producir,
-        articulo_id: _.parseInt(this.producto_terminado_en_turno.id),
-        id: _.parseInt(this.producto_terminado_en_turno.id),
+        articulo_id: Number(this.producto_terminado_en_turno.id),
+        id: Number(this.producto_terminado_en_turno.id),
         ingredientes: this.ingredientesParaProduccion,
         formulas_productos_terminados: this.producto_terminado_en_turno.formulas_productos_terminados,
       };
@@ -302,7 +307,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       this.medida_producir = data.medida;
     }, 10);
 
-    this.producto_terminado_en_turno = _.find(this.listaProductos, { id: data.id });
+    this.producto_terminado_en_turno = this.listaProductos.find((product) => product.id == data.id);
 
     setTimeout(() => {
       this.getIngredients();
