@@ -202,7 +202,7 @@
                         (blur)="revisarPrecio(factServ.isCompra ? 'costo' : 'precio', factServ.isCompra ? 'costo' : 'precio', index_cuerpo); calcularMontosRow(index_cuerpo)"
                         (focus)="verificarSecuencia(index_cuerpo)"
                         class="form-control entrada campoNumeros {{ factServ.isVenta ? 'inPRE' : '' }}"
-                        (keyup.enter)="fun.enfocarInput('codigo-' + (index_cuerpo + 1))"
+                        (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
                         id="{{ factServ.isCompra ? 'costo' : 'precio' }}-{{ index_cuerpo }}"
                         [formControlName]="factServ.isCompra ? 'costo' : 'precio'"
                         [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.is_bad_price.value }"

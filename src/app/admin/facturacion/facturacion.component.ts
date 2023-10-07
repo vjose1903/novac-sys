@@ -1388,11 +1388,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           return detalle;
         });
       }
-
-
-
-      console.log("this.cuerpoFactura ", this.cuerpoFactura);
-
     }
   }
 

@@ -368,8 +368,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   test(arg) {
     const current_detalle = this.factServ.filasDetalle[arg].getRawValue();
-
-    console.log('current_detalle ', current_detalle);
   }
 
   getBadPrice(data) {
