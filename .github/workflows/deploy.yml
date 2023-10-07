@@ -18,7 +18,7 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        run: npm ci --force
+        run: npm i
 
       - name: Build Novac App
         id: build-novac-app
