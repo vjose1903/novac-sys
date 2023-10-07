@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IconsArrayComponent } from './icons-array/icons-array.component';
+import { IconsArrayComponent } from './icons-array.component';
 import { TooltipModule } from 'primeng/tooltip';
 
 const components = [IconsArrayComponent];

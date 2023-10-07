@@ -1,6 +1,6 @@
-import { ModalClass } from '../../../modal/modal-class';
-import { TablasService } from '../../tablas.service';
-import { fun } from './../../../../../core/services/functions.service';
+import { ModalClass } from '../../modal/modal-class';
+import { TablasService } from '../tablas.service';
+import { fun } from '../../../../core/services/functions.service';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
 
