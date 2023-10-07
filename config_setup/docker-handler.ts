@@ -1,5 +1,3 @@
-import Functions from './functions';
-import { ConfigI } from '../src/app/core/typescript/config-interface.utils';
 import { cmd, puts } from '../main';
 
 export default class DockerHandler {

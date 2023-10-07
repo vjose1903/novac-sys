@@ -1,7 +1,7 @@
-import Functions from './functions.js';
-import { pathAdd, cmd, puts } from '../main';
-const logosJson = require('../logos.json');
 import * as fs from 'fs';
+import { pathAdd, puts } from '../main';
+import Functions from './functions.js';
+const logosJson = require('../logos.json');
 
 export default class ReplaceInFile {
   constructor() {}
