@@ -23,21 +23,20 @@ export class FacturacionService {
   productos_devueltos = [];
   filasDetalle;
 
-
   public get isCompra(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.compra;;
+    return this.tipoDocumento == tipoDocFacturacion.compra;
   }
 
   public get isVenta(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.venta;;
+    return this.tipoDocumento == tipoDocFacturacion.venta;
   }
 
   public get isCotizacion(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.cotizacion;;
+    return this.tipoDocumento == tipoDocFacturacion.cotizacion;
   }
 
   public get isPreVenta(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.pre_venta;;
+    return this.tipoDocumento == tipoDocFacturacion.pre_venta;
   }
 
   constructor() {}
@@ -154,8 +153,12 @@ export class FacturacionService {
   }
 
   getDetallesLlenos() {
-    const filasMap = this.filasDetalle.map((inner_detalle) => inner_detalle.value);
+    if (fun.hasValue(this.filasDetalle)) {
+      const filasMap = this.filasDetalle.map((inner_detalle) => inner_detalle.value);
 
-    return _.filter(filasMap, (filter_detalle) => fun.hasValue(filter_detalle?.key));
+      return filasMap.filter((filter_detalle) => fun.hasValue(filter_detalle?.key));
+    } else {
+      return [];
+    }
   }
 }

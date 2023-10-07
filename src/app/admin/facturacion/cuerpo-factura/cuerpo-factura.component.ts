@@ -55,6 +55,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   configApp: ConfigI;
   dropdownMedidaOpen: boolean = false;
 
+  lastCuerpoChange;
+
   constructor(private fb: UntypedFormBuilder, public factServ: FacturacionService) {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
@@ -72,19 +74,25 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   escucharCambiosEnForm() {
     this.form.valueChanges.subscribe((changes) => {
-      if (fun.hasValue(changes)) this.emitirCambiosForm(changes);
+      if (!fun.isEqual(this.lastCuerpoChange, fun.duplicarJson(this.factServ.getDetallesLlenos())) && fun.hasValue(this.factServ.getDetallesLlenos())) {
+        this.lastCuerpoChange = fun.duplicarJson(this.factServ.getDetallesLlenos());
+        setTimeout(() => {
+          this.emitirCambiosForm(this.factServ.getDetallesLlenos());
+        }, 250);
+      }
     });
   }
 
-  emitirCambiosForm(res) {
+  emitirCambiosForm(detalles_llenos) {
     const detalle_factura = [];
-    res.rowFactura.forEach((fila) => {
+    detalles_llenos.forEach((fila, index) => {
       if (fun.hasValue(fila.articulo)) {
         fila.articulo_id = fila?.articulo?.id;
         fila.total = fun.desformatear(fila.total);
         fila.descuento_valor = fun.hasValue(fila.descuento_valor) ? fun.desformatear(fila.descuento_valor) : 0;
         fila.precio = fun.desformatear(fila.precio);
         fila.costo = fun.desformatear(fila.costo);
+        this.calcularCantidadEnUnidades({ index: index });
 
         if (fila.cantidad && fila.unidad) detalle_factura.push(fun.duplicarJson(fila));
       }
@@ -105,8 +113,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         this.sacos = [25, 50, 100];
 
-        this.form = this.fb.group({
-          rowFactura: this.fb.array([this.createItem()]),
+        this.createForm().then(() => {
+          this.lastCuerpoChange = fun.duplicarJson(this.factServ.getDetallesLlenos());
+          this.escucharCambiosEnForm();
         });
 
         this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as UntypedFormArray;
@@ -114,12 +123,21 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         for (let index = 1; index <= 25; index++) await this.addItem();
 
         this.factServ.filasDetalle = (this.form.controls['rowFactura'] as UntypedFormArray).controls;
-        this.escucharCambiosEnForm();
 
         resolve(true);
       } catch (error) {
         reject(error);
       }
+    });
+  }
+
+  createForm() {
+    return new Promise<void>((resolve) => {
+      this.form = this.fb.group({
+        rowFactura: this.fb.array([this.createItem()]),
+      });
+
+      resolve();
     });
   }
 
@@ -189,7 +207,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const detalles = this.factServ.getDetallesLlenos();
 
-    return detalles.some((detalle) => detalle.key_origin == current_detalle.key) || this.factServ.productos_devueltos.some((detalle) => detalle.key_origin == current_detalle.key);
+    return detalles.some((detalle) => detalle.key_initial == current_detalle.key && fun.hasValue(current_detalle.key)) || this.factServ.productos_devueltos.some((detalle) => detalle.key_initial == current_detalle.key);
   }
 
   // =============================================
@@ -214,7 +232,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       detalle_id: [null],
       codigo: [null],
       cantidad: [null],
-      cantidad_origin: [0],
+      cantidad_initial: [0],
       cantidad_ant: [null],
       descripcion: [null],
       unidad: [null],
@@ -224,7 +242,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       total: [null],
       itbis: [null],
       cantidad_en_unidades: [0],
-      cantidad_en_unidades_origin: [0],
+      cantidad_en_unidades_initial: [0],
       calcular_saco: [false],
       is_defectuoso: [false],
       is_devuelto: [false],
@@ -233,8 +251,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       is_bad_price: [false],
       actual_price: [null],
       actual_price_value: [null],
-      key_origin: [null],
-      producto_origin: [null],
+      key_initial: [null],
+      producto_initial: [null],
     });
   }
 
@@ -311,40 +329,47 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   llenarDetalles(data, articulo, index) {
-    const controls = (this.factServ.filasDetalle[index] as any).controls;
+    const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+    const detalle = {};
+    detalle['detalle_id'] = fun.hasValue(data?.id) ? data?.id : null;
+    detalle['articulo'] = articulo;
+    detalle['codigo'] = articulo.codigo;
+    detalle['precio'] = fun.numFormatTwoDecimals(data.precio);
+    detalle['costo'] = fun.numFormatTwoDecimals(data.costo);
+    detalle['descuento_valor'] = fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : fun.numFormatTwoDecimals(data.descuento_valor);
+    detalle['cantidad'] = data.cantidad;
+    detalle['cantidad_initial'] = fun.hasValue(data.cantidad) ? data.cantidad : 0;
+    detalle['cantidad_en_unidades_initial'] = 0;
+    detalle['cantidad_en_unidades'] = 0;
+    detalle['key_initial'] = fun.hasValue(data?.key_initial) ? data.key_initial : null;
+    detalle['key'] = fun.hasValue(data?.key) ? data.key : fun.generateKey();
+    detalle['descripcion'] = `${_.capitalize(articulo.nombre)} ${data.is_defectuoso ? ' (defectuoso)' : ''}`;
+    detalle['calcular_saco'] = data.calcular_saco;
+    detalle['is_defectuoso'] = data.is_defectuoso;
+    detalle['is_devuelto'] = data.is_devuelto || false;
+    detalle['from_pre_factura'] = data.from_pre_factura || false;
+    detalle['vende_sin_inventario'] = this.configApp.vende_sin_inventario;
 
-    controls['detalle_id'].setValue(fun.hasValue(data?.id) ? data?.id : null);
-    controls['articulo'].setValue(articulo);
-    controls['codigo'].setValue(articulo.codigo);
-    controls['precio'].setValue(fun.numFormatTwoDecimals(data.precio));
-    controls['costo'].setValue(fun.numFormatTwoDecimals(data.costo));
-    controls['descuento_valor'].setValue(fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : fun.numFormatTwoDecimals(data.descuento_valor));
-    controls['cantidad'].setValue(data.cantidad);
-    controls['cantidad_origin'].setValue(fun.hasValue(data.cantidad) ? data.cantidad : 0);
-    controls['cantidad_en_unidades_origin'].setValue(0);
-    controls['cantidad_en_unidades'].setValue(0);
-    controls['key_origin'].setValue(fun.hasValue(data?.key_origin) ? data.key_origin : null);
-    controls['key'].setValue(fun.hasValue(data?.key) ? data.key : fun.generateKey());
-    controls['descripcion'].setValue(`${_.capitalize(articulo.nombre)} ${data.is_defectuoso ? ' (defectuoso)' : ''}`);
-    controls['calcular_saco'].setValue(data.calcular_saco);
-    controls['is_defectuoso'].setValue(data.is_defectuoso);
-    controls['is_devuelto'].setValue(data.is_devuelto || false);
-    controls['from_pre_factura'].setValue(data.from_pre_factura || false);
-    controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
-
-    controls['is_bad_price'].setValue(this.getBadPrice(data).bool);
-    controls['actual_price'].setValue(data?.actual_price);
-    controls['actual_price_value'].setValue(this.getBadPrice(data).monto);
-    controls['producto_origin'].setValue(fun.hasValue(data?.producto_origin) ? data.producto_origin : null);
+    detalle['is_bad_price'] = this.getBadPrice(data).bool;
+    detalle['actual_price'] = data?.actual_price;
+    detalle['actual_price_value'] = this.getBadPrice(data).monto;
+    detalle['producto_initial'] = fun.hasValue(data?.producto_initial) ? data.producto_initial : null;
 
     let unidad = fun.hasValue(data.peso_saco) ? `Saco de ${data.peso_saco} libras` : data.unidad;
 
-    controls['unidad'].setValue(unidad);
+    detalle['unidad'] = unidad;
+
+    formGroup.patchValue(detalle);
 
     this.calcularMontosRow(index);
-    this.calcularCantidadEnUnidades({ index: index });
 
     this.ajustarSecuencia();
+  }
+
+  test(arg) {
+    const current_detalle = this.factServ.filasDetalle[arg].getRawValue();
+
+    console.log('current_detalle ', current_detalle);
   }
 
   getBadPrice(data) {
@@ -443,25 +468,27 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   saliDeCantidad(index) {
     return new Promise<boolean>((resolve) => {
-      const { unidad, cantidad, cantidad_ant } = this.factServ.filasDetalle[index].getRawValue();
+      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const detale = {};
+      const { unidad, cantidad, cantidad_ant } = formGroup.getRawValue();
 
       if (cantidad != cantidad_ant && fun.hasValue(unidad)) {
         if (this.factServ.isVenta && !this.factServ.pre_venta_selected && fun.hasValue(unidad))
           this.checkCantidadExede(index, 'change').then((excede) => {
             if (excede) {
               fun.enfocarAndSelectInput('cantidad-' + index);
-              (this.factServ.filasDetalle[index] as any).controls['cantidad'].setValue(cantidad_ant);
-              (this.factServ.filasDetalle[index] as any).controls['unidad'].setValue(null);
-              this.calcularCantidadEnUnidades({ index: index, clean: true });
+              detale['cantidad'] = cantidad_ant;
+              detale['unidad'] = null;
             } else {
-              (this.factServ.filasDetalle[index] as any).controls['cantidad_ant'].setValue(cantidad);
+              detale['cantidad_ant'] = cantidad;
             }
+            formGroup.patchValue(detale);
 
             resolve(excede);
           });
       } else {
+        formGroup.controls['cantidad_ant'].setValue(cantidad);
         resolve(false);
-        (this.factServ.filasDetalle[index] as any).controls['cantidad_ant'].setValue(cantidad);
       }
     });
   }
@@ -470,7 +497,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return new Promise<boolean>(async (resolve) => {
       let cantidad = 0;
       this.llenarArrayUnidades(index);
-      this.calcularCantidadEnUnidades({ index: index });
 
       if (this.configApp.vende_sin_inventario) {
         resolve(false);
@@ -481,11 +507,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const from_pre_factura = (this.factServ.filasDetalle[index] as any).controls['from_pre_factura'].value;
 
       const rowsIgual = _.map(
-        _.filter(this.factServ.filasDetalle, (item) => item.value?.articulo?.id == articulo.id),
+        this.factServ.filasDetalle.filter((item) => item.value?.articulo?.id == articulo.id),
         'value',
       );
 
-      cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + (item.cantidad_en_unidades - item.cantidad_en_unidades_origin), 0);
+      cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + (item.cantidad_en_unidades - item.cantidad_en_unidades_initial), 0);
 
       if (lugar === 'saltar') index--;
 
@@ -535,7 +561,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async selectMedida(index) {
     if (this.dropdownMedidaOpen) {
-      let { unidad: unidadaSelected } = this.factServ.filasDetalle[index].getRawValue();
+      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const detalle = {};
+
+      let { unidad: unidadaSelected } = formGroup.getRawValue();
 
       fun.desEnfocarInput(`unidad-${index}`);
       this.setInputDrop(undefined);
@@ -549,20 +578,16 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         this.checkCantidadExede(index, 'change').then((excede) => {
           if (excede) {
             setTimeout(() => {
+              formGroup.controls['unidad'].setValue(null);
               fun.enfocarInput(`unidad-${index}`);
-              (this.factServ.filasDetalle[index] as FormGroup).controls['unidad'].setValue(null);
-              this.calcularCantidadEnUnidades({ index: index, clean: true });
             }, 200);
           } else {
-            (this.factServ.filasDetalle[index] as FormGroup).controls['precio'].setValue(fun.numFormatTwoDecimals(this.precioDetalle));
-            (this.factServ.filasDetalle[index] as FormGroup).controls['costo'].setValue(fun.numFormatTwoDecimals(costoDetalle));
+            detalle['precio'] = fun.numFormatTwoDecimals(this.precioDetalle);
+            detalle['costo'] = fun.numFormatTwoDecimals(costoDetalle);
+            formGroup.patchValue(detalle);
 
             this.calcularMontosRow(index).then(() => {
-              if (this.factServ.isCompra) {
-                fun.enfocarInput(`costo-${index}`);
-              } else {
-                this.seleccionarCampoEnTurno();
-              }
+              this.factServ.isCompra ? fun.enfocarInput(`costo-${index}`) : this.seleccionarCampoEnTurno();
             });
           }
         });
@@ -579,8 +604,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    const { controls, value } = this.factServ.filasDetalle[params.index];
-    const { unidad, cantidad, cantidad_origin } = value;
+    const formGroup = this.factServ.filasDetalle[params.index] as FormGroup;
+    const { unidad, cantidad, cantidad_initial } = formGroup.value;
+    const detalles = {};
+
     let cantidadMinima = 1;
 
     if (unidad && this.UnidadesArticulo.length > 0) {
@@ -589,27 +616,28 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     }
 
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
-    controls['cantidad_en_unidades'].setValue(cant_unidades);
+    detalles['cantidad_en_unidades'] = cant_unidades;
 
-    const cant_origin_unidades = params.clean ? 0 : (cantidad_origin || 0) * cantidadMinima;
-    controls['cantidad_en_unidades_origin'].setValue(cant_origin_unidades);
+    const cant_origin_unidades = params.clean ? 0 : (cantidad_initial || 0) * cantidadMinima;
+    detalles['cantidad_en_unidades_initial'] = cant_origin_unidades;
 
     if (cant_unidades == 0) {
-      controls['precio'].setValue(null);
-
-      controls['total'].setValue(null);
+      detalles['precio'] = null;
+      detalles['total'] = null;
     }
+
+    formGroup.patchValue(detalles);
   }
 
   calcularMontosRow(index: number) {
     return new Promise<any>((resolve, reject) => {
-      const { controls, value } = this.factServ.filasDetalle[index];
+      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const detalle = {};
+      let { cantidad, articulo, codigo, key, precio, costo, descuento_valor } = formGroup.value;
 
-      let { cantidad, articulo, codigo, key } = value;
-
-      const precio = fun.desformatear(value['precio']);
-      const costo = fun.desformatear(value['costo']);
-      let descuento = fun.desformatear(value['descuento_valor']);
+      precio = fun.desformatear(precio);
+      costo = fun.desformatear(costo);
+      let descuento = fun.desformatear(descuento_valor);
 
       const precioOcosto = this.factServ.isCompra ? costo : precio;
 
@@ -618,14 +646,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       if (descuento >= 0 || fun.isEmpty(descuento)) {
         if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
-          controls['descuento_valor'].reset();
+          formGroup.controls['descuento_valor'].reset();
 
-          if (fun.hasValue(total) && total > 0) controls['total'].setValue(fun.numFormatTwoDecimals(total));
+          if (fun.hasValue(total) && total > 0) detalle['total'] = fun.numFormatTwoDecimals(total);
           this.sacarDescuento(key);
         }
       } else {
         if (descuento < 0) fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
-        controls['descuento_valor'].setValue(0);
+        detalle['descuento_valor'] = 0;
         fun.enfocarInput(`desc-${index}`);
       }
 
@@ -642,11 +670,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           if (fun.hasValue(currentDescuento)) currentDescuento.valor = descuento;
           else this.listaDeDescuentos.push({ key: key, valor: descuento });
 
-          controls['total'].setValue(fun.numFormatTwoDecimals(nuevoTotal));
-          controls['itbis'].setValue(fun.numFormatTwoDecimals(itbis));
+          detalle['total'] = fun.numFormatTwoDecimals(nuevoTotal);
+          detalle['itbis'] = fun.numFormatTwoDecimals(itbis);
           this.ajustarSecuencia();
         }
       }
+
+      formGroup.patchValue(detalle);
 
       this.enviarTotalesGenerales();
       resolve(true);
@@ -689,10 +719,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const actual_price_value = (this.factServ.filasDetalle[index] as FormGroup).controls['actual_price_value'].value;
 
     const siFunction = (instance) => {
-      const campos = (this.factServ.filasDetalle[index] as FormGroup).controls;
+      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const detalle = {};
       const campoToSolve = this.factServ.isCompra ? 'costo' : 'precio';
-      campos['is_bad_price'].setValue(false);
-      campos[campoToSolve].setValue(actual_price_value);
+
+      detalle['is_bad_price'] = false;
+      detalle[campoToSolve] = actual_price_value;
+      formGroup.patchValue(detalle);
+
       this.calcularMontosRow(index).then((result) => instance.closeModal(instance.id, 'get_actual_price'));
     };
 
@@ -746,8 +780,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const current_detalle = tipo == 'defectuoso' ? this.factServ.filasDetalle[index].getRawValue() : null;
     const detalles = this.factServ.getDetallesLlenos();
 
-    const articulo_defectuoso = _.find(detalles, (detalle) => detalle.key_origin == current_detalle.key);
-    const articulo_solo_devuelto = _.find(this.factServ.productos_devueltos, (detalle) => detalle.key_origin == current_detalle.key);
+    const articulo_defectuoso = _.find(detalles, (detalle) => detalle.key_initial == current_detalle.key);
+    const articulo_solo_devuelto = _.find(this.factServ.productos_devueltos, (detalle) => detalle.key_initial == current_detalle.key);
 
     const name = current_detalle.descripcion;
     const unidad = current_detalle.unidad;
@@ -811,21 +845,24 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       fun.toastWarning(msg, 'AVISO');
     }
 
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['articulo'].setValue(params.articulo);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['key'].setValue(fun.generateKey());
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['codigo'].setValue(params.articulo.codigo);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['descripcion'].setValue(params.articulo.nombre);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['calcular_saco'].setValue(params.articulo.calcular_saco);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['cantidad'].setValue(null);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['cantidad_ant'].setValue(null);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['unidad'].setValue(null);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+    const formGroup = this.factServ.filasDetalle[params.index] as FormGroup;
+    const detalle = {};
+    detalle['articulo'] = params.articulo;
+    detalle['key'] = fun.generateKey();
+    detalle['codigo'] = params.articulo.codigo;
+    detalle['descripcion'] = params.articulo.nombre;
+    detalle['calcular_saco'] = params.articulo.calcular_saco;
+    detalle['cantidad'] = null;
+    detalle['cantidad_ant'] = null;
+    detalle['unidad'] = null;
+    detalle['vende_sin_inventario'] = this.configApp.vende_sin_inventario;
 
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['is_bad_price'].setValue(false);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['actual_price'].setValue(null);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['actual_price_value'].setValue(null);
-    (this.factServ.filasDetalle[params.index] as FormGroup).controls['producto_origin'].setValue(null);
+    detalle['is_bad_price'] = false;
+    detalle['actual_price'] = null;
+    detalle['actual_price_value'] = null;
+    detalle['producto_initial'] = null;
 
+    formGroup.patchValue(detalle);
     setTimeout(() => fun.enfocarInput('cantidad-' + params.index), 0);
   }
 
@@ -897,7 +934,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         });
 
         const articulo_devuelto_index = _.findIndex(itemRetorno.contenedor_retorno, articulo_devuelto);
-        const campos_devuelto = (articulo_devuelto as FormGroup)?.controls;
+        const FormGroup_devuelto = articulo_devuelto as FormGroup;
+        const detalle_devuelto = {};
 
         if (itemRetorno.tipo == 'defectuoso') articulo_devuelto = articulo_devuelto.value;
 
@@ -911,9 +949,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           }
         } else {
           if (itemRetorno.tipo == 'defectuoso') {
-            campos_devuelto['cantidad'].setValue(articulo_devuelto.cantidad - retornar_info['cantidad']);
-            campos_devuelto['cantidad_en_unidades'].setValue(articulo_devuelto.cantidad_en_unidades - retornar_info['cantidad_en_unidades']);
-            campos_devuelto['descuento_valor'].setValue(fun.numFormatTwoDecimals(articulo_devuelto.descuento_valor - retornar_info['descuento_valor']));
+            detalle_devuelto['cantidad'] = articulo_devuelto.cantidad - retornar_info['cantidad'];
+            detalle_devuelto['cantidad_en_unidades'] = articulo_devuelto.cantidad_en_unidades - retornar_info['cantidad_en_unidades'];
+            detalle_devuelto['descuento_valor'] = fun.numFormatTwoDecimals(articulo_devuelto.descuento_valor - retornar_info['descuento_valor']);
             this.calcularMontosRow(articulo_devuelto_index);
           } else {
             articulo_devuelto['cantidad'] -= retornar_info['cantidad'];
@@ -922,23 +960,27 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
             articulo_devuelto['total'] = articulo_devuelto['cantidad'] * fun.desformatear(articulo_devuelto['precio']) - articulo_devuelto['descuento_valor'];
           }
+          FormGroup_devuelto.patchValue(detalle_devuelto);
         }
 
         // ----- CAMBIO DEL ARTICULO ORIGEN -----
-        const articulo_origin = _.find(this.factServ.filasDetalle, (detalle) => detalle.value.key == articulo_devuelto.key_origin);
+        const articulo_origin = _.find(this.factServ.filasDetalle, (detalle) => detalle.value.key == articulo_devuelto.key_initial);
         if (fun.hasValue(articulo_origin)) {
           const articulo_origin_index = _.findIndex(this.factServ.filasDetalle, articulo_origin);
 
-          const campos_origin = (articulo_origin as FormGroup).controls;
+          const FormGroup_origin = articulo_origin as FormGroup;
+          const detalle_origin = {};
 
-          campos_origin['cantidad'].setValue(articulo_origin.value.cantidad + retornar_info['cantidad']);
-          campos_origin['cantidad_en_unidades'].setValue(articulo_origin.value.cantidad_en_unidades + retornar_info['cantidad_en_unidades']);
-          campos_origin['descuento_valor'].setValue(fun.numFormatTwoDecimals(articulo_origin.value.descuento_valor + retornar_info['descuento_valor']));
+          detalle_origin['cantidad'] = articulo_origin.value.cantidad + retornar_info['cantidad'];
+          detalle_origin['cantidad_en_unidades'] = articulo_origin.value.cantidad_en_unidades + retornar_info['cantidad_en_unidades'];
+          detalle_origin['descuento_valor'] = fun.numFormatTwoDecimals(articulo_origin.value.descuento_valor + retornar_info['descuento_valor']);
+
+          FormGroup_origin.patchValue(detalle_origin);
           this.calcularMontosRow(articulo_origin_index);
         } else {
-          retornar_info.key = retornar_info.key_origin;
+          retornar_info.key = retornar_info.key_initial;
           [retornar_info.is_defectuoso, retornar_info.is_devuelto, retornar_info.from_pre_factura] = Array(3).fill(false);
-          [retornar_info.key_origin, retornar_info.producto_origin] = Array(2).fill(undefined);
+          [retornar_info.key_initial, retornar_info.producto_initial] = Array(2).fill(undefined);
 
           this.llenarDetalles(retornar_info, retornar_info.articulo, this.secuencia);
         }
@@ -967,11 +1009,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (origin_current_detalle.cantidad == data_remover.cantidad) {
       promiseArray.push(this.pasosQuitarArticulo(origin_current_detalle.key));
     } else {
-      current_detalle.controls['cantidad'].setValue(current_detalle.value.cantidad - data_remover.cantidad);
-      current_detalle.controls['cantidad_en_unidades'].setValue(current_detalle.value.cantidad * current_detalle.value.articulo.contenido[medida]);
-      current_detalle.controls['descuento_valor'].setValue(fun.numFormatTwoDecimals((origin_current_detalle.descuento_valor / origin_current_detalle.cantidad) * current_detalle.value.cantidad));
+      const detalle = {};
+      detalle['cantidad'] = current_detalle.value.cantidad - data_remover.cantidad;
+      detalle['cantidad_en_unidades'] = current_detalle.value.cantidad * current_detalle.value.articulo.contenido[medida];
+      detalle['descuento_valor'] = fun.numFormatTwoDecimals((origin_current_detalle.descuento_valor / origin_current_detalle.cantidad) * current_detalle.value.cantidad);
 
-      promiseArray.push(this.calcularMontosRow(index_current_detalle).then((result) => {}));
+      current_detalle.patchValue(detalle);
+      promiseArray.push(this.calcularMontosRow(index_current_detalle));
     }
 
     Promise.all(promiseArray).then((res) => {
@@ -979,7 +1023,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       if (data_remover.cantidad <= origin_current_detalle.cantidad) {
         if (data_remover.razon == razon_remover.producto_defectuoso) {
-          const articulo_ya_retirado = _.find(detalles_llenos, (detalle) => detalle.key_origin == current_detalle.value.key);
+          const articulo_ya_retirado = _.find(detalles_llenos, (detalle) => detalle.key_initial == current_detalle.value.key);
           const articulo_retirado_index = fun.hasValue(articulo_ya_retirado) ? _.findIndex(this.factServ.filasDetalle, (detalle) => detalle.value.key == articulo_ya_retirado.key) : null;
 
           const producto_defectuoso = this.parsearProductoDevueltos(origin_current_detalle, data_remover, true);
@@ -992,7 +1036,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
             }
           }, 10);
         } else if (data_remover.razon == razon_remover.no_venta) {
-          const articulo_ya_retirado = _.find(this.factServ.productos_devueltos, (detalle) => detalle.key_origin == current_detalle.value.key);
+          const articulo_ya_retirado = _.find(this.factServ.productos_devueltos, (detalle) => detalle.key_initial == current_detalle.value.key);
 
           const producto_devuelto = this.parsearProductoDevueltos(origin_current_detalle, data_remover, false);
 
@@ -1006,7 +1050,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   addToProductosDevueltos(data, tipo: 'add' | 'modify', articulo_ya_retirado?) {
     const array1 = ['key', 'articulo_id', 'cantidad', 'articulo', 'calcular_saco', 'cantidad_en_unidades', 'costo', 'descuento_valor', 'descripcion'];
-    const array2 = ['is_defectuoso', 'is_devuelto', 'itbis', 'precio', 'total', 'unidad', 'key_origin', 'producto_origin'];
+    const array2 = ['is_defectuoso', 'is_devuelto', 'itbis', 'precio', 'total', 'unidad', 'key_initial', 'producto_initial'];
     const producto = _.pick(data, [...array1, ...array2]);
 
     producto['articulo_id'] = producto.articulo.id;
@@ -1026,18 +1070,20 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
 
       if (articulo_ya_retirado.tipo == 'producto_defectuoso') {
-        const campos = (this.factServ.filasDetalle[articulo_ya_retirado.index] as FormGroup).controls;
+        const formGroup = this.factServ.filasDetalle[articulo_ya_retirado.index] as FormGroup;
+        const detalle = {};
 
-        campos['cantidad'].setValue(producto.cantidad + articulo_ya_retirado.data.cantidad);
-        campos['descuento_valor'].setValue(fun.numFormatTwoDecimals(producto.descuento_valor + articulo_ya_retirado.data.descuento_valor));
+        detalle['cantidad'] = producto.cantidad + articulo_ya_retirado.data.cantidad;
+        detalle['descuento_valor'] = fun.numFormatTwoDecimals(producto.descuento_valor + articulo_ya_retirado.data.descuento_valor);
+        formGroup.patchValue(detalle);
 
         this.calcularMontosRow(articulo_ya_retirado.index);
       }
     }
   }
 
-  parsearProductoDevueltos(producto_origin, data_remover, is_defectuoso) {
-    const articulo_a_retirar = fun.duplicarJson(producto_origin);
+  parsearProductoDevueltos(producto_initial, data_remover, is_defectuoso) {
+    const articulo_a_retirar = fun.duplicarJson(producto_initial);
 
     const medida = articulo_a_retirar.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo_a_retirar.articulo.medida;
 
@@ -1047,13 +1093,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     articulo_a_retirar.cantidad_en_unidades = data_remover.cantidad * articulo_a_retirar.articulo.contenido[medida];
 
     articulo_a_retirar.total = articulo_a_retirar.cantidad * fun.desformatear(articulo_a_retirar.precio);
-    articulo_a_retirar.key_origin = articulo_a_retirar.key;
+    articulo_a_retirar.key_initial = articulo_a_retirar.key;
 
     articulo_a_retirar.key = fun.generateKey();
     articulo_a_retirar['is_defectuoso'] = is_defectuoso;
     articulo_a_retirar['from_pre_factura'] = true;
     articulo_a_retirar['is_devuelto'] = true;
-    articulo_a_retirar['producto_origin'] = fun.duplicarJson(producto_origin);
+    articulo_a_retirar['producto_initial'] = fun.duplicarJson(producto_initial);
 
     if (is_defectuoso) articulo_a_retirar.precio = fun.numFormatTwoDecimals(fun.desformatear(articulo_a_retirar.precio) / 2);
     if (is_defectuoso) articulo_a_retirar.total /= 2;
