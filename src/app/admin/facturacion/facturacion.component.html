@@ -34,7 +34,7 @@
         <div class="row">
           <div *ngIf="factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion" class="col-3 divRight pl-0">
             <div class="row">
-              <div class="col-3 p-0">
+              <div class="col-3 pl-0">
                 <span class="titulos"><strong>Tipo:</strong></span>
                 <input
                   #tipoFact
@@ -43,7 +43,7 @@
                   triggers="focus"
                   type="text"
                   (keydown.enter)="saltar('tipo', tipoFact.value)"
-                  class="form-control tipo inputE"
+                  class="form-control w-100 inputE"
                   [(ngModel)]="factServ.tipoFacturaReferenciaSelected"
                   (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
                   (focus)="tiposFacturas.toggle($event)"
@@ -85,7 +85,7 @@
                   triggers="focus"
                   type="text"
                   (keydown.enter)="saltar($event.target.id, gastoDe.value)"
-                  class="form-control tipo inputE"
+                  class="form-control w-100 inputE"
                   [(ngModel)]="CostoYgasto"
                   [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
                   [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"

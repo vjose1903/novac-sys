@@ -1,7 +1,6 @@
-import { fun } from './../../core/services/functions.service';
 import { Injectable } from '@angular/core';
+import { fun } from './../../core/services/functions.service';
 import { tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
-import * as _ from 'lodash';
 
 @Injectable({
   providedIn: 'root',
@@ -44,7 +43,7 @@ export class FacturacionService {
   setTipos(metodo) {
     return new Promise<any>((resolve, reject) => {
       if (metodo == tipoDocFacturacion.compra) {
-        this.tipoFactura = _.find(this.lista_tipos_facturas, { referencia: '01' });
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.referencia == '01');
         // this.tipoFactura = '01';
 
         this.htmlTiposFacturas =
@@ -71,7 +70,7 @@ export class FacturacionService {
         this.options_tipos_facturas = ['01', '02'];
         this.options_tipos_costos_gastos = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
       } else if (metodo == tipoDocFacturacion.venta) {
-        this.tipoFactura = _.find(this.lista_tipos_facturas, { referencia: '02' });
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.referencia == '02');
         // this.tipoFactura = '02';
         // <span>00 Factura sin comprobante</span><br>\
         this.htmlTiposFacturas =
@@ -89,9 +88,9 @@ export class FacturacionService {
 
         this.options_tipos_facturas = ['00', '01', '02', '11', '12', '13', '14', '15', '16', '17'];
       } else if (metodo == tipoDocFacturacion.cotizacion) {
-        this.tipoFactura = _.find(this.lista_tipos_facturas, { descripcion: tipoDocFacturacion.cotizacion });
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == tipoDocFacturacion.cotizacion);
       } else if (metodo == tipoDocFacturacion.pre_venta) {
-        this.tipoFactura = _.find(this.lista_tipos_facturas, { descripcion: tipoDocFacturacion.pre_venta });
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == tipoDocFacturacion.pre_venta);
       }
 
       this.setTipoFacturaSelected(metodo, this.tipoFactura.id, 'id');
@@ -102,7 +101,7 @@ export class FacturacionService {
   setTipoFacturaSelected(metodo, value, by = 'referencia') {
     return new Promise<any>((resolve, reject) => {
       if (this.options_tipos_facturas?.includes(value) || by != 'referencia') {
-        this.tipoFactura = _.find(this.lista_tipos_facturas, (tipo_factura) => tipo_factura[by] == value);
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura[by] == value);
         this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
         resolve(value);
       } else {
@@ -112,7 +111,7 @@ export class FacturacionService {
   }
 
   tipoFacturaId(descripcion: tFacturaD) {
-    return _.find(this.lista_tipos_facturas, { descripcion: descripcion }).id;
+    return this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == descripcion).id;
   }
 
   getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }, print?) {
