@@ -1,16 +1,12 @@
-import { Injectable, ViewChild, ViewChildren } from '@angular/core';
+import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
-import { BehaviorSubject } from 'rxjs';
 import { fun } from '../../../core/services/functions.service';
 import { paginateI } from './tabla-class';
-import { Paginator } from 'primeng/paginator';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TablasService {
-  // @ViewChild('paginator', { static: true }) paginator: Paginator;
-
   constructor() {}
 
   public obj_paginate = {
@@ -36,7 +32,7 @@ export class TablasService {
   modifyPaginationById(id, params: Array<paginateI>) {
     params.forEach((param) => {
       const key = _.keys(param)[0];
-      console.log("this.obj_paginate ", this.obj_paginate);
+      console.log('this.obj_paginate ', this.obj_paginate);
 
       this.obj_paginate[id][key] = param[key];
 
