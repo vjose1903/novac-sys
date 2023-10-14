@@ -269,7 +269,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     const cantidades = params.articulo.cantidades;
 
     if (params.articulo.existencia > 0 && params.articulo.aviso_existencia > cantidades[params.articulo.medida_alerta]) {
-      let cant_restante = fun.numFormatTwoDecimals(cantidades[params.articulo.medida_alerta]);
+      let cant_restante = fun.roundNumberToDecimal(cantidades[params.articulo.medida_alerta]);
 
       let msg = `Solo quedan ${cant_restante} ${params.articulo.medida_alerta} de este producto, debe de aumentar el inventario!!!`;
 
@@ -331,7 +331,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   calcularPrecioSaco(cant, precio) {
     const res = (cant / 100) * precio;
-    return fun.redondearNum(res);
+    return fun.roundNumberToDecimal(res);
   }
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES

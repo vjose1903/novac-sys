@@ -211,42 +211,42 @@ function parseResumen(data, tipo_pdf) {
       key: 'bruto',
       item: [
         { text: 'Bruto:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.numFormatTwoDecimals(data?.Bruto), alignment: 'right', style: 'letra11', bold: true },
+        { text: fun_.roundNumberToDecimal(data?.Bruto), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
       key: 'itbis',
       item: [
         { text: 'Itbis:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.numFormatTwoDecimals(data?.itbis), alignment: 'right', style: 'letra11', bold: true },
+        { text: fun_.roundNumberToDecimal(data?.itbis), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
       key: 'descuento',
       item: [
         { text: 'Descuento:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.numFormatTwoDecimals(data?.descuento), alignment: 'right', style: 'letra11', bold: true },
+        { text: fun_.roundNumberToDecimal(data?.descuento), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
       key: 'total',
       item: [
         { text: 'Total:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.numFormatTwoDecimals(data?.total), alignment: 'right', style: 'letra11', bold: true },
+        { text: fun_.roundNumberToDecimal(data?.total), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
       key: 'efectivo',
       item: [
         { text: 'Efectivo', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.numFormatTwoDecimals(data?.total + data?.devuelta), bold: true, alignment: 'right', style: 'letra11' },
+        { text: fun_.roundNumberToDecimal(data?.total + data?.devuelta), bold: true, alignment: 'right', style: 'letra11' },
       ],
     },
     {
       key: 'cambio',
       item: [
         { text: 'Cambio', alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.numFormatTwoDecimals(data?.devuelta), alignment: 'right', style: 'letra11' },
+        { text: fun_.roundNumberToDecimal(data?.devuelta), alignment: 'right', style: 'letra11' },
       ],
     },
   ];
@@ -370,7 +370,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
         alignment: 'left',
         text: [
           { text: 'Recibido: ', bold: true, style: 'letra10' },
-          { text: fun_.numFormatTwoDecimals(data?.total), style: 'letra10' },
+          { text: fun_.roundNumberToDecimal(data?.total), style: 'letra10' },
           { text: ` - ${fun_.my_capitalize(numero_letra)}`, style: 'letra10' },
         ],
       },

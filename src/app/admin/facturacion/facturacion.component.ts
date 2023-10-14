@@ -27,6 +27,7 @@ import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configuracion_articulos/articulos_configuracion';
 
 @Component({
   selector: 'app-facturacion',
@@ -149,6 +150,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   suplidorClass = new SuplidorC();
   vehiculoClass = new VehiculoC();
   userClass = new EmpleadoC();
+  configArticuloClass = new ConfigArticuloC();
 
   overlay;
   // camionesSelected = [];
@@ -171,6 +173,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   tipoDocFacturacion = tipoDocFacturacion;
   fun = fun;
   isInitialized = false;
+  cofig_articulos: ConfigArticuloI;
 
   constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, public factServ: FacturacionService) {
     super();
@@ -210,7 +213,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       });
       //
       this.makeOptionsExtra();
+      this.getConfiguracionArticulo();
     });
+  }
+
+  getConfiguracionArticulo() {
+    this.configArticuloClass.getOne(1).then((cofig_articulos) => (this.cofig_articulos = cofig_articulos.data as ConfigArticuloI));
   }
 
   validatePermisos() {
@@ -719,17 +727,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   getCalculosDinero(arg) {
-    this.TOTAL = fun.numFormatTwoDecimals(arg.total);
-    this.ITBIS = fun.numFormatTwoDecimals(arg.itbis);
-    this.DESCUENTO = fun.numFormatTwoDecimals(arg.descuento);
+    this.TOTAL = fun.roundNumberToDecimal(arg.total);
+    this.ITBIS = fun.roundNumberToDecimal(arg.itbis);
+    this.DESCUENTO = fun.roundNumberToDecimal(arg.descuento);
 
     this.calcularBruto();
   }
 
   calcularBruto() {
     setTimeout(() => {
-      const suma = fun.desformatear(this.TOTAL) + fun.desformatear(this.DESCUENTO) - fun.desformatear(this.ITBIS);
-      this.BRUTO = fun.numFormatTwoDecimals(suma);
+      const suma = fun.desformatearStNumber(this.TOTAL) + fun.desformatearStNumber(this.DESCUENTO) - fun.desformatearStNumber(this.ITBIS);
+      this.BRUTO = fun.roundNumberToDecimal(suma);
     }, 5);
   }
 
@@ -1224,10 +1232,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             fun.toastWarning(`Debe seleccionar al menos un camión y un chofer para el viaje.`, 'Aviso');
             document.getElementById('btnCamion').click();
           } else {
-            if (
-              this.factServ.tipoDocumento != tipoDocFacturacion.compra &&
-              (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.isPreVenta || this.factServ.isCotizacion)
-            ) {
+            if (this.factServ.tipoDocumento != tipoDocFacturacion.compra && (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.isPreVenta || this.factServ.isCotizacion)) {
               const obj = { metodo: this.factServ.tipoDocumento, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
 
               this.openNewModal({
@@ -1381,7 +1386,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) {
         this.cuerpoFactura.map((detalle) => {
-          detalle.itbis = this.configApp.calcular_itbis ? fun.desformatear(detalle.itbis) : 0;
+          detalle.itbis = this.configApp.calcular_itbis ? fun.desformatearStNumber(detalle.itbis) : 0;
           detalle.retirado = this.modo_factura === 'adelantada' ? 0 : detalle.cantidad_en_unidades;
           detalle.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : detalle.cantidad_en_unidades;
 
@@ -1403,49 +1408,46 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  calculatePrice(costo): number {
+  calculatePrecio(costo): number {
     if (costo > 0 || costo != null || costo) {
-      const precio = costo / 0.9;
-      return fun.desformatear(fun.redondearNum(precio));
+      const precio = costo / this.configArticuloClass.getWinPercerntCalc(this.cofig_articulos);
+      return fun.desformatearStNumber(fun.roundNumberToDecimal(precio));
     }
   }
 
-  calculoMedidaPrincipal(costo_db, costoRow, articulo) {
-    const contenido_articulo = articulo.contenido_articulos;
+  sendRequestChangeCost(costoDB, costoRow, articulo) {
+    const contenidoArticulo = articulo.contenido_articulos;
 
-    if (costo_db !== costoRow) {
+    if (costoDB !== costoRow) {
       let cantPadre;
       let cantHijo;
       const tempContenido = [];
 
-      let precioRow = this.calculatePrice(costoRow);
+      let precioRow = this.calculatePrecio(costoRow);
+      const contenidoPadre = contenidoArticulo.find((contenido) => contenido.condicion == 'padre');
+      const contenidoHijo = contenidoArticulo.find((contenido) => contenido.condicion == 'padre');
 
-      contenido_articulo.forEach((contenido) => {
-        let temporal = contenido;
-        if (contenido.condicion === 'padre') {
-          if (contenido.precio) {
-            cantPadre = contenido.cantidad;
-            const precio = this.calcularNuevosPrecios(cantPadre, precioRow);
-            const costo = this.calcularNuevosPrecios(cantPadre, costoRow);
-            temporal.precio = fun.desformatear(precio);
-            temporal.costo = fun.desformatear(costo);
-          }
-        } else {
-          if (contenido.precio) {
-            cantHijo = contenido.cantidad;
-            const prePadre = this.calcularNuevosPrecios(cantPadre, precioRow);
-            const cosPadre = this.calcularNuevosPrecios(cantPadre, costoRow);
-            const precio = this.calcularNuevosPrecios(cantHijo, fun.redondearNum(prePadre));
-            const costo = this.calcularNuevosPrecios(cantHijo, fun.redondearNum(cosPadre));
-            temporal.precio = fun.desformatear(precio);
-            temporal.costo = fun.desformatear(costo);
-          } else {
-            temporal = null;
-          }
-        }
-        if (temporal !== null) {
-          const tempu = _.omit(temporal, ['created_at', 'updated_at']);
-          tempContenido.push(tempu);
+      if (contenidoPadre) {
+        cantPadre = contenidoPadre.cantidad;
+        const precioPadre = this.calcNewAmounts(cantPadre, precioRow);
+        const costoPadre = this.calcNewAmounts(cantPadre, costoRow);
+        contenidoPadre.precio = fun.desformatearStNumber(precioPadre);
+        contenidoPadre.costo = fun.desformatearStNumber(costoPadre);
+      }
+
+      if (contenidoHijo) {
+        const precio = this.calcNewAmounts(cantHijo, fun.roundNumberToDecimal(contenidoPadre.precio));
+        const costo = this.calcNewAmounts(cantHijo, fun.roundNumberToDecimal(contenidoPadre.costo));
+        contenidoHijo.precio = fun.desformatearStNumber(precio);
+        contenidoHijo.costo = fun.desformatearStNumber(costo);
+      }
+
+      [contenidoPadre, contenidoHijo].forEach((contenido)=>{
+        if (fun.hasValue(contenido)) {
+          console.log("contenido ", contenido);
+
+          const newContent = _.omit(contenido, ['created_at', 'updated_at']);
+          tempContenido.push(newContent);
         }
       });
 
@@ -1463,47 +1465,43 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.articulosAcambiar = [];
 
     for (let i = 0; i < cuerpoFact.length; i++) {
+      let temp = {};
       const row = cuerpoFact[i];
 
       let articulo = row.articulo;
-
       const contenido_articulo = articulo.contenido_articulos;
 
-      const costoRow = fun.desformatear(row.precio);
+      let costoRow = fun.desformatearStNumber(row.costo);
+      let costoPrincipalDB = articulo.costo_principal;
 
-      const costoPrincipal = articulo.costo_principal;
+      const contenidoPadre = contenido_articulo.find((cont) => cont.condicion === 'padre');
+      const contenidoHijo = contenido_articulo.find((cont) => cont.condicion === 'hijo');
 
-      let temp = {};
-      let costoA;
-      let costoR;
-      const contenidoPadre = contenido_articulo.filter((cont) => cont.condicion === 'padre')[0];
-      const contenidoHijo = contenido_articulo.filter((cont) => cont.condicion === 'hijo')[0];
-
-      let medidaEs = '';
-      if (articulo.medida === row.unidad) medidaEs = 'principal';
+      let isMedida = '';
+      if (articulo.medida == row.unidad) isMedida = 'principal';
 
       contenido_articulo.forEach((content) => {
-        if (content.medida === row.unidad) medidaEs = content.condicion;
+        if (content.medida === row.unidad) isMedida = content.condicion;
       });
 
-      if (contenido_articulo.length === 0 || medidaEs === 'principal') {
-        this.calculoMedidaPrincipal(costoPrincipal, costoRow, articulo);
+      if (contenido_articulo.length === 0 || isMedida === 'principal') {
+        this.sendRequestChangeCost(costoPrincipalDB, costoRow, articulo);
       } else {
-        if (medidaEs === 'padre') {
-          costoA = contenidoPadre.costo * contenidoPadre.cantidad;
-          costoR = contenidoPadre.cantidad * costoRow;
+        if (isMedida === 'padre') {
+          costoPrincipalDB = contenidoPadre.costo * contenidoPadre.cantidad;
+          costoRow = contenidoPadre.cantidad * costoRow;
         } else {
           let MaxContenido = 0;
           if (contenido_articulo.length === 1) {
             MaxContenido = contenidoPadre.cantidad;
-            costoA = contenidoPadre.costo * MaxContenido;
+            costoPrincipalDB = contenidoPadre.costo * MaxContenido;
           } else {
             MaxContenido = contenidoPadre.cantidad * contenidoHijo.cantidad;
-            costoA = contenidoHijo.costo * MaxContenido;
+            costoPrincipalDB = contenidoHijo.costo * MaxContenido;
           }
-          costoR = MaxContenido * costoRow;
+          costoRow = MaxContenido * costoRow;
         }
-        this.calculoMedidaPrincipal(costoA, costoR, articulo);
+        this.sendRequestChangeCost(costoPrincipalDB, costoRow, articulo);
       }
 
       temp = _.omit(row, ['costo', 'condicion', 'codigo']);
@@ -1567,9 +1565,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  calcularNuevosPrecios(cant, precio) {
+  calcNewAmounts(cant, precio) {
     const pre = precio / cant;
-    return fun.redondearNum(pre);
+    return fun.roundNumberToDecimal(pre);
   }
 
   async cambiarCostos() {
@@ -1616,7 +1614,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       cabecera_fact['fecha_vencimiento'] = fecha_venci;
       cabecera_fact['pagada'] = false;
-      cabecera_fact['balance'] = fun.parseFloatTwoDecimals(this.TOTAL);
+      cabecera_fact['balance'] = fun.parseStFloatTwoDecimals(this.TOTAL);
       cabecera_fact['devuelta'] = 0;
     } else {
       cabecera_fact['pagada'] = true;
@@ -1636,10 +1634,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['numero_comprobante'] = this.factServ.isCompra ? this.NCFcompra : null;
     cabecera_fact['costoYgasto'] = this.factServ.isCompra ? this.CostoYgasto : null;
     cabecera_fact['numero_factura'] = null;
-    cabecera_fact['total_factura'] = fun.parseFloatTwoDecimals(this.TOTAL);
-    cabecera_fact['Bruto'] = fun.parseFloatTwoDecimals(this.BRUTO);
-    cabecera_fact['itbis'] = fun.parseFloatTwoDecimals(this.ITBIS);
-    cabecera_fact['descuento'] = fun.parseFloatTwoDecimals(this.DESCUENTO);
+    cabecera_fact['total_factura'] = fun.parseStFloatTwoDecimals(this.TOTAL);
+    cabecera_fact['Bruto'] = fun.parseStFloatTwoDecimals(this.BRUTO);
+    cabecera_fact['itbis'] = fun.parseStFloatTwoDecimals(this.ITBIS);
+    cabecera_fact['descuento'] = fun.parseStFloatTwoDecimals(this.DESCUENTO);
     cabecera_fact['estado'] = true;
     cabecera_fact['is_adelantada'] = this.is_adelantada;
     cabecera_fact['is_viaje'] = this.is_viaje;

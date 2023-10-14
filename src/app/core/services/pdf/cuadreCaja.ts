@@ -118,7 +118,7 @@ function contenidoReporte(data) {
 
   data.contenido_reporte.forEach((detalle, i) => {
     const row = [];
-    row.push({ text: detalle.titulo, alignment: 'left', bold: true, style: 'letra11' }, { text: fun_.numFormatTwoDecimals(detalle.valor), alignment: 'right', margin: [0, 0, 15, 0] });
+    row.push({ text: detalle.titulo, alignment: 'left', bold: true, style: 'letra11' }, { text: fun_.roundNumberToDecimal(detalle.valor), alignment: 'right', margin: [0, 0, 15, 0] });
     body.push(row);
   });
 

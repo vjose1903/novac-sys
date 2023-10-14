@@ -77,7 +77,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       fun.enfocarInput(campo);
     }
     if (campo === 'send') {
-      if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < fun.desformatear(this.inputs.total_factura)) {
+      if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < fun.desformatearStNumber(this.inputs.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         fun.enfocarInput('inputEfectivo');
       } else {
@@ -87,11 +87,11 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   formatoNumero(num) {
-    return fun.numFormatTwoDecimals(num);
+    return fun.roundNumberToDecimal(num);
   }
 
   revisarPrecio(input) {
-    fun.revisarPrecio(input, `inputEfectivo`).then((res) => {
+    fun.revisarNumber(input, `inputEfectivo`).then((res) => {
       if (!res.error) input.value = res.number;
     });
   }
@@ -100,8 +100,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     if (fun.isEmpty(this.efectivo)) {
       this.devuelta = '0.00';
     } else {
-      const total = fun.desformatear(this.inputs.total_factura);
-      const efectivo = fun.desformatear(this.efectivo);
+      const total = fun.desformatearStNumber(this.inputs.total_factura);
+      const efectivo = fun.desformatearStNumber(this.efectivo);
 
       const dev = efectivo - total;
 
@@ -114,8 +114,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   btn_aceptar() {
-    const devuelta_ = fun.desformatear(this.devuelta);
-    const efectivo = fun.desformatear(this.efectivo);
+    const devuelta_ = fun.desformatearStNumber(this.devuelta);
+    const efectivo = fun.desformatearStNumber(this.efectivo);
     const obj = { dinero: efectivo, devuelta: this.devuelta ? devuelta_ : 0, forma_pago: this.formaPago, decision_cambio: this.cambiar_articulos === 'si' ? true : false };
 
     const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
@@ -142,8 +142,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   validarForm(from?): boolean {
-    const total = fun.desformatear(this.inputs.total_factura);
-    const efectivo = fun.desformatear(this.efectivo);
+    const total = fun.desformatearStNumber(this.inputs.total_factura);
+    const efectivo = fun.desformatearStNumber(this.efectivo);
 
     let isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;
 

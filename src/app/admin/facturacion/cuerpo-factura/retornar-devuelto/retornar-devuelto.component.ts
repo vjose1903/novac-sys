@@ -115,7 +115,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
 
   getCurrentDevuelto(cantidad) {
     if (fun.isEmpty(cantidad)) return '0.00';
-    return fun.numFormatTwoDecimals(cantidad);
+    return fun.roundNumberToDecimal(cantidad);
   }
 
   checkCantidad(tipo) {

@@ -22,7 +22,7 @@ export class ConduceC extends CrudG<any> {
       data_parsed['cliente']['rnc'] = documento ? documento.documento : '----------';
 
       data_parsed['contenido_reporte'].map((detalle) => {
-        detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+        detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${detalle.unidad}`;
       });
 
       resolve(data_parsed);

@@ -292,7 +292,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.is_active = estatus.icon;
         fact.is_active_tooltip = estatus.tooltip;
         fact.is_active_color = estatus.color;
-        fact.monto = fun.numFormatTwoDecimals(fact.balance);
+        fact.monto = fun.roundNumberToDecimal(fact.balance);
         fact.viewColor = 'gris-claro';
         fact.view = 'far fa-eye-slash';
         fact.delete = 'far fa-trash-alt';

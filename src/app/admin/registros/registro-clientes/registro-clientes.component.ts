@@ -155,7 +155,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.patchDocumentos(data.documentos_de_identidad);
 
-    this.form.controls.maximo_credito.setValue(fun.numFormatTwoDecimals(data.maximo_credito));
+    this.form.controls.maximo_credito.setValue(fun.roundNumberToDecimal(data.maximo_credito));
     this.clienteSelected = fun.duplicarJson(data);
 
     this.boton = 'Editar';
@@ -292,7 +292,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   revisarPrecio(id) {
     const input = this.form.controls[id];
-    fun.revisarPrecio(input, id).then((res) => {
+    fun.revisarNumber(input, id).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
   }
@@ -332,7 +332,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       formulario.estado = true;
 
       formulario['balance'] = 0;
-      formulario.maximo_credito = fun.desformatear(formulario.maximo_credito);
+      formulario.maximo_credito = fun.desformatearStNumber(formulario.maximo_credito);
 
       this.clienteClass.createUpdateOne(formulario).then((res) => {
         const actualPagination = this.tServ.getPaginationById('lista_clientes');

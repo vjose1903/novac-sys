@@ -67,7 +67,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   formatoNumero(num) {
     let numformat = '0.00';
-    if (num) numformat = fun.numFormatTwoDecimals(num);
+    if (num) numformat = fun.roundNumberToDecimal(num);
     return numformat;
   }
 
@@ -381,7 +381,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   checkNumber(input, column, index_body) {
     if (column.checkNumber) {
       const id = `input-${this.realIdTabla}-${column.key}-${this.getIndex(index_body)}`;
-      fun.revisarPrecio(input, id).then((res) => {
+      fun.revisarNumber(input, id).then((res) => {
         if (!res.error && column.inputEvents != 'formatoNumero') {
           input.value = fun.is_number(input.value) ? res.number : null;
         }
@@ -393,11 +393,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (fun.objHas(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
       if (column.inputEvents == 'formatoNumero') {
         if (type == 'focus') {
-          input.value = fun.is_number(input.value) ? fun.desformatear(input.value) : null;
+          input.value = fun.is_number(input.value) ? fun.desformatearStNumber(input.value) : null;
           input.select();
         }
         if (type == 'blur') {
-          input.value = fun.is_number(input.value) ? fun.numFormatTwoDecimals(input.value) : null;
+          input.value = fun.is_number(input.value) ? fun.roundNumberToDecimal(input.value) : null;
           if (fun.isEmpty(input.value)) fun.enfocarInput(input.id);
         }
       }
@@ -456,8 +456,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
 
-    const padre = fun.numFormatTwoDecimals(values[1]) + '  ' + fin1;
-    const hijo = fun.formatearNumero(values[2]) + '  ' + fin2;
+    const padre = fun.roundNumberToDecimal(values[1]) + '  ' + fin1;
+    const hijo = fun.roundNumberToDecimal(values[2]) + '  ' + fin2;
 
     let cantiTootip = '';
 
@@ -478,7 +478,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const values = _.values(objeto);
     const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
 
-    return fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
+    return fun.roundNumberToDecimal(values[0]) + '  ' + fin;
   }
 
   disableInput(dato, column) {
@@ -528,7 +528,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const copia = fun.duplicarJson(this.data[index][referencia]);
 
       if (formatear) {
-        input['value'] = fun.numFormatTwoDecimals(copia);
+        input['value'] = fun.roundNumberToDecimal(copia);
       } else {
         input['value'] = copia;
       }

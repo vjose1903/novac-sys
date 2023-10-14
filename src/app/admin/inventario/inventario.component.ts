@@ -79,7 +79,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   formatoNumero(num) {
-    return fun.numFormatTwoDecimals(num);
+    return fun.roundNumberToDecimal(num);
   }
 
   async necesarioParaEmpezar() {
