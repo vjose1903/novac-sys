@@ -24,7 +24,7 @@ import {
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';
-import { ConfigI } from './core/typescript/config-interface.utils';
+import { ConfigI } from './core/typescript/config-interface';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';

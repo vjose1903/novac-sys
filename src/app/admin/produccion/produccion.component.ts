@@ -224,7 +224,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
               return producto_distinto_en_lista;
             }),
           );
-          const ingredientesIguales = all_ingredientes.filter((item) => item.articulo_combo == ingrediente.articulo_combo);
+          const ingredientesIguales = all_ingredientes.filter((item) => item.articulo_combo_id == ingrediente.articulo_combo_id);
 
           if (ingredientesIguales.length) cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
         }

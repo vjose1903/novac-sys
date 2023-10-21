@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { colorAppT, modeAppT } from '../typescript/config-interface.utils';
+import { colorAppT, modeAppT } from '../typescript/config-interface';
 
 @Injectable({
   providedIn: 'root',

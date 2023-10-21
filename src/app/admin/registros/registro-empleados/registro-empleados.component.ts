@@ -1,5 +1,5 @@
 import { ConfigService } from './../../../core/services/configuration.service';
-import { ConfigI } from './../../../core/typescript/config-interface.utils';
+import { ConfigI } from '../../../core/typescript/config-interface';
 import { FormEntidadCuentaContableI } from './../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { CategoriaEntidadContableC, entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';

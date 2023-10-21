@@ -2,7 +2,7 @@ import { ConfigService } from './../configuration.service';
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
-import { ConfigI } from '../../typescript/config-interface.utils';
+import { ConfigI } from '../../typescript/config-interface';
 
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA

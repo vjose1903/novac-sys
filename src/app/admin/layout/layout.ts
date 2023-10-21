@@ -30,8 +30,12 @@ export class LayoutClass extends TablaClass {
       vizualizar: [Permisos.factura_compra.get_facturas_by_params, Permisos.factura_venta.get_facturas_by_params],
       flatt: [],
     },
-    ingresos: {
+    pagos: {
       recibosIngresos: Object.values(Permisos.recibo_ingreso),
+      cuentasPagar: Object.values(Permisos.pagos_compras),
+      flatt: [],
+    },
+    recibos_viajes: {
       viajes: [Permisos.factura_venta.get_viajes_sin_completar],
       flatt: [],
     },

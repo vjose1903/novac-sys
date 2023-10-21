@@ -77,7 +77,7 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
       this.tasaDeCambioClass.getAll(extra).then((res) => {
         res['data'].map((historial: TasaDeCambioI) => {
           historial.fecha_equivalente = moment(historial.fecha_equivalente).format('DD/MM/YYYY');
-          historial.monto = `${this.divisaPrincipal.simbolo} ${fun.numFormatTwoDecimals(historial.valor)}`;
+          historial.monto = `${this.divisaPrincipal.simbolo} ${fun.roundNumberToDecimal(historial.valor)}`;
 
           historial.customStyles = { fecha_equivalente: { 'text-align': 'start' } };
 

@@ -2,7 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
-import { ConfigI } from './src/app/core/typescript/config-interface.utils';
+import { ConfigI } from './src/app/core/typescript/config-interface';
 
 const { exec } = require('child_process');
 
@@ -87,7 +87,9 @@ function createWindow() {
     });
 
     if (serve) {
+      win.webContents.openDevTools();
       require('electron-reload')(__dirname, { electron: require(`${__dirname}/node_modules/electron`) });
+
       win.loadURL('http://localhost:5220');
     } else {
       win.loadURL(appFilePath);

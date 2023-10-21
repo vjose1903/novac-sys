@@ -376,6 +376,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
     return res;
   }
+
   getIsPagoAtiempo(factura) {
     let pago_a_tiempo = true;
 
@@ -421,7 +422,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
 
-    if (valor == this.campos.ultimas50) this.pedirFactura(fun.duplicarJson(this.tServ.obj_paginate.default));
+    if (valor == this.campos.ultimas50) this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
   }
 
   getProperties(tipo) {

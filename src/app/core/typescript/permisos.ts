@@ -68,6 +68,7 @@ export const Permisos = {
     update: 'cliente_update',
     destroy: 'cliente_destroy',
     get_filtrados: 'cliente_get_filtrados',
+    get_balances: 'cliente_get_balances',
   },
   costo_flete: {
     create: 'costo_flete_create',
@@ -201,6 +202,7 @@ export const Permisos = {
     destroy: 'suplidor_destroy',
     get_nombres_suplidores: 'suplidor_get_nombres_suplidores',
     get_filtrados: 'suplidor_get_filtrados',
+    get_balances: 'suplidor_get_balances',
   },
   tipo_articulo: {
     create: 'tipo_articulo_create',
@@ -208,12 +210,6 @@ export const Permisos = {
     read_one: 'tipo_articulo_read_one',
     update: 'tipo_articulo_update',
     destroy: 'tipo_articulo_destroy',
-  },
-  sub_tipo_articulo: {
-    create: 'sub_tipo_articulo_create',
-    read_all: 'sub_tipo_articulo_read_all',
-    read_one: 'sub_tipo_articulo_read_one',
-    update: 'sub_tipo_articulo_update',
   },
   tipo_factura: {
     create: 'tipo_factura_create',
@@ -267,6 +263,12 @@ export const Permisos = {
     read_one: 'cotizacion_read_one',
     update: 'cotizacion_update',
     destroy: 'cotizacion_destroy',
+  },
+  sub_tipo_articulo: {
+    create: 'sub_tipo_articulo_create',
+    read_all: 'sub_tipo_articulo_read_all',
+    read_one: 'sub_tipo_articulo_read_one',
+    update: 'sub_tipo_articulo_update',
   },
   periodo_fiscal: {
     create: 'periodo_fiscal_create',
@@ -368,5 +370,13 @@ export const Permisos = {
     read_one: 'transferencia_read_one',
     update: 'transferencia_update',
     anular_transferencia: 'transferencia_anular_transferencia',
+  },
+  pagos_compras: {
+    create: 'pagos_compras_create',
+    read_all: 'pagos_compras_read_all',
+    read_one: 'pagos_compras_read_one',
+    update: 'pagos_compras_update',
+    get_filtrados: 'pagos_compras_get_filtrados',
+    revertir_pago: 'pagos_compras_revertir_pago',
   },
 };

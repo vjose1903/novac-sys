@@ -2,7 +2,7 @@ import { ConfigService } from './../../configuration.service';
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
-import { ConfigI } from '../../../typescript/config-interface.utils';
+import { ConfigI } from '../../../typescript/config-interface';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
 import { config_ventas } from './configuraciones/ventas';

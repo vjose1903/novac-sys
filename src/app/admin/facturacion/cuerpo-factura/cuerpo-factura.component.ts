@@ -1,4 +1,4 @@
-import { ConfigI } from './../../../core/typescript/config-interface.utils';
+import { ConfigI } from '../../../core/typescript/config-interface';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { RetornarDevueltoComponent } from './retornar-devuelto/retornar-devuelto.component';
 import { FacturacionService } from './../facturacion.service';

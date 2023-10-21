@@ -1,6 +1,6 @@
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { TipoArticuloComponent } from './tipo-articulo/tipo-articulo.component';
-import { ConfigI } from './../../../core/typescript/config-interface.utils';
+import { ConfigI } from '../../../core/typescript/config-interface';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';

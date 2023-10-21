@@ -64,12 +64,12 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   closeModal(modalId, dataToReturn?: IReturnData) {
-    this.onHideModal(modalId);
 
     if (dataToReturn) {
       const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
       if (fun.hasValue(modal) && fun.hasValue(modal.returnDataFromModal)) modal.returnDataFromModal(dataToReturn);
     }
+    this.onHideModal(modalId);
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== modalId);
   }
 

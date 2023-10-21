@@ -62,7 +62,32 @@
             </div>
           </div>
 
-          <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.recibosIngresos" class="menuList">
+
+          <div *ngxPermissionsOnly="menuPermissionsObj.pagos.flatt" class="menuList">
+            <h5 id="pagosLabel" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('recibos') }" [innerText]="'Pagos'"></h5>
+            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('recibos') }" src="assets/img/reciboIngreso.png" alt="Pagos" (click)="cambiarMenu({ url: 'recibos', navigate: false, id_h5: 'pagosLabel' })" draggable="false" />
+
+            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('recibos') }">
+              <h4
+                class="opcion"
+                *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos"
+                [ngClass]="{ activa: actualRuta == 'lista_ingresos/ingresos' }"
+                (click)="cambiarMenu({ url: 'recibos/lista_ingresos/ingresos', navigate: true })"
+              >
+                Recibos de ingreso
+              </h4>
+              <h4
+                class="opcion"
+                *ngxPermissionsOnly="menuPermissionsObj.pagos.cuentasPagar"
+                [ngClass]="{ activa: actualRuta == 'lista_ingresos/pagos' }"
+                (click)="cambiarMenu({ url: 'recibos/lista_ingresos/pagos', navigate: true })"
+              >
+                Pago da facturas
+              </h4>
+            </div>
+          </div>
+
+          <!-- <div *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos" class="menuList">
             <h5 id="ingresosLabel" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('lista_ingresos') }" [innerText]="'Recibos de ingresos'"></h5>
             <img
               class="iconosMenu"
@@ -72,9 +97,9 @@
               (click)="cambiarMenu({ url: 'recibos/lista_ingresos', navigate: true, id_h5: 'ingresosLabel' })"
               draggable="false"
             />
-          </div>
+          </div> -->
 
-          <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.viajes" class="menuList">
+          <div *ngxPermissionsOnly="menuPermissionsObj.recibos_viajes.viajes" class="menuList">
             <h5 id="pedidosLabel" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('viajes') }" [innerText]="'Pedidos'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('viajes') }" src="assets/img/viaje.png" alt="Viajes" (click)="cambiarMenu({ url: 'recibos/viajes/0', navigate: true, id_h5: 'pedidosLabel' })" draggable="false" />
           </div>

@@ -2,7 +2,7 @@ import { DocumentoDeIdentidadI } from './../../../core/typescript/documentos_de_
 import { entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { ConfigService } from './../../../core/services/configuration.service';
-import { ConfigI } from './../../../core/typescript/config-interface.utils';
+import { ConfigI } from '../../../core/typescript/config-interface';
 import { CategoriaEntidadContableService } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';

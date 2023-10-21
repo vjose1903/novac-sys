@@ -2,7 +2,7 @@
 import * as _ from 'lodash';
 import * as fun_ from '../utils/funciones';
 import { styles_ } from '../utils/files';
-import { ConfigI } from '../../../typescript/config-interface.utils';
+import { ConfigI } from '../../../typescript/config-interface';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes, infoTipoPdf, firmas } from './infoPdfs';
 import { config_notas } from './configuraciones/notas/notas';

@@ -1,4 +1,4 @@
-import { ConfigI } from './../../core/typescript/config-interface.utils';
+import { ConfigI } from '../../core/typescript/config-interface';
 import { ConfigService } from './../../core/services/configuration.service';
 import { EmpleadoC } from '../registros/registro-empleados/empleado.utils';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
@@ -1182,7 +1182,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   onHideModal(arg) {
-    if (arg.modal.id == 'buscarCliente') {
+    if (arg.id == 'buscarCliente') {
       let documento = this.getDocumentoDescripcion();
       const actualPath = fun.getActualPath();
 
@@ -1441,9 +1441,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         contenidoHijo.costo = fun.desformatearStNumber(costo);
       }
 
-      [contenidoPadre, contenidoHijo].forEach((contenido)=>{
+      [contenidoPadre, contenidoHijo].forEach((contenido) => {
         if (fun.hasValue(contenido)) {
-          console.log("contenido ", contenido);
+          console.log('contenido ', contenido);
 
           const newContent = _.omit(contenido, ['created_at', 'updated_at']);
           tempContenido.push(newContent);

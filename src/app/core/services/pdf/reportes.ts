@@ -4,7 +4,7 @@ import { fun } from './../functions.service';
 import { styles_ } from './utils/files';
 import { getContentWithTablaNormal } from './utils/tabla_normal';
 import { getContentWithTablaAgrupada } from './utils/tabla_agrupada';
-import { ConfigI } from '../../typescript/config-interface.utils';
+import { ConfigI } from '../../typescript/config-interface';
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
 import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
 import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cxc_ant_preventa';

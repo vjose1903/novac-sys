@@ -242,7 +242,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async checkRoute() {
-    const cliente_id = this.route.snapshot.params['cliente_id'];
+    const cliente_id = this.route.snapshot.params['entidad_id'];
     const factura_id = this.route.snapshot.params['factura_id'];
 
     if (cliente_id != '0' && factura_id != '0') {
