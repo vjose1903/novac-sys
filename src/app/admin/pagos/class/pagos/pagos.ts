@@ -1,34 +1,31 @@
-import { fun } from '../../core/services/functions.service';
-import { CrudG } from '../../core/typescript/crud-g';
-import { ModalClass } from '../components/modal/modal-class';
-import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
-import { ReporteC } from '../reportes/reporte';
+import { fun } from '../../../../core/services/functions.service';
+import { CrudG } from '../../../../core/typescript/crud-g';
+import { ModalClass } from '../../../components/modal/modal-class';
+import { DetalleFacturaComponent } from '../../../manipular facturas/detalle-factura/detalle-factura.component';
+import { ReporteC } from '../../../reportes/reporte';
 import * as _ from 'lodash';
+import { PagoDetalleI } from './pagos-detalles';
 
-export interface ReciboI {
+export interface PagoI {
   id?: number;
   user_id?: number;
   tipo_factura_id?: number;
-  cliente_id?: number;
+  suplidor_id?: number;
   total?: number;
   forma_pago?: string;
-  numero_recibo?: number;
-  incidencia?: null;
-  devuelta?: number;
+  numero?: number;
   fecha_equivalente?: string;
   estado?: boolean;
-  cliente?: any;
+  suplidor?: any;
   user?: any;
-  detalle_recibos?: any;
-  // camiones_viajes?: any;
-  // choferes_viajes?: any;
+  pago_factura_detalles?: Array<PagoDetalleI>;
   total_registros?: any;
   data?: any;
 }
 
-export class ReciboC extends CrudG<ReciboI> {
+export class PagoC extends CrudG<PagoI> {
   constructor() {
-    super('recibos_ingresos');
+    super('pago_facturas');
   }
 
   modalVerDetalles(data) {
@@ -54,7 +51,7 @@ export class ReciboC extends CrudG<ReciboI> {
       params.openNewModal(ReporteC.objReporte);
 
       function returnDataFromModal(arg) {
-        ReciboC.requestReporte(arg, params);
+        PagoC.requestReporte(arg, params);
         resolve(arg);
       }
     });

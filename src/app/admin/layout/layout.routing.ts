@@ -39,7 +39,7 @@ const routes: Routes = [
       },
       {
         path: 'recibos',
-        loadChildren: () => import('../recibos/recibos.module').then((m) => m.RecibosModule),
+        loadChildren: () => import('../pagos/pagos.module').then((m) => m.PagosModule),
       },
       {
         path: 'contabilidad',

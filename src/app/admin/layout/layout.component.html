@@ -71,33 +71,22 @@
               <h4
                 class="opcion"
                 *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos"
-                [ngClass]="{ activa: actualRuta == 'lista_ingresos/ingresos' }"
-                (click)="cambiarMenu({ url: 'recibos/lista_ingresos/ingresos', navigate: true })"
+                [ngClass]="{ activa: actualRuta == 'lista_pagos/recibos-ingresos' }"
+                (click)="cambiarMenu({ url: 'recibos/lista_pagos/recibos-ingresos', navigate: true })"
               >
                 Recibos de ingreso
               </h4>
               <h4
                 class="opcion"
                 *ngxPermissionsOnly="menuPermissionsObj.pagos.cuentasPagar"
-                [ngClass]="{ activa: actualRuta == 'lista_ingresos/pagos' }"
-                (click)="cambiarMenu({ url: 'recibos/lista_ingresos/pagos', navigate: true })"
+                [ngClass]="{ activa: actualRuta == 'lista_pagos/pagos-facturas' }"
+                (click)="cambiarMenu({ url: 'recibos/lista_pagos/pagos-facturas', navigate: true })"
               >
                 Pago da facturas
               </h4>
             </div>
           </div>
 
-          <!-- <div *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos" class="menuList">
-            <h5 id="ingresosLabel" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('lista_ingresos') }" [innerText]="'Recibos de ingresos'"></h5>
-            <img
-              class="iconosMenu"
-              [ngClass]="{ iconosMenuA: isVistaActual('lista_ingresos') }"
-              src="assets/img/reciboIngreso.png"
-              alt="Recibo"
-              (click)="cambiarMenu({ url: 'recibos/lista_ingresos', navigate: true, id_h5: 'ingresosLabel' })"
-              draggable="false"
-            />
-          </div> -->
 
           <div *ngxPermissionsOnly="menuPermissionsObj.recibos_viajes.viajes" class="menuList">
             <h5 id="pedidosLabel" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('viajes') }" [innerText]="'Pedidos'"></h5>

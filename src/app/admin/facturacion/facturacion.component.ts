@@ -678,6 +678,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (arg.bool) {
       this.info_cambio = arg;
       this.info_cambio['verificar'] = true;
+
       this.checkSituaciones().then((result) => {
         if (result.factura_en_proceso) {
           this.procesoCambio(result.abrirModal, result.texto_modal, callback);

@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { IngresosComponent } from './recibo-ingresos/Formulario/ingresos.component';
-import { ListaRecibosComponent } from './recibo-ingresos/lista-recibos/lista-recibos.component';
 import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
+import { ListaPagosComponent } from './pagos-facturas/lista-pagos/lista-pagos.component';
+import { IngresosComponent } from './pagos-facturas/Formulario/ingresos.component';
 
 const routes: Routes = [
   {
-    path: 'lista_ingresos/:tipo',
-    component: ListaRecibosComponent,
+    path: 'lista_pagos/:tipo',
+    component: ListaPagosComponent,
   },
   {
     path: 'ingresos/:entidad_id/:factura_id',

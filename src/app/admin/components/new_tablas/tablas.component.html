@@ -200,7 +200,7 @@
         <tfoot class="tfoot w-100">
           <div *ngIf="config?.obj_paginate && config?.obj_paginate.show != false" id="paginationDiv-{{ realIdTabla }}" class="pieTabla d-flex align-items-center justify-content-between w-100">
             <div *ngIf="config?.obj_paginate.showTotal">
-              <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
+              <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ fun.roundNumberToDecimal(config.total_count, 0) }}</h6>
             </div>
 
             <!-- <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)"> -->

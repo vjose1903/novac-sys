@@ -6,7 +6,7 @@ import * as moment from '../../../../core/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { ReciboC } from '../../recibos';
+import { ReciboC } from '../../class/ingresos/recibos';
 import { FacturaC } from '../../../facturacion/factura';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';

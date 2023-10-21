@@ -8,7 +8,7 @@ import { ClienteC } from '../registros/registro-clientes/cliente';
 import { FacturaC } from '../facturacion/factura';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { InventarioC } from '../inventario/inventario';
-import { ReciboC } from '../recibos/recibos';
+import { ReciboC } from '../pagos/class/ingresos/recibos';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { CuadreC } from './../cuadres/cuadres';
 import { NotaC } from '../manipular facturas/notas-cred-deb/notas';
