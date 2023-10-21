@@ -20,7 +20,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   getValue(config) {
     let value = _.get(this.inputs.data, config.key);
 
-    if (config.tipo == 'number') value = fun.numFormatTwoDecimals(value);
+    if (config.tipo == 'number') value = fun.roundNumberToDecimal(value);
 
     return value;
   }

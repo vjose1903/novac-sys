@@ -129,7 +129,7 @@ export class fun extends CustomLodash {
     const promise = new Promise((resolve) => {
       fun.awaitTyping().then((res) => {
         if (typeof searchText == 'number') searchText = `${searchText}`;
-        if (this.isEmpty(searchText)) resolve(copyData);
+        if (fun.isEmpty(searchText)) resolve(copyData);
 
         const data_filtered = fun.deepCloning(copyData).filter((obj) => {
           const obj_picked = _.pick(obj, targets);
@@ -146,98 +146,30 @@ export class fun extends CustomLodash {
 
     return promise;
   }
-  // __________________________________________________________________________________________________
-  // Nombre: checkNumbers
-  // Descripcion : Esta funcion retorna true si algun caracter de una cadena no es un numero
-  // _________________________________________________________________________________________________
 
-  static checkNumbers(arg) {
-    let res = false;
-    for (let i = 0; i < arg.length; i++) {
-      const tempCaracter = arg.charAt(i);
-      if (tempCaracter !== ',') {
-        const caracter = _.parseInt(tempCaracter);
-        if (_.isNaN(caracter)) {
-          res = true;
-          break;
-        }
-      }
-    }
-    return res;
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: checkLongMillares
-  // Descripcion : Esta funcion validad que los millares sean de 3 en 3
-  // _________________________________________________________________________________________________
-  static checkLongMillares(num) {
-    let res = false;
-    const splitNum = _.split(num, ',');
-
-    splitNum.forEach((element, i) => {
-      if (i !== 0) {
-        if (element.length !== 3) res = true;
-      }
-    });
-
-    return res;
-  }
-
-  static revisarPrecio(input, id): any {
+  static revisarNumber(input, id): any {
     return new Promise((resolve) => {
       const precioTEMPO = input.value;
+      console.log("precioTEMPO ", precioTEMPO);
+
       const res = { number: null, error: true };
 
       if (fun.hasValue(precioTEMPO)) {
-        const splitPrecio = _.split(precioTEMPO, '.');
-        let precioTEMP;
-        let enteros = splitPrecio[0];
-        let tempdecimales = splitPrecio[1];
+        const newNumber = fun.roundNumberToDecimal(precioTEMPO);
+        console.log("newNumber ", newNumber);
 
-        if (tempdecimales === undefined) tempdecimales = '00';
-
-        if (splitPrecio.length > 2 || fun.checkNumbers(enteros) || fun.checkLongMillares(enteros) || fun.checkNumbers(tempdecimales) || fun.checkLongMillares(tempdecimales)) {
+        if (isNaN(Number(fun.desformatearStNumber(newNumber)))) {
           fun.toastError('Valor introducido es invalido', 'ERROR');
-          document.getElementById(id).focus();
-        } else {
-          //
-          if (splitPrecio.length === 2) {
-            if (fun.isEmpty(enteros)) enteros = '0';
-
-            let decimales;
-            if (tempdecimales.length > 2) decimales = tempdecimales.substring(0, 2);
-            else decimales = _.padEnd(tempdecimales, 2, '0');
-
-            precioTEMP = _.join([enteros, decimales], '.');
-          } else if (splitPrecio.length === 1) {
-            precioTEMP = _.join([enteros, '00'], '.');
-          }
-          res.number = this.formatearNumero(precioTEMP);
-          res.error = false;
+          if (document.getElementById(id)) document.getElementById(id).focus();
+          return;
         }
+
+        res.number = newNumber;
+        res.error = false;
       }
 
       resolve(res);
     });
-  }
-  // __________________________________________________________________________________________________
-  // Nombre: formatearNumero
-  // Descripcion : Esta funcion le da formato de numero a un string
-  // _________________________________________________________________________________________________
-
-  static formatearNumero(nStr) {
-    if (nStr !== undefined) {
-      nStr += '';
-      const x = nStr.split('.');
-      let x1 = x[0];
-      if (fun.isEmpty(x1)) x1 = 0;
-      const x2 = x.length > 1 ? '.' + x[1] : '';
-      const rgx = /(\d+)(\d{3})/;
-      while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-      }
-      return x1 + x2;
-    }
   }
 
   // __________________________________________________________________________________________________
@@ -245,24 +177,26 @@ export class fun extends CustomLodash {
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
 
-  static redondearNum(num, cant = 2) {
-    const string = num + '';
-    const splitStr = _.split(string, '.');
+  static roundNumberToDecimal(number, cant = 2): string {
+    if (fun.isEmpty(number)) {
+      this.logRed('No se puede redondear una variable vacia');
+      return number;
+    }
+    if (typeof number == 'string') number = parseFloat(fun.desformatearStNumber(number));
 
-    let enteros = splitStr[0];
+    if (isNaN(number)) {
+      this.logRed('No es un numero valido.');
+      return number;
+    }
+    const numerRounded = number.toFixed(cant);
 
-    const splitEnteros = _.split(enteros, ',');
+    // Formateamos el número con comas para separar millares
+    const partes = numerRounded.split('.');
+    const enteros = partes[0];
+    const decimales = partes[1];
+    const numeroFormateado = enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decimales;
 
-    enteros = _.join(splitEnteros, '');
-
-    let tempdecimales = splitStr[1];
-    if (splitStr.length == 1) tempdecimales = _.padEnd('', cant, '0');
-
-    const decimales = fun.checkCeros(tempdecimales.substring(0, cant));
-    const Arreglo = [enteros, decimales];
-    const numStr = _.join(Arreglo, '.');
-
-    return numStr;
+    return numeroFormateado;
   }
 
   // __________________________________________________________________________________________________
@@ -273,7 +207,7 @@ export class fun extends CustomLodash {
   static checkLongDecimales(currentValue, cant = 2) {
     const result = { value: currentValue, error: false };
 
-    const splitStr = _.split(currentValue, '.');
+    const splitStr = currentValue.split('.');
 
     if (splitStr.length > 1 && splitStr[1].length > cant) {
       splitStr[1] = splitStr[1].slice(0, cant);
@@ -282,24 +216,6 @@ export class fun extends CustomLodash {
     }
 
     return result;
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: checkCeros
-  // Descripcion : Esta funcion verifica que en un numero decimal no existan 0 a la derecha
-  // _________________________________________________________________________________________________
-
-  static checkCeros(num) {
-    let result = num;
-    if (num.length < 2) num += '00';
-
-    if (num.charAt(num.length - 1) == '0' && num.length > 2) {
-      let numSliced = num.slice(0, num.length - 1);
-
-      return fun.checkCeros(numSliced);
-    } else {
-      return result;
-    }
   }
 
   // __________________________________________________________________________________________________
@@ -315,8 +231,8 @@ export class fun extends CustomLodash {
   // Descripcion : Esta funcion toma un string y lo vuelve entero y lo redondea a 2 decimales
   // _________________________________________________________________________________________________
 
-  static parseFloatTwoDecimals(sTnum) {
-    return fun.desformatear(fun.redondearNum(sTnum));
+  static parseStFloatTwoDecimals(sTnum) {
+    return fun.desformatearStNumber(fun.roundNumberToDecimal(sTnum));
   }
 
   // __________________________________________________________________________________________________
@@ -326,14 +242,6 @@ export class fun extends CustomLodash {
 
   static isFunction(arg) {
     return fun.hasValue(arg) ? arg instanceof Function : false;
-  }
-  // __________________________________________________________________________________________________
-  // Nombre: numFormatTwoDecimals
-  // Descripcion : Esta funcion toma un string y lo formatea a dos decimales
-  // _________________________________________________________________________________________________
-  static numFormatTwoDecimals(num) {
-    if (typeof num == 'string') num = this.desformatear(num);
-    return fun.formatearNumero(fun.redondearNum(num));
   }
 
   // __________________________________________________________________________________________________
@@ -348,7 +256,7 @@ export class fun extends CustomLodash {
   // Nombre: desformatear
   // Descripcion : Esta funcion toma un string y lo vuelve un entero
   // _________________________________________________________________________________________________
-  static desformatear(sTnum: any) {
+  static desformatearStNumber(sTnum: any) {
     const number = typeof sTnum == 'string' ? parseFloat(sTnum.replaceAll(',', '')) : sTnum;
     return number;
   }
@@ -536,12 +444,12 @@ export class fun extends CustomLodash {
   // _________________________________________________________________________________________________
 
   static timeout;
-  static awaitTyping(params?: { evento?: any; awaitTime?: number }) {
+  static awaitTyping(event?, waitingTime = 700) {
     const promise = new Promise((resolve) => {
       clearTimeout(fun.timeout);
       fun.timeout = setTimeout(() => {
-        if (!params.evento || params.evento.keyCode != 13) resolve(params.evento);
-      }, params.awaitTime ?? 700);
+        if (!event || event.keyCode != 13) resolve(event);
+      }, waitingTime);
     });
     return promise;
   }
@@ -565,7 +473,10 @@ export class fun extends CustomLodash {
   static isEmpty(value) {
     return (
       // es null o indefinido
-      value == null ||
+      value === null ||
+      value === undefined ||
+      // es una fecha invalida
+      (value instanceof Date && isNaN(value.getTime())) ||
       // si tiene longitud 0
       (value.hasOwnProperty('length') && value.length == 0) ||
       // si es un string vacio o con lleno de espacios
@@ -642,9 +553,14 @@ export class fun extends CustomLodash {
   // Nombre: desEnfocarInput
   // Descripcion : Esta funcion desenfoca un elemento html
   // __________________________________________________________________________________________________
-  static desEnfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-    if (element) element.blur();
+  static desEnfocarInput(inputId?: string) {
+    const element = document.getElementById('input_fantasma');
+    if (element) element.click();
+
+    if (inputId) {
+      const input = document.getElementById(inputId);
+      if (input) input.blur();
+    }
   }
 
   // __________________________________________________________________________________________________
@@ -715,6 +631,7 @@ export class fun extends CustomLodash {
     if (lastName) base = base[lastName] = value;
     return base;
   }
+
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }

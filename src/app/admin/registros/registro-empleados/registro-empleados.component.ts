@@ -252,7 +252,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   checkIfSomethingIsDiferrent() {
     const pick_values = ['cedula', 'nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles', 'id'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
-    formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
+    formValue['maximo_credito'] = fun.desformatearStNumber(formValue['maximo_credito']);
     formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
     const originalEmpleado = this.listaEmpleados.find((empleado) => empleado.id == formValue.id);

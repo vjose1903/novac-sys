@@ -290,4 +290,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       this.checkRouteActiva();
     }
   }
+
+  clickFantasma() {
+    console.warn('click Fantasma');
+  }
 }

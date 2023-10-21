@@ -132,7 +132,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   formatoNumero(num) {
-    return fun.numFormatTwoDecimals(num);
+    return fun.roundNumberToDecimal(num);
   }
 
   areAllSelected() {
@@ -219,14 +219,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
 
     this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
-    this.totalPagadoPorciento = parseFloat(fun.numFormatTwoDecimals(this.totalPagadoPorciento));
+    this.totalPagadoPorciento = parseFloat(fun.roundNumberToDecimal(this.totalPagadoPorciento));
 
     setTimeout(() => {
       this.tablaComponent.changeTableConfig([{ total_count: res.data.facturas.total_registros }]);
       this.totalRegistros = res.data.facturas.total_registros;
 
       if (res.data.page != params.page) {
-        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }], this.tablaComponent);
+        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
 
         setTimeout(() => {
           Ss.cdRef.detectChanges();
@@ -254,7 +254,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   isOneFacturaWithMonto() {
-    const valid = this.facturasSelected.some((factura) => factura.select && fun.desformatear(factura.monto) > 0);
+    const valid = this.facturasSelected.some((factura) => factura.select && fun.desformatearStNumber(factura.monto) > 0);
     return valid;
   }
 
@@ -408,7 +408,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const factura_en_turno = this.facturasSelected.find((factura) => factura.id == params.data.id);
     if (fun.hasValue(factura_en_turno)) {
       const total = factura_en_turno.balance;
-      const monto = fun.desformatear(factura_en_turno.monto);
+      const monto = fun.desformatearStNumber(factura_en_turno.monto);
 
       if (monto > total) {
         this.ExisteMontoMayor = true;
@@ -422,7 +422,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   tableInputChange(params) {
     if (params.key == 'pagoT' && params.value) {
-      const monto = params.data.select ? fun.numFormatTwoDecimals(params.data.balance) : '0.00';
+      const monto = params.data.select ? fun.roundNumberToDecimal(params.data.balance) : '0.00';
       this.verificateFacturasSelected(params.data, 'modify', params.index, monto);
     }
 
@@ -431,7 +431,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         if (fun.isEmpty(params.value)) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
 
         const total = params.data.balance;
-        const monto_desformateado = fun.isEmpty(params.value) ? null : fun.desformatear(params.value);
+        const monto_desformateado = fun.isEmpty(params.value) ? null : fun.desformatearStNumber(params.value);
         const monto_original = fun.isEmpty(params.value) ? null : params.value;
 
         if (monto_desformateado == total) params.data.pagoT = true;
@@ -461,7 +461,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   sumarTotalRecibo() {
-    this.recibiendo = _.reduce(this.facturasSelected, (sum, item) => fun.desformatear(item.monto) + sum, 0);
+    this.recibiendo = _.reduce(this.facturasSelected, (sum, item) => fun.desformatearStNumber(item.monto) + sum, 0);
     this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
   }
 
@@ -496,7 +496,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       temp.push({
         cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
-        deposito: fun.desformatear(fact.monto),
+        deposito: fun.desformatearStNumber(fact.monto),
         descripcion:
           this.tipo_recibo === 'Pago factura'
             ? fact.pagoT
@@ -506,7 +506,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         pago_a_tiempo: fact.pago_a_tiempo,
       });
 
-      total += fun.desformatear(fact.monto);
+      total += fun.desformatearStNumber(fact.monto);
     }
 
     const obj = { total_recibo: total, detalle: temp };

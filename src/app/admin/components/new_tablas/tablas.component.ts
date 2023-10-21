@@ -60,14 +60,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   tablaInterval;
   realIdTabla;
 
-  constructor(public cdRef: ChangeDetectorRef, public tServ: TablasService, private zone: NgZone) {
+  constructor(public tServ: TablasService, private zone: NgZone, public cdRef: ChangeDetectorRef) {
     cdRef.detach();
     this.tablaInterval = setInterval(() => this.cdRef.detectChanges(), 500);
   }
 
   formatoNumero(num) {
     let numformat = '0.00';
-    if (num) numformat = fun.numFormatTwoDecimals(num);
+    if (num) numformat = fun.roundNumberToDecimal(num);
     return numformat;
   }
 
@@ -97,7 +97,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
     }
 
-    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || this.tServ.obj_paginate.default);
+    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
   }
 
   ngAfterViewInit() {
@@ -171,16 +171,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const search = event.target.value;
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
-      fun.awaitTyping({evento: event}).then(() => {
+      fun.awaitTyping({ evento: event }).then(() => {
         if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
           const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
 
           if (fun.hasValue(search)) {
-            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.realIdTabla, [{ ant_page: actualPagination.page }], this);
-            this.tServ.modifyPaginationById(this.realIdTabla, [{ page: 1 }], this);
+            if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.realIdTabla, [{ ant_page: actualPagination.page }]);
+            this.tServ.modifyPaginationById(this.realIdTabla, [{ page: 1 }]);
           } else if (fun.isEmpty(search) && fun.hasValue(actualPagination.ant_page)) {
-            this.tServ.modifyPaginationById(this.realIdTabla, [{ page: actualPagination.ant_page }], this);
-            this.tServ.modifyPaginationById(this.realIdTabla, [{ ant_page: null }], this);
+            this.tServ.modifyPaginationById(this.realIdTabla, [{ page: actualPagination.ant_page }]);
+            this.tServ.modifyPaginationById(this.realIdTabla, [{ ant_page: null }]);
           }
 
           this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: search });
@@ -190,7 +190,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       });
     }
 
-    this.tServ.modifyPaginationById(this.realIdTabla, [{ search: search }], this);
+    this.tServ.modifyPaginationById(this.realIdTabla, [{ search: search }]);
   }
 
   getPaginatorPageByNumber(number) {
@@ -216,7 +216,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         const clickeado_por = actualPage?.getAttribute('clickeado_por');
 
         if (fun.hasValue(actualPagination) && (page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
-          this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }], this);
+          this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
           if (actualPagination.is_local) {
             this.localPagination(page, per_page, 'paginatorChange');
@@ -269,7 +269,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         const element = {};
         element[key] = new_obj_pagination[key];
 
-        this.tServ.modifyPaginationById(id, [element], this);
+        this.tServ.modifyPaginationById(id, [element]);
       }
     }
   }
@@ -381,7 +381,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   checkNumber(input, column, index_body) {
     if (column.checkNumber) {
       const id = `input-${this.realIdTabla}-${column.key}-${this.getIndex(index_body)}`;
-      fun.revisarPrecio(input, id).then((res) => {
+      fun.revisarNumber(input, id).then((res) => {
         if (!res.error && column.inputEvents != 'formatoNumero') {
           input.value = fun.is_number(input.value) ? res.number : null;
         }
@@ -393,11 +393,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (fun.objHas(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
       if (column.inputEvents == 'formatoNumero') {
         if (type == 'focus') {
-          input.value = fun.is_number(input.value) ? fun.desformatear(input.value) : null;
+          input.value = fun.is_number(input.value) ? fun.desformatearStNumber(input.value) : null;
           input.select();
         }
         if (type == 'blur') {
-          input.value = fun.is_number(input.value) ? fun.numFormatTwoDecimals(input.value) : null;
+          input.value = fun.is_number(input.value) ? fun.roundNumberToDecimal(input.value) : null;
           if (fun.isEmpty(input.value)) fun.enfocarInput(input.id);
         }
       }
@@ -456,8 +456,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
     const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
 
-    const padre = fun.numFormatTwoDecimals(values[1]) + '  ' + fin1;
-    const hijo = fun.formatearNumero(values[2]) + '  ' + fin2;
+    const padre = fun.roundNumberToDecimal(values[1]) + '  ' + fin1;
+    const hijo = fun.roundNumberToDecimal(values[2]) + '  ' + fin2;
 
     let cantiTootip = '';
 
@@ -478,7 +478,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const values = _.values(objeto);
     const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
 
-    return fun.numFormatTwoDecimals(values[0]) + '  ' + fin;
+    return fun.roundNumberToDecimal(values[0]) + '  ' + fin;
   }
 
   disableInput(dato, column) {
@@ -528,7 +528,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const copia = fun.deepCloning(this.data[index][referencia]);
 
       if (formatear) {
-        input['value'] = fun.numFormatTwoDecimals(copia);
+        input['value'] = fun.roundNumberToDecimal(copia);
       } else {
         input['value'] = copia;
       }

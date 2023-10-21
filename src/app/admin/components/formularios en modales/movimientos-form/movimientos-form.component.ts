@@ -38,7 +38,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   }
 
   formatoNumero(arg) {
-    return fun.numFormatTwoDecimals(arg);
+    return fun.roundNumberToDecimal(arg);
   }
 
   mostrarExistencia(arg) {

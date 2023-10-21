@@ -276,7 +276,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   revisarPrecio(id) {
     const input = this.form.controls[id];
 
-    fun.revisarPrecio(input, id).then((res) => {
+    fun.revisarNumber(input, id).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
   }
@@ -290,7 +290,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async selectTipoArticulo(tipo_id) {
-    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(tipo_id));
+    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == Number(tipo_id));
     this.subTipoArticuloSelected = undefined;
     this.form.controls.sub_tipo_articulo_id.setValue(null);
     this.checkCuentasContables();
@@ -327,7 +327,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async selectSubTipoArticulo(subTipo_id) {
-    this.subTipoArticuloSelected = this.listaSubTipoArticulos.find((val) => val.id == _.parseInt(subTipo_id));
+    this.subTipoArticuloSelected = this.listaSubTipoArticulos.find((val) => val.id == Number(subTipo_id));
   }
 
   modificateValidators() {
@@ -528,11 +528,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       for (const unidad_en_turno of arrayUnidades) {
         if (fun.hasValue(articulo.costos[unidad_en_turno])) {
           costo_en_turno = articulo.costos[unidad_en_turno];
-          costo = fun.numFormatTwoDecimals(costo_en_turno.costo);
+          costo = fun.roundNumberToDecimal(costo_en_turno.costo);
         }
       }
 
-      if (fun.desformatear(costo) != fun.desformatear(fila_formulario.costo_formula)) {
+      if (fun.desformatearStNumber(costo) != fun.desformatearStNumber(fila_formulario.costo_formula)) {
         res = true;
         setTimeout(() => (this.recalcular = true), 10);
       }
@@ -561,8 +561,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
       this.ARRAY_FORMULA.controls[index].get('medida_formula').setValue(medida_en_turno);
 
-      this.ARRAY_FORMULA.controls[index].get('costo_formula').setValue(fun.numFormatTwoDecimals(costo_en_turno.costo));
-      this.ARRAY_FORMULA.controls[index].get('precio_formula').setValue(fun.numFormatTwoDecimals(costo_en_turno.precio));
+      this.ARRAY_FORMULA.controls[index].get('costo_formula').setValue(fun.roundNumberToDecimal(costo_en_turno.costo));
+      this.ARRAY_FORMULA.controls[index].get('precio_formula').setValue(fun.roundNumberToDecimal(costo_en_turno.precio));
 
       this.calculateCostoPT();
       dropdown.hide();
@@ -570,13 +570,16 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   calculateCostoPT() {
-    if (this.ARRAY_FORMULA.length > 0 && fun.hasValue(this.ARRAY_FORMULA)) {
-      let sumatoriaMult = _.reduce(this.ARRAY_FORMULA, (sum, item) => fun.desformatear(item?.cantidad_formula) * fun.desformatear(item?.costo_formula) + sum, 0);
+    const array = this.ARRAY_FORMULA.value;
+
+    if (array.length > 0 && array !== undefined) {
+      let sumatoriaMult = _.reduce(array, (sum, item) => fun.desformatearStNumber(item.cantidad_formula) * fun.desformatearStNumber(item.costo_formula) + sum, 0);
 
       const formulario = this.form.getRawValue();
-      if (sumatoriaMult > 0 && fun.hasValue(formulario.otros_costos) && !isNaN(formulario.otros_costos)) {
-        sumatoriaMult += fun.desformatear(formulario.otros_costos);
-        this.form.controls.costo_principal.setValue(fun.numFormatTwoDecimals(sumatoriaMult));
+
+      if (fun.hasValue(formulario.otros_costos) && !isNaN(formulario.otros_costos)) {
+        sumatoriaMult += fun.desformatearStNumber(formulario.otros_costos);
+        this.form.controls.costo_principal.setValue(fun.roundNumberToDecimal(sumatoriaMult));
         this.calculatePrice();
         this.calculatePriceLibra();
       }
@@ -603,17 +606,17 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   calculatePrice() {
     const formulario = this.form.getRawValue();
 
-    const costo = fun.desformatear(formulario.costo_principal);
+    const costo = fun.desformatearStNumber(formulario.costo_principal);
 
     if (costo > 0 && fun.hasValue(costo)) {
       // const precio = costo / 0.9;
 
-      const precio = costo / ((100 - this.cofig_articulos.porciento_ganancia) / 100);
+      const precio = costo / this.configArticuloClass.getWinPercerntCalc(this.cofig_articulos);
       const precio_rounded = fun.roundToNearestMultipleOf5(precio);
       const precioLibra = fun.roundToNearestMultipleOf5(precio_rounded / 100);
 
-      this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(precio_rounded));
-      this.form.controls.precio_libra.setValue(fun.numFormatTwoDecimals(precioLibra));
+      this.form.controls.precio_principal.setValue(fun.roundNumberToDecimal(precio_rounded));
+      this.form.controls.precio_libra.setValue(fun.roundNumberToDecimal(precioLibra));
 
       this.calculatePriceLibra();
     }
@@ -623,17 +626,17 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const formulario = this.form.getRawValue();
     const medida = formulario.medida;
 
-    const precio = fun.desformatear(formulario.precio_principal);
+    const precio = fun.desformatearStNumber(formulario.precio_principal);
 
-    const costo = fun.desformatear(formulario.costo_principal);
+    const costo = fun.desformatearStNumber(formulario.costo_principal);
 
     if (precio > 0 && fun.hasValue(precio)) {
       const precioLibra = precio / 100;
       const costoLibra = costo / 100;
       if (medida === 'Quintal') {
-        this.form.controls.precio_libra.setValue(fun.numFormatTwoDecimals(precioLibra));
-        this.form.controls.costo_padre.setValue(fun.redondearNum(costoLibra));
-        this.form.controls.precio_padre.setValue(fun.redondearNum(precioLibra));
+        this.form.controls.precio_libra.setValue(fun.roundNumberToDecimal(precioLibra));
+        this.form.controls.costo_padre.setValue(fun.roundNumberToDecimal(costoLibra));
+        this.form.controls.precio_padre.setValue(fun.roundNumberToDecimal(precioLibra));
         this.form.controls.cantidad_contenido_padre.setValue(100);
       } else {
         this.calculatePricePadre();
@@ -645,18 +648,18 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   calculatePricePadre() {
     const formulario = this.form.getRawValue();
 
-    const precio = fun.desformatear(formulario.precio_principal);
+    const precio = fun.desformatearStNumber(formulario.precio_principal);
     const precioPadreTemp = formulario.precio_padre;
 
-    const costo = fun.desformatear(formulario.costo_principal);
+    const costo = fun.desformatearStNumber(formulario.costo_principal);
     const cantidadPadre = formulario.cantidad_contenido_padre;
 
     if (fun.hasValue(precio) && precio > 0 && !isNaN(precio) && fun.hasValue(cantidadPadre) && cantidadPadre > 0 && !isNaN(cantidadPadre)) {
       const precioPadre = precio / cantidadPadre;
       const costoPadre = costo / cantidadPadre;
 
-      this.form.controls.precio_padre.setValue(fun.numFormatTwoDecimals(precioPadre));
-      this.form.controls.costo_padre.setValue(fun.redondearNum(costoPadre));
+      this.form.controls.precio_padre.setValue(fun.roundNumberToDecimal(precioPadre));
+      this.form.controls.costo_padre.setValue(fun.roundNumberToDecimal(costoPadre));
     }
 
     if (precioPadreTemp) this.calculatePriceHijo();
@@ -665,16 +668,16 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   calculatePriceHijo() {
     const formulario = this.form.getRawValue();
 
-    const precioP = fun.desformatear(formulario.precio_padre);
+    const precioP = fun.desformatearStNumber(formulario.precio_padre);
 
-    const costoP = fun.desformatear(formulario.costo_padre);
+    const costoP = fun.desformatearStNumber(formulario.costo_padre);
     const cantidadHijo = formulario.cantidad_contenido_hijo;
 
     if (fun.hasValue(precioP) && precioP > 0 && !isNaN(precioP) && fun.hasValue(cantidadHijo) && cantidadHijo > 0 && !isNaN(cantidadHijo)) {
       const PrecioHijo = precioP / cantidadHijo;
       const costoHijo = costoP / cantidadHijo;
-      this.form.controls.precio_hijo.setValue(fun.numFormatTwoDecimals(PrecioHijo));
-      this.form.controls.costo_hijo.setValue(fun.redondearNum(costoHijo));
+      this.form.controls.precio_hijo.setValue(fun.roundNumberToDecimal(PrecioHijo));
+      this.form.controls.costo_hijo.setValue(fun.roundNumberToDecimal(costoHijo));
     }
   }
 
@@ -781,18 +784,18 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       const control_en_turno = (formControlName) => this.ARRAY_FORMULA.controls[indexFormula].get(formControlName);
 
       if (recalcular) {
-        control_en_turno('costo_formula').setValue(fun.numFormatTwoDecimals(costo_en_turno));
-        control_en_turno('precio_formula').setValue(fun.numFormatTwoDecimals(precio_en_turno));
+        control_en_turno['costo_formula'].setValue(fun.roundNumberToDecimal(costo_en_turno));
+        control_en_turno['precio_formula'].setValue(fun.roundNumberToDecimal(precio_en_turno));
       } else {
-        control_en_turno('costo_formula').setValue(fun.numFormatTwoDecimals(ingredient.costo));
-        control_en_turno('precio_formula').setValue(fun.numFormatTwoDecimals(ingredient.precio));
+        control_en_turno['costo_formula'].setValue(fun.roundNumberToDecimal(ingredient.costo));
+        control_en_turno['precio_formula'].setValue(fun.roundNumberToDecimal(ingredient.precio));
       }
 
       control_en_turno('medida_formula').setValue(medida_en_turno);
       control_en_turno('articulo_id').setValue(ingredient.articulo_combo_id);
       control_en_turno('id').setValue(ingredient.id || null);
 
-      control_en_turno('cantidad_formula').setValue(fun.formatearNumero(fun.redondearNum(ingredient.cantidad, 4)));
+      control_en_turno['cantidad_formula'].setValue(fun.roundNumberToDecimal(ingredient.cantidad, 4));
     } catch (error) {
       console.error(error);
       fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
@@ -827,7 +830,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
       this.COMPRADOEN = 'Quintal';
-      this.form.controls.otros_costos.setValue(fun.numFormatTwoDecimals(articulo.otros_costos));
+      this.form.controls.otros_costos.setValue(fun.roundNumberToDecimal(articulo.otros_costos));
 
       this.getMateriasP().then(() => {
         if (articulo.formulas_productos_terminados.length) {
@@ -853,11 +856,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
         if (articulo.contenido_articulos.length === 1) {
           if (articulo.contenido_articulos[0].medida === 'Libra') {
-            this.form.controls.precio_libra.setValue(fun.numFormatTwoDecimals(contenido.precio));
+            this.form.controls.precio_libra.setValue(fun.roundNumberToDecimal(contenido.precio));
             this.form.controls.costo_padre.setValue(contenido.costo);
             this.form.controls.id_contenido_padre.setValue(contenido.id);
           } else {
-            this.form.controls.precio_unidad.setValue(fun.numFormatTwoDecimals(contenido.precio));
+            this.form.controls.precio_unidad.setValue(fun.roundNumberToDecimal(contenido.precio));
             this.form.controls.costo_padre.setValue(contenido.costo);
             this.form.controls.id_contenido_padre.setValue(contenido.id);
           }
@@ -866,7 +869,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         if (contenido.condicion === 'hijo') {
           this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
           this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
-          this.form.controls.precio_hijo.setValue(fun.numFormatTwoDecimals(contenido.precio));
+          this.form.controls.precio_hijo.setValue(fun.roundNumberToDecimal(contenido.precio));
           this.form.controls.costo_hijo.setValue(contenido.costo);
           this.form.controls.id_contenido_hijo.setValue(contenido.id);
           this.form.controls.referencia_hijo.setValue(contenido.referencia);
@@ -874,14 +877,14 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
           this.form.controls.medida_contenido_padre.setValue(contenido.medida);
 
-          this.form.controls.precio_padre.setValue(fun.numFormatTwoDecimals(contenido.precio));
+          this.form.controls.precio_padre.setValue(fun.roundNumberToDecimal(contenido.precio));
           this.form.controls.costo_padre.setValue(contenido.costo);
           this.form.controls.id_contenido_padre.setValue(contenido.id);
         }
       }
 
-      this.form.controls.costo_principal.setValue(fun.numFormatTwoDecimals(articulo.costo_principal));
-      this.form.controls.precio_principal.setValue(fun.numFormatTwoDecimals(articulo.precio_principal));
+      this.form.controls.costo_principal.setValue(fun.roundNumberToDecimal(articulo.costo_principal));
+      this.form.controls.precio_principal.setValue(fun.roundNumberToDecimal(articulo.precio_principal));
       this.form.controls.medida_alerta.setValue(articulo.medida_alerta);
       this.modificateValidators();
     });
@@ -894,7 +897,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   checkIfSomethingIsDiferrent() {
     const pick_values = ['cedula', 'rnc', 'nombre', 'apellido', 'telefono', 'sexo', 'limite_credito', 'maximo_credito', 'vendedor_id', 'direccion', 'id', 'img'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
-    formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
+    formValue['maximo_credito'] = fun.desformatearStNumber(formValue['maximo_credito']);
     formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
     const originalArticulo = this.listaArticulos.find((cliente) => cliente.id == formValue.id);
@@ -918,7 +921,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       articulo_id: formulario.id,
       id: fun.hasValue(formulario.id_contenido_padre) ? formulario.id_contenido_padre : null,
       costo: _.isString(formulario.costo_padre) ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
-      precio: fun.desformatear(['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
+      precio: fun.desformatearStNumber(['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
       cantidad: ['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.cantidad_contenido_padre : 100,
       medida: formulario.medida_contenido_padre,
       condicion: 'padre',
@@ -929,7 +932,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       articulo_id: formulario.id,
       id: fun.hasValue(formulario.id_contenido_hijo) ? formulario.id_contenido_hijo : null,
       costo: _.isString(formulario.costo_hijo) ? parseFloat(formulario.costo_hijo) : formulario.costo_hijo,
-      precio: fun.desformatear(formulario.precio_hijo),
+      precio: fun.desformatearStNumber(formulario.precio_hijo),
       cantidad: formulario.cantidad_contenido_hijo,
       medida: formulario.medida_contenido_hijo,
       condicion: 'hijo',
@@ -969,11 +972,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' };
     this.ARRAY_FORMULA.value.forEach((element) => {
       const obj = {
-        id: fun.hasValue(element.id) ? _.parseInt(element.id) : null,
-        articulo_combo_id: _.parseInt(element.articulo_id),
-        cantidad: fun.desformatear(element.cantidad_formula),
-        costo: fun.desformatear(element.costo_formula),
-        precio: fun.desformatear(element.precio_formula),
+        id: fun.hasValue(element.id) ? Number(element.id) : null,
+        articulo_combo_id: Number(element.articulo_id),
+        cantidad: fun.desformatearStNumber(element.cantidad_formula),
+        costo: fun.desformatearStNumber(element.costo_formula),
+        precio: fun.desformatearStNumber(element.precio_formula),
         medida: unidades[element.medida_formula],
         // _destroy: element._destroy ? element._destroy : null,
       };
@@ -1010,12 +1013,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const formulario = this.form.getRawValue();
 
     const obj = {
-      id: fun.hasValue(formulario.id) ? _.parseInt(formulario.id) : null,
-      tipo_articulo_id: _.parseInt(formulario.tipo_articulo_id),
-      sub_tipo_articulo_id: _.parseInt(formulario.sub_tipo_articulo_id),
+      id: fun.hasValue(formulario.id) ? Number(formulario.id) : null,
+      tipo_articulo_id: Number(formulario.tipo_articulo_id),
+      sub_tipo_articulo_id: Number(formulario.sub_tipo_articulo_id),
       nombre: formulario.nombre,
-      costo_principal: this.tipoArticuloSelected.tipo != 'servicio' ? fun.desformatear(formulario.costo_principal) : 0,
-      precio_principal: fun.desformatear(formulario.precio_principal),
+      costo_principal: this.tipoArticuloSelected.tipo != 'servicio' ? fun.desformatearStNumber(formulario.costo_principal) : 0,
+      precio_principal: fun.desformatearStNumber(formulario.precio_principal),
       aviso_existencia: formulario.aviso_existencia,
       medida_alerta: formulario.medida_alerta,
       fecha_ingreso: formulario.id ? formulario.fecha_ingreso : moment().format('DD/MM/YYYY'),

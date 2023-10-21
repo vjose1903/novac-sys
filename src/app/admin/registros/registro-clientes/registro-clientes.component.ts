@@ -175,7 +175,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.form.patchValue(data);
     this.patchDocumentos(data.documentos_de_identidad);
-    this.form.controls.maximo_credito.setValue(fun.numFormatTwoDecimals(data.maximo_credito));
+    this.form.controls.maximo_credito.setValue(fun.roundNumberToDecimal(data.maximo_credito));
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
@@ -323,7 +323,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   checkIfSomethingIsDiferrent() {
     const pick_values = ['cedula', 'rnc', 'nombre', 'apellido', 'telefono', 'sexo', 'limite_credito', 'maximo_credito', 'vendedor_id', 'direccion', 'id', 'img'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
-    formValue['maximo_credito'] = fun.desformatear(formValue['maximo_credito']);
+    formValue['maximo_credito'] = fun.desformatearStNumber(formValue['maximo_credito']);
     formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
     const originalCliente = this.listaClientes.find((cliente) => cliente.id == formValue.id);
@@ -339,7 +339,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   revisarPrecio(id) {
     const input = this.form.controls[id];
-    fun.revisarPrecio(input, id).then((res) => {
+    fun.revisarNumber(input, id).then((res) => {
       if (!res.error) input.setValue(res.number);
     });
   }
@@ -410,7 +410,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       }
 
       formulario.estado = true;
-      formulario.maximo_credito = fun.desformatear(formulario.maximo_credito);
+
+      formulario.maximo_credito = fun.desformatearStNumber(formulario.maximo_credito);
 
       if (ConfigService.config.has_contabilidad) formulario['cuentas_contables'] = this.listaEntidadCuentasContables;
 

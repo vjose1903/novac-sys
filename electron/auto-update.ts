@@ -1,20 +1,15 @@
-// import { autoUpdater } from 'electron-updater';
 const { autoUpdater } = require('electron-updater');
 
-import { BrowserWindow, dialog } from 'electron';
 
 import SharedElectronAngular, {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
-  ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
-  ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
-  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
   ELECTRON_EVENT_UPDATE_ERROR,
-  KEYWORD_ELECTRON_RESPONSE,
+  ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
+  ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
+  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE
 } from './shared-electron-angular';
 
-import Functions from './functions';
-import { ConfigI } from '../src/app/core/typescript/config-interface.utils';
 import { puts } from '../main';
 
 export default class AppUpdater {

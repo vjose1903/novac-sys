@@ -56,7 +56,7 @@ export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
   }
 
   numFormat(str) {
-    return fun.numFormatTwoDecimals(str);
+    return fun.roundNumberToDecimal(str);
   }
 
   btn_aceptar() {

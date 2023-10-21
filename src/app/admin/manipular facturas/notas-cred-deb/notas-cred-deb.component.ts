@@ -195,9 +195,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
               detalle['total_nota'] = '0.00';
               detalle['cantidad'] = detalle.cantidad - devueto;
-              detalle['cantidad_'] = `${fun.numFormatTwoDecimals(detalle['cantidad'])} ${detalle['unidad']}`;
-              detalle['precio_real'] = fun.numFormatTwoDecimals(detalle.precio);
-              detalle['itbis_real'] = fun.numFormatTwoDecimals(detalle.itbis);
+              detalle['cantidad_'] = `${fun.roundNumberToDecimal(detalle['cantidad'])} ${detalle['unidad']}`;
+              detalle['precio_real'] = fun.roundNumberToDecimal(detalle.precio);
+              detalle['itbis_real'] = fun.roundNumberToDecimal(detalle.itbis);
 
               resolve(tempFactData);
             }
@@ -226,10 +226,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       if (!params.value) {
         params.data.total_nota = '0.00';
         params.data.cant_nota = 0;
-        params.data.precio_real = fun.numFormatTwoDecimals(params.data.precio);
+        params.data.precio_real = fun.roundNumberToDecimal(params.data.precio);
 
         const itbis = ConfigService.config.calcular_itbis ? params.data.precio_real * 0.18 : 0;
-        params.data.itbis_real = fun.numFormatTwoDecimals(itbis);
+        params.data.itbis_real = fun.roundNumberToDecimal(itbis);
 
         const index = _.findIndex(this.detalleNota, { id: params.data.id });
         _.pullAt(this.detalleNota, index);
@@ -239,7 +239,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
     fun.awaitTyping().then(() => {
       if (params.key == 'cant_nota') {
-        const cant_nota = fun.desformatear(params.value);
+        const cant_nota = fun.desformatearStNumber(params.value);
 
         if (isNaN(cant_nota)) {
           params.data.cant_nota = 0;
@@ -259,8 +259,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
       if (params.key == 'precio_real') {
         let msg;
-        let precio = fun.desformatear(params.data.precio);
-        let precio_real = fun.desformatear(params.value);
+        let precio = fun.desformatearStNumber(params.data.precio);
+        let precio_real = fun.desformatearStNumber(params.value);
 
         if (this.tipoNota == 'credito') {
           if (precio_real > precio) msg = 'Las notas de crédito son utilizadas para reducir el valor de la factura, el precio real no puede ser mayor al original.';
@@ -277,7 +277,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           const itbis = ConfigService.config.calcular_itbis ? precio_real * 0.18 : 0;
 
           params.data.precio_real = precio_real;
-          params.data.itbis_real = fun.numFormatTwoDecimals(itbis);
+          params.data.itbis_real = fun.roundNumberToDecimal(itbis);
           this.sumarTotalRow(params);
         }
       }
@@ -288,8 +288,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   sumarTotalRow(params) {
     const descuento = params.data.descuento_valor / params.data.cantidad;
-    const precio = fun.desformatear(params.data.precio);
-    const precio_real = fun.desformatear(params.data.precio_real);
+    const precio = fun.desformatearStNumber(params.data.precio);
+    const precio_real = fun.desformatearStNumber(params.data.precio_real);
     let total = 0;
 
     if (this.tipoNota == 'credito') {
@@ -299,7 +299,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
 
     if (precio != precio_real) {
-      const itbis_real = fun.desformatear(params.data.itbis_real);
+      const itbis_real = fun.desformatearStNumber(params.data.itbis_real);
       const precio_itbis_real = precio_real + itbis_real;
       const total_real = params.data.cant * (precio_itbis_real - descuento);
 
@@ -310,7 +310,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formatoNumero(num) {
-    return fun.numFormatTwoDecimals(num);
+    return fun.roundNumberToDecimal(num);
   }
 
   formatoNumeroFactura(num) {
@@ -470,18 +470,18 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           cabecera_factura_id: factura.id,
           total: this.totalIndividual(factura),
 
-          detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && fun.desformatear(data.total_nota) > 0).map((detalle) => {
+          detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && fun.desformatearStNumber(data.total_nota) > 0).map((detalle) => {
             let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
 
-            objDetalleTemp['total'] = fun.desformatear(objDetalleTemp.total_nota);
+            objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
             objDetalleTemp['itbis'] = detalle.can_return_itbis ? objDetalleTemp.itbis : 0;
             objDetalleTemp['cantidad_en_unidades'] = detalle.cantidad_en_unidades_nota;
             objDetalleTemp['cantidad'] = detalle.cant_nota;
             objDetalleTemp['detalle_factura_id'] = detalle.id;
-            objDetalleTemp['itbis_real'] = fun.desformatear(objDetalleTemp['itbis_real']);
-            objDetalleTemp['itbis'] = fun.desformatear(objDetalleTemp['itbis']);
-            objDetalleTemp['precio_real'] = fun.desformatear(objDetalleTemp['precio_real']);
-            objDetalleTemp['precio'] = fun.desformatear(objDetalleTemp['precio']);
+            objDetalleTemp['itbis_real'] = fun.desformatearStNumber(objDetalleTemp['itbis_real']);
+            objDetalleTemp['itbis'] = fun.desformatearStNumber(objDetalleTemp['itbis']);
+            objDetalleTemp['precio_real'] = fun.desformatearStNumber(objDetalleTemp['precio_real']);
+            objDetalleTemp['precio'] = fun.desformatearStNumber(objDetalleTemp['precio']);
 
             objDetalleTemp = fun.remplaceKeyFromJson(objDetalleTemp, [{ old_key: 'descuento_valor', new_key: 'descuento' }]);
 

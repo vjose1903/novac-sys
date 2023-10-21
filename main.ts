@@ -94,7 +94,6 @@ function createWindow() {
     }
 
     win.maximize();
-
     win.setMenuBarVisibility(false);
 
     setTimeout(() => {

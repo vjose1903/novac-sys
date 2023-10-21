@@ -93,11 +93,11 @@ function getTotalizacion(configuration, data) {
 
   if ((data.total >= 0 && (data?.contenido_grupo?.length > 0 || data?.contenido_reporte?.length > 0)) || data.total >= 1) {
     const array = [
-      { bool: configuration?.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.numFormatTwoDecimals(data?.bruto) },
-      { bool: configuration?.mostrar_descuento, title: 'DESCUENTO RD$ ', value: fun_.numFormatTwoDecimals(data?.descuento) },
-      { bool: configuration?.mostrar_itbis, title: 'ITBIS RD$ ', value: fun_.numFormatTwoDecimals(data?.itbis) },
-      { bool: configuration?.mostrar_bruto, title: 'DEVUELTO RD$ ', value: fun_.numFormatTwoDecimals(data?.devuelto) },
-      { bool: configuration?.mostrar_total, title: 'TOTAL RD$ ', value: fun_.numFormatTwoDecimals(data?.total) },
+      { bool: configuration?.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.roundNumberToDecimal(data?.bruto) },
+      { bool: configuration?.mostrar_descuento, title: 'DESCUENTO RD$ ', value: fun_.roundNumberToDecimal(data?.descuento) },
+      { bool: configuration?.mostrar_itbis, title: 'ITBIS RD$ ', value: fun_.roundNumberToDecimal(data?.itbis) },
+      { bool: configuration?.mostrar_bruto, title: 'DEVUELTO RD$ ', value: fun_.roundNumberToDecimal(data?.devuelto) },
+      { bool: configuration?.mostrar_total, title: 'TOTAL RD$ ', value: fun_.roundNumberToDecimal(data?.total) },
     ];
 
     for (const item of array) {
@@ -133,9 +133,9 @@ function formarCuerpo(data, configuration, detalle, j) {
       if (info.formato_fecha) {
         text_ = fun_.my_dateFormater(detalle[info.key]);
       } else if (info.formato_numero_tachado) {
-        text_ = fun_.numFormatTwoDecimals(detalle[info.key], true);
+        text_ = fun_.roundNumberToDecimal(detalle[info.key], true);
       } else if (info.formato_numero) {
-        text_ = fun_.numFormatTwoDecimals(detalle[info.key]);
+        text_ = fun_.roundNumberToDecimal(detalle[info.key]);
       } else {
         text_ = detalle[info.key];
       }

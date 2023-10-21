@@ -205,7 +205,7 @@ export class FacturaC extends CrudG<FacturasI> {
 
       data_parsed.detalle_facturas.forEach((detalle) => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {
-          detalle['cantidad'] = `${fun.numFormatTwoDecimals(detalle.cantidad)} ${detalle.unidad}`;
+          detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${detalle.unidad}`;
           data_parsed.contenido_reporte.push(detalle);
         }
       });

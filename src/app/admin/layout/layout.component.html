@@ -182,7 +182,7 @@
 
       <div class="contenido">
         <router-outlet *ngIf="ready"></router-outlet>
-        <input id="input_fantasma" class="input_fantasma" />
+        <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
       </div>
       <div class="footer">Novac System v{{ versionApp }} - @{{ currentYear }} Desarrollado por: Inspot Technology</div>
       <div *ngIf="cuadre_hoy" class="cuadre_hoy">
