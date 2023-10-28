@@ -453,23 +453,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (dato.tipo_articulo.tipo == 'servicio') return null;
 
     const objeto = dato[column.key];
-    const keys = _.keys(objeto);
-    const values = _.values(objeto);
+    let [medidaPrincipal, medidaPaquete, medidaUnidad]: Array<string> = Object.keys(objeto);
+    const [cantidadPrincipal, cantidadPaquete, cantidadUnidad]: Array<number> = Object.values(objeto);
 
-    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
-    const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
-    const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
+    medidaPaquete = cantidadPaquete > 1 ? medidas[medidaPaquete] : medidaPaquete;
+    medidaUnidad = cantidadUnidad > 1 ? medidas[medidaUnidad] : medidaUnidad;
 
-    const padre = fun.roundNumberToDecimal(values[1]) + '  ' + fin1;
-    const hijo = fun.roundNumberToDecimal(values[2]) + '  ' + fin2;
+    const paquete = fun.hasValue(medidaPaquete) ? `${fun.roundNumberToDecimal(cantidadPaquete)} ${medidaPaquete}` : null;
+    const unidad = fun.hasValue(medidaUnidad) ? `${fun.roundNumberToDecimal(cantidadUnidad)} ${medidaUnidad}` : null;
 
-    let cantiTootip = '';
-
-    cantiTootip = `${padre}`;
-
-    if (keys.length > 1) {
-      keys.length == 2 ? (cantiTootip = `${padre}`) : (cantiTootip = `${padre} - ${hijo}`);
-    }
+    const cantiTootip = fun.hasValue(medidaUnidad) ? `${paquete} - ${unidad}` : fun.hasValue(medidaPaquete) ? `${paquete}` : null;
 
     return cantiTootip;
   }
@@ -478,11 +471,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (dato.tipo_articulo.tipo == 'servicio') return 'N/A';
 
     const objeto = dato[column.key];
-    const keys = _.keys(objeto);
-    const values = _.values(objeto);
-    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
+    let [medidaPrincipal, medidaPaquete, medidaUnidad]: Array<string> = Object.keys(objeto);
+    const [cantidadPrincipal, cantidadPaquete, cantidadUnidad]: Array<number> = Object.values(objeto);
 
-    return fun.roundNumberToDecimal(values[0]) + '  ' + fin;
+    medidaPrincipal = cantidadPrincipal > 1 ? medidas[medidaPrincipal] : medidaPrincipal;
+
+    return `${fun.roundNumberToDecimal(cantidadPrincipal)} ${medidaPrincipal}`;
   }
 
   disableInput(dato, column) {
