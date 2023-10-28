@@ -150,13 +150,11 @@ export class fun extends CustomLodash {
   static revisarNumber(input, id): any {
     return new Promise((resolve) => {
       const precioTEMPO = input.value;
-      console.log('precioTEMPO ', precioTEMPO);
 
       const res = { number: null, error: true };
 
       if (fun.hasValue(precioTEMPO)) {
         const newNumber = fun.roundNumberToDecimal(precioTEMPO);
-        console.log('newNumber ', newNumber);
 
         if (isNaN(Number(fun.desformatearStNumber(newNumber)))) {
           fun.toastError('Valor introducido es invalido', 'ERROR');

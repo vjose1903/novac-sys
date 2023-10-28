@@ -1,29 +1,30 @@
-import { ConfigService } from './../../../core/services/configuration.service';
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray } from '@angular/forms';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { ArticuloC } from '../../registros/articulos/articulo';
-import { ConduceC } from '../../conduce/coduce';
-import { FacturaC } from '../../facturacion/factura';
+import { fun } from '../../../core/services/functions.service';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { teclasCode } from '../../../core/typescript/constantes';
+import { Permisos } from '../../../core/typescript/permisos';
 import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ModalSeleccinarArticuloComponent } from '../../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
-import { fun } from '../../../core/services/functions.service';
-import { ModalService } from '../../components/modal/modal.service';
-import { Permisos } from '../../../core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
-import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
-import { teclasCode } from '../../../core/typescript/constantes';
 import { ModalClass } from '../../components/modal/modal-class';
+import { ModalService } from '../../components/modal/modal.service';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { ConduceC } from '../../conduce/coduce';
+import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { FacturaC } from '../../facturacion/factura';
+import { ArticuloC } from '../../registros/articulos/articulo';
+import { ConfigService } from './../../../core/services/configuration.service';
+import { MixinClass } from './../../../core/typescript/MixinClass';
 
 @Component({
   selector: 'app-conduce-form',
   templateUrl: './conduce-form.component.html',
   styleUrls: ['./conduce-form.component.scss'],
 })
-export class ConduceFormComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
+export class ConduceFormComponent extends MixinClass implements OnInit, OnDestroy {
   secuenciaKeys = [];
 
   @HostListener('window:keydown', ['$event'])
@@ -56,17 +57,19 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   indexRemove: any;
   filasDetalle;
 
+  minCodigo: number;
   secuencia = 0;
   inputSecuencia = 'cod-0';
   inputDrop;
 
   listaArticulos = [];
-  UnidadesArticulo: any[];
   sacos = [25, 50, 100];
 
   TOTAL: number;
   is_print = false;
+  dropdownMedidaOpen: boolean = false;
   info = [];
+  fun = fun;
 
   table_config: table_config = {
     info: [
@@ -91,29 +94,38 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   permissions = Permisos;
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
-  constructor(private fb: UntypedFormBuilder, public mServ: ModalService) {
+  constructor(private fb: UntypedFormBuilder, public mServ: ModalService, private router: Router) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'conduce', is_routing: true });
 
-    this.form = this.fb.group({
-      rowFactura: this.fb.array([this.createItem(0)]),
-    });
-
-    this.ARRAY_ROWARTICULOS = this.form['rowFactura'] as UntypedFormArray;
-
-    for (let index = 1; index <= 22; index++) {
-      this.addItem(index);
-    }
-
     this.necesarioStar();
   }
 
   async necesarioStar() {
+    this.createForm().then(() => {
+      this.ARRAY_ROWARTICULOS = this.form['rowFactura'] as UntypedFormArray;
+      this.filasDetalle = (this.form.controls['rowFactura'] as UntypedFormArray).controls;
+
+      for (let index = 1; index <= 22; index++) {
+        this.addItem(index);
+      }
+    });
+
     this.fechaConduce = this.formarFechaFactura(new Date())['FechaFactura'];
     fun.enfocarInput('clienteI');
+  }
+
+  createForm() {
+    return new Promise<void>((resolve, reject) => {
+      this.form = this.fb.group({
+        rowFactura: this.fb.array([this.createItem(0)]),
+      });
+
+      resolve();
+    });
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -129,10 +141,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   pressEscResponse(res) {
     if (fun.hasValue(res)) fun.enfocarAndSelectInput('cod-' + res);
-  }
-
-  ngAfterViewInit() {
-    this.filasDetalle = (this.form.controls['rowFactura'] as UntypedFormArray).controls;
   }
 
   async procesoQuitarArticulo() {
@@ -164,6 +172,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       this.secuencia = filas_ocupadas.length;
 
       this.inputSecuencia = 'cod-' + this.secuencia;
+
       resolve(true);
     });
   }
@@ -215,10 +224,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) {
         const campo = fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
         fun.enfocarInput(campo);
-      }
-
-      if (input == 'cod-' && fun.hasValue(uni) && uni.toLowerCase() != 'medida'.toLowerCase()) {
-        if (fun.hasValue(can) && can != 0 && fun.hasValue(cod)) this.ajustarSecuencia().then(() => fun.enfocarInput(campo_siguiente));
       }
 
       if (input == 'can-' && fun.hasValue(cod)) {
@@ -276,6 +281,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     }
 
     (this.filasDetalle[params.index] as any).controls['articulo'].setValue(params.articulo);
+    (this.filasDetalle[params.index] as any).controls['unidades'].setValue(this.llenarArrayUnidades(params.articulo));
     (this.filasDetalle[params.index] as any).controls['cod'].setValue(params.articulo.codigo);
     (this.filasDetalle[params.index] as any).controls['des'].setValue(params.articulo.nombre);
     (this.filasDetalle[params.index] as any).controls['can'].setValue(null);
@@ -286,39 +292,36 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
   }
 
-  async llenarArrayUnidades(index) {
-    const { articulo, cod } = this.filasDetalle[index].getRawValue();
+  llenarArrayUnidades(articulo) {
+    let unidadesArticulo = [];
 
-    if (cod && articulo) {
+    if (articulo) {
       const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
       const precioPrincipal = articulo.precio_principal;
       const costoPrincipal = articulo.costo_principal;
-      this.UnidadesArticulo = [];
 
-      this.UnidadesArticulo.push({ value: 'Medida', precio: 0, costo: 0, cantidad: articulo.contenido[articulo.medida] });
-
-      if (articulo.medida !== 'Quintal') {
-        this.UnidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
+      if (medida != 'Quintal') {
+        unidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
-      if (articulo.vendido_en.toLowerCase() == 'saco' && articulo.calcular_saco) this.entrarSacosAUnidades(precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco) this.entrarSacosAUnidades(unidadesArticulo, precioPrincipal, costoPrincipal);
 
       if (articulo.is_detallable) {
         articulo.contenido_articulos.forEach((element) => {
-          this.UnidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
+          unidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
         });
       }
 
-      this.UnidadesArticulo = _.uniqWith(this.UnidadesArticulo, fun.isEqual);
-
-      if (this.inputDrop) setTimeout(() => fun.enfocarInput(this.inputDrop), 0);
+      unidadesArticulo = _.uniqWith(unidadesArticulo, fun.isEqual);
     }
+
+    return unidadesArticulo;
   }
 
-  entrarSacosAUnidades(precioQuintal, costoQuintal) {
+  entrarSacosAUnidades(unidadesArticulo, precioQuintal, costoQuintal) {
     this.sacos.forEach((saco) => {
       const valor = 'Saco de ' + saco + ' libras';
-      this.UnidadesArticulo.push({
+      unidadesArticulo.push({
         value: valor,
         precio: this.calcularPrecioSaco(saco, precioQuintal),
         costo: this.calcularPrecioSaco(saco, costoQuintal),
@@ -331,6 +334,31 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     const res = (cant / 100) * precio;
     return fun.roundNumberToDecimal(res);
   }
+
+  changeStateDropDownMedida(open) {
+    this.dropdownMedidaOpen = open;
+  }
+
+  hideDropdownMedida() {
+    setTimeout(() => this.setInputDrop(undefined), 100);
+  }
+
+  showDropdownMedida(event, dropdown) {
+    fun.awaitTyping(null, 10).then(() => {
+      if (!this.dropdownMedidaOpen && event.type == 'focus') {
+        dropdown.show();
+        this.changeStateDropDownMedida(true);
+      }
+    });
+  }
+
+  checkCodigo(index) {
+    const formulario = this.filasDetalle[index].getRawValue();
+
+    if (fun.hasValue(formulario.cod) && fun.is_number(formulario.cod)) this.minCodigo = 5;
+    else this.minCodigo = undefined;
+  }
+
   // =============================================
   //  MODAL PARA FILTRAR CLIENTES
   // =============================================
@@ -353,35 +381,14 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     }
   }
 
-  calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    this.llenarArrayUnidades(params.index);
-    const control = this.filasDetalle[params.index].controls;
-    const fila_actual = this.filasDetalle[params.index].getRawValue();
-
-    const unidad = fila_actual['uni'];
-    const cantidad = fila_actual['can'];
-
-    let cantidadMinima = 1;
-
-    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => {
-
-      return uni.value.toLowerCase() == unidad.toLowerCase();
-    })?.cantidad;
-
-
-    const cant_unidades = params.clean && cantidadMinima ? 0 : cantidad * cantidadMinima;
-    control['cantidad_en_unidades'].setValue(cant_unidades);
-  }
-
   // =============================================
-  async checkCantidadExede(i, lugar, callback = (arg) => {}) {
+  async checkCantidadExede(index, lugar, callback = (arg) => {}) {
     let cantidad = 0;
-    const fila_actual = this.filasDetalle[i].getRawValue();
+    this.calcularCantidadEnUnidades({ index });
+    const fila_actual = this.filasDetalle[index].getRawValue();
     const articulo = fila_actual['articulo'];
 
     if (fun.hasValue(articulo)) {
-      this.calcularCantidadEnUnidades({ index: i });
-
       const rowsIgual = _.map(
         _.filter(this.filasDetalle, (item) => item.controls.articulo?.value?.id == articulo.id),
         'value',
@@ -389,7 +396,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
       cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + item.cantidad_en_unidades, 0);
 
-      if (lugar === 'saltar') i--;
+      if (lugar === 'saltar') index--;
 
       try {
         let excede = true;
@@ -405,10 +412,10 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               callback(false);
             } else {
               setTimeout(() => {
-                fun.enfocarAndSelectInput('can-' + i);
-                this.calcularCantidadEnUnidades({ index: i, clean: true });
-                (this.filasDetalle[i] as any).controls['uni'].setValue(null);
-                (this.filasDetalle[i] as any).controls['can_ant'].setValue(null);
+                fun.enfocarAndSelectInput('can-' + index);
+                this.calcularCantidadEnUnidades({ index: index, clean: true });
+                (this.filasDetalle[index] as any).controls['uni'].setValue(null);
+                (this.filasDetalle[index] as any).controls['can_ant'].setValue(null);
               }, 250);
               callback(true);
             }
@@ -448,36 +455,42 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     }
   }
 
-  async selectMedidaChange(arg, i) {
-    const medidaSelected = _.find(this.UnidadesArticulo, (unidad) => unidad.value === arg);
+  async selectMedidaChange(evento, index) {
+    if (evento.originalEvent.type == 'click') this.selectMedida(index);
+  }
 
-    const unidad = medidaSelected.value;
-
-    if (unidad.toLowerCase() === 'medida') {
-      (this.filasDetalle[i] as any).controls['uni'].setValue(null);
-    } else {
-      this.checkCantidadExede(i, 'change', (excede) => {
-        if (!excede) (this.filasDetalle[i] as any).controls['uni'].setValue(unidad);
-        this.ajustarSecuencia().then(() => fun.enfocarInput(this.inputSecuencia));
+  async selectMedida(index) {
+    if (this.dropdownMedidaOpen) {
+      this.checkCantidadExede(index, 'change', (excede) => {
+        if (!excede)
+          this.ajustarSecuencia().then(() => {
+            fun.enfocarInput(this.inputSecuencia);
+          });
       });
     }
   }
 
-  async calculateCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    this.llenarArrayUnidades(params.index);
-
-    const control = this.filasDetalle[params.index].controls;
-    const fila_actual = this.filasDetalle[params.index].getRawValue();
-    const unidad = fila_actual['uni'];
-    const cantidad = fila_actual['can'];
+  calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
+    const formGroup = this.filasDetalle[params.index] as FormGroup;
+    const { uni: unidad, can: cantidad, unidades } = formGroup.value;
+    const detalles = {};
 
     let cantidadMinima = 1;
 
-    if (unidad && this.UnidadesArticulo.length > 0) cantidadMinima = this.UnidadesArticulo.find((uni) => uni.value.toLowerCase() == unidad.toLowerCase()).cantidad;
+    if (unidad && unidades.length > 0) {
+      const unidad_find = unidades.find((_uni) => _uni.value.toLowerCase() == unidad.toLowerCase());
+      if (unidad_find) cantidadMinima = unidad_find.cantidad;
+    }
 
     const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
+    detalles['cantidad_en_unidades'] = cant_unidades;
 
-    control['cantidad_en_unidades'].setValue(cant_unidades);
+    if (cant_unidades == 0) {
+      detalles['precio'] = null;
+      detalles['total'] = null;
+    }
+
+    formGroup.patchValue(detalles);
   }
 
   setInputDrop(index) {
@@ -486,13 +499,17 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       if (fun.hasValue(articulo)) this.inputDrop = `uni-${index}`;
     } else {
       this.inputDrop = undefined;
+      this.changeStateDropDownMedida(false);
     }
+
+    if (this.inputDrop) setTimeout(() => fun.enfocarInput(this.inputDrop), 10);
   }
 
   createItem(i): UntypedFormGroup {
     return this.fb.group({
       id: [],
       articulo: [null],
+      unidades: [null],
       detalle_factura_id: [],
       cod: [null],
       uni: [null],
@@ -710,6 +727,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         (this.filasDetalle[i] as any).controls['can_original'].setValue(element.cantidad);
         (this.filasDetalle[i] as any).controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
         (this.filasDetalle[i] as any).controls['articulo'].setValue(articulo);
+        (this.filasDetalle[i] as any).controls['unidades'].setValue(this.llenarArrayUnidades(articulo));
 
         (this.filasDetalle[i] as any).controls['vende_sin_inventario'].setValue(ConfigService.config.vende_sin_inventario);
 
@@ -772,21 +790,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       fun.toastWarning('Conduce no tiene Articulos', 'Aviso');
       fun.enfocarInput('cod-1');
     } else {
-      this.CuerpoConduce = [];
-      for (let i = 0; i < filas_ocupadas.length; i++) {
-        const fila = filas_ocupadas[i].getRawValue();
-        const detalle = _.pick(fila, ['detalle_factura_id', 'articulo.id', 'can', 'cantidad_en_unidades', 'uni', 'id', 'vende_sin_inventario']);
-
-        let detalle_parsed = fun.remplaceKeyFromJson(detalle, [
-          { old_key: 'can', new_key: 'cantidad' },
-          { old_key: 'uni', new_key: 'unidad' },
-        ]);
-        detalle_parsed['articulo_id'] = detalle_parsed.articulo.id;
-        delete detalle_parsed['articulo'];
-
-        this.CuerpoConduce.push(detalle_parsed);
-      }
-
+      this.parseCuerpoConduce();
       const obj = { modo_factura: 'conduce', condicion_fact: 'conduce', metodo: 'conduce' };
 
       this.openNewModal({
@@ -810,6 +814,26 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     modalInstance.dismissModal(modalInstance.id);
   }
 
+  parseCuerpoConduce() {
+    const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
+
+    this.CuerpoConduce = [];
+    for (let i = 0; i < filas_ocupadas.length; i++) {
+      const fila = filas_ocupadas[i].getRawValue();
+      const detalle = _.pick(fila, ['detalle_factura_id', 'articulo.id', 'can', 'cantidad_en_unidades', 'uni', 'id', 'vende_sin_inventario']);
+
+      let detalle_parsed = fun.remplaceKeyFromJson(detalle, [
+        { old_key: 'can', new_key: 'cantidad' },
+        { old_key: 'uni', new_key: 'unidad' },
+      ]);
+
+      detalle_parsed['articulo_id'] = detalle_parsed.articulo.id;
+      delete detalle_parsed['articulo'];
+
+      this.CuerpoConduce.push(detalle_parsed);
+    }
+  }
+
   getCantidadArticulos() {
     const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
     return filas_ocupadas.length;
@@ -826,6 +850,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         const obj = { data: conduce_parsed, type: 'conduce' };
 
         this.cancelarConduce();
+        this.goBack();
         PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
       });
     });
@@ -882,5 +907,9 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     this.borrar();
     (document.getElementById('clienteI') as any).value = '';
     setTimeout(() => fun.enfocarInput('clienteI'), 10);
+  }
+
+  goBack() {
+    this.router.navigateByUrl('/admin/conduce/lista');
   }
 }

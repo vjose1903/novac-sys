@@ -46,6 +46,9 @@ export class ThemeService {
     localStorage.setItem('theme', newTreme);
 
     const availableThemes = { red: this.themeRed, blue: this.themeBlue, green: this.themeGreen };
+    console.log("availableThemes ", availableThemes);
+    console.log("newTreme ", newTreme);
+
     availableThemes[newTreme]();
   }
 
