@@ -1442,10 +1442,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         contenidoHijo.costo = fun.desformatearStNumber(costo);
       }
 
-      [contenidoPadre, contenidoHijo].forEach((contenido)=>{
+      [contenidoPadre, contenidoHijo].forEach((contenido) => {
         if (fun.hasValue(contenido)) {
-          console.log("contenido ", contenido);
-
           const newContent = _.omit(contenido, ['created_at', 'updated_at']);
           tempContenido.push(newContent);
         }
