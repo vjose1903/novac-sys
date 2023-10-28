@@ -1,5 +1,4 @@
-import { Ss } from './../../../../core/services/singleton.service';
-import { ClienteC } from './../../../registros/registro-clientes/cliente';
+import { Ss } from '../../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../../core/javascript/moment';
@@ -7,7 +6,9 @@ import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../class/ingresos/recibos';
-import { FacturaC } from '../../../facturacion/factura';
+import { ClienteC } from '../../../registros/registro-clientes/cliente';
+import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
+import { FacturaC, tipoDocFacturacion } from '../../../facturacion/factura';
 import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
@@ -15,14 +16,17 @@ import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
+import { PagosService } from '../pagos.service';
 
 @Component({
-  selector: 'app-ingresos',
-  templateUrl: './ingresos.component.html',
-  styleUrls: ['./ingresos.component.scss'],
+  selector: 'app-pagos',
+  templateUrl: './pagos.component.html',
+  styleUrls: ['./pagos.component.scss'],
 })
-export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
-  clienteAdepositar: any;
+export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
+  static modalBuscarEntidadId = 'buscarEntidad';
+  static tablaPagosId = 'listaPagos';
+  entidadAdepositar: any;
   facturas = [];
   tipo_recibo = 'Pago factura';
   is_print = false;
@@ -81,9 +85,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     ],
     colores: true,
     padding: '0.5rem',
-    id_tabla: 'listado_recibos',
+    id_tabla: PagosComponent.tablaPagosId,
     padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
-    obj_paginate: { show: true, showTotal: false,  is_local: false },
+    obj_paginate: { show: true, showTotal: false, is_local: false },
   };
 
   tablaComponent;
@@ -107,16 +111,17 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   facturasSelected: Array<any> = [];
 
   clienteClass = new ClienteC();
+  suplidorClass = new SuplidorC();
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router, private route: ActivatedRoute) {
+  constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router, private route: ActivatedRoute, public pagosService: PagosService) {
     super();
     this.config.notFoundText = 'Articulo no existe';
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'ingresos', is_routing: true });
+    this._init_mixin({ component: 'pagos', is_routing: true });
     this.necesarioStart();
   }
 
@@ -145,7 +150,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any }) {
+  async pedirPagosPorEntidad(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any }) {
     this.facturas.length = 0;
 
     this.totalFacturado = 0;
@@ -159,7 +164,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (fun.hasValue(params.factura_a_buscar)) parameters['factura_a_buscar'] = params.factura_a_buscar;
 
-    const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
+    const classDinamic = this.pagosService.isReciboIngreso ? 'clienteClass' : 'suplidorClass';
+
+    const res = await this[classDinamic].getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
 
     await res.data.facturas.data.map((factura, index) => {
       let factura_selected = _.find(this.facturasSelected, { id: factura.id });
@@ -222,17 +229,19 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalPagadoPorciento = parseFloat(fun.roundNumberToDecimal(this.totalPagadoPorciento));
 
     setTimeout(() => {
-      this.tablaComponent.changeTableConfig([{ total_count: res.data.facturas.total_registros }]);
-      this.totalRegistros = res.data.facturas.total_registros;
+      if (this.tablaComponent) {
+        this.tablaComponent.changeTableConfig([{ total_count: res.data.facturas.total_registros }]);
+        this.totalRegistros = res.data.facturas.total_registros;
 
-      if (res.data.page != params.page) {
-        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
+        if (res.data.page != params.page) {
+          this.tServ.modifyPaginationById(PagosComponent.tablaPagosId, [{ page: res.data.page }]);
 
-        setTimeout(() => {
-          Ss.cdRef.detectChanges();
-          const actualPagination = this.tServ.getPaginationById('listado_recibos');
-          Ss.cdRef.detectChanges();
-        }, 500);
+          setTimeout(() => {
+            Ss.cdRef.detectChanges();
+            const actualPagination = this.tServ.getPaginationById(PagosComponent.tablaPagosId);
+            Ss.cdRef.detectChanges();
+          }, 500);
+        }
       }
     }, 100);
   }
@@ -242,14 +251,21 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async checkRoute() {
-    const cliente_id = this.route.snapshot.params['entidad_id'];
-    const factura_id = this.route.snapshot.params['factura_id'];
+    let entidad_id = this.route.snapshot.params['entidad_id'];
+    entidad_id = entidad_id == '0' ? null : entidad_id;
 
-    if (cliente_id != '0' && factura_id != '0') {
-      const cliente_response = await this.clienteClass.getOne(cliente_id);
-      this.getDataFromModal({ data: cliente_response.data, modalId: 'buscarCliente', factura_a_buscar: factura_id });
+    let factura_id = this.route.snapshot.params['factura_id'];
+    factura_id = factura_id == '0' ? null : factura_id;
+
+    this.pagosService.tipoPago = this.route.snapshot.params['tipo'];
+
+    if (fun.hasValue(entidad_id)) {
+      const classDinamic = this.pagosService.isReciboIngreso ? 'clienteClass' : 'suplidorClass';
+
+      const entidad_response = await this[classDinamic].getOne(entidad_id);
+      this.getDataFromModal({ data: entidad_response.data, modalId: PagosComponent.modalBuscarEntidadId, factura_a_buscar: factura_id });
     } else {
-      fun.enfocarInput('clienteI');
+      fun.enfocarInput('entidadI');
     }
   }
 
@@ -258,15 +274,20 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return valid;
   }
 
+  goBack() {
+    const url = `/admin/recibos/lista_pagos/${this.pagosService.tipoPago}`;
+    this.router.navigateByUrl(url);
+  }
+
   cancelarIgreso() {
     this.facturas.length = 0;
     this.facturasSelected = [];
-    this.clienteAdepositar = undefined;
-    (document.getElementById('clienteI') as any).value = null;
+    this.entidadAdepositar = undefined;
+    (document.getElementById('entidadI') as any).value = null;
 
     this.resetVariables();
 
-    setTimeout(() => fun.enfocarInput('clienteI'), 250);
+    setTimeout(() => fun.enfocarInput('entidadI'), 250);
   }
 
   abrirModalDinamicText(tipo) {
@@ -294,23 +315,23 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.sendIngreso();
     }
 
-    if (arg.modalId == 'buscarCliente') {
+    if (arg.modalId == PagosComponent.modalBuscarEntidadId) {
       if (arg?.tipo == 'data_no_found') {
-        fun.enfocarAndSelectInput('clienteI');
+        fun.enfocarAndSelectInput('entidadI');
       } else {
-        this.clienteAdepositar = arg.data;
-        (document.getElementById('clienteI') as any).value = arg.data.nombre_completo;
+        this.entidadAdepositar = arg.data;
+        (document.getElementById('entidadI') as any).value = arg.data.nombre_completo;
         const parameters = { ...this.tServ.obj_paginate.default, factura_a_buscar: arg?.factura_a_buscar };
-        this.pedirFacturasPorCliente(arg.data.id, parameters);
+        this.pedirPagosPorEntidad(arg.data.id, parameters);
       }
     }
   }
 
   pedirNuevaData(params?: { per_page?: number; page?: number; search?: string }) {
-    if (fun.hasValue(this.clienteAdepositar)) {
-      this.pedirFacturasPorCliente(this.clienteAdepositar.id, params);
+    if (fun.hasValue(this.entidadAdepositar)) {
+      this.pedirPagosPorEntidad(this.entidadAdepositar.id, params);
     } else {
-      fun.toastWarning('Debe de seleccionar un cliente para continuar.', 'AVISO');
+      fun.toastWarning(`Debe de seleccionar un ${this.pagosService.isReciboIngreso ? 'cliente' : 'suplidor'} para continuar.`, 'AVISO');
     }
   }
 
@@ -470,19 +491,19 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       const obj = {
         data: [],
         palabra_a_buscar: nombre,
-        metodo: 'venta',
+        metodo: this.pagosService.isReciboIngreso ? tipoDocFacturacion.venta : tipoDocFacturacion.compra,
       };
 
       this.openNewModal({
         component: BuscarClienteSuplidorComponent,
         inputs: obj,
-        id: 'buscarCliente',
-        header: 'Buscar cliente',
+        id: PagosComponent.modalBuscarEntidadId,
+        header: this.pagosService.isReciboIngreso ? 'Buscar cliente' : 'Buscar suplidor',
         width: '900px',
         height: '500px',
         botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
       });
-      fun.desEnfocarInput('clienteI');
+      fun.desEnfocarInput('entidadI');
     }
   }
 
@@ -547,7 +568,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   async sendIngreso() {
     const obj = {
-      cliente_id: this.clienteAdepositar.id,
+      cliente_id: this.entidadAdepositar.id,
       total: this.detalleYtotal.total_recibo,
       forma_pago: this.forma_pago,
       tipo_factura_id: 17,
@@ -560,8 +581,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.reciboClass.createUpdateOne(obj).then((res) => {
       const recibo = res['data'].recibo;
 
-      const actualPagination = this.tServ.getPaginationById('listado_recibos');
-      this.pedirFacturasPorCliente(this.clienteAdepositar.id, actualPagination);
+      const actualPagination = this.tServ.getPaginationById(PagosComponent.tablaPagosId);
+      this.pedirPagosPorEntidad(this.entidadAdepositar.id, actualPagination);
 
       this.resetVariables();
       this.reciboClass.parseDataToPdf(recibo).then((recibo_parsed) => {

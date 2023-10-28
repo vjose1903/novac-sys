@@ -12,6 +12,7 @@ import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { tipoPagoE } from '../pagos-facturas/lista-pagos/pagos.config';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -52,7 +53,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     filtrar: { local: false },
     colores: true,
     id_tabla: 'lista_viajes',
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
   };
 
   config_viaje_selected: table_config = {
@@ -380,7 +381,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       header: 'Confirmación',
       texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para realizar el recibo de este pedido.',
       siFunction: (instance) => {
-        this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}/${factura.id}`);
+        this.router.navigateByUrl(`/admin/recibos/pagos/${tipoPagoE.recibosIngresos}/${factura.cliente_id}/${factura.id}`);
         instance.dismissModal(instance.id);
       },
     };

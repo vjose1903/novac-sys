@@ -179,6 +179,18 @@
               }
             }
           }
+
+          > .no-data {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .no-data-message {
+              color: #c5c5c5;
+            }
+          }
         }
 
         > .tfoot {
@@ -260,7 +272,9 @@
     > button {
       background: var(--primary05) !important;
       border-color: var(--primary05) !important;
-      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+      box-shadow:
+        0 4px 6px rgba(50, 50, 93, 0.11),
+        0 1px 3px rgba(0, 0, 0, 0.08) !important;
 
       @include speeddial-icons;
       &:hover {

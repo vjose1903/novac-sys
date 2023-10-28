@@ -67,17 +67,17 @@
   }
 }
 
-.clienteAdepositar {
+.entidadAdepositar {
   display: grid;
   height: 100%;
   grid-template-areas:
-    "nombre_cliente"
+    "nombre_entidad"
     "cuerpo"
     "porcentaje";
   grid-template-rows: min-content auto min-content;
 
-  .nombre_cliente {
-    grid-area: nombre_cliente;
+  .nombre_entidad {
+    grid-area: nombre_entidad;
   }
   .cuerpo {
     grid-area: cuerpo;

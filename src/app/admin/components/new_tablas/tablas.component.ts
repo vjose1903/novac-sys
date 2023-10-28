@@ -83,11 +83,15 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.TablasComponent = this;
     this.TablasComponentChange.emit(this.TablasComponent);
 
-    this.checkPagination();
+    this.checkConfig();
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
     setTimeout(() => (this.ready = true), 250);
   }
 
+  checkConfig() {
+    if (!fun.objHas(this.config, 'noDataMessage') || fun.isEmpty(this.config.noDataMessage)) this.config.noDataMessage = 'No existen registros.';
+    this.checkPagination();
+  }
   checkPagination() {
     if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;

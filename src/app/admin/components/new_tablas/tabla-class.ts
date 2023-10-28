@@ -136,6 +136,7 @@ export interface table_config {
   total_count?: any;
   obj_paginate?: paginateI;
   botones?: botonesTableI;
+  noDataMessage?: string;
 }
 
 export enum medidas {

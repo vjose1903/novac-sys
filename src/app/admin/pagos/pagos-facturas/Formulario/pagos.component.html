@@ -1,32 +1,32 @@
 <div class="row IngresosRow">
   <div class="col-12 titulo">
-    <h3 class="negrita mb-0">Realizar recibo de ingreso</h3>
+    <h3 class="negrita mb-0">{{ pagosService.isReciboIngreso ? 'Realizar recibo de ingreso' : 'Realizar pago de factura' }}</h3>
   </div>
   <div class="col-12 p-0 arriba">
     <div class="row">
       <div class="col-4">
         <div class="card card-padding sombra">
           <div class="form-group">
-            <label class="control-label">Cliente: </label>
+            <label class="control-label">{{ pagosService.isReciboIngreso ? 'Cliente' : 'Suplidor' }}: </label>
             <input
               type="text"
-              id="clienteI"
+              id="entidadI"
               (keydown.enter)="abrirModalFiltro($event.target.value)"
               (focus)="$event.target.select()"
-              placeholder="Nombre Cliente"
+              placeholder="{{ pagosService.isReciboIngreso ? 'Nombre Cliente' : 'Nombre Suplidor' }}"
               class="form-control mb-4"
               autocomplete="off"
-              [ngClass]="{ disabled: !!clienteAdepositar }"
+              [ngClass]="{ disabled: !!entidadAdepositar }"
             />
-            <button class="btn btn-gris" routerLink="/admin/recibos/lista_pagos">Atras</button>
-            <button [disabled]="!clienteAdepositar" class="btn btn-gris ml-2" (click)="cancelarIgreso()">Nueva Busqueda</button>
+            <button class="btn btn-gris" (click)="goBack()">Atras</button>
+            <button [disabled]="!entidadAdepositar" class="btn btn-gris ml-2" (click)="cancelarIgreso()">Nueva Busqueda</button>
           </div>
         </div>
       </div>
       <div class="col-8 pl-0">
-        <div *ngIf="clienteAdepositar" class="clienteAdepositar">
-          <div class="nombre_cliente">
-            <h3 class="negrita mb-0">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h3>
+        <div *ngIf="entidadAdepositar" class="entidadAdepositar">
+          <div class="nombre_entidad">
+            <h3 class="negrita mb-0">{{ entidadAdepositar.nombre_completo }}</h3>
           </div>
           <div class="cuerpo">
             <div class="cajas">
@@ -62,7 +62,7 @@
             </div>
           </div>
           <div class="porcentaje">
-            <div *ngIf="clienteAdepositar" class="d-flex justify-content-between">
+            <div *ngIf="entidadAdepositar" class="d-flex justify-content-between">
               <span class="negrita">Porcentaje de pago</span>
             </div>
             <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>

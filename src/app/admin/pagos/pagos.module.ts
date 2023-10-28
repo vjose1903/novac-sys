@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { RecibosRoutingModule } from './recibos.routing';
-import { IngresosComponent } from './pagos-facturas/Formulario/ingresos.component';
+import { PagosComponent } from './pagos-facturas/Formulario/pagos.component';
 
 import { ListaPagosComponent } from './pagos-facturas/lista-pagos/lista-pagos.component';
 import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
@@ -15,7 +15,7 @@ import { DetalleFacturaModule } from '../manipular facturas/detalle-factura/deta
 import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular.module';
 
 @NgModule({
-  declarations: [IngresosComponent, ListaPagosComponent, ReciboViajesComponent],
+  declarations: [PagosComponent, ListaPagosComponent, ReciboViajesComponent],
   imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtnIconModule],
 })
 export class PagosModule {}

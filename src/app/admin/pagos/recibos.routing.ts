@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ReciboViajesComponent } from './recibo-viajes/recibo-viajes.component';
 import { ListaPagosComponent } from './pagos-facturas/lista-pagos/lista-pagos.component';
-import { IngresosComponent } from './pagos-facturas/Formulario/ingresos.component';
+import { PagosComponent } from './pagos-facturas/Formulario/pagos.component';
 
 const routes: Routes = [
   {
@@ -10,8 +10,8 @@ const routes: Routes = [
     component: ListaPagosComponent,
   },
   {
-    path: 'ingresos/:entidad_id/:factura_id',
-    component: IngresosComponent,
+    path: 'pagos/:tipo/:entidad_id/:factura_id',
+    component: PagosComponent,
   },
   {
     path: 'viajes/:id',

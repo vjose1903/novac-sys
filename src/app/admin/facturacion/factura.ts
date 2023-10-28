@@ -229,9 +229,9 @@ export class FacturaC extends CrudG<FacturasI> {
     };
   }
 
-  handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?) {
+  handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?, isMostrar = true) {
     return new Promise<any>((resolve, reject) => {
-      PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
+      PdfService.generatePdf({ oPdf: toPDFData, imprimir: false, isMostrar }).then(async (res) => {
         if (res.status === 'si') {
           const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')), viewerOptions: { height: '40rem' } };
 

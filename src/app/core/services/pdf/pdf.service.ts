@@ -18,7 +18,7 @@ import { fun } from '../functions.service';
 export class PdfService {
   constructor() {}
 
-  static generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean }): any {
+  static generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean; isMostrar?: boolean }): any {
     return new Promise((resolve, reject) => {
       let obj;
       let todo_true = true;
@@ -32,22 +32,19 @@ export class PdfService {
       data['reimprimir'] = reimprimir;
 
       data.fecha = fun.hasValue(data.fecha_equivalente) ? data.fecha_equivalente : data.fecha;
+      options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
+
       try {
         switch (type_oPdf) {
           case 'recibo_ingreso':
-            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
             obj = options[ConfigService.config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
 
           case 'conduce':
-            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-
             obj = options[ConfigService.config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
             break;
 
           case 'nota':
-            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
-
             const tipo_pdf = `_${ConfigService.config.plantillas_impresion['nota'].toLowerCase()}`;
 
             obj = options[ConfigService.config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
@@ -57,16 +54,15 @@ export class PdfService {
             options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
             const tipo_documento = this.getFacturacionType(data);
             printer_selected = ConfigService.config.printer_selected[tipo_documento];
-            obj = options[ConfigService.config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', 'ventas');
+
+            obj = options[ConfigService.config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', 'ventas', params.isMostrar);
             break;
 
           case 'cotizacion':
-            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
             obj = options[ConfigService.config.pages_sizes.cotizacion].makePDF(data, 'cotizacion.pdf', 'cotizacion');
             break;
 
           case 'pre_venta':
-            options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
             obj = options[ConfigService.config.pages_sizes.pre_venta].makePDF(data, 'pre-venta.pdf', 'pre_venta');
             break;
 

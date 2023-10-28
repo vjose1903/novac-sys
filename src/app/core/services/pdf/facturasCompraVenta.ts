@@ -8,28 +8,27 @@ import { infoPagare } from './8.5x5.5/infoPdfs';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
-function getPageMargin(is_contado) {
+function getPageMargin(is_contado, is_venta) {
   let margins = [];
 
   if (is_contado) {
-    margins = [15, 135, 15, 0];
+    margins = is_venta ? [15, 135, 15, 0] : [15, 150, 15, 0];
   } else {
-    margins = [15, 148.6, 15, 0];
+    margins = is_venta ? [15, 148.6, 15, 0] : [15, 165, 15, 0];
   }
 
   return margins;
 }
 
-export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
+export function makePDF(data, file_name, tipo_pdf?, isMostrar = true) {
   const is_venta = data.tipo === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
 
-
   const dd = {
-    pageSize: is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 },
-    pageMargins: getPageMargin(is_contado),
+    pageSize: is_venta ? (is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 }) : { width: 600, height: 398 },
+    pageMargins: getPageMargin(is_contado, is_venta),
     header: (currentPage, pageCount, pageSize) => cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, ConfigService.config),
-    content: contenidoFacturaVenta(data, is_contado, is_venta, ConfigService.config),
+    content: contenidoFacturaVenta(data, is_contado, is_venta, ConfigService.config, isMostrar),
     images: {
       logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
     },
@@ -74,6 +73,13 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
                 { text: configApp.rnc_empresa, style: 'letra10' },
               ],
               alignment: 'center',
+            },
+            {
+              text: is_venta ? '' : '----- FACTURA DE COMPRA -----',
+              style: 'letra10',
+              bold: true,
+              alignment: 'center',
+              margin: is_venta ? [0, 0, 0, 0] : [0, 0, 0, 0],
             },
           ],
         },
@@ -178,9 +184,9 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 // ==========================================================================================================================================================
 // CONTENIDO
 // =========================================================~=================================================================================================
-function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
+function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI, isMostrar: boolean) {
   const tempBody = [];
-  const _break = is_contado ? 9 : 30;
+  const _break = is_venta ? (is_contado ? 9 : 30) : 9;
 
   data.contenido_reporte.forEach((detalle, i) => {
     const row = [];
@@ -204,6 +210,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
   });
 
   const numero_letra = numLetra.NumeroALetras(data.total_factura);
+  console.log('>>>>>>>>>>> isMostrar ', isMostrar);
 
   const content = [
     {
@@ -234,7 +241,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
       stack: [
         {
           columns: [
-            is_venta && !is_contado
+            (is_venta && !is_contado) || isMostrar
               ? { text: '' }
               : {
                   stack: [
