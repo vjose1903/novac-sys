@@ -51,6 +51,8 @@ export class ConfiguracionesComponent implements OnInit {
     { name: 'Recibo Ingreso', key: 'recibo_ingreso' },
     { name: 'Nota', key: 'nota' },
     { name: 'Conduce', key: 'conduce' },
+    { name: 'Cotización', key: 'cotizacion' },
+    { name: 'Pago Factura', key: 'pago_factura' },
   ];
 
   impresiones = [
@@ -64,6 +66,7 @@ export class ConfiguracionesComponent implements OnInit {
     { printerFormControlName: 'printer_nota', plantillaFormControlName: 'plantilla_impresion_nota', pageSizeFormControlName: 'page_size_nota', label: 'Notas', key: 'nota' },
     { printerFormControlName: 'printer_cuadre_caja', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_cuadre_caja', label: 'Cuadre de caja', key: 'cuadre' },
     { printerFormControlName: 'printer_reporte', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_reporte', label: 'Reportes', key: 'reporte' },
+    { printerFormControlName: 'printer_pago_factura', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_pago_factura', label: 'Pago Facturas', key: 'pago_factura' },
   ];
 
   configCopy;
@@ -103,6 +106,7 @@ export class ConfiguracionesComponent implements OnInit {
       is_produccion: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
       facturacion_editar_precio: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       vende_sin_inventario: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
+      can_pagar: [{ value: this.getValue(data, 'can_pagar'), disabled: false }, Validators.required],
       medida_producto_terminado: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
       documentos_a_imprimir: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
 
@@ -116,6 +120,7 @@ export class ConfiguracionesComponent implements OnInit {
       page_size_nota: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
       page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
       page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
+      page_size_pago_factura: [{ value: this.getValuePageSize(data, 'pages_sizes.pago_factura'), disabled: false }, Validators.required],
 
       printer_venta_contado: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
       printer_venta_credito: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
@@ -127,6 +132,7 @@ export class ConfiguracionesComponent implements OnInit {
       printer_nota: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
       printer_cuadre_caja: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
       printer_reporte: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
+      printer_pago_factura: [{ value: this.getValue(data, 'printer_selected.pago_factura'), disabled: false }, Validators.required],
 
       plantilla_impresion_nota: [{ value: this.getValue(data, 'plantillas_impresion.nota'), disabled: false }, Validators.required],
     });
@@ -189,9 +195,6 @@ export class ConfiguracionesComponent implements OnInit {
     printTestPdf({ paper_size: paperSize, documento: documento });
   }
 
-  test() {
-    const test = this.formIsInvalid();
-  }
 
   salir() {
     this.router.navigateByUrl('auth/login');
@@ -212,6 +215,7 @@ export class ConfiguracionesComponent implements OnInit {
       nota: formulario.page_size_nota.descripcion,
       cuadre_caja: formulario.page_size_cuadre_caja.descripcion,
       reporte: formulario.page_size_reporte.descripcion,
+      pago_factura: formulario.page_size_pago_factura.descripcion,
     };
 
     const printer_selected = {
@@ -225,6 +229,7 @@ export class ConfiguracionesComponent implements OnInit {
       nota: formulario.printer_nota,
       cuadre_caja: formulario.printer_cuadre_caja,
       reporte: formulario.printer_reporte,
+      pago_factura: formulario.printer_pago_factura,
     };
 
     const plantillas_impresion = {
@@ -243,6 +248,7 @@ export class ConfiguracionesComponent implements OnInit {
       'page_size_nota',
       'page_size_cuadre_caja',
       'page_size_reporte',
+      'page_size_pago_factura',
 
       'printer_venta_contado',
       'printer_venta_credito',
@@ -253,6 +259,7 @@ export class ConfiguracionesComponent implements OnInit {
       'printer_nota',
       'printer_cuadre_caja',
       'printer_reporte',
+      'printer_pago_factura',
     ];
 
     keys_to_omit.forEach((element) => (formulario = _.omit(formulario, [element])));
@@ -263,12 +270,42 @@ export class ConfiguracionesComponent implements OnInit {
     return formulario;
   }
 
+  test(){
+    let res = true;
+
+    console.log("this.form ", this.form);
+    console.log("this.form.valid ", this.form.valid);
+    if (this.form) {
+      if (this.form.valid) {
+        let formulario = this.getFormularioToSend();
+
+
+        let keysConfig = Object.keys(formulario);
+        const cambios = [];
+
+        keysConfig.forEach((keyC) => {
+          if (typeof this.configCopy[keyC] == 'string') {
+            if (this.configCopy[keyC] != formulario[keyC]) cambios.push(keyC);
+          } else {
+            if (!fun.isEqual(this.configCopy[keyC], formulario[keyC])) cambios.push(keyC);
+          }
+        });
+
+        res = cambios.length > 0 ? false : true;
+      } else res = true;
+    }
+
+    console.log("res ", res);
+
+  }
+
   formIsInvalid() {
     let res = true;
 
     if (this.form) {
       if (this.form.valid) {
         let formulario = this.getFormularioToSend();
+
 
         let keysConfig = Object.keys(formulario);
         const cambios = [];

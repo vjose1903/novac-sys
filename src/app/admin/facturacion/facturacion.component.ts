@@ -29,6 +29,7 @@ import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmac
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configuracion_articulos/articulos_configuracion';
+import { TipoCantidadEfectivo } from '../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.model';
 
 @Component({
   selector: 'app-facturacion',
@@ -1265,9 +1266,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 metodo: this.factServ.tipoDocumento,
                 total_factura: this.TOTAL,
                 efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
-                tipo_modal: 'devuelta',
+                tipo_modal: TipoCantidadEfectivo.devuelta,
                 formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
-                factura_de: this.factServ.tipoDocumento,
+                documento: this.factServ.tipoDocumento,
                 cambios_articulos: articulos_a_cambiar,
               };
 
@@ -1645,6 +1646,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['pre_factura'] = fun.hasValue(this.factServ.pre_venta_selected) ? this.factServ.pre_venta_selected?.id : null;
 
     cabecera_fact['cotizacion'] = fun.hasValue(this.factServ.cotizacion_selected) ? this.factServ.cotizacion_selected?.id : null;
+    if (this.factServ.isCompra) cabecera_fact['can_pagar'] = ConfigService.config.can_pagar;
 
     if (this.factServ.isCompra) {
       cabecera_fact['suplidor_id'] = this.factServ.propietario_factura.id;

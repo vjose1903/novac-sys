@@ -26,6 +26,7 @@ export default class HandlerConfigFile {
     is_db_local: true,
     calcular_itbis: false,
     is_produccion: true,
+    can_pagar: false,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
     medida_producto_terminado: 'Producto',
@@ -41,6 +42,7 @@ export default class HandlerConfigFile {
       nota: 'Ninguna',
       cuadre_caja: 'Ninguna',
       reporte: 'Ninguna',
+      pago_factura: 'Ninguna',
     },
 
     pages_sizes: {
@@ -54,6 +56,7 @@ export default class HandlerConfigFile {
       nota: '80mm_roll',
       cuadre_caja: '80mm_roll',
       reporte: '8.5x11',
+      pago_factura: '80mm_roll',
     },
 
     plantillas_impresion: {

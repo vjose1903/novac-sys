@@ -5,6 +5,7 @@ import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { SharedService } from '../../../../core/services/shared.service';
 import { teclasCode } from '../../../../core/typescript/constantes';
+import { TipoCantidadEfectivo } from './form-cantidad-efectivo.model';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
@@ -26,22 +27,23 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   formaPago = 'Efectivo';
   @Output() getDevuelta = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
-  factura_de: any;
+  documento: any;
 
   cambiar_articulos = undefined;
   is_print: boolean;
   documentos_a_imprimir = [];
+  TipoCantidadEfectivo = TipoCantidadEfectivo;
 
   constructor(private shServ: SharedService) {
     super();
   }
 
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   ngOnInit() {
     this.efectivo = fun.hasValue(this.inputs.efectivo) ? this.formatoNumero(this.inputs.efectivo) : '0.00';
-    this.factura_de = this.inputs.factura_de;
+    this.documento = this.inputs.documento;
     this.formaPago = this.inputs.formaPago;
 
     if (!this.inputs.cambios_articulos) this.cambiar_articulos = 'no';
@@ -52,29 +54,30 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(ConfigService.config.documentos_a_imprimir);
       this.handleDefaultSwitch();
 
-      if (this.factura_de != 'compra') fun.enfocarInput('inputEfectivo');
+      if (this.documento != 'compra') fun.enfocarInput('inputEfectivo');
+      if (this.documento == 'pago_factura') fun.enfocarInput('inputFormaPago');
 
-      if (this.factura_de == 'compra' && !this.inputs.cambios_articulos) this.disableBtnConfirm(false);
+      if (this.documento == 'compra' && !this.inputs.cambios_articulos) this.disableBtnConfirm(false);
       this.validarForm('init');
       this.calcularDevueta();
     }, 250);
   }
 
   handleDefaultSwitch() {
-    if (this.factura_de == 'venta') {
+    if (this.documento == 'venta') {
       const comparation = this.inputs.condicion_fact == 'Crédito' ? 'venta_credito' : 'venta_contado';
       this.is_print = this.documentos_a_imprimir.includes(comparation);
     } else {
-      this.is_print = this.documentos_a_imprimir.includes(this.factura_de);
+      this.is_print = this.documentos_a_imprimir.includes(this.documento);
     }
   }
 
   saltar(campo, valor?) {
-    if (campo === 'formaPago') {
+    if (campo === 'inputFormaPago') {
       fun.enfocarInput(campo);
     }
     if (campo === 'send') {
-      if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < fun.desformatearStNumber(this.inputs.total_factura)) {
+      if (this.inputs.tipo_modal != TipoCantidadEfectivo.noDevuelta && this.efectivo < fun.desformatearStNumber(this.inputs.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         fun.enfocarInput('inputEfectivo');
       } else {
@@ -117,7 +120,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
     let dataToReturn;
 
-    if (this.factura_de == 'compra') {
+    if (this.documento == 'compra') {
       if (this.cambiar_articulos != undefined) {
         dataToReturn = { obj, is_print: this.is_print, modalId: this.modalComponent.id };
       } else {
@@ -143,9 +146,9 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const total = fun.desformatearStNumber(this.inputs.total_factura);
     const efectivo = fun.desformatearStNumber(this.efectivo);
 
-    let isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;
+    let isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != TipoCantidadEfectivo.noDevuelta && total > efectivo;
 
-    if (this.factura_de == 'compra') isInvalid = false;
+    if (this.documento == 'compra') isInvalid = false;
 
     if (from == 'input' || from == 'init') this.disableBtnConfirm(isInvalid);
 

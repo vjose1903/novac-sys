@@ -10,7 +10,7 @@
         <div class="form">
           <div class="fantasma-form">
             <div class="row">
-              <div class="col-12 p-0 mt-4">
+              <div *ngIf="form" class="col-12 p-0 mt-4">
                 <form *ngIf="config" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
                   <div class="row">
                     <div class="col-12 mb-2">
@@ -96,43 +96,6 @@
                       </div>
                     </div>
 
-                    <!-- <div class="col-6 mb-2">
-                      <div [appMsgError]="'printer_caja_selected'" [form]="form">
-                        <label class="control-label">Impresora facturación seleccionada: </label>
-                        <p-dropdown [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value">
-                              <div>{{ form.controls['printer_caja_selected'].value }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-printerItem pTemplate="item">
-                            <div class="printerItem-item d-flex align-items-center">
-                              <div>{{ printerItem }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-6 mb-2">
-                      <div [appMsgError]="'printer_reportes_selected'" [form]="form">
-                        <label class="control-label">Impresora reportes seleccionada: </label>
-                        <p-dropdown [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value">
-                              <div>{{ form.controls['printer_reportes_selected'].value }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-printerItem pTemplate="item">
-                            <div class="printerItem-item d-flex align-items-center">
-                              <div>{{ printerItem }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer"></span>
-                      </div>
-                    </div> -->
 
                     <div class="col-4 mb-3">
                       <div [appMsgError]="'url_servidor'" [form]="form">
@@ -164,6 +127,7 @@
 
                         <p-multiSelect
                           class="multiSelectPrimeng"
+                          appendTo="body"
                           [options]="documentos_a_imprimir"
                           [(ngModel)]="documentos_a_imprimir_selected"
                           [ngModelOptions]="{ standalone: true }"
@@ -249,6 +213,15 @@
                                 </div>
                               </div>
                             </div>
+
+                            <div class="col-12 mb-2">
+                              <div class="h-100 w-100 d-flex align-items-center">
+                                <div class="switchDiv" [appMsgError]="'can_pagar'" [form]="form">
+                                  <input formControlName="can_pagar" class="apple-switch" type="checkbox" />
+                                  <span class="ml-2 mb-0">Pagar facturas compra</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -266,7 +239,7 @@
         <div class="form">
           <div class="fantasma-form">
             <div class="row">
-              <div class="col-12 p-0 mt-4">
+              <div *ngIf="form" class="col-12 p-0 mt-4">
                 <form *ngIf="config" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
                   <div class="row">
                     <div class="col-12 mb-3">
@@ -297,13 +270,13 @@
                                       </div>
                                     </ng-template>
                                   </p-dropdown>
-                                  <span [id]="'msgContainer' + item.pageSizeFormControlName"></span>
+                                  <span id="msgContainer"></span>
                                 </div>
 
                                 <div [appMsgError]="item.printerFormControlName" [form]="form" class="mb-2">
                                   <div class="mb-0">Impresora:</div>
                                   <p-dropdown appendTo="body" [options]="config.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-dropdown>
-                                  <span [id]="'msgContainer' + item.printerFormControlName"></span>
+                                  <span id="msgContainer"></span>
                                 </div>
 
                                 <div *ngIf="item.plantillaFormControlName" class="mt-3">
@@ -311,7 +284,7 @@
                                     <div class="mb-0">Plantilla de impresion</div>
 
                                     <p-dropdown appendTo="body" [options]="get_plantillas(item.key)" [formControlName]="item.plantillaFormControlName" placeholder="Seleccione una plantilla" optionLabel="value" optionValue="value"> </p-dropdown>
-                                    <span [id]="'msgContainer' + item.plantillaFormControlName"></span>
+                                    <span id="msgContainer"></span>
                                   </div>
                                 </div>
                               </div>

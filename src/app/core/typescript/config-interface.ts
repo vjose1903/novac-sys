@@ -28,6 +28,7 @@ export interface ConfigI {
   is_db_local:                 boolean;
   facturacion_editar_precio:   boolean;
   vende_sin_inventario:        boolean;
+  can_pagar:                   boolean;
   documentos_a_imprimir:       string;
   medida_producto_terminado:   string;
 }
@@ -43,6 +44,7 @@ export interface Documentos {
   cuadre_caja:                 string;
   reporte:                     string;
   cotizacion:                  string;
+  pago_factura:                string;
 }
 export interface PlantiallasImpresion {
   nota:                        string;

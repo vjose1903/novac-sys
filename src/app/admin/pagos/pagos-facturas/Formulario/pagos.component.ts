@@ -17,6 +17,7 @@ import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PagosService } from '../pagos.service';
+import { TipoCantidadEfectivo } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.model';
 
 @Component({
   selector: 'app-pagos',
@@ -312,7 +313,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       this.devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
       this.is_print = arg.is_print;
-      this.sendIngreso();
+      this.sendPago();
     }
 
     if (arg.modalId == PagosComponent.modalBuscarEntidadId) {
@@ -542,11 +543,14 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
-      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
+      const tipo_modal = this.pagosService.isReciboIngreso ? TipoCantidadEfectivo.devuelta : TipoCantidadEfectivo.noDevuelta;
+      const documento = this.pagosService.isReciboIngreso ? 'recibo_ingreso' : 'pago_factura';
+
+      const inputs = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, documento: documento, tipo_modal: tipo_modal, formaPago: 'Efectivo' };
 
       this.openNewModal({
         component: FormCantidadEfectivoComponent,
-        inputs: obj,
+        inputs: inputs,
         id: 'cambioEfectivo_IngresosComponent',
         header: 'Cantidad de efectivo',
         width: '34.375rem',
@@ -566,7 +570,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  async sendIngreso() {
+  async sendPago() {
     const obj = {
       cliente_id: this.entidadAdepositar.id,
       total: this.detalleYtotal.total_recibo,

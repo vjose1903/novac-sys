@@ -14,7 +14,7 @@ function getPageMargin(is_contado, is_venta) {
   if (is_contado) {
     margins = is_venta ? [15, 135, 15, 0] : [15, 150, 15, 0];
   } else {
-    margins = is_venta ? [15, 148.6, 15, 0] : [15, 165, 15, 0];
+    margins = is_venta ? [15, 148.6, 15, 0] : [15, 163.5, 15, 0];
   }
 
   return margins;
