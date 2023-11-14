@@ -589,6 +589,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     const detalles = this.pagosService.isReciboIngreso ? 'detalle_recibos' : 'pago_factura_detalles';
     obj[detalles] = this.detalleYtotal.detalle;
 
+
     const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
     classToQuery[this.pagosService.tipoPago].createUpdateOne(obj).then((res) => {
