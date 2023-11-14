@@ -71,16 +71,16 @@
               <h4
                 class="opcion"
                 *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos"
-                [ngClass]="{ activa: actualRuta == 'lista_pagos/recibos-ingresos' }"
-                (click)="cambiarMenu({ url: 'recibos/lista_pagos/recibos-ingresos', navigate: true })"
+                [ngClass]="{ activa: actualRuta == 'lista_pagos/recibo_ingreso' }"
+                (click)="cambiarMenu({ url: 'recibos/lista_pagos/recibo_ingreso', navigate: true })"
               >
                 Recibos de ingreso
               </h4>
               <h4
                 class="opcion"
                 *ngxPermissionsOnly="menuPermissionsObj.pagos.cuentasPagar"
-                [ngClass]="{ activa: actualRuta == 'lista_pagos/pagos-facturas' }"
-                (click)="cambiarMenu({ url: 'recibos/lista_pagos/pagos-facturas', navigate: true })"
+                [ngClass]="{ activa: actualRuta == 'lista_pagos/pago_factura' }"
+                (click)="cambiarMenu({ url: 'recibos/lista_pagos/pago_factura', navigate: true })"
               >
                 Pago da facturas
               </h4>

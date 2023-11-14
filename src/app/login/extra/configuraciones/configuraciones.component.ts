@@ -195,7 +195,6 @@ export class ConfiguracionesComponent implements OnInit {
     printTestPdf({ paper_size: paperSize, documento: documento });
   }
 
-
   salir() {
     this.router.navigateByUrl('auth/login');
   }
@@ -270,15 +269,12 @@ export class ConfiguracionesComponent implements OnInit {
     return formulario;
   }
 
-  test(){
+  test() {
     let res = true;
 
-    console.log("this.form ", this.form);
-    console.log("this.form.valid ", this.form.valid);
     if (this.form) {
       if (this.form.valid) {
         let formulario = this.getFormularioToSend();
-
 
         let keysConfig = Object.keys(formulario);
         const cambios = [];
@@ -294,9 +290,6 @@ export class ConfiguracionesComponent implements OnInit {
         res = cambios.length > 0 ? false : true;
       } else res = true;
     }
-
-    console.log("res ", res);
-
   }
 
   formIsInvalid() {
@@ -305,7 +298,6 @@ export class ConfiguracionesComponent implements OnInit {
     if (this.form) {
       if (this.form.valid) {
         let formulario = this.getFormularioToSend();
-
 
         let keysConfig = Object.keys(formulario);
         const cambios = [];

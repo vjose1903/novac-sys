@@ -462,20 +462,19 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const detale = {};
       const { unidad, cantidad, cantidad_ant } = formGroup.getRawValue();
 
-      if (cantidad != cantidad_ant && fun.hasValue(unidad)) {
-        if (this.factServ.isVenta && !this.factServ.pre_venta_selected && fun.hasValue(unidad))
-          this.checkCantidadExede(index, 'change').then((excede) => {
-            if (excede) {
-              fun.enfocarAndSelectInput('cantidad-' + index);
-              detale['cantidad'] = cantidad_ant;
-              detale['unidad'] = null;
-            } else {
-              detale['cantidad_ant'] = cantidad;
-            }
-            formGroup.patchValue(detale);
+      if (this.factServ.isVenta && !this.factServ.pre_venta_selected && fun.hasValue(unidad) && cantidad != cantidad_ant) {
+        this.checkCantidadExede(index, 'change').then((excede) => {
+          if (excede) {
+            fun.enfocarAndSelectInput('cantidad-' + index);
+            detale['cantidad'] = cantidad_ant;
+            detale['unidad'] = null;
+          } else {
+            detale['cantidad_ant'] = cantidad;
+          }
+          formGroup.patchValue(detale);
 
-            resolve(excede);
-          });
+          resolve(excede);
+        });
       } else {
         formGroup.controls['cantidad_ant'].setValue(cantidad);
         resolve(false);

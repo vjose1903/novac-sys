@@ -16,7 +16,7 @@ import { SubTipoArticuloComponent } from './sub-tipo-articulo/sub-tipo-articulo.
   styleUrls: ['./tipo-articulo.component.scss'],
 })
 export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI {
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs;
 
   listaTipoArticulos: TipoArticuloI[] = [];
@@ -40,7 +40,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     id_tabla: 'listado_tipo_articulos',
     padre_functions: { data_request: (params) => this.getTipoArticulos(params), handleBtnsDinamic: (params) => this.handleBtnsDinamic(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: {
       editar: { show: true, permiso: this.permissions.categoria_entidad_contable.update },
       dinamico: [{ show: true, icon: 'fa-solid fa-diagram-next', permiso: Object.values(this.permissions.sub_tipo_articulo), name: 'subTipoArticulo', tooltip: 'Sub Categorias' }],
@@ -74,8 +74,6 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
       });
 
       this.listaTipoArticulos = fun.deepCloning(res.data);
-
-      console.log('res ', res);
 
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });

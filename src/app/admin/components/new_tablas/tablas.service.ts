@@ -32,8 +32,6 @@ export class TablasService {
   modifyPaginationById(id, params: Array<paginateI>) {
     params.forEach((param) => {
       const key = _.keys(param)[0];
-      console.log('this.obj_paginate ', this.obj_paginate);
-
       this.obj_paginate[id][key] = param[key];
 
       if (key == 'page') {

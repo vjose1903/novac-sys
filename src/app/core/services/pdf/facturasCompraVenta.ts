@@ -210,7 +210,6 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI, i
   });
 
   const numero_letra = numLetra.NumeroALetras(data.total_factura);
-  console.log('>>>>>>>>>>> isMostrar ', isMostrar);
 
   const content = [
     {

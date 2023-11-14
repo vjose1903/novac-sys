@@ -7,16 +7,19 @@ import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
 import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
+import { config_pago_factura } from './configuraciones/pago_factura';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_pre_venta } from './configuraciones/pre_venta';
 import { config_notas } from './configuraciones/notas';
+import { fun } from '../../functions.service';
 
 const configuraciones = {
   pre_venta: config_pre_venta,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
+  pago_factura: config_pago_factura,
   conduce: config_conduce,
   notas: config_notas,
   cuadre_caja: config_cuadre_caja,
@@ -24,9 +27,7 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
-  const is_compra = data?.tipo == 'compra' ? true : false;
-
-  const is_suplidor = is_compra;
+  const is_suplidor = fun.objHas(data, 'suplidor_id') ? true : false;
 
   const dd = {
     pageSize: { width: 200, height: 'auto' },

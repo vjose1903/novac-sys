@@ -1,7 +1,14 @@
 import { table_info } from '../../../components/new_tablas/tabla-class';
 
+
+export enum tipoPagoE {
+  recibosIngresos = 'recibo_ingreso',
+  pagosFacturas = 'pago_factura',
+}
+
+
 export const tableConfigPagos: { [key: string]: Array<table_info> } = {
-  'recibos-ingresos': [
+  [tipoPagoE.recibosIngresos]: [
     { titulo: 'No. recibo', estilos: [{ width: '8%' }], key: 'numero_recibo', tipo: 'text' },
     { titulo: 'Fecha recibo', estilos: [{ width: '10%' }], key: 'fecha_equivalente', tipo: 'date' },
     { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
@@ -18,7 +25,7 @@ export const tableConfigPagos: { [key: string]: Array<table_info> } = {
       ],
     },
   ],
-  'pagos-facturas': [
+  [tipoPagoE.pagosFacturas]: [
     { titulo: 'No. pago', estilos: [{ width: '8%' }], key: 'numero', tipo: 'text' },
     { titulo: 'Fecha pago', estilos: [{ width: '10%' }], key: 'fecha_equivalente', tipo: 'date' },
     { titulo: 'Suplidor', key: 'suplidor.nombre_completo', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
@@ -37,7 +44,3 @@ export const tableConfigPagos: { [key: string]: Array<table_info> } = {
   ],
 };
 
-export enum tipoPagoE {
-  recibosIngresos = 'recibos-ingresos',
-  pagosFacturas = 'pagos-facturas',
-}

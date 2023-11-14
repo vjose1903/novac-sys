@@ -84,7 +84,6 @@ export class ReciboC extends CrudG<ReciboI> {
   parseDataToPdf(data) {
     return new Promise((resolve) => {
       const data_parsed = fun.remplaceKeyFromJson(data, [
-        { old_key: 'numero_reporte', new_key: 'numero_documento' },
         { old_key: 'numero_recibo', new_key: 'identificador' },
         { old_key: 'detalle_recibos', new_key: 'contenido_reporte' },
       ]);
@@ -93,7 +92,7 @@ export class ReciboC extends CrudG<ReciboI> {
       data_parsed['numero_documento'] = data_parsed['identificador'];
       data_parsed['usuario'] = data.user.nombre_completo;
 
-      const documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
+      const documento = data.cliente.documentos_de_identidad.find((documento) => documento.principal == true);
       data_parsed['cliente']['rnc'] = documento ? documento.documento : '----------';
 
       data_parsed['contenido_reporte'].map((detalle) => {

@@ -1683,10 +1683,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   async enviarABaseDatos() {
     const cabecera_fact = this.formarData();
-    console.log('cabecera_fact ', cabecera_fact);
-
     let res;
-
     let documento = this.getDocumentoDescripcion();
 
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });

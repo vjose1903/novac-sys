@@ -91,7 +91,7 @@
   <div class="col-12 abajo">
     <div *ngIf="facturas && facturas?.length" class="d-flex justify-content-end">
       <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-      <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarPago()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>
   </div>
 </div>

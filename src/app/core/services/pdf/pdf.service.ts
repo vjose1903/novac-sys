@@ -40,6 +40,10 @@ export class PdfService {
             obj = options[ConfigService.config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
             break;
 
+          case 'pago_factura':
+            obj = options[ConfigService.config.pages_sizes.pago_factura].makePDF(data, 'pagoFactura.pdf', 'pago_factura');
+            break;
+
           case 'conduce':
             obj = options[ConfigService.config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
             break;

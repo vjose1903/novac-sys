@@ -91,8 +91,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     const formulario = this.form.getRawValue();
 
     if (formulario.usuario == '1973' && formulario.password == '3791') {
-      console.log("ConfigService.config ", ConfigService.config);
-
       if (ConfigService.config.is_development) this.router.navigateByUrl('/auth/config');
       else this.openConfigsModal();
     } else {

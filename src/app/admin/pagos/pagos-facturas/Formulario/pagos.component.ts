@@ -17,7 +17,9 @@ import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PagosService } from '../pagos.service';
-import { TipoCantidadEfectivo } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.model';
+import { DocumentoDevuelta, TipoCantidadEfectivo } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.model';
+import { PagoC } from '../../class/pagos/pagos';
+import { tipoPagoE } from '../lista-pagos/pagos.config';
 
 @Component({
   selector: 'app-pagos',
@@ -93,7 +95,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
   tablaComponent;
 
-  tipoFacturas;
+  tipoFacturaId: number;
   precioEnTurno: any;
   ExisteMontoMayor: boolean;
   detalleYtotal: any;
@@ -115,6 +117,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
   suplidorClass = new SuplidorC();
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
+  pagoClass = new PagoC();
 
   constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router, private route: ActivatedRoute, public pagosService: PagosService) {
     super();
@@ -259,6 +262,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     factura_id = factura_id == '0' ? null : factura_id;
 
     this.pagosService.tipoPago = this.route.snapshot.params['tipo'];
+    this.tipoFacturaId = Ss.factServ.lista_tipos_facturas.find((tipoFactura) => tipoFactura.descripcion.toLowerCase() == this.pagosService.tipoPago).id;
 
     if (fun.hasValue(entidad_id)) {
       const classDinamic = this.pagosService.isReciboIngreso ? 'clienteClass' : 'suplidorClass';
@@ -508,7 +512,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  formarDetalleRecibos() {
+  formarDetallePagos() {
     const temp = [];
     let total = 0;
 
@@ -536,15 +540,15 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     return obj;
   }
 
-  async confirmarIgreso() {
+  async confirmarPago() {
     if (this.ExisteMontoMayor) {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
     } else if (this.facturasSelected.some((factura) => factura.monto == 0)) {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
-      this.detalleYtotal = await this.formarDetalleRecibos();
+      this.detalleYtotal = await this.formarDetallePagos();
       const tipo_modal = this.pagosService.isReciboIngreso ? TipoCantidadEfectivo.devuelta : TipoCantidadEfectivo.noDevuelta;
-      const documento = this.pagosService.isReciboIngreso ? 'recibo_ingreso' : 'pago_factura';
+      const documento = this.pagosService.isReciboIngreso ? DocumentoDevuelta.reciboIngreso : DocumentoDevuelta.pagoFactura;
 
       const inputs = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, documento: documento, tipo_modal: tipo_modal, formaPago: 'Efectivo' };
 
@@ -572,24 +576,29 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
   async sendPago() {
     const obj = {
-      cliente_id: this.entidadAdepositar.id,
       total: this.detalleYtotal.total_recibo,
       forma_pago: this.forma_pago,
-      tipo_factura_id: 17,
+      tipo_factura_id: this.tipoFacturaId,
       devuelta: this.devuelta,
-      numero_recibo: null,
       estado: true,
-      detalle_recibos: this.detalleYtotal.detalle,
     };
 
-    this.reciboClass.createUpdateOne(obj).then((res) => {
-      const recibo = res['data'].recibo;
+    const entidad = this.pagosService.isReciboIngreso ? 'cliente_id' : 'suplidor_id';
+    obj[entidad] = this.entidadAdepositar.id;
+
+    const detalles = this.pagosService.isReciboIngreso ? 'detalle_recibos' : 'pago_factura_detalles';
+    obj[detalles] = this.detalleYtotal.detalle;
+
+    const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
+
+    classToQuery[this.pagosService.tipoPago].createUpdateOne(obj).then((res) => {
+      const pago = this.pagosService.isReciboIngreso ? res['data'].recibo : res['data'];
 
       const actualPagination = this.tServ.getPaginationById(PagosComponent.tablaPagosId);
       this.pedirPagosPorEntidad(this.entidadAdepositar.id, actualPagination);
 
       this.resetVariables();
-      this.reciboClass.parseDataToPdf(recibo).then((recibo_parsed) => {
+      classToQuery[this.pagosService.tipoPago].parseDataToPdf(pago).then((recibo_parsed) => {
         const obj_print = { data: recibo_parsed, type: 'recibo_ingreso' };
 
         PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })

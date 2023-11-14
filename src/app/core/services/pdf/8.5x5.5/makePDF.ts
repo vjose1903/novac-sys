@@ -8,6 +8,7 @@ import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes,
 import { config_notas } from './configuraciones/notas/notas';
 import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
+import { config_pago_factura } from './configuraciones/pago_factura';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
@@ -20,6 +21,7 @@ const configuraciones = {
   notas_agrupada: config_notas.agrupada,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
+  pago_factura: config_pago_factura,
   conduce: config_conduce,
   cotizacion: config_cotizacion,
   cuadre_caja: config_cuadre_caja,
@@ -27,9 +29,7 @@ const configuraciones = {
 
 export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const tipo_pdf = `${base_tipo_pdf}${post_tipo_pdf}`;
-  const is_compra = data?.tipo === 'compra' ? true : false;
-
-  const is_suplidor = is_compra;
+  const is_suplidor = fun.objHas(data, 'suplidor_id') ? true : false;
 
   const configuration = configuraciones[tipo_pdf];
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
@@ -39,9 +39,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     pageMargins: configuration.pageMargins,
     header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp: ConfigService.config, tipo_pdf: base_tipo_pdf }),
     content: contenidoPDF({ data, configApp: ConfigService.config, configuration, tipo_pdf: base_tipo_pdf }),
-    images: {
-      logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
-    },
+    images: { logo: `data:image/png;base64,${ConfigService.config.logo_impresion}` },
     styles: styles_,
   };
 
@@ -333,6 +331,7 @@ function parseInfoFactura(data, tipo_pdf) {
 function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   const contenido = [];
   const numero_letra = numLetra.NumeroALetras(data?.total);
+
   if (!infoPropietarioPartes[tipo_pdf].length) return [{ text: '' }];
 
   const partes = [

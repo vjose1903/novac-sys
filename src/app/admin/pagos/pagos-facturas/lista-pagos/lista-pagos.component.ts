@@ -28,7 +28,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
     colores: true,
     padding: '0.5rem',
     id_tabla: ListaPagosComponent.tablePagosId,
-    padre_functions: { data_request: (params) => this.getRecibos(params) },
+    padre_functions: { data_request: (params) => this.getPagos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, is_local: false },
   };
@@ -65,8 +65,11 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   mapeoPagos(data) {
     data.map((pago) => {
       const numberKey = this.pagosService.isReciboIngreso ? 'numero_recibo' : 'numero';
-      pago[numberKey] = _.padStart(pago.numero_recibo, 8, '0');
-      pago['numero_factura'] = pago.detalle_recibos.length === 1 ? pago.detalle_recibos[0].descripcion.split(' ')[1] : 'Varios...';
+      pago[numberKey] = _.padStart(pago[numberKey], 8, '0');
+
+      const detalleKey = this.pagosService.isReciboIngreso ? 'detalle_recibos' : 'pago_factura_detalles';
+      pago['numero_factura'] = pago[detalleKey].length === 1 ? pago[detalleKey][0].descripcion.split(' ')[1] : 'Varios...';
+
       pago['ver'] = 'far fa-eye';
       pago['anular'] = 'far fa-trash-alt';
       pago['tooltip_ver'] = 'Ver';
@@ -101,12 +104,12 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   async necesarioStart() {
     this.pagosService.tipoPago = this.route.snapshot.params['tipo'];
     this.table_config.info = tableConfigPagos[this.pagosService.tipoPago];
-    await this.getRecibos(this.tServ.obj_paginate.default);
+    await this.getPagos(this.tServ.obj_paginate.default);
   }
 
-  async getRecibos(params?: { per_page?: number; page?: number; search?: string }) {
+  async getPagos(params?: { per_page?: number; page?: number; search?: string }) {
     try {
-      const classToQuery = { 'recibos-ingresos': this.reciboClass, 'pagos-facturas': this.pagoClass };
+      const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -131,17 +134,19 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
     if (event.columnKey) {
       switch (event.iconKey) {
         case 'ver':
-          this.makeReciboPdf(recibo_selected);
+          this.makePagoPdf(recibo_selected);
           break;
 
         case 'anular':
-          const texto_modal = `Seguro de que desea anular el recibo <b class="negrita"> #${recibo_selected.numero_recibo} </b>`;
+          const numberKey = this.pagosService.isReciboIngreso ? 'numero_recibo' : 'numero';
+          const texto_modal = `Seguro de que desea anular el pago <b class="negrita"> #${recibo_selected[numberKey]} </b>`;
+
           const siFunction = (instance) => {
             this.anularRecibo(recibo_selected.id);
             instance.dismissModal(instance.id);
           };
 
-          this.confirmationModal({ id: 'anular_recibo', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
+          this.confirmationModal({ id: 'anular_pago', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
           break;
 
         default:
@@ -150,10 +155,13 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
     }
   }
 
-  makeReciboPdf(arg) {
-    const recibo_selected = _.find(this.lista_pagos, (recibo) => recibo.id === arg.id);
-    this.reciboClass.parseDataToPdf(recibo_selected).then((recibo_parsed) => {
-      const obj = { data: recibo_parsed, type: 'recibo_ingreso', retunBase64: true };
+  makePagoPdf(arg) {
+    const pago_selected = _.find(this.lista_pagos, (pago) => pago.id === arg.id);
+
+    const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
+
+    classToQuery[this.pagosService.tipoPago].parseDataToPdf(pago_selected).then((pago_parsed) => {
+      const obj = { data: pago_parsed, type: this.pagosService.tipoPago, retunBase64: true };
       this.generarPdf(obj);
     });
   }
@@ -198,7 +206,9 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
           });
         }
       })
-      .catch(() => Ss.loadServ.isLoading.next(false));
+      .catch((err) => {
+        Ss.loadServ.isLoading.next(false);
+      });
   }
 
   verDetalles(data) {
@@ -229,7 +239,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
       const extra = { afterPath: `revertir/by_id/${id}` };
       const actualPagination = this.tServ.getPaginationById(ListaPagosComponent.tablePagosId);
 
-      this.reciboClass.dynamic(extra).then((res) => this.getRecibos(actualPagination));
+      this.reciboClass.dynamic(extra).then((res) => this.getPagos(actualPagination));
     } catch (error) {}
   }
 }
