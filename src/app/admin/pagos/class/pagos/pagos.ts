@@ -32,9 +32,9 @@ export class PagoC extends CrudG<PagoI> {
     return {
       component: DetalleFacturaComponent,
       inputs: { data: data },
-      id: `detalle_recibos`,
-      header: 'Detalles Recibos',
-      width: '30rem',
+      id: `detalle_pagos`,
+      header: 'Detalles Pagos',
+      width: '35rem',
       height: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),

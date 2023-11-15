@@ -139,10 +139,11 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
 
         case 'anular':
           const numberKey = this.pagosService.isReciboIngreso ? 'numero_recibo' : 'numero';
-          const texto_modal = `Seguro de que desea anular el pago <b class="negrita"> #${recibo_selected[numberKey]} </b>`;
+          const label = this.pagosService.isReciboIngreso ? 'recibo' : 'pago';
+          const texto_modal = `Seguro de que desea anular el ${label} <b class="negrita"> #${recibo_selected[numberKey]} </b>`;
 
           const siFunction = (instance) => {
-            this.anularRecibo(recibo_selected.id);
+            this.anularPago(recibo_selected.id);
             instance.dismissModal(instance.id);
           };
 
@@ -176,14 +177,16 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
           const base64 = res.base64;
           const pageOrientation = res.pageOrientation;
 
-          const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', reimprimir: true, fileName: _.first(res.file.split('.')) };
+          const titulo = this.pagosService.isReciboIngreso ? 'Revisión de recibo de ingreso' : 'Revisión de pago de factura';
+
+          const obj_pdf = { base64: res.base64, titulo: titulo, reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           Ss.loadServ.isLoading.next(false);
 
           this.openNewModal({
             component: PdfViewerComponent,
             inputs: obj_pdf,
-            id: 'revision_recibo',
+            id: 'revision_pago',
             header: obj_pdf.titulo,
             width: '900px',
             height: '40rem',
@@ -212,7 +215,9 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   verDetalles(data) {
-    const configModal = this.reciboClass.modalVerDetalles(data);
+    const classToUse = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
+
+    const configModal = classToUse[this.pagosService.tipoPago].modalVerDetalles(data);
     this.openNewModal(configModal);
   }
 
@@ -234,12 +239,13 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
     }
   }
 
-  async anularRecibo(id) {
+  async anularPago(id) {
     try {
       const extra = { afterPath: `revertir/by_id/${id}` };
       const actualPagination = this.tServ.getPaginationById(ListaPagosComponent.tablePagosId);
+      const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
-      this.reciboClass.dynamic(extra).then((res) => this.getPagos(actualPagination));
+      classToQuery[this.pagosService.tipoPago].dynamic(extra).then((res) => this.getPagos(actualPagination));
     } catch (error) {}
   }
 }

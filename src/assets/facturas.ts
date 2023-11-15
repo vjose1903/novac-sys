@@ -57,6 +57,7 @@ export const compra_credito_valor_fiscal = {
   usuario: 'Mari Santos',
   notas: [],
   pagos: [],
+  recibos: [],
   FACTURA_DE: 'compra',
 };
 export const compra_contado_valor_fiscal = {
@@ -171,6 +172,7 @@ export const compra_contado_valor_fiscal = {
   ],
   notas: [],
   pagos: [],
+  recibos: [],
   FACTURA_DE: 'compra',
 };
 
@@ -713,6 +715,7 @@ export const venta_contado_consumo = {
   usuario: 'Mari Santos',
   notas: [],
   pagos: [],
+  recibos: [],
   FACTURA_DE: 'venta',
 };
 
@@ -855,6 +858,7 @@ export const venta_credito_consumo = {
   vendedor: 'Adm',
   notas: [],
   pagos: [],
+  recibos: [],
   secuencia: '00012251',
   fecha: '01/03/2022',
   fechaV: '30/03/2022',
@@ -967,6 +971,7 @@ export const nota_credito = {
   usuario: 'Mari Santos',
   notas: [],
   pagos: [],
+  recibos: [],
   FACTURA_DE: 'nota',
 };
 export const conduce = {

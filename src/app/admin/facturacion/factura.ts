@@ -220,7 +220,7 @@ export class FacturaC extends CrudG<FacturasI> {
       inputs: { data: data },
       id: `detalle_factura`,
       header: 'Detalles Factura',
-      width: '30rem',
+      width: '35rem',
       height: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
@@ -255,21 +255,27 @@ export class FacturaC extends CrudG<FacturasI> {
     });
   }
 
-  abrirModalHistorial(pagos, notas, openNewModal) {
-    if (pagos.length > 0 || notas.length > 0) {
-      for (let i = 0; i < pagos.length; i++) {
-        const pago = pagos[i];
-        pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
-        pago.fecha_equivalente = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
-      }
+  abrirModalHistorial(pagos, notas, recibos, openNewModal, config = null) {
+    if (recibos.length > 0 || notas.length > 0 || pagos.length > 0) {
+      recibos.map((recibo) => {
+        recibo.numero_recibo = _.padStart(recibo.numero_recibo, 8, '0');
+        recibo.fecha_equivalente = moment(recibo.fecha_equivalente).format('DD/MM/YYYY');
+        return recibo;
+      });
 
-      for (let i = 0; i < notas.length; i++) {
-        const nota = notas[i];
+      notas.map((nota) => {
         nota.total = Math.abs(nota.total);
         nota.fecha_equivalente = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
-      }
+        return nota;
+      });
 
-      const obj = { abonos: pagos, notas: notas };
+      pagos.map((pago) => {
+        pago.numero = _.padStart(pago.numero, 8, '0');
+        pago.fecha_equivalente = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
+        return pago;
+      });
+
+      const obj = { recibos: recibos, notas: notas, pagos: pagos, config: config };
       openNewModal({
         component: ModalHistorialPagosComponent,
         inputs: obj,
@@ -366,6 +372,7 @@ export interface FacturasI {
   vendedor: string;
   notas: any;
   pagos: Pago[];
+  recibos: Recibo[];
   [propName: string]: any;
 }
 
@@ -412,6 +419,24 @@ export interface Contenidos {
   Saco_25?: number;
   Quintal?: number;
   Libra?: number;
+}
+
+export interface Recibo {
+  id: number;
+  recibos_ingreso_id: number;
+  cabecera_factura_id: number;
+  balance_factura: number;
+  balance_anterior_factura: number;
+  pago_total: boolean;
+  deposito: number;
+  descripcion: string;
+  pago_a_tiempo: boolean;
+  is_ultimo: boolean;
+  created_at: string;
+  updated_at: string;
+  numero_recibo: number;
+  recibo_creado_por: string;
+  fecha_equivalente: string;
 }
 
 export interface Pago {

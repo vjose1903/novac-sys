@@ -154,7 +154,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  async pedirPagosPorEntidad(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any }) {
+  async pedirPagosPorEntidad(entidad_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any }) {
     this.facturas.length = 0;
 
     this.totalFacturado = 0;
@@ -170,7 +170,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
     const classDinamic = this.pagosService.isReciboIngreso ? 'clienteClass' : 'suplidorClass';
 
-    const res = await this[classDinamic].getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
+    const res = await this[classDinamic].getAll({ afterPath: `custom/get_balances/${entidad_id}`, parameters: parameters });
 
     await res.data.facturas.data.map((factura, index) => {
       let factura_selected = _.find(this.facturasSelected, { id: factura.id });
@@ -188,7 +188,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
       factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
       factura.monto = fun.hasValue(factura_selected) ? factura_selected.monto : '0.00';
-      const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
+      const modalMoviemientos = factura.recibos.length > 0 || factura.notas.length > 0 || factura.pagos.length > 0;
 
       factura.tooltip_pedido = 'Modificar datos del pedido';
       factura.colorPedido = 'green';
@@ -363,8 +363,11 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
           this.confirmationModal(obj);
         }
       }
-      if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
-        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal);
+      if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length || params.data.recibos.length)) {
+        const config = {};
+        const configKey = this.pagosService.isReciboIngreso ? 'showPagos' : 'showRecibos';
+        config[configKey] = false;
+        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, params.data.recibos, this.openNewModal, config);
       }
 
       if (params.iconKey == 'ver') {
@@ -588,7 +591,6 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
     const detalles = this.pagosService.isReciboIngreso ? 'detalle_recibos' : 'pago_factura_detalles';
     obj[detalles] = this.detalleYtotal.detalle;
-
 
     const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 

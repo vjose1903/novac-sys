@@ -37,7 +37,7 @@ export class ReciboC extends CrudG<ReciboI> {
       inputs: { data: data },
       id: `detalle_recibos`,
       header: 'Detalles Recibos',
-      width: '30rem',
+      width: '35rem',
       height: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),

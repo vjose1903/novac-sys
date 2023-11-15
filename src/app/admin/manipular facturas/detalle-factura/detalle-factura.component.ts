@@ -10,15 +10,23 @@ import { fun } from '../../../core/services/functions.service';
 })
 export class DetalleFacturaComponent implements OnInit, ModalI {
   constructor() {}
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   detalles = [{ label: 'Forma de pago', key: 'forma_pago', tipo: 'string' }];
 
-  ngOnInit(): void {}
+  entidad;
+  entidadLabel;
+
+  ngOnInit(): void {
+
+    const hasCliente = fun.hasValue(this.inputs.data.cliente);
+    this.entidad = hasCliente ? this.inputs.data.cliente : this.inputs.data.suplidor;
+    this.entidadLabel = hasCliente ? 'Cliente' : 'Suplidor';
+  }
 
   getValue(config) {
-    let value = _.get(this.inputs.data, config.key);
+    let value = fun.getProperty(this.inputs.data, config.key);
 
     if (config.tipo == 'number') value = fun.roundNumberToDecimal(value);
 

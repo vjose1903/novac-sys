@@ -42,7 +42,7 @@
           <i
             class="fas fa-bars btn-icon"
             style="position: absolute; right: 1rem"
-            [ngClass]="{ disabled: !viaje_selected?.pagos.length && !viaje_selected?.notas.length }"
+            [ngClass]="{ disabled: !viaje_selected?.recibos.length && !viaje_selected?.notas.length }"
             pTooltip="Historial de movimientos"
             tooltipPosition="left"
             (click)="abrir_historial()"
@@ -63,7 +63,7 @@
                 <h6 class="negrita p-0 mr-2">Total facturado:</h6>
 
                 <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                  <p class="text-black mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
+                  <p *ngIf="fun.hasValue(viaje_selected)" class="text-black mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
                 </p-tag>
               </span>
 
@@ -71,7 +71,7 @@
                 <h6 class="negrita p-0 mr-2 text-red">Monto pendiente:</h6>
 
                 <p-tag [rounded]="true" [style]="{ background: '#e9c1c1', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                  <p class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
+                  <p *ngIf="fun.hasValue(viaje_selected)" class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
                 </p-tag>
               </span>
             </div>

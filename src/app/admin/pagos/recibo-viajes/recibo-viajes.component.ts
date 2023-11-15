@@ -202,9 +202,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       res.data.forEach((viaje) => {
         const pago_a_tiempo = viaje.condicion == 'Contado' ? true : viaje.fecha_vencimiento > fechaA ? true : false;
 
-        viaje.is_active = viaje.fecha_completada ? 'fas fa-check' : viaje.pagos.length > 0 ? 'far fa-check-square' : 'far fa-square';
-        viaje.is_active_color = viaje.fecha_completada ? 'green' : viaje.pagos.length > 0 ? 'yellow' : 'red';
-        viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.pagos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
+        viaje.is_active = viaje.fecha_completada ? 'fas fa-check' : viaje.recibos.length > 0 ? 'far fa-check-square' : 'far fa-square';
+        viaje.is_active_color = viaje.fecha_completada ? 'green' : viaje.recibos.length > 0 ? 'yellow' : 'red';
+        viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.recibos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
         viaje.ver = 'far fa-eye';
         viaje.make_recipt = 'fas fa-external-link-alt';
         viaje.make_recipt_tooltip = fun.hasValue(viaje.fecha_completada) ? 'Pedido completado' : 'Realizar recibo de ingreso';
@@ -395,10 +395,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   abrir_historial() {
-    const pagos = this.viaje_selected.pagos;
+    const pagos = [];
+    const recibos = this.viaje_selected.recibos;
     const notas = this.viaje_selected.notas;
 
-    if (pagos.length || notas.length) this.facturaClass.abrirModalHistorial(pagos, notas, this.openNewModal);
+    if (recibos.length || notas.length) this.facturaClass.abrirModalHistorial(pagos, notas, recibos, this.openNewModal, { showPagos: false });
   }
 
   addMovimiento() {
@@ -420,7 +421,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.viaje_selected = data;
     this.monto_pendiente = this.viaje_selected.balance;
 
-    this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
+    this.ultimo_pago = _.maxBy(this.viaje_selected.recibos, 'id');
 
     const index_viaje = this.viajes.findIndex((viaje) => viaje.id == data.id);
 
