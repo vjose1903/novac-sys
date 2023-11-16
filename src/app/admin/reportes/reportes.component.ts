@@ -12,6 +12,7 @@ import { ReciboC } from '../pagos/class/ingresos/recibos';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { CuadreC } from './../cuadres/cuadres';
 import { NotaC } from '../manipular facturas/notas-cred-deb/notas';
+import { PagoC } from '../pagos/class/pagos/pagos';
 
 @Component({
   selector: 'app-reportes',
@@ -39,6 +40,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     cuentas_con_pagos: ClienteC,
     ventas_cliente: ClienteC,
     recibos: ReciboC,
+    pago_facturas: PagoC,
     notas: NotaC,
   };
 

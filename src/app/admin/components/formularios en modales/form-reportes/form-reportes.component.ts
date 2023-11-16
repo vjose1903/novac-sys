@@ -4,13 +4,14 @@ import { Ss } from './../../../../core/services/singleton.service';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { tFacturaD } from './../../../facturacion/factura';
 
-
 import { CxP } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC, CxC } from '../../../registros/registro-clientes/cliente';
 import { ModalComponentI, ModalI } from '../../modal/modal-class';
+import { TipoPagoReporte } from '../../../pagos/class/pagos/pagos';
+import { TipoReciboReporte } from '../../../pagos/class/ingresos/recibos';
 
 @Component({
   selector: 'app-form-reportes',
@@ -45,7 +46,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     super();
   }
 
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   ngOnInit() {
@@ -112,7 +113,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   agregateValidators() {
     let tipo_selected = null;
     let condicion_selected = null;
-    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'movimientos_vehiculo'];
+    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'pago_facturas', 'movimientos_vehiculo'];
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
 
     if (this.inputs.tipo_reporte == 'cuadre') {
@@ -125,8 +126,16 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'recibos') {
       this.tipos = [
-        { id: 'detallado', label: 'Detallado' },
-        { id: 'agrupado', label: 'Agrupado' },
+        { id: TipoReciboReporte.detallado, label: 'Detallado' },
+        { id: TipoReciboReporte.agrupado, label: 'Agrupado' },
+      ];
+
+      tipo_selected = 'detallado';
+      //
+    } else if (this.inputs.tipo_reporte == 'pago_facturas') {
+      this.tipos = [
+        { id: TipoPagoReporte.detallado, label: 'Detallado' },
+        { id: TipoPagoReporte.agrupado, label: 'Agrupado' },
       ];
 
       tipo_selected = 'detallado';
@@ -262,7 +271,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       condicion: [null],
       fecha: [null],
       desde: [null],
-      hasta: [null]
+      hasta: [null],
     });
   }
 

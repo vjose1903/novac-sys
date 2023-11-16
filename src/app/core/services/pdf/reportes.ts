@@ -13,6 +13,7 @@ import { config_cxc_preventa } from './8.5x5.5/configuraciones/reportes/cuentas_
 import { config_cxc_ant } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc_ant';
 import { config_inventario } from './8.5x5.5/configuraciones/reportes/inventario';
 import { config_recibos } from './8.5x5.5/configuraciones/reportes/recibos';
+import { config_pago_facturas } from './8.5x5.5/configuraciones/reportes/pago_facturas';
 import { config_ventas_prod } from './8.5x5.5/configuraciones/reportes/ventas_prod';
 import { config_cuentas_pagos } from './8.5x5.5/configuraciones/reportes/cuentas_con_pagos';
 import { config_suplidor_prod } from './8.5x5.5/configuraciones/reportes/suplidor_prod';
@@ -46,6 +47,9 @@ const configuraciones = {
 
   recibos: config_recibos.detallado,
   recibos_agrupado: config_recibos.agrupado,
+
+  pago_facturas: config_pago_facturas.detallado,
+  pago_facturas_agrupado: config_pago_facturas.agrupado,
 
   suplidor_prod: config_suplidor_prod,
   cxp: config_cxp,

@@ -105,3 +105,8 @@ export class ReciboC extends CrudG<ReciboI> {
     });
   }
 }
+
+export enum TipoReciboReporte {
+  detallado = 'detallado',
+  agrupado = 'agrupado',
+}

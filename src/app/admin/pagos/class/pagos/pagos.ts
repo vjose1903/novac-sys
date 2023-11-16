@@ -101,4 +101,10 @@ export class PagoC extends CrudG<PagoI> {
       resolve(data_parsed);
     });
   }
+
+}
+
+export enum TipoPagoReporte {
+  detallado = 'detallado',
+  agrupado = 'agrupado',
 }

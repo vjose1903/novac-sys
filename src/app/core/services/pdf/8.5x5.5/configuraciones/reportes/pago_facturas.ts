@@ -1,0 +1,110 @@
+export const config_pago_facturas = {
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // DETALLADO
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  detallado: {
+    margin_general: [0, 0, 0, 0],
+    isBreak: false,
+    only_titulo: false,
+    widths: [24, 60, '*', 50, 'auto'],
+    mostrar_total: true,
+    mostrar_bruto: false,
+    mensaje_contenido_vacio: 'No existen recibos de ingresos en el rango de fechas introducido.',
+    info: [
+      {
+        text: '#',
+        alignment_titulo: 'center',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'index',
+        alignment_body: 'center',
+      },
+      {
+        text: 'Fecha',
+        alignment_titulo: 'left',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'fecha_equivalente',
+        alignment_body: 'left',
+        formato_fecha: true,
+      },
+      {
+        text: 'Suplidor',
+        alignment_titulo: 'left',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'suplidor_nombre',
+        alignment_body: 'left',
+      },
+      {
+        text: 'Met. pago',
+        style: 'letra10',
+        alignment_titulo: 'center',
+        noWrap: true,
+        style_body: 'letra10',
+        key: 'forma_pago',
+        alignment_body: 'center',
+      },
+
+      {
+        text: 'Recibido',
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'total',
+        alignment_body: 'right',
+        formato_numero: true,
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+      },
+    ],
+  },
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // AGRUPADO
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  agrupado: {
+    margin_general: [0, 0, 0, 0],
+    isBreak: false,
+    only_titulo: false,
+    widths: [24, '*', '*'],
+    mostrar_total: true,
+    mostrar_bruto: false,
+    mensaje_contenido_vacio: 'No existen recibos de ingresos en el rango de fechas introducido.',
+    info: [
+      {
+        text: '#',
+        alignment_titulo: 'center',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'index',
+        alignment_body: 'center',
+      },
+      {
+        text: 'Fecha',
+        alignment_titulo: 'left',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'fecha',
+        alignment_body: 'left',
+      },
+      {
+        text: 'Recibido',
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'total_general',
+        alignment_body: 'right',
+        formato_numero: true,
+        margin_titulo: [0, 0, 10, 0],
+        margin_body: [0, 0, 10, 0],
+      },
+    ],
+  },
+};
