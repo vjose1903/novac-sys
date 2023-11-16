@@ -32,6 +32,8 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     ventas_productos: ArticuloC,
     inventario: InventarioC,
     suplidor_prod: SuplidorC,
+    cuentas_pagar_suplidor: SuplidorC,
+    cuentas_pagar_ant_saldo: SuplidorC,
     cuentas_cobrar_cliente: ClienteC,
     cuentas_cobrar_ant_saldo: ClienteC,
     cuentas_con_pagos: ClienteC,

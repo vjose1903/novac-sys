@@ -80,12 +80,13 @@ export function isEmpty(value) {
 // =========================================================================================================
 
 export function roundNumber(number, cant = 2) {
-  if (isEmpty(number)) return number;
+  let tempNum = number;
+  if (isEmpty(tempNum)) return number;
 
-  if (typeof number == 'string') number = parseFloat(desformatearStNumber(number));
-  if (isNaN(number)) return number;
+  if (typeof number == 'string') tempNum = parseFloat(desformatearStNumber(number));
+  if (isNaN(tempNum)) return number;
 
-  const numerRounded = number.toFixed(cant);
+  const numerRounded = tempNum.toFixed(cant);
   // Formateamos el número con comas para separar millares
   const partes = numerRounded.split('.');
   const enteros = partes[0];
@@ -101,6 +102,6 @@ export function desformatearStNumber(sTnum: any) {
 }
 // =========================================================================================================
 export function roundNumberToDecimal(num, tachado = false) {
-  const numberFOrmated = tachado && num < 1 ? '-' : roundNumber(num);
-  return numberFOrmated;
+  const numberFormated = tachado && num < 1 ? '-' : roundNumber(num);
+  return numberFormated;
 }

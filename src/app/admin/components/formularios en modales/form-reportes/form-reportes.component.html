@@ -53,7 +53,17 @@
     </div>
 
     <!-- ----- TIPO -----  -->
-    <div *ngIf="inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'ventas_productos' || inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'notas'" class="col-12">
+    <div
+      *ngIf="
+        inputs.tipo_reporte == 'ventas_rango' ||
+        inputs.tipo_reporte == 'recibos' ||
+        inputs.tipo_reporte == 'ventas_productos' ||
+        inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' ||
+        inputs.tipo_reporte == 'cuentas_pagar_ant_saldo' ||
+        inputs.tipo_reporte == 'notas'
+      "
+      class="col-12"
+    >
       <label class="control-label mb-0 mt-2">Tipo: <span style="color: red">*</span> </label>
       <select formControlName="tipo" class="form-control" (change)="changeTipo()">
         <option disabled>Seleccione</option>

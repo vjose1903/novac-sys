@@ -46,7 +46,7 @@ export class ClienteC extends CrudG<any> {
   static async requestReporte(reporteParams, pdfParams) {
     let hasPermisoPreVenta = await Ss.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
 
-    let objTipo = { cuentas_cobrar_cliente: 1, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
+    let objTipo = { cuentas_cobrar_cliente: CxC.por_cliente, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
     let tipo;
     let requestParameters;
 
@@ -55,7 +55,7 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modalId] };
         tipo = requestParameters['tipo'];
-        if (tipo == 1) requestParameters['cliente_id'] = reporteParams.data.id;
+        if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.id;
         pdfParams.tipo = 'cuentas_cobrar';
         break;
 
@@ -83,14 +83,14 @@ export class ClienteC extends CrudG<any> {
         titulo: pdfParams.inputs.titulo,
         fileName: _.first(response.file.split('.')),
         openNewModal: pdfParams.openNewModal,
-        viewerOptions: { width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem' },
+        viewerOptions: { width: tipo == CxC.por_cliente ? '57rem' : '64rem', height: tipo == CxC.por_cliente ? '76vh' : '47rem' },
       };
 
       ReporteC.visualizarReporte(objPdfView);
     });
 
     function transformRequestResponse(requestResponse) {
-      if (hasPermisoPreVenta && objTipo['cuentas_cobrar_ant_saldo'] != 3 && pdfParams.tipo != 'ventas_cliente') requestResponse['tipo_reporte'] += '_preventa';
+      if (hasPermisoPreVenta && objTipo['cuentas_cobrar_ant_saldo'] != CxC.agrupado && pdfParams.tipo != 'ventas_cliente') requestResponse['tipo_reporte'] += '_preventa';
 
       return requestResponse;
     }
@@ -113,6 +113,12 @@ export class ClienteC extends CrudG<any> {
     };
     return objModal;
   }
+}
+
+export enum CxC {
+  por_cliente = 1,
+  detallado = 2,
+  agrupado = 3,
 }
 
 export interface ClienteI {

@@ -6,16 +6,18 @@ import { getContentWithTablaNormal } from './utils/tabla_normal';
 import { getContentWithTablaAgrupada } from './utils/tabla_agrupada';
 import { ConfigI } from '../../typescript/config-interface';
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
-import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
-import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cxc_ant_preventa';
+import { config_cxc } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc';
+import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc_ant_preventa';
 import { config_ventas_cliente } from './8.5x5.5/configuraciones/reportes/ventas_cliente';
-import { config_cxc_preventa } from './8.5x5.5/configuraciones/reportes/cxc_preventa';
-import { config_cxc_ant } from './8.5x5.5/configuraciones/reportes/cxc_ant';
+import { config_cxc_preventa } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc_preventa';
+import { config_cxc_ant } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc_ant';
 import { config_inventario } from './8.5x5.5/configuraciones/reportes/inventario';
 import { config_recibos } from './8.5x5.5/configuraciones/reportes/recibos';
 import { config_ventas_prod } from './8.5x5.5/configuraciones/reportes/ventas_prod';
 import { config_cuentas_pagos } from './8.5x5.5/configuraciones/reportes/cuentas_con_pagos';
 import { config_suplidor_prod } from './8.5x5.5/configuraciones/reportes/suplidor_prod';
+import { config_cxp } from './8.5x5.5/configuraciones/reportes/cuentas_pagar/cxp';
+import { config_cxp_ant } from './8.5x5.5/configuraciones/reportes/cuentas_pagar/cxp_ant';
 import { config_notas } from './8.5x5.5/configuraciones/reportes/notas';
 import { config_movimientos_vehiculo } from './8.5x5.5/configuraciones/reportes/movimientos_vehiculo';
 
@@ -45,9 +47,13 @@ const configuraciones = {
   recibos: config_recibos.detallado,
   recibos_agrupado: config_recibos.agrupado,
 
+  suplidor_prod: config_suplidor_prod,
+  cxp: config_cxp,
+  cxp_ant_detallado: config_cxp_ant.detallado,
+  cxp_ant_agrupado: config_cxp_ant.agrupado,
+
   ventas_productos: config_ventas_prod,
   cuentas_con_pagos: config_cuentas_pagos,
-  suplidor_prod: config_suplidor_prod,
   notas: config_notas,
   movimientos_vehiculo: config_movimientos_vehiculo,
 };

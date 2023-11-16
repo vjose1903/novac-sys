@@ -33,11 +33,13 @@
       <div class="col-12 p-0">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Cuentas</h5>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_cliente', titulo: 'Selección de cliente para reporte de CxC' })">
-            <i class="fas fa-comments-dollar"></i>
-            Relación de CxC por cliente
-          </span>
+          <!-- CUENTAS POR COBRAR -->
+          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_cliente', titulo: 'Selección de cliente para reporte de CxC' })"> <i class="fas fa-comments-dollar"></i> Relación de CxC por cliente </span>
           <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_ant_saldo', titulo: 'Reporte de CxC por antiguedad de saldos' })"> <i class="fas fa-comment-dollar"></i> Relación de CxC por antiguedad de saldo </span>
+
+          <!-- CUENTAS POR PAGAR -->
+          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_pagar_suplidor', titulo: 'Selección de suplidor para reporte de CxP' })"> <i class="fa-solid fa-money-check-dollar"></i> Relación de CxP por suplidor </span>
+          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_pagar_ant_saldo', titulo: 'Reporte de CxP por antiguedad de saldos' })"> <i class="fa-solid fa-file-invoice-dollar"></i> Relación de CxP por antiguedad de saldo </span>
         </div>
       </div>
       <div class="col-12 p-0 pl-2 mt-3">

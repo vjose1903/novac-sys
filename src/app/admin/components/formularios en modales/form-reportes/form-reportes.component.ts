@@ -1,16 +1,16 @@
-import { tFacturaD } from './../../../facturacion/factura';
-import { Permisos } from './../../../../core/typescript/permisos';
-import { Ss } from './../../../../core/services/singleton.service';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Ss } from './../../../../core/services/singleton.service';
+import { Permisos } from './../../../../core/typescript/permisos';
+import { tFacturaD } from './../../../facturacion/factura';
 
-import * as moment from '../../../../core/javascript/moment';
 
+import { CxP } from '../../../registros/registro-suplidores/suplidores';
+import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
-import { ClienteC } from '../../../registros/registro-clientes/cliente';
-import { IModalConfiguration, ModalComponentI, ModalI } from '../../modal/modal-class';
-import { fun } from '../../../../core/services/functions.service';
+import { ClienteC, CxC } from '../../../registros/registro-clientes/cliente';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 
 @Component({
   selector: 'app-form-reportes',
@@ -142,8 +142,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo') {
       this.tipos = [
-        { id: '2', label: 'Detallado' },
-        { id: '3', label: 'Agrupado' },
+        { id: CxC.detallado, label: 'Detallado' },
+        { id: CxC.agrupado, label: 'Agrupado' },
+      ];
+      //
+    } else if (this.inputs.tipo_reporte == 'cuentas_pagar_ant_saldo') {
+      this.tipos = [
+        { id: CxP.detallado, label: 'Detallado' },
+        { id: CxP.agrupado, label: 'Agrupado' },
       ];
       //
     } else if (this.inputs.tipo_reporte == 'notas') {
