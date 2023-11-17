@@ -1,0 +1,53 @@
+<div class="libro-diario-grid">
+  <div class="libro-diario-title">
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <div class="d-flex align-items-center">
+        <h4 class="negrita mb-0">Libro Diario</h4>
+      </div>
+      <div>
+        <button *ngxPermissionsOnly="permissions.create" (click)="nuevoRegistro()" class="btn btn-tema">Nueva entrada</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="libro-diario-body">
+    <div class="inner-body">
+      <div class="fantasma">
+        <div class="cardListados p-2">
+          <div class="diurnal-list">
+            <div class="search-section">
+              <div id="searchDiv-diurnal" class="searchDiv d-flex align-items-center" style="max-width: 17rem; z-index: 9">
+                <label class="search-label mr-1" for="search">Busqueda </label>
+                <input id="search-diurnal" class="search-input form-control min m-0" (keyup)="filter($event)" />
+              </div>
+
+              <div class="calendars-filter">
+                <div>
+                  <p-calendar inputId="desdeCalendar" inputStyleClass="form-control min" [(ngModel)]="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+                </div>
+                <div>
+                  <p-calendar inputId="hastaCalendar" inputStyleClass="form-control min" [(ngModel)]="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+                </div>
+              </div>
+
+              <div class="search-btn">
+                <btn-icon-circular [id]="'diurnal-search-btn'" [icon_size]="'1rem'" [icon]="'fas fa-search'" [size]="'size-md'" pTooltip="Buscar" tooltipPosition="right" (clickFunction)="filter(searchDiurnalCode)"> </btn-icon-circular>
+              </div>
+            </div>
+            <div class="body-section">
+              <p-accordion styleClass="no-content-padding grey-header" *ngFor="let item of temp">
+                <p-accordionTab [header]="item.title">
+                  <div class="diurnal-table-container">
+                    <div #cardTabla id="cardTabla" class="diurnal-table-inner">
+                      <dinamic-table [cardTabla]="cardTabla" [(data)]="detalle" [config]="table_config_diurnal" (table_events)="handle_table_events($event)"></dinamic-table>
+                    </div>
+                  </div>
+                </p-accordionTab>
+              </p-accordion>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

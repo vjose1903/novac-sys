@@ -62,31 +62,19 @@
             </div>
           </div>
 
-
           <div *ngxPermissionsOnly="menuPermissionsObj.pagos.flatt" class="menuList">
             <h5 id="pagosLabel" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('recibos') }" [innerText]="'Pagos'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('recibos') }" src="assets/img/reciboIngreso.png" alt="Pagos" (click)="cambiarMenu({ url: 'recibos', navigate: false, id_h5: 'pagosLabel' })" draggable="false" />
 
             <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('recibos') }">
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos"
-                [ngClass]="{ activa: actualRuta == 'lista_pagos/recibo_ingreso' }"
-                (click)="cambiarMenu({ url: 'recibos/lista_pagos/recibo_ingreso', navigate: true })"
-              >
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos" [ngClass]="{ activa: actualRuta == 'lista_pagos/recibo_ingreso' }" (click)="cambiarMenu({ url: 'recibos/lista_pagos/recibo_ingreso', navigate: true })">
                 Recibos de ingreso
               </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.pagos.cuentasPagar"
-                [ngClass]="{ activa: actualRuta == 'lista_pagos/pago_factura' }"
-                (click)="cambiarMenu({ url: 'recibos/lista_pagos/pago_factura', navigate: true })"
-              >
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.pagos.cuentasPagar" [ngClass]="{ activa: actualRuta == 'lista_pagos/pago_factura' }" (click)="cambiarMenu({ url: 'recibos/lista_pagos/pago_factura', navigate: true })">
                 Pago de facturas
               </h4>
             </div>
           </div>
-
 
           <div *ngxPermissionsOnly="menuPermissionsObj.recibos_viajes.viajes" class="menuList">
             <h5 id="pedidosLabel" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('viajes') }" [innerText]="'Pedidos'"></h5>
@@ -139,6 +127,16 @@
             <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('contabilidad') }">
               <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.catalogo_cuentas" [ngClass]="{ activa: actualRuta == 'catalogo_cuentas' }" (click)="cambiarMenu({ url: 'contabilidad/catalogo_cuentas', navigate: true })">
                 Catalogo de cuentas
+              </h4>
+              <h4
+                class="opcion"
+                *ngxPermissionsOnly="menuPermissionsObj.contabilidad.asientos_contables"
+                [ngClass]="{ activa: actualRuta == 'libro_diario' }"
+                (click)="cambiarMenu({ url: 'contabilidad/libro_diario', navigate: true })"
+                pTooltip="Libro Diario"
+                tooltipPosition="right"
+              >
+                Libro Diario
               </h4>
               <h4
                 class="opcion"

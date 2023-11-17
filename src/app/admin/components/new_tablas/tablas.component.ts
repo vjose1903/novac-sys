@@ -92,6 +92,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (!fun.objHas(this.config, 'noDataMessage') || fun.isEmpty(this.config.noDataMessage)) this.config.noDataMessage = 'No existen registros.';
     this.checkPagination();
   }
+
   checkPagination() {
     if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
@@ -105,7 +106,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngAfterViewInit() {
-    this.changeStylesTitles();
     if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
     this.handleConfig();
   }
@@ -339,36 +339,25 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return res;
   }
 
-  changeStylesTitles() {
-    for (let i = 0; i < this.config.info.length; i++) {
-      const info: any = this.config.info[i];
+  getTitleStyles(key) {
+    const columnConfig = this.config.info.find((config) => config.key == key);
+    if (columnConfig) {
+      let estilos = {};
 
-      let list_estilos_titulos = '';
-      if (info.estilos && info.estilos.length > 0) {
-        for (let j = 0; j < info.estilos.length; j++) {
-          const estilos = info.estilos[j];
-          const key = Object.keys(estilos)[0];
-          const value = Object.values(estilos)[0];
-
-          list_estilos_titulos += `${key}: ${value} !important; `;
+      if (columnConfig.estilos && columnConfig.estilos.length > 0) {
+        for (let j = 0; j < columnConfig.estilos.length; j++) {
+          const currentStyle = columnConfig.estilos[j];
+          estilos = { ...estilos, ...currentStyle };
         }
       }
 
-      if (fun.hasValue(info.style)) {
-        const keys = Object.keys(info.style);
-
-        for (let index = 0; index < keys.length; index++) {
-          const key = keys[index];
-          const value = info.style[key];
-
-          list_estilos_titulos += `${key}: ${value} !important; `;
-        }
+      if (fun.hasValue(columnConfig.style)) {
+        estilos = { ...estilos, ...columnConfig.style };
       }
 
-      if (fun.hasValue(list_estilos_titulos)) {
-        const columna = document.getElementById(`titulo_${this.realIdTabla}_${info.key}`) as any;
-        if (columna) columna.setAttribute('style', list_estilos_titulos);
-      }
+      return estilos;
+    } else {
+      return null;
     }
   }
 
@@ -440,7 +429,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       // ================================================
       // CUSTOM STYLES
       // ================================================
-      setTimeout(() => this.changeStylesTitles(), 10);
+
       // ================================================
 
       this.TablasComponent = this;

@@ -1,0 +1,64 @@
+.libro-diario-grid {
+  display: grid;
+  grid-template-areas:
+    "libro-diario-title"
+    "libro-diario-body";
+
+  grid-template-rows: min-content auto;
+  height: 100%;
+
+  row-gap: 1rem;
+
+  .libro-diario-title {
+    grid-area: libro-diario-title;
+  }
+  .libro-diario-body {
+    grid-area: libro-diario-body;
+    .inner-body {
+      height: 100%;
+      width: 100%;
+      position: relative;
+      .fantasma {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.diurnal-list {
+  display: grid;
+  grid-template-areas:
+    "search-section"
+    "body-section";
+
+  grid-template-rows: min-content auto;
+  height: 100%;
+
+  row-gap: 0.5rem;
+  .search-section {
+    grid-area: search-section;
+    display: flex;
+    align-items: center;
+    column-gap: 0.5rem;
+
+    .calendars-filter {
+      display: flex;
+      column-gap: 0.5rem;
+    }
+  }
+  .body-section {
+    grid-area: body-section;
+  }
+}
+
+.diurnal-table-container {
+  min-height: 12rem;
+  position: relative;
+  .diurnal-table-inner {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+  }
+}

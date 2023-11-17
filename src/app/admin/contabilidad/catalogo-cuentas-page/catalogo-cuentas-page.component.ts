@@ -8,7 +8,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 })
 export class CatalogoCuentasPageComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnInit() {
-    this._init_mixin({ component: 'reg_periodo_fiscal', is_routing: true });
+    this._init_mixin({ component: 'catalogo_cuentas_page', is_routing: true });
   }
 
   iniciarCambioMenu(arg, callback) {

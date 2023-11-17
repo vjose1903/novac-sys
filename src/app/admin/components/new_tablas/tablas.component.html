@@ -8,11 +8,11 @@
   <!-- TABLA -->
   <div #fantasma class="divTableFantasma h-100">
     <div #divTable class="divTable" [sizeCatcher]="fantasma">
-      <table *ngIf="config.info" class="myTable" id="content_{{ realIdTabla }}">
+      <table *ngIf="config.info" class="myTable" id="content_{{ realIdTabla }}" [ngStyle]="{ 'border-radius': config.redondo ? '10px' : '' }">
         <!-- THEAD -->
         <thead class="text-center position-relative thead letras {{ config.redondo ? 'redondo' : '' }} {{ config.colorTitulo ? 'colorTitulo' : 'noColorTitulo' }}">
           <tr id="titulosHeader-{{ realIdTabla }}" class="titulosHeader">
-            <th *ngFor="let row of config.info; let index_head = index" class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ realIdTabla }}_{{ row.key }}">
+            <th *ngFor="let row of config.info; let index_head = index" class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="getTitleStyles(row.key)">
               <span [ngSwitch]="row?.tipo">
                 <span *ngSwitchCase="'inputSwitch'">
                   <ng-container *ngIf="!row?.select_all"> {{ row?.titulo }} </ng-container>

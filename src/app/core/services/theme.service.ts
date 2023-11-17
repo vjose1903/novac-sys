@@ -29,6 +29,7 @@ export class ThemeService {
     documentElement.setProperty('--mode01', '#f5f5f5');
     documentElement.setProperty('--mode02', '#d0d0d0');
     documentElement.setProperty('--mode03', '#b2b2b2');
+    documentElement.setProperty('--mode04', '#939393');
   }
 
   static darkMode() {
@@ -38,6 +39,7 @@ export class ThemeService {
     documentElement.setProperty('--mode01', '#e5e5e5');
     documentElement.setProperty('--mode02', '#d0d0d0');
     documentElement.setProperty('--mode03', '#b2b2b2');
+    documentElement.setProperty('--mode04', '#939393');
   }
 
   // ================================================================================================================================================
