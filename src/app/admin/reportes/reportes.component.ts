@@ -44,6 +44,15 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     notas: NotaC,
   };
 
+  permisos = Permisos.reporte;
+  groupsPermisos = {
+    cuadre: [this.permisos.cuadre],
+    ventas: [this.permisos.ventas_diarias, this.permisos.ventas_rango, this.permisos.ventas_productos, this.permisos.cuentas_con_pagos, this.permisos.ventas_cliente, this.permisos.movimientos_vehiculo],
+    productos: [this.permisos.inventario, this.permisos.suplidor_prod],
+    cuentas: [this.permisos.cuentas_cobrar_cliente, this.permisos.cuentas_cobrar_ant_saldo, this.permisos.cuentas_pagar_suplidor, this.permisos.cuentas_pagar_ant_saldo],
+    other: [this.permisos.recibos, this.permisos.pago_facturas, this.permisos.notas],
+  };
+
   constructor() {
     super();
   }

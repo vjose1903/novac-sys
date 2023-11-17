@@ -2,52 +2,89 @@
 <div class="row">
   <div class="col-6 p-0">
     <div class="row">
-      <div class="col-12 p-0 pr-2">
+      <div *ngxPermissionsOnly="groupsPermisos.cuadre" class="col-12 p-0 pr-2">
         <div class="card card-padding sombra">
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuadre', titulo: 'Reporte de cuadre de caja' })"><i class="fas fa-cash-register"></i> Cuadre de caja </span>
+          <ng-container *ngxPermissionsOnly="permisos.cuadre">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuadre', titulo: 'Reporte de cuadre de caja' })"><i class="fas fa-cash-register"></i> Cuadre de caja </span>
+          </ng-container>
         </div>
       </div>
-      <div class="col-12 p-0 pr-2 mt-3">
+      <div *ngxPermissionsOnly="groupsPermisos.ventas" class="col-12 p-0 pr-2 mt-3">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Ventas</h5>
 
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_diarias', titulo: 'Reporte de ventas diarias' })"><i class="fas fa-calendar-day"></i> Relación de ventas diarias</span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_rango', titulo: 'Reporte de ventas por fechas' })"><i class="fas fa-calendar-alt"></i> Relación de ventas por fechas</span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_productos', titulo: 'Reporte de productos vendidos por dia' })"> <i class="fas fa-shopping-basket"></i> Relación de productos vendidos </span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_con_pagos', titulo: 'Reporte de facturas a crédito con sus pagos' })"> <i class="fas fa-file-invoice-dollar"></i> Relación de ventas a crédito con sus movimientos </span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_cliente', titulo: 'Reporte de venta por cliente' })"> <i class="fas fa-user-tag"></i> Relación de ventas por cliente </span>
-          <span *ngIf="hasPermisoCamiones" class="btnLetra" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"> <i class="fas fa-truck-moving"></i> Relación de viajes por camión </span>
+          <ng-container *ngxPermissionsOnly="permisos.ventas_diarias">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_diarias', titulo: 'Reporte de ventas diarias' })"><i class="fas fa-calendar-day"></i> Relación de ventas diarias</span>
+          </ng-container>
+
+          <ng-container *ngxPermissionsOnly="permisos.ventas_rango">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_rango', titulo: 'Reporte de ventas por fechas' })"><i class="fas fa-calendar-alt"></i> Relación de ventas por fechas</span>
+          </ng-container>
+
+          <ng-container *ngxPermissionsOnly="permisos.ventas_productos">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_productos', titulo: 'Reporte de productos vendidos por dia' })"> <i class="fas fa-shopping-basket"></i> Relación de productos vendidos </span>
+          </ng-container>
+
+          <ng-container *ngxPermissionsOnly="permisos.cuentas_con_pagos">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_con_pagos', titulo: 'Reporte de facturas a crédito con sus pagos' })"> <i class="fas fa-file-invoice-dollar"></i> Relación de ventas a crédito con sus movimientos </span>
+          </ng-container>
+
+          <ng-container *ngxPermissionsOnly="permisos.ventas_cliente">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_cliente', titulo: 'Reporte de venta por cliente' })"> <i class="fas fa-user-tag"></i> Relación de ventas por cliente </span>
+          </ng-container>
+
+          <ng-container *ngxPermissionsOnly="permisos.movimientos_vehiculo">
+            <span *ngIf="hasPermisoCamiones" class="btnLetra" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"> <i class="fas fa-truck-moving"></i> Relación de viajes por camión </span>
+          </ng-container>
         </div>
       </div>
 
-      <div class="col-12 p-0 pr-2 mt-3">
+      <div *ngxPermissionsOnly="groupsPermisos.productos" class="col-12 p-0 pr-2 mt-3">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Productos</h5>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'inventario', titulo: 'Reporte de inventario' })"> <i class="fas fa-boxes"></i> Inventario </span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'suplidor_prod', titulo: 'Reporte de suplidor por producto' })"> <i class="fa-solid fa-user-tie"></i> Suplidor por producto </span>
+          <ng-container *ngxPermissionsOnly="permisos.inventario">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'inventario', titulo: 'Reporte de inventario' })"> <i class="fas fa-boxes"></i> Inventario </span>
+          </ng-container>
+          <ng-container *ngxPermissionsOnly="permisos.suplidor_prod">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'suplidor_prod', titulo: 'Reporte de suplidor por producto' })"> <i class="fa-solid fa-user-tie"></i> Suplidor por producto </span>
+          </ng-container>
         </div>
       </div>
     </div>
   </div>
   <div class="col-6 p-0 pl-2">
     <div class="row">
-      <div class="col-12 p-0">
+      <div *ngxPermissionsOnly="groupsPermisos.cuentas" class="col-12 p-0">
         <div class="card card-padding sombra">
           <h5 class="negrita subrayado">Cuentas</h5>
           <!-- CUENTAS POR COBRAR -->
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_cliente', titulo: 'Selección de cliente para reporte de CxC' })"> <i class="fas fa-comments-dollar"></i> Relación de CxC por cliente </span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_ant_saldo', titulo: 'Reporte de CxC por antiguedad de saldos' })"> <i class="fas fa-comment-dollar"></i> Relación de CxC por antiguedad de saldo </span>
+          <ng-container *ngxPermissionsOnly="permisos.cuentas_cobrar_cliente">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_cliente', titulo: 'Selección de cliente para reporte de CxC' })"> <i class="fas fa-comments-dollar"></i> Relación de CxC por cliente </span>
+          </ng-container>
+          <ng-container *ngxPermissionsOnly="permisos.cuentas_cobrar_ant_saldo">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_ant_saldo', titulo: 'Reporte de CxC por antiguedad de saldos' })"> <i class="fas fa-comment-dollar"></i> Relación de CxC por antiguedad de saldo </span>
+          </ng-container>
 
           <!-- CUENTAS POR PAGAR -->
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_pagar_suplidor', titulo: 'Selección de suplidor para reporte de CxP' })"> <i class="fa-solid fa-money-check-dollar"></i> Relación de CxP por suplidor </span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_pagar_ant_saldo', titulo: 'Reporte de CxP por antiguedad de saldos' })"> <i class="fa-solid fa-file-invoice-dollar"></i> Relación de CxP por antiguedad de saldo </span>
+          <ng-container *ngxPermissionsOnly="permisos.cuentas_pagar_suplidor">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_pagar_suplidor', titulo: 'Selección de suplidor para reporte de CxP' })"> <i class="fa-solid fa-money-check-dollar"></i> Relación de CxP por suplidor </span>
+          </ng-container>
+          <ng-container *ngxPermissionsOnly="permisos.cuentas_pagar_ant_saldo">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_pagar_ant_saldo', titulo: 'Reporte de CxP por antiguedad de saldos' })"> <i class="fa-solid fa-file-invoice-dollar"></i> Relación de CxP por antiguedad de saldo </span>
+          </ng-container>
         </div>
       </div>
-      <div class="col-12 p-0 pl-2 mt-3">
+      <div *ngxPermissionsOnly="groupsPermisos.other" class="col-12 p-0 pl-2 mt-3">
         <div class="card card-padding sombra">
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'recibos', titulo: 'Reporte de recibos de ingreso' })"> <i class="fas fa-hand-holding-usd"></i> Recibos ingreso </span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'pago_facturas', titulo: 'Reporte de pago de facturas' })"> <i class="fa-solid fa-receipt"></i> Pago de facturas </span>
-          <span class="btnLetra" (click)="openReporteForm({ tipo: 'notas', titulo: 'Reporte de notas' })"> <i class="fa-solid fa-note-sticky"></i> Notas crédito/débito </span>
+          <ng-container *ngxPermissionsOnly="permisos.recibos">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'recibos', titulo: 'Reporte de recibos de ingreso' })"> <i class="fas fa-hand-holding-usd"></i> Recibos ingreso </span>
+          </ng-container>
+          <ng-container *ngxPermissionsOnly="permisos.pago_facturas">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'pago_facturas', titulo: 'Reporte de pago de facturas' })"> <i class="fa-solid fa-receipt"></i> Pago de facturas </span>
+          </ng-container>
+          <ng-container *ngxPermissionsOnly="permisos.notas">
+            <span class="btnLetra" (click)="openReporteForm({ tipo: 'notas', titulo: 'Reporte de notas' })"> <i class="fa-solid fa-note-sticky"></i> Notas crédito/débito </span>
+          </ng-container>
         </div>
       </div>
     </div>
