@@ -1,9 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { Permisos } from '../../../core/typescript/permisos';
 import { fun } from '../../../core/services/functions.service';
 import { searchDiurnalCode } from './libro-diario-page.utils';
 import { table_config } from '../../components/new_tablas/tabla-class';
+import { Subscription } from 'rxjs';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 
 @Component({
   selector: 'app-libro-diario-page',
@@ -31,24 +33,66 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   };
 
   detalle;
-
+  tabsVisibles = [];
   temp = [
-    {title:'01/10/2023 - Para registrar compra de ....'},
-    {title:'05/10/2023 - Para registrar compra de ....'},
-    {title:'08/10/2023 - Para registrar compra de ....'},
-  ]
+    { title: '01/10/2023 - Para registrar compra de ....' }, { title: '05/10/2023 - Para registrar compra de ....' }, { title: '08/10/2023 - Para registrar compra de ....' }, { title: '08/10/2023 - Para registrar compra de ....' }, { title: '08/10/2023 - Para registrar compra de ....' }, { title: '08/10/2023 - Para registrar compra de ....' }
+  ];
 
-  constructor() {
+  paginator = {
+    page: 0,
+    page_front: 0,
+    per_page: 20,
+    cantPagesView: 5,
+    total_count: 3,
+    per_page_options: [10, 15, 20, 30],
+  };
+  subWidth: Subscription;
+  constructor(public cdRef: ChangeDetectorRef, public tServ: TablasService, private zone: NgZone) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'libro_diario_page', is_routing: true });
+    this.subWidth = new fun().getWindowSize.subscribe((res) => {
+      if (res) this.setCantPagView(res.innerWidth, 'width_page');
+    });
     this.necesarioStart();
   }
 
   ngOnDestroy() {
     this._destroy_mixin();
+    if (this.subWidth) this.subWidth.unsubscribe();
+  }
+
+  setCantPagView(width, tipo) {
+    let actual = 1;
+
+
+    if (tipo == 'width_page') {
+      const divPaginator = document.getElementById('divPaginator');
+      if (divPaginator) width = divPaginator.offsetWidth;
+    }
+
+    if (width > 385) actual = 5;
+    else if (width <= 385 && width > 350) actual = 4;
+    else if (width <= 350 && width > 320) actual = 3;
+    else if (width <= 320 && width > 285) actual = 2;
+    else if (width <= 285) actual = 1;
+
+    const actualPage = this.tServ.getPaginatorPageByNumber(this.paginator.page, 'paginator');
+
+    setTimeout(() => {
+      this.zone.run(() => {
+        if (actualPage) {
+          actualPage.setAttribute('clickeado_por', 'maquina');
+          actualPage.click();
+          setTimeout(() => actualPage.removeAttribute('clickeado_por'), 2000);
+        }
+
+        this.paginator.cantPagesView = actual;
+        this.cdRef.detectChanges();
+      });
+    }, 100);
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -59,6 +103,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   }
 
   async necesarioStart() {
+    this.changeTabsVisibility({ visible: true });
     this.initDateVars();
   }
 
@@ -72,9 +117,27 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
     this.hasta = actual_date;
   }
 
-  nuevoRegistro() {}
+  changeTabsVisibility(params: { visible: boolean }) {
+    if (params.visible) {
+      const numberOfEntries = this.temp.length;
+      this.tabsVisibles = Array.from({ length: numberOfEntries }, (_, index) => index);
+    } else {
+      this.tabsVisibles = [];
+    }
+  }
+
+  isSomeTabVisible() {
+    return this.tabsVisibles.length > 0;
+  }
 
   filter(palabra_a_buscar) {
     console.log('palabra_a_buscar ', palabra_a_buscar);
   }
+
+  paginatorChange(opt) {
+    console.log('opt ', opt);
+  }
+
+  editEntrie(asientoContable) {}
+  nuevoRegistro() {}
 }

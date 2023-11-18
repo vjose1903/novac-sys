@@ -97,6 +97,33 @@
       }
     }
   }
+
+  &.header-p-1 {
+    p-accordiontab {
+      .p-accordion-tab {
+        .p-accordion-header {
+          .p-accordion-header-link {
+            padding: 0.5rem;
+            &:hover {
+            }
+
+            &:focus {
+            }
+          }
+
+          &.p-highlight {
+            .p-accordion-header-link {
+            }
+          }
+        }
+
+        .p-toggleable-content {
+          .p-accordion-content {
+          }
+        }
+      }
+    }
+  }
 }
 
 @media (min-width: 992px) {

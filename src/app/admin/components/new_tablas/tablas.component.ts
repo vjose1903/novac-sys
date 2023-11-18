@@ -75,9 +75,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.realIdTabla = this.config.id_tabla + this.post_id;
 
     this.subWidth = new fun().getWindowSize.subscribe((res) => {
-      if (res) {
-        this.setCantPagView(res.innerWidth, 'width_page');
-      }
+      if (res) this.setCantPagView(res.innerWidth, 'width_page');
     });
 
     this.TablasComponent = this;
@@ -197,16 +195,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.modifyPaginationById(this.realIdTabla, [{ search: search }]);
   }
 
-  getPaginatorPageByNumber(number) {
-    let paginatorPage = undefined;
-    const paginator = document.getElementById(`paginator-${this.realIdTabla}`);
 
-    if (paginator) {
-      const paginator_pages = document.getElementsByClassName('p-paginator-pages');
-      paginatorPage = _.find(_.head(paginator_pages).children, { outerText: `${number || 1}` });
-    }
-    return paginatorPage;
-  }
 
   paginatorChange(event, id) {
     setTimeout(() => {
@@ -215,7 +204,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         const per_page = event.rows;
         const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
 
-        const actualPage = this.getPaginatorPageByNumber(page);
+        const actualPage = this.tServ.getPaginatorPageByNumber(page, `paginator-${this.realIdTabla}`);
 
         const clickeado_por = actualPage?.getAttribute('clickeado_por');
 
@@ -278,10 +267,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
-  divPaginatorChangeWidth(event) {
-    this.setCantPagView(event.newRect.width, 'width_paginator');
-  }
-
   setCantPagView(width, tipo) {
     let actual = 1;
     const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
@@ -297,7 +282,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     else if (width <= 320 && width > 285) actual = 2;
     else if (width <= 285) actual = 1;
 
-    const actualPage = this.getPaginatorPageByNumber(actualPagination?.page);
+    const actualPage = this.tServ.getPaginatorPageByNumber(actualPagination?.page, `paginator-${this.realIdTabla}`);
 
     setTimeout(() => {
       this.zone.run(() => {

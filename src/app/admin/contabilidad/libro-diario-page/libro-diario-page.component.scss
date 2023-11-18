@@ -30,26 +30,45 @@
 .diurnal-list {
   display: grid;
   grid-template-areas:
-    "search-section"
-    "body-section";
+    "toolbar-section"
+    "body-section"
+    "footer-section";
 
-  grid-template-rows: min-content auto;
+  grid-template-rows: min-content auto min-content;
   height: 100%;
 
   row-gap: 0.5rem;
-  .search-section {
-    grid-area: search-section;
+  .toolbar-section {
+    grid-area: toolbar-section;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     column-gap: 0.5rem;
 
-    .calendars-filter {
+    .search-div {
       display: flex;
+      align-items: center;
+      column-gap: 0.5rem;
+      .calendars-filter {
+        display: flex;
+        column-gap: 0.5rem;
+      }
+    }
+
+    .actions-div {
+      display: flex;
+      align-items: center;
       column-gap: 0.5rem;
     }
   }
+
   .body-section {
     grid-area: body-section;
+    overflow: auto;
+  }
+
+  .footer-section {
+    grid-area: footer-section;
   }
 }
 

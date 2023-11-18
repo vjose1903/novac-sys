@@ -13,8 +13,11 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { CalendarModule } from 'primeng/calendar';
 import { FieldsetModule } from 'primeng/fieldset';
 import { AccordionModule } from 'primeng/accordion';
+import { PaginatorModule } from 'primeng/paginator';
+import { SpeedDialModule } from 'primeng/speeddial';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
-const modulos = [DialogModule, ProgressBarModule, SidebarModule, TooltipModule, DropdownModule, InputMaskModule, TagModule, TabViewModule, MultiSelectModule, OverlayPanelModule, CalendarModule, FieldsetModule, AccordionModule];
+const modulos = [InputSwitchModule, SpeedDialModule, PaginatorModule, DialogModule, ProgressBarModule, SidebarModule, TooltipModule, DropdownModule, InputMaskModule, TagModule, TabViewModule, MultiSelectModule, OverlayPanelModule, CalendarModule, FieldsetModule, AccordionModule];
 
 @NgModule({
   declarations: [],

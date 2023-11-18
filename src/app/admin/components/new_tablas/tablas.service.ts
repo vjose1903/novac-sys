@@ -170,4 +170,15 @@ export class TablasService {
 
     return styles;
   }
+
+  getPaginatorPageByNumber(number, paginatorId) {
+    let paginatorPage = undefined;
+    const paginator = document.getElementById(paginatorId);
+
+    if (paginator) {
+      const paginator_pages = document.getElementsByClassName('p-paginator-pages');
+      paginatorPage = _.find(_.head(paginator_pages).children, { outerText: `${number || 1}` });
+    }
+    return paginatorPage;
+  }
 }
