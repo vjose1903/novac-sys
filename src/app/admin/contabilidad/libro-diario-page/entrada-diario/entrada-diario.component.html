@@ -1,0 +1,27 @@
+<div>
+  <form [formGroup]="formGroup">
+    <div class="row">
+      <div class="col-12 col-md-4 p-0">
+        <div class="form-group" [appMsgError]="'fecha_equivalente'" [form]="formGroup">
+          <label class="control-label">Fecha de registro: <span style="color: red">*</span></label>
+          <p-calendar inputId="fecha_equivalente_btn" inputStyleClass="form-control" formControlName="fecha_equivalente" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+
+          <span id="msgContainer"></span>
+        </div>
+      </div>
+
+      <div class="col-12 p-0">
+        <div class="form-group" [appMsgError]="'comentario'" [form]="formGroup">
+          <label class="control-label">Concepto: <span style="color: red">*</span></label>
+          <textarea id="motivo" formControlName="comentario" class="form-control w-100" rows="3"></textarea>
+
+          <span id="msgContainer"></span>
+        </div>
+      </div>
+
+      <div class="col-12 p-0">
+        <form-entrada-diario></form-entrada-diario>
+      </div>
+    </div>
+  </form>
+</div>

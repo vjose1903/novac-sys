@@ -1,0 +1,101 @@
+<div class="main-diurnal-container">
+  <!-- TITLE -->
+  <div class="diurnal-title">
+    <form *ngIf="formGroup" [formGroup]="formGroup" class="diurnal-form">
+      <div class="form-group mb-0 cuenta-auxiliar-group">
+        <label class="control-label opacity-2 mb-0">Cuenta auxiliar: </label>
+
+        <p-dropdown
+          #dropdownCuenta
+          [placeholder]="'Seleccione la cuenta'"
+          inputId="campoCuentaAuxiliar"
+          appendTo="body"
+          formControlName="cuenta_contable_auxiliar_id"
+          [options]="cuentasAuxiliares"
+          [itemSize]="34"
+          [editable]="true"
+          optionLabel="label"
+          optionValue="id"
+          [autofocusFilter]="false"
+          styleClass="form-control"
+          emptyMessage="No existen cuantas contables"
+          [showClear]="true"
+          (onChange)="filter($event)"
+          (onFocus)="filter('clear'); dropdownCuenta.show()"
+          (onclick)="dropdownCuenta.show()"
+          (onClear)="filter('clear'); dropdownCuenta.focus(); dropdownCuenta.show()"
+        >
+          <ng-template let-cuenta_auxiliar pTemplate="item">
+            <div class="cuenta_auxiliar-item">
+              <span class="d-block" style="font-size: 1rem"> <strong>Descripción: </strong> {{ cuenta_auxiliar.descripcion }} </span>
+              <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>No. Cuenta: </strong> {{ cuenta_auxiliar.codigo }} </span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+
+      <div class="form-group mb-0 debito-group">
+        <label class="control-label opacity-2 mb-0">Débito: </label>
+        <input
+          #InputDebito
+          id="campoDebito"
+          type="text"
+          formControlName="valor_debito"
+          placeholder="0.00"
+          class="form-control"
+          autocomplete="off"
+          (blur)="checkAmount(InputDebito); convertAmount('blur', InputDebito, 'valor_debito'); checkAmountInputState()"
+          (focus)="convertAmount('focus', InputDebito, 'valor_debito')"
+          (keyup)="checkAmountInputState()"
+        />
+      </div>
+
+      <div class="form-group mb-0 credito-group">
+        <label class="control-label opacity-2 mb-0">Crédito: </label>
+        <input
+          #InputCredito
+          id="campoCredito"
+          type="text"
+          formControlName="valor_credito"
+          placeholder="0.00"
+          class="form-control"
+          autocomplete="off"
+          (blur)="checkAmount(InputCredito); convertAmount('blur', InputCredito, 'valor_credito'); checkAmountInputState()"
+          (focus)="convertAmount('focus', InputCredito, 'valor_credito')"
+          (keyup)="checkAmountInputState()"
+        />
+      </div>
+
+      <div class="btn-group">
+        <div class="mt-4">
+          <btn-icon-circular [disabled]="disableBtnAdd()" [id]="'add-entry-btn'" [icon_size]="'1rem'" [icon]="'fa-solid fa-plus'" [size]="'size-md'" [pTooltip]="disableBtnAdd() ? '' : 'Añadir'" tooltipPosition="left" (clickFunction)="addEntry()">
+          </btn-icon-circular>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- BODY -->
+  <div class="diurnal-body">
+    <div class="diurnal-entries-table-container">
+      <div #cardTabla id="cardTabla" class="diurnal-entries-table-inner">
+        <dinamic-table [cardTabla]="cardTabla" [(data)]="detalle" [config]="table_diurnal_entry" (table_events)="handle_table_events($event)"></dinamic-table>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="diurnal-footer">
+    <div class="total-divs">
+      <div class="d-flex w-50">
+        <label class="total-label opacity-2 mb-0">Total Débito: </label>
+        <input id="campoTotalDebito" type="text" [(ngModel)]="totalDebito" placeholder="0.00" class="form-control" disabled />
+      </div>
+
+      <div class="d-flex w-50">
+        <label class="total-label opacity-2 mb-0">Total Crédito: </label>
+        <input id="campoTotalCredito" type="text" [(ngModel)]="totalCredito" placeholder="0.00" class="form-control" disabled />
+      </div>
+    </div>
+  </div>
+</div>

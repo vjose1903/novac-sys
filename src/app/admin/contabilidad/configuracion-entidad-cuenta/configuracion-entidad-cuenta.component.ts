@@ -92,7 +92,8 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
   }
 
   async requestFilter(filter_target) {
-    const res = await this.cuentaContableClass.getAll({ parameters: { filter_target: filter_target, cuenta_control_id: true, iterator: false, only_control: true, label: true } });
+    const extra = { parameters: { filter_target: filter_target, cuenta_control_id: true, iterator: false, only_control: true, label: true } };
+    const res = await this.cuentaContableClass.getAll(extra);
     this.listaCuentasControl = res.data;
   }
 

@@ -170,6 +170,7 @@ export class fun extends CustomLodash {
     });
   }
 
+
   // __________________________________________________________________________________________________
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales

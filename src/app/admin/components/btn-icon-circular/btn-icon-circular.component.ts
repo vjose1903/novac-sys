@@ -13,6 +13,7 @@ export class BtnIconCircularComponent implements OnInit {
   @Input() size;
   @Input() tooltip;
   @Input() tooltipPosition;
+  @Input() disabled=false;
 
   @Output() clickFunction = new EventEmitter<any>();
 
@@ -27,6 +28,6 @@ export class BtnIconCircularComponent implements OnInit {
   }
 
   clickIcon(event) {
-    this.clickFunction.emit(event);
+    if(!this.disabled) this.clickFunction.emit(event);
   }
 }

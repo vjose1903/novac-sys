@@ -5,7 +5,7 @@
         <h4 class="negrita mb-0">Libro Diario</h4>
       </div>
       <div>
-        <button *ngxPermissionsOnly="permissions.create" (click)="nuevoRegistro()" class="btn btn-tema">Nueva entrada</button>
+        <button *ngxPermissionsOnly="permissions.create" (click)="abrirModalForm()" class="btn btn-tema">Nueva entrada</button>
       </div>
     </div>
   </div>
@@ -57,7 +57,7 @@
                       <span class="m-0 p-0">{{ item.title }}</span>
 
                       <div class="edit-btn">
-                        <btn-icon-circular [id]="'edit-entrie-btn'" [icon_size]="'1rem'" [icon]="'fas fa-pencil-alt'" [size]="'size-md'" pTooltip="Editar" tooltipPosition="left" (clickFunction)="editEntrie(item)"> </btn-icon-circular>
+                        <btn-icon-circular [id]="'edit-entry-btn'" [icon_size]="'1rem'" [icon]="'fas fa-pencil-alt'" [size]="'size-md'" pTooltip="Editar" tooltipPosition="left" (clickFunction)="editEntry(item)"> </btn-icon-circular>
                       </div>
                     </div>
                   </ng-template>

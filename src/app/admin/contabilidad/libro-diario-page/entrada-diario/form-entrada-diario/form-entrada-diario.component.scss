@@ -1,0 +1,74 @@
+.main-diurnal-container {
+  display: grid;
+  grid-template-areas:
+    "diurnal-title"
+    "diurnal-body"
+    "diurnal-footer";
+  grid-template-rows: min-content auto min-content;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid var(--mode04);
+
+  .diurnal-title {
+    grid-area: diurnal-title;
+    background-color: var(--mode03);
+    padding: 0.4rem;
+
+    .diurnal-form {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      column-gap: 0.5rem;
+
+      .cuenta-auxiliar-group {
+        width: 50%;
+      }
+
+      .debito-group {
+        width: 23%;
+      }
+
+      .credito-group {
+        width: 23%;
+      }
+
+      .btn-group {
+        width: 4%;
+      }
+    }
+  }
+
+  .diurnal-body {
+    grid-area: diurnal-body;
+
+    .diurnal-entries-table-container {
+      min-height: 12rem;
+      position: relative;
+      .diurnal-entries-table-inner {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  .diurnal-footer {
+    grid-area: diurnal-footer;
+    background-color: var(--mode03);
+    padding: 0.4rem;
+
+    .total-divs {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+
+      .total-label {
+        text-wrap: nowrap;
+        align-self: center;
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}

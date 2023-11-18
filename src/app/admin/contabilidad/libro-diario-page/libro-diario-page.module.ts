@@ -9,9 +9,12 @@ import { PrimengModule } from '../../../modules/primeng.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LibroDiarioPageComponent } from './libro-diario-page.component';
+import { EntradaDiarioComponent } from './entrada-diario/entrada-diario.component';
+import { FormEntradaDiarioComponent } from './entrada-diario/form-entrada-diario/form-entrada-diario.component';
 
 @NgModule({
-  declarations: [LibroDiarioPageComponent],
+  declarations: [LibroDiarioPageComponent, EntradaDiarioComponent, FormEntradaDiarioComponent],
   imports: [CommonModule, LibroDiarioPageRoutingModule, PipesModule, PrimengModule, BtnIconModule, TablasModule, DirectivesModule, FormsModule, ReactiveFormsModule, NgxPermissionsModule.forChild()],
+  exports: [FormEntradaDiarioComponent],
 })
 export class LibroDiarioPageModule {}

@@ -177,7 +177,9 @@ export class TablasService {
 
     if (paginator) {
       const paginator_pages = document.getElementsByClassName('p-paginator-pages');
-      paginatorPage = _.find(_.head(paginator_pages).children, { outerText: `${number || 1}` });
+
+      const firstPage = _.head(paginator_pages);
+      paginatorPage = firstPage ? _.find(firstPage.children, { outerText: `${number || 1}` }) : undefined;
     }
     return paginatorPage;
   }

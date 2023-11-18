@@ -1,3 +1,4 @@
+import { EntradaDiarioComponent } from './entrada-diario/entrada-diario.component';
 import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { Permisos } from '../../../core/typescript/permisos';
@@ -6,6 +7,7 @@ import { searchDiurnalCode } from './libro-diario-page.utils';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Subscription } from 'rxjs';
 import { TablasService } from '../../components/new_tablas/tablas.service';
+import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-libro-diario-page',
@@ -35,7 +37,12 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   detalle;
   tabsVisibles = [];
   temp = [
-    { title: '01/10/2023 - Para registrar compra de ....' }, { title: '05/10/2023 - Para registrar compra de ....' }, { title: '08/10/2023 - Para registrar compra de ....' }, { title: '08/10/2023 - Para registrar compra de ....' }, { title: '08/10/2023 - Para registrar compra de ....' }, { title: '08/10/2023 - Para registrar compra de ....' }
+    { title: '01/10/2023 - Para registrar compra de ....' },
+    { title: '05/10/2023 - Para registrar compra de ....' },
+    { title: '08/10/2023 - Para registrar compra de ....' },
+    { title: '08/10/2023 - Para registrar compra de ....' },
+    { title: '08/10/2023 - Para registrar compra de ....' },
+    { title: '08/10/2023 - Para registrar compra de ....' },
   ];
 
   paginator = {
@@ -57,6 +64,8 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
       if (res) this.setCantPagView(res.innerWidth, 'width_page');
     });
     this.necesarioStart();
+
+    this.abrirModalForm();
   }
 
   ngOnDestroy() {
@@ -66,7 +75,6 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
 
   setCantPagView(width, tipo) {
     let actual = 1;
-
 
     if (tipo == 'width_page') {
       const divPaginator = document.getElementById('divPaginator');
@@ -135,9 +143,56 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   }
 
   paginatorChange(opt) {
-    console.log('opt ', opt);
+    setTimeout(() => {
+      this.zone.run(() => {
+        const page = opt.page + 1;
+        const per_page = opt.rows;
+
+        const actualPage = this.tServ.getPaginatorPageByNumber(this.paginator.page, 'paginator');
+
+        const clickeado_por = actualPage?.getAttribute('clickeado_por');
+
+        if (fun.hasValue(this.paginator) && (page != this.paginator.page || per_page != this.paginator.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
+          this.paginator.page = page;
+          this.paginator.per_page = per_page;
+
+          const pageFromCero = page > 0 ? page - 1 : page;
+          this.paginator.page_front = pageFromCero * this.paginator.per_page;
+
+          // if (this.paginator.is_local) {
+          //   this.localPagination(page, per_page, 'paginatorChange');
+          // } else {
+          //   if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
+          //     this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
+          //   } else {
+          //     fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
+          //   }
+          // }
+        }
+
+        this.cdRef.detectChanges();
+      });
+    }, 150);
   }
 
-  editEntrie(asientoContable) {}
-  nuevoRegistro() {}
+  editEntry(asientoContable) {}
+
+  abrirModalForm(asientoContable?) {
+    const inputs = {};
+
+    this.openNewModal({
+      component: EntradaDiarioComponent,
+      inputs: inputs,
+      id: 'entradaLibroDiarioForm',
+      header: 'Entrada de libro diario',
+      width: '45rem',
+      botones: {
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [
+          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
+          { btnId: 'btnAceptar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: asientoContable ? 'Editar' : 'Registrar', disable: true },
+        ],
+      },
+    });
+  }
 }
