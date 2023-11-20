@@ -171,6 +171,16 @@ export class TablasService {
     return styles;
   }
 
+  getStyleDivider(rowData) {
+    let styles = {};
+
+    if ('style' in rowData) {
+      Object.assign(styles, rowData.style);
+    }
+
+    return styles;
+  }
+
   getPaginatorPageByNumber(number, paginatorId) {
     let paginatorPage = undefined;
     const paginator = document.getElementById(paginatorId);

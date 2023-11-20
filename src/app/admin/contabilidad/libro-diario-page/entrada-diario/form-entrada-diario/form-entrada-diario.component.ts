@@ -1,4 +1,5 @@
-import { table_config } from './../../../../components/new_tablas/tabla-class';
+import { ModalClass } from './../../../../components/modal/modal-class';
+import { rowDataDividerKey, table_config } from './../../../../components/new_tablas/tabla-class';
 import { Permisos } from './../../../../../core/typescript/permisos';
 import { MixinClass } from './../../../../../core/typescript/MixinClass';
 import { fun } from './../../../../../core/services/functions.service';
@@ -22,19 +23,21 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
 
   table_diurnal_entry: table_config = {
     info: [
-      { titulo: 'Cuenta auxiliar', key: 'cuenta_auxiliar_info', tipo: 'text', style: { width: '50%', 'text-align': 'left' } },
-      { titulo: 'Débito', key: 'valor_debito', tipo: 'text', style: { width: '20%', 'text-align': 'left' } },
-      { titulo: 'Crédito', key: 'valor_credito', tipo: 'text', style: { width: '20%', 'text-align': 'left' } },
+      { titulo: 'Cuenta auxiliar', key: 'cuenta_auxiliar_info', tipo: 'text', puntosSuspensivos: true, style: { width: '50%', 'text-align': 'left', 'padding-left': '0.3rem' } },
+      { titulo: 'Débito', key: 'valor_debito', tipo: 'formatoNumero', tachado: true, style: { width: '17%', 'text-align': 'right' } },
+      { titulo: 'Crédito', key: 'valor_credito', tipo: 'formatoNumero', tachado: true, style: { width: '17%', 'text-align': 'right' } },
     ],
     id_tabla: 'diurnalEntry',
+    table_size: 'sm',
     redondo: false,
     colorTitulo: false,
     obj_paginate: { show: false },
     botones: { editar: { show: true, permiso: this.permissions.update }, borrar: { show: true, permiso: this.permissions.destroy } },
   };
 
-  detalle;
+  detalleAsiento = [];
   cuentaContableClass = new CuentaContableC();
+  isEditing: boolean;
 
   constructor(private fb: FormBuilder) {
     super();
@@ -53,6 +56,7 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
     return new Promise<void>((resolve) => {
       this.formGroup = this.fb.group({
         id: [{ value: fun.hasValue(data) ? data.id : null, disabled: false }],
+        arrayId: [{ value: fun.hasValue(data) ? data.arrayId : fun.generateKey(), disabled: false }],
         cuenta_contable_auxiliar_id: [{ value: fun.hasValue(data) ? data.cuenta_contable_auxiliar_id : null, disabled: false }],
         valor_debito: [{ value: fun.hasValue(data) ? data.valor_debito : null, disabled: false }],
         valor_credito: [{ value: fun.hasValue(data) ? data.valor_credito : null, disabled: false }],
@@ -61,19 +65,35 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
     });
   }
 
+  dropCuentaAuxiliarHide(arg) {
+    const formulario = this.formGroup.getRawValue();
+
+    if (fun.hasValue(formulario.cuenta_contable_auxiliar_id)) this.saltar('campoCuentaAuxiliar');
+  }
+
+  dropCuentaAuxiliarFocus(drop) {
+    setTimeout(() => {
+      const filterInput = drop?.filterViewChild?.nativeElement;
+      if (filterInput) filterInput.focus();
+    }, 25);
+  }
+
   subscribeChangesForm() {
     this.formLastValue = this.formGroup.value;
 
     this.formGroup.valueChanges.subscribe((changes) => {
       if (!fun.isEqual(changes, this.formLastValue)) {
-        // console.log('changes ', changes);
         this.formLastValue = changes;
       }
     });
+
+    setTimeout(() => {
+      fun.clickInput('campoCuentaAuxiliar', 'class');
+    }, 0);
   }
 
   checkAmountInputState() {
-    const formulario = this.formGroup.value;
+    const formulario = this.formGroup.getRawValue();
 
     this.formGroup.controls.valor_debito.enable();
     this.formGroup.controls.valor_credito.enable();
@@ -89,17 +109,8 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
     this.cuentasAuxiliares = res.data;
   }
 
-  async filter(arg?) {
-    if (arg == 'init' || arg == 'clear' || (fun.objHas(arg, 'value') && arg?.originalEvent?.type != 'click')) {
-      let filter_target = arg?.value;
-      filter_target = fun.isEmpty(filter_target) ? '' : filter_target;
-
-      if (arg == 'init' || arg == 'clear') {
-        this.getCuentasAuxiliares(filter_target);
-      } else {
-        fun.awaitTyping().then(async () => this.getCuentasAuxiliares(filter_target));
-      }
-    }
+  saltar(currentInputId) {
+    if (currentInputId == 'campoCuentaAuxiliar') fun.enfocarAndSelectInput('campoDebito');
   }
 
   checkAmount(input) {
@@ -123,7 +134,7 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
   }
 
   disableBtnAdd() {
-    const formulario = this.formGroup.value;
+    const formulario = this.formGroup.getRawValue();
     let res = true;
 
     if (fun.hasValue(formulario.cuenta_contable_auxiliar_id) && (fun.hasValue(formulario.valor_debito) || fun.hasValue(formulario.valor_credito))) {
@@ -133,11 +144,112 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
     return res;
   }
 
-  parseEntry() {
-    // cuenta_auxiliar_info
+  changeIsEditingState(isEditing) {
+    this.isEditing = isEditing;
+
+    const formFunction = isEditing ? 'disable' : 'enable';
+
+    this.formGroup.controls.cuenta_contable_auxiliar_id[formFunction]();
   }
 
   addEntry() {
-    console.log('Añadir entrada');
+    const formulario = this.formGroup.getRawValue();
+    const diurnalEntry = formulario;
+    const cuentaAuxiliar = this.cuentasAuxiliares.find((aux) => aux.id == formulario.cuenta_contable_auxiliar_id);
+
+    diurnalEntry['cuenta_auxiliar_info'] = cuentaAuxiliar.label;
+    diurnalEntry['valor_debito'] = formulario.valor_debito ? fun.desformatearStNumber(formulario.valor_debito) : null;
+    diurnalEntry['valor_credito'] = formulario.valor_credito ? fun.desformatearStNumber(formulario.valor_credito) : null;
+
+    this.detalleAsiento.push(diurnalEntry);
+
+    if (this.detalleAsiento.length > 1) {
+      const registrosConDebito = this.detalleAsiento.filter((entry) => entry.valor_debito !== null && !entry.rowDivider);
+      const registrosDebitoOrdenados = registrosConDebito.sort((a, b) => a.valor_debito - b.valor_debito);
+
+      const registrosConCredito = this.detalleAsiento.filter((entry) => entry.valor_credito !== null && !entry.rowDivider);
+      const registrosCreditoOrdenados = registrosConCredito.sort((a, b) => a.valor_credito - b.valor_credito);
+
+      if (registrosConDebito.length > 0 && registrosConCredito.length > 0) {
+        const divider = { [rowDataDividerKey]: true, style: { padding: '0.2rem 0rem', background: 'var(--primary02)' } };
+
+        this.detalleAsiento = [...registrosDebitoOrdenados, divider, ...registrosCreditoOrdenados];
+      } else {
+        this.detalleAsiento = [...registrosDebitoOrdenados, ...registrosCreditoOrdenados];
+      }
+
+      this.totalDebito = registrosDebitoOrdenados.reduce((acumulado, item) => acumulado + item.valor_debito, 0);
+      this.totalCredito = registrosCreditoOrdenados.reduce((acumulado, item) => acumulado + item.valor_credito, 0);
+    }
+
+    this.formGroup.reset({ arrayId: fun.generateKey() });
+    this.checkAmountInputState();
+
+    this.changeIsEditingState(false);
+    this.calcularTotales();
+    fun.clickInput('campoCuentaAuxiliar', 'class');
+  }
+
+  validateAdd() {
+    const formulario = this.formGroup.getRawValue();
+
+    if (fun.isEmpty(formulario.cuenta_contable_auxiliar_id) || (fun.isEmpty(formulario.valor_debito) && fun.isEmpty(formulario.valor_credito))) {
+      fun.toastWarning('Debe completar el detalle para añadirlo.', 'AVISO');
+    } else {
+      this.addEntry();
+    }
+  }
+
+  tableClick_action(params) {
+    if (params.action == 'update') this.editarItem(params.data);
+    if (params.action == 'delete') this.eliminarReg(params.data);
+  }
+
+  editarItem(data) {
+    if (this.isEditing) {
+      fun.toastWarning('Debe terminar de editar el detalle que está editando.', 'AVISO');
+    } else {
+      const diurnalEntry = fun.deepCloning(data);
+
+      diurnalEntry.valor_debito = data.valor_debito ? fun.roundNumberToDecimal(data.valor_debito) : null;
+      diurnalEntry.valor_credito = data.valor_credito ? fun.roundNumberToDecimal(data.valor_credito) : null;
+
+      this.formGroup.patchValue(diurnalEntry);
+      this.removerDetalle(data.arrayId);
+
+      this.changeIsEditingState(true);
+      this.checkAmountInputState();
+      this.calcularTotales();
+    }
+  }
+
+  calcularTotales() {
+    const registrosConDebito = this.detalleAsiento.filter((entry) => entry.valor_debito !== null && !entry.rowDivider);
+    const registrosConCredito = this.detalleAsiento.filter((entry) => entry.valor_credito !== null && !entry.rowDivider);
+
+    const totalDebito = registrosConDebito.reduce((acumulado, item) => acumulado + item.valor_debito, 0);
+    const totalCredito = registrosConCredito.reduce((acumulado, item) => acumulado + item.valor_credito, 0);
+
+    this.totalDebito = fun.roundNumberToDecimal(totalDebito);
+    this.totalCredito = fun.roundNumberToDecimal(totalCredito);
+  }
+
+  eliminarReg(data) {
+    const siFunc = (instance) => {
+      this.removerDetalle(data.arrayId);
+      this.calcularTotales();
+      instance.dismissModal(instance.id);
+    };
+
+    this.confirmationModal({
+      id: 'eliminarDiurnalEntryDetail',
+      header: 'Confirmación',
+      texto: `Seguro que desea remover el detalle de: <strong>${data.cuenta_auxiliar_info}</strong> `,
+      siFunction: siFunc,
+    });
+  }
+
+  removerDetalle(arrayId) {
+    this.detalleAsiento = this.detalleAsiento.filter((entry) => entry.arrayId != arrayId);
   }
 }

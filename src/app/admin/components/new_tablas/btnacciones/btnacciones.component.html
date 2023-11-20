@@ -1,5 +1,5 @@
 <div class="position-relative">
-  <span *ngIf="windowsWidth >= 768; else cellPhone">
+  <div *ngIf="windowsWidth >= 768; else cellPhone" class="table-btn-container">
     <ng-container *ngFor="let btn of botones?.dinamico">
       <ng-container *ngIf="btn?.show">
         <span pTooltip="{{ btn?.tooltip || dato[btn?.tooltipKey] }}" (click)="handleFunctionsBtnDinamic($event, btn, dato)" tooltipPosition="left" *ngxPermissionsOnly="btn?.permiso">
@@ -25,7 +25,7 @@
         <i class="table-btn-icon far fa-trash-alt"></i>
       </span>
     </ng-container>
-  </span>
+  </div>
 </div>
 
 <ng-template #cellPhone>

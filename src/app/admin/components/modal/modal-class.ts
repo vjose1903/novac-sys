@@ -6,12 +6,12 @@ import { modalsConfigurations } from './modal.service';
 export interface ModalComponentI {
   id?: any;
   modalsConfig?: Array<IModalConfiguration>;
-  findModalConfigById?: (modalId: any) =>  IModalConfiguration;
-  closeModal?: (modalId: any, dataToReturn?: IReturnData) =>  void;
-  changeModalConfig?: (changes: Array<IModalConfiguration>, modalId: any) =>  void;
-  disabledButton?: (btnConfig: IModalButton | IButtonDynamic) =>  boolean;
-  getButtonTooltip?: (btnConfig: IModalButton | IButtonDynamic) =>  string;
-  hasAnyBtn?: (modalId: any) =>  boolean;
+  findModalConfigById?: (modalId: any) => IModalConfiguration;
+  closeModal?: (modalId: any, dataToReturn?: IReturnData) => void;
+  changeModalConfig?: (changes: Array<IModalConfiguration>, modalId: any) => void;
+  changeStateButton?: (params: { modalId: string; btnId: string; disable: boolean }) => void;
+  getButtonTooltip?: (btnConfig: IModalButton | IButtonDynamic) => string;
+  hasAnyBtn?: (modalId: any) => boolean;
   [prop: string]: any;
 }
 
@@ -61,7 +61,7 @@ export interface IBtnDisableFunction {
 }
 export interface IButtonDynamic {
   show?: boolean;
-  btnId?: string
+  btnId?: string;
   clase: string;
   label: string;
   tooltip?: string;
@@ -73,7 +73,7 @@ export interface IModalButton {
   show?: boolean;
   disable?: boolean | IBtnDisableFunction;
   tooltip?: string;
-  btnId?: string
+  btnId?: string;
 }
 
 export interface ButtonsI {
@@ -82,6 +82,11 @@ export interface ButtonsI {
   dinamico?: Array<IButtonDynamic>;
 }
 
+export enum BtnTypeE {
+  aceptar = 'aceptar',
+  cancelar = 'cancelar',
+  dinamico = 'dinamico',
+}
 export class ModalClass extends LayoutClass {
   static noShowAceptarCancelarButtons: ButtonsI = { aceptar: { show: false }, cancelar: { show: false } };
 
@@ -118,7 +123,7 @@ export class ModalClass extends LayoutClass {
   getDataFromModal(arg, search?) {}
   onHideModal(arg) {}
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function;}) {
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function }) {
     const config: IModalConfiguration = {
       id: obj.id,
       header: obj.header,

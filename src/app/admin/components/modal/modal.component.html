@@ -30,18 +30,18 @@
       <div class="d-flex justify-content-end align-items-center mt-2">
         <ng-container *ngFor="let dynamic_boton of modalConfig?.botones?.dinamico">
           <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
-            <button [disabled]="disabledButton(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig.id, dynamic_boton)">
+            <button [disabled]="buttonIsDisabled(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig.id, dynamic_boton)">
               {{ dynamic_boton.label }}
             </button>
           </span>
         </ng-container>
 
         <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.cancelar)" tooltipPosition="top">
-          <button *ngIf="modalConfig?.botones?.cancelar?.show" class="btn btn-blanco" (click)="cancelarOrAceptar(modalConfig.id, 'cancelar')" [disabled]="disabledButton(modalConfig?.botones?.cancelar || false)">Cancelar</button>
+          <button *ngIf="modalConfig?.botones?.cancelar?.show" class="btn btn-blanco" (click)="cancelarOrAceptar(modalConfig.id, 'cancelar')" [disabled]="buttonIsDisabled(modalConfig?.botones?.cancelar || false)">Cancelar</button>
         </span>
 
         <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.aceptar)" tooltipPosition="top">
-          <button *ngIf="modalConfig?.botones?.aceptar?.show" class="btn btn-verde" (click)="cancelarOrAceptar(modalConfig.id, 'aceptar')" [disabled]="disabledButton(modalConfig?.botones?.aceptar || false)">Aceptar</button>
+          <button *ngIf="modalConfig?.botones?.aceptar?.show" class="btn btn-verde" (click)="cancelarOrAceptar(modalConfig.id, 'aceptar')" [disabled]="buttonIsDisabled(modalConfig?.botones?.aceptar || false)">Aceptar</button>
         </span>
       </div>
     </ng-template>

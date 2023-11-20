@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angula
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { Permisos } from '../../../core/typescript/permisos';
 import { fun } from '../../../core/services/functions.service';
-import { searchDiurnalCode } from './libro-diario-page.utils';
+import { diurnalFormBtnAceptarId, diurnalFormId, searchDiurnalCode } from './libro-diario-page.utils';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Subscription } from 'rxjs';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -183,14 +183,14 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
     this.openNewModal({
       component: EntradaDiarioComponent,
       inputs: inputs,
-      id: 'entradaLibroDiarioForm',
+      id: diurnalFormId,
       header: 'Entrada de libro diario',
       width: '45rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
-          { btnId: 'btnAceptar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: asientoContable ? 'Editar' : 'Registrar', disable: true },
+          { btnId: diurnalFormBtnAceptarId, clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: asientoContable ? 'Editar' : 'Registrar', disable: true },
         ],
       },
     });

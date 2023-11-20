@@ -7,24 +7,28 @@
 
         <p-dropdown
           #dropdownCuenta
-          [placeholder]="'Seleccione la cuenta'"
-          inputId="campoCuentaAuxiliar"
+          placeholder="Seleccione la cuenta"
+          filterPlaceholder="Buscar"
           appendTo="body"
           formControlName="cuenta_contable_auxiliar_id"
           [options]="cuentasAuxiliares"
           [itemSize]="34"
-          [editable]="true"
+          [filter]="true"
           optionLabel="label"
           optionValue="id"
+          [resetFilterOnHide]="true"
           [autofocusFilter]="false"
-          styleClass="form-control"
+          styleClass="form-control campoCuentaAuxiliar"
           emptyMessage="No existen cuantas contables"
           [showClear]="true"
-          (onChange)="filter($event)"
-          (onFocus)="filter('clear'); dropdownCuenta.show()"
-          (onclick)="dropdownCuenta.show()"
-          (onClear)="filter('clear'); dropdownCuenta.focus(); dropdownCuenta.show()"
+          (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+          (keyup.enter)="saltar('campoCuentaAuxiliar')"
+          (onFocus)="dropCuentaAuxiliarFocus(dropdownCuenta)"
+          (onHide)="dropCuentaAuxiliarHide(dropdownCuenta)"
         >
+          <!-- (onclick)="dropdownCuenta.show()" -->
+          <!-- (onClear)="filter('clear'); dropdownCuenta.focus(); dropdownCuenta.show()" -->
+          <!-- (onFocus)="filter('clear'); dropdownCuenta.show()" -->
           <ng-template let-cuenta_auxiliar pTemplate="item">
             <div class="cuenta_auxiliar-item">
               <span class="d-block" style="font-size: 1rem"> <strong>Descripción: </strong> {{ cuenta_auxiliar.descripcion }} </span>
@@ -47,6 +51,7 @@
           (blur)="checkAmount(InputDebito); convertAmount('blur', InputDebito, 'valor_debito'); checkAmountInputState()"
           (focus)="convertAmount('focus', InputDebito, 'valor_debito')"
           (keyup)="checkAmountInputState()"
+          (keydown.enter)="validateAdd()"
         />
       </div>
 
@@ -63,12 +68,22 @@
           (blur)="checkAmount(InputCredito); convertAmount('blur', InputCredito, 'valor_credito'); checkAmountInputState()"
           (focus)="convertAmount('focus', InputCredito, 'valor_credito')"
           (keyup)="checkAmountInputState()"
+          (keydown.enter)="validateAdd()"
         />
       </div>
 
       <div class="btn-group">
         <div class="mt-4">
-          <btn-icon-circular [disabled]="disableBtnAdd()" [id]="'add-entry-btn'" [icon_size]="'1rem'" [icon]="'fa-solid fa-plus'" [size]="'size-md'" [pTooltip]="disableBtnAdd() ? '' : 'Añadir'" tooltipPosition="left" (clickFunction)="addEntry()">
+          <btn-icon-circular
+            [disabled]="disableBtnAdd()"
+            [id]="'add-entry-btn'"
+            [icon_size]="'1rem'"
+            [icon]="isEditing ? 'fas fa-pencil-alt' : 'fa-solid fa-plus'"
+            [size]="'size-md'"
+            [pTooltip]="disableBtnAdd() ? '' : isEditing ? 'Editar' : 'Añadir'"
+            tooltipPosition="left"
+            (clickFunction)="addEntry()"
+          >
           </btn-icon-circular>
         </div>
       </div>
@@ -79,7 +94,7 @@
   <div class="diurnal-body">
     <div class="diurnal-entries-table-container">
       <div #cardTabla id="cardTabla" class="diurnal-entries-table-inner">
-        <dinamic-table [cardTabla]="cardTabla" [(data)]="detalle" [config]="table_diurnal_entry" (table_events)="handle_table_events($event)"></dinamic-table>
+        <dinamic-table [cardTabla]="cardTabla" [(data)]="detalleAsiento" [config]="table_diurnal_entry" (table_events)="handle_table_events($event)"></dinamic-table>
       </div>
     </div>
   </div>

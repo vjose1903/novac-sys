@@ -170,7 +170,6 @@ export class fun extends CustomLodash {
     });
   }
 
-
   // __________________________________________________________________________________________________
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
@@ -533,8 +532,13 @@ export class fun extends CustomLodash {
   // Nombre: clickInput
   // Descripcion : Esta funcion hace click en un elemento html
   // __________________________________________________________________________________________________
-  static clickInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
+  static clickInput(arg, type = 'id') {
+    let element;
+    if (type == 'id') {
+      element = document.getElementById(arg) as HTMLElement;
+    } else if (type == 'class') {
+      element = document.getElementsByClassName(arg)[0] as HTMLElement;
+    }
     if (element) element.click();
   }
 
@@ -542,8 +546,13 @@ export class fun extends CustomLodash {
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
   // __________________________________________________________________________________________________
-  static enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
+  static enfocarInput(arg, type = 'id') {
+    let element;
+    if (type == 'id') {
+      element = document.getElementById(arg) as HTMLElement;
+    } else if (type == 'class') {
+      element = document.getElementsByClassName(arg)[0] as HTMLElement;
+    }
 
     if (element) element.focus();
   }

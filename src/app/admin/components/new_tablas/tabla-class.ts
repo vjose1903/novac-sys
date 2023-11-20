@@ -7,6 +7,8 @@ export interface table_info {
   key?: string;
   dropdown_key?: string;
   tipo?: tableRowType;
+  tachado?: boolean;
+  puntosSuspensivos?: boolean;
   tag_severity?: string;
   remplace?: any;
   data?: any;
@@ -131,7 +133,7 @@ export interface table_config {
   id_tabla?: String;
   info?: Array<table_info>;
   data_request?: any;
-  table_size?: 'sm';
+  table_size?: 'sm' | 'md' | 'lg';
   backgroundColor?: any;
   total_count?: any;
   obj_paginate?: paginateI;
@@ -151,6 +153,8 @@ export enum medidas {
   Producto = 'Productos',
   Funda = 'Fundas',
 }
+
+export const rowDataDividerKey = 'rowDivider';
 
 export class TablaClass {
   handle_table_events(event) {

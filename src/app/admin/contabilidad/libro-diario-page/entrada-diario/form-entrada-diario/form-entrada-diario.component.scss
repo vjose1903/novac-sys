@@ -43,8 +43,8 @@
     grid-area: diurnal-body;
 
     .diurnal-entries-table-container {
-      min-height: 12rem;
       position: relative;
+      min-height: 16rem;
       .diurnal-entries-table-inner {
         position: absolute;
         height: 100%;

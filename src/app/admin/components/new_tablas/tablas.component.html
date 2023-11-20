@@ -61,137 +61,144 @@
                 #RowElement
                 (click)="clickROW(rowData, getIndex(indexBody))"
               >
-                <td
-                  *ngFor="let column of config.info; let index_column = index"
-                  class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
-                  id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
-                  [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)"
-                >
-                  <span class="titulo_sm"> {{ column?.titulo_sm }} </span>
+                <ng-container *ngIf="verificateIsDivider(rowData)">
+                  <td class="table-td-divider" id="td-{{ realIdTabla }}-divider-{{ getIndex(indexBody) }}" [ngStyle]="tServ.getStyleDivider(rowData)" [attr.colspan]="verificateColspan(rowData)"></td>
+                </ng-container>
+                <ng-container *ngIf="!verificateIsDivider(rowData)">
+                  <td
+                    id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
+                    *ngFor="let column of config.info; let index_column = index"
+                    class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
+                    [ngClass]="{ 'puntos-suspensivos': column?.puntosSuspensivos }"
+                    [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)"
+                    [attr.colspan]="verificateColspan(rowData)"
+                  >
+                    <span class="titulo_sm"> {{ column?.titulo_sm }} </span>
 
-                  <span [ngSwitch]="column.tipo" [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
-                    <span *ngSwitchCase="'index'" class="d-flex justify-content-center align-items-center">
-                      <span class="text-bold-700">{{ (tServ.getPaginationById(realIdTabla).page - 1) * tServ.getPaginationById(realIdTabla).per_page + (getIndex(indexBody) + 1) }}</span>
-                    </span>
-
-                    <span *ngSwitchCase="'cantidades'" id="{{ column.key }}-{{ getIndex(indexBody) }}" pTooltip="{{ cantidadesTooltip(rowData, column) }}" [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'" style="width: 100%">
-                      {{ cantidadesLabel(rowData, column) }}
-                    </span>
-
-                    <span *ngSwitchCase="'img'" class="d-flex justify-content-center align-items-center">
-                      <img-component
-                        [alt]="column.alt ? column.alt : rowData[column.rowAlt] ? rowData[column.rowAlt] : ''"
-                        [imagenSrc]="getValueForm(column, rowData)"
-                        [imgStyle]="column.imgStyle ? column.imgStyle : rowData[column.rowImgStyle] ? rowData[column.rowImgStyle] : 'circular'"
-                      ></img-component>
-                    </span>
-
-                    <span *ngSwitchCase="'icon'">
-                      <icons-array
-                        [column]="column"
-                        [indexBody]="getIndex(indexBody)"
-                        [realIdTabla]="realIdTabla"
-                        [seleccionado]="seleccionado"
-                        [rowData]="rowData"
-                        [data]="data"
-                        [rowsEditing]="rowsEditing"
-                        (icon_click)="iconsClick($event)"
-                      ></icons-array>
-                    </span>
-
-                    <div *ngSwitchCase="'tag'" (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
-                      <ng-container *ngIf="fun.hasValue(getValueForm(column, rowData))">
-                        <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: rowData, column: column }"></ng-container>
-                      </ng-container>
-                    </div>
-
-                    <span *ngSwitchCase="'color'" class="d-flex justify-content-center align-items-center">
-                      <div class="show_color" [ngStyle]="getColor(getValueForm(column, rowData))"></div>
-                    </span>
-
-                    <span *ngSwitchCase="'switch'" class="d-flex justify-content-center align-items-center">
-                      <span *ngIf="column.remplace && seleccionado != rowData?.id" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
-                        <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                    <span [ngSwitch]="column.tipo" [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
+                      <span *ngSwitchCase="'index'" class="d-flex justify-content-center align-items-center">
+                        <span class="text-bold-700">{{ (tServ.getPaginationById(realIdTabla).page - 1) * tServ.getPaginationById(realIdTabla).per_page + (getIndex(indexBody) + 1) }}</span>
                       </span>
 
-                      <div *ngIf="(column.remplace && seleccionado == rowData?.id) || !column.remplace" class="table_switch">
-                        <input class="apple-switch" [ngClass]="{ disabled: disableInput(rowData, column) }" type="checkbox" (change)="changeValorCheck(rowData, column, getIndex(indexBody))" [checked]="getValueForm(column, rowData)" />
-                      </div>
-                    </span>
-
-                    <span *ngSwitchCase="'dropDown'">
-                      <span *ngIf="column.remplace && seleccionado != rowData?.id && !rowData?.is_editing" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
-                        <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                      <span *ngSwitchCase="'cantidades'" id="{{ column.key }}-{{ getIndex(indexBody) }}" pTooltip="{{ cantidadesTooltip(rowData, column) }}" [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'" style="width: 100%">
+                        {{ cantidadesLabel(rowData, column) }}
                       </span>
 
-                      <div *ngIf="(column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing">
-                        <p-dropdown
-                          #dropdown
-                          [virtualScroll]="true"
-                          [itemSize]="34"
-                          [dropdownIcon]="'pi pi-sort'"
-                          [disabled]="disableInput(rowData, column)"
-                          [options]="column.data"
-                          [filter]="true"
-                          filterBy="nombre_largo,hora_sorteo"
-                          [ngModel]="rowData[column.dropdown_key]"
-                          [placeholder]="getDropPlaceholder(column.placeholder)"
-                          [optionLabel]="column.optionLabel"
-                          [optionValue]="column.optionValue"
-                          styleClass="form-control min"
-                          appendTo="body"
-                          emptyFilterMessage="valor_buscado_no_se_encuentra"
-                          (onChange)="changeValorInput(column, column.dropdown_key, getIndex(indexBody), dropdown.value, rowData)"
-                        >
-                        </p-dropdown>
-                      </div>
-                    </span>
-
-                    <span *ngSwitchCase="'input'">
-                      <span *ngIf="column.remplace && seleccionado != rowData?.id && !rowData?.is_editing" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
-                        <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                      <span *ngSwitchCase="'img'" class="d-flex justify-content-center align-items-center">
+                        <img-component
+                          [alt]="column.alt ? column.alt : rowData[column.rowAlt] ? rowData[column.rowAlt] : ''"
+                          [imagenSrc]="getValueForm(column, rowData)"
+                          [imgStyle]="column.imgStyle ? column.imgStyle : rowData[column.rowImgStyle] ? rowData[column.rowImgStyle] : 'circular'"
+                        ></img-component>
                       </span>
 
-                      <div *ngIf="(column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing" class="table_input">
-                        <input
-                          #inputTable
-                          [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
-                          class="form-control m-0 inputTabla {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
-                          id="input-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
-                          [min]="rowData.min_ ? rowData.min_ : 0"
-                          [max]="rowData.max_ ? rowData.max_ : null"
-                          type="{{ column.inputType ? column.inputType : 'text' }}"
-                          [value]="getValueForm(column, rowData)"
-                          [disabled]="disableInput(rowData, column)"
-                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
-                          (blur)="checkNumber($event.target, column, getIndex(indexBody)); handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
-                          (keyup)="changeValorInput(column, column.key, getIndex(indexBody), $event.target.value, rowData)"
-                        />
-                        <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
+                      <span *ngSwitchCase="'icon'">
+                        <icons-array
+                          [column]="column"
+                          [indexBody]="getIndex(indexBody)"
+                          [realIdTabla]="realIdTabla"
+                          [seleccionado]="seleccionado"
+                          [rowData]="rowData"
+                          [data]="data"
+                          [rowsEditing]="rowsEditing"
+                          (icon_click)="iconsClick($event)"
+                        ></icons-array>
+                      </span>
 
-                        <i *ngIf="column.can_reset" pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, rowData)"></i>
+                      <div *ngSwitchCase="'tag'" (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
+                        <ng-container *ngIf="fun.hasValue(getValueForm(column, rowData))">
+                          <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: rowData, column: column }"></ng-container>
+                        </ng-container>
                       </div>
-                    </span>
 
-                    <span *ngSwitchDefault id="{{ column.key }}-{{ getIndex(indexBody) }}" class=" {{ rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'text-black' }}" style="width: 100%">
-                      {{ getValueForm(column, rowData) }}
-                      {{ column.alerta && config?.colores && rowData.danger ? '(Inactivo)' : '' }}
-                    </span>
-                  </span>
-                </td>
+                      <span *ngSwitchCase="'color'" class="d-flex justify-content-center align-items-center">
+                        <div class="show_color" [ngStyle]="getColor(getValueForm(column, rowData))"></div>
+                      </span>
 
-                <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
-                  <span class="titulo_sm"> Acciones </span>
-                  <app-btnacciones
-                    [index_body]="getIndex(indexBody)"
-                    [id_tabla]="realIdTabla"
-                    [dato]="rowData"
-                    [data]="data"
-                    [botones]="config.botones"
-                    (functionsBtnDinamic)="functionsBtnDinamic($event)"
-                    (clickBoton)="handle_table_events('click_action', $event)"
-                  ></app-btnacciones>
-                </td>
+                      <span *ngSwitchCase="'switch'" class="d-flex justify-content-center align-items-center">
+                        <span *ngIf="column.remplace && seleccionado != rowData?.id" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                          <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                        </span>
+
+                        <div *ngIf="(column.remplace && seleccionado == rowData?.id) || !column.remplace" class="table_switch">
+                          <input class="apple-switch" [ngClass]="{ disabled: disableInput(rowData, column) }" type="checkbox" (change)="changeValorCheck(rowData, column, getIndex(indexBody))" [checked]="getValueForm(column, rowData)" />
+                        </div>
+                      </span>
+
+                      <span *ngSwitchCase="'dropDown'">
+                        <span *ngIf="column.remplace && seleccionado != rowData?.id && !rowData?.is_editing" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                          <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                        </span>
+
+                        <div *ngIf="(column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing">
+                          <p-dropdown
+                            #dropdown
+                            [virtualScroll]="true"
+                            [itemSize]="34"
+                            [dropdownIcon]="'pi pi-sort'"
+                            [disabled]="disableInput(rowData, column)"
+                            [options]="column.data"
+                            [filter]="true"
+                            filterBy="nombre_largo,hora_sorteo"
+                            [ngModel]="rowData[column.dropdown_key]"
+                            [placeholder]="getDropPlaceholder(column.placeholder)"
+                            [optionLabel]="column.optionLabel"
+                            [optionValue]="column.optionValue"
+                            styleClass="form-control min"
+                            appendTo="body"
+                            emptyFilterMessage="valor_buscado_no_se_encuentra"
+                            (onChange)="changeValorInput(column, column.dropdown_key, getIndex(indexBody), dropdown.value, rowData)"
+                          >
+                          </p-dropdown>
+                        </div>
+                      </span>
+
+                      <span *ngSwitchCase="'input'">
+                        <span *ngIf="column.remplace && seleccionado != rowData?.id && !rowData?.is_editing" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                          <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                        </span>
+
+                        <div *ngIf="(column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing" class="table_input">
+                          <input
+                            #inputTable
+                            [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
+                            class="form-control m-0 inputTabla {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
+                            id="input-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
+                            [min]="rowData.min_ ? rowData.min_ : 0"
+                            [max]="rowData.max_ ? rowData.max_ : null"
+                            type="{{ column.inputType ? column.inputType : 'text' }}"
+                            [value]="getValueForm(column, rowData)"
+                            [disabled]="disableInput(rowData, column)"
+                            (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
+                            (blur)="checkNumber($event.target, column, getIndex(indexBody)); handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
+                            (keyup)="changeValorInput(column, column.key, getIndex(indexBody), $event.target.value, rowData)"
+                          />
+                          <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
+
+                          <i *ngIf="column.can_reset" pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, rowData)"></i>
+                        </div>
+                      </span>
+
+                      <span *ngSwitchDefault id="{{ column.key }}-{{ getIndex(indexBody) }}" class=" {{ rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'text-black' }}" style="width: 100%">
+                        {{ getValueForm(column, rowData) }}
+                        {{ column.alerta && config?.colores && rowData.danger ? '(Inactivo)' : '' }}
+                      </span>
+                    </span>
+                  </td>
+
+                  <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" *ngIf="fun.hasValue(config.botones)" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
+                    <span class="titulo_sm"> Acciones </span>
+                    <app-btnacciones
+                      [index_body]="getIndex(indexBody)"
+                      [id_tabla]="realIdTabla"
+                      [dato]="rowData"
+                      [data]="data"
+                      [botones]="config.botones"
+                      (functionsBtnDinamic)="functionsBtnDinamic($event)"
+                      (clickBoton)="handle_table_events('click_action', $event)"
+                    ></app-btnacciones>
+                  </td>
+                </ng-container>
               </tr>
             </ng-container>
           </tbody>
@@ -206,10 +213,7 @@
               <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ data ? fun.roundNumberToDecimal(config.total_count, 0) : 0 }}</h6>
             </div>
 
-
             <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center">
-
-
               <p-paginator
                 *ngIf="data"
                 id="paginator-{{ realIdTabla }}"

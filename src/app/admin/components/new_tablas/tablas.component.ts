@@ -6,7 +6,7 @@ import { ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { medidas, table_config, table_info } from './tabla-class';
+import { medidas, rowDataDividerKey, table_config, table_info } from './tabla-class';
 import { teclasCode } from '../../../core/typescript/constantes';
 
 @Component({
@@ -86,6 +86,33 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     setTimeout(() => (this.ready = true), 250);
   }
 
+  ngAfterViewInit() {
+    if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
+    this.handleConfig();
+  }
+
+  ngOnChanges(change) {
+    if (change.data && change.data.currentValue) {
+      this.updateDataCopy(this.data);
+
+      // ================================================
+      // CUSTOM STYLES
+      // ================================================
+
+      // ================================================
+
+      this.TablasComponent = this;
+      this.TablasComponentChange.emit(this.TablasComponent);
+    }
+    this.cdRef.detectChanges();
+  }
+
+  ngOnDestroy() {
+    if (this.subWidth) this.subWidth.unsubscribe();
+    this.tServ.deletePaginationById(this.realIdTabla);
+    clearInterval(this.tablaInterval);
+  }
+
   checkConfig() {
     if (!fun.objHas(this.config, 'noDataMessage') || fun.isEmpty(this.config.noDataMessage)) this.config.noDataMessage = 'No existen registros.';
     this.checkPagination();
@@ -101,11 +128,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
 
     this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
-  }
-
-  ngAfterViewInit() {
-    if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
-    this.handleConfig();
   }
 
   handleConfig() {
@@ -130,32 +152,31 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     });
   }
 
-  ngOnDestroy() {
-    if (this.subWidth) this.subWidth.unsubscribe();
-    this.tServ.deletePaginationById(this.realIdTabla);
-    clearInterval(this.tablaInterval);
-  }
-
   getValueForm(column: table_info, data) {
     switch (column.tipo) {
       case 'textList':
-        return _.reduce(_.get(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${_.get(item, column.key_value)}`, '');
+        return _.reduce(fun.getProperty(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${fun.getProperty(item, column.key_value)}`, '');
 
       case 'formatoNumero':
-        return this.formatoNumero(_.get(data, column.key));
+        const value = fun.getProperty(data, column.key);
+        if ('tachado' in column && column.tachado) {
+          return fun.hasValue(value) && value > 0 ? this.formatoNumero(value) : '-';
+        } else {
+          return this.formatoNumero(value);
+        }
 
       case 'date':
-        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
+        const fecha = fun.date_formater({ date: fun.getProperty(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
         return fecha;
 
       default:
-        return _.get(data, column.key);
+        return fun.getProperty(data, column.key);
     }
   }
 
   checkBackgroundTr(params: { tipo: string; dato: any }) {
     let res = false;
-    if (fun.objHas(params.dato, params.tipo)) res = _.get(params.dato, params.tipo);
+    if (fun.objHas(params.dato, params.tipo)) res = fun.getProperty(params.dato, params.tipo);
 
     return res;
     // dato?.danger && config?.colores;
@@ -194,8 +215,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.tServ.modifyPaginationById(this.realIdTabla, [{ search: search }]);
   }
-
-
 
   paginatorChange(event, id) {
     setTimeout(() => {
@@ -324,6 +343,21 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return res;
   }
 
+  verificateColspan(data) {
+    let colSpan = null;
+
+    if (rowDataDividerKey in data && data[rowDataDividerKey]) {
+      colSpan = this.config.info.length;
+      if ('botones' in this.config && fun.hasValue(this.config.botones)) colSpan += 1;
+    }
+
+    return colSpan;
+  }
+
+  verificateIsDivider(data) {
+    return rowDataDividerKey in data && data[rowDataDividerKey];
+  }
+
   getTitleStyles(key) {
     const columnConfig = this.config.info.find((config) => config.key == key);
     if (columnConfig) {
@@ -403,22 +437,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
-    }
-    this.cdRef.detectChanges();
-  }
-
-  ngOnChanges(change) {
-    if (change.data && change.data.currentValue) {
-      this.updateDataCopy(this.data);
-
-      // ================================================
-      // CUSTOM STYLES
-      // ================================================
-
-      // ================================================
-
-      this.TablasComponent = this;
-      this.TablasComponentChange.emit(this.TablasComponent);
     }
     this.cdRef.detectChanges();
   }

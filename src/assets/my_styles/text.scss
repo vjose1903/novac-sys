@@ -64,3 +64,10 @@
   -webkit-background-clip: text;
   color: transparent !important;
 }
+
+
+.puntos-suspensivos {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
