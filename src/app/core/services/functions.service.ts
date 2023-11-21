@@ -529,6 +529,16 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: getCuerrentFocusedElement
+  // Descripcion : Esta funcion retorna el elemento con el foco activo
+  // __________________________________________________________________________________________________
+  static getCuerrentFocusedElement() {
+
+    return  document.activeElement;
+    ;
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: clickInput
   // Descripcion : Esta funcion hace click en un elemento html
   // __________________________________________________________________________________________________

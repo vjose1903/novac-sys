@@ -1,8 +1,10 @@
+import { extraArgs } from './../../../../core/typescript/crud-g';
+import { PeriodoFiscalC } from './../../../registros/periodo-fiscal/periodo-fiscal';
 import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { fun } from './../../../../core/services/functions.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, UntypedFormArray, UntypedFormGroup, Validators } from '@angular/forms';
-import { tipoAsiento } from '../asiento-contable';
+import { AsientoContableC, tipoAsiento } from '../asiento-contable';
 import { diurnalFormBtnAceptarId, diurnalFormId } from '../libro-diario-page.utils';
 
 @Component({
@@ -18,6 +20,9 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
 
   modalComponent: ModalComponentI;
   inputs: any;
+  peridoClass = new PeriodoFiscalC();
+  asientoContableClass = new AsientoContableC();
+  isOpenMonth = true;
 
   ngOnInit(): void {
     this.necesarioStart();
@@ -31,6 +36,8 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
       this.formGroup.valueChanges.subscribe((change) => {
         this.validateSaveBtnState();
       });
+
+      setTimeout(() => fun.enfocarInput('fecha_equivalente_input'), 250);
     });
   }
 
@@ -50,6 +57,7 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
   createItemDiunalEntry(departmentLine?: any) {
     const scheduleForm = this.fb.group({
       id: [{ value: departmentLine ? departmentLine.id : null, disabled: false }],
+      arrayId: [{ value: departmentLine ? departmentLine.arrayId : fun.generateKey(), disabled: false }],
       valor_debito: [{ value: departmentLine ? departmentLine.valor_debito : null, disabled: false }],
       valor_credito: [{ value: departmentLine ? departmentLine.valor_credito : null, disabled: false }],
       cuenta_contable_auxiliar_id: [{ value: departmentLine ? departmentLine.cuenta_contable_auxiliar_id : null, disabled: false }, Validators.required],
@@ -72,6 +80,9 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
     let buttonIsDisable = this.formIsOnInitState();
     if (!buttonIsDisable) buttonIsDisable = this.formGroup.invalid;
 
+    const arrayDiurnalEntries = this.formGroup.get('detalles_asientos_contables') as UntypedFormArray;
+    if (!buttonIsDisable) buttonIsDisable = arrayDiurnalEntries.length == 0;
+
     if (this.modalComponent && this.modalComponent.changeStateButton) {
       this.modalComponent.changeStateButton({ modalId: diurnalFormId, btnId: diurnalFormBtnAceptarId, disable: buttonIsDisable });
     }
@@ -88,11 +99,52 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
     }
   }
 
-  test() {
-    this.modalComponent.changeStateButton({ modalId: diurnalFormId, btnId: diurnalFormBtnAceptarId, disable: false });
+  validateOpenPeriod() {
+    const formulario = this.formGroup.getRawValue();
+
+    if (fun.hasValue(formulario.fecha_equivalente)) {
+      const fecha_equivalente = fun.my_dateFormater(formulario.fecha_equivalente, false);
+
+      const extra: extraArgs = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
+      this.peridoClass.getAll(extra).then((response) => {
+        this.isOpenMonth = response.data.isOpen;
+
+        const stateFunction = this.isOpenMonth ? 'enable' : 'disable';
+        this.formGroup.controls.comentario[stateFunction]();
+
+        if (!this.isOpenMonth) {
+          const fechaMostrar = fun.my_dateFormater(formulario.fecha_equivalente);
+          const numMonth = formulario.fecha_equivalente.getMonth() + 1;
+          const monthLabel = PeriodoFiscalC.getMonthLabelByNum(numMonth);
+
+          fun.toastError(`Para registrar una entrada de libro diario en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
+        }
+      });
+    }
+  }
+
+  parseDetalleAsientos(detallesAsientos) {
+    const arrayDiurnalEntries = this.formGroup.get('detalles_asientos_contables') as UntypedFormArray;
+    arrayDiurnalEntries.clear();
+
+    detallesAsientos.forEach((detalleAsiento) => this.addItem(detalleAsiento));
   }
 
   btn_aceptar() {
-    throw new Error('Method not implemented.');
+    const formulario = this.formGroup.getRawValue();
+    const dataToSend = fun.deepCloning(formulario);
+    dataToSend.fecha_equivalente = fun.my_dateFormater(formulario.fecha_equivalente, false);
+
+    console.log('dataToSend ', dataToSend);
+    this.asientoContableClass
+      .createUpdateOne(dataToSend)
+      .then((res) => {
+        console.log('res ', res);
+      })
+      .catch((err) => {
+        console.error('error ', err);
+      });
   }
+
+  test() {}
 }

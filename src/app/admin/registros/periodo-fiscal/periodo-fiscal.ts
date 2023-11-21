@@ -36,6 +36,10 @@ export class PeriodoFiscalC extends CrudG<any> {
     _11_: 'noviembre',
     _12_: 'diciembre',
   };
+
+  static getMonthLabelByNum(number) {
+    return PeriodoFiscalC.labels[`_${number}_`];
+  }
 }
 
 export interface PeriodoFiscalI {

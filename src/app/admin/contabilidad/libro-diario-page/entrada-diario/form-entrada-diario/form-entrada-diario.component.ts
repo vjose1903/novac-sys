@@ -3,7 +3,7 @@ import { rowDataDividerKey, table_config } from './../../../../components/new_ta
 import { Permisos } from './../../../../../core/typescript/permisos';
 import { MixinClass } from './../../../../../core/typescript/MixinClass';
 import { fun } from './../../../../../core/services/functions.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { UntypedFormGroup, FormBuilder } from '@angular/forms';
 import { CuentaContableC } from '../../../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
 
@@ -12,10 +12,9 @@ import { CuentaContableC } from '../../../catalogo-cuentas-page/catalogo-cuentas
   templateUrl: './form-entrada-diario.component.html',
   styleUrls: ['./form-entrada-diario.component.scss'],
 })
-export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
+export class FormEntradaDiarioComponent extends MixinClass implements OnInit, OnChanges {
   cuentasAuxiliares = [];
   formGroup: UntypedFormGroup;
-  formLastValue;
 
   totalDebito = '0.00';
   totalCredito = '0.00';
@@ -39,6 +38,9 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
   cuentaContableClass = new CuentaContableC();
   isEditing: boolean;
 
+  @Output() getDetalleAsientos = new EventEmitter();
+  @Input() isOpenMonth;
+
   constructor(private fb: FormBuilder) {
     super();
   }
@@ -47,9 +49,15 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
     this.necesarioStart();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('isOpenMonth' in changes) {
+      this.changeFormState();
+    }
+  }
+
   async necesarioStart() {
     await this.getCuentasAuxiliares();
-    this.createForm().then(() => this.subscribeChangesForm());
+    this.createForm();
   }
 
   createForm(data?) {
@@ -65,6 +73,15 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
     });
   }
 
+  changeFormState() {
+    const stateFunction = this.isOpenMonth ? 'enable' : 'disable';
+    if (this.formGroup) {
+      this.formGroup.controls.cuenta_contable_auxiliar_id[stateFunction]();
+      this.formGroup.controls.valor_debito[stateFunction]();
+      this.formGroup.controls.valor_credito[stateFunction]();
+    }
+  }
+
   dropCuentaAuxiliarHide(arg) {
     const formulario = this.formGroup.getRawValue();
 
@@ -76,20 +93,6 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
       const filterInput = drop?.filterViewChild?.nativeElement;
       if (filterInput) filterInput.focus();
     }, 25);
-  }
-
-  subscribeChangesForm() {
-    this.formLastValue = this.formGroup.value;
-
-    this.formGroup.valueChanges.subscribe((changes) => {
-      if (!fun.isEqual(changes, this.formLastValue)) {
-        this.formLastValue = changes;
-      }
-    });
-
-    setTimeout(() => {
-      fun.clickInput('campoCuentaAuxiliar', 'class');
-    }, 0);
   }
 
   checkAmountInputState() {
@@ -163,31 +166,34 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
 
     this.detalleAsiento.push(diurnalEntry);
 
-    if (this.detalleAsiento.length > 1) {
-      const registrosConDebito = this.detalleAsiento.filter((entry) => entry.valor_debito !== null && !entry.rowDivider);
-      const registrosDebitoOrdenados = registrosConDebito.sort((a, b) => a.valor_debito - b.valor_debito);
-
-      const registrosConCredito = this.detalleAsiento.filter((entry) => entry.valor_credito !== null && !entry.rowDivider);
-      const registrosCreditoOrdenados = registrosConCredito.sort((a, b) => a.valor_credito - b.valor_credito);
-
-      if (registrosConDebito.length > 0 && registrosConCredito.length > 0) {
-        const divider = { [rowDataDividerKey]: true, style: { padding: '0.2rem 0rem', background: 'var(--primary02)' } };
-
-        this.detalleAsiento = [...registrosDebitoOrdenados, divider, ...registrosCreditoOrdenados];
-      } else {
-        this.detalleAsiento = [...registrosDebitoOrdenados, ...registrosCreditoOrdenados];
-      }
-
-      this.totalDebito = registrosDebitoOrdenados.reduce((acumulado, item) => acumulado + item.valor_debito, 0);
-      this.totalCredito = registrosCreditoOrdenados.reduce((acumulado, item) => acumulado + item.valor_credito, 0);
-    }
+    this.orderDetalles();
 
     this.formGroup.reset({ arrayId: fun.generateKey() });
     this.checkAmountInputState();
 
     this.changeIsEditingState(false);
-    this.calcularTotales();
+    const currentFocused = fun.getCuerrentFocusedElement();
+
+    fun.desEnfocarInput(currentFocused.id);
     fun.clickInput('campoCuentaAuxiliar', 'class');
+  }
+
+  orderDetalles() {
+    const registrosConDebito = this.detalleAsiento.filter((entry) => entry.valor_debito !== null && !entry.rowDivider);
+    const registrosDebitoOrdenados = registrosConDebito.sort((a, b) => a.valor_debito - b.valor_debito);
+
+    const registrosConCredito = this.detalleAsiento.filter((entry) => entry.valor_credito !== null && !entry.rowDivider);
+    const registrosCreditoOrdenados = registrosConCredito.sort((a, b) => a.valor_credito - b.valor_credito);
+
+    if (registrosConDebito.length > 0 && registrosConCredito.length > 0) {
+      const divider = { [rowDataDividerKey]: true, style: { padding: '0.2rem 0rem', background: 'var(--primary02)' } };
+
+      this.detalleAsiento = [...registrosDebitoOrdenados, divider, ...registrosCreditoOrdenados];
+    } else {
+      this.detalleAsiento = [...registrosDebitoOrdenados, ...registrosCreditoOrdenados];
+    }
+    this.calcularTotales();
+    this.returnDetalles();
   }
 
   validateAdd() {
@@ -219,7 +225,7 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
 
       this.changeIsEditingState(true);
       this.checkAmountInputState();
-      this.calcularTotales();
+      this.orderDetalles();
     }
   }
 
@@ -237,7 +243,6 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
   eliminarReg(data) {
     const siFunc = (instance) => {
       this.removerDetalle(data.arrayId);
-      this.calcularTotales();
       instance.dismissModal(instance.id);
     };
 
@@ -251,5 +256,11 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit {
 
   removerDetalle(arrayId) {
     this.detalleAsiento = this.detalleAsiento.filter((entry) => entry.arrayId != arrayId);
+    this.orderDetalles();
+  }
+
+  returnDetalles() {
+    const detallesWithOutDivider = this.detalleAsiento.filter((detalle) => !(rowDataDividerKey in detalle));
+    this.getDetalleAsientos.emit(detallesWithOutDivider);
   }
 }

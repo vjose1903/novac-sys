@@ -4,7 +4,17 @@
       <div class="col-12 col-md-4 p-0">
         <div class="form-group" [appMsgError]="'fecha_equivalente'" [form]="formGroup">
           <label class="control-label">Fecha de registro: <span style="color: red">*</span></label>
-          <p-calendar inputId="fecha_equivalente_btn" [maxDate]="maxDate" inputStyleClass="form-control" formControlName="fecha_equivalente" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+          <p-calendar
+            inputId="fecha_equivalente_input"
+            [maxDate]="maxDate"
+            inputStyleClass="form-control"
+            formControlName="fecha_equivalente"
+            appendTo="body"
+            dateFormat="dd/mm/yy"
+            placeholder="dd/mm/aaaa"
+            (onSelect)="validateOpenPeriod()"
+            (onInput)="validateOpenPeriod()"
+          ></p-calendar>
 
           <span id="msgContainer"></span>
         </div>
@@ -20,7 +30,7 @@
       </div>
 
       <div class="col-12 p-0 mt-2">
-        <form-entrada-diario></form-entrada-diario>
+        <form-entrada-diario [isOpenMonth]="isOpenMonth" (getDetalleAsientos)="parseDetalleAsientos($event)"></form-entrada-diario>
       </div>
 
       <!-- <div class="col-12 p-0">

@@ -43,7 +43,7 @@
         <!-- TBODY -->
         <div class="divBody">
           <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
-            <ng-container *ngIf="data">
+            <ng-container *ngIf="data && data.length">
               <tr
                 *ngFor="let rowData of data; let indexBody = index"
                 class="text-center"
@@ -202,7 +202,8 @@
               </tr>
             </ng-container>
           </tbody>
-          <div *ngIf="!data" class="no-data">
+
+          <div *ngIf="!data || data.length == 0" class="no-data">
             <h4 class="no-data-message">{{ config.noDataMessage }}</h4>
           </div>
         </div>
