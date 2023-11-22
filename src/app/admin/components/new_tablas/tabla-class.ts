@@ -8,6 +8,7 @@ export interface table_info {
   dropdown_key?: string;
   tipo?: tableRowType;
   tachado?: boolean;
+  acepta_negativos?: boolean;
   puntosSuspensivos?: boolean;
   tag_severity?: string;
   remplace?: any;
@@ -118,6 +119,7 @@ interface filtarI {
 }
 
 export interface table_config {
+  info?: Array<table_info>;
   padding?: string;
   padre_functions?: padreFunctionsI;
   colores?: Boolean;
@@ -131,7 +133,6 @@ export interface table_config {
   filterTargets?: any;
   id?: String;
   id_tabla?: String;
-  info?: Array<table_info>;
   data_request?: any;
   table_size?: 'sm' | 'md' | 'lg';
   backgroundColor?: any;

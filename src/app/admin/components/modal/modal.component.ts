@@ -66,7 +66,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
   closeModal(modalId, dataToReturn?: IReturnData) {
     if (dataToReturn) {
       const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
-      if (fun.hasValue(modal) && fun.hasValue(modal.returnDataFromModal)) modal.returnDataFromModal(dataToReturn);
+      if (fun.hasValue(modal) && fun.hasValue(modal.returnDataFromModal)) modal.returnDataFromModal({ ...dataToReturn, modalId: modalId });
     }
     this.onHideModal(modalId);
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== modalId);

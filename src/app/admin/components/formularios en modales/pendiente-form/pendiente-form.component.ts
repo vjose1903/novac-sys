@@ -19,7 +19,7 @@ export class PendienteFormComponent implements OnInit, ModalI {
 
   constructor() {}
 
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   btn_aceptar() {
@@ -27,7 +27,7 @@ export class PendienteFormComponent implements OnInit, ModalI {
 
     const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
 
-    this.modalComponent.closeModal(this.modalComponent.id, { fecha, modalId: this.modalComponent.id });
+    this.modalComponent.closeModal(this.modalComponent.id, { fecha });
   }
 
   ngOnInit() {

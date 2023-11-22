@@ -138,8 +138,8 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
     console.log('dataToSend ', dataToSend);
     this.asientoContableClass
       .createUpdateOne(dataToSend)
-      .then((res) => {
-        console.log('res ', res);
+      .then((res: any) => {
+        this.modalComponent.closeModal(this.modalComponent.id, { data: { ...res.data } });
       })
       .catch((err) => {
         console.error('error ', err);

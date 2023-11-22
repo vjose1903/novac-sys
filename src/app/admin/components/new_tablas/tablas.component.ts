@@ -160,7 +160,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       case 'formatoNumero':
         const value = fun.getProperty(data, column.key);
         if ('tachado' in column && column.tachado) {
-          return fun.hasValue(value) && value > 0 ? this.formatoNumero(value) : '-';
+          const can_take_negativos = column.acepta_negativos ? true : value > 0;
+          return fun.hasValue(value) && can_take_negativos ? this.formatoNumero(value) : '-';
         } else {
           return this.formatoNumero(value);
         }

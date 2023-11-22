@@ -26,22 +26,21 @@
 
                     <p-dropdown
                       #dropdownCuenta
-                      inputId="valorI"
+                      placeholder="Seleccione la cuenta"
+                      filterPlaceholder="Buscar"
                       appendTo="body"
                       formControlName="cuenta_contable_id"
                       [options]="listaCuentasControl"
                       [itemSize]="34"
-                      [editable]="true"
+                      [filter]="true"
                       optionLabel="label"
                       optionValue="id"
+                      [resetFilterOnHide]="true"
                       [autofocusFilter]="false"
-                      styleClass="form-control "
-                      emptyMessage="Seleccione la cuenta contable"
+                      styleClass="form-control"
+                      emptyMessage="No existen cuantas contables"
                       [showClear]="true"
-                      (onChange)="getCuentasControl($event)"
-                      (onFocus)="getCuentasControl('clear'); dropdownCuenta.show()"
-                      (onclick)="dropdownCuenta.show()"
-                      (onClear)="getCuentasControl('clear'); dropdownCuenta.focus(); dropdownCuenta.show()"
+                      (onFocus)="dropCuentaControlFocus(dropdownCuenta)"
                     >
                       <ng-template let-cuenta_auxiliar pTemplate="item">
                         <div class="cuenta_auxiliar-item">
@@ -50,6 +49,7 @@
                         </div>
                       </ng-template>
                     </p-dropdown>
+
                     <span id="msgContainer"></span>
                   </div>
                 </div>

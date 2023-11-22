@@ -276,6 +276,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   btn_aceptar() {
-    this.modalComponent.closeModal(this.modalComponent.id, { data: { ...this.form.value, switches: { ...this.inputs.switches } }, modalId: this.modalComponent.id });
+    this.modalComponent.closeModal(this.modalComponent.id, { data: { ...this.form.value, switches: { ...this.inputs.switches } } });
   }
 }

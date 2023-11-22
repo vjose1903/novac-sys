@@ -32,11 +32,11 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
     super();
   }
 
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   btn_aceptar() {
-    this.modalComponent.closeModal(this.modalComponent.id, { data: this.articulos_selected, modalId: this.modalComponent.id });
+    this.modalComponent.closeModal(this.modalComponent.id, { data: this.articulos_selected });
   }
 
   ngOnInit() {

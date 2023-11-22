@@ -62,8 +62,11 @@
                 (click)="clickROW(rowData, getIndex(indexBody))"
               >
                 <ng-container *ngIf="verificateIsDivider(rowData)">
-                  <td class="table-td-divider" id="td-{{ realIdTabla }}-divider-{{ getIndex(indexBody) }}" [ngStyle]="tServ.getStyleDivider(rowData)" [attr.colspan]="verificateColspan(rowData)"></td>
+                  <td class="table-td-divider" id="td-{{ realIdTabla }}-divider-{{ getIndex(indexBody) }}" [ngStyle]="tServ.getStyleDivider(rowData)" [attr.colspan]="verificateColspan(rowData)">
+                    <span> {{ rowData.label }}</span>
+                  </td>
                 </ng-container>
+
                 <ng-container *ngIf="!verificateIsDivider(rowData)">
                   <td
                     id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"

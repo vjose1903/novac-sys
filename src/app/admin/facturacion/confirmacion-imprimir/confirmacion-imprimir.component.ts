@@ -24,7 +24,7 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
 
   constructor(private shServ: SharedService, public factServ: FacturacionService) {}
 
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
   documentos_a_imprimir = [];
   documento;
@@ -48,6 +48,6 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
   }
 
   btn_aceptar() {
-    this.modalComponent.closeModal(this.modalComponent.id, { is_print: this.is_print, modalId: this.modalComponent.id });
+    this.modalComponent.closeModal(this.modalComponent.id, { is_print: this.is_print });
   }
 }

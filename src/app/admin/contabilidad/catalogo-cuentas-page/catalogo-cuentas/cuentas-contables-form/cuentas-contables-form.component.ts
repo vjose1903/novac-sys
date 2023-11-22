@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./cuentas-contables-form.component.scss'],
 })
 export class CuentasContablesFormComponent implements OnInit, ModalI {
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: { data: any; dataOriginal: any; method: 'edit' | 'add'; cuenta_control: any };
 
   form: UntypedFormGroup;
@@ -145,6 +145,6 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
   btn_aceptar() {
     const dataToSend = this.parseData(this.form.getRawValue());
 
-    this.modalComponent.closeModal(this.modalComponent.id, { obj: dataToSend, modalId: this.modalComponent.id });
+    this.modalComponent.closeModal(this.modalComponent.id, { obj: dataToSend });
   }
 }

@@ -4,10 +4,11 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { Permisos } from '../../../core/typescript/permisos';
 import { fun } from '../../../core/services/functions.service';
 import { diurnalFormBtnAceptarId, diurnalFormId, searchDiurnalCode } from './libro-diario-page.utils';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { rowDataDividerKey, table_config } from '../../components/new_tablas/tabla-class';
 import { Subscription } from 'rxjs';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { ModalClass } from '../../components/modal/modal-class';
+import { AsientoContableC, CabezaAsietoContableI, DetalleAsientoContableI } from './asiento-contable';
 
 @Component({
   selector: 'app-libro-diario-page',
@@ -25,35 +26,30 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
     info: [
       { titulo: 'Código', key: 'codigo', tipo: 'text', style: { width: '20%', 'text-align': 'left' } },
       { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', style: { width: '40%', 'text-align': 'left' } },
-      { titulo: 'Auxiliar', key: 'estado_', tipo: 'text' },
-      { titulo: 'Débito', key: 'debito', tipo: 'text' },
-      { titulo: 'Crédito', key: 'credito', tipo: 'text' },
+      { titulo: 'Auxiliar', key: 'valor_auxiliar', tipo: 'formatoNumero', tachado: true, acepta_negativos: true },
+      { titulo: 'Débito', key: 'valor_debito', tipo: 'formatoNumero', tachado: true },
+      { titulo: 'Crédito', key: 'valor_credito', tipo: 'formatoNumero', tachado: true },
     ],
     id_tabla: 'diurnalDetail',
     redondo: false,
     obj_paginate: { show: false },
   };
 
-  detalle;
   tabsVisibles = [];
-  temp = [
-    { title: '01/10/2023 - Para registrar compra de ....' },
-    { title: '05/10/2023 - Para registrar compra de ....' },
-    { title: '08/10/2023 - Para registrar compra de ....' },
-    { title: '08/10/2023 - Para registrar compra de ....' },
-    { title: '08/10/2023 - Para registrar compra de ....' },
-    { title: '08/10/2023 - Para registrar compra de ....' },
-  ];
+  asientosContablesList: Array<CabezaAsietoContableI> = [];
 
   paginator = {
-    page: 0,
+    page: 1,
     page_front: 0,
     per_page: 20,
     cantPagesView: 5,
-    total_count: 3,
+    total_count: 0,
     per_page_options: [10, 15, 20, 30],
   };
   subWidth: Subscription;
+
+  asientoContableClass = new AsientoContableC();
+
   constructor(public cdRef: ChangeDetectorRef, public tServ: TablasService, private zone: NgZone) {
     super();
   }
@@ -64,8 +60,6 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
       if (res) this.setCantPagView(res.innerWidth, 'width_page');
     });
     this.necesarioStart();
-
-    this.abrirModalForm();
   }
 
   ngOnDestroy() {
@@ -111,8 +105,76 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   }
 
   async necesarioStart() {
-    this.changeTabsVisibility({ visible: true });
     this.initDateVars();
+    this.getAsientos(this.paginator).then(() => {
+      this.changeTabsVisibility({ visible: true });
+    });
+  }
+
+  getAsientos(params?: { per_page?: number; page?: number; search?: string }) {
+    return new Promise<void>((resolve) => {
+      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, desde: fun.my_dateFormater(this.desde, false), hasta: fun.my_dateFormater(this.hasta, false) } };
+
+      this.asientoContableClass.getAll(extra).then((res) => {
+        console.log('res ', res);
+        res.data.map((asiento: CabezaAsietoContableI) => {
+          asiento.title = `${fun.my_dateFormater(asiento.fecha_equivalente)} - ${asiento.comentario}`;
+
+          asiento.detalles_asientos_contables_front = this.makeFrontDetalles(asiento.detalles_asientos_contables);
+
+          return asiento;
+        });
+        this.asientosContablesList = res.data;
+        this.paginator.total_count = res.total_registros;
+        resolve();
+        console.log('this.asientosContablesList ', this.asientosContablesList);
+      });
+    });
+  }
+
+  makeFrontDetalles(detalles_asientos_contables: Array<DetalleAsientoContableI>) {
+    let frontDetalles = [];
+
+    detalles_asientos_contables.forEach((detalle) => {
+      const tipo = detalle.valor_debito ? 'debito' : 'credito';
+      const detalleControl = { tipo, ...detalle.cuenta_contable_control, ...this.parseDetalleCuenta({ valor_credito: detalle.valor_credito, valor_debito: detalle.valor_debito }) };
+      frontDetalles.push(detalleControl);
+
+      const valorAuxiliar = detalle.valor_debito ? detalle.valor_debito : detalle.valor_credito * -1;
+      const detalleAuxiliar = { tipo, ...detalle.cuenta_contable_auxiliar, ...this.parseDetalleCuenta({ valor_auxiliar: valorAuxiliar }) };
+      frontDetalles.push(detalleAuxiliar);
+    });
+
+    frontDetalles = this.orderDetalles(frontDetalles);
+    console.log('frontDetalles ', frontDetalles);
+
+    return frontDetalles;
+  }
+
+  parseDetalleCuenta(params: { valor_auxiliar?: null | number; valor_debito?: null | number; valor_credito?: null | number }) {
+    const detalleParsed = {};
+    detalleParsed['valor_auxiliar'] = fun.objHas(params, 'valor_auxiliar') ? params['valor_auxiliar'] : null;
+    detalleParsed['valor_debito'] = fun.objHas(params, 'valor_debito') ? params['valor_debito'] : null;
+    detalleParsed['valor_credito'] = fun.objHas(params, 'valor_credito') ? params['valor_credito'] : null;
+    return detalleParsed;
+  }
+
+  orderDetalles(detalles) {
+    const registrosConDebito = detalles.filter((entry) => entry.tipo == 'debito');
+    const registrosDebitoOrdenados = registrosConDebito.sort((a, b) => a.codigo - b.codigo);
+
+    const registrosConCredito = detalles.filter((entry) => entry.tipo == 'credito');
+    const registrosCreditoOrdenados = registrosConCredito.sort((a, b) => a.codigo - b.codigo);
+
+    if (registrosConDebito.length > 0 && registrosConCredito.length > 0) {
+      const divider = { [rowDataDividerKey]: true, label: '@' };
+
+      detalles = [...registrosDebitoOrdenados, divider, ...registrosCreditoOrdenados];
+    } else {
+      detalles = [...registrosDebitoOrdenados, ...registrosCreditoOrdenados];
+    }
+    return detalles;
   }
 
   initDateVars() {
@@ -127,7 +189,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
 
   changeTabsVisibility(params: { visible: boolean }) {
     if (params.visible) {
-      const numberOfEntries = this.temp.length;
+      const numberOfEntries = this.asientosContablesList.length;
       this.tabsVisibles = Array.from({ length: numberOfEntries }, (_, index) => index);
     } else {
       this.tabsVisibles = [];
@@ -194,5 +256,12 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
         ],
       },
     });
+  }
+
+  async getDataFromModal(arg, search?) {
+    if (arg.modalId == diurnalFormId) {
+      // const actualPagination = this.tServ.getPaginationById('lista_articulos');
+      // this.getArticulos(actualPagination);
+    }
   }
 }

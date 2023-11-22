@@ -11,7 +11,7 @@ import { ConfigArticuloC } from '../articulos_configuracion';
 })
 export class ConfigArticulosComponent implements OnInit, ModalI {
   form: UntypedFormGroup;
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
   update_articulos = true;
   configArticuloClass = new ConfigArticuloC();
@@ -53,7 +53,7 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
     this.configArticuloClass
       .updateOne(formulario, { parameters: { update_articulos: this.update_articulos } })
       .then((res) => {
-        this.modalComponent.closeModal(this.modalComponent.id, { data: { ...res.data }, modalId: this.modalComponent.id });
+        this.modalComponent.closeModal(this.modalComponent.id, { data: { ...res.data } });
       })
       .catch((err) => console.error(err));
   }

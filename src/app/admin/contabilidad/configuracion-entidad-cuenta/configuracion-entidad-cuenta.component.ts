@@ -8,6 +8,7 @@ import { table_config } from './../../components/new_tablas/tabla-class';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './configuracion-entidad-cuenta.utils';
+import { dropdownFilterFocusInput } from './../../../core/typescript/p-dropdown.utils';
 // import * as _ from 'lodash';
 @Component({
   selector: 'app-configuracion-entidad-cuenta',
@@ -89,6 +90,10 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
         fun.awaitTyping().then(async () => this.requestFilter(filter_target));
       }
     }
+  }
+
+  dropCuentaControlFocus(drop) {
+    dropdownFilterFocusInput(drop);
   }
 
   async requestFilter(filter_target) {

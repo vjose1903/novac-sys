@@ -6,6 +6,7 @@ import { fun } from './../../../../../core/services/functions.service';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { UntypedFormGroup, FormBuilder } from '@angular/forms';
 import { CuentaContableC } from '../../../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
+import { dropdownFilterFocusInput } from '../../../../../core/typescript/p-dropdown.utils';
 
 @Component({
   selector: 'form-entrada-diario',
@@ -89,10 +90,7 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit, On
   }
 
   dropCuentaAuxiliarFocus(drop) {
-    setTimeout(() => {
-      const filterInput = drop?.filterViewChild?.nativeElement;
-      if (filterInput) filterInput.focus();
-    }, 25);
+    dropdownFilterFocusInput(drop);
   }
 
   checkAmountInputState() {

@@ -27,7 +27,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   constructor() {
     super();
   }
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   ngOnInit() {
@@ -103,7 +103,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
       this.resetForm();
 
       const obj = { bool: true, body: res.articulo };
-      this.modalComponent.closeModal(this.modalComponent.id, { data: obj, modalId: this.modalComponent.id });
+      this.modalComponent.closeModal(this.modalComponent.id, { data: obj });
     });
   }
 
