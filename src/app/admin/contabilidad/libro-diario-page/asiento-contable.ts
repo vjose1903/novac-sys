@@ -29,6 +29,8 @@ export interface DetalleAsientoContableI {
   valor_debito: number | null;
   cuenta_contable_auxiliar: CuentaContableI;
   cuenta_contable_control: CuentaContableI;
+  cuenta_contable_auxiliar_id: number;
+  cuenta_contable_control_id: number;
 }
 
 interface UsuarioCreador {

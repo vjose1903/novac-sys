@@ -30,7 +30,7 @@
       </div>
 
       <div class="col-12 p-0 mt-2">
-        <form-entrada-diario [isOpenMonth]="isOpenMonth" (getDetalleAsientos)="parseDetalleAsientos($event)"></form-entrada-diario>
+        <form-entrada-diario [isOpenMonth]="isOpenMonth" (getDetalleAsientos)="parseDetalleAsientos($event)" [initialDetalleAsientos]="inputs?.asientoContable?.detalles_asientos_contables"></form-entrada-diario>
       </div>
 
       <!-- <div class="col-12 p-0">

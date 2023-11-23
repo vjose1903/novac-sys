@@ -18,9 +18,15 @@ import { AsientoContableC, CabezaAsietoContableI, DetalleAsientoContableI } from
 export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDestroy {
   permissions = Permisos.cabeza_asiento_contable;
   searchDiurnalCode = searchDiurnalCode;
-
   desde;
   hasta;
+
+  validationFilterList = [
+    { label: 'Todos', value: null },
+    { label: 'Validos', value: true },
+    { label: 'Por Validar', value: false },
+  ];
+  validationFilterValue = null;
 
   table_config_diurnal: table_config = {
     info: [
@@ -49,6 +55,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   subWidth: Subscription;
 
   asientoContableClass = new AsientoContableC();
+  filterValue;
 
   constructor(public cdRef: ChangeDetectorRef, public tServ: TablasService, private zone: NgZone) {
     super();
@@ -114,10 +121,20 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   getAsientos(params?: { per_page?: number; page?: number; search?: string }) {
     return new Promise<void>((resolve) => {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, desde: fun.my_dateFormater(this.desde, false), hasta: fun.my_dateFormater(this.hasta, false) } };
+
+      const extra = {
+        afterPath: `filtro/${palabra_a_buscar}`,
+        parameters: {
+          page: params.page,
+          per_page: params.per_page,
+          paginado: true,
+          desde: fun.my_dateFormater(this.desde, false),
+          hasta: fun.my_dateFormater(this.hasta, false),
+          is_validated: this.validationFilterValue,
+        },
+      };
 
       this.asientoContableClass.getAll(extra).then((res) => {
-        console.log('res ', res);
         res.data.map((asiento: CabezaAsietoContableI) => {
           asiento.title = `${fun.my_dateFormater(asiento.fecha_equivalente)} - ${asiento.comentario}`;
 
@@ -128,9 +145,13 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
         this.asientosContablesList = res.data;
         this.paginator.total_count = res.total_registros;
         resolve();
-        console.log('this.asientosContablesList ', this.asientosContablesList);
       });
     });
+  }
+
+  filter(from?) {
+    const params = { ...this.paginator, search: this.filterValue };
+    fun.awaitTyping(null, from == searchDiurnalCode ? 0 : 700).then(() => this.getAsientos(params));
   }
 
   makeFrontDetalles(detalles_asientos_contables: Array<DetalleAsientoContableI>) {
@@ -147,7 +168,6 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
     });
 
     frontDetalles = this.orderDetalles(frontDetalles);
-    console.log('frontDetalles ', frontDetalles);
 
     return frontDetalles;
   }
@@ -200,10 +220,6 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
     return this.tabsVisibles.length > 0;
   }
 
-  filter(palabra_a_buscar) {
-    console.log('palabra_a_buscar ', palabra_a_buscar);
-  }
-
   paginatorChange(opt) {
     setTimeout(() => {
       this.zone.run(() => {
@@ -237,16 +253,29 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
     }, 150);
   }
 
-  editEntry(asientoContable) {}
+  editEntry(asientoContable: CabezaAsietoContableI, evento) {
+    this.abrirModalForm(asientoContable);
+    evento.stopPropagation();
+  }
+
+  calculateHeigthTableContainer(asientoContable: CabezaAsietoContableI) {
+    const cantidadDeDetalles = asientoContable.detalles_asientos_contables_front.length;
+    let proporcionalHeight = Number(`${2}.${Math.round(0.5 * cantidadDeDetalles + 0.5)}1`);
+    const heightOfChildrens = proporcionalHeight * cantidadDeDetalles;
+
+    let height = proporcionalHeight * 2 + heightOfChildrens;
+
+    return { 'min-height': `${height}rem` };
+  }
 
   abrirModalForm(asientoContable?) {
-    const inputs = {};
+    const inputs = { asientoContable: asientoContable, method: fun.hasValue(asientoContable) ? 'edit' : 'new' };
 
     this.openNewModal({
       component: EntradaDiarioComponent,
       inputs: inputs,
       id: diurnalFormId,
-      header: 'Entrada de libro diario',
+      header: `${inputs.method == 'new' ? 'Nueva' : 'Editar'} entrada de libro diario`,
       width: '45rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
@@ -260,8 +289,9 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
 
   async getDataFromModal(arg, search?) {
     if (arg.modalId == diurnalFormId) {
-      // const actualPagination = this.tServ.getPaginationById('lista_articulos');
-      // this.getArticulos(actualPagination);
+      this.getAsientos(this.paginator).then(() => {
+        if (arg.extra.method == 'new') this.changeTabsVisibility({ visible: true });
+      });
     }
   }
 }

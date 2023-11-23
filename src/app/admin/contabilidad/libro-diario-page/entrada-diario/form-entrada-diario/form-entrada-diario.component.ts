@@ -7,6 +7,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { UntypedFormGroup, FormBuilder } from '@angular/forms';
 import { CuentaContableC } from '../../../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
 import { dropdownFilterFocusInput } from '../../../../../core/typescript/p-dropdown.utils';
+import { DetalleAsientoContableI } from '../../asiento-contable';
 
 @Component({
   selector: 'form-entrada-diario',
@@ -41,6 +42,7 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit, On
 
   @Output() getDetalleAsientos = new EventEmitter();
   @Input() isOpenMonth;
+  @Input() initialDetalleAsientos = [];
 
   constructor(private fb: FormBuilder) {
     super();
@@ -59,6 +61,17 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit, On
   async necesarioStart() {
     await this.getCuentasAuxiliares();
     this.createForm();
+    if (Array.isArray(this.initialDetalleAsientos)) {
+      this.llenarDetalles(this.initialDetalleAsientos);
+    }
+  }
+
+  llenarDetalles(detallesAsiento: Array<DetalleAsientoContableI>) {
+    for (let index = 0; index < detallesAsiento.length; index++) {
+      const detalle = detallesAsiento[index];
+      this.formGroup.patchValue(detalle);
+      this.addEntry();
+    }
   }
 
   createForm(data?) {
