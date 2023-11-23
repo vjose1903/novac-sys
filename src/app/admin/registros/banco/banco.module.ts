@@ -1,0 +1,34 @@
+import { PipesModule } from './../../../core/pipe/pipes.module';
+import { NgxBootstrapModule } from './../../../modules/ngx-bootstrap.module';
+import { TablasModule } from './../../components/new_tablas/tablas.module';
+import { DirectivesModule } from './../../../core/directive/directives.module';
+import { ImgViewerEditModule } from './../../components/img-viewer-edit/img-viewer-edit.module';
+import { ImgModule } from './../../components/img-component/img.module';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { BancoComponent } from './banco.component';
+import { BancoRoutingModule } from './banco.routing';
+import { NgxPermissionsModule } from 'ngx-permissions';
+import { PrimengModule } from '../../../modules/primeng.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
+
+@NgModule({
+  declarations: [BancoComponent],
+  imports: [
+    CommonModule,
+    BancoRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    PrimengModule,
+    PipesModule,
+    NgxBootstrapModule,
+    TablasModule,
+    DirectivesModule,
+    NgxPermissionsModule.forChild(),
+    BtnIconModule,
+    ImgViewerEditModule,
+    ImgModule,
+  ],
+})
+export class BancoModule {}
