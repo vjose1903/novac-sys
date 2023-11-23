@@ -21,10 +21,10 @@ export interface responseModel<T> {
 export class CrudG<T> {
   constructor(private path: string) {}
 
-  async dynamic(arg?: extraArgs, httpMethod: MetodoHttp = 'get', tipo: 'backend' | 'externo' = 'backend') {
+  async dynamic(arg?: extraArgs, data: any = null, httpMethod: MetodoHttp = 'get', tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
 
-    return (await this.request(url, httpMethod, null, tipo, arg?.requestParams).toPromise()) as T;
+    return (await this.request(url, httpMethod, data, tipo, arg?.requestParams).toPromise()) as T;
   }
 
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
@@ -162,4 +162,4 @@ export class CrudG<T> {
     return parametros;
   }
 }
-0;
+
