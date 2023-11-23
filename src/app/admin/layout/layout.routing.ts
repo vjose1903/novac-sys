@@ -38,8 +38,12 @@ const routes: Routes = [
         loadChildren: () => import('../manipular facturas/manipular-facturas.module').then((m) => m.ManipularFacturasModule),
       },
       {
-        path: 'recibos',
+        path: 'pagos',
         loadChildren: () => import('../pagos/pagos.module').then((m) => m.PagosModule),
+      },
+      {
+        path: 'viajes',
+        loadChildren: () => import('../viajes/viajes.module').then((m) => m.ViajesModule),
       },
       {
         path: 'contabilidad',

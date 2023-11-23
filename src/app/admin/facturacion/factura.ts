@@ -255,7 +255,7 @@ export class FacturaC extends CrudG<FacturasI> {
     });
   }
 
-  abrirModalHistorial(pagos, notas, recibos, openNewModal, config = null) {
+  abrirModalHistorial(pagos, notas, recibos, openNewModal, config: any = null) {
     if (recibos.length > 0 || notas.length > 0 || pagos.length > 0) {
       recibos.map((recibo) => {
         recibo.numero_recibo = _.padStart(recibo.numero_recibo, 8, '0');

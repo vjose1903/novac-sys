@@ -1,18 +1,19 @@
-import { MovimientosC } from './../../components/formularios en modales/movimientos-form/movimiento-model';
+import { tipoPagoE } from './../../pagos/pagos-facturas/lista-pagos/pagos.config';
+import { table_info } from './../../components/new_tablas/tabla-class';
+import { ReciboC } from './../../pagos/class/ingresos/recibos';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
-import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
+import { TablasService } from '../../components/new_tablas/tablas.service';
 import { EmpleadoC } from '../../registros/registro-empleados/empleado.utils';
 import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
-import { ReciboC } from '../class/ingresos/recibos';
-import { FacturaC } from '../../facturacion/factura';
-import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+
 import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { tipoPagoE } from '../pagos-facturas/lista-pagos/pagos.config';
+import { fun } from '../../../core/services/functions.service';
+import { table_config } from '../../components/new_tablas/tabla-class';
+import { FacturaC, FacturasI } from '../../facturacion/factura';
 
 @Component({
   selector: 'app-recibo-viajes',
@@ -85,14 +86,14 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   tablaComponent;
   tablaMovimientosComponent;
 
-  viajes = [];
+  viajes: Array<FacturasI> = [];
   viaje_selected;
   movimiento_viaje_selected;
   ultimo_pago;
   is_print = false;
 
-  camiones = [];
-  choferes = [];
+  camiones: any = [];
+  choferes: any = [];
 
   viajes_pendientes_cant = 0;
   viajes_completados_cant = 0;
@@ -169,9 +170,15 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   async getChoferes() {
     const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'chofer' } };
     this.userClass.getAll(extra).then((res) => {
-      const config = this.config_viaje_selected.info.find((config) => config.id == 'chofer');
-      config.data = res['data'];
-      this.choferes = res['data'];
+      if (this.config_viaje_selected && this.config_viaje_selected.info) {
+        const config: table_info | undefined = this.config_viaje_selected.info.find((config) => config.id == 'chofer');
+        if (config) {
+          console.log('ENTRE AQUIIII CHOFERES');
+
+          config.data = res['data'];
+          this.choferes = res['data'];
+        }
+      }
     });
     setTimeout(() => {}, 500);
   }
@@ -179,9 +186,14 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   async getCamiones() {
     const extra = { afterPath: `filtro/ `, parameters: { paginado: false, info_vehiculo: true } };
     this.vehiculoClass.getAll(extra).then((res) => {
-      const config = this.config_viaje_selected.info.find((config) => config.id == 'camion');
-      config.data = res['data'];
-      this.camiones = res['data'];
+      if (this.config_viaje_selected && this.config_viaje_selected.info) {
+        const config: table_info | undefined = this.config_viaje_selected.info.find((config) => config.id == 'camion');
+        if (config) {
+          console.log('ENTRE AQUIIII CAMIONES');
+          config.data = res['data'];
+          this.camiones = res['data'];
+        }
+      }
     });
     setTimeout(() => {}, 500);
   }
@@ -191,11 +203,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       this.viajes_completados_cant = 0;
       this.viajes_pendientes_cant = 0;
       this.viajes.length = 0;
-      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+      const palabra_a_buscar = fun.isEmpty(params?.search) ? ' ' : params?.search;
 
       const res = await this.facturaClass.getAll({
         afterPath: 'custom/viajes',
-        parameters: { page: params.page, per_page: params.per_page, paginado: true, movimientos_viaje: true, estado: true, palabra_a_buscar: palabra_a_buscar },
+        parameters: { page: params?.page, per_page: params?.per_page, paginado: true, movimientos_viaje: true, estado: true, palabra_a_buscar: palabra_a_buscar },
       });
 
       const fechaA = moment().format('YYYY-MM-DD');
@@ -361,7 +373,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       .then((res_factura) => {
         if (fun.hasValue(row_edited)) {
           const viaje_modificado = this.viaje_selected.movimientos_viaje.find((movimiento) => movimiento.id == row_edited.id);
-          const chofer = this.choferes.find((chofer) => chofer.id == row_edited.user_id);
+          const chofer = this.choferes.find((chofer) => chofer && chofer.id == row_edited.user_id);
           const vehiculo = this.camiones.find((camion) => camion.id == row_edited.vehiculo_id);
 
           viaje_modificado.chofer = fun.deepCloning(chofer);

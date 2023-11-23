@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'roles', loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule) },
   { path: 'periodo_fiscal', loadChildren: () => import('./periodo-fiscal/periodo-fiscal.module').then((m) => m.PeriodoFiscalModule) },
   { path: 'divisa', loadChildren: () => import('./divisa/divisa.module').then((m) => m.DivisaModule) },
+  { path: 'banco', loadChildren: () => import('./banco/banco.module').then((m) => m.BancoModule) },
 ];
 
 @NgModule({

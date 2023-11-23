@@ -56,6 +56,19 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   hasPermisosValidated: boolean;
   currentYear: number;
 
+  idsH5 = {
+    factura: 'facturacionLabel',
+    manipular: 'manipularLabel',
+    pagos: 'pagosLabel',
+    viajes: 'pedidosLabel',
+    conduce: 'conduceLabel',
+    registros: 'registroLabel',
+    produccion: 'produccionLabel',
+    inventario: 'inventarioLabel',
+    contabilidad: 'contabilidadLabel',
+    reportes: 'reporteLabel',
+  };
+
   constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService, public divisaServ: DivisaService) {
     super();
 
@@ -237,14 +250,18 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   checkRouteActiva() {
     this.actualPath = fun.getActualPath();
 
-    const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
+    const pathSplit = _.pullAll(this.actualPath.split('/admin/'), ['']);
 
-    if (pathSplit.length >= 3) {
-      this.actualModule = pathSplit[1];
-      this.actualRuta = _.join(pathSplit.slice(2, pathSplit.length), '/');
-    } else {
-      this.actualModule = undefined;
-      this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
+    this.actualModule = pathSplit[0];
+    this.actualRuta = _.join(pathSplit.slice(2, pathSplit.length), '/');
+
+    const keysIdsH5 = Object.keys(this.idsH5);
+    const currentRouteKey = keysIdsH5.find((key) => this.actualModule.includes(key));
+
+    if (fun.hasValue(currentRouteKey)) {
+      setTimeout(() => {
+        fun.scrollTo({ id: this.idsH5[currentRouteKey], behavior: 'smooth', block: 'start', inline: 'center' });
+      }, 500);
     }
 
     this.ready = true;
