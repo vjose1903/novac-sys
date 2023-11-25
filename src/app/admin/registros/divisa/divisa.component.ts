@@ -22,7 +22,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   permissions = Permisos;
   formPermissions = [Permisos.configuracion_entidad_cuenta.update];
 
-  divisaSelected: any;
+  divisaSelected: DivisaI;
 
   divisaClass = new DivisaC();
 
