@@ -204,6 +204,7 @@
     }
 
     .content {
+      max-height: 100vh;
       position: relative;
       grid-area: content;
       display: grid;

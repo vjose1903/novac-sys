@@ -23,6 +23,7 @@ import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../
 import { CategoriaEntidadContableC, entidadesContables } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { FormEntidadCuentaContableI, tipoCategoria } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { SubTipoArticuloC, SubTipoArticuloI } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
+import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -109,9 +110,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   configApp: ConfigI = ConfigService.config;
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.articulo;
   fun = fun;
-
+  maxSizeTypeE = maxSizeTypeE;
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
+  }
+
+  htmlLog(elemento){
+
   }
 
   ngOnInit() {

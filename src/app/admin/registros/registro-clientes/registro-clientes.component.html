@@ -6,13 +6,13 @@
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
-        <div class="contenedorRegistro" *ngIf="isCreando || clienteSelected" class="form {{ isCreando || clienteSelected ? 'showForm' : 'hideForm' }} ">
-          <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
+        <div #divRegistro class="contenedorRegistro" *ngIf="isCreando || clienteSelected" class="form {{ isCreando || clienteSelected ? 'showForm' : 'hideForm' }} ">
+          <div #divTitulo class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
             <h4 class="mb-0">Formulario</h4>
           </div>
 
           <div #cardFormClass class="card cardFormClass p-0">
-            <div class="formContainer" [sizeCatcher]="cardFormClass">
+            <div class="formContainer" [maxSizer]="maxSizeTypeE.height" [source]="divRegistro" [targets]="[divTitulo]" [reduceTotalHeight]="5">
               <div class="formulario">
                 <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
                   <div class="row">
@@ -185,7 +185,7 @@
                 </form>
               </div>
               <div class="botones">
-                <div class="p-0 mt-3" style="display: flex; justify-content: space-between">
+                <div class="p-0" style="display: flex; justify-content: space-between">
                   <div>
                     <button class="btn mr-2 btn-blanco" id="borrarBtn" (click)="borrar()">Borrar</button>
                     <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2 btn-verde" id="sendBtn">{{ botonLabel }}</button>

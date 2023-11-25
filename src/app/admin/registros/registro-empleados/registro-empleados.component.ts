@@ -22,6 +22,7 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
 import { IModalConfiguration } from '../../components/modal/modal-class';
+import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -62,7 +63,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     id_tabla: 'lista_empleados',
     padre_functions: { data_request: (params) => this.getEmpleados(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.user.update }, borrar: { show: true, permiso: this.permissions.user.destroy } },
   };
   tablaComponent;
@@ -72,6 +73,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.user;
 
   configApp: ConfigI = ConfigService.config;
+  maxSizeTypeE = maxSizeTypeE;
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
@@ -316,13 +318,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     if (params.action == 'delete') this.eliminarReg(params.data);
   }
 
-
   openModalCategorias() {
     this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.user, id_modal: 'categorias_empleados', inputs: { configsEntCuentas: this.listaConfigEmpleados }, openNewModal: this.openNewModal.bind(this) });
   }
 
   onHideModal(modalConfig: IModalConfiguration) {
-    if (modalConfig.id == "categorias_empleados") {
+    if (modalConfig.id == 'categorias_empleados') {
       this.categoriaEntidadServ.setCategoriaChange();
     }
   }
@@ -345,7 +346,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   editarItem(data) {
-
     this.borrar();
     if (fun.hasValue(this.form)) this.form.reset();
     this.documentos_de_identidad = data.documentos_de_identidad;
@@ -438,5 +438,4 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   nuevoRegistro() {
     this.isCreando = true;
   }
-
 }

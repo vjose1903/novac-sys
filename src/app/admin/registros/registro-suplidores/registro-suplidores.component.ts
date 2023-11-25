@@ -21,6 +21,7 @@ import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-
 import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 import { IModalConfiguration } from '../../components/modal/modal-class';
+import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -76,6 +77,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.suplidor;
   configApp: ConfigI = ConfigService.config;
   fun = fun;
+  maxSizeTypeE = maxSizeTypeE;
 
   constructor(
     private fb: UntypedFormBuilder,

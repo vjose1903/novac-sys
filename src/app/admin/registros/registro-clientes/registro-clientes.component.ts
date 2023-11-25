@@ -21,6 +21,7 @@ import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-
 import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
 import { IModalConfiguration } from '../../components/modal/modal-class';
+import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -67,13 +68,15 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_clientes',
     padre_functions: { data_request: (params) => this.getClientes(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
   };
   tablaComponent;
 
   configApp: ConfigI = ConfigService.config;
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.cliente;
+
+  maxSizeTypeE = maxSizeTypeE;
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
@@ -216,7 +219,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   changeStateCampos(enable = false) {
-
     ['nombre', 'apellido', 'direccion', 'sexo', 'telefono', 'limite_credito', 'maximo_credito', 'vendedor_id'].forEach((campo) => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
@@ -440,7 +442,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   onHideModal(modalConfig: IModalConfiguration) {
-    if (modalConfig.id == "categorias_clientes") {
+    if (modalConfig.id == 'categorias_clientes') {
       this.categoriaEntidadServ.setCategoriaChange();
     }
   }

@@ -1,3 +1,4 @@
+import { MaxSizerDirective } from './max-sizer.directive';
 import { UppercaseDirective } from './uppercase.directive';
 import { CapitaliceDirective } from './capitalice.directive';
 import { NgModule } from '@angular/core';
@@ -8,7 +9,7 @@ import { OnScrollDirective } from './on-scroll.directive';
 import { DataFilterDirective } from './data-filter.directive';
 import { SizeCatcherDirective } from './size-catcher.directive';
 
-const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, CapitaliceDirective, UppercaseDirective, SizeCatcherDirective];
+const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, CapitaliceDirective, UppercaseDirective, SizeCatcherDirective, MaxSizerDirective];
 
 @NgModule({
   declarations: directives,
