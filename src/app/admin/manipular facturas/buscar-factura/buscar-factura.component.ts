@@ -391,7 +391,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   resetFacturas() {
     this.facturas.length = 0;
-    this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate);
   }
 
   selectTableConfig() {
@@ -403,11 +402,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   changeSelect(tipo, valor) {
-    if (tipo == 'tipo_documento') {
-      this.buscar_por = null;
-      this.selectTableConfig();
-    }
-
     this.tipo_factura_id = null;
     this.valor_a_buscar = null;
     this.idsFacturasSeleccionadas.length = 0;
@@ -416,13 +410,21 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (fun.hasValue(valorInput)) valorInput.value = null;
 
     this.resetFacturas();
-    this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
+    const actualPagination = this.tServ.getPaginationById(shearchDocumentTableId);
+    if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
 
     const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura, this.campos.cliente].map((item) => `${item}`);
 
     if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
 
     if (valor == this.campos.ultimas50) this.pedirFactura(fun.duplicarJson(this.tServ.obj_paginate.default));
+
+    if (tipo == 'tipo_documento') {
+      this.buscar_por = null;
+      setTimeout(() => {
+        this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
+      }, 100);
+    }
   }
 
   getProperties(tipo) {
