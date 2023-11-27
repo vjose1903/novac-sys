@@ -16,7 +16,7 @@ app_config.config
 *.pdf
 *.txt
 *.js
-
+!/scripts/*
 # dependencies
 /resources
 /log

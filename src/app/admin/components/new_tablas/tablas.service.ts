@@ -151,7 +151,6 @@ export class TablasService {
 
     if (fun.hasValue(rowData?.customStyles)) {
       const estilos = rowData.customStyles[column.key];
-      // console.log('estilos ', estilos);
 
       if (Array.isArray(estilos)) {
         for (const item of estilos) {
