@@ -1,12 +1,16 @@
+import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
 import { customValidators } from './../../../core/typescript/custom-validators';
 import { BancoI, BancoC } from './banco.utils';
 import { fun } from './../../../core/services/functions.service';
 import { Permisos } from './../../../core/typescript/permisos';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
+import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar } from './cuenta-bancaria-form/cuenta_bancaria';
+import { ModalClass } from '../../components/modal/modal-class';
+import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-bancaria.component';
 
 @Component({
   selector: 'app-banco',
@@ -19,7 +23,8 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   botonLabel: string = 'Guardar';
   isCreando: boolean = false;
   permissions = Permisos;
-  formPermissions = [Permisos.configuracion_entidad_cuenta.update];
+  formPermissions = [Permisos.banco.update, Permisos.banco.create];
+  allPermisosTipoCuentaBancaria = Object.values(Permisos.tipo_cuenta_bancaria);
 
   bancoSelected: BancoI;
   listaBancos: Array<BancoI> = [];
@@ -59,6 +64,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     this._init_mixin({ component: 'banco', is_routing: true });
 
     this.necesarioStart();
+    this.openModalCuentasBancarias();
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -87,7 +93,32 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
       direccion: [{ value: null, disabled: false }],
       ejecutivo_cuenta: [{ value: null, disabled: false }, Validators.required],
       telefono_ejecutivo_cuenta: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
+      cuentas_bancarias: this.fb.array([]),
     });
+  }
+
+  createItemCuentaBancaria(cuenta_bancaria?: any) {
+    const scheduleForm = this.fb.group({
+      id: [{ value: cuenta_bancaria ? cuenta_bancaria.id : null, disabled: false }],
+    });
+
+    return scheduleForm;
+  }
+
+  addItem(schedule?: any) {
+    return new Promise<void>((resolve) => {
+      const arrayCuentasBancarias = this.formGroup.get('cuentas_bancarias') as UntypedFormArray;
+      arrayCuentasBancarias.push(this.createItemCuentaBancaria(schedule));
+      resolve();
+    });
+  }
+
+  removeItem(arrayId: string) {
+    const arrayCuentasBancarias = this.formGroup.get('cuentas_bancarias') as UntypedFormArray;
+    // TODO: poner la interfaz de cuenta bancaria
+    const index = arrayCuentasBancarias.value.findIndex((cuenta: any) => cuenta.arrayId == arrayId);
+
+    // arrayCuentasBancarias.removeAt(index);
   }
 
   getBancos(params?: { per_page?: number; page?: number; search?: string }) {
@@ -109,6 +140,33 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     this.bancoSelected = undefined;
     this.botonLabel = 'Guardar';
     this.isCreando = true;
+  }
+
+  openModalCuentasBancarias(cuenta?: CuentaBancariaI, banco?: BancoI) {
+    //
+    this.openNewModal({
+      component: CuentaBancariaFormComponent,
+      inputs: { cuenta, banco: { nombre: 'BHD LEON' } },
+      id: modalCuentaBancaria,
+      header: cuenta ? 'Actualizar cuenta bancaria' : 'Registro cuenta bancaria',
+      width: '40rem',
+      botones: { aceptar: { show: true, disable: true, btnId: modalCuentaBancariaBtnAceptar }, cancelar: { show: true, disable: false } },
+    });
+  }
+
+  openModalTipoCuentasBancarias() {
+    //
+    this.openNewModal({
+      component: TipoCuentaBancariaComponent,
+      inputs: null,
+      id: modalCuentaBancaria,
+      header: 'Tipos de cuentas bancarias',
+      width: '70rem',
+      botones: {
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
+      },
+    });
   }
 
   formIsInvalid() {

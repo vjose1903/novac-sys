@@ -15,7 +15,7 @@ export class FacturacionService {
   htmlTiposCostosGastos: string;
   options_tipos_costos_gastos: string[];
 
-  lista_tipos_facturas: TipoFacturaI[];
+  lista_tipos_facturas: Array<TipoFacturaI>;
   propietario_factura;
   pre_venta_selected;
   cotizacion_selected;

@@ -24,17 +24,17 @@ export class CrudG<T> {
   async dynamic(arg?: extraArgs, data: any = null, httpMethod: MetodoHttp = 'get', tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
 
-    return (await this.request(url, httpMethod, data, tipo, arg?.requestParams).toPromise()) as T;
+    return (await this.request(url, httpMethod, data, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
-  async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
-    return new Promise<any>(async (resolve, reject) => {
+  async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend'): Promise<responseModel<T>> {
+    return new Promise<responseModel<T>>(async (resolve, reject) => {
       try {
         const url = this.makeUrl(tipo, arg);
 
         const response = await lastValueFrom(this.request(url, 'get', null, tipo, arg?.requestParams));
 
-        resolve(response as T);
+        resolve(response as responseModel<T>);
       } catch (error) {
         reject(error);
       }
@@ -43,16 +43,16 @@ export class CrudG<T> {
 
   async getOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
-    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
+    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
   async deleteOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
-    return (await this.request(url, 'delete', null, tipo, arg?.requestParams).toPromise()) as T;
+    return (await this.request(url, 'delete', null, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
   createUpdateOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise<responseModel<T>>((resolve, reject) => {
       if (Number(data.id) === 0 || !data.id) delete data.id;
 
       if (fun.objHas(data, 'id') && data.id !== 0) {
@@ -72,41 +72,50 @@ export class CrudG<T> {
 
   async createOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
-    return (await this.request(url, 'post', data, tipo, arg?.requestParams).toPromise()) as T;
+    return (await this.request(url, 'post', data, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
   async updateOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, data.id);
-    return (await this.request(url, 'patch', data, tipo, arg?.requestParams).toPromise()) as T;
+    return (await this.request(url, 'patch', data, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
   private parseParams(arg) {
-    let params = '';
+    let parameters = '';
+    console.log(' ');
+    console.log(' ');
+    console.log('arg ', arg);
 
     for (const key in arg) {
       if (Object.prototype.hasOwnProperty.call(arg, key)) {
         const value = arg[key];
+        console.log('value ', value);
+        console.log('key ', key);
+        console.log('parameters.length ', parameters.length);
 
-        if (params.length == 0) params += '?';
+        if (parameters.length == 0) parameters += '?';
+        console.log('parameters ', parameters);
 
         if (fun.hasValue(value)) {
           if (typeof value == 'object') {
-            params += `&${key}={`;
+            if (parameters != '?') parameters += '&';
+            parameters += `${key}={`;
             let inner_object = '';
             for (const inner_key in value) {
               const inner_value = value[inner_key];
 
               if (inner_object.length > 0) inner_object += ',';
-              params += `${inner_key}:${inner_value}`;
+              parameters += `${inner_key}:${inner_value}`;
             }
-            params += `}`;
+            parameters += `}`;
           } else {
-            params += `&${key}=${value}`;
+            if (parameters != '?') parameters += '&';
+            parameters += `${key}=${value}`;
           }
         }
       }
     }
-    return params;
+    return parameters;
   }
 
   private makeUrl(tipo, args?, id = null) {
@@ -162,4 +171,3 @@ export class CrudG<T> {
     return parametros;
   }
 }
-

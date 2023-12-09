@@ -115,9 +115,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     super();
   }
 
-  htmlLog(elemento){
-
-  }
+  htmlLog(elemento) {}
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
@@ -397,13 +395,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.ARRAY_FORMULA = this.form.controls['rowFormula'] as UntypedFormArray;
   }
 
-  saltar(campo, i?) {
+  saltar(campo, index?) {
     let is_invalid = true;
     if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir' && campo != 'in_medida_alerta') {
       fun.enfocarInput(campo);
       //
     } else if (campo == 'ingrediente_producir') {
-      fun.enfocarInput(`cantidad_formula-${i}`);
+      fun.enfocarInput(`cantidad_formula-${index}`);
       //
     } else if (campo == 'in_medida_alerta') {
       if (this.showContenido(this.form.getRawValue().medida)) {
@@ -425,7 +423,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         else fun.enfocarInput(campo);
       }
     } else if (campo == 'cantidad_formula') {
-      const actual_campo = i >= 0 ? `#cantidad_formula-${i}` : '#vendido';
+      const actual_campo = index >= 0 ? `#cantidad_formula-${index}` : '#vendido';
       var field = $(actual_campo)[0];
 
       var fields = $(actual_campo).parents('form:eq(0),body').find(':input').not('[tabindex]');
@@ -558,8 +556,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       let costo_en_turno;
       let medida_en_turno;
       for (const unidad_en_turno of arrayUnidades) {
-        if (fun.hasValue(res.data.costos[unidad_en_turno])) {
-          costo_en_turno = res.data.costos[unidad_en_turno];
+        if (fun.hasValue(res.data['costos'][unidad_en_turno])) {
+          costo_en_turno = res.data['costos'][unidad_en_turno];
           medida_en_turno = unidades[unidad_en_turno];
         }
       }

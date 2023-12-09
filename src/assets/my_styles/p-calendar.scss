@@ -1,4 +1,4 @@
-@import "./forms";
+@import './forms';
 
 .p-calendar {
   width: 100% !important;
@@ -9,6 +9,10 @@
 
     &.minSize {
       padding: 0.15rem;
+    }
+    &::placeholder {
+      color: #b8b7b7;
+      font-weight: 600 !important;
     }
   }
 

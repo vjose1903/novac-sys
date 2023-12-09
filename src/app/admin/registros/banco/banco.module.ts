@@ -12,9 +12,11 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
+import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
+import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-bancaria.component';
 
 @NgModule({
-  declarations: [BancoComponent],
+  declarations: [BancoComponent, CuentaBancariaFormComponent, TipoCuentaBancariaComponent],
   imports: [
     CommonModule,
     BancoRoutingModule,

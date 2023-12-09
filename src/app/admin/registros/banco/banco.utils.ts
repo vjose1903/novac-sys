@@ -8,5 +8,13 @@ export class BancoC extends CrudG<any> {
 
 export interface BancoI {
   id?: number;
-  [nombrePropiedad: string]: any;
+  nombre?: string;
+  rnc?: string;
+  comentario?: string;
+  telefono?: string;
+  direccion?: string;
+  ejecutivo_cuenta?: string;
+  telefono_ejecutivo_cuenta?: string;
+  cuentas_bancarias: Array<any>;
 }
+// [nombrePropiedad: string]: any;

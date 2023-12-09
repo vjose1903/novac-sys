@@ -21,7 +21,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   dataFiltro;
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
   paraFiltroClientes;
 
@@ -31,7 +31,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     id_tabla: 'buscar_cliente_suplidor',
     padre_functions: { data_request: (params) => this.buscarClientesOrSuplidor(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
   };
   tablaComponent: any;
 
@@ -65,29 +65,32 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
     const classDinamic = this.inputs.metodo == tipoDocFacturacion.compra ? 'suplidorClass' : 'clienteClass';
     try {
-      const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } }).catch((error) => {
-        if (where === 'init') this.closeThis({ tipo: 'data_no_found'});
-      });
+      this[classDinamic]
+        .getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } })
+        .then((res) => {
+          if (res.data && res.data.length > 0) {
+            res.data.map(async (entidad) => {
+              entidad.nombre = fun.capitalice(entidad.nombre);
+              entidad.apellido = fun.capitalice(entidad.apellido);
+              const doc = entidad.documentos_de_identidad.find((documento) => documento.principal);
 
-      if (res.data && res.data.length > 0) {
-        res.data.map(async (entidad) => {
-          entidad.nombre = fun.capitalice(entidad.nombre);
-          entidad.apellido = fun.capitalice(entidad.apellido);
-          const doc = entidad.documentos_de_identidad.find((documento) => documento.principal);
+              entidad.documento_identidad = doc ? doc.documento : '----------';
+              return entidad;
+            });
+            this.dataFiltro = res.data;
+          } else {
+            this.dataFiltro = copyData;
+          }
 
-          entidad.documento_identidad = doc ? doc.documento : '----------';
-          return entidad;
+          const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: ConfigService.config.direccion_empresa, telefono: null };
+
+          if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
+
+          this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+        })
+        .catch((error) => {
+          if (where === 'init') this.closeThis({ tipo: 'data_no_found' });
         });
-        this.dataFiltro = res.data;
-      } else {
-        this.dataFiltro = copyData;
-      }
-
-      const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: ConfigService.config.direccion_empresa, telefono: null };
-
-      if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
-
-      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {}
   }
 

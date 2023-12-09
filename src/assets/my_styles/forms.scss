@@ -9,15 +9,13 @@
   box-shadow: 0 0 0 0.2rem var(--transparente04);
 }
 
-
-
 .p-checkbox-box {
   &.p-highlight {
-    &[aria-checked="true"] {
+    &[aria-checked='true'] {
       border-color: #20b9d5 !important;
       background: #20b9d5 !important;
     }
-    &[aria-checked="false"] {
+    &[aria-checked='false'] {
       border-color: #bd4848 !important;
       background: #bd4848 !important;
     }
@@ -54,6 +52,11 @@
     background-color: var(--primary02) !important;
     border-color: transparent !important;
     box-shadow: 0px 0px 6px var(--primary08) !important;
+  }
+
+  .p-inputtext.p-placeholder {
+    color: #b8b7b7;
+    font-weight: 600 !important;
   }
 
   .p-dropdown-clear-icon {
@@ -151,11 +154,19 @@ textarea {
     color: #6c757d !important;
     touch-action: none !important;
     pointer-events: none !important;
+    &::placeholder {
+      color: #b3bfca !important;
+    }
   }
 
   &.with-right-btn {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
+  }
+
+  &::placeholder {
+    color: #b8b7b7;
+    font-weight: 100 !important;
   }
 }
 

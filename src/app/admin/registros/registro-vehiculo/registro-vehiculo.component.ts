@@ -55,7 +55,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_vehiculos',
     padre_functions: { data_request: (params) => this.getVehiculos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.vehiculo.update }, borrar: { show: true, permiso: this.permissions.vehiculo.destroy } },
   };
   tablaComponent;
@@ -128,9 +128,9 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   async getMarcas() {
     try {
-      const res = await this.marcasClass.getAll();
-
-      this.listaMarcas = res;
+      this.marcasClass.getAll().then((marcas: any) => {
+        this.listaMarcas = marcas;
+      });
     } catch (error) {
       fun.toastError('Error buscando marcas', 'ERROR');
     }
@@ -266,7 +266,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   nuevoRegistro() {
     this.isCreando = true;
   }
-
 
   abrirModalMarcasYModelos(tipo) {
     this.openNewModal({

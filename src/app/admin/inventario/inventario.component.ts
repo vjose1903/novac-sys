@@ -34,7 +34,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     id_tabla: 'lista_inventario',
     padre_functions: { data_request: (params) => this.getArticulos(params), handleBtnsDinamic: (params) => this.movimientoInventario(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { dinamico: [{ show: true, icon: 'fas fa-dolly', permiso: this.permissions.movimiento_inventario.create, name: 'movimiento_inventario', tooltip: 'Movimientos de inventario' }] },
   };
 
@@ -95,7 +95,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   async getStock() {
     const extra = { afterPath: `custom/stock` };
-    this.articuloClass.getAll(extra).then((result) => (this.cant_inventario = result['data'].stock));
+    this.articuloClass.getAll(extra).then((result: any) => (this.cant_inventario = result['data'].stock));
   }
 
   async getArticulos(params?: { per_page?: number; page?: number; search?: string }) {

@@ -79,7 +79,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     filtrar: { local: false },
     id_tabla: 'lista_notas',
     padre_functions: { data_request: (params) => this.pedirNotas(params) },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
   };
 
   tablaNotasComponent;
@@ -508,7 +508,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   deleteRequest(params: { ids: string; tipo: string }) {
     const extra = { afterPath: `custom/delete`, parameters: params };
 
-    this.facturaClass.dynamic(extra).then((res) => {
+    this.facturaClass.dynamic(extra).then((res: any) => {
       const info = {
         pre_venta: { label: { singular: 'Pre_Venta', plural: 'Pre_Ventas' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
         venta: { label: { singular: 'Factura', plural: 'Facturas' }, key: 'numero_comprobante', key_label: { singular: 'número de comprobante', plural: 'números de comprobantes' } },

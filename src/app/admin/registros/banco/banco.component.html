@@ -44,18 +44,17 @@
 
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="'comentario'" [form]="formGroup">
-                    <label class="control-label">Comentario <span style="color: red">*</span></label>
+                    <label class="control-label">Comentario </label>
                     <textarea id="campoComentario" [appCapitalice]="'formGroup'" formControlName="comentario" class="form-control" cols="30" rows="3"></textarea>
                     <span id="msgContainer"></span>
                   </div>
                 </div>
 
-                <div class="col-12 p-0">
-                  <div class="ejecutivoDiv">
+                <div class="col-12 p-0 mb-3">
+                  <small class="ml-2" style="color: grey">Ejecutivo de cuentas</small>
+                  <div class="ejecutivoDiv mt-2">
                     <div class="row w-100 h-100">
-                      <div class="col-12 p-0">
-                        <h5 class="mb-4">Ejecutivo de cuentas</h5>
-                      </div>
+                      <div class="col-12 p-0"></div>
                       <div class="col-6 pl-0">
                         <div class="form-group mb-2" [appMsgError]="'ejecutivo_cuenta'" [form]="formGroup">
                           <label class="control-label">Nombre: <span style="color: red">*</span></label>
@@ -77,6 +76,20 @@
                     </div>
                   </div>
                 </div>
+
+                <div class="col-12 p-0">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="ml-2" style="color: grey">Cuentas Bancarias</small>
+
+                    <btn-icon-circular [id]="'btnFormCuentasBancarias'" [icon]="'fa-solid fa-plus'" [size]="'size-sm'" pTooltip="Agregar cuenta Bancaria" tooltipPosition="right" (clickFunction)="openModalCuentasBancarias()"> </btn-icon-circular>
+                  </div>
+                  <div class="formCuentasDiv">
+                    <ng-container *ngIf="formGroup.controls.cuentas; else elseTemplate"> </ng-container>
+                    <ng-template #elseTemplate>
+                      <h6 class="no-cuentas-message p-2 w-100 text-center mb-0">No tiene cuentas bancarias registradas</h6>
+                    </ng-template>
+                  </div>
+                </div>
               </div>
             </form>
             <div class="form-group p-0 mt-5" style="display: flex; justify-content: space-between">
@@ -96,10 +109,15 @@
       <div class="list {{ isCreando || bancoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado de bancos</h4>
-          <button *ngxPermissionsOnly="permissions.banco.create" [disabled]="bancoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <div class="d-flex">
+            <span [pTooltip]="bancoSelected || isCreando ? 'Para abrir el formulario de categorias, debe de cerrar el formulario de articulos.' : ''" tooltipPosition="left">
+              <button *ngxPermissionsOnly="allPermisosTipoCuentaBancaria" [disabled]="bancoSelected || isCreando" (click)="openModalTipoCuentasBancarias()" class="btn btn-gris mr-3">Tipo cuentas bancarias</button>
+            </span>
+            <button *ngxPermissionsOnly="permissions.banco.create" [disabled]="bancoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          </div>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
-          <div  class="divTabla">
+          <div class="divTabla">
             <dinamic-table [cardTabla]="cardTabla" [(data)]="listaBancos" [seleccionado]="bancoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
           </div>
         </div>

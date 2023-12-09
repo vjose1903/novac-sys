@@ -65,4 +65,8 @@ export class DivisaService {
   getDivisaInfoById(id: number) {
     return this.listaDivisas.find((divisa) => divisa.id == id);
   }
+
+  getDivisaPrincipalInfo() {
+    return this.listaDivisas.find((divisa) => divisa.is_principal);
+  }
 }

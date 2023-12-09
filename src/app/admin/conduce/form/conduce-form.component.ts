@@ -14,7 +14,7 @@ import { ModalService } from '../../components/modal/modal.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { ConduceC } from '../../conduce/coduce';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
-import { FacturaC } from '../../facturacion/factura';
+import { FacturaC, FacturasI } from '../../facturacion/factura';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
@@ -50,7 +50,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   listaClientes;
 
   cliente;
-  facturas_adelantadas = [];
+  facturas_adelantadas: Array<FacturasI> = [];
 
   form: UntypedFormGroup;
   ARRAY_ROWARTICULOS: any;
@@ -402,8 +402,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         let excede = true;
 
         const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
-        await this.articuloClass.getAll(extra).then((res) => {
-          excede = res['data'];
+        await this.articuloClass.getAll(extra).then((res: any) => {
+          excede = res.data;
 
           if (excede) {
             fun.toastError('Cantidad introducida excede la cantidad en inventario', 'ERROR');

@@ -3,3 +3,13 @@
   border-radius: 0.8rem;
   padding: 0.7rem;
 }
+
+.formCuentasDiv {
+  background-color: var(--mode00);
+  border-radius: 0.8rem;
+  padding: 0.7rem;
+
+  .no-cuentas-message {
+    color: grey;
+  }
+}

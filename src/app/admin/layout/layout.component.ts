@@ -142,7 +142,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     return new Promise<void>(async (resolve, reject) => {
       await this.tipoFacturaClass
         .getAll()
-        .then((tiposFacturas) => {
+        .then((tiposFacturas: any) => {
           tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
           Ss.factServ.lista_tipos_facturas = tiposFacturas;
           resolve();
@@ -249,7 +249,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   checkRouteActiva() {
     this.actualPath = fun.getActualPath();
-
 
     const pathSplit = _.pullAll(this.actualPath.split('/admin/'), ['']);
 

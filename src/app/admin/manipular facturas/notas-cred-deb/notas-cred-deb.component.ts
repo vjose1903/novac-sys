@@ -16,6 +16,7 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../../components/modal/modal-class';
+import { responseModel } from '../../../core/typescript/crud-g';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -157,9 +158,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getFacturas() {
     return new Promise(async (resolve) => {
-
-      this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura) => {
-        let tempFactData: FacturasI[] = res_factura['data'];
+      this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura: responseModel<any>) => {
+        let tempFactData: Array<FacturasI> = res_factura.data;
 
         this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.idsFacturas}` }).then((res) => {
           const devueltos = res['data'];
@@ -394,7 +394,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
     return result;
   }
-
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
     this.openNewModal({

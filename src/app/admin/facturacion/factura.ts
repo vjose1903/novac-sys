@@ -157,7 +157,7 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean }) {
+  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean }): Promise<any> {
     const valor_enc = btoa(args.valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
@@ -289,7 +289,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 }
 
-export class TiposFacturaC extends CrudG<any> {
+export class TiposFacturaC extends CrudG<TipoFacturaI> {
   constructor() {
     super('tipo_facturas');
   }
