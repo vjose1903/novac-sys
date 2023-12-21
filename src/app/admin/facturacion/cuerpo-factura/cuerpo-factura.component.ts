@@ -646,7 +646,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fun.enfocarInput(`desc-${index}`);
       }
 
-      if (fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
+      if (fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad)) {
         let nuevoTotal = 0;
         nuevoTotal = total - descuento;
 
