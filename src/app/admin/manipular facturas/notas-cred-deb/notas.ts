@@ -56,7 +56,7 @@ export class NotaC extends CrudG<any> {
   parseContentAgrupadoNota(factura_aplicada) {
     factura_aplicada.fecha = moment(`${factura_aplicada.cabecera_factura.fecha_equivalente}`).format('DD/MM/YYYY');
     factura_aplicada.numero_comprobante = factura_aplicada.cabecera_factura.numero_comprobante;
-    factura_aplicada.total = fun.numFormatTwoDecimals(Math.abs(factura_aplicada.total));
+    factura_aplicada.total = fun.roundNumberToDecimal(Math.abs(factura_aplicada.total));
     delete factura_aplicada.cabecera_factura;
     delete factura_aplicada.detalles_facturas_notas;
     return factura_aplicada;
@@ -70,7 +70,7 @@ export class NotaC extends CrudG<any> {
 
       obj_detalle['fecha'] = moment(`${factura_aplicada.cabecera_factura.fecha_equivalente}`).format('DD/MM/YYYY');
       obj_detalle['numero_comprobante'] = factura_aplicada.cabecera_factura.numero_comprobante;
-      obj_detalle['total'] = fun.numFormatTwoDecimals(Math.abs(detalle_nota.total));
+      obj_detalle['total'] = fun.roundNumberToDecimal(Math.abs(detalle_nota.total));
       obj_detalle['articulo'] = detalle_nota.articulo.nombre;
 
       detalles.push(obj_detalle);

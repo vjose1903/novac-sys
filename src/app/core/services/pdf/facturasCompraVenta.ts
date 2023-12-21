@@ -192,14 +192,14 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
       { text: detalle.descripcion, style: 'letra11', pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.cantidad, style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
-        text: fun_.numFormatTwoDecimals(is_venta ? detalle.precio : detalle.costo),
+        text: fun_.roundNumberToDecimal(is_venta ? detalle.precio : detalle.costo),
         style: 'letra11',
         alignment: 'right',
         margin: [0, 0, 14, 0],
         pageBreak: br_ ? 'before' : 'none',
       },
-      { text: fun_.numFormatTwoDecimals(detalle.itbis), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
-      { text: fun_.numFormatTwoDecimals(detalle.total), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.roundNumberToDecimal(detalle.itbis), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.roundNumberToDecimal(detalle.total), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
     );
     tempBody.push(row);
   });
@@ -273,25 +273,25 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
                 body: [
                   [
                     { text: 'Bruto RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-                    { text: fun_.numFormatTwoDecimals(data.Bruto), style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0] },
+                    { text: fun_.roundNumberToDecimal(data.Bruto), style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0] },
                   ],
                   [
                     { text: 'Itbis RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                    { text: fun_.numFormatTwoDecimals(data.itbis), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: fun_.roundNumberToDecimal(data.itbis), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
                   ],
                   [
                     { text: 'Descuento RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                    { text: fun_.numFormatTwoDecimals(data.descuento), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: fun_.roundNumberToDecimal(data.descuento), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
                   ],
                   [
                     { text: 'TOTAL RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                    { text: fun_.numFormatTwoDecimals(data.total_factura), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: fun_.roundNumberToDecimal(data.total_factura), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
                   ],
                   data.tipo === 'compra'
                     ? [{ text: '' }, { text: '' }]
                     : [
                         { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                        { text: fun_.numFormatTwoDecimals(data.devuelta), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
+                        { text: fun_.roundNumberToDecimal(data.devuelta), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
                       ],
                 ],
               },
@@ -364,7 +364,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
 
                               <text transform="translate(8, 128)" style="font-size: 9px" font-weight="bold"> RD$ </text>
                               <rect height="20" width="200" fill="#ffffff" rx="0" ry="5" x="40" y="115" stroke="black" />
-                              <text transform="translate(50, 128)" style="font-size: 12px" font-weight="bold"> ${fun_.numFormatTwoDecimals(data.total_factura)} </text>
+                              <text transform="translate(50, 128)" style="font-size: 12px" font-weight="bold"> ${fun_.roundNumberToDecimal(data.total_factura)} </text>
 
                               <line x1="30" y1="163" x2="165" y2="163" style="stroke:#000000;stroke-width:1" />
                               <text transform="translate(75, 174)" style="font-size: 9px" >Nombre</text>

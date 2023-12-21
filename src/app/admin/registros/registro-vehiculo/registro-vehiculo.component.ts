@@ -109,7 +109,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       (err: any) => {},
     );
   }
-  async getVehiculos(params?: { per_page: number; page: number; search: string }) {
+  async getVehiculos(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, nombre_completo_propietario: true } };
@@ -123,7 +123,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
     this.listaVehiculos = _.orderBy(res.data, ['id'], ['asc']);
 
-    this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+    this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
   }
 
   async getMarcas() {

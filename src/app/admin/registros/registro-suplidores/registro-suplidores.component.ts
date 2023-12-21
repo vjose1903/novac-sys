@@ -101,7 +101,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     campo.setValue(fun.Capitalice(arg));
   }
 
-  async getSuplidores(params?: { per_page: number; page: number; search: string }) {
+  async getSuplidores(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
@@ -117,7 +117,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       });
 
       this.listaSuplidores = res['data'];
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

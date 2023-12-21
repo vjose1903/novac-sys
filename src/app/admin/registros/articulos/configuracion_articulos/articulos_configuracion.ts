@@ -9,5 +9,8 @@ export class ConfigArticuloC extends CrudG<any> {
   constructor() {
     super('config_articulos');
   }
-}
 
+  getWinPercerntCalc(configArticulo: ConfigArticuloI) {
+    return (100 - configArticulo.porciento_ganancia) / 100;
+  }
+}

@@ -48,16 +48,14 @@ const files = [
 ];
 
 function makeSetup(tipo) {
-  console.log(' ');
-  console.log(' ');
-  console.log(' ');
+  console.log('\n\n\n ');
   setup_[tipo].DOCKER_NAME += nivel == 'dev' ? '-dev' : '-prod';
 
   if (clientes.includes(tipo)) {
     console.log('------------------------------------');
     console.log(`             ${tipo_selected}`);
     console.log('------------------------------------');
-    console.log(' ');
+    console.log('\n ');
 
     files.forEach((obj_file) => {
       if (obj_file.tipo == 'reemplazo') {
@@ -68,10 +66,10 @@ function makeSetup(tipo) {
         move_files(tipo, obj_file);
       }
 
-      console.log(' ');
+      console.log('\n ');
     });
 
-    fs.writeFileSync('config_setup/actual_cliente.txt', tipo, { encoding: 'utf-8' });
+    fs.writeFileSync(pathAdd('../config_setup/actual_cliente.txt'), tipo, { encoding: 'utf-8' });
   } else {
     console.log('********************************************');
     console.log('**                                        **');
@@ -84,23 +82,23 @@ function makeSetup(tipo) {
 
 // //  ============= REEMPLAZO =============
 function remplace_files(tipo, obj_file) {
-  let file_data = fs.readFileSync(`config_setup/${obj_file.file_name}`, 'utf-8');
+  let file_data = fs.readFileSync(pathAdd(`../config_setup/${obj_file.file_name}`), 'utf-8');
 
   Object.keys(setup_[tipo]).forEach((key) => {
     file_data = file_data.replaceAll(`$$${key}$$`, setup_[tipo][key]);
   });
 
-  fs.writeFileSync(obj_file.path, file_data, { encoding: 'utf-8' });
+  fs.writeFileSync(pathAdd(`../${obj_file.path}`), file_data, { encoding: 'utf-8' });
 
   console.log(`ARCHIVO: ${obj_file.file_name} reemplado.`);
 }
 
 // //  ============= MOVER =============
 function move_files(tipo, obj_file) {
-  let file_data = fs.readFileSync(`config_setup/${obj_file.file_name}_${tipo}.${obj_file.extension}`, 'utf-8');
+  let file_data = fs.readFileSync(pathAdd(`../config_setup/${obj_file.file_name}_${tipo}.${obj_file.extension}`), 'utf-8');
 
-  fs.writeFileSync(obj_file.path, file_data, { encoding: 'utf-8' });
-  console.log(' ');
+  fs.writeFileSync(pathAdd(`../${obj_file.path}`), file_data, { encoding: 'utf-8' });
+  console.log('\n ');
   console.log(`ARCHIVO: ${obj_file.file_name} movido.`);
 }
 

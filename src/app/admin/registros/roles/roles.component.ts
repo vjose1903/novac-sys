@@ -87,7 +87,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     this.getPermisos();
   }
 
-  async getRoles(params?: { per_page: number; page: number; search: string }) {
+  async getRoles(params?: { per_page?: number; page?: number; search?: string }) {
     this.palabra_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${this.palabra_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
@@ -105,12 +105,12 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
         });
 
         this.listaRoles = res['data'];
-        this.tablaRolesComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.tablaRolesComponent.changeTableConfig([{ total_count: res.total_registros }]);
       })
       .catch((err) => {
         if (err.error.total_registros == 0) {
           this.listaRoles = [];
-          this.tablaRolesComponent.changeConfig([{ total_count: 0 }]);
+          this.tablaRolesComponent.changeTableConfig([{ total_count: 0 }]);
         }
       });
   }

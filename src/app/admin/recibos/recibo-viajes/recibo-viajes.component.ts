@@ -241,11 +241,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
       setTimeout(() => {
         this.viajes_cant_porciento = (this.viajes_completados_cant / this.viajes_cant) * 100;
-        this.viajes_cant_porciento = fun.numFormatTwoDecimals(this.viajes_cant_porciento);
-        this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+        this.viajes_cant_porciento = fun.roundNumberToDecimal(this.viajes_cant_porciento);
+        this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       }, 5);
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
 
       resolve(true);
     });

@@ -62,48 +62,45 @@ export function my_houreFormater(str) {
 }
 
 // =========================================================================================================
-
-export function redondearAdos(num) {
-  const string = num + '';
-  const splitStr = my_stringSplit(string, '.');
-
-  let enteros = splitStr[0];
-
-  const splitEnteros = my_stringSplit(enteros, ',');
-
-  enteros = my_stringJoin(splitEnteros, '');
-
-  let tempdecimales = splitStr[1];
-  if (splitStr.length === 1) {
-    tempdecimales = '00';
-  }
-
-  const decimales = tempdecimales.substring(0, 2);
-  const Arreglo = [enteros, decimales];
-  const numStr = my_stringJoin(Arreglo, '.');
-
-  return parseFloat(numStr).toFixed(2);
+export function isEmpty(value) {
+  return (
+    // es null o indefinido
+    value === null ||
+    value === undefined ||
+    // es una fecha invalida
+    (value instanceof Date && isNaN(value.getTime())) ||
+    // si tiene longitud 0
+    (value.hasOwnProperty('length') && value.length == 0) ||
+    // si es un string vacio o con lleno de espacios
+    (typeof value == 'string' && value.trim().length == 0) ||
+    // si es un objeto y no tiene propiedades
+    (value.constructor == Object && Object.keys(value).length == 0)
+  );
 }
 // =========================================================================================================
 
-export function formatearNumero(nStr) {
-  if (nStr !== undefined) {
-    nStr += '';
-    const x = my_stringSplit(nStr, '.');
-    let x1 = x[0];
-    const x2 = x.length > 1 ? '.' + x[1] : '';
-    const rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-    }
-    return x1 + x2;
-  }
+export function roundNumber(number, cant = 2) {
+  if (isEmpty(number)) return number;
+
+  if (typeof number == 'string') number = parseFloat(desformatearStNumber(number));
+  if (isNaN(number)) return number;
+
+  const numerRounded = number.toFixed(cant);
+  // Formateamos el número con comas para separar millares
+  const partes = numerRounded.split('.');
+  const enteros = partes[0];
+  const decimales = partes[1];
+  const numeroFormateado = enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decimales;
+
+  return numeroFormateado;
 }
 // =========================================================================================================
-export function numFormatTwoDecimals(num, tachado = false) {
-  if (tachado) {
-    return typeof num === 'string' ? num : num < 1 ? '-' : formatearNumero(redondearAdos(num));
-  } else {
-    return typeof num === 'string' ? num : formatearNumero(redondearAdos(num));
-  }
+export function desformatearStNumber(sTnum: any) {
+  const number = typeof sTnum == 'string' ? parseFloat(sTnum.replaceAll(',', '')) : sTnum;
+  return number;
+}
+// =========================================================================================================
+export function roundNumberToDecimal(num, tachado = false) {
+  const numberFOrmated = tachado && num < 1 ? '-' : roundNumber(num);
+  return numberFOrmated;
 }

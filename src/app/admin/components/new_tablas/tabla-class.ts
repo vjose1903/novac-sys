@@ -1,10 +1,12 @@
+export type tableRowType = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
+
 export interface table_info {
   id?: string;
   titulo?: string;
   titulo_sm?: string;
   key?: string;
   dropdown_key?: string;
-  tipo?: string;
+  tipo?: tableRowType;
   tag_severity?: string;
   remplace?: any;
   data?: any;
@@ -12,6 +14,7 @@ export interface table_info {
   optionLabel?: any;
   optionValue?: any;
   estilos?: Array<any>;
+  style?: any;
   select_all?: boolean;
   alert_msg?: string;
   checkNumber?: boolean;
@@ -20,9 +23,11 @@ export interface table_info {
   inputEvents?: string;
   textAlign?: 'start' | 'center' | 'end';
   tooltip?: string;
+  column_gap?: string;
   rowTooltip?: string;
   alerta?: boolean;
   tag_color?: string;
+  row_tag_color?: string;
   tag_apretada?: boolean;
   con_hora?: boolean;
   disable?: any;
@@ -30,8 +35,11 @@ export interface table_info {
   text_color?: string;
   dateFormat?: any;
   hours?: any;
+  imgStyle?: 'circular' | 'cuadrada';
+  rowImgStyle?: 'circular' | 'cuadrada';
   src?: any;
   alt?: any;
+  rowAlt?: any;
   click?: Function;
   iconsArray?: Array<iconsI>;
   key_value?: string;
@@ -54,6 +62,7 @@ interface iconsI {
   key: string | keySource;
   rowTooltip?: string;
   tooltip?: string;
+  style?: any;
   text_color?: string;
   showCondition?: Array<any>;
   editing_buttons?: boolean;
@@ -72,6 +81,7 @@ export interface paginateI {
   showTotal?: boolean;
   showDropDown?: boolean;
   page?: number;
+  page_front?: number;
   ant_page?: number;
   per_page?: number;
   per_page_options?: Array<number>;
@@ -84,7 +94,7 @@ interface inner_btn {
   name?: string;
   tooltip?: string;
   tooltipKey?: string;
-  permiso?: string;
+  permiso?: string | string[];
   icon?: string;
 }
 
@@ -93,6 +103,7 @@ export interface botonesTableI {
   borrar?: inner_btn;
   editar?: inner_btn;
   mostrar?: inner_btn;
+  styles?: any;
 }
 
 interface padreFunctionsI {

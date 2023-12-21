@@ -6,7 +6,7 @@
   <div class="colTitulo d-flex">
     <h4 class="negrita mb-2">{{ titulo | titlecase }}</h4>
 
-    <div *ngIf="optionesExtra.length > 0 && factServ.tipoDocumento == tipoDocFacturacion.venta" class="ml-3">
+    <div *ngIf="optionesExtra.length > 0 && factServ.isVenta" class="ml-3">
       <btn-icon-circular [id]="'btnExtra'" [icon]="'fa-solid fa-ellipsis'" [size]="'size-md'" [tooltip]="'Opciones Extras'" [tooltipPosition]="'right'" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
       <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs" (onHide)="cerrarOverlay()">
@@ -34,7 +34,7 @@
         <div class="row">
           <div *ngIf="factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion" class="col-3 divRight pl-0">
             <div class="row">
-              <div class="col-3 p-0">
+              <div class="col-3 pl-0">
                 <span class="titulos"><strong>Tipo:</strong></span>
                 <input
                   #tipoFact
@@ -43,7 +43,7 @@
                   triggers="focus"
                   type="text"
                   (keydown.enter)="saltar('tipo', tipoFact.value)"
-                  class="form-control tipo inputE"
+                  class="form-control w-100 inputE"
                   [(ngModel)]="factServ.tipoFacturaReferenciaSelected"
                   (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
                   (focus)="tiposFacturas.toggle($event)"
@@ -57,7 +57,7 @@
                 </p-overlayPanel>
               </div>
 
-              <div class="{{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'col-6' : 'col-9' }} p-0">
+              <div class="{{ factServ.isCompra ? 'col-6' : 'col-9' }} p-0">
                 <span class="titulos"><strong>Condición:</strong></span>
 
                 <select
@@ -76,7 +76,7 @@
                 </select>
               </div>
 
-              <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.compra" class="col-3 pr-0">
+              <div *ngIf="factServ.isCompra" class="col-3 pr-0">
                 <span class="titulos"><strong>Gasto:</strong></span>
                 <input
                   #gastoDe
@@ -85,7 +85,7 @@
                   triggers="focus"
                   type="text"
                   (keydown.enter)="saltar($event.target.id, gastoDe.value)"
-                  class="form-control tipo inputE"
+                  class="form-control w-100 inputE"
                   [(ngModel)]="CostoYgasto"
                   [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
                   [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
@@ -99,7 +99,7 @@
               </div>
             </div>
 
-            <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.venta">
+            <div *ngIf="factServ.isVenta">
               <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
               <select
                 #ventaInput
@@ -108,7 +108,7 @@
                 (change)="selectModoFactura($event.target.value)"
                 class="form-control inputE"
                 [(ngModel)]="modo_factura"
-                (blur)="checkCambiosModoyCondicionFactura($event.target)"
+                (blur)="checkCambiosModoyCondicionFactura({ elemento_html: $event.target })"
                 tabindex="-1"
                 [disabled]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
                 [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
@@ -123,21 +123,16 @@
             <div *ngIf="modo_factura === 'viaje'">
               <span class="mt-1"><strong>Fecha viaje:</strong></span>
               <div class="d-flex justify-content-between align-items-center">
-                <input
-                  #fecha_viajeInput
-                  id="fecha_viaje"
-                  type="text"
-                  (keydown.enter)="saltar($event.target.id, fecha_viajeInput.value)"
-                  [bsConfig]="dpConfig"
-                  placeholder="mm/dd/aaaa"
-                  class="form-control inputE"
+                <p-calendar
+                  inputId="fecha_viaje"
+                  inputStyleClass="minSize"
                   [(ngModel)]="fecha_viaje"
-                  #dp="bsDatepicker"
-                  placement="bottom"
-                  bsDatepicker
-                  tabindex="-1"
-                  (blur)="checkCambiosModoyCondicionFactura($event.target)"
-                />
+                  dateFormat="dd/mm/yy"
+                  placeholder="dd/mm/aaaa"
+                  [minDate]="datesAvailable.viaje.minDate"
+                  (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
+                ></p-calendar>
+
                 <div class="ml-3 position-relative">
                   <btn-icon-circular
                     [id]="'btnCamion'"
@@ -234,7 +229,7 @@
               </p-overlayPanel>
             </div>
 
-            <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.compra">
+            <div *ngIf="factServ.isCompra">
               <span class="mt-2"><strong>Número comprobante:</strong></span>
 
               <p-inputMask
@@ -250,21 +245,16 @@
 
               <div *ngIf="condicion_fact === 'Crédito'">
                 <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
-                <input
-                  #fecha_vencimiento_input
-                  id="fecha_vencimiento"
-                  type="text"
-                  [bsConfig]="dpConfig"
-                  (keydown.enter)="$event.target.blur()"
-                  placeholder="mm/dd/aaaa"
-                  class="form-control inputE"
+
+                <p-calendar
+                  inputId="fecha_vencimiento"
+                  inputStyleClass="minSize"
                   [(ngModel)]="fecha_vencimiento"
-                  #dp="bsDatepicker"
-                  placement="bottom"
-                  bsDatepicker
-                  tabindex="-1"
-                  (blur)="checkCambiosModoyCondicionFactura($event.target)"
-                />
+                  dateFormat="dd/mm/yy"
+                  placeholder="dd/mm/aaaa"
+                  [minDate]="datesAvailable.viaje.minDate"
+                  (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_vencimiento', value: fecha_vencimiento })"
+                ></p-calendar>
               </div>
             </div>
           </div>
@@ -274,7 +264,7 @@
             <form [formGroup]="form">
               <div class="d-flex" style="height: 1.7rem">
                 <h5>
-                  <strong>{{ factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Suplidor' : 'Cliente' }}:</strong>
+                  <strong>{{ factServ.isCompra ? 'Suplidor' : 'Cliente' }}:</strong>
                 </h5>
                 <span class="ml-3">
                   <btn-icon-circular
@@ -282,7 +272,7 @@
                     [icon]="'fas fa-search'"
                     [size]="'size-md'"
                     [icon_size]="'1rem'"
-                    [tooltip]="factServ.tipoDocumento == tipoDocFacturacion.compra ? 'Buscar suplidor' : 'Buscar cliente'"
+                    [tooltip]="factServ.isCompra ? 'Buscar suplidor' : 'Buscar cliente'"
                     [tooltipPosition]="'right'"
                     (clickFunction)="abrirModalFiltro()"
                   >
@@ -368,7 +358,7 @@
       </div>
       <div class="cuerpoFactura mb-2">
         <div class="fantasma-cuerpo">
-          <app-cuerpo-factura [factura]="factura_a_rellenar" [modo_factura]="modo_factura" [fechaFactura]="fechaFactura?.front" (getCuerpoFactura)="getCuerpoFactura($event)" (getCalculosDinero)="getCalculosDinero($event)"></app-cuerpo-factura>
+          <app-cuerpo-factura [factura]="factura_a_rellenar" [modo_factura]="modo_factura" [fechaFactura]="fechaFactura?.front" (getCuerpoFactura)="getCuerpoFactura($event)" (getCalculosDinero)="getCalculosDinero($event)" [isInitialized]="isInitialized"></app-cuerpo-factura>
         </div>
       </div>
       <div class="pieFactura">
@@ -381,7 +371,7 @@
 
           <div class="col-7">
             <div class="h-100 d-flex justify-content-around align-items-center ml-4">
-              <div *ngxPermissionsOnly="factServ.tipoDocumento == tipoDocFacturacion.venta ? permissions.factura_venta.create : permissions.factura_compra.create">
+              <div *ngxPermissionsOnly="factServ.isVenta ? permissions.factura_venta.create : permissions.factura_compra.create">
                 <app-btncircular [alto]="'100px'" [accion]="'Terminar ' + getDocumentoDescripcion().descripcion_short" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
               </div>
               <div>
@@ -400,11 +390,11 @@
                   (pulsar)="archivarFactura()"
                 ></app-btncircular>
               </div>
-              <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.venta">
+              <div *ngIf="factServ.isVenta">
                 <app-btncircular *ngIf="fun.isEmpty(factura_a_rellenar)" [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
               </div>
 
-              <!-- <div *ngIf="factServ.tipoDocumento == tipoDocFacturacion.venta">
+              <!-- <div *ngIf="factServ.isVenta">
                 <app-btncircular
                 [alto]="'100px'"
                 [accion]="'PRUEBA'"

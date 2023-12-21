@@ -59,7 +59,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     this.inputs['articulo_defectuoso'] = null;
 
     this.inputs[currentKey] = fun.duplicarJson(event.data);
-    this.inputs['data'] = fun.duplicarJson(event.data.producto_origin);
+    this.inputs['data'] = fun.duplicarJson(event.data.producto_initial);
 
     this.enfocarInitInput();
   }
@@ -115,7 +115,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
 
   getCurrentDevuelto(cantidad) {
     if (fun.isEmpty(cantidad)) return '0.00';
-    return fun.numFormatTwoDecimals(cantidad);
+    return fun.roundNumberToDecimal(cantidad);
   }
 
   checkCantidad(tipo) {
@@ -152,12 +152,12 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     const informacion_retornar = this.form.getRawValue();
 
     obj['data'] = {
-      solo_devuelto: { key: this.inputs.articulo_solo_devuelto?.key, cantidad: informacion_retornar.solo_devuelto, origin: this.inputs?.articulo_solo_devuelto?.producto_origin },
-      defectuoso: { key: this.inputs.articulo_defectuoso?.key, cantidad: informacion_retornar.defectuoso, origin: this.inputs?.articulo_defectuoso?.producto_origin },
+      solo_devuelto: { key: this.inputs.articulo_solo_devuelto?.key, cantidad: informacion_retornar.solo_devuelto, origin: this.inputs?.articulo_solo_devuelto?.producto_initial },
+      defectuoso: { key: this.inputs.articulo_defectuoso?.key, cantidad: informacion_retornar.defectuoso, origin: this.inputs?.articulo_defectuoso?.producto_initial },
     };
 
     if (this.inputs.data.is_devuelto) {
-      obj['data'][this.inputs.tipo] = { key: this.inputs.data?.key, cantidad: informacion_retornar.devuelto, origin: this.inputs?.data?.producto_origin };
+      obj['data'][this.inputs.tipo] = { key: this.inputs.data?.key, cantidad: informacion_retornar.devuelto, origin: this.inputs?.data?.producto_initial };
     }
 
     modal.returnDataFromModal(obj);

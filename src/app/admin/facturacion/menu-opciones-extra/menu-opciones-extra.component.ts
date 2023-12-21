@@ -162,7 +162,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
       this.documentos = _.orderBy(this.documentos, ['fecha_equivalente'], ['desc']);
 
       if (this.documentos.length > 0) {
-        setTimeout(() => this.tablaComponent.changeConfig([{ total_count: res.total_registros }]), 100);
+        setTimeout(() => this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]), 100);
       } else {
         if (this.filter_key == this.filter_options.cliente) {
           fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');

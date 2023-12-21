@@ -162,35 +162,35 @@ function parseResumen(data, tipo_pdf) {
       key: 'bruto',
       item: [
         { text: 'BRUTO:', bold: true, alignment: 'left', style: 'letra8', margin: [0, 0, 0, 0] },
-        { text: fun_.numFormatTwoDecimals(data.Bruto), alignment: 'right', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
+        { text: fun_.roundNumberToDecimal(data.Bruto), alignment: 'right', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
       ],
     },
     {
       key: 'descuento',
       item: [
         { text: 'DESCUENTO:', bold: true, alignment: 'left', style: 'letra8', margin: [0, 0, 0, 0] },
-        { text: fun_.numFormatTwoDecimals(data.descuento), alignment: 'right', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
+        { text: fun_.roundNumberToDecimal(data.descuento), alignment: 'right', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
       ],
     },
     {
       key: 'total',
       item: [
         { text: 'TOTAL A PAGAR:', bold: true, fillColor: '#d8d8d8', alignment: 'left', style: 'letra8', margin: [0, 0, 0, 0] },
-        { text: fun_.numFormatTwoDecimals(data.total), alignment: 'right', fillColor: '#d8d8d8', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
+        { text: fun_.roundNumberToDecimal(data.total), alignment: 'right', fillColor: '#d8d8d8', style: 'letra8', bold: true, margin: [0, 0, 5, 0] },
       ],
     },
     {
       key: 'efectivo',
       item: [
         { text: 'EFECTIVO', bold: true, alignment: 'left', style: 'letra8', margin: [0, 0, -5, 0] },
-        { text: fun_.numFormatTwoDecimals(data.total + data.devuelta), bold: true, alignment: 'right', style: 'letra8', margin: [0, 0, 5, 0] },
+        { text: fun_.roundNumberToDecimal(data.total + data.devuelta), bold: true, alignment: 'right', style: 'letra8', margin: [0, 0, 5, 0] },
       ],
     },
     {
       key: 'cambio',
       item: [
         { text: 'CAMBIO', alignment: 'left', style: 'letra8', margin: [0, 0, -5, 0] },
-        { text: fun_.numFormatTwoDecimals(data.devuelta), alignment: 'right', style: 'letra8', margin: [0, 0, 5, 0] },
+        { text: fun_.roundNumberToDecimal(data.devuelta), alignment: 'right', style: 'letra8', margin: [0, 0, 5, 0] },
       ],
     },
   ];

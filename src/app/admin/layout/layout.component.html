@@ -113,7 +113,8 @@
     </div>
 
     <div class="content">
-      <div class="navBar drag">
+      <!-- <div class="navBar drag"> -->
+      <div class="navBar">
         <div class="right">
           <div class="btn-group dropCuenta" id="dropCuenta">
             <span class="dropdown-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
@@ -143,7 +144,7 @@
 
       <div class="contenido">
         <router-outlet *ngIf="ready"></router-outlet>
-        <input id="input_fantasma" class="input_fantasma" />
+        <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
       </div>
       <div class="footer">Novac System {{ versionApp }} - @2020 Desarrollador: Victor J. Vasquez</div>
       <div *ngIf="cuadre_hoy" class="cuadre_hoy">

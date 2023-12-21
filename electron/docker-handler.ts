@@ -1,5 +1,3 @@
-import Functions from './functions';
-import { ConfigI } from '../src/app/core/typescript/config-interface';
 import { cmd, puts } from '../main';
 
 export default class DockerHandler {
@@ -16,7 +14,7 @@ export default class DockerHandler {
       first_reject ||= reject;
 
       if (this.count_docker <= 20 && this.count_db <= 20) {
-        cmd('docker ps --filter "name=vasquez-prod" --format "{{.Status}}"', (res) => {
+        cmd('docker ps --filter "name=agrodemi-dev" --format "{{.Status}}"', (res) => {
           if (res.status) {
             if (this.count_db == 1) puts('Docker esta corriendo perfectamente.');
 

@@ -1,7 +1,7 @@
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import { BsDatepickerConfig, BsLocaleService } from 'ngx-bootstrap/datepicker';
+
 import * as moment from '../../../core/javascript/moment';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -10,7 +10,6 @@ import { NcfC } from './ncf';
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
-import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
   selector: 'app-ncf',
@@ -32,8 +31,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   fechaCompra;
   fechaValidez;
   tipo_articulo_id = -1;
-  public dpConfig: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
-  public dpConfigValidez: Partial<BsDatepickerConfig> = new BsDatepickerConfig();
+
   aletarTipoArticulo = false;
   ncfSelected;
   Desde;
@@ -73,14 +71,11 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   tablaComponent;
   formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
 
-  constructor(private tServ: TablasService, private localeService: BsLocaleService) {
+  constructor(private tServ: TablasService) {
     super();
-    this.dpConfig = Object.assign({}, { showWeekNumbers: false, dateInputFormat: 'DD/MM/YYYY' });
-    this.dpConfigValidez = Object.assign({}, { showWeekNumbers: false, minDate: this.fechaCompra, dateInputFormat: 'DD/MM/YYYY' });
   }
 
   ngOnInit() {
-    this.localeService.use('es');
     this._init_mixin({ component: 'reg_ncf', is_routing: true });
     this.necesarioStart();
 
@@ -98,28 +93,14 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this._destroy_mixin();
   }
 
-  text(arg) {
-    this.setDateInputs(new Date());
-  }
-
-  // calculateFechaValida() {
-
-  //   setTimeout(() => {
-  //     const anio = moment(this.fechaCompra).add(1, 'year').format('YYYY');
-
-  //     const newFecha = moment('12/31/' + anio).format('DD/MM/YYYY');
-
-  //     this.fechaValidez = newFecha;
-  //   }, 50);
-  // }
-
   setDateInputs(actual) {
     actual = moment(actual).format('MM/DD/YYYY');
     const anio = moment(new Date(actual)).add(1, 'year').format('YYYY');
 
     const newFecha = moment('12/31/' + anio).format('MM/DD/YYYY');
-    this.fechaCompra = moment(actual).format('DD/MM/YYYY');
-    this.fechaValidez = moment(newFecha).format('DD/MM/YYYY');
+
+    this.fechaCompra = new Date(actual);
+    this.fechaValidez = new Date(newFecha);
   }
 
   async necesarioStart() {
@@ -150,7 +131,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  async getPaquetesNCF(params?: { per_page: number; page: number; search: string }) {
+  async getPaquetesNCF(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -183,7 +164,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       this.listaNCF = tempNCF;
       this.listaNCFBack = fun.duplicarJson(tempNCF);
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error(error);
 

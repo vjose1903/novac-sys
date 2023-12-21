@@ -1,3 +1,4 @@
+import { ConfigI } from '../src/app/core/typescript/config-interface';
 import * as fs from 'fs';
 import { pathAdd, puts } from '../main';
 import Functions from './functions.js';
@@ -6,9 +7,10 @@ import { BrowserWindow } from 'electron';
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
-  static default_config: any = {
+  static default_config: ConfigI = {
     cliente: 'agrodemi',
     color_app: 'green',
+    mode_app:  'light',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
     direccion_empresa: 'Autopista Duarte Km0 El Higüero, La Vega',
     logo_empresa: logos.logo_empresa,
@@ -20,6 +22,7 @@ export default class HandlerConfigFile {
     url_servidor_descargas: 'http://admservidor.ddns.net:9090',
     url_servidor_respaldo: 'http://10.0.0.9:9090',
     usa_url_principal: true,
+    has_contabilidad: true,
     is_db_local: false,
     calcular_itbis: false,
     is_produccion: true,

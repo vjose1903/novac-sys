@@ -6,27 +6,32 @@ export interface ConfigI {
   telefono_empresa:            string;
   logo_empresa:                string;
   logo_impresion:              string;
-  color_app:                   string;
-  gitUser:                     string;
+  color_app:                   colors;
+  mode_app:                    modes;
+  gitUser?:                    string;
   url_servidor:                string;
   url_servidor_respaldo:       string;
   url_servidor_descargas:      string;
   config_password:             string;
   usa_url_principal:           boolean;
   is_produccion:               boolean;
+  has_contabilidad:            boolean;
   calcular_itbis:              boolean;
   pages_sizes:                 Documentos;
   printer_selected:            Documentos;
   plantillas_impresion:        PlantiallasImpresion;
-  is_development:              boolean;
-  printersList:                Printer[];
-  app_version:                 string;
+  is_development?:             boolean;
+  printersList?:               Printer[];
+  app_version?:                string;
   is_db_local:                 boolean;
   facturacion_editar_precio:   boolean;
   vende_sin_inventario:        boolean;
   documentos_a_imprimir:       string;
   medida_producto_terminado:   string;
 }
+
+type colors = 'red' | 'blue' | 'green';
+type modes = 'light' | 'dark';
 
 export interface Documentos {
   venta_contado:   string;
