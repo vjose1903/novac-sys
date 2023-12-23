@@ -107,6 +107,7 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
 
   borrar() {
     this.formGroup.reset();
+    this.tipoCuentaSelected = undefined;
   }
 
   formIsInvalid() {
@@ -117,6 +118,13 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
     }
 
     return res;
+  }
+
+  tableClick_action(evento) {
+    if (evento.action == 'update') {
+      this.formGroup.patchValue(evento.data);
+      this.tipoCuentaSelected = evento.data;
+    }
   }
 
   btn_aceptar() {

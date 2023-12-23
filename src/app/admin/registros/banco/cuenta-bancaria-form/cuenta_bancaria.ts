@@ -1,5 +1,5 @@
 import { CrudG } from '../../../../core/typescript/crud-g';
-
+import { CuentaContableI } from '../../../contabilidad/catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
 export class CuentaBancariaC extends CrudG<any> {
   constructor() {
     super('cuentas_bancarias');
@@ -8,15 +8,20 @@ export class CuentaBancariaC extends CrudG<any> {
 
 export interface CuentaBancariaI {
   id?: number;
-  nombre?: string;
-  rnc?: string;
-  comentario?: string;
-  telefono?: string;
-  direccion?: string;
-  ejecutivo_cuenta?: string;
-  telefono_ejecutivo_cuenta?: string;
-  cuentas_bancarias: Array<any>;
+  banco_id: number;
+  tipo_cuenta_bancaria_id: number;
+  divisa_id: number;
+  numero_cuenta: string;
+  comentario: string;
+  descripcion: string;
+  fecha_primera_conciliacion: string;
+  fecha_apertura: string;
+  estado: boolean;
+  balance_inicial_libro: number;
+  balance_inicial_banco: number;
+  cuenta_contable: CuentaContableI;
+  cuenta_contable_prima: CuentaContableI;
+  [nombrePropiedad: string]: any;
 }
-// [nombrePropiedad: string]: any;
 export const modalCuentaBancaria = 'cuentaBancariaForm';
 export const modalCuentaBancariaBtnAceptar = 'cuentaBancariaFormBtnAceptar';

@@ -1,4 +1,6 @@
 import { CrudG } from '../../../core/typescript/crud-g';
+import { CuentaBancariaI } from './cuenta-bancaria-form/cuenta_bancaria';
+
 
 export class BancoC extends CrudG<any> {
   constructor() {
@@ -15,6 +17,8 @@ export interface BancoI {
   direccion?: string;
   ejecutivo_cuenta?: string;
   telefono_ejecutivo_cuenta?: string;
-  cuentas_bancarias: Array<any>;
+  estado: boolean;
+  cuentas_bancarias: Array<CuentaBancariaI>;
 }
+
 // [nombrePropiedad: string]: any;

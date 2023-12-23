@@ -82,19 +82,12 @@ export class CrudG<T> {
 
   private parseParams(arg) {
     let parameters = '';
-    console.log(' ');
-    console.log(' ');
-    console.log('arg ', arg);
 
     for (const key in arg) {
       if (Object.prototype.hasOwnProperty.call(arg, key)) {
         const value = arg[key];
-        console.log('value ', value);
-        console.log('key ', key);
-        console.log('parameters.length ', parameters.length);
 
         if (parameters.length == 0) parameters += '?';
-        console.log('parameters ', parameters);
 
         if (fun.hasValue(value)) {
           if (typeof value == 'object') {

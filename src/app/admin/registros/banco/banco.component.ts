@@ -1,15 +1,15 @@
-import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
-import { customValidators } from './../../../core/typescript/custom-validators';
-import { BancoI, BancoC } from './banco.utils';
-import { fun } from './../../../core/services/functions.service';
-import { Permisos } from './../../../core/typescript/permisos';
-import { FormArray, FormControl, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { ModalClass } from '../../components/modal/modal-class';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
+import { fun } from './../../../core/services/functions.service';
+import { MixinClass } from './../../../core/typescript/MixinClass';
+import { customValidators } from './../../../core/typescript/custom-validators';
+import { Permisos } from './../../../core/typescript/permisos';
+import { BancoC, BancoI } from './banco.utils';
+import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
 import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar } from './cuenta-bancaria-form/cuenta_bancaria';
-import { ModalClass } from '../../components/modal/modal-class';
 import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-bancaria.component';
 
 @Component({
@@ -34,7 +34,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Nombre', tipo: 'img', key: 'nombre', style: { width: '45%', 'text-align': 'start' } },
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre', style: { width: '45%', 'text-align': 'start' } },
       { titulo: 'Rnc', tipo: 'text', key: 'rnc' },
       { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
       {
@@ -42,17 +42,19 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
         titulo: 'Acciones',
         column_gap: '0.8rem',
         tipo: 'icon',
-        style: { 'text-align': 'center' },
+        style: { width: '11%', 'text-align': 'center' },
         iconsArray: [
-          { key: 'edit_divisa', rowTooltip: 'edit_divisa_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'estado', value: [false] }] },
-          { key: 'currency_change', rowTooltip: 'currency_change_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'estado', value: [false] }] },
-          { key: 'deactivate_reactivate_divisa', rowTooltip: 'deactivate_reactivate_divisa_tooltip', text_color: 'colorNegro' },
+          { key: 'edit_banco', rowTooltip: 'edit_banco_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'estado', value: [false] }] },
+          { key: 'delete_banco', rowTooltip: 'delete_banco_tooltip', text_color: 'colorNegro' },
         ],
       },
     ],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_banco',
+    padre_functions: { data_request: (params) => this.getBancos(params) },
+    filtrar: { local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
   };
   tablaComponent;
 
@@ -64,7 +66,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     this._init_mixin({ component: 'banco', is_routing: true });
 
     this.necesarioStart();
-    this.openModalCuentasBancarias();
+    // this.openModalCuentasBancarias();
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -97,28 +99,37 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     });
   }
 
-  createItemCuentaBancaria(cuenta_bancaria?: any) {
+  createItemCuentaBancaria(cuenta_bancaria?: CuentaBancariaI) {
     const scheduleForm = this.fb.group({
       id: [{ value: cuenta_bancaria ? cuenta_bancaria.id : null, disabled: false }],
+      arrayId: [{ value: cuenta_bancaria ? (cuenta_bancaria.arrayId ? cuenta_bancaria.arrayId : fun.generateKey()) : fun.generateKey(), disabled: false }],
+      banco_id: [{ value: cuenta_bancaria ? cuenta_bancaria.banco_id : null, disabled: false }],
+      tipo_cuenta_bancaria_id: [{ value: cuenta_bancaria ? cuenta_bancaria.tipo_cuenta_bancaria_id : null, disabled: false }],
+      divisa_id: [{ value: cuenta_bancaria ? cuenta_bancaria.divisa_id : null, disabled: false }],
+      numero_cuenta: [{ value: cuenta_bancaria ? cuenta_bancaria.numero_cuenta : null, disabled: false }],
+      comentario: [{ value: cuenta_bancaria ? cuenta_bancaria.comentario : null, disabled: false }],
+      descripcion: [{ value: cuenta_bancaria ? cuenta_bancaria.descripcion : null, disabled: false }],
+      fecha_primera_conciliacion: [{ value: cuenta_bancaria ? cuenta_bancaria.fecha_primera_conciliacion : null, disabled: false }],
+      fecha_apertura: [{ value: cuenta_bancaria ? cuenta_bancaria.fecha_apertura : null, disabled: false }],
+      balance_inicial_libro: [{ value: cuenta_bancaria ? cuenta_bancaria.balance_inicial_libro : null, disabled: false }],
+      balance_inicial_banco: [{ value: cuenta_bancaria ? cuenta_bancaria.balance_inicial_banco : null, disabled: false }],
     });
 
     return scheduleForm;
   }
 
-  addItem(schedule?: any) {
+  addItem(cuentaBancaria?: CuentaBancariaI) {
     return new Promise<void>((resolve) => {
       const arrayCuentasBancarias = this.formGroup.get('cuentas_bancarias') as UntypedFormArray;
-      arrayCuentasBancarias.push(this.createItemCuentaBancaria(schedule));
+      arrayCuentasBancarias.push(this.createItemCuentaBancaria(cuentaBancaria));
       resolve();
     });
   }
 
   removeItem(arrayId: string) {
     const arrayCuentasBancarias = this.formGroup.get('cuentas_bancarias') as UntypedFormArray;
-    // TODO: poner la interfaz de cuenta bancaria
     const index = arrayCuentasBancarias.value.findIndex((cuenta: any) => cuenta.arrayId == arrayId);
-
-    // arrayCuentasBancarias.removeAt(index);
+    arrayCuentasBancarias.removeAt(index);
   }
 
   getBancos(params?: { per_page?: number; page?: number; search?: string }) {
@@ -127,8 +138,54 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
     this.listaBancos.length = 0;
     this.bancoClass.getAll(extra).then((res) => {
+      res.data = res.data.map((banco) => {
+        banco = this.parseBanco(banco);
+        return banco;
+      });
+      console.log('res ', res);
+
       this.listaBancos = res.data;
+      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+
+      this.tableClickIcon({ id_tabla: 'lista_banco', iconKey: 'edit_banco', data: this.listaBancos[0] });
     });
+  }
+
+  parseBanco(bancoParsed) {
+    bancoParsed.edit_banco = 'fas fa-pencil-alt';
+    bancoParsed.delete_banco = 'far fa-trash-alt';
+
+    bancoParsed.edit_banco_tooltip = 'Editar';
+    bancoParsed.delete_banco_tooltip = 'Borrar';
+
+    bancoParsed.customStyles = {
+      actions: [
+        { key: 'actions', isTd: true, estilos: 'width: 11% !important;' },
+        { key: 'edit_banco', estilos: 'font-size: 1.2rem !important;' },
+        { key: 'delete_banco', estilos: 'font-size: 1.2rem !important' },
+      ],
+    };
+
+    return bancoParsed;
+  }
+
+  fillCuentasBancarias(cuentas: Array<CuentaBancariaI>) {
+    cuentas.forEach((cuenta) => {
+      this.addItem(cuenta);
+    });
+  }
+
+  tableClickIcon(evento) {
+    if ((evento.id_tabla = 'lista_banco'))
+      if (evento.iconKey == 'edit_banco') {
+        this.formGroup.patchValue(evento.data);
+        this.bancoSelected = evento.data;
+        this.fillCuentasBancarias(evento.data.cuentas_bancarias);
+        console.log('this.formGroup.getRawValue() ', this.formGroup.getRawValue());
+
+        this.isCreando = false;
+      }
+    console.log('evento ', evento);
   }
 
   nuevoRegistro() {
@@ -184,11 +241,11 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     // const formValue = fun.pick(this.formGroup.getRawValue(), pick_values);
 
     // const originalValue = fun.pick(
-    //   this.divisaServ.listaDivisas.find((cuenta) => cuenta.id == formValue.id),
+    //   this.bancoServ.listabancos.find((cuenta) => cuenta.id == formValue.id),
     //   pick_values,
     // );
 
-    // originalValue['img'] = this.divisaServ.listaDivisas.find((cuenta) => cuenta.id == formValue.id)?.img_divisa;
+    // originalValue['img'] = this.bancoServ.listabancos.find((cuenta) => cuenta.id == formValue.id)?.img_banco;
 
     // return !fun.isEqual(formValue, originalValue);
     return true;
@@ -199,19 +256,19 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     formValue = fun.omit(formValue, ['is_principal', 'img']);
 
     // if (this.botonLabel == 'Guardar' && (fun.isEmpty(this.photoData) || fun.isEmpty(this.photoData?.src_img))) {
-    //   fun.toastError('Debe de selecciar una imagen para crear una divisa', 'ERROR');
+    //   fun.toastError('Debe de selecciar una imagen para crear una banco', 'ERROR');
     //   return;
     // }
 
     // if (fun.hasValue(this.photoData?.fileName) && fun.hasValue(this.photoData?.base_64)) {
-    //   let idImg = Number(`${this.photoData.id}`.replaceAll('divisa-img-', ''));
+    //   let idImg = Number(`${this.photoData.id}`.replaceAll('banco-img-', ''));
     //   idImg = idImg > 0 ? idImg : null;
 
     //   formValue['imagenes'] = [{ file_name: this.photoData.fileName, base_64: this.photoData.src_img, id: idImg }];
     // }
 
     // this.bancoClass.createUpdateOne(formValue).then((res) => {
-    //   this.divisaServ.getDivisas();
+    //   this.bancoServ.getbancos();
     //   this.borrar();
     // });
   }

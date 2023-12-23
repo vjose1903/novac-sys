@@ -84,7 +84,9 @@
                     <btn-icon-circular [id]="'btnFormCuentasBancarias'" [icon]="'fa-solid fa-plus'" [size]="'size-sm'" pTooltip="Agregar cuenta Bancaria" tooltipPosition="right" (clickFunction)="openModalCuentasBancarias()"> </btn-icon-circular>
                   </div>
                   <div class="formCuentasDiv">
-                    <ng-container *ngIf="formGroup.controls.cuentas; else elseTemplate"> </ng-container>
+                    <ng-container *ngIf="formGroup.controls.cuentas_bancarias.value?.lenght; else elseTemplate">
+                      <div class="divContainerCuentaBancaria">   </div>
+                    </ng-container>
                     <ng-template #elseTemplate>
                       <h6 class="no-cuentas-message p-2 w-100 text-center mb-0">No tiene cuentas bancarias registradas</h6>
                     </ng-template>

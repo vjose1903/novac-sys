@@ -83,6 +83,7 @@ export interface paginateI {
   show?: boolean;
   showTotal?: boolean;
   showDropDown?: boolean;
+  showPaginator?: boolean;
   page?: number;
   page_front?: number;
   ant_page?: number;

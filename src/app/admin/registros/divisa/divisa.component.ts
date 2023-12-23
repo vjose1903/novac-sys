@@ -52,6 +52,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_divisa',
+    obj_paginate: { show: true, showTotal: true, showPaginator: false },
   };
   tablaComponent;
   photoData: PhotoDataI;
@@ -79,7 +80,9 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.createForm();
-    await this.divisaServ.getDivisas();
+    await this.divisaServ.getDivisas().then((divisas) => {
+      this.tablaComponent.changeTableConfig([{ total_count: divisas.length }]);
+    });
     fun.enfocarInput('cedula');
   }
 
