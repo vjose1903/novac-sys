@@ -4,7 +4,6 @@ import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse
 import { Observable, throwError } from 'rxjs';
 
 import { catchError, map, finalize } from 'rxjs/operators';
-import { LoaderService } from './loader.service';
 import * as _ from 'lodash';
 import { Ss } from './singleton.service';
 import { fun } from './functions.service';

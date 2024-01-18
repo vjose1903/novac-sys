@@ -26,8 +26,6 @@ export class MessageTask {
     });
   }
 
-
-
   asJson(): any {
     return { id: this.id, eventName: this.eventName, data: this.data };
   }

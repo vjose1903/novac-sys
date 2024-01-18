@@ -1,3 +1,4 @@
+import { ImagenService } from './core/services/imagen.service';
 import { LoaderService } from './core/services/loader.service';
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 
@@ -9,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 import { LayoutService } from './admin/layout/layout.service';
 import { ConfigService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
-import { MessageTask } from './core/models/message-task';
+import { MessageTask } from './core/typescript/message-task';
 import { PrimeNGConfig } from 'primeng/api';
 
 import {
@@ -31,6 +32,7 @@ import { fun } from './core/services/functions.service';
 import { MixinClass } from './core/typescript/MixinClass';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from './admin/facturacion/facturacion.service';
+import { DivisaService } from './admin/registros/divisa/divisa.service';
 
 @Component({
   selector: 'app-root',
@@ -70,6 +72,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public toastr: ToastrService,
     public sharedServ: SharedService,
     public permissionsService: NgxPermissionsService,
+    public imgServ: ImagenService,
+    public divisaServ: DivisaService,
 
     private config: PrimeNGConfig,
   ) {
@@ -82,6 +86,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     Ss.zone = this.zone;
     Ss._ipc = this._ipc;
     Ss.factServ = this.factServ;
+    Ss.imgServ = this.imgServ;
+    Ss.divisaServ = this.divisaServ;
 
     Ss.permissionsService = this.permissionsService;
     Ss.loadServ = this.loaderServ;

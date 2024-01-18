@@ -8,11 +8,6 @@ import { LayoutComponent } from './layout.component';
 
 const routes: Routes = [
   {
-    path: 'admin',
-    redirectTo: 'admin/dashboard',
-    pathMatch: 'full',
-  },
-  {
     path: '',
     component: LayoutComponent,
     children: [

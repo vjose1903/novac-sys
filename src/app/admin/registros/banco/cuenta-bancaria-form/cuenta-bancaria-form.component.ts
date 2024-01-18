@@ -1,14 +1,13 @@
-import { Permisos } from './../../../../core/typescript/permisos';
-import { fun } from './../../../../core/services/functions.service';
-import { DivisaService } from './../../divisa/divisa.service';
 import { Component, OnInit } from '@angular/core';
-import { ModalComponentI, ModalI } from '../../../components/modal/modal-class';
-import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { getImgUrlServer } from '../../../../core/typescript/imagen.utils';
-import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar } from './cuenta_bancaria';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { ModalComponentI, ModalI } from '../../../components/modal/modal-class';
 import { BancoI } from '../banco.utils';
 import { TipoCuentaBancariaC, TipoCuentaBancariaI } from '../tipo-cuenta-bancaria/tipo_cuenta_bancaria';
+import { fun } from './../../../../core/services/functions.service';
+import { ImagenService } from './../../../../core/services/imagen.service';
+import { DivisaService } from './../../divisa/divisa.service';
+import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar } from './cuenta_bancaria';
 
 @Component({
   selector: 'app-cuenta-bancaria-form',
@@ -28,7 +27,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   CuentaBancariaSelected;
   maxDate;
 
-  constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService) {
+  constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService, public imgServ: ImagenService) {
     super();
   }
 
@@ -58,19 +57,19 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
       const divisa_principal = this.divisaServ.getDivisaPrincipalInfo();
 
       this.formGroup = this.fb.group({
-        id: [{ value: null, disabled: false }],
-        banco_id: [{ value: null, disabled: false }],
-        tipo_cuenta_bancaria_id: [{ value: null, disabled: false }, Validators.required],
-        divisa_id: [{ value: cuenta ? null : divisa_principal ? divisa_principal.id : null, disabled: false }, Validators.compose([Validators.required])],
-        fecha_apertura: [{ value: null, disabled: false }],
-        numero_cuenta: [{ value: null, disabled: false }, Validators.compose([Validators.required])],
-        balance_inicial_libro: [{ value: null, disabled: false }],
-        balance_inicial_banco: [{ value: null, disabled: false }],
-        fecha_primera_conciliacion: [{ value: null, disabled: false }],
-        comentario: [{ value: null, disabled: false }],
-        descripcion: [{ value: null, disabled: false }, Validators.required],
-        cuenta_contable: [{ value: null, disabled: true }],
-        nombre_cuenta: [{ value: null, disabled: true }],
+        id: [{ value: cuenta ? cuenta.id : null, disabled: false }],
+        banco_id: [{ value: cuenta ? cuenta.banco_id : null, disabled: false }],
+        tipo_cuenta_bancaria_id: [{ value: cuenta ? cuenta.tipo_cuenta_bancaria_id : null, disabled: false }, Validators.required],
+        divisa_id: [{ value: cuenta ? cuenta.divisa_id : divisa_principal ? divisa_principal.id : null, disabled: false }, Validators.compose([Validators.required])],
+        fecha_apertura: [{ value: cuenta ? cuenta.fecha_apertura : null, disabled: false }],
+        numero_cuenta: [{ value: cuenta ? cuenta.numero_cuenta : null, disabled: false }, Validators.compose([Validators.required])],
+        balance_inicial_libro: [{ value: cuenta ? cuenta.balance_inicial_libro : null, disabled: false }],
+        balance_inicial_banco: [{ value: cuenta ? cuenta.balance_inicial_banco : null, disabled: false }],
+        fecha_primera_conciliacion: [{ value: cuenta ? cuenta.fecha_primera_conciliacion : null, disabled: false }],
+        comentario: [{ value: cuenta ? cuenta.comentario : null, disabled: false }],
+        descripcion: [{ value: cuenta ? cuenta.descripcion : null, disabled: false }, Validators.required],
+        cuenta_contable: [{ value: cuenta ? cuenta?.cuenta_contable?.codigo : null, disabled: true }],
+        nombre_cuenta: [{ value: cuenta ? cuenta.cuenta_contable?.descripcion : null, disabled: true }],
       });
       resolve();
     });
@@ -89,16 +88,6 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
 
   showDivisaDrop(event, dropdown) {
     if (fun.hasValue(event.relatedTarget)) dropdown.show();
-  }
-
-  getImgUrlServer(fileName) {
-    return getImgUrlServer(fileName);
-  }
-
-  getDivisaInfoById(id: number, property?: string) {
-    const divisa = this.divisaServ.getDivisaInfoById(id);
-
-    return fun.hasValue(property) ? fun.getProperty(divisa, property) : divisa;
   }
 
   validateSaveBtnState() {

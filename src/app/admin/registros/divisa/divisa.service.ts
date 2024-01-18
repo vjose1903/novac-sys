@@ -1,7 +1,7 @@
+import { Ss } from './../../../core/services/singleton.service';
 import { fun } from './../../../core/services/functions.service';
 import { DivisaC, DivisaI } from './divisa.utils';
 import { Injectable } from '@angular/core';
-import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +20,7 @@ export class DivisaService {
 
         this.divisaClass.getAll(extra).then((res) => {
           res['data'].map((divisa: DivisaI) => {
-            divisa.img_divisa = getImgUrlServer(divisa?.imagen?.file_name);
+            divisa.img_divisa = Ss.imgServ.getImgUrlServer(divisa?.imagen?.file_name);
             divisa.es_principal = divisa.is_principal ? 'P' : null;
             divisa.tasa_actual = `$ ${divisa.current_tasa}`;
 

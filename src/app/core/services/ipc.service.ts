@@ -4,7 +4,7 @@ import * as childProcess from 'child_process';
 import { BehaviorSubject, lastValueFrom, skip, take } from 'rxjs';
 import * as fs from 'fs';
 import { KEYWORD_ELECTRON_RESPONSE, KEYWORD_ELECTRON_SENDER, MessageTaskInterface } from '../../../../electron/shared-electron-angular';
-import { MessageTask } from '../models/message-task';
+import { MessageTask } from '../typescript/message-task';
 import { ELECTRON_EVENTS_OBSERVER } from '../typescript/GLOBAL';
 
 @Injectable({

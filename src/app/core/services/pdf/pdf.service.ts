@@ -10,7 +10,7 @@ import * as facturasCompraVenta from './facturasCompraVenta';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
 import { Ss } from '../singleton.service';
-import { MessageTask } from '../../models/message-task';
+import { MessageTask } from '../../typescript/message-task';
 import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
 import { fun } from '../functions.service';
 

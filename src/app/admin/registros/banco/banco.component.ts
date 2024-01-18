@@ -11,6 +11,7 @@ import { BancoC, BancoI } from './banco.utils';
 import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
 import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar } from './cuenta-bancaria-form/cuenta_bancaria';
 import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-bancaria.component';
+import { ImagenService } from './../../../core/services/imagen.service';
 
 @Component({
   selector: 'app-banco',
@@ -58,7 +59,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   };
   tablaComponent;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public imgServ: ImagenService) {
     super();
   }
 
@@ -180,8 +181,8 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
       if (evento.iconKey == 'edit_banco') {
         this.formGroup.patchValue(evento.data);
         this.bancoSelected = evento.data;
+
         this.fillCuentasBancarias(evento.data.cuentas_bancarias);
-        console.log('this.formGroup.getRawValue() ', this.formGroup.getRawValue());
 
         this.isCreando = false;
       }
@@ -199,11 +200,11 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     this.isCreando = true;
   }
 
-  openModalCuentasBancarias(cuenta?: CuentaBancariaI, banco?: BancoI) {
+  openModalCuentasBancarias(cuenta?: CuentaBancariaI) {
     //
     this.openNewModal({
       component: CuentaBancariaFormComponent,
-      inputs: { cuenta, banco: { nombre: 'BHD LEON' } },
+      inputs: { cuenta, banco: this.formGroup.getRawValue() },
       id: modalCuentaBancaria,
       header: cuenta ? 'Actualizar cuenta bancaria' : 'Registro cuenta bancaria',
       width: '40rem',

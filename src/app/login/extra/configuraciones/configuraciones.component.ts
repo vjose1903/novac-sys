@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import { MessageTask } from '../../../core/models/message-task';
+import { MessageTask } from '../../../core/typescript/message-task';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
 import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';

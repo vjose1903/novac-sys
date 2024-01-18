@@ -19,9 +19,9 @@ import { CategoriaEntidadContableService } from '../../contabilidad/categoria-en
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
-import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
 import { IModalConfiguration } from '../../components/modal/modal-class';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
+import { ImagenService } from '../../../core/services/imagen.service';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -85,6 +85,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     private tServ: TablasService,
     public categoriaEntidadServ: CategoriaEntidadContableService,
     public entCuentaContServ: EntidadCuentaContableService,
+    public imgServ: ImagenService,
     public divisaServ: DivisaService,
   ) {
     super();
@@ -144,7 +145,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
         const doc = _.find(suplidor.documentos_de_identidad, { principal: true });
         suplidor.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
-        suplidor.img_divisa = suplidor?.divisa?.imagen?.file_name ? getImgUrlServer(suplidor?.divisa?.imagen?.file_name) : 'assets/img/no-divisa.png';
+        suplidor.img_divisa = suplidor?.divisa?.imagen?.file_name ? this.imgServ.getImgUrlServer(suplidor?.divisa?.imagen?.file_name) : 'assets/img/no-divisa.png';
         suplidor.img_divisa_tooltip = suplidor?.divisa?.nombre ? suplidor?.divisa?.nombre : 'Divisa no registrada';
         suplidor.codigo = _.padStart(suplidor.id, 5, '0');
 
@@ -160,15 +161,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     });
   }
 
-  getImgUrlServer(fileName) {
-    return getImgUrlServer(fileName);
-  }
-
-  getDivisaInfoById(id: number, property?: string) {
-    const divisa = this.divisaServ.getDivisaInfoById(id);
-
-    return fun.hasValue(property) ? fun.getProperty(divisa, property) : divisa;
-  }
 
   getConfigEntidadSuplidores() {
     const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.suplidor } };
@@ -233,7 +225,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   changeDivisa(event?) {
     const formulario = this.form.getRawValue();
-    const current_divisa = this.getDivisaInfoById(formulario.divisa_id);
+    const current_divisa = this.imgServ.getDivisaInfoById(formulario.divisa_id);
     this.currentDivisaNacional = current_divisa ? current_divisa?.is_principal : false;
     this.filterConfig();
 

@@ -7,6 +7,8 @@ import { IpcService } from './ipc.service';
 import { SharedService } from './shared.service';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '../../admin/facturacion/facturacion.service';
+import { ImagenService } from './imagen.service';
+import { DivisaService } from '../../admin/registros/divisa/divisa.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +19,8 @@ export class Ss {
   public static http: HttpClient;
   public static loadServ: LoaderService;
   public static factServ: FacturacionService;
+  public static imgServ: ImagenService;
+  public static divisaServ: DivisaService;
 
   public static layServ: LayoutService;
   public static toastr: ToastrService;

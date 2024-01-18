@@ -9,7 +9,7 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import { getImgUrlServer } from '../../../core/typescript/imagen.utils';
+
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC, ClienteI } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado.utils';
@@ -22,6 +22,7 @@ import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-co
 import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
 import { IModalConfiguration } from '../../components/modal/modal-class';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
+import { ImagenService } from '../../../core/services/imagen.service';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -78,7 +79,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   maxSizeTypeE = maxSizeTypeE;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
+  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService, public imgServ: ImagenService) {
     super();
   }
 
@@ -146,7 +147,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.listaClientes.length = 0;
     this.clienteClass.getAll(extra).then((res) => {
       res['data'].map((cliente) => {
-        cliente.img_cliente = getImgUrlServer(cliente?.imagen?.file_name);
+        cliente.img_cliente = this.imgServ.getImgUrlServer(cliente?.imagen?.file_name);
         const doc = _.find(cliente.documentos_de_identidad, { principal: true });
         cliente.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         return cliente;

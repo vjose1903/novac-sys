@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
 import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
-import { MessageTask } from '../models/message-task';
+import { MessageTask } from '../typescript/message-task';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun extends CustomLodash {
@@ -711,12 +711,7 @@ export class fun extends CustomLodash {
     console.log(`%c ${text}`, 'background: #00000000; color: #9954d9', body !== undefined ? body : '');
   }
 
-  // ----------------------------------------------------------------------------------------------------------
-  static LightenDarkenColor(col, amt) {
-    col = parseInt(col, 16);
 
-    return (((col & 0x0000ff) + amt) | ((((col >> 8) & 0x00ff) + amt) << 8) | (((col >> 16) + amt) << 16))?.toString(16);
-  }
 
   /* Suma el porcentaje indicado a un color (RR, GG o BB) hexadecimal para aclararlo */
   static addLight(color: any, amount: any) {

@@ -6,7 +6,7 @@
     </h5>
   </div>
 
-  <form [formGroup]="formGroup" (keydown.enter)="$event.preventDefault()">
+  <form *ngIf="formGroup" [formGroup]="formGroup" (keydown.enter)="$event.preventDefault()">
     <div class="row">
       <div class="col-12 p-0">
         <div class="form-group" [appMsgError]="'descripcion'" [form]="formGroup">
@@ -33,9 +33,9 @@
             [placeholder]="'Seleccione el tipo de cuenta'"
             [options]="listaTipoCuentasBancarias"
             formControlName="tipo_cuenta_bancaria_id"
-            optionLabel="label"
-            optionValue="value"
-            [appendTo]="'body'"
+            optionLabel="descripcion"
+            optionValue="id"
+            appendTo="body"
             (onHide)="saltar('campoTipoCuenta')"
             (keydown.enter)="saltar('campoTipoCuenta')"
             styleClass="form-control"
@@ -68,13 +68,13 @@
             <!-- (onChange)="changeDivisa($event)" -->
             <ng-template pTemplate="selectedItem">
               <div class="d-flex align-items-center" *ngIf="fun.hasValue(CuentaBancariaSelected) || fun.hasValue(formGroup.controls.divisa_id.value)">
-                <img-component class="mr-2" style="width: 2rem" [imagenSrc]="getImgUrlServer(getDivisaInfoById(formGroup.controls.divisa_id.value, 'imagen.file_name'))"></img-component>
-                <div>{{ getDivisaInfoById(formGroup.controls.divisa_id.value, 'nombre') }}</div>
+                <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'imagen.file_name'))"></img-component>
+                <div>{{ imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'nombre') }}</div>
               </div>
             </ng-template>
             <ng-template let-divisa pTemplate="item">
               <div class="d-flex align-items-center">
-                <img-component class="mr-2" style="width: 2rem" [imagenSrc]="getImgUrlServer(divisa.imagen.file_name)"></img-component>
+                <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(divisa.imagen.file_name)"></img-component>
                 <div>{{ divisa.nombre }}</div>
               </div>
             </ng-template>

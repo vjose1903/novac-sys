@@ -84,8 +84,24 @@
                     <btn-icon-circular [id]="'btnFormCuentasBancarias'" [icon]="'fa-solid fa-plus'" [size]="'size-sm'" pTooltip="Agregar cuenta Bancaria" tooltipPosition="right" (clickFunction)="openModalCuentasBancarias()"> </btn-icon-circular>
                   </div>
                   <div class="formCuentasDiv">
-                    <ng-container *ngIf="formGroup.controls.cuentas_bancarias.value?.lenght; else elseTemplate">
-                      <div class="divContainerCuentaBancaria">   </div>
+                    <ng-container *ngIf="bancoSelected && bancoSelected?.cuentas_bancarias?.length; else elseTemplate">
+                      <div class="row">
+                        <div class="col-12 col-md-6 p-1 pb-2" *ngFor="let cuenta of bancoSelected.cuentas_bancarias">
+                          <div class="divContainerCuentaBancaria " (click)="openModalCuentasBancarias(cuenta)">
+                            <div class="innerGrid">
+                              <div class="cuenta_divisa">
+                                <img-component class="d-block" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(cuenta.divisa_id, 'imagen.file_name'))"></img-component>
+                              </div>
+
+                              <div class="cuenta_info d-flex justify-content-center">
+                                <h5 class="control-label mb-0">{{ cuenta.numero_cuenta }}</h5>
+                                <small class="tipo_cuenta">{{ cuenta.tipo_cuenta_bancaria }}</small>
+                              </div>
+                            </div>
+                            <small class="cuenta_comentario mt-2">{{ cuenta.comentario }}</small>
+                          </div>
+                        </div>
+                      </div>
                     </ng-container>
                     <ng-template #elseTemplate>
                       <h6 class="no-cuentas-message p-2 w-100 text-center mb-0">No tiene cuentas bancarias registradas</h6>
