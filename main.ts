@@ -215,7 +215,7 @@ function beforeCreateWindow(win) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ipcMain.on(KEYWORD_ELECTRON_SENDER, handleEvent);
 
-async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
+async function handleEvent(event: any, obj: string) {
   try {
     var arg = JSON.parse(obj) as MessageTaskInterface;
 
@@ -326,8 +326,11 @@ function getActualGitUser() {
 }
 
 async function getPrinters() {
+
   const printerPromise = await win.webContents.getPrintersAsync();
+  puts(printerPromise, 'printerPromise');
   const printers_list = printerPromise.map((item) => item.name);
+
   return printers_list;
 }
 

@@ -36,6 +36,7 @@
     "@angular/animations": "15.2.0",
     "@angular/cdk": "15.2.0",
     "@fortawesome/fontawesome-free": "^6.0.0",
+    "@mapbox/node-pre-gyp": "1.0.11",
     "@ng-bootstrap/ng-bootstrap": "^14.0.1",
     "@ng-select/ng-select": "^10.0.3",
     "animate.css": "~4.1.1",
@@ -57,6 +58,7 @@
     "pdfmake": "^0.1.70",
     "primeicons": "6.0.1",
     "primeng": "15.2.0",
+    "printer": "0.4.0",
     "replace-in-file": "6.3.2",
     "request": "^2.88.2",
     "zlib": "1.0.5"
