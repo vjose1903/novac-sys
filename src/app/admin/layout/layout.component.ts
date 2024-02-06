@@ -250,10 +250,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   checkRouteActiva() {
     this.actualPath = fun.getActualPath();
 
-    const pathSplit = _.pullAll(this.actualPath.split('/admin/'), ['']);
+    let pathSplit = this.actualPath.split('/admin/')[1].split('/');
 
     this.actualModule = pathSplit[0];
-    this.actualRuta = _.join(pathSplit.slice(2, pathSplit.length), '/');
+
+    this.actualRuta = _.join(pathSplit.slice(1), '/');
 
     const keysIdsH5 = Object.keys(this.idsH5);
     const currentRouteKey = keysIdsH5.find((key) => this.actualModule.includes(key));

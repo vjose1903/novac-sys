@@ -70,6 +70,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
         descripcion: [{ value: cuenta ? cuenta.descripcion : null, disabled: false }, Validators.required],
         cuenta_contable: [{ value: cuenta ? cuenta?.cuenta_contable?.codigo : null, disabled: true }],
         nombre_cuenta: [{ value: cuenta ? cuenta.cuenta_contable?.descripcion : null, disabled: true }],
+        arrayId: [{ value: cuenta ? (cuenta.arrayId ? cuenta.arrayId : fun.generateKey()) : fun.generateKey(), disabled: false }],
       });
       resolve();
     });
@@ -111,6 +112,9 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   }
 
   btn_aceptar() {
-    throw new Error('Method not implemented.');
+    const formulario = this.formGroup.getRawValue();
+    console.log('formulario ', formulario);
+
+    this.modalComponent.closeModal(this.modalComponent.id, formulario);
   }
 }

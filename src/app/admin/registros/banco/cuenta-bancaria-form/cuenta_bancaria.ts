@@ -26,3 +26,6 @@ export interface CuentaBancariaI {
 }
 export const modalCuentaBancaria = 'cuentaBancariaForm';
 export const modalCuentaBancariaBtnAceptar = 'cuentaBancariaFormBtnAceptar';
+
+export const modalTipoCuentaBancaria = 'tipoCuentaBancariaForm';
+export const modalTipoCuentaBancariaBtnAceptar = 'tipoCuentaBancariaFormBtnAceptar';

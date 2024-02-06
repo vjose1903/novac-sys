@@ -492,7 +492,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
 
       const formGroup = this.factServ.filasDetalle[index] as FormGroup;
-      const { articulo, from_pre_factura } = formGroup.value;
+      const { articulo, from_pre_factura } = formGroup.getRawValue();
 
       const rowsIgual = _.map(
         this.factServ.filasDetalle.filter((item) => item.value?.articulo?.id == articulo.id),
@@ -593,7 +593,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
     const formGroup = this.factServ.filasDetalle[params.index] as FormGroup;
-    const { unidad, cantidad, cantidad_initial, unidades } = formGroup.value;
+    const { unidad, cantidad, cantidad_initial, unidades } = formGroup.getRawValue();
     const detalles = {};
 
     let cantidadMinima = 1;
@@ -621,7 +621,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return new Promise<any>((resolve, reject) => {
       const formGroup = this.factServ.filasDetalle[index] as FormGroup;
       const detalle = {};
-      let { cantidad, articulo, codigo, key, precio, costo, descuento_valor } = formGroup.value;
+      let { cantidad, articulo, codigo, key, precio, costo, descuento_valor } = formGroup.getRawValue();
 
       precio = fun.desformatearStNumber(precio);
       costo = fun.desformatearStNumber(costo);

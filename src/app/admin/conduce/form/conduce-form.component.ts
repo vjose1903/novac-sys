@@ -472,7 +472,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
     const formGroup = this.filasDetalle[params.index] as FormGroup;
-    const { uni: unidad, can: cantidad, unidades } = formGroup.value;
+    const { uni: unidad, can: cantidad, unidades } = formGroup.getRawValue();
     const detalles = {};
 
     let cantidadMinima = 1;

@@ -31,7 +31,7 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
   necesarioStart() {
     this.maxDate = new Date();
     this.createForm(this.inputs.asientoContable).then(() => {
-      this.formGroupInitialValue = this.formGroup.value;
+      this.formGroupInitialValue = this.formGroup.getRawValue();
 
       this.formGroup.valueChanges.subscribe((change) => {
         this.validateSaveBtnState();
