@@ -326,6 +326,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   checkCuentasContables() {
+    console.log('this.listaEntidadCuentasContables ', this.listaEntidadCuentasContables);
+
     this.listaEntidadCuentasContables = this.listaEntidadCuentasContables.filter((cuenta) => ![tipoCategoria.tipoArticulo, tipoCategoria.subTipoArticulo].includes(cuenta.tipo_categoria));
   }
 
@@ -828,6 +830,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     await this.selectSubTipoArticulo(articulo.sub_tipo_articulo_id);
 
     this.is_combo = articulo.is_combo;
+    console.log('articulo.cuentas_contables ', articulo.cuentas_contables);
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(articulo.cuentas_contables);
 
@@ -1014,8 +1017,41 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   submit() {
     const formulario = this.form.getRawValue();
+    console.log('ANDO AQUII');
 
-    const obj = {
+    if (ConfigService.config.has_contabilidad) {
+      const entidades_validation = this.validate_cuentas();
+      console.log('entidades_validation ', entidades_validation);
+
+      if (!entidades_validation.error) {
+        if (fun.isEmpty(formulario.id)) {
+          const confirmationObj = {
+            id: 'aviso_cuentas',
+            texto: 'Confirme las <b class="negrita">CUENTAS CONTABLES</b>, una vez registrado el articulo, no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
+            header: 'Confirmación',
+            siFunction: async (instance) => {
+              this.sendData();
+              instance.dismissModal(instance.id);
+            },
+            width: '30rem',
+          };
+
+          this.confirmationModal(confirmationObj);
+        } else {
+          this.sendData();
+        }
+      } else {
+        fun.toastError(entidades_validation.msg, 'Error');
+      }
+    } else {
+      this.sendData();
+    }
+  }
+
+  sendData() {
+    const formulario = this.form.getRawValue();
+
+    const articuloData = {
       id: fun.hasValue(formulario.id) ? Number(formulario.id) : null,
       tipo_articulo_id: Number(formulario.tipo_articulo_id),
       sub_tipo_articulo_id: Number(formulario.sub_tipo_articulo_id),
@@ -1037,17 +1073,19 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       calcular_saco: formulario.calcular_saco,
     };
 
-    if (ConfigService.config.has_contabilidad) obj['cuentas_contables'] = this.listaEntidadCuentasContables;
+    if (ConfigService.config.has_contabilidad) articuloData['cuentas_contables'] = this.listaEntidadCuentasContables;
 
-    if (obj.is_combo || (fun.hasValue(this.ARRAY_FORMULA.value) && this.ARRAY_FORMULA.value.length)) {
-      obj['is_combo'] = true;
-      obj['otros_costos'] = formulario.otros_costos;
-      obj['formulas_productos_terminados'] = this.formarFormula();
+    if (articuloData.is_combo || (fun.hasValue(this.ARRAY_FORMULA.value) && this.ARRAY_FORMULA.value.length)) {
+      articuloData['is_combo'] = true;
+      articuloData['otros_costos'] = formulario.otros_costos;
+      articuloData['formulas_productos_terminados'] = this.formarFormula();
     }
 
-    this.articuloClass.createUpdateOne(obj).then((res) => {
-      this.necesarioStart();
-      this.borrar();
-    });
+    console.log('articuloData ', articuloData);
+
+    // this.articuloClass.createUpdateOne(articuloData).then((res) => {
+    //   this.necesarioStart();
+    //   this.borrar();
+    // });
   }
 }

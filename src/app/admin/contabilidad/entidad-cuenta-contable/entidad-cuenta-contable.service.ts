@@ -16,8 +16,14 @@ export class EntidadCuentaContableService {
   validateEntidades(params: { configsEntCuentas: ConfiguracionEntidadCuentaI[]; entidad_cuentas_contables: FormEntidadCuentaContableI[] }) {
     let result = { error: false, valid: true, msg: '' };
 
+    const configuracionesIndexadas = params.configsEntCuentas.reduce((acc, config) => {
+      acc[config.id] = config;
+      return acc;
+    }, {});
+
     if (params.configsEntCuentas.length == params.entidad_cuentas_contables.length) {
       const all_has_agrupacion = params.entidad_cuentas_contables.every((cuenta) => cuenta.tipo_agrupacion_contable != null);
+
       if (all_has_agrupacion) {
         for (let index = 0; index < params.entidad_cuentas_contables.length; index++) {
           const cuenta_contable = params.entidad_cuentas_contables[index];
@@ -32,10 +38,16 @@ export class EntidadCuentaContableService {
       } else {
         result.error = true;
         result.valid = false;
+
+        const cuentas_sin_agrupacion = params.entidad_cuentas_contables.filter((cuenta) => cuenta.tipo_agrupacion_contable == null);
+
+        result.msg = 'Debe de seleccionar la agrupacion de las cuentas: ';
+        const cuentas_sin_informacion = cuentas_sin_agrupacion.map((cuenta) => this.configEntContableClass.getConfigLabel(configuracionesIndexadas[cuenta.configuracion_entidad_cuenta_id])).join(', ');
+        result.msg += cuentas_sin_informacion;
       }
     } else {
       result.error = true;
-      result.msg = `Debe de agregar todas las cuentas pertenecientes para la entidad: ${this.configEntContableClass.getConfigLabel(params.configsEntCuentas[0])}`;
+      result.msg = 'Debe de completar todas las informaciones de las cuentas contables.';
     }
 
     return result;

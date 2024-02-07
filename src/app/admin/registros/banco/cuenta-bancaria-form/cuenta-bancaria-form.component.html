@@ -125,14 +125,36 @@
 
         <div class="roundedDiv mt-2">
           <div class="row p-0">
-            <div class="col-12 col-md-4 pl-0">
-              <small class="control-label">Código: </small>
-              <input type="text" formControlName="cuenta_contable" [appCapitalice]="'formGroup'" placeholder="Auto Generable..." id="campoCuentaContable" class="form-control" autocomplete="off" />
+            <div class="col-12 p-0">
+              <div class="row p-0">
+                <div class="col-12 col-md-3 pl-0">
+                  <small class="control-label">Código: </small>
+                  <input type="text" formControlName="cuenta_contable" placeholder="Auto Generable..." id="campoCuentaContable" class="form-control" autocomplete="off" />
+                </div>
+
+                <div class="col-12 col-md-9 p-0">
+                  <small class="control-label">Nombre de la cuenta: </small>
+                  <input type="text" formControlName="nombre_cuenta" placeholder="Auto Generable..." id="campoNombreCuentaContable" class="form-control" autocomplete="off" />
+                </div>
+              </div>
             </div>
 
-            <div class="col-12 col-md-8 pr-0">
-              <small class="control-label">Nombre de la cuenta: </small>
-              <input type="text" formControlName="nombre_cuenta" [appCapitalice]="'formGroup'" placeholder="Auto Generable..." id="campoNombreCuentaContable" class="form-control" autocomplete="off" />
+            <small class="control-label mt-2" *ngIf="showPrimaFields()" style="color: grey; font-weight: 100 !important"> Cuenta Prima </small>
+
+            <div class="col-12 p-2 mt-1 colPrima" *ngIf="showPrimaFields()">
+              <div class="row p-0">
+                <div class="col-12 p-0"></div>
+
+                <div class="col-12 col-md-3 pl-0">
+                  <small class="control-label">Código: </small>
+                  <input type="text" formControlName="cuenta_contable_prima" placeholder="Auto Generable..." id="campoCuentaContablePrima" class="form-control" autocomplete="off" />
+                </div>
+
+                <div class="col-12 col-md-9 p-0">
+                  <small class="control-label">Nombre de la cuenta: </small>
+                  <input type="text" formControlName="nombre_cuenta_prima" placeholder="Auto Generable..." id="campoNombreCuentaContablePrima" class="form-control" autocomplete="off" />
+                </div>
+              </div>
             </div>
           </div>
         </div>

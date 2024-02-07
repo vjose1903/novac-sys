@@ -57,10 +57,11 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
       const divisa_principal = this.divisaServ.getDivisaPrincipalInfo();
 
       this.formGroup = this.fb.group({
+        arrayId: [{ value: cuenta ? (cuenta.arrayId ? cuenta.arrayId : fun.generateKey()) : fun.generateKey(), disabled: false }],
         id: [{ value: cuenta ? cuenta.id : null, disabled: false }],
         banco_id: [{ value: cuenta ? cuenta.banco_id : null, disabled: false }],
         tipo_cuenta_bancaria_id: [{ value: cuenta ? cuenta.tipo_cuenta_bancaria_id : null, disabled: false }, Validators.required],
-        divisa_id: [{ value: cuenta ? cuenta.divisa_id : divisa_principal ? divisa_principal.id : null, disabled: false }, Validators.compose([Validators.required])],
+        divisa_id: [{ value: cuenta ? cuenta.divisa_id : divisa_principal ? divisa_principal.id : null, disabled: cuenta && fun.hasValue(cuenta?.id) }, Validators.compose([Validators.required])],
         fecha_apertura: [{ value: cuenta ? cuenta.fecha_apertura : null, disabled: false }],
         numero_cuenta: [{ value: cuenta ? cuenta.numero_cuenta : null, disabled: false }, Validators.compose([Validators.required])],
         balance_inicial_libro: [{ value: cuenta ? cuenta.balance_inicial_libro : null, disabled: false }],
@@ -68,9 +69,10 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
         fecha_primera_conciliacion: [{ value: cuenta ? cuenta.fecha_primera_conciliacion : null, disabled: false }],
         comentario: [{ value: cuenta ? cuenta.comentario : null, disabled: false }],
         descripcion: [{ value: cuenta ? cuenta.descripcion : null, disabled: false }, Validators.required],
-        cuenta_contable: [{ value: cuenta ? cuenta?.cuenta_contable?.codigo : null, disabled: true }],
-        nombre_cuenta: [{ value: cuenta ? cuenta.cuenta_contable?.descripcion : null, disabled: true }],
-        arrayId: [{ value: cuenta ? (cuenta.arrayId ? cuenta.arrayId : fun.generateKey()) : fun.generateKey(), disabled: false }],
+        cuenta_contable: [{ value: cuenta ? cuenta?.cuenta_contable : null, disabled: true }],
+        nombre_cuenta: [{ value: cuenta ? cuenta?.nombre_cuenta : null, disabled: true }],
+        cuenta_contable_prima: [{ value: cuenta ? cuenta?.cuenta_contable_prima : null, disabled: true }],
+        nombre_cuenta_prima: [{ value: cuenta ? cuenta?.nombre_cuenta_prima : null, disabled: true }],
       });
       resolve();
     });
@@ -111,9 +113,14 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
     }
   }
 
+  showPrimaFields() {
+    const formulario = this.formGroup.getRawValue();
+
+    return fun.hasValue(formulario.divisa_id) ? !this.divisaServ.listaDivisasIndexada[formulario.divisa_id].is_principal : false;
+  }
+
   btn_aceptar() {
     const formulario = this.formGroup.getRawValue();
-    console.log('formulario ', formulario);
 
     this.modalComponent.closeModal(this.modalComponent.id, formulario);
   }

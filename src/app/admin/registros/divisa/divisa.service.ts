@@ -8,6 +8,7 @@ import { Injectable } from '@angular/core';
 })
 export class DivisaService {
   listaDivisas: Array<DivisaI> = [];
+  listaDivisasIndexada: { [id: number]: DivisaI } = {};
   divisaClass = new DivisaC();
   constructor() {}
 
@@ -57,6 +58,11 @@ export class DivisaService {
           });
 
           this.listaDivisas = res['data'];
+          this.listaDivisasIndexada = this.listaDivisas.reduce((acc, divisa) => {
+            acc[divisa.id] = divisa;
+            return acc;
+          }, {});
+
           resolve(fun.deepCloning(this.listaDivisas));
         });
       } catch (error) {

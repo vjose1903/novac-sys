@@ -48,13 +48,13 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnInit(): void {
     this.necesarioStart();
-    this.subCategoriaChange = this.catEntContServ.categoriasChange$.subscribe((value: boolean)=>{
+    this.subCategoriaChange = this.catEntContServ.categoriasChange$.subscribe((value: boolean) => {
       if (value && !this.isArticulo) this.getCategorias();
     });
   }
 
   ngOnDestroy(): void {
-    if(this.subCategoriaChange) this.subCategoriaChange.unsubscribe();
+    if (this.subCategoriaChange) this.subCategoriaChange.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -74,7 +74,6 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
     await this.createForm().then((form) => {
       form.valueChanges.subscribe((changes) => {
-
         fun.awaitTyping({ awaitTime: 250 }).then(() => {
           if (!fun.isEqual(changes, this.lastChange)) this.returnData();
         });
@@ -108,6 +107,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
   createForm() {
     return new Promise<UntypedFormGroup>((resolve, reject) => {
+      console.log('this.cuentaContableData ', this.cuentaContableData);
       this.form = this.fb.group({
         id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.id : null, disabled: false }],
         tipo_agrupacion_contable: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable : null, disabled: false }, Validators.required],

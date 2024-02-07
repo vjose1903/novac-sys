@@ -20,7 +20,7 @@ import { ImagenService } from './../../../core/services/imagen.service';
 })
 export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   formGroup: UntypedFormGroup;
-  formInitialValue: UntypedFormGroup;
+  formInitialValue: any;
   isCreando: boolean = false;
   permissions = Permisos;
   formPermissions = [Permisos.banco.update, Permisos.banco.create];
@@ -111,6 +111,10 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
       fecha_apertura: [{ value: cuenta_bancaria ? cuenta_bancaria.fecha_apertura : null, disabled: false }],
       balance_inicial_libro: [{ value: cuenta_bancaria ? cuenta_bancaria.balance_inicial_libro : null, disabled: false }],
       balance_inicial_banco: [{ value: cuenta_bancaria ? cuenta_bancaria.balance_inicial_banco : null, disabled: false }],
+      cuenta_contable: [{ value: cuenta_bancaria ? (cuenta_bancaria?.cuenta_contable ? cuenta_bancaria.cuenta_contable.codigo : null) : null, disabled: false }],
+      nombre_cuenta: [{ value: cuenta_bancaria ? (cuenta_bancaria?.cuenta_contable ? cuenta_bancaria.cuenta_contable.descripcion : null) : null, disabled: false }],
+      cuenta_contable_prima: [{ value: cuenta_bancaria ? (cuenta_bancaria?.cuenta_contable_prima ? cuenta_bancaria.cuenta_contable_prima.codigo : null) : null, disabled: false }],
+      nombre_cuenta_prima: [{ value: cuenta_bancaria ? (cuenta_bancaria?.cuenta_contable_prima ? cuenta_bancaria.cuenta_contable_prima.descripcion : null) : null, disabled: false }],
     });
 
     return scheduleForm;
@@ -189,10 +193,9 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   tableClickIcon(evento) {
     if ((evento.id_tabla = 'lista_banco'))
       if (evento.iconKey == 'edit_banco') {
-        this.formInitialValue = fun.deepCloning(evento.data);
-
         this.formGroup.patchValue(evento.data);
         this.fillCuentasBancarias(evento.data.cuentas_bancarias);
+        this.formInitialValue = this.formGroup.getRawValue();
 
         this.isCreando = false;
       }
@@ -226,8 +229,6 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   openModalCuentasBancarias(cuenta?: CuentaBancariaI) {
     //
 
-    console.log('cuenta.arrayId => ', cuenta.arrayId);
-
     this.openNewModal({
       component: CuentaBancariaFormComponent,
       inputs: { cuenta, banco: this.formGroup.getRawValue() },
@@ -239,18 +240,14 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async getDataFromModal(cuentaBancaria: CuentaBancariaI, search?) {
-    console.log('cuentaBancaria ', cuentaBancaria);
     if (cuentaBancaria.modalId == modalCuentaBancaria) {
       const currentCuenta = this.formGroup.get('cuentas_bancarias').value.find((cuenta) => cuenta.arrayId == cuentaBancaria.arrayId);
       const promisesArray = [];
 
-      console.log('currentCuenta ', currentCuenta);
       if (currentCuenta) promisesArray.push(this.editCuentaBancaria(currentCuenta, cuentaBancaria));
-      else promisesArray.push(this.addItem(cuentaBancaria.data));
+      else promisesArray.push(this.addItem(cuentaBancaria));
 
-      Promise.all(promisesArray).then((res) => {
-        console.log('res ', res);
-      });
+      Promise.all(promisesArray).then((res) => {});
     }
   }
 
@@ -270,11 +267,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   formIsInvalid() {
-    let res = false;
-
-    if (!this.formGroup.valid || !this.formIsOnInitState()) {
-      res = true;
-    }
+    let res = this.formGroup.invalid || this.formIsOnInitState();
 
     return res;
   }
@@ -284,8 +277,26 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     const formValue = fun.pick(this.formGroup.getRawValue(), pick_values);
 
     const originalValue = fun.pick(this.formInitialValue, pick_values);
+    const bancoIsOnInitState = fun.isEqual(formValue, originalValue);
 
-    return !fun.isEqual(formValue, originalValue);
+    const pick_values_cuenta = ['id', 'arrayId', 'banco_id', 'tipo_cuenta_bancaria_id', 'divisa_id', 'numero_cuenta', 'comentario', 'descripcion', 'fecha_primera_conciliacion', 'fecha_apertura', 'balance_inicial_libro', 'balance_inicial_banco'];
+    let cuentasIsOnInitState = this.formInitialValue.cuentas_bancarias.length == this.formGroup.getRawValue().cuentas_bancarias.length;
+
+    const initialCuentasIndexed = this.formInitialValue.cuentas_bancarias.reduce((acc, item) => {
+      acc[item.arrayId] = fun.pick(item, pick_values_cuenta);
+      return acc;
+    }, {});
+
+    for (const formCuentaBancaria of this.formGroup.getRawValue().cuentas_bancarias) {
+      const formCuentaBancariaPicked = fun.pick(formCuentaBancaria, pick_values_cuenta);
+      const initialCurrentCuenta = initialCuentasIndexed[formCuentaBancaria.arrayId];
+
+      cuentasIsOnInitState = fun.isEqual(formCuentaBancariaPicked, initialCurrentCuenta);
+
+      if (!cuentasIsOnInitState) break;
+    }
+
+    return bancoIsOnInitState && cuentasIsOnInitState;
   }
 
   requests() {
@@ -294,16 +305,14 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     formValue.cuentas_bancarias.map((cuenta_bancaria: CuentaBancariaI) => {
       let cuenta_parsed = cuenta_bancaria;
       if (fun.isEmpty(cuenta_bancaria)) delete cuenta_parsed.id;
-      if (cuenta_bancaria.id == 1) cuenta_parsed.numero_cuenta = '11111111111';
       delete cuenta_parsed.arrayId;
 
       return cuenta_parsed;
     });
 
-    console.log('formValue ', formValue);
-
     this.bancoClass.createUpdateOne(formValue).then((res) => {
-      this.getBancos();
+      const actualPagination = this.tServ.getPaginationById('lista_banco');
+      this.getBancos(actualPagination);
       this.borrar();
     });
   }
