@@ -129,14 +129,7 @@
               <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.catalogo_cuentas" [ngClass]="{ activa: actualRuta == 'catalogo_cuentas' }" (click)="cambiarMenu({ url: 'contabilidad/catalogo_cuentas', navigate: true })">
                 Catalogo de cuentas
               </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.contabilidad.asientos_contables"
-                [ngClass]="{ activa: actualRuta == 'libro_diario' }"
-                (click)="cambiarMenu({ url: 'contabilidad/libro_diario', navigate: true })"
-                pTooltip="Libro Diario"
-                tooltipPosition="right"
-              >
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.asientos_contables" [ngClass]="{ activa: actualRuta == 'libro_diario' }" (click)="cambiarMenu({ url: 'contabilidad/libro_diario', navigate: true })">
                 Libro Diario
               </h4>
               <h4

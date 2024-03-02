@@ -105,6 +105,10 @@
         transition: 0.4s ease-out;
         transform: translateX(15rem);
         letter-spacing: 1px;
+
+        background: #faa2a2;
+        border-radius: 0.5rem;
+        text-align: center;
       }
     }
 
@@ -121,6 +125,7 @@
       .in-validation-label {
         .validate-label {
           transform: translateX(0rem);
+          padding: 0rem 0.5rem;
         }
       }
 

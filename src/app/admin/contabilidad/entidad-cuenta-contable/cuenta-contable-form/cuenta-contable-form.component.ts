@@ -73,6 +73,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
     this.isArticulo = this.inputs?.entidad == CategoriaEntidadContableC.entidad.articulo;
 
     await this.createForm().then((form) => {
+      this.enableDisableIsComunSwitch();
       form.valueChanges.subscribe((changes) => {
         fun.awaitTyping({ awaitTime: 250 }).then(() => {
           if (!fun.isEqual(changes, this.lastChange)) this.returnData();
@@ -107,7 +108,6 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
   createForm() {
     return new Promise<UntypedFormGroup>((resolve, reject) => {
-      console.log('this.cuentaContableData ', this.cuentaContableData);
       this.form = this.fb.group({
         id: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.id : null, disabled: false }],
         tipo_agrupacion_contable: [{ value: fun.hasValue(this.cuentaContableData) ? this.cuentaContableData.tipo_agrupacion_contable : null, disabled: false }, Validators.required],

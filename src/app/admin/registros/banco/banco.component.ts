@@ -128,6 +128,19 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     });
   }
 
+  clearArrayCuentasBancarias() {
+    const arrayCuentasBancarias = this.formGroup.get('cuentas_bancarias') as UntypedFormArray;
+    arrayCuentasBancarias.clear();
+  }
+
+  fillCuentasBancarias(cuentas: Array<CuentaBancariaI>) {
+    this.clearArrayCuentasBancarias();
+
+    cuentas.forEach((cuenta) => {
+      this.addItem(cuenta);
+    });
+  }
+
   editCuentaBancaria(previousData, editedData) {
     new Promise<void>((resolve, reject) => {
       Object.assign(previousData, editedData);
@@ -162,7 +175,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
       this.listaBancos = res.data;
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
 
-      this.tableClickIcon({ id_tabla: 'lista_banco', iconKey: 'edit_banco', data: this.listaBancos[0] });
+      // this.tableClickIcon({ id_tabla: 'lista_banco', iconKey: 'edit_banco', data: this.listaBancos[0] });
     });
   }
 
@@ -182,12 +195,6 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     };
 
     return bancoParsed;
-  }
-
-  fillCuentasBancarias(cuentas: Array<CuentaBancariaI>) {
-    cuentas.forEach((cuenta) => {
-      this.addItem(cuenta);
-    });
   }
 
   tableClickIcon(evento) {
@@ -220,10 +227,11 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     this.isCreando = true;
   }
 
-  borrar() {
-    this.formGroup.get('cuentas_bancarias').value.forEach((cuenta) => this.removeItem(null, 0));
+  borrar(isCreando = true) {
+    this.clearArrayCuentasBancarias();
+
     if (fun.hasValue(this.formGroup)) this.formGroup.reset();
-    this.isCreando = true;
+    this.isCreando = isCreando;
   }
 
   openModalCuentasBancarias(cuenta?: CuentaBancariaI) {
@@ -313,7 +321,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     this.bancoClass.createUpdateOne(formValue).then((res) => {
       const actualPagination = this.tServ.getPaginationById('lista_banco');
       this.getBancos(actualPagination);
-      this.borrar();
+      this.borrar(false);
     });
   }
 }

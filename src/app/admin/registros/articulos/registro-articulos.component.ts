@@ -158,7 +158,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   getConfigEntidadCliente() {
     const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.articulo } };
-    this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigArticulos = res['data']));
+    this.configEntContableClass.getAll(extra).then((res) => {
+      this.listaConfigArticulos = res['data'];
+    });
   }
 
   getConfiguracionArticulo() {
@@ -326,8 +328,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   checkCuentasContables() {
-    console.log('this.listaEntidadCuentasContables ', this.listaEntidadCuentasContables);
-
     this.listaEntidadCuentasContables = this.listaEntidadCuentasContables.filter((cuenta) => ![tipoCategoria.tipoArticulo, tipoCategoria.subTipoArticulo].includes(cuenta.tipo_categoria));
   }
 
@@ -444,7 +444,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   test() {
-    console.log('TESTING');
+    // console.log('TESTING');
   }
 
   borrar(reset = false) {
@@ -830,7 +830,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     await this.selectSubTipoArticulo(articulo.sub_tipo_articulo_id);
 
     this.is_combo = articulo.is_combo;
-    console.log('articulo.cuentas_contables ', articulo.cuentas_contables);
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(articulo.cuentas_contables);
 
@@ -1017,11 +1016,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   submit() {
     const formulario = this.form.getRawValue();
-    console.log('ANDO AQUII');
 
     if (ConfigService.config.has_contabilidad) {
       const entidades_validation = this.validate_cuentas();
-      console.log('entidades_validation ', entidades_validation);
 
       if (!entidades_validation.error) {
         if (fun.isEmpty(formulario.id)) {
@@ -1081,11 +1078,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       articuloData['formulas_productos_terminados'] = this.formarFormula();
     }
 
-    console.log('articuloData ', articuloData);
-
-    // this.articuloClass.createUpdateOne(articuloData).then((res) => {
-    //   this.necesarioStart();
-    //   this.borrar();
-    // });
+    this.articuloClass.createUpdateOne(articuloData).then((res) => {
+      this.necesarioStart();
+      this.borrar();
+    });
   }
 }

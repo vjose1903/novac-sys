@@ -34,6 +34,7 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
       this.initEntidadCuentasContables();
     }
 
+
     if (fun.objHas(changes, 'inputs')) this.initEntidadCuentasContables();
     if (fun.objHas(changes, 'configuration')) this.checkConfig();
   }
@@ -53,6 +54,7 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
       if (fun.isEmpty(entidad_cuenta)) {
         entidad_cuenta = fun.deepCloning(entidadCuentaContableBlank);
         entidad_cuenta.configuracion_entidad_cuenta_id = config.id;
+        if (!config.has_comun) entidad_cuenta.is_comun = true;
 
         this.cuentasContablesData.push(entidad_cuenta);
       }

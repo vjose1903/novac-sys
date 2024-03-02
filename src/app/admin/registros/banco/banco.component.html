@@ -117,7 +117,7 @@
                 <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn ml-2 btn-verde" style="max-width: 6rem">{{ formGroup.controls.id.value ? 'Editar' : 'Guardar' }}</button>
               </div>
               <div>
-                <button class="btn btn-blanco ml-2" style="max-width: 6rem" (click)="borrar(); isCreando = false">Cerrar</button>
+                <button class="btn btn-blanco ml-2" style="max-width: 6rem" (click)="borrar(false)">Cerrar</button>
               </div>
             </div>
           </div>
