@@ -2,7 +2,7 @@ import { fun } from './../../../core/services/functions.service';
 import { Permisos } from './../../../core/typescript/permisos';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
+import { requestParameters } from '../../../core/typescript/crud-g';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { PeriodoFiscalC, PeriodoFiscalI } from './periodo-fiscal';
@@ -51,7 +51,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
     id_tabla: 'lista_periodos',
     padre_functions: { data_request: (params) => this.getPeriodosFiscales(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
   };
   tablaComponent;
 
@@ -120,7 +120,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
     } catch (error) {
       console.error(error);
 
-      fun.toastError('Error buscando Paquetes de NCF registrados.', 'ERROR');
+      fun.toastError('Error buscando los periodos fiscales registrados.', 'ERROR');
     }
   }
 
@@ -188,7 +188,11 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   }
 
   abrirNuevoPeriodo() {
-    console.log('funcion para endpoit de abrir nuevo periodo');
+    const requestParameters: requestParameters = { afterPath: 'custom/open_new_periodo' };
+    this.periodoFiscalClass.createOne({}, requestParameters).then((res) => {
+      const actualPagination = this.tServ.getPaginationById('lista_periodos');
+      this.getPeriodosFiscales(actualPagination);
+    });
   }
 
   async submit() {
