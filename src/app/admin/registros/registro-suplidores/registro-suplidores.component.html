@@ -14,7 +14,7 @@
           <div #cardFormClass class="card cardFormClass p-0">
             <div class="formContainer" [maxSizer]="maxSizeTypeE.height" [source]="divRegistro" [targets]="divTitulo" [reduceTotalHeight]="5">
               <div class="formulario">
-                <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+                <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
                   <div class="row">
                     <div class="col-6 p-0 pr-2">
                       <div>

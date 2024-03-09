@@ -11,7 +11,7 @@
           <div class="fantasma-form">
             <div class="row">
               <div *ngIf="form" class="col-12 p-0 mt-4">
-                <form *ngIf="config" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+                <form *ngIf="config" [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
                   <div class="row">
                     <div class="col-12 mb-2">
                       <div [appMsgError]="'nombre_empresa'" [form]="form">
@@ -240,7 +240,7 @@
           <div class="fantasma-form">
             <div class="row">
               <div *ngIf="form" class="col-12 p-0 mt-4">
-                <form *ngIf="config" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+                <form *ngIf="config" [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
                   <div class="row">
                     <div class="col-12 mb-3">
                       <div class="row bg-dark-1 br-1 p-2">

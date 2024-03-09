@@ -15,7 +15,7 @@
 
             <div class="formContainer" [maxSizer]="maxSizeTypeE.height" [source]="divRegistro" [targets]="divTitulo" [reduceTotalHeight]="5">
               <div class="formulario">
-                <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+                <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
                   <div class="row">
                     <div class="col-12 p-0 mb-3">
                       <div class="row">

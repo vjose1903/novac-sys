@@ -262,7 +262,7 @@
           <!-- ======================================================================================================================================================================== -->
           <!-- ======================================================================================================================================================================== -->
           <div class="{{ factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
-            <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+            <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
               <div class="d-flex" style="height: 1.7rem">
                 <h5>
                   <strong>{{ factServ.isCompra ? 'Suplidor' : 'Cliente' }}:</strong>

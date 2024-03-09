@@ -14,7 +14,7 @@
     <div>
       <hr class="rayaTop" />
     </div>
-    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+    <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
       <div class="row">
         <div class="col-5">
           <div class="d-flex align-items-center h-100">

@@ -1,5 +1,5 @@
 <div class="cuentaContableForm">
-  <form *ngIf="form" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+  <form *ngIf="form" [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
     <div class="actions">
       <div *ngIf="showRevertBtn()" class="circle" (click)="revertChanges()" [pTooltip]="'Revertir cambios'" tooltipPosition="left">
         <i class="fa-solid fa-arrow-rotate-left"></i>

@@ -1,7 +1,7 @@
 <div style="height: 100%">
   <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView panelsStyle p-0" (onChange)="clickTabView()">
     <p-tabPanel header="Marcas">
-      <form [formGroup]="formMarca" class="h-100" (keydown.enter)="$event.preventDefault()">
+      <form [formGroup]="formMarca" class="h-100" (keydown.enter)="$event.stopPropagation()">
         <div class="row h-100">
           <div *ngIf="hasPermissionsMarcaCreate" class="col-6 contenedorRegistro" style="padding-left: 0 !important">
             <div class="card card-padding sombra-light">
@@ -39,7 +39,7 @@
     <!---------------------------------------------------------------------------------------------------------------------------------------------------->
 
     <p-tabPanel header="Modelos">
-      <form [formGroup]="formModelo" class="h-100" (keydown.enter)="$event.preventDefault()">
+      <form [formGroup]="formModelo" class="h-100" (keydown.enter)="$event.stopPropagation()">
         <div class="row h-100">
           <div *ngIf="hasPermissionsModeloCreate" class="col-6 contenedorRegistro" style="padding-left: 0 !important">
             <div class="row card card-padding sombra-light">

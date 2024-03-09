@@ -34,7 +34,7 @@
   </table>
 
   <div class="contenido-fact" #cuadro>
-    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+    <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
       <div formArrayName="rowFactura" *ngFor="let item_cuerpo of ARRAY_ROWFACTURAS?.controls; let index_cuerpo = index">
         <div [formGroupName]="index_cuerpo">
           <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">

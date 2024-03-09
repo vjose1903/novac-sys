@@ -6,7 +6,7 @@
     </h5>
   </div>
 
-  <form *ngIf="formGroup" [formGroup]="formGroup" (keydown.enter)="$event.preventDefault()">
+  <form *ngIf="formGroup" [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
     <div class="row">
       <div class="col-12 p-0">
         <div class="form-group" [appMsgError]="'descripcion'" [form]="formGroup">

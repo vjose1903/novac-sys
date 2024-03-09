@@ -15,7 +15,7 @@
     <p class="my-1">Ingrese la cantidad de articulos devueltos que desea retornar.</p>
   </div>
 
-  <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+  <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
     <div class="row">
       <div *ngIf="inputs?.data?.is_devuelto" class="col-12 p-0">
         <div class="row">

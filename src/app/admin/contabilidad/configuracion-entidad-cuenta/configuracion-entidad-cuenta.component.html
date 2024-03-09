@@ -12,7 +12,7 @@
           </div>
 
           <div class="card cardFormClass">
-            <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+            <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
               <div class="row">
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
