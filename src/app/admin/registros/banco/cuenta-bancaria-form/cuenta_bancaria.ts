@@ -1,5 +1,6 @@
 import { CrudG } from '../../../../core/typescript/crud-g';
 import { CuentaContableI } from '../../../contabilidad/catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
+import { BancoI } from '../banco.utils';
 export class CuentaBancariaC extends CrudG<any> {
   constructor() {
     super('cuentas_bancarias');
@@ -9,6 +10,7 @@ export class CuentaBancariaC extends CrudG<any> {
 export interface CuentaBancariaI {
   id?: number;
   banco_id: number;
+  banco: BancoI;
   tipo_cuenta_bancaria_id: number;
   divisa_id: number;
   numero_cuenta: string;

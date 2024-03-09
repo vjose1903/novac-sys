@@ -9,6 +9,15 @@
   box-shadow: 0 0 0 0.2rem var(--transparente04);
 }
 
+.required-field-label::after {
+  content: '*';
+  color: #e7515a;
+  font-size: 17px;
+  font-weight: 500;
+  transform: translate(1px, -3px);
+  position: absolute;
+}
+
 .p-checkbox-box {
   &.p-highlight {
     &[aria-checked='true'] {

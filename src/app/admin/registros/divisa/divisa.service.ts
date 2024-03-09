@@ -58,6 +58,8 @@ export class DivisaService {
           });
 
           this.listaDivisas = res['data'];
+          fun.logGreen('this.listaDivisas ', this.listaDivisas);
+
           this.listaDivisasIndexada = this.listaDivisas.reduce((acc, divisa) => {
             acc[divisa.id] = divisa;
             return acc;

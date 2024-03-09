@@ -1,6 +1,7 @@
 import { fun } from './../../../../core/services/functions.service';
 import { entidadesContables } from './../../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
+import { CuentaContableI } from '../../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
 
 export type agrupacionContable = 'categoria' | 'individual' | 'sub_categoria' | 'sin_cuenta';
 
@@ -21,16 +22,9 @@ export interface EntidadCuentaContableI {
   key: string;
   tipo_agrupacion_contable: agrupacionContable;
   is_comun: boolean;
-  cuenta_contable: CuentaContable;
+  cuenta_contable: CuentaContableI;
   origen_categoria: OrigenCategoria;
   [nombrePropiedad: string]: any;
-}
-
-export interface CuentaContable {
-  id: number;
-  descripcion: string;
-  codigo: string;
-  label: string;
 }
 
 export interface OrigenCategoria {
@@ -46,7 +40,7 @@ export interface FormEntidadCuentaContableI {
   has_cuenta: boolean;
   is_comun: boolean;
   configuracion_entidad_cuenta_id: number;
-  cuenta_contable?: CuentaContable;
+  cuenta_contable?: CuentaContableI;
   [nombrePropiedad: string]: any;
 }
 

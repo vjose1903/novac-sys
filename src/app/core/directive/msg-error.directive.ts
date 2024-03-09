@@ -84,7 +84,7 @@ export class MsgErrorDirective {
 
           if (fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
             response.render = true;
-            console.error('errors ', errors);
+            // console.error('errors ', errors);
 
             if (errors.required) response.msg = 'Este campo es requerido.';
             else if (errors.minlength) response.msg = `Cant. mínima de letras es: ${errors.minlength.requiredLength}.`;

@@ -16,6 +16,7 @@ import { ModalClass } from '../../components/modal/modal-class';
   styleUrls: ['./divisa.component.scss'],
 })
 export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
+  
   form: UntypedFormGroup;
   botonLabel: string = 'Guardar';
   isCreando: boolean = false;

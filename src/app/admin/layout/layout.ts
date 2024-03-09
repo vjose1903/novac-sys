@@ -47,6 +47,7 @@ export class LayoutClass extends TablaClass {
       catalogo_cuentas: [...Object.values(Permisos.grupo_cuenta), ...Object.values(Permisos.cuenta_contable)],
       configuracion_entidad_cuenta: Object.values(Permisos.configuracion_entidad_cuenta),
       asientos_contables: Object.values(Permisos.cabeza_asiento_contable),
+      deposito: Object.values(Permisos.deposito),
       flatt: [],
     },
     registro: {

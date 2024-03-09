@@ -142,6 +142,9 @@
               >
                 Config. de cuentas
               </h4>
+              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.deposito" [ngClass]="{ activa: actualRuta == 'deposito' }" (click)="cambiarMenu({ url: 'contabilidad/deposito', navigate: true })">
+                Depositos
+              </h4>
             </div>
           </div>
 

@@ -131,9 +131,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
     this.validateUserAndLoadPermisos().then((result) => {
       this.getTiposFacturas().then(() => {
-        this.divisaServ.getDivisas();
-
-        this.hasPermisosValidated = result;
+        this.divisaServ.getDivisas().then((res) => {
+          this.hasPermisosValidated = result;
+        });
       });
     });
   }

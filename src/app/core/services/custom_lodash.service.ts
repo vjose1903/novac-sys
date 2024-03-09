@@ -2,7 +2,6 @@ import { ToastService } from './toast.service';
 import { fun } from './functions.service';
 
 export class CustomLodash extends ToastService {
-
   constructor() {
     super();
   }
@@ -89,9 +88,7 @@ export class CustomLodash extends ToastService {
       const prop = props[index];
       const props_split = prop.split('.');
 
-      if (fun.hasValue(fun.getProperty(obj, prop))) {
-        fun.createNestedObject(result, [...props_split], fun.getProperty(obj, prop));
-      }
+      fun.createNestedObject(result, [...props_split], fun.getProperty(obj, prop));
     }
     return result;
   }

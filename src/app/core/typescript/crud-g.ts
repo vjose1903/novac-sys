@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { fun } from '../services/functions.service';
 import { getUrlInUse } from './url-server.uitls';
 
-export interface extraArgs {
+export interface requestParameters {
   afterPath?: any;
   parameters?: any;
   requestParams?: Array<{ key: any; value: any }>;
@@ -21,13 +21,13 @@ export interface responseModel<T> {
 export class CrudG<T> {
   constructor(private path: string) {}
 
-  async dynamic(arg?: extraArgs, data: any = null, httpMethod: MetodoHttp = 'get', tipo: 'backend' | 'externo' = 'backend') {
+  async dynamic(arg?: requestParameters, data: any = null, httpMethod: MetodoHttp = 'get', tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
 
     return (await this.request(url, httpMethod, data, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
-  async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend'): Promise<responseModel<T>> {
+  async getAll(arg?: requestParameters, tipo: 'backend' | 'externo' = 'backend'): Promise<responseModel<T>> {
     return new Promise<responseModel<T>>(async (resolve, reject) => {
       try {
         const url = this.makeUrl(tipo, arg);
@@ -41,17 +41,17 @@ export class CrudG<T> {
     });
   }
 
-  async getOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
+  async getOne(id: number, arg: requestParameters = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
     return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
-  async deleteOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
+  async deleteOne(id: number, arg: requestParameters = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, id);
     return (await this.request(url, 'delete', null, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
-  createUpdateOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
+  createUpdateOne(data, arg: requestParameters = null, tipo: 'backend' | 'externo' = 'backend') {
     const promise = new Promise<responseModel<T>>((resolve, reject) => {
       if (Number(data.id) === 0 || !data.id) delete data.id;
 
@@ -70,12 +70,12 @@ export class CrudG<T> {
     return promise;
   }
 
-  async createOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
+  async createOne(data, arg: requestParameters = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
     return (await this.request(url, 'post', data, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }
 
-  async updateOne(data, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
+  async updateOne(data, arg: requestParameters = null, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg, data.id);
     return (await this.request(url, 'patch', data, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
   }

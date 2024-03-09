@@ -1,4 +1,4 @@
-import { extraArgs } from './../../../../core/typescript/crud-g';
+import { requestParameters } from './../../../../core/typescript/crud-g';
 import { PeriodoFiscalC } from './../../../registros/periodo-fiscal/periodo-fiscal';
 import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { fun } from './../../../../core/services/functions.service';
@@ -106,7 +106,7 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
     if (fun.hasValue(formulario.fecha_equivalente)) {
       const fecha_equivalente = fun.my_dateFormater(formulario.fecha_equivalente, false);
 
-      const extra: extraArgs = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
+      const extra: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
       this.peridoClass.getAll(extra).then((response) => {
         this.isOpenMonth = response.data.isOpen;
 
