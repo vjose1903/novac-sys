@@ -86,8 +86,8 @@ export default class Functions {
   // Nombre: getDefaultPrinter
   // Descripcion : Esta funcion hace un multiAsignamiento en onjetos a partir de otro objeto
   // __________________________________________________________________________________________________
-  static getDefaultPrinter(win: BrowserWindow) {
-    const printers = win.webContents.getPrinters();
+  static async getDefaultPrinter(win: BrowserWindow) {
+    const printers = await win.webContents.getPrintersAsync();
     const defaultPrinter = printers.find((printer) => printer.isDefault);
     return defaultPrinter;
   }

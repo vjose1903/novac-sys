@@ -91,12 +91,11 @@ function createWindow() {
       require('electron-reload')(__dirname, { electron: require(`${__dirname}/node_modules/electron`) });
 
       win.loadURL('http://localhost:5220');
-      win.maximize();
     } else {
       win.loadURL(appFilePath);
-      win.setFullScreen(true);
     }
-
+    
+    win.setFullScreen(true);
     win.setMenuBarVisibility(false);
     win.maximizable = false;
 

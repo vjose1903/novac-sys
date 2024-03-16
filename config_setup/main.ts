@@ -94,12 +94,13 @@ function createWindow() {
     } else {
       win.loadURL(appFilePath);
     }
-
-    win.maximize();
+    
+    win.setFullScreen(true);
     win.setMenuBarVisibility(false);
+    win.maximizable = false;
 
     setTimeout(() => {
-      if (serve)  win.webContents.openDevTools();
+      if (serve) win.webContents.openDevTools();
     }, 250);
 
     // Emitted when the window is closed.
