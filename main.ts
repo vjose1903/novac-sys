@@ -91,15 +91,17 @@ function createWindow() {
       require('electron-reload')(__dirname, { electron: require(`${__dirname}/node_modules/electron`) });
 
       win.loadURL('http://localhost:5220');
+      win.maximize();
     } else {
       win.loadURL(appFilePath);
+      win.setFullScreen(true);
     }
 
-    win.maximize();
     win.setMenuBarVisibility(false);
+    win.maximizable = false;
 
     setTimeout(() => {
-      if (serve)  win.webContents.openDevTools();
+      if (serve) win.webContents.openDevTools();
     }, 250);
 
     // Emitted when the window is closed.
