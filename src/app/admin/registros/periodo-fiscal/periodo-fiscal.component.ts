@@ -3,7 +3,7 @@ import { Permisos } from './../../../core/typescript/permisos';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { requestParameters } from '../../../core/typescript/crud-g';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { PeriodoFiscalC, PeriodoFiscalI } from './periodo-fiscal';
 import * as _ from 'lodash';
@@ -26,12 +26,12 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
 
   table_config: table_config = {
     info: [
-      { titulo: 'Fecha de inicio', tipo: 'text', key: 'fecha_inicio' },
-      { titulo: 'Fecha de cierre', tipo: 'text', key: 'fecha_cierre' },
-      { titulo: 'Activo', tipo: 'icon', key: 'estado_', estilos: [{ width: '5rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
+      { titulo: 'Fecha de inicio', tipo: tableCellType.text, key: 'fecha_inicio' },
+      { titulo: 'Fecha de cierre', tipo: tableCellType.text, key: 'fecha_cierre' },
+      { titulo: 'Activo', tipo: tableCellType.icon, key: 'estado_', estilos: [{ width: '5rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
       {
         titulo: 'Acciones',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         column_gap: '1rem',
         key: 'actions',
         estilos: [{ width: '10%' }, { color: '#000' }],

@@ -7,7 +7,7 @@ import { fun } from '../../../../core/services/functions.service';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { TipoArticuloI, TipoArticuloC } from './tipo-articulo';
-import { table_config } from '../../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../../components/new_tablas/tabla-class';
 import { SubTipoArticuloComponent } from './sub-tipo-articulo/sub-tipo-articulo.component';
 
 @Component({
@@ -32,8 +32,8 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
 
   table_config: table_config = {
     info: [
-      { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', style: { 'text-align': 'left', width: '55%' } },
-      { titulo: 'Tipo', key: 'tipo_', tipo: 'text', style: { 'text-align': 'left', width: '25%' } },
+      { titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text, style: { 'text-align': 'left', width: '55%' } },
+      { titulo: 'Tipo', key: 'tipo_', tipo: tableCellType.text, style: { 'text-align': 'left', width: '25%' } },
     ],
     colores: true,
     padding: '0.5rem',

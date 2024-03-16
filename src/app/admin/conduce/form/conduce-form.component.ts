@@ -11,7 +11,7 @@ import { BuscarClienteSuplidorComponent } from '../../components/formularios en 
 import { ModalSeleccinarArticuloComponent } from '../../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
 import { ModalClass } from '../../components/modal/modal-class';
 import { ModalService } from '../../components/modal/modal.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { ConduceC } from '../../conduce/coduce';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { FacturaC, FacturasI } from '../../facturacion/factura';
@@ -73,11 +73,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   table_config: table_config = {
     info: [
-      { titulo: '1', tipo: 'icon', key: 'some_is_selected', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'detalles_selected' }] },
-      { titulo: 'Numero Fact', key: 'secuencia', tipo: 'text' },
-      { titulo: 'NCF', key: 'numero_comprobante', tipo: 'text' },
-      { titulo: 'Fecha Facturacion', key: 'fecha_equivalente', tipo: 'date' },
-      { titulo: 'Total Facturado', key: 'total_factura', tipo: 'formatoNumero' },
+      { titulo: '1', tipo: tableCellType.icon, key: 'some_is_selected', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'detalles_selected' }] },
+      { titulo: 'Numero Fact', key: 'secuencia', tipo: tableCellType.text },
+      { titulo: 'NCF', key: 'numero_comprobante', tipo: tableCellType.text },
+      { titulo: 'Fecha Facturacion', key: 'fecha_equivalente', tipo: tableCellType.date },
+      { titulo: 'Total Facturado', key: 'total_factura', tipo: tableCellType.formatoNumero },
     ],
     id_tabla: 'lista_conduces',
     obj_paginate: { show: false },

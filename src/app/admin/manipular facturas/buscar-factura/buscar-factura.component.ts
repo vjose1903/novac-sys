@@ -15,7 +15,7 @@ import { BuscarClienteSuplidorComponent } from '../../components/formularios en 
 import { NotaC } from '../notas-cred-deb/notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
 
@@ -70,10 +70,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   table_notas_config: table_config = {
     info: [
-      { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
-      { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-      { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total' },
-      { titulo: 'Acciones', tipo: 'icon', key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }] },
+      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente' },
+      { titulo: 'Comprobante', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+      { titulo: 'Total nota', tipo: tableCellType.formatoNumero, key: 'total' },
+      { titulo: 'Acciones', tipo: tableCellType.icon, key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }] },
     ],
     colores: true,
     filtrar: { local: false },

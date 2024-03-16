@@ -4,7 +4,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { Permisos } from '../../../core/typescript/permisos';
 import { fun } from '../../../core/services/functions.service';
 import { diurnalFormBtnAceptarId, diurnalFormId, searchDiurnalCode } from './libro-diario-page.utils';
-import { rowDataDividerKey, table_config } from '../../components/new_tablas/tabla-class';
+import { rowDataDividerKey, tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Subscription } from 'rxjs';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { ModalClass } from '../../components/modal/modal-class';
@@ -30,11 +30,11 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
 
   table_config_diurnal: table_config = {
     info: [
-      { titulo: 'Código', key: 'codigo', tipo: 'text', style: { width: '20%', 'text-align': 'left' } },
-      { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', style: { width: '40%', 'text-align': 'left' } },
-      { titulo: 'Auxiliar', key: 'valor_auxiliar', tipo: 'formatoNumero', tachado: true, acepta_negativos: true },
-      { titulo: 'Débito', key: 'valor_debito', tipo: 'formatoNumero', tachado: true },
-      { titulo: 'Crédito', key: 'valor_credito', tipo: 'formatoNumero', tachado: true },
+      { titulo: 'Código', key: 'codigo', tipo: tableCellType.text, style: { width: '20%', 'text-align': 'left' } },
+      { titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text, style: { width: '40%', 'text-align': 'left' } },
+      { titulo: 'Auxiliar', key: 'valor_auxiliar', tipo: tableCellType.formatoNumero, tachado: true, acepta_negativos: true },
+      { titulo: 'Débito', key: 'valor_debito', tipo: tableCellType.formatoNumero, tachado: true },
+      { titulo: 'Crédito', key: 'valor_credito', tipo: tableCellType.formatoNumero, tachado: true },
     ],
     id_tabla: 'diurnalDetail',
     redondo: false,

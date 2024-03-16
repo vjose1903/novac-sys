@@ -1,4 +1,4 @@
-import { table_config } from './../../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../../components/new_tablas/tabla-class';
 import { TasaDeCambioC, TasaDeCambioI } from './tasa_de_cambio.utils';
 import { fun } from './../../../../core/services/functions.service';
 import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
@@ -15,7 +15,7 @@ import { DivisaService } from '../divisa.service';
   styleUrls: ['./tasa-de-cambio.component.scss'],
 })
 export class TasaDeCambioComponent implements OnInit, ModalI {
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: { divisa: DivisaI };
 
   form: UntypedFormGroup;
@@ -30,8 +30,8 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Fecha', tipo: 'text', key: 'fecha_equivalente', estilos: [{ 'text-align': 'left' }] },
-      { titulo: 'Valor', tipo: 'text', key: 'monto' },
+      { titulo: 'Fecha', tipo: tableCellType.text, key: 'fecha_equivalente', estilos: [{ 'text-align': 'left' }] },
+      { titulo: 'Valor', tipo: tableCellType.text, key: 'monto' },
     ],
     colores: false,
     padding: '0rem',

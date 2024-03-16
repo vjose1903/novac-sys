@@ -4,7 +4,7 @@ import { MixinClass } from './../../../core/typescript/MixinClass';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { Permisos } from './../../../core/typescript/permisos';
-import { table_config } from './../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './configuracion-entidad-cuenta.utils';
@@ -33,8 +33,8 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
 
   table_config: table_config = {
     info: [
-      { titulo: 'Descripción', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { 'padding-left': '2rem' }, { width: '30%' }] },
-      { titulo: 'Cuenta contable', tipo: 'text', key: 'cuenta_contable.label', estilos: [{ 'text-align': 'left' }] },
+      { titulo: 'Descripción', tipo: tableCellType.text, key: 'descripcion', estilos: [{ 'text-align': 'left' }, { 'padding-left': '2rem' }, { width: '30%' }] },
+      { titulo: 'Cuenta contable', tipo: tableCellType.text, key: 'cuenta_contable.label', estilos: [{ 'text-align': 'left' }] },
     ],
     colores: true,
     padding: '0.5rem',

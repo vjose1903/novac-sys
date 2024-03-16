@@ -1,5 +1,5 @@
 import { TablasService } from './../../../components/new_tablas/tablas.service';
-import { table_config, table_info } from './../../../components/new_tablas/tabla-class';
+import { tableCellType, table_config, table_info } from './../../../components/new_tablas/tabla-class';
 import { CuentasContablesService } from './utils/cuentas-contables.service';
 import { TreeNode } from 'primeng/api';
 import { fun } from './../../../../core/services/functions.service';
@@ -32,16 +32,16 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
   table_config: table_config = {
     info: [
-      { key: 'codigo', titulo: 'No. Cuenta', tipo: 'text', style: { width: '23%' } },
-      { key: 'descripcion', titulo: 'Cuenta', tipo: 'text', style: {} },
-      { key: 'origen', titulo: 'Origen', tipo: 'text', style: { 'text-align': 'center', width: '10%' } },
-      { key: 'tipo', titulo: 'Tipo', tipo: 'text', style: { 'text-align': 'center', width: '10%' } },
-      { key: 'status', titulo: 'Estado', tipo: 'tag', row_tag_color: 'status_tag_color', style: { 'text-align': 'center', width: '10%' } },
+      { key: 'codigo', titulo: 'No. Cuenta', tipo: tableCellType.text, style: { width: '23%' } },
+      { key: 'descripcion', titulo: 'Cuenta', tipo: tableCellType.text, style: {} },
+      { key: 'origen', titulo: 'Origen', tipo: tableCellType.text, style: { 'text-align': 'center', width: '10%' } },
+      { key: 'tipo', titulo: 'Tipo', tipo: tableCellType.text, style: { 'text-align': 'center', width: '10%' } },
+      { key: 'status', titulo: 'Estado', tipo: tableCellType.tag, row_tag_color: 'status_tag_color', style: { 'text-align': 'center', width: '10%' } },
       {
         key: 'actions',
         titulo: 'Acciones',
         column_gap: '1rem',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         style: { 'text-align': 'center', width: '11%' },
         iconsArray: [
           { key: 'add_account', rowTooltip: 'add_account_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'is_control', value: [false] }] },

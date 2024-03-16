@@ -1,5 +1,5 @@
 import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { table_config } from './../../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../../components/new_tablas/tabla-class';
 import { fun } from './../../../../core/services/functions.service';
 import { IModalConfiguration, ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { Component, DoCheck, OnInit } from '@angular/core';
@@ -23,9 +23,9 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
 
   table_config: table_config = {
     info: [
-      { titulo: 'Articulo', tipo: 'text', key: 'descripcion' },
-      { titulo: 'Tipo', tipo: 'text', key: 'tipo' },
-      { titulo: 'Cantidad', tipo: 'formatoNumero', key: 'cantidad' },
+      { titulo: 'Articulo', tipo: tableCellType.text, key: 'descripcion' },
+      { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipo' },
+      { titulo: 'Cantidad', tipo: tableCellType.formatoNumero, key: 'cantidad' },
     ],
     colores: true,
     id_tabla: 'retornar_articulo',

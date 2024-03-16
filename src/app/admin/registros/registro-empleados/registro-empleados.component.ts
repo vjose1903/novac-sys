@@ -16,7 +16,7 @@ import { EmpleadoC, EmpleadoI } from './empleado.utils';
 import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
 import { fun } from '../../../core/services/functions.service';
 import { RolesC } from '../roles/roles';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 
 import { Permisos } from '../../../core/typescript/permisos';
 import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
@@ -52,10 +52,10 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre_completo' },
-      { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
-      { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
-      { titulo: 'Role', tipo: 'textList', key: 'roles', key_value: 'nombre' },
+      { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre_completo' },
+      { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
+      { titulo: 'Cedula', tipo: tableCellType.text, key: 'documento_identidad' },
+      { titulo: 'Role', tipo: tableCellType.textList, key: 'roles', key_value: 'nombre' },
     ],
 
     colores: true,

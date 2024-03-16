@@ -1,21 +1,21 @@
-import { table_config } from './../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
 export const shearchDocumentTableId = 'facturas_params';
 export class BuscarFacturaC {
-  static tables_config = {
+  static tables_config: { [prop: string]: table_config } = {
     venta: {
       info: [
-        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
-        { titulo: 'No. Factura', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
-        { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
-        { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-        { titulo: 'Condición', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
-        { titulo: 'Fecha Facturación', tipo: 'date', key: 'fecha_equivalente' },
-        { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFechaV', key: 'fechaV' },
-        { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
-        { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
+        { titulo: '1', tipo: tableCellType.icon, key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: 'No. Factura', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '7rem' }] },
+        { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipo_factura' },
+        { titulo: 'Comprobante', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+        { titulo: 'Condición', tipo: tableCellType.text, key: 'condicion', estilos: [{ width: '6rem' }] },
+        { titulo: 'Fecha Facturación', tipo: tableCellType.date, key: 'fecha_equivalente' },
+        { titulo: 'Fecha Vencimiento', tipo: tableCellType.text, text_color: 'colorFechaV', key: 'fechaV' },
+        { titulo: 'Total facturado', tipo: tableCellType.formatoNumero, key: 'total_factura' },
+        { titulo: 'Balance factura', tipo: tableCellType.formatoNumero, key: 'balance' },
         {
           titulo: 'Acciones',
-          tipo: 'icon',
+          tipo: tableCellType.icon,
           key: 'actions',
           estilos: [{ width: '9%' }],
           iconsArray: [
@@ -39,22 +39,22 @@ export class BuscarFacturaC {
       padding: '0.5rem',
       id_tabla: shearchDocumentTableId,
       obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    } as table_config,
+    },
 
     compra: {
       info: [
-        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
-        { titulo: 'No. Factura', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
-        { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
-        { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
-        { titulo: 'Condición', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
-        { titulo: 'Fecha ingreso', tipo: 'date', key: 'fecha_equivalente' },
-        { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV', text_color: 'colorFechaV' },
-        { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
-        { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
+        { titulo: '1', tipo: tableCellType.icon, key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: 'No. Factura', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '7rem' }] },
+        { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipo_factura' },
+        { titulo: 'Comprobante', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+        { titulo: 'Condición', tipo: tableCellType.text, key: 'condicion', estilos: [{ width: '6rem' }] },
+        { titulo: 'Fecha ingreso', tipo: tableCellType.date, key: 'fecha_equivalente' },
+        { titulo: 'Fecha Vencimiento', tipo: tableCellType.text, key: 'fechaV', text_color: 'colorFechaV' },
+        { titulo: 'Total facturado', tipo: tableCellType.formatoNumero, key: 'total_factura' },
+        { titulo: 'Balance factura', tipo: tableCellType.formatoNumero, key: 'balance' },
         {
           titulo: 'Acciones',
-          tipo: 'icon',
+          tipo: tableCellType.icon,
           key: 'actions',
           estilos: [{ width: '9%' }],
           iconsArray: [{ key: 'delete', tooltip: 'Anular Compra' }],
@@ -64,18 +64,18 @@ export class BuscarFacturaC {
       padding: '0.5rem',
       id_tabla: shearchDocumentTableId,
       obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    } as table_config,
+    },
 
     pre_venta: {
       info: [
-        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
-        { titulo: 'No. Pre-venta', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
-        { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
-        { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre' },
-        { titulo: 'Total', tipo: 'formatoNumero', key: 'total_factura' },
+        { titulo: '1', tipo: tableCellType.icon, key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: 'No. Pre-venta', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '7rem' }] },
+        { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente' },
+        { titulo: 'Cliente', tipo: tableCellType.text, key: 'cliente.nombre' },
+        { titulo: 'Total', tipo: tableCellType.formatoNumero, key: 'total_factura' },
         {
           titulo: 'Acciones',
-          tipo: 'icon',
+          tipo: tableCellType.icon,
           key: 'actions',
           estilos: [{ width: '9%' }],
           iconsArray: [
@@ -96,18 +96,18 @@ export class BuscarFacturaC {
       padding: '0.5rem',
       id_tabla: shearchDocumentTableId,
       obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    } as table_config,
+    },
 
     cotizacion: {
       info: [
-        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
-        { titulo: 'No. Cotización', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
-        { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
-        { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre' },
-        { titulo: 'Total cotizado', tipo: 'formatoNumero', key: 'total_factura' },
+        { titulo: '1', tipo: tableCellType.icon, key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: 'No. Cotización', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '7rem' }] },
+        { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente' },
+        { titulo: 'Cliente', tipo: tableCellType.text, key: 'cliente.nombre' },
+        { titulo: 'Total cotizado', tipo: tableCellType.formatoNumero, key: 'total_factura' },
         {
           titulo: 'Acciones',
-          tipo: 'icon',
+          tipo: tableCellType.icon,
           key: 'actions',
           estilos: [{ width: '9%' }],
           iconsArray: [
@@ -121,6 +121,6 @@ export class BuscarFacturaC {
       padding: '0.5rem',
       id_tabla: shearchDocumentTableId,
       obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
-    } as table_config,
+    },
   };
 }

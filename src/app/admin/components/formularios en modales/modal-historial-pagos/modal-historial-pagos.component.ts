@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalComponentI, ModalI } from '../../modal/modal-class';
-import { table_config } from '../../new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../new_tablas/tabla-class';
 import { fun } from '../../../../core/services/functions.service';
 @Component({
   selector: 'app-modal-historial-pagos',
@@ -15,9 +15,9 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
 
   table_pagos_config: table_config = {
     info: [
-      { titulo: 'NO. Pago', tipo: 'text', key: 'numero' },
-      { titulo: 'Pagado', tipo: 'formatoNumero', key: 'deposito' },
-      { titulo: 'Fecha pago', tipo: 'text', key: 'fecha_equivalente' },
+      { titulo: 'NO. Pago', tipo: tableCellType.text, key: 'numero' },
+      { titulo: 'Pagado', tipo: tableCellType.formatoNumero, key: 'deposito' },
+      { titulo: 'Fecha pago', tipo: tableCellType.text, key: 'fecha_equivalente' },
     ],
     colores: true,
     id_tabla: 'listado_pagos',
@@ -26,9 +26,9 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
 
   table_recibos_config: table_config = {
     info: [
-      { titulo: 'NO. recibo', tipo: 'text', key: 'numero_recibo' },
-      { titulo: 'Abonado', tipo: 'formatoNumero', key: 'deposito' },
-      { titulo: 'Fecha abono', tipo: 'text', key: 'fecha_equivalente' },
+      { titulo: 'NO. recibo', tipo: tableCellType.text, key: 'numero_recibo' },
+      { titulo: 'Abonado', tipo: tableCellType.formatoNumero, key: 'deposito' },
+      { titulo: 'Fecha abono', tipo: tableCellType.text, key: 'fecha_equivalente' },
     ],
     colores: true,
     id_tabla: 'listado_recibos',
@@ -37,10 +37,10 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
 
   table_notas_config: table_config = {
     info: [
-      { titulo: 'NO. comprobante', tipo: 'text', key: 'numero_comprobante' },
-      { titulo: 'Tipo', tipo: 'text', key: 'tipo_label' },
-      { titulo: 'Monto', tipo: 'formatoNumero', key: 'total' },
-      { titulo: 'Fecha nota', tipo: 'text', key: 'fecha_equivalente' },
+      { titulo: 'NO. comprobante', tipo: tableCellType.text, key: 'numero_comprobante' },
+      { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipo_label' },
+      { titulo: 'Monto', tipo: tableCellType.formatoNumero, key: 'total' },
+      { titulo: 'Fecha nota', tipo: tableCellType.text, key: 'fecha_equivalente' },
     ],
     colores: true,
     id_tabla: 'listado_notas',

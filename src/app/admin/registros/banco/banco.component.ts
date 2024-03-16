@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ModalClass } from '../../components/modal/modal-class';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
@@ -33,14 +33,14 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre', style: { width: '45%', 'text-align': 'start' } },
-      { titulo: 'Rnc', tipo: 'text', key: 'rnc' },
-      { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+      { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre', style: { width: '45%', 'text-align': 'start' } },
+      { titulo: 'Rnc', tipo: tableCellType.text, key: 'rnc' },
+      { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
       {
         key: 'actions',
         titulo: 'Acciones',
         column_gap: '0.8rem',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         style: { width: '11%', 'text-align': 'center' },
         iconsArray: [
           { key: 'edit_banco', rowTooltip: 'edit_banco_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'estado', value: [false] }] },

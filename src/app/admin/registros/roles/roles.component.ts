@@ -5,7 +5,7 @@ import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { ModalClass } from '../../components/modal/modal-class';
 
@@ -24,9 +24,9 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   formPermissions = [Permisos.role.create, Permisos.role.update];
   table_roles_config: table_config = {
     info: [
-      { titulo: 'Nombre', key: 'nombre', tipo: 'text', estilos: [{ width: '20%' }, { 'text-align': 'left' }] },
-      { titulo: 'Descripcion', key: 'descripcion', tipo: 'text', estilos: [{ width: '50%' }, { 'text-align': 'left' }] },
-      { titulo: 'Activo', key: 'estado_', tag_severity: 'estado_tag', tag_apretada: true, tipo: 'tag', estilos: [{ width: '10%' }] },
+      { titulo: 'Nombre', key: 'nombre', tipo: tableCellType.text, estilos: [{ width: '20%' }, { 'text-align': 'left' }] },
+      { titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text, estilos: [{ width: '50%' }, { 'text-align': 'left' }] },
+      { titulo: 'Activo', key: 'estado_', tag_severity: 'estado_tag', tag_apretada: true, tipo: tableCellType.tag, estilos: [{ width: '10%' }] },
     ],
 
     colores: true,
@@ -34,15 +34,15 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     id_tabla: 'lista_roles',
     padre_functions: { data_request: (params) => this.getRoles(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.role.update }, borrar: { show: true, permiso: this.permissions.role.destroy } },
   };
   tablaRolesComponent;
 
   table_permisos_config: table_config = {
     info: [
-      { titulo: 'Descripcion', key: 'nombre', tipo: 'text', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.5rem' }, { width: '75%' }] },
-      { titulo: 'Activo', key: 'selected', tipo: 'switch', estilos: [{ width: '25%' }] },
+      { titulo: 'Descripcion', key: 'nombre', tipo: tableCellType.text, estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.5rem' }, { width: '75%' }] },
+      { titulo: 'Activo', key: 'selected', tipo: tableCellType.switch, estilos: [{ width: '25%' }] },
     ],
 
     id_tabla: 'lista_acciones',

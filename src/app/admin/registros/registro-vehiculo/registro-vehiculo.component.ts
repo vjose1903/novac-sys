@@ -10,7 +10,7 @@ import { EmpleadoC } from '../registro-empleados/empleado.utils';
 import { VehiculoC } from './vehiculo';
 import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ModalClass } from '../../components/modal/modal-class';
@@ -44,10 +44,10 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   permissions = Permisos;
   table_config: table_config = {
     info: [
-      { titulo: 'Propietario', key: 'nombre_completo_propietario', tipo: 'text' },
-      { titulo: 'Marca', key: 'marca', tipo: 'text' },
-      { titulo: 'Modelo', key: 'modelo', tipo: 'text' },
-      { titulo: 'Cant. viajes', key: 'cantidad_viajes', tipo: 'text' },
+      { titulo: 'Propietario', key: 'nombre_completo_propietario', tipo: tableCellType.text },
+      { titulo: 'Marca', key: 'marca', tipo: tableCellType.text },
+      { titulo: 'Modelo', key: 'modelo', tipo: tableCellType.text },
+      { titulo: 'Cant. viajes', key: 'cantidad_viajes', tipo: tableCellType.text },
     ],
 
     colores: true,

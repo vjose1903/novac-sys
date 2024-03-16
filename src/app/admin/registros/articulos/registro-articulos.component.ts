@@ -14,7 +14,7 @@ import { ArticuloC, ArticuloI } from './articulo';
 import { TipoArticuloC, TipoArticuloI, tipos_articulos } from './tipo-articulo/tipo-articulo';
 import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
@@ -91,10 +91,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '12%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
-      { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
-      { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
+      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', estilos: [{ width: '12%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
+      { titulo: 'Articulo', tipo: tableCellType.text, key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
+      { titulo: 'Medida', tipo: tableCellType.text, key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
+      { titulo: 'Precio', tipo: tableCellType.formatoNumero, key: 'precio_principal', estilos: [{ width: '20%' }] },
     ],
     colores: true,
     padding: '0.5rem',

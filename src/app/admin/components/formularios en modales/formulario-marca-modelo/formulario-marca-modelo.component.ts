@@ -4,9 +4,9 @@ import * as _ from 'lodash';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
-import {   ModalComponentI, ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
-import { table_config } from '../../new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../new_tablas/tabla-class';
 import { Permisos } from '../../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 
@@ -25,7 +25,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   formModelo: UntypedFormGroup;
   permissions = Permisos;
   table_marca_config: table_config = {
-    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }],
+    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text }],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_marcas',
@@ -38,8 +38,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
   table_modelo_config: table_config = {
     info: [
-      { titulo: 'Marca', key: 'marca_nombre', tipo: 'text' },
-      { titulo: 'Modelo', key: 'descripcion', tipo: 'text' },
+      { titulo: 'Marca', key: 'marca_nombre', tipo: tableCellType.text },
+      { titulo: 'Modelo', key: 'descripcion', tipo: tableCellType.text },
     ],
     colores: true,
     padding: '0.5rem',
@@ -51,7 +51,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   };
   tablaModeloComponent: any;
 
-  info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }];
+  info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text }];
 
   botones = { titulo: true, borrar: true, editar: true };
   componente = { 0: 'listado_marcas', 1: 'listado_modelos' };

@@ -13,7 +13,7 @@ import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
 import { SuplidorC, SuplidorI } from './suplidores';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
@@ -57,10 +57,10 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   permissions = Permisos;
   table_config: table_config = {
     info: [
-      { titulo: 'Divisa', tipo: 'img', key: 'img_divisa', rowTooltip: 'img_divisa_tooltip', style: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '4.3rem' } },
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', style: { width: '8%' } },
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre', style: { 'text-align': 'start', 'padding-left': '1rem' } },
-      { titulo: 'Rnc', tipo: 'text', key: 'documento_identidad', style: { width: '17.5%' } },
+      { titulo: 'Divisa', tipo: tableCellType.img, key: 'img_divisa', rowTooltip: 'img_divisa_tooltip', style: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '4.3rem' } },
+      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', style: { width: '8%' } },
+      { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre', style: { 'text-align': 'start', 'padding-left': '1rem' } },
+      { titulo: 'Rnc', tipo: tableCellType.text, key: 'documento_identidad', style: { width: '17.5%' } },
     ],
 
     colores: true,
@@ -142,7 +142,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.listaSuplidores.length = 0;
     this.suplidorClass.getAll(extra).then((res) => {
       res['data'].map((suplidor) => {
-
         const doc = _.find(suplidor.documentos_de_identidad, { principal: true });
         suplidor.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         suplidor.img_divisa = suplidor?.divisa?.imagen?.file_name ? this.imgServ.getImgUrlServer(suplidor?.divisa?.imagen?.file_name) : 'assets/img/no-divisa.png';
@@ -160,7 +159,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
-
 
   getConfigEntidadSuplidores() {
     const extra = { parameters: { filter_target: CategoriaEntidadContableC.entidad.suplidor } };
@@ -256,7 +254,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-
         if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === documento)) {
           enable_campos = true;
           return;
@@ -323,7 +320,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   onHideModal(modalConfig: IModalConfiguration) {
-    if (modalConfig.id == "categorias_suplidores") {
+    if (modalConfig.id == 'categorias_suplidores') {
       this.categoriaEntidadServ.setCategoriaChange();
     }
   }

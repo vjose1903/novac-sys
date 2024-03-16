@@ -1,4 +1,19 @@
-export type tableRowType = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
+export enum tableCellType {
+  inputSwitch = 'inputSwitch',
+  index = 'index',
+  cantidades = 'cantidades',
+  img = 'img',
+  icon = 'icon',
+  color = 'color',
+  switch = 'switch',
+  dropDown = 'dropDown',
+  input = 'input',
+  text = 'text',
+  tag = 'tag',
+  formatoNumero = 'formatoNumero',
+  textList = 'textList',
+  date = 'date',
+}
 
 export interface table_info {
   id?: string;
@@ -6,7 +21,7 @@ export interface table_info {
   titulo_sm?: string;
   key?: string;
   dropdown_key?: string;
-  tipo?: tableRowType;
+  tipo?: tableCellType;
   tachado?: boolean;
   acepta_negativos?: boolean;
   puntosSuspensivos?: boolean;

@@ -1,6 +1,6 @@
 import { TipoArticuloI } from './../tipo-articulo';
 import { TablasService } from './../../../../components/new_tablas/tablas.service';
-import { table_config } from './../../../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../../../components/new_tablas/tabla-class';
 import { Permisos } from './../../../../../core/typescript/permisos';
 import { ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
 import { MixinClass } from './../../../../../core/typescript/MixinClass';
@@ -30,7 +30,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
   subTipoArticuloClass = new SubTipoArticuloC();
 
   table_config: table_config = {
-    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text', style: { 'text-align': 'left', width: '80%' } }],
+    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text, style: { 'text-align': 'left', width: '80%' } }],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_sub_tipo_articulos',

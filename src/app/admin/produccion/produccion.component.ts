@@ -8,7 +8,7 @@ import { tipos_articulos } from '../registros/articulos/tipo-articulo/tipo-artic
 import { ProduccionC } from './produccion';
 import * as $ from 'jquery';
 import { fun } from '../../core/services/functions.service';
-import { medidas, table_config } from '../components/new_tablas/tabla-class';
+import { medidas, tableCellType, table_config } from '../components/new_tablas/tabla-class';
 import { ModalClass } from '../components/modal/modal-class';
 @Component({
   selector: 'app-produccion',
@@ -30,9 +30,9 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   table_config: table_config = {
     info: [
-      { titulo: 'Producto', tipo: 'text', key: 'nombre' },
-      { titulo: 'Cantidad', tipo: 'formatoNumero', key: 'cantidad' },
-      { titulo: 'Medida', tipo: 'text', key: 'medida' },
+      { titulo: 'Producto', tipo: tableCellType.text, key: 'nombre' },
+      { titulo: 'Cantidad', tipo: tableCellType.formatoNumero, key: 'cantidad' },
+      { titulo: 'Medida', tipo: tableCellType.text, key: 'medida' },
     ],
     colores: true,
     id_tabla: 'lista_produccion',

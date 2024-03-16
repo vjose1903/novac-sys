@@ -4,7 +4,7 @@ import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.com
 import { PdfService } from './../../../core/services/pdf/pdf.service';
 import { ClienteC } from './../../registros/registro-clientes/cliente';
 import { MixinClass } from './../../../core/typescript/MixinClass';
-import { table_config } from './../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
 import { FacturaC, tipoDocFacturacion } from './../factura';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
@@ -51,13 +51,13 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
   table_notas_config: table_config = {
     info: [
-      { titulo: 'No. Doc.', tooltip: 'Número de documento', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
-      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1rem' }, { width: '45%' }] },
-      { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '6rem' }] },
-      { titulo: 'Total', tipo: 'formatoNumero', key: 'total_factura' },
+      { titulo: 'No. Doc.', tooltip: 'Número de documento', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '7rem' }] },
+      { titulo: 'Cliente', tipo: tableCellType.text, key: 'cliente.nombre', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1rem' }, { width: '45%' }] },
+      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', estilos: [{ width: '6rem' }] },
+      { titulo: 'Total', tipo: tableCellType.formatoNumero, key: 'total_factura' },
       {
         titulo: 'Acciones',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         key: 'actions',
         estilos: [{ width: '9%' }],
         iconsArray: [

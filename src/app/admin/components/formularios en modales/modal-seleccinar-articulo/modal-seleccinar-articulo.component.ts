@@ -3,7 +3,7 @@ import { Component, OnInit, Input, Output } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalComponentI, ModalI } from '../../modal/modal-class';
-import { table_config } from '../../new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../new_tablas/tabla-class';
 
 @Component({
   selector: 'app-modal-seleccinar-articulo',
@@ -13,13 +13,13 @@ import { table_config } from '../../new_tablas/tabla-class';
 export class ModalSeleccinarArticuloComponent extends MixinClass implements OnInit, ModalI {
   table_config: table_config = {
     info: [
-      { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'articulo_is_active', rowTooltip: 'articulo_is_active_tooltip', text_color: 'is_active_color' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ width: '44%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
-      { titulo: 'Cantidad', tipo: 'text', key: 'cantidad', estilos: [{ width: '12%' }] },
-      { titulo: 'Unidad', tipo: 'text', key: 'unidad', estilos: [{ width: '14%' }] },
-      { titulo: 'Retirado', tipo: 'text', key: 'retirado_mostrar', estilos: [{ width: '12%' }] },
-      { titulo: 'Restante', tipo: 'text', key: 'restante_mostrar', estilos: [{ width: '12%' }] },
-      { titulo: 'Seleccione', tipo: 'switch', key: 'select', estilos: [{ width: '10.8%' }], disable: [{ kind: 'campo', target: 'disable', value: [true] }] },
+      { titulo: '1', tipo: tableCellType.icon, key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'articulo_is_active', rowTooltip: 'articulo_is_active_tooltip', text_color: 'is_active_color' }] },
+      { titulo: 'Articulo', tipo: tableCellType.text, key: 'descripcion', estilos: [{ width: '44%' }, { 'text-align': 'left' }, { 'padding-left': '0.5rem' }] },
+      { titulo: 'Cantidad', tipo: tableCellType.text, key: 'cantidad', estilos: [{ width: '12%' }] },
+      { titulo: 'Unidad', tipo: tableCellType.text, key: 'unidad', estilos: [{ width: '14%' }] },
+      { titulo: 'Retirado', tipo: tableCellType.text, key: 'retirado_mostrar', estilos: [{ width: '12%' }] },
+      { titulo: 'Restante', tipo: tableCellType.text, key: 'restante_mostrar', estilos: [{ width: '12%' }] },
+      { titulo: 'Seleccione', tipo: tableCellType.switch, key: 'select', estilos: [{ width: '10.8%' }], disable: [{ kind: 'campo', target: 'disable', value: [true] }] },
     ],
     colores: true,
     id_tabla: 'tabla_adelantados',

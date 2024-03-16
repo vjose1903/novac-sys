@@ -1,5 +1,5 @@
 import { tipoPagoE } from './../../pagos/pagos-facturas/lista-pagos/pagos.config';
-import { table_info } from './../../components/new_tablas/tabla-class';
+import { tableCellType, table_info } from './../../components/new_tablas/tabla-class';
 import { ReciboC } from './../../pagos/class/ingresos/recibos';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
@@ -27,19 +27,19 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     info: [
       {
         titulo: '1',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         key: 'estado',
         div_class: 'd-flex justify-content-around',
         estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }],
         iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
       },
-      { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '13%' }] },
-      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre', estilos: [{ width: '40%' }] },
-      { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
-      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
+      { titulo: 'Fecha Fact.', tipo: tableCellType.date, key: 'fecha_equivalente', estilos: [{ width: '13%' }] },
+      { titulo: 'Cliente', tipo: tableCellType.text, key: 'cliente.nombre', estilos: [{ width: '40%' }] },
+      { titulo: 'NCF', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '15%' }] },
+      { titulo: 'Total facturado', tipo: tableCellType.formatoNumero, key: 'total_factura', estilos: [{ width: '20%' }] },
       {
         titulo: 'Acciones',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         key: 'actions',
         div_class: 'd-flex justify-content-around',
         estilos: [{ width: '7%' }],
@@ -59,11 +59,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   config_viaje_selected: table_config = {
     info: [
-      { id: 'camion', titulo: 'Camión', tipo: 'dropDown', optionValue: 'id', optionLabel: 'info_vehiculo', data: [], key: 'vehiculo.info_vehiculo', dropdown_key: 'vehiculo_id', remplace: { with: 'text' } },
-      { id: 'chofer', titulo: 'Chofer', tipo: 'dropDown', optionValue: 'id', optionLabel: 'nombre_completo', data: [], key: 'chofer.nombre_completo', dropdown_key: 'user_id', remplace: { with: 'text' } },
+      { id: 'camion', titulo: 'Camión', tipo: tableCellType.dropDown, optionValue: 'id', optionLabel: 'info_vehiculo', data: [], key: 'vehiculo.info_vehiculo', dropdown_key: 'vehiculo_id', remplace: { with: 'text' } },
+      { id: 'chofer', titulo: 'Chofer', tipo: tableCellType.dropDown, optionValue: 'id', optionLabel: 'nombre_completo', data: [], key: 'chofer.nombre_completo', dropdown_key: 'user_id', remplace: { with: 'text' } },
       {
         titulo: 'Acciones',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         key: 'actions',
         div_class: 'd-flex justify-content-around',
         estilos: [{ width: '7%' }],

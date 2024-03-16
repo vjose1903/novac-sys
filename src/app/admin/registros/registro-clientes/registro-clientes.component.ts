@@ -14,7 +14,7 @@ import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC, ClienteI } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado.utils';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
@@ -59,10 +59,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   table_config: table_config = {
     info: [
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-      { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
-      { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
-      { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
+      { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre' },
+      { titulo: 'Apellido', tipo: tableCellType.text, key: 'apellido' },
+      { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
+      { titulo: 'Doc. identidad', tipo: tableCellType.text, key: 'documento_identidad' },
     ],
     colores: true,
     padding: '0.5rem',

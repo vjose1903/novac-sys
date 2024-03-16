@@ -6,7 +6,7 @@ import { PdfService } from './../../../core/services/pdf/pdf.service';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { ModalService } from './../../components/modal/modal.service';
-import { table_config } from './../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
 import { Permisos } from './../../../core/typescript/permisos';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from './../../../core/typescript/MixinClass';
@@ -24,13 +24,13 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   table_config: table_config = {
     info: [
-      { titulo: 'No. conduce', estilos: [{ width: '11%' }], key: 'numero_conduce', tipo: 'text' },
-      { titulo: 'Fecha conduce', estilos: [{ width: '10%' }], key: 'fecha_equivalente', tipo: 'date' },
-      { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
-      { titulo: 'Cantidad de productos', key: 'cantidad_productos', tipo: 'text', estilos: [{ width: '10%' }, { 'text-align': 'center' }] },
+      { titulo: 'No. conduce', estilos: [{ width: '11%' }], key: 'numero_conduce', tipo: tableCellType.text },
+      { titulo: 'Fecha conduce', estilos: [{ width: '10%' }], key: 'fecha_equivalente', tipo: tableCellType.date },
+      { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: tableCellType.text, estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
+      { titulo: 'Cantidad de productos', key: 'cantidad_productos', tipo: tableCellType.text, estilos: [{ width: '10%' }, { 'text-align': 'center' }] },
       {
         titulo: 'Acciones',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         key: 'actions',
         estilos: [{ width: '9%' }, { color: '#000' }],
         iconsArray: [
@@ -44,7 +44,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_conduces',
     padre_functions: { data_request: (params) => this.getConduces(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
   };
 
   tablaComponent;

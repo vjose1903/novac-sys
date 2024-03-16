@@ -6,7 +6,7 @@ import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
-import { table_config, table_info } from '../../new_tablas/tabla-class';
+import { tableCellType, table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 @Component({
   selector: 'app-buscar-cliente-suplidor',
@@ -36,18 +36,18 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   tablaComponent: any;
 
   ventaInfo: Array<table_info> = [
-    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
-    { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
+    { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre' },
+    { titulo: 'Apellido', tipo: tableCellType.text, key: 'apellido' },
+    { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
+    { titulo: 'Doc. identidad', tipo: tableCellType.text, key: 'documento_identidad' },
+    { titulo: 'Direccion', tipo: tableCellType.text, key: 'direccion' },
   ];
 
   compraInfo: Array<table_info> = [
-    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
-    { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
+    { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre' },
+    { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
+    { titulo: 'Doc. identidad', tipo: tableCellType.text, key: 'documento_identidad' },
+    { titulo: 'Direccion', tipo: tableCellType.text, key: 'direccion' },
   ];
 
   btn_aceptar() {}

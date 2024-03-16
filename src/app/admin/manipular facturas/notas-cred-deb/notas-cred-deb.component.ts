@@ -13,7 +13,7 @@ import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { NotaC } from './notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../../components/modal/modal-class';
 import { responseModel } from '../../../core/typescript/crud-g';
@@ -54,22 +54,22 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   table_config: table_config = {
     info: [
-      { titulo: ' ', tipo: 'switch', select_all: true, key: 'select', estilos: [{ width: '3.5rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }, { 'padding-left': '0.5rem' }] },
-      { titulo: 'Cantidad', key: 'cantidad_', tipo: 'text', estilos: [{ width: '7rem' }] },
-      { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero' },
-      { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
+      { titulo: ' ', tipo: tableCellType.switch, select_all: true, key: 'select', estilos: [{ width: '3.5rem' }] },
+      { titulo: 'Articulo', tipo: tableCellType.text, key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }, { 'padding-left': '0.5rem' }] },
+      { titulo: 'Cantidad', key: 'cantidad_', tipo: tableCellType.text, estilos: [{ width: '7rem' }] },
+      { titulo: 'Descuento', key: 'descuento_valor', tipo: tableCellType.formatoNumero },
+      { titulo: 'Precio', key: 'precio', tipo: tableCellType.formatoNumero },
       {
         titulo: 'Precio real',
         key: 'precio_real',
-        tipo: 'input',
+        tipo: tableCellType.input,
         inputEvents: 'formatoNumero',
         inputType: 'text',
         textAlign: 'end',
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
         estilos: [{ width: '8rem' }],
       },
-      { titulo: 'Total nota', key: 'total_nota', tipo: 'input', textAlign: 'end', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
+      { titulo: 'Total nota', key: 'total_nota', tipo: tableCellType.input, textAlign: 'end', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
     ],
     id_tabla: 'notas',
     obj_paginate: { show: false },

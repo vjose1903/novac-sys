@@ -1,6 +1,6 @@
 import { TablasService } from './../../../components/new_tablas/tablas.service';
 import { Permisos } from './../../../../core/typescript/permisos';
-import { table_config } from './../../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../../components/new_tablas/tabla-class';
 import { TipoCuentaBancariaC, TipoCuentaBancariaI, tableTipoCuentaBancaria } from './tipo_cuenta_bancaria';
 import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
@@ -29,7 +29,7 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
   tipoCuentaSelected: TipoCuentaBancariaI;
 
   table_config: table_config = {
-    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text', style: { 'text-align': 'left', width: '55%' } }],
+    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text, style: { 'text-align': 'left', width: '55%' } }],
     colores: true,
     padding: '0.5rem',
     id_tabla: tableTipoCuentaBancaria,

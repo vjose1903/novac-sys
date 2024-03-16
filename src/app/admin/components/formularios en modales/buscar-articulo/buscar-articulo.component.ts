@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ArticuloC } from '../../../registros/articulos/articulo';
-import {  ModalComponentI, ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { table_config } from '../../new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../new_tablas/tabla-class';
 
 @Component({
   selector: 'app-buscar-articulo',
@@ -18,18 +18,18 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
   }
 
   dataFiltro;
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   table_config: table_config = {
     info: [
-      { titulo: 'Descripción', tipo: 'text', key: 'nombre' },
-      { titulo: 'Existencia', tipo: 'cantidades', key: 'cantidades' },
+      { titulo: 'Descripción', tipo: tableCellType.text, key: 'nombre' },
+      { titulo: 'Existencia', tipo: tableCellType.cantidades, key: 'cantidades' },
     ],
     focusRow: true,
     id_tabla: 'buscar_articulo',
     padre_functions: { data_request: (params) => this.buscarArticulos(params) },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
   };
 
   tablaComponent;

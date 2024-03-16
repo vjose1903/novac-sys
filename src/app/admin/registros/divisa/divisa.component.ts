@@ -4,7 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../..//core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
 import { TasaDeCambioComponent } from './tasa-de-cambio/tasa-de-cambio.component';
@@ -31,17 +31,17 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: '', tipo: 'tag', key: 'es_principal', tag_color: 'green', tooltip: 'Divisa Principal', tag_apretada: true, estilos: [{ width: '2rem' }] },
-      { titulo: 'Imagen', tipo: 'img', key: 'img_divisa', estilos: [{ 'padding-left': '0.5rem' }, { 'padding-right': '0.5rem' }, { width: '5rem' }] },
-      { titulo: 'Simbolo', tipo: 'text', key: 'simbolo', estilos: [{ width: '10%' }] },
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.3rem' }] },
-      { titulo: 'Tasa actual', tipo: 'text', key: 'tasa_actual', estilos: [{ 'text-align': 'center' }, { width: '8%' }] },
-      { titulo: 'Estado', tipo: 'tag', key: 'status', row_tag_color: 'status_tag_color', estilos: [{ 'text-align': 'center' }, { width: '10%' }] },
+      { titulo: '', tipo: tableCellType.tag, key: 'es_principal', tag_color: 'green', tooltip: 'Divisa Principal', tag_apretada: true, estilos: [{ width: '2rem' }] },
+      { titulo: 'Imagen', tipo: tableCellType.img, key: 'img_divisa', estilos: [{ 'padding-left': '0.5rem' }, { 'padding-right': '0.5rem' }, { width: '5rem' }] },
+      { titulo: 'Simbolo', tipo: tableCellType.text, key: 'simbolo', estilos: [{ width: '10%' }] },
+      { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.3rem' }] },
+      { titulo: 'Tasa actual', tipo: tableCellType.text, key: 'tasa_actual', estilos: [{ 'text-align': 'center' }, { width: '8%' }] },
+      { titulo: 'Estado', tipo: tableCellType.tag, key: 'status', row_tag_color: 'status_tag_color', estilos: [{ 'text-align': 'center' }, { width: '10%' }] },
       {
         key: 'actions',
         titulo: 'Acciones',
         column_gap: '0.8rem',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         estilos: [{ 'text-align': 'center' }, { width: '7rem' }],
         iconsArray: [
           { key: 'edit_divisa', rowTooltip: 'edit_divisa_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'estado', value: [false] }] },

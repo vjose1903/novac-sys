@@ -14,7 +14,7 @@
           <tr id="titulosHeader-{{ realIdTabla }}" class="titulosHeader">
             <th *ngFor="let row of config.info; let index_head = index" class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="getTitleStyles(row.key)">
               <span [ngSwitch]="row?.tipo">
-                <span *ngSwitchCase="'inputSwitch'">
+                <span *ngSwitchCase="tableCellType.inputSwitch">
                   <ng-container *ngIf="!row?.select_all"> {{ row?.titulo }} </ng-container>
 
                   <input
@@ -79,15 +79,15 @@
                     <span class="titulo_sm"> {{ column?.titulo_sm }} </span>
 
                     <span [ngSwitch]="column.tipo" [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
-                      <span *ngSwitchCase="'index'" class="d-flex justify-content-center align-items-center">
+                      <span *ngSwitchCase="tableCellType.index" class="d-flex justify-content-center align-items-center">
                         <span class="text-bold-700">{{ (tServ.getPaginationById(realIdTabla).page - 1) * tServ.getPaginationById(realIdTabla).per_page + (getIndex(indexBody) + 1) }}</span>
                       </span>
 
-                      <span *ngSwitchCase="'cantidades'" id="{{ column.key }}-{{ getIndex(indexBody) }}" pTooltip="{{ cantidadesTooltip(rowData, column) }}" [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'" style="width: 100%">
+                      <span *ngSwitchCase="tableCellType.cantidades" id="{{ column.key }}-{{ getIndex(indexBody) }}" pTooltip="{{ cantidadesTooltip(rowData, column) }}" [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'" style="width: 100%">
                         {{ cantidadesLabel(rowData, column) }}
                       </span>
 
-                      <span *ngSwitchCase="'img'" class="d-flex justify-content-center align-items-center">
+                      <span *ngSwitchCase="tableCellType.img" class="d-flex justify-content-center align-items-center">
                         <img-component
                           [alt]="column.alt ? column.alt : rowData[column.rowAlt] ? rowData[column.rowAlt] : ''"
                           [imagenSrc]="getValueForm(column, rowData)"
@@ -95,7 +95,7 @@
                         ></img-component>
                       </span>
 
-                      <span *ngSwitchCase="'icon'">
+                      <span *ngSwitchCase="tableCellType.icon">
                         <icons-array
                           [column]="column"
                           [indexBody]="getIndex(indexBody)"
@@ -108,17 +108,17 @@
                         ></icons-array>
                       </span>
 
-                      <div *ngSwitchCase="'tag'" (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
+                      <div *ngSwitchCase="tableCellType.tag" (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
                         <ng-container *ngIf="fun.hasValue(getValueForm(column, rowData))">
                           <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: rowData, column: column }"></ng-container>
                         </ng-container>
                       </div>
 
-                      <span *ngSwitchCase="'color'" class="d-flex justify-content-center align-items-center">
+                      <span *ngSwitchCase="tableCellType.color" class="d-flex justify-content-center align-items-center">
                         <div class="show_color" [ngStyle]="getColor(getValueForm(column, rowData))"></div>
                       </span>
 
-                      <span *ngSwitchCase="'switch'" class="d-flex justify-content-center align-items-center">
+                      <span *ngSwitchCase="tableCellType.switch" class="d-flex justify-content-center align-items-center">
                         <span *ngIf="column.remplace && seleccionado != rowData?.id" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
                           <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
                         </span>
@@ -128,7 +128,7 @@
                         </div>
                       </span>
 
-                      <span *ngSwitchCase="'dropDown'">
+                      <span *ngSwitchCase="tableCellType.dropDown">
                         <span *ngIf="column.remplace && seleccionado != rowData?.id && !rowData?.is_editing" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
                           <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
                         </span>
@@ -156,7 +156,7 @@
                         </div>
                       </span>
 
-                      <span *ngSwitchCase="'input'">
+                      <span *ngSwitchCase="tableCellType.input">
                         <span *ngIf="column.remplace && seleccionado != rowData?.id && !rowData?.is_editing" class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
                           <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
                         </span>
@@ -241,11 +241,11 @@
 <!-- Reemplazador de inputs -->
 <ng-template #remplaceTemplate let-dato="dato" let-column="column" let-index="index">
   <ng-container [ngSwitch]="column?.remplace?.with">
-    <ng-container *ngSwitchCase="'text'">
+    <ng-container *ngSwitchCase="tableCellType.text">
       {{ getValueForm(column, dato) }}
     </ng-container>
 
-    <ng-container *ngSwitchCase="'tag'">
+    <ng-container *ngSwitchCase="tableCellType.tag">
       <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: dato, column: column }"></ng-container>
     </ng-container>
   </ng-container>

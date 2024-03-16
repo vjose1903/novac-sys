@@ -8,7 +8,7 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { Permisos } from '../../../core/typescript/permisos';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { CategoriaEntidadContableC, CategoriaEntidadContableI, entidadesContables } from './categoria-entidad-contable.utils';
-import { paginateI, table_config } from '../../components/new_tablas/tabla-class';
+import { paginateI, tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import * as _ from 'lodash';
 import { CategoriaEntidadContableService } from './categoria-entidad-contable.service';
 
@@ -31,7 +31,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
   selectedConfig: ConfiguracionEntidadCuentaI;
 
   table_config: table_config = {
-    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text', estilos: [{ 'text-align': 'left' }, { width: '80%' }] }],
+    info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text, estilos: [{ 'text-align': 'left' }, { width: '80%' }] }],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_categorias',

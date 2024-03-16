@@ -1,13 +1,11 @@
-import { ModalClass } from './../modal/modal-class';
-import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
-
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
 import * as _ from 'lodash';
-import { ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
 import { medidas, rowDataDividerKey, table_config, table_info } from './tabla-class';
 import { teclasCode } from '../../../core/typescript/constantes';
+import { tableCellType } from './tabla-class';
 
 @Component({
   selector: 'dinamic-table',
@@ -31,7 +29,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   row_id;
   actualRowIndex = 0;
   copyData: any;
-
+  tableCellType = tableCellType;
   seleccionado_id: any;
   altoTabla;
   altoTbody;

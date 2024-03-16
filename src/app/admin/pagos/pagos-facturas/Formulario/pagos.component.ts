@@ -13,7 +13,7 @@ import { PdfService } from '../../../../core/services/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { fun } from '../../../../core/services/functions.service';
-import { table_config } from '../../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PagosService } from '../pagos.service';
@@ -41,7 +41,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     info: [
       {
         titulo: '1',
-        tipo: 'icon',
+        tipo: tableCellType.icon,
         key: 'actions',
         div_class: 'd-flex justify-content-around',
         estilos: [{ width: '6%' }, { color: 'var(--transparente00)' }],
@@ -51,31 +51,16 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
           { key: 'pedido', rowTooltip: 'tooltip_pedido', text_color: 'colorPedido', showCondition: [{ kind: 'campo', target: 'is_viaje', value: [true] }] },
         ],
       },
-
-      { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
-      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente' },
-      { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
-      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
-      { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
-
-      {
-        titulo: 'Seleccione',
-        tipo: 'switch',
-        key: 'select',
-        select_all: false,
-        estilos: [{ width: '7rem', padding: '0.6rem 0rem' }],
-      },
-      {
-        titulo: 'Pago Total',
-        tipo: 'switch',
-        key: 'pagoT',
-        select_all: false,
-        estilos: [{ width: '6rem', padding: '0.6rem 0rem' }],
-        disable: [{ kind: 'campo', target: 'select', value: [false] }],
-      },
+      { titulo: 'NCF', tipo: tableCellType.text, estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
+      { titulo: 'Fecha Facturacion', tipo: tableCellType.date, key: 'fecha_equivalente' },
+      { titulo: 'Fecha Vencimiento', tipo: tableCellType.text, text_color: 'colorFecha', key: 'fechaV' },
+      { titulo: 'Total facturado', tipo: tableCellType.formatoNumero, key: 'total_factura' },
+      { titulo: 'Balance factura', tipo: tableCellType.formatoNumero, key: 'balance' },
+      { titulo: 'Seleccione', tipo: tableCellType.switch, key: 'select', select_all: false, estilos: [{ width: '7rem', padding: '0.6rem 0rem' }] },
+      { titulo: 'Pago Total', tipo: tableCellType.switch, key: 'pagoT', select_all: false, estilos: [{ width: '6rem', padding: '0.6rem 0rem' }], disable: [{ kind: 'campo', target: 'select', value: [false] }] },
       {
         titulo: 'Monto a pagar',
-        tipo: 'input',
+        tipo: tableCellType.input,
         key: 'monto',
         can_reset: false,
         inputEvents: 'formatoNumero',

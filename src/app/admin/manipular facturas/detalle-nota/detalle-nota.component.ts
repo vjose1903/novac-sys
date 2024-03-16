@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { fun } from '../../../core/services/functions.service';
 import { ModalComponentI, ModalI } from '../../components/modal/modal-class';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 @Component({
   selector: 'app-detalle-nota',
   templateUrl: './detalle-nota.component.html',
@@ -13,7 +13,7 @@ export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
     super();
   }
 
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
   tabIndex = 0;
 
@@ -21,9 +21,9 @@ export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '50%' }, { 'padding-left': '1rem' }] },
-      { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', estilos: [{ width: '25%' }] },
-      { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '25%' }] },
+      { titulo: 'Articulo', tipo: tableCellType.text, key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '50%' }, { 'padding-left': '1rem' }] },
+      { titulo: 'Cantidad', key: 'cantidad', tipo: tableCellType.formatoNumero, estilos: [{ width: '25%' }] },
+      { titulo: 'Unidad', key: 'unidad', tipo: tableCellType.text, estilos: [{ width: '25%' }] },
     ],
     id_tabla: 'detalles_notas',
     obj_paginate: { show: false },

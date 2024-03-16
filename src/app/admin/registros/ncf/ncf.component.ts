@@ -8,7 +8,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
@@ -52,13 +52,13 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '5rem' }] },
-      { titulo: 'Tipo', tipo: 'text', key: 'tipoC', estilos: [{ width: '3rem' }] },
-      { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
-      { titulo: 'Desde', tipo: 'text', key: 'desde' },
-      { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
-      { titulo: 'Usado', tipo: 'icon', key: 'usado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
-      { titulo: 'Activo', tipo: 'icon', key: 'estado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
+      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', estilos: [{ width: '5rem' }] },
+      { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipoC', estilos: [{ width: '3rem' }] },
+      { titulo: 'Secuencia', tipo: tableCellType.text, key: 'secuencia_' },
+      { titulo: 'Desde', tipo: tableCellType.text, key: 'desde' },
+      { titulo: 'Hasta', tipo: tableCellType.text, key: 'hasta' },
+      { titulo: 'Usado', tipo: tableCellType.icon, key: 'usado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
+      { titulo: 'Activo', tipo: tableCellType.icon, key: 'estado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
     ],
     colores: true,
     padding: '0.5rem',

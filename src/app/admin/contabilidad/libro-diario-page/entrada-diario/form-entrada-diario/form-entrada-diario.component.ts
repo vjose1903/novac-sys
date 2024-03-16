@@ -1,5 +1,5 @@
 import { ModalClass } from './../../../../components/modal/modal-class';
-import { rowDataDividerKey, table_config } from './../../../../components/new_tablas/tabla-class';
+import { rowDataDividerKey, tableCellType, table_config } from './../../../../components/new_tablas/tabla-class';
 import { Permisos } from './../../../../../core/typescript/permisos';
 import { MixinClass } from './../../../../../core/typescript/MixinClass';
 import { fun } from './../../../../../core/services/functions.service';
@@ -24,9 +24,9 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit, On
 
   table_diurnal_entry: table_config = {
     info: [
-      { titulo: 'Cuenta auxiliar', key: 'cuenta_auxiliar_info', tipo: 'text', puntosSuspensivos: true, style: { width: '50%', 'text-align': 'left', 'padding-left': '0.3rem' } },
-      { titulo: 'Débito', key: 'valor_debito', tipo: 'formatoNumero', tachado: true, style: { width: '17%', 'text-align': 'right' } },
-      { titulo: 'Crédito', key: 'valor_credito', tipo: 'formatoNumero', tachado: true, style: { width: '17%', 'text-align': 'right' } },
+      { titulo: 'Cuenta auxiliar', key: 'cuenta_auxiliar_info', tipo: tableCellType.text, puntosSuspensivos: true, style: { width: '50%', 'text-align': 'left', 'padding-left': '0.3rem' } },
+      { titulo: 'Débito', key: 'valor_debito', tipo: tableCellType.formatoNumero, tachado: true, style: { width: '17%', 'text-align': 'right' } },
+      { titulo: 'Crédito', key: 'valor_credito', tipo: tableCellType.formatoNumero, tachado: true, style: { width: '17%', 'text-align': 'right' } },
     ],
     id_tabla: 'diurnalEntry',
     table_size: 'sm',
