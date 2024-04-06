@@ -1,17 +1,19 @@
 import { ImagenService } from './../../../core/services/imagen.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
-import { table_config } from './../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Permisos } from '../../../core/typescript/permisos';
-import { DepositoC, DepositoI, depositoFormAttr, depositoFormFieldId } from './deposito.utils';
+import { DepositoC, DepositoI, depositoFormAttr, depositoFormFieldId, depositoTableId } from './deposito.utils';
 import { fun } from '../../../core/services/functions.service';
+import { DateUtils } from '../../../core/typescript/date.utils';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { CuentaBancariaC, CuentaBancariaI } from '../../registros/banco/cuenta-bancaria-form/cuenta_bancaria';
 import { requestParameters } from '../../../core/typescript/crud-g';
 import { PeriodoFiscalC } from '../../registros/periodo-fiscal/periodo-fiscal';
 import { dropdownFilterFocusInput } from '../../../core/typescript/p-dropdown.utils';
 import { DivisaService } from '../../registros/divisa/divisa.service';
+import * as moment from '../../../core/javascript/moment';
 
 @Component({
   selector: 'app-deposito',
@@ -21,8 +23,9 @@ import { DivisaService } from '../../registros/divisa/divisa.service';
 export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
   formGroup: UntypedFormGroup;
   formInitValue: DepositoI;
-  botonLabel: string = 'Guardar';
-  isCreando: boolean = false;
+  botonLabel: string;
+  isCreando: boolean;
+  minDate: Date;
   maxDate: Date;
   permissions = Permisos;
   formPermissions = [Permisos.deposito.create, Permisos.deposito.update];
@@ -42,28 +45,26 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: '', tipo: 'tag', key: 'es_principal', tag_color: 'green', tooltip: 'Divisa Principal', tag_apretada: true, estilos: [{ width: '2rem' }] },
-      { titulo: 'Imagen', tipo: 'img', key: 'img_divisa', estilos: [{ 'padding-left': '0.5rem' }, { 'padding-right': '0.5rem' }, { width: '5rem' }] },
-      { titulo: 'Simbolo', tipo: 'text', key: 'simbolo', estilos: [{ width: '10%' }] },
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.3rem' }] },
-      { titulo: 'Tasa actual', tipo: 'text', key: 'tasa_actual', estilos: [{ 'text-align': 'center' }, { width: '8%' }] },
-      { titulo: 'Estado', tipo: 'tag', key: 'status', row_tag_color: 'status_tag_color', estilos: [{ 'text-align': 'center' }, { width: '10%' }] },
+      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { 'text-align': 'left', width: '10%' } },
+      { titulo: 'Banco', tipo: tableCellType.text, key: 'cuenta_bancaria.banco.nombre', style: { 'text-align': 'left', 'padding-left': '0.3rem' } },
+      { titulo: 'No. de cuenta', tipo: tableCellType.text, key: 'cuenta_bancaria.numero_cuenta', style: { 'text-align': 'left' } },
+      { titulo: 'Comentario', tipo: tableCellType.text, key: 'comentario', puntosSuspensivos: true, style: { 'text-align': 'left', width: '40%' } },
+      { titulo: 'Monto', tipo: tableCellType.formatoNumero, key: 'monto', style: { 'text-align': 'right', width: '10%' } },
       {
         key: 'actions',
         titulo: 'Acciones',
         column_gap: '0.8rem',
-        tipo: 'icon',
-        estilos: [{ 'text-align': 'center' }, { width: '7rem' }],
+        tipo: tableCellType.icon,
+        style: { 'text-align': 'center', width: '8rem' },
         iconsArray: [
-          { key: 'edit_divisa', rowTooltip: 'edit_divisa_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'estado', value: [false] }] },
-          { key: 'currency_change', rowTooltip: 'currency_change_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'estado', value: [false] }] },
-          { key: 'deactivate_reactivate_divisa', rowTooltip: 'deactivate_reactivate_divisa_tooltip', text_color: 'colorNegro' },
+          { key: 'edit_deposito', tooltip: 'Editar', text_color: 'colorNegro' },
+          { key: 'anular_deposito', tooltip: 'Anular', text_color: 'colorNegro' },
         ],
       },
     ],
     colores: true,
     padding: '0.5rem',
-    id_tabla: 'lista_divisa',
+    id_tabla: depositoTableId,
     obj_paginate: { show: true, showTotal: true, showPaginator: false },
   };
   tablaComponent;
@@ -97,7 +98,10 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   initVariables() {
+    this.botonLabel = 'Guardar';
+    this.isCreando = false;
     this.maxDate = new Date();
+    this.minDate = undefined;
   }
 
   getDepositos(params?: { per_page?: number; page?: number; search?: string }) {
@@ -107,9 +111,21 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     this.depositoList.length = 0;
 
     this.depositoClass.getAll(extra).then((res) => {
-      this.depositoList = res.data.map((banco) => {
-        // banco = this.parseBanco(banco);
-        return banco;
+      this.depositoList = res.data.map((deposito: DepositoI) => {
+        deposito[depositoFormAttr.cuenta_bancaria_id] = deposito.cuenta_bancaria.id;
+        deposito[depositoFormAttr.divisa_id] = deposito.divisa.id;
+
+        deposito.edit_deposito = 'fas fa-pencil-alt';
+        deposito.anular_deposito = 'fa-solid fa-ban';
+
+        deposito.customStyles = {
+          actions: [
+            { key: 'actions', isTd: true, estilos: 'width: 8rem !important;' },
+            { key: 'edit_deposito', estilos: 'font-size: 1.2rem !important' },
+            { key: 'anular_deposito', estilos: 'font-size: 1.2rem !important' },
+          ],
+        };
+        return deposito;
       });
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
@@ -117,7 +133,6 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
   createForm() {
     const divisa_principal = this.divisaServ.getDivisaPrincipalInfo();
-    console.log('divisa_principal ', divisa_principal);
 
     this.formGroup = this.fb.group({
       [depositoFormAttr.id]: [null],
@@ -206,7 +221,7 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
         if (!response.data.isOpen) {
           const fechaMostrar = fun.my_dateFormater(formulario.fecha_equivalente);
           const numMonth = formulario.fecha_equivalente.getMonth() + 1;
-          const monthLabel = PeriodoFiscalC.getMonthLabelByNum(numMonth);
+          const monthLabel = DateUtils.getMonthLabelByNum(numMonth);
 
           fun.toastError(`Para registrar un deposito en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
         }
@@ -229,7 +244,8 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
-      if (params.iconKey == 'edit_divisa') this.editarItem(params.data);
+      if (params.iconKey == 'edit_deposito') this.editarItem(params.data);
+      if (params.iconKey == 'anular_deposito') this.editarItem(params.data);
     }
   }
 
@@ -240,10 +256,37 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
       this.botonLabel = 'Editar';
       this.enableDisableFields('enable');
       this.depositoSelected = fun.deepCloning(deposito);
-      this.formGroup.patchValue(deposito);
+      this.depositoSelected.fecha_equivalente = this.depositoSelected.fecha_equivalente ? new Date(this.depositoSelected.fecha_equivalente) : null;
+      this.depositoSelected.monto = this.depositoSelected.monto ? fun.roundNumberToDecimal(this.depositoSelected.monto) : null;
+
+      this.formGroup.patchValue(this.depositoSelected);
 
       this.formInitValue = this.formGroup.getRawValue();
+      this.verificateFieldsState();
+      this.encapsulateMonth();
+      console.log('this.formInitValue ', this.formInitValue);
     }, 1);
+  }
+
+  encapsulateMonth() {
+    if (fun.isEmpty(this.formGroup)) return;
+
+    const formulario = this.formGroup.getRawValue();
+    const currentDate = formulario[depositoFormAttr.fecha_equivalente];
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+
+    this.minDate = DateUtils.getFirstDayOfMonth({ year: year, month: month });
+    this.maxDate = month == DateUtils.getActualMonth() ? this.maxDate : DateUtils.getLastDayOfMonth({ year: year, month: month });
+  }
+
+  verificateFieldsState() {
+    if (fun.isEmpty(this.formGroup)) return;
+
+    const formulario = this.formGroup.getRawValue();
+    const funct = fun.hasValue(formulario?.[depositoFormAttr.id]) ? 'disable' : 'enable';
+    const fields = [depositoFormAttr.cuenta_bancaria_id, depositoFormAttr.divisa_id];
+    fields.forEach((field) => this.formGroup.controls[field][funct]());
   }
 
   enableDisableFields(func: 'enable' | 'disable') {
@@ -255,7 +298,7 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     if (fun.hasValue(this.formGroup)) this.formGroup.reset();
     this.depositoSelected = undefined;
     this.enableDisableFields('disable');
-    this.botonLabel = 'Guardar';
+    this.initVariables();
     this.isCreando = true;
   }
 
@@ -263,11 +306,13 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     const formulario = this.formGroup.getRawValue();
     const dataToSend = fun.deepCloning(formulario);
     dataToSend.fecha_equivalente = fun.my_dateFormater(formulario.fecha_equivalente, false);
+    dataToSend.monto = fun.desformatearStNumber(formulario.monto);
     console.log('dataToSend ', dataToSend);
 
-    // this.depositoClass.createUpdateOne(formValue).then((res) => {
-    //   this.getDepositos();
-    //   this.borrar();
-    // });
+    this.depositoClass.createUpdateOne(dataToSend).then((res) => {
+      const actualPagination = this.tServ.getPaginationById(depositoTableId);
+      this.getDepositos(actualPagination);
+      this.borrar();
+    });
   }
 }

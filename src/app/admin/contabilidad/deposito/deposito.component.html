@@ -19,6 +19,7 @@
                     <label class="control-label" requiredFieldLabel>Fecha de registro: </label>
                     <p-calendar
                       [inputId]="depositoFormFieldId.fecha_equivalente"
+                      [minDate]="minDate"
                       [maxDate]="maxDate"
                       inputStyleClass="form-control"
                       [formControlName]="depositoFormAttr.fecha_equivalente"
@@ -62,7 +63,7 @@
                     >
                       <ng-template let-cuenta_bancaria pTemplate="item">
                         <div class="cuenta_bancaria-item">
-                          <span class="d-block" style="font-size: 1rem"> <strong>Np. Cuenta: </strong> {{ cuenta_bancaria.numero_cuenta }} </span>
+                          <span class="d-block" style="font-size: 1rem"> <strong>No. Cuenta: </strong> {{ cuenta_bancaria.numero_cuenta }} </span>
                           <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>Banco: </strong> {{ cuenta_bancaria.banco_name }} </span>
                         </div>
                       </ng-template>
@@ -166,7 +167,7 @@
       <div class="list {{ isCreando || depositoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado de depositos</h4>
-          <button *ngxPermissionsOnly="permissions.deposito.create||permissions.deposito.update" [disabled]="depositoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <button *ngxPermissionsOnly="permissions.deposito.create || permissions.deposito.update" [disabled]="depositoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">

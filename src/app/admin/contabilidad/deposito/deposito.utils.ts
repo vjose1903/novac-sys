@@ -5,7 +5,7 @@ export class DepositoC extends CrudG<any> {
     super('depositos');
   }
 }
-
+export const depositoTableId = 'lista_depositos';
 export interface DepositoI {
   id: number;
   [nombrePropiedad: string]: any;
@@ -22,7 +22,6 @@ export enum depositoFormAttr {
 }
 
 export enum depositoFormFieldId {
-  
   cuenta_bancaria_id = 'cuenta_bancaria_dropdown',
   divisa_id = 'divisa_dropdown',
   monto = 'monto_input',
@@ -31,5 +30,3 @@ export enum depositoFormFieldId {
   fecha_equivalente = 'fecha_equivalente_input',
   send = 'send',
 }
-
-

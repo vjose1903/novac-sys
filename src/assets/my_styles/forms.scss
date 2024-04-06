@@ -79,10 +79,13 @@
     opacity: 1 !important;
 
     .p-dropdown-label {
-      color: #6c757d !important;
-
+      color: #acb9c5d4 !important;
+      
       @include noPrimengFocus;
     }
+  }
+  .p-dropdown-label {
+    font-weight: 500 !important;
   }
 }
 
