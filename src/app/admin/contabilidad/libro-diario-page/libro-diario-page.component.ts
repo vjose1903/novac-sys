@@ -1,3 +1,4 @@
+import { DateUtils } from '../../../core/typescript/date.utils';
 import { EntradaDiarioComponent } from './entrada-diario/entrada-diario.component';
 import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -128,15 +129,15 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
           page: params.page,
           per_page: params.per_page,
           paginado: true,
-          desde: fun.my_dateFormater(this.desde, false),
-          hasta: fun.my_dateFormater(this.hasta, false),
+          desde: DateUtils.format({ date: this.desde, dateFormat: 'YYYY-MM-DD' }),
+          hasta: DateUtils.format({ date: this.hasta, dateFormat: 'YYYY-MM-DD' }),
           is_validated: this.validationFilterValue,
         },
       };
 
       this.asientoContableClass.getAll(extra).then((res) => {
         res.data.map((asiento: CabezaAsietoContableI) => {
-          asiento.title = `${fun.my_dateFormater(asiento.fecha_equivalente)} - ${asiento.comentario}`;
+          asiento.title = `${DateUtils.format({ date: asiento.fecha_equivalente })} - ${asiento.comentario}`;
 
           asiento.detalles_asientos_contables_front = this.makeFrontDetalles(asiento.detalles_asientos_contables);
 
@@ -199,9 +200,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
 
   initDateVars() {
     let actual_date = new Date();
-    actual_date.setDate(actual_date.getDate() - 1);
-
-    const desde = new Date(fun.getFirstDayOfMoth(actual_date));
+    const desde = DateUtils.getFirstDayOfMonth({ month: actual_date.getMonth() + 1, year: actual_date.getFullYear() });
 
     this.desde = desde;
     this.hasta = actual_date;

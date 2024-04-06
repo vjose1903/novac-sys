@@ -5,12 +5,12 @@ import { ModalHistorialPagosComponent } from './../components/formularios en mod
 import { CrudG } from '../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import { fun } from '../../core/services/functions.service';
-import * as moment from '../../core/javascript/moment';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { DateUtils } from '../../core/typescript/date.utils';
 
 export enum deleteDocumentosTypes {
   anular = 'anular',
@@ -116,8 +116,8 @@ export class FacturaC extends CrudG<FacturasI> {
       requestParams.parameters['tipo_factura_id'] = params.reporte.data.tipo_factura_id;
       requestParams.parameters['tipo'] = params.reporte.data.tipo;
       requestParams.parameters['condicion'] = params.reporte.data.condicion;
-      requestParams.parameters['desde'] = fun.my_dateFormater(params.reporte.data.desde, false);
-      requestParams.parameters['hasta'] = fun.my_dateFormater(params.reporte.data.hasta, false);
+      requestParams.parameters['desde'] = DateUtils.format({ date: params.reporte.data.desde, dateFormat: 'YYYY-MM-DD' });
+      requestParams.parameters['hasta'] = DateUtils.format({ date: params.reporte.data.hasta, dateFormat: 'YYYY-MM-DD' });
 
       for (let index = 0; index < FacturaC.inputsMovimientosViaje.length; index++) {
         const item = FacturaC.inputsMovimientosViaje[index];
@@ -194,7 +194,8 @@ export class FacturaC extends CrudG<FacturasI> {
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
 
-      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format();
+      data_parsed.fecha_equivalente = DateUtils.format({ date: data_parsed.fecha_equivalente, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm:ss', separator: 'T' });
+
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
       if (data_parsed.tipo_pdf == 'COTIZACION') data_parsed.tipo_pdf = 'COTIZACIÓN';
       data_parsed.total = data_parsed.total_factura;
@@ -259,19 +260,19 @@ export class FacturaC extends CrudG<FacturasI> {
     if (recibos.length > 0 || notas.length > 0 || pagos.length > 0) {
       recibos.map((recibo) => {
         recibo.numero_recibo = _.padStart(recibo.numero_recibo, 8, '0');
-        recibo.fecha_equivalente = moment(recibo.fecha_equivalente).format('DD/MM/YYYY');
+        recibo.fecha_equivalente = DateUtils.format({ date: recibo.fecha_equivalente });
         return recibo;
       });
 
       notas.map((nota) => {
         nota.total = Math.abs(nota.total);
-        nota.fecha_equivalente = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
+        nota.fecha_equivalente = DateUtils.format({ date: nota.fecha_equivalente });
         return nota;
       });
 
       pagos.map((pago) => {
         pago.numero = _.padStart(pago.numero, 8, '0');
-        pago.fecha_equivalente = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
+        pago.fecha_equivalente = DateUtils.format({ date: pago.fecha_equivalente });
         return pago;
       });
 

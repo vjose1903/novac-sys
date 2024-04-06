@@ -17,6 +17,7 @@ import { tableCellType, table_config } from '../../components/new_tablas/tabla-c
 import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../../components/modal/modal-class';
 import { responseModel } from '../../../core/typescript/crud-g';
+import { DateUtils } from '../../../core/typescript/date.utils';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -89,7 +90,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.idsFacturas = this.activeRoute.snapshot.params['ids'];
 
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
-    this.fecha = moment().format('DD/MM/YYYY');
+    this.fecha = DateUtils.format({ dateFormat: 'DD/MM/YYYY' });
+    console.log('this.fecha ', this.fecha);
 
     if (this.tipoNota === 'credito') {
       this.tituloPag = 'Nota de crédito aplicada a factura ';

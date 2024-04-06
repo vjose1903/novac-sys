@@ -1,5 +1,5 @@
+import { DateUtils } from './../../../../core/typescript/date.utils';
 import { fun } from './../../../../core/services/functions.service';
-import { PeriodoFiscalC } from './../periodo-fiscal';
 import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
 
@@ -9,10 +9,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./cierre-mensual.component.scss'],
 })
 export class CierreMensualComponent implements OnInit, ModalI {
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
-  meses = Object.values(PeriodoFiscalC.labels);
+  meses = DateUtils.getMonthsLabelArray();
   overlay: any;
 
   ngOnInit(): void {}

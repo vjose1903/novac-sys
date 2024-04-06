@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, UntypedFormArray, UntypedFormGroup, Validators } from '@angular/forms';
 import { AsientoContableC, CabezaAsietoContableI, DetalleAsientoContableI, tipoAsiento } from '../asiento-contable';
 import { diurnalFormBtnAceptarId, diurnalFormId } from '../libro-diario-page.utils';
+import { DateUtils } from './../../../../core/typescript/date.utils';
 
 @Component({
   selector: 'app-entrada-diario',
@@ -104,7 +105,7 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
     const formulario = this.formGroup.getRawValue();
 
     if (fun.hasValue(formulario.fecha_equivalente)) {
-      const fecha_equivalente = fun.my_dateFormater(formulario.fecha_equivalente, false);
+      const fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
 
       const extra: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
       this.peridoClass.getAll(extra).then((response) => {
@@ -114,9 +115,10 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
         this.formGroup.controls.comentario[stateFunction]();
 
         if (!this.isOpenMonth) {
-          const fechaMostrar = fun.my_dateFormater(formulario.fecha_equivalente);
+          const fechaMostrar = DateUtils.format({ date: formulario.fecha_equivalente });
+          this.formGroup.controls.fecha_equivalente.setValue(null, { emitEvent: false });
           const numMonth = formulario.fecha_equivalente.getMonth() + 1;
-          const monthLabel = PeriodoFiscalC.getMonthLabelByNum(numMonth);
+          const monthLabel = DateUtils.getMonthLabelByNum(numMonth);
 
           fun.toastError(`Para registrar una entrada de libro diario en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
         }
@@ -134,7 +136,7 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
   btn_aceptar() {
     const formulario = this.formGroup.getRawValue();
     const dataToSend = fun.deepCloning(formulario);
-    dataToSend.fecha_equivalente = fun.my_dateFormater(formulario.fecha_equivalente, false);
+    dataToSend.fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
 
     this.asientoContableClass
       .createUpdateOne(dataToSend)

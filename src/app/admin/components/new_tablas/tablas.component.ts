@@ -1,3 +1,4 @@
+import { DateUtils } from '../../../core/typescript/date.utils';
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
@@ -166,7 +167,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }
 
       case 'date':
-        const fecha = fun.date_formater({ date: fun.getProperty(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
+        const fecha = DateUtils.format({ date: fun.getProperty(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', include_hour: column.include_hour });
         return fecha;
 
       default:

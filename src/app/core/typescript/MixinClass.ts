@@ -2,6 +2,7 @@ import * as moment from '../javascript/moment';
 import { ModalClass } from '../../admin/components/modal/modal-class';
 import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
+import { DateUtils } from './date.utils';
 
 interface mixinInit {
   component?: String;
@@ -33,17 +34,10 @@ export class MixinClass extends ModalClass {
 
   // =========================================================================================================
   formarFechaFactura(date): fechaFactura {
-    const hora = moment(date).hour();
-    const minutos = moment(date).minutes();
-    const fechaTemp = moment(date).format('YYYY-MM-DD');
     const obj = {};
-    obj['FechaFactura'] = fechaTemp + ' ' + (hora <= 9 ? '0' + hora : hora) + ':' + (minutos <= 9 ? '0' + minutos : minutos);
-    obj['FechaFacturaMostrar'] = fun.my_dateFormater(obj['FechaFactura']) + ' - ' + fun.my_houreFormater(obj['FechaFactura']);
+    obj['FechaFactura'] = DateUtils.format({ date: date, dateFormat: 'YYYY-MM-DD', separator: ' ', include_hour: true, hourFormat: 'hh:mm' });
+    obj['FechaFacturaMostrar'] = DateUtils.format({ date: date, include_hour: true });
     return obj;
-  }
-  // =========================================================================================================
-  my_timeDateFormater(str) {
-    return `${fun.my_dateFormater(str)} - ${this.my_houreFormater(str)}`;
   }
 
   // =========================================================================================================

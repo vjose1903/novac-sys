@@ -5,6 +5,7 @@ import { DetalleFacturaComponent } from '../../../manipular facturas/detalle-fac
 import { ReporteC } from '../../../reportes/reporte';
 import * as _ from 'lodash';
 import { PagoDetalleI } from './pagos-detalles';
+import { DateUtils } from '../../../../core/typescript/date.utils';
 
 export interface PagoI {
   id?: number;
@@ -63,8 +64,8 @@ export class PagoC extends CrudG<PagoI> {
 
     requestParameters = {};
 
-    requestParameters['desde'] = fun.my_dateFormater(reporteParams.data.desde, false);
-    requestParameters['hasta'] = fun.my_dateFormater(reporteParams.data.hasta, false);
+    requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+    requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
     requestParameters['order'] = 'ASC';
     requestParameters['tipo'] = reporteParams.data.tipo;
 

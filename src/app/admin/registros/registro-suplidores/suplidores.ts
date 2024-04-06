@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
 import { IModalConfiguration, ModalClass } from '../../components/modal/modal-class';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { DateUtils } from '../../../core/typescript/date.utils';
 
 export class SuplidorC extends CrudG<any> {
   constructor() {
@@ -57,7 +58,11 @@ export class SuplidorC extends CrudG<any> {
         break;
 
       case 'suplidor_prod':
-        requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), articulo_id: reporteParams.data.articulo_id };
+        requestParameters = {
+          desde: DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' }),
+          hasta: DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' }),
+          articulo_id: reporteParams.data.articulo_id,
+        };
         break;
 
       default:

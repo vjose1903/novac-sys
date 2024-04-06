@@ -1,3 +1,4 @@
+import { DateUtils } from '../../../../core/typescript/date.utils';
 import { fun } from '../../../../core/services/functions.service';
 import { CrudG } from '../../../../core/typescript/crud-g';
 import { ModalClass } from '../../../components/modal/modal-class';
@@ -66,8 +67,8 @@ export class ReciboC extends CrudG<ReciboI> {
 
     requestParameters = {};
 
-    requestParameters['desde'] = fun.my_dateFormater(reporteParams.data.desde, false);
-    requestParameters['hasta'] = fun.my_dateFormater(reporteParams.data.hasta, false);
+    requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+    requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
     requestParameters['order'] = 'ASC';
     requestParameters['tipo'] = reporteParams.data.tipo;
 

@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
 import { SubTipoArticuloI } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
+import { DateUtils } from '../../../core/typescript/date.utils';
 
 export interface ArticuloI {
   data?: any;
@@ -91,8 +92,8 @@ export class ArticuloC extends CrudG<ArticuloI> {
 
     switch (pdfParams.tipo) {
       case 'ventas_productos':
-        if (reporteParams.data.tipo == '1') requestParameters = { desde: fun.my_dateFormater(reporteParams.data.fecha, false) };
-        else requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false) };
+        if (reporteParams.data.tipo == '1') requestParameters = { desde: DateUtils.format({ date: reporteParams.data.fecha, dateFormat: 'YYYY-MM-DD' }) };
+        else requestParameters = { desde: DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' }), hasta: DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' }) };
 
         break;
 

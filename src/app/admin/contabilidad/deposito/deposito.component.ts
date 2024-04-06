@@ -13,7 +13,6 @@ import { requestParameters } from '../../../core/typescript/crud-g';
 import { PeriodoFiscalC } from '../../registros/periodo-fiscal/periodo-fiscal';
 import { dropdownFilterFocusInput } from '../../../core/typescript/p-dropdown.utils';
 import { DivisaService } from '../../registros/divisa/divisa.service';
-import * as moment from '../../../core/javascript/moment';
 
 @Component({
   selector: 'app-deposito',
@@ -75,7 +74,6 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._init_mixin({ component: 'deposito', is_routing: true });
-
     this.necesarioStart();
   }
 
@@ -212,14 +210,15 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     const formulario = this.formGroup.getRawValue();
 
     if (fun.hasValue(formulario.fecha_equivalente)) {
-      const fecha_equivalente = fun.my_dateFormater(formulario.fecha_equivalente, false);
+      const fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
 
       const requestParameters: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
       this.peridoClass.getAll(requestParameters).then((response) => {
         this.enableDisableFields(response.data.isOpen ? 'enable' : 'disable');
 
         if (!response.data.isOpen) {
-          const fechaMostrar = fun.my_dateFormater(formulario.fecha_equivalente);
+          this.formGroup.controls[depositoFormAttr.fecha_equivalente].setValue(null, { emitEvent: false });
+          const fechaMostrar = DateUtils.format({ date: formulario.fecha_equivalente });
           const numMonth = formulario.fecha_equivalente.getMonth() + 1;
           const monthLabel = DateUtils.getMonthLabelByNum(numMonth);
 
@@ -264,7 +263,6 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
       this.formInitValue = this.formGroup.getRawValue();
       this.verificateFieldsState();
       this.encapsulateMonth();
-      console.log('this.formInitValue ', this.formInitValue);
     }, 1);
   }
 
@@ -305,9 +303,8 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
   requests() {
     const formulario = this.formGroup.getRawValue();
     const dataToSend = fun.deepCloning(formulario);
-    dataToSend.fecha_equivalente = fun.my_dateFormater(formulario.fecha_equivalente, false);
+    dataToSend.fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
     dataToSend.monto = fun.desformatearStNumber(formulario.monto);
-    console.log('dataToSend ', dataToSend);
 
     this.depositoClass.createUpdateOne(dataToSend).then((res) => {
       const actualPagination = this.tServ.getPaginationById(depositoTableId);

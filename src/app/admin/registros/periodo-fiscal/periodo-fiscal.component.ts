@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { CierreMensualComponent } from './cierre-mensual/cierre-mensual.component';
 import { ModalClass } from '../../components/modal/modal-class';
+import { DateUtils } from '../../../core/typescript/date.utils';
 
 @Component({
   selector: 'app-periodo-fiscal',
@@ -140,7 +141,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   actual_month_is_december() {
     const fecha_actual = new Date(moment().format());
 
-    return fecha_actual.getMonth() + 1 == PeriodoFiscalC.numbers.diciembre;
+    return fecha_actual.getMonth() + 1 == DateUtils.monthNumber.diciembre;
   }
 
   atras() {}

@@ -7,6 +7,7 @@ import { tFacturaD } from './../../../facturacion/factura';
 import { CxP } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { DateUtils } from '../../../../core/typescript/date.utils';
 import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC, CxC } from '../../../registros/registro-clientes/cliente';
 import { ModalComponentI, ModalI } from '../../modal/modal-class';
@@ -200,13 +201,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   setDesdeHastaControls() {
-    let desde_temp = new Date();
-    desde_temp.setDate(desde_temp.getDate() - 1);
-
-    const desde = new Date(fun.getFirstDayOfMoth(desde_temp));
+    let actual_date = new Date();
+    const desde = DateUtils.getFirstDayOfMonth({ month: actual_date.getMonth() + 1, year: actual_date.getFullYear() });
 
     this.form.controls.desde.setValue(desde);
-    this.form.controls.hasta.setValue(new Date());
+    this.form.controls.hasta.setValue(actual_date);
 
     this.setValidator('desde');
     this.setValidator('hasta');

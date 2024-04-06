@@ -8,6 +8,7 @@ import * as moment from '../../../../core/javascript/moment';
 import { DivisaC, DivisaI } from '../divisa.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { DivisaService } from '../divisa.service';
+import { DateUtils } from '../../../../core/typescript/date.utils';
 
 @Component({
   selector: 'app-tasa-de-cambio',
@@ -56,13 +57,12 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
   }
 
   setDefaultRange() {
-    let desde_temp = new Date();
-    desde_temp.setDate(desde_temp.getDate() - 30);
-    const desde = new Date(fun.getFirstDayOfMoth(desde_temp));
+    let actual_date = new Date();
+    const desde = DateUtils.getFirstDayOfMonth({ month: actual_date.getMonth() + 1, year: actual_date.getFullYear() });
 
     this.desde = desde;
-    this.hasta = new Date();
-    this.hastaMaxDate = new Date();
+    this.hasta = actual_date;
+    this.hastaMaxDate = actual_date;
   }
 
   verificateChangeOfCurrency() {
@@ -73,10 +73,17 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
   async getHistorialCambiosTasas() {
     try {
       this.listaHistorial.length = 0;
-      const extra = { afterPath: 'custom/get_history_changes', parameters: { desde: fun.my_dateFormater(this.desde, false), hasta: fun.my_dateFormater(this.hasta, false), divisa_id: this.inputs.divisa.id } };
+      const extra = {
+        afterPath: 'custom/get_history_changes',
+        parameters: {
+          desde: DateUtils.format({ date: this.desde, dateFormat: 'YYYY-MM-DD' }),
+          hasta: DateUtils.format({ date: this.hasta, dateFormat: 'YYYY-MM-DD' }),
+          divisa_id: this.inputs.divisa.id,
+        },
+      };
       this.tasaDeCambioClass.getAll(extra).then((res) => {
         res['data'].map((historial: TasaDeCambioI) => {
-          historial.fecha_equivalente = moment(historial.fecha_equivalente).format('DD/MM/YYYY');
+          historial.fecha_equivalente = DateUtils.format({ date: historial.fecha_equivalente });
           historial.monto = `${this.divisaPrincipal.simbolo} ${fun.roundNumberToDecimal(historial.valor)}`;
 
           historial.customStyles = { fecha_equivalente: { 'text-align': 'start' } };
@@ -97,7 +104,7 @@ export class TasaDeCambioComponent implements OnInit, ModalI {
   btn_aceptar() {
     const formValue = this.form.getRawValue();
 
-    const dataToSend = { id: this.inputs.divisa.id, divisa_id: this.inputs.divisa.id, valor: formValue.tasa, fecha_equivalente: fun.my_dateFormater(this.hastaMaxDate, false) };
+    const dataToSend = { id: this.inputs.divisa.id, divisa_id: this.inputs.divisa.id, valor: formValue.tasa, fecha_equivalente: DateUtils.format({ date: this.hastaMaxDate, dateFormat: 'YYYY-MM-DD' }) };
 
     this.tasaDeCambioClass.updateOne(dataToSend).then((res) => {
       this.getHistorialCambiosTasas();

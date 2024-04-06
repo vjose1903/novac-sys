@@ -5,41 +5,7 @@ export class PeriodoFiscalC extends CrudG<any> {
     super('periodos_fiscales');
   }
 
-  // # Numbers
-  static numbers = {
-    enero: 1,
-    febrero: 2,
-    marzo: 3,
-    abril: 4,
-    mayo: 5,
-    junio: 6,
-    julio: 7,
-    agosto: 8,
-    septiembre: 9,
-    octubre: 10,
-    noviembre: 11,
-    diciembre: 12,
-  };
 
-  // # Labels
-  static labels = {
-    _1_: 'enero',
-    _2_: 'febrero',
-    _3_: 'marzo',
-    _4_: 'abril',
-    _5_: 'mayo',
-    _6_: 'junio',
-    _7_: 'julio',
-    _8_: 'agosto',
-    _9_: 'septiembre',
-    _10_: 'octubre',
-    _11_: 'noviembre',
-    _12_: 'diciembre',
-  };
-
-  static getMonthLabelByNum(number) {
-    return PeriodoFiscalC.labels[`_${number}_`];
-  }
 }
 
 export interface PeriodoFiscalI {

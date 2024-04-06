@@ -1,3 +1,4 @@
+import { DateUtils } from './../../../core/typescript/date.utils';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';
@@ -24,7 +25,6 @@ export class NotaC extends CrudG<any> {
 
   parseDataToPdf(data) {
     return new Promise((resolve) => {
-
       const pick_nota = ['cliente', 'estado', 'fecha_equivalente', 'fecha_valida', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'usuario', 'facturas_aplicadas', 'tipo_factura_id'];
 
       let temp_data_parsed = _.pick(fun.deepCloning(data), pick_nota);
@@ -108,7 +108,11 @@ export class NotaC extends CrudG<any> {
   static requestReporte(reporteParams, pdfParams) {
     let requestParameters;
 
-    requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), tipo_factura_id: reporteParams.data.tipo };
+    requestParameters = {
+      desde: DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' }),
+      hasta: DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' }),
+      tipo_factura_id: reporteParams.data.tipo,
+    };
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 

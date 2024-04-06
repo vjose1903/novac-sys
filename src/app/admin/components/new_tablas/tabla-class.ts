@@ -47,7 +47,7 @@ export interface table_info {
   tag_color?: string;
   row_tag_color?: string;
   tag_apretada?: boolean;
-  con_hora?: boolean;
+  include_hour?: boolean;
   disable?: any;
   color?: string;
   text_color?: string;

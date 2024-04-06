@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import * as moment from '../../../../core/javascript/moment';
-
-import { IModalConfiguration, ModalComponentI, ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';
+import { DateUtils } from '../../../../core/typescript/date.utils';
 
 @Component({
   selector: 'app-pendiente-form',
@@ -10,11 +9,11 @@ import * as _ from 'lodash';
   styleUrls: ['./pendiente-form.component.scss'],
 })
 export class PendienteFormComponent implements OnInit, ModalI {
-  time = { hour: 13, minute: 30 };
+  time: { hour: number; minute: number; second?: number };
   hora;
   minutos;
   meridian = true;
-  fecha;
+  fecha: Date;
   maxDate = new Date();
 
   constructor() {}
@@ -23,20 +22,24 @@ export class PendienteFormComponent implements OnInit, ModalI {
   inputs: any;
 
   btn_aceptar() {
-    const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
-
-    const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
-
+    const fecha = DateUtils.format({ date: this.fecha, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm', separator: ' ' });
     this.modalComponent.closeModal(this.modalComponent.id, { fecha });
   }
 
   ngOnInit() {
-    this.hora = moment().hour();
-    this.minutos = moment().minutes();
-
     this.fecha = new Date();
+    this.hora = this.fecha.getHours();
+    this.minutos = this.fecha.getMinutes();
 
     this.time = { hour: this.hora, minute: this.minutos };
+  }
+
+  changeHour() {
+    const time = this.fecha;
+    time.setHours(this.time.hour);
+    time.setMinutes(this.time.minute);
+
+    this.fecha = time;
   }
 
   toggleMeridian() {

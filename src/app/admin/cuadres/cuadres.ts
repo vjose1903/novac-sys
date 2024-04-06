@@ -4,6 +4,7 @@ import { CuadreCajaC } from '../../core/typescript/cuadre_caja.utils';
 import { fun } from './../../core/services/functions.service';
 import { ReporteC } from '../reportes/reporte';
 import * as _ from 'lodash';
+import { DateUtils } from '../../core/typescript/date.utils';
 
 export class CuadreC {
   constructor() {}
@@ -22,7 +23,7 @@ export class CuadreC {
   }
 
   static requestReporte(reporteParams, pdfParams) {
-    const requestParams = { parameters: { fecha: fun.my_dateFormater(reporteParams.data.fecha, false) } };
+    const requestParams = { parameters: { fecha: DateUtils.format({ date: reporteParams.data.fecha, dateFormat: 'YYYY-MM-DD' }) } };
 
     new CuadreCajaC().createOne({}, requestParams).then((res) => {
       this.parseDataToPdf(res['data']).then(async (cuadre_parsed) => {

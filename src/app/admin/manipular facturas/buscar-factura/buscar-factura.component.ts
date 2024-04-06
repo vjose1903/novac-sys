@@ -1,6 +1,6 @@
 import { deleteDocumentosTypes, tipoDocFacturacion } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import * as moment from '../../../core/javascript/moment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,6 +18,7 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
+import { DateUtils } from '../../../core/typescript/date.utils';
 
 @Component({
   selector: 'app-buscar-factura',
@@ -286,7 +287,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         const estatus = this.getIsActiveInfo(fact);
 
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
-        fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
+        fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? DateUtils.format({ date: fact.fecha_vencimiento }) : '';
         fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
         fact.is_active = estatus.icon;
         fact.is_active_tooltip = estatus.tooltip;
@@ -382,9 +383,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (factura.condicion != 'Crédito' || factura.pagada) return pago_a_tiempo;
 
-    const fecha_actual = moment().format('YYYY-MM-DD');
+    const fecha_actual = DateUtils.format({ dateFormat: 'YYYY-MM-DD' });
 
-    pago_a_tiempo = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') > fecha_actual;
+    pago_a_tiempo = DateUtils.format({ date: factura.fecha_vencimiento, dateFormat: 'YYYY-MM-DD' }) > fecha_actual;
 
     return pago_a_tiempo;
   }

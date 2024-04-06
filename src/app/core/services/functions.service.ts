@@ -78,15 +78,6 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: date_formater
-  // Descripcion : Esta funcion formatea una fecha con los parametros establecidos
-  // _________________________________________________________________________________________________
-  static date_formater(params: { date: any; dateFormat?: 'DD/MM/YYYY'; con_hora?: boolean }) {
-    let fecha = moment(params.date).format(params.dateFormat);
-    if (params.con_hora) fecha += ` - ${moment(params.date).format('LT')}`;
-    return fecha;
-  }
-  // __________________________________________________________________________________________________
   // Nombre: deepCloning
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
@@ -378,41 +369,6 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: my_houreFormater
-  // Descripcion : Esta formatea una hora
-  // _________________________________________________________________________________________________
-  static my_houreFormater(str) {
-    const dateObj = new Date(str);
-
-    let hours = dateObj.getHours();
-    const minutes = dateObj.getMinutes();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-
-    const res = `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
-    return res;
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: my_dateFormater
-  // Descripcion : Esta formatea un date
-  // _________________________________________________________________________________________________
-  static my_dateFormater(str, front = true) {
-    str = str + '';
-    let dateObj = new Date(str);
-
-    let month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    let day = String(dateObj.getDate()).padStart(2, '0');
-    let year = dateObj.getFullYear();
-
-    if (front) str = `${day}/${month}/${year}`;
-    else str = `${year}-${month}-${day}`;
-
-    return str;
-  }
-
-  // __________________________________________________________________________________________________
   // Nombre: is_number
   // Descripcion : Esta funcion evalua si un parametro pasado es un numero
   // _________________________________________________________________________________________________
@@ -533,9 +489,7 @@ export class fun extends CustomLodash {
   // Descripcion : Esta funcion retorna el elemento con el foco activo
   // __________________________________________________________________________________________________
   static getCuerrentFocusedElement() {
-
-    return  document.activeElement;
-    ;
+    return document.activeElement;
   }
 
   // __________________________________________________________________________________________________
@@ -630,17 +584,6 @@ export class fun extends CustomLodash {
   // Nombre: createNestedObject
   // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
   // __________________________________________________________________________________________________
-  static getFirstDayOfMoth(date?) {
-    const month = moment(date).month() + 1;
-    const year = moment(date).year();
-    const temp = `${year}-${month}-01`;
-    return temp;
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: createNestedObject
-  // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
-  // __________________________________________________________________________________________________
   static createNestedObject(base, names, value?) {
     var lastName = arguments.length == 3 ? names.pop() : false;
     for (var i = 0; i < names.length; i++) {
@@ -710,8 +653,6 @@ export class fun extends CustomLodash {
   static logPurple(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #9954d9', body !== undefined ? body : '');
   }
-
-
 
   /* Suma el porcentaje indicado a un color (RR, GG o BB) hexadecimal para aclararlo */
   static addLight(color: any, amount: any) {

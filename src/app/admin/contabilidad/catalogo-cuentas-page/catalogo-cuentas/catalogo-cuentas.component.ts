@@ -1,3 +1,4 @@
+import { DateUtils } from './../../../../core/typescript/date.utils';
 import { TablasService } from './../../../components/new_tablas/tablas.service';
 import { tableCellType, table_config, table_info } from './../../../components/new_tablas/tabla-class';
 import { CuentasContablesService } from './utils/cuentas-contables.service';
@@ -136,7 +137,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
         return this.formatoNumero(_.get(data, column.key));
 
       case 'date':
-        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
+        const fecha = DateUtils.format({ date: _.get(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', include_hour: column.include_hour });
         return fecha;
 
       default:
@@ -152,7 +153,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
   filter(event) {
     this.filter_target = event.target.value;
-    fun.awaitTyping({evento: event}).then(() => this.getCuentasContables(this.filter_target));
+    fun.awaitTyping({ evento: event }).then(() => this.getCuentasContables(this.filter_target));
   }
 
   iconsClick(event) {

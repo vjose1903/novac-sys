@@ -30,6 +30,7 @@ import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configuracion_articulos/articulos_configuracion';
 import { TipoCantidadEfectivo } from '../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.model';
+import { DateUtils } from '../../core/typescript/date.utils';
 
 @Component({
   selector: 'app-facturacion',
@@ -181,12 +182,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
-
-    this.timeInterval = setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
+    this.timeInterval = setInterval(() => (this.fecha = DateUtils.format({ include_hour: true })), 1000);
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
+    this.fecha = DateUtils.format({ include_hour: true });
   }
 
   ngOnDestroy(): void {
@@ -1520,6 +1521,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   async getDataFromModal(arg, search?) {
     if (arg.modalId === 'facturaPendiente') {
+      console.log('arg ', arg);
+
       this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(arg.fecha)['FechaFacturaMostrar'];
@@ -1593,10 +1596,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['forma_pago'] = this.forma_pago;
 
     let fecha_equi;
-    if (this.factura_pendiente) fecha_equi = moment(this.fechaFactura['front']).format();
+    if (this.factura_pendiente) fecha_equi = new Date(this.fechaFactura['front']);
     else fecha_equi = null;
 
-    cabecera_fact['fecha_viaje'] = this.is_viaje ? moment(this.fecha_viaje).format() : null;
+    cabecera_fact['fecha_viaje'] = this.is_viaje ? new Date(this.fecha_viaje) : null;
 
     cabecera_fact['fecha_equivalente'] = fecha_equi;
 
@@ -1606,7 +1609,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (this.factServ.isVenta || this.factServ.isPreVenta || this.factServ.isCotizacion) {
         fecha_venci = moment(new Date()).add(this.factServ.propietario_factura.limite_credito, 'days').format('YYYY-MM-DD');
       } else {
-        fecha_venci = moment(this.fecha_vencimiento).format('YYYY-MM-DD');
+        fecha_venci = DateUtils.format({ date: this.fecha_vencimiento, dateFormat: 'YYYY-MM-DD' });
       }
 
       fecha_venci = moment(fecha_venci).add(8, 'hours').format();
@@ -1624,7 +1627,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let fecha_valida = null;
 
     if (fun.hasValue(this.paqueteComprobante?.fecha_valida) && moment(this.paqueteComprobante?.fecha_valida).isValid()) {
-      fecha_valida = moment(this.paqueteComprobante?.fecha_valida).format('YYYY-MM-DD');
+      fecha_valida = DateUtils.format({ date: this.paqueteComprobante?.fecha_valida, dateFormat: 'YYYY-MM-DD' });
       fecha_valida = moment(fecha_valida).add(8, 'hours').format();
     }
 

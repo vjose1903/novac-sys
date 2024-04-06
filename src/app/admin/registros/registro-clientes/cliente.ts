@@ -9,6 +9,7 @@ import { fun } from '../../../core/services/functions.service';
 import { ImagenI } from '../../../core/typescript/imagen.utils';
 import { EntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
+import { DateUtils } from '../../../core/typescript/date.utils';
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
@@ -61,7 +62,11 @@ export class ClienteC extends CrudG<any> {
 
       case 'cuentas_con_pagos':
       case 'ventas_cliente':
-        requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), cliente_id: reporteParams.data.cliente_id };
+        requestParameters = {
+          desde: DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' }),
+          hasta: DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' }),
+          cliente_id: reporteParams.data.cliente_id,
+        };
 
         if (pdfParams.tipo == 'ventas_cliente') {
           requestParameters['tipo_factura_id'] = reporteParams.data.tipo_factura_id;
