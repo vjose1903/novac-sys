@@ -99,7 +99,7 @@ function createWindow() {
     win.setMenuBarVisibility(false);
 
     setTimeout(() => {
-      if (serve) win.webContents.openDevTools();
+      if (serve)  win.webContents.openDevTools();
     }, 250);
 
     // Emitted when the window is closed.
@@ -328,9 +328,7 @@ function getActualGitUser() {
 async function getPrinters() {
 
   const printerPromise = await win.webContents.getPrintersAsync();
-  puts(printerPromise, 'printerPromise');
   const printers_list = printerPromise.map((item) => item.name);
-
   return printers_list;
 }
 

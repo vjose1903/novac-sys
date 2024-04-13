@@ -328,9 +328,7 @@ function getActualGitUser() {
 async function getPrinters() {
 
   const printerPromise = await win.webContents.getPrintersAsync();
-  puts(printerPromise, 'printerPromise');
   const printers_list = printerPromise.map((item) => item.name);
-
   return printers_list;
 }
 
