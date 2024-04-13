@@ -1,3 +1,4 @@
+import { DateUtils } from './../../../core/typescript/date.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { TipoArticuloComponent } from './tipo-articulo/tipo-articulo.component';
 import { ConfigI } from '../../../core/typescript/config-interface';
@@ -9,7 +10,6 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import * as moment from '../../../core/javascript/moment';
 import { ArticuloC, ArticuloI } from './articulo';
 import { TipoArticuloC, TipoArticuloI, tipos_articulos } from './tipo-articulo/tipo-articulo';
 import * as $ from 'jquery';
@@ -1057,7 +1057,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       precio_principal: fun.desformatearStNumber(formulario.precio_principal),
       aviso_existencia: formulario.aviso_existencia,
       medida_alerta: formulario.medida_alerta,
-      fecha_ingreso: formulario.id ? formulario.fecha_ingreso : moment().format('DD/MM/YYYY'),
+      fecha_ingreso: formulario.id ? formulario.fecha_ingreso : DateUtils.format(),
       medida: this.tipoArticuloSelected.tipo != 'servicio' ? formulario.medida : null,
       is_detallable: formulario.is_detallable,
       contenido_articulos: this.formarContenido(),

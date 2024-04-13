@@ -1,3 +1,4 @@
+import { DateUtils } from './../../../core/typescript/date.utils';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { FormEntidadCuentaContableI } from './../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
@@ -7,7 +8,6 @@ import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './../.
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
@@ -306,11 +306,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.form.controls.confirm_password.setValidators(Validators.required);
 
     ['password', 'confirm_password'].forEach((formControl) => this.form.controls[formControl].updateValueAndValidity());
-  }
-
-  fecha(a: any) {
-    const fechaFormato = moment(a).format('DD/MM/YYYY');
-    return fechaFormato;
   }
 
   tableClick_action(params) {

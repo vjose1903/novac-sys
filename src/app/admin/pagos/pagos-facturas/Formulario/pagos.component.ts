@@ -1,7 +1,7 @@
+import { DateUtils } from './../../../../core/typescript/date.utils';
 import { Ss } from '../../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../../core/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
@@ -148,7 +148,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalNotasDebito = 0;
     this.totalPagadoPorciento = 0;
 
-    const fechaA = moment().format('YYYY-MM-DD');
+    const fechaA = DateUtils.format({ dateFormat: 'YYYY-MM-DD' });
     const parameters = { page: params.page, per_page: params.per_page, paginado: true };
 
     if (fun.hasValue(params.factura_a_buscar)) parameters['factura_a_buscar'] = params.factura_a_buscar;
@@ -167,11 +167,11 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       }
 
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
-      factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
+      factura.fechaV = factura.condicion === 'Crédito' ? DateUtils.format({ date: factura.fecha_vencimiento, dateFormat: 'DD/MM/YYYY' }) : null;
       factura.select = fun.hasValue(factura_selected);
       factura.pagoT = fun.hasValue(factura_selected) ? factura_selected.pagoT : false;
       factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
-      factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
+      factura.colorFecha = DateUtils.format({ date: factura.fecha_vencimiento, dateFormat: 'YYYY-MM-DD' }) < fechaA ? 'red' : 'black';
       factura.monto = fun.hasValue(factura_selected) ? factura_selected.monto : '0.00';
       const modalMoviemientos = factura.recibos.length > 0 || factura.notas.length > 0 || factura.pagos.length > 0;
 
@@ -514,8 +514,8 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
         descripcion:
           this.tipo_recibo === 'Pago factura'
             ? fact.pagoT
-              ? 'Saldo ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-              : 'Abono ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
+              ? 'Saldo ' + fact.numero_comprobante + ' ' + DateUtils.format({ date: fact.fecha_equivalente, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm:ss' })
+              : 'Abono ' + fact.numero_comprobante + ' ' + DateUtils.format({ date: fact.fecha_equivalente, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm:ss' })
             : '',
         pago_a_tiempo: fact.pago_a_tiempo,
       });

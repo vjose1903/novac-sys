@@ -104,7 +104,8 @@ export class DateUtils {
    * @returns Una cadena de texto que representa la fecha formateada según las opciones proporcionadas.
    * @example DateUtils.format({ date: new Date(), dateFormat: 'DD/MM/YYYY', include_hour: true, only_hour: false, hourFormat: 'LT', separator: ' - ' })
    */
-  static format(params: { date?: any; dateFormat?: string; include_hour?: boolean; only_hour?: boolean; hourFormat?: string; separator?: string }) {
+  static format(params?: { date?: any; dateFormat?: string; include_hour?: boolean; only_hour?: boolean; hourFormat?: string; separator?: string }) {
+    if (params == undefined) params = {};
     if (fun.hasValue(params.date) && typeof params.date == 'string') params.date = new Date(params.date);
     if (fun.isEmpty(params.date)) params.date = new Date();
 

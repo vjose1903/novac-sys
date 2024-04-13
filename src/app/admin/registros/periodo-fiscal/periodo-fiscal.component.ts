@@ -139,9 +139,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   }
 
   actual_month_is_december() {
-    const fecha_actual = new Date(moment().format());
-
-    return fecha_actual.getMonth() + 1 == DateUtils.monthNumber.diciembre;
+    return new Date().getMonth() + 1 == DateUtils.monthNumber.diciembre;
   }
 
   atras() {}

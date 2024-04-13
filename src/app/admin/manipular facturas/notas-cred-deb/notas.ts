@@ -1,8 +1,6 @@
 import { DateUtils } from './../../../core/typescript/date.utils';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { CrudG } from '../../../core/typescript/crud-g';
-import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
 import { fun } from '../../../core/services/functions.service';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { ModalClass } from '../../components/modal/modal-class';
@@ -27,11 +25,11 @@ export class NotaC extends CrudG<any> {
     return new Promise((resolve) => {
       const pick_nota = ['cliente', 'estado', 'fecha_equivalente', 'fecha_valida', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'usuario', 'facturas_aplicadas', 'tipo_factura_id'];
 
-      let temp_data_parsed = _.pick(fun.deepCloning(data), pick_nota);
+      let temp_data_parsed = fun.pick(fun.deepCloning(data), pick_nota);
 
       const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [{ old_key: 'tipo_factura', new_key: 'tipo_pdf' }]);
 
-      data_parsed.fecha = moment(data_parsed.fecha_equivalente);
+      data_parsed.fecha = new Date(data_parsed.fecha_equivalente);
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
 
       data_parsed.contenido_reporte = [];
@@ -51,7 +49,7 @@ export class NotaC extends CrudG<any> {
   }
 
   parseContentAgrupadoNota(factura_aplicada) {
-    factura_aplicada.fecha = moment(`${factura_aplicada.cabecera_factura.fecha_equivalente}`).format('DD/MM/YYYY');
+    factura_aplicada.fecha = DateUtils.format({ date: factura_aplicada.cabecera_factura.fecha_equivalente, dateFormat: 'DD/MM/YYYY' });
     factura_aplicada.numero_comprobante = factura_aplicada.cabecera_factura.numero_comprobante;
     factura_aplicada.total = fun.roundNumberToDecimal(Math.abs(factura_aplicada.total));
     delete factura_aplicada.cabecera_factura;
@@ -65,7 +63,7 @@ export class NotaC extends CrudG<any> {
     factura_aplicada.detalles_facturas_notas.forEach((detalle_nota) => {
       const obj_detalle = {};
 
-      obj_detalle['fecha'] = moment(`${factura_aplicada.cabecera_factura.fecha_equivalente}`).format('DD/MM/YYYY');
+      obj_detalle['fecha'] = DateUtils.format({ date: factura_aplicada.cabecera_factura.fecha_equivalente, dateFormat: 'DD/MM/YYYY' });
       obj_detalle['numero_comprobante'] = factura_aplicada.cabecera_factura.numero_comprobante;
       obj_detalle['total'] = fun.roundNumberToDecimal(Math.abs(detalle_nota.total));
       obj_detalle['articulo'] = detalle_nota.articulo.nombre;
@@ -117,7 +115,7 @@ export class NotaC extends CrudG<any> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
-      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: response.file.split('.')[0], openNewModal: pdfParams.openNewModal };
 
       ReporteC.visualizarReporte(objPdfView);
     });

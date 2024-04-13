@@ -320,7 +320,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formatoFecha(fecha) {
-    return moment(fecha).format('DD/MM/YYYY');
+    return DateUtils.format({ date: fecha, dateFormat: 'DD/MM/YYYY' });
   }
 
   // =============================================
@@ -450,7 +450,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async formarNota() {
     const TipoFact = Ss.factServ.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
-    const fecha_valida = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
+    const fecha_valida = this.paqueteComprobante.fecha_valida !== null ? this.formatoFecha(this.paqueteComprobante.fecha_valida) : null;
 
     let dataToSend;
     if (this.facturasConDetalles.length > 0) {

@@ -3,8 +3,6 @@ import { TasaDeCambioC, TasaDeCambioI } from './tasa_de_cambio.utils';
 import { fun } from './../../../../core/services/functions.service';
 import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
-import * as moment from '../../../../core/javascript/moment';
-
 import { DivisaC, DivisaI } from '../divisa.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { DivisaService } from '../divisa.service';

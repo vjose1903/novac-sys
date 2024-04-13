@@ -1,9 +1,9 @@
+import { DateUtils } from './../../../core/typescript/date.utils';
 import { tipoPagoE } from './../../pagos/pagos-facturas/lista-pagos/pagos.config';
 import { tableCellType, table_info } from './../../components/new_tablas/tabla-class';
 import { ReciboC } from './../../pagos/class/ingresos/recibos';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { EmpleadoC } from '../../registros/registro-empleados/empleado.utils';
@@ -210,7 +210,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         parameters: { page: params?.page, per_page: params?.per_page, paginado: true, movimientos_viaje: true, estado: true, palabra_a_buscar: palabra_a_buscar },
       });
 
-      const fechaA = moment().format('YYYY-MM-DD');
+      const fechaA = DateUtils.format({ dateFormat: 'YYYY-MM-DD' });
       res.data.forEach((viaje) => {
         const pago_a_tiempo = viaje.condicion == 'Contado' ? true : viaje.fecha_vencimiento > fechaA ? true : false;
 
@@ -427,7 +427,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   verViaje(data) {
-    // this.form.reset();
     this.monto_pendiente = 0;
 
     this.viaje_selected = data;
@@ -441,76 +440,4 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       fun.scrollTo({ id: `row-lista_viajes-${this.tablaComponent.getIndex(index_viaje)}`, behavior: 'smooth', block: 'center', inline: 'center' });
     }, 500);
   }
-
-  // formarDetalle() {
-  //   const temp = [];
-
-  //   const pagado_total = this.viaje_selected.total_factura === this.total_recibido;
-  //   temp.push({
-  //     cabecera_factura_id: this.viaje_selected.id,
-  //     pago_total: pagado_total,
-  //     deposito: fun.desformatear(this.total_recibido),
-  //     descripcion: pagado_total
-  //       ? 'Saldo ' + this.viaje_selected.numero_comprobante + ' ' + moment(this.viaje_selected.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-  //       : 'Abono ' + this.viaje_selected.numero_comprobante + ' ' + moment(this.viaje_selected.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss'),
-  //     pago_a_tiempo: this.viaje_selected.pago_a_tiempo,
-  //   });
-
-  //   return temp;
-  // }
-
-  // async IMPRIMIR() {
-  //   const formulario = this.form.getRawValue();
-  //   const formulario_send = { choferes_viajes: [], camiones_viajes: [] };
-  //   const formMapKeys = { choferes_viajes: 'user_id', camiones_viajes: 'vehiculo_id' };
-
-  //   for (const key in formulario) {
-  //     let formItem = formulario[key];
-  //     formItem.forEach((item) => {
-  //       const objItem = {};
-  //       objItem[formMapKeys[key]] = item.id;
-  //       formulario_send[key].push(objItem);
-  //     });
-  //   }
-
-  //   const obj = {
-  //     cliente_id: this.viaje_selected.cliente_id,
-  //     total: this.total_recibido,
-  //     forma_pago: this.forma_pago,
-  //     tipo_factura_id: 17,
-  //     devuelta: this.devuelta,
-  //     numero_recibo: null,
-  //     estado: true,
-  //   };
-
-  //   obj['detalle_recibos'] = this.formarDetalle();
-
-  //   Object.assign(obj, formulario_send);
-
-  //   this.reciboClass.createUpdateOne(obj).then((res) => {
-  //     const actualPagination = this.tServ.getPaginationById('lista_viajes');
-  //     this.getViajes(actualPagination);
-  //     this.resetVariables();
-
-  //     this.reciboClass.parseDataToPdf(res['data'].recibo).then((recibo_parsed) => {
-  //       const obj_print = { data: recibo_parsed, type: 'recibo_ingreso' };
-
-  //       PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })
-  //         .then(async (res) => {
-  //           if (res.status === 'si') {
-  //           } else fun.toastError(res.msg, 'ERROR');('Existe una fila en estado de edición, debe de terminar ese proceso para editar otra fila.', 'Aviso');
-
-  //           this.getCuadre();
-  //         })
-  //         .catch((err) => fun.toastError(err.msg, 'ERROR'));('Existe una fila en estado de edición, debe de terminar ese proceso para editar otra fila.', 'Aviso');
-  //     });
-  //   });
-  // }
-
-  // resetVariables() {
-  //   [this.ultimo_pago, this.viaje_selected, this.forma_pago, this.total_recibido] = Array(4).fill(undefined);
-  //   [this.monto_pendiente] = Array(1).fill(0);
-  //   this.have_incidencia = false;
-  //   this.incidencia = '';
-  // }
 }

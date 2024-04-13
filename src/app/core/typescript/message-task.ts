@@ -1,4 +1,3 @@
-import * as moment from '../javascript/moment';
 import { BehaviorSubject } from 'rxjs';
 import * as _ from 'lodash';
 import { fun } from '../services/functions.service';

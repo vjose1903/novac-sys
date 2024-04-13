@@ -1,3 +1,4 @@
+import { DateUtils } from './../../../core/typescript/date.utils';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
@@ -94,10 +95,10 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   setDateInputs(actual) {
-    actual = moment(actual).format('MM/DD/YYYY');
-    const anio = moment(new Date(actual)).add(1, 'year').format('YYYY');
+    actual = DateUtils.format({ date: actual, dateFormat: 'MM/DD/YYYY' });
 
-    const newFecha = moment('12/31/' + anio).format('MM/DD/YYYY');
+    const anio = moment(new Date(actual)).add(1, 'year').format('YYYY');
+    const newFecha = DateUtils.format({ date: '12/31/' + anio, dateFormat: 'MM/DD/YYYY' });
 
     this.fechaCompra = new Date(actual);
     this.fechaValidez = new Date(newFecha);
