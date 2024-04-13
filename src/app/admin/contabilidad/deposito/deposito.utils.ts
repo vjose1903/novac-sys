@@ -11,6 +11,7 @@ export interface DepositoI {
   [nombrePropiedad: string]: any;
 }
 
+export const anularDepositoModalId = 'modal_anular_id'
 export enum depositoFormAttr {
   id = 'id',
   cuenta_bancaria_id = 'cuenta_bancaria_id',

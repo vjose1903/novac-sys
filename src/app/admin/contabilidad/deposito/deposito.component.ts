@@ -4,7 +4,7 @@ import { tableCellType, table_config } from './../../components/new_tablas/tabla
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Permisos } from '../../../core/typescript/permisos';
-import { DepositoC, DepositoI, depositoFormAttr, depositoFormFieldId, depositoTableId } from './deposito.utils';
+import { DepositoC, DepositoI, anularDepositoModalId, depositoFormAttr, depositoFormFieldId, depositoTableId } from './deposito.utils';
 import { fun } from '../../../core/services/functions.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -244,8 +244,29 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'edit_deposito') this.editarItem(params.data);
-      if (params.iconKey == 'anular_deposito') this.editarItem(params.data);
+      if (params.iconKey == 'anular_deposito') {
+        const identifier = params.data.numero_referencia ?? params.data.comentario;
+
+        this.confirmationModal({
+          id: anularDepositoModalId,
+          header: 'Confirmar',
+          texto: `Seguro que desea <b class="negrita"> ANULAR </b> el deposito <b class="negrita">${identifier}</b>`,
+          // texto: params.data.estado
+          //   ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`
+          //   : `Seguro que desea <b class="negrita"> REACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`,
+          siFunction: (instance) => {
+            this.anularDeposito(params.data);
+            instance.dismissModal(instance.id);
+          },
+        });
+      }
     }
+  }
+
+  anularDeposito(data) {
+    this.depositoClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
+      this.reloadDepositosInSamePage();
+    });
   }
 
   editarItem(deposito: DepositoI) {
@@ -307,9 +328,13 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     dataToSend.monto = fun.desformatearStNumber(formulario.monto);
 
     this.depositoClass.createUpdateOne(dataToSend).then((res) => {
-      const actualPagination = this.tServ.getPaginationById(depositoTableId);
-      this.getDepositos(actualPagination);
+      this.reloadDepositosInSamePage();
       this.borrar();
     });
+  }
+
+  reloadDepositosInSamePage() {
+    const actualPagination = this.tServ.getPaginationById(depositoTableId);
+    this.getDepositos(actualPagination);
   }
 }
