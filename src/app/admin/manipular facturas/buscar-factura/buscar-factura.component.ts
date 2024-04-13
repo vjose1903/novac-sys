@@ -51,7 +51,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   permissions = Permisos;
 
   tipos_documentos = [];
-  tipo_documento_selected = 'venta';
+  tipo_documento_selected = tipoDocFacturacion.venta;
 
   buscar_por = null;
 
@@ -193,12 +193,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       this.para = 'Nota de débito';
     } else if (this.buscarPara == 'solo_ver') {
       this.para = 'Visualizar';
-
-      const td_actions = _.find(this.table_config.info, { key: 'actions' });
-      const btn_select = _.find(td_actions.iconsArray, { id: 'select' });
-
-      _.pull(td_actions.iconsArray, btn_select);
-
       this.makeTiposDocumentos();
     }
   }
@@ -293,9 +287,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.is_active_tooltip = estatus.tooltip;
         fact.is_active_color = estatus.color;
         fact.monto = fun.roundNumberToDecimal(fact.balance);
+
         fact.viewColor = 'gris-claro';
         fact.view = 'far fa-eye-slash';
         fact.delete = 'far fa-trash-alt';
+        fact.duplicate = 'fa-regular fa-copy';
         fact.make_bill = 'fas fa-external-link-alt';
 
         fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
@@ -312,10 +308,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
-            { key: 'view', estilos: 'font-size: 1.1rem !important;' },
-            { key: 'delete', estilos: 'font-size: 1.1rem !important;' },
-            { key: 'make_bill', estilos: 'font-size: 1.1rem !important; margin:  0rem 0.8rem !important;' },
-            { key: 'selected', estilos: 'margin-left: 0.8rem !important; font-size: 1.2rem !important;' },
+            { key: 'view', estilos: 'font-size: 1.2rem !important;' },
+            { key: 'duplicate', estilos: 'font-size: 1.2rem !important;' },
+            { key: 'delete', estilos: 'font-size: 1.2rem !important;' },
+            { key: 'make_bill', estilos: 'font-size: 1.2rem !important;' },
+            { key: 'selected', estilos: 'font-size: 1.2rem !important;' },
           ],
         };
 
@@ -395,10 +392,24 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   selectTableConfig() {
     return new Promise<void>((resolve) => {
-      this.table_config = BuscarFacturaC.tables_config[this.tipo_documento_selected];
+      this.table_config = fun.duplicarJson(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
       this.table_config['padre_functions'] = { data_request: (params) => this.pedirFactura(params) };
+
+      this.verificateTableActions();
       resolve();
     });
+  }
+
+  verificateTableActions() {
+    const td_actions = _.find(this.table_config.info, { key: 'actions' });
+
+    if (this.buscarPara == 'solo_ver') {
+      const btn_select = _.find(td_actions.iconsArray, { id: 'select' });
+      if (fun.hasValue(btn_select)) _.pull(td_actions.iconsArray, btn_select);
+    } else {
+      const btn_duplicate = _.find(td_actions.iconsArray, { id: 'duplicate' });
+      if (fun.hasValue(btn_duplicate)) _.pull(td_actions.iconsArray, btn_duplicate);
+    }
   }
 
   changeSelect(tipo, valor) {
@@ -462,7 +473,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.resetFacturas();
     if (tipo != 'salir') (document.getElementById('valorI') as any).value = null;
 
-    this.tipo_documento_selected = 'venta';
+    this.tipo_documento_selected = tipoDocFacturacion.venta;
     this.tipo_factura_id = null;
     this.buscar_por = null;
     fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
@@ -491,7 +502,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (params.idIcon == 'select') {
           params.data.is_selected = !params.data.is_selected;
-
           params.data.is_selected ? this.idsFacturasSeleccionadas.push(params.data.id) : _.pull(this.idsFacturasSeleccionadas, params.data.id);
         }
 

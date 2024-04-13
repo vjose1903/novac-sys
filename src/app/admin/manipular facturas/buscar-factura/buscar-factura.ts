@@ -17,8 +17,10 @@ export class BuscarFacturaC {
           titulo: 'Acciones',
           tipo: 'icon',
           key: 'actions',
+          column_gap: '0.8rem',
           estilos: [{ width: '9%' }],
           iconsArray: [
+            { id: 'duplicate', key: 'duplicate', tooltip: 'Duplicar factura' },
             { key: 'view', tooltip: 'Ver factura', text_color: 'viewColor' },
             {
               id: 'select',
@@ -76,6 +78,7 @@ export class BuscarFacturaC {
         {
           titulo: 'Acciones',
           tipo: 'icon',
+          column_gap: '0.8rem',
           key: 'actions',
           estilos: [{ width: '9%' }],
           iconsArray: [
@@ -109,6 +112,7 @@ export class BuscarFacturaC {
           titulo: 'Acciones',
           tipo: 'icon',
           key: 'actions',
+          column_gap: '0.8rem',
           estilos: [{ width: '9%' }],
           iconsArray: [
             { key: 'view', tooltip: 'Ver Cotización', text_color: 'viewColor' },
