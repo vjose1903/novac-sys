@@ -29,7 +29,7 @@ function setClient(client) {
   console.log(`${green('nivel >>')} ${nivel}`);
   console.log(`${white('\n')}`);
 
-  if (['agrodemi', 'brendy', 'vasquez'].includes(client)) {
+  if (['agrodemi', 'brendy', 'vasquez', 'demo'].includes(client)) {
     if (fs.existsSync(pathAdd('../app_config.config'))) fs.unlinkSync(pathAdd('../app_config.config'));
     execSync(`node ${pathAdd('./setup.js')} ${client} ${nivel}`, { stdio: 'inherit' });
   } else {
