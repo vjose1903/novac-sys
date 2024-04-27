@@ -1,4 +1,4 @@
-import { deleteDocumentosTypes, tipoDocFacturacion } from './../../facturacion/factura';
+import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
@@ -19,6 +19,7 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-buscar-factura',
@@ -510,7 +511,25 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           this.deleteRequest({ ids: params.data.id, tipo: tipo });
         }
 
-        if (params.iconKey == 'make_bill') this.pasarCotizacionAfacturar(params.data);
+        const toGoFacturacionTypes = ['duplicate', 'make_bill'];
+        if (toGoFacturacionTypes.includes(params.iconKey)) {
+          const actions = { duplicate: { url: actionFacturacion.duplicate, modalLabel: 'duplicar', modalId: 'duplicate_bill' }, make_bill: { url: actionFacturacion.bill_from_cotizacion, modalLabel: 'facturar', modalId: 'make_bill' } };
+
+          const titleCasePipe = new TitleCasePipe();
+          const tipoDocumento = titleCasePipe.transform(tipoDocFacturacionLabel[this.tipo_documento_selected]);
+          const action = actions[params.iconKey].url;
+          const label = actions[params.iconKey].modalLabel;
+
+          const si = (instance) => {
+            console.log("params ", params);
+            
+            this.goToFacturacionPage(params.data.tipo, action, params.data.id);
+            this.closeModal(instance);
+          };
+
+          let obj = { id: actions[params.iconKey].modalId, header: 'Confirmación', texto: `Seguro que desea <strong>${label}</strong> la ${tipoDocumento} No.: <strong>${params.data.secuencia} </strong>`, siFunction: si };
+          this.confirmationModal(obj);
+        }
       }
     }
   }
@@ -614,8 +633,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   editarFactura() {
     this.facturaClass.getAll({ afterPath: `custom/can_update`, parameters: { id: this.facturaSelected.id } }).then((res) => {
-      setTimeout(() => this.router.navigateByUrl(`/admin/factura/${this.facturaSelected.tipo}/update/${this.facturaSelected.id}`), 10);
+      this.goToFacturacionPage(this.facturaSelected.tipo, actionFacturacion.update, this.facturaSelected.id);
     });
+  }
+
+  goToFacturacionPage(tipo: string, action: string, id: any) {
+    setTimeout(() => this.router.navigateByUrl(`/admin/factura/${tipo}/${action}/${id}`), 10);
   }
 
   async AnularFactura() {
@@ -642,7 +665,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
 
-    if (continuar)
+    if (continuar) {
       botonesDinamicos.push({
         clase: 'btn btn-verde mr-2',
         function: (instance) => {
@@ -652,6 +675,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         label: 'Continuar',
         disable: false,
       });
+    }
 
     PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
       if (res.status === 'si') {
@@ -716,8 +740,19 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
             disable: false,
           };
 
+          const cloneButton = {
+            clase: 'btn btn-azul ml-2',
+            function: (instance) => {
+              this.goToFacturacionPage(dataFactura.tipo, actionFacturacion.duplicate, dataFactura.id);
+              instance.closeModal(instance.id, 'mostrarFactura');
+            },
+            label: 'Clonar',
+            disable: false,
+          };
+
           if (dataFactura.estado) obj_modal.botones.dinamico.push(rePrintButton);
           if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(editButton);
+          if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(cloneButton);
         }
 
         this.openNewModal(obj_modal);
