@@ -521,8 +521,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           const label = actions[params.iconKey].modalLabel;
 
           const si = (instance) => {
-            console.log("params ", params);
-            
             this.goToFacturacionPage(params.data.tipo, action, params.data.id);
             this.closeModal(instance);
           };

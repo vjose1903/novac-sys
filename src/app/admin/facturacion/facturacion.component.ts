@@ -355,12 +355,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   rellenarVariables() {
-    console.log('  ');
     return new Promise<void>((resolve) => {
       this.isInitialized = false;
 
       this.factServ.tipoDocumento = this.route.snapshot.params['tipo'];
-      console.log('this.factServ.tipoDocumento ', this.factServ.tipoDocumento);
 
       this.factServ.productos_devueltos.length = 0;
 
@@ -417,11 +415,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const actualPath = fun.getActualPath();
       const res = { same_modulo: true };
 
-      console.log('actualPath ', actualPath);
-      console.log('this.factServ.action ', this.factServ.action);
-      console.log('factura.tipo ', factura.tipo);
-      console.log('factura.action ', factura.action);
-
       if (!actualPath.includes(factura.tipo) || !this.factServ.action.includes(factura.action)) {
         const action_route = fun.hasValue(factura.action) ? factura?.action : 'new';
 
@@ -461,8 +454,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   rellenarCabezaFactura(factura: FacturasI) {
     return new Promise(async (resolve) => {
-      console.log('factura ', factura);
-
       const original_factura = fun.duplicarJson(factura);
       let productos_devueltos = fun.hasValue(original_factura?.productos_devueltos) ? original_factura?.productos_devueltos : [];
 
