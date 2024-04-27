@@ -1,6 +1,6 @@
-import { ConfigI } from '../src/app/core/typescript/config-interface';
+import { ConfigI } from '../src/app/core/typescript/config-interface.js';
 import * as fs from 'fs';
-import { pathAdd, puts } from '../main';
+import { pathAdd, puts } from '../main.js';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
 
@@ -8,27 +8,27 @@ const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config: ConfigI = {
-    cliente: 'agrodemi',
-    color_app: 'green',
-    mode_app:  'light',
+    cliente: 'demo',
+    color_app: 'blue',
+    mode_app: 'light',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-    direccion_empresa: 'Autopista Duarte Km0 El Higüero, La Vega',
+    direccion_empresa: 'La Vega República Dominicana',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Agropecuaria Delia y Milo, S.R.L AGRODEMI',
-    rnc_empresa: '131-99603-5',
-    telefono_empresa: '(809)-573-0060',
-    url_servidor: 'http://admservidor.ddns.net:9090',
-    url_servidor_descargas: 'http://admservidor.ddns.net:9090',
-    url_servidor_respaldo: 'http://10.0.0.9:9090',
+    nombre_empresa: 'Inspot Technology',
+    rnc_empresa: '000-00000-0',
+    telefono_empresa: '(809) 879-0161',
+    url_servidor: 'https://8n3mw1zq-9093.use2.devtunnels.ms:9093',
+    url_servidor_descargas: 'https://8n3mw1zq-9093.use2.devtunnels.ms:9093',
+    url_servidor_respaldo: 'https://8n3mw1zq-9093.use2.devtunnels.ms:9093',
     usa_url_principal: true,
     has_contabilidad: true,
     is_db_local: false,
-    calcular_itbis: false,
-    is_produccion: true,
+    calcular_itbis: true,
+    is_produccion: false,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
-    medida_producto_terminado: 'Quintal',
+    medida_producto_terminado: 'Producto',
 
     printer_selected: {
       venta_contado: 'Ninguna',
@@ -57,10 +57,10 @@ export default class HandlerConfigFile {
     },
 
     plantillas_impresion: {
-      nota: 'Agrupada',
+      nota: 'Detallada',
     },
 
-    documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota,cotizacion',
+    documentos_a_imprimir: 'conduce',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {

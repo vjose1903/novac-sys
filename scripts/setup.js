@@ -1,12 +1,20 @@
 var fs = require('fs');
 var path = require('path');
 
-const clientes = ['brendy', 'agrodemi', 'vasquez'];
+const clientes = ['brendy', 'agrodemi', 'vasquez', 'demo'];
 
 const tipo_selected = process.argv.slice(2)[0];
 const nivel = process.argv.slice(2)[1];
 
 const setup_ = {
+  demo: {
+    TITLE_APP: 'Novac System - DEMO',
+    PORT_APP: '5223',
+    DB_PORT: '9093',
+    DOCKER_NAME: 'demo',
+    NAME_UPDATE_REPO: 'novac-system-demo',
+    CUSTOM_ACCESS: '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',
+  },
   agrodemi: {
     TITLE_APP: 'Novac System - AGRODEMI',
     PORT_APP: '5220',
