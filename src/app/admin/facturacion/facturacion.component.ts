@@ -1319,7 +1319,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   formarFacturaAGuardar() {
     const factura_a_guardar = this.formarData();
-    factura_a_guardar['action'] = this.factServ.action;
+    factura_a_guardar['action'] = this.factServ.action != actionFacturacion.duplicate ? this.factServ.action : actionFacturacion.new;
     factura_a_guardar['factura_pendiente'] = this.factura_pendiente;
     factura_a_guardar['productos_devueltos'] = fun.duplicarJson(this.factServ.productos_devueltos);
 
