@@ -216,7 +216,7 @@ function beforeCreateWindow(win) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ipcMain.on(KEYWORD_ELECTRON_SENDER, handleEvent);
 
-async function handleEvent(event: Electron.IpcMainEvent, obj: string) {
+async function handleEvent(event: any, obj: string) {
   try {
     var arg = JSON.parse(obj) as MessageTaskInterface;
 
@@ -327,6 +327,7 @@ function getActualGitUser() {
 }
 
 async function getPrinters() {
+
   const printerPromise = await win.webContents.getPrintersAsync();
   const printers_list = printerPromise.map((item) => item.name);
   return printers_list;
@@ -464,13 +465,21 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function imprimir(params: { fileName: string; tipo: string; pageOrientation: string; printer: string }) {
   return new Promise(async (resolve, reject) => {
-    const gsprint_path = await pathAdd(`/print/gsprint.exe`);
-    const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
-
     const file_path = await pathAdd(`/${params.fileName}`);
 
     puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
-    const comando = `${gsprint_path} -${params.pageOrientation} -colour -ghostscript "${ghostscript_path}" -dPDFFitPage -printer "${params.printer}" "${file_path}"`;
+    let comando = '';
+
+    if (isMacOs()) {
+      // let pageSize = `${params.width}x${params.height}in`;
+      // options.push(`-o PageSize=${pageSize}`);
+      comando = `lp -o ${params.pageOrientation} -o ColorModel=RGB -o fit-to-page -d "${params.printer}" "${file_path}"`;
+    } else {
+      const gsprint_path = await pathAdd(`/print/gsprint.exe`);
+      const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
+
+      comando = `${gsprint_path} -${params.pageOrientation} -colour -ghostscript "${ghostscript_path}" -dPDFFitPage -printer "${params.printer}" "${file_path}"`;
+    }
 
     cmd(comando, (res) => {
       if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });

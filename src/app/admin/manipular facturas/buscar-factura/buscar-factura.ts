@@ -17,8 +17,10 @@ export class BuscarFacturaC {
           titulo: 'Acciones',
           tipo: tableCellType.icon,
           key: 'actions',
+          column_gap: '0.8rem',
           estilos: [{ width: '9%' }],
           iconsArray: [
+            { id: 'duplicate', key: 'duplicate', tooltip: 'Duplicar factura' },
             { key: 'view', tooltip: 'Ver factura', text_color: 'viewColor' },
             {
               id: 'select',
@@ -75,6 +77,7 @@ export class BuscarFacturaC {
         { titulo: 'Total', tipo: tableCellType.formatoNumero, key: 'total_factura' },
         {
           titulo: 'Acciones',
+          column_gap: '0.8rem',
           tipo: tableCellType.icon,
           key: 'actions',
           estilos: [{ width: '9%' }],
@@ -109,6 +112,7 @@ export class BuscarFacturaC {
           titulo: 'Acciones',
           tipo: tableCellType.icon,
           key: 'actions',
+          column_gap: '0.8rem',
           estilos: [{ width: '9%' }],
           iconsArray: [
             { key: 'view', tooltip: 'Ver Cotización', text_color: 'viewColor' },
