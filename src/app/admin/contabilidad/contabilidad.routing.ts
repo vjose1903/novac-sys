@@ -6,6 +6,7 @@ const routes: Routes = [
   { path: 'configuracion_entidad_cuenta', loadChildren: () => import('./configuracion-entidad-cuenta/configuracion-entidad-cuenta.module').then((m) => m.ConfiguracionEntidadCuentaModule) },
   { path: 'libro_diario', loadChildren: () => import('./libro-diario-page/libro-diario-page.module').then((m) => m.LibroDiarioPageModule) },
   { path: 'deposito', loadChildren: () => import('./deposito/deposito.module').then((m) => m.DepositoModule) },
+  { path: 'transferencia', loadChildren: () => import('./transferencias/transferencias.module').then((m) => m.TransferenciasModule) },
 ];
 
 @NgModule({

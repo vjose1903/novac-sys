@@ -18,3 +18,4 @@ import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer
   imports: [CommonModule, DepositoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, ImgViewerEditModule, ImgModule, NgxPermissionsModule.forChild()],
 })
 export class DepositoModule {}
+ 

@@ -145,6 +145,9 @@
               <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.deposito" [ngClass]="{ activa: actualRuta == 'deposito' }" (click)="cambiarMenu({ url: 'contabilidad/deposito', navigate: true })">
                 Depositos
               </h4>
+              <h4 class="opcion sm" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.transferencia" [ngClass]="{ activa: actualRuta == 'transferencia' }" (click)="cambiarMenu({ url: 'contabilidad/transferencia', navigate: true })">
+                Transferencias
+              </h4>
             </div>
           </div>
 

@@ -393,7 +393,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   selectTableConfig() {
     return new Promise<void>((resolve) => {
-      this.table_config = fun.duplicarJson(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
+      this.table_config = fun.deepCloning(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
       this.table_config['padre_functions'] = { data_request: (params) => this.pedirFactura(params) };
 
       this.verificateTableActions();

@@ -48,6 +48,7 @@ export class LayoutClass extends TablaClass {
       configuracion_entidad_cuenta: Object.values(Permisos.configuracion_entidad_cuenta),
       asientos_contables: Object.values(Permisos.cabeza_asiento_contable),
       deposito: Object.values(Permisos.deposito),
+      transferencia: Object.values(Permisos.transferencia),
       flatt: [],
     },
     registro: {
@@ -78,6 +79,7 @@ export class LayoutClass extends TablaClass {
   };
 
   _init_layout(arg) {
+    console.log('arg:', arg);
     this.layServ = Ss.layServ;
     if (arg.component == 'layout') LayoutClass.layoutComponent ||= this;
 
@@ -88,6 +90,8 @@ export class LayoutClass extends TablaClass {
   }
 
   runRouterNavigate(arg) {
+    console.log('arg ', arg);
+
     if (arg && arg.bool) {
       const tempLastComponent = LayoutClass.lastComponentInitLayout;
 

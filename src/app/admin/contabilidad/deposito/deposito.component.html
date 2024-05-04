@@ -16,7 +16,7 @@
               <div class="row">
                 <div class="col-12 col-md-4 p-0 pr-md-3">
                   <div class="form-group" [appMsgError]="depositoFormAttr.fecha_equivalente" [form]="formGroup">
-                    <label class="control-label" requiredFieldLabel>Fecha de registro: </label>
+                    <label class="control-label" requiredFieldLabel>Fecha: </label>
                     <p-calendar
                       [inputId]="depositoFormFieldId.fecha_equivalente"
                       [minDate]="minDate"
@@ -154,7 +154,7 @@
               <div class="d-flex column-gap-2">
                 <button (click)="borrar()" class="btn btn-blanco" style="max-width: 6rem">Borrar</button>
                 <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde" style="max-width: 6rem">{{ botonLabel }}</button>
-                <button type="submit" (click)="checkIfSomethingIsDiferrent()" class="btn btn-gris" style="max-width: 6rem">test</button>
+                <!-- <button type="submit" (click)="checkIfSomethingIsDiferrent()" class="btn btn-gris" style="max-width: 6rem">test</button> -->
               </div>
               <div>
                 <button class="btn btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem">Cerrar</button>

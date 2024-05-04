@@ -1,0 +1,180 @@
+<div class="row rowResgitro">
+  <div class="col-12 p-0 colTitulo">
+    <h4 class="negrita mb-0">Registro de Transferencias</h4>
+  </div>
+
+  <div class="col-12 p-0 colFormularioListado">
+    <div class="d-flex h-100">
+      <ng-container *ngxPermissionsOnly="formPermissions">
+        <div class="contenedorRegistro" *ngIf="isCreando || depositoSelected" class="form formDeposito {{ isCreando || depositoSelected ? 'showForm' : 'hideForm' }} ">
+          <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
+            <h4 class="mb-0">Formulario</h4>
+          </div>
+
+          <div class="card cardFormClass">
+            <form [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
+              <div class="row">
+                <div class="col-12 col-md-4 p-0 pr-md-3">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.fecha_equivalente" [form]="formGroup">
+                    <label class="control-label" requiredFieldLabel>Fecha: </label>
+                    <p-calendar
+                      [inputId]="transferenciaFormFieldId.fecha_equivalente"
+                      [minDate]="minDate"
+                      [maxDate]="maxDate"
+                      inputStyleClass="form-control"
+                      [formControlName]="transferenciaFormAttr.fecha_equivalente"
+                      appendTo="body"
+                      dateFormat="dd/mm/yy"
+                      placeholder="dd/mm/aaaa"
+                      (onSelect)="validateOpenPeriod()"
+                      (onInput)="validateOpenPeriod()"
+                    ></p-calendar>
+
+                    <span id="msgContainer"></span>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-8 p-0">
+                  <div class="form-group mb-0" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_id" [form]="formGroup">
+                    <label class="control-label" requiredFieldLabel>Cuenta Bancaria: </label>
+
+                    <p-dropdown
+                      #dropdownCuenta
+                      [inputId]="transferenciaFormFieldId.cuenta_bancaria_id"
+                      placeholder="Seleccione la cuenta"
+                      filterPlaceholder="Buscar"
+                      appendTo="body"
+                      [formControlName]="transferenciaFormAttr.cuenta_bancaria_id"
+                      [options]="cuentasBancariasList"
+                      [itemSize]="34"
+                      [filter]="true"
+                      filterBy="numero_cuenta,banco_name"
+                      optionLabel="label"
+                      optionValue="id"
+                      [resetFilterOnHide]="true"
+                      [autofocusFilter]="false"
+                      styleClass="form-control campoCuentaBancaria"
+                      emptyMessage="No existen cuantas bancarias"
+                      [showClear]="true"
+                      (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                      (keyup.enter)="saltar('campoCuentaBancaria')"
+                      (onFocus)="dropCuentaBancariaFocus(dropdownCuenta)"
+                      (onHide)="dropCuentaBancariaHide(dropdownCuenta)"
+                    >
+                      <ng-template let-cuenta_bancaria pTemplate="item">
+                        <div class="cuenta_bancaria-item">
+                          <span class="d-block" style="font-size: 1rem"> <strong>No. Cuenta: </strong> {{ cuenta_bancaria.numero_cuenta }} </span>
+                          <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>Banco: </strong> {{ cuenta_bancaria.banco_name }} </span>
+                        </div>
+                      </ng-template>
+                    </p-dropdown>
+                    <span id="msgContainer"></span>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 p-0 pr-md-3">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.divisa_id" [form]="formGroup">
+                    <label class="control-label" requiredFieldLabel>Divisa: </label>
+                    <p-dropdown
+                      #divisaDropDown
+                      [autoDisplayFirst]="false"
+                      [inputId]="transferenciaFormFieldId.divisa_id"
+                      [options]="divisaServ.listaDivisas"
+                      appendTo="body"
+                      [formControlName]="transferenciaFormAttr.divisa_id"
+                      optionLabel="nombre"
+                      optionValue="id"
+                      placeholder="Selecciona la divisa"
+                      styleClass="form-control"
+                      (keydown.enter)="saltar(transferenciaFormFieldId.divisa_id)"
+                      (onFocus)="showDivisaDrop($event, divisaDropDown)"
+                    >
+                      <ng-template pTemplate="selectedItem">
+                        <div class="d-flex align-items-center" *ngIf="fun.hasValue(formGroup.controls[transferenciaFormAttr.divisa_id].value)">
+                          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'imagen.file_name'))"></img-component>
+                          <div>{{ imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'nombre') }}</div>
+                        </div>
+                      </ng-template>
+                      <ng-template let-divisa pTemplate="item">
+                        <div class="d-flex align-items-center">
+                          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(divisa.imagen.file_name)"></img-component>
+                          <div>{{ divisa.nombre }}</div>
+                        </div>
+                      </ng-template>
+                    </p-dropdown>
+                    <span id="msgContainer"></span>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 p-0">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.monto" [form]="formGroup">
+                    <label class="control-label" requiredFieldLabel>Monto: </label>
+                    <input
+                      type="text"
+                      (keydown.enter)="saltar($event.target.id)"
+                      [id]="transferenciaFormFieldId.monto"
+                      [formControlName]="transferenciaFormAttr.monto"
+                      placeholder="Introduzca monto"
+                      class="form-control"
+                      (focus)="desformatearMonto(transferenciaFormAttr.monto); $event.target.select()"
+                      autocomplete="off"
+                      (blur)="formatearMonto(transferenciaFormAttr.monto)"
+                    />
+                    <span id="msgContainer"></span>
+                  </div>
+                </div>
+
+                <div class="col-12 p-0">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.numero_referencia" [form]="formGroup">
+                    <label class="control-label">Número de referencia: </label>
+                    <input
+                      type="text"
+                      (keydown.enter)="saltar($event.target.id)"
+                      [id]="transferenciaFormFieldId.numero_referencia"
+                      [formControlName]="transferenciaFormAttr.numero_referencia"
+                      placeholder="Introduzca la referencia"
+                      class="form-control"
+                      (focus)="$event.target.select()"
+                      autocomplete="off"
+                    />
+                    <span id="msgContainer"></span>
+                  </div>
+                </div>
+
+                <div class="col-12 p-0">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.comentario" [form]="formGroup">
+                    <label class="control-label" requiredFieldLabel>Comentarios: </label>
+                    <textarea placeholder="Ingresar comentario" class="form-control form-control-sm" [id]="transferenciaFormFieldId.comentario" [formControlName]="transferenciaFormAttr.comentario" rows="3" pInputTextarea> </textarea>
+                    <span id="msgContainer"></span>
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div class="form-group p-0 mt-5" style="display: flex; justify-content: space-between">
+              <div class="d-flex column-gap-2">
+                <button (click)="borrar()" class="btn btn-blanco" style="max-width: 6rem">Borrar</button>
+                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde" style="max-width: 6rem">{{ botonLabel }}</button>
+                <!-- <button type="submit" (click)="checkIfSomethingIsDiferrent()" class="btn btn-gris" style="max-width: 6rem">test</button> -->
+              </div>
+              <div>
+                <button class="btn btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="list listDeposito {{ isCreando || depositoSelected ? 'FormList' : 'onlyList' }}">
+        <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
+          <h4 class="mb-0">Listado de depositos</h4>
+          <button *ngxPermissionsOnly="permissions.deposito.create || permissions.deposito.update" [disabled]="depositoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+        </div>
+        <div #cardTabla id="cardTabla" class="card cardContentClass">
+          <div class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="depositoList" [seleccionado]="depositoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-@import "../../../assets/my_styles/global-font.scss";
+@import '../../../assets/my_styles/global-font.scss';
 
 // .drag {
 //   -webkit-app-region: drag;
@@ -79,7 +79,7 @@
     width: 100%;
 
     display: grid;
-    grid-template-areas: "menu content";
+    grid-template-areas: 'menu content';
     grid-template-columns: 7.5rem auto;
     overflow: hidden;
 
@@ -87,8 +87,8 @@
       grid-area: menu;
       display: grid;
       grid-template-areas:
-        "title"
-        "sideBar";
+        'title'
+        'sideBar';
       grid-template-rows: min-content auto;
       z-index: 1;
       > .title {
@@ -188,6 +188,11 @@
                 padding: 0.5rem;
                 background-color: var(--primary04);
                 font-family: $globalFont;
+
+                &.sm {
+                  font-size: 0.9rem !important;
+                }
+
                 &.activa {
                   background-color: var(--primary09) !important;
                 }
@@ -209,9 +214,9 @@
       grid-area: content;
       display: grid;
       grid-template-areas:
-        "navBar"
-        "contenido"
-        "footer";
+        'navBar'
+        'contenido'
+        'footer';
 
       grid-template-rows: min-content auto min-content;
 

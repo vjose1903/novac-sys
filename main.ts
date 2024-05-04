@@ -90,7 +90,7 @@ function createWindow() {
       win.webContents.openDevTools();
       require('electron-reload')(__dirname, { electron: require(`${__dirname}/node_modules/electron`) });
 
-      win.loadURL('http://localhost:5223');
+      win.loadURL('http://localhost:5220');
     } else {
       win.loadURL(appFilePath);
     }
