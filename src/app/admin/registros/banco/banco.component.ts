@@ -33,6 +33,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
+      { titulo: '1', tipo: tableCellType.icon, key: 'incomplete', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'incomplete', tooltip: 'Información Incompleta', text_color: 'incomplete_color' }] },
       { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre', style: { width: '45%', 'text-align': 'start' } },
       { titulo: 'Rnc', tipo: tableCellType.text, key: 'rnc' },
       { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
@@ -167,15 +168,20 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     this.listaBancos.length = 0;
 
     this.bancoClass.getAll(extra).then((res) => {
-      res.data = res.data.map((banco) => {
+      res.data = res.data.map((banco: BancoI) => {
         banco = this.parseBanco(banco);
+        banco.warning_bg = fun.isEmpty(banco.rnc) || fun.isEmpty(banco.telefono) || fun.isEmpty(banco.ejecutivo_cuenta) || fun.isEmpty(banco.telefono_ejecutivo_cuenta);
+        banco.incomplete_color = 'warning';
+        banco.incomplete = banco.warning_bg ? 'fas fa-exclamation-triangle' : '';
+
+        banco.customStyles = {
+          incomplete: [{ key: 'incomplete', isTd: true, estilos: 'width: 2rem !important;' }],
+        };
         return banco;
       });
 
       this.listaBancos = res.data;
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
-
-      // this.tableClickIcon({ id_tabla: 'lista_banco', iconKey: 'edit_banco', data: this.listaBancos[0] });
     });
   }
 
@@ -287,10 +293,11 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     const originalValue = fun.pick(this.formInitialValue, pick_values);
     const bancoIsOnInitState = fun.isEqual(formValue, originalValue);
 
-    const pick_values_cuenta = ['id', 'arrayId', 'banco_id', 'tipo_cuenta_bancaria_id', 'divisa_id', 'numero_cuenta', 'comentario', 'descripcion', 'fecha_primera_conciliacion', 'fecha_apertura', 'balance_inicial_libro', 'balance_inicial_banco'];
-    let cuentasIsOnInitState = this.formInitialValue.cuentas_bancarias.length == this.formGroup.getRawValue().cuentas_bancarias.length;
+    let cuentasIsOnInitState = this.formInitialValue?.cuentas_bancarias.length == this.formGroup.getRawValue().cuentas_bancarias.length;
 
-    const initialCuentasIndexed = this.formInitialValue.cuentas_bancarias.reduce((acc, item) => {
+    const pick_values_cuenta = ['id', 'arrayId', 'banco_id', 'tipo_cuenta_bancaria_id', 'divisa_id', 'numero_cuenta', 'comentario', 'descripcion', 'fecha_primera_conciliacion', 'fecha_apertura', 'balance_inicial_libro', 'balance_inicial_banco'];
+
+    const initialCuentasIndexed = this.formInitialValue?.cuentas_bancarias.reduce((acc, item) => {
       acc[item.arrayId] = fun.pick(item, pick_values_cuenta);
       return acc;
     }, {});

@@ -128,6 +128,13 @@
                 }
               }
 
+              &.warning {
+                background-color: #ffe97e8d !important;
+                &:hover {
+                  background-color: #ceb94da1 !important;
+                }
+              }
+
               &.greenTd {
                 background-color: #7eff988d !important;
                 &:hover {

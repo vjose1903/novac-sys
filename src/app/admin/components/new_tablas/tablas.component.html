@@ -51,7 +51,7 @@
                 [ngClass]="{
                   greenTd: checkBackgroundTr({ tipo: 'greenTd', dato: rowData }),
                   danger: checkBackgroundTr({ tipo: 'danger', dato: rowData }),
-                  warning: rowData?.panico > 0 && config?.colores,
+                  warning: rowData?.warning_bg && config?.colores,
                   'bg-selected': config?.colores && fun.hasValue(seleccionado) && seleccionado == rowData?.id,
                   'bg-light': config.focusRow && RowElement.id == row_id,
                   'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData })
@@ -83,7 +83,13 @@
                         <span class="text-bold-700">{{ (tServ.getPaginationById(realIdTabla).page - 1) * tServ.getPaginationById(realIdTabla).per_page + (getIndex(indexBody) + 1) }}</span>
                       </span>
 
-                      <span *ngSwitchCase="tableCellType.cantidades" id="{{ column.key }}-{{ getIndex(indexBody) }}" pTooltip="{{ cantidadesTooltip(rowData, column) }}" [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'" style="width: 100%">
+                      <span
+                        *ngSwitchCase="tableCellType.cantidades"
+                        id="{{ column.key }}-{{ getIndex(indexBody) }}"
+                        pTooltip="{{ cantidadesTooltip(rowData, column) }}"
+                        [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'"
+                        style="width: 100%"
+                      >
                         {{ cantidadesLabel(rowData, column) }}
                       </span>
 
