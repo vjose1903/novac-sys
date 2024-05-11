@@ -57,8 +57,6 @@
     "ngx-permissions": "^16.0.1",
     "ngx-toastr": "^16.0.2",
     "pdfmake": "^0.1.70",
-    "primeicons": "6.0.1",
-    "primeng": "15.2.0",
     "replace-in-file": "6.3.2",
     "request": "^2.88.2",
     "zlib": "1.0.5"
@@ -69,7 +67,7 @@
     "@angular-eslint/builder": "1.2.0",
     "@angular-eslint/eslint-plugin": "1.2.0",
     "@angular-eslint/eslint-plugin-template": "1.2.0",
-    "@angular-eslint/schematics": "15.2.1",
+    "@angular-eslint/schematics": "~15.2.1",
     "@angular-eslint/template-parser": "1.2.0",
     "@angular/cli": "15.2.11",
     "@angular/common": "15.2.0",
