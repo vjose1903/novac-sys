@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { TabViewModule } from 'primeng/tabview';
-import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../new_tablas/tablas.module';
 import { ChangePasswordComponent } from './change-password/change-password.component';
@@ -33,7 +32,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, NgxBootstrapModule, TabViewModule, NgxPermissionsModule],
+  imports: [CommonModule, TablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, TabViewModule, NgxPermissionsModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}
