@@ -276,8 +276,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
         .sendTask(task)
         .then((config: ConfigI) => {
           if (fun.objHas(config, 'err')) {
+            console.error(config);
           } else {
-            console.log('config ', config);
+            console.log(config);
 
             this.themeService.setTheme(config.color_app);
             this.configServ.setConfig = config;

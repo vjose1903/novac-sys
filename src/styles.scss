@@ -1,27 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
-$bodyfont: "Poppins";
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
+$bodyfont: 'Poppins';
 
-@import "~@ng-select/ng-select/themes/default.theme.css";
-@import "./animateCss.scss";
+@import '~@ng-select/ng-select/themes/default.theme.css';
+@import './animateCss.scss';
 
-@import "./assets/my_styles/modal.scss";
-@import "./assets/my_styles/tablas.scss";
-@import "./assets/my_styles/forms.scss";
-@import "./assets/my_styles/btns.scss";
-@import "./assets/my_styles/overlayPanel.scss";
-@import "./assets/my_styles/inputs.scss";
-@import "./assets/my_styles/height.scss";
-@import "./assets/my_styles/p-calendar.scss";
-@import "./assets/my_styles/rowFactura.scss";
-@import "./splash-styles.scss";
+@import './assets/my_styles/modal.scss';
+@import './assets/my_styles/tablas.scss';
+@import './assets/my_styles/forms.scss';
+@import './assets/my_styles/btns.scss';
+@import './assets/my_styles/overlayPanel.scss';
+@import './assets/my_styles/inputs.scss';
+@import './assets/my_styles/height.scss';
+@import './assets/my_styles/p-calendar.scss';
+@import './assets/my_styles/rowFactura.scss';
+@import './splash-styles.scss';
 
 .visually-hidden {
   display: none !important;
 }
 
 * {
-  font-family: "Poppins";
+  font-family: 'Poppins';
 }
 
 .h-inherit {
@@ -50,7 +50,7 @@ $bodyfont: "Poppins";
 }
 
 .text-poppins {
-  font-family: "Poppins" !important;
+  font-family: 'Poppins' !important;
 }
 
 .ng-dropdown-panel {
@@ -154,8 +154,8 @@ $bodyfont: "Poppins";
   }
 }
 
-.form-control[type="text"],
-.form-control[type="number"] {
+.form-control[type='text'],
+.form-control[type='number'] {
   pointer-events: initial;
   &:read-only {
     pointer-events: none !important;
@@ -491,8 +491,8 @@ body {
   height: 100%;
   display: grid;
   grid-template-areas:
-    "p-tabview-nav-container"
-    "p-tabview-panels";
+    'p-tabview-nav-container'
+    'p-tabview-panels';
 
   grid-template-rows: min-content auto;
 
@@ -600,7 +600,7 @@ input.apple-switch {
 }
 
 input.apple-switch:after {
-  content: "";
+  content: '';
   position: absolute;
   top: 1px;
   left: 1px;
@@ -742,10 +742,6 @@ Not supports in Firefox and IE */
     color: var(--primary05) !important;
     cursor: pointer;
   }
-
-  & .ngx-pagination {
-    margin-bottom: 0rem !important;
-  }
 }
 
 .my-pagination .pagination-next > a:hover,
@@ -876,8 +872,8 @@ Not supports in Firefox and IE */
   height: 100%;
   display: grid;
   grid-template-areas:
-    "colTitulo"
-    "colFormularioListado";
+    'colTitulo'
+    'colFormularioListado';
 
   grid-template-rows: min-content auto;
 
@@ -902,8 +898,8 @@ Not supports in Firefox and IE */
 
         display: grid;
         grid-template-areas:
-          "titulo_card_area"
-          "card_content_area";
+          'titulo_card_area'
+          'card_content_area';
         grid-template-rows: min-content auto;
 
         > .tituloFormClass {
@@ -936,8 +932,8 @@ Not supports in Firefox and IE */
 
         display: grid;
         grid-template-areas:
-          "titulo_card_area"
-          "card_content_area";
+          'titulo_card_area'
+          'card_content_area';
         grid-template-rows: min-content auto;
 
         > .tituloCardClass {

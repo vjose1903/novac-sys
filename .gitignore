@@ -8,6 +8,7 @@
 /app-builds
 /release
 /resources/*
+.nx/*
 /log/*
 main.js
 app_config.config

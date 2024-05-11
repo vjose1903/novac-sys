@@ -21,7 +21,7 @@ export interface ConfigI {
   printer_selected:            Documentos;
   plantillas_impresion:        PlantiallasImpresion;
   is_development?:             boolean;
-  printersList?:               Printer[];
+  printersList?:               Printer[] | string [];
   app_version?:                string;
   is_db_local:                 boolean;
   facturacion_editar_precio:   boolean;
