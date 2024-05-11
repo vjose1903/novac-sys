@@ -54,7 +54,7 @@
     "ngx-bootstrap": "10.2.0",
     "ngx-extended-pdf-viewer": "16.2.4",
     "ngx-pagination": "^5.0.0",
-    "ngx-permissions": "13.0.1",
+    "ngx-permissions": "^16.0.1",
     "ngx-toastr": "^16.0.2",
     "pdfmake": "^0.1.70",
     "primeicons": "6.0.1",
@@ -107,7 +107,7 @@
     "typescript": "4.8.4",
     "wait-on": "7.2.0",
     "webpack-bundle-analyzer": "^4.4.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "0.12.0"
   },
   "engines": {
     "node": ">=10.13.0"
