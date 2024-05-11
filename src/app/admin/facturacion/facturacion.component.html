@@ -3,29 +3,33 @@
 </span>
 
 <div class="rowFacturacion">
-  <div class="colTitulo d-flex">
-    <h4 class="negrita mb-2">{{ titulo | titlecase }}</h4>
+  <div class="colTitulo mb-2 d-flex justify-content-between ">
+    <div class="d-flex align-items-center">
+      <h4 class="negrita mb-0">{{ titulo | titlecase }}</h4>
 
-    <div *ngIf="optionesExtra.length > 0 && factServ.isVenta" class="ml-3">
-      <btn-icon-circular [id]="'btnExtra'" [icon]="'fa-solid fa-ellipsis'" [size]="'size-md'" [tooltip]="'Opciones Extras'" [tooltipPosition]="'right'" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
+      <div *ngIf="optionesExtra.length > 0 && factServ.isVenta" class="ml-3">
+        <btn-icon-circular [id]="'btnExtra'" [icon]="'fa-solid fa-ellipsis'" [size]="'size-md'" [tooltip]="'Opciones Extras'" [tooltipPosition]="'right'" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
-      <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs" (onHide)="cerrarOverlay()">
-        <ng-template pTemplate>
-          <div id="overlayExtra">
-            <ul class="overlayExtra" role="menu">
-              <ng-container *ngFor="let option of optionesExtra; let index_option = index">
-                <li *ngIf="option.condition()" id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
-                  <div class="d-flex align-items-center">
-                    <strong> {{ option.key }} - </strong> &nbsp;
-                    <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
-                  </div>
-                </li>
-              </ng-container>
-            </ul>
-          </div>
-        </ng-template>
-      </p-overlayPanel>
+        <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs" (onHide)="cerrarOverlay()">
+          <ng-template pTemplate>
+            <div id="overlayExtra">
+              <ul class="overlayExtra" role="menu">
+                <ng-container *ngFor="let option of optionesExtra; let index_option = index">
+                  <li *ngIf="option.condition()" id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
+                    <div class="d-flex align-items-center">
+                      <strong> {{ option.key }} - </strong> &nbsp;
+                      <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
+                    </div>
+                  </li>
+                </ng-container>
+              </ul>
+            </div>
+          </ng-template>
+        </p-overlayPanel>
+      </div>
     </div>
+
+    <div class="d-flex">...</div>
   </div>
 
   <div class="colCard">
@@ -358,7 +362,14 @@
       </div>
       <div class="cuerpoFactura mb-2">
         <div class="fantasma-cuerpo">
-          <app-cuerpo-factura [factura]="factura_a_rellenar" [modo_factura]="modo_factura" [fechaFactura]="fechaFactura?.front" (getCuerpoFactura)="getCuerpoFactura($event)" (getCalculosDinero)="getCalculosDinero($event)" [isInitialized]="isInitialized"></app-cuerpo-factura>
+          <app-cuerpo-factura
+            [factura]="factura_a_rellenar"
+            [modo_factura]="modo_factura"
+            [fechaFactura]="fechaFactura?.front"
+            (getCuerpoFactura)="getCuerpoFactura($event)"
+            (getCalculosDinero)="getCalculosDinero($event)"
+            [isInitialized]="isInitialized"
+          ></app-cuerpo-factura>
         </div>
       </div>
       <div class="pieFactura">

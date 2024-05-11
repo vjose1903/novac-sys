@@ -26,6 +26,7 @@ export interface ConfigI {
   is_db_local:                 boolean;
   facturacion_editar_precio:   boolean;
   vende_sin_inventario:        boolean;
+  facturacion_electronica?:    boolean;
   documentos_a_imprimir:       string;
   medida_producto_terminado:   string;
 }
