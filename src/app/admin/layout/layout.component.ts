@@ -4,7 +4,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
+import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
 import { CurrentUserService } from '../../core/services/current-user.service';
@@ -57,7 +57,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
     super();
 
-    this.subRouter = this.router.events.subscribe((routerEvent: Event) => {
+    this.subRouter = this.router.events.subscribe((routerEvent: Event | RouterEvent) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
         this.initNavigate = true;
