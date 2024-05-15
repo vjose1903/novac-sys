@@ -413,7 +413,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  changeSelect(tipo, valor) {
+  async changeSelect(tipo, valor) {
     this.tipo_factura_id = null;
     this.valor_a_buscar = null;
     this.idsFacturasSeleccionadas.length = 0;
@@ -422,7 +422,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (fun.hasValue(valorInput)) valorInput.value = null;
 
     this.resetFacturas();
-    const actualPagination = this.tServ.getPaginationById(shearchDocumentTableId);
+    const actualPagination = await this.getActualPagination();
     if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
 
     const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura, this.campos.cliente].map((item) => `${item}`);
@@ -535,7 +535,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   deleteRequest(params: { ids: string; tipo: string }) {
     const extra = { afterPath: `custom/delete`, parameters: params };
 
-    this.facturaClass.dynamic(extra).then((res) => {
+    this.facturaClass.dynamic(extra).then(async (res) => {
       const info = {
         pre_venta: { label: { singular: 'Pre_Venta', plural: 'Pre_Ventas' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
         venta: { label: { singular: 'Factura', plural: 'Facturas' }, key: 'numero_comprobante', key_label: { singular: 'número de comprobante', plural: 'números de comprobantes' } },
@@ -563,7 +563,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fun.toastSuccess(msg, 'CORRECTO');
       }
 
-      const actualPagination = this.tServ.getPaginationById(shearchDocumentTableId);
+      const actualPagination = await this.getActualPagination();
       this.pedirFactura(actualPagination);
     });
   }
@@ -572,9 +572,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     setTimeout(() => this.router.navigateByUrl(`/admin/factura/venta/bill_from_cotizacion/${cotizacion.id}`), 10);
   }
 
-  saltar(salioDe, valor) {
+  async saltar(salioDe, valor) {
     this.resetFacturas();
-    const actualPagination = this.tServ.getPaginationById(shearchDocumentTableId);
+    let actualPagination = await this.getActualPagination();
 
     let siguiente_input;
     this.valor_a_buscar = valor;
@@ -642,7 +642,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   async AnularFactura() {
     try {
       const res = await this.facturaClass.createOne(null, { afterPath: `anular_factura/${this.facturaSelected.id}` });
-      const actualPagination = this.tServ.getPaginationById(shearchDocumentTableId);
+      const actualPagination = await this.getActualPagination();
       this.pedirFactura(actualPagination);
     } catch (error) {
       console.error(error);
@@ -782,14 +782,25 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.openNewModal(configModal);
   }
 
-  getDataFromModal(arg, search?) {
+  async getActualPagination() {
+    let actualPagination = this.tServ.getPaginationById(shearchDocumentTableId);
+
+    if (fun.isEmpty(actualPagination)) {
+      await this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate);
+      actualPagination = this.tServ.getPaginationById(shearchDocumentTableId);
+    }
+
+    return actualPagination;
+  }
+
+  async getDataFromModal(arg, search?) {
     if (arg.modal_id == 'buscarClienteOsuplidor') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('valorI');
       } else {
         (document.getElementById('valorI') as any).value = arg.data.nombre_completo;
 
-        const actualPagination = this.tServ.getPaginationById(shearchDocumentTableId);
+        const actualPagination = await this.getActualPagination();
 
         this.buscar_por = this.tipo_documento_selected == tipoDocFacturacion.compra ? this.campos.suplidor : this.campos.cliente;
         this.valor_a_buscar = arg.data.id;
