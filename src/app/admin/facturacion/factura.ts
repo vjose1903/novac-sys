@@ -12,6 +12,7 @@ import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 
+
 export enum deleteDocumentosTypes {
   anular = 'anular',
   delete = 'delete',
@@ -26,9 +27,20 @@ export enum tipoDocFacturacion {
   nota_debito = 'nota_debito',
 }
 
+
+export enum tipoDocFacturacionLabel {
+  pre_venta = 'pre-venta',
+  venta = 'venta',
+  compra = 'compra',
+  cotizacion = 'cotización',
+  nota_credito = 'nota de crédito',
+  nota_debito = 'nota de débito',
+}
+
 export enum actionFacturacion {
   new = 'new',
   update = 'update',
+  duplicate = 'duplicate',
   bill_from_cotizacion = 'bill_from_cotizacion',
   bill_from_pre_venta = 'bill_from_pre_venta',
 }

@@ -8,6 +8,7 @@ import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { ConfigI } from '../../../../core/typescript/config-interface';
 @Component({
   selector: 'app-buscar-cliente-suplidor',
   templateUrl: './buscar-cliente-suplidor.component.html',
@@ -49,6 +50,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
+  configApp!: ConfigI;
 
   btn_aceptar() {}
 
@@ -56,6 +58,8 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     this.table_config.info = this.inputs.metodo == tipoDocFacturacion.compra ? this.compraInfo : this.ventaInfo;
 
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
+
+    this.configApp = Ss.configServ.getConfig({ isPromise: false });
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
@@ -71,14 +75,18 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
       });
 
       if (res.data && res.data.length > 0) {
-        res.data.map(async (entidad) => {
-          entidad.nombre = fun.Capitalice(entidad.nombre);
-          entidad.apellido = fun.Capitalice(entidad.apellido);
-          const doc = entidad.documentos_de_identidad.find((documento) => documento.principal);
+        res.data.unshift({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
 
+        res.data.map(async (entidad) => {
+          entidad.nombre = entidad.nombre ? fun.Capitalice(entidad.nombre) : '----------';
+          entidad.apellido = entidad.apellido ? fun.Capitalice(entidad.apellido) : '----------';
+          entidad.telefono = entidad.telefono ?? '----------';
+
+          const doc = entidad?.documentos_de_identidad?.find((documento) => documento.principal);
           entidad.documento_identidad = doc ? doc.documento : '----------';
           return entidad;
         });
+
         this.dataFiltro = res.data;
       } else {
         this.dataFiltro = copyData;

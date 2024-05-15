@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { fun } from './../../core/services/functions.service';
 import { tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
+import { Ss } from '../../core/services/singleton.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +22,16 @@ export class FacturacionService {
   cotizacion_selected;
   productos_devueltos = [];
   filasDetalle;
+
+  public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
+    if (fun.hasValue(Ss.configServ)) {
+      const configApp = Ss.configServ.getConfig({ isPromise: false });
+
+      return { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
+    } else {
+      return {};
+    }
+  }
 
   public get isCompra(): boolean {
     return this.tipoDocumento == tipoDocFacturacion.compra;
