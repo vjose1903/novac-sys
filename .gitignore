@@ -20,6 +20,7 @@ app_config.config
 # dependencies
 /resources
 /log
+/.nx/*
 /node_modules
 /actualizacion
 actualizacion.zip
