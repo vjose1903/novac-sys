@@ -9,6 +9,16 @@ import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { ModalClass } from '../../components/modal/modal-class';
 import { ReporteC } from '../../reportes/reporte';
 
+export enum comprobanteNormal {
+  debito = '03',
+  credito = '04',
+}
+
+export enum comprobanteElectronico {
+  debito = '33',
+  credito = '34',
+}
+
 export class NotaC extends CrudG<any> {
   constructor() {
     super('notas');
@@ -20,8 +30,14 @@ export class NotaC extends CrudG<any> {
   };
 
   static base_comprobante = {
-    nota_credito: '04',
-    nota_debito: '03',
+    normal: {
+      nota_debito: comprobanteNormal.debito,
+      nota_credito: comprobanteNormal.credito,
+    },
+    electronica: {
+      nota_debito: comprobanteElectronico.debito,
+      nota_credito: comprobanteElectronico.credito,
+    },
   };
 
   parseDataToPdf(data) {

@@ -30,7 +30,9 @@
     </div>
 
     <div class="d-flex">
-      <span>...</span>
+      <span>
+        <p-selectButton [options]="facturasSerieOptions" [(ngModel)]="factServ.serieType" (ngModelChange)="changeSerie()" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+      </span>
     </div>
   </div>
 
@@ -41,6 +43,7 @@
           <div *ngIf="factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion" class="col-3 divRight pl-0">
             <div class="row">
               <div class="col-3 pl-0">
+                <!-- ================== TIPO ================== -->
                 <span class="titulos"><strong>Tipo:</strong></span>
                 <input
                   #tipoFact
@@ -50,8 +53,9 @@
                   type="text"
                   (keydown.enter)="saltar('tipo', tipoFact.value)"
                   class="form-control w-100 inputE"
+                  [ngClass]="{ badAlert: errorComprobante }"
                   [(ngModel)]="factServ.tipoFacturaReferenciaSelected"
-                  (blur)="checkTipoFactura('condicion', tipoFact.value, true); tiposFacturas.hide()"
+                  (blur)="checkTipoFactura(); tiposFacturas.hide()"
                   (focus)="tiposFacturas.toggle($event)"
                   tabindex="-1"
                   [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
@@ -64,6 +68,7 @@
               </div>
 
               <div class="{{ factServ.isCompra ? 'col-6' : 'col-9' }} p-0">
+                <!-- ================== CONDICION ================== -->
                 <span class="titulos"><strong>Condición:</strong></span>
 
                 <select
@@ -74,7 +79,7 @@
                   [(ngModel)]="condicion_fact"
                   (change)="cambiarCondicion($event.target.value)"
                   tabindex="-1"
-                  [disabled]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
+                  [disabled]="(factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
                   [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
                 >
                   <option value="Contado">Contado</option>
@@ -83,6 +88,7 @@
               </div>
 
               <div *ngIf="factServ.isCompra" class="col-3 pr-0">
+                <!-- ================== GASTO ================== -->
                 <span class="titulos"><strong>Gasto:</strong></span>
                 <input
                   #gastoDe
@@ -94,7 +100,7 @@
                   class="form-control w-100 inputE"
                   [(ngModel)]="CostoYgasto"
                   [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
-                  [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
+                  [ngClass]="{ disabled: (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante }"
                   (focus)="gastosFacturas.toggle($event)"
                   (blur)="gastosFacturas.hide()"
                   tabindex="-1"
@@ -106,6 +112,7 @@
             </div>
 
             <div *ngIf="factServ.isVenta">
+              <!-- ================== VENTA ================== -->
               <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
               <select
                 #ventaInput
@@ -116,8 +123,8 @@
                 [(ngModel)]="modo_factura"
                 (blur)="checkCambiosModoyCondicionFactura({ elemento_html: $event.target })"
                 tabindex="-1"
-                [disabled]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
-                [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
+                [disabled]="(factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
+                [ngClass]="{ disabled: (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante }"
               >
                 <option value="" disabled selected>Modo de venta</option>
                 <option value="normal">Normal</option>
@@ -127,6 +134,7 @@
             </div>
 
             <div *ngIf="modo_factura === 'viaje'">
+              <!-- ================== FECHA VIAJE ================== -->
               <span class="mt-1"><strong>Fecha viaje:</strong></span>
               <div class="d-flex justify-content-between align-items-center">
                 <p-calendar
@@ -137,6 +145,7 @@
                   placeholder="dd/mm/aaaa"
                   [minDate]="datesAvailable.viaje.minDate"
                   (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
+                  [disabled]="errorComprobante"
                 ></p-calendar>
 
                 <div class="ml-3 position-relative">
@@ -185,7 +194,7 @@
                             <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' mr-1 c-help'"></i>
 
                             <span id="dropdown-item" class="mb-0"> {{ getCamionInfo(camion, 'label') }} </span>
-                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
+                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
                           </div>
                         </li>
 
@@ -221,7 +230,7 @@
                             <span id="dropdown-item" class="mb-0">
                               {{ chofer.nombre_completo }}
                             </span>
-                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' }" type="checkbox" (change)="seleccionarChofer(chofer, index_chofer)" [checked]="checkChoferIsSelected(chofer)" />
+                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarChofer(chofer, index_chofer)" [checked]="checkChoferIsSelected(chofer)" />
                           </div>
                         </li>
 
@@ -236,20 +245,23 @@
             </div>
 
             <div *ngIf="factServ.isCompra">
+              <!-- ================== COMPROBANTE ================== -->
               <span class="mt-2"><strong>Número comprobante:</strong></span>
 
               <p-inputMask
                 inputId="ncf"
                 (keydown.enter)="saltar($event.target.id, $event.target.value)"
                 [(ngModel)]="NCFcompra"
-                mask="B9999999999"
+                [mask]="factServ.isComprobanteNormal ? 'B9999999999' : 'E999999999999'"
                 tabindex="-1"
                 styleClass="form-control inputE UPPERCASE"
-                placeholder="B__________"
+                [placeholder]="factServ.isComprobanteNormal ? 'B__________' : 'E____________'"
                 [autoClear]="false"
+                [disabled]="errorComprobante"
               ></p-inputMask>
 
               <div *ngIf="condicion_fact === 'Crédito'">
+                <!-- ================== FECHA VENCIMIENTO ================== -->
                 <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
 
                 <p-calendar
@@ -260,6 +272,7 @@
                   placeholder="dd/mm/aaaa"
                   [minDate]="datesAvailable.viaje.minDate"
                   (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_vencimiento', value: fecha_vencimiento })"
+                  [disabled]="errorComprobante"
                 ></p-calendar>
               </div>
             </div>
@@ -269,6 +282,7 @@
           <div class="{{ factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
             <form [formGroup]="form">
               <div class="d-flex" style="height: 1.7rem">
+                <!-- ================== PROPIETARIO ================== -->
                 <h5>
                   <strong>{{ factServ.isCompra ? 'Suplidor' : 'Cliente' }}:</strong>
                 </h5>
@@ -287,6 +301,7 @@
               </div>
               <div class="row">
                 <div class="col-7 pl-0">
+                  <!-- ================== NOMBRE ================== -->
                   <span class="control-label titulos mr-2">Nombre:</span>
                   <input
                     #nombreInput
@@ -307,6 +322,7 @@
 
                 <div class="col-5 pr-0">
                   <div class="form-group">
+                    <!-- ================== TELEFONO ================== -->
                     <span class="control-label titulos">Telefono:</span>
                     <input type="text" class="form-control inputE disabled" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" [readOnly]="true" tabindex="-1" />
                     <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)">Introduzca el numero de telefono</div>
@@ -315,6 +331,7 @@
 
                 <div class="col-12 p-0">
                   <div class="form-group">
+                    <!-- ================== DIRECCION ================== -->
                     <span class="control-label titulos mr-2">Direccion:</span>
                     <input
                       #direccionInput

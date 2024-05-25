@@ -14,9 +14,10 @@ import { DetalleFacturaModule } from '../manipular facturas/detalle-factura/deta
 import { BtncircularModule } from '../components/btncircular/btncircular.module';
 import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular.module';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent, MenuOpcionesExtraComponent, RetornarDevueltoComponent],
-  imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule,  BtnIconModule],
+  imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, BtnIconModule, SelectButtonModule],
 })
 export class FacturacionModule {}

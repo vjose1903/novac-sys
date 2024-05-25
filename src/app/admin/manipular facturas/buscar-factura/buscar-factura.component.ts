@@ -148,7 +148,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
+      // TODO: seguir aqui
       const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.buscarPara]);
+
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
       this.paqueteComprobante = res['data'] as any;

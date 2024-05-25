@@ -16,6 +16,7 @@ import { BuscarClienteSuplidorComponent } from './buscar-cliente-suplidor/buscar
 import { BuscarArticuloComponent } from './buscar-articulo/buscar-articulo.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -32,7 +33,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, TabViewModule, NgxPermissionsModule],
+  imports: [CommonModule, TablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, TabViewModule, NgxPermissionsModule, SelectButtonModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}
