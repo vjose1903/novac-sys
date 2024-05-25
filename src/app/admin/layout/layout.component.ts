@@ -1,4 +1,4 @@
-import { TiposFacturaC } from './../facturacion/factura';
+import { TiposFacturaC, actionFacturacion } from './../facturacion/factura';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit, ElementRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription } from 'rxjs';
@@ -53,6 +53,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   chequiando_cuadre: boolean;
   hasPermisosValidated: boolean;
+  actionFacturacion = actionFacturacion;
 
   constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
     super();

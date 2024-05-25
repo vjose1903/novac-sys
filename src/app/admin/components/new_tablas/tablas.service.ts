@@ -21,8 +21,12 @@ export class TablasService {
     },
   };
 
-  initPagination(id, params: paginateI) {
-    if (this.obj_paginate[id] == undefined) this.obj_paginate[id] = params;
+  initPagination(id, params?: paginateI) {
+    return new Promise<void>((resolve, reject) => {
+      params ??= fun.duplicarJson(this.obj_paginate);
+      if (this.obj_paginate[id] == undefined) this.obj_paginate[id] = params;
+      resolve();
+    });
   }
 
   getPaginationById(id): paginateI {

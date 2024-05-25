@@ -289,7 +289,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
                 await this.getArticuloToLlenar(detalle_en_turno).then((articulo) => {
                   this.llenarDetalles(detalle_en_turno, articulo, index);
-                  this.seleccionarCampoEnTurno();
+                  if (fun.hasValue(this.factServ.propietario_factura)) this.seleccionarCampoEnTurno();
                 });
               }
 
@@ -398,9 +398,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   seleccionarCampoEnTurno() {
-    setTimeout(() => {
-      this.ajustarSecuencia().then((res) => setTimeout(() => fun.enfocarInput(this.inputSecuencia), 10));
-    }, 100);
+    if (fun.hasValue(this.factServ.propietario_factura)) {
+      setTimeout(() => {
+        this.ajustarSecuencia().then((res) => setTimeout(() => fun.enfocarInput(this.inputSecuencia), 10));
+      }, 100);
+    }
   }
 
   async saltar(input, index) {
