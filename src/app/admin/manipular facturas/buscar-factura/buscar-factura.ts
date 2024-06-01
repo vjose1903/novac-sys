@@ -7,10 +7,10 @@ export class BuscarFacturaC {
         { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
         { titulo: 'No. Factura', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
         { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
-        { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+        { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '9rem' }] },
         { titulo: 'Condición', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
-        { titulo: 'Fecha Facturación', tipo: 'date', key: 'fecha_equivalente' },
-        { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFechaV', key: 'fechaV' },
+        { titulo: 'Fecha Facturación', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '6.5rem' }] },
+        { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFechaV', key: 'fechaV', estilos: [{ width: '6.5rem' }] },
         { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
         { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
         {
@@ -48,10 +48,10 @@ export class BuscarFacturaC {
         { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
         { titulo: 'No. Factura', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
         { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
-        { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+        { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '9rem' }] },
         { titulo: 'Condición', tipo: 'text', key: 'condicion', estilos: [{ width: '6rem' }] },
-        { titulo: 'Fecha ingreso', tipo: 'date', key: 'fecha_equivalente' },
-        { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV', text_color: 'colorFechaV' },
+        { titulo: 'Fecha ingreso', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '6.5rem' }] },
+        { titulo: 'Fecha Vencimiento', tipo: 'text', key: 'fechaV', text_color: 'colorFechaV', estilos: [{ width: '6.5rem' }] },
         { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
         { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
         {
@@ -105,7 +105,7 @@ export class BuscarFacturaC {
       info: [
         { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
         { titulo: 'No. Cotización', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
-        { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
+        { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '6.5rem' }] },
         { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre' },
         { titulo: 'Total cotizado', tipo: 'formatoNumero', key: 'total_factura' },
         {

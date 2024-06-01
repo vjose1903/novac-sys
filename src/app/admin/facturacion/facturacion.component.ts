@@ -215,7 +215,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           //
         } else if (this.factServ.action == actionFacturacion.duplicate) {
           this.procesoRelleno({ id: this.id_documento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.duplicate }).then((res) => {
-            this.abrirModalPropietario();
+            this.abrirModalPropietario({ include_contado: true });
           });
           //
         } else {
@@ -1203,7 +1203,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================
 
-  abrirModalPropietario() {
+  abrirModalPropietario(params?: { include_contado: boolean }) {
+    if (fun.isEmpty(params)) {
+      params = { include_contado: false };
+    }
     let documento = this.getDocumentoDescripcion();
     if (this.is_editando && (this.factServ.isVenta || this.factServ.isCompra)) {
       const entidad = this.factServ.isVenta ? 'Cliente' : 'Suplidor';
@@ -1219,7 +1222,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
 
       if (fun.hasValue(input_activo)) fun.desEnfocarInput(input_activo);
-      const include_contado = this.factServ.tipoDocumento === tipoDocFacturacion.cotizacion;
+      const include_contado = this.factServ.tipoDocumento === tipoDocFacturacion.cotizacion || params.include_contado;
 
       this.openNewModal({
         component: BuscarClienteSuplidorComponent,
@@ -1696,6 +1699,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['is_viaje'] = this.is_viaje;
     cabecera_fact['is_nota'] = false;
     cabecera_fact['movimientos_viaje'] = this.movimientosSelected;
+    cabecera_fact['serie'] = this.factServ.serieType;
 
     cabecera_fact['pre_factura'] = fun.hasValue(this.factServ.pre_venta_selected) ? this.factServ.pre_venta_selected?.id : null;
 

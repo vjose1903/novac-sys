@@ -307,7 +307,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.customStyles = {
           condicion: { width: '6rem' },
           secuencia: { width: '7rem' },
-          numero_comprobante: { width: '7rem' },
+          numero_comprobante: { width: '9rem' },
+          fecha_equivalente: { width: '6.5rem' },
+          fechaV: { width: '6.5rem' },
           estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
@@ -614,7 +616,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async abrirModalFiltro(nombre) {
-    const obj = { data: null, palabra_a_buscar: nombre, metodo: this.tipo_documento_selected };
+    const obj = { data: null, palabra_a_buscar: nombre, metodo: this.tipo_documento_selected, include_contado: false };
 
     this.openNewModal({
       component: BuscarClienteSuplidorComponent,
