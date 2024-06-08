@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import '../polyfills';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,27 +22,19 @@ import { ConfirmacionImprimirComponent } from './admin/facturacion/confirmacion-
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 
 
-@NgModule({
-  declarations: [AppComponent, NgInitDirective, PageNotFoundComponent, ConfirmacionImprimirComponent],
-  imports: [
-    CommonModule,
-    BrowserModule,
-    PrimengModule,
-    FormsModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    CoreModule,
-    ToastrModule.forRoot({ preventDuplicates: true }),
-    NgxPermissionsModule.forRoot(),
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    NewModalModule,
-    NgSelectModule,
-    FormulariosEnModalesModule,
-  ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }, NgxExtendedPdfViewerService],
-
-  bootstrap: [AppComponent],
-  exports: [NgxPermissionsModule],
-})
+@NgModule({ declarations: [AppComponent, NgInitDirective, PageNotFoundComponent, ConfirmacionImprimirComponent],
+    bootstrap: [AppComponent],
+    exports: [NgxPermissionsModule], imports: [CommonModule,
+        BrowserModule,
+        PrimengModule,
+        FormsModule,
+        ReactiveFormsModule,
+        CoreModule,
+        ToastrModule.forRoot({ preventDuplicates: true }),
+        NgxPermissionsModule.forRoot(),
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        NewModalModule,
+        NgSelectModule,
+        FormulariosEnModalesModule], providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }, NgxExtendedPdfViewerService, provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {}

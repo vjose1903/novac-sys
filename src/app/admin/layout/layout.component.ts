@@ -1,8 +1,7 @@
 import { TiposFacturaC, actionFacturacion } from './../facturacion/factura';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit, ElementRef } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+
+import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
 import { MixinClass } from '../../core/typescript/MixinClass';
@@ -39,7 +38,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ready;
   // facturas_localStorage: any;
-  isHandset$: Observable<boolean>;
   activeIndex;
   initNavigate = true;
   cuadre_hoy;
@@ -55,7 +53,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   hasPermisosValidated: boolean;
   actionFacturacion = actionFacturacion;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
+  constructor(private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
     super();
 
     this.subRouter = this.router.events.subscribe((routerEvent: Event | RouterEvent) => {
@@ -157,7 +155,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.showLoading = true;
     this.imgUser = 'assets/img/transparente.png';
     this.noServer = false;
-    this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
     this.activeIndex = 0;
 
     this.cuadre_hoy = false;
