@@ -1,7 +1,7 @@
 import { MovimientosC } from './../../components/formularios en modales/movimientos-form/movimiento-model';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
+const moment = require('../../../core/javascript/moment');
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../registros/registro-empleados/empleado';

@@ -3,7 +3,6 @@ import { ClienteC } from './../../../registros/registro-clientes/cliente';
 import { NotaC } from './../../../manipular facturas/notas-cred-deb/notas';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../../core/javascript/moment';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
@@ -16,6 +15,7 @@ import { fun } from '../../../../core/services/functions.service';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
+const moment = require('../../../../core/javascript/moment');
 
 @Component({
   selector: 'app-ingresos',

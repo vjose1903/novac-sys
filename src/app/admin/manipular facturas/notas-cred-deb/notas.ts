@@ -3,7 +3,7 @@ import { ConfigI } from './../../../core/typescript/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
+const moment = require('../../../core/javascript/moment');
 import { fun } from '../../../core/services/functions.service';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { ModalClass } from '../../components/modal/modal-class';

@@ -4,7 +4,9 @@ import { Ss } from './../../../../core/services/singleton.service';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 
-import * as moment from '../../../../core/javascript/moment';
+
+const moment = require('../../../../core/javascript/moment');
+
 
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';

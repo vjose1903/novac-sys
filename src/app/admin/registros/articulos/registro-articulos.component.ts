@@ -5,9 +5,8 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import * as moment from '../../../core/javascript/moment';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
-import * as $ from 'jquery';
+
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
@@ -16,6 +15,8 @@ import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
 import { ModalClass } from '../../components/modal/modal-class';
+const moment = require('../../../core/javascript/moment');
+const $ = require('jquery');
 
 @Component({
   selector: 'app-registro-articulos',

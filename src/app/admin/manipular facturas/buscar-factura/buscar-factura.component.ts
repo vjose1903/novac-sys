@@ -2,7 +2,7 @@ import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFa
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
+const moment = require('../../../core/javascript/moment');
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';

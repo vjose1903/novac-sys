@@ -4,12 +4,13 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import { TablasService } from '../components/new_tablas/tablas.service';
 import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
 import { ProduccionC } from './produccion';
-import * as $ from 'jquery';
+
 import { fun } from '../../core/services/functions.service';
 import { medidas, table_config } from '../components/new_tablas/tabla-class';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { Ss } from '../../core/services/singleton.service';
 import { ModalClass } from '../components/modal/modal-class';
+const $ = require('jquery');
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',

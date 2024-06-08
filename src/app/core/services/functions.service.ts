@@ -1,4 +1,4 @@
-import * as moment from '../javascript/moment';
+const moment = require('../javascript/moment');
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 

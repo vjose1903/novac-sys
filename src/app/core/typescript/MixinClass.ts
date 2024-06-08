@@ -1,4 +1,4 @@
-import * as moment from '../javascript/moment';
+const moment = require('../javascript/moment');
 import { ModalClass } from '../../admin/components/modal/modal-class';
 import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
