@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
 $bodyfont: 'Poppins';
 
-@import '~@ng-select/ng-select/themes/default.theme.css';
+@import '@ng-select/ng-select/themes/default.theme.css';
 @import './animateCss.scss';
 
 @import './assets/my_styles/modal.scss';
