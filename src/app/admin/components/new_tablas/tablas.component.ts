@@ -1,12 +1,10 @@
-import { ModalClass } from './../modal/modal-class';
-import { Component, OnInit, ViewChild, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
 
 import * as _ from 'lodash';
-import { ElementRef } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { medidas, table_config, table_info } from './tabla-class';
+import { btnTableI, medidas, table_config, table_info } from './tabla-class';
 import { teclasCode } from '../../../core/typescript/constantes';
 
 @Component({
@@ -53,7 +51,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   cantPagesView: number = 5;
   total_registros;
-  subWidth: Subscription;
+  private destroy$ = new Subject<void>();
 
   fun = fun;
   rowsEditing = [];
@@ -74,7 +72,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   ngOnInit() {
     this.realIdTabla = this.config.id_tabla + this.post_id;
 
-    this.subWidth = new fun().getWindowSize.subscribe((res) => {
+    new fun().getWindowSize.pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res) {
         this.setCantPagView(res.innerWidth, 'width_page');
       }
@@ -83,12 +81,18 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.TablasComponent = this;
     this.TablasComponentChange.emit(this.TablasComponent);
 
-    this.checkPagination();
+    this.verificateConfig();
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
     setTimeout(() => (this.ready = true), 250);
   }
 
-  checkPagination() {
+  ngAfterViewInit() {
+    this.changeStylesTitles();
+    if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
+    this.handleConfig();
+  }
+
+  verificateConfig() {
     if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
@@ -96,14 +100,37 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
     }
+    this.verificateBottons(this.config);
 
     this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.duplicarJson(this.tServ.obj_paginate.default));
   }
 
-  ngAfterViewInit() {
-    this.changeStylesTitles();
-    if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
-    this.handleConfig();
+  ngOnDestroy() {
+    if (this.destroy$) this.destroy$.next();
+    if (this.destroy$) this.destroy$.complete();
+
+    this.tServ.deletePaginationById(this.realIdTabla);
+    clearInterval(this.tablaInterval);
+  }
+
+  verificateBottons(config: table_config) {
+    const verificateId = (boton: btnTableI) => (boton.btn_id ??= fun.generateKey());
+
+    if (config.botones) {
+      for (const key in config.botones) {
+        const btnObj = config.botones[key];
+
+        if (Array.isArray(btnObj)) {
+          btnObj.forEach((btn) => verificateId(btn));
+        } else {
+          verificateId(btnObj);
+        }
+      }
+
+      config.info.forEach((info) => {
+        info.iconsArray.forEach((icon) => (icon.id ??= fun.generateKey()));
+      });
+    }
   }
 
   handleConfig() {
@@ -126,12 +153,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         this.config[key] = element[key];
       });
     });
-  }
-
-  ngOnDestroy() {
-    if (this.subWidth) this.subWidth.unsubscribe();
-    this.tServ.deletePaginationById(this.realIdTabla);
-    clearInterval(this.tablaInterval);
   }
 
   getValueForm(column: table_info, data) {

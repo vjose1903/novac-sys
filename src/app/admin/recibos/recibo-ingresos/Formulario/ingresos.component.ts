@@ -345,8 +345,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (params.iconKey == 'ver') {
         this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
           let botonesDinamicos = [
-            { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
+            { clase: 'btn btn-gris', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+            { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
           ];
           const toPDFData = { data: dataFactura, type: 'facturacion' };
 
@@ -533,12 +533,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         botones: {
           ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            {
-              clase: 'btn btn-blanco mr-2',
-              function: (instance) => this.closeModal(instance),
-              label: 'Cancelar',
-              disable: false,
-            },
+            { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
           ],
         },

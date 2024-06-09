@@ -6,11 +6,11 @@
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
-        <div class="contenedorRegistro" *ngIf="isCreando || empleadoSelected" class="form {{ isCreando || empleadoSelected ? 'showForm' : 'hideForm' }} ">
+        @if (isCreando || empleadoSelected) {
+        <div class="contenedorRegistro" class="form {{ isCreando || empleadoSelected ? 'showForm' : 'hideForm' }} ">
           <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
             <h4 class="mb-0">Formulario</h4>
           </div>
-
           <div class="card cardFormClass">
             <form [formGroup]="form">
               <div class="row">
@@ -30,13 +30,11 @@
                           formControlName="cedula"
                           [autoClear]="false"
                         ></p-inputMask>
-
                         <span id="msgContainer_cedula"></span>
                       </div>
                     </div>
                   </div>
                 </div>
-
                 <div class="col-6 p-0 pr-2">
                   <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
@@ -44,7 +42,6 @@
                     <span id="msgContainer_nombre"></span>
                   </div>
                 </div>
-
                 <div class="col-6 p-0 pl-2">
                   <div class="form-group" [appMsgError]="'apellido'" [form]="form">
                     <label class="control-label">Apellido: <span style="color: red">*</span></label>
@@ -61,7 +58,6 @@
                     <span id="msgContainer_apellido"></span>
                   </div>
                 </div>
-
                 <div class="col-6 p-0 pr-2">
                   <div class="form-group" [appMsgError]="'usuario'" [form]="form">
                     <label class="control-label">Usuario: <span style="color: red">*</span></label>
@@ -69,17 +65,13 @@
                     <span id="msgContainer_usuario"></span>
                   </div>
                 </div>
-
                 <div class="col-6 p-0 pl-2">
                   <div class="form-group" [appMsgError]="'telefono'" [form]="form">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
-
                     <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
-
                     <span id="msgContainer_telefono"></span>
                   </div>
                 </div>
-
                 <div class="col-8 p-0 pr-2">
                   <div class="form-group" [appMsgError]="'email'" [form]="form">
                     <label class="control-label">Email: <span style="color: red">*</span> </label>
@@ -87,7 +79,6 @@
                     <span id="msgContainer_email"></span>
                   </div>
                 </div>
-
                 <div class="col-4 p-0 pl-2">
                   <div class="form-group" [appMsgError]="'sexo'" [form]="form">
                     <label class="control-label">Sexo: <span style="color: red">*</span></label>
@@ -99,19 +90,14 @@
                     <span id="msgContainer_sexo"></span>
                   </div>
                 </div>
-
                 <div class="col-6 p-0 pr-2" [appMsgError]="'fecha_nacimiento'" [form]="form">
                   <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
-
                   <p-calendar inputId="campoFecha" formControlName="fecha_nacimiento" dateFormat="dd/mm/yy" [maxDate]="maxDateBirth" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('campoRole')"></p-calendar>
-
                   <span id="msgContainer_fecha_nacimiento"></span>
                 </div>
-
                 <div class="col-6 p-0 pl-2">
                   <div class="form-group" [appMsgError]="'ids_roles'" [form]="form">
                     <label class="control-label">Role: <span style="color: red">*</span></label>
-
                     <p-multiSelect
                       class="multiSelectPrimeng"
                       [options]="listRoles"
@@ -127,30 +113,32 @@
                     >
                     </p-multiSelect>
                     <!-- <select (keydown.enter)="saltar(editando ? 'send' : 'campoPassword')" id="campoRole" formControlName="role" class="form-control">
-                      <option value="" disabled selected hidden>Role</option>
-                      <option value="A">Administrador</option>
-                      <option value="V">Vendedor</option>
-                      <option value="U">Cajero</option>
-                      <option value="C">Chofer</option>
-                    </select> -->
-
+                        <option value="" disabled selected hidden>Role</option>
+                        <option value="A">Administrador</option>
+                        <option value="V">Vendedor</option>
+                        <option value="U">Cajero</option>
+                        <option value="C">Chofer</option>
+                      </select> -->
                     <span id="msgContainer_ids_roles"></span>
                   </div>
                 </div>
-
                 <div class="col-6 p-0 pr-2">
-                  <div *ngIf="!editando" class="form-group" [appMsgError]="'password'" [form]="form">
+                  @if (!editando) {
+                  <div class="form-group" [appMsgError]="'password'" [form]="form">
                     <label class="control-label">Contraseña:<span style="color: red">*</span></label>
                     <input (keydown.enter)="saltar('campoConfirmPassword')" id="campoPassword" type="password" formControlName="password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
                     <span id="msgContainer_password"></span>
                   </div>
+                  }
                 </div>
                 <div class="col-6 p-0 pl-2">
-                  <div *ngIf="!editando" class="form-group" [appMsgError]="'confirm_password'" [form]="form">
+                  @if (!editando) {
+                  <div class="form-group" [appMsgError]="'confirm_password'" [form]="form">
                     <label class="control-label">Confirmar Contraseña:<span style="color: red">*</span></label>
                     <input type="password" id="campoConfirmPassword" compare="password" (keydown.enter)="saltar('send')" formControlName="confirm_password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
                     <span id="msgContainer_confirm_password"></span>
                   </div>
+                  }
                 </div>
               </div>
             </form>
@@ -161,7 +149,9 @@
                 </button>
                 <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2" id="btn-verde">{{ boton }}</button>
                 <!-- [value]="boton"  -->
-                <a *ngIf="editando" class="btn ml-2" id="btn-blanco" (click)="showModal()">Cambiar contraseña</a>
+                @if (editando) {
+                <a class="btn ml-2" id="btn-blanco" (click)="showModal()">Cambiar contraseña</a>
+                }
               </div>
               <div>
                 <button class="btn mr-2" value="" id="btn-blanco" (click)="borrar(); isCreando = false">
@@ -171,6 +161,7 @@
             </div>
           </div>
         </div>
+        }
       </ng-container>
       <div class="list {{ isCreando || empleadoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">

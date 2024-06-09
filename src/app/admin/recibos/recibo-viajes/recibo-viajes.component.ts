@@ -276,8 +276,8 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         if (params.iconKey == 'ver') {
           this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
             let botonesDinamicos = [
-              { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-              { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
+              { clase: 'btn btn-gris', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+              { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
             ];
 
             const toPDFData = { data: dataFactura, type: 'facturacion' };
@@ -302,7 +302,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   editMovimientoViaje(params) {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'cancelar_btn') {
-        if (`${params.data.id}`.includes('new_')) {
+        if (params.isAdded) {
           fun.pull(this.viaje_selected.movimientos_viaje, params.data);
         }
       }
@@ -401,7 +401,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   addMovimiento() {
-    const movimiento_viaje = { vehiculo_id: null, user_id: null, is_editing: true, id: `new_${fun.generateKey()}` };
+    const movimiento_viaje = { vehiculo_id: null, user_id: null, is_editing: true, id: fun.generateKey(), isAdded: true };
     this.parseMovimientosViaje(movimiento_viaje);
     this.viaje_selected.movimientos_viaje.push(movimiento_viaje);
 

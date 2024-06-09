@@ -375,7 +375,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           botones: {
             ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
-              { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+              { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
               { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
             ],
           },
@@ -407,13 +407,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'SI', disable: false, },
         ],
       },
     });
@@ -437,6 +432,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   changeHeaderStatus(iteraFact, tabPanel, idTab) {
+    // TODO: verificar
     if (tabPanel) {
       const element = document.getElementsByClassName(idTab);
 

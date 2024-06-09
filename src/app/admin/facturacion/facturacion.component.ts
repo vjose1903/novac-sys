@@ -1218,7 +1218,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.factServ.isCotizacion || this.factServ.isPreVenta) {
         const label = `Salir de ${this.factServ.isCotizacion ? 'Cotización' : 'Pre venta'}`;
-        botones['dinamico'] = [{ clase: 'btn btn-gris mr-2', function: (instance) => this.router.navigateByUrl('/admin/dashboard') && this.closeModal(instance), label: label, disable: false }];
+        botones['dinamico'] = [{ clase: 'btn btn-gris', function: (instance) => this.router.navigateByUrl('/admin/dashboard') && this.closeModal(instance), label: label, disable: false }];
       }
 
       if (fun.hasValue(input_activo)) fun.desEnfocarInput(input_activo);
@@ -1298,7 +1298,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 botones: {
                   ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
                   dinamico: [
-                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                    { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
                     { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
                   ],
                 },
@@ -1334,7 +1334,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 botones: {
                   ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
                   dinamico: [
-                    { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+                    { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
                     { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
                   ],
                 },

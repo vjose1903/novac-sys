@@ -4,9 +4,7 @@ import { Ss } from './../../../../core/services/singleton.service';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 
-
 const moment = require('../../../../core/javascript/moment');
-
 
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../../registros/articulos/articulo';
@@ -73,6 +71,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   checkDinamycSelections() {
     for (let index = 0; index < this.inputs?.dinamyc_selections?.length; index++) {
       const element = this.inputs.dinamyc_selections[index];
+      element.id = fun.generateKey();
 
       this.form.addControl(element.formControl, this.fb.control(null));
 

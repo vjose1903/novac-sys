@@ -172,12 +172,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          {
-            clase: 'btn btn-blanco mr-2',
-            function: (instance) => this.closeModal(instance),
-            label: 'Cancelar',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false, },
           { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
         ],
       },

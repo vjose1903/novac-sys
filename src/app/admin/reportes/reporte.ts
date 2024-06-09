@@ -80,13 +80,8 @@ export class ReporteC extends CrudG<any> {
         botones: {
           ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-            {
-              clase: 'btn btn-verde',
-              function: (instance) => this.imprimirPDF(objPdfView, instance),
-              label: 'Imprimir',
-              disable: false,
-            },
+            { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+            { clase: 'btn btn-verde', function: (instance) => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false, },
           ],
         },
       });

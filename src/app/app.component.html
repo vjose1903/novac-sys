@@ -1,18 +1,22 @@
-<div *ngIf="!configReady" class="h-100 w-100 splash-container">
-  <h2 class="msg">Cargando archivo de configuración</h2>
-  <img class="logo" src="assets/img/logo_splash.png" />
-  <img class="rayas" src="assets/img/splash_screen_rayas.png" />
-  <img class="inspot" src="assets/img/inspot_splash.png" />
-</div>
+@if (!configReady) {
+  <div class="h-100 w-100 splash-container">
+    <h2 class="msg">Cargando archivo de configuración</h2>
+    <img class="logo" src="assets/img/logo_splash.png" />
+    <img class="rayas" src="assets/img/splash_screen_rayas.png" />
+    <img class="inspot" src="assets/img/inspot_splash.png" />
+  </div>
+}
 
-<div id="fondoC" *ngIf="loading && configReady" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
-  <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
-  <span class="text"> CARGANDO ... </span>
-</div>
+@if (loading && configReady) {
+  <div id="fondoC" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
+    <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
+    <span class="text"> CARGANDO ... </span>
+  </div>
+}
 
-<ng-container *ngIf="configReady">
+@if (configReady) {
   <router-outlet></router-outlet>
-</ng-container>
+}
 
 <p-dialog [closable]="false" [closeOnEscape]="false" header="Porcentaje de descarga" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
   <div class="d-flex justify-content-between mb-2 position-relative">

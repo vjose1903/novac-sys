@@ -1,6 +1,6 @@
 import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
 import { ActivatedRoute, Router } from '@angular/router';
@@ -87,8 +87,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   tablaNotasComponent;
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
-
-  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  route = inject(ActivatedRoute);
+  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
@@ -665,11 +665,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
 
     if (continuar) {
       botonesDinamicos.push({
-        clase: 'btn btn-verde mr-2',
+        clase: 'btn btn-verde',
         function: (instance) => {
           this.continuarANotas(dataFactura.id);
           instance.closeModal(instance.id, 'cancelar');
@@ -726,7 +726,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (this.para == 'Visualizar' || type == 'nota') {
           const editButton = {
-            clase: 'btn btn-verde ml-2',
+            clase: 'btn btn-verde',
             function: (instance) => {
               this.editarFactura();
               instance.closeModal(instance.id, 'mostrarFactura');

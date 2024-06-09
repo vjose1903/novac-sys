@@ -1,235 +1,240 @@
-<div class="cuerpo-fact" *ngIf="isInitialized">
-  <table class="table m-auto titulos-fact">
-    <thead>
-      <tr class="text-center">
-        <th class="tiCOD">Codigo</th>
-        <th class="tiCAN">Cantidad</th>
-        <th class="tiUNI text-center">Unidad</th>
-        <th class="tiDES" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripcion</th>
-        <th class="tiDESC">Descuento</th>
-        <th class="tiPRE">{{ factServ.isCompra ? 'Costo' : 'Precio' }}</th>
-        <th class="tiITBIS" *ngIf="configApp.calcular_itbis">ITBIS</th>
-        <th class="tiTOT">Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="tiCOD p-0"></td>
-
-        <td class="tiCAN p-0"></td>
-
-        <td class="tiUNI p-0"></td>
-
-        <td class="tiDES p-0" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }"></td>
-
-        <td class="tiDESC p-0"></td>
-
-        <td class="tiPRE p-0"></td>
-
-        <td class="tiITBIS p-0" *ngIf="configApp.calcular_itbis"></td>
-
-        <td class="tiTOT p-0"></td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="contenido-fact" #cuadro>
-    <form [formGroup]="form" action="">
-      <div formArrayName="rowFactura" *ngFor="let item_cuerpo of ARRAY_ROWFACTURAS?.controls; let index_cuerpo = index">
-        <div [formGroupName]="index_cuerpo">
-          <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
-            <ng-template pTemplate>
-              <ul class="dropRowConfig" role="menu">
-                <li *ngIf="!item_cuerpo.controls.is_devuelto.value" role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable">
-                  <a class="" id="dropdown-item">
-                    <i class="far fa-trash-alt text-gris-oscuro btnConfig mr-1"></i>
-                    Quitar Producto
-                  </a>
-                </li>
-
-                <li *ngIf="item_cuerpo.controls.is_bad_price.value" role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
-                  <a class="" id="dropdown-item">
-                    <i class="fa-solid fa-triangle-exclamation text-gris-oscuro btnConfig mr-1"></i>
-                    Obtener {{ factServ.isCompra ? 'costo' : 'precio' }} actual
-                  </a>
-                </li>
-
-                <li *ngIf="hasArticulosDevueltos(index_cuerpo) || item_cuerpo.controls.is_devuelto.value" role="menuitem" (click)="retornarArticulosDevueltos(index_cuerpo, 'defectuoso', $event)" class="hoverlable">
-                  <a class="" id="dropdown-item">
-                    <i class="fa-solid fa-repeat text-gris-oscuro btnConfig mr-1"></i>
-                    Retornar articulos devueltos
-                  </a>
-                </li>
-              </ul>
-            </ng-template>
-          </p-overlayPanel>
-
-          <table class="table m-auto">
-            <tbody>
-              <tr>
-                <!--  ::::::::::::  CONFIG  ::::::::::::  -->
-                <td *ngIf="fun.hasValue(factServ.propietario_factura)" class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
-                  <div class="btn-group">
-                    <div *ngIf="checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px" (click)="abrirOverlay(dropRowConfig, $event)">
-                      <i class="fas fa-ellipsis-v btnConfig"></i>
+@if (isInitialized) {
+  <div class="cuerpo-fact">
+    <table class="table m-auto titulos-fact">
+      <thead>
+        <tr class="text-center">
+          <th class="tiCOD">Codigo</th>
+          <th class="tiCAN">Cantidad</th>
+          <th class="tiUNI text-center">Unidad</th>
+          <th class="tiDES" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripcion</th>
+          <th class="tiDESC">Descuento</th>
+          <th class="tiPRE">{{ factServ.isCompra ? 'Costo' : 'Precio' }}</th>
+          @if (configApp.calcular_itbis) {
+            <th class="tiITBIS">ITBIS</th>
+          }
+          <th class="tiTOT">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="tiCOD p-0"></td>
+          <td class="tiCAN p-0"></td>
+          <td class="tiUNI p-0"></td>
+          <td class="tiDES p-0" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }"></td>
+          <td class="tiDESC p-0"></td>
+          <td class="tiPRE p-0"></td>
+          @if (configApp.calcular_itbis) {
+            <td class="tiITBIS p-0"></td>
+          }
+          <td class="tiTOT p-0"></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="contenido-fact" #cuadro>
+      <form [formGroup]="form" action="">
+        @for (item_cuerpo of ARRAY_ROWFACTURAS?.controls; track index_cuerpo; let index_cuerpo = $index) {
+          <div formArrayName="rowFactura">
+            <div [formGroupName]="index_cuerpo">
+              <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
+                <ng-template pTemplate>
+                  <ul class="dropRowConfig" role="menu">
+                    @if (!item_cuerpo.controls.is_devuelto.value) {
+                      <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable">
+                        <a class="" id="dropdown-item">
+                          <i class="far fa-trash-alt text-gris-oscuro btnConfig mr-1"></i>
+                          Quitar Producto
+                        </a>
+                      </li>
+                    }
+                    @if (item_cuerpo.controls.is_bad_price.value) {
+                      <li role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
+                        <a class="" id="dropdown-item">
+                          <i class="fa-solid fa-triangle-exclamation text-gris-oscuro btnConfig mr-1"></i>
+                          Obtener {{ factServ.isCompra ? 'costo' : 'precio' }} actual
+                        </a>
+                      </li>
+                    }
+                    @if (hasArticulosDevueltos(index_cuerpo) || item_cuerpo.controls.is_devuelto.value) {
+                      <li role="menuitem" (click)="retornarArticulosDevueltos(index_cuerpo, 'defectuoso', $event)" class="hoverlable">
+                        <a class="" id="dropdown-item">
+                          <i class="fa-solid fa-repeat text-gris-oscuro btnConfig mr-1"></i>
+                          Retornar articulos devueltos
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </ng-template>
+              </p-overlayPanel>
+              <table class="table m-auto">
+                <tbody>
+                  <tr>
+                    <!--  ::::::::::::  CONFIG  ::::::::::::  -->
+                    @if (fun.hasValue(factServ.propietario_factura)) {
+                      <td class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
+                        <div class="btn-group">
+                          @if (checkIfRowContainArticulo(index_cuerpo)) {
+                            <div style="padding: 3px" (click)="abrirOverlay(dropRowConfig, $event)">
+                              <i class="fas fa-ellipsis-v btnConfig"></i>
+                            </div>
+                          }
+                          @if (!checkIfRowContainArticulo(index_cuerpo)) {
+                            <div style="padding: 3px">
+                              <i class="fas fa-ellipsis-v btnConfigDis"></i>
+                            </div>
+                          }
+                        </div>
+                      </td>
+                    }
+                    <!-- <td *ngIf="fun.hasValue(factServ.propietario_factura)" class="sombreado2">
+                    <div class="btn-group">
+                      <div style="padding: 3px" (click)="test(index_cuerpo)">
+                        <i class="fas fa-ellipsis-v btnConfig"></i>
+                      </div>
                     </div>
-
-                    <div *ngIf="!checkIfRowContainArticulo(index_cuerpo)" style="padding: 3px">
-                      <i class="fas fa-ellipsis-v btnConfigDis"></i>
-                    </div>
-                  </div>
-                </td>
-                <!-- <td *ngIf="fun.hasValue(factServ.propietario_factura)" class="sombreado2">
-                  <div class="btn-group">
-                    <div style="padding: 3px" (click)="test(index_cuerpo)">
-                      <i class="fas fa-ellipsis-v btnConfig"></i>
-                    </div>
-                  </div>
-                </td> -->
-
-                <!--  ::::::::::::  CODIGO  ::::::::::::  -->
-                <td class="tiCOD p-0">
-                  <div class="form-group m-0">
-                    <input
-                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
-                      type="text"
-                      class="form-control entrada"
-                      id="codigo-{{ index_cuerpo }}"
-                      [maxlength]="minCodigo"
-                      (focus)="verificarSecuencia(index_cuerpo)"
-                      (keyup)="checkCodigo(index_cuerpo)"
-                      (keyup.enter)="saltar('cantidad-', index_cuerpo)"
-                      formControlName="codigo"
-                      tabindex="-1"
-                    />
-                  </div>
-                </td>
-
-                <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
-                <td class="tiCAN p-0">
-                  <!-- <div class="position-absolute" style="width: 20px; height: 20px; background:red; z-index:999999" (click)="$event.stopPropagation(); test()"></div> -->
-                  <div class="form-group m-0" class="position-relative">
-                    <input
-                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
-                      type="number"
-                      min="1"
-                      class="form-control entrada input_cantidad"
-                      id="cantidad-{{ index_cuerpo }}"
-                      (keyup.enter)="saltar('unidad-', index_cuerpo)"
-                      formControlName="cantidad"
-                      (focus)="verificarSecuencia(index_cuerpo)"
-                      (blur)="calcularMontosRow(index_cuerpo)"
-                      tabindex="-1"
-                    />
-                    <!-- <div style="background-color: red; width: 20px; height: 20px; top:0" class="position-absolute" (click)="probando(index_cuerpo)"></div> -->
-                  </div>
-                </td>
-
-                <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
-                <td class="tiUNI p-0">
-                  <div class="form-group m-0">
-                    <input
-                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
-                      *ngIf="inputDrop !== 'unidad-' + index_cuerpo"
-                      type="text"
-                      class="form-control entrada input-unidad"
-                      id="unidad-{{ index_cuerpo }}"
-                      (focus)="setInputDrop(index_cuerpo); verificarSecuencia(index_cuerpo)"
-                      (blur)="calcularMontosRow(index_cuerpo)"
-                      [pTooltip]="factServ.filasDetalle[index_cuerpo].value.unidad ?? ''"
-                      tooltipPosition="top"
-                      formControlName="unidad"
-                      tabindex="-1"
-                    />
-
-                    <p-dropdown
-                      #pDropdownMedida
-                      *ngIf="inputDrop === 'unidad-' + index_cuerpo"
-                      panelStyleClass="panel-dropdown-unidad"
-                      styleClass="form-control entrada dropdown-unidad"
-                      inputId="unidad-{{ index_cuerpo }}"
-                      formControlName="unidad"
-                      appendTo="body"
-                      optionLabel="value"
-                      optionValue="value"
-                      [options]="factServ.filasDetalle[index_cuerpo].value.unidades"
-                      placeholder="medida"
-                      [filter]="false"
-                      [virtualScroll]="true"
-                      [itemSize]="30"
-                      [autoDisplayFirst]="false"
-                      (onChange)="selectMedidaChange($event, index_cuerpo)"
-                      (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-                      (keyup.enter)="selectMedida(index_cuerpo)"
-                      (onFocus)="showDropdownMedida($event, pDropdownMedida)"
-                      (onBlur)="hideDropdownMedida()"
-                    >
-                    </p-dropdown>
-                  </div>
-                </td>
-
-                <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
-                <td class="tiDES p-0">
-                  <div class="form-group m-0">
-                    <input type="text" class="form-control entrada inDES disabled" id="descripcion-{{ index_cuerpo }}" formControlName="descripcion" tabindex="-1" />
-                  </div>
-                </td>
-
-                <!--  ::::::::::::  DESCUENTO  ::::::::::::  -->
-
-                <td class="tiDESC p-0">
-                  <div class="form-group m-0">
-                    <input
-                      [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
-                      type="text"
-                      class="form-control entrada campoNumeros input_cantidad"
-                      id="desc-{{ index_cuerpo }}"
-                      (focus)="handleInputEvent('focus', 'descuento_valor', index_cuerpo); verificarSecuencia(index_cuerpo)"
-                      (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
-                      formControlName="descuento_valor"
-                      (blur)="handleInputEvent('blur', 'descuento_valor', index_cuerpo); revisarPrecio('descuento_valor', 'desc', index_cuerpo); calcularMontosRow(index_cuerpo)"
-                      tabindex="-1"
-                    />
-                  </div>
-                </td>
-                <!--  ::::::::::::  PRECIO \ COSTO ::::::::::::  -->
-                <td class="tiPRE p-0">
-                  <div class="form-group m-0" [pTooltip]="item_cuerpo.controls.is_bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
-                    <div class="precio-div">
-                      <i *ngIf="item_cuerpo.controls.is_bad_price.value" class="fa-solid {{ getInfoBadPrice(index_cuerpo).icon }} iconArrow"></i>
+                  </td> -->
+                  <!--  ::::::::::::  CODIGO  ::::::::::::  -->
+                  <td class="tiCOD p-0">
+                    <div class="form-group m-0">
                       <input
+                        [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                         type="text"
-                        (blur)="revisarPrecio(factServ.isCompra ? 'costo' : 'precio', factServ.isCompra ? 'costo' : 'precio', index_cuerpo); calcularMontosRow(index_cuerpo)"
+                        class="form-control entrada"
+                        id="codigo-{{ index_cuerpo }}"
+                        [maxlength]="minCodigo"
                         (focus)="verificarSecuencia(index_cuerpo)"
-                        class="form-control entrada campoNumeros {{ factServ.isVenta ? 'inPRE' : '' }}"
-                        (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
-                        id="{{ factServ.isCompra ? 'costo' : 'precio' }}-{{ index_cuerpo }}"
-                        [formControlName]="factServ.isCompra ? 'costo' : 'precio'"
-                        [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.is_bad_price.value }"
+                        (keyup)="checkCodigo(index_cuerpo)"
+                        (keyup.enter)="saltar('cantidad-', index_cuerpo)"
+                        formControlName="codigo"
                         tabindex="-1"
-                      />
+                        />
                     </div>
-                  </div>
-                </td>
-
-                <!--  ::::::::::::  ITBIS  ::::::::::::  -->
-                <td *ngIf="configApp.calcular_itbis" class="tiITBIS p-0">
-                  <div class="form-group m-0">
-                    <input type="text" class="form-control entrada inITBIS campoNumeros disabled" id="itbis-{{ index_cuerpo }}" formControlName="itbis" tabindex="-1" />
-                  </div>
-                </td>
-
-                <!--  ::::::::::::  TOTAL  ::::::::::::  -->
-                <td class="tiTOT p-0">
-                  <div class="form-group m-0">
-                    <input type="text" class="form-control entrada inTOT campoNumeros disabled" id="total-{{ index_cuerpo }}" formControlName="total" tabindex="-1" />
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                  <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
+                  <td class="tiCAN p-0">
+                    <!-- <div class="position-absolute" style="width: 20px; height: 20px; background:red; z-index:999999" (click)="$event.stopPropagation(); test()"></div> -->
+                    <div class="form-group m-0" class="position-relative">
+                      <input
+                        [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
+                        type="number"
+                        min="1"
+                        class="form-control entrada input_cantidad"
+                        id="cantidad-{{ index_cuerpo }}"
+                        (keyup.enter)="saltar('unidad-', index_cuerpo)"
+                        formControlName="cantidad"
+                        (focus)="verificarSecuencia(index_cuerpo)"
+                        (blur)="calcularMontosRow(index_cuerpo)"
+                        tabindex="-1"
+                        />
+                      <!-- <div style="background-color: red; width: 20px; height: 20px; top:0" class="position-absolute" (click)="probando(index_cuerpo)"></div> -->
+                    </div>
+                  </td>
+                  <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
+                  <td class="tiUNI p-0">
+                    <div class="form-group m-0">
+                      @if (inputDrop !== 'unidad-' + index_cuerpo) {
+                        <input
+                          [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
+                          type="text"
+                          class="form-control entrada input-unidad"
+                          id="unidad-{{ index_cuerpo }}"
+                          (focus)="setInputDrop(index_cuerpo); verificarSecuencia(index_cuerpo)"
+                          (blur)="calcularMontosRow(index_cuerpo)"
+                          [pTooltip]="factServ.filasDetalle[index_cuerpo].value.unidad ?? ''"
+                          tooltipPosition="top"
+                          formControlName="unidad"
+                          tabindex="-1"
+                          />
+                      }
+                      @if (inputDrop === 'unidad-' + index_cuerpo) {
+                        <p-dropdown
+                          #pDropdownMedida
+                          panelStyleClass="panel-dropdown-unidad"
+                          styleClass="form-control entrada dropdown-unidad"
+                          inputId="unidad-{{ index_cuerpo }}"
+                          formControlName="unidad"
+                          appendTo="body"
+                          optionLabel="value"
+                          optionValue="value"
+                          [options]="factServ.filasDetalle[index_cuerpo].value.unidades"
+                          placeholder="medida"
+                          [filter]="false"
+                          [virtualScroll]="true"
+                          [itemSize]="30"
+                          [autoDisplayFirst]="false"
+                          (onChange)="selectMedidaChange($event, index_cuerpo)"
+                          (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                          (keyup.enter)="selectMedida(index_cuerpo)"
+                          (onFocus)="showDropdownMedida($event, pDropdownMedida)"
+                          (onBlur)="hideDropdownMedida()"
+                          >
+                        </p-dropdown>
+                      }
+                    </div>
+                  </td>
+                  <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
+                  <td class="tiDES p-0">
+                    <div class="form-group m-0">
+                      <input type="text" class="form-control entrada inDES disabled" id="descripcion-{{ index_cuerpo }}" formControlName="descripcion" tabindex="-1" />
+                    </div>
+                  </td>
+                  <!--  ::::::::::::  DESCUENTO  ::::::::::::  -->
+                  <td class="tiDESC p-0">
+                    <div class="form-group m-0">
+                      <input
+                        [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
+                        type="text"
+                        class="form-control entrada campoNumeros input_cantidad"
+                        id="desc-{{ index_cuerpo }}"
+                        (focus)="handleInputEvent('focus', 'descuento_valor', index_cuerpo); verificarSecuencia(index_cuerpo)"
+                        (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
+                        formControlName="descuento_valor"
+                        (blur)="handleInputEvent('blur', 'descuento_valor', index_cuerpo); revisarPrecio('descuento_valor', 'desc', index_cuerpo); calcularMontosRow(index_cuerpo)"
+                        tabindex="-1"
+                        />
+                    </div>
+                  </td>
+                  <!--  ::::::::::::  PRECIO \ COSTO ::::::::::::  -->
+                  <td class="tiPRE p-0">
+                    <div class="form-group m-0" [pTooltip]="item_cuerpo.controls.is_bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
+                      <div class="precio-div">
+                        @if (item_cuerpo.controls.is_bad_price.value) {
+                          <i class="fa-solid {{ getInfoBadPrice(index_cuerpo).icon }} iconArrow"></i>
+                        }
+                        <input
+                          type="text"
+                          (blur)="revisarPrecio(factServ.isCompra ? 'costo' : 'precio', factServ.isCompra ? 'costo' : 'precio', index_cuerpo); calcularMontosRow(index_cuerpo)"
+                          (focus)="verificarSecuencia(index_cuerpo)"
+                          class="form-control entrada campoNumeros {{ factServ.isVenta ? 'inPRE' : '' }}"
+                          (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
+                          id="{{ factServ.isCompra ? 'costo' : 'precio' }}-{{ index_cuerpo }}"
+                          [formControlName]="factServ.isCompra ? 'costo' : 'precio'"
+                          [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.is_bad_price.value }"
+                          tabindex="-1"
+                          />
+                      </div>
+                    </div>
+                  </td>
+                  <!--  ::::::::::::  ITBIS  ::::::::::::  -->
+                  @if (configApp.calcular_itbis) {
+                    <td class="tiITBIS p-0">
+                      <div class="form-group m-0">
+                        <input type="text" class="form-control entrada inITBIS campoNumeros disabled" id="itbis-{{ index_cuerpo }}" formControlName="itbis" tabindex="-1" />
+                      </div>
+                    </td>
+                  }
+                  <!--  ::::::::::::  TOTAL  ::::::::::::  -->
+                  <td class="tiTOT p-0">
+                    <div class="form-group m-0">
+                      <input type="text" class="form-control entrada inTOT campoNumeros disabled" id="total-{{ index_cuerpo }}" formControlName="total" tabindex="-1" />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      }
     </form>
   </div>
 </div>
+}

@@ -89,7 +89,8 @@ export interface paginateI {
   is_local?: boolean;
 }
 
-interface inner_btn {
+export interface btnTableI {
+  btn_id?: string;
   show: boolean;
   name?: string;
   tooltip?: string;
@@ -99,10 +100,10 @@ interface inner_btn {
 }
 
 export interface botonesTableI {
-  dinamico?: Array<inner_btn>;
-  borrar?: inner_btn;
-  editar?: inner_btn;
-  mostrar?: inner_btn;
+  dinamico?: Array<btnTableI>;
+  borrar?: btnTableI;
+  editar?: btnTableI;
+  mostrar?: btnTableI;
   styles?: any;
 }
 

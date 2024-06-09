@@ -348,13 +348,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => functions[tipo](instance, data),
-            label: 'SI',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          { clase: 'btn btn-verde', function: (instance) => functions[tipo](instance, data), label: 'SI', disable: false },
         ],
       },
     });

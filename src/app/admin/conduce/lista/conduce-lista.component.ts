@@ -186,7 +186,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
             botones: {
               ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
-                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+                { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
                 {
                   clase: 'btn btn-verde',
                   function: (instance) => {
@@ -213,7 +213,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+          { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
             clase: 'btn btn-verde',
             function: (instance) => obj.siFunction(instance),

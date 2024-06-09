@@ -16,7 +16,7 @@ export interface ConfigureModalI {
   component?: any;
   width?: string;
   height?: string;
-  botones?: ButtonsI;
+  botones?: ButtonsObjI;
   closable?: boolean;
   closableEsc?: boolean;
   html?: any;
@@ -29,10 +29,20 @@ export interface ConfigureModalI {
 export interface btnDisabled {
   function?: Function;
 }
-export interface ButtonsI {
-  aceptar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string };
-  cancelar: { show: boolean; disable?: boolean | btnDisabled; tooltip?: string };
-  dinamico?: Array<{ btn_id?: string; clase: string; label: string; function?: Function; function_in_other_component?: string; disable: boolean | btnDisabled; tooltip?: string }>;
+export interface ButtonsObjI {
+  aceptar: ButtonI;
+  cancelar: ButtonI;
+  dinamico?: Array<ButtonI>;
+}
+export interface ButtonI {
+  btn_id?: string;
+  show?: boolean;
+  clase?: string;
+  label?: string;
+  function?: Function;
+  function_in_other_component?: string;
+  disable?: boolean | btnDisabled;
+  tooltip?: string;
 }
 
 export class ModalClass extends LayoutClass {
@@ -59,38 +69,36 @@ export class ModalClass extends LayoutClass {
     modal_configuration['transitionOptions'] = fun.objHas(params, 'transitionOptions') ? params.transitionOptions : '0ms';
     modal_configuration['contentStyleClass'] = fun.objHas(params, 'contentStyleClass') ? params.contentStyleClass : '';
     modal_configuration['returnDataFromModal'] = fun.objHas(params, 'returnDataFromModal') ? (arg) => params.returnDataFromModal(arg) : (arg) => this.getDataFromModal(arg, ' ');
+
     modal_configuration['onHide'] = (arg) => {
       if (fun.hasValue(this) && fun.objHas(this, 'onHideModal')) this.onHideModal(arg);
     };
+
     modal_configuration['html'] = fun.objHas(params, 'html') ? params.html : null;
-    modal_configuration['id'] = params?.id;
+    modal_configuration['id'] = params.id ?? fun.generateKey();
+    this.verificateBottons(modal_configuration);
 
     MODALCONFIG.next(modal_configuration);
   }
 
+  verificateBottons(config: ConfigureModalI) {
+    const verificateId = (boton: ButtonI) => (boton.btn_id ??= fun.generateKey());
+
+    if (config.botones) {
+      for (const key in config.botones) {
+        const btnObj = config.botones[key];
+
+        if (Array.isArray(btnObj)) {
+          btnObj.forEach((btn) => verificateId(btn));
+        } else {
+          verificateId(btnObj);
+        }
+      }
+    }
+  }
+
   getDataFromModal(arg, search?) {}
   onHideModal(arg) {}
-
-  // confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-  //   this.openNewModal({
-  //     id: obj.id,
-  //     header: obj.header,
-  //     width: obj.width || '30rem',
-  //     html: `<p> ${obj.texto} </p>`,
-  //     botones: {
-  //       ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-  //       dinamico: [
-  //         { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
-  //         {
-  //           clase: 'btn btn-verde',
-  //           function: (instance) => obj.siFunction(instance),
-  //           label: 'SI',
-  //           disable: false,
-  //         },
-  //       ],
-  //     },
-  //   });
-  // }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function }) {
     const config = {
@@ -101,14 +109,14 @@ export class ModalClass extends LayoutClass {
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
+          { clase: 'btn btn-blanco', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
           { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
         ],
       },
     };
 
     if (fun.objHas(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
-      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
+      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
     }
 
     this.openNewModal(config);
