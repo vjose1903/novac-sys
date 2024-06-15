@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
@@ -56,6 +57,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   formPermissions = [Permisos.user.create, Permisos.user.update];
   maxDateBirth = new Date();
 
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();

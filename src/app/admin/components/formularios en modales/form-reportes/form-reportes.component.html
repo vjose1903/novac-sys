@@ -4,43 +4,44 @@
     @if (dinamycSelectionReady && inputs.tipo_reporte == 'movimientos_vehiculo') { @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
-      <ng-select
+      <p-dropdown
+        [options]="dinamyc_selection.items"
         [formControlName]="dinamyc_selection.formControl"
-        [items]="dinamyc_selection.items"
-        bindLabel="{{ dinamyc_selection.bindLabel }}"
-        bindValue="{{ dinamyc_selection.bindValue }}"
-        [clearable]="true"
-        [appendTo]="'body'"
-        (search)="dinamyc_selection.searchFunction($event)"
-        [notFoundText]="dinamyc_selection.notFoundText"
+        [placeholder]="dinamyc_selection.placeholder"
+        [filter]="true"
+        [optionLabel]="dinamyc_selection.optionLabel ?? null"
+        [optionValue]="dinamyc_selection.optionValue ?? null"
+        (onFilter)="dinamyc_selection.searchFunction($event.filter)"
         [disabled]="dinamyc_selection.disabledFunction()"
-        (blur)="dinamyc_selection.blurFunction()"
-      >
-      </ng-select>
+        [emptyFilterMessage]="dinamyc_selection.notFoundText"
+        [resetFilterOnHide]="true"
+      />
     </div>
     } }
     <!-- ----- SELECCION DE CLIENTE -----  -->
     @if (inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'cuentas_con_pagos') {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Seleccione cliente: <span style="color: red">*</span> </label>
-      <ng-select
+
+      <p-dropdown
+        [options]="listaClientes"
         formControlName="cliente_id"
-        [items]="listaClientes"
-        bindLabel="nombre_completo"
-        bindValue="id"
-        [clearable]="true"
-        [appendTo]="'body'"
-        (search)="getClientes($event)"
-        notFoundText="Cliente no encontrado"
+        placeholder="Ingrese el nombre del cliente"
+        [filter]="true"
+        optionLabel="nombre_completo"
+        optionValue="id"
+        (onFilter)="getClientes($event.filter)"
         [disabled]="listaClientes.length == 0"
+        emptyFilterMessage="Cliente no encontrado"
+        [resetFilterOnHide]="true"
       >
-        <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-          <div>
-            <span class="d-block" style="font-size: 1rem"> <strong>Nombre: </strong> {{ item.nombre_completo }} </span>
-            <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad</strong> {{ item.documento_identidad }} </span>
+        <ng-template let-cliente pTemplate="item">
+          <div class="">
+            <span class="d-flex gap-2 w-100" style="font-size: 1rem"> <strong>Nombre: </strong> {{ cliente.nombre_completo }} </span>
+            <span class="d-flex gap-2 w-100" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad: </strong> {{ cliente.documento_identidad }} </span>
           </div>
         </ng-template>
-      </ng-select>
+      </p-dropdown>
     </div>
     }
     <!-- ----- SERIE -----  -->
@@ -94,18 +95,20 @@
     @if (inputs.tipo_reporte == 'suplidor_prod') {
     <div class="col-12 p-0 mb-3">
       <label class="control-label mb-0 mt-2">Seleccione articulo: <span style="color: red">*</span> </label>
-      <ng-select
+
+      <p-dropdown
+        [options]="listaArticulos"
         formControlName="articulo_id"
-        [items]="listaArticulos"
-        bindLabel="nombre"
-        bindValue="id"
-        [clearable]="true"
-        [appendTo]="'body'"
-        (search)="getArticulos($event)"
-        notFoundText="Articulo no encontrado"
+        placeholder="Ingrese el nombre de un articulo"
+        [filter]="true"
+        optionLabel="nombre"
+        optionValue="id"
+        (onFilter)="getArticulos($event.filter)"
         [disabled]="listaArticulos.length == 0"
-      >
-      </ng-select>
+        emptyFilterMessage="Articulo no encontrado"
+        [resetFilterOnHide]="true"
+        appendTo="body"
+      />
     </div>
     }
 

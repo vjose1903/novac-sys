@@ -1,4 +1,5 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
 
 import * as _ from 'lodash';
 import { Subject, Subscription, takeUntil } from 'rxjs';
@@ -58,6 +59,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   tablaInterval;
   realIdTabla;
 
+  htmlServ = inject(HtmlElementsService);
   constructor(public tServ: TablasService, private zone: NgZone, public cdRef: ChangeDetectorRef) {
     cdRef.detach();
     this.tablaInterval = setInterval(() => this.cdRef.detectChanges(), 500);

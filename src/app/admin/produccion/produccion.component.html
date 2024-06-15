@@ -39,7 +39,7 @@
                       (keydown.enter)="saltar('medida_producir')"
                       id="cantidad_producir"
                       [(ngModel)]="cantidad_producir"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       placeholder="Cantidad a producir"
                       class="form-control inputE input_cantidad"
                       autocomplete="off"

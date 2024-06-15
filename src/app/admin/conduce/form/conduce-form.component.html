@@ -13,8 +13,8 @@
                 <input
                   type="text"
                   id="clienteI"
-                  (keydown.enter)="abrirModalFiltro($event.target.value)"
-                  (focus)="$event.target.select()"
+                  (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
+                  (focus)="htmlServ.selectValue($event)"
                   placeholder="Nombre Cliente"
                   class="form-control mb-4 inputE"
                   autocomplete="off"

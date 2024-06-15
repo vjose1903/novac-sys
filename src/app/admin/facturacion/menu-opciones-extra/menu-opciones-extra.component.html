@@ -40,7 +40,7 @@
             </div>
           </ng-template>
         </p-dropdown>
-        <!-- <input id="valorI" class="form-control inputE" [(ngModel)]="filter_value" (keydown.enter)="desenfocarValor()" (blur)="buscarDocumentos()" type="text" (focus)="$event.target.select()" placeholder="Nombre cliente" autocomplete="off" /> -->
+        <!-- <input id="valorI" class="form-control inputE" [(ngModel)]="filter_value" (keydown.enter)="desenfocarValor()" (blur)="buscarDocumentos()" type="text" (focus)="htmlServ.selectValue($event)" placeholder="Nombre cliente" autocomplete="off" /> -->
         }
 
         <!-- ================ NUMERO DOCUMENTO  ================ -->
@@ -54,7 +54,7 @@
           mask="99999999"
           tabindex="-1"
           placeholder="________"
-          (onFocus)="$event.target.select()"
+          (onFocus)="htmlServ.selectValue($event)"
           [autoClear]="false"
         ></p-inputMask>
         }

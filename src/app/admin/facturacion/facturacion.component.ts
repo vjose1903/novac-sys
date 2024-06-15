@@ -2,7 +2,7 @@ import { EmpleadoC } from './../registros/registro-empleados/empleado';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
-import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, signal, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 const moment = require('../../core/javascript/moment');
@@ -28,6 +28,7 @@ import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmac
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configuracion_articulos/articulos_configuracion';
+import { HtmlElementsService } from '../../core/services/html-elements.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -177,6 +178,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   cofig_articulos: ConfigArticuloI;
 
   facturasSerieOptions = seriesDGII;
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, public factServ: FacturacionService) {
     super();

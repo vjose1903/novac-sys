@@ -1,3 +1,4 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
 import { serie } from './../../../core/typescript/constantes';
@@ -92,6 +93,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
   route = inject(ActivatedRoute);
+  htmlServ = inject(HtmlElementsService)
+
+
   constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }

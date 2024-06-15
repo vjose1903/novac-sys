@@ -19,7 +19,7 @@
                         <label class="control-label">Nombre de la empresa: </label>
                         <input
                           id="campoNombre"
-                          (keyup)="capitalice('nombre_empresa', $event.target.value)"
+                          (keyup)="capitalice('nombre_empresa', htmlServ.getValue($event))"
                           (keydown.enter)="saltar('campoApellido')"
                           type="text"
                           formControlName="nombre_empresa"
@@ -58,7 +58,7 @@
                         <label class="control-label">Direccion: </label>
                         <input
                           id="campoNombre"
-                          (keyup)="capitalice('direccion_empresa', $event.target.value)"
+                          (keyup)="capitalice('direccion_empresa', htmlServ.getValue($event))"
                           (keydown.enter)="saltar('campoApellido')"
                           type="text"
                           formControlName="direccion_empresa"

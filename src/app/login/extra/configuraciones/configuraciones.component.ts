@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { Ss } from '../../../core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
@@ -69,6 +70,8 @@ export class ConfiguracionesComponent implements OnInit {
   ];
 
   configCopy;
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private fb: UntypedFormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
 

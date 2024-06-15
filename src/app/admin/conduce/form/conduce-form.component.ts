@@ -1,5 +1,6 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
-import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, HostListener, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray, FormGroup } from '@angular/forms';
 import * as _ from 'lodash';
 import { ArticuloC } from '../../registros/articulos/articulo';
@@ -96,6 +97,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
   configApp: ConfigI;
+
+  htmlServ = inject(HtmlElementsService);
   constructor(private fb: UntypedFormBuilder, public mServ: ModalService, private router: Router) {
     super();
   }

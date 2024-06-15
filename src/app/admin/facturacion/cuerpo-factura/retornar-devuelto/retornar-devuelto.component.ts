@@ -1,8 +1,9 @@
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
 import { table_config } from './../../../components/new_tablas/tabla-class';
 import { fun } from './../../../../core/services/functions.service';
 import { ModalI } from './../../../components/modal/modal-class';
-import { Component, DoCheck, OnInit } from '@angular/core';
+import { Component, DoCheck, OnInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 
@@ -36,6 +37,8 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   articuloSelected;
 
   tablaComponent;
+
+  htmlServ = inject(HtmlElementsService)
 
   ngOnInit() {
     this.createForm();

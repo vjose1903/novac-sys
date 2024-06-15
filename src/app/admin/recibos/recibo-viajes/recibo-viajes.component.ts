@@ -1,5 +1,6 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { MovimientosC } from './../../components/formularios en modales/movimientos-form/movimiento-model';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -108,7 +109,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  // form;
+  htmlServ = inject(HtmlElementsService);
 
   fun = fun;
   constructor(private tServ: TablasService, private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router) {

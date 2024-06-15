@@ -16,7 +16,7 @@
               <div class="col-12 p-0">
                 <div class="form-group">
                   <label class="control-label">Tipo comprobante: <span style="color: red">*</span></label>
-                  <select (keydown.enter)="saltar('campoDesde')" id="tipo" [(ngModel)]="tipo_articulo_id" (change)="selectTipoFactura($event.target.value)" (blur)="checkTipoArticuloSelect()" class="form-control">
+                  <select (keydown.enter)="saltar('campoDesde')" id="tipo" [(ngModel)]="tipo_articulo_id" (change)="selectTipoFactura(htmlServ.getValue($event))" (blur)="checkTipoArticuloSelect()" class="form-control">
                     <option value="{{ -1 }}" disabled>Tipo de comprobantes</option>
                     @for (tipo of lista_tipos_facturas; track tipo.id) { @if (tipo.referencia) {
                     <option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>

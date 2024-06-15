@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
@@ -54,6 +55,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   };
   tablaComponent;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
     super();

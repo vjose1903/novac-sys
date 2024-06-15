@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { LayoutRoutingModule } from './layout.routing';
 import { LayoutComponent } from './layout.component';
 import { PrimengModule } from '../../modules/primeng.module';
-import { NgSelectModule } from '@ng-select/ng-select';
 
 import { DirectivesModule } from '../../core/directive/directives.module';
 import { ValidateRayaAbajo } from '../../directives/validaciones';
@@ -30,7 +29,6 @@ import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular
     PrimengModule,
     TablasModule,
     TabViewModule,
-    NgSelectModule,
     FormsModule,
     DirectivesModule,
     PdfViewerModule,

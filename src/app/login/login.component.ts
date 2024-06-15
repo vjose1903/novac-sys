@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { HtmlElementsService } from './../core/services/html-elements.service';
+import { AfterViewInit, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
@@ -35,6 +36,8 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   requestClass = new RequestC();
   configServ = Ss.configServ;
   configApp: ConfigI;
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private fb: UntypedFormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {
     super();

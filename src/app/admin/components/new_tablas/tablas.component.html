@@ -165,9 +165,9 @@
                         [disabled]="disableInput(rowData, column)"
                         (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
                         (blur)="checkNumber($event.target, column, getIndex(indexBody)); handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
-                        (keyup)="changeValorInput(column, column.key, getIndex(indexBody), $event.target.value, rowData)"
+                        (keyup)="changeValorInput(column, column.key, getIndex(indexBody), htmlServ.getValue($event), rowData)"
                       />
-                      <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), $event.target.value, dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
+                      <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), htmlServ.getValue($event), dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
                       @if (column.can_reset) {
                       <i pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, rowData)"></i>
                       }

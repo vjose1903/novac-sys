@@ -1,5 +1,6 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -93,6 +94,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   };
   tablaComponent;
   cofig_articulos: ConfigArticuloI;
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();

@@ -73,10 +73,10 @@
                 <select
                   #condicionInput
                   id="condicion"
-                  (keydown.enter)="saltar($event.target.id, condicionInput.value)"
+                  (keydown.enter)="saltar(htmlServ.getId($event), condicionInput.value)"
                   class="form-control inputE"
                   [(ngModel)]="condicion_fact"
-                  (change)="cambiarCondicion($event.target.value)"
+                  (change)="cambiarCondicion(htmlServ.getValue($event))"
                   tabindex="-1"
                   [disabled]="(factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
                   [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
@@ -95,7 +95,7 @@
                   placement="right"
                   triggers="focus"
                   type="text"
-                  (keydown.enter)="saltar($event.target.id, gastoDe.value)"
+                  (keydown.enter)="saltar(htmlServ.getId($event), gastoDe.value)"
                   class="form-control w-100 inputE"
                   [(ngModel)]="CostoYgasto"
                   [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
@@ -117,8 +117,8 @@
               <select
                 #ventaInput
                 id="venta"
-                (keydown.enter)="saltar($event.target.id, ventaInput.value)"
-                (change)="selectModoFactura($event.target.value)"
+                (keydown.enter)="saltar(htmlServ.getId($event), ventaInput.value)"
+                (change)="selectModoFactura(htmlServ.getValue($event))"
                 class="form-control inputE"
                 [(ngModel)]="modo_factura"
                 (blur)="checkCambiosModoyCondicionFactura({ elemento_html: $event.target })"
@@ -249,7 +249,7 @@
               <span class="mt-2"><strong>Número comprobante:</strong></span>
               <p-inputMask
                 inputId="ncf"
-                (keydown.enter)="saltar($event.target.id, $event.target.value)"
+                (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
                 [(ngModel)]="NCFcompra"
                 [mask]="factServ.isComprobanteNormal ? 'B9999999999' : 'E999999999999'"
                 tabindex="-1"
@@ -307,11 +307,11 @@
                   <input
                     #nombreInput
                     id="nom"
-                    (keydown.enter)="saltar($event.target.id, nombreInput.value)"
+                    (keydown.enter)="saltar(htmlServ.getId($event), nombreInput.value)"
                     type="text"
                     formControlName="nombre"
                     class="form-control inputE"
-                    (focus)="$event.target.select()"
+                    (focus)="htmlServ.selectValue($event)"
                     autocomplete="off"
                     [readOnly]="activarNombreDireccion()"
                     tabindex="-1"
@@ -341,11 +341,11 @@
                     <input
                       #direccionInput
                       id="dir"
-                      (keydown.enter)="saltar($event.target.id, direccionInput.value)"
+                      (keydown.enter)="saltar(htmlServ.getId($event), direccionInput.value)"
                       type="text"
                       formControlName="direccion"
                       class="form-control inputE"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       autocomplete="off"
                       [readOnly]=""
                       [ngClass]="{ disabled: activarNombreDireccion() }"

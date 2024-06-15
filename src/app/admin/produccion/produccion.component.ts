@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { HtmlElementsService } from './../../core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { TablasService } from '../components/new_tablas/tablas.service';
@@ -47,6 +48,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   articuloEditando: any;
   articuloClass = new ArticuloC();
   produccionClass = new ProduccionC();
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private tServ: TablasService) {
     super();

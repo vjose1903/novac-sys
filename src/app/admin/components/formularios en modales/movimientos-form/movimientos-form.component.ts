@@ -1,4 +1,5 @@
-import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { Component, OnInit, Output, EventEmitter, AfterViewInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
@@ -24,11 +25,13 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
 
   movimientosC = new MovimientosC();
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
+  modal: any = {};
+  inputs: any;
+
+  htmlServ = inject(HtmlElementsService);
   constructor() {
     super();
   }
-  modal: any = {};
-  inputs: any;
 
   ngOnInit() {
     this.medidas = _.keys(this.inputs.cantidades);

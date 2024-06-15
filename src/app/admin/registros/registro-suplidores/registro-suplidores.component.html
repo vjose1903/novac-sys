@@ -77,7 +77,7 @@
                     <input
                       type="text"
                       formControlName="nombre"
-                      (keyup)="capitalice('nombre', $event.target.value)"
+                      (keyup)="capitalice('nombre', htmlServ.getValue($event))"
                       placeholder="Introduzca nombre"
                       class="form-control"
                       (keydown.enter)="saltar('campoEmail')"
@@ -98,7 +98,7 @@
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="'direccion'" [form]="form">
                     <label class="control-label">Direccion: <span style="color: red">*</span></label>
-                    <textarea id="campoDir" formControlName="direccion" (keyup)="capitalice('direccion', $event.target.value)" placeholder="Ingrese la direccion" cols="100" rows="3" class="form-control"></textarea>
+                    <textarea id="campoDir" formControlName="direccion" (keyup)="capitalice('direccion', htmlServ.getValue($event))" placeholder="Ingrese la direccion" cols="100" rows="3" class="form-control"></textarea>
                     <span id="msgContainer_direccion"></span>
                   </div>
                 </div>

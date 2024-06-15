@@ -1,3 +1,4 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { Router } from '@angular/router';
 import { ModalClass } from './../../components/modal/modal-class';
 import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
@@ -8,7 +9,7 @@ import { table_config } from './../../components/new_tablas/tabla-class';
 import { FacturaC, tipoDocFacturacion } from './../factura';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ModalI } from '../../components/modal/modal-class';
 import * as _ from 'lodash';
 
@@ -75,6 +76,8 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
   facturaClass = new FacturaC();
   clienteClass = new ClienteC();
+
+  htmlServ = inject(HtmlElementsService)
 
   ngOnInit(): void {
     this.filter_key = this.filter_options.todos;

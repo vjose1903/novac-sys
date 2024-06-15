@@ -754,9 +754,6 @@ export class fun {
   // Descripcion : Esta funcion remueve un item  de un arreglo
   // _________________________________________________________________________________________________
   static pull(array, item_remove) {
-    console.log('item_remove ', item_remove);
-    console.log('array ', array);
-
     const index = array.findIndex((item) => fun.isEqual(item, item_remove));
     array.splice(index, 1);
   }

@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -62,6 +63,9 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   formPermissions = [Permisos.vehiculo.create, Permisos.vehiculo.update];
   hasPermissionsMarca: boolean;
   hasPermissionsModelo: boolean;
+
+  htmlServ = inject(HtmlElementsService);
+  fun = fun;
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
@@ -95,6 +99,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.getMarcas();
     this.checkPermisos();
   }
+
   checkPermisos() {
     this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then((result) => (this.hasPermissionsMarca = result));
     this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then((result) => (this.hasPermissionsModelo = result));
@@ -109,6 +114,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       (err: any) => {},
     );
   }
+
   async getVehiculos(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -152,6 +158,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       telefono_no_empleado: [{ value: null, disabled: true }, Validators.required],
       estado: [true],
     });
+    this.verificateMarcaIsSelected();
   }
 
   saltar(campo, array?, i?) {
@@ -199,14 +206,23 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     if (fun.hasValue(this.form)) this.form.controls[campo].reset(null);
   }
 
-  async selectMarca(callback = (arg) => {}) {
-    const marca_selected_id = this.form.controls.marca.value;
-    if (marca_selected_id) {
-      const res = await this.modeloClass.getAll({ afterPath: `por_marca/${marca_selected_id}` });
-      this.listaModelos = res;
-      if (fun.hasValue(this.form)) this.form.controls.modelo.reset();
-      callback(true);
-    }
+  async selectMarca() {
+    return new Promise<void>(async (resolve, reject) => {
+      const marca_selected_id = this.form.controls.marca.value;
+      if (marca_selected_id) {
+        const res = await this.modeloClass.getAll({ afterPath: `por_marca/${marca_selected_id}` });
+        this.listaModelos = res;
+        if (fun.hasValue(this.form)) this.form.controls.modelo.reset();
+        this.verificateMarcaIsSelected();
+        resolve();
+      }
+    });
+  }
+
+  verificateMarcaIsSelected() {
+    const formulario = this.form.getRawValue();
+    const func = fun.hasValue(formulario.marca) ? 'enable' : 'disable';
+    this.form.controls.modelo[func]({ emitEvent: false });
   }
 
   // =============================================
@@ -247,17 +263,16 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.boton = 'Editar';
 
     await this.form.patchValue(this.vehiculoSelected);
+    this.verificateMarcaIsSelected();
 
     if (!this.vehiculoSelected.user_id) this.form.controls.user_id.setValue(-1);
 
     const marca_id = this.listaMarcas.find((marca) => marca.descripcion === this.vehiculoSelected.marca).id;
 
     this.form.controls.marca.setValue(marca_id);
-    this.selectMarca((res) => {
-      if (res) {
-        const modelo_id = this.listaModelos.find((modelo) => modelo.descripcion == this.vehiculoSelected.modelo).id;
-        this.form.controls.modelo.setValue(modelo_id);
-      }
+    this.selectMarca().then(() => {
+      const modelo_id = this.listaModelos.find((modelo) => modelo.descripcion == this.vehiculoSelected.modelo).id;
+      this.form.controls.modelo.setValue(modelo_id);
     });
 
     this.selectPropietario();
@@ -265,6 +280,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   nuevoRegistro() {
     this.isCreando = true;
+    this.verificateMarcaIsSelected();
   }
 
   capitalice(control, arg) {

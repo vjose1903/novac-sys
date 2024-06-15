@@ -27,7 +27,7 @@
             min="1"
             [max]="inputs.cantidad"
             (keydown.enter)="saltar('razon')"
-            (focus)="$event.target.select()"
+            (focus)="htmlServ.selectValue($event)"
             (blur)="checkCantidad()"
             type="number"
             class="form-control input_cantidad"
