@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Sistema facturacion e inventario NOVAC.",
   "author": {
     "name": "Victor Jose Vásquez Santos",
@@ -54,7 +54,9 @@
     "primeicons": "7.0.0",
     "primeng": "17.18.0",
     "replace-in-file": "7.1.0",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "@ng-bootstrap/ng-bootstrap": "^17.0.0",
+    "@popperjs/core": "2.11.8"
   },
   "devDependencies": {
     "@angular-eslint/builder": "17.4.0",
