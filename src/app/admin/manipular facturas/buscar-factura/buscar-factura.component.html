@@ -15,7 +15,7 @@
           @if (buscarPara == 'solo_ver') {
           <div class="form-group">
             <label class="control-label mb-0">Tipo: </label>
-            <select id="tipoI" [(ngModel)]="tipo_documento_selected" class="form-control inputE" (keydown.enter)="saltar($event.target.id, $event.target.value)" (change)="changeSelect('tipo_documento', $event.target.value)" value="">
+            <select id="tipoI" [(ngModel)]="tipo_documento_selected" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))" (change)="changeSelect('tipo_documento', htmlServ.getValue($event))" value="">
               <option [value]="null" selected disabled>Escoger tipo</option>
               @for (tipo of tipos_documentos; track $index) {
               <option [value]="tipo.value">{{ tipo.label }}</option>
@@ -32,8 +32,8 @@
               id="buscarPorI"
               [(ngModel)]="buscar_por"
               class="form-control inputE"
-              (keydown.enter)="saltar($event.target.id, $event.target.value)"
-              (change)="changeSelect('buscar_por', $event.target.value)"
+              (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
+              (change)="changeSelect('buscar_por', htmlServ.getValue($event))"
               value=""
               [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected)"
             >
@@ -55,7 +55,7 @@
             @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected != 'cotizacion') {
             <div class="form-group mr-2">
               <label class="control-label mb-0">Tipo factura : </label>
-              <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar($event.target.id, $event.target.value)">
+              <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))">
                 <option [value]="null" selected disabled>Escoger tipo</option>
                 <option value="3">Factura de consumo</option>
                 <option value="2">Factura con Valor Fiscal</option>
@@ -74,9 +74,9 @@
               <input
                 id="valorI"
                 class="form-control inputE"
-                (keydown.enter)="saltar('cliente', $event.target.value)"
+                (keydown.enter)="saltar('cliente', htmlServ.getValue($event))"
                 type="text"
-                (focus)="$event.target.select()"
+                (focus)="htmlServ.selectValue($event)"
                 [placeholder]="getProperties('placeHolder')"
                 autocomplete="off"
                 [disabled]="tipo_documento_selected != 'cotizacion' && fun.isEmpty(tipo_factura_id)"
@@ -87,11 +87,11 @@
               <p-inputMask
                 inputId="valorI"
                 styleClass="form-control inputE UPPERCASE"
-                (keydown.enter)="saltar('buscarFactura', $event.target.value)"
+                (keydown.enter)="saltar('buscarFactura', htmlServ.getValue($event))"
                 mask="B9999999999"
                 tabindex="-1"
                 placeholder="B__________"
-                (onFocus)="$event.target.select()"
+                (onFocus)="htmlServ.selectValue($event)"
                 [autoClear]="false"
               ></p-inputMask>
               }
@@ -100,9 +100,9 @@
               <input
                 id="valorI"
                 class="form-control inputE input_cantidad"
-                (keydown.enter)="saltar('buscarFactura', $event.target.value)"
+                (keydown.enter)="saltar('buscarFactura', htmlServ.getValue($event))"
                 type="number"
-                (focus)="$event.target.select()"
+                (focus)="htmlServ.selectValue($event)"
                 [placeholder]="getProperties('placeHolder')"
                 autocomplete="off"
               />

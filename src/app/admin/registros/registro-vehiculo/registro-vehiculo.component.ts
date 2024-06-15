@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -62,6 +63,9 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   formPermissions = [Permisos.vehiculo.create, Permisos.vehiculo.update];
   hasPermissionsMarca: boolean;
   hasPermissionsModelo: boolean;
+
+  htmlServ = inject(HtmlElementsService);
+  
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }

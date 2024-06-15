@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { Component, OnInit, inject } from '@angular/core';
 import { ModalI } from '../../../../admin/components/modal/modal-class';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
@@ -14,8 +15,10 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
   constructor(private fb: UntypedFormBuilder) {}
   modal: any = {};
   inputs: any;
-
   form;
+
+  htmlServ = inject(HtmlElementsService);
+
   ngOnInit(): void {
     this.createForm();
   }

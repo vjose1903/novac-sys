@@ -1,7 +1,8 @@
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { ModalClass } from '../../modal/modal-class';
 import { TablasService } from '../tablas.service';
 import { fun } from '../../../../core/services/functions.service';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import * as _ from 'lodash';
 
 @Component({
@@ -18,6 +19,8 @@ export class IconsArrayComponent {
   @Input() data;
 
   @Output() icon_click = new EventEmitter<any>();
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(public tServ: TablasService) {}
 

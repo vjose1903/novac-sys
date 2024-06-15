@@ -53,10 +53,10 @@
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
                     <input
                       (keydown.enter)="saltar('tipo')"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       type="text"
                       formControlName="nombre"
-                      (keyup)="capitalice('nombre', $event.target.value)"
+                      (keyup)="capitalice('nombre', htmlServ.getValue($event))"
                       placeholder="Introduzca nombre"
                       class="form-control"
                       autocomplete="off"
@@ -74,7 +74,7 @@
                       (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
                       id="tipo"
                       formControlName="tipo_articulo_id"
-                      (change)="selectTipoArticulo($event.target.value)"
+                      (change)="selectTipoArticulo(htmlServ.getValue($event))"
                       class="form-control"
                       value=""
                     >
@@ -114,7 +114,7 @@
                       formControlName="precio_principal"
                       placeholder="Introduzca precio"
                       class="form-control"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       autocomplete="off"
                       (blur)="calculatePriceLibra()"
                       (blur)="revisarPrecio('precio_principal')"
@@ -133,7 +133,7 @@
                   <div class="form-group">
                     <label class="control-label">Comprado en: <span style="color: red">*</span></label>
                     <!-- (keydown.enter)="saltar(tipoArticuloSelected?.descripcion === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
-                    <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn($event.target.value)">
+                    <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn(htmlServ.getValue($event))">
                       <option [value]="null" disabled>Tipo</option>
                       <option value="Quintal">Quintal</option>
                       <option value="Libra">Libra</option>
@@ -179,7 +179,7 @@
                       (blur)="calculatePrice()"
                       placeholder="Introduzca costo"
                       class="form-control"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       autocomplete="off"
                       (blur)="revisarPrecio('costo_principal')"
                     />
@@ -199,7 +199,7 @@
                       formControlName="precio_principal"
                       placeholder="Introduzca precio"
                       class="form-control"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       autocomplete="off"
                       (blur)="calculatePriceLibra()"
                       (blur)="revisarPrecio('precio_principal')"
@@ -220,7 +220,7 @@
                           (keydown.enter)="saltar('medida_alerta')"
                           id="existencia"
                           formControlName="aviso_existencia"
-                          (focus)="$event.target.select()"
+                          (focus)="htmlServ.selectValue($event)"
                           placeholder="Cantidad para alertar"
                           min="1"
                           class="form-control input_cantidad"
@@ -299,7 +299,7 @@
                           <div class="col-2 pr-0">
                             <div class="form-group mb-0">
                               <input
-                                (focus)="$event.target.select()"
+                                (focus)="htmlServ.selectValue($event)"
                                 type="text"
                                 (keydown.enter)="saltar('cantidad_formula', index_formula)"
                                 (blur)="calculateCostoPT()"
@@ -360,7 +360,7 @@
                         placeholder="Otros Gastos"
                         class="form-control"
                         (blur)="calculateCostoPT(); revisarPrecio('otros_costos')"
-                        (focus)="$event.target.select()"
+                        (focus)="htmlServ.selectValue($event)"
                         autocomplete="off"
                       />
                       @if (!form.controls['otros_costos'].valid && (form.controls['otros_costos'].dirty || form.controls['otros_costos'].touched)) {
@@ -379,7 +379,7 @@
                         (blur)="calculatePrice()"
                         placeholder="Introduzca costo"
                         class="form-control"
-                        (focus)="$event.target.select()"
+                        (focus)="htmlServ.selectValue($event)"
                         autocomplete="off"
                         (blur)="revisarPrecio('costo_principal')"
                       />
@@ -398,7 +398,7 @@
                         formControlName="precio_principal"
                         placeholder="Introduzca precio"
                         class="form-control"
-                        (focus)="$event.target.select()"
+                        (focus)="htmlServ.selectValue($event)"
                         autocomplete="off"
                         (blur)="calculatePriceLibra(); revisarPrecio('precio_principal')"
                       />
@@ -417,7 +417,7 @@
                             (keydown.enter)="saltar('medida_alerta')"
                             id="existencia"
                             formControlName="aviso_existencia"
-                            (focus)="$event.target.select()"
+                            (focus)="htmlServ.selectValue($event)"
                             placeholder="Cantidad para alertar"
                             class="form-control input_cantidad"
                             min="1"
@@ -451,7 +451,7 @@
                 <div class="col-3 p-0">
                   <label class="control-label">Precio por libra </label>
                   <div class="form-group">
-                    <input (keydown.enter)="saltar('send')" (focus)="$event.target.select()" type="text" id="precio_libra" formControlName="precio_libra" class="form-control" (blur)="revisarPrecio('precio_libra')" autocomplete="off" />
+                    <input (keydown.enter)="saltar('send')" (focus)="htmlServ.selectValue($event)" type="text" id="precio_libra" formControlName="precio_libra" class="form-control" (blur)="revisarPrecio('precio_libra')" autocomplete="off" />
                     @if (!form.controls['precio_libra'].valid && (form.controls['precio_libra'].dirty || form.controls['precio_libra'].touched)) {
                     <div class="alerta text-danger ml-1" style="font-size: 12px">Cantidad de la caja</div>
                     }
@@ -472,7 +472,7 @@
                   <div class="form-group">
                     <input
                       (keydown.enter)="saltar('medidaPadre')"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       type="Number"
                       id="contenidoPadre"
                       formControlName="cantidad_contenido_padre"
@@ -514,7 +514,7 @@
                       (keydown.enter)="saltar(form.controls['medida_contenido_padre'].value === 'Paquete' ? 'contenidoHijo' : 'send')"
                       type="text"
                       id="precio_padre"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       formControlName="precio_padre"
                       placeholder="Introduzca precio"
                       class="form-control"
@@ -542,7 +542,7 @@
                   <div class="form-group">
                     <input
                       type="Number"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       (keydown.enter)="saltar('medidaHijo')"
                       id="contenidoHijo"
                       formControlName="cantidad_contenido_hijo"
@@ -579,7 +579,7 @@
                       formControlName="precio_hijo"
                       placeholder="Introduzca precio"
                       class="form-control"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       (blur)="revisarPrecio('precio_hijo')"
                       autocomplete="off"
                     />

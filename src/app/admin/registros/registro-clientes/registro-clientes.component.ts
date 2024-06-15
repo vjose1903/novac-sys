@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, FormArray, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 import { GLOBAL } from '../../../core/typescript/GLOBAL';
@@ -56,6 +57,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
   };
   tablaComponent;
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();

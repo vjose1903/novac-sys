@@ -31,8 +31,8 @@
                   <div class="form-group">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
                     <input
-                      (keyup)="capitalice('nombre_no_empleado', $event.target.value)"
-                      (focus)="$event.target.select()"
+                      (keyup)="capitalice('nombre_no_empleado', htmlServ.getValue($event))"
+                      (focus)="htmlServ.selectValue($event)"
                       type="text"
                       formControlName="nombre_no_empleado"
                       placeholder="Introduzca nombre"
@@ -50,8 +50,8 @@
                   <div class="form-group">
                     <label class="control-label">Apellido: <span style="color: red">*</span></label>
                     <input
-                      (keyup)="capitalice('apellido_no_empleado', $event.target.value)"
-                      (focus)="$event.target.select()"
+                      (keyup)="capitalice('apellido_no_empleado', htmlServ.getValue($event))"
+                      (focus)="htmlServ.selectValue($event)"
                       type="text"
                       formControlName="apellido_no_empleado"
                       placeholder="Introduzca apellido"
@@ -93,7 +93,7 @@
                 <div class="col-6 p-0 pl-2">
                   <div class="form-group">
                     <label class="control-label">Modelo: <span style="color: red">*</span></label>
-                    <!-- <input (focus)="$event.target.select()" type="text" formControlName="modelo" placeholder="Introduzca modelo" class="form-control" autocomplete="off" id="modelo" /> -->
+                    <!-- <input (focus)="htmlServ.selectValue($event)" type="text" formControlName="modelo" placeholder="Introduzca modelo" class="form-control" autocomplete="off" id="modelo" /> -->
                     <ng-select id="modelo" formControlName="modelo" [items]="listaModelos" bindLabel="descripcion" bindValue="id" [clearable]="false">
                       <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
                         <div>
@@ -106,7 +106,7 @@
                 <div class="col-6 p-0 pr-2">
                   <div class="form-group">
                     <label class="control-label">Año: <span style="color: red">*</span></label>
-                    <input (focus)="$event.target.select()" type="text" formControlName="anio" placeholder="Introduzca año" class="form-control" autocomplete="off" id="anio" maxlength="4" />
+                    <input (focus)="htmlServ.selectValue($event)" type="text" formControlName="anio" placeholder="Introduzca año" class="form-control" autocomplete="off" id="anio" maxlength="4" />
                     @if (!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)) {
                     <div class="alerta text-danger ml-1" style="font-size: 12px">
                       @if (form.controls['anio'].errors.minlength) {

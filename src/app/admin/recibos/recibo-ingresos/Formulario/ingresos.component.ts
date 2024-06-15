@@ -1,7 +1,8 @@
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { Ss } from './../../../../core/services/singleton.service';
 import { ClienteC } from './../../../registros/registro-clientes/cliente';
 import { NotaC } from './../../../manipular facturas/notas-cred-deb/notas';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
@@ -110,6 +111,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   clienteClass = new ClienteC();
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router, private route: ActivatedRoute) {
     super();

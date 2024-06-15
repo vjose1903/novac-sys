@@ -1,5 +1,6 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import * as _ from 'lodash';
 
 const moment = require('../../../core/javascript/moment');
@@ -70,6 +71,8 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   };
   tablaComponent;
   formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private tServ: TablasService) {
     super();
