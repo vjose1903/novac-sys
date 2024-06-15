@@ -1,10 +1,8 @@
 import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { Ss } from './../../../../core/services/singleton.service';
 import { ClienteC } from './../../../registros/registro-clientes/cliente';
-import { NotaC } from './../../../manipular facturas/notas-cred-deb/notas';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import * as _ from 'lodash';
-import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
@@ -112,11 +110,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router, private route: ActivatedRoute) {
+  constructor(private tServ: TablasService, private router: Router, private route: ActivatedRoute) {
     super();
-    this.config.notFoundText = 'Articulo no existe';
   }
 
   ngOnInit() {

@@ -50,13 +50,19 @@
               <div class="col-12">
                 <div class="form-group">
                   <label class="control-label">Marca: <span style="color: red">*</span></label>
-                  <ng-select id="marca_modal" formControlName="marca_id" [items]="listaMarcas" bindLabel="descripcion" bindValue="id" [clearable]="false">
-                    <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-                      <div>
-                        <span>{{ item.descripcion }} </span>
-                      </div>
-                    </ng-template>
-                  </ng-select>
+
+                  <p-dropdown
+                    inputId="marca_modal"
+                    [options]="listaMarcas"
+                    formControlName="marca_id"
+                    placeholder="Seleccione una marca"
+                    [filter]="true"
+                    filterBy="descripcion"
+                    optionLabel="descripcion"
+                    optionValue="id"
+                    emptyFilterMessage="Marca no encontrada"
+                    [resetFilterOnHide]="true"
+                  />
                 </div>
               </div>
               <div class="col-12">

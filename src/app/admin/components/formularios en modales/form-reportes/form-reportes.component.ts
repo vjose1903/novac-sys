@@ -82,11 +82,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     setTimeout(() => (this.dinamycSelectionReady = true), 10);
   }
 
-  async getArticulos(arg) {
-    if (arg.term && arg.term !== '') {
+  async getArticulos(name) {
+    if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
         try {
-          this.articuloClass.getArticulosFiltrado({ buscar: arg.term, fecha: this.Fecha, paginado: false, is_compra: true }).then((res) => (this.listaArticulos = res['data']));
+          this.articuloClass.getArticulosFiltrado({ buscar: name, fecha: this.Fecha, paginado: false, is_compra: true }).then((res) => (this.listaArticulos = res['data']));
         } catch (error) {
           console.error(error);
           fun.toastError('Error buscando articulos registrados.', 'ERROR');
@@ -97,10 +97,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     }
   }
 
-  async getClientes(arg) {
-    if (arg.term && arg.term !== '') {
+  async getClientes(name) {
+    if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
-        const extra = { afterPath: `filtro/${arg.term}`, parameters: { paginado: false } };
+        const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false } };
 
         this.clienteClass.getAll(extra).then((res) => {
           res['data'].map((cliente) => {
@@ -233,7 +233,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       tFacturaD.comprobante_para_exportaciones,
       tFacturaD.comprobantes_para_pago_al_exterior,
     ];
-    
 
     this.tipos_facturas = [{ label: 'Todos', id: 0 }];
 

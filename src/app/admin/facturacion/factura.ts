@@ -99,10 +99,11 @@ export class FacturaC extends CrudG<FacturasI> {
       label: 'Seleccione el camión',
       formControl: 'vehiculo_id',
       items: [],
-      bindLabel: 'info_vehiculo',
-      bindValue: 'id',
+      optionLabel: 'info_vehiculo',
+      optionValue: 'id',
       searchFunction: FacturaC.getCamiones,
       blurFunction: FacturaC.cleanCamiones,
+      placeholder: 'Ingrese el nombre del camión',
       notFoundText: 'Camión no encontrado',
       disabledFunction: () => false,
       validators: Validators.required,
@@ -139,10 +140,12 @@ export class FacturaC extends CrudG<FacturasI> {
     FacturaC.inputsMovimientosViaje[0].items = [];
   }
 
-  static async getCamiones(event) {
-    if (fun.hasValue(event.term)) {
+  static async getCamiones(name) {
+    console.log("name ", name);
+    
+    if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
-        const extra = { afterPath: `filtro/${event.term}`, parameters: { paginado: false, info_vehiculo: true } };
+        const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false, info_vehiculo: true } };
         new VehiculoC().getAll(extra).then((res) => {
           FacturaC.inputsMovimientosViaje[0].items = res['data'];
         });

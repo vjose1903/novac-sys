@@ -17,13 +17,20 @@
                 <div class="col-12 p-0">
                   <div class="form-group">
                     <label class="control-label">Propietario: <span style="color: red">*</span></label>
-                    <ng-select id="user_id" formControlName="user_id" (change)="selectPropietario()" [items]="listaPropietarios" bindLabel="nombre_completo" bindValue="id" [clearable]="false">
-                      <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-                        <div>
-                          <span>{{ item.nombre_completo }} </span>
-                        </div>
-                      </ng-template>
-                    </ng-select>
+
+                    <p-dropdown
+                      inputId="user_id"
+                      [options]="listaPropietarios"
+                      formControlName="user_id"
+                      placeholder="Seleccione un propietario"
+                      [filter]="true"
+                      filterBy="nombre_completo"
+                      optionLabel="nombre_completo"
+                      optionValue="id"
+                      emptyFilterMessage="Propietario no encontrado"
+                      [resetFilterOnHide]="true"
+                      (onChange)="selectPropietario()"
+                    />
                   </div>
                 </div>
                 @if (form.controls['user_id'].value === -1) {
@@ -81,26 +88,38 @@
                 <div class="col-6 p-0 pr-2">
                   <div class="form-group">
                     <label class="control-label">Marca: <span style="color: red">*</span></label>
-                    <ng-select id="marca" formControlName="marca" (change)="selectMarca()" [items]="listaMarcas" bindLabel="descripcion" bindValue="id" [clearable]="false">
-                      <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-                        <div>
-                          <span>{{ item.descripcion }} </span>
-                        </div>
-                      </ng-template>
-                    </ng-select>
+
+                    <p-dropdown
+                      inputId="marca"
+                      [options]="listaMarcas"
+                      formControlName="marca"
+                      placeholder="Seleccione una marca"
+                      [filter]="true"
+                      filterBy="descripcion"
+                      optionLabel="descripcion"
+                      optionValue="id"
+                      emptyFilterMessage="Marca no encontrada"
+                      [resetFilterOnHide]="true"
+                      (onChange)="selectMarca()"
+                    />
                   </div>
                 </div>
                 <div class="col-6 p-0 pl-2">
                   <div class="form-group">
                     <label class="control-label">Modelo: <span style="color: red">*</span></label>
-                    <!-- <input (focus)="htmlServ.selectValue($event)" type="text" formControlName="modelo" placeholder="Introduzca modelo" class="form-control" autocomplete="off" id="modelo" /> -->
-                    <ng-select id="modelo" formControlName="modelo" [items]="listaModelos" bindLabel="descripcion" bindValue="id" [clearable]="false">
-                      <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-                        <div>
-                          <span>{{ item.descripcion }} </span>
-                        </div>
-                      </ng-template>
-                    </ng-select>
+
+                    <p-dropdown
+                      inputId="modelo"
+                      [options]="listaModelos"
+                      formControlName="modelo"
+                      placeholder="Seleccione un modelo"
+                      [filter]="true"
+                      filterBy="descripcion"
+                      optionLabel="descripcion"
+                      optionValue="id"
+                      emptyFilterMessage="Modelo no encontrado"
+                      [resetFilterOnHide]="true"
+                    />
                   </div>
                 </div>
                 <div class="col-6 p-0 pr-2">

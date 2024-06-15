@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgSelectModule } from '@ng-select/ng-select';
 import { TabViewModule } from 'primeng/tabview';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../new_tablas/tablas.module';
@@ -33,7 +32,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, NgSelectModule, FormsModule, ReactiveFormsModule, PrimengModule, TabViewModule, NgxPermissionsModule, SelectButtonModule],
+  imports: [CommonModule, TablasModule,  FormsModule, ReactiveFormsModule, PrimengModule, TabViewModule, NgxPermissionsModule, SelectButtonModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}
