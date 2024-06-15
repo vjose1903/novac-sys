@@ -114,15 +114,23 @@
       </div>
       <div class="col-6">
         @if (buscarPara.includes('nota')) {
-        <btn-icon-circular
-          [id]="'btnNota'"
-          [icon]="'fas fa-history'"
-          [size]="'size-lg'"
-          [tooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
-          [tooltipPosition]="'top'"
-          (clickFunction)="openSide()"
-        >
-        </btn-icon-circular>
+
+        <div class="w-100 h-100 d-flex justify-content-between flex-column">
+          <btn-icon-circular
+            [id]="'btnNota'"
+            [icon]="'fas fa-history'"
+            [size]="'size-lg'"
+            [tooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
+            [tooltipPosition]="'top'"
+            (clickFunction)="openSide()"
+          >
+          </btn-icon-circular>
+          @if (mostrarListaFacturas()) {
+          <div class="w-100 d-flex justify-content-end">
+            <p-selectButton [options]="series" [(ngModel)]="serieSelected" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+          </div>
+          }
+        </div>
         }
       </div>
     </div>

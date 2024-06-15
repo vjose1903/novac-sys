@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { FacturacionService } from './facturacion.service';
 import { ArticuloC } from '../registros/articulos/articulo';
-import { tipoDocFacturacion, FacturasI, tFacturaD, actionFacturacion, serie, comprobanteNormal, comprobanteElectronico } from './factura';
+import { tipoDocFacturacion, FacturasI, tFacturaD, actionFacturacion, comprobanteNormal, comprobanteElectronico } from './factura';
 import { NcfC } from '../registros/ncf/ncf';
 import { PendienteFormComponent } from '../components/formularios en modales/pendiente-form/pendiente-form.component';
 import { FormCantidadEfectivoComponent } from '../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
@@ -20,7 +20,7 @@ import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { fun } from '../../core/services/functions.service';
 import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
-import { teclasCode } from '../../core/typescript/constantes';
+import { seriesDGII, teclasCode, serie } from '../../core/typescript/constantes';
 import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { Ss } from '../../core/services/singleton.service';
@@ -176,10 +176,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   isInitialized = false;
   cofig_articulos: ConfigArticuloI;
 
-  facturasSerieOptions = [
-    { label: 'Normal', value: serie.normal, disabled: false },
-    { label: 'Electronica', value: serie.electronica, disabled: false },
-  ];
+  facturasSerieOptions = seriesDGII;
 
   constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, public factServ: FacturacionService) {
     super();
@@ -360,7 +357,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  // TODO: TEMPORAL
+  // NOTE: TEMPORAL
 
   verificateSerieValidity() {
     if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) {
@@ -375,7 +372,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       this.factServ.tipoDocumento = this.route.snapshot.params['tipo'];
       this.factServ.productos_devueltos.length = 0;
-      // TODO: TEMPORAL
+      // NOTE: TEMPORAL
       this.verificateSerieValidity();
 
       if (this.factServ.isVenta) this.titulo = 'Factura de venta';
@@ -1435,8 +1432,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   getCuerpoFactura(arg) {
     if (arg.tipo == 'cuerpo') {
       this.cuerpoFactura = arg.data;
-
-      // TODO: aqui tengo que revisar que pasa en facturacion con el itbis
 
       if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) {
         this.cuerpoFactura.map((detalle) => {

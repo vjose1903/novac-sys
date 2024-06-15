@@ -1,15 +1,14 @@
-@import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Orbitron&display=swap');
 
 .cardNota {
   display: grid;
-
+  overflow: hidden;
   grid-template-areas:
-    "titulo"
-    "cabezaNota"
-    "cuerpoNota"
-    "pieNota";
+    'cabezaNota'
+    'cuerpoNota'
+    'pieNota';
 
-  grid-template-rows: min-content min-content auto min-content;
+  grid-template-rows: min-content auto min-content;
 
   .titulo {
     grid-area: titulo;
@@ -60,7 +59,7 @@
   width: 100%;
   background-color: var(--primary10);
   border-radius: 0.5rem;
-  font-family: "Orbitron", sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-size: 2rem;
   color: white;
   margin: 3rem 3rem 0rem auto !important;
@@ -108,14 +107,4 @@
 
 .numerosCalculos {
   justify-content: flex-end;
-}
-
-::ng-deep .anularPadding {
-  & .p-tabview-panels {
-    padding: 0 !important;
-  }
-}
-
-::ng-deep .notaVaciaStyle {
-  background: #efc2c2 !important;
 }

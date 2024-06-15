@@ -12,9 +12,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { DetalleFacturaModule } from './detalle-factura/detalle-factura.module';
 import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular.module';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [NotasCredDebComponent, BuscarFacturaComponent, DetalleNotaComponent],
-  imports: [CommonModule, ManipularFacturasRoutingModule, TablasModule, BtncircularModule, PrimengModule, FormsModule, ReactiveFormsModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtnIconModule],
+  imports: [CommonModule, ManipularFacturasRoutingModule, TablasModule, BtncircularModule, PrimengModule, FormsModule, ReactiveFormsModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtnIconModule, SelectButtonModule],
 })
 export class ManipularFacturasModule {}

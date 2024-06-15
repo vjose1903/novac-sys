@@ -75,7 +75,6 @@
               <div class="text-center tituloIngre">Inventario</div>
 
               <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                <!-- TODO: revisar id -->
                 @for (ingrediente of ingredientes; track ingrediente.id; let index = $index) {
                 <div class="ingredientesList d-flex">
                   <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
@@ -92,7 +91,6 @@
               <div class="text-center tituloIngre">Producción</div>
               @if (ingredientesParaProduccion.length > 0) {
               <div id="produccion_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                <!-- TODO: revisar id -->
                 @for (ingrediente of ingredientesParaProduccion; track ingrediente.id; let index_ingrediente = $index) {
                 <div class="ingredientesList d-flex">
                   <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>

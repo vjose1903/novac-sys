@@ -16,7 +16,6 @@ export class IconsArrayComponent {
   @Input() realIdTabla;
   @Input() rowData;
   @Input() data;
-  @Input() rowsEditing;
 
   @Output() icon_click = new EventEmitter<any>();
 
@@ -74,7 +73,7 @@ export class IconsArrayComponent {
   }
 
   iconBtn(key, index, data, e, objIcon) {
-    const obj = { id_tabla: this.realIdTabla, index: index, idIcon: objIcon.id, columnKey: key, iconKey: objIcon.key, data: data, rowsEditing: this.rowsEditing };
+    const obj = { id_tabla: this.realIdTabla, index: index, idIcon: objIcon.id, columnKey: key, iconKey: objIcon.key, data: data, rowsEditing: this.tServ.rowsEditing };
 
     const is_disable = this.disableInput(data, objIcon);
 
@@ -82,14 +81,14 @@ export class IconsArrayComponent {
       if (!objIcon?.editing_buttons || objIcon.key == 'guardar_btn') {
         this.handle_table_events('clickIcon', obj);
       } else {
-        if (objIcon?.one_per_row && objIcon.key == 'editar_btn' && this.rowsEditing.length > 1) {
+        if (objIcon?.one_per_row && objIcon.key == 'editar_btn' && this.tServ.rowsEditing.length > 1) {
           fun.toastInfo('Solo se puede editar una fila a la vez', 'AVISO');
           return;
         }
 
         if (objIcon.key == 'editar_btn') {
           data.is_editing = true;
-          this.tServ.modifyRowsEditing(data, 'add', this.rowsEditing).then(() => this.handle_table_events('clickIcon', obj));
+          this.tServ.modifyRowsEditing(data, 'add').then(() => this.handle_table_events('clickIcon', obj));
         }
         if (objIcon.key == 'cancelar_btn') this.checkIfIsEdited(data, obj);
       }
@@ -101,17 +100,17 @@ export class IconsArrayComponent {
   checkIfIsEdited(data, obj_click) {
     const row_editing_id = data.id;
     const original_row = this.data.find((item) => item.id == row_editing_id);
-    const editing_row = this.rowsEditing.find((item) => item.id == row_editing_id);
+    const editing_row = this.tServ.rowsEditing.find((item) => item.id == row_editing_id);
 
     if (fun.isEqual(original_row, editing_row)) {
       data.is_editing = false;
-      this.tServ.modifyRowsEditing(editing_row, 'remove', this.rowsEditing).then(() => this.handle_table_events('clickIcon', obj_click));
+      this.tServ.modifyRowsEditing(editing_row, 'remove').then(() => this.handle_table_events('clickIcon', obj_click));
     } else {
       const texto_modal = `¿Seguro que desea cancelar la edición?, al cancelar los cambios quedarán descartados.`;
 
       const siFunction = (instance) => {
         data.is_editing = false;
-        this.tServ.modifyRowsEditing(editing_row, 'remove', this.rowsEditing).then(() => this.handle_table_events('clickIcon', obj_click));
+        this.tServ.modifyRowsEditing(editing_row, 'remove').then(() => this.handle_table_events('clickIcon', obj_click));
         new ModalClass().closeModal(instance);
       };
 

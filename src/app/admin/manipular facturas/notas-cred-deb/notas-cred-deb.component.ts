@@ -159,7 +159,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getFacturas() {
     return new Promise(async (resolve) => {
-
       this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura) => {
         let tempFactData: FacturasI[] = res_factura['data'];
 
@@ -397,7 +396,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return result;
   }
 
-
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
     this.openNewModal({
       id: obj.id,
@@ -408,7 +406,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'SI', disable: false, },
+          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'SI', disable: false },
         ],
       },
     });
@@ -431,8 +429,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return suma;
   }
 
-  changeHeaderStatus(iteraFact, tabPanel, idTab) {
-    // TODO: verificar
+  changeHeaderStatus(iteraFact, tabPanel, idTab): any {
     if (tabPanel) {
       const element = document.getElementsByClassName(idTab);
 

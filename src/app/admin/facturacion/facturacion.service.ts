@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { fun } from './../../core/services/functions.service';
-import { comprobante, comprobanteElectronico, comprobanteNormal, serie, tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
+import { comprobante, comprobanteElectronico, comprobanteNormal, tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
 import { Ss } from '../../core/services/singleton.service';
+import { serie } from '../../core/typescript/constantes';
 
 @Injectable({
   providedIn: 'root',

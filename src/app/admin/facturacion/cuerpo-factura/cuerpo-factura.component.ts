@@ -13,7 +13,6 @@ import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
-import { OverlayOptions } from 'primeng/api/overlayoptions';
 
 @Component({
   selector: 'app-cuerpo-factura',

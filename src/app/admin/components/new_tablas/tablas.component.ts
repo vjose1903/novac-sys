@@ -54,7 +54,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   private destroy$ = new Subject<void>();
 
   fun = fun;
-  rowsEditing = [];
+
   tablaInterval;
   realIdTabla;
 
@@ -110,6 +110,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (this.destroy$) this.destroy$.complete();
 
     this.tServ.deletePaginationById(this.realIdTabla);
+    this.tServ.resetRowEditing();
     clearInterval(this.tablaInterval);
   }
 
@@ -126,11 +127,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           verificateId(btnObj);
         }
       }
-
-      config.info.forEach((info) => {
-        info.iconsArray.forEach((icon) => (icon.id ??= fun.generateKey()));
-      });
     }
+
+    config.info.forEach((info) => {
+      if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach((icon) => (icon.id ??= fun.generateKey()));
+    });
   }
 
   handleConfig() {
@@ -429,13 +430,13 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorInput(column, key, index, value, data) {
-    let newData = fun.duplicarJson(this.rowsEditing.find((item) => item.id == data.id));
+    let newData = fun.duplicarJson(this.tServ.rowsEditing.find((item) => item.id == data.id));
 
-    if (fun.isEmpty(newData) || this.rowsEditing.length == 0) newData = fun.duplicarJson(data);
+    if (fun.isEmpty(newData) || this.tServ.rowsEditing.length == 0) newData = fun.duplicarJson(data);
 
     fun.setProperty(newData, key, value);
 
-    this.tServ.modifyRowsEditing(newData, 'add', this.rowsEditing);
+    this.tServ.modifyRowsEditing(newData, 'add');
 
     const obj = { data, newData, index, key, value, id_tabla: this.realIdTabla };
     this.handle_table_events('inputChange', obj);

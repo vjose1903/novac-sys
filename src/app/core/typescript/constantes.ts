@@ -4,6 +4,17 @@ export const pattern = {
   rnc: [/[0-9]/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/],
 };
 
+export enum serie {
+  no = 0,
+  normal = 'normal',
+  electronica = 'electronica',
+}
+
+export const seriesDGII = [
+  { label: 'Normal', value: serie.normal, disabled: false },
+  { label: 'Electronica', value: serie.electronica, disabled: false },
+];
+
 export enum TypeNavigation {
   first_access = 0,
   reload = 1,

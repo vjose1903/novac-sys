@@ -1,5 +1,6 @@
 import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
+import { serie } from './../../../core/typescript/constantes';
 import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
@@ -20,6 +21,7 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
 import { TitleCasePipe } from '@angular/common';
+import { seriesDGII } from '../../../core/typescript/constantes';
 
 @Component({
   selector: 'app-buscar-factura',
@@ -50,6 +52,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   TablasComponent;
   idsFacturasSeleccionadas = [];
   permissions = Permisos;
+  series = seriesDGII;
+  serieSelected = serie.normal;
 
   tipos_documentos = [];
   tipo_documento_selected = tipoDocFacturacion.venta;
@@ -103,7 +107,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.verificatePermisos().then(async (res) => {
       this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       this.completarTituloPag();
-
+      // NOTE: temporal
+      this.verificateSerieValidity();
       fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
     });
   }
@@ -129,6 +134,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
+  verificateSerieValidity() {
+    const option = this.series.find((option) => option.value == serie.electronica);
+    option.disabled = true;
+  }
+
   pressEscResponse(res) {
     if (fun.hasValue(res)) fun.enfocarInput('valorI');
   }
@@ -148,8 +158,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
-      // TODO: seguir aqui
-      const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.buscarPara]);
+      console.log('NotaC.base_comprobante ', NotaC.base_comprobante);
+      console.log('this.buscarPara ', this.buscarPara);
+      console.log('this.serieSelected ', this.serieSelected);
+
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.serieSelected][this.buscarPara]);
+      console.log('Ss.factServ.lista_tipos_facturas:  ', Ss.factServ.lista_tipos_facturas);
+      console.log('NotaC.base_comprobante[this.serieSelected]:  ', NotaC.base_comprobante[this.serieSelected]);
+      console.log('tipoFact:  ', tipoFact);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 

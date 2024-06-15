@@ -11,12 +11,7 @@ import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/d
 import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
-
-export enum serie {
-  no = 0,
-  normal = 'normal',
-  electronica = 'electronica',
-}
+import { serie } from '../../core/typescript/constantes';
 
 export enum comprobanteNormal {
   valor_fiscal = '01',

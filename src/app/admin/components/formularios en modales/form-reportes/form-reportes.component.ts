@@ -1,4 +1,6 @@
-import { serie, tFacturaD } from './../../../facturacion/factura';
+import { tFacturaD } from './../../../facturacion/factura';
+
+import { serie } from './../../../../core/typescript/constantes';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { Ss } from './../../../../core/services/singleton.service';
 import { Component, OnInit } from '@angular/core';
@@ -231,6 +233,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       tFacturaD.comprobante_para_exportaciones,
       tFacturaD.comprobantes_para_pago_al_exterior,
     ];
+    
 
     this.tipos_facturas = [{ label: 'Todos', id: 0 }];
 
