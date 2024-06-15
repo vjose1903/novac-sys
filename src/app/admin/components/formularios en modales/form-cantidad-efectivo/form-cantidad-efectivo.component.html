@@ -11,7 +11,7 @@
     <input
       type="text"
       class="form-control inputEfectivo"
-      (focus)="$event.target.select()"
+      (focus)="htmlServ.selectValue($event)"
       (keyup)="calcularDevueta()"
       (keydown.enter)="saltar('formaPago')"
       [(ngModel)]="efectivo"

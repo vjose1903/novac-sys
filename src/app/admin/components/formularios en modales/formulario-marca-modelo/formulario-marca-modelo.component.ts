@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { Component, OnInit, Input, Output, EventEmitter, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
@@ -77,6 +78,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   hasPermissionsModelo: boolean;
   hasPermissionsMarcaCreate: boolean;
   hasPermissionsModeloCreate: boolean;
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
