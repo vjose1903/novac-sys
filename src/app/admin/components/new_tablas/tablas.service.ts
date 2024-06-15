@@ -8,7 +8,7 @@ import { paginateI } from './tabla-class';
 })
 export class TablasService {
   constructor() {}
-
+  rowsEditing = [];
   public obj_paginate = {
     default: {
       ant_page: null,
@@ -44,6 +44,10 @@ export class TablasService {
         this.obj_paginate[id].page_front = pageFromCero * this.obj_paginate[id].per_page;
       }
     });
+  }
+
+  resetRowEditing() {
+    this.rowsEditing = [];
   }
 
   deletePaginationById(id) {
@@ -84,7 +88,7 @@ export class TablasService {
         if (params.column.disable.some((conf) => conf.kind === 'selected')) temp_res = Number(params.dato.id) !== Number(params.seleccionado || 0);
 
         if (temp_res) break;
-        // TODO: hacer que se pueda desabilitar si el campo especificado tiene valor
+
         if (element.kind == 'has_value') {
           temp_res = fun.hasValue(params.dato[element.target]);
         }
@@ -102,23 +106,23 @@ export class TablasService {
     return fun.hasValue(params?.config?.read) && params?.config?.read ? true : res;
   }
 
-  modifyRowsEditing(newData, kind: 'add' | 'remove', rowsEditing) {
+  modifyRowsEditing(newData, kind: 'add' | 'remove') {
     return new Promise<any>((resolve, reject) => {
       newData = fun.duplicarJson(newData);
-      const row_editing = rowsEditing.find((item) => item.id == newData.id);
+      const row_editing = this.rowsEditing.find((item) => item.id == newData.id);
 
-      const index_editing = rowsEditing.findIndex((row_edit) => row_edit.id == row_editing?.id);
+      const index_editing = this.rowsEditing.findIndex((row_edit) => row_edit.id == row_editing?.id);
 
       if (kind == 'add') {
         if (fun.hasValue(row_editing)) {
           Object.assign(row_editing, newData);
         } else {
-          rowsEditing.push(newData);
+          this.rowsEditing.push(newData);
         }
       }
 
       if (kind == 'remove') {
-        if (fun.hasValue(row_editing) && index_editing != -1) fun.pullAt(rowsEditing, index_editing);
+        if (fun.hasValue(row_editing) && index_editing != -1) fun.pullAt(this.rowsEditing, index_editing);
       }
 
       resolve(true);

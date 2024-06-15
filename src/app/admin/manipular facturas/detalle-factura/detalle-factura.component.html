@@ -7,16 +7,19 @@
       </p-tag>
     </div>
 
-    <div *ngIf="inputs?.data?.numero_comprobante" class="d-flex ml-3">
+    @if (inputs?.data?.numero_comprobante) {
+    <div class="d-flex ml-3">
       <b class="mr-2">Comprobante: </b>
       <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
         <p class="text-black mb-0">{{ inputs.data.numero_comprobante }}</p></p-tag
       >
     </div>
+    }
   </div>
   <hr class="rayaTop" />
   <div class="row">
-    <div class="col-6 pl-0" *ngFor="let item of detalles; let i = index">
+    @for (item of detalles; track index; let index = $index) {
+    <div class="col-6 pl-0">
       <ng-container class="d-flex">
         <p>
           <strong>{{ item.label }}</strong
@@ -24,5 +27,6 @@
         </p>
       </ng-container>
     </div>
+    }
   </div>
 </div>

@@ -1,0 +1,26 @@
+.widget {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-areas:
+    'header'
+    'content'
+    'footer';
+  grid-template-rows: min-content auto min-content;
+
+  &.rounded {
+    border-radius: 8px !important;
+  }
+
+  .widget-header {
+    grid-area: header;
+  }
+
+  .widget-content {
+    grid-area: content;
+  }
+
+  .widget-footer {
+    grid-area: footer;
+  }
+}

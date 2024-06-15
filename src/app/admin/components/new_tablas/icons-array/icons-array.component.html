@@ -1,6 +1,8 @@
 <div class="d-flex {{ column.div_class ? column.div_class : 'justify-content-center align-items-center ' }} w-100" [ngStyle]="{ 'column-gap': column.column_gap || 0 }">
-  <div *ngFor="let objIcon of column.iconsArray">
-    <span *ngIf="showIcon(objIcon, rowData)" class="span_icon" [ngClass]="{ icon_disable: disableInput(rowData, objIcon) }">
+  @for (objIcon of column.iconsArray; track objIcon.id) {
+  <div>
+    @if (showIcon(objIcon, rowData)) {
+    <span class="span_icon" [ngClass]="{ icon_disable: disableInput(rowData, objIcon) }">
       <i
         id="{{ realIdTabla }}-{{ getIconKey(objIcon) }}-{{ indexBody }}"
         [pTooltip]="rowData[objIcon.rowTooltip] || objIcon.tooltip || ''"
@@ -11,5 +13,7 @@
         (mouseleave)="tServ.mouseMoveEvent('leave', rowData, objIcon.key, $event.target.id)"
       ></i>
     </span>
+    }
   </div>
+  }
 </div>

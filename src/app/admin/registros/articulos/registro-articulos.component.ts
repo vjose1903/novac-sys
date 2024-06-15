@@ -5,9 +5,8 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
-import * as moment from '../../../core/javascript/moment';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
-import * as $ from 'jquery';
+
 import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
@@ -16,6 +15,8 @@ import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
 import { ModalClass } from '../../components/modal/modal-class';
+const moment = require('../../../core/javascript/moment');
+const $ = require('jquery');
 
 @Component({
   selector: 'app-registro-articulos',
@@ -171,12 +172,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          {
-            clase: 'btn btn-blanco mr-2',
-            function: (instance) => this.closeModal(instance),
-            label: 'Cancelar',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false, },
           { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
         ],
       },

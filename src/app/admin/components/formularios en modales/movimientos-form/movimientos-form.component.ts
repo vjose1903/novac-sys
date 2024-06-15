@@ -33,6 +33,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   ngOnInit() {
     this.medidas = _.keys(this.inputs.cantidades);
   }
+
   ngAfterViewInit() {
     fun.enfocarInput('tipo_movimiento');
   }

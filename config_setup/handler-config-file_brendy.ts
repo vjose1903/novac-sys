@@ -28,6 +28,7 @@ export default class HandlerConfigFile {
     is_produccion: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
+    facturacion_electronica: false,
     medida_producto_terminado: 'Producto',
 
     printer_selected: {

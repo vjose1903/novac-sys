@@ -5,13 +5,58 @@ import { ModalHistorialPagosComponent } from './../components/formularios en mod
 import { CrudG } from '../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import { fun } from '../../core/services/functions.service';
-import * as moment from '../../core/javascript/moment';
+const moment = require('../../core/javascript/moment');
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
+import { serie } from '../../core/typescript/constantes';
 
+export enum comprobanteNormal {
+  valor_fiscal = '01',
+  factura_consumo = '02',
+  comprobante_compras = '11',
+  gastos_menores = '13',
+  comprobante_regimen_especiales = '14',
+  comprobante_gubernamental = '15',
+  comprobante_exportaciones = '16',
+  comprobantes_pago_exterior = '17',
+}
+
+export enum comprobanteElectronico {
+  valor_fiscal = '31',
+  factura_consumo = '32',
+  comprobante_compras = '41',
+  gastos_menores = '43',
+  comprobante_regimen_especiales = '44',
+  comprobante_gubernamental = '45',
+  comprobante_exportaciones = '46',
+  comprobantes_pago_exterior = '47',
+}
+
+export const comprobante = {
+  normal: {
+    valor_fiscal: comprobanteNormal.valor_fiscal,
+    factura_consumo: comprobanteNormal.factura_consumo,
+    comprobante_compras: comprobanteNormal.comprobante_compras,
+    gastos_menores: comprobanteNormal.gastos_menores,
+    comprobante_regimen_especiales: comprobanteNormal.comprobante_regimen_especiales,
+    comprobante_gubernamental: comprobanteNormal.comprobante_gubernamental,
+    comprobante_exportaciones: comprobanteNormal.comprobante_exportaciones,
+    comprobantes_pago_exterior: comprobanteNormal.comprobantes_pago_exterior,
+  },
+  electronica: {
+    valor_fiscal: comprobanteElectronico.valor_fiscal,
+    factura_consumo: comprobanteElectronico.factura_consumo,
+    comprobante_compras: comprobanteElectronico.comprobante_compras,
+    gastos_menores: comprobanteElectronico.gastos_menores,
+    comprobante_regimen_especiales: comprobanteElectronico.comprobante_regimen_especiales,
+    comprobante_gubernamental: comprobanteElectronico.comprobante_gubernamental,
+    comprobante_exportaciones: comprobanteElectronico.comprobante_exportaciones,
+    comprobantes_pago_exterior: comprobanteElectronico.comprobantes_pago_exterior,
+  },
+};
 
 export enum deleteDocumentosTypes {
   anular = 'anular',
@@ -26,7 +71,6 @@ export enum tipoDocFacturacion {
   nota_credito = 'nota_credito',
   nota_debito = 'nota_debito',
 }
-
 
 export enum tipoDocFacturacionLabel {
   pre_venta = 'pre-venta',
@@ -238,7 +282,7 @@ export class FacturaC extends CrudG<FacturasI> {
       height: '10rem',
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+        dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
   }
@@ -257,7 +301,7 @@ export class FacturaC extends CrudG<FacturasI> {
             width: '900px',
             botones: {
               ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+              dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
             },
           };
 
@@ -336,6 +380,7 @@ export interface TipoFacturaI {
   id: number;
   descripcion: string;
   referencia: string;
+  serie: serie;
   updated_at: any;
   created_at: any;
 }

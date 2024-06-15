@@ -12,12 +12,12 @@ import { PrimengModule } from '../../modules/primeng.module';
 import { TablasModule } from '../components/new_tablas/tablas.module';
 import { DetalleFacturaModule } from '../manipular facturas/detalle-factura/detalle-factura.module';
 import { BtncircularModule } from '../components/btncircular/btncircular.module';
-import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
 import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular.module';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent, MenuOpcionesExtraComponent, RetornarDevueltoComponent],
-  imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, NgxBootstrapModule, BtnIconModule],
+  imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, BtnIconModule, SelectButtonModule],
 })
 export class FacturacionModule {}

@@ -1,27 +1,27 @@
 <form [formGroup]="form">
   <div class="row">
     <!-- ----- DINAMYC SELECTION -----  -->
-    <ng-container *ngIf="dinamycSelectionReady && inputs.tipo_reporte == 'movimientos_vehiculo'">
-      <div *ngFor="let dinamyc_selection of inputs.dinamyc_selections" class="col-12">
-        <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
-
-        <ng-select
-          [formControlName]="dinamyc_selection.formControl"
-          [items]="dinamyc_selection.items"
-          bindLabel="{{ dinamyc_selection.bindLabel }}"
-          bindValue="{{ dinamyc_selection.bindValue }}"
-          [clearable]="true"
-          [appendTo]="'body'"
-          (search)="dinamyc_selection.searchFunction($event)"
-          [notFoundText]="dinamyc_selection.notFoundText"
-          [disabled]="dinamyc_selection.disabledFunction()"
-          (blur)="dinamyc_selection.blurFunction()"
-        >
-        </ng-select>
-      </div>
-    </ng-container>
+    @if (dinamycSelectionReady && inputs.tipo_reporte == 'movimientos_vehiculo') { @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
+    <div class="col-12 p-0">
+      <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
+      <ng-select
+        [formControlName]="dinamyc_selection.formControl"
+        [items]="dinamyc_selection.items"
+        bindLabel="{{ dinamyc_selection.bindLabel }}"
+        bindValue="{{ dinamyc_selection.bindValue }}"
+        [clearable]="true"
+        [appendTo]="'body'"
+        (search)="dinamyc_selection.searchFunction($event)"
+        [notFoundText]="dinamyc_selection.notFoundText"
+        [disabled]="dinamyc_selection.disabledFunction()"
+        (blur)="dinamyc_selection.blurFunction()"
+      >
+      </ng-select>
+    </div>
+    } }
     <!-- ----- SELECCION DE CLIENTE -----  -->
-    <div *ngIf="inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'cuentas_con_pagos'" class="col-12">
+    @if (inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'cuentas_con_pagos') {
+    <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Seleccione cliente: <span style="color: red">*</span> </label>
       <ng-select
         formControlName="cliente_id"
@@ -42,38 +42,58 @@
         </ng-template>
       </ng-select>
     </div>
+    }
+    <!-- ----- SERIE -----  -->
+    @if (inputs.tipo_reporte == 'ventas_diarias' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_cliente') {
+    <div class="col-12 p-0">
+      <label class="control-label mb-0 mt-2">Serie: <span style="color: red">*</span> </label>
+      <p-selectButton [options]="facturasSerieOptions" formControlName="serie" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+    </div>
+    }
 
     <!-- ----- CONDICION -----  -->
-    <div *ngIf="inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_diarias'" class="col-12">
+    @if (inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_diarias') {
+    <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Condicion: <span style="color: red">*</span> </label>
       <select formControlName="condicion" class="form-control">
         <option disabled>Seleccione</option>
-        <option *ngFor="let condicion of condiciones" [value]="condicion.id">{{ condicion.label }}</option>
+        @for (condicion of condiciones; track condicion.id) {
+        <option [value]="condicion.id">{{ condicion.label }}</option>
+        }
       </select>
     </div>
+    }
 
     <!-- ----- TIPO -----  -->
-    <div *ngIf="inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'ventas_productos' || inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'notas'" class="col-12">
+    @if (inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'ventas_productos' || inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'notas') {
+    <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Tipo: <span style="color: red">*</span> </label>
       <select formControlName="tipo" class="form-control" (change)="changeTipo()">
         <option disabled>Seleccione</option>
-        <option *ngFor="let tipo of tipos" [value]="tipo.id">{{ tipo.label }}</option>
+        @for (tipo of tipos; track tipo) {
+        <option [value]="tipo.id">{{ tipo.label }}</option>
+        }
       </select>
     </div>
+    }
 
     <!-- ----- TIPO FACTURAS -----  -->
-    <div *ngIf="inputs.tipo_reporte == 'ventas_diarias' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_cliente'" class="col-12">
+    @if (inputs.tipo_reporte == 'ventas_diarias' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_cliente') {
+    <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Tipo de factura: <span style="color: red">*</span> </label>
       <select formControlName="tipo_factura_id" class="form-control">
         <option disabled>Seleccione</option>
-        <option *ngFor="let tipo of tipos_facturas" [value]="tipo.id">{{ tipo.label }}</option>
+        @for (tipo of tipos_facturas; track tipo) {
+        <option [value]="tipo.id">{{ tipo.label }}</option>
+        }
       </select>
     </div>
+    }
 
     <!-- ----- SELECCION DE ARTICULO -----  -->
-    <div *ngIf="inputs.tipo_reporte == 'suplidor_prod'" class="col-12 mb-3">
+    @if (inputs.tipo_reporte == 'suplidor_prod') {
+    <div class="col-12 p-0 mb-3">
       <label class="control-label mb-0 mt-2">Seleccione articulo: <span style="color: red">*</span> </label>
-
       <ng-select
         formControlName="articulo_id"
         [items]="listaArticulos"
@@ -85,73 +105,60 @@
         notFoundText="Articulo no encontrado"
         [disabled]="listaArticulos.length == 0"
       >
-        <!-- <ng-template ng-option-tmp let-item="item" let-search="searchTerm">
-          <div>
-            <span>{{ item.Nombre }} </span>
-          </div>
-        </ng-template> -->
       </ng-select>
     </div>
+    }
 
     <!-- ----- FECHA -----  -->
 
-    <div *ngIf="(inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '1') || inputs.tipo_reporte == 'cuadre'" class="col-12">
+    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '1') || inputs.tipo_reporte == 'cuadre') {
+    <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Fecha: <span style="color: red">*</span> </label>
-
       <p-calendar inputId="fecha" formControlName="fecha" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
-
-      <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)">Este campo es obligatorio</div>
+      @if (!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)) {
+      <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+      }
     </div>
+    }
     <!-- ----- DESDE -----  -->
 
-    <div
-      *ngIf="
-        inputs.tipo_reporte == 'notas' ||
-        inputs.tipo_reporte == 'ventas_rango' ||
-        inputs.tipo_reporte == 'suplidor_prod' ||
-        inputs.tipo_reporte == 'recibos' ||
-        inputs.tipo_reporte == 'cuentas_con_pagos' ||
-        inputs.tipo_reporte == 'ventas_cliente' ||
-        inputs.tipo_reporte == 'movimientos_vehiculo' ||
-        (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')
-      "
-      class="col-6"
-    >
+    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'
+    || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    <div class="col-6 pl-0">
       <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
-
       <p-calendar inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
-      <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['desde'].valid && (form.controls['desde'].dirty || form.controls['desde'].touched)">Este campo es obligatorio</div>
+      @if (!form.controls['desde'].valid && (form.controls['desde'].dirty || form.controls['desde'].touched)) {
+      <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+      }
     </div>
+    }
     <!-- ----- HASTA -----  -->
-    <div
-      *ngIf="
-        inputs.tipo_reporte == 'notas' ||
-        inputs.tipo_reporte == 'ventas_rango' ||
-        inputs.tipo_reporte == 'suplidor_prod' ||
-        inputs.tipo_reporte == 'recibos' ||
-        inputs.tipo_reporte == 'cuentas_con_pagos' ||
-        inputs.tipo_reporte == 'ventas_cliente' ||
-        inputs.tipo_reporte == 'movimientos_vehiculo' ||
-        (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2')
-      "
-      class="col-6"
-    >
+    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'
+    || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    <div class="col-6 pr-0">
       <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
-
       <p-calendar inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
-      <div class="alerta text-danger ml-1" style="font-size: 12px" *ngIf="!form.controls['hasta'].valid && (form.controls['hasta'].dirty || form.controls['hasta'].touched)">Este campo es obligatorio</div>
+      @if (!form.controls['hasta'].valid && (form.controls['hasta'].dirty || form.controls['hasta'].touched)) {
+      <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+      }
     </div>
+    }
   </div>
 </form>
 
-<div *ngIf="inputs.switches">
+@if (inputs.switches) {
+<div>
   <br />
-  <label *ngIf="inputs.switches && inputs.switches?.title && fun.hasValue(inputs.switches.title)" class="control-label">{{ inputs.switches.title }} </label>
-
+  @if (inputs.switches && inputs.switches?.title && fun.hasValue(inputs.switches.title)) {
+  <label class="control-label">{{ inputs.switches.title }} </label>
+  }
   <div>
-    <div class="form-group mb-2 switchDiv" *ngFor="let switch of inputs.switches.array">
+    @for (switch of inputs.switches.array; track switch) {
+    <div class="form-group mb-2 switchDiv">
       <input [(ngModel)]="switch.value" class="apple-switch ml-2" type="checkbox" />
       <span class="ml-2">{{ switch.label }}</span>
     </div>
+    }
   </div>
 </div>
+}

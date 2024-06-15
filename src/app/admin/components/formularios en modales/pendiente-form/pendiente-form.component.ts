@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as moment from '../../../../core/javascript/moment';
+const moment = require('../../../../core/javascript/moment');
 
 import { ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';

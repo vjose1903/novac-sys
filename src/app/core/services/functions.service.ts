@@ -1,4 +1,4 @@
-import * as moment from '../javascript/moment';
+const moment = require('../javascript/moment');
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 
@@ -174,16 +174,10 @@ export class fun {
   // _________________________________________________________________________________________________
 
   static roundNumberToDecimal(number, cant = 2): string {
-    if (fun.isEmpty(number)) {
-      this.logRed('No se puede redondear una variable vacia');
-      return number;
-    }
-    if (typeof number == 'string') number = parseFloat(fun.desformatearStNumber(number));
+    if (fun.isEmpty(number)) return number;
 
-    if (isNaN(number)) {
-      this.logRed('No es un numero valido.');
-      return number;
-    }
+    if (typeof number == 'string' || isNaN(number)) number = parseFloat(fun.desformatearStNumber(number));
+
     const numerRounded = number.toFixed(cant);
 
     // Formateamos el número con comas para separar millares
@@ -245,7 +239,19 @@ export class fun {
   // Descripcion : Esta funcion retorna un id unico
   // _________________________________________________________________________________________________
   static generateKey(): string {
-    return moment().unix() + '' + Math.round(Math.random() * 10000);
+    return `${moment().unix()}${Math.round(Math.random() * 10000)}`;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: identifyObject
+  // Descripcion : Esta funcion le agrega una propiedad id a un objeto
+  // _________________________________________________________________________________________________
+  static identifyObject(object: any | Array<any>, key = 'id') {
+    if (Array.isArray(object)) {
+      object.map((item) => (item[key] = fun.generateKey()));
+    } else {
+      object[key] = fun.generateKey();
+    }
   }
 
   // __________________________________________________________________________________________________

@@ -28,6 +28,7 @@ export default class HandlerConfigFile {
     is_produccion: true,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
+    facturacion_electronica: true,
     medida_producto_terminado: 'Quintal',
 
     printer_selected: {

@@ -106,9 +106,9 @@ export class IpcService {
 
   private addColaMensaje(task: MessageTask) {
     if (this.isElectron) {
-      const lis = this.colaDeMensajes.getValue();
-      lis[task.id] = task;
-      this.colaDeMensajes.next(lis);
+      const list = this.colaDeMensajes.getValue();
+      list[task.id] = task;
+      this.colaDeMensajes.next(list);
     }
   }
 }

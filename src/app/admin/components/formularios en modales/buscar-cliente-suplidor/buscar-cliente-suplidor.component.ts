@@ -51,12 +51,13 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
   configApp!: ConfigI;
-
+  isSuplidor: boolean = false;
   btn_aceptar() {}
 
   ngOnInit(): void {
-    this.table_config.info = this.inputs.metodo == tipoDocFacturacion.compra ? this.compraInfo : this.ventaInfo;
+    this.isSuplidor = this.inputs.metodo == tipoDocFacturacion.compra;
 
+    this.table_config.info = this.isSuplidor ? this.compraInfo : this.ventaInfo;
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
 
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
@@ -68,14 +69,16 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
 
-    const classDinamic = this.inputs.metodo == tipoDocFacturacion.compra ? 'suplidorClass' : 'clienteClass';
+    const classDinamic = this.isSuplidor ? 'suplidorClass' : 'clienteClass';
     try {
       const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } }).catch((error) => {
         if (where === 'init') this.closeThis({ tipo: 'data_no_found', modal_id: this.modal.component_id });
       });
 
+      
       if (res.data && res.data.length > 0) {
-        res.data.unshift({ id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null });
+        const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
+        if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado && !this.isSuplidor) res.data.unshift(cliente_contado);
 
         res.data.map(async (entidad) => {
           entidad.nombre = entidad.nombre ? fun.Capitalice(entidad.nombre) : '----------';
@@ -91,10 +94,6 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
       } else {
         this.dataFiltro = copyData;
       }
-
-      const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
-
-      if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
 
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {}

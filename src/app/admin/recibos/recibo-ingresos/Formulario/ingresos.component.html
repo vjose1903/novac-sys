@@ -24,7 +24,8 @@
         </div>
       </div>
       <div class="col-8 pl-0">
-        <div *ngIf="clienteAdepositar" class="clienteAdepositar">
+        @if (clienteAdepositar) {
+        <div class="clienteAdepositar">
           <div class="nombre_cliente">
             <h3 class="negrita mb-0">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h3>
           </div>
@@ -39,15 +40,16 @@
                 <span class="w-100 detalleBalance badge bg-info mb-2">
                   <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
                 </span>
-                <span *ngIf="facturasSelected.length" class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
+                @if (facturasSelected.length) {
+                <span class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
                   <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo) }}</span>
                 </span>
-
-                <span *ngIf="facturasSelected.length" class="w-100 detalleBalance badge bg-warning mb-2">
+                } @if (facturasSelected.length) {
+                <span class="w-100 detalleBalance badge bg-warning mb-2">
                   <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando) }}</span>
                 </span>
+                }
               </div>
-
               <div class="derecha pl-2">
                 <span class="w-100 detalleBalance badge blue text-shadow text-white mb-2">
                   <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
@@ -62,36 +64,41 @@
             </div>
           </div>
           <div class="porcentaje">
-            <div *ngIf="clienteAdepositar" class="d-flex justify-content-between">
+            @if (clienteAdepositar) {
+            <div class="d-flex justify-content-between">
               <span class="negrita">Porcentaje de pago</span>
             </div>
+            }
             <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
           </div>
         </div>
+        }
       </div>
     </div>
   </div>
   <div class="col-12 medio">
-    <div *ngIf="facturas && facturas?.length" class="card sombra cardFacturas br-1">
+    @if (facturas && facturas?.length) {
+    <div class="card sombra cardFacturas br-1">
       <div class="bonton_select_all">
         <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
       </div>
-
       <div class="divFantasma">
         <div #cardTabla id="cardTabla" class="tablaIngresos">
           <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
-
         <span class="w-90 facturas-seleccionadas">
           Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ totalRegistros }}</strong>
         </span>
       </div>
     </div>
+    }
   </div>
   <div class="col-12 abajo">
-    <div *ngIf="facturas && facturas?.length" class="d-flex justify-content-end">
-      <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+    @if (facturas && facturas?.length) {
+    <div class="d-flex justify-content-end">
+      <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
       <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>
+    }
   </div>
 </div>

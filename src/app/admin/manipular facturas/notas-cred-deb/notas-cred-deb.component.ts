@@ -2,7 +2,7 @@ import { ConfigI } from './../../../core/typescript/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
+const moment = require('../../../core/javascript/moment');
 import { ActivatedRoute, Router } from '@angular/router';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
@@ -159,7 +159,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getFacturas() {
     return new Promise(async (resolve) => {
-
       this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura) => {
         let tempFactData: FacturasI[] = res_factura['data'];
 
@@ -375,7 +374,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           botones: {
             ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
-              { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+              { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
               { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
             ],
           },
@@ -397,7 +396,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return result;
   }
 
-
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
     this.openNewModal({
       id: obj.id,
@@ -407,13 +405,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
+          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'SI', disable: false },
         ],
       },
     });
@@ -436,7 +429,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return suma;
   }
 
-  changeHeaderStatus(iteraFact, tabPanel, idTab) {
+  changeHeaderStatus(iteraFact, tabPanel, idTab): any {
     if (tabPanel) {
       const element = document.getElementsByClassName(idTab);
 

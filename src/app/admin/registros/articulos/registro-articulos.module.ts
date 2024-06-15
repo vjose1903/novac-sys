@@ -9,13 +9,12 @@ import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
-import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 
 @NgModule({
   declarations: [RegistroArticulosComponent, ConfigArticulosComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
 })
 export class RegistroArticulosModule {}

@@ -15,22 +15,26 @@
     </div>
   </div>
 
-  <div *ngIf="tipo_movimiento === 'salida'" class="col-12">
-    <div class="form-group">
-      <label class="control-label">Tipo de salida: </label>
-      <select id="tipo_salida" (keydown.enter)="saltar('medida')" [(ngModel)]="tipo_salida" class="form-control">
-        <option value="perdida">Perdida</option>
-        <option value="caduco">Caducó</option>
-        <option value="producto_defectuoso">Producto defectuoso</option>
-      </select>
+  @if (tipo_movimiento === 'salida') {
+    <div class="col-12">
+      <div class="form-group">
+        <label class="control-label">Tipo de salida: </label>
+        <select id="tipo_salida" (keydown.enter)="saltar('medida')" [(ngModel)]="tipo_salida" class="form-control">
+          <option value="perdida">Perdida</option>
+          <option value="caduco">Caducó</option>
+          <option value="producto_defectuoso">Producto defectuoso</option>
+        </select>
+      </div>
     </div>
-  </div>
+  }
 
   <div class="col-12">
     <div class="form-group">
       <label class="control-label {{ tipo_movimiento === 'salida' ? 'mt-3' : '' }}">Medida: </label>
       <select id="medida" (keydown.enter)="saltar('cantidad')" [(ngModel)]="medida" class="form-control">
-        <option *ngFor="let item of medidas" value="{{ item }}">{{ item }}</option>
+        @for (item of medidas; track item) {
+          <option value="{{ item }}">{{ item }}</option>
+        }
       </select>
     </div>
   </div>
@@ -42,12 +46,14 @@
     </div>
   </div>
 
-  <div *ngIf="medida && cantidad" class="col-12 mb-3">
-    <div class="contenedorAvisosMov">
-      {{ mostrarExistencia('mov') }} <br />
-      {{ mostrarExistencia('stock') }}
+  @if (medida && cantidad) {
+    <div class="col-12 mb-3">
+      <div class="contenedorAvisosMov">
+        {{ mostrarExistencia('mov') }} <br />
+        {{ mostrarExistencia('stock') }}
+      </div>
     </div>
-  </div>
+  }
 
   <div class="col-12">
     <label class="control-label">Motivo {{ tipo_movimiento }}</label>

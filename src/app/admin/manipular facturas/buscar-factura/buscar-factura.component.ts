@@ -1,8 +1,9 @@
 import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { serie } from './../../../core/typescript/constantes';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
+const moment = require('../../../core/javascript/moment');
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -20,6 +21,7 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
 import { TitleCasePipe } from '@angular/common';
+import { seriesDGII } from '../../../core/typescript/constantes';
 
 @Component({
   selector: 'app-buscar-factura',
@@ -50,6 +52,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   TablasComponent;
   idsFacturasSeleccionadas = [];
   permissions = Permisos;
+  series = seriesDGII;
+  serieSelected = serie.normal;
 
   tipos_documentos = [];
   tipo_documento_selected = tipoDocFacturacion.venta;
@@ -87,8 +91,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   tablaNotasComponent;
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
-
-  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  route = inject(ActivatedRoute);
+  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
   }
 
@@ -103,7 +107,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     this.verificatePermisos().then(async (res) => {
       this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       this.completarTituloPag();
-
+      // NOTE: temporal
+      this.verificateSerieValidity();
       fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
     });
   }
@@ -129,6 +134,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
+  verificateSerieValidity() {
+    const option = this.series.find((option) => option.value == serie.electronica);
+    option.disabled = true;
+  }
+
   pressEscResponse(res) {
     if (fun.hasValue(res)) fun.enfocarInput('valorI');
   }
@@ -148,7 +158,15 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.buscarPara]);
+      console.log('NotaC.base_comprobante ', NotaC.base_comprobante);
+      console.log('this.buscarPara ', this.buscarPara);
+      console.log('this.serieSelected ', this.serieSelected);
+
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.serieSelected][this.buscarPara]);
+      console.log('Ss.factServ.lista_tipos_facturas:  ', Ss.factServ.lista_tipos_facturas);
+      console.log('NotaC.base_comprobante[this.serieSelected]:  ', NotaC.base_comprobante[this.serieSelected]);
+      console.log('tipoFact:  ', tipoFact);
+
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
       this.paqueteComprobante = res['data'] as any;
@@ -305,7 +323,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.customStyles = {
           condicion: { width: '6rem' },
           secuencia: { width: '7rem' },
-          numero_comprobante: { width: '7rem' },
+          numero_comprobante: { width: '9rem' },
+          fecha_equivalente: { width: '6.5rem' },
+          fechaV: { width: '6.5rem' },
           estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
@@ -612,7 +632,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async abrirModalFiltro(nombre) {
-    const obj = { data: null, palabra_a_buscar: nombre, metodo: this.tipo_documento_selected };
+    const obj = { data: null, palabra_a_buscar: nombre, metodo: this.tipo_documento_selected, include_contado: false };
 
     this.openNewModal({
       component: BuscarClienteSuplidorComponent,
@@ -661,11 +681,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
 
     if (continuar) {
       botonesDinamicos.push({
-        clase: 'btn btn-verde mr-2',
+        clase: 'btn btn-verde',
         function: (instance) => {
           this.continuarANotas(dataFactura.id);
           instance.closeModal(instance.id, 'cancelar');
@@ -722,7 +742,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (this.para == 'Visualizar' || type == 'nota') {
           const editButton = {
-            clase: 'btn btn-verde ml-2',
+            clase: 'btn btn-verde',
             function: (instance) => {
               this.editarFactura();
               instance.closeModal(instance.id, 'mostrarFactura');

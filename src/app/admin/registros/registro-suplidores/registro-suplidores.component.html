@@ -6,11 +6,11 @@
   <div class="col-12 pr-0 colFormularioListado">
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
-        <div class="contenedorRegistro" *ngIf="isCreando || suplidorSelected" class="form {{ isCreando || suplidorSelected ? 'showForm' : 'hideForm' }} ">
+        @if (isCreando || suplidorSelected) {
+        <div class="contenedorRegistro" class="form {{ isCreando || suplidorSelected ? 'showForm' : 'hideForm' }} ">
           <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
             <h4 class="mb-0">Formulario</h4>
           </div>
-
           <div class="card cardFormClass">
             <form [formGroup]="form">
               <div class="row">
@@ -22,8 +22,8 @@
                       <span style="color: red">*</span>
                     </label>
                   </div>
-
-                  <div *ngIf="doc_is_cedula" class="form-group" [appMsgError]="'cedula'" [form]="form">
+                  @if (doc_is_cedula) {
+                  <div class="form-group" [appMsgError]="'cedula'" [form]="form">
                     <div class="input-group d-flex" style="flex-wrap: nowrap">
                       <p-inputMask
                         (keydown.enter)="saltar('campoTelefono')"
@@ -36,15 +36,14 @@
                         formControlName="cedula"
                         [autoClear]="false"
                       ></p-inputMask>
-
                       <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                         <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                       </div>
                     </div>
                     <span id="msgContainer_cedula"></span>
                   </div>
-
-                  <div *ngIf="!doc_is_cedula" class="form-group" [appMsgError]="'rnc'" [form]="form">
+                  } @if (!doc_is_cedula) {
+                  <div class="form-group" [appMsgError]="'rnc'" [form]="form">
                     <div class="input-group d-flex" style="flex-wrap: nowrap">
                       <p-inputMask
                         (keydown.enter)="saltar('campoTelefono')"
@@ -57,24 +56,21 @@
                         formControlName="rnc"
                         [autoClear]="false"
                       ></p-inputMask>
-
                       <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                         <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                       </div>
                     </div>
                     <span id="msgContainer_rnc"></span>
                   </div>
+                  }
                 </div>
-
                 <div class="col-6 p-0 pl-2">
                   <div class="form-group mb-2" [appMsgError]="'telefono'" [form]="form">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
                     <p-inputMask (keydown.enter)="saltar('campoNombre')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
-
                     <span id="msgContainer_telefono"></span>
                   </div>
                 </div>
-
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
@@ -92,16 +88,13 @@
                     <span id="msgContainer_nombre"></span>
                   </div>
                 </div>
-
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="'email'" [form]="form">
                     <label class="control-label">Email:</label>
                     <input type="text" id="campoEmail" (keydown.enter)="saltar('campoDir')" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
-
                     <span id="msgContainer_email"></span>
                   </div>
                 </div>
-
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="'direccion'" [form]="form">
                     <label class="control-label">Direccion: <span style="color: red">*</span></label>
@@ -109,7 +102,6 @@
                     <span id="msgContainer_direccion"></span>
                   </div>
                 </div>
-
                 <div class="col-12 p-0 mt-3">
                   <div class="col-12 form-group" style="display: flex; justify-content: space-between">
                     <div>
@@ -125,6 +117,7 @@
             </form>
           </div>
         </div>
+        }
       </ng-container>
 
       <div class="list {{ isCreando || suplidorSelected ? 'FormList' : 'onlyList' }}">

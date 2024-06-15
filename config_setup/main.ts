@@ -67,29 +67,28 @@ function createSplash(type = 'splash') {
 
 function createWindow() {
   return new Promise<BrowserWindow>(async (resolve, reject) => {
-    puts('  ');
-    puts('  ');
-    puts(' ::::: ========= PASANDO A CREAR LA VENTANA DEL SISTEMA ========= :::::');
-    puts('  ');
-    puts('  ');
-    puts(app.getVersion(), 'app.getVersion()');
-    const electronScreen = screen;
-    const size = electronScreen.getPrimaryDisplay().workAreaSize;
+    try {
+      puts('  ');
+      puts('  ');
+      puts(' ::::: ========= PASANDO A CREAR LA VENTANA DEL SISTEMA ========= :::::');
+      puts('  ');
+      puts('  ');
+      puts(app.getVersion(), 'app.getVersion()');
+      const electronScreen = screen;
+      const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
-    // Create the browser window.
-    win = new BrowserWindow({
-      width: size.width,
-      minWidth: size.width,
-      height: size.height,
-      minHeight: size.height,
-      icon: isMacOs() ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
-      webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
-    });
+      // Create the browser window.
+      win = new BrowserWindow({
+        width: size.width,
+        minWidth: size.width,
+        height: size.height,
+        minHeight: size.height,
+        icon: isMacOs() ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
+        webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
+      });
+
 
     if (serve) {
-      win.webContents.openDevTools();
-      require('electron-reload')(__dirname, { electron: require(`${__dirname}/node_modules/electron`) });
-
       win.loadURL('http://localhost:$$PORT_APP$$');
     } else {
       win.loadURL(appFilePath);
@@ -99,115 +98,120 @@ function createWindow() {
     win.setMenuBarVisibility(false);
 
     setTimeout(() => {
-      if (serve)  win.webContents.openDevTools();
+      if (serve) win.webContents.openDevTools();
     }, 250);
 
     // Emitted when the window is closed.
     win.on('closed', (event) => (win = emptyWin));
 
     resolve(win);
-  });
+  } catch (error) {
+    console.error(error);
+  }
+});
 }
 
 try {
-  app.on('ready', () => createSplash());
+app.on('ready', () => createSplash());
 
-  // Quit when all windows are closed.
-  app.on('window-all-closed', () => app.quit());
+// Quit when all windows are closed.
+app.on('window-all-closed', () => app.quit());
 } catch (e) {
-  // Catch Error
-  throw e;
+// Catch Error
+throw e;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER LA CONFIGURACION DE LA APP
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function isMacOs() {
-  return process.platform === 'darwin';
+return process.platform === 'darwin';
 }
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER LA CONFIGURACION DE LA APP
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getConfig(): Promise<ConfigI> {
-  return new Promise<any>(async (resolve, reject) => {
-    const confTemp = (await Functions.getConfigFile()) as any;
-    const conf: ConfigI = JSON.parse(confTemp);
-    resolve(conf);
-  });
+return new Promise<any>(async (resolve, reject) => {
+  const confTemp = (await Functions.getConfigFile()) as any;
+
+  const conf: ConfigI = JSON.parse(confTemp);
+  resolve(conf);
+});
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER SI EL PROYECTO SE ESTA CORRIENDO EN PRODUCCION O EN DESARROLLO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function getServer_(): Promise<boolean> {
-  return new Promise<any>((resolve, reject) => {
-    const args_ = process.argv.slice(1);
-    const serve_ = args_.some((val) => val === '--serve');
-    resolve(serve_);
-  });
+return new Promise<any>((resolve, reject) => {
+  const args_ = process.argv.slice(1);
+  const serve_ = args_.some((val) => val === '--serve');
+  resolve(serve_);
+});
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // CONFIGURACIONES DESPUES DE QUE SE CREA EL SPLASH SCREEN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function beforeCreateSplash(splash) {
-  return new Promise<any>(async (resolve, reject) => {
-    // -------- borrar el archivo de logs --------
-    borrarLogs().then(async () => {
-      puts(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
+return new Promise<any>(async (resolve, reject) => {
+  // -------- borrar el archivo de logs --------
+  borrarLogs().then(async () => {
+    puts(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
-      // ----------- inicializando docker handler --------------
-      docker_handler = new DockerHandler();
+    // ----------- inicializando docker handler --------------
+    docker_handler = new DockerHandler();
 
-      HandlerConfigFile.checkConfigFile(splash)
-        .then(async (is_config_ready) => {
-          if (is_config_ready) {
-            const conf = await getConfig();
-            const serve_ = await getServer_();
+    HandlerConfigFile.checkConfigFile(splash)
+      .then(async (is_config_ready) => {
+        if (is_config_ready) {
+          const conf = await getConfig();
+          const serve_ = await getServer_();
 
-            // ----------- correr base de datos local --------------
-            puts(conf.is_db_local, 'conf.is_db_local ');
+          // ----------- correr base de datos local --------------
+          puts(conf.is_db_local, 'conf.is_db_local ');
 
-            if (conf.is_db_local) {
-              docker_handler
-                .checkAllInDocker()
-                .then((res_db) => continuarCargandoArchivos(resolve))
-                .catch((error_type) => createSplash(`splash_${error_type}_error`));
-              //
-            } else {
-              continuarCargandoArchivos(resolve);
-            }
+          if (conf.is_db_local) {
+            docker_handler
+              .checkAllInDocker()
+              .then((res_db) => continuarCargandoArchivos(resolve))
+              .catch((error_type) => createSplash(`splash_${error_type}_error`));
+            //
+          } else {
+            continuarCargandoArchivos(resolve);
           }
-        })
-        .catch((err) => {
-          createSplash('splash_config_error');
-        });
-    });
+        }
+      })
+      .catch((err) => {
+        createSplash('splash_config_error');
+      });
   });
+});
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // continuar la carga de archivos necesarios
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function continuarCargandoArchivos(resolve) {
-  // -------------- remplazar en archivos ----------------
-  replace_in_file = new ReplaceInFile();
-  puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
-  setTimeout(() => resolve(true), 2000);
+// -------------- remplazar en archivos ----------------
+replace_in_file = new ReplaceInFile();
+puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+setTimeout(() => resolve(true), 2000);
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Handle angular events
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function beforeCreateWindow(win) {
-  // ----- Manejar las actualizaciones -----
+async function beforeCreateWindow(win) {
+// ----- Manejar las actualizaciones -----
+const serve_ = await getServer_();
 
-  setTimeout(() => {
-    puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
-    auto_updater = new AppUpdater(win);
-  }, 2000);
-  // ---------------------------------------
+if (!serve_) {
+  puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
+  setTimeout(() => (auto_updater = new AppUpdater(win)), 2000);
+}
+// ---------------------------------------
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -216,143 +220,142 @@ function beforeCreateWindow(win) {
 ipcMain.on(KEYWORD_ELECTRON_SENDER, handleEvent);
 
 async function handleEvent(event: any, obj: string) {
-  try {
-    var arg = JSON.parse(obj) as MessageTaskInterface;
+try {
+  var arg = JSON.parse(obj) as MessageTaskInterface;
 
-    let res;
+  let res;
 
-    switch (arg.eventName) {
-      case KEYWORD_ELECTRON_TEST:
-        // test function
-        break;
-      //
-      case KEYWORD_ELECTRON_RELOAD:
-        puts('RECARGANDO ELECTRON');
-        win.reload();
-        if (!serve) win.loadURL(appFilePath);
-      //
-      case KEYWORD_ELECTRON_CHANGE_CONFIG_FILE:
-        const obj = JSON.parse(arg.data);
+  switch (arg.eventName) {
+    case KEYWORD_ELECTRON_TEST:
+      // test function
+      break;
+    //
+    case KEYWORD_ELECTRON_RELOAD:
+      puts('RECARGANDO ELECTRON');
+      win.reload();
+      if (!serve) win.loadURL(appFilePath);
+    //
+    case KEYWORD_ELECTRON_CHANGE_CONFIG_FILE:
+      const obj = JSON.parse(arg.data);
 
-        replace_in_file
-          .replaceFunction(obj)
-          .then((res) => {
-            arg.response = res;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-          })
-          .catch((err) => {
-            arg.response = err;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-          });
-
-        break;
-      //
-      case KEYWORD_ELECTRON_EVENT_DECRYPT:
-        res = Functions.desEncriptar(arg.data);
-        arg.response = res;
-        event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-        break;
-      //
-      case KEYWORD_ELECTRON_EVENT_ENCRYPT:
-        res = Functions.encriptar(arg.data);
-        arg.response = res;
-        event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-        break;
-      //
-      case KEYWORD_ELECTRON_PRINT_BASE64:
-        puts('INICIANDOO PROCESO DE IMPRESION');
-        const oPdf = JSON.parse(arg.data);
-
-        const base64 = oPdf.base64;
-        const fileName = oPdf.file;
-        const printer = oPdf.printer;
-        const type = oPdf['type'] ? oPdf['type'] : 'reporte';
-        const pageOrientation = oPdf['pageOrientation'] ? oPdf['pageOrientation'] : 'portrait';
-
-        generatePdfFileFormBase64({ fileName, base64, type, pageOrientation, printer })
-          .then((res) => {
-            arg.response = res;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-          })
-          .catch((err) => {
-            arg.response = err;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-          });
-
-        break;
-      //
-      case KEYWORD_ELECTRON_GET_APP_CONFIG:
-        getConfigFile()
-          .then((config) => {
-            arg.response = config;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-          })
-          .catch((err) => {
-            arg.response = err;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
-          });
-        break;
-      //
-      case KEYWORD_ELECTRON_SET_APP_CONFIG:
-        Functions.setConfigFile(arg.data).then(() => {
-          arg.response = 'LISTO';
+      replace_in_file
+        .replaceFunction(obj)
+        .then((res) => {
+          arg.response = res;
+          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        })
+        .catch((err) => {
+          arg.response = err;
           event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
         });
-        break;
-      //
-      default:
-        event.reply(KEYWORD_ELECTRON_RESPONSE);
-        break;
-    }
-  } catch (error) {}
+
+      break;
+    //
+    case KEYWORD_ELECTRON_EVENT_DECRYPT:
+      res = Functions.desEncriptar(arg.data);
+      arg.response = res;
+      event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+      break;
+    //
+    case KEYWORD_ELECTRON_EVENT_ENCRYPT:
+      res = Functions.encriptar(arg.data);
+      arg.response = res;
+      event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+      break;
+    //
+    case KEYWORD_ELECTRON_PRINT_BASE64:
+      puts('INICIANDOO PROCESO DE IMPRESION');
+      const oPdf = JSON.parse(arg.data);
+
+      const base64 = oPdf.base64;
+      const fileName = oPdf.file;
+      const printer = oPdf.printer;
+      const type = oPdf['type'] ? oPdf['type'] : 'reporte';
+      const pageOrientation = oPdf['pageOrientation'] ? oPdf['pageOrientation'] : 'portrait';
+
+      generatePdfFileFormBase64({ fileName, base64, type, pageOrientation, printer })
+        .then((res) => {
+          arg.response = res;
+          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        })
+        .catch((err) => {
+          arg.response = err;
+          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        });
+
+      break;
+    //
+    case KEYWORD_ELECTRON_GET_APP_CONFIG:
+      getConfigFile()
+        .then((config) => {
+          arg.response = config;
+          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        })
+        .catch((err) => {
+          arg.response = err;
+          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+        });
+      break;
+    //
+    case KEYWORD_ELECTRON_SET_APP_CONFIG:
+      Functions.setConfigFile(arg.data).then(() => {
+        arg.response = 'LISTO';
+        event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+      });
+      break;
+    //
+    default:
+      event.reply(KEYWORD_ELECTRON_RESPONSE);
+      break;
+  }
+} catch (error) {}
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER EL ACTUAL USUARIO DE GIT
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getActualGitUser() {
-  return new Promise<any>(async (resolve, reject) => {
-    const serve_ = await getServer_();
+return new Promise<any>(async (resolve, reject) => {
+  const serve_ = await getServer_();
 
-    if (serve_) {
-      cmd(`git config --get user.name`, async (res_username) => {
-        const username = res_username.STDOUT.trim() != '' ? res_username.STDOUT.trim() : 'vjose1903';
-        resolve(username);
-      });
-    } else {
-      resolve('vjose1903');
-    }
-  });
+  if (serve_) {
+    cmd(`git config --get user.name`, async (res_username) => {
+      const username = res_username.STDOUT.trim() != '' ? res_username.STDOUT.trim() : 'vjose1903';
+      resolve(username);
+    });
+  } else {
+    resolve('vjose1903');
+  }
+});
 }
 
 async function getPrinters() {
-
-  const printerPromise = await win.webContents.getPrintersAsync();
-  const printers_list = printerPromise.map((item) => item.name);
-  return printers_list;
+const printerPromise = await win.webContents.getPrintersAsync();
+const printers_list = printerPromise.map((item) => item.name);
+return printers_list;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER EL ARCHIVO APP.CONFIG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getConfigFile() {
-  return new Promise(async (resolve, reject) => {
+return new Promise(async (resolve, reject) => {
+  try {
     const serve_ = await getServer_();
     const pjson = require('./package.json');
+    const config = await getConfig();
 
-    Functions.getConfigFile()
-      .then(async (config: any) => {
-        var config = JSON.parse(config);
-        const printer_list = await getPrinters();
-        config['is_development'] = serve_;
-        config['gitUser'] = await getActualGitUser();
-        config['printersList'] = ['Ninguna', ...printer_list];
-        config['app_version'] = pjson.version;
+    const printer_list = await getPrinters();
+    config['is_development'] = serve_;
+    config['gitUser'] = await getActualGitUser();
+    config['printersList'] = ['Ninguna', ...printer_list];
+    config['app_version'] = pjson.version;
 
-        resolve(config);
-      })
-      .catch((err) => reject({ err: err, msg: 'Error buscando el archivo de configuracion' }));
-  });
+    resolve(config);
+  } catch (error) {
+    reject({ err: error, msg: 'Error buscando el archivo de configuracion' });
+  }
+});
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -360,40 +363,40 @@ function getConfigFile() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function borrarLogs() {
-  return new Promise<any>(async (resolve, reject) => {
-    const carpeta = await pathAdd('/log');
+return new Promise<any>(async (resolve, reject) => {
+  const carpeta = await pathAdd('/log');
 
-    if (!fs.existsSync(carpeta)) {
-      fs.mkdir(carpeta, { recursive: true }, (err) => {
-        if (err) throw err;
-      });
-    } else {
-      const comando = isMacOs() ? `rm -rf "${await pathAdd('/log/my_log.txt')}"` : `del "${await pathAdd('/log/my_log.txt')}"`;
+  if (!fs.existsSync(carpeta)) {
+    fs.mkdir(carpeta, { recursive: true }, (err) => {
+      if (err) throw err;
+    });
+  } else {
+    const comando = isMacOs() ? `rm -rf "${await pathAdd('/log/my_log.txt')}"` : `del "${await pathAdd('/log/my_log.txt')}"`;
 
-      cmd(comando);
-    }
+    cmd(comando);
+  }
 
-    setTimeout(() => resolve(true), 1000);
-  });
+  setTimeout(() => resolve(true), 1000);
+});
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export function cmd(command, callback = (arg) => {}) {
-  puts(command, 'comando realizado en la funcion cmd');
+puts(command, 'comando realizado en la funcion cmd');
 
-  exec(command, (error, stdout, stderr) => {
-    let obj;
-    if (error) {
-      obj = { status: false, STDOUT: stdout, STDERR: stderr, msg: error };
+exec(command, (error, stdout, stderr) => {
+  let obj;
+  if (error) {
+    obj = { status: false, STDOUT: stdout, STDERR: stderr, msg: error };
 
-      callback(obj);
-    } else {
-      obj = { status: true, msg: 'Comando realizado correctamente', STDOUT: stdout, STDERR: stderr };
-      callback(obj);
-    }
-  });
+    callback(obj);
+  } else {
+    obj = { status: true, msg: 'Comando realizado correctamente', STDOUT: stdout, STDERR: stderr };
+    callback(obj);
+  }
+});
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -401,95 +404,95 @@ export function cmd(command, callback = (arg) => {}) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 export async function puts(msg, titulo?) {
-  // cmd('ls');
-  if (win || splash) {
-    const fs = require('fs');
+// cmd('ls');
+if (win || splash) {
+  const fs = require('fs');
 
-    const carpeta = await pathAdd('/log');
-    const file = await pathAdd('/log/my_log.txt');
+  const carpeta = await pathAdd('/log');
+  const file = await pathAdd('/log/my_log.txt');
 
-    let texto = '';
-    if (typeof msg === 'object') texto = JSON.stringify(msg, null, '\t');
-    else if (typeof msg === 'number') texto = msg.toString();
-    else texto = msg;
+  let texto = '';
+  if (typeof msg === 'object') texto = JSON.stringify(msg, null, '\t');
+  else if (typeof msg === 'number') texto = msg.toString();
+  else texto = msg;
 
-    if (!fs.existsSync(carpeta)) {
-      fs.mkdir(carpeta, { recursive: true }, (err) => {
-        if (err) throw err;
-        else escribirLogs(file, titulo, texto);
-      });
-    } else {
-      escribirLogs(file, titulo, texto);
-    }
+  if (!fs.existsSync(carpeta)) {
+    fs.mkdir(carpeta, { recursive: true }, (err) => {
+      if (err) throw err;
+      else escribirLogs(file, titulo, texto);
+    });
+  } else {
+    escribirLogs(file, titulo, texto);
   }
+}
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION QUE SE ENCARGA DE ESCRIBIR EN EL ARCHIVO LOG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function escribirLogs(file, titulo, texto) {
-  if (!fs.existsSync(file)) {
-    const stream = fs.createWriteStream(file);
+if (!fs.existsSync(file)) {
+  const stream = fs.createWriteStream(file);
 
-    await stream.once('open', (fd) => {
-      stream.write(titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`);
-      stream.end();
-    });
-  } else {
-    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
-  }
+  await stream.once('open', (fd) => {
+    stream.write(titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`);
+    stream.end();
+  });
+} else {
+  await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
+}
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // GENERAR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; pageOrientation: string; printer: string }) {
-  return new Promise(async (resolve, reject) => {
-    const pdfFileName = await pathAdd('/' + params.fileName);
+return new Promise(async (resolve, reject) => {
+  const pdfFileName = await pathAdd('/' + params.fileName);
 
-    try {
-      fs.writeFile(pdfFileName, params.base64, { encoding: 'base64' }, (err) => {
-        imprimir({ fileName: params.fileName, tipo: params.type, pageOrientation: params.pageOrientation, printer: params.printer })
-          .then((res) => resolve(res))
-          .catch((err) => reject(err));
-      });
-    } catch (err) {
-      reject({ msg: 'Error generando reporte!!', status: false, error: err });
-    }
-  });
+  try {
+    fs.writeFile(pdfFileName, params.base64, { encoding: 'base64' }, (err) => {
+      imprimir({ fileName: params.fileName, tipo: params.type, pageOrientation: params.pageOrientation, printer: params.printer })
+        .then((res) => resolve(res))
+        .catch((err) => reject(err));
+    });
+  } catch (err) {
+    reject({ msg: 'Error generando reporte!!', status: false, error: err });
+  }
+});
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // IMPRIMIR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function imprimir(params: { fileName: string; tipo: string; pageOrientation: string; printer: string }) {
-  return new Promise(async (resolve, reject) => {
-    const file_path = await pathAdd(`/${params.fileName}`);
+return new Promise(async (resolve, reject) => {
+  const file_path = await pathAdd(`/${params.fileName}`);
 
-    puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
-    let comando = '';
+  puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
+  let comando = '';
 
-    if (isMacOs()) {
-      // let pageSize = `${params.width}x${params.height}in`;
-      // options.push(`-o PageSize=${pageSize}`);
-      comando = `lp -o ${params.pageOrientation} -o ColorModel=RGB -o fit-to-page -d "${params.printer}" "${file_path}"`;
-    } else {
-      const gsprint_path = await pathAdd(`/print/gsprint.exe`);
-      const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
+  if (isMacOs()) {
+    // let pageSize = `${params.width}x${params.height}in`;
+    // options.push(`-o PageSize=${pageSize}`);
+    comando = `lp -o ${params.pageOrientation} -o ColorModel=RGB -o fit-to-page -d "${params.printer}" "${file_path}"`;
+  } else {
+    const gsprint_path = await pathAdd(`/print/gsprint.exe`);
+    const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
 
-      comando = `${gsprint_path} -${params.pageOrientation} -colour -ghostscript "${ghostscript_path}" -dPDFFitPage -printer "${params.printer}" "${file_path}"`;
-    }
+    comando = `${gsprint_path} -${params.pageOrientation} -colour -ghostscript "${ghostscript_path}" -dPDFFitPage -printer "${params.printer}" "${file_path}"`;
+  }
 
-    cmd(comando, (res) => {
-      if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
-      else reject({ msg: 'Error imprimiento PDF!!', status: 'no', err: res });
-    });
+  cmd(comando, (res) => {
+    if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
+    else reject({ msg: 'Error imprimiento PDF!!', status: 'no', err: res });
   });
+});
 }
 
 function localFilePath(path) {
-  const local_path = serve ? `src/${path}` : `dist/${path}`;
-  return local_path;
+const local_path = serve ? `src/${path}` : `dist/${path}`;
+return local_path;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -497,29 +500,29 @@ function localFilePath(path) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 export function contruirPath(path_temp) {
-  return isMacOs() ? path_temp : path_temp.split('/').join('\\');
+return isMacOs() ? path_temp : path_temp.split('/').join('\\');
 }
 
 export function pathAdd(addToPath = '', resource = true): Promise<string> {
-  return new Promise<any>(async (resolve, reject) => {
-    let path_temp;
-    let path_resolved;
-    const pjson = require('./package.json');
-    const serve_ = await getServer_();
+return new Promise<any>(async (resolve, reject) => {
+  let path_temp;
+  let path_resolved;
+  const pjson = require('./package.json');
+  const serve_ = await getServer_();
 
-    if (serve_) {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(pjson.name.toLowerCase())) + pjson.name;
+  if (serve_) {
+    path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(pjson.name.toLowerCase())) + pjson.name;
+  } else {
+    if (resource) {
+      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
     } else {
-      if (resource) {
-        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
-      } else {
-        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
-      }
+      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
     }
+  }
 
-    path_temp = path_temp + addToPath;
-    path_resolved = isMacOs() ? path_temp : path_temp.split('/').join('\\');
+  path_temp = path_temp + addToPath;
+  path_resolved = isMacOs() ? path_temp : path_temp.split('/').join('\\');
 
-    resolve(path_resolved);
-  });
+  resolve(path_resolved);
+});
 }

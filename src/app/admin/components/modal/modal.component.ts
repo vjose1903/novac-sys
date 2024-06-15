@@ -1,5 +1,5 @@
-import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { MODALCONFIG, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
 import * as _ from 'lodash';
@@ -10,12 +10,12 @@ import { fun } from '../../../core/services/functions.service';
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class NewModalComponent implements OnInit {
+export class NewModalComponent implements OnInit, OnDestroy {
   @ViewChildren(ModalDirective) modal_receptor: ModalDirective;
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef, public mServ: ModalService) {}
 
-  subConfig: Subscription;
+  private destroy$ = new Subject<void>();
 
   defaultModalConfig: any = {
     show: false,
@@ -32,6 +32,7 @@ export class NewModalComponent implements OnInit {
     transitionOptions: '0ms',
     contentStyleClass: '0ms',
     botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
+
     returnDataFromModal: (arg?) => {},
 
     closeModal: (id, accion) => {
@@ -44,13 +45,18 @@ export class NewModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subConfig = MODALCONFIG.subscribe((res) => {
+    MODALCONFIG.pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res && res.show) {
         this.renderizarComponente(res);
       } else {
         this.resetConfig(res.id, res.accion);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.destroy$) this.destroy$.next();
+    if (this.destroy$) this.destroy$.complete();
   }
 
   resetConfig(id_, accion) {
