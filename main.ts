@@ -490,11 +490,6 @@ return new Promise(async (resolve, reject) => {
 });
 }
 
-function localFilePath(path) {
-const local_path = serve ? `src/${path}` : `dist/${path}`;
-return local_path;
-}
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // PARA CREAR LA RUTA CORRECTA EN CASO DE SER COMPILADA O NO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

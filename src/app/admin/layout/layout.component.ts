@@ -52,6 +52,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   chequiando_cuadre: boolean;
   hasPermisosValidated: boolean;
   actionFacturacion = actionFacturacion;
+  currentYear: number;
 
   constructor(private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
     super();
@@ -156,7 +157,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.imgUser = 'assets/img/transparente.png';
     this.noServer = false;
     this.activeIndex = 0;
-
+    this.currentYear = new Date().getFullYear();
     this.cuadre_hoy = false;
   }
 
