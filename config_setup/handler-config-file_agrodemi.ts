@@ -1,6 +1,6 @@
 import { ConfigI } from '../src/app/core/typescript/config-interface';
 import * as fs from 'fs';
-import { pathAdd, puts } from '../main';
+import { pathAdd, writeLogs } from '../main';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
 
@@ -71,7 +71,7 @@ export default class HandlerConfigFile {
       const existe_archivo_config = fs.existsSync(config_path);
 
       setTimeout(() => {
-        writeLogsexiste_archivo_config, ':::::::: existe_archivo_config');
+        writeLogs(existe_archivo_config, ':::::::: existe_archivo_config');
 
         if (!existe_archivo_config) {
           Functions.setConfigFile(JSON.stringify(this.default_config))

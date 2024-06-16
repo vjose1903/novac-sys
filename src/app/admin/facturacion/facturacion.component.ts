@@ -362,10 +362,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // NOTE: TEMPORAL
 
   verificateSerieValidity() {
-    if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) {
-      const option = this.facturasSerieOptions.find((option) => option.value == serie.electronica);
-      option.disabled = true;
-    }
+    let disable = false;
+    if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) disable = true;
+
+    const option = this.facturasSerieOptions.find((option) => option.value == serie.electronica);
+    if (option) option.disabled = disable;
   }
 
   rellenarVariables() {

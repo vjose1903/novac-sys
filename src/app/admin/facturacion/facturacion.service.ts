@@ -122,6 +122,9 @@ export class FacturacionService {
         this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == tipoDocFacturacion.pre_venta && tipo_factura.serie == this.serieType);
       }
 
+      console.log("this.tipoFactura ", this.tipoFactura);
+      
+
       this.setTipoFacturaSelected(this.tipoFactura.id, 'id');
       resolve(true);
     });
