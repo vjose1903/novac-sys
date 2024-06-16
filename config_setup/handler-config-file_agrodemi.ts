@@ -71,7 +71,7 @@ export default class HandlerConfigFile {
       const existe_archivo_config = fs.existsSync(config_path);
 
       setTimeout(() => {
-        puts(existe_archivo_config, ':::::::: existe_archivo_config');
+        writeLogsexiste_archivo_config, ':::::::: existe_archivo_config');
 
         if (!existe_archivo_config) {
           Functions.setConfigFile(JSON.stringify(this.default_config))
@@ -79,7 +79,7 @@ export default class HandlerConfigFile {
               console.log(' ');
               console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
               console.log(' ');
-              puts('------ ARCHIVO DE CONFIGURACION CREADO ------');
+              writeLogs('------ ARCHIVO DE CONFIGURACION CREADO ------');
 
               setTimeout(() => resolve(true), 500);
             })
