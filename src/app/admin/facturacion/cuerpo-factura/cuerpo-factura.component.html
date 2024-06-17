@@ -32,7 +32,7 @@
     </table>
     <div class="contenido-fact" #cuadro>
       <form [formGroup]="form" action="">
-        @for (item_cuerpo of ARRAY_ROWFACTURAS?.controls; track index_cuerpo; let index_cuerpo = $index) {
+        @for (item_cuerpo of ARRAY_ROWFACTURAS?.controls; track item_cuerpo; let index_cuerpo = $index) {
           <div formArrayName="rowFactura">
             <div [formGroupName]="index_cuerpo">
               <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">

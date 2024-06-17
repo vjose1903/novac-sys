@@ -497,7 +497,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (![actionFacturacion.duplicate].includes(original_factura.action)) this.setPropietario(factura);
 
-      const currentSerie = factura.numero_comprobante.includes('E') ? serie.electronica : serie.normal;
+      const currentSerie = fun.hasValue(factura?.numero_comprobante) && factura.numero_comprobante.includes('E') ? serie.electronica : serie.normal;
 
       this.factServ.setTipos(this.factServ.tipoDocumento, currentSerie).then((result) => {
         this.factServ

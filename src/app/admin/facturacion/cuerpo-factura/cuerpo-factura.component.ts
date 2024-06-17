@@ -2,7 +2,7 @@ import { RetornarDevueltoComponent } from './retornar-devuelto/retornar-devuelto
 import { FacturacionService } from './../facturacion.service';
 import { tipoDocFacturacion } from './../factura';
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, FormGroup } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
@@ -13,6 +13,7 @@ import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -54,6 +55,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   dropdownMedidaOpen: boolean = false;
 
   lastCuerpoChange;
+  private destroy$ = new Subject<void>();
 
   constructor(private fb: UntypedFormBuilder, public factServ: FacturacionService) {
     super();
@@ -67,11 +69,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   ngOnDestroy() {
+    if (this.destroy$) this.destroy$.next();
+    if (this.destroy$) this.destroy$.complete();
     this._destroy_mixin();
   }
 
   escucharCambiosEnForm() {
-    this.form.valueChanges.subscribe((changes) => {
+    this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((changes) => {
       if (!fun.isEqual(this.lastCuerpoChange, fun.duplicarJson(this.factServ.getDetallesLlenos())) && fun.hasValue(this.factServ.getDetallesLlenos())) {
         this.lastCuerpoChange = fun.duplicarJson(this.factServ.getDetallesLlenos());
         setTimeout(() => {
@@ -255,13 +259,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   addItem(): void {
-    this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as UntypedFormArray;
+    this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
     this.ARRAY_ROWFACTURAS.push(this.createItem());
   }
 
   removeItem(key: string) {
-    const index = _.findIndex(this.factServ.filasDetalle, (detalle) => detalle.value.key == key);
-    (this.form.get('rowFactura') as UntypedFormArray).removeAt(index);
+    const index = this.factServ.filasDetalle.findIndex((detalle) => detalle.value.key == key);
+    (this.form.get('rowFactura') as FormArray).removeAt(index);
   }
 
   // =============================================
