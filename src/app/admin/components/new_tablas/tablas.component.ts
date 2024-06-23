@@ -1,12 +1,13 @@
 import { DateUtils } from '../../../core/typescript/date.utils';
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, OnDestroy, NgZone, HostListener } from '@angular/core';
-import * as _ from 'lodash';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { medidas, rowDataDividerKey, table_config, table_info } from './tabla-class';
+import { rowDataDividerKey, medidas, table_config, table_info, btnTableI } from './tabla-class';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { teclasCode } from '../../../core/typescript/constantes';
 import { tableCellType } from './tabla-class';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'dinamic-table',
@@ -52,13 +53,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   cantPagesView: number = 5;
   total_registros;
-  subWidth: Subscription;
+  private destroy$ = new Subject<void>();
 
   fun = fun;
-  rowsEditing = [];
+
   tablaInterval;
   realIdTabla;
 
+  htmlServ = inject(HtmlElementsService);
   constructor(public tServ: TablasService, private zone: NgZone, public cdRef: ChangeDetectorRef) {
     cdRef.detach();
     this.tablaInterval = setInterval(() => this.cdRef.detectChanges(), 500);
@@ -73,14 +75,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   ngOnInit() {
     this.realIdTabla = this.config.id_tabla + this.post_id;
 
-    this.subWidth = new fun().getWindowSize.subscribe((res) => {
-      if (res) this.setCantPagView(res.innerWidth, 'width_page');
+    new fun().getWindowSize.pipe(takeUntil(this.destroy$)).subscribe((res) => {
+      if (res) {
+        this.setCantPagView(res.innerWidth, 'width_page');
+      }
     });
 
     this.TablasComponent = this;
     this.TablasComponentChange.emit(this.TablasComponent);
 
-    this.checkConfig();
+    this.verificateConfig();
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
     setTimeout(() => (this.ready = true), 250);
   }
@@ -94,30 +98,15 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (change.data && change.data.currentValue) {
       this.updateDataCopy(this.data);
 
-      // ================================================
-      // CUSTOM STYLES
-      // ================================================
-
-      // ================================================
-
       this.TablasComponent = this;
       this.TablasComponentChange.emit(this.TablasComponent);
     }
     this.cdRef.detectChanges();
   }
 
-  ngOnDestroy() {
-    if (this.subWidth) this.subWidth.unsubscribe();
-    this.tServ.deletePaginationById(this.realIdTabla);
-    clearInterval(this.tablaInterval);
-  }
-
-  checkConfig() {
+  verificateConfig() {
     if (!fun.objHas(this.config, 'noDataMessage') || fun.isEmpty(this.config.noDataMessage)) this.config.noDataMessage = 'No existen registros.';
-    this.checkPagination();
-  }
 
-  checkPagination() {
     if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
@@ -125,8 +114,38 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
     }
+    this.verificateBottons(this.config);
 
     this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
+  }
+
+  ngOnDestroy() {
+    if (this.destroy$) this.destroy$.next();
+    if (this.destroy$) this.destroy$.complete();
+
+    this.tServ.deletePaginationById(this.realIdTabla);
+    this.tServ.resetRowEditing();
+    clearInterval(this.tablaInterval);
+  }
+
+  verificateBottons(config: table_config) {
+    const verificateId = (boton: btnTableI) => (boton.btnId ??= fun.generateKey());
+
+    if (config.botones) {
+      for (const key in config.botones) {
+        const btnObj = config.botones[key];
+
+        if (Array.isArray(btnObj)) {
+          btnObj.forEach((btn) => verificateId(btn));
+        } else {
+          verificateId(btnObj);
+        }
+      }
+    }
+
+    config.info.forEach((info) => {
+      if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach((icon) => (icon.id ??= fun.generateKey()));
+    });
   }
 
   handleConfig() {
@@ -421,13 +440,13 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorInput(column, key, index, value, data) {
-    let newData = fun.deepCloning(this.rowsEditing.find((item) => item.id == data.id));
+    let newData = fun.deepCloning(this.tServ.rowsEditing.find((item) => item.id == data.id));
 
-    if (fun.isEmpty(newData) || this.rowsEditing.length == 0) newData = fun.deepCloning(data);
+    if (fun.isEmpty(newData) || this.tServ.rowsEditing.length == 0) newData = fun.deepCloning(data);
 
     fun.setProperty(newData, key, value);
 
-    this.tServ.modifyRowsEditing(newData, 'add', this.rowsEditing);
+    this.tServ.modifyRowsEditing(newData, 'add');
 
     const obj = { data, newData, index, key, value, id_tabla: this.realIdTabla };
     this.handle_table_events('inputChange', obj);

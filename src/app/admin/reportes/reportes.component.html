@@ -33,9 +33,11 @@
             <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_cliente', titulo: 'Reporte de venta por cliente' })"> <i class="fas fa-user-tag"></i> Relación de ventas por cliente </span>
           </ng-container>
 
-          <ng-container *ngxPermissionsOnly="permisos.movimientos_vehiculo">
-            <span *ngIf="hasPermisoCamiones" class="btnLetra" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"> <i class="fas fa-truck-moving"></i> Relación de viajes por camión </span>
-          </ng-container>
+          @if (hasPermisoCamiones) {
+            <ng-container *ngxPermissionsOnly="permisos.movimientos_vehiculo">
+              <span class="btnLetra" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"> <i class="fas fa-truck-moving"></i> Relación de viajes por camión </span>
+            </ng-container>
+          }
         </div>
       </div>
 

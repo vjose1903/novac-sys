@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalComponentI, ModalI } from '../../modal/modal-class';
-import * as _ from 'lodash';
 import { DateUtils } from '../../../../core/typescript/date.utils';
 
 @Component({

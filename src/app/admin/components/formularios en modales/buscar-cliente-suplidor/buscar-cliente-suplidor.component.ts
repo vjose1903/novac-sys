@@ -8,6 +8,7 @@ import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { tableCellType, table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { ConfigI } from '../../../../core/typescript/config-interface';
 @Component({
   selector: 'app-buscar-cliente-suplidor',
   templateUrl: './buscar-cliente-suplidor.component.html',
@@ -69,22 +70,23 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
         .getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } })
         .then((res) => {
           if (res.data && res.data.length > 0) {
-            res.data.map(async (entidad) => {
-              entidad.nombre = fun.capitalice(entidad.nombre);
-              entidad.apellido = fun.capitalice(entidad.apellido);
-              const doc = entidad.documentos_de_identidad.find((documento) => documento.principal);
+            const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: ConfigService.config.direccion_empresa, telefono: null };
+            if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado && this.inputs.metodo != tipoDocFacturacion.compra) res.data.unshift(cliente_contado);
 
+            res.data.map(async (entidad) => {
+              entidad.nombre = entidad.nombre ? fun.capitalice(entidad.nombre) : '----------';
+              entidad.apellido = entidad.apellido ? fun.capitalice(entidad.apellido) : '----------';
+              entidad.telefono = entidad.telefono ?? '----------';
+
+              const doc = entidad?.documentos_de_identidad?.find((documento) => documento.principal);
               entidad.documento_identidad = doc ? doc.documento : '----------';
               return entidad;
             });
+
             this.dataFiltro = res.data;
           } else {
             this.dataFiltro = copyData;
           }
-
-          const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: ConfigService.config.direccion_empresa, telefono: null };
-
-          if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado) this.dataFiltro.unshift(cliente_contado);
 
           this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
         })

@@ -1,11 +1,12 @@
 import { ConfigService } from './../../../../core/services/configuration.service';
-import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener, inject } from '@angular/core';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { SharedService } from '../../../../core/services/shared.service';
 import { teclasCode } from '../../../../core/typescript/constantes';
 import { DocumentoDevuelta, TipoCantidadEfectivo } from './form-cantidad-efectivo.model';
+import { HtmlElementsService } from '../../../../core/services/html-elements.service';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
@@ -40,6 +41,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   modalComponent: ModalComponentI = {};
   inputs: any;
+
+  htmlServ = inject(HtmlElementsService)
 
   ngOnInit() {
     this.efectivo = fun.hasValue(this.inputs.efectivo) ? this.formatoNumero(this.inputs.efectivo) : '0.00';

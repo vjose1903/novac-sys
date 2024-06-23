@@ -1,8 +1,8 @@
-import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
-import * as _ from 'lodash';
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { IModalConfiguration, ModalComponentI, ModalI } from '../../modal/modal-class';
+import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { MovimientosC } from './movimiento-model';
 
 @Component({
@@ -18,21 +18,23 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   element: any;
   cantidad = 0;
   motivo;
-  // @Input() data;
-  @Output() cancel = new EventEmitter<any>();
   medidas;
 
   movimientosC = new MovimientosC();
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
-  constructor() {
-    super();
-  }
+
+  htmlServ = inject(HtmlElementsService);
   modalComponent: ModalComponentI = {};
   inputs: any;
 
-  ngOnInit() {
-    this.medidas = _.keys(this.inputs.cantidades);
+  constructor() {
+    super();
   }
+
+  ngOnInit() {
+    this.medidas = Object.keys(this.inputs.cantidades);
+  }
+
   ngAfterViewInit() {
     fun.enfocarInput('tipo_movimiento');
   }

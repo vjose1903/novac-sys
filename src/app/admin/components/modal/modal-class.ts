@@ -5,12 +5,12 @@ import { modalsConfigurations } from './modal.service';
 
 export interface ModalComponentI {
   id?: any;
-  modalsConfig?: Array<IModalConfiguration>;
-  findModalConfigById?: (modalId: any) => IModalConfiguration;
+  modalsConfig?: Array<ConfigureModalI>;
+  findModalConfigById?: (modalId: any) => ConfigureModalI;
   closeModal?: (modalId: any, dataToReturn?: IReturnData) => void;
-  changeModalConfig?: (changes: Array<IModalConfiguration>, modalId: any) => void;
+  changeModalConfig?: (changes: Array<ConfigureModalI>, modalId: any) => void;
   changeStateButton?: (params: { modalId: string; btnId: string; disable: boolean }) => void;
-  getButtonTooltip?: (btnConfig: IModalButton | IButtonDynamic) => string;
+  getButtonTooltip?: (btnConfig: IModalButton) => string;
   hasAnyBtn?: (modalId: any) => boolean;
   [prop: string]: any;
 }
@@ -22,7 +22,7 @@ export interface ModalI {
   [prop: string]: any;
 }
 
-export interface IModalConfiguration {
+export interface ConfigureModalI {
   id?: string;
   show?: boolean;
   header?: string;
@@ -30,8 +30,7 @@ export interface IModalConfiguration {
   component?: any;
   width?: string;
   height?: string;
-  botones?: ButtonsI;
-  componentInstance?: ModalI;
+  botones?: ButtonsObjI;
   closable?: boolean;
   closableEsc?: boolean;
   html?: any;
@@ -55,32 +54,22 @@ export interface IReturnData {
 export interface btnDisabled {
   function?: Function;
 }
-
-export interface IBtnDisableFunction {
-  function: () => boolean;
-}
-export interface IButtonDynamic {
-  show?: boolean;
-  btnId?: string;
-  clase: string;
-  label: string;
-  tooltip?: string;
-  disable?: boolean | IBtnDisableFunction;
-  function?: (modalComponent: IModalConfiguration) => any;
-  functioInOtherComponent?: string;
-}
-export interface IModalButton {
-  show?: boolean;
-  disable?: boolean | IBtnDisableFunction;
-  tooltip?: string;
-  btnId?: string;
-}
-
-export interface ButtonsI {
+export interface ButtonsObjI {
   aceptar: IModalButton;
   cancelar: IModalButton;
-  dinamico?: Array<IButtonDynamic>;
+  dinamico?: Array<IModalButton>;
 }
+export interface IModalButton {
+  btnId?: string;
+  show?: boolean;
+  clase?: string;
+  label?: string;
+  function?: Function;
+  functionInOtherComponent?: string;
+  disable?: boolean | btnDisabled;
+  tooltip?: string;
+}
+
 
 export enum BtnTypeE {
   aceptar = 'aceptar',
@@ -88,13 +77,13 @@ export enum BtnTypeE {
   dinamico = 'dinamico',
 }
 export class ModalClass extends LayoutClass {
-  static noShowAceptarCancelarButtons: ButtonsI = { aceptar: { show: false }, cancelar: { show: false } };
+  static noShowAceptarCancelarButtons: ButtonsObjI = { aceptar: { show: false }, cancelar: { show: false } };
 
   constructor() {
     super();
   }
 
-  openNewModal(params: IModalConfiguration) {
+  openNewModal(params: ConfigureModalI) {
     const modal_configuration = {};
     modal_configuration['show'] = true;
 
@@ -111,20 +100,39 @@ export class ModalClass extends LayoutClass {
     modal_configuration['transitionOptions'] = fun.objHas(params, 'transitionOptions') ? params.transitionOptions : '0ms';
     modal_configuration['contentStyleClass'] = fun.objHas(params, 'contentStyleClass') ? params.contentStyleClass : '';
     modal_configuration['returnDataFromModal'] = fun.objHas(params, 'returnDataFromModal') ? (arg) => params.returnDataFromModal(arg) : (arg) => this.getDataFromModal(arg, ' ');
-    modal_configuration['onHideModal'] = (arg) => {
-      if (fun.hasValue(this) && fun.hasValue(this.onHideModal)) this.onHideModal(arg);
+
+    modal_configuration['onHide'] = (arg) => {
+      if (fun.hasValue(this) && fun.objHas(this, 'onHideModal')) this.onHideModal(arg);
     };
+
     modal_configuration['html'] = fun.objHas(params, 'html') ? params.html : null;
-    modal_configuration['id'] = params?.id;
+    modal_configuration['id'] = params.id ?? fun.generateKey();
+    this.verificateBottons(modal_configuration);
 
     modalsConfigurations.next(modal_configuration);
+  }
+
+  verificateBottons(config: ConfigureModalI) {
+    const verificateId = (boton: IModalButton) => (boton.btnId ??= fun.generateKey());
+
+    if (config.botones) {
+      for (const key in config.botones) {
+        const btnObj = config.botones[key];
+
+        if (Array.isArray(btnObj)) {
+          btnObj.forEach((btn) => verificateId(btn));
+        } else {
+          verificateId(btnObj);
+        }
+      }
+    }
   }
 
   getDataFromModal(arg, search?) {}
   onHideModal(arg) {}
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function }) {
-    const config: IModalConfiguration = {
+    const config: ConfigureModalI = {
       id: obj.id,
       header: obj.header,
       width: obj.width || '30rem',
@@ -132,20 +140,20 @@ export class ModalClass extends LayoutClass {
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.dismissModal(instance)), label: 'No', disable: false },
+          { clase: 'btn btn-blanco', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.dismissModal(instance)), label: 'No', disable: false },
           { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
         ],
       },
     };
 
     if (fun.objHas(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
-      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco mr-2', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
+      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
     }
 
     this.openNewModal(config);
   }
 
-  dismissModal(modalInstance: IModalConfiguration) {
+  dismissModal(modalInstance: ConfigureModalI) {
     if (modalInstance.dismissModal && modalInstance.id) modalInstance.dismissModal(modalInstance.id);
   }
 }

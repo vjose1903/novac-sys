@@ -1,14 +1,13 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { Router } from '@angular/router';
-import { IModalConfiguration, ModalClass, ModalComponentI } from './../../components/modal/modal-class';
-import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
-import { PdfService } from './../../../core/services/pdf/pdf.service';
+import { ModalComponentI } from './../../components/modal/modal-class';
 import { ClienteC } from './../../registros/registro-clientes/cliente';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
 import { FacturaC, tipoDocFacturacion } from './../factura';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ModalI } from '../../components/modal/modal-class';
 import * as _ from 'lodash';
 
@@ -22,7 +21,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     super();
   }
 
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   filter_key;
@@ -75,6 +74,8 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
   facturaClass = new FacturaC();
   clienteClass = new ClienteC();
+
+  htmlServ = inject(HtmlElementsService);
 
   ngOnInit(): void {
     this.filter_key = this.filter_options.todos;
@@ -137,7 +138,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
       const res = await this.facturaClass.getFacturasByParams(args);
 
       res['data'].forEach((fact) => {
-        fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
+        fact.secuencia = fact.numero_factura.padStart(8, '0');
 
         fact.viewColor = 'gris-claro';
         fact.view = 'far fa-eye-slash';
@@ -159,7 +160,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
         this.documentos.push(fact);
       });
 
-      this.documentos = _.orderBy(this.documentos, ['fecha_equivalente'], ['desc']);
+      this.documentos = this.documentos.sort((a, b) => fun.compare(a, b, 'fecha_equivalente', 'desc'));
 
       if (this.documentos.length > 0) {
         setTimeout(() => this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]), 100);
@@ -196,7 +197,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   mostrarFactura(dataFactura, type) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any }];
 
     if (this.inputs.code == tipoDocFacturacion.cotizacion) {
       botonesDinamicos.push({

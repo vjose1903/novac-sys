@@ -1,18 +1,16 @@
 import { DateUtils } from './../../../core/typescript/date.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { TipoArticuloComponent } from './tipo-articulo/tipo-articulo.component';
-import { ConfigI } from '../../../core/typescript/config-interface';
 import { ConfigService } from './../../../core/services/configuration.service';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators, FormGroup } from '@angular/forms';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC, ArticuloI } from './articulo';
 import { TipoArticuloC, TipoArticuloI, tipos_articulos } from './tipo-articulo/tipo-articulo';
-import * as $ from 'jquery';
 import { fun } from '../../../core/services/functions.service';
 import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
@@ -24,6 +22,9 @@ import { CategoriaEntidadContableC, entidadesContables } from '../../contabilida
 import { FormEntidadCuentaContableI, tipoCategoria } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { SubTipoArticuloC, SubTipoArticuloI } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
+import { ConfigI } from 'src/app/core/typescript/config-interface';
+
+const $ = require('jquery');
 
 @Component({
   selector: 'app-registro-articulos',
@@ -111,6 +112,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.articulo;
   fun = fun;
   maxSizeTypeE = maxSizeTypeE;
+  htmlServ = inject(HtmlElementsService);
+
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
   }
@@ -214,7 +217,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       width: '70rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
+        dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
       },
     });
   }
@@ -229,12 +232,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          {
-            clase: 'btn btn-blanco mr-2',
-            function: (instance) => this.dismissModal(instance),
-            label: 'Cancelar',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
           { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
         ],
       },
@@ -356,6 +354,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.listaSubTipoArticulos.length > 0 ? this.form.controls.sub_tipo_articulo_id.enable() : this.form.controls.sub_tipo_articulo_id.disable();
   }
 
+  capitalice(control, arg) {
+    const campo = this.form.get(control);
+    campo.setValue(fun.capitalice(arg));
+  }
+
   createForm() {
     this.form = this.fb.group({
       nombre: [null, Validators.required],
@@ -430,7 +433,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
       var fields = $(actual_campo).parents('form:eq(0),body').find(':input').not('[tabindex]');
 
-      var index = _.findIndex(fields, field);
+      var index = fields.findIndex((item) => item == field);
 
       if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
     } else {
@@ -578,7 +581,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const array = this.ARRAY_FORMULA.value;
 
     if (array.length > 0 && array !== undefined) {
-      let sumatoriaMult = _.reduce(array, (sum, item) => fun.desformatearStNumber(item.cantidad_formula) * fun.desformatearStNumber(item.costo_formula) + sum, 0);
+      let sumatoriaMult = array.reduce((sum, item) => fun.desformatearStNumber(item.cantidad_formula) * fun.desformatearStNumber(item.costo_formula) + sum, 0);
 
       const formulario = this.form.getRawValue();
 
@@ -925,7 +928,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       referencia: null,
       articulo_id: formulario.id,
       id: fun.hasValue(formulario.id_contenido_padre) ? formulario.id_contenido_padre : null,
-      costo: _.isString(formulario.costo_padre) ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
+      costo: typeof formulario.costo_padre == 'string' ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
       precio: fun.desformatearStNumber(['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
       cantidad: ['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.cantidad_contenido_padre : 100,
       medida: formulario.medida_contenido_padre,
@@ -936,7 +939,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       referencia: formulario.referencia_hijo,
       articulo_id: formulario.id,
       id: fun.hasValue(formulario.id_contenido_hijo) ? formulario.id_contenido_hijo : null,
-      costo: _.isString(formulario.costo_hijo) ? parseFloat(formulario.costo_hijo) : formulario.costo_hijo,
+      costo: typeof formulario.costo_hijo == 'string' ? parseFloat(formulario.costo_hijo) : formulario.costo_hijo,
       precio: fun.desformatearStNumber(formulario.precio_hijo),
       cantidad: formulario.cantidad_contenido_hijo,
       medida: formulario.medida_contenido_hijo,

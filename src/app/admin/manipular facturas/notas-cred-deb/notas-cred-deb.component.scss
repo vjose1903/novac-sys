@@ -1,15 +1,14 @@
-@import "../../../../assets/my_styles/global-font.scss";
+@import '../../../../assets/my_styles/global-font.scss';
 
 .cardNota {
   display: grid;
-
+  overflow: hidden;
   grid-template-areas:
-    "titulo"
-    "cabezaNota"
-    "cuerpoNota"
-    "pieNota";
+    'cabezaNota'
+    'cuerpoNota'
+    'pieNota';
 
-  grid-template-rows: min-content min-content auto min-content;
+  grid-template-rows: min-content auto min-content;
 
   .titulo {
     grid-area: titulo;
@@ -102,12 +101,4 @@
 .fecha {
   top: 0.2rem;
   font-size: 1rem;
-}
-
-.numerosCalculos {
-  justify-content: flex-end;
-}
-
-::ng-deep .notaVaciaStyle {
-  background: #efc2c2 !important;
 }

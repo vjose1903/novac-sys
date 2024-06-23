@@ -2,13 +2,12 @@ import { DateUtils } from './../../../core/typescript/date.utils';
 import { tipoPagoE } from './../../pagos/pagos-facturas/lista-pagos/pagos.config';
 import { tableCellType, table_info } from './../../components/new_tablas/tabla-class';
 import { ReciboC } from './../../pagos/class/ingresos/recibos';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import * as _ from 'lodash';
-import { MixinClass } from '../../../core/typescript/MixinClass';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { TablasService } from '../../components/new_tablas/tablas.service';
+import { MixinClass } from '../../../core/typescript/MixinClass';
 import { EmpleadoC } from '../../registros/registro-empleados/empleado.utils';
 import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
-
 import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fun } from '../../../core/services/functions.service';
@@ -68,7 +67,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         div_class: 'd-flex justify-content-around',
         estilos: [{ width: '7%' }],
 
-        // TODO: AGREGAR BOTON DE BORRAR MOVIMIENTO
         iconsArray: [
           { key: 'editar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Editar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
           { key: 'borrar_btn', tooltip: 'Borrar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
@@ -111,7 +109,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  // form;
+  htmlServ = inject(HtmlElementsService);
 
   fun = fun;
   constructor(private tServ: TablasService, private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router) {
@@ -289,8 +287,8 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         if (params.iconKey == 'ver') {
           this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
             let botonesDinamicos = [
-              { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-              { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any },
+              { clase: 'btn btn-gris', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+              { clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any },
             ];
 
             const toPDFData = { data: dataFactura, type: 'facturacion' };
@@ -314,32 +312,44 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   editMovimientoViaje(params) {
     if (params.columnKey == 'actions') {
+      const data = params.data;
       if (params.iconKey == 'cancelar_btn') {
-        if (`${params.data.id}`.includes('new_')) {
-          fun.pull(this.viaje_selected.movimientos_viaje, params.data);
-        }
+        if (data.isAdded && (fun.isEmpty(data.vehiculo_id) || fun.isEmpty(data.user_id))) this.removeMovimientoInfo(data);
       }
       if (params.iconKey == 'guardar_btn') {
-        const row_edited = params.rowsEditing[0];
+        const [row_edited] = params.rowsEditing;
 
-        let index_row_en_turno = this.viaje_selected.movimientos_viaje.findIndex((movimiento) => movimiento.id == row_edited.id);
-
-        this.viaje_selected.movimientos_viaje[index_row_en_turno] = fun.deepCloning(row_edited);
-
-        const new_movimiento_viaje = this.viaje_selected.movimientos_viaje.map((movimiento) => {
-          return { vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id };
-        });
-
+        let is_completed = true;
         const data_update = fun.pick(this.viaje_selected, ['id']);
+        if (fun.isEmpty(row_edited)) {
+          is_completed = false;
+        } else {
+          let index_row_en_turno = this.viaje_selected.movimientos_viaje.findIndex((movimiento) => movimiento.id == row_edited.id);
 
-        data_update['movimientos_viaje'] = new_movimiento_viaje;
-        this.sendUpdateMovimientos(data_update, row_edited);
+          this.viaje_selected.movimientos_viaje[index_row_en_turno] = fun.deepCloning(row_edited);
+
+          const new_movimiento_viaje = this.viaje_selected.movimientos_viaje.map((movimiento) => {
+            return fun.pick(movimiento, ['vehiculo_id', 'user_id']);
+          });
+
+          is_completed = new_movimiento_viaje.every((movimiento) => {
+            return fun.hasValue(movimiento?.user_id) && fun.hasValue(movimiento?.vehiculo_id);
+          });
+
+          data_update['movimientos_viaje'] = new_movimiento_viaje;
+        }
+
+        if (!is_completed) {
+          fun.toastError('Debe de ingresar todos los datos', 'Error');
+        } else {
+          this.sendUpdateMovimientos(data_update, row_edited);
+        }
       }
     }
   }
 
   deleteMovimientoViaje(params) {
-    fun.pull(this.viaje_selected.movimientos_viaje, params.data);
+    this.removeMovimientoInfo(params.data);
     let data_update = fun.pick(this.viaje_selected, ['id', 'movimientos_viaje']);
 
     data_update.movimientos_viaje = this.viaje_selected.movimientos_viaje.map((movimiento) => {
@@ -349,22 +359,31 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.sendUpdateMovimientos(data_update);
   }
 
+  removeMovimientoInfo(data) {
+    fun.pull(this.viaje_selected.movimientos_viaje, data);
+  }
+
   confirmDeleteMovimientoViaje(params) {
-    let text = `Seguro que desea eliminar el movimiento realizado por: <strong>${params.data.chofer.nombre_completo}</strong>, con el camión: <strong>${params.data.vehiculo.info_vehiculo}</strong>.`;
-    if (fun.isEmpty(params.data.user_id)) text = `Seguro que desea eliminar el movimiento realizado con el camión: <strong>${params.data.vehiculo.info_vehiculo}</strong>.`;
-    if (fun.isEmpty(params.data.vehiculo_id)) text = `Seguro que desea eliminar el movimiento realizado por: <strong>${params.data.chofer.nombre_completo}</strong>.`;
+    const data = params.data;
+    if (data.isAdded && fun.isEmpty(data.user_id) && fun.isEmpty(data.vehiculo_id)) {
+      this.removeMovimientoInfo(params.data);
+    } else {
+      let text = `Seguro que desea eliminar el movimiento realizado por: <strong>${data.chofer.nombre_completo}</strong>, con el camión: <strong>${data.vehiculo.info_vehiculo}</strong>.`;
+      if (fun.isEmpty(data.user_id)) text = `Seguro que desea eliminar el movimiento realizado con el camión: <strong>${data.vehiculo.info_vehiculo}</strong>.`;
+      if (fun.isEmpty(data.vehiculo_id)) text = `Seguro que desea eliminar el movimiento realizado por: <strong>${params.data.chofer.nombre_completo}</strong>.`;
 
-    const obj = {
-      id: 'delete_movimiento_viaje',
-      header: 'Confirmación',
-      texto: text,
-      siFunction: (instance) => {
-        this.deleteMovimientoViaje(params);
-        instance.dismissModal(instance.id);
-      },
-    };
+      const obj = {
+        id: 'delete_movimiento_viaje',
+        header: 'Confirmación',
+        texto: text,
+        siFunction: (instance) => {
+          this.deleteMovimientoViaje(params);
+          instance.dismissModal(instance.id);
+        },
+      };
 
-    this.confirmationModal(obj);
+      this.confirmationModal(obj);
+    }
   }
 
   sendUpdateMovimientos(data_update, row_edited?) {
@@ -382,6 +401,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           viaje_modificado.vehiculo_id = vehiculo.id;
 
           delete viaje_modificado.is_editing;
+          this.tServ.modifyRowsEditing(row_edited, 'remove');
         }
       })
       .catch((error) => {});
@@ -415,11 +435,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   addMovimiento() {
-    const movimiento_viaje = { vehiculo_id: null, user_id: null, is_editing: true, id: `new_${fun.generateKey()}` };
+    const movimiento_viaje = { vehiculo_id: null, user_id: null, is_editing: true, id: fun.generateKey(), isAdded: true };
     this.parseMovimientosViaje(movimiento_viaje);
     this.viaje_selected.movimientos_viaje.push(movimiento_viaje);
 
-    this.tablaMovimientosComponent.modifyRowsEditing(movimiento_viaje, 'add');
+    setTimeout(() => this.tServ.modifyRowsEditing(movimiento_viaje, 'add'), 10);
   }
 
   tableClickRow(event) {
@@ -432,7 +452,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.viaje_selected = data;
     this.monto_pendiente = this.viaje_selected.balance;
 
-    this.ultimo_pago = _.maxBy(this.viaje_selected.recibos, 'id');
+    this.ultimo_pago = fun.maxBy(this.viaje_selected.recibos, 'id');
 
     const index_viaje = this.viajes.findIndex((viaje) => viaje.id == data.id);
 

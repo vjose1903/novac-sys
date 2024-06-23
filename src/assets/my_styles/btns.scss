@@ -112,6 +112,18 @@ input[type="text"] {
   }
 }
 
+.btn-azul,
+#btn-azul {
+  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  background-color: #3B82F6;
+  color: white;
+  &:hover {
+    cursor: pointer;
+    background-color: #306ed4;
+    color: white;
+  }
+}
+
 .btnAccion {
   & i {
     font-size: 1rem;

@@ -1,7 +1,7 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import * as _ from 'lodash';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray, FormGroup } from '@angular/forms';
 import { fun } from '../../../core/services/functions.service';
 import { PdfService } from '../../../core/services/pdf/pdf.service';
 import { teclasCode } from '../../../core/typescript/constantes';
@@ -18,6 +18,7 @@ import { FacturaC, FacturasI } from '../../facturacion/factura';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-conduce-form',
@@ -94,6 +95,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   permissions = Permisos;
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
+  htmlServ = inject(HtmlElementsService);
   constructor(private fb: UntypedFormBuilder, public mServ: ModalService, private router: Router) {
     super();
   }
@@ -647,7 +649,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               botones: {
                 ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
-                  { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
+                  { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
                   { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'SI', disable: true },
                 ],
               },
@@ -802,7 +804,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
+            { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
             { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
           ],
         },

@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { IModalConfiguration, ModalComponentI, ModalI } from '../../../../admin/components/modal/modal-class';
-import * as _ from 'lodash';
+import { Component, OnInit, inject } from '@angular/core';
+import { ModalI, ModalComponentI } from '../../../../admin/components/modal/modal-class';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '../../../../core/services/functions.service';
-import { timeStamp } from 'console';
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { ModalService } from 'src/app/admin/components/modal/modal.service';
 
 @Component({
   selector: 'app-remover-articulo',
@@ -11,11 +11,13 @@ import { timeStamp } from 'console';
   styleUrls: ['./remover-articulo.component.scss'],
 })
 export class RemoverArticuloComponent implements OnInit, ModalI {
-  constructor(private fb: UntypedFormBuilder) {}
-  modalComponent: ModalComponentI= {};
+  constructor(private fb: UntypedFormBuilder, public mServ: ModalService) {}
+  modalComponent: ModalComponentI = {};
   inputs: any;
-
   form;
+
+  htmlServ = inject(HtmlElementsService);
+
   ngOnInit(): void {
     this.createForm();
   }
@@ -59,11 +61,10 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
 
   btn_aceptar() {
     if (this.form.valid || this.inputs.data_detalle.is_defectuoso || !this.inputs.is_prefactura_selected) {
+      const modal = this.mServ.findModalConfigById(this.modalComponent.component_id);
 
-      const dataToReturn = { key: this.inputs.key, modalId: this.modalComponent.id };
-      if (this.inputs.is_prefactura_selected) dataToReturn['data'] = this.form.getRawValue();
-
-      this.modalComponent.closeModal(this.modalComponent.id, dataToReturn);
+      const data_to_return = { key: this.inputs.key, modalId: this.modalComponent.component_id, data: this.form.getRawValue() };
+      modal.dismissModal(this.modalComponent.component_id, data_to_return);
     } else {
       fun.toastError('Complete los campos para retirar el articulo.', 'ERROR');
     }

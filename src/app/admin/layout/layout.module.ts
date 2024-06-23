@@ -4,11 +4,9 @@ import { CommonModule } from '@angular/common';
 import { LayoutRoutingModule } from './layout.routing';
 import { LayoutComponent } from './layout.component';
 import { PrimengModule } from '../../modules/primeng.module';
-import { NgSelectModule } from '@ng-select/ng-select';
 
 import { DirectivesModule } from '../../core/directive/directives.module';
 import { ValidateRayaAbajo } from '../../directives/validaciones';
-import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
 import { TablasModule } from '../components/new_tablas/tablas.module';
 
 import { HomeAdminComponent } from '../home/homeAdmin.component';
@@ -29,8 +27,6 @@ import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular
     PrimengModule,
     TablasModule,
     TabViewModule,
-    NgxBootstrapModule,
-    NgSelectModule,
     FormsModule,
     DirectivesModule,
     ReactiveFormsModule,

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { fun } from './../../core/services/functions.service';
-import { tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
+import { comprobante, comprobanteElectronico, comprobanteNormal, tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
+import { Ss } from '../../core/services/singleton.service';
+import { serie } from '../../core/typescript/constantes';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +23,17 @@ export class FacturacionService {
   cotizacion_selected;
   productos_devueltos = [];
   filasDetalle;
+  serieType = serie.normal;
+
+  public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
+    if (fun.hasValue(Ss.configServ)) {
+      const configApp = Ss.configServ.getConfig({ isPromise: false });
+
+      return { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
+    } else {
+      return {};
+    }
+  }
 
   public get isCompra(): boolean {
     return this.tipoDocumento == tipoDocFacturacion.compra;
@@ -38,19 +51,28 @@ export class FacturacionService {
     return this.tipoDocumento == tipoDocFacturacion.pre_venta;
   }
 
+  public get isComprobanteElectronico(): boolean {
+    return this.serieType == serie.electronica;
+  }
+
+  public get isComprobanteNormal(): boolean {
+    return this.serieType == serie.normal;
+  }
+
   constructor() {}
 
-  setTipos(metodo) {
+  setTipos(metodo: tipoDocFacturacion, serie: serie, sameTipo: boolean = false) {
     return new Promise<any>((resolve, reject) => {
-      if (metodo == tipoDocFacturacion.compra) {
-        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.referencia == '01');
-        // this.tipoFactura = '01';
+      this.serieType = serie;
 
-        this.htmlTiposFacturas =
-          '<div style=" max-width: 21rem;" > \
-        <span>01 Valor fiscal</span><br>\
-        <span>02 Factura de consumo</span><br>\
-        </div>';
+      if (metodo == tipoDocFacturacion.compra) {
+        const referenciaTarget = sameTipo && fun.hasValue(this.tipoFactura) ? this.tipoFactura.descripcion : tFacturaD.factura_con_valor_fiscal;
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == referenciaTarget && tipo_factura.serie == this.serieType);
+
+        this.htmlTiposFacturas = `<div style=" max-width: 21rem;" > \
+        <span>${comprobante[this.serieType].valor_fiscal} Valor fiscal</span><br>\
+        <span>${comprobante[this.serieType].factura_consumo} Factura de consumo</span><br>\
+        </div>`;
 
         this.htmlTiposCostosGastos =
           '<div style=" max-width: 30rem; min-width: 30rem;" > \
@@ -67,51 +89,55 @@ export class FacturacionService {
         <span>11 Gastos de Seguros</span><br>\
         </div>';
 
-        this.options_tipos_facturas = ['01', '02'];
+        this.options_tipos_facturas = [comprobante[this.serieType].valor_fiscal, comprobante[this.serieType].factura_consumo];
         this.options_tipos_costos_gastos = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
       } else if (metodo == tipoDocFacturacion.venta) {
-        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.referencia == '02');
-        // this.tipoFactura = '02';
-        // <span>00 Factura sin comprobante</span><br>\
-        this.htmlTiposFacturas =
-          '<div style=" max-width: 21rem;" > \
-          <span>01 Valor fiscal</span><br>\
-          <span>02 Factura de consumo</span><br>\
-          <span>11 Comprobante de compras</span><br>\
-          <span>12 Registro de unico ingreso</span><br>\
-          <span>13 Comprobante para gastos menores</span><br>\
-          <span>14 Comprobante de regimen especiales</span><br>\
-          <span>15 Comprobante gubernamental</span><br>\
-          <span>16 Comprobante para exportaciones</span><br>\
-          <span>17 Comprobantes para pago al exterior</span><br>\
-          </div>';
+        const referenciaTarget = sameTipo && fun.hasValue(this.tipoFactura) ? this.tipoFactura.descripcion : tFacturaD.factura_de_consumo;
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == referenciaTarget && tipo_factura.serie == this.serieType);
 
-        this.options_tipos_facturas = ['00', '01', '02', '11', '12', '13', '14', '15', '16', '17'];
+        this.htmlTiposFacturas = `<div style=" max-width: 21rem;" > \
+          <span>${comprobante[this.serieType].valor_fiscal} Valor fiscal</span><br>\
+          <span>${comprobante[this.serieType].factura_consumo} Factura de consumo</span><br>\
+          <span>${comprobante[this.serieType].comprobante_compras} Comprobante de compras</span><br>\
+          <span>${comprobante[this.serieType].gastos_menores} Comprobante para gastos menores</span><br>\
+          <span>${comprobante[this.serieType].comprobante_regimen_especiales} Comprobante de regimen especiales</span><br>\
+          <span>${comprobante[this.serieType].comprobante_gubernamental} Comprobante gubernamental</span><br>\
+          <span>${comprobante[this.serieType].comprobante_exportaciones} Comprobante para exportaciones</span><br>\
+          <span>${comprobante[this.serieType].comprobantes_pago_exterior} Comprobantes para pago al exterior</span><br>\
+          </div>`;
+
+        this.options_tipos_facturas = [
+          comprobante[this.serieType].valor_fiscal,
+          comprobante[this.serieType].factura_consumo,
+          comprobante[this.serieType].comprobante_compras,
+          comprobante[this.serieType].gastos_menores,
+          comprobante[this.serieType].comprobante_regimen_especiales,
+          comprobante[this.serieType].comprobante_gubernamental,
+          comprobante[this.serieType].comprobante_exportaciones,
+          comprobante[this.serieType].comprobantes_pago_exterior,
+        ];
       } else if (metodo == tipoDocFacturacion.cotizacion) {
-        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == tipoDocFacturacion.cotizacion);
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == tipoDocFacturacion.cotizacion && tipo_factura.serie == this.serieType);
       } else if (metodo == tipoDocFacturacion.pre_venta) {
-        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == tipoDocFacturacion.pre_venta);
+        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == tipoDocFacturacion.pre_venta && tipo_factura.serie == this.serieType);
       }
 
-      this.setTipoFacturaSelected(metodo, this.tipoFactura.id, 'id');
+      this.setTipoFacturaSelected(this.tipoFactura.id, 'id');
       resolve(true);
     });
   }
 
-  setTipoFacturaSelected(metodo, value, by = 'referencia') {
+  setTipoFacturaSelected(value, by = 'referencia') {
     return new Promise<any>((resolve, reject) => {
-      if (this.options_tipos_facturas?.includes(value) || by != 'referencia') {
-        this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura[by] == value);
-        this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
-        resolve(value);
-      } else {
-        reject(undefined);
-      }
+      this.tipoFactura = this.lista_tipos_facturas.find((tipo_factura) => tipo_factura[by] == value && tipo_factura.serie == this.serieType);
+      this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
+
+      resolve(value);
     });
   }
 
   tipoFacturaId(descripcion: tFacturaD) {
-    return this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == descripcion).id;
+    return this.lista_tipos_facturas.find((tipo_factura) => tipo_factura.descripcion == descripcion && tipo_factura.serie == this.serieType).id;
   }
 
   getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }, print?) {

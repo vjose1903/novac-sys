@@ -118,19 +118,19 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   parsePermisos(params: { clean: boolean }) {
     if (params.clean) {
       const all_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
-      const all_acciones_selected = _.filter(all_acciones, { selected: true });
+      const all_acciones_selected = all_acciones.filter((item) => item.selected == true);
       all_acciones_selected.map((accion) => (accion.selected = false));
     } else {
       this.roleSelected.permisos_acciones.forEach((permiso_accion) => {
-        const permiso_en_turno = _.find(this.listaPermisos, (item) => item.id == permiso_accion.permiso.id);
+        const permiso_en_turno = this.listaPermisos.find((item) => item.id == permiso_accion.permiso.id);
 
-        const accion_en_turno = _.find(permiso_en_turno.acciones, (item) => item.id == permiso_accion.accion.id);
+        const accion_en_turno = permiso_en_turno.acciones.find((item) => item.id == permiso_accion.accion.id);
         accion_en_turno.selected = true;
       });
     }
 
     this.boton = params.clean ? 'Registrar' : 'Actualizar';
-    this.permiso_selected = _.first(this.listaPermisos);
+    this.permiso_selected = this.listaPermisos[0];
   }
 
   getPermisos() {
@@ -221,7 +221,10 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     let res = true;
     if (this.form.valid) {
       const all_permiso_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
-      const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'id');
+      const permiso_acciones_selected = _.map(
+        all_permiso_acciones.filter((item) => item.selected),
+        'id',
+      );
 
       res = permiso_acciones_selected.length == 0;
     } else {
@@ -257,13 +260,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => this.eliminarRole(instance, data),
-            label: 'SI',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'NO', disable: false },
+          { clase: 'btn btn-verde', function: (instance) => this.eliminarRole(instance, data), label: 'SI', disable: false },
         ],
       },
     });
@@ -282,7 +280,10 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     const formulario = this.form.getRawValue();
 
     const all_permiso_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
-    const permiso_acciones_selected = _.map(_.filter(all_permiso_acciones, { selected: true }), 'permiso_accion_id');
+    const permiso_acciones_selected = _.map(
+      all_permiso_acciones.filter((item) => item.selected),
+      'permiso_accion_id',
+    );
 
     formulario['permisos_acciones'] = permiso_acciones_selected;
 

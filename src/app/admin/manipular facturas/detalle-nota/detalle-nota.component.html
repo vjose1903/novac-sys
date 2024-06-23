@@ -17,10 +17,12 @@
 
   <div class="tabs">
     <div class="fantasma">
-      <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView detalle-notas" [scrollable]="true"(onChange)="clickTabView($event.index)" >
-        <p-tabPanel *ngFor="let iteraFact of inputs.data.facturas_aplicadas" header="{{ iteraFact.cabecera_factura.numero_comprobante }}">
+      <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView detalle-notas" [scrollable]="true" (onChange)="clickTabView($event.index)">
+        @for (iteraFact of inputs.data.facturas_aplicadas; track $index) {
+        <p-tabPanel header="{{ iteraFact.cabecera_factura.numero_comprobante }}">
           <div #cardTablaDetalleNota id="cardTabla" class="divTabla">
-            <div *ngIf="show" class="innerTablaNotas">
+            @if (show) {
+            <div class="innerTablaNotas">
               <dinamic-table
                 [cardTabla]="cardTablaDetalleNota"
                 [post_id]="'-' + iteraFact.id"
@@ -30,8 +32,10 @@
                 (table_events)="handle_table_events($event)"
               ></dinamic-table>
             </div>
+            }
           </div>
         </p-tabPanel>
+        }
       </p-tabView>
     </div>
   </div>

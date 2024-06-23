@@ -3,10 +3,10 @@ import { entidadesContables } from './../../contabilidad/categoria-entidad-conta
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { ConfigI } from '../../../core/typescript/config-interface';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
@@ -19,7 +19,7 @@ import { CategoriaEntidadContableService } from '../../contabilidad/categoria-en
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
-import { IModalConfiguration } from '../../components/modal/modal-class';
+import { ConfigureModalI } from '../../components/modal/modal-class';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
 import { ImagenService } from '../../../core/services/imagen.service';
 
@@ -78,6 +78,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   configApp: ConfigI = ConfigService.config;
   fun = fun;
   maxSizeTypeE = maxSizeTypeE;
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -142,11 +144,11 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.listaSuplidores.length = 0;
     this.suplidorClass.getAll(extra).then((res) => {
       res['data'].map((suplidor) => {
-        const doc = _.find(suplidor.documentos_de_identidad, { principal: true });
+        const doc = suplidor.documentos_de_identidad.find((doc) => doc.principal == true);
         suplidor.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         suplidor.img_divisa = suplidor?.divisa?.imagen?.file_name ? this.imgServ.getImgUrlServer(suplidor?.divisa?.imagen?.file_name) : 'assets/img/no-divisa.png';
         suplidor.img_divisa_tooltip = suplidor?.divisa?.nombre ? suplidor?.divisa?.nombre : 'Divisa no registrada';
-        suplidor.codigo = _.padStart(suplidor.id, 5, '0');
+        suplidor.codigo = suplidor.id.padStart(5, '0');
 
         suplidor.customStyles = {
           img_divisa: { 'padding-left': '1rem', 'padding-right': '1rem' },
@@ -204,8 +206,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     const formulario = this.form.getRawValue();
     if (campo != 'send') {
       if (campo == 'campoTelefono') {
-        if (!_.endsWith(formulario[this.doc_principal], '_')) {
-          const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
+        if (!formulario[this.doc_principal].endsWith('_')) {
+          const docSinGuiones = formulario[this.doc_principal].split('-').join('');
           if (this.doc_principal == 'cedula') {
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
@@ -263,7 +265,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
           .then((res) => {
             if (res['data'].length) {
-              const is_suplidor = _.find(res['data'], (item) => item.persona_is === 'Suplidor');
+              const is_suplidor = res['data'].find((item) => item.persona_is === 'Suplidor');
               const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_suplidor) && is_suplidor?.persona?.estado) {
@@ -272,9 +274,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
                 return;
               }
 
-              const persona = fun.hasValue(is_suplidor) ? is_suplidor?.persona : _.head(res['data']).persona;
+              const persona = fun.hasValue(is_suplidor) ? is_suplidor?.persona : res['data'][0].persona;
               persona.id = id_anterior;
-              const documento_persona = _.find(persona.documentos_de_identidad, (item) => item.principal);
+              const documento_persona = persona.documentos_de_identidad.find((item) => item.principal == true);
 
               if (fun.hasValue(documento_persona)) {
                 this.doc_is_cedula = documento_persona.descripcion == 'cedula' ? true : false;
@@ -298,7 +300,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
             console.error('err ', err);
           });
       } else {
-        if (!_.endsWith(documento, '_')) {
+        if (!documento.endsWith('_')) {
           this.documentos_de_identidad = undefined;
           this.changeStateCampos(false);
         }
@@ -319,7 +321,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.suplidor, id_modal: 'categorias_suplidores', inputs: { configsEntCuentas: this.listaConfigSuplidores }, openNewModal: this.openNewModal.bind(this) });
   }
 
-  onHideModal(modalConfig: IModalConfiguration) {
+  onHideModal(modalConfig: ConfigureModalI) {
     if (modalConfig.id == 'categorias_suplidores') {
       this.categoriaEntidadServ.setCategoriaChange();
     }
@@ -383,7 +385,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         else this.form.controls.cedula.setValue(doc.documento);
       });
 
-      const doc_principal = _.find(documentos, (doc) => doc.principal);
+      const doc_principal = documentos.find((doc) => doc.principal == true);
 
       setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
     }
@@ -472,13 +474,13 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     ];
 
     documentos_identidad.map((element) => {
-      const doc_backend = _.find(this.documentos_de_identidad, (doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+      const doc_backend = this.documentos_de_identidad.find((doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;
       return element;
     });
 
-    formulario.documentos_de_identidad = _.filter(documentos_identidad, (doc) => fun.hasValue(doc.documento));
+    formulario.documentos_de_identidad = documentos_identidad.filter((doc) => fun.hasValue(doc.documento));
     formulario.estado = true;
 
     if (ConfigService.config.has_contabilidad) formulario['cuentas_contables'] = this.listaEntidadCuentasContables;

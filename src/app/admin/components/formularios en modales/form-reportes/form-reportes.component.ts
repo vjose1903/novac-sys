@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms
 import { Ss } from './../../../../core/services/singleton.service';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { tFacturaD } from './../../../facturacion/factura';
-
+import { serie } from './../../../../core/typescript/constantes';
 import { CxP } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
@@ -43,6 +43,12 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   clienteClass = new ClienteC();
   dinamycSelectionReady: boolean = false;
 
+  facturasSerieOptions = [
+    { label: 'Todas', value: serie.no, disabled: false },
+    { label: 'Normal', value: serie.normal, disabled: true },
+    { label: 'Electronica', value: serie.electronica, disabled: true },
+  ];
+
   constructor(private fb: UntypedFormBuilder) {
     super();
   }
@@ -67,6 +73,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   checkDinamycSelections() {
     for (let index = 0; index < this.inputs?.dinamyc_selections?.length; index++) {
       const element = this.inputs.dinamyc_selections[index];
+      element.id = fun.generateKey();
 
       this.form.addControl(element.formControl, this.fb.control(null));
 
@@ -75,11 +82,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     setTimeout(() => (this.dinamycSelectionReady = true), 10);
   }
 
-  async getArticulos(arg) {
-    if (arg.term && arg.term !== '') {
+  async getArticulos(name) {
+    if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
         try {
-          this.articuloClass.getArticulosFiltrado({ buscar: arg.term, fecha: this.Fecha, paginado: false, is_compra: true }).then((res) => (this.listaArticulos = res['data']));
+          this.articuloClass.getArticulosFiltrado({ buscar: name, fecha: this.Fecha, paginado: false, is_compra: true }).then((res) => (this.listaArticulos = res['data']));
         } catch (error) {
           console.error(error);
           fun.toastError('Error buscando articulos registrados.', 'ERROR');
@@ -90,10 +97,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     }
   }
 
-  async getClientes(arg) {
-    if (arg.term && arg.term !== '') {
+  async getClientes(name) {
+    if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
-        const extra = { afterPath: `filtro/${arg.term}`, parameters: { paginado: false } };
+        const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false } };
 
         this.clienteClass.getAll(extra).then((res) => {
           res['data'].map((cliente) => {
@@ -113,6 +120,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   agregateValidators() {
     let tipo_selected = null;
+    let serie_selected = null;
     let condicion_selected = null;
     const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'pago_facturas', 'movimientos_vehiculo'];
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
@@ -121,6 +129,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       this.form.controls.fecha.setValue(new Date());
       //
     } else if (this.inputs.tipo_reporte == 'ventas_diarias') {
+      serie_selected = serie.no;
       tipo_selected = 'ventas_diarias';
       condicion_selected = 'todos';
 
@@ -146,6 +155,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
         { id: 'agrupado', label: 'Agrupado' },
       ];
 
+      serie_selected = serie.no;
       tipo_selected = 'detallado';
       condicion_selected = 'todos';
 
@@ -171,6 +181,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'cuentas_con_pagos' || this.inputs.tipo_reporte == 'ventas_cliente') {
       this.setValidator('cliente_id');
+      serie_selected = serie.no;
 
       if (this.inputs.tipo_reporte == 'ventas_cliente') {
         this.setValidator('tipo');
@@ -195,6 +206,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       this.setValidator('tipo');
     }
 
+    if (fun.hasValue(serie_selected)) {
+      this.form.controls.serie.setValue(serie_selected);
+      this.setValidator('serie');
+    }
+
     if (tipo_factura_includes.includes(this.inputs.tipo_reporte)) this.parseTipoFacturas();
 
     if (desde_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls();
@@ -213,15 +229,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   parseTipoFacturas() {
     const tipos_aceptados = [
-      'Factura con valor fiscal',
-      'Factura de consumo',
-      'Comprobante de compras',
-      'Registro de unico ingreso',
-      'Comprobante para gastos menores',
-      'Comprobante de regimen especiales',
-      'Comprobante gubernamental',
-      'Comprobante para exportaciones',
-      'Comprobantes para pago al exterior',
+      tFacturaD.factura_con_valor_fiscal,
+      tFacturaD.factura_de_consumo,
+      tFacturaD.comprobante_de_compras,
+      tFacturaD.comprobante_para_gastos_menores,
+      tFacturaD.comprobante_de_regimen_especiales,
+      tFacturaD.comprobante_gubernamental,
+      tFacturaD.comprobante_para_exportaciones,
+      tFacturaD.comprobantes_para_pago_al_exterior,
     ];
 
     this.tipos_facturas = [{ label: 'Todos', id: 0 }];
@@ -271,6 +286,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       fecha: [null],
       desde: [null],
       hasta: [null],
+      serie: [null]
     });
   }
 

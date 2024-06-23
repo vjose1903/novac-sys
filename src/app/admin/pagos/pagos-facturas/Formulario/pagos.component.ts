@@ -1,8 +1,8 @@
 import { DateUtils } from './../../../../core/typescript/date.utils';
-import { Ss } from '../../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { Ss } from './../../../../core/services/singleton.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import * as _ from 'lodash';
-import { NgSelectConfig } from '@ng-select/ng-select';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../class/ingresos/recibos';
@@ -104,9 +104,10 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
   facturaClass = new FacturaC();
   pagoClass = new PagoC();
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router, private route: ActivatedRoute, public pagosService: PagosService) {
+  htmlServ = inject(HtmlElementsService);
+
+  constructor(private tServ: TablasService, private router: Router, private route: ActivatedRoute, public pagosService: PagosService) {
     super();
-    this.config.notFoundText = 'Articulo no existe';
   }
 
   ngOnInit() {
@@ -358,8 +359,8 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       if (params.iconKey == 'ver') {
         this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
           let botonesDinamicos = [
-            { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any },
+            { clase: 'btn btn-gris', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+            { clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any },
           ];
           const toPDFData = { data: dataFactura, type: 'facturacion' };
 
@@ -549,12 +550,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            {
-              clase: 'btn btn-blanco mr-2',
-              function: (instance) => this.dismissModal(instance),
-              label: 'Cancelar',
-              disable: false,
-            },
+            { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
             { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
           ],
         },

@@ -1,57 +1,59 @@
-<p *ngIf="!inputs.is_prefactura_selected">
-  Seguro que desea remover el articulo <strong>{{ inputs.nombre }}</strong>
-</p>
+@if (!inputs.is_prefactura_selected) {
+  <p>
+    Seguro que desea remover el articulo <strong>{{ inputs.nombre }}</strong>
+  </p>
+} @else {
+  <div>
+    @if (inputs.data_detalle.is_defectuoso) {
+      Seguro que desea retirar el articulo defectuoso: <strong>{{ inputs.nombre }}</strong>
+    } @else {
+      <h2>
+        <strong>Articulo: </strong> {{ inputs.nombre }}
+      </h2>
+      <p>Especifique la razón de quitar este articulo de la Pre-factura.</p>
 
-<div *ngIf="inputs.is_prefactura_selected">
-
-  <ng-container *ngIf="inputs.data_detalle.is_defectuoso">
-    Seguro que desea retirar el articulo defectuoso:  <strong>{{ inputs.nombre }}</strong>
-  </ng-container>
-
-  <ng-container *ngIf="!inputs.data_detalle.is_defectuoso">
-    <h2><strong>Articulo: </strong> {{ inputs.nombre }}</h2>
-    <p>Especifique la razón de quitar este articulo de la Pre-factura.</p>
-    <div>
-      <hr class="rayaTop" />
-    </div>
-    <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
-      <div class="row">
-        <div class="col-5">
-          <div class="d-flex align-items-center h-100">
-            <label class="control-label mr-2 mb-0">Devolver todo: </label>
-            <input class="apple-switch" type="checkbox" formControlName="all" (change)="changeValorCheck()" />
-          </div>
-        </div>
-
-        <div class="col-7">
-          <div class="form-group">
-            <label class="control-label mt-3">Cantidad: </label>
-            <input
-              id="cantidad"
-              min="1"
-              [max]="inputs.cantidad"
-              (keydown.enter)="saltar('razon')"
-              (focus)="$event.target.select()"
-              (blur)="checkCantidad()"
-              type="number"
-              class="form-control input_cantidad"
-              formControlName="cantidad"
-              placeholder="Introduzca la cantidad"
-              autocomplete="off"
-            />
-          </div>
-        </div>
-
-        <div class="col-12">
-          <div class="form-group">
-            <label class="control-label">Razón: </label>
-            <select id="razon" (keydown.enter)="saltar('send')" formControlName="razon" class="form-control">
-              <option value="no_venta">Solo devolver</option>
-              <option value="producto_defectuoso">Producto defectuoso</option>
-            </select>
-          </div>
-        </div>
+      <div>
+        <hr class="rayaTop" />
       </div>
-    </form>
-  </ng-container>
-</div>
+
+      <form [formGroup]="form">
+        <div class="row">
+          <div class="col-5">
+            <div class="d-flex align-items-center h-100">
+              <label class="control-label mr-2 mb-0">Devolver todo: </label>
+              <input class="apple-switch" type="checkbox" formControlName="all" (change)="changeValorCheck()" />
+            </div>
+          </div>
+          <div class="col-7">
+            <div class="form-group">
+              <label class="control-label mt-3">Cantidad: </label>
+              <input
+                id="cantidad"
+                min="1"
+                [max]="inputs.cantidad"
+                (keydown.enter)="saltar('razon')"
+                (focus)="htmlServ.selectValue($event)"
+                (blur)="checkCantidad()"
+                type="number"
+                class="form-control input_cantidad"
+                formControlName="cantidad"
+                placeholder="Introduzca la cantidad"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          
+          <div class="col-12">
+            <div class="form-group">
+              <label class="control-label">Razón: </label>
+              <select id="razon" (keydown.enter)="saltar('send')" formControlName="razon" class="form-control">
+                <option value="no_venta">Solo devolver</option>
+                <option value="producto_defectuoso">Producto defectuoso</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </form>
+    }
+  </div>
+}

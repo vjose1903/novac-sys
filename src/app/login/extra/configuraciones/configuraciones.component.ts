@@ -1,8 +1,8 @@
 import { ConfigService } from './../../../core/services/configuration.service';
-import { Component, OnInit } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
-import * as _ from 'lodash';
 import { MessageTask } from '../../../core/typescript/message-task';
 import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
 import { fun } from '../../../core/services/functions.service';
@@ -10,6 +10,7 @@ import { SharedService } from '../../../core/services/shared.service';
 import { Router } from '@angular/router';
 import { IpcService } from '../../../core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
+
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -71,6 +72,8 @@ export class ConfiguracionesComponent implements OnInit {
 
   configCopy;
 
+  htmlServ = inject(HtmlElementsService);
+
   constructor(private fb: UntypedFormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
 
   ngOnInit(): void {
@@ -83,7 +86,7 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   createForm(data) {
-    const color_format = _.find(this.colores, (item) => item.descripcion == data.color_app);
+    const color_format = this.colores.find((item) => item.descripcion == data.color_app);
 
     this.form = this.fb.group({
       nombre_empresa: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
@@ -142,25 +145,25 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   getValuePageSize(data, key) {
-    const size = _.get(data, key);
-    const page_size = _.find(this.paper_sizes, (item) => item.descripcion == size);
+    const size = fun.getProperty(data, key);
+    const page_size = this.paper_sizes.find((item) => item.descripcion == size);
     return page_size;
   }
 
   getDocumentosAImprimir(data) {
-    const docs = _.filter(data.documentos_a_imprimir, { selected: true });
+    const docs = data.documentos_a_imprimir.filter((doc) => doc.selected == true);
 
     return docs;
   }
 
   get_plantillas(key) {
-    const plantillas = _.filter(this.plantillas_impresion, { key });
+    const plantillas = this.plantillas_impresion.filter((plantilla) => fun.hasValue(plantilla.key));
 
     return plantillas;
   }
 
   getValue(data, key) {
-    return _.get(data, key);
+    return fun.getProperty(data, key);
   }
 
   capitalice(control, arg) {
@@ -173,13 +176,17 @@ export class ConfiguracionesComponent implements OnInit {
   parseDocumentosAImprimir(config) {
     return new Promise<any>((resolve) => {
       const documentos_config = config.documentos_a_imprimir.split(',');
-      documentos_config.forEach((item) => this.documentos_a_imprimir_selected.push(_.find(this.documentos_a_imprimir, { key: item })));
+
+      documentos_config.forEach((item) => {
+        const doc = this.documentos_a_imprimir.find((documento) => documento.key == item);
+        if (fun.hasValue(doc)) this.documentos_a_imprimir_selected.push(doc);
+      });
       resolve(true);
     });
   }
 
   changeDocumentosAImprimir() {
-    const documentos_selected = _.join(_.map(this.documentos_a_imprimir_selected, 'key'), ',');
+    const documentos_selected = this.documentos_a_imprimir_selected.map((item) => 'key').join(',');
 
     this.form.controls.documentos_a_imprimir.setValue(fun.hasValue(documentos_selected) ? documentos_selected : null);
   }
@@ -261,7 +268,7 @@ export class ConfiguracionesComponent implements OnInit {
       'printer_pago_factura',
     ];
 
-    keys_to_omit.forEach((element) => (formulario = _.omit(formulario, [element])));
+    formulario = fun.omit(formulario, keys_to_omit);
 
     formulario['pages_sizes'] = pages_sizes;
     formulario['printer_selected'] = printer_selected;

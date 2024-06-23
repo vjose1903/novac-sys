@@ -2,7 +2,7 @@ import { ConfigService } from './../../../core/services/configuration.service';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
+const moment = require('../../../core/javascript/moment');
 import { ActivatedRoute, Router } from '@angular/router';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
@@ -375,7 +375,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           botones: {
             ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
-              { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
+              { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
               { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
             ],
           },
@@ -406,13 +406,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
-            label: 'SI',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
+          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'SI', disable: false },
         ],
       },
     });
@@ -435,7 +430,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return suma;
   }
 
-  changeHeaderStatus(iteraFact, tabPanel, idTab) {
+  changeHeaderStatus(iteraFact, tabPanel, idTab): any {
     if (tabPanel) {
       const element = document.getElementsByClassName(idTab);
 

@@ -1,12 +1,11 @@
 import { ConfigService } from './configuration.service';
 import { CustomLodash } from './custom_lodash.service';
-import * as moment from '../javascript/moment';
 import { DocumentosC } from '../typescript/documentos_de_identidad.utils';
-import * as _ from 'lodash';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
 import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../typescript/message-task';
+const moment = require('../javascript/moment');
 
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun extends CustomLodash {
@@ -123,7 +122,7 @@ export class fun extends CustomLodash {
         if (fun.isEmpty(searchText)) resolve(copyData);
 
         const data_filtered = fun.deepCloning(copyData).filter((obj) => {
-          const obj_picked = _.pick(obj, targets);
+          const obj_picked = fun.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
           const is_include = array_picked.some((value: any) => value.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
@@ -167,16 +166,10 @@ export class fun extends CustomLodash {
   // _________________________________________________________________________________________________
 
   static roundNumberToDecimal(number, cant = 2): string {
-    if (fun.isEmpty(number)) {
-      this.logRed('No se puede redondear una variable vacia');
-      return number;
-    }
-    if (typeof number == 'string') number = parseFloat(fun.desformatearStNumber(number));
+    if (fun.isEmpty(number)) return number;
 
-    if (isNaN(number)) {
-      this.logRed('No es un numero valido.');
-      return number;
-    }
+    if (typeof number == 'string' || isNaN(number)) number = parseFloat(fun.desformatearStNumber(number));
+
     const numerRounded = number.toFixed(cant);
 
     // Formateamos el número con comas para separar millares
@@ -200,7 +193,7 @@ export class fun extends CustomLodash {
 
     if (splitStr.length > 1 && splitStr[1].length > cant) {
       splitStr[1] = splitStr[1].slice(0, cant);
-      result.value = _.join(splitStr, '.');
+      result.value = splitStr.join('.');
       result.error = true;
     }
 
@@ -238,7 +231,19 @@ export class fun extends CustomLodash {
   // Descripcion : Esta funcion retorna un id unico
   // _________________________________________________________________________________________________
   static generateKey(): string {
-    return moment().unix() + '' + Math.round(Math.random() * 10000);
+    return `${moment().unix()}${Math.round(Math.random() * 10000)}`;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: identifyObject
+  // Descripcion : Esta funcion le agrega una propiedad id a un objeto
+  // _________________________________________________________________________________________________
+  static identifyObject(object: any | Array<any>, key = 'id') {
+    if (Array.isArray(object)) {
+      object.map((item) => (item[key] = fun.generateKey()));
+    } else {
+      object[key] = fun.generateKey();
+    }
   }
 
   // __________________________________________________________________________________________________
@@ -307,10 +312,10 @@ export class fun extends CustomLodash {
       // recorremos en un ciclo for cada dígito de la cédula
       for (let i = 0; i < 10; i++) {
         // se multiplica el numero entre 1 y 2 alternadamente
-        digito = _.parseInt(cedula.charAt(i)) * (i % 2 === 0 ? 1 : 2);
+        digito = Number(cedula.charAt(i)) * (i % 2 === 0 ? 1 : 2);
         // si la multiplicacion da de dos digitos se suman los numeros individuales
         if (digito > 9) {
-          digito = _.parseInt(digito.toString().charAt(0)) + _.parseInt(digito.toString().charAt(1));
+          digito = Number(digito.toString().charAt(0)) + Number(digito.toString().charAt(1));
         }
         suma += digito;
       }
@@ -357,7 +362,7 @@ export class fun extends CustomLodash {
   // _________________________________________________________________________________________________
   static capitalice(str) {
     const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
-    return fun.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
+    return fun.hasValue(str) ? str.substr(0, 1).toUpperCase() + str.substr(1, ultimosCaractes) : str;
   }
 
   // __________________________________________________________________________________________________
@@ -365,7 +370,7 @@ export class fun extends CustomLodash {
   // Descripcion : Esta poner en mayusculas un string
   // _________________________________________________________________________________________________
   static uppercase(str) {
-    return fun.hasValue(str) ? _.upperCase(str) : str;
+    return fun.hasValue(str) ? str.toUpperCase() : str;
   }
 
   // __________________________________________________________________________________________________
@@ -466,7 +471,7 @@ export class fun extends CustomLodash {
 
     for (let i = 0; i < params.length; i++) {
       const element = params[i];
-      jsonString = _.replace(jsonString, `"${element.old_key}"`, `"${element.new_key}"`);
+      jsonString = jsonString.replace(`"${element.old_key}"`, `"${element.new_key}"`);
     }
 
     return JSON.parse(jsonString);
@@ -620,7 +625,7 @@ export class fun extends CustomLodash {
 
   static decryptConfigPassword(str) {
     const str_remplace = btoa(str);
-    return str_remplace == _.replace(ConfigService.config.config_password, 'VMj$pt30r=', '=');
+    return str_remplace == ConfigService.config.config_password.replace('VMj$pt30r=', '=');
   }
   // ----------------------------------------------------------------------------------------------------------
 

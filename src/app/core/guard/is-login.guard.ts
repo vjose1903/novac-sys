@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { fun } from '../services/functions.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class IsLoginGuard implements CanActivate {
+export class IsLoginGuard  {
   constructor(public router: Router) {}
   canActivate(): boolean {
     const token = fun.getAuthToken();

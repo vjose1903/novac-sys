@@ -14,6 +14,5 @@ export interface viewerOptions {
   showZoomButtons?: boolean;
   showRotateButton?: boolean;
   enablePrint?: boolean;
-  useBrowserLocale?: boolean;
   textLayer?: boolean;
 }

@@ -80,7 +80,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     super();
   }
 
-
   ngOnInit(): void {
     Ss.http = this.http;
     Ss.zone = this.zone;
@@ -201,8 +200,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   ngOnDestroy(): void {
-    if(this.sub) this.sub.unsubscribe();
-    if(this.subModified) this.subModified.unsubscribe();
+    if (this.sub) this.sub.unsubscribe();
+    if (this.subModified) this.subModified.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -285,10 +284,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
         .sendTask(task)
         .then((config: ConfigI) => {
           if (fun.objHas(config, 'err')) {
+            console.error(config);
           } else {
             ThemeService.setTheme(config.color_app || 'green');
             ThemeService.setMode(config.mode_app || 'light');
-
+            
             ConfigService.setConfig = config;
             this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 

@@ -1,6 +1,7 @@
-<span *ngFor="let modalConfig of modalsConfig">
+@for (modalConfig of modalsConfig; track modalConfig.id) {
+<span>
+  @if (modalConfig) {
   <p-dialog
-    *ngIf="modalConfig"
     #myModal
     [id]="modalConfig.id"
     [header]="modalConfig.header"
@@ -20,30 +21,37 @@
     (onHide)="closeModal(modalConfig.id)"
   >
     <div [ngStyle]="{ height: modalConfig.height, width: modalConfig.width }" style="transition: all 0.5s">
-      <div *ngIf="modalConfig.html; else component" [innerHtml]="modalConfig.html"></div>
-      <ng-template #component>
-        <ng-container [appModal]="modalConfig.id"></ng-container>
-      </ng-template>
+      @if (modalConfig.html) {
+      <div [innerHtml]="modalConfig.html"></div>
+      } @else {
+      <ng-container [appModal]="modalConfig.id"></ng-container>
+      }
     </div>
 
-    <ng-template *ngIf="hasAnyBtn(modalConfig.id)" pTemplate="footer">
-      <div class="d-flex justify-content-end align-items-center mt-2">
-        <ng-container *ngFor="let dynamic_boton of modalConfig?.botones?.dinamico">
-          <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
-            <button [disabled]="buttonIsDisabled(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig.id, dynamic_boton)">
-              {{ dynamic_boton.label }}
-            </button>
-          </span>
-        </ng-container>
-
-        <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.cancelar)" tooltipPosition="top">
-          <button *ngIf="modalConfig?.botones?.cancelar?.show" class="btn btn-blanco" (click)="cancelarOrAceptar(modalConfig.id, 'cancelar')" [disabled]="buttonIsDisabled(modalConfig?.botones?.cancelar || false)">Cancelar</button>
+    @if (hasAnyBtn(modalConfig)) {
+    <ng-template pTemplate="footer">
+      <div class="d-flex justify-content-end align-items-center mt-2 gap-3">
+        @for (dynamic_boton of modalConfig?.botones?.dinamico; track dynamic_boton.btnId ) {
+        <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
+          <button [disabled]="buttonIsDisabled(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig, dynamic_boton)">
+            {{ dynamic_boton.label }}
+          </button>
         </span>
-
+        }
+        <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.cancelar)" tooltipPosition="top">
+          @if (modalConfig?.botones?.cancelar?.show) {
+          <button class="btn btn-blanco" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="buttonIsDisabled(modalConfig?.botones?.cancelar || false)">Cancelar</button>
+          }
+        </span>
         <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.aceptar)" tooltipPosition="top">
-          <button *ngIf="modalConfig?.botones?.aceptar?.show" class="btn btn-verde" (click)="cancelarOrAceptar(modalConfig.id, 'aceptar')" [disabled]="buttonIsDisabled(modalConfig?.botones?.aceptar || false)">Aceptar</button>
+          @if (modalConfig?.botones?.aceptar?.show) {
+          <button class="btn btn-verde" (click)="cancelarAndAceptar(true, modalConfig.id)" [disabled]="buttonIsDisabled(modalConfig?.botones?.aceptar || false)">Aceptar</button>
+          }
         </span>
       </div>
     </ng-template>
+    }
   </p-dialog>
+  }
 </span>
+}

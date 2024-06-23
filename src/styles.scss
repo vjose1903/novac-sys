@@ -1,31 +1,17 @@
-@import './assets/my_styles/global-font.scss';
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
 
-@import '../node_modules/@ng-select/ng-select/themes/default.theme.css';
 @import './animateCss.scss';
-
-@import './assets/my_styles/modal.scss';
-@import './assets/my_styles/tablas.scss';
-@import './assets/my_styles/p-treeTable.scss';
-@import './assets/my_styles/forms.scss';
-@import './assets/my_styles/btns.scss';
-@import './assets/my_styles/overlayPanel.scss';
-@import './assets/my_styles/inputs.scss';
-@import './assets/my_styles/height.scss';
-@import './assets/my_styles/p-calendar.scss';
-@import './assets/my_styles/p-tag.scss';
-@import './assets/my_styles/p-accordion.scss';
-@import './assets/my_styles/cards.scss';
-@import './assets/my_styles/rowFactura.scss';
-@import './assets/my_styles/text.scss';
-@import './assets/my_styles/gap.scss';
 @import './splash-styles.scss';
+@import './assets/my_styles/main.scss';
+
 
 .visually-hidden {
   display: none !important;
 }
 
 * {
-  font-family: 'global-font';
+  font-family: 'Poppins';
 }
 
 .h-inherit {
@@ -51,6 +37,10 @@
 
 .text-end {
   text-align: end;
+}
+
+.text-poppins {
+  font-family: 'Poppins' !important;
 }
 
 .ng-dropdown-panel {
@@ -506,85 +496,6 @@ img {
 }
 
 /* ====================================================== */
-/* TAB VIEW */
-/* ====================================================== */
-.my_tabView {
-  height: 100%;
-  display: grid;
-  grid-template-areas:
-    'p-tabview-nav-container'
-    'p-tabview-panels';
-
-  grid-template-rows: min-content auto;
-
-  &.back-light {
-    > .p-tabview-nav-container {
-      background: #8e8e8e32;
-
-      > .p-tabview-nav-content .p-tabview-nav li {
-        background: white;
-      }
-    }
-  }
-
-  & .p-tabview-nav li {
-    margin-right: 0 !important;
-    & .p-tabview-nav-link {
-      border: 1px solid #c8c8c8 !important;
-      border-color: #c8c8c866 !important;
-      background: transparent !important;
-      color: #a5a5a5 !important;
-      font-weight: 500;
-      padding: 0.5rem 2rem !important;
-      border-bottom: 2px solid #b6b6b6 !important;
-      &:focus {
-        box-shadow: 0 0 0 0rem transparent !important;
-      }
-    }
-
-    &.p-highlight .p-tabview-nav-link {
-      background: #007ad900 !important;
-      border-color: #c8c8c866 !important;
-      color: var(--primary07) !important;
-      font-weight: 700;
-      border-bottom: 2px solid var(--primary06) !important;
-    }
-  }
-
-  > .p-tabview-nav-container {
-    grid-area: p-tabview-nav-container;
-    > .p-tabview-nav-btn {
-      background: grey;
-      @include primengFocus;
-    }
-  }
-  > .p-tabview-panels {
-    grid-area: p-tabview-panels;
-    background-color: transparent !important;
-    border: 0px solid transparent !important;
-    height: 100%;
-    // overflow-y: auto;
-    > p-tabpanel {
-      height: 100%;
-      > .p-tabview-panel {
-        height: 100%;
-      }
-    }
-  }
-}
-
-.noTabView {
-  a {
-    pointer-events: all !important;
-    cursor: not-allowed !important;
-    color: #a0a0a088 !important;
-  }
-}
-
-.tabViewTootip {
-  z-index: 9999999999 !important;
-}
-/* ====================================================== */
 /* INPUT BUSCAR */
 /* ====================================================== */
 
@@ -749,10 +660,6 @@ Not supports in Firefox and IE */
   & .pagination-next > a:hover {
     color: var(--primary05) !important;
     cursor: pointer;
-  }
-
-  & .ngx-pagination {
-    margin-bottom: 0rem !important;
   }
 }
 

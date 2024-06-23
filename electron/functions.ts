@@ -1,18 +1,15 @@
-import * as zlib from 'zlib';
 import * as fs from 'fs';
 import { pathAdd } from '../main';
 import { BrowserWindow } from 'electron';
 
 export default class Functions {
   static encriptar(arg: string): string {
-    var arr = Buffer.from(arg);
-    var deflated = zlib.deflateSync(arr).toString('base64');
-    return deflated;
+    const base64String = btoa(unescape(encodeURIComponent(arg)));
+    return base64String;
   }
   static desEncriptar(arg: string): string {
-    var arr = Buffer.from(arg, 'base64');
-    var deflated = zlib.inflateSync(arr).toString('utf8');
-    return deflated;
+    const decodedString = decodeURIComponent(escape(atob(arg)));
+    return decodedString;
   }
 
   static getConfigFile() {

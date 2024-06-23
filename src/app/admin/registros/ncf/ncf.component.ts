@@ -1,9 +1,7 @@
 import { DateUtils } from './../../../core/typescript/date.utils';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import * as _ from 'lodash';
-
-import * as moment from '../../../core/javascript/moment';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
@@ -11,6 +9,8 @@ import { NcfC } from './ncf';
 import { fun } from '../../../core/services/functions.service';
 import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
+
+const moment = require('../../../core/javascript/moment');
 
 @Component({
   selector: 'app-ncf',
@@ -72,6 +72,8 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   tablaComponent;
   formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
 
+  htmlServ = inject(HtmlElementsService);
+
   constructor(private tServ: TablasService) {
     super();
   }
@@ -116,7 +118,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       for (let index = 0; index < temp_tipos_facturas.length; index++) {
         const tipo_factura_en_turno = temp_tipos_facturas[index];
         if (!tipo_factura_en_turno.referencia || tipo_factura_en_turno.referencia == '02' || tipo_factura_en_turno.referencia == '00') {
-          _.pullAt(temp_tipos_facturas, index);
+          fun.pullAt(temp_tipos_facturas, index);
         }
       }
 
@@ -145,7 +147,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           ncf.cantidad = ncf.hasta - ncf.desde + 1;
           ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].referencia;
           ncf.tipoC_ = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
-          ncf.codigo = _.padStart(ncf.id, 5, '0');
+          ncf.codigo = ncf.id.padStart(5, '0');
           ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
           ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
 

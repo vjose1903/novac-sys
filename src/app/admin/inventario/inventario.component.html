@@ -14,7 +14,9 @@
         <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
           <option value="0" disabled>Filtro por tipo de articulos</option>
           <option value="todos">Todos</option>
-          <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.codigo }}">{{ tipo.descripcion }}</option>
+          @for (tipo of tipo_articulos; track tipo.id) {
+            <option value="{{ tipo.codigo }}">{{ tipo.descripcion }}</option>
+          }
         </select>
 
         <div class="mr-3" style="margin-top: 0.2rem">

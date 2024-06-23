@@ -30,7 +30,7 @@
                             </label>
                           </div>
 
-                          <div *ngIf="doc_is_cedula" class="form-group" [appMsgError]="'cedula'" [form]="form">
+                          <div *ngIf="doc_is_cedula" class="form-group" appMsgError="cedula" [form]="form">
                             <div class="input-group d-flex" style="flex-wrap: nowrap">
                               <p-inputMask
                                 (keydown.enter)="saltar('campoNombre')"
@@ -45,14 +45,14 @@
                                 [autoClear]="false"
                               ></p-inputMask>
 
-                              <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append " pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
+                              <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                                 <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                               </div>
                             </div>
                             <span id="msgContainer"></span>
                           </div>
 
-                          <div *ngIf="!doc_is_cedula" class="form-group" [appMsgError]="'rnc'" [form]="form">
+                          <div *ngIf="!doc_is_cedula" class="form-group" appMsgError="rnc" [form]="form">
                             <div class="input-group d-flex" style="flex-wrap: nowrap">
                               <p-inputMask
                                 (keydown.enter)="saltar('campoNombre')"
@@ -75,16 +75,16 @@
                           </div>
                         </div>
                         <div class="pr-0 col-12">
-                          <div class="form-group" [appMsgError]="'nombre'" [form]="form">
+                          <div class="form-group" appMsgError="nombre" [form]="form">
                             <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                            <input id="campoNombre" [appCapitalice]="'formGroup'" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
+                            <input id="campoNombre" appCapitalice="formGroup" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
                             <span id="msgContainer"></span>
                           </div>
                         </div>
                         <div class="pr-0 col-12 mb-3">
-                          <div class="form-group" [appMsgError]="'apellido'" [form]="form">
+                          <div class="form-group" appMsgError="apellido" [form]="form">
                             <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                            <input id="campoApellido" [appCapitalice]="'formGroup'" (keydown.enter)="saltar('campoTelefono')" type="text" formControlName="apellido" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
+                            <input id="campoApellido" appCapitalice="formGroup" (keydown.enter)="saltar('campoTelefono')" type="text" formControlName="apellido" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
                             <span id="msgContainer"></span>
                           </div>
                         </div>
@@ -92,7 +92,7 @@
                     </div>
 
                     <div class="col-6 p-0 pr-2 mt-4">
-                      <div class="form-group" [appMsgError]="'telefono'" [form]="form">
+                      <div class="form-group" appMsgError="telefono" [form]="form">
                         <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
                         <p-inputMask
@@ -112,7 +112,7 @@
                     </div>
 
                     <div class="col-6 p-0 pl-2 mt-4">
-                      <div class="form-group" [appMsgError]="'sexo'" [form]="form">
+                      <div class="form-group" appMsgError="sexo" [form]="form">
                         <label class="control-label">Sexo: <span style="color: red">*</span></label>
                         <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
                           <option [value]="null" disabled>Sexo</option>
@@ -123,7 +123,7 @@
                       </div>
                     </div>
                     <div class="col-6 p-0 pr-2">
-                      <div class="form-group" [appMsgError]="'limite_credito'" [form]="form">
+                      <div class="form-group" appMsgError="limite_credito" [form]="form">
                         <label class="control-label">Dias credito: <span style="color: red">*</span></label>
                         <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
                           <option [value]="null" disabled>Seleccione</option>
@@ -135,7 +135,7 @@
                     </div>
 
                     <div class="col-6 p-0 pl-2">
-                      <div class="form-group" [appMsgError]="'maximo_credito'" [form]="form">
+                      <div class="form-group" appMsgError="maximo_credito" [form]="form">
                         <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
 
                         <input
@@ -153,7 +153,7 @@
                     </div>
 
                     <div class="col-6 p-0 pr-2">
-                      <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
+                      <div class="form-group" appMsgError="vendedor_id" [form]="form">
                         <label class="control-label">Vendedor: <span style="color: red">*</span></label>
                         <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
                           <option [value]="null" disabled>Seleccione</option>
@@ -164,9 +164,9 @@
                     </div>
 
                     <div class="col-12 p-0">
-                      <div class="form-group" [appMsgError]="'direccion'" [form]="form">
+                      <div class="form-group" appMsgError="direccion" [form]="form">
                         <label class="control-label">Direccion <span style="color: red">*</span></label>
-                        <textarea id="campoDir" [appCapitalice]="'formGroup'" formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
+                        <textarea id="campoDir" appCapitalice="formGroup" formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
                         <span id="msgContainer"></span>
                       </div>
                     </div>
@@ -192,7 +192,7 @@
                   </div>
                   <div>
                     <!-- <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button> -->
-                    <button class="btn btn-blanco"  id="btnCerrar" (click)="borrar(); isCreando = false">Cerrar</button>
+                    <button class="btn btn-blanco" id="btnCerrar" (click)="borrar(); isCreando = false">Cerrar</button>
                   </div>
                 </div>
               </div>

@@ -183,7 +183,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
             botones: {
               ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
-                { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
+                { clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
                 {
                   clase: 'btn btn-verde',
                   function: (instance) => {
@@ -199,6 +199,22 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         }
       })
       .catch(() => Ss.loadServ.isLoading.next(false));
+  }
+
+  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+    this.openNewModal({
+      id: obj.id,
+      header: obj.header,
+      width: obj.width || '30rem',
+      html: `<p> ${obj.texto} </p>`,
+      botones: {
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [
+          { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'SI', disable: false },
+        ],
+      },
+    });
   }
 
   imprimir_base64(fileName, base64, pageOrientation) {

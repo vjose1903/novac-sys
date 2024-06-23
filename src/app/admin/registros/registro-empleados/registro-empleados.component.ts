@@ -1,13 +1,12 @@
-import { DateUtils } from './../../../core/typescript/date.utils';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { FormEntidadCuentaContableI } from './../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { CategoriaEntidadContableC, entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import * as _ from 'lodash';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
 import { pattern } from '../../../core/typescript/constantes';
@@ -17,12 +16,12 @@ import { ChangePasswordComponent } from '../../components/formularios en modales
 import { fun } from '../../../core/services/functions.service';
 import { RolesC } from '../roles/roles';
 import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
-
 import { Permisos } from '../../../core/typescript/permisos';
 import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
-import { IModalConfiguration } from '../../components/modal/modal-class';
+import { ConfigureModalI } from '../../components/modal/modal-class';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
+
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -71,6 +70,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   maxDateBirth = new Date();
 
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.user;
+  htmlServ = inject(HtmlElementsService);
 
   configApp: ConfigI = ConfigService.config;
   maxSizeTypeE = maxSizeTypeE;
@@ -134,7 +134,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       this.listaEmpleados.length = 0;
       this.empleadosClass.getAll(extra).then((res) => {
         res['data'].map((empleado) => {
-          const doc = _.find(empleado.documentos_de_identidad, { principal: true });
+          const doc = empleado.documentos_de_identidad.find((doc) => doc.principal == true);
           empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
 
           return empleado;
@@ -180,7 +180,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
           .then((res) => {
             if (res['data'].length) {
-              const is_user = _.find(res['data'], (item) => item.persona_is === 'User');
+              const is_user = res['data'].find((item) => item.persona_is === 'User');
               const id_anterior = this.form.getRawValue().id;
               if (fun.hasValue(is_user) && is_user?.persona?.estado) {
                 fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
@@ -188,8 +188,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
                 return;
               }
 
-              const persona = fun.hasValue(is_user) ? is_user.persona : _.head(res['data']).persona;
-              const documento_persona = _.find(persona.documentos_de_identidad, (item) => item.principal);
+              const persona = fun.hasValue(is_user) ? is_user.persona : res['data'][0].persona;
+              const documento_persona = persona.documentos_de_identidad.find((item) => item.principal == true);
 
               if (fun.hasValue(documento_persona)) this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
 
@@ -209,7 +209,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
             console.error('err ', err);
           });
       } else {
-        if (!_.endsWith(cedula, '_')) {
+        if (!cedula.endsWith('_')) {
           this.documentos_de_identidad = undefined;
           // this.camposDisabled = true;
           this.changeStateCampos(false);
@@ -222,8 +222,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     const formulario = this.form.getRawValue();
     if (campo != 'send') {
       if (campo == 'campoNombre') {
-        if (!_.endsWith(formulario['cedula'], '_')) {
-          const docSinGuiones = _.join(_.split(formulario['cedula'], '-'), '');
+        if (!formulario['cedula'].endsWith('_')) {
+          const docSinGuiones = formulario['cedula'].split('-').join('');
           if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
         }
       } else fun.enfocarInput(campo);
@@ -317,7 +317,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.user, id_modal: 'categorias_empleados', inputs: { configsEntCuentas: this.listaConfigEmpleados }, openNewModal: this.openNewModal.bind(this) });
   }
 
-  onHideModal(modalConfig: IModalConfiguration) {
+  onHideModal(modalConfig: ConfigureModalI) {
     if (modalConfig.id == 'categorias_empleados') {
       this.categoriaEntidadServ.setCategoriaChange();
     }
@@ -405,7 +405,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     const documentos_identidad = [{ documento: formulario.cedula, descripcion: 'cedula' }];
 
     documentos_identidad.map((element) => {
-      const doc_backend = _.find(this.documentos_de_identidad, (doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+      const doc_backend = this.documentos_de_identidad.find((doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = true;
       return element;
@@ -414,7 +414,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     formulario.documentos_de_identidad = documentos_identidad;
     formulario.estado = true;
 
-    const objSend = _.omit(formulario, ['cedula']);
+    const objSend = fun.omit(formulario, ['cedula']);
 
     if (ConfigService.config.has_contabilidad) objSend['cuentas_contables'] = this.listaEntidadCuentasContables;
 

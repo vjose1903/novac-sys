@@ -1,10 +1,10 @@
 import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { modalsConfigurations, ModalService } from './modal.service';
+import { Subject, takeUntil } from 'rxjs';
+import { MODALCONFIG, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
 import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
-import { BtnTypeE, IModalConfiguration, IReturnData } from './modal-class';
+import { BtnTypeE, ConfigureModalI, IReturnData } from './modal-class';
 
 @Component({
   selector: 'app-new-modal',
@@ -16,9 +16,9 @@ export class NewModalComponent implements OnInit, OnDestroy {
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef, public mServ: ModalService) {}
 
-  subConfig: Subscription;
+  private destroy$ = new Subject<void>();
 
-  defaultModalConfig: IModalConfiguration = {
+  defaultModalConfig: ConfigureModalI = {
     show: false,
     component: undefined,
     width: '40rem',
@@ -27,12 +27,12 @@ export class NewModalComponent implements OnInit, OnDestroy {
     header: '',
     html: undefined,
     position: 'center',
-    componentInstance: undefined,
     closable: true,
     closableEsc: false,
     transitionOptions: '0ms',
     contentStyleClass: '0ms',
     botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
+
     returnDataFromModal: (arg?) => {},
 
     dismissModal: (modalId: string, dataToReturn?: IReturnData) => {
@@ -45,34 +45,45 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subConfig = modalsConfigurations.subscribe((res) => {
+    MODALCONFIG.pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res && res.show) {
         this.renderizarComponente(res);
       } else {
-        this.closeModal(res.id);
+        this.resetConfig(res.id, res.accion);
       }
     });
   }
 
   ngOnDestroy(): void {
-    if (this.subConfig) this.subConfig.unsubscribe();
+    if (this.destroy$) this.destroy$.next();
+    if (this.destroy$) this.destroy$.complete();
   }
 
-  findModalConfigById(modalId): IModalConfiguration {
-    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+  resetConfig(id_, accion) {
+    const modal = _.find(this.modalsConfig, (config) => config.id === id_);
+
+    const data = { modal: modal, accion: accion };
+
+    if (modal && typeof modal.onHide == 'function') modal.onHide(data);
+
+    this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
+  }
+
+  findModalConfigById(modalId): ConfigureModalI {
+    const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
     return modal;
   }
 
   closeModal(modalId, dataToReturn?: IReturnData) {
     if (dataToReturn) {
-      const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+      const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
       if (fun.hasValue(modal) && fun.hasValue(modal.returnDataFromModal)) modal.returnDataFromModal({ ...dataToReturn, modalId: modalId });
     }
     this.onHideModal(modalId);
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== modalId);
   }
 
-  handleConfig(config: IModalConfiguration) {
+  handleConfig(config: ConfigureModalI) {
     const modalConfig = config;
     modalConfig.dismissModal = this.defaultModalConfig.dismissModal;
     this.mServ.modalsConfig.push(modalConfig);
@@ -83,7 +94,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   changeModalConfig(array, modalId) {
-    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+    const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
 
     array.forEach((element) => {
       const key = _.keys(element)[0];
@@ -116,13 +127,13 @@ export class NewModalComponent implements OnInit, OnDestroy {
         componente['instance'].modalComponent = this;
         componente['instance'].modalComponent.id = config.id;
 
-        currentConfig.componentInstance = componente['instance'];
+        currentConfig['instance'] = componente['instance'];
       }, 1);
     }
   }
 
   changeStateButton(params: { modalId: string; btnId: string; disable: boolean }) {
-    const modal: IModalConfiguration = this.mServ.findModalConfigById(params.modalId);
+    const modal: ConfigureModalI = this.mServ.findModalConfigById(params.modalId);
     const botones = [];
 
     for (const key in modal.botones) {
@@ -156,28 +167,28 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   onHideModal(modalId) {
-    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+    const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
     if (modal && modal.onHideModal) modal.onHideModal(modal);
   }
 
-  cancelarOrAceptar(modalId, reason: 'aceptar' | 'cancelar') {
-    if (reason == 'cancelar') {
-      modalsConfigurations.next({ show: false, id: modalId });
+  cancelarOrAceptar(bool, id_, accion?) {
+    if (!bool) {
+      MODALCONFIG.next({ show: false, id: id_, accion: accion ? accion : 'cancelar' });
       return;
     }
 
-    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+    const modal = _.find(this.modalsConfig, (config) => config.id === id_);
 
-    if (modal.componentInstance && modal?.componentInstance?.btn_aceptar) {
-      modal.componentInstance.btn_aceptar();
+    if (modal['instance']) {
+      modal['instance'].btn_aceptar();
     } else {
-      const bool = reason == 'aceptar';
-      modal.dismissModal(modal.id, { bool: bool, inputs: modal.inputs, modalId: modal.id });
+      modal.returnDataFromModal({ bool: bool, inputs: modal.inputs, id: modal.id });
+      modal.closeModal(modal.id, 'aceptar');
     }
   }
 
   dynamicFunction(modalId, btnConfig) {
-    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+    const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
 
     if (fun.objHas(btnConfig, 'functioInOtherComponent')) modal['componentInstance'][btnConfig['functioInOtherComponent']]();
     else btnConfig['function'](modal);
@@ -188,7 +199,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   hasAnyBtn(modalId: any) {
-    const modal: IModalConfiguration = this.mServ.findModalConfigById(modalId);
+    const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
     const botones_show = modal?.botones?.aceptar?.show || modal?.botones?.cancelar?.show || modal?.botones?.dinamico;
     return botones_show;
   }

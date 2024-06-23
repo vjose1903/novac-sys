@@ -1,13 +1,11 @@
 import { DivisaService } from './../registros/divisa/divisa.service';
 import { LoaderService } from './../../core/services/loader.service';
 import { ConfigService } from './../../core/services/configuration.service';
-import { TiposFacturaC } from './../facturacion/factura';
+import { TiposFacturaC, actionFacturacion } from './../facturacion/factura';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
-import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
+import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { CuadreCajaC } from '../../core/typescript/cuadre_caja.utils';
 import { CurrentUserService } from '../../core/services/current-user.service';
@@ -41,7 +39,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   ready;
   // facturas_localStorage: any;
-  isHandset$: Observable<boolean>;
   activeIndex;
   initNavigate = true;
   cuadre_hoy;
@@ -54,7 +51,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   chequiando_cuadre: boolean;
   hasPermisosValidated: boolean;
-  currentYear: number;
 
   idsH5 = {
     factura: 'facturacionLabel',
@@ -69,10 +65,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     reportes: 'reporteLabel',
   };
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService, public divisaServ: DivisaService) {
+  actionFacturacion = actionFacturacion;
+  currentYear: number;
+
+  constructor(private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService, public divisaServ: DivisaService) {
     super();
 
-    this.subRouter = this.router.events.subscribe((routerEvent: Event) => {
+    this.subRouter = this.router.events.subscribe((routerEvent: Event | RouterEvent) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
         this.initNavigate = true;
@@ -172,7 +171,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.showLoading = true;
     this.imgUser = 'assets/img/transparente.png';
     this.noServer = false;
-    this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
     this.activeIndex = 0;
     this.currentYear = new Date().getFullYear();
     this.cuadre_hoy = false;

@@ -6,12 +6,14 @@
       tooltip="Factura no tiene recibos"
       headerStyleClass="{{ arrayHasData('recibos').disable ? 'noTabView' : '' }}"
       tooltipDisabled="true"
-      tooltipStyleClass="{{ arrayHasData('recibos').disable ? 'd-block' : 'd-none' }} tabViewTootip"
-      header="Recibos {{ !arrayHasData('recibos').disable ? '(' + arrayHasData('recibos').cant + ')' : '' }}"
+      tooltipStyleClass="{{ arrayHasData('abonos').disable ? 'd-block' : 'd-none' }} tabViewTootip"
+      header="Abonos {{ !arrayHasData('abonos').disable ? '(' + arrayHasData('abonos').cant + ')' : '' }}"
     >
-      <div *ngIf="show" class="d-flex h-100 w-100" #cardTablaRecibos id="cardTabla">
-        <dinamic-table [cardTabla]="cardTablaRecibos" [(data)]="inputs['recibos']" [(TablasComponent)]="tablaRecibosComponent" [config]="table_recibos_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      @if (show) {
+      <div class="d-flex h-100 w-100" #cardTablaPagos id="cardTabla">
+        <dinamic-table [cardTabla]="cardTablaPagos" [(data)]="inputs['abonos']" [(TablasComponent)]="tablaPagosComponent" [config]="table_pagos_config" (table_events)="handle_table_events($event)"></dinamic-table>
       </div>
+      }
     </p-tabPanel>
 
     <p-tabPanel
@@ -37,9 +39,11 @@
       tooltipStyleClass="{{ arrayHasData('notas').disable ? 'd-block' : 'd-none' }} tabViewTootip"
       header="Notas {{ !arrayHasData('notas').disable ? '(' + arrayHasData('notas').cant + ')' : '' }}"
     >
-      <div *ngIf="show" class="d-flex h-100 w-100" #cardTablaNota id="cardTablaNota">
+      @if (show) {
+      <div class="d-flex h-100 w-100" #cardTablaNota id="cardTablaNota">
         <dinamic-table [cardTabla]="cardTablaNota" [(data)]="inputs['notas']" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
       </div>
+      }
     </p-tabPanel>
   </p-tabView>
 </div>

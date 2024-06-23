@@ -10,5 +10,7 @@
     <i class="fa-solid fa-file-arrow-up icon"></i>
   </label>
 
-  <button *ngIf="src_img" pTooltip="Remover imagen" tooltipPosition="right" (click)="borrar($event)" class="btn px-1 my-0 py-0 ml-2" id="btn-gris"><i class="fas fa-eraser"></i></button>
+  @if (src_img) {
+    <button pTooltip="Remover imagen" tooltipPosition="right" (click)="borrar($event)" class="btn px-1 my-0 py-0 ml-2" id="btn-gris"><i class="fas fa-eraser"></i></button>
+  }
 </div>

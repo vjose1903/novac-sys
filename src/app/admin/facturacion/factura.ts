@@ -5,12 +5,59 @@ import { ModalHistorialPagosComponent } from './../components/formularios en mod
 import { CrudG } from '../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import { fun } from '../../core/services/functions.service';
+const moment = require('../../core/javascript/moment');
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { DateUtils } from '../../core/typescript/date.utils';
+import { serie } from '../../core/typescript/constantes';
+
+export enum comprobanteNormal {
+  valor_fiscal = '01',
+  factura_consumo = '02',
+  comprobante_compras = '11',
+  gastos_menores = '13',
+  comprobante_regimen_especiales = '14',
+  comprobante_gubernamental = '15',
+  comprobante_exportaciones = '16',
+  comprobantes_pago_exterior = '17',
+}
+
+export enum comprobanteElectronico {
+  valor_fiscal = '31',
+  factura_consumo = '32',
+  comprobante_compras = '41',
+  gastos_menores = '43',
+  comprobante_regimen_especiales = '44',
+  comprobante_gubernamental = '45',
+  comprobante_exportaciones = '46',
+  comprobantes_pago_exterior = '47',
+}
+
+export const comprobante = {
+  normal: {
+    valor_fiscal: comprobanteNormal.valor_fiscal,
+    factura_consumo: comprobanteNormal.factura_consumo,
+    comprobante_compras: comprobanteNormal.comprobante_compras,
+    gastos_menores: comprobanteNormal.gastos_menores,
+    comprobante_regimen_especiales: comprobanteNormal.comprobante_regimen_especiales,
+    comprobante_gubernamental: comprobanteNormal.comprobante_gubernamental,
+    comprobante_exportaciones: comprobanteNormal.comprobante_exportaciones,
+    comprobantes_pago_exterior: comprobanteNormal.comprobantes_pago_exterior,
+  },
+  electronica: {
+    valor_fiscal: comprobanteElectronico.valor_fiscal,
+    factura_consumo: comprobanteElectronico.factura_consumo,
+    comprobante_compras: comprobanteElectronico.comprobante_compras,
+    gastos_menores: comprobanteElectronico.gastos_menores,
+    comprobante_regimen_especiales: comprobanteElectronico.comprobante_regimen_especiales,
+    comprobante_gubernamental: comprobanteElectronico.comprobante_gubernamental,
+    comprobante_exportaciones: comprobanteElectronico.comprobante_exportaciones,
+    comprobantes_pago_exterior: comprobanteElectronico.comprobantes_pago_exterior,
+  },
+};
 
 export enum deleteDocumentosTypes {
   anular = 'anular',
@@ -26,9 +73,19 @@ export enum tipoDocFacturacion {
   nota_debito = 'nota_debito',
 }
 
+export enum tipoDocFacturacionLabel {
+  pre_venta = 'pre-venta',
+  venta = 'venta',
+  compra = 'compra',
+  cotizacion = 'cotización',
+  nota_credito = 'nota de crédito',
+  nota_debito = 'nota de débito',
+}
+
 export enum actionFacturacion {
   new = 'new',
   update = 'update',
+  duplicate = 'duplicate',
   bill_from_cotizacion = 'bill_from_cotizacion',
   bill_from_pre_venta = 'bill_from_pre_venta',
 }
@@ -43,10 +100,11 @@ export class FacturaC extends CrudG<FacturasI> {
       label: 'Seleccione el camión',
       formControl: 'vehiculo_id',
       items: [],
-      bindLabel: 'info_vehiculo',
-      bindValue: 'id',
+      optionLabel: 'info_vehiculo',
+      optionValue: 'id',
       searchFunction: FacturaC.getCamiones,
       blurFunction: FacturaC.cleanCamiones,
+      placeholder: 'Ingrese el nombre del camión',
       notFoundText: 'Camión no encontrado',
       disabledFunction: () => false,
       validators: Validators.required,
@@ -83,10 +141,12 @@ export class FacturaC extends CrudG<FacturasI> {
     FacturaC.inputsMovimientosViaje[0].items = [];
   }
 
-  static async getCamiones(event) {
-    if (fun.hasValue(event.term)) {
+  static async getCamiones(name) {
+    console.log('name ', name);
+
+    if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
-        const extra = { afterPath: `filtro/${event.term}`, parameters: { paginado: false, info_vehiculo: true } };
+        const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false, info_vehiculo: true } };
         new VehiculoC().getAll(extra).then((res) => {
           FacturaC.inputsMovimientosViaje[0].items = res['data'];
         });
@@ -225,7 +285,7 @@ export class FacturaC extends CrudG<FacturasI> {
       height: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
+        dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
       },
     };
   }
@@ -244,7 +304,7 @@ export class FacturaC extends CrudG<FacturasI> {
             width: '900px',
             botones: {
               ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
+              dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
             },
           };
 
@@ -329,6 +389,7 @@ export interface TipoFacturaI {
   id: number;
   descripcion: string;
   referencia: string;
+  serie: serie;
   updated_at: any;
   created_at: any;
 }

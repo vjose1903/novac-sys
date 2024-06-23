@@ -8,30 +8,30 @@
         <div class="form-group">
           <select id="filterKeyI" [(ngModel)]="filter_key" class="form-control inputE" (change)="selectFiltro()">
             <option [value]="null" selected disabled>Escoger tipo</option>
-            <option *ngFor="let tipo of tipos_filtro" [value]="tipo.key">{{ tipo.label }}</option>
+            @for (tipo of tipos_filtro; track $index) {
+              <option [value]="tipo.key">{{ tipo.label }}</option>
+            }
           </select>
         </div>
       </div>
 
       <div class="col-4">
         <!-- ================ CLIENTE  ================ -->
-        <ng-container *ngIf="filter_key == filter_options.cliente">
+        @if (filter_key == filter_options.cliente) {
           <p-dropdown
             #dropdownCliente
             inputId="valorI"
             [(ngModel)]="clienteSelected"
             [options]="listaClientes"
             [itemSize]="34"
-            styleClass="form-control inputE"
+            styleClass="custom inputE"
             [editable]="true"
             (onChange)="getClientes($event)"
             optionLabel="nombre_completo"
-            (onFocus)="dropdownCliente.show()"
-            (onclick)="dropdownCliente.focus(); dropdownCliente.show()"
+            (onFocus)="dropdownCliente.show(); dropdownCliente.focus()"
             emptyMessage="Escriba el nombre del cliente"
             [showClear]="true"
-            (onClear)="clearClienteFilter(); dropdownCliente.focus(); dropdownCliente.show()"
-
+            (onClear)="clearClienteFilter(); dropdownCliente.show(); dropdownCliente.focus()"
           >
             <ng-template let-cliente pTemplate="item">
               <div class="cliente-item">
@@ -40,33 +40,33 @@
               </div>
             </ng-template>
           </p-dropdown>
-
-          <!-- <input id="valorI" class="form-control inputE" [(ngModel)]="filter_value" (keydown.enter)="desenfocarValor()" (blur)="buscarDocumentos()" type="text" (focus)="$event.target.select()" placeholder="Nombre cliente" autocomplete="off" /> -->
-        </ng-container>
+        }
 
         <!-- ================ NUMERO DOCUMENTO  ================ -->
-        <ng-container *ngIf="filter_key == filter_options.numero_documento">
+        @if (filter_key == filter_options.numero_documento) {
           <p-inputMask
             inputId="valorI"
             [(ngModel)]="filter_value"
             styleClass="form-control inputE UPPERCASE"
             (keydown.enter)="desenfocarValor()"
-            class="w-100"
             (onBlur)="checkNumeroPreFactura()"
             mask="99999999"
             tabindex="-1"
             placeholder="________"
-            (onFocus)="$event.target.select()"
+            (onFocus)="htmlServ.selectValue($event)"
             [autoClear]="false"
           ></p-inputMask>
-        </ng-container>
+        }
       </div>
     </div>
   </div>
+  
   <div class="options_table">
     <div #cardTablaDcumentos id="cardTablaDcumentos" class="divContainerTabla">
       <div class="innerTablas">
-        <dinamic-table *ngIf="documentos.length" [cardTabla]="cardTablaDcumentos" [(data)]="documentos" [(TablasComponent)]="tablaComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        @if (documentos.length) {
+          <dinamic-table [cardTabla]="cardTablaDcumentos" [(data)]="documentos" [(TablasComponent)]="tablaComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        }
       </div>
     </div>
   </div>

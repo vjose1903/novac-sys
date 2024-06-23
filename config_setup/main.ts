@@ -36,7 +36,7 @@ let replace_in_file: ReplaceInFile;
 
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
-const appFilePath: any = url.format({ pathname: path.join(__dirname, 'dist/index.html'), protocol: 'file:', slashes: true });
+const appFilePath: any = url.format({ pathname: path.join(app.getAppPath(), 'dist', 'browser' ,'index.html'), protocol: 'file:', slashes: true });
 
 function createSplash(type = 'splash') {
   if (splash) {
@@ -46,9 +46,9 @@ function createSplash(type = 'splash') {
 
   splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
 
-  const splash_html = localFilePath(`${type}.html`);
+  const splashUrl = url.format({ pathname: path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`), protocol: 'file:', slashes: true, });
 
-  splash.loadURL(url.format({ pathname: path.join(__dirname, splash_html), protocol: 'file:', slashes: true }));
+  splash.loadURL(splashUrl);
   splash.center();
 
   if (type == 'splash') {
@@ -67,46 +67,47 @@ function createSplash(type = 'splash') {
 
 function createWindow() {
   return new Promise<BrowserWindow>(async (resolve, reject) => {
-    puts('  ');
-    puts('  ');
-    puts(' ::::: ========= PASANDO A CREAR LA VENTANA DEL SISTEMA ========= :::::');
-    puts('  ');
-    puts('  ');
-    puts(app.getVersion(), 'app.getVersion()');
-    const electronScreen = screen;
-    const size = electronScreen.getPrimaryDisplay().workAreaSize;
+    try {
+      writeLogs('  ');
+      writeLogs('  ');
+      writeLogs(' ::::: ========= PASANDO A CREAR LA VENTANA DEL SISTEMA ========= :::::');
+      writeLogs('  ');
+      writeLogs('  ');
+      writeLogs(app.getVersion(), 'app.getVersion()');
+      const electronScreen = screen;
+      const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
-    // Create the browser window.
-    win = new BrowserWindow({
-      width: size.width,
-      minWidth: size.width,
-      height: size.height,
-      minHeight: size.height,
-      icon: isMacOs() ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
-      webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
-    });
+      // Create the browser window.
+      win = new BrowserWindow({
+        width: size.width,
+        minWidth: size.width,
+        height: size.height,
+        minHeight: size.height,
+        icon: isMacOs() ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
+        webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
+      });
 
-    if (serve) {
-      win.webContents.openDevTools();
-      require('electron-reload')(__dirname, { electron: require(`${__dirname}/node_modules/electron`) });
+      if (serve) {
+        win.loadURL('http://localhost:$$PORT_APP$$');
+      } else {
+        win.loadURL(appFilePath);
+      }
 
-      win.loadURL('http://localhost:$$PORT_APP$$');
-    } else {
-      win.loadURL(appFilePath);
+      win.maximize();
+      win.setMenuBarVisibility(false);
+
+      setTimeout(() => {
+        if (serve) win.webContents.openDevTools();
+      }, 250);
+
+      // Emitted when the window is closed.
+      win.on('closed', (event) => (win = emptyWin));
+
+      resolve(win);
+    } catch (error) {
+      writeLogs(error, 'ERROR EJECUTANDO LA CARPETA PRINCIPAL')
+      console.error(error);
     }
-    
-    win.setFullScreen(true);
-    win.setMenuBarVisibility(false);
-    win.maximizable = false;
-
-    setTimeout(() => {
-      if (serve) win.webContents.openDevTools();
-    }, 250);
-
-    // Emitted when the window is closed.
-    win.on('closed', (event) => (win = emptyWin));
-
-    resolve(win);
   });
 }
 
@@ -132,6 +133,7 @@ function isMacOs() {
 function getConfig(): Promise<ConfigI> {
   return new Promise<any>(async (resolve, reject) => {
     const confTemp = (await Functions.getConfigFile()) as any;
+
     const conf: ConfigI = JSON.parse(confTemp);
     resolve(conf);
   });
@@ -155,7 +157,7 @@ function beforeCreateSplash(splash) {
   return new Promise<any>(async (resolve, reject) => {
     // -------- borrar el archivo de logs --------
     borrarLogs().then(async () => {
-      puts(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
+      writeLogs(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
       // ----------- inicializando docker handler --------------
       docker_handler = new DockerHandler();
@@ -167,7 +169,7 @@ function beforeCreateSplash(splash) {
             const serve_ = await getServer_();
 
             // ----------- correr base de datos local --------------
-            puts(conf.is_db_local, 'conf.is_db_local ');
+            writeLogs(conf.is_db_local, 'conf.is_db_local ');
 
             if (conf.is_db_local) {
               docker_handler
@@ -193,7 +195,7 @@ function beforeCreateSplash(splash) {
 function continuarCargandoArchivos(resolve) {
   // -------------- remplazar en archivos ----------------
   replace_in_file = new ReplaceInFile();
-  puts(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+  writeLogs(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
   setTimeout(() => resolve(true), 2000);
 }
 
@@ -201,13 +203,14 @@ function continuarCargandoArchivos(resolve) {
 // Handle angular events
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-function beforeCreateWindow(win) {
+async function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
+  const serve_ = await getServer_();
 
-  setTimeout(() => {
-    puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
-    auto_updater = new AppUpdater(win);
-  }, 2000);
+  if (!serve_) {
+    writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
+    setTimeout(() => (auto_updater = new AppUpdater(win)), 2000);
+  }
   // ---------------------------------------
 }
 
@@ -228,7 +231,7 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case KEYWORD_ELECTRON_RELOAD:
-        puts('RECARGANDO ELECTRON');
+        writeLogs('RECARGANDO ELECTRON');
         win.reload();
         if (!serve) win.loadURL(appFilePath);
       //
@@ -261,7 +264,7 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case KEYWORD_ELECTRON_PRINT_BASE64:
-        puts('INICIANDOO PROCESO DE IMPRESION');
+        writeLogs('INICIANDOO PROCESO DE IMPRESION');
         const oPdf = JSON.parse(arg.data);
 
         const base64 = oPdf.base64;
@@ -305,7 +308,9 @@ async function handleEvent(event: any, obj: string) {
         event.reply(KEYWORD_ELECTRON_RESPONSE);
         break;
     }
-  } catch (error) {}
+  } catch (error) {
+    writeLogs(error, 'HANDLE ECENT ERROR ')
+  }
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -327,7 +332,6 @@ function getActualGitUser() {
 }
 
 async function getPrinters() {
-
   const printerPromise = await win.webContents.getPrintersAsync();
   const printers_list = printerPromise.map((item) => item.name);
   return printers_list;
@@ -338,21 +342,21 @@ async function getPrinters() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getConfigFile() {
   return new Promise(async (resolve, reject) => {
-    const serve_ = await getServer_();
-    const pjson = require('./package.json');
+    try {
+      const serve_ = await getServer_();
+      const pjson = require('./package.json');
+      const config = await getConfig();
 
-    Functions.getConfigFile()
-      .then(async (config: any) => {
-        var config = JSON.parse(config);
-        const printer_list = await getPrinters();
-        config['is_development'] = serve_;
-        config['gitUser'] = await getActualGitUser();
-        config['printersList'] = ['Ninguna', ...printer_list];
-        config['app_version'] = pjson.version;
+      const printer_list = await getPrinters();
+      config['is_development'] = serve_;
+      config['gitUser'] = await getActualGitUser();
+      config['printersList'] = ['Ninguna', ...printer_list];
+      config['app_version'] = pjson.version;
 
-        resolve(config);
-      })
-      .catch((err) => reject({ err: err, msg: 'Error buscando el archivo de configuracion' }));
+      resolve(config);
+    } catch (error) {
+      reject({ err: error, msg: 'Error buscando el archivo de configuracion' });
+    }
   });
 }
 
@@ -382,7 +386,7 @@ function borrarLogs() {
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export function cmd(command, callback = (arg) => {}) {
-  puts(command, 'comando realizado en la funcion cmd');
+  writeLogs(command, 'comando realizado en la funcion cmd');
 
   exec(command, (error, stdout, stderr) => {
     let obj;
@@ -401,7 +405,7 @@ export function cmd(command, callback = (arg) => {}) {
 // FUNCION QUE SE ENCARGA DE VERIFICAR SI EL ARCHIVO LOG EXISTE
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-export async function puts(msg, titulo?) {
+export async function writeLogs(msg, titulo?) {
   // cmd('ls');
   if (win || splash) {
     const fs = require('fs');
@@ -467,7 +471,7 @@ function imprimir(params: { fileName: string; tipo: string; pageOrientation: str
   return new Promise(async (resolve, reject) => {
     const file_path = await pathAdd(`/${params.fileName}`);
 
-    puts(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
+    writeLogs(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
     let comando = '';
 
     if (isMacOs()) {
@@ -486,11 +490,6 @@ function imprimir(params: { fileName: string; tipo: string; pageOrientation: str
       else reject({ msg: 'Error imprimiento PDF!!', status: 'no', err: res });
     });
   });
-}
-
-function localFilePath(path) {
-  const local_path = serve ? `src/${path}` : `dist/${path}`;
-  return local_path;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

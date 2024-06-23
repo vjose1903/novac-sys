@@ -7,10 +7,10 @@ export class BuscarFacturaC {
         { titulo: '1', tipo: tableCellType.icon, key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
         { titulo: 'No. Factura', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '7rem' }] },
         { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipo_factura' },
-        { titulo: 'Comprobante', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+        { titulo: 'Comprobante', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '9rem' }] },
         { titulo: 'Condición', tipo: tableCellType.text, key: 'condicion', estilos: [{ width: '6rem' }] },
-        { titulo: 'Fecha Facturación', tipo: tableCellType.date, key: 'fecha_equivalente' },
-        { titulo: 'Fecha Vencimiento', tipo: tableCellType.text, text_color: 'colorFechaV', key: 'fechaV' },
+        { titulo: 'Fecha Facturación', tipo: tableCellType.date, key: 'fecha_equivalente', estilos: [{ width: '6.5rem' }] },
+        { titulo: 'Fecha Vencimiento', tipo: tableCellType.text, text_color: 'colorFechaV', key: 'fechaV', estilos: [{ width: '6.5rem' }] },
         { titulo: 'Total facturado', tipo: tableCellType.formatoNumero, key: 'total_factura' },
         { titulo: 'Balance factura', tipo: tableCellType.formatoNumero, key: 'balance' },
         {
@@ -48,9 +48,9 @@ export class BuscarFacturaC {
         { titulo: '1', tipo: tableCellType.icon, key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
         { titulo: 'No. Factura', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '7rem' }] },
         { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipo_factura' },
-        { titulo: 'Comprobante', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+        { titulo: 'Comprobante', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '9rem' }] },
         { titulo: 'Condición', tipo: tableCellType.text, key: 'condicion', estilos: [{ width: '6rem' }] },
-        { titulo: 'Fecha ingreso', tipo: tableCellType.date, key: 'fecha_equivalente' },
+        { titulo: 'Fecha ingreso', tipo: tableCellType.date, key: 'fecha_equivalente', estilos: [{ width: '6.5rem' }] },
         { titulo: 'Fecha Vencimiento', tipo: tableCellType.text, key: 'fechaV', text_color: 'colorFechaV' },
         { titulo: 'Total facturado', tipo: tableCellType.formatoNumero, key: 'total_factura' },
         { titulo: 'Balance factura', tipo: tableCellType.formatoNumero, key: 'balance' },
@@ -104,8 +104,8 @@ export class BuscarFacturaC {
     cotizacion: {
       info: [
         { titulo: '1', tipo: tableCellType.icon, key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
-        { titulo: 'No. Cotización', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '7rem' }] },
-        { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente' },
+        { titulo: 'No. Cotización', tipo: tableCellType.text, key: 'secuencia', estilos: [{ width: '9rem' }] },
+        { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', estilos: [{ width: '6.5rem' }] },
         { titulo: 'Cliente', tipo: tableCellType.text, key: 'cliente.nombre' },
         { titulo: 'Total cotizado', tipo: tableCellType.formatoNumero, key: 'total_factura' },
         {

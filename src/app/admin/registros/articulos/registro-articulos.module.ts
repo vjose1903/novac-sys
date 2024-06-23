@@ -10,7 +10,6 @@ import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
-import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
@@ -19,6 +18,6 @@ import { SubTipoArticuloComponent } from './tipo-articulo/sub-tipo-articulo/sub-
 
 @NgModule({
   declarations: [RegistroArticulosComponent, ConfigArticulosComponent, TipoArticuloComponent, SubTipoArticuloComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, EntidadCuentaContableModule],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, EntidadCuentaContableModule],
 })
 export class RegistroArticulosModule {}

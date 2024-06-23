@@ -1,6 +1,6 @@
 import { ConfigI } from './../src/app/core/typescript/config-interface';
 import * as fs from 'fs';
-import { pathAdd, puts } from '../main';
+import { pathAdd, writeLogs } from '../main';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
 
@@ -29,6 +29,7 @@ export default class HandlerConfigFile {
     can_pagar: false,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
+    facturacion_electronica: false,
     medida_producto_terminado: 'Producto',
 
     printer_selected: {
@@ -73,7 +74,7 @@ export default class HandlerConfigFile {
       const existe_archivo_config = fs.existsSync(config_path);
 
       setTimeout(() => {
-        puts(existe_archivo_config, ':::::::: existe_archivo_config');
+        writeLogs(existe_archivo_config, ':::::::: existe_archivo_config');
 
         if (!existe_archivo_config) {
           Functions.setConfigFile(JSON.stringify(this.default_config))
@@ -81,7 +82,7 @@ export default class HandlerConfigFile {
               console.log(' ');
               console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
               console.log(' ');
-              puts('------ ARCHIVO DE CONFIGURACION CREADO ------');
+              writeLogs('------ ARCHIVO DE CONFIGURACION CREADO ------');
 
               setTimeout(() => resolve(true), 500);
             })

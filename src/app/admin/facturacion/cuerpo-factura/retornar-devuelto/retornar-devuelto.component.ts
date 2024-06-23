@@ -1,10 +1,12 @@
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
 import { tableCellType, table_config } from './../../../components/new_tablas/tabla-class';
 import { fun } from './../../../../core/services/functions.service';
-import { IModalConfiguration, ModalComponentI, ModalI } from './../../../components/modal/modal-class';
-import { Component, DoCheck, OnInit } from '@angular/core';
+import { ModalI, ModalComponentI } from './../../../components/modal/modal-class';
+import { Component, DoCheck, OnInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { ModalService } from 'src/app/admin/components/modal/modal.service';
 
 @Component({
   selector: 'app-retornar-devuelto',
@@ -12,10 +14,10 @@ import { UntypedFormBuilder, Validators } from '@angular/forms';
   styleUrls: ['./retornar-devuelto.component.scss'],
 })
 export class RetornarDevueltoComponent extends MixinClass implements OnInit, ModalI, DoCheck {
-  constructor(private fb: UntypedFormBuilder) {
+  constructor(private fb: UntypedFormBuilder, public mServ: ModalService) {
     super();
   }
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: any;
 
   form;
@@ -36,6 +38,8 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   articuloSelected;
 
   tablaComponent;
+
+  htmlServ = inject(HtmlElementsService);
 
   ngOnInit() {
     this.createForm();
@@ -104,7 +108,8 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   }
 
   btnAceptarIsDisabled() {
-    const modal = _.find(this.modalComponent.modalsConfig, (config) => config.id === this.modalComponent.id);
+    const modal = this.mServ.findModalConfigById(this.modalComponent.component_id);
+
     const aceptar_btn = modal.botones.aceptar;
     const formulario = this.form.getRawValue();
     const valores = [formulario.solo_devuelto, formulario.defectuoso, formulario.devuelto];

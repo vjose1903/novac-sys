@@ -1,15 +1,17 @@
 import { ConfigService } from './../../core/services/configuration.service';
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { HtmlElementsService } from './../../core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../core/typescript/MixinClass';
 import { TablasService } from '../components/new_tablas/tablas.service';
 import { ArticuloC } from '../registros/articulos/articulo';
 import { tipos_articulos } from '../registros/articulos/tipo-articulo/tipo-articulo';
 import { ProduccionC } from './produccion';
-import * as $ from 'jquery';
+
 import { fun } from '../../core/services/functions.service';
 import { medidas, tableCellType, table_config } from '../components/new_tablas/tabla-class';
 import { ModalClass } from '../components/modal/modal-class';
+const $ = require('jquery');
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
@@ -36,7 +38,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     ],
     colores: true,
     id_tabla: 'lista_produccion',
-    obj_paginate: { show: true, showTotal: true,  is_local: true },
+    obj_paginate: { show: true, showTotal: true, is_local: true },
     botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
   };
   tablaComponent;
@@ -45,6 +47,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   articuloEditando: any;
   articuloClass = new ArticuloC();
   produccionClass = new ProduccionC();
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private tServ: TablasService) {
     super();
@@ -90,7 +94,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async getIngredients() {
-    this.ingredientes = _.orderBy(this.producto_terminado_en_turno.formulas_productos_terminados, ['articulo_combo_id'], ['asc']);
+    this.ingredientes = this.producto_terminado_en_turno.formulas_productos_terminados.sort((a, b) => fun.compare(a, b, 'articulo_combo_id', 'asc'));
     this.ingredientesParaProduccion.length = 0;
     [this.cantidad_producir, this.medida_producir] = Array(2).fill(null);
   }
@@ -219,14 +223,14 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
         if (this.lista_produccion.length > 0) {
           const all_ingredientes = _.flattenDeep(
-            _.map(this.lista_produccion, (producto) => {
+            this.lista_produccion.map((producto) => {
               const producto_distinto_en_lista = producto.articulo_id != ingrediente.articulo_id ? fun.getProperty(producto, 'ingredientes') : [];
               return producto_distinto_en_lista;
             }),
           );
           const ingredientesIguales = all_ingredientes.filter((item) => item.articulo_combo_id == ingrediente.articulo_combo_id);
 
-          if (ingredientesIguales.length) cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
+          if (ingredientesIguales.length) cantidad_calculada = ingredientesIguales.reduce((acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
         }
 
         const extra = { afterPath: `check_excede/${ingrediente.articulo_combo_id}`, parameters: { cantidad: cantidad_calculada } };
@@ -249,7 +253,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
               cantidad_en_unidades: contenido_a_producir[ingrediente.medida],
               medida: ingrediente.medida,
             });
-            this.ingredientesParaProduccion = _.orderBy(this.ingredientesParaProduccion, ['articulo_combo_id'], ['asc']);
+            this.ingredientesParaProduccion = this.ingredientesParaProduccion.sort((a, b) => fun.compare(a, b, 'articulo_combo_id', 'asc'));
           }
         });
       });
@@ -345,13 +349,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => functions[tipo](instance, data),
-            label: 'SI',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
+          { clase: 'btn btn-verde', function: (instance) => functions[tipo](instance, data), label: 'SI', disable: false },
         ],
       },
     });

@@ -1,205 +1,220 @@
-<div id="fondoC" *ngIf="noServer" class="h-100 w-100 position-absolute backnegro">
-  <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
-</div>
+@if (noServer) {
+  <div id="fondoC" class="h-100 w-100 position-absolute backnegro">
+    <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
+  </div>
+}
 
 <div class="fantasma">
-  <div *ngIf="hasPermisosValidated" class="layout">
-    <div class="menu">
-      <div class="title">
-        <span class="titulo" (click)="cambiarMenu({ url: 'dashboard', navigate: true })">Menu</span>
-      </div>
+  @if (hasPermisosValidated) {
+    <div class="layout">
+      <div class="menu">
+        <div class="title">
+          <span class="titulo" (click)="cambiarMenu({ url: 'dashboard', navigate: true })">Menu</span>
+        </div>
+        <div class="sideBar">
+          <div class="menuContent">
+            <!-- FACTURACION -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.facturacion.flatt" class="menuList">
+              <h5 [id]="idsH5.factura" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('factura') }" [innerText]="'Facturación'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('factura') }" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu({ url: 'factura', navigate: false, id_h5: idsH5.factura })" draggable="false" />
 
-      <div class="sideBar">
-        <div class="menuContent">
-          <div *ngxPermissionsOnly="menuPermissionsObj.facturacion.flatt" class="menuList">
-            <h5 [id]="idsH5.factura" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('factura') }" [innerText]="'Facturación'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('factura') }" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu({ url: 'factura', navigate: false, id_h5: 'facturacionLabel' })" draggable="false" />
+              <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('factura') }">
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.pre_venta" [ngClass]="{ activa: getLayoutActiveRoute('pre_venta', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/pre_venta/new/0', navigate: true })">
+                  Pre-Venta
+                </h4>
 
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('factura') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.pre_venta" [ngClass]="{ activa: getLayoutActiveRoute('pre_venta', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/pre_venta/new/0', navigate: true })">
-                Pre-Venta
-              </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.facturacion.venta"
-                [ngClass]="{ activa: getLayoutActiveRoute('venta', ['new', 'update', 'bill_from_cotizacion', 'bill_from_pre_venta']) }"
-                (click)="cambiarMenu({ url: 'factura/venta/new/0', navigate: true })"
-              >
-                Venta
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.compra" [ngClass]="{ activa: getLayoutActiveRoute('compra', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/compra/new/0', navigate: true })">Compra</h4>
+                <h4
+                  class="opcion"
+                  *ngxPermissionsOnly="menuPermissionsObj.facturacion.venta"
+                  [ngClass]="{ activa: getLayoutActiveRoute('venta', [actionFacturacion.new, actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta]) }"
+                  (click)="cambiarMenu({ url: 'factura/venta/new/0', navigate: true })"
+                >
+                  Venta
+                </h4>
 
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.cotizacion" [ngClass]="{ activa: getLayoutActiveRoute('cotizacion', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/cotizacion/new/0', navigate: true })">
-                Cotización
-              </h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.compra" [ngClass]="{ activa: getLayoutActiveRoute('compra', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/compra/new/0', navigate: true })">Compra</h4>
+
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.cotizacion" [ngClass]="{ activa: getLayoutActiveRoute('cotizacion', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/cotizacion/new/0', navigate: true })">
+                  Cotización
+                </h4>
+              </div>
             </div>
-          </div>
 
-          <div *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.flatt" class="menuList">
-            <h5 [id]="idsH5.manipular" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('manipular') }" [innerText]="'Manipular\ndocumentos'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('manipular') }" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu({ url: 'manipular', navigate: false, id_h5: 'manipularLabel' })" draggable="false" />
-
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('manipular') }">
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.notaCredito"
-                [ngClass]="{ activa: actualRuta == 'buscarFactura/nota_credito' }"
-                (click)="cambiarMenu({ url: 'manipular/buscarFactura/nota_credito', navigate: true })"
-              >
-                Nota de Crédito
-              </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.notaDebito"
-                [ngClass]="{ activa: actualRuta == 'buscarFactura/nota_debito' }"
-                (click)="cambiarMenu({ url: 'manipular/buscarFactura/nota_debito', navigate: true })"
-              >
-                Nota de Débito
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.vizualizar" [ngClass]="{ activa: actualRuta == 'buscarFactura/solo_ver' }" (click)="cambiarMenu({ url: 'manipular/buscarFactura/solo_ver', navigate: true })">
-                Visualizar
-              </h4>
+            <!-- MANIPULAR DOCUMENTOS -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.flatt" class="menuList">
+              <h5 [id]="idsH5.manipular" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('manipular') }" [innerText]="'Manipular\ndocumentos'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('manipular') }" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu({ url: 'manipular', navigate: false, id_h5: idsH5.manipular })" draggable="false" />
+              
+              <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('manipular') }">
+                <h4
+                  class="opcion"
+                  *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.notaCredito"
+                  [ngClass]="{ activa: actualRuta == 'buscarFactura/nota_credito' }"
+                  (click)="cambiarMenu({ url: 'manipular/buscarFactura/nota_credito', navigate: true })"
+                >
+                  Nota de Crédito
+                </h4>
+                <h4
+                  class="opcion"
+                  *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.notaDebito"
+                  [ngClass]="{ activa: actualRuta == 'buscarFactura/nota_debito' }"
+                  (click)="cambiarMenu({ url: 'manipular/buscarFactura/nota_debito', navigate: true })"
+                  >
+                  Nota de Débito
+                </h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.vizualizar" [ngClass]="{ activa: actualRuta == 'buscarFactura/solo_ver' }" (click)="cambiarMenu({ url: 'manipular/buscarFactura/solo_ver', navigate: true })">
+                  Visualizar
+                </h4>
+              </div>
             </div>
-          </div>
 
-          <div *ngxPermissionsOnly="menuPermissionsObj.pagos.flatt" class="menuList">
-            <h5 [id]="idsH5.pagos" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('pagos') }" [innerText]="'Pagos'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('pagos') }" src="assets/img/reciboIngreso.png" alt="Pagos" (click)="cambiarMenu({ url: 'pagos', navigate: false, id_h5: 'pagosLabel' })" draggable="false" />
-
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('pagos') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos" [ngClass]="{ activa: actualRuta == 'lista_pagos/recibo_ingreso' }" (click)="cambiarMenu({ url: 'pagos/lista_pagos/recibo_ingreso', navigate: true })">
-                Recibos de ingreso
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.pagos.cuentasPagar" [ngClass]="{ activa: actualRuta == 'lista_pagos/pago_factura' }" (click)="cambiarMenu({ url: 'pagos/lista_pagos/pago_factura', navigate: true })">
-                Pago de facturas
-              </h4>
+            <!-- PAGOS -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.pagos.flatt" class="menuList">
+              <h5 [id]="idsH5.pagos" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('pagos') }" [innerText]="'Pagos'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('pagos') }" src="assets/img/reciboIngreso.png" alt="Pagos" (click)="cambiarMenu({ url: 'pagos', navigate: false, id_h5: idsH5.pagos })" draggable="false" />
+              
+              <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('pagos') }">
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos" [ngClass]="{ activa: actualRuta == 'lista_pagos/recibo_ingreso' }" (click)="cambiarMenu({ url: 'pagos/lista_pagos/recibo_ingreso', navigate: true })">
+                  Recibos de ingreso
+                </h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.pagos.cuentasPagar" [ngClass]="{ activa: actualRuta == 'lista_pagos/pago_factura' }" (click)="cambiarMenu({ url: 'pagos/lista_pagos/pago_factura', navigate: true })">
+                  Pago de facturas
+                </h4>
+              </div>
             </div>
-          </div>
-
-          <div *ngxPermissionsOnly="menuPermissionsObj.recibos_viajes.viajes" class="menuList">
-            <h5 [id]="idsH5.viajes" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('viajes') }" [innerText]="'Pedidos'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('viajes') }" src="assets/img/viaje.png" alt="Viajes" (click)="cambiarMenu({ url: 'viajes/viajes/0', navigate: true, id_h5: 'pedidosLabel' })" draggable="false" />
-          </div>
-
-          <div *ngxPermissionsOnly="menuPermissionsObj.conduce.flatt" class="menuList">
-            <h5 [id]="idsH5.conduce" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('conduce') }" [innerText]="'Conduce'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('conduce') }" src="assets/img/conduce.png" alt="Facturacion" (click)="cambiarMenu({ url: 'conduce/lista', navigate: true, id_h5: 'conduceLabel' })" draggable="false" />
-          </div>
-
-          <div *ngxPermissionsOnly="menuPermissionsObj.registro.flatt" class="menuList">
-            <h5 [id]="idsH5.registros" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('registros') }" [innerText]="'Registros'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('registros') }" src="assets/img/registro.png" alt="Registros" (click)="cambiarMenu({ url: 'registros', navigate: false, id_h5: 'registroLabel' })" draggable="false" />
-
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('registros') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.user" [ngClass]="{ activa: actualRuta == 'empleados' }" (click)="cambiarMenu({ url: 'registros/empleados', navigate: true })">Empleados</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.clientes" [ngClass]="{ activa: actualRuta == 'clientes' }" (click)="cambiarMenu({ url: 'registros/clientes', navigate: true })">Clientes</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.suplidores" [ngClass]="{ activa: actualRuta == 'suplidores' }" (click)="cambiarMenu({ url: 'registros/suplidores', navigate: true })">Suplidores</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.articulos" [ngClass]="{ activa: actualRuta == 'articulos' }" (click)="cambiarMenu({ url: 'registros/articulos', navigate: true })">Articulos</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.camiones" [ngClass]="{ activa: actualRuta == 'camiones' }" (click)="cambiarMenu({ url: 'registros/camiones', navigate: true })">Camiones</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.roles" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'registros/roles', navigate: true })">Roles</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.ncf" [ngClass]="{ activa: actualRuta == 'ncf' }" (click)="cambiarMenu({ url: 'registros/ncf', navigate: true })">NCF</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.periodo_fiscal" [ngClass]="{ activa: actualRuta == 'periodo_fiscal' }" (click)="cambiarMenu({ url: 'registros/periodo_fiscal', navigate: true })">Periodos Fiscales</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.divisa" [ngClass]="{ activa: actualRuta == 'divisa' }" (click)="cambiarMenu({ url: 'registros/divisa', navigate: true })">Divisas</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.banco" [ngClass]="{ activa: actualRuta == 'banco' }" (click)="cambiarMenu({ url: 'registros/banco', navigate: true })">Bancos</h4>
+            
+            <!-- PEDIDOS -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.recibos_viajes.viajes" class="menuList">
+              <h5 [id]="idsH5.viajes" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('viajes') }" [innerText]="'Pedidos'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('viajes') }" src="assets/img/viaje.png" alt="Viajes" (click)="cambiarMenu({ url: 'viajes/viajes/0', navigate: true, id_h5: 'pedidosLabel' })" draggable="false" />
             </div>
-          </div>
 
-          <div *ngxPermissionsOnly="menuPermissionsObj.produccion.flatt" class="menuList">
-            <h5 [id]="idsH5.produccion" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('produccion') }" [innerText]="'Producción'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('produccion') }" src="assets/img/produccion.png" alt="Producción" (click)="cambiarMenu({ url: 'produccion', navigate: true, id_h5: 'produccionLabel' })" draggable="false" />
-          </div>
+            <!-- CONDUCE -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.conduce.flatt" class="menuList">
+              <h5 [id]="idsH5.conduce" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('conduce') }" [innerText]="'Conduce'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('conduce') }" src="assets/img/conduce.png" alt="Facturacion" (click)="cambiarMenu({ url: 'conduce/lista', navigate: true, id_h5: 'conduceLabel' })" draggable="false" />
+            </div>
 
-          <div *ngxPermissionsOnly="menuPermissionsObj.inventario.flatt" class="menuList">
-            <h5 [id]="idsH5.inventario" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('inventario') }" [innerText]="'Inventario'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('inventario') }" src="assets/img/inventario.png" alt="Inventario" (click)="cambiarMenu({ url: 'inventario', navigate: true, id_h5: 'inventarioLabel' })" draggable="false" />
-          </div>
+            <!-- REGISTROS -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.registro.flatt" class="menuList">
+              <h5 [id]="idsH5.registros" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('registros') }" [innerText]="'Registros'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('registros') }" src="assets/img/registro.png" alt="Registros" (click)="cambiarMenu({ url: 'registros', navigate: false, id_h5: idsH5.registros })" draggable="false" />
+              
+              <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('registros') }">
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.user" [ngClass]="{ activa: actualRuta == 'empleados' }" (click)="cambiarMenu({ url: 'registros/empleados', navigate: true })">Empleados</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.clientes" [ngClass]="{ activa: actualRuta == 'clientes' }" (click)="cambiarMenu({ url: 'registros/clientes', navigate: true })">Clientes</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.suplidores" [ngClass]="{ activa: actualRuta == 'suplidores' }" (click)="cambiarMenu({ url: 'registros/suplidores', navigate: true })">Suplidores</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.articulos" [ngClass]="{ activa: actualRuta == 'articulos' }" (click)="cambiarMenu({ url: 'registros/articulos', navigate: true })">Articulos</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.camiones" [ngClass]="{ activa: actualRuta == 'camiones' }" (click)="cambiarMenu({ url: 'registros/camiones', navigate: true })">Camiones</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.roles" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'registros/roles', navigate: true })">Roles</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.ncf" [ngClass]="{ activa: actualRuta == 'ncf' }" (click)="cambiarMenu({ url: 'registros/ncf', navigate: true })">NCF</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.periodo_fiscal" [ngClass]="{ activa: actualRuta == 'periodo_fiscal' }" (click)="cambiarMenu({ url: 'registros/periodo_fiscal', navigate: true })">Periodos Fiscales</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.divisa" [ngClass]="{ activa: actualRuta == 'divisa' }" (click)="cambiarMenu({ url: 'registros/divisa', navigate: true })">Divisas</h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.banco" [ngClass]="{ activa: actualRuta == 'banco' }" (click)="cambiarMenu({ url: 'registros/banco', navigate: true })">Bancos</h4>
+              </div>
+            </div>
 
-          <div *ngxPermissionsOnly="menuPermissionsObj.contabilidad.flatt" class="menuList">
-            <h5 [id]="idsH5.contabilidad" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('contabilidad') }" [innerText]="'Contabilidad'"></h5>
-            <img
+            <!-- PRODUCCION -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.produccion.flatt" class="menuList">
+              <h5 [id]="idsH5.produccion" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('produccion') }" [innerText]="'Producción'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('produccion') }" src="assets/img/produccion.png" alt="Producción" (click)="cambiarMenu({ url: 'produccion', navigate: true, id_h5: 'produccionLabel' })" draggable="false" />
+            </div>
+
+            <!-- INVENTARIO -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.inventario.flatt" class="menuList">
+              <h5 [id]="idsH5.inventario" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('inventario') }" [innerText]="'Inventario'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('inventario') }" src="assets/img/inventario.png" alt="Inventario" (click)="cambiarMenu({ url: 'inventario', navigate: true, id_h5: 'inventarioLabel' })" draggable="false" />
+            </div>
+            
+            <!-- CONTABILIDAD -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.contabilidad.flatt" class="menuList">
+              <h5 [id]="idsH5.contabilidad" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('contabilidad') }" [innerText]="'Contabilidad'"></h5>
+              <img
               class="iconosMenu"
-              [ngClass]="{ iconosMenuA: isVistaActual('contabilidad') }"
-              src="assets/img/contabilidad.png"
-              alt="Contabilidad"
-              (click)="cambiarMenu({ url: 'contabilidad', navigate: false, id_h5: 'contabilidadLabel' })"
-              draggable="false"
-            />
+                [ngClass]="{ iconosMenuA: isVistaActual('contabilidad') }"
+                src="assets/img/contabilidad.png"
+                alt="Contabilidad"
+                (click)="cambiarMenu({ url: 'contabilidad', navigate: false, id_h5: 'contabilidadLabel' })"
+                draggable="false"
+                />
+                
+              <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('contabilidad') }">
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.catalogo_cuentas" [ngClass]="{ activa: actualRuta == 'catalogo_cuentas' }" (click)="cambiarMenu({ url: 'contabilidad/catalogo_cuentas', navigate: true })">
+                  Catalogo de cuentas
+                </h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.asientos_contables" [ngClass]="{ activa: actualRuta == 'libro_diario' }" (click)="cambiarMenu({ url: 'contabilidad/libro_diario', navigate: true })">
+                  Libro Diario
+                </h4>
+                <h4
+                  class="opcion"
+                  *ngxPermissionsOnly="menuPermissionsObj.contabilidad.configuracion_entidad_cuenta"
+                  [ngClass]="{ activa: actualRuta == 'configuracion_entidad_cuenta' }"
+                  (click)="cambiarMenu({ url: 'contabilidad/configuracion_entidad_cuenta', navigate: true })"
+                  pTooltip="Configuración de cuentas contables"
+                  tooltipPosition="right"
+                  >
+                  Config. de cuentas
+                </h4>
+                <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.deposito" [ngClass]="{ activa: actualRuta == 'deposito' }" (click)="cambiarMenu({ url: 'contabilidad/deposito', navigate: true })">Depositos</h4>
+                <h4 class="opcion sm" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.transferencia" [ngClass]="{ activa: actualRuta == 'transferencia' }" (click)="cambiarMenu({ url: 'contabilidad/transferencia', navigate: true })">
+                  Transferencias
+                </h4>
+              </div>
+            </div>
 
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('contabilidad') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.catalogo_cuentas" [ngClass]="{ activa: actualRuta == 'catalogo_cuentas' }" (click)="cambiarMenu({ url: 'contabilidad/catalogo_cuentas', navigate: true })">
-                Catalogo de cuentas
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.asientos_contables" [ngClass]="{ activa: actualRuta == 'libro_diario' }" (click)="cambiarMenu({ url: 'contabilidad/libro_diario', navigate: true })">
-                Libro Diario
-              </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.contabilidad.configuracion_entidad_cuenta"
-                [ngClass]="{ activa: actualRuta == 'configuracion_entidad_cuenta' }"
-                (click)="cambiarMenu({ url: 'contabilidad/configuracion_entidad_cuenta', navigate: true })"
-                pTooltip="Configuración de cuentas contables"
-                tooltipPosition="right"
-              >
-                Config. de cuentas
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.deposito" [ngClass]="{ activa: actualRuta == 'deposito' }" (click)="cambiarMenu({ url: 'contabilidad/deposito', navigate: true })">
-                Depositos
-              </h4>
-              <h4 class="opcion sm" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.transferencia" [ngClass]="{ activa: actualRuta == 'transferencia' }" (click)="cambiarMenu({ url: 'contabilidad/transferencia', navigate: true })">
-                Transferencias
-              </h4>
+            <!-- REPORTES -->
+            <div *ngxPermissionsOnly="menuPermissionsObj.reportes.flatt" class="menuList">
+              <h5 [id]="idsH5.reportes" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('reportes') }" [innerText]="'Reportes'"></h5>
+              <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('reportes') }" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu({ url: 'reportes', navigate: true, id_h5: 'reporteLabel' })" draggable="false" />
+            </div>
+            <div class="menuList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="navBar">
+          <div class="right">
+            <div class="btn-group dropCuenta" id="dropCuenta">
+              <span class="dropdown-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
+                <img class="rounded-circle" [src]="imgUser" alt="Admin" draggable="false" />
+                Cuenta
+                <span class="caret"></span>
+              </span>
+              <p-overlayPanel [dismissable]="true" [showCloseIcon]="false" #dropdownCuenta styleClass="overlayCuenta" appendTo="body">
+                <ul class="dropdown-cuenta">
+                  <div class="dropdown-header">
+                    <h3>{{ usuario?.nombre }}</h3>
+                    <p>{{ usuario?.email }}</p>
+                  </div>
+                  <li role="menuitem">
+                    <a class="dropdown-item" id="dropdown-item" (click)="refreshPage(); dropdownCuenta.hide()"><i class="fas fa-undo-alt"></i>Recargar aplicación</a>
+                  </li>
+                  <li class="divider dropdown-divider"></li>
+                  <li role="menuitem">
+                    <a class="dropdown-item" id="dropdown-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
+                  </li>
+                </ul>
+              </p-overlayPanel>
             </div>
           </div>
-
-          <div *ngxPermissionsOnly="menuPermissionsObj.reportes.flatt" class="menuList">
-            <h5 [id]="idsH5.reportes" class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('reportes') }" [innerText]="'Reportes'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('reportes') }" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu({ url: 'reportes', navigate: true, id_h5: 'reporteLabel' })" draggable="false" />
-          </div>
-
-          <div class="menuList"></div>
         </div>
+
+        <div class="contenido">
+          @if (ready) {
+            <router-outlet></router-outlet>
+          }
+          <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
+        </div>
+
+        <div class="footer">Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez</div>
+        
+        @if (cuadre_hoy) {
+          <div class="cuadre_hoy">
+            <div class="msg">Hoy ya existe un cuadre</div>
+          </div>
+        }
       </div>
     </div>
-
-    <div class="content">
-      <!-- <div class="navBar drag"> -->
-      <div class="navBar">
-        <div class="right">
-          <div class="btn-group dropCuenta" id="dropCuenta">
-            <span class="dropdown-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
-              <img class="rounded-circle" [src]="imgUser" alt="Admin" draggable="false" />
-              Cuenta
-              <span class="caret"></span>
-            </span>
-
-            <p-overlayPanel [dismissable]="true" [showCloseIcon]="false" #dropdownCuenta styleClass="overlayCuenta" appendTo="body">
-              <ul class="dropdown-cuenta">
-                <div class="dropdown-header">
-                  <h3>{{ usuario?.nombre }}</h3>
-                  <p>{{ usuario?.email }}</p>
-                </div>
-                <li role="menuitem">
-                  <a class="dropdown-item" id="dropdown-item" (click)="refreshPage(); dropdownCuenta.hide()"><i class="fas fa-undo-alt"></i>Recargar aplicación</a>
-                </li>
-                <li class="divider dropdown-divider"></li>
-
-                <li role="menuitem">
-                  <a class="dropdown-item" id="dropdown-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
-                </li>
-              </ul>
-            </p-overlayPanel>
-          </div>
-        </div>
-      </div>
-
-      <div class="contenido">
-        <router-outlet *ngIf="ready"></router-outlet>
-        <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
-      </div>
-      <div class="footer">Novac System v{{ versionApp }} - @{{ currentYear }} Desarrollado por: Inspot Technology</div>
-      <div *ngIf="cuadre_hoy" class="cuadre_hoy">
-        <div class="msg">Hoy ya existe un cuadre</div>
-      </div>
-    </div>
-  </div>
+  }
 </div>
