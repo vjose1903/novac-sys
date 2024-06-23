@@ -147,7 +147,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           ncf.cantidad = ncf.hasta - ncf.desde + 1;
           ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].referencia;
           ncf.tipoC_ = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
-          ncf.codigo = ncf.id.padStart(5, '0');
+          ncf.codigo = String(ncf.id).padStart(5, '0');
           ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
           ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
 

@@ -1,10 +1,11 @@
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { TablasService } from './../../../components/new_tablas/tablas.service';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { tableCellType, table_config } from './../../../components/new_tablas/tabla-class';
 import { TipoCuentaBancariaC, TipoCuentaBancariaI, tableTipoCuentaBancaria } from './tipo_cuenta_bancaria';
 import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { fun } from './../../../../core/services/functions.service';
 import { NgxPermissionsService } from 'ngx-permissions';
@@ -41,6 +42,8 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
     },
   };
   tablaComponent: any;
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private fb: UntypedFormBuilder, private permissionsService: NgxPermissionsService, private tServ: TablasService) {
     super();

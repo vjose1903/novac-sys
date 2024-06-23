@@ -586,6 +586,33 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: compare
+  // Descripcion : Esta funcion se utiliza para ordenar un arreglo
+  // __________________________________________________________________________________________________
+  static compare(a: any, b: any, keys: Array<string> | string, order: 'asc' | 'desc' = 'asc') {
+    if (typeof keys == 'string') keys = [keys];
+
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
+
+      if (typeof a === 'object' && typeof b === 'object') {
+        const valueA = a[key];
+        const valueB = b[key];
+
+        if (valueA < valueB) return order === 'asc' ? -1 : 1;
+        if (valueA > valueB) return order === 'asc' ? 1 : -1;
+      } else {
+        if (a === b) continue;
+        if (typeof a === 'number' && typeof b === 'number') return order === 'asc' ? a - b : b - a;
+        if (typeof a === 'string' && typeof b === 'string') return order === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+        if (a instanceof Date && b instanceof Date) return order === 'asc' ? a.getTime() - b.getTime() : b.getTime() - a.getTime();
+      }
+    }
+
+    return 0;
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: createNestedObject
   // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
   // __________________________________________________________________________________________________

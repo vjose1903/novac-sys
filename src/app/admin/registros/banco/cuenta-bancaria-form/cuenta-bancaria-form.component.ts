@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalComponentI, ModalI } from '../../../components/modal/modal-class';
@@ -26,6 +27,8 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
 
   CuentaBancariaSelected;
   maxDate;
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService, public imgServ: ImagenService) {
     super();

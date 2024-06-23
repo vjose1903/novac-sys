@@ -7,6 +7,6 @@ export enum DocumentoDevuelta {
   compra = 'compra',
   venta = 'venta',
   pagoFactura = 'pago_factura',
-  reciboIngreso = 'pago_factura',
+  reciboIngreso = 'recibo_ingreso',
 }
 

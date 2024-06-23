@@ -138,7 +138,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
       const res = await this.facturaClass.getFacturasByParams(args);
 
       res['data'].forEach((fact) => {
-        fact.secuencia = fact.numero_factura.padStart(8, '0');
+        fact.secuencia = String(fact.numero_factura).padStart(8, '0');
 
         fact.viewColor = 'gris-claro';
         fact.view = 'far fa-eye-slash';

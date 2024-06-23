@@ -16,7 +16,7 @@ export interface responseModel<T> {
   msg: any[];
   total_paginas?: number;
   total_registros?: number;
-} // NOTE: <================================================================ PARA DESPUES`
+}
 
 export class CrudG<T> {
   constructor(private path: string) {}

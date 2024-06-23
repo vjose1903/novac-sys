@@ -68,6 +68,29 @@ export class CustomLodash extends ToastService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: maxBy
+  // Descripcion : esta funcion retorna el elemento mas alto dependiendo de una propiedad
+  // _________________________________________________________________________________________________
+  static maxBy(collection, iteratee) {
+    if (collection == null || collection.length === 0) return undefined;
+
+    let maxElement = collection[0];
+    let maxValue = typeof iteratee === 'function' ? iteratee(maxElement) : maxElement[iteratee];
+
+    for (let i = 1; i < collection.length; i++) {
+      const element = collection[i];
+      const value = typeof iteratee === 'function' ? iteratee(element) : element[iteratee];
+      
+      if (value > maxValue) {
+        maxValue = value;
+        maxElement = element;
+      }
+    }
+
+    return maxElement;
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: setProperty
   // Descripcion : Esta funcion setea una propiedad a un objeto
   // _________________________________________________________________________________________________

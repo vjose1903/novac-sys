@@ -4,7 +4,7 @@
     <input class="apple-switch" type="checkbox" (change)="changeUpdateArticulos()" [checked]="update_articulos" />
   </div>
 
-  <div class="form-group mb-3" [appMsgError]="'porciento_ganancia'" [form]="form">
+  <div class="form-group mb-3" appMsgError="porciento_ganancia" [form]="form">
     <label class="control-label">Porcentaje de ganancia: <span style="color: red">*</span></label>
 
     <div class="input-group">

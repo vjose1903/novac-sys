@@ -91,6 +91,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
             }
           }, 500);
 
+          
           this.initNavigate = false;
         }
       }

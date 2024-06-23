@@ -427,8 +427,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       if (input === 'cantidad-' && fun.hasValue(codigo)) {
         if (fun.isEmpty(articulo) || codigo !== articulo.codigo) {
-          const metodo = this.factServ.isPreVenta ? tipoDocFacturacion.venta : this.factServ.tipoDocumento;
+          const metodo = this.factServ.isVenta ? tipoDocFacturacion.venta : this.factServ.tipoDocumento;
           const obj = { palabra_a_buscar: codigo, index, metodo: metodo, data: [], fecha_articulo: this.fechaFactura };
+
           this.openNewModal({
             component: BuscarArticuloComponent,
             inputs: obj,
@@ -719,7 +720,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       detalle[campoToSolve] = actual_price_value;
       formGroup.patchValue(detalle);
 
-      this.calcularMontosRow(index).then((result) => instance.closeModal(instance.id, 'get_actual_price'));
+      this.calcularMontosRow(index).then((result) => instance.dismissModal(instance.id, 'get_actual_price'));
     };
 
     const label = this.factServ.isCompra ? 'costo' : 'precio';

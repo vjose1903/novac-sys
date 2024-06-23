@@ -1,7 +1,8 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { ImagenService } from './../../../core/services/imagen.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Permisos } from '../../../core/typescript/permisos';
 import { TransferenciaC, TransferenciaI, anularTransferenciaModalId, transferenciaFormAttr, transferenciaFormFieldId, transferenciaTableId } from './transferencia.utils';
@@ -68,6 +69,8 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   };
   tablaComponent;
 
+  htmlServ = inject(HtmlElementsService);
+  
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService, public imgServ: ImagenService) {
     console.log("===== TRANSFERENCIAS =====");
     

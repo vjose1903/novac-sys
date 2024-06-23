@@ -101,7 +101,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   mapeoRecibos(data) {
     data.map((conduce) => {
-      conduce['numero_conduce'] = _.padStart(conduce.numero_conduce, 8, '0');
+      conduce['numero_conduce'] = String(conduce.numero_conduce).padStart(8, '0');
       conduce['cantidad_productos'] = conduce.detalle_conduces.length;
 
       conduce['ver'] = 'far fa-eye';
@@ -210,7 +210,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+          { clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id, obj.id), label: 'NO', disable: false },
           { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'SI', disable: false },
         ],
       },

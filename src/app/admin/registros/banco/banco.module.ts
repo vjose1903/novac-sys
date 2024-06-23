@@ -1,5 +1,4 @@
 import { PipesModule } from './../../../core/pipe/pipes.module';
-import { NgxBootstrapModule } from './../../../modules/ngx-bootstrap.module';
 import { TablasModule } from './../../components/new_tablas/tablas.module';
 import { DirectivesModule } from './../../../core/directive/directives.module';
 import { ImgViewerEditModule } from './../../components/img-viewer-edit/img-viewer-edit.module';
@@ -17,20 +16,6 @@ import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-
 
 @NgModule({
   declarations: [BancoComponent, CuentaBancariaFormComponent, TipoCuentaBancariaComponent],
-  imports: [
-    CommonModule,
-    BancoRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    PrimengModule,
-    PipesModule,
-    NgxBootstrapModule,
-    TablasModule,
-    DirectivesModule,
-    NgxPermissionsModule.forChild(),
-    BtnIconModule,
-    ImgViewerEditModule,
-    ImgModule,
-  ],
+  imports: [CommonModule, BancoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule],
 })
 export class BancoModule {}

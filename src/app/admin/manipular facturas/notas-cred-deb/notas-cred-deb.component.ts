@@ -316,7 +316,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   formatoNumeroFactura(num) {
-    return _.padStart(num, 8, '0');
+    return String(num).padStart(8, '0');
   }
 
   formatoFecha(fecha) {

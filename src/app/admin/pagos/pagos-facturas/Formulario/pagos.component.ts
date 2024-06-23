@@ -167,7 +167,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
         this.verificateFacturasSelected(factura_selected, 'insert', index, true);
       }
 
-      factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
+      factura.secuencia = String(factura.numero_factura).padStart(8, '0');
       factura.fechaV = factura.condicion === 'Crédito' ? DateUtils.format({ date: factura.fecha_vencimiento, dateFormat: 'DD/MM/YYYY' }) : null;
       factura.select = fun.hasValue(factura_selected);
       factura.pagoT = fun.hasValue(factura_selected) ? factura_selected.pagoT : false;

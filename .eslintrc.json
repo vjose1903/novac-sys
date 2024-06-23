@@ -33,6 +33,12 @@
         "@angular-eslint/template/banana-in-box": "error",
         "@angular-eslint/template/no-negated-async": "error"
       }
+    },
+    {
+      "files": ["*.html"],
+      "rules": {
+      "@angular-eslint/template/prefer-control-flow": "warn",
+      }
     }
   ]
 }

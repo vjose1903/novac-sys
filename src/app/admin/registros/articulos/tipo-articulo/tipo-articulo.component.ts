@@ -1,8 +1,9 @@
+import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
 import { ModalClass, ModalComponentI, ModalI } from './../../../components/modal/modal-class';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { fun } from '../../../../core/services/functions.service';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
@@ -47,6 +48,8 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     },
   };
   tablaComponent: any;
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private permissionsService: NgxPermissionsService, private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();

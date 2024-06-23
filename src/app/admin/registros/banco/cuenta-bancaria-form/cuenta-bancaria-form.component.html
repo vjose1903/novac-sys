@@ -9,24 +9,24 @@
   <form *ngIf="formGroup" [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
     <div class="row">
       <div class="col-12 p-0">
-        <div class="form-group" [appMsgError]="'descripcion'" [form]="formGroup">
+        <div class="form-group" appMsgError="descripcion" [form]="formGroup">
           <label class="control-label">Descripcion: <span style="color: red">*</span></label>
-          <input type="text" formControlName="descripcion" [appCapitalice]="'formGroup'" placeholder="Ingrese descripción" id="campoNombre" class="form-control" (keydown.enter)="saltar($event.target.id)" autocomplete="off" />
+          <input type="text" formControlName="descripcion" [appCapitalice]="'formGroup'" placeholder="Ingrese descripción" id="campoNombre" class="form-control" (keydown.enter)="saltar(htmlServ.getId($event))" autocomplete="off" />
           <span id="msgContainer"></span>
         </div>
       </div>
 
       <div class="col-6 pl-0">
         <label class="control-label">No. Cuenta: <span style="color: red">*</span></label>
-        <div class="form-group" [appMsgError]="'numero_cuenta'" [form]="formGroup">
-          <input type="text" formControlName="numero_cuenta" [appCapitalice]="'formGroup'" placeholder="Ingrese no. cuenta" (keydown.enter)="saltar($event.target.id)" id="campoNumeroCuenta" class="form-control" autocomplete="off" />
+        <div class="form-group" appMsgError="numero_cuenta" [form]="formGroup">
+          <input type="text" formControlName="numero_cuenta" [appCapitalice]="'formGroup'" placeholder="Ingrese no. cuenta" (keydown.enter)="saltar(htmlServ.getId($event))" id="campoNumeroCuenta" class="form-control" autocomplete="off" />
 
           <span id="msgContainer"></span>
         </div>
       </div>
 
       <div class="col-6 pr-0">
-        <div class="form-group" [appMsgError]="'tipo_cuenta_bancaria_id'" [form]="formGroup">
+        <div class="form-group" appMsgError="tipo_cuenta_bancaria_id" [form]="formGroup">
           <label class="control-label">Tipo cuenta: <span style="color: red">*</span></label>
 
           <p-dropdown
@@ -49,7 +49,7 @@
       </div>
 
       <div class="col-6 pl-0">
-        <div class="form-group" [appMsgError]="'divisa_id'" [form]="formGroup">
+        <div class="form-group" appMsgError="divisa_id" [form]="formGroup">
           <label class="control-label">Divisa:</label>
           <p-dropdown
             #divisaDropDown
@@ -93,7 +93,7 @@
               <div class="row p-0">
                 <div class="col-12 col-md-6 pl-0">
                   <small class="control-label">Fecha primera conciliación: </small>
-                  <div class="form-group" [appMsgError]="'fecha_primera_conciliacion'" [form]="formGroup">
+                  <div class="form-group" appMsgError="fecha_primera_conciliacion" [form]="formGroup">
                     <p-calendar inputId="fecha_primera_conciliacion_input" [maxDate]="maxDate" inputStyleClass="form-control" formControlName="fecha_primera_conciliacion" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
                     <span id="msgContainer"></span>
                   </div>
@@ -103,7 +103,7 @@
 
             <div class="col-12 col-md-6 pl-0">
               <small class="control-label">Balance inicial en libro: </small>
-              <div class="form-group" [appMsgError]="'balance_inicial_libro'" [form]="formGroup">
+              <div class="form-group" appMsgError="balance_inicial_libro" [form]="formGroup">
                 <input type="text" formControlName="balance_inicial_libro" [appCapitalice]="'formGroup'" placeholder="Ingrese balance" id="campoBalanceLibro" class="form-control" autocomplete="off" />
                 <span id="msgContainer"></span>
               </div>
@@ -111,7 +111,7 @@
 
             <div class="col-12 col-md-6 pr-0">
               <small class="control-label">Balance inicial en banco: </small>
-              <div class="form-group" [appMsgError]="'balance_inicial_banco'" [form]="formGroup">
+              <div class="form-group" appMsgError="balance_inicial_banco" [form]="formGroup">
                 <input type="text" formControlName="balance_inicial_banco" [appCapitalice]="'formGroup'" placeholder="Ingrese balance" id="campoBalanceBanco" class="form-control" autocomplete="off" />
                 <span id="msgContainer"></span>
               </div>

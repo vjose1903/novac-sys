@@ -6,12 +6,12 @@ import { requestParameters } from '../../../core/typescript/crud-g';
 import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { PeriodoFiscalC, PeriodoFiscalI } from './periodo-fiscal';
-import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
 import { CierreMensualComponent } from './cierre-mensual/cierre-mensual.component';
 import { ModalClass } from '../../components/modal/modal-class';
 import { DateUtils } from '../../../core/typescript/date.utils';
 
+import * as _ from 'lodash';
+const moment = require('../../../core/javascript/moment');
 @Component({
   selector: 'app-periodo-fiscal',
   templateUrl: './periodo-fiscal.component.html',

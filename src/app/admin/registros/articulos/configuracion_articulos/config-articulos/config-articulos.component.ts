@@ -1,6 +1,6 @@
 import { HtmlElementsService } from './../../../../../core/services/html-elements.service';
 import { fun } from './../../../../../core/services/functions.service';
-import { IModalConfiguration, ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
+import { ConfigureModalI, ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit, inject } from '@angular/core';
 import { ConfigArticuloC } from '../articulos_configuracion';

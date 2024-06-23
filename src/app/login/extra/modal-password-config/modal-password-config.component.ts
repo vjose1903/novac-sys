@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import * as _ from 'lodash';
-import { IModalConfiguration, ModalComponentI, ModalI } from '../../../admin/components/modal/modal-class';
+import { ModalComponentI, ModalI } from '../../../admin/components/modal/modal-class';
 import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -12,7 +11,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
   styleUrls: ['./modal-password-config.component.scss'],
 })
 export class ModalPasswordConfigComponent extends MixinClass implements OnInit, ModalI {
-  public modalComponent: ModalComponentI= {};
+  public modalComponent: ModalComponentI = {};
   inputs;
   form;
 

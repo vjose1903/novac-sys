@@ -1,9 +1,9 @@
+import { ModalService } from './../../../components/modal/modal.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { ModalI, ModalComponentI } from '../../../../admin/components/modal/modal-class';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '../../../../core/services/functions.service';
 import { HtmlElementsService } from './../../../../core/services/html-elements.service';
-import { ModalService } from 'src/app/admin/components/modal/modal.service';
 
 @Component({
   selector: 'app-remover-articulo',
@@ -61,10 +61,10 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
 
   btn_aceptar() {
     if (this.form.valid || this.inputs.data_detalle.is_defectuoso || !this.inputs.is_prefactura_selected) {
-      const modal = this.mServ.findModalConfigById(this.modalComponent.component_id);
+      const modal = this.mServ.findModalConfigById(this.modalComponent.id);
 
-      const data_to_return = { key: this.inputs.key, modalId: this.modalComponent.component_id, data: this.form.getRawValue() };
-      modal.dismissModal(this.modalComponent.component_id, data_to_return);
+      const data_to_return = { key: this.inputs.key, modalId: this.modalComponent.id, data: this.form.getRawValue() };
+      modal.dismissModal(this.modalComponent.id, data_to_return);
     } else {
       fun.toastError('Complete los campos para retirar el articulo.', 'ERROR');
     }

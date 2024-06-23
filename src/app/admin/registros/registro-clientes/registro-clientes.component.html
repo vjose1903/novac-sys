@@ -6,7 +6,8 @@
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
-        <div #divRegistro class="contenedorRegistro" *ngIf="isCreando || clienteSelected" class="form {{ isCreando || clienteSelected ? 'showForm' : 'hideForm' }} ">
+        @if(isCreando || clienteSelected){
+        <div #divRegistro class="contenedorRegistro" class="form {{ isCreando || clienteSelected ? 'showForm' : 'hideForm' }} ">
           <div #divTitulo class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
             <h4 class="mb-0">Formulario</h4>
           </div>
@@ -30,7 +31,8 @@
                             </label>
                           </div>
 
-                          <div *ngIf="doc_is_cedula" class="form-group" appMsgError="cedula" [form]="form">
+                          @if(doc_is_cedula){
+                          <div  class="form-group" appMsgError="cedula" [form]="form">
                             <div class="input-group d-flex" style="flex-wrap: nowrap">
                               <p-inputMask
                                 (keydown.enter)="saltar('campoNombre')"
@@ -51,8 +53,8 @@
                             </div>
                             <span id="msgContainer"></span>
                           </div>
-
-                          <div *ngIf="!doc_is_cedula" class="form-group" appMsgError="rnc" [form]="form">
+                        } @else {
+                          <div  class="form-group" appMsgError="rnc" [form]="form">
                             <div class="input-group d-flex" style="flex-wrap: nowrap">
                               <p-inputMask
                                 (keydown.enter)="saltar('campoNombre')"
@@ -73,6 +75,8 @@
                             </div>
                             <span id="msgContainer"></span>
                           </div>
+                        }
+
                         </div>
                         <div class="pr-0 col-12">
                           <div class="form-group" appMsgError="nombre" [form]="form">
@@ -157,7 +161,9 @@
                         <label class="control-label">Vendedor: <span style="color: red">*</span></label>
                         <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
                           <option [value]="null" disabled>Seleccione</option>
-                          <option *ngFor="let item of vendedores" value="{{ item.id }}">{{ item.nombre_completo }}</option>
+                          @for (item of vendedores; track item.id) {
+                            <option value="{{ item.id }}">{{ item.nombre_completo }}</option>
+                          }
                         </select>
                         <span id="msgContainer"></span>
                       </div>
@@ -170,17 +176,18 @@
                         <span id="msgContainer"></span>
                       </div>
                     </div>
-
-                    <div *ngIf="configApp.has_contabilidad" class="col-12 p-0">
-                      <entidad-cuenta-contable
-                        *ngxPermissionsOnly="entCuentaContServ.permissions"
-                        [inputs]="{ configsEntCuentas: listaConfigClientes, entidad: entidadContable }"
-                        [configuration]="{ btn: { subCategoria: false } }"
-                        [cuentasContablesDataCruda]="clienteSelected ? clienteSelected?.cuentas_contables : []"
-                        [(cuentasContablesData)]="listaEntidadCuentasContables"
-                        [camposDisabled]="camposDisabled"
-                      ></entidad-cuenta-contable>
-                    </div>
+                    @if (configApp.has_contabilidad) {
+                      <div  class="col-12 p-0">
+                        <entidad-cuenta-contable
+                          *ngxPermissionsOnly="entCuentaContServ.permissions"
+                          [inputs]="{ configsEntCuentas: listaConfigClientes, entidad: entidadContable }"
+                          [configuration]="{ btn: { subCategoria: false } }"
+                          [cuentasContablesDataCruda]="clienteSelected ? clienteSelected?.cuentas_contables : []"
+                          [(cuentasContablesData)]="listaEntidadCuentasContables"
+                          [camposDisabled]="camposDisabled"
+                        ></entidad-cuenta-contable>
+                      </div>
+                    }
                   </div>
                 </form>
               </div>
@@ -199,6 +206,7 @@
             </div>
           </div>
         </div>
+        }
       </ng-container>
 
       <div class="list {{ isCreando || clienteSelected ? 'FormList' : 'onlyList' }}">

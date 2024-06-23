@@ -65,7 +65,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   mapeoPagos(data) {
     data.map((pago) => {
       const numberKey = this.pagosService.isReciboIngreso ? 'numero_recibo' : 'numero';
-      pago[numberKey] = _.padStart(pago[numberKey], 8, '0');
+      pago[numberKey] = String(pago[numberKey]).padStart(8, '0');
 
       const detalleKey = this.pagosService.isReciboIngreso ? 'detalle_recibos' : 'pago_factura_detalles';
       pago['numero_factura'] = pago[detalleKey].length === 1 ? pago[detalleKey][0].descripcion.split(' ')[1] : 'Varios...';

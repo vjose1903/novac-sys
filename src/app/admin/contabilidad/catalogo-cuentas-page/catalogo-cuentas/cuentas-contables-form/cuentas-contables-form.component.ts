@@ -1,6 +1,6 @@
 import { fun } from './../../../../../core/services/functions.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { IModalConfiguration, ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
+import { ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
 import { Component, OnInit } from '@angular/core';
 
 @Component({

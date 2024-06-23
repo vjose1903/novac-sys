@@ -1,5 +1,5 @@
 import { fun } from './../services/functions.service';
-import * as moment from '../javascript/moment';
+const moment = require('../javascript/moment');
 
 export class DateUtils {
   /**

@@ -1427,7 +1427,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   getCantidadArticulos() {
-    const articulos_a_vender = _.filter(this.cuerpoFactura, (factura) => fun.hasValue(factura.cantidad));
+    const articulos_a_vender = this.cuerpoFactura.filter((factura) => fun.hasValue(factura.cantidad));
     return articulos_a_vender.length;
   }
 
@@ -1573,8 +1573,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   async getDataFromModal(arg, search?) {
     if (arg.modalId === 'facturaPendiente') {
-      console.log('arg ', arg);
-
       this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
       this.fechaFactura['back'] = this.fechaFactura['front'];
       this.FechaFacturaMostrar = this.formarFechaFactura(arg.fecha)['FechaFacturaMostrar'];

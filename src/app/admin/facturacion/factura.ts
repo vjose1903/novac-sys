@@ -319,7 +319,7 @@ export class FacturaC extends CrudG<FacturasI> {
   abrirModalHistorial(pagos, notas, recibos, openNewModal, config: any = null) {
     if (recibos.length > 0 || notas.length > 0 || pagos.length > 0) {
       recibos.map((recibo) => {
-        recibo.numero_recibo = _.padStart(recibo.numero_recibo, 8, '0');
+        recibo.numero_recibo = String(recibo.numero_recibo).padStart(8, '0');
         recibo.fecha_equivalente = DateUtils.format({ date: recibo.fecha_equivalente });
         return recibo;
       });
@@ -331,7 +331,7 @@ export class FacturaC extends CrudG<FacturasI> {
       });
 
       pagos.map((pago) => {
-        pago.numero = _.padStart(pago.numero, 8, '0');
+        pago.numero = String(pago.numero).padStart(8, '0');
         pago.fecha_equivalente = DateUtils.format({ date: pago.fecha_equivalente });
         return pago;
       });

@@ -9,13 +9,11 @@ import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
-import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
-
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { CierreMensualComponent } from './cierre-mensual/cierre-mensual.component';
 
 @NgModule({
   declarations: [PeriodoFiscalComponent, CierreMensualComponent],
-  imports: [CommonModule, PeriodoFiscalRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule],
+  imports: [CommonModule, PeriodoFiscalRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule],
 })
 export class PeriodoFiscalModule {}

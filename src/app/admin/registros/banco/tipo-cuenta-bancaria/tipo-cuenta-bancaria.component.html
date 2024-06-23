@@ -3,9 +3,9 @@
     <div *ngIf="hasPermissionsCreateUpdate && formGroup" class="col-6 pl-0 pt-3">
       <form [formGroup]="formGroup" class="h-100" (keydown.enter)="$event.stopPropagation()">
         <div class="card card-padding sombra-light">
-          <div class="form-group" [appMsgError]="'descripcion'" [form]="formGroup">
+          <div class="form-group" appMsgError="descripcion" [form]="formGroup">
             <label class="control-label mb-0">Descripcion: <span style="color: red">*</span></label>
-            <input (focus)="$event.target.select()" type="text" id="campoDescripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
+            <input (focus)="htmlServ.selectValue($event)" type="text" id="campoDescripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
             <span id="msgContainer"></span>
           </div>
 

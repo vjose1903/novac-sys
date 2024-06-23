@@ -1,7 +1,7 @@
+import { ConfigService } from './../../core/services/configuration.service';
 import { Injectable } from '@angular/core';
 import { fun } from './../../core/services/functions.service';
-import { comprobante, comprobanteElectronico, comprobanteNormal, tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
-import { Ss } from '../../core/services/singleton.service';
+import { comprobante, tFacturaD, tipoDocFacturacion, TipoFacturaI } from './factura';
 import { serie } from '../../core/typescript/constantes';
 
 @Injectable({
@@ -16,7 +16,6 @@ export class FacturacionService {
   options_tipos_facturas: string[];
   htmlTiposCostosGastos: string;
   options_tipos_costos_gastos: string[];
-
   lista_tipos_facturas: Array<TipoFacturaI>;
   propietario_factura;
   pre_venta_selected;
@@ -26,8 +25,8 @@ export class FacturacionService {
   serieType = serie.normal;
 
   public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
-    if (fun.hasValue(Ss.configServ)) {
-      const configApp = Ss.configServ.getConfig({ isPromise: false });
+    if (fun.hasValue(ConfigService.config)) {
+      const configApp = ConfigService.config;
 
       return { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
     } else {

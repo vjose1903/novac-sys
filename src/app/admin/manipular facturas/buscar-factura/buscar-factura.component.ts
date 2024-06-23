@@ -164,14 +164,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
-      console.log('NotaC.base_comprobante ', NotaC.base_comprobante);
-      console.log('this.buscarPara ', this.buscarPara);
-      console.log('this.serieSelected ', this.serieSelected);
-
       const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.serieSelected][this.buscarPara]);
-      console.log('Ss.factServ.lista_tipos_facturas:  ', Ss.factServ.lista_tipos_facturas);
-      console.log('NotaC.base_comprobante[this.serieSelected]:  ', NotaC.base_comprobante[this.serieSelected]);
-      console.log('tipoFact:  ', tipoFact);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
@@ -254,7 +247,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       const res = await this.notasClass.getAll(extra);
 
       res['data'].forEach((nota) => {
-        nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
+        nota.secuencia = String(nota.numero_factura).padStart(8, '0');
         nota.total = Math.abs(nota.total);
         nota.selectedColor = 'gris-claro';
         nota.viewColor = 'gris-claro';
@@ -305,7 +298,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         const pago_a_tiempo = this.getIsPagoAtiempo(fact);
         const estatus = this.getIsActiveInfo(fact);
 
-        fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
+        fact.secuencia = String(fact.numero_factura).padStart(8, '0');
         fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? DateUtils.format({ date: fact.fecha_vencimiento }) : '';
         fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
         fact.is_active = estatus.icon;
@@ -654,7 +647,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   formatoNumeroFactura(num) {
-    return _.padStart(num, 8, '0');
+    return String(num).padStart(8, '0');
   }
 
   editarFactura() {
@@ -822,7 +815,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'buscarClienteOsuplidor') {
+    if (arg.modalId == 'buscarClienteOsuplidor') {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('valorI');
       } else {

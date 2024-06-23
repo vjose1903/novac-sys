@@ -9,7 +9,6 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
-import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
 import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer-edit.module';
@@ -18,6 +17,6 @@ import { ImgModule } from '../../components/img-component/img.module';
 
 @NgModule({
   declarations: [DivisaComponent, TasaDeCambioComponent],
-  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule],
+  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule,  TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule],
 })
 export class DivisaModule {}

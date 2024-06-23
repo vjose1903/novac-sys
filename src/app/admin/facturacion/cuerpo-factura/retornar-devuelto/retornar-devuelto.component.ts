@@ -1,3 +1,4 @@
+import { ModalService } from './../../../components/modal/modal.service';
 import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
 import { tableCellType, table_config } from './../../../components/new_tablas/tabla-class';
@@ -6,7 +7,7 @@ import { ModalI, ModalComponentI } from './../../../components/modal/modal-class
 import { Component, DoCheck, OnInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { ModalService } from 'src/app/admin/components/modal/modal.service';
+
 
 @Component({
   selector: 'app-retornar-devuelto',
@@ -108,7 +109,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   }
 
   btnAceptarIsDisabled() {
-    const modal = this.mServ.findModalConfigById(this.modalComponent.component_id);
+    const modal = this.mServ.findModalConfigById(this.modalComponent.id);
 
     const aceptar_btn = modal.botones.aceptar;
     const formulario = this.form.getRawValue();

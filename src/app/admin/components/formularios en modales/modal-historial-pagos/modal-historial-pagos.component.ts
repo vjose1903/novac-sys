@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import * as _ from 'lodash';
+
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { tableCellType, table_config } from '../../new_tablas/tabla-class';

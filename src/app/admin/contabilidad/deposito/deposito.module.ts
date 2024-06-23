@@ -7,7 +7,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
-import { NgxBootstrapModule } from '../../../modules/ngx-bootstrap.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
 import { ImgModule } from '../../components/img-component/img.module';
@@ -15,7 +14,6 @@ import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer
 
 @NgModule({
   declarations: [DepositoComponent],
-  imports: [CommonModule, DepositoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, NgxBootstrapModule, TablasModule, DirectivesModule, ImgViewerEditModule, ImgModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, DepositoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, ImgViewerEditModule, ImgModule, NgxPermissionsModule.forChild()],
 })
 export class DepositoModule {}
- 

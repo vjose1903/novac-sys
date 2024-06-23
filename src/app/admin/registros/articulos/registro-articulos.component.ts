@@ -1,3 +1,4 @@
+import { ConfigI } from './../../../core/typescript/config-interface';
 import { DateUtils } from './../../../core/typescript/date.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { TipoArticuloComponent } from './tipo-articulo/tipo-articulo.component';
@@ -5,7 +6,7 @@ import { ConfigService } from './../../../core/services/configuration.service';
 import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, FormArray, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -22,7 +23,6 @@ import { CategoriaEntidadContableC, entidadesContables } from '../../contabilida
 import { FormEntidadCuentaContableI, tipoCategoria } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { SubTipoArticuloC, SubTipoArticuloI } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
-import { ConfigI } from 'src/app/core/typescript/config-interface';
 
 const $ = require('jquery');
 
@@ -58,7 +58,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   isCreando: boolean = false;
 
-  ARRAY_FORMULA: UntypedFormArray;
+  ARRAY_FORMULA: FormArray;
   COMPRADOEN: any;
   MEDIDACAJA: any;
   is_combo = false;
@@ -354,11 +354,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.listaSubTipoArticulos.length > 0 ? this.form.controls.sub_tipo_articulo_id.enable() : this.form.controls.sub_tipo_articulo_id.disable();
   }
 
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.capitalice(arg));
-  }
-
   createForm() {
     this.form = this.fb.group({
       nombre: [null, Validators.required],
@@ -397,7 +392,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       otros_costos: [null],
     });
 
-    this.ARRAY_FORMULA = this.form.controls['rowFormula'] as UntypedFormArray;
+    this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
   }
 
   saltar(campo, index?) {
@@ -549,11 +544,17 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     return res;
   }
 
+  getFormControlInFormArray(index, formControlName) {
+    return ((this.form.get('rowFormula') as FormArray).controls[index] as FormGroup).get(formControlName);
+  }
+
+  getFormGroupInFormArray(index) {
+    return (this.form.get('rowFormula') as FormArray).controls[index] as FormGroup;
+  }
+
   async getCosto(index, dropdown) {
     const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
     const arrayUnidades = Object.keys(unidades);
-
-    this.ARRAY_FORMULA.controls[index].get('costo_formula').setValue(null);
 
     let extra = { afterPath: '', parameters: { costos: true } };
 
@@ -567,10 +568,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         }
       }
 
-      this.ARRAY_FORMULA.controls[index].get('medida_formula').setValue(medida_en_turno);
-
-      this.ARRAY_FORMULA.controls[index].get('costo_formula').setValue(fun.roundNumberToDecimal(costo_en_turno.costo));
-      this.ARRAY_FORMULA.controls[index].get('precio_formula').setValue(fun.roundNumberToDecimal(costo_en_turno.precio));
+      const formGroup = this.getFormGroupInFormArray(index);
+      if (fun.hasValue(formGroup)) {
+        this.getFormControlInFormArray(index, 'medida_formula').setValue(medida_en_turno);
+        this.getFormControlInFormArray(index, 'costo_formula').setValue(fun.roundNumberToDecimal(costo_en_turno.costo));
+        this.getFormControlInFormArray(index, 'precio_formula').setValue(fun.roundNumberToDecimal(costo_en_turno.precio));
+      }
 
       this.calculateCostoPT();
       dropdown.hide();
@@ -789,21 +792,23 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         }
       }
 
-      const control_en_turno = (formControlName) => this.ARRAY_FORMULA.controls[indexFormula].get(formControlName);
+      const formGroup = this.getFormGroupInFormArray(indexFormula);
 
-      if (recalcular) {
-        control_en_turno['costo_formula'].setValue(fun.roundNumberToDecimal(costo_en_turno));
-        control_en_turno['precio_formula'].setValue(fun.roundNumberToDecimal(precio_en_turno));
-      } else {
-        control_en_turno['costo_formula'].setValue(fun.roundNumberToDecimal(ingredient.costo));
-        control_en_turno['precio_formula'].setValue(fun.roundNumberToDecimal(ingredient.precio));
+      if (fun.hasValue(formGroup)) {
+        if (recalcular) {
+          this.getFormControlInFormArray(indexFormula, 'costo_formula').setValue(fun.roundNumberToDecimal(costo_en_turno));
+          this.getFormControlInFormArray(indexFormula, 'precio_formula').setValue(fun.roundNumberToDecimal(precio_en_turno));
+        } else {
+          this.getFormControlInFormArray(indexFormula, 'costo_formula').setValue(fun.roundNumberToDecimal(ingredient.costo));
+
+          this.getFormControlInFormArray(indexFormula, 'precio_formula').setValue(fun.roundNumberToDecimal(ingredient.precio));
+        }
+
+        this.getFormControlInFormArray(indexFormula, 'medida_formula').setValue(medida_en_turno);
+        this.getFormControlInFormArray(indexFormula, 'articulo_id').setValue(ingredient.articulo_combo_id);
+        this.getFormControlInFormArray(indexFormula, 'id').setValue(ingredient.id || null);
+        this.getFormControlInFormArray(indexFormula, 'cantidad_formula').setValue(fun.roundNumberToDecimal(ingredient.cantidad, 4));
       }
-
-      control_en_turno('medida_formula').setValue(medida_en_turno);
-      control_en_turno('articulo_id').setValue(ingredient.articulo_combo_id);
-      control_en_turno('id').setValue(ingredient.id || null);
-
-      control_en_turno['cantidad_formula'].setValue(fun.roundNumberToDecimal(ingredient.cantidad, 4));
     } catch (error) {
       console.error(error);
       fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
@@ -845,9 +850,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           this.form.controls.medida.setValue(this.medida_config);
           this.resetCompradoEn(this.medida_config);
 
-          for (let i = 0; i < articulo.formulas_productos_terminados.length; i++) {
-            const ingredient = articulo.formulas_productos_terminados[i];
-            this.fillFormula(ingredient, i);
+          for (let index = 0; index < articulo.formulas_productos_terminados.length; index++) {
+            const ingredient = articulo.formulas_productos_terminados[index];
+
+            this.fillFormula(ingredient, index);
             if (this.ARRAY_FORMULA.controls.length < articulo.formulas_productos_terminados.length) this.addItem();
           }
         } else {

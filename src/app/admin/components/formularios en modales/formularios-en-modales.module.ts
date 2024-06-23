@@ -34,7 +34,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabViewModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule],
+  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabViewModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule, DirectivesModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}

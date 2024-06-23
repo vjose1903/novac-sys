@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { PipesModule } from '../../../core/pipe/pipes.module';
-import { NgxBootstrapModule } from '../../../../app/modules/ngx-bootstrap.module';
 import { PrimengModule } from '../../../../app/modules/primeng.module';
 import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
@@ -14,6 +12,6 @@ import { CatalogoCuentasPageRoutingModule } from './catalogo-cuentas-page.routin
 
 @NgModule({
   declarations: [CatalogoCuentasPageComponent],
-  imports: [CommonModule, PipesModule, NgxBootstrapModule, PrimengModule, BtnIconModule, TablasModule, DirectivesModule, CatalogoCuentasModule, CatalogoCuentasPageRoutingModule],
+  imports: [CommonModule, PipesModule, PrimengModule, BtnIconModule, TablasModule, DirectivesModule, CatalogoCuentasModule, CatalogoCuentasPageRoutingModule],
 })
 export class CatalogoCuentasPageModule {}

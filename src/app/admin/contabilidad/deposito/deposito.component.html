@@ -111,12 +111,12 @@
                     <label class="control-label" requiredFieldLabel>Monto: </label>
                     <input
                       type="text"
-                      (keydown.enter)="saltar($event.target.id)"
+                      (keydown.enter)="saltar(htmlServ.getId($event))"
                       [id]="depositoFormFieldId.monto"
                       [formControlName]="depositoFormAttr.monto"
                       placeholder="Introduzca monto"
                       class="form-control"
-                      (focus)="desformatearMonto(depositoFormAttr.monto); $event.target.select()"
+                      (focus)="desformatearMonto(depositoFormAttr.monto); htmlServ.selectValue($event)"
                       autocomplete="off"
                       (blur)="formatearMonto(depositoFormAttr.monto)"
                     />
@@ -129,12 +129,12 @@
                     <label class="control-label">Número de referencia: </label>
                     <input
                       type="text"
-                      (keydown.enter)="saltar($event.target.id)"
+                      (keydown.enter)="saltar(htmlServ.getId($event))"
                       [id]="depositoFormFieldId.numero_referencia"
                       [formControlName]="depositoFormAttr.numero_referencia"
                       placeholder="Introduzca la referencia"
                       class="form-control"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       autocomplete="off"
                     />
                     <span id="msgContainer"></span>

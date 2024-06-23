@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "5.0.5",
+  "version": "5.0.5",   
   "description": "Sistema facturacion e inventario NOVAC.",
   "author": {
     "name": "Victor Jose Vásquez Santos",
@@ -28,7 +28,7 @@
     "electron:solo": "tsc -p tsconfig.serve.json && electron-builder build --windows --x64",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "bundle-report": "webpack-bundle-analyzer dist/stats.json"
-  }, 
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/vjose1903/novac-system-agrodemi.git"

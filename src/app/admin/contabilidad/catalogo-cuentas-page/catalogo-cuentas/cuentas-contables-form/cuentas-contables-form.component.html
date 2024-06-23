@@ -37,7 +37,7 @@
         </div>
 
         <div class="p-0 col-12">
-          <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
+          <div class="form-group" appMsgError="descripcion" [form]="form">
             <label class="control-label">Descripción: <span style="color: red">*</span></label>
             <input
               [appCapitalice]="'formGroup'"
@@ -55,14 +55,15 @@
         </div>
 
         <div class="p-0 col-12" *ngIf="inputs.method == 'edit'">
-          <div class="form-group" [appMsgError]="'descripcion'" [form]="form">
+          <div class="form-group" appMsgError="descripcion" [form]="form">
             <label class="control-label">Cuenta Contable: </label>
             <input [appCapitalice]="'formGroup'" id="campoCodigo" type="text" formControlName="codigo" class="form-control" autocomplete="off" />
+            <span id="msgContainer"></span>
           </div>
         </div>
 
         <div class="p-0 col-12">
-          <div class="form-group" [appMsgError]="'origen'" [form]="form">
+          <div class="form-group" appMsgError="origen" [form]="form">
             <label class="control-label">Origen: <span style="color: red">*</span></label>
             <p-dropdown
               [placeholder]="'Seleccione el origen de la cuenta'"
@@ -83,7 +84,7 @@
         </div>
 
         <div class="p-0 col-12">
-          <div class="form-group" [appMsgError]="'tipo'" [form]="form">
+          <div class="form-group" appMsgError="tipo" [form]="form">
             <label class="control-label">Tipo: <span style="color: red">*</span></label>
             <p-dropdown
               [placeholder]="'Seleccione el tipo de cuenta'"

@@ -1,9 +1,8 @@
 import { ConfigService } from './../../../core/services/configuration.service';
 import { Component, HostListener, OnInit } from '@angular/core';
-import { IModalConfiguration, ModalComponentI, ModalI } from '../../components/modal/modal-class';
+import { ModalComponentI, ModalI } from '../../components/modal/modal-class';
 import { SharedService } from '../../../core/services/shared.service';
 import { teclasCode } from '../../../core/typescript/constantes';
-import * as _ from 'lodash';
 import { FacturacionService } from '../facturacion.service';
 
 @Component({

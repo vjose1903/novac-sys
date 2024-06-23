@@ -1,7 +1,8 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ModalComponentI, ModalI } from '../../components/modal/modal-class';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { NgxPermissionsService } from 'ngx-permissions';
@@ -23,7 +24,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
   permissions = Permisos;
   hasPermissionsCreateUpdate;
 
-  modalComponent: ModalComponentI= {};
+  modalComponent: ModalComponentI = {};
   inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI>; entidad: entidadesContables };
 
   tabIndex = 0;
@@ -37,7 +38,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     id_tabla: 'listado_categorias',
     padre_functions: { data_request: (params) => this.fillArrayWithCategorias({ ...params }) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true,  is_local: false },
+    obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.categoria_entidad_contable.update } },
   };
   tablaComponent: any;
@@ -46,6 +47,8 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
   listadoCategorias: Array<CategoriaEntidadContableI> = [];
 
   categoriaEntContClass = new CategoriaEntidadContableC();
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private permissionsService: NgxPermissionsService, private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();

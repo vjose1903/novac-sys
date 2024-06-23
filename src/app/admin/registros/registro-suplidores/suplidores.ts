@@ -2,9 +2,8 @@ import { EntidadCuentaContableI } from './../../contabilidad/entidad-cuenta-cont
 import { CrudG } from '../../../core/typescript/crud-g';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
-import * as _ from 'lodash';
 import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
-import { IModalConfiguration, ModalClass } from '../../components/modal/modal-class';
+import { ConfigureModalI, ModalClass } from '../../components/modal/modal-class';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { DateUtils } from '../../../core/typescript/date.utils';
 
@@ -13,7 +12,6 @@ export class SuplidorC extends CrudG<any> {
     super('suplidores');
   }
 
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
       let objModal;
@@ -75,7 +73,7 @@ export class SuplidorC extends CrudG<any> {
       let objPdfView = {
         ...response,
         titulo: pdfParams.inputs.titulo,
-        fileName: _.first(response.file.split('.')),
+        fileName: response.file.split('.')[0],
         openNewModal: pdfParams.openNewModal,
         viewerOptions: { width: tipo == CxP.por_suplidor ? '57rem' : '64rem', height: tipo == CxP.por_suplidor ? '76vh' : '47rem' },
       };
@@ -90,7 +88,7 @@ export class SuplidorC extends CrudG<any> {
     params.inputs['metodo'] = 'compra';
     params.inputs['palabra_a_buscar'] = ' ';
 
-    let objModal: IModalConfiguration = {
+    let objModal: ConfigureModalI = {
       id: params.tipo,
       inputs: params.inputs,
       header: params.inputs.titulo,
