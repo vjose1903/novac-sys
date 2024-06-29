@@ -127,7 +127,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
         componente['instance'].modalComponent = this;
         componente['instance'].modalComponent.id = config.id;
 
-        currentConfig['instance'] = componente['instance'];
+        currentConfig['componentInstance'] = componente['instance'];
       }, 1);
     }
   }
@@ -179,8 +179,8 @@ export class NewModalComponent implements OnInit, OnDestroy {
 
     const modal = _.find(this.modalsConfig, (config) => config.id === id_);
 
-    if (modal['instance']) {
-      modal['instance'].btn_aceptar();
+    if (modal['componentInstance']) {
+      modal['componentInstance'].btn_aceptar();
     } else {
       modal.dismissModal(modal.id, { bool: bool, inputs: modal.inputs, modalId: modal.id });
     }

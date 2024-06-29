@@ -28,6 +28,7 @@ export interface ConfigureModalI {
   header?: string;
   inputs?: any;
   component?: any;
+  componentInstance?: any;
   width?: string;
   height?: string;
   botones?: ButtonsObjI;

@@ -94,7 +94,7 @@
                           class="form-control entrada"
                           id="codigo-{{ index_cuerpo }}"
                           [maxlength]="minCodigo"
-                          (focus)="verificarSecuencia(index_cuerpo)"
+                          (focus)="verificarSecuencia(index_cuerpo); htmlServ.selectValue($event)"
                           (keyup)="checkCodigo(index_cuerpo)"
                           (keyup.enter)="saltar('cantidad-', index_cuerpo)"
                           formControlName="codigo"
@@ -199,7 +199,7 @@
                           <input
                             type="text"
                             (blur)="revisarPrecio(factServ.isCompra ? 'costo' : 'precio', factServ.isCompra ? 'costo' : 'precio', index_cuerpo); calcularMontosRow(index_cuerpo)"
-                            (focus)="verificarSecuencia(index_cuerpo)"
+                            (focus)="verificarSecuencia(index_cuerpo); htmlServ.selectAndConvertToNumber($event)"
                             class="form-control entrada campoNumeros {{ factServ.isVenta ? 'inPRE' : '' }}"
                             (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
                             id="{{ factServ.isCompra ? 'costo' : 'precio' }}-{{ index_cuerpo }}"

@@ -1306,6 +1306,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 },
               });
             } else {
+              console.log("ENTRO AQUIII");
+              
               let articulos_a_cambiar = false;
 
               if (this.factServ.isCompra) {

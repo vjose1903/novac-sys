@@ -12,7 +12,7 @@ export class PendienteFormComponent implements OnInit, ModalI {
   hora;
   minutos;
   meridian = true;
-  fecha: Date;
+  fecha: Date | string;
   maxDate = new Date();
 
   constructor() {}
@@ -20,28 +20,36 @@ export class PendienteFormComponent implements OnInit, ModalI {
   modalComponent: ModalComponentI = {};
   inputs: any;
 
-  btn_aceptar() {
-    const fecha = DateUtils.format({ date: this.fecha, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm', separator: ' ' });
-    this.modalComponent.closeModal(this.modalComponent.id, { fecha });
-  }
-
   ngOnInit() {
     this.fecha = new Date();
     this.hora = this.fecha.getHours();
     this.minutos = this.fecha.getMinutes();
+    this.fecha = DateUtils.format({ date: new Date(), include_hour: true });
 
     this.time = { hour: this.hora, minute: this.minutos };
   }
 
   changeHour() {
-    const time = this.fecha;
+    let time = this.fecha as Date;
+
+    if (!DateUtils.isValid(time)) {
+      time = DateUtils.convertStringToDate({ dateString: time });
+    }
+
     time.setHours(this.time.hour);
     time.setMinutes(this.time.minute);
 
-    this.fecha = time;
+    this.fecha = DateUtils.format({ date: time, include_hour: true });
   }
 
   toggleMeridian() {
     this.meridian = !this.meridian;
+  }
+
+  btn_aceptar() {
+    const dateFormat = DateUtils.convertStringToDate({ dateString: this.fecha });
+    const fecha = DateUtils.format({ date: dateFormat, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm', separator: ' ' });
+
+    this.modalComponent.closeModal(this.modalComponent.id, { fecha });
   }
 }

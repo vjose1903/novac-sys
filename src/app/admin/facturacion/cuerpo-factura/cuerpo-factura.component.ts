@@ -1,9 +1,10 @@
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { RetornarDevueltoComponent } from './retornar-devuelto/retornar-devuelto.component';
 import { FacturacionService } from './../facturacion.service';
 import { tipoDocFacturacion } from './../factura';
-import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -57,6 +58,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   lastCuerpoChange;
   private destroy$ = new Subject<void>();
+
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private fb: UntypedFormBuilder, public factServ: FacturacionService) {
     super();

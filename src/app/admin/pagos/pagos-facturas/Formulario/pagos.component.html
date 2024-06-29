@@ -13,7 +13,7 @@
               id="clienteI"
               (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
               (focus)="htmlServ.selectValue($event)"
-              [placeholder]="pagosService.isReciboIngreso ? 'Nombre Cliente' : 'Nombre Suplidor' "
+              [placeholder]="pagosService.isReciboIngreso ? 'Nombre Cliente' : 'Nombre Suplidor'"
               class="form-control mb-4"
               autocomplete="off"
               [ngClass]="{ disabled: !!entidadAdepositar }"
@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="col-8 pl-0">
-        @if (clienteAdepositar) {
+        @if (entidadAdepositar) {
         <div class="clienteAdepositar">
           <div class="nombre_entidad">
             <h3 class="negrita mb-0">{{ entidadAdepositar.nombre_completo }}</h3>
@@ -64,11 +64,10 @@
             </div>
           </div>
           <div class="porcentaje">
-            @if (clienteAdepositar) {
             <div class="d-flex justify-content-between">
               <span class="negrita">Porcentaje de pago</span>
             </div>
-            }
+
             <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
           </div>
         </div>
@@ -97,7 +96,7 @@
     @if (facturas && facturas?.length) {
     <div class="d-flex justify-content-end gap-2">
       <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
-      <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarPago()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>
     }
   </div>

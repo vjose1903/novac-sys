@@ -93,6 +93,16 @@ export class DateUtils {
   }
 
   /**
+   * Verifica si el valor de una variable es de tipo Date.
+   * @param value Variable a evaluar
+   * @returns true or false.
+   * @example DateUtils.isDate()
+   */
+  static isValid(value: any): boolean {
+    return value instanceof Date && !isNaN(value.getTime());
+  }
+
+  /**
    * Formatea una fecha según las opciones proporcionadas.
    * @param params Objeto con las opciones de formateo de la fecha.
    *               - date: La fecha a formatear (opcional, por defecto es la fecha actual).
@@ -117,5 +127,55 @@ export class DateUtils {
     if (params.include_hour) fecha += `${fecha.length > 0 ? params.separator : ''}${moment(params.date).format(params.hourFormat ?? 'LT')}`;
 
     return fecha;
+  }
+
+  /**
+   * Formatea una fecha según las opciones proporcionadas.
+   * @param params Objeto con las opciones de formateo de la fecha.
+   *               - date: La fecha a formatear (opcional, por defecto es la fecha actual).
+   *               - dateFormat: El formato de la fecha (opcional, por defecto es 'DD/MM/YYYY').
+   *               - include_hour: Indica si se debe incluir la hora en el formato (opcional, por defecto es false).
+   *               - only_hour: Indica si solo se debe incluir la hora en el formato (opcional, por defecto es false).
+   *               - hourFormat: El formato de la hora (opcional, por defecto es 'LT').
+   *               - separator: El separador entre la fecha y la hora (opcional, por defecto es ' - ').
+   * @returns Una cadena de texto que representa la fecha formateada según las opciones proporcionadas.
+   * @example DateUtils.format({ date: new Date(), dateFormat: 'DD/MM/YYYY', include_hour: true, only_hour: false, hourFormat: 'LT', separator: ' - ' })
+   */
+  static convertStringToDate(params?: { dateString?: any; include_hour?: boolean; separator?: string }) {
+    if (params == undefined) params = {};
+
+    const pattern = /^(\d{2})\/(\d{2})\/(\d{4}) - (\d{1,2}):(\d{2}) (AM|PM)$/;
+
+    const match = params.dateString.match(pattern);
+
+    let date;
+
+    if (!match) {
+      return (date = new Date(params.dateString));
+    } else {
+      const [, day, month, year, hour, minute, period] = match;
+
+      // Convierte las partes de string a números
+      let parsedHour = parseInt(hour, 10);
+      const parsedMinute = parseInt(minute, 10);
+      const parsedDay = parseInt(day, 10);
+      const parsedMonth = parseInt(month, 10) - 1; // Los meses en Date son 0-indexed
+      const parsedYear = parseInt(year, 10);
+
+      // Ajusta la hora para el formato AM/PM
+      if (period === 'PM' && parsedHour !== 12) {
+        parsedHour += 12;
+      } else if (period === 'AM' && parsedHour === 12) {
+        parsedHour = 0;
+      }
+
+      // Crea el objeto Date
+      date = new Date(parsedYear, parsedMonth, parsedDay, parsedHour, parsedMinute);
+    }
+
+    // Verifica si la fecha es válida
+    if (!DateUtils.isValid(date)) return null;
+
+    return date;
   }
 }
