@@ -21,9 +21,6 @@ export class CustomLodash extends ToastService {
   // Descripcion : Esta funcion remueve un item  de un arreglo
   // _________________________________________________________________________________________________
   static pull(array, item_remove) {
-    console.log('item_remove ', item_remove);
-    console.log('array ', array);
-
     const index = array.findIndex((item) => fun.isEqual(item, item_remove));
     array.splice(index, 1);
   }
@@ -80,7 +77,7 @@ export class CustomLodash extends ToastService {
     for (let i = 1; i < collection.length; i++) {
       const element = collection[i];
       const value = typeof iteratee === 'function' ? iteratee(element) : element[iteratee];
-      
+
       if (value > maxValue) {
         maxValue = value;
         maxElement = element;
