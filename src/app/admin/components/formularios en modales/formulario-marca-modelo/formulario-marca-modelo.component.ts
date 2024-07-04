@@ -131,7 +131,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: params.paginado, page: params.page, per_page: params.per_page } };
     this.listadoMarcas.length = 0;
     this.marcasClass.getAll(extra).then((res) => {
-      if (!params.paginado) this.listaMarcas = fun.duplicarJson(res);
+      if (!params.paginado) this.listaMarcas = fun.deepCloning(res);
       if (params.paginado) {
         this.listadoMarcas = res.data;
         this.tablaMarcaComponent.changeTableConfig([{ total_count: res.total_registros }]);
@@ -200,7 +200,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   async submit(formToSubmit) {
-    const obj = fun.duplicarJson(formToSubmit.getRawValue());
+    const obj = fun.deepCloning(formToSubmit.getRawValue());
     const metodo = fun.hasValue(obj?.id) ? 'actualizado' : 'creado';
 
     if (this.isShowMarcas() && fun.objHas(obj, 'marca_id')) delete obj['marca_id'];

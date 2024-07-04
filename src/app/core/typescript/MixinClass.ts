@@ -74,19 +74,19 @@ export class MixinClass extends ModalClass {
 
   // =========================================================================================================
   logBlue(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logYellow(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logRed(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logGreen(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   eliminarRegistro(obj) {
@@ -99,7 +99,7 @@ export class MixinClass extends ModalClass {
       width: '510px',
       html: `<p> ${obj?.texto} </p>`,
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco', function: (instance) => noFunction(instance), label: 'NO', disable: false },
           {

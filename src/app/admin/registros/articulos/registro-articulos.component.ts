@@ -1,7 +1,7 @@
 import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators, FormArray, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -95,7 +95,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   tablaComponent;
   cofig_articulos: ConfigArticuloI;
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
@@ -152,7 +152,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
 
       this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.materia_prima }).then((res) => {
-        this.listaMateriasPrimas = fun.duplicarJson(res['data']);
+        this.listaMateriasPrimas = fun.deepCloning(res['data']);
         resolve(true);
       });
     });
@@ -161,7 +161,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   getTipoArticulos() {
     this.listaTipoArticulos = [];
     this.tipoArticuloClass.getAll().then((res) => {
-      this.listaTipoArticulos = fun.duplicarJson(res.data);
+      this.listaTipoArticulos = fun.deepCloning(res.data);
     });
   }
 
@@ -173,9 +173,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       header: 'Configuraciones de articulos',
       width: '50rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false, },
+          { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
           { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
         ],
       },
@@ -273,11 +273,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       medida: { venta_normal: [Validators.required], servicio: null },
     };
 
-    for (const key in objValidators) {
-      const element = objValidators[key];
-
-      this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
-      this.form.controls[key].updateValueAndValidity();
+    if (fun.hasValue(this.tipoArticuloSelected)) {
+      for (const key in objValidators) {
+        const element = objValidators[key];
+        this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
+        this.form.controls[key].updateValueAndValidity();
+      }
     }
   }
 
@@ -323,7 +324,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       otros_costos: [null],
     });
 
-    this.ARRAY_FORMULA = this.form.controls['rowFormula'] as UntypedFormArray;
+    this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
   }
 
   saltar(campo, i?) {
@@ -373,20 +374,19 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   borrar(reset = false) {
-    this.articuloSelected = undefined;
+    [this.articuloSelected, this.tipoArticuloSelected] = Array(2).fill(undefined);
+
     if (fun.hasValue(this.form)) this.form.reset();
-    fun.enfocarInput('nombre');
     if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
     if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
-    this.boton = 'Registrar';
-    this.tipoArticuloSelected = undefined;
-    this.recalcular = false;
-    if (this.is_combo) this.resetArray();
 
-    this.is_combo = false;
-    if (fun.hasValue(this.form)) this.form.controls['rowFormula'].reset();
+    [this.recalcular, this.is_combo] = Array(2).fill(false);
 
+    if (fun.hasValue(this.ARRAY_FORMULA)) this.resetArray();
     if (reset) this.isCreando = true;
+    this.modificateValidators();
+
+    fun.enfocarInput('nombre');
   }
 
   resetCompradoEn(value) {
@@ -433,24 +433,20 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   resetArray() {
-    this.ARRAY_FORMULA = this.form.get('rowFormula') as UntypedFormArray;
-
-    this.ARRAY_FORMULA.value.forEach((element) => this.removeItem(0));
+    this.ARRAY_FORMULA.clear();
   }
 
   addItem(): void {
-    this.ARRAY_FORMULA = this.form.get('rowFormula') as UntypedFormArray;
     this.ARRAY_FORMULA.push(this.createItem());
   }
 
-  removeItem(i: number) {
-    const control = this.form.controls['rowFormula'] as UntypedFormArray;
-    control.removeAt(i);
+  removeItem(index: number) {
+    this.ARRAY_FORMULA.removeAt(index);
   }
 
   checkCostoFormula(fila) {
     let res = false;
-    const fila_formulario = fun.duplicarJson(fila.value);
+    const fila_formulario = fun.deepCloning(fila.value);
     const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
 
     if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
@@ -473,28 +469,36 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     return res;
   }
 
+  getFormControlInFormArray(index, formControlName) {
+    return ((this.form.get('rowFormula') as FormArray).controls[index] as FormGroup).get(formControlName);
+  }
+
+  getFormGroupInFormArray(index) {
+    return (this.form.get('rowFormula') as FormArray).controls[index] as FormGroup;
+  }
+
   async getCosto(index, dropdown) {
-    const control = this.form.controls['rowFormula'] as UntypedFormArray;
     const unidades = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
     const arrayUnidades = Object.keys(unidades);
-    (control.controls[index] as any).controls['costo_formula'].setValue(null);
 
     let extra = { afterPath: '', parameters: { costos: true } };
 
-    this.articuloClass.getOne(control.value[index].articulo_id, extra).then((res) => {
+    this.articuloClass.getOne(this.ARRAY_FORMULA.value[index].articulo_id, extra).then((res) => {
       let costo_en_turno;
       let medida_en_turno;
       for (const unidad_en_turno of arrayUnidades) {
-        if (fun.hasValue(res.data.costos[unidad_en_turno])) {
-          costo_en_turno = res.data.costos[unidad_en_turno];
+        if (fun.hasValue(res.data['costos'][unidad_en_turno])) {
+          costo_en_turno = res.data['costos'][unidad_en_turno];
           medida_en_turno = unidades[unidad_en_turno];
         }
       }
 
-      (control.controls[index] as any).controls['medida_formula'].setValue(medida_en_turno);
-
-      (control.controls[index] as any).controls['costo_formula'].setValue(fun.roundNumberToDecimal(costo_en_turno.costo));
-      (control.controls[index] as any).controls['precio_formula'].setValue(fun.roundNumberToDecimal(costo_en_turno.precio));
+      const formGroup = this.getFormGroupInFormArray(index);
+      if (fun.hasValue(formGroup)) {
+        this.getFormControlInFormArray(index, 'medida_formula').setValue(medida_en_turno);
+        this.getFormControlInFormArray(index, 'costo_formula').setValue(fun.roundNumberToDecimal(costo_en_turno.costo));
+        this.getFormControlInFormArray(index, 'precio_formula').setValue(fun.roundNumberToDecimal(costo_en_turno.precio));
+      }
 
       this.calculateCostoPT();
       dropdown.hide();
@@ -679,7 +683,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async recalcularFunc() {
-    const temp = fun.duplicarJson(this.tipoArticuloSelected);
+    const temp = fun.deepCloning(this.tipoArticuloSelected);
     this.tipoArticuloSelected = undefined;
     this.resetArray();
 
@@ -694,13 +698,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.tipoArticuloSelected = temp;
   }
 
-  fillFormula(ingredient, i, recalcular = false) {
-    const control = this.form.controls['rowFormula'] as UntypedFormArray;
-
-    const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo));
-
+  fillFormula(ingredient, indexFormula, recalcular = false) {
     try {
-      const unidades_minimas = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
+      const articulo_combo_id = ingredient.articulo_combo_id ?? ingredient?.articulo_combo?.id ?? ingredient.articulo_combo;
+      const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(articulo_combo_id));
+      
+      const unidades_minimas = { Libra: 'Lbs.', Unidad: 'Und.', Onza: 'Oz.' };
       const arrayUnidades = Object.keys(unidades_minimas);
 
       let costo_en_turno;
@@ -712,25 +715,29 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           costo_en_turno = materiaPrima.costos[unidad_en_turno].costo;
           precio_en_turno = materiaPrima.costos[unidad_en_turno].precio;
           medida_en_turno = unidades_minimas[unidad_en_turno];
+          break;
         }
       }
 
-      const control_en_turno = (control.controls[i] as any).controls;
+      const formGroup = this.getFormGroupInFormArray(indexFormula);
 
-      if (recalcular) {
-        control_en_turno['costo_formula'].setValue(fun.roundNumberToDecimal(costo_en_turno));
-        control_en_turno['precio_formula'].setValue(fun.roundNumberToDecimal(precio_en_turno));
-      } else {
-        control_en_turno['costo_formula'].setValue(fun.roundNumberToDecimal(ingredient.costo));
-        control_en_turno['precio_formula'].setValue(fun.roundNumberToDecimal(ingredient.precio));
+      if (fun.hasValue(formGroup)) {
+        if (recalcular) {
+          this.getFormControlInFormArray(indexFormula, 'costo_formula').setValue(fun.roundNumberToDecimal(costo_en_turno));
+          this.getFormControlInFormArray(indexFormula, 'precio_formula').setValue(fun.roundNumberToDecimal(precio_en_turno));
+        } else {
+          this.getFormControlInFormArray(indexFormula, 'costo_formula').setValue(fun.roundNumberToDecimal(ingredient.costo));
+          this.getFormControlInFormArray(indexFormula, 'precio_formula').setValue(fun.roundNumberToDecimal(ingredient.precio));
+        }
+
+        this.getFormControlInFormArray(indexFormula, 'medida_formula').setValue(medida_en_turno);
+        this.getFormControlInFormArray(indexFormula, 'articulo_id').setValue(articulo_combo_id);
+        this.getFormControlInFormArray(indexFormula, 'id').setValue(ingredient.id || null);
+        this.getFormControlInFormArray(indexFormula, 'cantidad_formula').setValue(fun.roundNumberToDecimal(ingredient.cantidad, 4));
       }
-
-      control_en_turno['medida_formula'].setValue(medida_en_turno);
-      control_en_turno['articulo_id'].setValue(ingredient.articulo_combo);
-      control_en_turno['id'].setValue(ingredient.id || null);
-
-      control_en_turno['cantidad_formula'].setValue(fun.roundNumberToDecimal(ingredient.cantidad, 4));
     } catch (error) {
+      console.error(error);
+
       fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
     }
   }
@@ -748,6 +755,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async editarItem(articulo) {
     this.borrar();
+
     this.form.patchValue(articulo);
     this.articuloSelected = articulo;
     this.boton = 'Editar';
@@ -760,20 +768,24 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(fun.roundNumberToDecimal(articulo.otros_costos));
-      const res = await this.getMateriasP();
 
-      if (articulo.formulas_productos_terminados.length) {
-        this.form.controls.medida.setValue(this.medida_config);
-        this.resetCompradoEn(this.medida_config);
+      await this.getMateriasP().then(() => {
+        if (articulo.formulas_productos_terminados.length) {
+          this.form.controls.medida.setValue(this.medida_config);
+          this.resetCompradoEn(this.medida_config);
 
-        for (let i = 0; i < articulo.formulas_productos_terminados.length; i++) {
-          const ingredient = articulo.formulas_productos_terminados[i];
+          const formGroup = this.getFormGroupInFormArray(0);
+
+          for (let index = 0; index < articulo.formulas_productos_terminados.length; index++) {
+            const ingredient = articulo.formulas_productos_terminados[index];
+
+            this.addItem();
+            this.fillFormula(ingredient, index);
+          }
+        } else {
           this.addItem();
-          this.fillFormula(ingredient, i);
         }
-      } else {
-        this.addItem();
-      }
+      });
     } else this.COMPRADOEN = articulo.medida;
 
     if (articulo.contenido_articulos.length > 0) this.MEDIDACAJA = articulo.contenido_articulos[0].medida;

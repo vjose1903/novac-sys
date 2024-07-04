@@ -85,11 +85,11 @@ export class fun {
     return fecha;
   }
   // __________________________________________________________________________________________________
-  // Nombre: duplicarJson
+  // Nombre: deepCloning
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
 
-  static duplicarJson(obj: Object | Array<any>) {
+  static deepCloning(obj: Object | Array<any>) {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
@@ -102,7 +102,7 @@ export class fun {
     Object.getOwnPropertyNames(obj).forEach(function (key) {
       let descriptor = Object.getOwnPropertyDescriptor(obj, key);
       if (descriptor.value && typeof descriptor.value === 'object') {
-        descriptor.value = fun.duplicarJson(descriptor.value);
+        descriptor.value = fun.deepCloning(descriptor.value);
       }
       Object.defineProperty(copy, key, descriptor);
     });
@@ -129,7 +129,7 @@ export class fun {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (fun.isEmpty(searchText)) resolve(copyData);
 
-        const data_filtered = fun.duplicarJson(copyData).filter((obj) => {
+        const data_filtered = fun.deepCloning(copyData).filter((obj) => {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
@@ -743,7 +743,7 @@ export class fun {
   // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
   // _________________________________________________________________________________________________
   static pushAt(arr, index, newItem) {
-    const copyArr = fun.duplicarJson(arr);
+    const copyArr = fun.deepCloning(arr);
     arr.length = 0;
     const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
     newArr.forEach((item) => arr.push(item));

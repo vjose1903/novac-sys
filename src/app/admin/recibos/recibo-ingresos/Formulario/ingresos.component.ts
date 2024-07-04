@@ -396,7 +396,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         _.pull(this.facturasSelected, factura_en_turno);
       }
     } else if (method == 'modify') {
-      this.facturasSelected[index_factura_en_turno] = fun.duplicarJson(factura);
+      this.facturasSelected[index_factura_en_turno] = fun.deepCloning(factura);
 
       this.facturasSelected[index_factura_en_turno].monto = value;
       this.tablaComponent.resetInput('monto', 'especificar', index, true, value);
@@ -481,7 +481,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
       });
       fun.desEnfocarInput('clienteI');
     }
@@ -531,7 +531,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         header: 'Cantidad de efectivo',
         width: '34.375rem',
         botones: {
-          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },

@@ -78,7 +78,7 @@ export class ConfiguracionesComponent implements OnInit {
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
       this.config = config;
-      this.configCopy = fun.duplicarJson(config);
+      this.configCopy = fun.deepCloning(config);
       this.parseDocumentosAImprimir(config).then(() => this.createForm(config));
 
       fun.logGreen('this.config', this.config);

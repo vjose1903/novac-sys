@@ -417,7 +417,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   selectTableConfig() {
     return new Promise<void>((resolve) => {
-      this.table_config = fun.duplicarJson(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
+      this.table_config = fun.deepCloning(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
       this.table_config['padre_functions'] = { data_request: (params) => this.pedirFactura(params) };
 
       this.verificateTableActions();
@@ -453,7 +453,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
 
-    if (valor == this.campos.ultimas50) this.pedirFactura(fun.duplicarJson(this.tServ.obj_paginate.default));
+    if (valor == this.campos.ultimas50) this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
 
     if (tipo == 'tipo_documento') {
       this.buscar_por = null;
@@ -645,7 +645,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       header: this.tipo_documento_selected == 'compra' ? 'Buscar Suplidor' : 'Buscar Cliente',
       width: '900px',
       height: '500px',
-      botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+      botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
     });
   }
 
@@ -717,7 +717,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
           botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: botonesDinamicos,
           },
         };

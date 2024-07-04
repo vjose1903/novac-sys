@@ -349,7 +349,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       width: '510px',
       html: `<p> ${texto_modal} </p>`,
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
           { clase: 'btn btn-verde', function: (instance) => functions[tipo](instance, data), label: 'SI', disable: false },
@@ -378,7 +378,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async confirmarProduccion() {
-    const obj = fun.duplicarJson(this.lista_produccion);
+    const obj = fun.deepCloning(this.lista_produccion);
     const produccion_send = {};
 
     const detalle = [];

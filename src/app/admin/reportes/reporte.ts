@@ -78,7 +78,7 @@ export class ReporteC extends CrudG<any> {
         width: objPdfView?.viewerOptions?.width ?? '57rem',
         height: objPdfView?.viewerOptions?.height ?? '76vh',
         botones: {
-          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
             { clase: 'btn btn-verde', function: (instance) => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false, },

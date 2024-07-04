@@ -23,7 +23,7 @@ export class TablasService {
 
   initPagination(id, params?: paginateI) {
     return new Promise<void>((resolve, reject) => {
-      params ??= fun.duplicarJson(this.obj_paginate);
+      params ??= fun.deepCloning(this.obj_paginate);
       if (this.obj_paginate[id] == undefined) this.obj_paginate[id] = params;
       resolve();
     });
@@ -108,7 +108,7 @@ export class TablasService {
 
   modifyRowsEditing(newData, kind: 'add' | 'remove') {
     return new Promise<any>((resolve, reject) => {
-      newData = fun.duplicarJson(newData);
+      newData = fun.deepCloning(newData);
       const row_editing = this.rowsEditing.find((item) => item.id == newData.id);
 
       const index_editing = this.rowsEditing.findIndex((row_edit) => row_edit.id == row_editing?.id);

@@ -248,7 +248,7 @@ export class FacturaC extends CrudG<FacturasI> {
       const pick_factura2 = ['fecha_viaje', 'forma_pago', 'id', 'is_viaje', 'monto', 'numero_comprobante', 'tipo', 'tipo_factura_id', 'itbis', 'suplidor', 'tipo_factura', 'total_factura', 'usuario', 'vendedor'];
       const pick_factura = [...pick_factura1, ...pick_factura2];
 
-      let temp_data_parsed = _.pick(fun.duplicarJson(data), pick_factura);
+      let temp_data_parsed = _.pick(fun.deepCloning(data), pick_factura);
 
       const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [
         { old_key: 'tipo_factura', new_key: 'tipo_pdf' },
@@ -284,7 +284,7 @@ export class FacturaC extends CrudG<FacturasI> {
       width: '30rem',
       height: '10rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
@@ -303,7 +303,7 @@ export class FacturaC extends CrudG<FacturasI> {
             header: dataModal.header,
             width: '900px',
             botones: {
-              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
             },
           };
@@ -338,7 +338,7 @@ export class FacturaC extends CrudG<FacturasI> {
         header: 'Historial de moviemientos a balance de factura',
         width: '700px',
         height: '400px',
-        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
       });
     }
   }
