@@ -266,7 +266,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   goBack() {
-    const url = `/admin/recibos/lista_pagos/${this.pagosService.tipoPago}`;
+    const url = `/admin/pagos/lista_pagos/${this.pagosService.tipoPago}`;
     this.router.navigateByUrl(url);
   }
 
@@ -310,7 +310,6 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('entidadI');
       } else {
-        
         this.entidadAdepositar = arg.data;
         (document.getElementById('entidadI') as any).value = arg.data.nombre_completo;
         const parameters = { ...this.tServ.obj_paginate.default, factura_a_buscar: arg?.factura_a_buscar };
@@ -354,7 +353,8 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
         const config = {};
         const configKey = this.pagosService.isReciboIngreso ? 'showPagos' : 'showRecibos';
         config[configKey] = false;
-        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, params.data.recibos, this.openNewModal, config);
+
+        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, params.data.recibos, this.openNewModal.bind(this), config);
       }
 
       if (params.iconKey == 'ver') {

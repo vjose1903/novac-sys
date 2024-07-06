@@ -91,7 +91,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     this.tipoNota = this.activeRoute.snapshot.params['tipo'];
     this.fecha = DateUtils.format({ dateFormat: 'DD/MM/YYYY' });
-    console.log('this.fecha ', this.fecha);
 
     if (this.tipoNota === 'credito') {
       this.tituloPag = 'Nota de crédito aplicada a factura ';

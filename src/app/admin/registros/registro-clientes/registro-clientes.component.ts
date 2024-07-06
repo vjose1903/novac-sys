@@ -421,14 +421,13 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       if (ConfigService.config.has_contabilidad) formulario['cuentas_contables'] = this.listaEntidadCuentasContables;
 
       const clienteData = fun.omit(formulario, ['img']);
-      console.log('clienteData ', clienteData);
 
-      // this.clienteClass.createUpdateOne(clienteData).then((res) => {
-      //   const actualPagination = this.tServ.getPaginationById('lista_clientes');
-      //   this.getClientes(actualPagination);
-      //   this.borrar();
-      //   fun.enfocarInput('cedula');
-      // });
+      this.clienteClass.createUpdateOne(clienteData).then((res) => {
+        const actualPagination = this.tServ.getPaginationById('lista_clientes');
+        this.getClientes(actualPagination);
+        this.borrar();
+        fun.enfocarInput('cedula');
+      });
     }
   }
 

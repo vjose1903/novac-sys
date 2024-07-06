@@ -80,9 +80,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((changes) => {
       if (!fun.isEqual(this.lastCuerpoChange, fun.deepCloning(this.factServ.getDetallesLlenos())) && fun.hasValue(this.factServ.getDetallesLlenos())) {
         this.lastCuerpoChange = fun.deepCloning(this.factServ.getDetallesLlenos());
-        setTimeout(() => {
-          this.emitirCambiosForm(this.factServ.getDetallesLlenos());
-        }, 250);
+        setTimeout(() => this.emitirCambiosForm(this.factServ.getDetallesLlenos()), 250);
       }
     });
   }
@@ -325,7 +323,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       if (fun.isEmpty(articulo) || fun.isEmpty(row.articulo.id)) {
         const res = await this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura });
-        articulo = _.first(res['data']);
+        [articulo] = res['data'];
       }
 
       resolve(articulo);

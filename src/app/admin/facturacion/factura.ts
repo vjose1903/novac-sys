@@ -142,8 +142,6 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static async getCamiones(name) {
-    console.log('name ', name);
-
     if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
         const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false, info_vehiculo: true } };
@@ -331,17 +329,20 @@ export class FacturaC extends CrudG<FacturasI> {
       });
 
       pagos.map((pago) => {
+
         pago.numero = String(pago.numero).padStart(8, '0');
         pago.fecha_equivalente = DateUtils.format({ date: pago.fecha_equivalente });
         return pago;
       });
+      
 
       const obj = { recibos: recibos, notas: notas, pagos: pagos, config: config };
+
       openNewModal({
         component: ModalHistorialPagosComponent,
         inputs: obj,
         id: 'historial_pago',
-        header: 'Historial de moviemientos a balance de factura',
+        header: 'Historial de movimientos a balance de factura',
         width: '700px',
         height: '400px',
         botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),

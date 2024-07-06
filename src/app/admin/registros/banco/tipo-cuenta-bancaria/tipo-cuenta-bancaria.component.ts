@@ -56,7 +56,6 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
   async necesarioStart() {
     await this.createForm().then(() => {
       this.formInitialValue = this.formGroup.getRawValue();
-      console.log('      this.formInitialValue ', this.formInitialValue);
     });
 
     this.initVariables();
@@ -89,7 +88,6 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
     this.listaTipoCuentasBancarias.length = 0;
     this.tipoCuentaBancariaClass.getAll(extra).then((res) => {
       this.listaTipoCuentasBancarias = fun.deepCloning(res.data);
-      console.log('res ', res);
 
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });

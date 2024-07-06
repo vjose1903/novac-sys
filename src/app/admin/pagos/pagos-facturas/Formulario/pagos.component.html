@@ -5,8 +5,8 @@
   <div class="col-12 p-0 arriba">
     <div class="row">
       <div class="col-4">
-        <div class="card card-padding sombra">
-          <div class="form-group">
+        <div class="card card-padding sombra h-100">
+          <div class="form-group mb-0 d-contents">
             <label class="control-label">{{ pagosService.isReciboIngreso ? 'Cliente' : 'Suplidor' }}: </label>
             <input
               type="text"
@@ -18,25 +18,29 @@
               autocomplete="off"
               [ngClass]="{ disabled: !!entidadAdepositar }"
             />
-            <button class="btn btn-gris" (click)="goBack()">Atras</button>
-            <button [disabled]="!entidadAdepositar" class="btn btn-gris ml-2" (click)="cancelarIgreso()">Nueva Busqueda</button>
+            <div class="d-flex gap-2 mt-auto">
+              <button class="btn btn-gris" (click)="goBack()">Atras</button>
+              <button [disabled]="!entidadAdepositar" class="btn btn-gris" (click)="cancelarIgreso()">Nueva Busqueda</button>
+            </div>
           </div>
         </div>
       </div>
       <div class="col-8 pl-0">
         @if (entidadAdepositar) {
-        <div class="clienteAdepositar">
+        <div class="entidadAdepositar">
           <div class="nombre_entidad">
             <h3 class="negrita mb-0">{{ entidadAdepositar.nombre_completo }}</h3>
           </div>
+
           <div class="cuerpo">
             <div class="cajas">
               <div class="centro">
-                <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
+                <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white">
                   <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
                 </span>
               </div>
-              <div class="izquierda pr-2">
+
+              <div class="izquierda">
                 <span class="w-100 detalleBalance badge bg-info mb-2">
                   <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
                 </span>
@@ -50,7 +54,8 @@
                 </span>
                 }
               </div>
-              <div class="derecha pl-2">
+
+              <div class="derecha">
                 <span class="w-100 detalleBalance badge blue text-shadow text-white mb-2">
                   <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
                 </span>
@@ -63,6 +68,7 @@
               </div>
             </div>
           </div>
+
           <div class="porcentaje">
             <div class="d-flex justify-content-between">
               <span class="negrita">Porcentaje de pago</span>

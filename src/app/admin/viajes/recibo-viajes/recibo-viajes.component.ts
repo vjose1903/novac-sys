@@ -171,8 +171,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       if (this.config_viaje_selected && this.config_viaje_selected.info) {
         const config: table_info | undefined = this.config_viaje_selected.info.find((config) => config.id == 'chofer');
         if (config) {
-          console.log('ENTRE AQUIIII CHOFERES');
-
           config.data = res['data'];
           this.choferes = res['data'];
         }
@@ -187,7 +185,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       if (this.config_viaje_selected && this.config_viaje_selected.info) {
         const config: table_info | undefined = this.config_viaje_selected.info.find((config) => config.id == 'camion');
         if (config) {
-          console.log('ENTRE AQUIIII CAMIONES');
           config.data = res['data'];
           this.camiones = res['data'];
         }

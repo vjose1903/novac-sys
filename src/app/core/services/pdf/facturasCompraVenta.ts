@@ -44,6 +44,8 @@ export function makePDF(data, file_name, tipo_pdf?, isMostrar = true) {
 // CABECERA
 // ==========================================================================================================================================================
 function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp: ConfigI) {
+  const entidad = data[is_venta ? 'cliente' : 'suplidor'];
+
   const header = [
     {
       margin: [15, 15, 15, 0],
@@ -88,13 +90,19 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           margin: [0, 10, 0, 0],
           text: [
             {
-              text: [is_venta ? { text: 'Cliente : ', style: 'letra10' } : { text: 'Suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' }],
+              text: [
+                { text: is_venta ? 'Cliente : ' : 'Suplidor : ', style: 'letra10' },
+                { text: entidad.nombre, style: 'letra10' },
+              ],
             },
           ],
         },
 
         {
-          text: [is_venta ? { text: 'Rnc cliente : ', style: 'letra10' } : { text: 'Rnc suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.rnc, style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
+          text: [
+            { text: `Rnc ${is_venta ? 'cliente' : 'suplidor'} : `, style: 'letra10' },
+            { text: entidad.rnc, style: 'letra10' },
+          ],
           margin: [0, 4, 0, 0],
         },
 
@@ -102,7 +110,10 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           margin: [0, 4, 0, 0],
           text: [
             {
-              text: [{ text: 'Dirección : ', style: 'letra10' }, is_venta ? { text: data.cliente.direccion, style: 'letra10' } : { text: data.suplidor.direccion, style: 'letra10' }],
+              text: [
+                { text: 'Dirección : ', style: 'letra10' },
+                { text: entidad.direccion, style: 'letra10' },
+              ],
             },
           ],
         },
@@ -157,7 +168,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
                 { text: ' #', style: 'letra11', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
                 { text: 'Articulo', style: 'letra11', bold: true, margin: [-5, 0, 0, 0] },
                 { text: 'Cantidad', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
-                is_venta ? { text: 'Precio', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
+                { text: is_venta ? 'Precio' : 'Costo', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
                 { text: 'Itbis', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
                 { text: 'Total', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
               ],
@@ -203,7 +214,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI, i
         margin: [0, 0, 14, 0],
         pageBreak: br_ ? 'before' : 'none',
       },
-      { text: fun_.roundNumberToDecimal(detalle.itbis), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.roundNumberToDecimal(detalle.itbis) || '0.00', style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
       { text: fun_.roundNumberToDecimal(detalle.total), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
     );
     tempBody.push(row);
