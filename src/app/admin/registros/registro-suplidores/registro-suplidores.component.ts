@@ -367,7 +367,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     this.documentos_de_identidad = data.documentos_de_identidad;
     this.editando = true;
-    this.patchDocumentos(data.documentos_de_identidad);
+    this.suplidorSelected = fun.deepCloning(data);
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 

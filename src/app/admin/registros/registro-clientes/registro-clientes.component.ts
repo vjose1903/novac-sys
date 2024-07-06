@@ -181,6 +181,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.form.patchValue(data);
     this.patchDocumentos(data.documentos_de_identidad);
     this.form.controls.maximo_credito.setValue(fun.roundNumberToDecimal(data.maximo_credito));
+    this.clienteSelected = fun.deepCloning(data);
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 

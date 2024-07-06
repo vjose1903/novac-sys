@@ -114,6 +114,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   maxSizeTypeE = maxSizeTypeE;
   htmlServ = inject(HtmlElementsService);
 
+  htmlServ = inject(HtmlElementsService);
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
   }
@@ -343,9 +344,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         medida: { venta_normal: [Validators.required], servicio: null },
       };
 
+    if (fun.hasValue(this.tipoArticuloSelected)) {
       for (const key in objValidators) {
         const element = objValidators[key];
-
         this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
         this.form.controls[key].updateValueAndValidity();
       }
@@ -515,8 +516,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.ARRAY_FORMULA.push(this.createItem());
   }
 
-  removeItem(i: number) {
-    this.ARRAY_FORMULA.removeAt(i);
+  removeItem(index: number) {
+    this.ARRAY_FORMULA.removeAt(index);
   }
 
   checkCostoFormula(fila) {
@@ -774,10 +775,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   fillFormula(ingredient, indexFormula, recalcular = false) {
-    const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(ingredient.articulo_combo_id));
-
     try {
-      const unidades_minimas = { Unidad: 'Und.', Libra: 'Lbs.', Onza: 'Oz.' };
+      const articulo_combo_id = ingredient.articulo_combo_id ?? ingredient?.articulo_combo?.id ?? ingredient.articulo_combo;
+      const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(articulo_combo_id));
+      
+      const unidades_minimas = { Libra: 'Lbs.', Unidad: 'Und.', Onza: 'Oz.' };
       const arrayUnidades = Object.keys(unidades_minimas);
 
       let costo_en_turno;
@@ -789,6 +791,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           costo_en_turno = materiaPrima.costos[unidad_en_turno].costo;
           precio_en_turno = materiaPrima.costos[unidad_en_turno].precio;
           medida_en_turno = unidades_minimas[unidad_en_turno];
+          break;
         }
       }
 
@@ -800,17 +803,17 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           this.getFormControlInFormArray(indexFormula, 'precio_formula').setValue(fun.roundNumberToDecimal(precio_en_turno));
         } else {
           this.getFormControlInFormArray(indexFormula, 'costo_formula').setValue(fun.roundNumberToDecimal(ingredient.costo));
-
           this.getFormControlInFormArray(indexFormula, 'precio_formula').setValue(fun.roundNumberToDecimal(ingredient.precio));
         }
 
         this.getFormControlInFormArray(indexFormula, 'medida_formula').setValue(medida_en_turno);
-        this.getFormControlInFormArray(indexFormula, 'articulo_id').setValue(ingredient.articulo_combo_id);
+        this.getFormControlInFormArray(indexFormula, 'articulo_id').setValue(articulo_combo_id);
         this.getFormControlInFormArray(indexFormula, 'id').setValue(ingredient.id || null);
         this.getFormControlInFormArray(indexFormula, 'cantidad_formula').setValue(fun.roundNumberToDecimal(ingredient.cantidad, 4));
       }
     } catch (error) {
       console.error(error);
+
       fun.toastError(recalcular ? 'Error recalculando los costos de la formula.' : 'Error rellenando los campos del formulario', 'ERROR');
     }
   }
@@ -828,6 +831,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async editarItem(articulo: ArticuloI) {
     this.borrar();
+
     this.form.patchValue(articulo);
     this.articuloSelected = articulo;
     this.botonLabel = 'Editar';
@@ -845,7 +849,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(fun.roundNumberToDecimal(articulo.otros_costos));
 
-      this.getMateriasP().then(() => {
+      await this.getMateriasP().then(() => {
         if (articulo.formulas_productos_terminados.length) {
           this.form.controls.medida.setValue(this.medida_config);
           this.resetCompradoEn(this.medida_config);
@@ -853,8 +857,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           for (let index = 0; index < articulo.formulas_productos_terminados.length; index++) {
             const ingredient = articulo.formulas_productos_terminados[index];
 
+            this.addItem();
             this.fillFormula(ingredient, index);
-            if (this.ARRAY_FORMULA.controls.length < articulo.formulas_productos_terminados.length) this.addItem();
           }
         } else {
           this.addItem();
