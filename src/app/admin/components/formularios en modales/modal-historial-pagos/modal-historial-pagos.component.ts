@@ -24,6 +24,7 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
   };
   tablaPagosComponent;
 
+  
   table_recibos_config: table_config = {
     info: [
       { titulo: 'NO. recibo', tipo: tableCellType.text, key: 'numero_recibo' },
