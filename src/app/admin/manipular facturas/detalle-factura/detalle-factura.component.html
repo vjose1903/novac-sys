@@ -1,5 +1,5 @@
 <div class="mainContainer">
-  <div class="d-flex info">
+  <div class="d-flex info flex-wrap column-gap-2">
     <div class="d-flex">
       <b class="mr-2">{{ entidadLabel }}: </b>
       <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
@@ -8,12 +8,12 @@
     </div>
 
     @if (inputs?.data?.numero_comprobante) {
-      <div class="d-flex ml-3">
-        <b class="mr-2">Comprobante: </b>
-        <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-          <p class="text-black mb-0">{{ inputs.data.numero_comprobante }}</p></p-tag
-        >
-      </div>
+    <div class="d-flex">
+      <b class="mr-2">Comprobante: </b>
+      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+        <p class="text-black mb-0">{{ inputs.data.numero_comprobante }}</p></p-tag
+      >
+    </div>
     }
   </div>
 
