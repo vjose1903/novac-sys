@@ -280,7 +280,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
-          { btnId: diurnalFormBtnAceptarId, clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: asientoContable ? 'Editar' : 'Registrar', disable: true },
+          { btnId: diurnalFormBtnAceptarId, clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: asientoContable ? 'Editar' : 'Registrar', disable: true },
         ],
       },
     });

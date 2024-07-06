@@ -1308,7 +1308,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                   ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                   dinamico: [
                     { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
-                    { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
+                    { btnId: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
                   ],
                 },
               });
@@ -1346,7 +1346,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                   ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                   dinamico: [
                     { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
-                    { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
+                    { btnId: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
                   ],
                 },
               });

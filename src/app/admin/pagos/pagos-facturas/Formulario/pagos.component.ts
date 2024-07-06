@@ -310,6 +310,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       if (arg?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('entidadI');
       } else {
+        
         this.entidadAdepositar = arg.data;
         (document.getElementById('entidadI') as any).value = arg.data.nombre_completo;
         const parameters = { ...this.tServ.obj_paginate.default, factura_a_buscar: arg?.factura_a_buscar };
@@ -551,7 +552,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
-            { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
+            { btnId: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
           ],
         },
       });

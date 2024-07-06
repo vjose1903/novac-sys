@@ -125,7 +125,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   navegar() {
-    this.router.navigateByUrl(`/admin/recibos/pagos/${this.pagosService.tipoPago}/0/0`);
+    this.router.navigateByUrl(`/admin/pagos/${this.pagosService.tipoPago}/0/0`);
   }
 
   tableClickIcon(event) {

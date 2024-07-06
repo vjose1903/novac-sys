@@ -10,7 +10,7 @@
             <label class="control-label">{{ pagosService.isReciboIngreso ? 'Cliente' : 'Suplidor' }}: </label>
             <input
               type="text"
-              id="clienteI"
+              id="entidadI"
               (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
               (focus)="htmlServ.selectValue($event)"
               [placeholder]="pagosService.isReciboIngreso ? 'Nombre Cliente' : 'Nombre Suplidor'"

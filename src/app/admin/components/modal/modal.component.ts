@@ -171,13 +171,13 @@ export class NewModalComponent implements OnInit, OnDestroy {
     if (modal && modal.onHideModal) modal.onHideModal(modal);
   }
 
-  cancelarAndAceptar(bool, id_, accion?) {
+  cancelarAndAceptar(bool, modalId, accion?) {
     if (!bool) {
-      modalsConfigurations.next({ show: false, id: id_, accion: accion ? accion : 'cancelar' } as any);
+      modalsConfigurations.next({ show: false, id: modalId, accion: accion ? accion : 'cancelar' } as any);
       return;
     }
 
-    const modal = _.find(this.modalsConfig, (config) => config.id === id_);
+    const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
 
     if (modal['componentInstance']) {
       modal['componentInstance'].btn_aceptar();
@@ -189,7 +189,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
   dynamicFunction(modalId: string, btnConfig) {
     const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
 
-    if (fun.objHas(btnConfig, 'functioInOtherComponent')) modal['componentInstance'][btnConfig['functioInOtherComponent']]();
+    if (fun.objHas(btnConfig, 'functionInOtherComponent')) modal['componentInstance'][btnConfig['functionInOtherComponent']]();
     else btnConfig['function'](modal);
   }
 

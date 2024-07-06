@@ -9,7 +9,7 @@ const routes: Routes = [
     component: ListaPagosComponent,
   },
   {
-    path: 'pagos/:tipo/:entidad_id/:factura_id',
+    path: ':tipo/:entidad_id/:factura_id',
     component: PagosComponent,
   },
 

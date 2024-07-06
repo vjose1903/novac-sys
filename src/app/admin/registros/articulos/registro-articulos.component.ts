@@ -114,12 +114,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   maxSizeTypeE = maxSizeTypeE;
   htmlServ = inject(HtmlElementsService);
 
-  htmlServ = inject(HtmlElementsService);
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
   }
-
-  htmlLog(elemento) {}
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
@@ -186,9 +183,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   getTipoArticulos() {
     this.listaTipoArticulos.length = 0;
-    this.tipoArticuloClass.getAll().then((res) => {
-      this.listaTipoArticulos = fun.deepCloning(res.data);
-    });
+    this.tipoArticuloClass.getAll().then((res) => (this.listaTipoArticulos = fun.deepCloning(res.data)));
   }
 
   getSubTipoArticulos() {
@@ -234,7 +229,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
-          { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
+          { btnId: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
         ],
       },
     });
@@ -344,15 +339,16 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         medida: { venta_normal: [Validators.required], servicio: null },
       };
 
-    if (fun.hasValue(this.tipoArticuloSelected)) {
-      for (const key in objValidators) {
-        const element = objValidators[key];
-        this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
-        this.form.controls[key].updateValueAndValidity();
+      if (fun.hasValue(this.tipoArticuloSelected)) {
+        for (const key in objValidators) {
+          const element = objValidators[key];
+          this.form.controls[key].setValidators(element[this.tipoArticuloSelected.tipo]);
+          this.form.controls[key].updateValueAndValidity();
+        }
       }
-    }
 
-    this.listaSubTipoArticulos.length > 0 ? this.form.controls.sub_tipo_articulo_id.enable() : this.form.controls.sub_tipo_articulo_id.disable();
+      this.listaSubTipoArticulos.length > 0 ? this.form.controls.sub_tipo_articulo_id.enable() : this.form.controls.sub_tipo_articulo_id.disable();
+    }
   }
 
   createForm() {
@@ -398,6 +394,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   saltar(campo, index?) {
     let is_invalid = true;
+
     if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir' && campo != 'in_medida_alerta') {
       fun.enfocarInput(campo);
       //
@@ -440,10 +437,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       fun.enfocarInput('nombre');
       this.submit();
     }
-  }
-
-  test() {
-    // console.log('TESTING');
   }
 
   borrar(reset = false) {
@@ -778,7 +771,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     try {
       const articulo_combo_id = ingredient.articulo_combo_id ?? ingredient?.articulo_combo?.id ?? ingredient.articulo_combo;
       const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(articulo_combo_id));
-      
+
       const unidades_minimas = { Libra: 'Lbs.', Unidad: 'Und.', Onza: 'Oz.' };
       const arrayUnidades = Object.keys(unidades_minimas);
 

@@ -376,7 +376,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
             ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
               { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
-              { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
+              { btnId: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
             ],
           },
         });

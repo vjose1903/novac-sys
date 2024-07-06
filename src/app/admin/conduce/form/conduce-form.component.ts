@@ -650,7 +650,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
                 ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
                   { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
-                  { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'SI', disable: true },
+                  { btnId: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'SI', disable: true },
                 ],
               },
             });
@@ -805,7 +805,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'Cancelar', disable: false },
-            { btnId: 'btnConfirmar', clase: 'btn btn-verde', functioInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
+            { btnId: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: false },
           ],
         },
       });
