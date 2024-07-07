@@ -73,8 +73,9 @@
             <div class="d-flex justify-content-between">
               <span class="negrita">Porcentaje de pago</span>
             </div>
-
-            <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
+            <div class="w-100" [pTooltip]="totalPagadoPorciento > 0 ? totalPagadoPorciento + '%' : ''">
+              <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
+            </div>
           </div>
         </div>
         }

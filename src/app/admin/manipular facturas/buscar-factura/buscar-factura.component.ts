@@ -311,8 +311,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.delete = 'far fa-trash-alt';
         fact.duplicate = 'fa-regular fa-copy';
         fact.make_bill = 'fas fa-external-link-alt';
+        fact.pay_bill = 'fas fa-external-link-alt';
 
         fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
+
+        fact.pago_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido pagada` : `Pagar factura`) : `${documento_descripcion} está anulada.`;
+        fact.view_compra = 'Ver Factura';
+        fact.delete_compra = 'Anular Compra';
 
         fact.is_selected = this.idsFacturasSeleccionadas.includes(fact.id);
         fact.tooltip_select = 'Seleccionar Factura';
@@ -320,23 +325,32 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
         fact.customStyles = {
-          condicion: { width: '6rem' },
-          secuencia: { width: '7rem' },
-          numero_comprobante: { width: '9rem' },
-          fecha_equivalente: { width: '6.5rem' },
-          fechaV: { width: '6.5rem' },
-          estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
             { key: 'view', estilos: 'font-size: 1.2rem !important;' },
             { key: 'duplicate', estilos: 'font-size: 1.2rem !important;' },
             { key: 'delete', estilos: 'font-size: 1.2rem !important;' },
             { key: 'make_bill', estilos: 'font-size: 1.2rem !important;' },
+            { key: 'pay_bill', estilos: 'font-size: 1.2rem !important;' },
             { key: 'selected', estilos: 'font-size: 1.2rem !important;' },
           ],
         };
 
-        if (this.para == 'Visualizar') _.pull(fact.customStyles.actions, _.find(fact.customStyles.actions, { key: 'selected' }));
+        if (this.tipo_documento_selected == tipoDocFacturacion.compra) {
+          if (fun.hasValue(fact.fecha_completada) || !fact.can_pagar) {
+            [fact.pago_tooltip, fact.delete_compra] = Array(2).fill('');
+          }
+
+          if (fun.hasValue(fact.pagos)) {
+            [fact.delete_compra] = Array(1).fill('');
+          }
+        }
+
+        if (this.para == 'Visualizar')
+          _.pull(
+            fact.customStyles.actions,
+            fact.customStyles.actions.find((style) => style.key == 'selected'),
+          );
 
         this.facturas.push(fact);
       });
@@ -374,9 +388,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     let res = { icon: null, tooltip: null, color: null };
 
     if (this.tipo_documento_selected == tipoDocFacturacion.compra) {
-      res.icon = documento.estado ? (documento.balance < 1 ? 'fas fa-check' : 'fas fa-exclamation-triangle') : 'fas fa-times';
-      res.tooltip = documento.estado ? (documento.balance < 1 ? 'Factura saldada' : 'Factura pendiente de pago') : 'Factura anulada';
-      res.color = documento.estado ? (documento.balance < 1 ? 'green' : 'yellow') : 'red';
+      res.icon = documento.estado ? (documento.can_pagar ? (documento.balance < 1 ? 'fas fa-check' : 'fas fa-exclamation-triangle') : '') : 'fas fa-times';
+      res.tooltip = documento.estado ? (documento.can_pagar ? (documento.balance < 1 ? 'Factura saldada' : 'Factura pendiente de pago') : '') : 'Factura anulada';
+      res.color = documento.estado ? (documento.can_pagar ? (documento.balance < 1 ? 'green' : 'yellow') : '') : 'red';
     } else {
       if (documento.tipo == tipoDocFacturacion.cotizacion || documento.tipo == tipoDocFacturacion.pre_venta) {
         const documento_descripcion = documento.tipo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre-Venta';
@@ -501,20 +515,21 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   tableClickIcon(params) {
+    const documento = params.data;
     if (params.id_tabla == 'lista_notas') {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
-          this.notaSelected = params.data;
+          this.notaSelected = documento;
 
-          this.notasClass.parseDataToPdf(params.data).then((data_parsed) => {
-            this.mostrarFactura(data_parsed, 'nota', params.data);
+          this.notasClass.parseDataToPdf(documento).then((data_parsed) => {
+            this.mostrarFactura(data_parsed, 'nota', documento);
           });
         }
       }
     } else if (params.id_tabla == shearchDocumentTableId) {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
-          this.facturaClass.parseDataToPdf(params.data).then((factura_parsed) => {
+          this.facturaClass.parseDataToPdf(documento).then((factura_parsed) => {
             this.facturaSelected = factura_parsed;
             const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
             this.mostrarFactura(factura_parsed, tipo);
@@ -522,18 +537,22 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         }
 
         if (params.idIcon == 'select') {
-          params.data.is_selected = !params.data.is_selected;
-          params.data.is_selected ? this.idsFacturasSeleccionadas.push(params.data.id) : _.pull(this.idsFacturasSeleccionadas, params.data.id);
+          documento.is_selected = !documento.is_selected;
+          documento.is_selected ? this.idsFacturasSeleccionadas.push(documento.id) : _.pull(this.idsFacturasSeleccionadas, documento.id);
         }
 
         if (params.iconKey == 'delete') {
           const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion || this.tipo_documento_selected == tipoDocFacturacion.compra ? deleteDocumentosTypes.delete : deleteDocumentosTypes.anular;
-          this.deleteRequest({ ids: params.data.id, tipo: tipo });
+          this.deleteRequest({ ids: documento.id, tipo: tipo });
         }
 
-        const toGoFacturacionTypes = ['duplicate', 'make_bill'];
-        if (toGoFacturacionTypes.includes(params.iconKey)) {
-          const actions = { duplicate: { url: actionFacturacion.duplicate, modalLabel: 'duplicar', modalId: 'duplicate_bill' }, make_bill: { url: actionFacturacion.bill_from_cotizacion, modalLabel: 'facturar', modalId: 'make_bill' } };
+        const redirectPageTypes = ['duplicate', 'make_bill', 'pay_bill'];
+        if (redirectPageTypes.includes(params.iconKey)) {
+          const actions = {
+            duplicate: { url: actionFacturacion.duplicate, modalLabel: 'duplicar', modalId: 'duplicate_bill', redirectTo: 'facturacion' },
+            make_bill: { url: actionFacturacion.bill_from_cotizacion, modalLabel: 'facturar', modalId: 'make_bill', redirectTo: 'facturacion' },
+            pay_bill: { modalLabel: 'pagar', modalId: 'pay_bill', redirectTo: 'pagos' },
+          };
 
           const titleCasePipe = new TitleCasePipe();
           const tipoDocumento = titleCasePipe.transform(tipoDocFacturacionLabel[this.tipo_documento_selected]);
@@ -541,8 +560,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           const label = actions[params.iconKey].modalLabel;
 
           const si = (instance) => {
-            this.goToFacturacionPage(params.data.tipo, action, params.data.id);
-            instance.dismissModal(instance);
+            if (actions[params.iconKey].redirectTo == 'facturacion') {
+              this.goToFacturacionPage(documento.tipo, action, documento.id);
+            } else {
+              this.goToPaymentPage(documento.suplidor_id, documento.id);
+            }
+
+            instance.dismissModal(instance.id);
           };
 
           let obj = { id: actions[params.iconKey].modalId, header: 'Confirmación', texto: `Seguro que desea <strong>${label}</strong> la ${tipoDocumento} No.: <strong>${params.data.secuencia} </strong>`, siFunction: si };
@@ -658,6 +682,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   goToFacturacionPage(tipo: string, action: string, id: any) {
     setTimeout(() => this.router.navigateByUrl(`/admin/factura/${tipo}/${action}/${id}`), 10);
+  }
+
+  goToPaymentPage(suplidor_id: number, factura_id: number) {
+    setTimeout(() => this.router.navigateByUrl(`/admin/pagos/pago_factura/${suplidor_id}/${factura_id}`), 10);
   }
 
   async AnularFactura() {
