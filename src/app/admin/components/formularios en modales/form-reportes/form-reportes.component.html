@@ -1,25 +1,23 @@
 <form [formGroup]="form">
   <div class="row">
     <!-- ----- DINAMYC SELECTION -----  -->
-    @if (dinamycSelectionReady && inputs.tipo_reporte == 'movimientos_vehiculo') { 
-      @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
-      <div class="col-12 p-0">
-        <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
-        <p-dropdown
-          [options]="dinamyc_selection.items"
-          [formControlName]="dinamyc_selection.formControl"
-          [placeholder]="dinamyc_selection.placeholder"
-          [filter]="true"
-          [optionLabel]="dinamyc_selection.optionLabel ?? null"
-          [optionValue]="dinamyc_selection.optionValue ?? null"
-          (onFilter)="dinamyc_selection.searchFunction($event.filter)"
-          [disabled]="dinamyc_selection.disabledFunction()"
-          [emptyFilterMessage]="dinamyc_selection.notFoundText"
-          [resetFilterOnHide]="true"
-        />
-      </div>
-      } 
-    }
+    @if (dinamycSelectionReady && inputs.tipo_reporte == 'movimientos_vehiculo') { @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
+    <div class="col-12 p-0">
+      <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
+      <p-dropdown
+        [options]="dinamyc_selection.items"
+        [formControlName]="dinamyc_selection.formControl"
+        [placeholder]="dinamyc_selection.placeholder"
+        [filter]="true"
+        [optionLabel]="dinamyc_selection.optionLabel ?? null"
+        [optionValue]="dinamyc_selection.optionValue ?? null"
+        (onFilter)="dinamyc_selection.searchFunction($event.filter)"
+        [disabled]="dinamyc_selection.disabledFunction()"
+        [emptyFilterMessage]="dinamyc_selection.notFoundText"
+        [resetFilterOnHide]="true"
+      />
+    </div>
+    } }
 
     <!-- ----- SELECCION DE CLIENTE -----  -->
     @if (inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'cuentas_con_pagos') {
@@ -69,7 +67,8 @@
     }
 
     <!-- ----- TIPO -----  -->
-    @if (inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'ventas_productos' || inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'notas') {
+    @if (inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'ventas_productos' || inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'notas'|| inputs.tipo_reporte ==
+    'pago_facturas' || inputs.tipo_reporte == 'cuentas_pagar_ant_saldo') {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Tipo: <span style="color: red">*</span> </label>
       <select formControlName="tipo" class="form-control" (change)="changeTipo()">
@@ -127,8 +126,7 @@
     }
 
     <!-- ----- DESDE -----  -->
-    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'
-    || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    @if ( desde_hasta_includes.includes(inputs.tipo_reporte) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
     <div class="col-6 pl-0">
       <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
@@ -139,8 +137,7 @@
     }
 
     <!-- ----- HASTA -----  -->
-    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'
-    || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    @if ( desde_hasta_includes.includes(inputs.tipo_reporte) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
     <div class="col-6 pr-0">
       <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>

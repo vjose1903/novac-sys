@@ -6,25 +6,31 @@
 
   <div class="catalogo-cuentas-body">
     <div #catalogoCuentasBody class="catalogo-cuentas-fantasma">
-      <p-treeTable *ngIf="treeNodes.length" [value]="treeNodes" [columns]="table_config.info" [scrollable]="true" scrollHeight="{{ treeTableScrollHeight }}" [resizableColumns]="true">
+      @if (treeNodes.length) {
+      <p-treeTable [value]="treeNodes" [columns]="table_config.info" [scrollable]="true" scrollHeight="{{ treeTableScrollHeight }}" [resizableColumns]="true">
         <ng-template pTemplate="header" let-columns>
           <tr #trTreeHead>
-            <th *ngFor="let column of columns" [ngStyle]="column.style">
+            @for (column of columns; track $index; ) {
+            <th [ngStyle]="column.style">
               {{ column.titulo }}
             </th>
+            }
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-columns="columns" let-rowIndex="rowIndex">
           <tr #trTreeBody [ttRow]="rowNode">
-            <td *ngFor="let column of columns; let indexBody = index" [ngStyle]="tServ.getStyle(rowData, column, rowData.index, table_config.id_tabla)" [ngClass]="{ negrita: rowData.is_control }">
-              <p-treeTableToggler [rowNode]="rowNode" *ngIf="indexBody === 0"></p-treeTableToggler>
+            @for (column of columns; track $index; let indexBody = $index ) {
+            <td [ngStyle]="tServ.getStyle(rowData, column, rowData.index, table_config.id_tabla)" [ngClass]="{ negrita: rowData.is_control }">
+              @if ($first) {
+              <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+              }
 
               <span [ngSwitch]="column?.tipo">
-                <ng-container *ngSwitchCase="'text'">
+                <ng-container *ngSwitchCase="tableCellType.text">
                   {{ fun.hasValue(column?.key) ? rowData[column.key] : '' }}
                 </ng-container>
 
-                <ng-container *ngSwitchCase="'tag'">
+                <ng-container *ngSwitchCase="tableCellType.tag">
                   <p-tag
                     [value]="getValueForm(column, rowData)"
                     [rounded]="true"
@@ -41,14 +47,16 @@
                   ></p-tag>
                 </ng-container>
 
-                <ng-container *ngSwitchCase="'icon'">
-                  <icons-array [column]="column" [indexBody]="rowData.index" [realIdTabla]="table_config.id_tabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="rowData" [rowsEditing]="[]" (icon_click)="iconsClick($event)"></icons-array>
+                <ng-container *ngSwitchCase="tableCellType.icon">
+                  <icons-array [column]="column" [indexBody]="rowData.index" [realIdTabla]="table_config.id_tabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="rowData" (icon_click)="iconsClick($event)"></icons-array>
                 </ng-container>
               </span>
             </td>
+            }
           </tr>
         </ng-template>
       </p-treeTable>
+      }
     </div>
   </div>
 </div>

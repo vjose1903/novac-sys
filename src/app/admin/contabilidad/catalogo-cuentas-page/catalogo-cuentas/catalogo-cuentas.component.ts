@@ -30,7 +30,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
   filter_target;
 
   fun = fun;
-
+  tableCellType = tableCellType;
   table_config: table_config = {
     info: [
       { key: 'codigo', titulo: 'No. Cuenta', tipo: tableCellType.text, style: { width: '23%' } },
@@ -45,9 +45,9 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
         tipo: tableCellType.icon,
         style: { 'text-align': 'center', width: '11%' },
         iconsArray: [
-          { key: 'add_account', rowTooltip: 'add_account_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'is_control', value: [false] }] },
-          { key: 'edit_account', tooltip: 'Editar Cuenta', text_color: 'colorNegro' },
-          { key: 'deactivate_reactivate_account', rowTooltip: 'deactivate_reactivate_account_tooltip', text_color: 'colorNegro' },
+          { id: 'btn_add_account', key: 'add_account', rowTooltip: 'add_account_tooltip', text_color: 'colorNegro', disable: [{ kind: 'campo', target: 'is_control', value: [false] }] },
+          { id: 'btn_edit_account', key: 'edit_account', tooltip: 'Editar Cuenta', text_color: 'colorNegro' },
+          { id: 'btn_deactivate_reactivate_account', key: 'deactivate_reactivate_account', rowTooltip: 'deactivate_reactivate_account_tooltip', text_color: 'colorNegro' },
         ],
       },
     ],

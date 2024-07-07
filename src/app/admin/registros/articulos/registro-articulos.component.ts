@@ -439,6 +439,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
+  test() {
+    this.resetArray();
+  }
+
   borrar(reset = false) {
     [this.articuloSelected, this.tipoArticuloSelected, this.subTipoArticuloSelected] = Array(3).fill(undefined);
 
@@ -502,10 +506,14 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   resetArray() {
+    console.log('RESER ARRAY');
+
     this.ARRAY_FORMULA.clear();
   }
 
   addItem(): void {
+    console.log('addItem ');
+
     this.ARRAY_FORMULA.push(this.createItem());
   }
 
@@ -833,6 +841,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     await this.selectTipoArticulo(articulo.tipo_articulo_id);
     await this.selectSubTipoArticulo(articulo.sub_tipo_articulo_id);
+    if (fun.hasValue(this.ARRAY_FORMULA)) this.resetArray();
 
     this.is_combo = articulo.is_combo;
 
@@ -842,22 +851,23 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(fun.roundNumberToDecimal(articulo.otros_costos));
 
-      await this.getMateriasP().then(() => {
-        if (articulo.formulas_productos_terminados.length) {
-          this.form.controls.medida.setValue(this.medida_config);
-          this.resetCompradoEn(this.medida_config);
+      if (articulo.formulas_productos_terminados.length) {
+        this.form.controls.medida.setValue(this.medida_config);
+        this.resetCompradoEn(this.medida_config);
 
-          for (let index = 0; index < articulo.formulas_productos_terminados.length; index++) {
-            const ingredient = articulo.formulas_productos_terminados[index];
+        for (let index = 0; index < articulo.formulas_productos_terminados.length; index++) {
+          const ingredient = articulo.formulas_productos_terminados[index];
 
-            this.addItem();
-            this.fillFormula(ingredient, index);
-          }
-        } else {
           this.addItem();
+          this.fillFormula(ingredient, index);
         }
-      });
-    } else this.COMPRADOEN = articulo.medida;
+      } else {
+        this.addItem();
+      }
+      
+    } else {
+      this.COMPRADOEN = articulo.medida;
+    }
 
     if (articulo.contenido_articulos.length > 0) this.MEDIDACAJA = articulo.contenido_articulos[0].medida;
 

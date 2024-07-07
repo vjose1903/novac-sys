@@ -49,6 +49,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     { label: 'Electronica', value: serie.electronica, disabled: true },
   ];
 
+  desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'pago_facturas', 'movimientos_vehiculo'];
+
   constructor(private fb: UntypedFormBuilder) {
     super();
   }
@@ -122,7 +124,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     let tipo_selected = null;
     let serie_selected = null;
     let condicion_selected = null;
-    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'pago_facturas', 'movimientos_vehiculo'];
+
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
 
     if (this.inputs.tipo_reporte == 'cuadre') {
@@ -213,7 +215,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
     if (tipo_factura_includes.includes(this.inputs.tipo_reporte)) this.parseTipoFacturas();
 
-    if (desde_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls();
+    if (this.desde_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls();
   }
 
   setDesdeHastaControls() {
@@ -286,7 +288,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       fecha: [null],
       desde: [null],
       hasta: [null],
-      serie: [null]
+      serie: [null],
     });
   }
 
