@@ -112,7 +112,7 @@
 
                       <div class="col-6 pr-0">
                         <div class="form-group" appMsgError="divisa_id" [form]="form">
-                          <label class="control-label">Divisa:</label>
+                          <label class="control-label">Divisa: <span style="color: red">*</span></label>
                           <p-dropdown
                             #divisaDropDown
                             [autoDisplayFirst]="false"
@@ -127,7 +127,7 @@
                             (keydown.enter)="saltar('campoDir')"
                             (onChange)="changeDivisa($event)"
                             (onFocus)="showDivisaDrop($event, divisaDropDown)"
-                          >
+                            >
                             <ng-template pTemplate="selectedItem">
                               @if (fun.hasValue(suplidorSelected) || fun.hasValue(form.controls.divisa_id.value)) {
                                 <div class="d-flex align-items-center" >

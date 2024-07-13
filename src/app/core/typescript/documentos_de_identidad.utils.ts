@@ -6,6 +6,11 @@ export class DocumentosC extends CrudG<any> {
   }
 }
 
+export enum documentoIdentidad {
+  cedula = 'cedula',
+  rnc = 'rnc',
+  pasaporte = 'pasaporte',
+}
 export interface DocumentoDeIdentidadI {
   descripcion: 'cedula' | 'rnc';
   documento: string;

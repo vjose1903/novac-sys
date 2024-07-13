@@ -506,14 +506,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   resetArray() {
-    console.log('RESER ARRAY');
-
     this.ARRAY_FORMULA.clear();
   }
 
   addItem(): void {
-    console.log('addItem ');
-
     this.ARRAY_FORMULA.push(this.createItem());
   }
 
@@ -547,11 +543,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   getFormControlInFormArray(index, formControlName) {
-    return ((this.form.get('rowFormula') as FormArray).controls[index] as FormGroup).get(formControlName);
+    return (this.ARRAY_FORMULA.controls[index] as FormGroup).get(formControlName);
   }
 
   getFormGroupInFormArray(index) {
-    return (this.form.get('rowFormula') as FormArray).controls[index] as FormGroup;
+    return this.ARRAY_FORMULA.controls[index] as FormGroup;
   }
 
   async getCosto(index, dropdown) {
@@ -864,7 +860,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       } else {
         this.addItem();
       }
-      
     } else {
       this.COMPRADOEN = articulo.medida;
     }

@@ -410,7 +410,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       header: 'Confirmación',
       texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para realizar el recibo de este pedido.',
       siFunction: (instance) => {
-        this.router.navigateByUrl(`/admin/recibos/pagos/${tipoPagoE.recibosIngresos}/${factura.cliente_id}/${factura.id}`);
+        this.router.navigateByUrl(`/admin/pagos/${tipoPagoE.recibosIngresos}/${factura.cliente_id}/${factura.id}`);
         instance.dismissModal(instance.id);
       },
     };

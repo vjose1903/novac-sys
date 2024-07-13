@@ -93,7 +93,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   saltar(saliDe: string) {}
 
   showDivisaDrop(event, dropdown) {
-    if (fun.hasValue(event.relatedTarget)) dropdown.show();
+    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
   }
 
   validateSaveBtnState() {

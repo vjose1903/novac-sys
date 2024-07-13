@@ -268,7 +268,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   test() {
-    const a = this.checkIfSomethingIsDiferrent();
+    
   }
 
   changeStateCampos(enable = false) {

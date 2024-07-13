@@ -69,7 +69,7 @@
                       </div>
                     </div>
 
-                    <div class="col-6 p-0">
+                    <div class="{{ tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado' ? 'col-4' : 'col-6' }} p-0">
                       <div class="form-group" appMsgError="tipo_articulo_id" [form]="form">
                         <label class="control-label">Tipo: <span style="color: red">*</span></label>
                         <select
@@ -89,8 +89,35 @@
                       </div>
                     </div>
 
+                    <div class="{{ tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado' ? 'col-4' : 'col-6' }} pr-0">
+                      <div
+                        class="form-group"
+                        [appMsgError]="'sub_tipo_articulo_id'"
+                        [form]="form"
+                        [pTooltip]="fun.isEmpty(tipoArticuloSelected) ? 'Debe seleccionar un tipo de articulo primero.' : listaSubTipoArticulos.length == 0 ? 'No existen sub tipo articulos para el tipo de articulo seleccionado.' : ''"
+                        tooltipPosition="left"
+                      >
+                        <label class="control-label">Sub tipo:</label>
+                        <select
+                          (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
+                          id="campoSubTipo"
+                          formControlName="sub_tipo_articulo_id"
+                          (change)="selectSubTipoArticulo(htmlServ.getValue($event))"
+                          class="form-control"
+                          value=""
+                        >
+                          <option [value]="null" disabled>Seleccione</option>
+                          <ng-container *ngFor="let tipo of listaSubTipoArticulos">
+                            <option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
+                          </ng-container>
+                        </select>
+
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
+
                     @if (tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado') {
-                    <div class="col-6 pr-0">
+                    <div class="col-4 pr-0">
                       <div class="form-group" appMsgError="vendido_en" [form]="form">
                         <label class="control-label">Vendido en: <span style="color: red">*</span></label>
                         <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">

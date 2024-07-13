@@ -171,7 +171,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   showDivisaDrop(event, dropdown) {
-    if (fun.hasValue(event.relatedTarget)) dropdown.show();
+    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
   }
 
   formatearMonto(formFieldName) {

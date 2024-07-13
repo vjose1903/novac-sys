@@ -22,6 +22,7 @@ import { FormEntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-co
 import { ConfigureModalI } from '../../components/modal/modal-class';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
 import { ImagenService } from '../../../core/services/imagen.service';
+import { documentoIdentidad } from '../../../core/typescript/documentos_de_identidad.utils';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -43,7 +44,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   suplidorSelected;
   doc_is_cedula = false;
-  doc_principal = 'rnc';
+  doc_principal = documentoIdentidad.rnc;
   documentos_de_identidad: any;
 
   isCreando: boolean = false;
@@ -180,7 +181,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   marcarCheck(arg) {
     const radio = document.getElementById('identificacion-' + arg) as HTMLElement;
     if (radio) (radio as any).checked = true;
-    this.changeIdent(arg == 'cedula');
+    this.changeIdent(arg == documentoIdentidad.cedula);
     this.setDocumentoPrincipal(arg);
   }
 
@@ -208,7 +209,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       if (campo == 'campoTelefono') {
         if (!formulario[this.doc_principal].endsWith('_')) {
           const docSinGuiones = formulario[this.doc_principal].split('-').join('');
-          if (this.doc_principal == 'cedula') {
+          if (this.doc_principal == documentoIdentidad.cedula) {
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
         }
@@ -279,7 +280,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
               const documento_persona = persona.documentos_de_identidad.find((item) => item.principal == true);
 
               if (fun.hasValue(documento_persona)) {
-                this.doc_is_cedula = documento_persona.descripcion == 'cedula' ? true : false;
+                this.doc_is_cedula = documento_persona.descripcion == documentoIdentidad.cedula ? true : false;
                 this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
               }
 
@@ -366,6 +367,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.form.controls.divisa_id.setValue(data?.divisa?.id);
 
     this.documentos_de_identidad = data.documentos_de_identidad;
+    this.patchDocumentos(this.documentos_de_identidad);
+    if (fun.hasValue(this.documentos_de_identidad)) this.doc_is_cedula = this.documentos_de_identidad[0].descripcion == documentoIdentidad.rnc ? false : true;
+
     this.editando = true;
     this.suplidorSelected = fun.deepCloning(data);
 
@@ -381,7 +385,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   patchDocumentos(documentos) {
     if (documentos.length) {
       documentos.forEach((doc) => {
-        if (doc.descripcion === 'rnc') this.form.controls.rnc.setValue(doc.documento);
+        if (doc.descripcion === documentoIdentidad.rnc) this.form.controls.rnc.setValue(doc.documento);
         else this.form.controls.cedula.setValue(doc.documento);
       });
 
@@ -419,8 +423,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     const originalSuplidor = this.listaSuplidores.find((suplidor) => suplidor.id == formValue.id);
     const originalValue = fun.pick(originalSuplidor, pick_values);
 
-    originalValue['cedula'] = originalSuplidor?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
-    originalValue['rnc'] = originalSuplidor?.documentos_de_identidad.find((doc) => doc.descripcion == 'rnc')?.documento;
+    originalValue['cedula'] = originalSuplidor?.documentos_de_identidad.find((doc) => doc.descripcion == documentoIdentidad.cedula)?.documento;
+    originalValue['rnc'] = originalSuplidor?.documentos_de_identidad.find((doc) => doc.descripcion == documentoIdentidad.rnc)?.documento;
     originalValue['cuentas_contables'] = fun.deepCloning(this.entCuentaContServ.parseCuentasFromBackend(originalSuplidor?.cuentas_contables));
 
     return !fun.isEqual(formValue, originalValue);
@@ -429,7 +433,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   test(e?) {}
 
   showDivisaDrop(event, dropdown) {
-    if (fun.hasValue(event.relatedTarget)) dropdown.show();
+    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
   }
 
   validate_cuentas() {
@@ -469,8 +473,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     let formulario = this.form.getRawValue();
 
     const documentos_identidad = [
-      { documento: formulario.cedula, descripcion: 'cedula' },
-      { documento: formulario.rnc, descripcion: 'rnc' },
+      { documento: formulario.cedula, descripcion: documentoIdentidad.cedula },
+      { documento: formulario.rnc, descripcion: documentoIdentidad.rnc },
     ];
 
     documentos_identidad.map((element) => {
