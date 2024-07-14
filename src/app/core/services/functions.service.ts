@@ -21,22 +21,6 @@ export class fun extends CustomLodash {
 
   getWindowSize = windowSize.asObservable();
 
-  static getFacturasguardadas() {
-    return JSON.parse(localStorage.getItem('facturas_guardadas')) || [];
-  }
-
-  static setFacturasGuardadas(facturas) {
-    localStorage.removeItem('facturas_guardadas');
-    localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
-
-    const btn_side = document.getElementById('btn_side_facturas');
-
-    if (btn_side) {
-      if (facturas.length.length > 0) btn_side.setAttribute('data-cant-facturas', facturas.length);
-      else btn_side.removeAttribute('data-cant-facturas');
-    }
-  }
-
   // __________________________________________________________________________________________________
   // Nombre: reloadElectron
   // Descripcion : Esta funcion recarga el electron
@@ -632,7 +616,6 @@ export class fun extends CustomLodash {
   static async logout() {
     return new Promise((resolve) => {
       try {
-        localStorage.removeItem('facturas_guardadas');
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
         localStorage.removeItem('content-type');

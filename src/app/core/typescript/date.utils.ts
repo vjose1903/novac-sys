@@ -40,6 +40,8 @@ export class DateUtils {
     _12_: 'diciembre',
   };
 
+  static hourMinuteRegExp = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
   /**
    * Esta función retorna un arreglo de strings con todos los meses del año
    * @returns Arreglo de los nombres de los meses del año
@@ -177,5 +179,62 @@ export class DateUtils {
     if (!DateUtils.isValid(date)) return null;
 
     return date;
+  }
+
+  /**
+   * Retorna la diferencia en horas entre 2 horas establecidas.
+   * @param time1 String || Date hora de inicio para comparar
+   * @param time2 String || Date hora de fin para comparar
+   * @returns La diferencia en horas entre las dos horas establecidas.
+   * @example DateUtils.diffHours('03:12', '15:30')
+   */
+  static diffHours(time1: string | Date, time2?: string | Date): number | undefined {
+    if (time2 == undefined) time2 = new Date();
+
+    if (typeof time1 === 'string' || typeof time2 === 'string') {
+      if (DateUtils.isValid(new Date(time1))) time1 = new Date(time1);
+      if (DateUtils.isValid(new Date(time2))) time2 = new Date(time2);
+
+      const match1 = typeof time1 == 'string' ? time1.match(DateUtils.hourMinuteRegExp) : false;
+      const match2 = typeof time2 == 'string' ? time2.match(DateUtils.hourMinuteRegExp) : false;
+
+      if (typeof time1 === 'string' && match1) time1 = new Date(`1970-01-01T${time1}:00`);
+      if (typeof time2 === 'string' && match2) time2 = new Date(`1970-01-01T${time2}:00`);
+    }
+
+    if (DateUtils.isValid(time1) && DateUtils.isValid(time2) && time1 instanceof Date && time2 instanceof Date) {
+      const diffInMillis = time2.getTime() - time1.getTime();
+      const diffInHours = diffInMillis / (1000 * 60 * 60);
+      return diffInHours;
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Resta horas a un objeto Date dado y devuelve el nuevo objeto Date.
+   * @param hoursToSubtract - El número de horas a restar.
+   * @param date - El objeto Date del cual se restarán las horas.
+   * @returns El nuevo objeto Date con las horas restadas.
+   * * @example DateUtils.diffHours(15, new Date())
+   */
+  static subtractHours(hoursToSubtract: number, date?: string | Date): Date {
+    if (date == undefined) date = new Date();
+
+    if (typeof date === 'string') {
+      if (DateUtils.isValid(new Date(date))) date = new Date(date);
+
+      const match1 = typeof date == 'string' ? date.match(DateUtils.hourMinuteRegExp) : false;
+      if (typeof date === 'string' && match1) date = new Date(`1970-01-01T${date}:00`);
+    }
+
+    if (DateUtils.isValid(date) && date instanceof Date) {
+      const newDate = new Date(date.getTime());
+      newDate.setHours(newDate.getHours() - hoursToSubtract);
+
+      return newDate;
+    }
+
+    return undefined;
   }
 }

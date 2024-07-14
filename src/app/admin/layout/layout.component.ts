@@ -14,6 +14,7 @@ import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
 import { Ss } from '../../core/services/singleton.service';
 import { fun } from '../../core/services/functions.service';
+import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 
 @Component({
   selector: 'app-layout',
@@ -127,6 +128,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   ngAfterViewInit() {
     this.parseMenu();
     this.checkRouteActiva();
+    this.checkFacturasArchivadas();
     this.cdRef.detectChanges();
 
     this.validateUserAndLoadPermisos().then((result) => {
@@ -265,6 +267,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     }
 
     this.ready = true;
+  }
+
+  // =================================================================================
+  // CHECK FACTURAS ARCHIVADAS
+  // =================================================================================
+
+  checkFacturasArchivadas() {
+    FactsLocalStorage.verificateFacturasGuardadas();
   }
 
   // =================================================================================
