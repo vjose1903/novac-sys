@@ -20,22 +20,6 @@ export class fun {
 
   getWindowSize = windowSize.asObservable();
 
-  static getFacturasguardadas() {
-    return JSON.parse(localStorage.getItem('facturas_guardadas')) || [];
-  }
-
-  static setFacturasGuardadas(facturas) {
-    localStorage.removeItem('facturas_guardadas');
-    localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
-
-    const btn_side = document.getElementById('btn_side_facturas');
-
-    if (btn_side) {
-      if (facturas.length.length > 0) btn_side.setAttribute('data-cant-facturas', facturas.length);
-      else btn_side.removeAttribute('data-cant-facturas');
-    }
-  }
-
   // __________________________________________________________________________________________________
   // Nombre: reloadElectron
   // Descripcion : Esta funcion recarga el electron
@@ -603,6 +587,33 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: compare
+  // Descripcion : Esta funcion se utiliza para ordenar un arreglo
+  // __________________________________________________________________________________________________
+  static compare(a: any, b: any, keys: Array<string> | string, order: 'asc' | 'desc' = 'asc') {
+    if (typeof keys == 'string') keys = [keys];
+
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
+
+      if (typeof a === 'object' && typeof b === 'object') {
+        const valueA = a[key];
+        const valueB = b[key];
+
+        if (valueA < valueB) return order === 'asc' ? -1 : 1;
+        if (valueA > valueB) return order === 'asc' ? 1 : -1;
+      } else {
+        if (a === b) continue;
+        if (typeof a === 'number' && typeof b === 'number') return order === 'asc' ? a - b : b - a;
+        if (typeof a === 'string' && typeof b === 'string') return order === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+        if (a instanceof Date && b instanceof Date) return order === 'asc' ? a.getTime() - b.getTime() : b.getTime() - a.getTime();
+      }
+    }
+
+    return 0;
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: createNestedObject
   // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
   // __________________________________________________________________________________________________
@@ -622,7 +633,6 @@ export class fun {
   static async logout() {
     return new Promise((resolve) => {
       try {
-        localStorage.removeItem('facturas_guardadas');
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
         localStorage.removeItem('content-type');

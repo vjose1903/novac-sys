@@ -141,8 +141,6 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static async getCamiones(name) {
-    console.log("name ", name);
-    
     if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
         const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false, info_vehiculo: true } };
