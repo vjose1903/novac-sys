@@ -24,6 +24,7 @@ export interface ModalI {
 
 export interface ConfigureModalI {
   id?: string;
+  initializing?: boolean;
   show?: boolean;
   header?: string;
   inputs?: any;
@@ -94,6 +95,7 @@ export class ModalClass extends LayoutClass {
     modal_configuration['position'] = fun.objHas(params, 'position') ? params.position : 'center';
     modal_configuration['botones'] = fun.objHas(params, 'botones') ? params.botones : { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } };
     modal_configuration['closable'] = fun.objHas(params, 'closable') ? params.closable : true;
+    modal_configuration['initializing'] = fun.objHas(params, 'initializing') ? params.initializing : true;
     modal_configuration['closableEsc'] = fun.objHas(params, 'closableEsc') ? params.closableEsc : false;
     modal_configuration['transitionOptions'] = fun.objHas(params, 'transitionOptions') ? params.transitionOptions : '0ms';
     modal_configuration['contentStyleClass'] = fun.objHas(params, 'contentStyleClass') ? params.contentStyleClass : '';

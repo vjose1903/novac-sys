@@ -64,12 +64,14 @@ export class MsgErrorDirective {
       if (msgHandle.render) {
         var msg = document.createElement('div');
 
-        msg.setAttribute('style', 'color: #ff4d4d; margin-left: 0.2rem; position: absolute; font-size: 12px;');
-        msg.id = id_msg;
-        msg.innerHTML = msgHandle.msg;
+        if (msg) {
+          msg.setAttribute('style', 'color: #ff4d4d; margin-left: 0.2rem; position: absolute; font-size: 12px;');
+          msg.id = id_msg;
+          msg.innerHTML = msgHandle.msg;
 
-        msgContainer.appendChild(msg);
-        this.setVariables();
+          msgContainer.appendChild(msg);
+          this.setVariables();
+        }
       }
     });
   }

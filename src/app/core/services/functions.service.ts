@@ -597,6 +597,41 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: simulateTabKeyPress
+  // Descripcion : Esta funcion simula el comportamiento de la tecla tab
+  // __________________________________________________________________________________________________
+
+  static simulateTabKeyPress() {
+    const focusableElements = Array.from(document.querySelectorAll('input, button, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')).filter((el: any) => !el.disabled && !el.hidden && el.tabIndex != -1);
+
+    const currentIndex = focusableElements.indexOf(document.activeElement);
+    if (currentIndex > -1 && currentIndex < focusableElements.length - 1) {
+      (focusableElements[currentIndex + 1] as any).focus();
+    }
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: retryUntil
+  // Descripcion : Esta funcion recibe una tarea y la repite hasta que las condiciones establecidas se cumplan
+  // _________________________________________________________________________________________________
+  static retryUntil(task: any, retryWhen: any, actionAfterRetry: any, actionIfNoSuccess: any, delayBetweenRetries = 250, retryMax = 20, retryCount = 0) {
+    task().then((response: any) => {
+      const hasRetries = retryCount < retryMax;
+
+      if (hasRetries && retryWhen(response)) {
+        setTimeout(() => {
+          fun.retryUntil(task, retryWhen, actionAfterRetry, actionIfNoSuccess, delayBetweenRetries, retryMax, ++retryCount);
+        }, delayBetweenRetries);
+      } else if (!hasRetries) {
+        console.error('Max numbers of retries -');
+        actionIfNoSuccess();
+      } else {
+        actionAfterRetry(response);
+      }
+    });
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: createNestedObject
   // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
   // __________________________________________________________________________________________________

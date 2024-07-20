@@ -73,7 +73,7 @@
                       <div class="form-group" appMsgError="tipo_articulo_id" [form]="form">
                         <label class="control-label">Tipo: <span style="color: red">*</span></label>
                         <select
-                          (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
+                          (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : listaSubTipoArticulos.length ? 'campoSubTipo' : 'vendido')"
                           id="tipo"
                           formControlName="tipo_articulo_id"
                           (change)="selectTipoArticulo(htmlServ.getValue($event))"
@@ -120,7 +120,7 @@
                     <div class="col-4 pr-0">
                       <div class="form-group" appMsgError="vendido_en" [form]="form">
                         <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                        <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">
+                        <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula')" id="vendido" class="form-control" value="">
                           <option [value]="null" disabled>Tipo</option>
                           @for (item of vendidoEn; track item) {
                           <option value="{{ item.backend }}">{{ item.front }}</option>
@@ -307,14 +307,15 @@
                                     [filter]="true"
                                     optionDisabled="optionDisabled"
                                     filterBy="nombre"
-                                    (onHide)="saltar('ingrediente_producir', index_formula)"
-                                    (keydown.enter)="saltar('ingrediente_producir', index_formula)"
+                                    (onHide)="saltar('ingrediente_producir')"
+                                    (keydown.enter)="saltar('ingrediente_producir')"
                                     (onChange)="getCosto(index_formula, dropdown)"
                                     styleClass="form-control min"
                                     panelStyleClass="ingredienteDrop"
                                     [virtualScroll]="true"
                                     appendTo="body"
                                     [virtualScrollItemSize]="30"
+                                    class="articulo_id-{{ index_formula }}"
                                     id="articulo_id-{{ index_formula }}"
                                   ></p-dropdown>
                                 </div>
@@ -325,7 +326,7 @@
                                   <input
                                     (focus)="htmlServ.selectValue($event)"
                                     type="text"
-                                    (keydown.enter)="saltar('cantidad_formula', index_formula)"
+                                    (keydown.enter)="saltar('cantidad_formula')"
                                     (blur)="calculateCostoPT()"
                                     [id]="'cantidad_formula-' + index_formula"
                                     formControlName="cantidad_formula"
@@ -640,9 +641,9 @@
 
                       @if ((!tipoArticuloSelected || tipoArticuloSelected?.descripcion === 'Producto terminado') && recalcular === true) {
                       <button class="btn btn-blanco" (click)="recalcularFunc()">Recarcular</button>
-                    }
-                  </div>
-                  <div>
+                      }
+                    </div>
+                    <div>
                       <button class="btn btn-blanco" (click)="test()">test</button>
                       <button class="btn btn-blanco" (click)="borrar(true); isCreando = false" style="max-width: 6rem">Cerrar</button>
                     </div>

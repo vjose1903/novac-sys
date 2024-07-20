@@ -5,6 +5,7 @@ import { ModalDirective } from './modal.directive';
 import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
 import { BtnTypeE, ConfigureModalI, IReturnData } from './modal-class';
+import { ConfigService } from '../../../core/services/configuration.service';
 
 @Component({
   selector: 'app-new-modal',
@@ -17,6 +18,10 @@ export class NewModalComponent implements OnInit, OnDestroy {
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef, public mServ: ModalService) {}
 
   private destroy$ = new Subject<void>();
+
+  get imgLogo() {
+    return ConfigService.logoEmpresa;
+  }
 
   defaultModalConfig: ConfigureModalI = {
     show: false,
@@ -83,14 +88,13 @@ export class NewModalComponent implements OnInit, OnDestroy {
     this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== modalId);
   }
 
-  handleConfig(config: ConfigureModalI) {
-    const modalConfig = config;
+  handleConfig(modalConfig: ConfigureModalI) {
     modalConfig.dismissModal = this.defaultModalConfig.dismissModal;
     this.mServ.modalsConfig.push(modalConfig);
   }
 
   searchInArray(array, source, target) {
-    return _.find(array, (config) => config[source] === target);
+    return array.find((config) => config[source] === target);
   }
 
   changeModalConfig(array, modalId: string) {
@@ -104,32 +108,52 @@ export class NewModalComponent implements OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  renderizarComponente(config) {
-    this.handleConfig(config);
+  renderizarComponente(modalConfig) {
+    this.handleConfig(modalConfig);
 
-    const currentConfig = this.searchInArray(this.modalsConfig, 'id', config.id);
-
+    const currentConfig = this.searchInArray(this.modalsConfig, 'id', modalConfig.id);
+    modalConfig.initializing = true;
     if (currentConfig.component) {
-      setTimeout(() => {
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentConfig.component as any);
-
-        const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modalId', config.id);
-
-        let viewContainerRef = currentReceptor.viewContainerRef;
-
-        viewContainerRef.clear();
-        viewContainerRef.remove();
-
-        const componente = viewContainerRef.createComponent(componentFactory);
-
-        componente['instance'].inputs = config.inputs;
-
-        componente['instance'].modalComponent = this;
-        componente['instance'].modalComponent.id = config.id;
-
-        currentConfig['componentInstance'] = componente['instance'];
-      }, 1);
+      try {
+        this.tryToGetReceptor(modalConfig)
+          .then((receptor: any) => {
+            let componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentConfig.component as any);
+            let viewContainerRef = receptor.viewContainerRef;
+            viewContainerRef.clear();
+            viewContainerRef.remove();
+            const componente = viewContainerRef.createComponent(componentFactory);
+            componente['instance'].inputs = modalConfig.inputs;
+            componente['instance'].modalComponent = this;
+            componente['instance'].modalComponent.id = modalConfig.id;
+            currentConfig['componentInstance'] = componente['instance'];
+            modalConfig.initializing = false;
+            this.cdRef.detectChanges();
+          })
+          .catch(() => {
+            // this.closeModal(modalConfig.id);
+          });
+      } catch (error) {
+        console.error(error);
+      }
     }
+  }
+
+  tryToGetReceptor(modalConfig: ConfigureModalI) {
+    return new Promise<void>((resolve, reject) => {
+      const getReceptor = () =>
+        new Promise((resolve) => {
+          const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modalId', modalConfig.id);
+          resolve(currentReceptor);
+        });
+
+      const reintentarSi = (visit: any) => fun.isEmpty(visit);
+
+      const parseAntecedent = async (receptor) => resolve(receptor);
+
+      const noReceptor = () => reject();
+
+      fun.retryUntil(getReceptor, reintentarSi, parseAntecedent, noReceptor);
+    });
   }
 
   changeStateButton(params: { modalId: string; btnId: string; disable: boolean }) {

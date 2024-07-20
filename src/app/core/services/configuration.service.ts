@@ -7,6 +7,7 @@ import { ConfigI } from '../typescript/config-interface';
 export class ConfigService {
   constructor() {}
 
+  public static logoEmpresa: string;
   private static config_: ConfigI;
 
   static set setConfig(configuration) {

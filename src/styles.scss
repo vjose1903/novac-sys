@@ -7,6 +7,11 @@
 @import './assets/my_styles/main.scss';
 
 
+.logoLoading {
+  height: 14rem;
+  position: absolute;
+  z-index: 99999;
+}
 
 .visually-hidden {
   display: none !important;

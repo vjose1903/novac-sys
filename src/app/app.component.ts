@@ -51,13 +51,17 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   loading = false;
   objProgress;
   visible = false;
-  imgLogo;
+
   tiempo_restante;
   objPercent;
   configReady = false;
   counter = 0;
   sub: Subscription;
   subModified: Subscription;
+
+  get imgLogo() {
+    return ConfigService.logoEmpresa;
+  }
 
   constructor(
     public _ipc: IpcService,
@@ -288,9 +292,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           } else {
             ThemeService.setTheme(config.color_app || 'green');
             ThemeService.setMode(config.mode_app || 'light');
-            
+
             ConfigService.setConfig = config;
-            this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+            ConfigService.logoEmpresa = `data:image/png;base64,${config.logo_empresa}`;
 
             resolve(config);
           }

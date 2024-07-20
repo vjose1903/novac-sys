@@ -24,8 +24,6 @@ import { FormEntidadCuentaContableI, tipoCategoria } from '../../contabilidad/en
 import { SubTipoArticuloC, SubTipoArticuloI } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
 
-const $ = require('jquery');
-
 @Component({
   selector: 'app-registro-articulos',
   templateUrl: './registro-articulos.component.html',
@@ -392,14 +390,14 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
   }
 
-  saltar(campo, index?) {
+  saltar(campo) {
     let is_invalid = true;
 
     if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir' && campo != 'in_medida_alerta') {
       fun.enfocarInput(campo);
       //
     } else if (campo == 'ingrediente_producir') {
-      fun.enfocarInput(`cantidad_formula-${index}`);
+      fun.simulateTabKeyPress();
       //
     } else if (campo == 'in_medida_alerta') {
       if (this.showContenido(this.form.getRawValue().medida)) {
@@ -421,14 +419,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         else fun.enfocarInput(campo);
       }
     } else if (campo == 'cantidad_formula') {
-      const actual_campo = index >= 0 ? `#cantidad_formula-${index}` : '#vendido';
-      var field = $(actual_campo)[0];
-
-      var fields = $(actual_campo).parents('form:eq(0),body').find(':input').not('[tabindex]');
-
-      var index = fields.findIndex((item) => item == field);
-
-      if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
+      fun.simulateTabKeyPress();
     } else {
       is_invalid = this.formIsInvalid();
     }
@@ -963,18 +954,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     return contenido;
   }
 
-  prue() {
-    // var keypressEvent = $.Event('keydown', { which: 9, keyCode: 9 });
-    // $(`#nombre`).siblings();
-
-    ($(`#articulo_id-0`)[0].firstChild as any).focus();
-    // var fields = $(`#cantidad_formula-0`).parents('form:eq(0),body').find(':input').not('[tabindex]');
-    // var index = fields.index($(`#cantidad_formula-0`));
-    // if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
-    // if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
-
-    // $(`#nombre`).trigger(keypressEvent);
-  }
+  prue() {}
 
   checkLongDecimales(event) {
     let check_obj = fun.checkLongDecimales(event.target.value, 4);
