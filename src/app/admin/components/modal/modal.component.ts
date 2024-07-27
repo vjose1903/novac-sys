@@ -192,7 +192,8 @@ export class NewModalComponent implements OnInit, OnDestroy {
 
   onHideModal(modalId: string) {
     const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
-    if (modal && modal.onHideModal) modal.onHideModal(modal);
+
+    if (modal && modal.onHide) modal.onHide(modal);
   }
 
   cancelarAndAceptar(bool, modalId, accion?) {

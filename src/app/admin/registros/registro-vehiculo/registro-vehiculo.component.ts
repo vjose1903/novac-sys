@@ -3,7 +3,6 @@ import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angula
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { MarcaC, ModeloC } from '../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
@@ -296,7 +295,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   onHideModal(arg) {
-    if (arg.modal.id == 'crud_marca_modelo') this.getMarcas();
+    if (arg.id == 'crud_marca_modelo') this.getMarcas();
   }
   // =============================================
   //  Crear vehiculo

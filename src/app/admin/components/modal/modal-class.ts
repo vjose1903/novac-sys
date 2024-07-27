@@ -41,7 +41,7 @@ export interface ConfigureModalI {
   contentStyleClass?: string;
   returnDataFromModal?: (args: IReturnData) => void;
   dismissModal?: (id: string, dataToReturn?: IReturnData) => void;
-  onHideModal?: (dataToReturn: IReturnData) => void;
+  onHide?: (dataToReturn: IReturnData) => void;
 }
 
 export interface IReturnData {
@@ -102,7 +102,12 @@ export class ModalClass extends LayoutClass {
     modal_configuration['returnDataFromModal'] = fun.objHas(params, 'returnDataFromModal') ? (arg) => params.returnDataFromModal(arg) : (arg) => this.getDataFromModal(arg, ' ');
 
     modal_configuration['onHide'] = (arg) => {
-      if (fun.hasValue(this) && fun.objHas(this, 'onHideModal')) this.onHideModal(arg);
+      try {
+        if (fun.hasValue(this) && fun.objHas(this, 'onHideModal')) this.onHideModal(arg);
+        this.onHideModal(arg);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     modal_configuration['html'] = fun.objHas(params, 'html') ? params.html : null;
