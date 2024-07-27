@@ -108,20 +108,6 @@
   color: var(--primary04);
 }
 
-/* botones de opciones */
-.dropdown-item {
-  display: block;
-  color: #333;
-  padding: 15px 25px;
-  font-size: 14px;
-  font-family: $globalFont;
-}
-
-.dropdown-item:hover {
-  border-radius: 2px;
-  background: var(--primary02);
-  // background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
-}
 
 .overlayCuenta {
   .p-overlaypanel-content {
@@ -129,6 +115,7 @@
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.51);
   }
 }
+
 .dropdown-cuenta {
   max-width: 300px;
   min-width: 300px;
@@ -318,9 +305,7 @@ body {
 // CARDS
 // ========================================================
 
-.br-1 {
-  border-radius: 1rem !important;
-}
+
 
 .card-padding {
   padding: 1.5rem 1rem 1.5rem 1rem;

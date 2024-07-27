@@ -5,21 +5,15 @@
 }
 
 .filtroArticulos {
-  height: calc(1em + 0.8rem + 2px);
-  max-width: 13rem;
-  padding: 0rem !important;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 2;
-  z-index: 999999;
+  min-width: 13rem;
 }
 
 .mainInventario {
   height: 100%;
   display: grid;
   grid-template-areas:
-    "colTitulo"
-    "cuerpo";
+    'colTitulo'
+    'cuerpo';
   grid-template-rows: min-content auto;
 
   > .colTitulo {
@@ -35,6 +29,7 @@
       position: absolute;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       width: 100%;
       padding-left: 18rem;
 

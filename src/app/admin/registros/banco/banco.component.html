@@ -17,7 +17,7 @@
                 <div class="col-12 p-0">
                   <div class="form-group" appMsgError="nombre" [form]="formGroup">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                    <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" id="campoNombre" class="form-control" autocomplete="off" />
+                    <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" (keydown.enter)="saltar(htmlServ.getId($event))" id="campoNombre" class="form-control" autocomplete="off" tabindex="-1" />
                     <span id="msgContainer"></span>
                   </div>
                 </div>
@@ -26,7 +26,17 @@
                   <label class="control-label">Rnc: <span style="color: red">*</span></label>
                   <div class="form-group" appMsgError="rnc" [form]="formGroup">
                     <!-- (keydown.enter)="saltar('campoNombre')" -->
-                    <p-inputMask mask="999-99999-9" tabindex="-1" class="w-100" styleClass="form-control with-right-btn" inputId="rnc" placeholder="___-_____-_" formControlName="rnc" [autoClear]="false"></p-inputMask>
+                    <p-inputMask
+                      mask="999-99999-9"
+                      tabindex="-1"
+                      class="w-100"
+                      styleClass="form-control with-right-btn"
+                      (keydown.enter)="saltar(htmlServ.getId($event))"
+                      inputId="campoRnc"
+                      placeholder="___-_____-_"
+                      formControlName="rnc"
+                      [autoClear]="false"
+                    ></p-inputMask>
                     <span id="msgContainer"></span>
                   </div>
                 </div>
@@ -36,7 +46,17 @@
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
                     <!-- (keydown.enter)="saltar('campoEmail')" -->
-                    <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" class="w-100" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
+                    <p-inputMask
+                      mask="(999) 999-9999"
+                      tabindex="-1"
+                      styleClass="form-control"
+                      class="w-100"
+                      (keydown.enter)="saltar(htmlServ.getId($event))"
+                      inputId="campoTelefono"
+                      placeholder="(___) ___-____"
+                      formControlName="telefono"
+                      [autoClear]="false"
+                    ></p-inputMask>
 
                     <span id="msgContainer"></span>
                   </div>
@@ -45,7 +65,18 @@
                 <div class="col-12 p-0">
                   <div class="form-group" appMsgError="comentario" [form]="formGroup">
                     <label class="control-label">Comentario </label>
-                    <textarea id="campoComentario" [appCapitalice]="'formGroup'" formControlName="comentario" class="form-control" cols="30" rows="3"></textarea>
+                    <textarea
+                      id="campoComentario"
+                      [appCapitalice]="'formGroup'"
+                      formControlName="comentario"
+                      (blur)="htmlServ.trimValue(htmlServ.getId($event), formGroup.controls.comentario)"
+                      (keyup)="htmlServ.trimStartValue(htmlServ.getId($event), formGroup.controls.comentario)"
+                      (keydown.enter)="saltar(htmlServ.getId($event))"
+                      class="form-control"
+                      cols="30"
+                      rows="3"
+                      tabindex="-1"
+                    ></textarea>
                     <span id="msgContainer"></span>
                   </div>
                 </div>
@@ -58,7 +89,7 @@
                       <div class="col-6 pl-0">
                         <div class="form-group mb-2" appMsgError="ejecutivo_cuenta" [form]="formGroup">
                           <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                          <input type="text" formControlName="ejecutivo_cuenta" [appCapitalice]="'formGroup'" id="campoNombre" class="form-control" autocomplete="off" />
+                          <input type="text" formControlName="ejecutivo_cuenta" [appCapitalice]="'formGroup'" (keydown.enter)="saltar(htmlServ.getId($event))" id="campoNombreEjecutivo" class="form-control" tabindex="-1" autocomplete="off" />
                           <span id="msgContainer"></span>
                         </div>
                       </div>
@@ -68,7 +99,17 @@
                           <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
                           <!-- (keydown.enter)="saltar('campoEmail')" -->
-                          <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" class="w-100" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_ejecutivo_cuenta" [autoClear]="false"></p-inputMask>
+                          <p-inputMask
+                            mask="(999) 999-9999"
+                            tabindex="-1"
+                            styleClass="form-control"
+                            class="w-100"
+                            (keydown.enter)="saltar(htmlServ.getId($event))"
+                            inputId="campoTelefonoEjecutivo"
+                            placeholder="(___) ___-____"
+                            formControlName="telefono_ejecutivo_cuenta"
+                            [autoClear]="false"
+                          ></p-inputMask>
 
                           <span id="msgContainer"></span>
                         </div>
@@ -110,14 +151,15 @@
                 </div>
               </div>
             </form>
-            <div class="form-group p-0 mt-5" style="display: flex; justify-content: space-between">
-              <div>
-                <button (click)="borrar()" class="btn mr-2 btn-blanco" style="max-width: 6rem">Borrar</button>
+            <div class="form-group p-0 mt-5 d-flex justify-content-between">
+              <div class="d-flex gap-2">
+                <button (click)="borrar()" class="btn btn-blanco" style="max-width: 6rem">Borrar</button>
+                <!-- <button type="submit" (click)="test()" class="btn btn-gris" style="max-width: 6rem">test</button> -->
 
-                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn ml-2 btn-verde" style="max-width: 6rem">{{ formGroup.controls.id.value ? 'Editar' : 'Guardar' }}</button>
+                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde" style="max-width: 6rem">{{ formGroup.controls.id.value ? 'Editar' : 'Guardar' }}</button>
               </div>
               <div>
-                <button class="btn btn-blanco ml-2" style="max-width: 6rem" (click)="borrar(false)">Cerrar</button>
+                <button class="btn btn-blanco" style="max-width: 6rem" (click)="borrar(false)">Cerrar</button>
               </div>
             </div>
           </div>

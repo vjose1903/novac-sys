@@ -157,7 +157,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   makePagoPdf(arg) {
-    const pago_selected = _.find(this.lista_pagos, (pago) => pago.id === arg.id);
+    const pago_selected = this.lista_pagos.find((pago) => pago.id === arg.id);
 
     const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 

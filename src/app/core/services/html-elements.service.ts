@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { AbstractControl, FormControl } from '@angular/forms';
 import { fun } from './functions.service';
+import { Dropdown } from 'primeng/dropdown';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +24,7 @@ export class HtmlElementsService {
     return inputElement ? inputElement.value : null;
   }
 
-  selectAndConvertToNumber(event: any, control?: FormControl) {
+  selectAndConvertToNumber(event: any, control?: FormControl | AbstractControl<any, any>) {
     const inputElement = event.target as HTMLInputElement;
 
     const value = fun.hasValue(control) ? control.value : inputElement.value;
@@ -35,7 +36,7 @@ export class HtmlElementsService {
     if (inputElement) inputElement.select();
   }
 
-  formatInputNumber(event: any, control?: FormControl) {
+  formatInputNumber(event: any, control?: FormControl | AbstractControl<any, any>) {
     const inputElement = event.target as HTMLInputElement;
 
     const value = fun.hasValue(control) ? control.value : inputElement.value;
@@ -43,5 +44,29 @@ export class HtmlElementsService {
 
     if (fun.hasValue(control)) control.setValue(stNumberValue);
     else inputElement.value = stNumberValue;
+  }
+
+  trimValue(event: any, control?: FormControl | AbstractControl<any, any>) {
+    const inputElement = event.target as HTMLInputElement;
+
+    const value = fun.hasValue(control) ? control.value : inputElement.value;
+    const valueTimmed = value.trim();
+
+    if (fun.hasValue(control)) control.setValue(valueTimmed);
+    else inputElement.value = valueTimmed;
+  }
+
+  trimStartValue(event: any, control?: FormControl | AbstractControl<any, any>) {
+    const inputElement = event.target as HTMLInputElement;
+
+    const value = fun.hasValue(control) ? control.value : inputElement.value;
+    const valueTimmed = value.trimStart();
+
+    if (fun.hasValue(control)) control.setValue(valueTimmed);
+    else inputElement.value = valueTimmed;
+  }
+
+  showPDropdown(event: any, dropdown: Dropdown) {
+    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
   }
 }

@@ -41,8 +41,8 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
   body.push(titulos as TablaRowPdfMake);
 
   if (!configuration.only_titulo && Array.isArray(contendio_)) {
-    contendio_.forEach((detalle, j) => {
-      const row = formarCuerpo(data, configuration, detalle, j);
+    contendio_.forEach((detalle, index_contenido) => {
+      const row = formarCuerpo(data, configuration, detalle, index_contenido);
       body.push(row as TablaRowPdfMake);
     });
   }
@@ -116,21 +116,24 @@ function getTotalizacion(configuration, data) {
   return totalizacion;
 }
 
-function formarCuerpo(data, configuration, detalle, j) {
+function formarCuerpo(data, configuration, detalle, index_contenido) {
   const row = [];
 
   const brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
 
-  const br_ = j != 0 && j % brk === 0;
+  const br_ = index_contenido != 0 && index_contenido % brk === 0;
 
   configuration.info.forEach((info, i) => {
     let obj = {};
     let text_ = '';
 
+    
     if (info.key === 'index') {
-      text_ = j + 1;
+      text_ = index_contenido + 1;
     } else {
       if (info.formato_fecha) {
+        console.log('detalle ', detalle);
+        console.log('detalle[info.key] ', detalle[info.key]);
         text_ = fun_.my_dateFormater(detalle[info.key]);
       } else if (info.formato_numero_tachado) {
         text_ = fun_.roundNumberToDecimal(detalle[info.key], true);

@@ -432,10 +432,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   test(e?) {}
 
-  showDivisaDrop(event, dropdown) {
-    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
-  }
-
   validate_cuentas() {
     return this.entCuentaContServ.validateEntidades({ configsEntCuentas: this.listaConfigSuplidores, entidad_cuentas_contables: this.listaEntidadCuentasContables });
   }

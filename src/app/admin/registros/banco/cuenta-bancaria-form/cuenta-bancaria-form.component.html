@@ -11,7 +11,7 @@
       <div class="col-12 p-0">
         <div class="form-group" appMsgError="descripcion" [form]="formGroup">
           <label class="control-label">Descripcion: <span style="color: red">*</span></label>
-          <input type="text" formControlName="descripcion" [appCapitalice]="'formGroup'" placeholder="Ingrese descripción" id="campoNombre" class="form-control" (keydown.enter)="saltar(htmlServ.getId($event))" autocomplete="off" />
+          <input type="text" formControlName="descripcion" [appCapitalice]="'formGroup'" (keydown.enter)="saltar(htmlServ.getId($event))" placeholder="Ingrese descripción" id="campoDescripcion" class="form-control" autocomplete="off" tabindex="-1" />
           <span id="msgContainer"></span>
         </div>
       </div>
@@ -19,7 +19,17 @@
       <div class="col-6 pl-0">
         <label class="control-label">No. Cuenta: <span style="color: red">*</span></label>
         <div class="form-group" appMsgError="numero_cuenta" [form]="formGroup">
-          <input type="text" formControlName="numero_cuenta" [appCapitalice]="'formGroup'" placeholder="Ingrese no. cuenta" (keydown.enter)="saltar(htmlServ.getId($event))" id="campoNumeroCuenta" class="form-control" autocomplete="off" />
+          <input
+            type="text"
+            formControlName="numero_cuenta"
+            [appCapitalice]="'formGroup'"
+            placeholder="Ingrese no. cuenta"
+            id="campoNumeroCuenta"
+            class="form-control"
+            autocomplete="off"
+            (keydown.enter)="saltar(htmlServ.getId($event))"
+            tabindex="-1"
+          />
 
           <span id="msgContainer"></span>
         </div>
@@ -30,18 +40,21 @@
           <label class="control-label">Tipo cuenta: <span style="color: red">*</span></label>
 
           <p-dropdown
-            [placeholder]="'Seleccione el tipo de cuenta'"
+            #tipoCuentaDropdown
+            [autoDisplayFirst]="false"
+            inputId="campoTipoCuenta"
             [options]="listaTipoCuentasBancarias"
+            appendTo="body"
             formControlName="tipo_cuenta_bancaria_id"
             optionLabel="descripcion"
             optionValue="id"
-            appendTo="body"
-            (onHide)="saltar('campoTipoCuenta')"
-            (keydown.enter)="saltar('campoTipoCuenta')"
+            placeholder="Seleccione el tipo de cuenta"
             styleClass="form-control"
+            (keydown.enter)="saltar(htmlServ.getId($event))"
+            (onFocus)="htmlServ.showPDropdown($event, tipoCuentaDropdown)"
+            tabindex="-1"
             [virtualScroll]="true"
             [virtualScrollItemSize]="30"
-            id="campoTipoCuenta"
           ></p-dropdown>
 
           <span id="msgContainer"></span>
@@ -52,9 +65,9 @@
         <div class="form-group" appMsgError="divisa_id" [form]="formGroup">
           <label class="control-label">Divisa:</label>
           <p-dropdown
-            #divisaDropDown
+            #divisaDropdown
             [autoDisplayFirst]="false"
-            [inputId]="'campoDivisa'"
+            inputId="campoDivisa"
             [options]="divisaServ.listaDivisas"
             appendTo="body"
             formControlName="divisa_id"
@@ -62,8 +75,9 @@
             optionValue="id"
             placeholder="Selecciona la divisa"
             styleClass="form-control"
-            (keydown.enter)="saltar('campoDir')"
-            (onFocus)="showDivisaDrop($event, divisaDropDown)"
+            (keydown.enter)="saltar(htmlServ.getId($event))"
+            (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
+            tabindex="-1"
           >
             <!-- (onChange)="changeDivisa($event)" -->
             <ng-template pTemplate="selectedItem">
@@ -94,7 +108,17 @@
                 <div class="col-12 col-md-6 pl-0">
                   <small class="control-label">Fecha primera conciliación: </small>
                   <div class="form-group" appMsgError="fecha_primera_conciliacion" [form]="formGroup">
-                    <p-calendar inputId="fecha_primera_conciliacion_input" [maxDate]="maxDate" inputStyleClass="form-control" formControlName="fecha_primera_conciliacion" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+                    <p-calendar
+                      inputId="fecha_primera_conciliacion_input"
+                      [maxDate]="maxDate"
+                      inputStyleClass="form-control"
+                      formControlName="fecha_primera_conciliacion"
+                      appendTo="body"
+                      dateFormat="dd/mm/yy"
+                      placeholder="dd/mm/aaaa"
+                      tabindex="-1"
+                      (keydown.enter)="saltar(htmlServ.getId($event))"
+                    ></p-calendar>
                     <span id="msgContainer"></span>
                   </div>
                 </div>
@@ -104,7 +128,17 @@
             <div class="col-12 col-md-6 pl-0">
               <small class="control-label">Balance inicial en libro: </small>
               <div class="form-group" appMsgError="balance_inicial_libro" [form]="formGroup">
-                <input type="text" formControlName="balance_inicial_libro" [appCapitalice]="'formGroup'" placeholder="Ingrese balance" id="campoBalanceLibro" class="form-control" autocomplete="off" />
+                <input
+                  type="text"
+                  formControlName="balance_inicial_libro"
+                  [appCapitalice]="'formGroup'"
+                  (keydown.enter)="saltar(htmlServ.getId($event))"
+                  placeholder="Ingrese balance"
+                  id="campoBalanceLibro"
+                  class="form-control"
+                  autocomplete="off"
+                  tabindex="-1"
+                />
                 <span id="msgContainer"></span>
               </div>
             </div>
@@ -112,7 +146,17 @@
             <div class="col-12 col-md-6 pr-0">
               <small class="control-label">Balance inicial en banco: </small>
               <div class="form-group" appMsgError="balance_inicial_banco" [form]="formGroup">
-                <input type="text" formControlName="balance_inicial_banco" [appCapitalice]="'formGroup'" placeholder="Ingrese balance" id="campoBalanceBanco" class="form-control" autocomplete="off" />
+                <input
+                  type="text"
+                  formControlName="balance_inicial_banco"
+                  [appCapitalice]="'formGroup'"
+                  (keydown.enter)="saltar(htmlServ.getId($event))"
+                  placeholder="Ingrese balance"
+                  id="campoBalanceBanco"
+                  class="form-control"
+                  autocomplete="off"
+                  tabindex="-1"
+                />
                 <span id="msgContainer"></span>
               </div>
             </div>
@@ -129,12 +173,12 @@
               <div class="row p-0">
                 <div class="col-12 col-md-3 pl-0">
                   <small class="control-label">Código: </small>
-                  <input type="text" formControlName="cuenta_contable" placeholder="Auto Generable..." id="campoCuentaContable" class="form-control" autocomplete="off" />
+                  <input type="text" formControlName="cuenta_contable" placeholder="Auto Generable..." id="campoCuentaContable" class="form-control" autocomplete="off" tabindex="-1" />
                 </div>
 
                 <div class="col-12 col-md-9 p-0">
                   <small class="control-label">Nombre de la cuenta: </small>
-                  <input type="text" formControlName="nombre_cuenta" placeholder="Auto Generable..." id="campoNombreCuentaContable" class="form-control" autocomplete="off" />
+                  <input type="text" formControlName="nombre_cuenta" placeholder="Auto Generable..." id="campoNombreCuentaContable" class="form-control" autocomplete="off" tabindex="-1" />
                 </div>
               </div>
             </div>

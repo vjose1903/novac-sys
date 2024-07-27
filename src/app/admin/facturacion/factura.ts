@@ -329,12 +329,10 @@ export class FacturaC extends CrudG<FacturasI> {
       });
 
       pagos.map((pago) => {
-
         pago.numero = String(pago.numero).padStart(8, '0');
         pago.fecha_equivalente = DateUtils.format({ date: pago.fecha_equivalente });
         return pago;
       });
-      
 
       const obj = { recibos: recibos, notas: notas, pagos: pagos, config: config };
 

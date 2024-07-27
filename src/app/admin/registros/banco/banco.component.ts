@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ModalClass } from '../../components/modal/modal-class';
 import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
@@ -58,6 +59,8 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   };
   tablaComponent;
 
+  htmlServ = inject(HtmlElementsService);
+
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public imgServ: ImagenService) {
     super();
   }
@@ -96,6 +99,8 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
       telefono_ejecutivo_cuenta: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
       cuentas_bancarias: this.fb.array([]),
     });
+
+    this.formInitialValue = this.formGroup.getRawValue();
   }
 
   createItemCuentaBancaria(cuenta_bancaria?: CuentaBancariaI) {
@@ -155,6 +160,33 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     });
   }
 
+  saltar(salioDe, valor?) {
+    let siguiente_input = '';
+    let is_enforcar = true;
+
+    console.log();
+
+    switch (salioDe) {
+      case 'campoNombre':
+        siguiente_input = 'campoRnc';
+        break;
+      case 'campoRnc':
+        siguiente_input = 'campoTelefono';
+        break;
+      case 'campoTelefono':
+        siguiente_input = 'campoComentario';
+        break;
+      case 'campoComentario':
+        siguiente_input = 'campoNombreEjecutivo';
+        break;
+      case 'campoNombreEjecutivo':
+        siguiente_input = 'campoTelefonoEjecutivo';
+        break;
+    }
+
+    if (is_enforcar) fun.enfocarInput(siguiente_input);
+  }
+
   removeItem(arrayId: string, index: number = null) {
     const arrayCuentasBancarias = this.formGroup.get('cuentas_bancarias') as UntypedFormArray;
     if (fun.isEmpty(index)) index = arrayCuentasBancarias.value.findIndex((cuenta: any) => cuenta.arrayId == arrayId);
@@ -208,6 +240,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
       if (evento.iconKey == 'edit_banco') {
         this.formGroup.patchValue(evento.data);
         this.fillCuentasBancarias(evento.data.cuentas_bancarias);
+
         this.formInitialValue = this.formGroup.getRawValue();
 
         this.isCreando = false;
@@ -231,6 +264,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
   nuevoRegistro() {
     this.isCreando = true;
+    setTimeout(() => fun.enfocarInput('campoNombre'), 200);
   }
 
   borrar(isCreando = true) {
@@ -286,8 +320,12 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     return res;
   }
 
-  formIsOnInitState() {
-    const pick_values = ['nombre', 'rnc', 'telefono', 'comentario', 'ejecutivo_cuenta', 'telefono_ejecutivo_cuenta', 'id'];
+  test() {
+    
+  }
+
+  formIsOnInitState(log = false) {
+    const pick_values = ['nombre', 'rnc', 'telefono', 'comentario', 'ejecutivo_cuenta', 'telefono_ejecutivo_cuenta'];
     const formValue = fun.pick(this.formGroup.getRawValue(), pick_values);
 
     const originalValue = fun.pick(this.formInitialValue, pick_values);
@@ -295,7 +333,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
     let cuentasIsOnInitState = this.formInitialValue?.cuentas_bancarias.length == this.formGroup.getRawValue().cuentas_bancarias.length;
 
-    const pick_values_cuenta = ['id', 'arrayId', 'banco_id', 'tipo_cuenta_bancaria_id', 'divisa_id', 'numero_cuenta', 'comentario', 'descripcion', 'fecha_primera_conciliacion', 'fecha_apertura', 'balance_inicial_libro', 'balance_inicial_banco'];
+    const pick_values_cuenta = ['arrayId', 'banco_id', 'tipo_cuenta_bancaria_id', 'divisa_id', 'numero_cuenta', 'comentario', 'descripcion', 'fecha_primera_conciliacion', 'fecha_apertura', 'balance_inicial_libro', 'balance_inicial_banco'];
 
     const initialCuentasIndexed = this.formInitialValue?.cuentas_bancarias.reduce((acc, item) => {
       acc[item.arrayId] = fun.pick(item, pick_values_cuenta);

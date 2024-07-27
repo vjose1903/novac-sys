@@ -47,7 +47,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   tipo_articulos;
 
   filtrado = false;
-  filtro = 'todos';
+  filtro = null;
 
   palabra_buscar;
   fechaFactura: string;
@@ -64,7 +64,10 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this._init_mixin({ component: 'inventario', is_routing: true });
     this.necesarioParaEmpezar();
 
-    this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res.data));
+    this.tipoArticuloClass.getAll().then((res) => {
+      this.tipo_articulos = res.data;
+      this.tipo_articulos.unshift({ codigo: null, descripcion: 'Todos' });
+    });
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -116,9 +119,9 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   filtrarArticulos() {
     const actualPagination = this.tServ.getPaginationById('lista_inventario');
-    actualPagination['search'] = this.palabra_buscar;
+    actualPagination['search'] = this.palabra_buscar != 'Todos' ? this.palabra_buscar : ' ';
 
-    if (this.filtro != 'todos') {
+    if (this.filtro != 'Todos') {
       if (fun.isEmpty(actualPagination['ant_page'])) {
         this.tServ.modifyPaginationById('lista_inventario', [{ ant_page: actualPagination.page }]);
         this.tServ.modifyPaginationById('lista_inventario', [{ page: 1 }]);

@@ -165,10 +165,6 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     dropdownFilterFocusInput(drop);
   }
 
-  showDivisaDrop(event, dropdown) {
-    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
-  }
-
   formatearMonto(formFieldName) {
     const input = this.formGroup.controls[formFieldName];
     fun.revisarNumber(input, formFieldName).then((res) => {

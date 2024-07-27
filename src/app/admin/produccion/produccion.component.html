@@ -10,7 +10,7 @@
                 <label class="control-label mt-1 mb-0">Nombre producto: <span style="color: red">*</span></label>
                 <div>
                   <p-dropdown
-                    [placeholder]="'Seleccione producto'"
+                    placeholder="Seleccione producto"
                     [options]="listaProductos"
                     [(ngModel)]="producto_terminado_en_turno"
                     optionLabel="nombre"
@@ -24,7 +24,11 @@
                     [virtualScroll]="true"
                     [virtualScrollItemSize]="30"
                     id="articulo_id"
-                  ></p-dropdown>
+                  >
+                    <ng-template pTemplate="selectedItem">
+                      <div>{{ producto_terminado_en_turno.nombre }}</div>
+                    </ng-template>
+                  </p-dropdown>
                 </div>
               </div>
             </div>
@@ -76,9 +80,9 @@
 
               <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
                 @for (ingrediente of ingredientes; track ingrediente.id; let index = $index) {
-                <div class="ingredientesList d-flex">
-                  <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
-                  <div style="width: 100%">
+                <div class="ingredientesList">
+                  <div class="NombreIngre">{{ ingrediente.nombre + ': ' }}</div>
+                  <div class="cantIngre no-wrap">
                     <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index != 0 ? 'top' : 'bottom'" [escape]="false">
                       {{ lookprincipal(ingrediente) }}
                     </span>
@@ -92,9 +96,9 @@
               @if (ingredientesParaProduccion.length > 0) {
               <div id="produccion_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
                 @for (ingrediente of ingredientesParaProduccion; track ingrediente.id; let index_ingrediente = $index) {
-                <div class="ingredientesList d-flex">
-                  <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
-                  <div class="" style="width: 100%">
+                <div class="ingredientesList">
+                  <div class="NombreIngre">{{ ingrediente.nombre + ': ' }}</div>
+                  <div class="cantIngre no-wrap">
                     <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'" [escape]="false">
                       {{ lookprincipal(ingrediente) }}
                     </span>
@@ -120,9 +124,9 @@
     </div>
   </div>
   <div class="col-12 abajo">
-    <div class="d-flex justify-content-end w-100">
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP', 'Seguro de que desea cancelar la produccion.', null)" type="submit" class="btn btn-blanco" value="Cancelar" />
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar', 'Seguro de que desea confirmar la produccion.', null)" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+    <div class="d-flex justify-content-end w-100 gap-2">
+      <button [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP', 'Seguro de que desea cancelar la produccion.', null)" type="submit" class="btn btn-blanco">Cancelar</button>
+      <button [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar', 'Seguro de que desea confirmar la produccion.', null)" type="submit" class="btn btn-verde">Confirmar</button>
     </div>
   </div>
 </div>

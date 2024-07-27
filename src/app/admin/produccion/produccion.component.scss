@@ -9,9 +9,9 @@
   grid-row-gap: 1rem;
   height: 100%;
   grid-template-areas:
-    "arriba"
-    "medio"
-    "abajo";
+    'arriba'
+    'medio'
+    'abajo';
 
   grid-template-rows: min-content auto min-content;
 
@@ -30,8 +30,8 @@
   grid-row-gap: 0.5rem;
   height: 100%;
   grid-template-areas:
-    "titulo"
-    "cuerpo";
+    'titulo'
+    'cuerpo';
 
   grid-template-rows: min-content auto;
 
@@ -47,24 +47,48 @@
 .bordes {
   border: 1px solid grey;
 }
+
 .fondoGris {
   background-color: #f1f1f1d0;
+  border-top-left-radius: 0.9rem;
+  border-bottom-left-radius: 0.9rem;
+  overflow: hidden;
 }
+
+.fondoBlanco {
+  border-top-right-radius: 0.9rem;
+  border-bottom-right-radius: 0.9rem;
+  overflow: hidden;
+}
+
 .ingredientesList {
-  padding: 0.5rem 0rem 0.5rem 0.5rem;
+  padding: 0.5rem;
   border-bottom: 0.5px solid grey;
+
+  display: grid;
+  grid-template-areas: 'nombre cantidad';
+  grid-template-columns: 60% 40%;
+
+  .NombreIngre {
+    font-weight: bold;
+    grid-area: nombre;
+  }
+
+  .cantIngre {
+    grid-area: cantidad;
+    text-align: end;
+  }
+
+  .NombreIngre,
+  .cantIngre {
+    cursor: default;
+  }
 }
+
 .tituloIngre {
   background-color: var(--primary01);
   border-bottom: 1px solid grey;
-}
-.Nombreingre {
-  font-weight: bold;
-  width: 20vw;
-}
-
-.cantidadInve {
-  margin-right: 0.7rem;
+  padding: 5px;
 }
 
 .fondoGris,
@@ -81,11 +105,4 @@
 
   overflow: auto;
   overflow-x: hidden;
-}
-
-.Nombreingre,
-.cantidadInve {
-  &:hover {
-    cursor: default;
-  }
 }

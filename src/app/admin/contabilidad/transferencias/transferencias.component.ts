@@ -70,16 +70,16 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   tablaComponent;
 
   htmlServ = inject(HtmlElementsService);
-  
+
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService, public imgServ: ImagenService) {
-    console.log("===== TRANSFERENCIAS =====");
-    
+    console.log('===== TRANSFERENCIAS =====');
+
     super();
   }
 
   ngOnInit(): void {
-    console.log("------ ANDO AQUIII ------");
-    
+    console.log('------ ANDO AQUIII ------');
+
     this._init_mixin({ component: 'transferencia', is_routing: true });
     this.necesarioStart();
   }
@@ -168,10 +168,6 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   dropCuentaBancariaFocus(drop) {
     dropdownFilterFocusInput(drop);
-  }
-
-  showDivisaDrop(event, dropdown) {
-    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
   }
 
   formatearMonto(formFieldName) {

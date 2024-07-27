@@ -81,6 +81,8 @@ export class PagoC extends CrudG<PagoI> {
 
   parseDataToPdf(data) {
     return new Promise((resolve) => {
+      console.log('data:  ', data);
+
       const data_parsed = fun.remplaceKeyFromJson(data, [
         { old_key: 'numero', new_key: 'identificador' },
         { old_key: 'pago_factura_detalles', new_key: 'contenido_reporte' },
@@ -94,15 +96,16 @@ export class PagoC extends CrudG<PagoI> {
       data_parsed['suplidor']['rnc'] = documento ? documento.documento : '----------';
 
       data_parsed['contenido_reporte'].map((detalle) => {
+        console.log('detalle ', detalle);
+
         detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
         detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
-        detalle['fecha'] = `${_.split(detalle.descripcion, ' ')[2]} ${_.split(detalle.descripcion, ' ')[3]}`;
+        detalle['fecha'] = `${detalle.descripcion.split(' ')[2]} ${detalle.descripcion.split(' ')[3]}`;
       });
 
       resolve(data_parsed);
     });
   }
-
 }
 
 export enum TipoPagoReporte {

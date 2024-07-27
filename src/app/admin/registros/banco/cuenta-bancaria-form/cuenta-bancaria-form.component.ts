@@ -48,6 +48,8 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
       this.formGroup.valueChanges.subscribe((change) => {
         this.validateSaveBtnState();
       });
+
+      setTimeout(() => fun.enfocarInput('campoDescripcion'), 200);
     });
   }
 
@@ -90,15 +92,47 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
     });
   }
 
-  saltar(saliDe: string) {}
+  saltar(salioDe, valor?) {
+    let siguiente_input = '';
+    let is_enforcar = true;
 
-  showDivisaDrop(event, dropdown) {
-    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
+    console.log();
+
+    switch (salioDe) {
+      case 'campoDescripcion':
+        siguiente_input = 'campoNumeroCuenta';
+        break;
+      case 'campoNumeroCuenta':
+        siguiente_input = 'campoTipoCuenta';
+        break;
+      case 'campoTipoCuenta':
+        siguiente_input = 'campoDivisa';
+        break;
+      case 'campoDivisa':
+        siguiente_input = 'fecha_primera_conciliacion_input';
+        break;
+      case 'fecha_primera_conciliacion_input':
+        siguiente_input = 'campoBalanceLibro';
+        break;
+      case 'campoBalanceLibro':
+        siguiente_input = 'campoBalanceBanco';
+        break;
+      case 'campoBalanceBanco':
+        if (!this.formIsInvalid()) this.btn_aceptar();
+        break;
+    }
+
+    if (is_enforcar) fun.enfocarInput(siguiente_input);
+  }
+
+  formIsInvalid() {
+    let buttonIsDisable = this.formIsOnInitState();
+    if (!buttonIsDisable) buttonIsDisable = this.formGroup.invalid;
+    return buttonIsDisable;
   }
 
   validateSaveBtnState() {
-    let buttonIsDisable = this.formIsOnInitState();
-    if (!buttonIsDisable) buttonIsDisable = this.formGroup.invalid;
+    const buttonIsDisable = this.formIsInvalid();
 
     if (this.modalComponent && this.modalComponent.changeStateButton) {
       this.modalComponent.changeStateButton({ modalId: modalCuentaBancaria, btnId: modalCuentaBancariaBtnAceptar, disable: buttonIsDisable });

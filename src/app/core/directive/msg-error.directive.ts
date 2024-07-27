@@ -82,6 +82,8 @@ export class MsgErrorDirective {
         this.borrarMsgAntiguos().then(() => {
           let response = { render: false, msg: '' };
 
+          const formName = this.id.replaceAll('_', ' ');
+
           const errors = this.form.controls[this.id].errors;
 
           if (fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
@@ -96,7 +98,7 @@ export class MsgErrorDirective {
             else if (errors.compares) response.msg = `Las contraseñas no coinciden.`;
             else if (errors.invalidCedula) response.msg = `Ingrese una cédula válida.`;
             else if (errors.email) response.msg = `Ingrese una email válido.`;
-            else if (errors.sinRayas) response.msg = `Complete el campo: ${this.id}`;
+            else if (errors.sinRayas) response.msg = `Complete el campo: ${formName}`;
           }
 
           resolve(response);

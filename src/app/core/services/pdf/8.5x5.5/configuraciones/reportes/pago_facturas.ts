@@ -50,7 +50,7 @@ export const config_pago_facturas = {
       },
 
       {
-        text: 'Recibido',
+        text: 'Pagado',
         alignment_titulo: 'right',
         noWrap: true,
         style: 'letra10',
@@ -94,7 +94,7 @@ export const config_pago_facturas = {
         alignment_body: 'left',
       },
       {
-        text: 'Recibido',
+        text: 'Pagado',
         alignment_titulo: 'right',
         noWrap: true,
         style: 'letra10',

@@ -76,7 +76,7 @@
                   <div class="form-group" [appMsgError]="depositoFormAttr.divisa_id" [form]="formGroup">
                     <label class="control-label" requiredFieldLabel>Divisa: </label>
                     <p-dropdown
-                      #divisaDropDown
+                      #divisaDropdown
                       [autoDisplayFirst]="false"
                       [inputId]="depositoFormFieldId.divisa_id"
                       [options]="divisaServ.listaDivisas"
@@ -87,7 +87,7 @@
                       placeholder="Selecciona la divisa"
                       styleClass="form-control"
                       (keydown.enter)="saltar(depositoFormFieldId.divisa_id)"
-                      (onFocus)="showDivisaDrop($event, divisaDropDown)"
+                      (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
                     >
                       <ng-template pTemplate="selectedItem">
                         <div class="d-flex align-items-center" *ngIf="fun.hasValue(formGroup.controls[depositoFormAttr.divisa_id].value)">
