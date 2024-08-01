@@ -97,9 +97,9 @@ export class ReciboC extends CrudG<ReciboI> {
       data_parsed['cliente']['rnc'] = documento ? documento.documento : '----------';
 
       data_parsed['contenido_reporte'].map((detalle) => {
-        detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
-        detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
-        detalle['fecha'] = `${_.split(detalle.descripcion, ' ')[2]} ${_.split(detalle.descripcion, ' ')[3]}`;
+        detalle['tipo'] = detalle.descripcion.split(' ')[0];
+        detalle['comprobante_fiscal'] = detalle.descripcion.split(' ')[1];
+        detalle['fecha'] = `${detalle.descripcion.split(' ')[2]} ${detalle.descripcion.split(' ')[3]}`;
       });
 
       resolve(data_parsed);

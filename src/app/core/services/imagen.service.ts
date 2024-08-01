@@ -15,7 +15,6 @@ export class ImagenService {
 
   getDivisaInfoById(id: number, property?: string) {
     const divisa = Ss.divisaServ.getDivisaInfoById(id);
-
     return fun.hasValue(property) ? fun.getProperty(divisa, property) : divisa;
   }
 }

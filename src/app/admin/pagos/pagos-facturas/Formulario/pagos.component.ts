@@ -538,6 +538,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetallePagos();
+
       const tipo_modal = this.pagosService.isReciboIngreso ? TipoCantidadEfectivo.devuelta : TipoCantidadEfectivo.noDevuelta;
       const documento = this.pagosService.isReciboIngreso ? DocumentoDevuelta.reciboIngreso : DocumentoDevuelta.pagoFactura;
 

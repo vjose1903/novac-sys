@@ -45,10 +45,10 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { 'text-align': 'left', width: '10%' } },
-      { titulo: 'Banco', tipo: tableCellType.text, key: 'cuenta_bancaria.banco.nombre', style: { 'text-align': 'left', 'padding-left': '0.3rem' } },
-      { titulo: 'No. de cuenta', tipo: tableCellType.text, key: 'cuenta_bancaria.numero_cuenta', style: { 'text-align': 'left' } },
-      { titulo: 'Comentario', tipo: tableCellType.text, key: 'comentario', puntosSuspensivos: true, style: { 'text-align': 'left', width: '40%' } },
+      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { 'text-align': 'left', width: '13%' } },
+      { titulo: 'No. de cuenta', tipo: tableCellType.text, key: 'cuenta_bancaria.numero_cuenta', style: { 'text-align': 'left', width: '15%', 'padding-left': '0.3rem', 'padding-right': '0.3rem' } },
+      { titulo: 'Banco', tipo: tableCellType.text, key: 'cuenta_bancaria.banco.nombre', style: { 'text-align': 'left', width: '25%' } },
+      { titulo: 'Comentario', tipo: tableCellType.text, key: 'comentario', puntosSuspensivos: true, style: { 'text-align': 'left', 'padding-left': '0.3rem', width: '30%' } },
       { titulo: 'Monto', tipo: tableCellType.formatoNumero, key: 'monto', style: { 'text-align': 'right', width: '10%' } },
       {
         key: 'actions',
@@ -112,6 +112,8 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.depositoClass.getAll(extra).then((res) => {
       this.depositoList = res.data.map((deposito: DepositoI) => {
+        console.log('deposito ', deposito);
+
         deposito[depositoFormAttr.cuenta_bancaria_id] = deposito.cuenta_bancaria.id;
         deposito[depositoFormAttr.divisa_id] = deposito.divisa.id;
 

@@ -14,7 +14,7 @@
           <div class="card cardFormClass">
             <form [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
               <div class="row">
-                <div class="col-12 col-md-4 p-0 pr-md-3">
+                <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="depositoFormAttr.fecha_equivalente" [form]="formGroup">
                     <label class="control-label" requiredFieldLabel>Fecha: </label>
                     <p-calendar
@@ -34,8 +34,8 @@
                   </div>
                 </div>
 
-                <div class="col-12 col-md-8 p-0">
-                  <div class="form-group mb-0" [appMsgError]="depositoFormAttr.cuenta_bancaria_id" [form]="formGroup">
+                <div class="col-12 p-0">
+                  <div class="form-group" [appMsgError]="depositoFormAttr.cuenta_bancaria_id" [form]="formGroup">
                     <label class="control-label" requiredFieldLabel>Cuenta Bancaria: </label>
 
                     <p-dropdown
@@ -85,19 +85,19 @@
                       optionLabel="nombre"
                       optionValue="id"
                       placeholder="Selecciona la divisa"
-                      styleClass="form-control"
+                      styleClass="form-control min-padding"
                       (keydown.enter)="saltar(depositoFormFieldId.divisa_id)"
                       (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
                     >
                       <ng-template pTemplate="selectedItem">
-                        <div class="d-flex align-items-center" *ngIf="fun.hasValue(formGroup.controls[depositoFormAttr.divisa_id].value)">
-                          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'imagen.file_name'))"></img-component>
+                        <div class="d-flex align-items-center gap-2" *ngIf="fun.hasValue(formGroup.controls[depositoFormAttr.divisa_id].value)">
+                          <img-component style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'imagen.file_name'))"></img-component>
                           <div>{{ imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'nombre') }}</div>
                         </div>
                       </ng-template>
                       <ng-template let-divisa pTemplate="item">
-                        <div class="d-flex align-items-center">
-                          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(divisa.imagen.file_name)"></img-component>
+                        <div class="d-flex align-items-center gap-2">
+                          <img-component style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(divisa.imagen.file_name)"></img-component>
                           <div>{{ divisa.nombre }}</div>
                         </div>
                       </ng-template>

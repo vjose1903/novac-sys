@@ -5,7 +5,7 @@ import { tableCellType, table_config } from './../../components/new_tablas/tabla
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Permisos } from '../../../core/typescript/permisos';
-import { TransferenciaC, TransferenciaI, anularTransferenciaModalId, transferenciaFormAttr, transferenciaFormFieldId, transferenciaTableId } from './transferencia.utils';
+import { TransferenciaC, TransferenciaI, TransferenciaType, anularTransferenciaModalId, transferenciaFormAttr, transferenciaFormFieldId, transferenciaTableId, transferenciasType } from './transferencia.utils';
 import { fun } from '../../../core/services/functions.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -41,14 +41,16 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   fun = fun;
   transferenciaFormAttr = transferenciaFormAttr;
+  selectedTransferenciaType = TransferenciaType.terceros;
+  TransferenciaType = TransferenciaType;
   transferenciaFormFieldId = transferenciaFormFieldId;
 
   table_config: table_config = {
     info: [
-      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { 'text-align': 'left', width: '10%' } },
-      { titulo: 'Banco', tipo: tableCellType.text, key: 'cuenta_bancaria.banco.nombre', style: { 'text-align': 'left', 'padding-left': '0.3rem' } },
-      { titulo: 'No. de cuenta', tipo: tableCellType.text, key: 'cuenta_bancaria.numero_cuenta', style: { 'text-align': 'left' } },
-      { titulo: 'Comentario', tipo: tableCellType.text, key: 'comentario', puntosSuspensivos: true, style: { 'text-align': 'left', width: '40%' } },
+      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { 'text-align': 'left', width: '13%' } },
+      { titulo: 'No. de cuenta', tipo: tableCellType.text, key: 'cuenta_bancaria.numero_cuenta', style: { 'text-align': 'left', width: '15%', 'padding-left': '0.3rem', 'padding-right': '0.3rem' } },
+      { titulo: 'Banco', tipo: tableCellType.text, key: 'cuenta_bancaria.banco.nombre', style: { 'text-align': 'left', width: '25%' } },
+      { titulo: 'Comentario', tipo: tableCellType.text, key: 'comentario', puntosSuspensivos: true, style: { 'text-align': 'left', 'padding-left': '0.3rem', width: '30%' } },
       { titulo: 'Monto', tipo: tableCellType.formatoNumero, key: 'monto', style: { 'text-align': 'right', width: '10%' } },
       {
         key: 'actions',
@@ -68,18 +70,14 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     obj_paginate: { show: true, showTotal: true, showPaginator: false },
   };
   tablaComponent;
-
+  transferenciasType = transferenciasType;
   htmlServ = inject(HtmlElementsService);
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService, public imgServ: ImagenService) {
-    console.log('===== TRANSFERENCIAS =====');
-
     super();
   }
 
   ngOnInit(): void {
-    console.log('------ ANDO AQUIII ------');
-
     this._init_mixin({ component: 'transferencia', is_routing: true });
     this.necesarioStart();
   }
@@ -117,7 +115,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
     this.transferenciaClass.getAll(extra).then((res) => {
       this.depositoList = res.data.map((deposito: TransferenciaI) => {
-        deposito[transferenciaFormAttr.cuenta_bancaria_id] = deposito.cuenta_bancaria.id;
+        deposito[transferenciaFormAttr.cuenta_bancaria_origen_id] = deposito.cuenta_bancaria.id;
         deposito[transferenciaFormAttr.divisa_id] = deposito.divisa.id;
 
         deposito.edit_deposito = 'fas fa-pencil-alt';
@@ -141,7 +139,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
     this.formGroup = this.fb.group({
       [transferenciaFormAttr.id]: [null],
-      [transferenciaFormAttr.cuenta_bancaria_id]: [{ value: null, disabled: true }, Validators.required],
+      [transferenciaFormAttr.cuenta_bancaria_origen_id]: [{ value: null, disabled: true }, Validators.required],
       [transferenciaFormAttr.divisa_id]: [{ value: divisa_principal ? divisa_principal.id : null, disabled: true }, Validators.required],
       [transferenciaFormAttr.monto]: [{ value: '', disabled: true }, Validators.required],
       [transferenciaFormAttr.comentario]: [{ value: '', disabled: true }, Validators.required],
@@ -163,7 +161,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   dropCuentaBancariaHide(arg) {
     const formulario = this.formGroup.getRawValue();
 
-    if (fun.hasValue(formulario[transferenciaFormAttr.cuenta_bancaria_id])) this.saltar(transferenciaFormFieldId.cuenta_bancaria_id);
+    if (fun.hasValue(formulario[transferenciaFormAttr.cuenta_bancaria_origen_id])) this.saltar(transferenciaFormFieldId.cuenta_bancaria_origen_id);
   }
 
   dropCuentaBancariaFocus(drop) {
@@ -188,7 +186,15 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     if (sali_de != transferenciaFormFieldId.send) {
       let nextInput;
 
-      if (sali_de == transferenciaFormFieldId.cuenta_bancaria_id) nextInput = transferenciaFormFieldId.divisa_id;
+      if (sali_de == transferenciaFormFieldId.cuenta_bancaria_origen_id) {
+        if (this.selectedTransferenciaType == TransferenciaType.misCuentas) nextInput = transferenciaFormFieldId.cuenta_bancaria_destino_id;
+        else nextInput = transferenciaFormFieldId.nombre_banco_tercero;
+      }
+
+      if (sali_de == transferenciaFormFieldId.cuenta_bancaria_destino_id) nextInput = transferenciaFormFieldId.divisa_id;
+      if (sali_de == transferenciaFormFieldId.nombre_banco_tercero) nextInput = transferenciaFormFieldId.cuenta_bancaria_tercero;
+      if (sali_de == transferenciaFormFieldId.cuenta_bancaria_tercero) nextInput = transferenciaFormFieldId.divisa_id;
+
       if (sali_de == transferenciaFormFieldId.divisa_id) nextInput = transferenciaFormFieldId.monto;
       if (sali_de == transferenciaFormFieldId.monto) nextInput = transferenciaFormFieldId.numero_referencia;
       if (sali_de == transferenciaFormFieldId.numero_referencia) nextInput = transferenciaFormFieldId.comentario;
@@ -232,7 +238,14 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   checkIfSomethingIsDiferrent() {
-    const pick_values = [transferenciaFormAttr.comentario, transferenciaFormAttr.cuenta_bancaria_id, transferenciaFormAttr.divisa_id, transferenciaFormAttr.fecha_equivalente, transferenciaFormAttr.monto, transferenciaFormAttr.numero_referencia];
+    const pick_values = [
+      transferenciaFormAttr.comentario,
+      transferenciaFormAttr.cuenta_bancaria_origen_id,
+      transferenciaFormAttr.divisa_id,
+      transferenciaFormAttr.fecha_equivalente,
+      transferenciaFormAttr.monto,
+      transferenciaFormAttr.numero_referencia,
+    ];
 
     const formValue = fun.pick(this.formGroup.getRawValue(), pick_values);
     const initValue = fun.pick(this.formInitValue, pick_values);
@@ -307,12 +320,12 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
     const formulario = this.formGroup.getRawValue();
     const funct = fun.hasValue(formulario?.[transferenciaFormAttr.id]) ? 'disable' : 'enable';
-    const fields = [transferenciaFormAttr.cuenta_bancaria_id, transferenciaFormAttr.divisa_id];
+    const fields = [transferenciaFormAttr.cuenta_bancaria_origen_id, transferenciaFormAttr.divisa_id];
     fields.forEach((field) => this.formGroup.controls[field][funct]());
   }
 
   enableDisableFields(func: 'enable' | 'disable') {
-    const fields = [transferenciaFormAttr.cuenta_bancaria_id, transferenciaFormAttr.divisa_id, transferenciaFormAttr.monto, transferenciaFormAttr.numero_referencia, transferenciaFormAttr.comentario];
+    const fields = [transferenciaFormAttr.cuenta_bancaria_origen_id, transferenciaFormAttr.divisa_id, transferenciaFormAttr.monto, transferenciaFormAttr.numero_referencia, transferenciaFormAttr.comentario];
     fields.forEach((field) => this.formGroup.controls[field][func]());
   }
 
@@ -330,10 +343,12 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     dataToSend.fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
     dataToSend.monto = fun.desformatearStNumber(formulario.monto);
 
-    this.transferenciaClass.createUpdateOne(dataToSend).then((res) => {
-      this.reloadDepositosInSamePage();
-      this.borrar();
-    });
+    console.log('dataToSend ', dataToSend);
+
+    // this.transferenciaClass.createUpdateOne(dataToSend).then((res) => {
+    //   this.reloadDepositosInSamePage();
+    //   this.borrar();
+    // });
   }
 
   reloadDepositosInSamePage() {

@@ -127,13 +127,10 @@ function formarCuerpo(data, configuration, detalle, index_contenido) {
     let obj = {};
     let text_ = '';
 
-    
     if (info.key === 'index') {
       text_ = index_contenido + 1;
     } else {
       if (info.formato_fecha) {
-        console.log('detalle ', detalle);
-        console.log('detalle[info.key] ', detalle[info.key]);
         text_ = fun_.my_dateFormater(detalle[info.key]);
       } else if (info.formato_numero_tachado) {
         text_ = fun_.roundNumberToDecimal(detalle[info.key], true);

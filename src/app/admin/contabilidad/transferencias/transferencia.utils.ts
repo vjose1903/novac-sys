@@ -5,17 +5,31 @@ export class TransferenciaC extends CrudG<any> {
     super('transferencias');
   }
 }
-export const transferenciaTableId = 'lrista_tansferencias';
+
+export enum TransferenciaType {
+  terceros = 'terceros',
+  misCuentas = 'mis_cuentas',
+}
+
+export const transferenciasType = [
+  { label: 'Terceros', value: TransferenciaType.terceros, disabled: false },
+  { label: 'Entre mis Cuentas', value: TransferenciaType.misCuentas, disabled: false },
+];
+
+export const transferenciaTableId = 'lista_tansferencias';
 
 export interface TransferenciaI {
   id: number;
   [nombrePropiedad: string]: any;
 }
 
-export const anularTransferenciaModalId = 'modal_anular_id'
+export const anularTransferenciaModalId = 'modal_anular_id';
 export enum transferenciaFormAttr {
   id = 'id',
-  cuenta_bancaria_id = 'cuenta_bancaria_id',
+  cuenta_bancaria_origen_id = 'cuenta_bancaria_origen_id',
+  cuenta_bancaria_destino_id = 'cuenta_bancaria_destino_id',
+  nombre_banco_tercero = 'nombre_banco_tercero',
+  cuenta_bancaria_tercero = 'cuenta_bancaria_tercero',
   divisa_id = 'divisa_id',
   monto = 'monto',
   comentario = 'comentario',
@@ -24,7 +38,10 @@ export enum transferenciaFormAttr {
 }
 
 export enum transferenciaFormFieldId {
-  cuenta_bancaria_id = 'cuenta_bancaria_dropdown',
+  cuenta_bancaria_origen_id = 'cuenta_bancaria_origen_dropdown',
+  cuenta_bancaria_destino_id = 'cuenta_bancaria_destino_dropdown',
+  nombre_banco_tercero = 'nombre_banco_tercero_input',
+  cuenta_bancaria_tercero = 'cuenta_bancaria_tercero_input',
   divisa_id = 'divisa_dropdown',
   monto = 'monto_input',
   comentario = 'comentario_input',

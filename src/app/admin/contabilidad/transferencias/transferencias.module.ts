@@ -12,9 +12,24 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ImgModule } from '../../components/img-component/img.module';
 import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer-edit.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [TransferenciasComponent],
-  imports: [CommonModule, TransferenciasRoutingModule, FormsModule, ReactiveFormsModule, PipesModule, TablasModule, DirectivesModule, CalendarModule, DropdownModule, ImgModule, ImgViewerEditModule, NgxPermissionsModule.forChild()],
+  imports: [
+    CommonModule,
+    TransferenciasRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    PipesModule,
+    TablasModule,
+    DirectivesModule,
+    CalendarModule,
+    DropdownModule,
+    ImgModule,
+    ImgViewerEditModule,
+    SelectButtonModule,
+    NgxPermissionsModule.forChild(),
+  ],
 })
 export class TransferenciasModule {}

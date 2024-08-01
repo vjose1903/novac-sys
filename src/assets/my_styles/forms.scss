@@ -91,13 +91,21 @@
       @include noPrimengFocus;
     }
   }
+
   .p-dropdown-label {
     font-weight: 400 !important;
+    padding: 0.4rem 0.5rem;
   }
 
   &.dropdown-sm {
     .p-dropdown-label {
       padding: 0.2rem 0.5rem;
+    }
+  }
+
+  &.min-padding {
+    .p-dropdown-label {
+      padding: 0.4rem 0rem !important;
     }
   }
 }
@@ -214,6 +222,26 @@ textarea {
   // > input:not(.apple-switch) {
   //   @include campos;
   // }
+}
+
+.entrada {
+  border-radius: 0 !important;
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  padding: 0rem 0.3rem 0rem 0.5rem !important;
+  box-shadow: none !important;
+  &:focus {
+    background-color: var(--primary01);
+    border-color: #d4d4d4 !important;
+    box-shadow: 1px 1px #d4d4d4 !important;
+  }
+
+  & > .p-dropdown-label {
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+  & > .p-dropdown-trigger {
+    width: auto !important;
+  }
 }
 
 p-inputswitch {

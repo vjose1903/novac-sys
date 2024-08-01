@@ -1,0 +1,93 @@
+.fade-in {
+  opacity: 0;
+  animation: fadeInAnimation 0.2s ease-in forwards;
+}
+
+@keyframes fadeInAnimation {
+  to {
+    opacity: 1;
+  }
+}
+
+// .transition-entrance {
+//   overflow: hidden;
+
+//   &.vertical {
+//     max-height: 0px;
+//     transition: max-height 0.8s ease-in-out;
+
+//     &.show {
+//       max-height: 999px;
+//     }
+//   }
+
+//   &.horizontal {
+//     max-width: 0;
+//     transition: max-width 0.8s ease-in-out;
+
+//     &.show {
+//       max-width: 999px;
+//     }
+//   }
+// }
+
+.transition-entrance {
+  overflow: hidden;
+  transition: max-height 0.8s ease-in-out;
+
+  &.vertical {
+    max-height: 0px;
+    &.show {
+      animation: expandHeight 0.8s ease-in-out forwards;
+    }
+    &.hide {
+      animation: collapseHeight 0.8s ease-in-out forwards;
+    }
+  }
+
+  &.horizontal {
+    max-width: 0;
+    &.show {
+      animation: expandWidth 0.8s ease-in-out forwards;
+    }
+    &.hide {
+      animation: collapseWidth 0.8s ease-in-out forwards;
+    }
+  }
+}
+
+@keyframes expandHeight {
+  from {
+    max-height: 0px;
+  }
+  to {
+    max-height: 999px;
+  }
+}
+
+@keyframes collapseHeight {
+  from {
+    max-height: 999px;
+  }
+  to {
+    max-height: 0px;
+  }
+}
+
+@keyframes expandWidth {
+  from {
+    max-width: 0;
+  }
+  to {
+    max-width: 999px;
+  }
+}
+
+@keyframes collapseWidth {
+  from {
+    max-width: 999px;
+  }
+  to {
+    max-width: 0;
+  }
+}
