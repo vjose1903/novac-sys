@@ -74,15 +74,23 @@
 
                 <div class="col-12 p-0">
                   <div class="form-group">
-                    <p-selectButton [options]="transferenciasType" [(ngModel)]="selectedTransferenciaType" [ngModelOptions]="{ standalone: true }" optionLabel="label" optionValue="value" [unselectable]="true" />
+                    <p-selectButton
+                      [options]="transferenciasType"
+                      [ngModel]="selectedTransferenciaType()"
+                      (ngModelChange)="selectedTransferenciaType.set($event)"
+                      [ngModelOptions]="{ standalone: true }"
+                      optionLabel="label"
+                      optionValue="value"
+                      [unselectable]="true"
+                    />
                   </div>
                 </div>
 
                 <div class="col-12 p-0">
                   <!-- ======================= ENTRE MIS CUENTAS ======================= -->
-                  <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType === TransferenciaType.misCuentas,  }">
+                  <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.misCuentas,  }">
                     <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_destino_id" [form]="formGroup">
-                      <label class="control-label" requiredFieldLabel>Cuenta Bancaria Destino: </label>
+                      <label class="control-label" [requiredFieldLabel]="selectedTransferenciaType() === TransferenciaType.misCuentas">Cuenta Bancaria Destino: </label>
 
                       <p-dropdown
                         #dropdownCuenta
@@ -120,9 +128,11 @@
                 </div>
 
                 <div class="col-12 p-0">
-                  <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType === TransferenciaType.terceros,  }">
+                  <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.terceros,  }">
                     <!-- ======================= TERCEROS ======================= -->
-                    <!-- <form-auto-complete></form-auto-complete> -->
+                    <form-auto-complete [formControlName]="transferenciaFormAttr.nombre_banco_tercero" [config]="nombreBancoTerceroConfig" [suggestions]="bancosList" [multiple]="false"></form-auto-complete>
+
+                    
                   </div>
                 </div>
 

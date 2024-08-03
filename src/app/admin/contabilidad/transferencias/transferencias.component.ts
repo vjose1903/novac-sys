@@ -2,10 +2,10 @@ import { HtmlElementsService } from './../../../core/services/html-elements.serv
 import { ImagenService } from './../../../core/services/imagen.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect, inject, signal } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Permisos } from '../../../core/typescript/permisos';
-import { TransferenciaC, TransferenciaI, TransferenciaType, anularTransferenciaModalId, transferenciaFormAttr, transferenciaFormFieldId, transferenciaTableId, transferenciasType } from './transferencia.utils';
+import { TransferenciaC, TransferenciaI, TransferenciaType, anularTransferenciaModalId, nombreBancoTerceroConfig, transferenciaFormAttr, transferenciaFormFieldId, transferenciaTableId, transferenciasType } from './transferencia.utils';
 import { fun } from '../../../core/services/functions.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -41,7 +41,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   fun = fun;
   transferenciaFormAttr = transferenciaFormAttr;
-  selectedTransferenciaType = TransferenciaType.terceros;
+  selectedTransferenciaType = signal<TransferenciaType>(TransferenciaType.terceros);
   TransferenciaType = TransferenciaType;
   transferenciaFormFieldId = transferenciaFormFieldId;
 
@@ -71,10 +71,17 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   };
   tablaComponent;
   transferenciasType = transferenciasType;
+  nombreBancoTerceroConfig = nombreBancoTerceroConfig;
   htmlServ = inject(HtmlElementsService);
+
+  bancosList = [{ name: 'Popular' }, { name: 'BHD' }, { name: 'Promedica' }, { name: 'Santa Cruz' }, { name: 'Banco Agricola' }];
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService, public imgServ: ImagenService) {
     super();
+
+    effect(() => {
+      this.nombreBancoTerceroConfig.required = this.selectedTransferenciaType() == TransferenciaType.terceros;
+    });
   }
 
   ngOnInit(): void {
@@ -93,6 +100,9 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     this._destroy_mixin();
   }
 
+  test(a) {
+    console.log('a:  ', a);
+  }
   async necesarioStart() {
     this.initVariables();
     await this.getDepositos(fun.deepCloning(this.tServ.obj_paginate.default));
@@ -140,6 +150,9 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     this.formGroup = this.fb.group({
       [transferenciaFormAttr.id]: [null],
       [transferenciaFormAttr.cuenta_bancaria_origen_id]: [{ value: null, disabled: true }, Validators.required],
+      [transferenciaFormAttr.cuenta_bancaria_destino_id]: [{ value: null, disabled: true }],
+      [transferenciaFormAttr.nombre_banco_tercero]: [{ value: null, disabled: true }, Validators.required],
+      [transferenciaFormAttr.cuenta_bancaria_tercero]: [{ value: null, disabled: true }],
       [transferenciaFormAttr.divisa_id]: [{ value: divisa_principal ? divisa_principal.id : null, disabled: true }, Validators.required],
       [transferenciaFormAttr.monto]: [{ value: '', disabled: true }, Validators.required],
       [transferenciaFormAttr.comentario]: [{ value: '', disabled: true }, Validators.required],
@@ -147,6 +160,12 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
       [transferenciaFormAttr.fecha_equivalente]: [{ value: '', disabled: false }, Validators.required],
     });
     this.formInitValue = this.formGroup.getRawValue();
+
+    this.formGroup.valueChanges.subscribe((value: any) => {
+      console.log('value ', value);
+
+      console.log('this.formGroup.getRawValue():  ', this.formGroup.getRawValue());
+    });
   }
 
   async getCuentasBancarias() {
@@ -187,7 +206,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
       let nextInput;
 
       if (sali_de == transferenciaFormFieldId.cuenta_bancaria_origen_id) {
-        if (this.selectedTransferenciaType == TransferenciaType.misCuentas) nextInput = transferenciaFormFieldId.cuenta_bancaria_destino_id;
+        if (this.selectedTransferenciaType() == TransferenciaType.misCuentas) nextInput = transferenciaFormFieldId.cuenta_bancaria_destino_id;
         else nextInput = transferenciaFormFieldId.nombre_banco_tercero;
       }
 

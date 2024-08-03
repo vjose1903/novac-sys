@@ -1,3 +1,4 @@
+import { IAutoCompleteConfig } from '../../../core/components/form-auto-complete/form-auto-complete.utils';
 import { CrudG } from '../../../core/typescript/crud-g';
 
 export class TransferenciaC extends CrudG<any> {
@@ -10,6 +11,13 @@ export enum TransferenciaType {
   terceros = 'terceros',
   misCuentas = 'mis_cuentas',
 }
+
+export const nombreBancoTerceroConfig: IAutoCompleteConfig = {
+  label: 'Nombre Banco',
+  placeholder: 'Ingrese el nombre del banco',
+  keyLabel: 'name',
+  keyValue: 'name',
+};
 
 export const transferenciasType = [
   { label: 'Terceros', value: TransferenciaType.terceros, disabled: false },
