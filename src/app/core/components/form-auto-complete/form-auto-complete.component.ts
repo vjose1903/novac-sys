@@ -80,31 +80,40 @@ export class FormAutoCompleteComponent implements OnInit, ControlValueAccessor {
     // }
   }
 
-  async onAutoCompleteSelected(selectEvent: any) {
-    if (selectEvent && selectEvent.value) {
-      this.valueSignal.update((currentValue) => {
-        currentValue ??= [];
-        const newValue = fun.hasValue(this.config().keyValue) ? selectEvent.value[this.config().keyValue] : selectEvent.value;
-
-        return this.multiple() ? [...currentValue, newValue] : newValue;
-      });
-
-      this.onChange(this.valueSignal());
-      this.onTouched();
-    }
-
-    // try {
-    //   if (autoCompleteInfo.processData) {
-    //     this.formService.formGroup.controls[autoCompleteInfo.formFieldName].setValue(autoCompleteInfo.processData(autoCompleteInfo));
-    //   }
-    //   resolve(true);
-    // } catch (error) {
-    //   console.error(error);
-    //   reject();
-    // }
+  test(a) {
+    console.log('a ', a);
   }
 
-  onDeleteAutoCompleteOption(arg: any): void {}
+  onValueChanges(nextValue: any) {
+    if (fun.hasValue(nextValue)) {
+      const config = this.config();
+      const keyValue = config.keyValue;
+      const isMultiple = this.multiple();
+
+      this.valueSignal.update((currentValue) => {
+        currentValue ??= [];
+
+        let newValue = nextValue;
+
+        if (fun.hasValue(keyValue)) {
+          if (isMultiple) {
+            newValue = nextValue.map((item) => (typeof item !== 'string' ? item[keyValue] : item));
+          } else {
+            newValue = nextValue[keyValue];
+          }
+        }
+
+        return newValue;
+      });
+    } else {
+      this.valueSignal.set(nextValue);
+    }
+
+    console.log('this.valueSignal():  ', this.valueSignal());
+
+    this.onChange(this.valueSignal());
+    this.onTouched();
+  }
 
   setNewOptionValue(itemName: string): void {
     this.newOptionValue.set(itemName.replace(/\s+/g, ' ').trim());

@@ -12,7 +12,7 @@ export interface IAutoCompleteConfig {
   required?: boolean;
   placeholder: string;
   keyLabel: string;
-  keyValue: string;
+  keyValue?: string;
   extraFilterSuggestions?: (config: IAutoCompleteConfig) => any;
   processData?: (config: IAutoCompleteConfig, allData?: any, data?: any) => any;
   processNewOption?: (config: IAutoCompleteConfig, btn: IAutoCompleteBtnNewOption) => any;

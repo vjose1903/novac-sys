@@ -162,8 +162,6 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     this.formInitValue = this.formGroup.getRawValue();
 
     this.formGroup.valueChanges.subscribe((value: any) => {
-      console.log('value ', value);
-
       console.log('this.formGroup.getRawValue():  ', this.formGroup.getRawValue());
     });
   }

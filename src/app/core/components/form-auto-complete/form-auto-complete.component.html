@@ -4,35 +4,30 @@
   <p-autoComplete
     [id]="'input-' + fieldName()"
     [ngModel]="valueSignal()"
+    (ngModelChange)="onValueChanges($event)"
     [minLength]="1"
     [dropdown]="config()?.dropdown || false"
     [multiple]="multiple()"
     [showEmptyMessage]="true"
     styleClass="p-autocomplete with-icon {{ config().dropdown ? 'dropdown-style' : '' }} "
     panelStyleClass="p-autocomplete-panel"
-    [field]="config().keyValue"
     [forceSelection]="true"
     [placeholder]="config().placeholder"
     appendTo="body"
-    [lazy]="true"
-    [delay]="500"
     [suggestions]="filteredSuggestions()"
     (completeMethod)="setNewOptionValue($event.query)"
-    (onSelect)="onAutoCompleteSelected($event)"
-    (onUnselect)="onDeleteAutoCompleteOption($event)"
     (onBlur)="onTouched()"
   >
-    <ng-template let-item pTemplate="selectedItem">
+    <!-- <ng-template let-item pTemplate="selectedItem">
       <div class="d-flex align-items-center" [ngClass]="config().dynamicChipClass ? config().dynamicChipClass(config(), item) : ''">
-        <div>{{ item }}</div>
-        <div>{{ item[config().keyLabel] }}</div>
+        <div>{{ hasValue(config().keyValue) ? item : item[config().keyValue] }}</div>
       </div>
-    </ng-template>
+    </ng-template> -->
 
     <ng-template let-item pTemplate="item">
       <div class="d-flex align-items-center">
         <div>
-          <strong *ngIf="config().optionDescriptor"> {{ item[config().optionDescriptor] }}:</strong> {{ item[config().keyLabel] }}
+          <strong *ngIf="config().optionDescriptor"> {{ item[config().optionDescriptor] }}:</strong> {{ item[config().keyValue] }}
         </div>
       </div>
     </ng-template>
