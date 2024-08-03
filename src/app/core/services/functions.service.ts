@@ -668,6 +668,16 @@ export class fun extends CustomLodash {
     // this.router.navigateByUrl('/auth/login');
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: normalizeWord
+  // Descripcion : Esta funcion retorna un string sin tildes
+  // __________________________________________________________________________________________________
+  static normalizeWord(word: string) {
+    const normalized = word.normalize('NFD');
+    const diacriticRegex = /[\u0300-\u036f]/g;
+    return normalized.replace(diacriticRegex, '');
+  }
+
   static decryptConfigPassword(str) {
     const str_remplace = btoa(str);
     return str_remplace == ConfigService.config.config_password.replace('VMj$pt30r=', '=');

@@ -5,6 +5,7 @@ import { TransferenciasRoutingModule } from './transferencias.routing';
 import { TransferenciasComponent } from './transferencias.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PipesModule } from '../../../core/pipe/pipes.module';
+import { FormAutoCompleteModule } from '../../../core/components/form-auto-complete/form-auto-complete.module';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { CalendarModule } from 'primeng/calendar';
@@ -29,6 +30,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
     ImgModule,
     ImgViewerEditModule,
     SelectButtonModule,
+    FormAutoCompleteModule,
     NgxPermissionsModule.forChild(),
   ],
 })

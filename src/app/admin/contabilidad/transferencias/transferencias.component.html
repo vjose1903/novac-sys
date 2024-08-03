@@ -83,7 +83,7 @@
                   <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType === TransferenciaType.misCuentas,  }">
                     <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_destino_id" [form]="formGroup">
                       <label class="control-label" requiredFieldLabel>Cuenta Bancaria Destino: </label>
-  
+
                       <p-dropdown
                         #dropdownCuenta
                         [inputId]="transferenciaFormFieldId.cuenta_bancaria_destino_id"
@@ -122,7 +122,7 @@
                 <div class="col-12 p-0">
                   <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType === TransferenciaType.terceros,  }">
                     <!-- ======================= TERCEROS ======================= -->
-                     
+                    <!-- <form-auto-complete></form-auto-complete> -->
                   </div>
                 </div>
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { getUrlInUse } from '../typescript/url-server.uitls';
+import { getUrlInUse } from '../typescript/url-server.utils';
 import { Ss } from './singleton.service';
 import { fun } from './functions.service';
 
