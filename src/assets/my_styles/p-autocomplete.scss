@@ -1,0 +1,229 @@
+@import './forms';
+
+p-autocomplete {
+  .p-autocomplete {
+    width: 100%;
+
+    .p-autocomplete-input,
+    .p-autocomplete-multiple-container {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #d0d0d0;
+      border-radius: 0.25rem !important;
+      box-shadow: 1px 1px 4px 0px rgba(29, 37, 59, 0.2392156863) !important;
+      &:hover {
+        border: 1px solid #d0d0d0;
+      }
+
+      &.p-focus,
+      &:focus {
+        @include primengFocus;
+      }
+
+      .p-autocomplete-token {
+        background: #f4f7f7;
+        border-radius: 6px !important;
+        flex: 0 auto !important;
+
+        .p-autocomplete-token-icon {
+          background: #00000013;
+          padding: 0.2rem;
+          border-radius: 4px;
+          color: transparent !important;
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          &::after {
+            position: absolute;
+            content: '\00d7';
+            font-size: 24px;
+            color: #00000058;
+            font-weight: 600;
+            line-height: 0;
+            transform: translatey(-4px);
+          }
+        }
+
+        &:has(.color-green) {
+          background: #b2ee8d42 !important;
+
+          .p-autocomplete-token-icon {
+            background: #01700513;
+            &::after {
+              color: #0d430158;
+            }
+          }
+        }
+
+        &:has(.color-blue) {
+          background: #e3f2fd !important;
+          .p-autocomplete-token-icon {
+            background: #016c7013;
+            &::after {
+              color: #012c4358;
+            }
+          }
+        }
+
+        &:has(.color-red) {
+          background: #ffefef !important;
+
+          .p-autocomplete-token-icon {
+            background: #70010113;
+            &::after {
+              color: #43010158;
+            }
+          }
+        }
+      }
+
+      &.p-disabled,
+      &:disabled {
+        @include disabledInput;
+      }
+    }
+
+    &.dropdown-style {
+      > .p-autocomplete-input,
+      > .p-autocomplete-multiple-container {
+        border-right: 1px solid transparent !important;
+        border-top-right-radius: 0px !important;
+        border-bottom-right-radius: 0px !important;
+
+        &.p-focus ~ .p-autocomplete-dropdown {
+          @include primengFocus;
+          &::before {
+            top: -2px;
+            height: 105%;
+          }
+        }
+
+        & ~ .p-autocomplete-dropdown {
+          background: #ffffff !important;
+          border-color: #d0d0d0;
+          border-left: 1px solid transparent !important;
+          color: #848484 !important;
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+          overflow: visible;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -4px;
+            width: 10px;
+            height: 103%;
+            background-color: white;
+            border-top: 1px solid #d0d0d0;
+            border-bottom: 1px solid #d0d0d0;
+          }
+
+          &:focus,
+          &.p-focus {
+            @include primengFocus;
+          }
+        }
+      }
+    }
+
+    &.c-danger {
+      .p-autocomplete-multiple-container {
+        .p-autocomplete-token {
+          background: var(--bg-light-danger);
+
+          .p-autocomplete-token-icon {
+            background: #70010113;
+            &::after {
+              color: #43010158;
+            }
+          }
+        }
+      }
+    }
+
+    &.p-disabled,
+    &:disabled {
+      cursor: not-allowed !important;
+      opacity: 1 !important;
+      pointer-events: all !important;
+    }
+  }
+
+  &.ng-invalid.ng-touched,
+  &.invalid.ng-touched {
+    .p-autocomplete {
+      .p-autocomplete-input,
+      .p-autocomplete-multiple-container {
+        border: 1px solid #f8554c !important;
+      }
+    }
+  }
+}
+
+.v2-p-autocomplete-panel {
+  background-color: white !important;
+  transform: translateY(8px) !important;
+  border: 1px solid var(--light-grey) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  max-width: 1000px !important;
+
+  .p-autocomplete-items {
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+
+    .p-autocomplete-item {
+      height: auto !important;
+      position: relative;
+      align-items: center;
+      border-bottom: 1px solid var(--light-grey) !important;
+      display: flex !important;
+      flex: 0 auto !important;
+      text-wrap: wrap !important;
+
+      &.p-highlight {
+        background-color: transparent !important;
+        font-weight: 400;
+        color: var(--secondaryColor) !important;
+        padding-right: 33px !important;
+
+        &::after {
+          content: '\2713';
+          right: 10px;
+          position: absolute;
+          font-size: 22px;
+        }
+      }
+
+      &:hover {
+        background-color: var(--bg-light) !important;
+      }
+
+      strong {
+        text-wrap: wrap !important;
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}

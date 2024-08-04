@@ -1,21 +1,24 @@
-import { ControlValueAccessor, FormGroup, NgControl } from '@angular/forms';
+import { FormControl, NgControl } from '@angular/forms';
 import { IAutoCompleteConfig, IAutoCompleteBtnNewOption } from './form-auto-complete.utils';
-import { Component, computed, input, OnInit, Optional, Self, signal } from '@angular/core';
+import { Component, computed, input, model, OnInit, Optional, Self, signal } from '@angular/core';
 import { fun } from '../../services/functions.service';
+import { customFormsElements } from '../../typescript/custom-forms-elements/custom-forms-elements';
 
 @Component({
   selector: 'form-auto-complete',
   templateUrl: './form-auto-complete.component.html',
   styleUrl: './form-auto-complete.component.scss',
 })
-export class FormAutoCompleteComponent implements OnInit, ControlValueAccessor {
+export class FormAutoCompleteComponent extends customFormsElements implements OnInit {
   suggestions = input<any[]>([]);
   field = input<string>('');
-
-  valueSignal = signal<any>(undefined);
-  isDisabledSignal = signal<boolean>(false);
-
   newOptionValue = signal<any>('');
+
+  config = input.required<IAutoCompleteConfig>();
+  multiple = input.required<boolean>();
+
+  hasValue = fun.hasValue;
+  getProperty = fun.getProperty;
 
   filteredSuggestions = computed(() =>
     this.suggestions().filter((item: any) => {
@@ -28,18 +31,8 @@ export class FormAutoCompleteComponent implements OnInit, ControlValueAccessor {
     }),
   );
 
-  fieldName = signal<string>('');
-  formGroup = signal<FormGroup>(null);
-  config = input.required<IAutoCompleteConfig>();
-  multiple = input.required<boolean>();
-
-  onChange: any = () => {};
-  onTouched: any = () => {};
-
-  hasValue = fun.hasValue;
-
   constructor(@Optional() @Self() public control: NgControl) {
-    if (this.control) this.control.valueAccessor = this;
+    super(control);
   }
 
   ngOnInit(): void {
@@ -47,22 +40,6 @@ export class FormAutoCompleteComponent implements OnInit, ControlValueAccessor {
       this.fieldName.set(`${this.control.name}`);
       this.formGroup.set(this.control['_parent'].form);
     }
-  }
-
-  writeValue(value: any): void {
-    this.valueSignal.set(value);
-  }
-
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState?(isDisabled: boolean): void {
-    this.isDisabledSignal.set(isDisabled);
   }
 
   onCreateAutoCompleteOption(config: IAutoCompleteConfig, btn: IAutoCompleteBtnNewOption) {
@@ -80,42 +57,23 @@ export class FormAutoCompleteComponent implements OnInit, ControlValueAccessor {
     // }
   }
 
-  test(a) {
-    console.log('a ', a);
-  }
-
-  onValueChanges(nextValue: any) {
-    if (fun.hasValue(nextValue)) {
-      const config = this.config();
-      const keyValue = config.keyValue;
-      const isMultiple = this.multiple();
-
-      this.valueSignal.update((currentValue) => {
-        currentValue ??= [];
-
-        let newValue = nextValue;
-
-        if (fun.hasValue(keyValue)) {
-          if (isMultiple) {
-            newValue = nextValue.map((item) => (typeof item !== 'string' ? item[keyValue] : item));
-          } else {
-            newValue = nextValue[keyValue];
-          }
-        }
-
-        return newValue;
-      });
-    } else {
-      this.valueSignal.set(nextValue);
-    }
-
-    console.log('this.valueSignal():  ', this.valueSignal());
-
-    this.onChange(this.valueSignal());
-    this.onTouched();
-  }
-
   setNewOptionValue(itemName: string): void {
     this.newOptionValue.set(itemName.replace(/\s+/g, ' ').trim());
   }
+
+  returnValue(value: any) {
+    const config = this.config();
+    const keyValue = config.keyValue;
+
+    if (fun.hasValue(keyValue) && fun.hasValue(value)) {
+      const isMultiple = this.multiple();
+
+      if (isMultiple) value = value.map((item) => (fun.isPrimitive(item) ? item : item[keyValue]));
+      else value = value[keyValue];
+    }
+
+    this.onChange(value);
+  }
+
+  test(item, prop) {}
 }

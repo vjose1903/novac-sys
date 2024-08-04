@@ -1,52 +1,57 @@
-<div class="form-group d-flex flex-column" [id]="'section-' + fieldName()" [appMsgError]="fieldName()" [form]="formGroup()">
-  <label [for]="'input-' + fieldName()" class="control-label" [requiredFieldLabel]="config().required">{{ config().label }}</label>
+<div class="w-100 position-relative">
+  <div class="form-group d-flex flex-column" [id]="'section-' + fieldName()" [appMsgError]="fieldName()" [form]="formGroup()">
+    <label [for]="'input-' + fieldName()" class="control-label" [requiredFieldLabel]="config().required">{{ config().label }}</label>
 
-  <p-autoComplete
-    [id]="'input-' + fieldName()"
-    [ngModel]="valueSignal()"
-    (ngModelChange)="onValueChanges($event)"
-    [minLength]="1"
-    [dropdown]="config()?.dropdown || false"
-    [multiple]="multiple()"
-    [showEmptyMessage]="true"
-    styleClass="p-autocomplete with-icon {{ config().dropdown ? 'dropdown-style' : '' }} "
-    panelStyleClass="p-autocomplete-panel"
-    [forceSelection]="true"
-    [placeholder]="config().placeholder"
-    appendTo="body"
-    [suggestions]="filteredSuggestions()"
-    (completeMethod)="setNewOptionValue($event.query)"
-    (onBlur)="onTouched()"
-  >
-    <!-- <ng-template let-item pTemplate="selectedItem">
-      <div class="d-flex align-items-center" [ngClass]="config().dynamicChipClass ? config().dynamicChipClass(config(), item) : ''">
-        <div>{{ hasValue(config().keyValue) ? item : item[config().keyValue] }}</div>
-      </div>
-    </ng-template> -->
-
-    <ng-template let-item pTemplate="item">
-      <div class="d-flex align-items-center">
-        <div>
-          <strong *ngIf="config().optionDescriptor"> {{ item[config().optionDescriptor] }}:</strong> {{ item[config().keyValue] }}
-        </div>
-      </div>
-    </ng-template>
-
-    <ng-template let-searchValue pTemplate="empty">
-      <ng-container *ngIf="hasValue(newOptionValue())">
-        <p>No se encontraron coincidencias</p>
-        <div *ngIf="hasValue(newOptionValue())" class="div-new-item">
-          <span> <b>Nueva opción: </b> {{ newOptionValue() }} </span>
-
-          <div class="d-flex align-items-center">
-            <button class="v2-btn btn-sm  {{ btn.btnAddClass }}" *ngFor="let btn of config().btnsNewOption" (click)="onCreateAutoCompleteOption(config(), btn)">{{ btn.btnAddLabel }}</button>
+    <p-autoComplete
+      [id]="'input-' + fieldName()"
+      [ngModel]="valueSignal()"
+      (ngModelChange)="this.returnValue($event); this.onTouched()"
+      [minLength]="1"
+      [dropdown]="config()?.dropdown || false"
+      [multiple]="multiple()"
+      [showEmptyMessage]="true"
+      styleClass="p-autocomplete {{ config().dropdown ? 'dropdown-style' : '' }} "
+      panelStyleClass="p-autocomplete-panel"
+      [forceSelection]="true"
+      [placeholder]="config().placeholder"
+      [field]="config().keyLabel"
+      appendTo="body"
+      [suggestions]="filteredSuggestions()"
+      (completeMethod)="setNewOptionValue($event.query)"
+      (onBlur)="onTouched()"
+      [disabled]="disabled()"
+      class="{{ getControlClass() }}"
+    >
+      <ng-template let-item pTemplate="selectedItem">
+        <div class="d-flex align-items-center" [ngClass]="config().dynamicChipClass ? config().dynamicChipClass(config(), item) : ''">
+          <div class="d-flex gap-2">
+            <div>{{ getProperty(item, config().keyLabel) }}</div>
           </div>
         </div>
-      </ng-container>
-    </ng-template>
-  </p-autoComplete>
+      </ng-template>
 
-  <span id="msgContainer"></span>
+      <ng-template let-item pTemplate="item">
+        <div class="d-flex align-items-center">
+          <div>
+            <strong *ngIf="config().optionDescriptor"> {{ item[config().optionDescriptor] }}:</strong> {{ item[config().keyLabel] }}
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template let-searchValue pTemplate="empty">
+        <ng-container *ngIf="hasValue(newOptionValue())">
+          <p>No se encontraron coincidencias</p>
+          <div *ngIf="hasValue(newOptionValue())" class="div-new-item">
+            <span> <b>Nueva opción: </b> {{ newOptionValue() }} </span>
+
+            <div class="d-flex align-items-center">
+              <button class="v2-btn btn-sm  {{ btn.btnAddClass }}" *ngFor="let btn of config().btnsNewOption" (click)="onCreateAutoCompleteOption(config(), btn)">{{ btn.btnAddLabel }}</button>
+            </div>
+          </div>
+        </ng-container>
+      </ng-template>
+    </p-autoComplete>
+
+    <span id="msgContainer"></span>
+  </div>
 </div>
-
-({{ formGroup().controls[fieldName()].valid }})

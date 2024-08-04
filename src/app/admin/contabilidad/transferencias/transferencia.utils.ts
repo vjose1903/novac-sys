@@ -16,7 +16,7 @@ export const nombreBancoTerceroConfig: IAutoCompleteConfig = {
   label: 'Nombre Banco',
   placeholder: 'Ingrese el nombre del banco',
   keyLabel: 'name',
-  keyValue: 'name',
+  keyValue: 'id',
 };
 
 export const transferenciasType = [

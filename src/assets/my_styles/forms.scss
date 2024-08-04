@@ -6,7 +6,21 @@
 @mixin primengFocus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem var(--transparente04);
+  background-color: var(--primary02) !important;
+  border-color: transparent !important;
+  box-shadow: 0px 0px 6px var(--primary08) !important;
+}
+
+@mixin disabledInput {
+  background-color: #e9ecef;
+  opacity: 1 !important;
+  color: #6c757d !important;
+  pointer-events: all !important;
+  cursor: not-allowed !important;
+  
+  &::placeholder {
+    color: #b3bfca !important;
+  }
 }
 
 .required-field-label::after {
@@ -65,14 +79,10 @@
   &.p-focus,
   &.p-dropdown-open {
     @include primengFocus;
-    background-color: var(--primary02) !important;
-    border-color: transparent !important;
-    box-shadow: 0px 0px 6px var(--primary08) !important;
   }
 
   &.p-disabled {
-    background-color: #e9ecef;
-    opacity: 1 !important;
+    @include disabledInput;
   }
 
   .p-dropdown-clear-icon {
@@ -120,8 +130,6 @@
       input {
         &:focus {
           @include primengFocus;
-          background-color: var(--primary02) !important;
-          border-color: transparent !important;
         }
       }
     }
@@ -146,9 +154,7 @@
   color: #1d253b !important;
   box-shadow: 1px 1px 4px 0px #1d253b3d !important;
   &:focus {
-    background-color: var(--primary02) !important;
-    border-color: transparent !important;
-    box-shadow: 0px 0px 6px var(--primary08) !important;
+    @include primengFocus;
   }
   &:hover {
     cursor: pointer;
@@ -194,13 +200,7 @@ textarea {
 
   &.disabled,
   &:disabled {
-    background-color: #e9ecef;
-    color: #6c757d !important;
-    touch-action: none !important;
-    pointer-events: none !important;
-    &::placeholder {
-      color: #b3bfca !important;
-    }
+    @include disabledInput;
   }
 
   &.with-right-btn {

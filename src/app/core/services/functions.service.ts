@@ -678,6 +678,20 @@ export class fun extends CustomLodash {
     return normalized.replace(diacriticRegex, '');
   }
 
+  // __________________________________________________________________________________________________
+  // Nombre: isPrimitive
+  // Descripcion : Esta funcion retorna el valor de una variable es un primitivo
+  // __________________________________________________________________________________________________
+  static isPrimitive(value: any): boolean {
+    const primitiveTypes = ['string', 'number', 'boolean', 'undefined', 'symbol', 'bigint'];
+
+    if (primitiveTypes.includes(typeof value)) return true;
+    if (value === null) return true;
+    if (value instanceof Date) return true;
+
+    return false;
+  }
+
   static decryptConfigPassword(str) {
     const str_remplace = btoa(str);
     return str_remplace == ConfigService.config.config_password.replace('VMj$pt30r=', '=');

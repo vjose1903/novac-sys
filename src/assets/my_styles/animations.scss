@@ -9,28 +9,6 @@
   }
 }
 
-// .transition-entrance {
-//   overflow: hidden;
-
-//   &.vertical {
-//     max-height: 0px;
-//     transition: max-height 0.8s ease-in-out;
-
-//     &.show {
-//       max-height: 999px;
-//     }
-//   }
-
-//   &.horizontal {
-//     max-width: 0;
-//     transition: max-width 0.8s ease-in-out;
-
-//     &.show {
-//       max-width: 999px;
-//     }
-//   }
-// }
-
 .transition-entrance {
   overflow: hidden;
   transition: max-height 0.8s ease-in-out;
@@ -39,6 +17,7 @@
     max-height: 0px;
     &.show {
       animation: expandHeight 0.8s ease-in-out forwards;
+      overflow: visible;
     }
     &.hide {
       animation: collapseHeight 0.8s ease-in-out forwards;
@@ -49,6 +28,7 @@
     max-width: 0;
     &.show {
       animation: expandWidth 0.8s ease-in-out forwards;
+      overflow: visible;
     }
     &.hide {
       animation: collapseWidth 0.8s ease-in-out forwards;

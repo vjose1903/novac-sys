@@ -72,9 +72,16 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   tablaComponent;
   transferenciasType = transferenciasType;
   nombreBancoTerceroConfig = nombreBancoTerceroConfig;
+
   htmlServ = inject(HtmlElementsService);
 
-  bancosList = [{ name: 'Popular' }, { name: 'BHD' }, { name: 'Promedica' }, { name: 'Santa Cruz' }, { name: 'Banco Agricola' }];
+  bancosList = [
+    { name: 'Popular', id: 1 },
+    { name: 'BHD', id: 2 },
+    { name: 'Promedica', id: 3 },
+    { name: 'Santa Cruz', id: 4 },
+    { name: 'Banco Agricola', id: 5 },
+  ];
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService, public imgServ: ImagenService) {
     super();
@@ -342,8 +349,17 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   enableDisableFields(func: 'enable' | 'disable') {
-    const fields = [transferenciaFormAttr.cuenta_bancaria_origen_id, transferenciaFormAttr.divisa_id, transferenciaFormAttr.monto, transferenciaFormAttr.numero_referencia, transferenciaFormAttr.comentario];
-    fields.forEach((field) => this.formGroup.controls[field][func]());
+    const fields = [
+      transferenciaFormAttr.cuenta_bancaria_origen_id,
+      transferenciaFormAttr.cuenta_bancaria_destino_id,
+      transferenciaFormAttr.divisa_id,
+      transferenciaFormAttr.monto,
+      transferenciaFormAttr.numero_referencia,
+      transferenciaFormAttr.comentario,
+      transferenciaFormAttr.nombre_banco_tercero,
+      transferenciaFormAttr.cuenta_bancaria_tercero,
+    ];
+    fields.forEach((field) => this.formGroup.controls[field][func]({ emitEvent: false }));
   }
 
   borrar() {
