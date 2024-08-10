@@ -20,3 +20,14 @@ export interface BancoI {
   cuentas_bancarias: Array<CuentaBancariaI>;
   [nombrePropiedad: string]: any;
 }
+
+
+export interface ListBancoI {
+  id?: number;
+  nombre?: string;
+}
+export class ListaBancoC extends CrudG<any> {
+  constructor() {
+    super('nombre_bancos');
+  }
+}

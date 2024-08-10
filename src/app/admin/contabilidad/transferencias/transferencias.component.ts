@@ -14,6 +14,7 @@ import { requestParameters } from '../../../core/typescript/crud-g';
 import { PeriodoFiscalC } from '../../registros/periodo-fiscal/periodo-fiscal';
 import { dropdownFilterFocusInput } from '../../../core/typescript/p-dropdown.utils';
 import { DivisaService } from '../../registros/divisa/divisa.service';
+import { ListaBancoC, ListBancoI } from '../../registros/banco/banco.utils';
 
 @Component({
   selector: 'app-transferencias',
@@ -37,6 +38,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   transferenciaClass = new TransferenciaC();
   cuentaBancariaClass = new CuentaBancariaC();
+  listaBancosClass = new ListaBancoC();
   peridoClass = new PeriodoFiscalC();
 
   fun = fun;
@@ -75,13 +77,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   htmlServ = inject(HtmlElementsService);
 
-  bancosList = [
-    { name: 'Popular', id: 1 },
-    { name: 'BHD', id: 2 },
-    { name: 'Promedica', id: 3 },
-    { name: 'Santa Cruz', id: 4 },
-    { name: 'Banco Agricola', id: 5 },
-  ];
+  bancosList: Array<ListBancoI> = [];
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService, public imgServ: ImagenService) {
     super();
@@ -115,6 +111,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     await this.getDepositos(fun.deepCloning(this.tServ.obj_paginate.default));
     await this.createForm();
     await this.getCuentasBancarias();
+    await this.getNombresBancos();
   }
 
   initVariables() {
@@ -180,6 +177,10 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
       cuenta.label = `${cuenta.banco_name} - ${cuenta.numero_cuenta}`;
       return cuenta;
     });
+  }
+
+  async getNombresBancos() {
+    this.listaBancosClass.getAll().then((res) => (this.bancosList = res.data));
   }
 
   dropCuentaBancariaHide(arg) {

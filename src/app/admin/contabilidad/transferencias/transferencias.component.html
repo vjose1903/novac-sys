@@ -76,6 +76,7 @@
                   <div class="form-group">
                     <p-selectButton
                       [options]="transferenciasType"
+                      [disabled]="formGroup.get(transferenciaFormAttr.cuenta_bancaria_origen_id).disabled"
                       [ngModel]="selectedTransferenciaType()"
                       (ngModelChange)="selectedTransferenciaType.set($event)"
                       [ngModelOptions]="{ standalone: true }"
@@ -130,9 +131,24 @@
                 <div class="col-12 p-0">
                   <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.terceros,  }">
                     <!-- ======================= TERCEROS ======================= -->
-                    <form-auto-complete [formControlName]="transferenciaFormAttr.nombre_banco_tercero" [config]="nombreBancoTerceroConfig" [suggestions]="bancosList" [multiple]="false"></form-auto-complete>
+                    <div>
+                      <form-auto-complete [formControlName]="transferenciaFormAttr.nombre_banco_tercero" [config]="nombreBancoTerceroConfig" [suggestions]="bancosList" [multiple]="false"></form-auto-complete>
+                    </div>
 
-                    
+                    <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_tercero" [form]="formGroup">
+                      <label class="control-label">Cuenta Bancaria Destino:</label>
+                      <input
+                        type="text"
+                        (keydown.enter)="saltar(htmlServ.getId($event))"
+                        [id]="transferenciaFormFieldId.cuenta_bancaria_tercero"
+                        [formControlName]="transferenciaFormAttr.cuenta_bancaria_tercero"
+                        placeholder="Introduzca la cuenta"
+                        class="form-control"
+                        (focus)="htmlServ.selectValue($event)"
+                        autocomplete="off"
+                      />
+                      <span id="msgContainer"></span>
+                    </div>
                   </div>
                 </div>
 

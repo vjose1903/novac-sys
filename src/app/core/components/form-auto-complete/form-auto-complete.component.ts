@@ -1,20 +1,21 @@
 import { FormControl, NgControl } from '@angular/forms';
 import { IAutoCompleteConfig, IAutoCompleteBtnNewOption } from './form-auto-complete.utils';
-import { Component, computed, input, model, OnInit, Optional, Self, signal } from '@angular/core';
+import { Component, computed, input, model, OnChanges, OnInit, Optional, Self, signal, SimpleChanges } from '@angular/core';
 import { fun } from '../../services/functions.service';
 import { customFormsElements } from '../../typescript/custom-forms-elements/custom-forms-elements';
+import { isEmpty } from '../../services/pdf/utils/funciones';
 
 @Component({
   selector: 'form-auto-complete',
   templateUrl: './form-auto-complete.component.html',
   styleUrl: './form-auto-complete.component.scss',
 })
-export class FormAutoCompleteComponent extends customFormsElements implements OnInit {
+export class FormAutoCompleteComponent extends customFormsElements implements OnInit, OnChanges {
   suggestions = input<any[]>([]);
   field = input<string>('');
   newOptionValue = signal<any>('');
 
-  config = input.required<IAutoCompleteConfig>();
+  config = model.required<IAutoCompleteConfig>();
   multiple = input.required<boolean>();
 
   hasValue = fun.hasValue;
@@ -42,20 +43,17 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
     }
   }
 
-  onCreateAutoCompleteOption(config: IAutoCompleteConfig, btn: IAutoCompleteBtnNewOption) {
-    // if (config.processNewOption) {
-    //   const formulario = this.formService.formGroup.getRawValue();
-    //   const newOption = config.processNewOption(config, btn);
-    //   if (this.isAutoCompleteSelected(newOption, config, formulario)) {
-    //     fun.toastWarning('Opción ya agregada para esta indicación.', 'Elemento ya seleccionado');
-    //   } else {
-    //     const currentFieldValue = this.formService.formGroup.controls[config.formFieldName].value;
-    //     currentFieldValue.push(newOption);
-    //     this.formService.formGroup.controls[config.formFieldName].setValue(currentFieldValue);
-    //     this.onAutoCompleteSelected(newOption, config);
-    //   }
-    // }
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('config' in changes) this.verificateConfig();
   }
+
+  verificateConfig() {
+    if (isEmpty(this.config().canCreateNewOptions)) {
+      this.config.update((value) => ({ ...value, canCreateNewOptions: false }));
+    }
+  }
+
+  onCreateAutoCompleteOption(btn: IAutoCompleteBtnNewOption) {}
 
   setNewOptionValue(itemName: string): void {
     this.newOptionValue.set(itemName.replace(/\s+/g, ' ').trim());

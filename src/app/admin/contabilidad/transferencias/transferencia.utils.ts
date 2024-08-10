@@ -15,8 +15,10 @@ export enum TransferenciaType {
 export const nombreBancoTerceroConfig: IAutoCompleteConfig = {
   label: 'Nombre Banco',
   placeholder: 'Ingrese el nombre del banco',
-  keyLabel: 'name',
-  keyValue: 'id',
+  keyLabel: 'nombre',
+  keyValue: 'nombre',
+  canCreateNewOptions: false,
+  noOptionFoundMessage: 'El banco buscado no existe\nPor favor comunicarse con el soporte de Novac System. para agregarlo.',
 };
 
 export const transferenciasType = [

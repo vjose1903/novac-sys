@@ -163,44 +163,35 @@ p-autocomplete {
   }
 }
 
-.v2-p-autocomplete-panel {
+.p-autocomplete-panel {
   background-color: white !important;
-  transform: translateY(8px) !important;
-  border: 1px solid var(--light-grey) !important;
+  transform: translateY(5px) !important;
+  border: 1px solid #d0d0d0 !important;
   border-radius: 8px !important;
-  overflow: hidden;
-  max-width: 1000px !important;
+  max-width: 850px !important;
 
   .p-autocomplete-items {
-    padding: 0 !important;
-    display: flex;
-    flex-direction: column;
+    margin-bottom: 0;
 
     .p-autocomplete-item {
       height: auto !important;
       position: relative;
       align-items: center;
-      border-bottom: 1px solid var(--light-grey) !important;
-      display: flex !important;
-      flex: 0 auto !important;
+      border-bottom: 1px solid #e6e6e6 !important;
       text-wrap: wrap !important;
 
       &.p-highlight {
-        background-color: transparent !important;
-        font-weight: 400;
-        color: var(--secondaryColor) !important;
+        background-color: var(--transparente04) !important;
+        color: black;
+        font-weight: 600;
         padding-right: 33px !important;
-
-        &::after {
-          content: '\2713';
-          right: 10px;
-          position: absolute;
-          font-size: 22px;
+        &:hover {
+          background-color: var(--transparente05) !important;
         }
       }
 
       &:hover {
-        background-color: var(--bg-light) !important;
+        background-color: #d0d0d080 !important;
       }
 
       strong {
