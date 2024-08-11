@@ -15,11 +15,7 @@
             <form [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
               <div class="row">
                 <div class="col-12 p-0">
-                  <div class="form-group" appMsgError="nombre" [form]="formGroup">
-                    <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                    <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" (keydown.enter)="saltar(htmlServ.getId($event))" id="campoNombre" class="form-control" autocomplete="off" tabindex="-1" />
-                    <span id="msgContainer"></span>
-                  </div>
+                  <form-auto-complete [formControlName]="bancoFormAttr.nombre" [(config)]="nombreBancoConfig" [suggestions]="bancosList" [multiple]="false" (keydownEnter)="saltar(nombreBancoConfig.fieldId)"></form-auto-complete>
                 </div>
 
                 <div class="col-6 pl-0">
@@ -32,9 +28,9 @@
                       class="w-100"
                       styleClass="form-control with-right-btn"
                       (keydown.enter)="saltar(htmlServ.getId($event))"
-                      inputId="campoRnc"
+                      [inputId]="bancoFormFieldId[bancoFormAttr.rnc]"
                       placeholder="___-_____-_"
-                      formControlName="rnc"
+                      [formControlName]="bancoFormAttr.rnc"
                       [autoClear]="false"
                     ></p-inputMask>
                     <span id="msgContainer"></span>
@@ -52,9 +48,9 @@
                       styleClass="form-control"
                       class="w-100"
                       (keydown.enter)="saltar(htmlServ.getId($event))"
-                      inputId="campoTelefono"
+                      [inputId]="bancoFormFieldId[bancoFormAttr.telefono]"
                       placeholder="(___) ___-____"
-                      formControlName="telefono"
+                      [formControlName]="bancoFormAttr.telefono"
                       [autoClear]="false"
                     ></p-inputMask>
 
@@ -66,9 +62,9 @@
                   <div class="form-group" appMsgError="comentario" [form]="formGroup">
                     <label class="control-label">Comentario </label>
                     <textarea
-                      id="campoComentario"
+                      [id]="bancoFormFieldId[bancoFormAttr.comentario]"
                       [appCapitalice]="'formGroup'"
-                      formControlName="comentario"
+                      [formControlName]="bancoFormAttr.comentario"
                       (blur)="htmlServ.trimValue(htmlServ.getId($event), formGroup.controls.comentario)"
                       (keyup)="htmlServ.trimStartValue(htmlServ.getId($event), formGroup.controls.comentario)"
                       (keydown.enter)="saltar(htmlServ.getId($event))"
@@ -89,7 +85,16 @@
                       <div class="col-6 pl-0">
                         <div class="form-group mb-2" appMsgError="ejecutivo_cuenta" [form]="formGroup">
                           <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                          <input type="text" formControlName="ejecutivo_cuenta" [appCapitalice]="'formGroup'" (keydown.enter)="saltar(htmlServ.getId($event))" id="campoNombreEjecutivo" class="form-control" tabindex="-1" autocomplete="off" />
+                          <input
+                            type="text"
+                            [formControlName]="bancoFormAttr.ejecutivo_cuenta"
+                            [appCapitalice]="'formGroup'"
+                            (keydown.enter)="saltar(htmlServ.getId($event))"
+                            [id]="bancoFormFieldId[bancoFormAttr.ejecutivo_cuenta]"
+                            class="form-control"
+                            tabindex="-1"
+                            autocomplete="off"
+                          />
                           <span id="msgContainer"></span>
                         </div>
                       </div>
@@ -105,9 +110,9 @@
                             styleClass="form-control"
                             class="w-100"
                             (keydown.enter)="saltar(htmlServ.getId($event))"
-                            inputId="campoTelefonoEjecutivo"
+                            [inputId]="bancoFormFieldId[bancoFormAttr.telefono_ejecutivo_cuenta]"
                             placeholder="(___) ___-____"
-                            formControlName="telefono_ejecutivo_cuenta"
+                            [formControlName]="bancoFormAttr.telefono_ejecutivo_cuenta"
                             [autoClear]="false"
                           ></p-inputMask>
 

@@ -4,7 +4,6 @@ import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, Afte
 
 import { IpcService } from './core/services/ipc.service';
 import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
-import * as _ from 'lodash';
 import { Ss } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from './admin/layout/layout.service';
@@ -257,7 +256,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   ngAfterContentChecked() {
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
   }
 
   resize() {
@@ -276,7 +275,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       object.percent = parseFloat(fun.roundNumberToDecimal(object.percent));
 
       this.objPercent = object;
-      this.cdRef.detectChanges();
+      Ss.cdRef.detectChanges();
     });
   }
 

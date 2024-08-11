@@ -8,11 +8,12 @@ import { fun } from './../../../core/services/functions.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
 import { customValidators } from './../../../core/typescript/custom-validators';
 import { Permisos } from './../../../core/typescript/permisos';
-import { BancoC, BancoI } from './banco.utils';
+import { BancoC, bancoFormAttr, bancoFormFieldId, BancoI, ListaBancoC, ListBancoI, nombreBancoConfig } from './banco.utils';
 import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
 import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar, modalTipoCuentaBancaria } from './cuenta-bancaria-form/cuenta_bancaria';
 import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-bancaria.component';
 import { ImagenService } from './../../../core/services/imagen.service';
+import { pairwise, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-banco',
@@ -31,11 +32,19 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
   myValidators = new customValidators();
   bancoClass = new BancoC();
+  listaBancosClass = new ListaBancoC();
+
+  bancoFormAttr = bancoFormAttr;
+  bancoFormFieldId = bancoFormFieldId;
+  nombreBancoConfig = nombreBancoConfig;
+  bancosList: Array<ListBancoI> = [];
+
+  readFormChanges = false;
 
   table_config: table_config = {
     info: [
       { titulo: '1', tipo: tableCellType.icon, key: 'incomplete', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'incomplete', tooltip: 'Información Incompleta', text_color: 'incomplete_color' }] },
-      { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre', style: { width: '45%', 'text-align': 'start' } },
+      { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre.nombre', style: { width: '45%', 'text-align': 'start' } },
       { titulo: 'Rnc', tipo: tableCellType.text, key: 'rnc' },
       { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
       {
@@ -83,24 +92,39 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async necesarioStart() {
-    await this.createForm();
-    await this.getBancos(this.tServ.obj_paginate.default);
+    await this.createForm().then(async () => {
+      await this.subscribeFormChanges();
+      await this.getNombresBancos();
+      await this.getBancos(this.tServ.obj_paginate.default);
+    });
   }
 
   createForm() {
-    this.formGroup = this.fb.group({
-      id: [{ value: null, disabled: false }],
-      nombre: [{ value: null, disabled: false }, Validators.required],
-      rnc: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
-      comentario: [{ value: null, disabled: false }],
-      telefono: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
-      direccion: [{ value: null, disabled: false }],
-      ejecutivo_cuenta: [{ value: null, disabled: false }, Validators.required],
-      telefono_ejecutivo_cuenta: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
-      cuentas_bancarias: this.fb.array([]),
-    });
+    return new Promise<void>((resolve) => {
+      this.formGroup = this.fb.group({
+        id: [{ value: null, disabled: false }],
+        [bancoFormAttr.nombre]: [{ value: null, disabled: false }, Validators.required],
+        [bancoFormAttr.rnc]: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
+        [bancoFormAttr.comentario]: [{ value: null, disabled: false }],
+        [bancoFormAttr.telefono]: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
+        [bancoFormAttr.direccion]: [{ value: null, disabled: false }],
+        [bancoFormAttr.ejecutivo_cuenta]: [{ value: null, disabled: false }, Validators.required],
+        [bancoFormAttr.telefono_ejecutivo_cuenta]: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
+        [bancoFormAttr.cuentas_bancarias]: this.fb.array([]),
+      });
 
-    this.formInitialValue = this.formGroup.getRawValue();
+      this.formInitialValue = this.formGroup.getRawValue();
+      resolve();
+    });
+  }
+
+  subscribeFormChanges() {
+    this.formGroup.valueChanges.pipe(startWith(this.formGroup.value), pairwise()).subscribe(([previousValue, currentValue]) => {
+      if (this.readFormChanges && !fun.isEqual(previousValue.nombre, currentValue.nombre)) {
+        if (fun.isEmpty(currentValue.nombre)) this.formGroup.controls[bancoFormAttr.rnc].setValue(null, { emitEvent: false });
+        else this.formGroup.controls[bancoFormAttr.rnc].setValue(currentValue.nombre.identificador, { emitEvent: false });
+      }
+    });
   }
 
   createItemCuentaBancaria(cuenta_bancaria?: CuentaBancariaI) {
@@ -147,6 +171,10 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     });
   }
 
+  async getNombresBancos() {
+    this.listaBancosClass.getAll().then((res) => (this.bancosList = res.data));
+  }
+
   editCuentaBancaria(previousData, editedData) {
     new Promise<void>((resolve, reject) => {
       Object.assign(previousData, editedData);
@@ -164,27 +192,32 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     let siguiente_input = '';
     let is_enforcar = true;
 
-    console.log();
-
     switch (salioDe) {
-      case 'campoNombre':
-        siguiente_input = 'campoRnc';
+      case this.nombreBancoConfig.fieldId:
+        siguiente_input = bancoFormFieldId[bancoFormAttr.rnc];
         break;
-      case 'campoRnc':
-        siguiente_input = 'campoTelefono';
+      case bancoFormFieldId[bancoFormAttr.rnc]:
+        siguiente_input = bancoFormFieldId[bancoFormAttr.telefono];
         break;
-      case 'campoTelefono':
-        siguiente_input = 'campoComentario';
+      case bancoFormFieldId[bancoFormAttr.telefono]:
+        siguiente_input = bancoFormFieldId[bancoFormAttr.comentario];
         break;
-      case 'campoComentario':
-        siguiente_input = 'campoNombreEjecutivo';
+      case bancoFormFieldId[bancoFormAttr.comentario]:
+        siguiente_input = bancoFormFieldId[bancoFormAttr.ejecutivo_cuenta];
         break;
-      case 'campoNombreEjecutivo':
-        siguiente_input = 'campoTelefonoEjecutivo';
+      case bancoFormFieldId[bancoFormAttr.ejecutivo_cuenta]:
+        siguiente_input = bancoFormFieldId[bancoFormAttr.telefono_ejecutivo_cuenta];
+        break;
+      case bancoFormFieldId[bancoFormAttr.telefono_ejecutivo_cuenta]:
+        is_enforcar = false;
+        siguiente_input = bancoFormFieldId.send;
         break;
     }
 
     if (is_enforcar) fun.enfocarInput(siguiente_input);
+    else {
+      if (siguiente_input == bancoFormFieldId.send) this.requests();
+    }
   }
 
   removeItem(arrayId: string, index: number = null) {
@@ -218,6 +251,8 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   parseBanco(bancoParsed) {
+    bancoParsed.nombre = this.bancosList.find((banco) => banco.nombre == bancoParsed.nombre);
+
     bancoParsed.edit_banco = 'fas fa-pencil-alt';
     bancoParsed.delete_banco = 'far fa-trash-alt';
 
@@ -236,17 +271,21 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tableClickIcon(evento) {
-    if ((evento.id_tabla = 'lista_banco'))
-      if (evento.iconKey == 'edit_banco') {
-        this.formGroup.patchValue(evento.data);
-        this.fillCuentasBancarias(evento.data.cuentas_bancarias);
+    if ((evento.id_tabla = 'lista_banco')) {
+      if (evento.iconKey == 'edit_banco') this.editItem(evento.data);
+      if (evento.iconKey == 'delete_banco') this.eliminarReg(evento.data);
+    }
+  }
 
-        this.formInitialValue = this.formGroup.getRawValue();
+  editItem(data: BancoI) {
+    this.readFormChanges = false;
+    this.formGroup.patchValue(data, { emitEvent: false });
+    this.fillCuentasBancarias(data.cuentas_bancarias);
 
-        this.isCreando = false;
-      }
+    this.formInitialValue = this.formGroup.getRawValue();
 
-    if (evento.iconKey == 'delete_banco') this.eliminarReg(evento.data);
+    setTimeout(() => (this.readFormChanges = true), 500);
+    this.isCreando = false;
   }
 
   eliminarReg(data) {
@@ -264,7 +303,14 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
   nuevoRegistro() {
     this.isCreando = true;
-    setTimeout(() => fun.enfocarInput('campoNombre'), 200);
+    setTimeout(() => {
+      fun.enfocarInput(this.nombreBancoConfig.fieldId);
+      this.readFormChanges = true;
+    }, 500);
+  }
+
+  test() {
+    fun.enfocarInput(this.nombreBancoConfig.fieldId);
   }
 
   borrar(isCreando = true) {
@@ -272,6 +318,8 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (fun.hasValue(this.formGroup)) this.formGroup.reset();
     this.isCreando = isCreando;
+
+    if (!this.isCreando) this.readFormChanges = false;
   }
 
   openModalCuentasBancarias(cuenta?: CuentaBancariaI) {
@@ -320,10 +368,6 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     return res;
   }
 
-  test() {
-    
-  }
-
   formIsOnInitState(log = false) {
     const pick_values = ['nombre', 'rnc', 'telefono', 'comentario', 'ejecutivo_cuenta', 'telefono_ejecutivo_cuenta'];
     const formValue = fun.pick(this.formGroup.getRawValue(), pick_values);
@@ -362,6 +406,8 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
       return cuenta_parsed;
     });
+
+    if (typeof formValue.nombre != 'string') formValue.nombre = formValue.nombre.nombre;
 
     this.bancoClass.createUpdateOne(formValue).then((res) => {
       const actualPagination = this.tServ.getPaginationById('lista_banco');

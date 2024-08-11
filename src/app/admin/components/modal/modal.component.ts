@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChildren, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { modalsConfigurations, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
 import { BtnTypeE, ConfigureModalI, IReturnData } from './modal-class';
 import { ConfigService } from '../../../core/services/configuration.service';
+import { Ss } from '../../../core/services/singleton.service';
 
 @Component({
   selector: 'app-new-modal',
@@ -15,7 +16,7 @@ import { ConfigService } from '../../../core/services/configuration.service';
 export class NewModalComponent implements OnInit, OnDestroy {
   @ViewChildren(ModalDirective) modal_receptor: ModalDirective;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef, public mServ: ModalService) {}
+  constructor(private componentFactoryResolver: ComponentFactoryResolver, public mServ: ModalService) {}
 
   private destroy$ = new Subject<void>();
 
@@ -105,7 +106,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
       modal[key] = element[key];
     });
 
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
   }
 
   renderizarComponente(modalConfig) {
@@ -127,7 +128,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
             componente['instance'].modalComponent.id = modalConfig.id;
             currentConfig['componentInstance'] = componente['instance'];
             modalConfig.initializing = false;
-            this.cdRef.detectChanges();
+            Ss.cdRef.detectChanges();
           })
           .catch(() => {
             // this.closeModal(modalConfig.id);

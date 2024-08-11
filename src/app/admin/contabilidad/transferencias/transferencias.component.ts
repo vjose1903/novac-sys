@@ -29,10 +29,10 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   minDate: Date;
   maxDate: Date;
   permissions = Permisos;
-  formPermissions = [Permisos.deposito.create, Permisos.deposito.update];
+  formPermissions = [Permisos.transferencia.create, Permisos.transferencia.update];
 
-  depositoSelected: TransferenciaI;
-  depositoList: Array<TransferenciaI> = [];
+  transferenciaSelected: TransferenciaI;
+  transferenciaList: Array<TransferenciaI> = [];
 
   cuentasBancariasList: Array<CuentaBancariaI> = [];
 
@@ -61,8 +61,8 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
         tipo: tableCellType.icon,
         style: { 'text-align': 'center', width: '8rem' },
         iconsArray: [
-          { key: 'edit_deposito', tooltip: 'Editar', text_color: 'colorNegro' },
-          { key: 'anular_deposito', tooltip: 'Anular', text_color: 'colorNegro' },
+          { key: 'edit_transferencia', tooltip: 'Editar', text_color: 'colorNegro' },
+          { key: 'anular_transferencia', tooltip: 'Anular', text_color: 'colorNegro' },
         ],
       },
     ],
@@ -71,6 +71,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     id_tabla: transferenciaTableId,
     obj_paginate: { show: true, showTotal: true, showPaginator: false },
   };
+
   tablaComponent;
   transferenciasType = transferenciasType;
   nombreBancoTerceroConfig = nombreBancoTerceroConfig;
@@ -106,9 +107,10 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   test(a) {
     console.log('a:  ', a);
   }
+
   async necesarioStart() {
     this.initVariables();
-    await this.getDepositos(fun.deepCloning(this.tServ.obj_paginate.default));
+    await this.getTransferencias(fun.deepCloning(this.tServ.obj_paginate.default));
     await this.createForm();
     await this.getCuentasBancarias();
     await this.getNombresBancos();
@@ -121,28 +123,28 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     this.minDate = undefined;
   }
 
-  getDepositos(params?: { per_page?: number; page?: number; search?: string }) {
+  getTransferencias(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
-    this.depositoList.length = 0;
+    this.transferenciaList.length = 0;
 
     this.transferenciaClass.getAll(extra).then((res) => {
-      this.depositoList = res.data.map((deposito: TransferenciaI) => {
-        deposito[transferenciaFormAttr.cuenta_bancaria_origen_id] = deposito.cuenta_bancaria.id;
-        deposito[transferenciaFormAttr.divisa_id] = deposito.divisa.id;
+      this.transferenciaList = res.data.map((transferencia: TransferenciaI) => {
+        transferencia[transferenciaFormAttr.cuenta_bancaria_origen_id] = transferencia.cuenta_bancaria.id;
+        transferencia[transferenciaFormAttr.divisa_id] = transferencia.divisa.id;
 
-        deposito.edit_deposito = 'fas fa-pencil-alt';
-        deposito.anular_deposito = 'fa-solid fa-ban';
+        transferencia.edit_transferencia = 'fas fa-pencil-alt';
+        transferencia.anular_transferencia = 'fa-solid fa-ban';
 
-        deposito.customStyles = {
+        transferencia.customStyles = {
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8rem !important;' },
-            { key: 'edit_deposito', estilos: 'font-size: 1.2rem !important' },
-            { key: 'anular_deposito', estilos: 'font-size: 1.2rem !important' },
+            { key: 'edit_transferencia', estilos: 'font-size: 1.2rem !important' },
+            { key: 'anular_transferencia', estilos: 'font-size: 1.2rem !important' },
           ],
         };
-        return deposito;
+        return transferencia;
       });
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
@@ -164,10 +166,6 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
       [transferenciaFormAttr.fecha_equivalente]: [{ value: '', disabled: false }, Validators.required],
     });
     this.formInitValue = this.formGroup.getRawValue();
-
-    this.formGroup.valueChanges.subscribe((value: any) => {
-      console.log('this.formGroup.getRawValue():  ', this.formGroup.getRawValue());
-    });
   }
 
   async getCuentasBancarias() {
@@ -183,10 +181,10 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     this.listaBancosClass.getAll().then((res) => (this.bancosList = res.data));
   }
 
-  dropCuentaBancariaHide(arg) {
+  dropCuentaBancariaHide(dropdownCuenta, fieldId) {
     const formulario = this.formGroup.getRawValue();
-
-    if (fun.hasValue(formulario[transferenciaFormAttr.cuenta_bancaria_origen_id])) this.saltar(transferenciaFormFieldId.cuenta_bancaria_origen_id);
+    dropdownCuenta.hide;
+    if (fun.hasValue(formulario[fieldId])) this.saltar(transferenciaFormFieldId[fieldId]);
   }
 
   dropCuentaBancariaFocus(drop) {
@@ -211,20 +209,25 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     if (sali_de != transferenciaFormFieldId.send) {
       let nextInput;
 
-      if (sali_de == transferenciaFormFieldId.cuenta_bancaria_origen_id) {
-        if (this.selectedTransferenciaType() == TransferenciaType.misCuentas) nextInput = transferenciaFormFieldId.cuenta_bancaria_destino_id;
-        else nextInput = transferenciaFormFieldId.nombre_banco_tercero;
+      if (this.formGroup.controls[transferenciaFormAttr.cuenta_bancaria_origen_id].enabled) {
+        if (sali_de == transferenciaFormFieldId.fecha_equivalente) nextInput = transferenciaFormFieldId.cuenta_bancaria_origen_id;
+
+        if (sali_de == transferenciaFormFieldId.cuenta_bancaria_origen_id) {
+          if (this.selectedTransferenciaType() == TransferenciaType.misCuentas) nextInput = transferenciaFormFieldId.cuenta_bancaria_destino_id;
+          else nextInput = this.nombreBancoTerceroConfig.fieldId;
+        }
+
+        if (sali_de == transferenciaFormFieldId.cuenta_bancaria_destino_id) nextInput = transferenciaFormFieldId.divisa_id;
+        if (sali_de == this.nombreBancoTerceroConfig.fieldId) nextInput = transferenciaFormFieldId.cuenta_bancaria_tercero;
+        if (sali_de == transferenciaFormFieldId.cuenta_bancaria_tercero) nextInput = transferenciaFormFieldId.divisa_id;
+        if (sali_de == transferenciaFormFieldId.divisa_id) nextInput = transferenciaFormFieldId.monto;
+        if (sali_de == transferenciaFormFieldId.monto) nextInput = transferenciaFormFieldId.numero_referencia;
+        if (sali_de == transferenciaFormFieldId.numero_referencia) nextInput = transferenciaFormFieldId.comentario;
+
+        if (fun.hasValue(nextInput)) setTimeout(() => fun.enfocarInput(nextInput), 100);
+      } else {
+        fun.enfocarInput(transferenciaFormAttr.fecha_equivalente);
       }
-
-      if (sali_de == transferenciaFormFieldId.cuenta_bancaria_destino_id) nextInput = transferenciaFormFieldId.divisa_id;
-      if (sali_de == transferenciaFormFieldId.nombre_banco_tercero) nextInput = transferenciaFormFieldId.cuenta_bancaria_tercero;
-      if (sali_de == transferenciaFormFieldId.cuenta_bancaria_tercero) nextInput = transferenciaFormFieldId.divisa_id;
-
-      if (sali_de == transferenciaFormFieldId.divisa_id) nextInput = transferenciaFormFieldId.monto;
-      if (sali_de == transferenciaFormFieldId.monto) nextInput = transferenciaFormFieldId.numero_referencia;
-      if (sali_de == transferenciaFormFieldId.numero_referencia) nextInput = transferenciaFormFieldId.comentario;
-
-      if (fun.hasValue(nextInput)) setTimeout(() => fun.enfocarInput(nextInput), 100);
     } else {
       if (!this.formIsInvalid()) setTimeout(() => this.requests(), 250);
     }
@@ -256,7 +259,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
           const numMonth = formulario.fecha_equivalente.getMonth() + 1;
           const monthLabel = DateUtils.getMonthLabelByNum(numMonth);
 
-          fun.toastError(`Para registrar un deposito en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
+          fun.toastError(`Para registrar una transferencia en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
         }
       });
     }
@@ -280,23 +283,24 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   nuevoRegistro() {
     this.isCreando = true;
+    setTimeout(() => fun.enfocarInput(transferenciaFormFieldId.fecha_equivalente), 500);
   }
 
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
-      if (params.iconKey == 'edit_deposito') this.editarItem(params.data);
-      if (params.iconKey == 'anular_deposito') {
+      if (params.iconKey == 'edit_transferencia') this.editarItem(params.data);
+      if (params.iconKey == 'anular_transferencia') {
         const identifier = params.data.numero_referencia ?? params.data.comentario;
 
         this.confirmationModal({
           id: anularTransferenciaModalId,
           header: 'Confirmar',
-          texto: `Seguro que desea <b class="negrita"> ANULAR </b> el deposito <b class="negrita">${identifier}</b>`,
+          texto: `Seguro que desea <b class="negrita"> ANULAR </b> la Transferencia <b class="negrita">${identifier}</b>`,
           // texto: params.data.estado
           //   ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`
           //   : `Seguro que desea <b class="negrita"> REACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`,
           siFunction: (instance) => {
-            this.anularDeposito(params.data);
+            this.anularTransferencia(params.data);
             instance.dismissModal(instance.id);
           },
         });
@@ -304,23 +308,23 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     }
   }
 
-  anularDeposito(data) {
+  anularTransferencia(data) {
     this.transferenciaClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
-      this.reloadDepositosInSamePage();
+      this.reloadTransferenciasInSamePage();
     });
   }
 
-  editarItem(deposito: TransferenciaI) {
+  editarItem(transferencia: TransferenciaI) {
     if (fun.hasValue(this.formGroup)) this.formGroup.reset();
 
     setTimeout(() => {
       this.botonLabel = 'Editar';
       this.enableDisableFields('enable');
-      this.depositoSelected = fun.deepCloning(deposito);
-      this.depositoSelected.fecha_equivalente = this.depositoSelected.fecha_equivalente ? new Date(this.depositoSelected.fecha_equivalente) : null;
-      this.depositoSelected.monto = this.depositoSelected.monto ? fun.roundNumberToDecimal(this.depositoSelected.monto) : null;
+      this.transferenciaSelected = fun.deepCloning(transferencia);
+      this.transferenciaSelected.fecha_equivalente = this.transferenciaSelected.fecha_equivalente ? new Date(this.transferenciaSelected.fecha_equivalente) : null;
+      this.transferenciaSelected.monto = this.transferenciaSelected.monto ? fun.roundNumberToDecimal(this.transferenciaSelected.monto) : null;
 
-      this.formGroup.patchValue(this.depositoSelected);
+      this.formGroup.patchValue(this.transferenciaSelected);
 
       this.formInitValue = this.formGroup.getRawValue();
       this.verificateFieldsState();
@@ -365,7 +369,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   borrar() {
     if (fun.hasValue(this.formGroup)) this.formGroup.reset();
-    this.depositoSelected = undefined;
+    this.transferenciaSelected = undefined;
     this.enableDisableFields('disable');
     this.initVariables();
     this.isCreando = true;
@@ -379,14 +383,14 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
     console.log('dataToSend ', dataToSend);
 
-    // this.transferenciaClass.createUpdateOne(dataToSend).then((res) => {
-    //   this.reloadDepositosInSamePage();
-    //   this.borrar();
-    // });
+    this.transferenciaClass.createUpdateOne(dataToSend).then((res) => {
+      this.reloadTransferenciasInSamePage();
+      this.borrar();
+    });
   }
 
-  reloadDepositosInSamePage() {
+  reloadTransferenciasInSamePage() {
     const actualPagination = this.tServ.getPaginationById(transferenciaTableId);
-    this.getDepositos(actualPagination);
+    this.getTransferencias(actualPagination);
   }
 }

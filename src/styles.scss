@@ -6,7 +6,6 @@
 @import './assets/my_styles/global-font.scss';
 @import './assets/my_styles/main.scss';
 
-
 .logoLoading {
   height: 14rem;
   position: absolute;
@@ -107,7 +106,6 @@
   text-decoration-line: none;
   color: var(--primary04);
 }
-
 
 .overlayCuenta {
   .p-overlaypanel-content {
@@ -304,8 +302,6 @@ body {
 // ========================================================
 // CARDS
 // ========================================================
-
-
 
 .card-padding {
   padding: 1.5rem 1rem 1.5rem 1rem;
@@ -801,6 +797,12 @@ Not supports in Firefox and IE */
           width: 50%;
         }
 
+        &.minForm {
+          &.showForm {
+            width: 40%;
+          }
+        }
+
         &.hideForm {
           width: 0%;
           overflow: hidden;
@@ -859,6 +861,12 @@ Not supports in Firefox and IE */
         transition: all 0.3s;
         &.FormList {
           width: 50%;
+        }
+
+        &.minForm {
+          &.FormList {
+            width: 60%;
+          }
         }
 
         &.onlyList {

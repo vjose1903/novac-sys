@@ -7,6 +7,7 @@ export interface IAutoCompleteBtnNewOption {
 
 export interface IAutoCompleteConfig {
   label: string;
+  fieldId?: string;
   optionDescriptor?: string;
   dropdown?: boolean;
   required?: boolean;

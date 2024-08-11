@@ -3,14 +3,15 @@
     <label [for]="'input-' + fieldName()" class="control-label" [requiredFieldLabel]="config().required">{{ config().label }}</label>
 
     <p-autoComplete
-      [id]="'input-' + fieldName()"
+      [id]="config().fieldId"
+      [inputId]="config().fieldId"
       [ngModel]="valueSignal()"
       (ngModelChange)="this.returnValue($event); this.onTouched()"
       [minLength]="1"
       [dropdown]="config()?.dropdown || false"
       [multiple]="multiple()"
       [showEmptyMessage]="true"
-      styleClass="p-autocomplete {{ config().dropdown ? 'dropdown-style' : '' }} "
+      styleClass="p-autocomplete{{ config().dropdown ? ' dropdown-style' : '' }}"
       panelStyleClass="p-autocomplete-panel"
       [forceSelection]="true"
       [placeholder]="config().placeholder"
@@ -20,6 +21,7 @@
       (completeMethod)="setNewOptionValue($event.query)"
       (onBlur)="onTouched()"
       [disabled]="disabled()"
+      (keydown.enter)="emitKeydown($event)"
       class="{{ getControlClass() }}"
     >
       <ng-template let-item pTemplate="selectedItem">
@@ -40,26 +42,23 @@
 
       <ng-template let-searchValue pTemplate="empty">
         @if (hasValue(newOptionValue())) {
-          
-          <h6 class="mb-3">No se encontraron coincidencias</h6>
-            @if (hasValue(newOptionValue())) {
-              <div class="div-new-item">
-                @if (config().canCreateNewOptions) {
-                  <span> <b>Nueva opción: </b> {{ newOptionValue() }} </span>
 
-                  <div class="d-flex align-items-center">
-                    <button class="v2-btn btn-sm  {{ btn.btnAddClass }}" *ngFor="let btn of config().btnsNewOption" (click)="onCreateAutoCompleteOption(btn)">{{ btn.btnAddLabel }}</button>
-                  </div>
-                } @else {
-                  @if (config().noOptionFoundMessage) {
-                    <div class="no-option-found">
-                      <p class="text-danger mb-0" [innerText]="config().noOptionFoundMessage">  </p>
-                    </div>
-                  }
-                }
-              </div>
-            }
-        }
+        <h6 class="mb-3">No se encontraron coincidencias</h6>
+        @if (hasValue(newOptionValue())) {
+        <div class="div-new-item">
+          @if (config().canCreateNewOptions) {
+          <span> <b>Nueva opción: </b> {{ newOptionValue() }} </span>
+
+          <div class="d-flex align-items-center">
+            <button class="v2-btn btn-sm  {{ btn.btnAddClass }}" *ngFor="let btn of config().btnsNewOption" (click)="onCreateAutoCompleteOption(btn)">{{ btn.btnAddLabel }}</button>
+          </div>
+          } @else { @if (config().noOptionFoundMessage) {
+          <div class="no-option-found">
+            <p class="text-danger mb-0" [innerText]="config().noOptionFoundMessage"></p>
+          </div>
+          } }
+        </div>
+        } }
       </ng-template>
     </p-autoComplete>
 

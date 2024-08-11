@@ -1,6 +1,6 @@
-import { FormControl, NgControl } from '@angular/forms';
+import { NgControl } from '@angular/forms';
 import { IAutoCompleteConfig, IAutoCompleteBtnNewOption } from './form-auto-complete.utils';
-import { Component, computed, input, model, OnChanges, OnInit, Optional, Self, signal, SimpleChanges } from '@angular/core';
+import { Component, computed, EventEmitter, input, model, OnChanges, OnInit, Optional, Output, Self, signal, SimpleChanges } from '@angular/core';
 import { fun } from '../../services/functions.service';
 import { customFormsElements } from '../../typescript/custom-forms-elements/custom-forms-elements';
 import { isEmpty } from '../../services/pdf/utils/funciones';
@@ -21,6 +21,8 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
   hasValue = fun.hasValue;
   getProperty = fun.getProperty;
 
+  @Output() keydownEnter = new EventEmitter();
+
   filteredSuggestions = computed(() =>
     this.suggestions().filter((item: any) => {
       const keyLabel = this.config().keyLabel;
@@ -40,6 +42,7 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
     if (this.control) {
       this.fieldName.set(`${this.control.name}`);
       this.formGroup.set(this.control['_parent'].form);
+      this.config.update((value) => ({ ...value, fieldId: `autoComplete-${this.fieldName()}` }));
     }
   }
 
@@ -48,9 +51,7 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
   }
 
   verificateConfig() {
-    if (isEmpty(this.config().canCreateNewOptions)) {
-      this.config.update((value) => ({ ...value, canCreateNewOptions: false }));
-    }
+    if (isEmpty(this.config().canCreateNewOptions)) this.config.update((value) => ({ ...value, canCreateNewOptions: false }));
   }
 
   onCreateAutoCompleteOption(btn: IAutoCompleteBtnNewOption) {}
@@ -71,6 +72,10 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
     }
 
     this.onChange(value);
+  }
+
+  emitKeydown(event: any) {
+    this.keydownEnter.emit(event);
   }
 
   test(item, prop) {}

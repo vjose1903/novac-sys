@@ -1,3 +1,4 @@
+import { Ss } from './../../../core/services/singleton.service';
 import { ConfigI } from './../../../core/typescript/config-interface';
 import { DateUtils } from './../../../core/typescript/date.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
@@ -5,7 +6,7 @@ import { TipoArticuloComponent } from './tipo-articulo/tipo-articulo.component';
 import { ConfigService } from './../../../core/services/configuration.service';
 import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, FormArray, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TablasService } from '../../components/new_tablas/tablas.service';
@@ -112,7 +113,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   maxSizeTypeE = maxSizeTypeE;
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService, public entCuentaContServ: EntidadCuentaContableService) {
+  constructor(private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService, public entCuentaContServ: EntidadCuentaContableService) {
     super();
   }
 
@@ -262,7 +263,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   ngOnChanges() {
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
   }
 
   showContenido(value) {

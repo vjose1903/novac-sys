@@ -1,6 +1,7 @@
+import { Ss } from './../../../core/services/singleton.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '../../../core/services/functions.service';
 import { rowDataDividerKey, medidas, table_config, table_info, btnTableI } from './tabla-class';
@@ -61,9 +62,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   realIdTabla;
 
   htmlServ = inject(HtmlElementsService);
-  constructor(public tServ: TablasService, private zone: NgZone, public cdRef: ChangeDetectorRef) {
-    cdRef.detach();
-    this.tablaInterval = setInterval(() => this.cdRef.detectChanges(), 500);
+  constructor(public tServ: TablasService, private zone: NgZone) {
+    Ss.cdRef.detach();
+    this.tablaInterval = setInterval(() => Ss.cdRef.detectChanges(), 500);
   }
 
   formatoNumero(num) {
@@ -101,7 +102,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       this.TablasComponent = this;
       this.TablasComponentChange.emit(this.TablasComponent);
     }
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
   }
 
   verificateConfig() {
@@ -261,7 +262,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           }
         }
 
-        this.cdRef.detectChanges();
+        Ss.cdRef.detectChanges();
       });
     }, 150);
   }
@@ -332,7 +333,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }
 
         this.cantPagesView = actual;
-        this.cdRef.detectChanges();
+        Ss.cdRef.detectChanges();
       });
     }, 100);
   }
@@ -458,7 +459,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
     }
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
   }
 
   cantidadesTooltip(dato, column) {
@@ -600,7 +601,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       else this.actualRowIndex = this.actualRowIndex + 1;
     }
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
 
     fun.scrollTo({ id: this.row_id, behavior: 'smooth', block: 'center', inline: 'center' });
     fun.enfocarInput(this.row_id);

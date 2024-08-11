@@ -6,7 +6,7 @@
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
-        <div class="contenedorRegistro" *ngIf="isCreando || depositoSelected" class="form formDeposito {{ isCreando || depositoSelected ? 'showForm' : 'hideForm' }} ">
+        <div class="contenedorRegistro" *ngIf="isCreando || transferenciaSelected" class="form minForm {{ isCreando || transferenciaSelected ? 'showForm' : 'hideForm' }} ">
           <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
             <h4 class="mb-0">Formulario</h4>
           </div>
@@ -23,6 +23,7 @@
                       [maxDate]="maxDate"
                       inputStyleClass="form-control"
                       [formControlName]="transferenciaFormAttr.fecha_equivalente"
+                      (keydown.enter)="saltar(transferenciaFormFieldId.fecha_equivalente)"
                       appendTo="body"
                       dateFormat="dd/mm/yy"
                       placeholder="dd/mm/aaaa"
@@ -57,9 +58,8 @@
                       emptyMessage="No existen cuantas bancarias"
                       [showClear]="true"
                       (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-                      (keyup.enter)="saltar('campoCuentaBancaria')"
                       (onFocus)="dropCuentaBancariaFocus(dropdownCuenta)"
-                      (onHide)="dropCuentaBancariaHide(dropdownCuenta)"
+                      (onHide)="dropCuentaBancariaHide(dropdownCuenta, transferenciaFormAttr.cuenta_bancaria_origen_id)"
                     >
                       <ng-template let-cuenta_bancaria pTemplate="item">
                         <div class="cuenta_bancaria-item">
@@ -112,9 +112,8 @@
                         emptyMessage="No existen cuantas bancarias"
                         [showClear]="true"
                         (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-                        (keyup.enter)="saltar(transferenciaFormFieldId.cuenta_bancaria_destino_id)"
                         (onFocus)="dropCuentaBancariaFocus(dropdownCuenta)"
-                        (onHide)="dropCuentaBancariaHide(dropdownCuenta)"
+                        (onHide)="dropCuentaBancariaHide(dropdownCuenta, transferenciaFormAttr.cuenta_bancaria_destino_id)"
                       >
                         <ng-template let-cuenta_bancaria pTemplate="item">
                           <div class="cuenta_bancaria-item">
@@ -132,7 +131,13 @@
                   <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.terceros,  }">
                     <!-- ======================= TERCEROS ======================= -->
                     <div>
-                      <form-auto-complete [formControlName]="transferenciaFormAttr.nombre_banco_tercero" [config]="nombreBancoTerceroConfig" [suggestions]="bancosList" [multiple]="false"></form-auto-complete>
+                      <form-auto-complete
+                        [formControlName]="transferenciaFormAttr.nombre_banco_tercero"
+                        [(config)]="nombreBancoTerceroConfig"
+                        [suggestions]="bancosList"
+                        [multiple]="false"
+                        (keydownEnter)="saltar(nombreBancoTerceroConfig.fieldId)"
+                      ></form-auto-complete>
                     </div>
 
                     <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_tercero" [form]="formGroup">
@@ -244,14 +249,14 @@
         </div>
       </ng-container>
 
-      <div class="list listDeposito {{ isCreando || depositoSelected ? 'FormList' : 'onlyList' }}">
+      <div class="list minForm {{ isCreando || transferenciaSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
-          <h4 class="mb-0">Listado de depositos</h4>
-          <button *ngxPermissionsOnly="permissions.deposito.create || permissions.deposito.update" [disabled]="depositoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+          <h4 class="mb-0">Listado de Transferencias</h4>
+          <button *ngxPermissionsOnly="permissions.transferencia.create || permissions.transferencia.update" [disabled]="transferenciaSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">
-            <dinamic-table [cardTabla]="cardTabla" [(data)]="depositoList" [seleccionado]="depositoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="transferenciaList" [seleccionado]="transferenciaSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
           </div>
         </div>
       </div>

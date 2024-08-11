@@ -1,6 +1,7 @@
+import { Ss } from './../../../core/services/singleton.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
 import { EntradaDiarioComponent } from './entrada-diario/entrada-diario.component';
-import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { Permisos } from '../../../core/typescript/permisos';
 import { fun } from '../../../core/services/functions.service';
@@ -58,7 +59,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   asientoContableClass = new AsientoContableC();
   filterValue;
 
-  constructor(public cdRef: ChangeDetectorRef, public tServ: TablasService, private zone: NgZone) {
+  constructor(public tServ: TablasService, private zone: NgZone) {
     super();
   }
 
@@ -100,7 +101,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
         }
 
         this.paginator.cantPagesView = actual;
-        this.cdRef.detectChanges();
+        Ss.cdRef.detectChanges();
       });
     }, 100);
   }
@@ -247,7 +248,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
           // }
         }
 
-        this.cdRef.detectChanges();
+        Ss.cdRef.detectChanges();
       });
     }, 150);
   }

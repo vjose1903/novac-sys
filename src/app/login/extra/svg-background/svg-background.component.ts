@@ -1,4 +1,5 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { Ss } from './../../../core/services/singleton.service';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'svg-background',
@@ -10,11 +11,11 @@ export class SvgBackgroundComponent implements AfterViewInit {
 
   initComponent: boolean = false;
 
-  constructor(public cdRef: ChangeDetectorRef) {}
+  constructor() {}
 
   ngAfterViewInit(): void {
     this.initComponent = true;
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
   }
 
   getSvgSize(prop: 'offsetWidth' | 'offsetHeight') {

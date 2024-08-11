@@ -34,6 +34,7 @@ export interface TransferenciaI {
 }
 
 export const anularTransferenciaModalId = 'modal_anular_id';
+
 export enum transferenciaFormAttr {
   id = 'id',
   cuenta_bancaria_origen_id = 'cuenta_bancaria_origen_id',
@@ -50,7 +51,6 @@ export enum transferenciaFormAttr {
 export enum transferenciaFormFieldId {
   cuenta_bancaria_origen_id = 'cuenta_bancaria_origen_dropdown',
   cuenta_bancaria_destino_id = 'cuenta_bancaria_destino_dropdown',
-  nombre_banco_tercero = 'nombre_banco_tercero_input',
   cuenta_bancaria_tercero = 'cuenta_bancaria_tercero_input',
   divisa_id = 'divisa_dropdown',
   monto = 'monto_input',

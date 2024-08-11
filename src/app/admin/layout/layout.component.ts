@@ -2,7 +2,7 @@ import { DivisaService } from './../registros/divisa/divisa.service';
 import { LoaderService } from './../../core/services/loader.service';
 import { ConfigService } from './../../core/services/configuration.service';
 import { TiposFacturaC, actionFacturacion } from './../facturacion/factura';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
@@ -69,7 +69,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   actionFacturacion = actionFacturacion;
   currentYear: number;
 
-  constructor(private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService, public divisaServ: DivisaService) {
+  constructor(private router: Router, private currentUserServ: CurrentUserService, public divisaServ: DivisaService) {
     super();
 
     this.subRouter = this.router.events.subscribe((routerEvent: Event | RouterEvent) => {
@@ -92,7 +92,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
             }
           }, 500);
 
-          
           this.initNavigate = false;
         }
       }
@@ -129,7 +128,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.parseMenu();
     this.checkRouteActiva();
     this.checkFacturasArchivadas();
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
 
     this.validateUserAndLoadPermisos().then((result) => {
       this.getTiposFacturas().then(() => {

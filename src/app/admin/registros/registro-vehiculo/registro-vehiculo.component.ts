@@ -1,5 +1,6 @@
+import { Ss } from './../../../core/services/singleton.service';
 import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -65,7 +66,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   htmlServ = inject(HtmlElementsService);
   fun = fun;
-  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor(private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
 
@@ -142,7 +143,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   ngOnChanges() {
-    this.cdRef.detectChanges();
+    Ss.cdRef.detectChanges();
   }
 
   createForm() {
