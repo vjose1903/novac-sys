@@ -112,8 +112,6 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.depositoClass.getAll(extra).then((res) => {
       this.depositoList = res.data.map((deposito: DepositoI) => {
-        console.log('deposito ', deposito);
-
         deposito[depositoFormAttr.cuenta_bancaria_id] = deposito.cuenta_bancaria.id;
         deposito[depositoFormAttr.divisa_id] = deposito.divisa.id;
 
@@ -206,26 +204,35 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     return res;
   }
 
-  validateOpenPeriod() {
-    const formulario = this.formGroup.getRawValue();
+  validateOpenPeriod(date?: any, type?: 'create' | 'update' | 'anulate') {
+    return new Promise<void>((resolve, reject) => {
+      const formulario = this.formGroup.getRawValue();
 
-    if (fun.hasValue(formulario.fecha_equivalente)) {
-      const fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
+      date ??= formulario.fecha_equivalente;
 
-      const requestParameters: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
-      this.peridoClass.getAll(requestParameters).then((response) => {
-        this.enableDisableFields(response.data.isOpen ? 'enable' : 'disable');
+      if (fun.hasValue(date)) {
+        const fecha_equivalente = DateUtils.format({ date: date, dateFormat: 'YYYY-MM-DD' });
 
-        if (!response.data.isOpen) {
-          this.formGroup.controls[depositoFormAttr.fecha_equivalente].setValue(null, { emitEvent: false });
-          const fechaMostrar = DateUtils.format({ date: formulario.fecha_equivalente });
-          const numMonth = formulario.fecha_equivalente.getMonth() + 1;
-          const monthLabel = DateUtils.getMonthLabelByNum(numMonth);
+        const requestParameters: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
+        this.peridoClass.getAll(requestParameters).then((response) => {
+          this.enableDisableFields(response.data.isOpen ? 'enable' : 'disable');
 
-          fun.toastError(`Para registrar un deposito en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
-        }
-      });
-    }
+          if (!response.data.isOpen) {
+            this.formGroup.controls[depositoFormAttr.fecha_equivalente].setValue(null, { emitEvent: false });
+            const fechaMostrar = DateUtils.format({ date: date });
+            const numMonth = date.getMonth() + 1;
+            const monthLabel = DateUtils.getMonthLabelByNum(numMonth);
+
+            fun.toastError(`Para ${fun.isEmpty(type) || type == 'create' ? 'registrar' : type == 'update' ? 'editar' : 'anular'} un deposito en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
+            reject();
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        reject();
+      }
+    });
   }
 
   checkIfSomethingIsDiferrent() {
@@ -243,48 +250,51 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
-      if (params.iconKey == 'edit_deposito') this.editarItem(params.data);
-      if (params.iconKey == 'anular_deposito') {
-        const identifier = params.data.numero_referencia ?? params.data.comentario;
-
-        this.confirmationModal({
-          id: anularDepositoModalId,
-          header: 'Confirmar',
-          texto: `Seguro que desea <b class="negrita"> ANULAR </b> el deposito <b class="negrita">${identifier}</b>`,
-          // texto: params.data.estado
-          //   ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`
-          //   : `Seguro que desea <b class="negrita"> REACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`,
-          siFunction: (instance) => {
-            this.anularDeposito(params.data);
-            instance.dismissModal(instance.id);
-          },
-        });
-      }
+      const data = params.data;
+      if (params.iconKey == 'edit_deposito') this.editarItem(data);
+      if (params.iconKey == 'anular_deposito') this.anularItem(data);
     }
   }
 
-  anularDeposito(data) {
-    this.depositoClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
-      this.reloadDepositosInSamePage();
+  anularItem(deposito: DepositoI) {
+    this.validateOpenPeriod(DateUtils.parse(deposito.fecha_equivalente), 'anulate').then(() => {
+      const identifier = deposito.numero_referencia || deposito.comentario;
+
+      const anularFunction = (data) => {
+        this.depositoClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
+          this.reloadDepositosInSamePage();
+        });
+      };
+
+      this.confirmationModal({
+        id: anularDepositoModalId,
+        header: 'Confirmar',
+        texto: `Seguro que desea <b class="negrita"> ANULAR </b> el deposito <b class="negrita">${identifier}</b>`,
+        siFunction: (instance) => {
+          anularFunction(deposito);
+          instance.dismissModal(instance.id);
+        },
+      });
     });
   }
-
   editarItem(deposito: DepositoI) {
-    if (fun.hasValue(this.formGroup)) this.formGroup.reset();
+    this.validateOpenPeriod(DateUtils.parse(deposito.fecha_equivalente), 'update').then(() => {
+      if (fun.hasValue(this.formGroup)) this.formGroup.reset();
 
-    setTimeout(() => {
-      this.botonLabel = 'Editar';
-      this.enableDisableFields('enable');
-      this.depositoSelected = fun.deepCloning(deposito);
-      this.depositoSelected.fecha_equivalente = this.depositoSelected.fecha_equivalente ? new Date(this.depositoSelected.fecha_equivalente) : null;
-      this.depositoSelected.monto = this.depositoSelected.monto ? fun.roundNumberToDecimal(this.depositoSelected.monto) : null;
+      setTimeout(() => {
+        this.botonLabel = 'Editar';
+        this.enableDisableFields('enable');
+        this.depositoSelected = fun.deepCloning(deposito);
+        this.depositoSelected.fecha_equivalente = this.depositoSelected.fecha_equivalente ? new Date(this.depositoSelected.fecha_equivalente) : null;
+        this.depositoSelected.monto = this.depositoSelected.monto ? fun.roundNumberToDecimal(this.depositoSelected.monto) : null;
 
-      this.formGroup.patchValue(this.depositoSelected);
+        this.formGroup.patchValue(this.depositoSelected);
 
-      this.formInitValue = this.formGroup.getRawValue();
-      this.verificateFieldsState();
-      this.encapsulateMonth();
-    }, 1);
+        this.formInitValue = this.formGroup.getRawValue();
+        this.verificateFieldsState();
+        this.encapsulateMonth();
+      }, 1);
+    });
   }
 
   encapsulateMonth() {
@@ -304,7 +314,7 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
     const formulario = this.formGroup.getRawValue();
     const funct = fun.hasValue(formulario?.[depositoFormAttr.id]) ? 'disable' : 'enable';
-    const fields = [depositoFormAttr.cuenta_bancaria_id, depositoFormAttr.divisa_id];
+    const fields = [depositoFormAttr.divisa_id];
     fields.forEach((field) => this.formGroup.controls[field][funct]());
   }
 

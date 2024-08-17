@@ -50,9 +50,9 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   table_config: table_config = {
     info: [
       { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { 'text-align': 'left', width: '13%' } },
-      { titulo: 'No. de cuenta', tipo: tableCellType.text, key: 'cuenta_bancaria.numero_cuenta', style: { 'text-align': 'left', width: '15%', 'padding-left': '0.3rem', 'padding-right': '0.3rem' } },
-      { titulo: 'Banco', tipo: tableCellType.text, key: 'cuenta_bancaria.banco.nombre', style: { 'text-align': 'left', width: '25%' } },
-      { titulo: 'Comentario', tipo: tableCellType.text, key: 'comentario', puntosSuspensivos: true, style: { 'text-align': 'left', 'padding-left': '0.3rem', width: '30%' } },
+      { titulo: 'Origen', tipo: tableCellType.text, key: 'cuenta_bancaria_origen.info_completa', style: { 'text-align': 'left', width: '25%', 'padding-left': '0.3rem', 'padding-right': '0.3rem' } },
+      { titulo: 'Destino', tipo: tableCellType.text, key: 'destino_info_completa', style: { 'text-align': 'left', width: '25%' } },
+      { titulo: 'Comentario', tipo: tableCellType.text, key: 'comentario', puntosSuspensivos: true, lineClamp: 3, style: { 'text-align': 'left', 'padding-left': '0.3rem', width: '20%' } },
       { titulo: 'Monto', tipo: tableCellType.formatoNumero, key: 'monto', style: { 'text-align': 'right', width: '10%' } },
       {
         key: 'actions',
@@ -131,7 +131,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
     this.transferenciaClass.getAll(extra).then((res) => {
       this.transferenciaList = res.data.map((transferencia: TransferenciaI) => {
-        transferencia[transferenciaFormAttr.cuenta_bancaria_origen_id] = transferencia.cuenta_bancaria.id;
+        transferencia[transferenciaFormAttr.cuenta_bancaria_origen_id] = transferencia.cuenta_bancaria_origen.id;
         transferencia[transferenciaFormAttr.divisa_id] = transferencia.divisa.id;
 
         transferencia.edit_transferencia = 'fas fa-pencil-alt';
@@ -243,26 +243,34 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     return res;
   }
 
-  validateOpenPeriod() {
-    const formulario = this.formGroup.getRawValue();
+  validateOpenPeriod(date?: any, type?: 'create' | 'update' | 'anulate') {
+    return new Promise<void>((resolve, reject) => {
+      const formulario = this.formGroup.getRawValue();
+      date ??= formulario.fecha_equivalente;
 
-    if (fun.hasValue(formulario.fecha_equivalente)) {
-      const fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
+      if (fun.hasValue(date)) {
+        const fecha_equivalente = DateUtils.format({ date: date, dateFormat: 'YYYY-MM-DD' });
 
-      const requestParameters: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
-      this.peridoClass.getAll(requestParameters).then((response) => {
-        this.enableDisableFields(response.data.isOpen ? 'enable' : 'disable');
+        const requestParameters: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
+        this.peridoClass.getAll(requestParameters).then((response) => {
+          this.enableDisableFields(response.data.isOpen ? 'enable' : 'disable');
 
-        if (!response.data.isOpen) {
-          this.formGroup.controls[transferenciaFormAttr.fecha_equivalente].setValue(null, { emitEvent: false });
-          const fechaMostrar = DateUtils.format({ date: formulario.fecha_equivalente });
-          const numMonth = formulario.fecha_equivalente.getMonth() + 1;
-          const monthLabel = DateUtils.getMonthLabelByNum(numMonth);
+          if (!response.data.isOpen) {
+            this.formGroup.controls[transferenciaFormAttr.fecha_equivalente].setValue(null, { emitEvent: false });
+            const fechaMostrar = DateUtils.format({ date: date });
+            const numMonth = date.getMonth() + 1;
+            const monthLabel = DateUtils.getMonthLabelByNum(numMonth);
 
-          fun.toastError(`Para registrar una transferencia en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
-        }
-      });
-    }
+            fun.toastError(`Para ${fun.isEmpty(type) || type == 'create' ? 'registrar' : type == 'update' ? 'editar' : 'anular'} una transferencia en la fecha: ${fechaMostrar}, debe de abrir el mes de ${fun.capitalice(monthLabel)}`);
+            reject();
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        reject();
+      }
+    });
   }
 
   checkIfSomethingIsDiferrent() {
@@ -286,50 +294,67 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     setTimeout(() => fun.enfocarInput(transferenciaFormFieldId.fecha_equivalente), 500);
   }
 
-  tableClickIcon(params) {
-    if (params.columnKey == 'actions') {
-      if (params.iconKey == 'edit_transferencia') this.editarItem(params.data);
-      if (params.iconKey == 'anular_transferencia') {
-        const identifier = params.data.numero_referencia ?? params.data.comentario;
+  changeTipoTransferencia(tipo) {
+    this.selectedTransferenciaType.set(tipo);
 
-        this.confirmationModal({
-          id: anularTransferenciaModalId,
-          header: 'Confirmar',
-          texto: `Seguro que desea <b class="negrita"> ANULAR </b> la Transferencia <b class="negrita">${identifier}</b>`,
-          // texto: params.data.estado
-          //   ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`
-          //   : `Seguro que desea <b class="negrita"> REACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`,
-          siFunction: (instance) => {
-            this.anularTransferencia(params.data);
-            instance.dismissModal(instance.id);
-          },
-        });
-      }
+    if (tipo == TransferenciaType.misCuentas) {
+      this.formGroup.controls[transferenciaFormAttr.nombre_banco_tercero].clearValidators();
+    } else {
+      this.formGroup.controls[transferenciaFormAttr.nombre_banco_tercero].setValidators(Validators.required);
+    }
+
+    this.formGroup.controls[transferenciaFormAttr.nombre_banco_tercero].updateValueAndValidity();
+  }
+
+  tableClickIcon(params) {
+    const data = params.data;
+
+    if (params.columnKey == 'actions') {
+      if (params.iconKey == 'edit_transferencia') this.editarItem(data);
+      if (params.iconKey == 'anular_transferencia') this.aunlarItem(data);
     }
   }
 
-  anularTransferencia(data) {
-    this.transferenciaClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
-      this.reloadTransferenciasInSamePage();
+  aunlarItem(transferencia: TransferenciaI) {
+    this.validateOpenPeriod(DateUtils.parse(transferencia.fecha_equivalente), 'anulate').then(() => {
+      const identifier = transferencia.numero_referencia || transferencia.comentario;
+
+      const anularFunction = (data) => {
+        this.transferenciaClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
+          this.reloadTransferenciasInSamePage();
+        });
+      };
+
+      this.confirmationModal({
+        id: anularTransferenciaModalId,
+        header: 'Confirmar',
+        texto: `Seguro que desea <b class="negrita"> ANULAR </b> la Transferencia.<br /><br /><b class="negrita">Origen:</b> ${transferencia.cuenta_bancaria_origen.info_completa}<br /><b class="negrita">Destino:</b> ${transferencia.destino_info_completa}<br /><br />${identifier}`,
+        siFunction: (instance) => {
+          anularFunction(transferencia);
+          instance.dismissModal(instance.id);
+        },
+      });
     });
   }
 
   editarItem(transferencia: TransferenciaI) {
-    if (fun.hasValue(this.formGroup)) this.formGroup.reset();
+    this.validateOpenPeriod(DateUtils.parse(transferencia.fecha_equivalente), 'update').then(() => {
+      if (fun.hasValue(this.formGroup)) this.formGroup.reset();
 
-    setTimeout(() => {
-      this.botonLabel = 'Editar';
-      this.enableDisableFields('enable');
-      this.transferenciaSelected = fun.deepCloning(transferencia);
-      this.transferenciaSelected.fecha_equivalente = this.transferenciaSelected.fecha_equivalente ? new Date(this.transferenciaSelected.fecha_equivalente) : null;
-      this.transferenciaSelected.monto = this.transferenciaSelected.monto ? fun.roundNumberToDecimal(this.transferenciaSelected.monto) : null;
+      setTimeout(() => {
+        this.botonLabel = 'Editar';
+        this.enableDisableFields('enable');
+        this.transferenciaSelected = fun.deepCloning(transferencia);
+        this.transferenciaSelected.fecha_equivalente = this.transferenciaSelected.fecha_equivalente ? DateUtils.parse(this.transferenciaSelected.fecha_equivalente) : null;
+        this.transferenciaSelected.monto = this.transferenciaSelected.monto ? fun.roundNumberToDecimal(this.transferenciaSelected.monto) : null;
 
-      this.formGroup.patchValue(this.transferenciaSelected);
+        this.formGroup.patchValue(this.transferenciaSelected);
 
-      this.formInitValue = this.formGroup.getRawValue();
-      this.verificateFieldsState();
-      this.encapsulateMonth();
-    }, 1);
+        this.formInitValue = this.formGroup.getRawValue();
+        this.verificateFieldsState();
+        this.encapsulateMonth();
+      }, 1);
+    });
   }
 
   encapsulateMonth() {
@@ -349,7 +374,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
     const formulario = this.formGroup.getRawValue();
     const funct = fun.hasValue(formulario?.[transferenciaFormAttr.id]) ? 'disable' : 'enable';
-    const fields = [transferenciaFormAttr.cuenta_bancaria_origen_id, transferenciaFormAttr.divisa_id];
+    const fields = [transferenciaFormAttr.divisa_id];
     fields.forEach((field) => this.formGroup.controls[field][funct]());
   }
 
@@ -380,8 +405,6 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     const dataToSend = fun.deepCloning(formulario);
     dataToSend.fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
     dataToSend.monto = fun.desformatearStNumber(formulario.monto);
-
-    console.log('dataToSend ', dataToSend);
 
     this.transferenciaClass.createUpdateOne(dataToSend).then((res) => {
       this.reloadTransferenciasInSamePage();

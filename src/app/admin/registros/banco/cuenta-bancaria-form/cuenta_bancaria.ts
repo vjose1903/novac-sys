@@ -24,6 +24,7 @@ export interface CuentaBancariaI {
   cuenta_contable: CuentaContableI;
   cuenta_contable_prima: CuentaContableI;
   tipo_cuenta_bancaria: string;
+  info_completa: string;
   [nombrePropiedad: string]: any;
 }
 export const modalCuentaBancaria = 'cuentaBancariaForm';

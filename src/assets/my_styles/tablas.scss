@@ -104,6 +104,7 @@
             }
           }
         }
+
         .divBody {
           grid-area: tbody;
           grid-row: body-start / body-end;
@@ -192,6 +193,15 @@
                 }
 
                 &.btnAccion {
+                }
+
+                & .text-cell.text-clamp {
+                  --line-clamp: 2;
+                  display: -webkit-box;
+                  -webkit-box-orient: vertical;
+                  -webkit-line-clamp: var(--line-clamp);
+                  overflow: hidden;
+                  text-overflow: ellipsis;
                 }
               }
             }
@@ -315,8 +325,6 @@
     }
   }
 }
-
-
 
 @media (min-width: 992px) {
   // =====================================================================================================================================================================

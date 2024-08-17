@@ -57,6 +57,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   private destroy$ = new Subject<void>();
 
   fun = fun;
+  
 
   tablaInterval;
   realIdTabla;

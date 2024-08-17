@@ -1,5 +1,9 @@
 import { IAutoCompleteConfig } from '../../../core/components/form-auto-complete/form-auto-complete.utils';
 import { CrudG } from '../../../core/typescript/crud-g';
+import { BancoI } from '../../registros/banco/banco.utils';
+import { CuentaBancariaI } from '../../registros/banco/cuenta-bancaria-form/cuenta_bancaria';
+import { DivisaI } from '../../registros/divisa/divisa.utils';
+import { EmpleadoI } from '../../registros/registro-empleados/empleado.utils';
 
 export class TransferenciaC extends CrudG<any> {
   constructor() {
@@ -29,7 +33,27 @@ export const transferenciasType = [
 export const transferenciaTableId = 'lista_tansferencias';
 
 export interface TransferenciaI {
-  id: number;
+  id?: number;
+  tasa: number;
+  monto?: number | string;
+  monto_local: number;
+  comentario: string;
+  numero_referencia: string;
+  fecha_equivalente: string | Date;
+  fecha_anulacion?: null;
+  nombre_banco_tercero?: null;
+  cuenta_bancaria_tercero?: null;
+  estado: true;
+  cuenta_bancaria_origen: CuentaBancariaI;
+  cuenta_bancaria_destino: CuentaBancariaI;
+  divisa: DivisaI;
+  user_creador: EmpleadoI;
+  last_user_update?: EmpleadoI;
+  user_anulador?: EmpleadoI;
+  banco_obj: BancoI;
+  destino_info_completa: string;
+  cuenta_bancaria_origen_id: number;
+  divisa_id: number;
   [nombrePropiedad: string]: any;
 }
 

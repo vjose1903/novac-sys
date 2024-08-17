@@ -405,7 +405,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     const documentos_identidad = [{ documento: formulario.cedula, descripcion: 'cedula' }];
 
     documentos_identidad.map((element) => {
-      const doc_backend = this.documentos_de_identidad.find((doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+      const doc_backend = this.documentos_de_identidad?.find((doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = true;
       return element;

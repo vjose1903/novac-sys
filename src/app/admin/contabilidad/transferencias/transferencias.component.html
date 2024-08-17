@@ -78,7 +78,7 @@
                       [options]="transferenciasType"
                       [disabled]="formGroup.get(transferenciaFormAttr.cuenta_bancaria_origen_id).disabled"
                       [ngModel]="selectedTransferenciaType()"
-                      (ngModelChange)="selectedTransferenciaType.set($event)"
+                      (ngModelChange)="changeTipoTransferencia($event)"
                       [ngModelOptions]="{ standalone: true }"
                       optionLabel="label"
                       optionValue="value"

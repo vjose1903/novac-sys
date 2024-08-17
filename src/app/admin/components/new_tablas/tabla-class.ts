@@ -35,6 +35,7 @@ export interface table_info {
   style?: any;
   select_all?: boolean;
   alert_msg?: string;
+  lineClamp?: number;
   checkNumber?: boolean;
   can_reset?: boolean;
   inputType?: string;

@@ -105,6 +105,16 @@ export class DateUtils {
   }
 
   /**
+   * Convierte un string a un Date.
+   * @param value Variable a parsear
+   * @returns Date object.
+   * @example DateUtils.parse('2024-03-19')
+   */
+  static parse(value: any): Date {
+    return new Date(value);
+  }
+
+  /**
    * Formatea una fecha según las opciones proporcionadas.
    * @param params Objeto con las opciones de formateo de la fecha.
    *               - date: La fecha a formatear (opcional, por defecto es la fecha actual).

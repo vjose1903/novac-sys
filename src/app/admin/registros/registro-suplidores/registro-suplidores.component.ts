@@ -474,7 +474,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     ];
 
     documentos_identidad.map((element) => {
-      const doc_backend = this.documentos_de_identidad.find((doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+      const doc_backend = this.documentos_de_identidad?.find((doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;
       return element;
