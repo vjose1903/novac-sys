@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalComponentI, ModalI } from '../../../components/modal/modal-class';
-import { BancoI } from '../banco.utils';
+import { BancoI, ListBancoI } from '../banco.utils';
 import { TipoCuentaBancariaC, TipoCuentaBancariaI } from '../tipo-cuenta-bancaria/tipo_cuenta_bancaria';
 import { fun } from './../../../../core/services/functions.service';
 import { ImagenService } from './../../../../core/services/imagen.service';
@@ -26,6 +26,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   tipoCuentaBancariaClass = new TipoCuentaBancariaC();
 
   CuentaBancariaSelected;
+  nombreBanco: string;
   maxDate;
 
   htmlServ = inject(HtmlElementsService);
@@ -36,6 +37,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
 
   ngOnInit(): void {
     this.necesarioStart();
+    this.nombreBanco = (this.inputs?.banco?.nombre as ListBancoI)?.nombre;
   }
 
   async necesarioStart() {
@@ -95,8 +97,6 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   saltar(salioDe, valor?) {
     let siguiente_input = '';
     let is_enforcar = true;
-
-    console.log();
 
     switch (salioDe) {
       case 'campoDescripcion':

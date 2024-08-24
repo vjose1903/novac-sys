@@ -144,7 +144,8 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
 
           return asiento;
         });
-        this.asientosContablesList = res.data;
+
+        this.asientosContablesList = res.data.sort((a, b) => fun.compare(a, b, ['fecha_equivalente'], 'asc'));
         this.paginator.total_count = res.total_registros;
         resolve();
       });

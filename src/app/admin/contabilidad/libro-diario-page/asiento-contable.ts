@@ -19,6 +19,7 @@ export interface CabezaAsietoContableI {
   usuario_creador: UsuarioCreador;
   usuario_anulador: null;
   periodo_fiscal: PeriodoFiscalI;
+  codigo: string;
   detalles_asientos_contables: Array<DetalleAsientoContableI>;
   [prop: string]: any;
 }

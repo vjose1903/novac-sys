@@ -10,7 +10,7 @@ export class BancoC extends CrudG<any> {
 
 export interface BancoI {
   id?: number;
-  nombre?: string | ListBancoI;
+  nombre?: ListBancoI | string;
   rnc?: string;
   comentario?: string;
   telefono?: string;
@@ -57,7 +57,7 @@ export enum bancoFormAttr {
 export enum bancoFormFieldId {
   id = 'id',
   rnc = 'rnc_input',
-  comentario = 'comentario_textarea', 
+  comentario = 'comentario_textarea',
   telefono = 'telefono_input',
   direccion = 'direccion_input',
   ejecutivo_cuenta = 'ejecutivo_cuenta_input',

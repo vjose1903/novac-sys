@@ -71,6 +71,7 @@
                     (click)="clickROW(rowData, getIndex(indexBody))"
                   >
                     @if(verificateIsDivider(rowData)){
+
                       <td class="table-td-divider" id="td-{{ realIdTabla }}-divider-{{ getIndex(indexBody) }}" [ngStyle]="tServ.getStyleDivider(rowData)" [attr.colspan]="verificateColspan(rowData)">
                         <span> {{ rowData.label }}</span>
                       </td>
@@ -202,22 +203,23 @@
                           </span>
                         </td>
                       } 
+                      
+                      @if (fun.hasValue(config.botones)) {
+                        <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
+                          <span class="titulo_sm"> Acciones </span>
+                          <app-btnacciones
+                            [index_body]="getIndex(indexBody)"
+                            [id_tabla]="realIdTabla"
+                            [dato]="rowData"
+                            [data]="data"
+                            [botones]="config.botones"
+                            (functionsBtnDinamic)="functionsBtnDinamic($event)"
+                            (clickBoton)="handle_table_events('click_action', $event)"
+                          ></app-btnacciones>
+                        </td>
+                      }
                     } 
 
-                    @if (fun.hasValue(config.botones)) {
-                      <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
-                        <span class="titulo_sm"> Acciones </span>
-                        <app-btnacciones
-                          [index_body]="getIndex(indexBody)"
-                          [id_tabla]="realIdTabla"
-                          [dato]="rowData"
-                          [data]="data"
-                          [botones]="config.botones"
-                          (functionsBtnDinamic)="functionsBtnDinamic($event)"
-                          (clickBoton)="handle_table_events('click_action', $event)"
-                        ></app-btnacciones>
-                      </td>
-                    }
                   </tr>
                 } 
               }

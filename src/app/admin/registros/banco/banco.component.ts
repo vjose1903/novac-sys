@@ -67,6 +67,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     obj_paginate: { show: true, showTotal: true, is_local: false },
   };
   tablaComponent;
+  
 
   htmlServ = inject(HtmlElementsService);
 

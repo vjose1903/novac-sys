@@ -12,10 +12,10 @@
           </div>
 
           <div class="card cardFormClass">
-            <form [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
+            <form [formGroup]="formGroup()" (keydown.enter)="$event.stopPropagation()">
               <div class="row">
                 <div class="col-12 p-0">
-                  <div class="form-group" [appMsgError]="transferenciaFormAttr.fecha_equivalente" [form]="formGroup">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.fecha_equivalente" [form]="formGroup()">
                     <label class="control-label" requiredFieldLabel>Fecha: </label>
                     <p-calendar
                       [inputId]="transferenciaFormFieldId.fecha_equivalente"
@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="col-12 p-0">
-                  <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_origen_id" [form]="formGroup">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_origen_id" [form]="formGroup()">
                     <label class="control-label" requiredFieldLabel>Cuenta Bancaria Origen: </label>
 
                     <p-dropdown
@@ -46,7 +46,7 @@
                       filterPlaceholder="Buscar"
                       appendTo="body"
                       [formControlName]="transferenciaFormAttr.cuenta_bancaria_origen_id"
-                      [options]="cuentasBancariasList"
+                      [options]="cuentasBancariasList()"
                       [virtualScrollItemSize]="34"
                       [filter]="true"
                       filterBy="numero_cuenta,banco_name"
@@ -76,7 +76,7 @@
                   <div class="form-group">
                     <p-selectButton
                       [options]="transferenciasType"
-                      [disabled]="formGroup.get(transferenciaFormAttr.cuenta_bancaria_origen_id).disabled"
+                      [disabled]="formGroup().get(transferenciaFormAttr.cuenta_bancaria_origen_id).disabled"
                       [ngModel]="selectedTransferenciaType()"
                       (ngModelChange)="changeTipoTransferencia($event)"
                       [ngModelOptions]="{ standalone: true }"
@@ -89,8 +89,9 @@
 
                 <div class="col-12 p-0">
                   <!-- ======================= ENTRE MIS CUENTAS ======================= -->
+
                   <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.misCuentas,  }">
-                    <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_destino_id" [form]="formGroup">
+                    <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_destino_id" [form]="formGroup()">
                       <label class="control-label" [requiredFieldLabel]="selectedTransferenciaType() === TransferenciaType.misCuentas">Cuenta Bancaria Destino: </label>
 
                       <p-dropdown
@@ -100,7 +101,7 @@
                         filterPlaceholder="Buscar"
                         appendTo="body"
                         [formControlName]="transferenciaFormAttr.cuenta_bancaria_destino_id"
-                        [options]="cuentasBancariasList"
+                        [options]="cuentasBancariasFilteredList()"
                         [virtualScrollItemSize]="34"
                         [filter]="true"
                         filterBy="numero_cuenta,banco_name"
@@ -140,7 +141,7 @@
                       ></form-auto-complete>
                     </div>
 
-                    <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_tercero" [form]="formGroup">
+                    <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_tercero" [form]="formGroup()">
                       <label class="control-label">Cuenta Bancaria Destino:</label>
                       <input
                         type="text"
@@ -158,7 +159,7 @@
                 </div>
 
                 <div class="col-12 col-md-6 p-0 pr-md-3">
-                  <div class="form-group" [appMsgError]="transferenciaFormAttr.divisa_id" [form]="formGroup">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.divisa_id" [form]="formGroup()">
                     <label class="control-label" requiredFieldLabel>Divisa: </label>
                     <p-dropdown
                       #divisaDropdown
@@ -175,9 +176,9 @@
                       (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
                     >
                       <ng-template pTemplate="selectedItem">
-                        <div class="d-flex align-items-center" *ngIf="fun.hasValue(formGroup.controls[transferenciaFormAttr.divisa_id].value)">
-                          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'imagen.file_name'))"></img-component>
-                          <div>{{ imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'nombre') }}</div>
+                        <div class="d-flex align-items-center" *ngIf="fun.hasValue(formGroup().controls[transferenciaFormAttr.divisa_id].value)">
+                          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(formGroup().controls.divisa_id.value, 'imagen.file_name'))"></img-component>
+                          <div>{{ imgServ.getDivisaInfoById(formGroup().controls.divisa_id.value, 'nombre') }}</div>
                         </div>
                       </ng-template>
                       <ng-template let-divisa pTemplate="item">
@@ -192,7 +193,7 @@
                 </div>
 
                 <div class="col-12 col-md-6 p-0">
-                  <div class="form-group" [appMsgError]="transferenciaFormAttr.monto" [form]="formGroup">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.monto" [form]="formGroup()">
                     <label class="control-label" requiredFieldLabel>Monto: </label>
                     <input
                       type="text"
@@ -210,7 +211,7 @@
                 </div>
 
                 <div class="col-12 p-0">
-                  <div class="form-group" [appMsgError]="transferenciaFormAttr.numero_referencia" [form]="formGroup">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.numero_referencia" [form]="formGroup()">
                     <label class="control-label">Número de referencia: </label>
                     <input
                       type="text"
@@ -227,7 +228,7 @@
                 </div>
 
                 <div class="col-12 p-0">
-                  <div class="form-group" [appMsgError]="transferenciaFormAttr.comentario" [form]="formGroup">
+                  <div class="form-group" [appMsgError]="transferenciaFormAttr.comentario" [form]="formGroup()">
                     <label class="control-label" requiredFieldLabel>Comentarios: </label>
                     <textarea placeholder="Ingresar comentario" class="form-control form-control-sm" [id]="transferenciaFormFieldId.comentario" [formControlName]="transferenciaFormAttr.comentario" rows="3" pInputTextarea> </textarea>
                     <span id="msgContainer"></span>

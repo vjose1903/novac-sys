@@ -1,10 +1,10 @@
 <div class="w-100 h-100">
+  @if (nombreBanco) {
   <div class="d-flex mb-3">
-    <h5 class="d-flex">
-      <strong> Banco: </strong>
-      <span class="ml-2"> {{ inputs?.banco?.nombre }} </span>
-    </h5>
+    <strong> Banco: </strong>
+    <span class="ml-2"> {{ nombreBanco }} </span>
   </div>
+  }
 
   <form *ngIf="formGroup" [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
     <div class="row">

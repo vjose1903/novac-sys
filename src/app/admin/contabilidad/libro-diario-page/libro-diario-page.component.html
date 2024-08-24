@@ -87,6 +87,8 @@
                       <span class="m-0 p-0">{{ asiento.title }} </span>
 
                       <div class="entry-actions-div">
+                        <small class="text-c-white-70 asiento_codigo"> {{asiento.codigo}}</small>
+                        
                         <div *ngIf="!asiento.is_validated" class="in-validation-div">
                           <div class="in-validation-label">
                             <span class="validate-label"> En estado de validación</span>

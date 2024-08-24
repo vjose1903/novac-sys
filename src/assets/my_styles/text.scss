@@ -15,17 +15,11 @@
 }
 
 .letras {
-  color: #1d253b ;
-}
-
-.datta-dark {
-  .letras {
-    color: #adb7be !important;
-  }
+  color: #1d253b;
 }
 
 .text-dark {
-  color: #1d253b  !important;
+  color: #1d253b !important;
   &.hoverable {
     > i:hover {
       color: #022217 !important;
@@ -43,6 +37,18 @@
 
 .text-light-2 {
   color: #adb7be !important;
+}
+
+.text-c-white-30 {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.text-c-white-50 {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.text-c-white-70 {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 .degradado-rojo {
@@ -64,7 +70,6 @@
   -webkit-background-clip: text;
   color: transparent !important;
 }
-
 
 .puntos-suspensivos {
   text-overflow: ellipsis;
