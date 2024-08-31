@@ -9,6 +9,7 @@ import { paginateI } from './tabla-class';
 export class TablasService {
   constructor() {}
   rowsEditing = [];
+
   public obj_paginate = {
     default: {
       ant_page: null,
@@ -20,6 +21,8 @@ export class TablasService {
       is_local: false,
     },
   };
+
+  blockRowMovement = false;
 
   initPagination(id, params?: paginateI) {
     return new Promise<void>((resolve, reject) => {

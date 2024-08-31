@@ -514,6 +514,8 @@ export class fun {
   // __________________________________________________________________________________________________
   static clickInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
+    console.log("element ", element);
+    
     if (element) element.click();
   }
 
@@ -521,9 +523,8 @@ export class fun {
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
   // __________________________________________________________________________________________________
-  static enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-
+  static enfocarInput(arg, element?) {
+    element ??= document.getElementById(arg) as HTMLElement;
     if (element) element.focus();
   }
 
@@ -539,6 +540,16 @@ export class fun {
       const input = document.getElementById(inputId);
       if (input) input.blur();
     }
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: clickInputFantasma
+  // Descripcion : Esta funcion clickea el input fantasma
+  // __________________________________________________________________________________________________
+  static clickInputFantasma() {
+    const element = document.getElementById('input_fantasma');
+    console.log('element:  ', element);
+
+    if (element) element.click();
   }
 
   // __________________________________________________________________________________________________

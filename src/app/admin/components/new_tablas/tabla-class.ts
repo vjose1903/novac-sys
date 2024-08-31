@@ -117,6 +117,7 @@ interface filtarI {
 }
 
 export interface table_config {
+  focusSearchInput?: boolean;
   padding?: string;
   padre_functions?: padreFunctionsI;
   colores?: Boolean;

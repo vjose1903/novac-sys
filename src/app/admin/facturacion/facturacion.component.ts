@@ -50,19 +50,23 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
+    const isNumpad = event.code.toLowerCase().includes('numpad');
+
     event.stopPropagation();
-    const key = event.keyCode;
+    let key = event.keyCode;
+    if (isNumpad && event.keyCode != teclasCode._enter) key -= 48;
+
     const secuenciasAceptadas = [teclasCode._control, teclasCode._P, teclasCode._G, teclasCode._E];
 
     if (event.type == 'keydown') {
       if (!this.secuenciaKeys.includes(key) && secuenciasAceptadas.includes(key)) this.secuenciaKeys.push(key);
     } else if (event.type == 'keyup') {
-      const combinacion = _.join(this.secuenciaKeys, '_');
+      const combinacion = this.secuenciaKeys.join('_');
       this.secuenciaKeys = [];
 
       if (this.factServ.isVenta && combinacion == `${teclasCode._control}_${teclasCode._E}`) {
         if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
-        document.getElementById('btnExtra').click();
+        fun.clickInput('btnExtra');
       }
 
       if (combinacion == `${teclasCode._control}_${teclasCode._P}`) {
@@ -78,11 +82,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (fun.hasValue(this.overlay?.item)) {
         if (this.overlay?.tipo == 'extra') {
           if (this.optionesExtra.length > 0) {
-            const option = _.find(this.optionesExtra, { keyboardCode: key });
-
             fun.desEnfocarInput(document.activeElement.id);
 
-            if (fun.hasValue(option)) this.selectOptionExtra(_.find(this.optionesExtra, { keyboardCode: key }), 'teclado');
+            const option = this.optionesExtra.find((opt) => opt.keyboardCode == key);
+
+            if (fun.hasValue(option)) this.selectOptionExtra(option, 'teclado');
           }
         }
 
@@ -1204,15 +1208,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
 
   abrirModalPropietario(params?: { include_contado: boolean }) {
-    if (fun.isEmpty(params)) {
-      params = { include_contado: false };
-    }
+    if (fun.isEmpty(params)) params = { include_contado: false };
     let documento = this.getDocumentoDescripcion();
+
     if (this.is_editando && (this.factServ.isVenta || this.factServ.isCompra)) {
       const entidad = this.factServ.isVenta ? 'Cliente' : 'Suplidor';
       fun.toastWarning(`Al editar una ${documento.descripcion}, no se le puede cambiar el ${entidad}.`, 'AVISO');
     } else {
-      const input_activo = document?.activeElement?.id;
+      fun.desEnfocarInput(document?.activeElement?.id);
 
       let botones = fun.deepCloning(ModalClass.noShowAceptarCancelarButtons);
 
@@ -1221,7 +1224,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         botones['dinamico'] = [{ clase: 'btn btn-gris', function: (instance) => this.router.navigateByUrl('/admin/dashboard') && this.closeModal(instance), label: label, disable: false }];
       }
 
-      if (fun.hasValue(input_activo)) fun.desEnfocarInput(input_activo);
       const include_contado = this.factServ.tipoDocumento === tipoDocFacturacion.cotizacion || params.include_contado;
 
       this.openNewModal({
