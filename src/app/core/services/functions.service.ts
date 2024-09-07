@@ -514,8 +514,7 @@ export class fun {
   // __________________________________________________________________________________________________
   static clickInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
-    console.log("element ", element);
-    
+
     if (element) element.click();
   }
 
@@ -547,7 +546,6 @@ export class fun {
   // __________________________________________________________________________________________________
   static clickInputFantasma() {
     const element = document.getElementById('input_fantasma');
-    console.log('element:  ', element);
 
     if (element) element.click();
   }

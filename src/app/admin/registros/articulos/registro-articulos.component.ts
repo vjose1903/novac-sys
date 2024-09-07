@@ -236,7 +236,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async selectTipoArticulo(tipo) {
-    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(tipo));
+    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == Number(tipo));
     this.modificateValidators();
 
     if (this.tipoArticuloSelected.codigo == 'materia_prima') {
@@ -762,7 +762,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
 
-    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == _.parseInt(articulo.tipo_articulo_id));
+    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == Number(articulo.tipo_articulo_id));
     this.is_combo = articulo.is_combo;
 
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
@@ -895,8 +895,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' };
     array.forEach((element) => {
       const obj = {
-        id: fun.hasValue(element.id) ? _.parseInt(element.id) : null,
-        articulo_combo: _.parseInt(element.articulo_id),
+        id: fun.hasValue(element.id) ? Number(element.id) : null,
+        articulo_combo: Number(element.articulo_id),
         cantidad: fun.desformatearStNumber(element.cantidad_formula),
         costo: fun.desformatearStNumber(element.costo_formula),
         precio: fun.desformatearStNumber(element.precio_formula),
@@ -932,8 +932,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const formulario = this.form.getRawValue();
 
     const obj = {
-      id: fun.hasValue(formulario.id) ? _.parseInt(formulario.id) : null,
-      tipo_articulo_id: _.parseInt(formulario.tipo_articulo_id),
+      id: fun.hasValue(formulario.id) ? Number(formulario.id) : null,
+      tipo_articulo_id: Number(formulario.tipo_articulo_id),
       nombre: formulario.nombre,
       costo_principal: this.tipoArticuloSelected.tipo != 'servicio' ? fun.desformatearStNumber(formulario.costo_principal) : 0,
       precio_principal: fun.desformatearStNumber(formulario.precio_principal),

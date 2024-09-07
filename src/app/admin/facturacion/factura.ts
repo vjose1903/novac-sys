@@ -12,6 +12,7 @@ import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { serie } from '../../core/typescript/constantes';
+import { flip } from '@popperjs/core';
 
 export enum comprobanteNormal {
   valor_fiscal = '01',
@@ -216,7 +217,7 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean }) {
+  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean; movimientos_viaje?: boolean }) {
     const valor_enc = btoa(args.valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
@@ -234,6 +235,7 @@ export class FacturaC extends CrudG<FacturasI> {
         tipo_factura_id: args.tipo_factura_id,
         is_adelantada: fun.objHas(args, 'adelantada') ? args.adelantada : '0',
         estado: fun.objHas(args, 'estado') ? args.estado : '0',
+        movimientos_viaje: args.movimientos_viaje ?? false,
       },
     };
 

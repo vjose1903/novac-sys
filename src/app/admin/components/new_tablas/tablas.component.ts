@@ -19,7 +19,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
     if (!this.tServ.blockRowMovement && this.config.focusRow && this.ready) {
-      console.log('----- tablas -----');
       const key = event.keyCode;
 
       if (key == teclasCode._arriba) this.mover_foco('up');
