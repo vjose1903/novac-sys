@@ -62,6 +62,17 @@ export class DateUtils {
   }
 
   /**
+   * Esta función devuelve el primer día del año correspondiente al año especificados.
+   * @param params Objeto que contiene el año del cual se quiere obtener el primer día.
+   *               - year: El año. Ejemplo: 2024.
+   * @returns El primer día del año como un objeto Date.
+   * @example DateUtils.getFirstDayOfMonth({ year: 2024 })
+   */
+  static getFirstDayOfYear(params: { year: number }) {
+    return new Date(params.year, 0, 1);
+  }
+
+  /**
    * Esta función devuelve el primer día del mes correspondiente al año y mes especificados.
    * @param params Objeto que contiene el año y el mes del cual se quiere obtener el primer día.
    *               - month: El número del mes (1 - 12). Ejemplo: 3.

@@ -231,7 +231,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async openSide() {
     this.pedirNotas(this.tServ.obj_paginate.default);
-    this.showSide = true;
   }
 
   async pedirNotas(params?: { per_page: number; page: number; search: string }) {
@@ -241,26 +240,33 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: this.buscarPara.includes('credito') ? NotaC.tipo_nota.credito : NotaC.tipo_nota.debito } };
 
-      const res = await this.notasClass.getAll(extra);
+      try {
+        const res = await this.notasClass.getAll(extra);
 
-      res['data'].forEach((nota) => {
-        nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
-        nota.total = Math.abs(nota.total);
-        nota.selectedColor = 'gris-claro';
-        nota.viewColor = 'gris-claro';
-        nota.view = 'far fa-eye-slash';
+        res['data'].forEach((nota) => {
+          nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
+          nota.total = Math.abs(nota.total);
+          nota.selectedColor = 'gris-claro';
+          nota.viewColor = 'gris-claro';
+          nota.view = 'far fa-eye-slash';
 
-        nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+          nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
-        nota.customStyles = {
-          actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
-          numero_comprobante: { width: '7rem' },
-        };
+          nota.customStyles = {
+            actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
+            numero_comprobante: { width: '7rem' },
+          };
 
-        this.notas.push(nota);
-      });
+          this.notas.push(nota);
+        });
+        this.showSide = true;
 
-      setTimeout(() => this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]), 10);
+        setTimeout(() => this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]), 10);
+      } catch (err) {
+        const error = err.error;
+
+        if (fun.isEmpty(error?.data) || error?.data?.length == 0) this.showSide = false;
+      }
       resolve(true);
     });
   }

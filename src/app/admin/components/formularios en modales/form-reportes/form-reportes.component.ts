@@ -1,3 +1,4 @@
+import { CxCType } from './../../../registros/registro-clientes/cliente';
 import { tFacturaD } from './../../../facturacion/factura';
 
 import { serie } from './../../../../core/typescript/constantes';
@@ -13,6 +14,7 @@ import { ArticuloC } from '../../../registros/articulos/articulo';
 import { ClienteC } from '../../../registros/registro-clientes/cliente';
 import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
+import { DateUtils } from '../../../../core/typescript/date.utils';
 
 @Component({
   selector: 'app-form-reportes',
@@ -130,6 +132,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     let serie_selected = null;
     let condicion_selected = null;
     const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'movimientos_vehiculo'];
+    const desde_year_hasta_includes = ['cuentas_cobrar_ant_saldo'];
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
 
     if (this.inputs.tipo_reporte == 'cuadre') {
@@ -161,8 +164,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo') {
       this.tipos = [
-        { id: '2', label: 'Detallado' },
-        { id: '3', label: 'Agrupado' },
+        { id: CxCType.antSaldoDetallado, label: 'Detallado' },
+        { id: CxCType.antSaldoAgrupado, label: 'Agrupado' },
       ];
       //
     } else if (this.inputs.tipo_reporte == 'notas') {
@@ -207,13 +210,16 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     if (tipo_factura_includes.includes(this.inputs.tipo_reporte)) this.parseTipoFacturas();
 
     if (desde_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls();
+    if (desde_year_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls({ begin_of_year: true });
   }
 
-  setDesdeHastaControls() {
-    let desde_temp = new Date();
-    desde_temp.setDate(desde_temp.getDate() - 1);
+  setDesdeHastaControls(params?: { begin_of_year?: boolean }) {
+    if (fun.isEmpty(params)) params = {};
+    if (fun.isEmpty(params?.begin_of_year)) params.begin_of_year = false;
 
-    const desde = new Date(this.getFirstDayOfMoth(desde_temp));
+    let desde_temp = new Date();
+
+    const desde = params.begin_of_year ? DateUtils.getFirstDayOfYear({ year: desde_temp.getFullYear() }) : DateUtils.getFirstDayOfMonth({ month: desde_temp.getMonth() + 1, year: desde_temp.getFullYear() });
 
     this.form.controls.desde.setValue(desde);
     this.form.controls.hasta.setValue(new Date());

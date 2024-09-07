@@ -125,8 +125,8 @@
     }
     <!-- ----- DESDE -----  -->
 
-    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'
-    || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'||
+    inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
     <div class="col-6 pl-0">
       <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
@@ -136,8 +136,8 @@
     </div>
     }
     <!-- ----- HASTA -----  -->
-    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'
-    || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'||
+    inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
     <div class="col-6 pr-0">
       <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>

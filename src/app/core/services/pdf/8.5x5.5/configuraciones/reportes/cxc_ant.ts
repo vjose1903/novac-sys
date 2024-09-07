@@ -7,7 +7,7 @@ export const config_cxc_ant = {
     isBreak: false,
     pageOrient: 'landscape',
     only_titulo: false,
-    widths: ['auto', 278, 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
+    widths: ['auto', "*", 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
     mostrar_bruto: false,
     mensaje_contenido_vacio: 'No existen cuentas por cobrar.',

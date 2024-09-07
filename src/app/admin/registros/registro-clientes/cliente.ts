@@ -6,6 +6,7 @@ import { ConfigureModalI, ModalClass } from '../../components/modal/modal-class'
 import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
+import { DateUtils } from '../../../core/typescript/date.utils';
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
@@ -43,7 +44,7 @@ export class ClienteC extends CrudG<any> {
   static async requestReporte(reporteParams, pdfParams) {
     let hasPermisoPreVenta = await Ss.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
 
-    let objTipo = { cuentas_cobrar_cliente: 1, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
+    let objTipo = { cuentas_cobrar_cliente: CxCType.cliente, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
     let tipo;
     let requestParameters;
 
@@ -52,13 +53,18 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modal_id] };
         tipo = requestParameters['tipo'];
-        if (tipo == 1) requestParameters['cliente_id'] = reporteParams.data.id;
+
+        if (tipo == CxCType.cliente) requestParameters['cliente_id'] = reporteParams.data.id;
+        if (tipo == CxCType.antSaldoAgrupado || tipo == CxCType.antSaldoDetallado) requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+        if (tipo == CxCType.antSaldoAgrupado || tipo == CxCType.antSaldoDetallado) requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+
         pdfParams.tipo = 'cuentas_cobrar';
+
         break;
 
       case 'cuentas_con_pagos':
       case 'ventas_cliente':
-        requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), cliente_id: reporteParams.data.cliente_id };
+        requestParameters = { desde: DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' }), hasta: DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' }), cliente_id: reporteParams.data.cliente_id };
 
         if (pdfParams.tipo == 'ventas_cliente') {
           requestParameters['tipo_factura_id'] = reporteParams.data.tipo_factura_id;
@@ -110,4 +116,10 @@ export class ClienteC extends CrudG<any> {
     };
     return objModal;
   }
+}
+
+export enum CxCType {
+  cliente = '1',
+  antSaldoDetallado = '2',
+  antSaldoAgrupado = '3',
 }
