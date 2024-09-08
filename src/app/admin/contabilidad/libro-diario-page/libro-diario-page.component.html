@@ -53,16 +53,7 @@
                 </div>
 
                 <div class="search-btn mb-1">
-                  <btn-icon-circular
-                    [id]="'diurnal-search-btn'"
-                    [icon_size]="'1rem'"
-                    [icon]="'fas fa-search'"
-                    [size]="'size-md'"
-                    pTooltip="Buscar"
-                    tooltipPosition="right"
-                    (clickFunction)="filter(searchDiurnalCode)"
-                  >
-                  </btn-icon-circular>
+                  <btn-icon-circular [id]="'diurnal-search-btn'" [icon_size]="'1rem'" [icon]="'fas fa-search'" [size]="'size-md'" pTooltip="Buscar" tooltipPosition="right" (clickFunction)="filter(searchDiurnalCode)"> </btn-icon-circular>
                 </div>
               </div>
 
@@ -87,25 +78,17 @@
                       <span class="m-0 p-0">{{ asiento.title }} </span>
 
                       <div class="entry-actions-div">
-                        <small class="text-c-white-70 asiento_codigo"> {{asiento.codigo}}</small>
-                        
                         <div *ngIf="!asiento.is_validated" class="in-validation-div">
                           <div class="in-validation-label">
                             <span class="validate-label"> En estado de validación</span>
                           </div>
                           <i class="fa-solid fa-triangle-exclamation validate-icon"></i>
                         </div>
+
+                        <small class="text-c-white-70 asiento_codigo"> {{ asiento.codigo }}</small>
+
                         <div class="edit-btn">
-                          <btn-icon-circular
-                            [id]="'edit-entry-btn'"
-                            [icon_size]="'1rem'"
-                            [icon]="'fas fa-pencil-alt'"
-                            [size]="'size-md'"
-                            pTooltip="Editar"
-                            tooltipPosition="left"
-                            (clickFunction)="editEntry(asiento, $event)"
-                          >
-                          </btn-icon-circular>
+                          <btn-icon-circular [id]="'edit-entry-btn'" [icon_size]="'1rem'" [icon]="'fas fa-pencil-alt'" [size]="'size-md'" pTooltip="Editar" tooltipPosition="left" (clickFunction)="editEntry(asiento, $event)"> </btn-icon-circular>
                         </div>
                       </div>
                     </div>
@@ -113,12 +96,7 @@
                   <ng-template pTemplate="content">
                     <div class="diurnal-table-container" [ngStyle]="calculateHeigthTableContainer(asiento)">
                       <div #cardTabla id="cardTabla" class="diurnal-table-inner">
-                        <dinamic-table
-                          [cardTabla]="cardTabla"
-                          [(data)]="asiento.detalles_asientos_contables_front"
-                          [config]="table_config_diurnal"
-                          (table_events)="handle_table_events($event)"
-                        ></dinamic-table>
+                        <dinamic-table [cardTabla]="cardTabla" [(data)]="asiento.detalles_asientos_contables_front" [config]="table_config_diurnal" (table_events)="handle_table_events($event)"></dinamic-table>
                       </div>
                     </div>
                   </ng-template>

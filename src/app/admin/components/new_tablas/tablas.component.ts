@@ -57,16 +57,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   private destroy$ = new Subject<void>();
 
   fun = fun;
-  
 
-  tablaInterval;
   realIdTabla;
 
   htmlServ = inject(HtmlElementsService);
-  constructor(public tServ: TablasService, private zone: NgZone) {
-    Ss.cdRef.detach();
-    this.tablaInterval = setInterval(() => Ss.cdRef.detectChanges(), 500);
-  }
+  constructor(public tServ: TablasService, private zone: NgZone) {}
 
   formatoNumero(num) {
     let numformat = '0.00';
@@ -127,7 +122,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.tServ.deletePaginationById(this.realIdTabla);
     this.tServ.resetRowEditing();
-    clearInterval(this.tablaInterval);
   }
 
   verificateBottons(config: table_config) {

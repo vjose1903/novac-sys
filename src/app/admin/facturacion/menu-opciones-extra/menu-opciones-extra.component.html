@@ -9,7 +9,7 @@
           <select id="filterKeyI" [(ngModel)]="filter_key" class="form-control inputE" (change)="selectFiltro()">
             <option [value]="null" selected disabled>Escoger tipo</option>
             @for (tipo of tipos_filtro; track $index) {
-              <option [value]="tipo.key">{{ tipo.label }}</option>
+            <option [value]="tipo.key">{{ tipo.label }}</option>
             }
           </select>
         </div>
@@ -34,7 +34,7 @@
           (onFocus)="dropdownCliente.show(); dropdownCliente.focus()"
           emptyMessage="Escriba el nombre del cliente"
           [showClear]="true"
-          (onClear)="clearClienteFilter(); dropdownCliente.show(); dropdownCliente.focus()"
+          (onClear)="clearFilters(); dropdownCliente.show(); dropdownCliente.focus()"
         >
           <ng-template let-cliente pTemplate="item">
             <div class="cliente-item">
@@ -68,12 +68,12 @@
       </div>
     </div>
   </div>
-  
+
   <div class="options_table">
     <div #cardTablaDcumentos id="cardTablaDcumentos" class="divContainerTabla">
       <div class="innerTablas">
         @if (documentos.length) {
-          <dinamic-table [cardTabla]="cardTablaDcumentos" [(data)]="documentos" [(TablasComponent)]="tablaComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        <dinamic-table [cardTabla]="cardTablaDcumentos" [(data)]="documentos" [(TablasComponent)]="tablaComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
         }
       </div>
     </div>

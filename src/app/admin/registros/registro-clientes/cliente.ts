@@ -57,9 +57,9 @@ export class ClienteC extends CrudG<any> {
         requestParameters = { tipo: objTipo[reporteParams.modalId] };
         tipo = requestParameters['tipo'];
 
-        if (tipo == CxCType.cliente) requestParameters['cliente_id'] = reporteParams.data.id;
-        if (tipo == CxCType.antSaldoAgrupado || tipo == CxCType.antSaldoDetallado) requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
-        if (tipo == CxCType.antSaldoAgrupado || tipo == CxCType.antSaldoDetallado) requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+        if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.id;
+        if (tipo == CxC.agrupado || tipo == CxC.detallado) requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+        if (tipo == CxC.agrupado || tipo == CxC.detallado) requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
 
         pdfParams.tipo = 'cuentas_cobrar';
 

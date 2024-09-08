@@ -296,8 +296,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
       if (this.actualPath !== next_cambio_menu) {
         this.runRouterNavigate({ bool: true, ruta: next_cambio_menu });
-        fun.enfocarInput(null, args.event.target);
-
       } else {
         fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
       }

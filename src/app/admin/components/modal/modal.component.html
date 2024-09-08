@@ -1,59 +1,58 @@
 @for (modalConfig of modalsConfig; track modalConfig.id) {
 <span>
   @if (modalConfig) {
-    <p-dialog
-      #myModal
-      [id]="modalConfig.id"
-      [header]="modalConfig.header"
-      [(visible)]="modalConfig.show"
-      [breakpoints]="{ '767px': '90vw' }"
-      [position]="modalConfig.position"
-      [contentStyleClass]="modalConfig.contentStyleClass"
-      [baseZIndex]="10000"
-      [draggable]="false"
-      [modal]="true"
-      [showHeader]="!!modalConfig.header"
-      [blockScroll]="false"
-      [resizable]="false"
-      [closeOnEscape]="modalConfig.closableEsc"
-      [closable]="modalConfig.closable"
-      [transitionOptions]="modalConfig.transitionOptions"
-      (onHide)="closeModal(modalConfig.id)"
-    >
-      <div [ngStyle]="{ height: modalConfig.height, width: modalConfig.width }" style="transition: all 0.5s">
-        @if (modalConfig.html) {
-          <div [innerHtml]="modalConfig.html"></div>
-        } @else {
-          <ng-container [appModal]="modalConfig.id"></ng-container>
+  <p-dialog
+    #myModal
+    [id]="modalConfig.id"
+    [header]="modalConfig.header"
+    [(visible)]="modalConfig.show"
+    [breakpoints]="{ '767px': '90vw' }"
+    [position]="modalConfig.position"
+    [contentStyleClass]="modalConfig.contentStyleClass"
+    [baseZIndex]="10000"
+    [draggable]="false"
+    [modal]="true"
+    [showHeader]="hasValue(modalConfig.header)"
+    [blockScroll]="false"
+    [resizable]="false"
+    [closeOnEscape]="modalConfig.closableEsc"
+    [closable]="modalConfig.closable"
+    [transitionOptions]="modalConfig.transitionOptions"
+    (onHide)="closeModal(modalConfig.id)"
+  >
+    <!-- Elemento oculto para recibir el enfoque -->
+    <input tabindex="0" [id]="'focusElement-' + modalConfig.id" style="position: absolute; width: 0px; height: 0px; opacity: 0" />
+
+    <div [ngStyle]="{ height: modalConfig.height, width: modalConfig.width }" style="transition: all 0.5s">
+      @if (modalConfig.html) {
+      <div [innerHtml]="modalConfig.html"></div>
+      } @else {
+      <ng-container [appModal]="modalConfig.id"></ng-container>
+      }
+    </div>
+
+    @if (hasAnyBtn(modalConfig.id)) {
+    <ng-template pTemplate="footer">
+      <div class="d-flex justify-content-end align-items-center mt-2 gap-3">
+        @for (dynamic_boton of modalConfig?.botones?.dinamico; track dynamic_boton.btnId ) {
+        <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
+          <button [disabled]="buttonIsDisabled(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig.id, dynamic_boton)">
+            {{ dynamic_boton.label }}
+          </button>
+        </span>
+        } @if (modalConfig?.botones?.cancelar?.show) {
+        <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.cancelar)" tooltipPosition="top">
+          <button class="btn btn-blanco" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="buttonIsDisabled(modalConfig?.botones?.cancelar || false)">Cancelar</button>
+        </span>
+        } @if (modalConfig?.botones?.aceptar?.show) {
+        <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.aceptar)" tooltipPosition="top">
+          <button class="btn btn-verde" (click)="cancelarAndAceptar(true, modalConfig.id)" [disabled]="buttonIsDisabled(modalConfig?.botones?.aceptar || false)">Aceptar</button>
+        </span>
         }
       </div>
-
-      @if (hasAnyBtn(modalConfig.id)) {
-        <ng-template pTemplate="footer">
-            <div class="d-flex justify-content-end align-items-center mt-2 gap-3">
-              @for (dynamic_boton of modalConfig?.botones?.dinamico; track dynamic_boton.btnId ) {
-              <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
-                <button [disabled]="buttonIsDisabled(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig.id, dynamic_boton)">
-                  {{ dynamic_boton.label }}
-                </button>
-              </span>
-              } 
-              
-              @if (modalConfig?.botones?.cancelar?.show) {
-                <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.cancelar)" tooltipPosition="top">
-                  <button class="btn btn-blanco" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="buttonIsDisabled(modalConfig?.botones?.cancelar || false)">Cancelar</button>
-                </span>
-              } 
-              
-              @if (modalConfig?.botones?.aceptar?.show) {
-                <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.aceptar)" tooltipPosition="top">
-                  <button class="btn btn-verde" (click)="cancelarAndAceptar(true, modalConfig.id)" [disabled]="buttonIsDisabled(modalConfig?.botones?.aceptar || false)">Aceptar</button>
-                </span>
-              }
-            </div>
-        </ng-template>
-      }
-    </p-dialog>
+    </ng-template>
+    }
+  </p-dialog>
   }
 </span>
 }

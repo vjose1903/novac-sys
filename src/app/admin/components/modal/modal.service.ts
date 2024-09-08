@@ -22,4 +22,8 @@ export class ModalService {
     const modal: ConfigureModalI = this.modalsConfig.find((config: ConfigureModalI) => config.id == modalId) ?? {};
     return modal;
   }
+
+  removeModalConfig(modalId: string): void {
+    this.modalsConfig = this.modalsConfig.filter((config) => config.id !== modalId);
+  }
 }

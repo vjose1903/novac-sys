@@ -90,6 +90,9 @@
     border-radius: 0.5rem;
     padding: 2px 10px;
     background-color: var(--mode05);
+    min-width: 155px;
+    display: block;
+    text-align: center;
   }
 
   .in-validation-div {

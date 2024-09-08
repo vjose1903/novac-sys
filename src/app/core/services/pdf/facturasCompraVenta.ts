@@ -196,7 +196,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 // =========================================================~=================================================================================================
 function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI, isMostrar: boolean) {
   const tempBody = [];
-  const _break = is_venta ? (is_contado ? 9 : 30) : 9;
+  const _break = is_venta ? (is_contado ? 9 : 18) : 9;
 
   data.contenido_reporte.forEach((detalle, i) => {
     const row = [];

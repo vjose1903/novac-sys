@@ -3,7 +3,7 @@ import { Ss } from './../../../../core/services/singleton.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { tFacturaD } from './../../../facturacion/factura';
-import { serie } from './../../../../core/typescript/constantes';
+import { dateRangeType, serie } from './../../../../core/typescript/constantes';
 import { CxP } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
@@ -49,8 +49,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     { label: 'Electronica', value: serie.electronica, disabled: true },
   ];
 
-  desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'pago_facturas', 'movimientos_vehiculo'];
-
+  dateRangeType = dateRangeType;
   constructor(private fb: UntypedFormBuilder) {
     super();
   }
@@ -193,8 +192,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       }
     } else if (this.inputs.tipo_reporte == 'ventas_productos') {
       this.tipos = [
-        { id: '1', label: 'Dia único' },
-        { id: '2', label: 'Rango fechas' },
+        { id: dateRangeType.dia_unico, label: 'Dia único' },
+        { id: dateRangeType.rango_fecha, label: 'Rango fechas' },
       ];
       //
     }
@@ -224,9 +223,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     if (fun.isEmpty(params)) params = {};
     if (fun.isEmpty(params?.begin_of_year)) params.begin_of_year = false;
 
-    let desde_temp = new Date();
-
-    const desde = params.begin_of_year ? DateUtils.getFirstDayOfYear({ year: desde_temp.getFullYear() }) : DateUtils.getFirstDayOfMonth({ month: desde_temp.getMonth() + 1, year: desde_temp.getFullYear() });
+    const actual_date = new Date();
+    const desde = params.begin_of_year ? DateUtils.getFirstDayOfYear({ year: actual_date.getFullYear() }) : DateUtils.getFirstDayOfMonth({ month: actual_date.getMonth() + 1, year: actual_date.getFullYear() });
 
     this.form.controls.desde.setValue(desde);
     this.form.controls.hasta.setValue(actual_date);

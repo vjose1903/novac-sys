@@ -103,8 +103,7 @@ export class ModalClass extends LayoutClass {
 
     modal_configuration['onHide'] = (arg) => {
       try {
-        if (fun.hasValue(this) && fun.objHas(this, 'onHideModal')) this.onHideModal(arg);
-        this.onHideModal(arg);
+        if (fun.hasValue(this)) this.onHideModal(arg);
       } catch (error) {
         console.error(error);
       }

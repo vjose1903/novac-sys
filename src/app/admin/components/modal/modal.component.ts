@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactoryResolver, ViewChildren, OnDestroy } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { modalsConfigurations, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
@@ -53,9 +53,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     modalsConfigurations.pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res && res.show) {
-        this.renderizarComponente(res);
-      } else {
-        this.resetConfig(res.id, (res as any).accion);
+        this.renderizarComponente(res).then(() => setTimeout(() => fun.enfocarInput(`focusElement-${res.id}`), 0));
       }
     });
   }
@@ -65,28 +63,14 @@ export class NewModalComponent implements OnInit, OnDestroy {
     if (this.destroy$) this.destroy$.complete();
   }
 
-  resetConfig(id_, accion) {
-    const modal = _.find(this.modalsConfig, (config) => config.id === id_);
-
-    const data = { modal: modal, accion: accion };
-
-    if (modal && typeof modal.onHide == 'function') modal.onHide(data);
-
-    this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== id_);
-  }
-
-  findModalConfigById(modalId: string): ConfigureModalI {
-    const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
-    return modal;
-  }
-
   closeModal(modalId: string, dataToReturn?: IReturnData) {
     if (dataToReturn) {
       const modal: ConfigureModalI = this.mServ.findModalConfigById(modalId);
       if (fun.hasValue(modal) && fun.hasValue(modal.returnDataFromModal)) modal.returnDataFromModal({ ...dataToReturn, modalId: modalId });
     }
     this.onHideModal(modalId);
-    this.mServ.modalsConfig = _.remove(this.modalsConfig, (config) => config.id !== modalId);
+
+    this.mServ.removeModalConfig(modalId);
   }
 
   handleConfig(modalConfig: ConfigureModalI) {
@@ -110,33 +94,38 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   renderizarComponente(modalConfig) {
-    this.handleConfig(modalConfig);
+    return new Promise<void>((resolve, reject) => {
+      this.handleConfig(modalConfig);
 
-    const currentConfig = this.searchInArray(this.modalsConfig, 'id', modalConfig.id);
-    modalConfig.initializing = true;
-    if (currentConfig.component) {
-      try {
-        this.tryToGetReceptor(modalConfig)
-          .then((receptor: any) => {
-            let componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentConfig.component as any);
-            let viewContainerRef = receptor.viewContainerRef;
-            viewContainerRef.clear();
-            viewContainerRef.remove();
-            const componente = viewContainerRef.createComponent(componentFactory);
-            componente['instance'].inputs = modalConfig.inputs;
-            componente['instance'].modalComponent = this;
-            componente['instance'].modalComponent.id = modalConfig.id;
-            currentConfig['componentInstance'] = componente['instance'];
-            modalConfig.initializing = false;
-            Ss.cdRef.detectChanges();
-          })
-          .catch(() => {
-            // this.closeModal(modalConfig.id);
-          });
-      } catch (error) {
-        console.error(error);
+      const currentConfig = this.searchInArray(this.modalsConfig, 'id', modalConfig.id);
+      modalConfig.initializing = true;
+      if (currentConfig.component) {
+        try {
+          this.tryToGetReceptor(modalConfig)
+            .then((receptor: any) => {
+              let componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentConfig.component as any);
+              let viewContainerRef = receptor.viewContainerRef;
+              viewContainerRef.clear();
+              viewContainerRef.remove();
+              const componente = viewContainerRef.createComponent(componentFactory);
+              componente['instance'].inputs = modalConfig.inputs;
+              componente['instance'].modalComponent = this;
+              componente['instance'].modalComponent.id = modalConfig.id;
+              currentConfig['componentInstance'] = componente['instance'];
+              modalConfig.initializing = false;
+              resolve();
+              Ss.cdRef.detectChanges();
+            })
+            .catch(() => {
+              reject();
+              // this.closeModal(modalConfig.id);
+            });
+        } catch (error) {
+          reject();
+          console.error(error);
+        }
       }
-    }
+    });
   }
 
   tryToGetReceptor(modalConfig: ConfigureModalI) {
@@ -197,9 +186,9 @@ export class NewModalComponent implements OnInit, OnDestroy {
     if (modal && modal.onHide) modal.onHide(modal);
   }
 
-  cancelarAndAceptar(bool, modalId, accion?) {
+  cancelarAndAceptar(bool, modalId) {
     if (!bool) {
-      modalsConfigurations.next({ show: false, id: modalId, accion: accion ? accion : 'cancelar' } as any);
+      this.closeModal(modalId);
       return;
     }
 

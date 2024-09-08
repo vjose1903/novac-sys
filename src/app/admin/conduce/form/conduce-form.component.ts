@@ -561,9 +561,9 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     try {
       this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
         (res) => {
-          this.facturas_adelantadas = res['data'];
+          this.facturas_adelantadas = res['data'] as FacturasI[];
           this.facturas_adelantadas.map((factura) => {
-            factura.secuencia = String(factura.numero_factura).padStart( 8, '0');
+            factura.secuencia = String(factura.numero_factura).padStart(8, '0');
             factura.customStyles = {
               some_is_selected: [
                 { key: 'some_is_selected', isTd: true, estilos: 'width: 2rem !important;' },

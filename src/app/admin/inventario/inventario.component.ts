@@ -113,6 +113,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       });
 
       this.listaArticulos = fun.deepCloning(res.data);
+
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }

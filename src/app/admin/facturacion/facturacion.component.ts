@@ -90,7 +90,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
             const option = this.optionesExtra.find((opt) => opt.keyboardCode == key);
 
-            if (fun.hasValue(option)) this.selectOptionExtra(option, 'teclado');
+            if (fun.hasValue(option)) this.selectOptionExtra(option);
           }
         }
 
@@ -1249,7 +1249,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       let documento = this.getDocumentoDescripcion();
       const actualPath = fun.getActualPath();
 
-      if (fun.hasValue(documento) && !documento.has_Propietario && actualPath.includes('factura')) {
+      if (fun.hasValue(documento) && !documento.has_Propietario && actualPath.includes('factura/venta')) {
         fun.toastWarning(`Para realizar una ${documento.descripcion}, debe de seleccionar el cliente.`, 'AVISO');
       }
     }
