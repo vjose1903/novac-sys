@@ -292,6 +292,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.subTipoArticuloSelected = undefined;
     this.form.controls.sub_tipo_articulo_id.setValue(null);
     this.checkCuentasContables();
+    this.modificateValidators();
 
     this.getSubTipoArticulos().finally(() => this.modificateValidators());
 

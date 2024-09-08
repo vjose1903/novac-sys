@@ -9,8 +9,9 @@
 
       @if (optionesExtra.length > 0 && factServ.isVenta) {
       <div class="ml-3">
-        <btn-icon-circular [id]="'btnExtra'" [icon]="'fa-solid fa-ellipsis'" [size]="'size-md'" [tooltip]="'Opciones Extras'" [tooltipPosition]="'right'" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
-        <p-overlayPanel [dismissable]="true" [showCloseIcon]="true" #overlayExtra styleClass="dropConfigs" (onHide)="cerrarOverlay()">
+        <btn-icon-circular [id]="'btnExtra'" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
+
+        <p-overlayPanel #overlayExtra [dismissable]="false" [showCloseIcon]="true"  styleClass="dropConfigs" (onHide)="cerrarOverlay()">
           <ng-template pTemplate>
             <div id="overlayExtra">
               <ul class="overlayExtra" role="menu">

@@ -2,6 +2,7 @@ import { Ss } from '../../core/services/singleton.service';
 import { TablaClass } from '../components/new_tablas/tabla-class';
 import * as _ from 'lodash';
 import { Permisos } from '../../core/typescript/permisos';
+
 export class LayoutClass extends TablaClass {
   constructor() {
     super();

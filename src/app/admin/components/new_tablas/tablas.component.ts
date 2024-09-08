@@ -20,7 +20,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
-    if (this.config.focusRow && this.ready) {
+    if (!this.tServ.blockRowMovement && this.config.focusRow && this.ready) {
       const key = event.keyCode;
 
       if (key == teclasCode._arriba) this.mover_foco('up');
@@ -159,6 +159,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
     if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
 
+    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
+      setTimeout(() => {
+        fun.enfocarInput(`search-${this.realIdTabla}`);
+      }, 100);
+    }
+
     this.config.info.map((item) => {
       if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
     });
@@ -213,6 +219,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   filter(event) {
+    if ([teclasCode._abajo, teclasCode._arriba, teclasCode._izquierda, teclasCode._derecha, teclasCode._enter].includes(event.keyCode)) return;
+
     const search = event.target.value;
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {

@@ -41,7 +41,7 @@
         <ng-template let-cliente pTemplate="item">
           <div class="">
             <span class="d-flex gap-2 w-100" style="font-size: 1rem"> <strong>Nombre: </strong> {{ cliente.nombre_completo }} </span>
-            <span class="d-flex gap-2 w-100" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad: </strong> {{ cliente.documento_identidad }} </span>
+            <span class="d-flex gap-2 w-100 no-wrap" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad: </strong> {{ cliente.documento_identidad }} </span>
           </div>
         </ng-template>
       </p-dropdown>
@@ -128,7 +128,9 @@
     }
 
     <!-- ----- DESDE -----  -->
-    @if ( desde_hasta_includes.includes(inputs.tipo_reporte) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+
+    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'||
+    inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
     <div class="col-6 pl-0">
       <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
@@ -139,7 +141,8 @@
     }
 
     <!-- ----- HASTA -----  -->
-    @if ( desde_hasta_includes.includes(inputs.tipo_reporte) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'||
+    inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
     <div class="col-6 pr-0">
       <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>

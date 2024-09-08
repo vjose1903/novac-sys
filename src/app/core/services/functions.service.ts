@@ -523,6 +523,15 @@ export class fun extends CustomLodash {
       if (input) input.blur();
     }
   }
+  // __________________________________________________________________________________________________
+  // Nombre: clickInputFantasma
+  // Descripcion : Esta funcion clickea el input fantasma
+  // __________________________________________________________________________________________________
+  static clickInputFantasma() {
+    const element = document.getElementById('input_fantasma');
+
+    if (element) element.click();
+  }
 
   // __________________________________________________________________________________________________
   // Nombre: selectContenido

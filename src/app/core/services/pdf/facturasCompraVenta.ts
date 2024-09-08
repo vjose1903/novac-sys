@@ -181,7 +181,6 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
             hLineWidth: (i, node) => 1,
             vLineWidth: (i, node) => 0,
             hLineColor: (i, node) => 'black',
-            // hLineColor: (i, node) => 'red',
             vLineColor: (i, node) => 'white',
           },
         },
@@ -231,93 +230,79 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI, i
       margin: [0, -2, 0, 0],
       layout: {
         hLineWidth: (i, node) => (i % _break == 0 && node.table.body.length != _break ? 0 : 1),
-        // hLineWidth: (i, node) =>  i % _break == 0 && node.table.body.length != _break ? 0 : i == node.table.body.length ? 2 : 1,
         vLineWidth: (i, node) => 0,
         hLineColor: (i, node) => (i == node.table.body.length ? 'black' : 'gray'),
         vLineColor: (i, node) => 'white',
       },
     },
     {
-      margin: [0, 5, 0, 0],
-      text: [
-        { text: 'Realizada Por :  ', style: 'letra10', bold: true },
-        { text: data.usuario, style: 'letra10' },
-        data.vendedor ? { text: '    Vendedor :  ', style: 'letra10', bold: true } : { text: '' },
-        data.vendedor ? { text: data.vendedor, style: 'letra10' } : { text: '' },
+      columns: [
+        {
+          width: '*',
+          stack: [
+            {
+              margin: [0, 2, 0, 2],
+              text: [
+                { text: 'Realizada Por :  ', style: 'letra10', bold: true },
+                { text: data.usuario, style: 'letra10' },
+                // vendedor
+                data.vendedor ? { text: '    Vendedor :  ', style: 'letra10', bold: true } : { text: '' },
+                data.vendedor ? { text: data.vendedor, style: 'letra10' } : { text: '' },
+              ],
+            },
+            formatMovimientosViajes(data),
+          ],
+        },
+        {
+          width: 'auto',
+          margin: [0, 0, 19, 0],
+          table: {
+            widths: ['*', 'auto'],
+            body: [
+              [
+                { text: 'Bruto RD$: ', style: 'letra11', bold: true, alignment: 'right' },
+                { text: fun_.roundNumberToDecimal(data.Bruto), style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0] },
+              ],
+              [
+                { text: 'Itbis RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                { text: fun_.roundNumberToDecimal(data.itbis), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
+              ],
+              [
+                { text: 'Descuento RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                { text: fun_.roundNumberToDecimal(data.descuento), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
+              ],
+              [
+                { text: 'TOTAL RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                { text: fun_.roundNumberToDecimal(data.total_factura), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
+              ],
+              data.tipo === 'compra'
+                ? [{ text: '' }, { text: '' }]
+                : [
+                    { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
+                    { text: fun_.roundNumberToDecimal(data.devuelta), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
+                  ],
+            ],
+          },
+          layout: 'noBorders',
+        },
       ],
     },
     // -----------------------
-    {
-      stack: [
-        {
-          columns: [
-            (is_venta && !is_contado) || isMostrar
-              ? { text: '' }
-              : {
-                  stack: [
-                    {
-                      canvas: [
-                        { type: 'rect', x: 0, y: 0, w: 110, h: 1, color: '#000000' },
-                        { type: 'rect', x: 160, y: 0, w: 110, h: 1, color: '#000000' },
-                      ],
-                      margin: [0, 80, 0, 0],
-                    },
-                    {
-                      columns: [
-                        [
-                          {
-                            text: [{ text: 'Revisada Por', style: 'letra10', bold: true }],
-                            margin: [28, 3, 0, 0],
-                          },
-                        ],
-                        [
-                          {
-                            text: [{ text: 'Cliente', style: 'letra10', bold: true }],
-                            margin: [60, 3, 0, 0],
-                          },
-                        ],
-                      ],
-                    },
-                  ],
-                  margin: [0, -40, 0, 0],
-                },
-
-            {
-              margin: [0, -12, 19, 0],
-              table: {
-                widths: ['*', 'auto'],
-                body: [
-                  [
-                    { text: 'Bruto RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-                    { text: fun_.roundNumberToDecimal(data.Bruto), style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0] },
-                  ],
-                  [
-                    { text: 'Itbis RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                    { text: fun_.roundNumberToDecimal(data.itbis), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
-                  ],
-                  [
-                    { text: 'Descuento RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                    { text: fun_.roundNumberToDecimal(data.descuento), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
-                  ],
-                  [
-                    { text: 'TOTAL RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                    { text: fun_.roundNumberToDecimal(data.total_factura), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
-                  ],
-                  data.tipo === 'compra'
-                    ? [{ text: '' }, { text: '' }]
-                    : [
-                        { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                        { text: fun_.roundNumberToDecimal(data.devuelta), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
-                      ],
-                ],
-              },
-              layout: 'noBorders',
-            },
-          ],
+    is_venta && !is_contado
+      ? { text: '' }
+      : {
+          table: {
+            widths: [130, 20, 130],
+            body: [
+              [
+                { text: 'Revisada Por', style: 'letra10', bold: true, alignment: 'center', border: [false, true, false, false] },
+                { text: '', border: [false, false, false, false] },
+                { text: 'Cliente', style: 'letra10', bold: true, alignment: 'center', border: [false, true, false, false] },
+              ],
+            ],
+          },
         },
-      ],
-      unbreakable: true,
-    },
+
     {
       stack: [
         is_venta
@@ -408,4 +393,39 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI, i
     // -----------------------
   ];
   return content;
+}
+
+function formatMovimientosViajes(data) {
+  if (!data.is_viaje) return [{ text: '' }];
+
+  const movimientosRows = [];
+
+  data.movimientos_viaje.forEach((movimiento) => {
+    movimientosRows.push([
+      {
+        // camión
+        text: [
+          { text: 'Camión: ', style: 'letra10', bold: true },
+          { text: movimiento.vehiculo.info_vehiculo, style: 'letra10' },
+        ],
+      },
+      {
+        // chofer
+        text: [
+          { text: 'Chofer: ', style: 'letra10', bold: true },
+          { text: movimiento.chofer.nombre_completo, style: 'letra10' },
+        ],
+      },
+    ]);
+  });
+
+  const tableMovimientos = {
+    table: {
+      widths: ['auto', 'auto'],
+      body: movimientosRows,
+    },
+    layout: 'noBorders',
+  };
+
+  return tableMovimientos;
 }

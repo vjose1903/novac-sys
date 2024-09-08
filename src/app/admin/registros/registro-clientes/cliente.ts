@@ -56,17 +56,18 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modalId] };
         tipo = requestParameters['tipo'];
-        if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.id;
+
+        if (tipo == CxCType.cliente) requestParameters['cliente_id'] = reporteParams.data.id;
+        if (tipo == CxCType.antSaldoAgrupado || tipo == CxCType.antSaldoDetallado) requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+        if (tipo == CxCType.antSaldoAgrupado || tipo == CxCType.antSaldoDetallado) requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+
         pdfParams.tipo = 'cuentas_cobrar';
+
         break;
 
       case 'cuentas_con_pagos':
       case 'ventas_cliente':
-        requestParameters = {
-          desde: DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' }),
-          hasta: DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' }),
-          cliente_id: reporteParams.data.cliente_id,
-        };
+        requestParameters = { desde: DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' }), hasta: DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' }), cliente_id: reporteParams.data.cliente_id };
 
         if (pdfParams.tipo == 'ventas_cliente') {
           requestParameters['tipo_factura_id'] = reporteParams.data.tipo_factura_id;

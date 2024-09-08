@@ -7,7 +7,7 @@ import { tableCellType, table_config } from './../../components/new_tablas/tabla
 import { FacturaC, tipoDocFacturacion } from './../factura';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { ModalI } from '../../components/modal/modal-class';
 import * as _ from 'lodash';
 
@@ -17,6 +17,7 @@ import * as _ from 'lodash';
   styleUrls: ['./menu-opciones-extra.component.scss'],
 })
 export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ModalI {
+  @ViewChild('dropdownCliente') dropdownCliente: ElementRef;
   constructor(private tServ: TablasService, private router: Router) {
     super();
   }
@@ -41,7 +42,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   tipos_filtro = [
     { key: this.filter_options.todos, label: 'Todos' },
     { key: this.filter_options.cliente, label: 'Cliente' },
-    { key: this.filter_options.numero_documento, label: 'Número de Documento' },
+    { key: this.filter_options.numero_documento, label: 'No. de Cotización' },
   ];
 
   table_config;
@@ -83,23 +84,48 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   }
 
   selectFiltro() {
-    this.clienteSelected = undefined;
-    this.filter_value = '';
+    this.clearFilterValues();
 
     if (this.filter_key == this.filter_options.todos) {
-      this.buscarDocumentos(this.tServ.obj_paginate.default);
+      this.showAllDocuments();
     } else {
       setTimeout(() => fun.enfocarInput('valorI'), 100);
     }
   }
 
-  desenfocarValor() {
-    fun.desEnfocarInput('valorI');
+  dropdownClienteAction(action: 'show' | 'hide') {
+    setTimeout(() => {
+      this.tServ.blockRowMovement = action === 'show';
+      if (action === 'hide') fun.desEnfocarInput('valorI');
+    }, 100);
   }
 
-  async checkNumeroPreFactura() {
-    if (this.filter_value.length < 8 || this.filter_value.includes('_')) fun.toastWarning('Numero de Pre-venta incompleto', 'Aviso');
-    else this.buscarDocumentos(this.tServ.obj_paginate.default);
+  clearFilterValues() {
+    this.clienteSelected = null;
+    this.filter_value = '';
+  }
+
+  showAllDocuments() {
+    this.buscarDocumentos(this.tServ.obj_paginate.default);
+  }
+
+  clearFilters() {
+    const currentFilterKey = this.filter_key;
+    this.filter_key = this.filter_options.todos;
+    this.clearFilterValues();
+    this.clearClienteFilter();
+    this.showAllDocuments();
+
+    this.filter_key = currentFilterKey;
+  }
+
+  async checkNumeroPreFactura(evento) {
+    setTimeout(() => {
+      if (this.filter_value.length < 8 || this.filter_value.includes('_')) fun.toastWarning('Numero de Pre-venta incompleto', 'Aviso');
+      else this.buscarDocumentos(this.tServ.obj_paginate.default);
+      evento.stopPropagation();
+      evento.preventDefault();
+    }, 0);
   }
 
   async getClientes(arg) {

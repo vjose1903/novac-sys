@@ -29,6 +29,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   table_config: table_config = {
     info: [],
     focusRow: true,
+    focusSearchInput: true,
     id_tabla: 'buscar_cliente_suplidor',
     padre_functions: { data_request: (params) => this.buscarClientesOrSuplidor(params) },
     filtrar: { local: false },

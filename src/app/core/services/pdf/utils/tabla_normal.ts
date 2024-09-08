@@ -126,18 +126,20 @@ function formarCuerpo(data, configuration, detalle, index_contenido) {
   configuration.info.forEach((info, i) => {
     let obj = {};
     let text_ = '';
+    const value = detalle[info.key];
 
     if (info.key === 'index') {
       text_ = index_contenido + 1;
     } else {
       if (info.formato_fecha) {
-        text_ = fun_.my_dateFormater(detalle[info.key]);
+        text_ = fun_.my_dateFormater(value);
       } else if (info.formato_numero_tachado) {
-        text_ = fun_.roundNumberToDecimal(detalle[info.key], true);
+        if (isNaN(Number(value))) text_ = value;
+        else text_ = fun_.roundNumberToDecimal(value, true);
       } else if (info.formato_numero) {
-        text_ = fun_.roundNumberToDecimal(detalle[info.key]);
+        text_ = fun_.roundNumberToDecimal(value);
       } else {
-        text_ = detalle[info.key];
+        text_ = value;
       }
     }
 

@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Ss } from './../../../../core/services/singleton.service';
 import { Permisos } from './../../../../core/typescript/permisos';
+import { Ss } from './../../../../core/services/singleton.service';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { tFacturaD } from './../../../facturacion/factura';
 import { serie } from './../../../../core/typescript/constantes';
 import { CxP } from '../../../registros/registro-suplidores/suplidores';
@@ -124,7 +124,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     let tipo_selected = null;
     let serie_selected = null;
     let condicion_selected = null;
-
+    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'movimientos_vehiculo'];
+    const desde_year_hasta_includes = ['cuentas_cobrar_ant_saldo'];
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
 
     if (this.inputs.tipo_reporte == 'cuadre') {
@@ -215,12 +216,17 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
     if (tipo_factura_includes.includes(this.inputs.tipo_reporte)) this.parseTipoFacturas();
 
-    if (this.desde_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls();
+    if (desde_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls();
+    if (desde_year_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls({ begin_of_year: true });
   }
 
-  setDesdeHastaControls() {
-    let actual_date = new Date();
-    const desde = DateUtils.getFirstDayOfMonth({ month: actual_date.getMonth() + 1, year: actual_date.getFullYear() });
+  setDesdeHastaControls(params?: { begin_of_year?: boolean }) {
+    if (fun.isEmpty(params)) params = {};
+    if (fun.isEmpty(params?.begin_of_year)) params.begin_of_year = false;
+
+    let desde_temp = new Date();
+
+    const desde = params.begin_of_year ? DateUtils.getFirstDayOfYear({ year: desde_temp.getFullYear() }) : DateUtils.getFirstDayOfMonth({ month: desde_temp.getMonth() + 1, year: desde_temp.getFullYear() });
 
     this.form.controls.desde.setValue(desde);
     this.form.controls.hasta.setValue(actual_date);
