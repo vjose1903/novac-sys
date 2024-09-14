@@ -70,6 +70,7 @@ export class PagoC extends CrudG<PagoI> {
     requestParameters['tipo'] = reporteParams.data.tipo;
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
+    console.log('requestParams ', requestParams);
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
       let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };

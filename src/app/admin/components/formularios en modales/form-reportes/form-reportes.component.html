@@ -1,7 +1,7 @@
 <form [formGroup]="form">
   <div class="row">
     <!-- ----- DINAMYC SELECTION -----  -->
-    @if (dinamycSelectionReady && inputs.tipo_reporte == 'movimientos_vehiculo') { @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
+    @if (dinamycSelectionReady && reportTypeHasfield(reportField.dynamicSelection)) { @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
       <p-dropdown
@@ -21,7 +21,7 @@
     } }
 
     <!-- ----- SELECCION DE CLIENTE -----  -->
-    @if (inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'cuentas_con_pagos') {
+    @if ( reportTypeHasfield(reportField.customerField) ) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Seleccione cliente: <span style="color: red">*</span> </label>
 
@@ -48,7 +48,7 @@
     </div>
     }
     <!-- ----- SERIE -----  -->
-    @if (inputs.tipo_reporte == 'ventas_diarias' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_cliente') {
+    @if ( reportTypeHasfield(reportField.serieField) ) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Serie: <span style="color: red">*</span> </label>
       <p-selectButton [options]="facturasSerieOptions" formControlName="serie" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
@@ -56,7 +56,7 @@
     }
 
     <!-- ----- CONDICION -----  -->
-    @if (inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_diarias') {
+    @if (reportTypeHasfield(reportField.conditionField)) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Condicion: <span style="color: red">*</span> </label>
       <select formControlName="condicion" class="form-control">
@@ -69,8 +69,7 @@
     }
 
     <!-- ----- TIPO -----  -->
-    @if (inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'ventas_productos' || inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'notas'|| inputs.tipo_reporte ==
-    'pago_facturas' || inputs.tipo_reporte == 'cuentas_pagar_ant_saldo') {
+    @if (reportTypeHasfield(reportField.typeField) ) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Tipo: <span style="color: red">*</span> </label>
       <select formControlName="tipo" class="form-control" (change)="changeTipo()">
@@ -83,7 +82,7 @@
     }
 
     <!-- ----- TIPO FACTURAS -----  -->
-    @if (inputs.tipo_reporte == 'ventas_diarias' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_cliente') {
+    @if (reportTypeHasfield(reportField.billTypeField)) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Tipo de factura: <span style="color: red">*</span> </label>
       <select formControlName="tipo_factura_id" class="form-control">
@@ -96,7 +95,7 @@
     }
 
     <!-- ----- SELECCION DE ARTICULO -----  -->
-    @if (inputs.tipo_reporte == 'suplidor_prod') {
+    @if (reportTypeHasfield(reportField.articuloField)) {
     <div class="col-12 p-0 mb-3">
       <label class="control-label mb-0 mt-2">Seleccione articulo: <span style="color: red">*</span> </label>
 
@@ -117,7 +116,7 @@
     }
 
     <!-- ----- FECHA -----  -->
-    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.dia_unico) || inputs.tipo_reporte == 'cuadre') {
+    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.dia_unico) || reportTypeHasfield(reportField.dateField)) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Fecha: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha" formControlName="fecha" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
@@ -129,8 +128,7 @@
 
     <!-- ----- DESDE -----  -->
 
-    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'||
-    inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
+    @if (reportTypeHasfield(reportField.fromField) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
     <div class="col-6 pl-0">
       <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
@@ -141,8 +139,7 @@
     }
 
     <!-- ----- HASTA -----  -->
-    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'||
-    inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
+    @if ( reportTypeHasfield(reportField.toDateField)|| (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
     <div class="col-6 pr-0">
       <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>

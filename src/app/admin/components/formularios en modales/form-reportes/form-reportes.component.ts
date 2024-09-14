@@ -13,6 +13,7 @@ import { ClienteC, CxC } from '../../../registros/registro-clientes/cliente';
 import { ModalComponentI, ModalI } from '../../modal/modal-class';
 import { TipoPagoReporte } from '../../../pagos/class/pagos/pagos';
 import { TipoReciboReporte } from '../../../pagos/class/ingresos/recibos';
+import { reportField } from './form-reportes.component.model';
 
 @Component({
   selector: 'app-form-reportes',
@@ -56,6 +57,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   modalComponent: ModalComponentI = {};
   inputs: any;
+  reportField = reportField;
 
   ngOnInit() {
     this.necesarioStart();
@@ -123,8 +125,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     let tipo_selected = null;
     let serie_selected = null;
     let condicion_selected = null;
-    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'movimientos_vehiculo'];
-    const desde_year_hasta_includes = ['cuentas_cobrar_ant_saldo'];
+    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'movimientos_vehiculo', 'pago_facturas'];
+    const desde_year_hasta_includes = ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo'];
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
 
     if (this.inputs.tipo_reporte == 'cuadre') {
@@ -231,6 +233,23 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
     this.setValidator('desde');
     this.setValidator('hasta');
+  }
+
+  reportTypeHasfield(reportType: string) {
+    const reportTypeMap = {
+      [reportField.dynamicSelection]: ['movimientos_vehiculo'],
+      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos'],
+      [reportField.serieField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
+      [reportField.conditionField]: ['ventas_cliente', 'ventas_rango', 'ventas_diarias'],
+      [reportField.typeField]: ['ventas_rango', 'recibos', 'ventas_productos', 'cuentas_cobrar_ant_saldo', 'notas', 'pago_facturas', 'cuentas_pagar_ant_saldo'],
+      [reportField.billTypeField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
+      [reportField.articuloField]: ['suplidor_prod'],
+      [reportField.dateField]: ['cuadre'],
+      [reportField.fromField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas'],
+      [reportField.toDateField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas'],
+    };
+
+    return reportTypeMap[reportType].includes(this.inputs.tipo_reporte);
   }
 
   parseTipoFacturas() {
