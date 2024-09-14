@@ -21,6 +21,11 @@ export enum TypeNavigation {
   back_forward = 2,
 }
 
+export enum dateRangeType{
+  dia_unico = '1',
+  rango_fecha = '2',
+}
+
 export enum teclasCode {
   _esc = 27,
   _derecha = 39,

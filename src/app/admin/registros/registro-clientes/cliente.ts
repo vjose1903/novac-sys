@@ -14,22 +14,9 @@ export class ClienteC extends CrudG<any> {
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
-      let objModal;
-      switch (params.tipo) {
-        case 'cuentas_cobrar_cliente':
-          objModal = ClienteC.reporteCxC(params);
-          break;
-        case 'cuentas_cobrar_ant_saldo':
-        case 'cuentas_con_pagos':
-        case 'ventas_cliente':
-          ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
-          objModal = ReporteC.objReporte;
+      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
+      let objModal = ReporteC.objReporte;
 
-          break;
-
-        default:
-          break;
-      }
       objModal['returnDataFromModal'] = returnDataFromModal;
 
       params.openNewModal(objModal);
@@ -44,7 +31,7 @@ export class ClienteC extends CrudG<any> {
   static async requestReporte(reporteParams, pdfParams) {
     let hasPermisoPreVenta = await Ss.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
 
-    let objTipo = { cuentas_cobrar_cliente: CxCType.cliente, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
+    let objTipo = { cuentas_cobrar_cliente: CxC.por_cliente, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
     let tipo;
     let requestParameters;
 
@@ -53,10 +40,10 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modal_id] };
         tipo = requestParameters['tipo'];
-
-        if (tipo == CxCType.cliente) requestParameters['cliente_id'] = reporteParams.data.id;
-        if (tipo == CxCType.antSaldoAgrupado || tipo == CxCType.antSaldoDetallado) requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
-        if (tipo == CxCType.antSaldoAgrupado || tipo == CxCType.antSaldoDetallado) requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+        
+        if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.cliente_id;
+        requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+        requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
 
         pdfParams.tipo = 'cuentas_cobrar';
 
@@ -118,8 +105,8 @@ export class ClienteC extends CrudG<any> {
   }
 }
 
-export enum CxCType {
-  cliente = '1',
-  antSaldoDetallado = '2',
-  antSaldoAgrupado = '3',
+export enum CxC {
+  por_cliente = 1,
+  detallado = 2,
+  agrupado = 3,
 }
