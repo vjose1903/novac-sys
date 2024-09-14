@@ -17,22 +17,9 @@ export class ClienteC extends CrudG<any> {
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
-      let objModal;
-      switch (params.tipo) {
-        case 'cuentas_cobrar_cliente':
-          objModal = ClienteC.reporteCxC(params);
-          break;
-        case 'cuentas_cobrar_ant_saldo':
-        case 'cuentas_con_pagos':
-        case 'ventas_cliente':
-          ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
-          objModal = ReporteC.objReporte;
+      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
+      let objModal = ReporteC.objReporte;
 
-          break;
-
-        default:
-          break;
-      }
       objModal['returnDataFromModal'] = returnDataFromModal;
 
       params.openNewModal(objModal);
@@ -56,10 +43,10 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modalId] };
         tipo = requestParameters['tipo'];
-
-        if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.id;
-        if (tipo == CxC.agrupado || tipo == CxC.detallado) requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
-        if (tipo == CxC.agrupado || tipo == CxC.detallado) requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+        
+        if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.cliente_id;
+        requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+        requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
 
         pdfParams.tipo = 'cuentas_cobrar';
 

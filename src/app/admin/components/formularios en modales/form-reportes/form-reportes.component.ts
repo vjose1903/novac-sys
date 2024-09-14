@@ -126,7 +126,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     let serie_selected = null;
     let condicion_selected = null;
     const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'movimientos_vehiculo', 'pago_facturas'];
-    const desde_year_hasta_includes = ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo'];
+    const desde_year_hasta_includes = ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo', 'cuentas_cobrar_cliente'];
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
 
     if (this.inputs.tipo_reporte == 'cuadre') {
@@ -238,15 +238,15 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   reportTypeHasfield(reportType: string) {
     const reportTypeMap = {
       [reportField.dynamicSelection]: ['movimientos_vehiculo'],
-      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos'],
+      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos', 'cuentas_cobrar_cliente'],
       [reportField.serieField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
       [reportField.conditionField]: ['ventas_cliente', 'ventas_rango', 'ventas_diarias'],
       [reportField.typeField]: ['ventas_rango', 'recibos', 'ventas_productos', 'cuentas_cobrar_ant_saldo', 'notas', 'pago_facturas', 'cuentas_pagar_ant_saldo'],
       [reportField.billTypeField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
       [reportField.articuloField]: ['suplidor_prod'],
       [reportField.dateField]: ['cuadre'],
-      [reportField.fromField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas'],
-      [reportField.toDateField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas'],
+      [reportField.fromField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas', 'cuentas_cobrar_cliente'],
+      [reportField.toDateField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas', 'cuentas_cobrar_cliente'],
     };
 
     return reportTypeMap[reportType].includes(this.inputs.tipo_reporte);
