@@ -5,7 +5,7 @@ export const config_cxp = {
   widths: [24, 60, 73, 53, '*', 'auto'],
   mostrar_total: true,
   mostrar_bruto: false,
-  mensaje_contenido_vacio: 'El suplidor buscado no tiene cuentas por pagar.',
+  mensaje_contenido_vacio: 'El suplidor buscado no tiene cuentas por pagar, en el rango de fechas establecido.',
   info: [
     {
       text: '#',

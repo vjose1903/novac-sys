@@ -9,7 +9,7 @@ export const config_pago_facturas = {
     widths: [24, 60, '*', 50, 'auto'],
     mostrar_total: true,
     mostrar_bruto: false,
-    mensaje_contenido_vacio: 'No existen recibos de ingresos en el rango de fechas introducido.',
+    mensaje_contenido_vacio: 'No existen pagos de facturas en el rango de fechas introducido.',
     info: [
       {
         text: '#',
@@ -73,7 +73,7 @@ export const config_pago_facturas = {
     widths: [24, '*', '*'],
     mostrar_total: true,
     mostrar_bruto: false,
-    mensaje_contenido_vacio: 'No existen recibos de ingresos en el rango de fechas introducido.',
+    mensaje_contenido_vacio: 'No existen pagos de facturas en el rango de fechas introducido.',
     info: [
       {
         text: '#',
