@@ -140,8 +140,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'recibos') {
       this.tipos = [
-        // { id: TipoReciboReporte.detallado, label: 'Detallado' },
-        // { id: TipoReciboReporte.agrupado, label: 'Agrupado' },
+        { id: 'detallado', label: 'Detallado' },
+        { id: 'agrupado', label: 'Agrupado' },
       ];
 
       tipo_selected = 'detallado';
