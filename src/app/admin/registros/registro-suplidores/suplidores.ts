@@ -6,10 +6,44 @@ import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_id
 import { ConfigureModalI, ModalClass } from '../../components/modal/modal-class';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { DateUtils } from '../../../core/typescript/date.utils';
+import { Validators } from '@angular/forms';
 
 export class SuplidorC extends CrudG<any> {
   constructor() {
     super('suplidores');
+  }
+
+  static inputsSelectSuplidor = [
+    {
+      label: 'Seleccione el suplidor',
+      formControl: 'suplidor_id',
+      items: [],
+      optionLabel: 'nombre_completo',
+      optionValue: 'id',
+      searchFunction: SuplidorC.getSuplidores,
+      blurFunction: SuplidorC.cleanSuplidores,
+      placeholder: 'Ingrese el nombre del suplidor',
+      notFoundText: 'Suplidor no encontrado',
+      disabledFunction: () => false,
+      validators: Validators.required,
+    },
+  ];
+
+  static async getSuplidores(name) {
+    if (fun.hasValue(name)) {
+      fun.awaitTyping().then((res) => {
+        const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false } };
+        new SuplidorC().getAll(extra).then((res) => {
+          SuplidorC.inputsSelectSuplidor[0].items = res['data'];
+        });
+      });
+    } else {
+      SuplidorC.inputsSelectSuplidor[0].items = [];
+    }
+  }
+
+  static async cleanSuplidores() {
+    SuplidorC.inputsSelectSuplidor[0].items = [];
   }
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
@@ -18,8 +52,6 @@ export class SuplidorC extends CrudG<any> {
 
       switch (params.tipo) {
         case 'cuentas_pagar_suplidor':
-          objModal = SuplidorC.reporteCxP(params);
-          break;
         case 'cuentas_pagar_ant_saldo':
         case 'suplidor_prod':
           ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
@@ -28,6 +60,10 @@ export class SuplidorC extends CrudG<any> {
 
         default:
           break;
+      }
+
+      if (params.tipo == 'cuentas_pagar_suplidor') {
+        params.inputs['dinamyc_selections'] = SuplidorC.inputsSelectSuplidor;
       }
 
       objModal['returnDataFromModal'] = returnDataFromModal;
@@ -51,7 +87,11 @@ export class SuplidorC extends CrudG<any> {
       case 'cuentas_pagar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modalId] };
         tipo = requestParameters['tipo'];
-        if (tipo == CxP.por_suplidor) requestParameters['suplidor_id'] = reporteParams.data.id;
+
+        if (tipo == CxP.por_suplidor) requestParameters['suplidor_id'] = reporteParams.data.suplidor_id;
+        requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+        requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+
         pdfParams.tipo = 'cuentas_pagar';
         break;
 

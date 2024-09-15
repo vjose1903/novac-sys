@@ -43,7 +43,7 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modalId] };
         tipo = requestParameters['tipo'];
-        
+
         if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.cliente_id;
         requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
         requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
