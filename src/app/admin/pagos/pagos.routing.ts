@@ -5,7 +5,7 @@ import { PagosComponent } from './pagos-facturas/Formulario/pagos.component';
 
 const routes: Routes = [
   {
-    path: 'lista_pagos/:tipo',
+    path: 'pagos/:tipo',
     component: ListaPagosComponent,
   },
   {

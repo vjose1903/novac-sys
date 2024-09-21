@@ -81,7 +81,7 @@ export class LayoutClass extends TablaClass {
 
   _init_layout(arg) {
     this.layServ = Ss.layServ;
-    if (arg.component == 'layout') LayoutClass.layoutComponent ||= this;
+    if (arg.component == 'layout') LayoutClass.layoutComponent ??= this;
 
     if (arg.component != 'layout' && arg.is_routing) {
       LayoutClass.metodos[arg.component] = this;
@@ -90,6 +90,9 @@ export class LayoutClass extends TablaClass {
   }
 
   runRouterNavigate(arg) {
+    console.log("\n\n --- runRouterNavigate ---");
+    console.log('arg:  ', arg)
+    
     if (arg && arg.bool) {
       const tempLastComponent = LayoutClass.lastComponentInitLayout;
 

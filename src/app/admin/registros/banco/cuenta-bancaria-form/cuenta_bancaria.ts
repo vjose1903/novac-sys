@@ -19,6 +19,7 @@ export interface CuentaBancariaI {
   fecha_primera_conciliacion: string;
   fecha_apertura: string;
   estado: boolean;
+  has_chequera: boolean;
   balance_inicial_libro: number;
   balance_inicial_banco: number;
   cuenta_contable: CuentaContableI;

@@ -15,6 +15,11 @@ export const seriesDGII = [
   { label: 'Electronica', value: serie.electronica, disabled: false },
 ];
 
+export const booleanYesNo = [
+  { label: 'Si', value: true, disabled: false },
+  { label: 'No', value: false, disabled: false },
+];
+
 export enum TypeNavigation {
   first_access = 0,
   reload = 1,

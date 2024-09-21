@@ -11,15 +11,15 @@
       
       @if (botones?.mostrar?.show) {
         <span pTooltip="Mostrar" (click)="clickBtn($event, dato, 'mostrar')" tooltipPosition="left" *ngxPermissionsOnly="botones?.mostrar?.permiso">
-          <i class="table-btn-icon far fa-eye"></i>
+          <i  class="table-btn-icon far fa-eye"></i>
         </span>
       } @if (botones?.editar?.show) {
         <span pTooltip="Editar" (click)="clickBtn($event, dato, 'update')" tooltipPosition="left" *ngxPermissionsOnly="botones?.editar?.permiso">
-          <i class="table-btn-icon fas fa-pencil-alt"></i>
+          <i  class="table-btn-icon fas fa-pencil-alt"></i>
         </span>
       } @if (botones?.borrar?.show) {
         <span pTooltip="Borrar" (click)="clickBtn($event, dato, 'delete')" tooltipPosition="left" *ngxPermissionsOnly="botones?.borrar?.permiso">
-          <i class="table-btn-icon far fa-trash-alt"></i>
+          <i  class="table-btn-icon far fa-trash-alt"></i>
         </span>
       }
     </div>

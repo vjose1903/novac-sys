@@ -229,6 +229,8 @@ textarea {
 }
 
 .form-group {
+  display: flex;
+  flex-direction: column;
   > label {
     color: #1d253b;
   }

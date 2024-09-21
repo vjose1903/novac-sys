@@ -105,9 +105,9 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
       status: { width: '10%' },
       actions: [
         { key: 'actions', isTd: true, estilos: 'width: 11% !important;' },
-        { key: 'add_account', estilos: 'font-size: 1.2rem !important;' },
-        { key: 'edit_account', estilos: 'font-size: 1.2rem !important' },
-        { key: 'deactivate_reactivate_account', estilos: 'font-size: 1.2rem !important' },
+        { key: 'add_account', estilos: 'font-size: 1.1rem !important;' },
+        { key: 'edit_account', estilos: 'font-size: 1.1rem !important' },
+        { key: 'deactivate_reactivate_account', estilos: 'font-size: 1.1rem !important' },
       ],
     };
 

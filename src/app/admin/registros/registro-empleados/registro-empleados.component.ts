@@ -107,6 +107,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   iniciarCambioMenu(arg, callback) {
+    console.log("\n\n --- iniciarCambioMenu --- empleados");
+    console.log('arg:  ', arg)
+    
     if (arg.bool) {
       this.runFinalizarCambioMenu(arg);
       callback({ bool: true });

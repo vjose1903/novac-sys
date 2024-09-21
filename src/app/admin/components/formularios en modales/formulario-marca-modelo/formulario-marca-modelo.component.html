@@ -7,12 +7,10 @@
           <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
             <div class="card card-padding sombra">
               <div>
-                <div class="form-group">
+                <div class="form-group" appMsgError="descripcion" [form]="formMarca">
                   <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
-                  <input type="text" id="descripcion" class="form-control mb-2" formControlName="descripcion" (focus)="htmlServ.selectValue($event)" autocomplete="off" [appCapitalice]="'formGroup'" />
-                  @if (!formMarca.controls['descripcion'].valid && (formMarca.controls['descripcion'].dirty || formMarca.controls['descripcion'].touched)) {
-                  <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                  }
+                  <input type="text" id="descripcion" class="form-control" formControlName="descripcion" (focus)="htmlServ.selectValue($event)" autocomplete="off" [appCapitalice]="'formGroup'" />
+                  <span id="msgContainer"></span>
                 </div>
               </div>
               <div class="row">
@@ -52,8 +50,8 @@
           <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
             <div class="card card-padding sombra">
               <div class="row">
-                <div class="col-12">
-                  <div class="form-group">
+                <div class="col-12 mb-2">
+                  <div class="form-group" appMsgError="marca_id" [form]="formModelo">
                     <label class="control-label">Marca: <span style="color: red">*</span></label>
 
                     <p-dropdown
@@ -68,16 +66,15 @@
                       emptyFilterMessage="Marca no encontrada"
                       [resetFilterOnHide]="true"
                     />
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 
                 <div class="col-12">
-                  <div class="form-group">
+                  <div class="form-group" appMsgError="descripcion" [form]="formModelo">
                     <label class="control-label">Modelo: <span style="color: red">*</span></label>
-                    <input type="text" id="descripcion" class="form-control mb-2" formControlName="descripcion" (focus)="htmlServ.selectValue($event)" autocomplete="off" [appCapitalice]="'formGroup'" />
-                    @if (!formModelo.controls['descripcion'].valid && (formModelo.controls['descripcion'].dirty || formModelo.controls['descripcion'].touched)) {
-                    <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                    }
+                    <input type="text" id="descripcion" class="form-control" formControlName="descripcion" (focus)="htmlServ.selectValue($event)" autocomplete="off" [appCapitalice]="'formGroup'" />
+                    <span id="msgContainer"></span>
                   </div>
                 </div>
 

@@ -45,13 +45,13 @@ export class DivisaService {
               tasa_actual: { width: '8%' },
               status: [
                 { key: 'status', isTd: true, estilos: 'width: 10% !important;' },
-                { key: 'status_cuenta', estilos: 'font-size: 1.2rem !important;' },
+                { key: 'status_cuenta', estilos: 'font-size: 1.1rem !important;' },
               ],
               actions: [
                 { key: 'actions', isTd: true, estilos: 'width: 7rem !important;' },
-                { key: 'edit_divisa', estilos: 'font-size: 1.2rem !important' },
-                { key: 'currency_change', estilos: 'font-size: 1.2rem !important' },
-                { key: 'deactivate_reactivate_divisa', estilos: 'font-size: 1.2rem !important' },
+                { key: 'edit_divisa', estilos: 'font-size: 1.1rem !important' },
+                { key: 'currency_change', estilos: 'font-size: 1.1rem !important' },
+                { key: 'deactivate_reactivate_divisa', estilos: 'font-size: 1.1rem !important' },
               ],
             };
             return divisa;

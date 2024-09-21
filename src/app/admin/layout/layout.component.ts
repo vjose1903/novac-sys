@@ -25,6 +25,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   actualPath;
   actualRuta;
   actualModule;
+  prevModule;
 
   showLoading;
 
@@ -239,7 +240,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (fun.hasValue(paths) || paths?.length > 0) {
       return paths.some((path) => this.actualPath.includes(`/${module}/${path}`));
     } else {
-      return this.actualPath.includes(`/${module}`);
+      return this.actualPath?.includes(`/${module}`) || this.actualModule?.includes(module);
     }
   }
 
@@ -252,6 +253,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
     let pathSplit = this.actualPath.split('/admin/')[1].split('/');
 
+    this.prevModule = this.actualModule;
     this.actualModule = pathSplit[0];
 
     this.actualRuta = _.join(pathSplit.slice(1), '/');
@@ -276,19 +278,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     FactsLocalStorage.verificateFacturasGuardadas();
   }
 
-  // =================================================================================
-  // NAVEGAR
-  // =================================================================================
-  isVistaActual(arg) {
-    let res = false;
-
-    if ((fun.hasValue(this.actualModule) && arg == this.actualModule) || (fun.hasValue(this.actualPath) && this.actualPath.includes(arg)) || (fun.hasValue(this.actualRuta) && this.actualRuta.includes(arg))) {
-      res = true;
-    }
-    return res;
-  }
-
   cambiarMenu(args: { url: string; navigate: boolean; id_h5?: string }) {
+    console.log('\n\n ---- cambiarMenu ---- ');
+    console.log('args:  ', args);
+
     let next_cambio_menu = '';
 
     if (args.navigate) {
@@ -300,7 +293,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
       }
     } else {
+      this.prevModule = this.actualModule;
       this.actualModule = args.url;
+
+      if (this.prevModule == this.actualModule) [this.actualModule, this.prevModule] = Array(2).fill(undefined);
     }
     setTimeout(() => {
       if (fun.hasValue(args.id_h5)) fun.scrollTo({ id: args.id_h5, behavior: 'smooth', block: 'start', inline: 'center' });
@@ -311,6 +307,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (arg.bool && arg.verificar) this.ready = false;
 
     if (arg.bool) {
+      this.prevModule = this.actualModule;
       this.actualModule = undefined;
       this.router.navigateByUrl(arg.ruta);
     } else {

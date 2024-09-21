@@ -266,7 +266,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   goBack() {
-    // const url = `/admin/pagos/lista_pagos/${this.pagosService.tipoPago}`;
+    // const url = `/admin/pagos/pagos/${this.pagosService.tipoPago}`;
     // this.router.navigateByUrl(url);
     window.history.back();
   }

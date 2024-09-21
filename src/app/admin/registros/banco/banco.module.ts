@@ -14,9 +14,10 @@ import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circu
 import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
 import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-bancaria.component';
 import { FormAutoCompleteModule } from './../../../core/components/form-auto-complete/form-auto-complete.module';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [BancoComponent, CuentaBancariaFormComponent, TipoCuentaBancariaComponent],
-  imports: [CommonModule, BancoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule, FormAutoCompleteModule],
+  imports: [CommonModule, BancoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule, FormAutoCompleteModule, SelectButtonModule],
 })
 export class BancoModule {}

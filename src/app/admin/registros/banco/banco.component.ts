@@ -67,7 +67,6 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     obj_paginate: { show: true, showTotal: true, is_local: false },
   };
   tablaComponent;
-  
 
   htmlServ = inject(HtmlElementsService);
 
@@ -143,6 +142,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
       balance_inicial_libro: [{ value: cuenta_bancaria ? cuenta_bancaria.balance_inicial_libro : null, disabled: false }],
       balance_inicial_banco: [{ value: cuenta_bancaria ? cuenta_bancaria.balance_inicial_banco : null, disabled: false }],
       cuenta_contable: [{ value: cuenta_bancaria ? (cuenta_bancaria?.cuenta_contable ? cuenta_bancaria.cuenta_contable.codigo : null) : null, disabled: false }],
+      has_chequera: [{ value: cuenta_bancaria ? (cuenta_bancaria?.has_chequera ? cuenta_bancaria.has_chequera : false) : false, disabled: false }],
       nombre_cuenta: [{ value: cuenta_bancaria ? (cuenta_bancaria?.cuenta_contable ? cuenta_bancaria.cuenta_contable.descripcion : null) : null, disabled: false }],
       cuenta_contable_prima: [{ value: cuenta_bancaria ? (cuenta_bancaria?.cuenta_contable_prima ? cuenta_bancaria.cuenta_contable_prima.codigo : null) : null, disabled: false }],
       nombre_cuenta_prima: [{ value: cuenta_bancaria ? (cuenta_bancaria?.cuenta_contable_prima ? cuenta_bancaria.cuenta_contable_prima.descripcion : null) : null, disabled: false }],
@@ -242,6 +242,11 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
         banco.customStyles = {
           incomplete: [{ key: 'incomplete', isTd: true, estilos: 'width: 2rem !important;' }],
+          actions: [
+            { key: 'actions', isTd: true, estilos: 'width: 11% !important;' },
+            { key: 'edit_banco', estilos: 'font-size: 1.1rem !important' },
+            { key: 'delete_banco', estilos: 'font-size: 1.1rem !important' },
+          ],
         };
         return banco;
       });
@@ -259,14 +264,6 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
     bancoParsed.edit_banco_tooltip = 'Editar';
     bancoParsed.delete_banco_tooltip = 'Borrar';
-
-    bancoParsed.customStyles = {
-      actions: [
-        { key: 'actions', isTd: true, estilos: 'width: 11% !important;' },
-        { key: 'edit_banco', estilos: 'font-size: 1.2rem !important;' },
-        { key: 'delete_banco', estilos: 'font-size: 1.2rem !important' },
-      ],
-    };
 
     return bancoParsed;
   }
@@ -311,7 +308,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   test() {
-    fun.enfocarInput(this.nombreBancoConfig.fieldId);
+    this.formIsOnInitState(true);
   }
 
   borrar(isCreando = true) {
@@ -378,7 +375,20 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
     let cuentasIsOnInitState = this.formInitialValue?.cuentas_bancarias.length == this.formGroup.getRawValue().cuentas_bancarias.length;
 
-    const pick_values_cuenta = ['arrayId', 'banco_id', 'tipo_cuenta_bancaria_id', 'divisa_id', 'numero_cuenta', 'comentario', 'descripcion', 'fecha_primera_conciliacion', 'fecha_apertura', 'balance_inicial_libro', 'balance_inicial_banco'];
+    const pick_values_cuenta = [
+      'arrayId',
+      'banco_id',
+      'tipo_cuenta_bancaria_id',
+      'divisa_id',
+      'numero_cuenta',
+      'comentario',
+      'descripcion',
+      'fecha_primera_conciliacion',
+      'fecha_apertura',
+      'balance_inicial_libro',
+      'balance_inicial_banco',
+      'has_chequera',
+    ];
 
     const initialCuentasIndexed = this.formInitialValue?.cuentas_bancarias.reduce((acc, item) => {
       acc[item.arrayId] = fun.pick(item, pick_values_cuenta);

@@ -150,8 +150,8 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
         transferencia.customStyles = {
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8rem !important;' },
-            { key: 'edit_transferencia', estilos: 'font-size: 1.2rem !important' },
-            { key: 'anular_transferencia', estilos: 'font-size: 1.2rem !important' },
+            { key: 'edit_transferencia', estilos: 'font-size: 1.1rem !important' },
+            { key: 'anular_transferencia', estilos: 'font-size: 1.1rem !important' },
           ],
         };
         return transferencia;

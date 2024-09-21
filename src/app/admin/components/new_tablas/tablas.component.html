@@ -104,7 +104,7 @@
                                     </img-component>
                                   </span>
                               } @case (tableCellType.icon) {
-                                  <span>
+                                  <span [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
                                     <icons-array [column]="column" [indexBody]="getIndex(indexBody)" [realIdTabla]="realIdTabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="data" (icon_click)="iconsClick($event)"></icons-array>
                                   </span>
                               } @case (tableCellType.tag) {

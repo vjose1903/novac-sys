@@ -227,8 +227,8 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           total_factura: { width: '20%' },
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 7% !important' },
-            { key: 'ver', estilos: 'font-size: 1rem !important' },
-            { key: 'make_recipt', estilos: 'font-size: 1rem !important' },
+            { key: 'ver', estilos: 'font-size: 1.1rem !important' },
+            { key: 'make_recipt', estilos: 'font-size: 1.1rem !important' },
           ],
         };
 
@@ -270,10 +270,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       'chofer.nombre_completo': { padding: '0.5rem' },
       actions: [
         { key: 'actions', isTd: true, estilos: 'width: 7% !important' },
-        { key: 'editar_btn', estilos: 'font-size: 1rem !important' },
-        { key: 'borrar_btn', estilos: 'font-size: 1rem !important' },
-        { key: 'cancelar_btn', estilos: 'font-size: 1rem !important' },
-        { key: 'guardar_btn', estilos: 'font-size: 1rem !important' },
+        { key: 'editar_btn', estilos: 'font-size: 1.1rem !important' },
+        { key: 'borrar_btn', estilos: 'font-size: 1.1rem !important' },
+        { key: 'cancelar_btn', estilos: 'font-size: 1.1rem !important' },
+        { key: 'guardar_btn', estilos: 'font-size: 1.1rem !important' },
       ],
     };
   }

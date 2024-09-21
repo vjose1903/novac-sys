@@ -548,7 +548,8 @@ export class fun extends CustomLodash {
   // __________________________________________________________________________________________________
   static getActualPath() {
     const actualPath = window.location.pathname;
-    return actualPath;
+    const parameters = window.location.search;
+    return `${actualPath}${fun.hasValue(parameters) ? parameters : ''}`;
   }
 
   // __________________________________________________________________________________________________

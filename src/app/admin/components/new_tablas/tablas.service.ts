@@ -168,7 +168,8 @@ export class TablasService {
           const startId = item.isTd ? 'td-' : '';
 
           const elemento = document.getElementById(`${startId}${realIdTabla}-${item.key}-${index}`);
-
+          // console.log("item.key ", item.key);
+          
           if (elemento) elemento.setAttribute('style', item.estilos);
         }
       } else {

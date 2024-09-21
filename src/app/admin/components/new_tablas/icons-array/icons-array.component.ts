@@ -3,7 +3,6 @@ import { ModalClass } from '../../modal/modal-class';
 import { TablasService } from '../tablas.service';
 import { fun } from '../../../../core/services/functions.service';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import * as _ from 'lodash';
 
 @Component({
   selector: 'icons-array',

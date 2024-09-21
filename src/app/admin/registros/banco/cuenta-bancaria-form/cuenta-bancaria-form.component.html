@@ -98,6 +98,16 @@
         </div>
       </div>
 
+      <div class="col-6 pr-0">
+        <div class="form-group" appMsgError="has_chequera" [form]="formGroup">
+          <label class="control-label">Tiene chequera:</label>
+
+          <p-selectButton [options]="hasChequeraOptions" styleClass="opt_same_width" formControlName="has_chequera" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+
+          <span id="msgContainer"></span>
+        </div>
+      </div>
+
       <div class="col-12 p-0">
         <small class="ml-2" style="color: grey">Primera Conciliación</small>
 

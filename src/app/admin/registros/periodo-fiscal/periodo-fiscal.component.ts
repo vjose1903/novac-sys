@@ -107,8 +107,8 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
           estado_: { width: '5rem', 'font-size': '1.1rem' },
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 10% !important;' },
-            { key: 'cierre_mensual', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'cierre_anual', estilos: 'font-size: 1.2rem !important' },
+            { key: 'cierre_mensual', estilos: 'font-size: 1.1rem !important;' },
+            { key: 'cierre_anual', estilos: 'font-size: 1.1rem !important' },
           ],
         };
 

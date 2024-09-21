@@ -256,7 +256,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
           nota.customStyles = {
-            actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
+            actions: [{ key: 'view', estilos: 'font-size: 1.1rem !important' }],
             numero_comprobante: { width: '7rem' },
           };
 
@@ -333,12 +333,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         fact.customStyles = {
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
-            { key: 'view', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'duplicate', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'delete', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'make_bill', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'pay_bill', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'selected', estilos: 'font-size: 1.2rem !important;' },
+            { key: 'view', estilos: 'font-size: 1.1rem !important;' },
+            { key: 'duplicate', estilos: 'font-size: 1.1rem !important;' },
+            { key: 'delete', estilos: 'font-size: 1.1rem !important;' },
+            { key: 'make_bill', estilos: 'font-size: 1.1rem !important;' },
+            { key: 'pay_bill', estilos: 'font-size: 1.1rem !important;' },
+            { key: 'selected', estilos: 'font-size: 1.1rem !important;' },
           ],
         };
 

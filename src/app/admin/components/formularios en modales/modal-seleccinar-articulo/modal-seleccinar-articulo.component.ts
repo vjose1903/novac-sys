@@ -48,7 +48,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
       arti.customStyles = {
         estado: [
           { key: 'estado', isTd: true, estilos: 'width: 2rem !important;' },
-          { key: 'articulo_is_active', estilos: 'font-size: 1.2rem !important' },
+          { key: 'articulo_is_active', estilos: 'font-size: 1.1rem !important' },
         ],
         descripcion: { width: '42.2%', 'text-align': 'left', 'padding-left': '0.5rem' },
         cantidad: { width: '9%' },

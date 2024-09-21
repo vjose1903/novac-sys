@@ -5,7 +5,7 @@
   display: flex;
   gap: 0.3rem;
   .p-button {
-    background: transparent !important;
+    background: #80808012 !important;
     border: none !important;
     border-radius: 0.25rem;
     padding: 0.3rem 0.5rem;
@@ -13,11 +13,18 @@
     &:hover {
       background: #8080802a !important;
     }
+
     &.p-highlight {
       background: var(--primary08) !important;
       &:hover {
         background: var(--primary09) !important;
       }
+    }
+  }
+
+  &.opt_same_width {
+    .p-button {
+      flex: 1;
     }
   }
 }

@@ -9,6 +9,7 @@ import { fun } from './../../../../core/services/functions.service';
 import { ImagenService } from './../../../../core/services/imagen.service';
 import { DivisaService } from './../../divisa/divisa.service';
 import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar } from './cuenta_bancaria';
+import { booleanYesNo } from './../../../../core/typescript/constantes';
 
 @Component({
   selector: 'app-cuenta-bancaria-form',
@@ -29,6 +30,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   nombreBanco: string;
   maxDate;
 
+  hasChequeraOptions = booleanYesNo;
   htmlServ = inject(HtmlElementsService);
 
   constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService, public imgServ: ImagenService) {
@@ -64,23 +66,25 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
       const divisa_principal = this.divisaServ.getDivisaPrincipalInfo();
 
       this.formGroup = this.fb.group({
-        arrayId: [{ value: cuenta ? (cuenta.arrayId ? cuenta.arrayId : fun.generateKey()) : fun.generateKey(), disabled: false }],
-        id: [{ value: cuenta ? cuenta.id : null, disabled: false }],
-        banco_id: [{ value: cuenta ? cuenta.banco_id : null, disabled: false }],
-        tipo_cuenta_bancaria_id: [{ value: cuenta ? cuenta.tipo_cuenta_bancaria_id : null, disabled: false }, Validators.required],
-        divisa_id: [{ value: cuenta ? cuenta.divisa_id : divisa_principal ? divisa_principal.id : null, disabled: cuenta && fun.hasValue(cuenta?.id) }, Validators.compose([Validators.required])],
-        fecha_apertura: [{ value: cuenta ? cuenta.fecha_apertura : null, disabled: false }],
-        numero_cuenta: [{ value: cuenta ? cuenta.numero_cuenta : null, disabled: false }, Validators.compose([Validators.required])],
-        balance_inicial_libro: [{ value: cuenta ? cuenta.balance_inicial_libro : null, disabled: false }],
-        balance_inicial_banco: [{ value: cuenta ? cuenta.balance_inicial_banco : null, disabled: false }],
-        fecha_primera_conciliacion: [{ value: cuenta ? cuenta.fecha_primera_conciliacion : null, disabled: false }],
-        comentario: [{ value: cuenta ? cuenta.comentario : null, disabled: false }],
-        descripcion: [{ value: cuenta ? cuenta.descripcion : null, disabled: false }, Validators.required],
-        cuenta_contable: [{ value: cuenta ? cuenta?.cuenta_contable : null, disabled: true }],
-        nombre_cuenta: [{ value: cuenta ? cuenta?.nombre_cuenta : null, disabled: true }],
-        cuenta_contable_prima: [{ value: cuenta ? cuenta?.cuenta_contable_prima : null, disabled: true }],
-        nombre_cuenta_prima: [{ value: cuenta ? cuenta?.nombre_cuenta_prima : null, disabled: true }],
+        arrayId: [{ value: fun.hasValue(cuenta) ? (cuenta.arrayId ? cuenta.arrayId : fun.generateKey()) : fun.generateKey(), disabled: false }],
+        id: [{ value: fun.hasValue(cuenta) ? cuenta.id : null, disabled: false }],
+        banco_id: [{ value: fun.hasValue(cuenta) ? cuenta.banco_id : null, disabled: false }],
+        tipo_cuenta_bancaria_id: [{ value: fun.hasValue(cuenta) ? cuenta.tipo_cuenta_bancaria_id : null, disabled: false }, Validators.required],
+        divisa_id: [{ value: fun.hasValue(cuenta) ? cuenta.divisa_id : divisa_principal ? divisa_principal.id : null, disabled: cuenta && fun.hasValue(cuenta?.id) }, Validators.compose([Validators.required])],
+        fecha_apertura: [{ value: fun.hasValue(cuenta) ? cuenta.fecha_apertura : null, disabled: false }],
+        numero_cuenta: [{ value: fun.hasValue(cuenta) ? cuenta.numero_cuenta : null, disabled: false }, Validators.compose([Validators.required])],
+        balance_inicial_libro: [{ value: fun.hasValue(cuenta) ? cuenta.balance_inicial_libro : null, disabled: false }],
+        balance_inicial_banco: [{ value: fun.hasValue(cuenta) ? cuenta.balance_inicial_banco : null, disabled: false }],
+        fecha_primera_conciliacion: [{ value: fun.hasValue(cuenta) ? cuenta.fecha_primera_conciliacion : null, disabled: false }],
+        comentario: [{ value: fun.hasValue(cuenta) ? cuenta.comentario : null, disabled: false }],
+        descripcion: [{ value: fun.hasValue(cuenta) ? cuenta.descripcion : null, disabled: false }, Validators.required],
+        has_chequera: [{ value: fun.hasValue(cuenta) ? (fun.hasValue(cuenta.has_chequera) ? cuenta.has_chequera : false) : false, disabled: false }],
+        cuenta_contable: [{ value: fun.hasValue(cuenta) ? cuenta?.cuenta_contable : null, disabled: true }],
+        nombre_cuenta: [{ value: fun.hasValue(cuenta) ? cuenta?.nombre_cuenta : null, disabled: true }],
+        cuenta_contable_prima: [{ value: fun.hasValue(cuenta) ? cuenta?.cuenta_contable_prima : null, disabled: true }],
+        nombre_cuenta_prima: [{ value: fun.hasValue(cuenta) ? cuenta?.nombre_cuenta_prima : null, disabled: true }],
       });
+
       resolve();
     });
   }

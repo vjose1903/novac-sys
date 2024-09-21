@@ -107,6 +107,9 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   }
 
   iniciarCambioMenu(arg, callback) {
+    console.log('\n\n --- iniciarCambioMenu --- libro diario ');
+    console.log('arg:  ', arg)
+    
     if (arg.bool) {
       this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
