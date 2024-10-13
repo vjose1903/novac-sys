@@ -122,7 +122,7 @@ export const config_cxc_ant_preventa = {
         style_body: 'letra10',
         key: 'total_pendiente',
         alignment_body: 'right',
-        formato_numero_tachado: true,
+        formato_numero: true,
       },
     ],
   },

@@ -7,9 +7,11 @@ export const config_cxp_ant = {
     isBreak: false,
     pageOrient: 'landscape',
     only_titulo: false,
-    widths: ['auto', '*', 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
-    mostrar_total: true,
-    mostrar_bruto: false,
+    widths: ['auto', '*', 60, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+    customTotalizacion: [
+      { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
+      { title: 'TOTAL PENDIENTE RD$', key: 'total' },
+    ],
     mensaje_contenido_vacio: 'No existen cuentas por pagar.',
     info: [
       {
@@ -88,7 +90,18 @@ export const config_cxp_ant = {
         alignment_body: 'right',
         formato_numero_tachado: true,
       },
-
+      {
+        text: 'Facturado',
+        margin_titulo: [0, 0, 5, 0],
+        margin_body: [0, 0, 5, 0],
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'total_factura',
+        alignment_body: 'right',
+        formato_numero: true,
+      },
       {
         text: 'Pendiente',
         margin_titulo: [0, 0, 10, 0],
@@ -111,7 +124,7 @@ export const config_cxp_ant = {
     isBreak: false,
     pageOrient: 'landscape',
     only_titulo: false,
-    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+    widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
     mostrar_total: true,
     mostrar_bruto: false,
     mensaje_contenido_vacio: 'No existen cuentas por cobrar.',
@@ -182,7 +195,18 @@ export const config_cxp_ant = {
         alignment_body: 'right',
         formato_numero_tachado: true,
       },
-
+      {
+        text: 'Facturado',
+        margin_titulo: [0, 0, 5, 0],
+        margin_body: [0, 0, 5, 0],
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'total_factura',
+        alignment_body: 'right',
+        formato_numero: true,
+      },
       {
         text: 'Pendiente',
         margin_titulo: [0, 0, 10, 0],

@@ -3,8 +3,10 @@ export const config_cxp = {
   isBreak: false,
   only_titulo: false,
   widths: [24, 60, 73, 53, '*', 'auto'],
-  mostrar_total: true,
-  mostrar_bruto: false,
+  customTotalizacion: [
+    { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
+    { title: 'TOTAL PENDIENTE RD$', key: 'total' },
+  ],
   mensaje_contenido_vacio: 'El suplidor buscado no tiene cuentas por pagar, en el rango de fechas establecido.',
   info: [
     {
