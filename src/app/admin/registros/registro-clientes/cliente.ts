@@ -7,13 +7,32 @@ import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
+import { Validators } from '@angular/forms';
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
   }
 
+  static inputsIncludeSaldadas = [
+    {
+      label: 'Incluir Facturas Saldadas',
+      formControl: 'include_pagadas',
+      defaultValue: false,
+      disabledFunction: () => false,
+      validators: Validators.required,
+    },
+  ];
+
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
+      //
+
+      const reportIncludedInSwitches = ['cuentas_cobrar_ant_saldo', 'cuentas_cobrar_cliente'];
+
+      if (reportIncludedInSwitches.includes(params.tipo)) {
+        params.inputs['dinamyc_switches'] = ClienteC.inputsIncludeSaldadas;
+      }
+
       ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
       let objModal = ReporteC.objReporte;
 
@@ -40,10 +59,11 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modal_id] };
         tipo = requestParameters['tipo'];
-        
+
         if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.cliente_id;
         requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
         requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+        requestParameters['include_pagadas'] = reporteParams.data.include_pagadas ?? false;
 
         pdfParams.tipo = 'cuentas_cobrar';
 

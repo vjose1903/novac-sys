@@ -58,6 +58,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   vendido_en: any;
   listaMateriasPrimas = [];
+  listaMateriasPrimasIndexed = {};
 
   vendidoEn = [
     { backend: 'Unidad', front: 'Unidad' },
@@ -153,6 +154,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
       this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.materia_prima }).then((res) => {
         this.listaMateriasPrimas = fun.deepCloning(res['data']);
+
+        this.listaMateriasPrimasIndexed = this.listaMateriasPrimas.reduce((acu: any, item: any) => {
+          acu[item.id] = item;
+          return acu;
+        }, {});
+
         resolve(true);
       });
     });
@@ -422,13 +429,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   createItem(): UntypedFormGroup {
     const permission = this.hasPermissionUpdateFormula;
     return this.fb.group({
+      key: [{ value: fun.generateKey(), disabled: false }],
       id: [{ value: null, disabled: !permission }],
       articulo_id: [{ value: null, disabled: !permission }],
       cantidad_formula: [{ value: null, disabled: !permission }],
       medida_formula: [{ value: null, disabled: !permission }],
       costo_formula: [{ value: null, disabled: !permission }],
       precio_formula: [{ value: null, disabled: !permission }],
-      _destroy: [{ value: null, disabled: !permission }],
     });
   }
 
@@ -447,7 +454,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   checkCostoFormula(fila) {
     let res = false;
     const fila_formulario = fun.deepCloning(fila.value);
-    const articulo = this.listaMateriasPrimas.find((val) => Number(val.id) === Number(fila_formulario.articulo_id));
+    const articulo = this.listaMateriasPrimasIndexed[fila_formulario.articulo_id];
 
     if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
       const arrayUnidades = ['Unidad', 'Libra', 'Onza'];
@@ -462,7 +469,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
       if (fun.desformatearStNumber(costo) != fun.desformatearStNumber(fila_formulario.costo_formula)) {
         res = true;
-        setTimeout(() => (this.recalcular = true), 10);
+        if (!this.recalcular) this.recalcular = true;
       }
     }
 
@@ -701,8 +708,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   fillFormula(ingredient, indexFormula, recalcular = false) {
     try {
       const articulo_combo_id = ingredient.articulo_combo_id ?? ingredient?.articulo_combo?.id ?? ingredient.articulo_combo;
-      const materiaPrima = this.listaMateriasPrimas.find((val) => val.id === Number(articulo_combo_id));
-      
+      const materiaPrima = this.listaMateriasPrimasIndexed[articulo_combo_id];
+
       const unidades_minimas = { Libra: 'Lbs.', Unidad: 'Und.', Onza: 'Oz.' };
       const arrayUnidades = Object.keys(unidades_minimas);
 
@@ -734,6 +741,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         this.getFormControlInFormArray(indexFormula, 'articulo_id').setValue(articulo_combo_id);
         this.getFormControlInFormArray(indexFormula, 'id').setValue(ingredient.id || null);
         this.getFormControlInFormArray(indexFormula, 'cantidad_formula').setValue(fun.roundNumberToDecimal(ingredient.cantidad, 4));
+
+        const keyControl = this.getFormControlInFormArray(indexFormula, 'key');
+        if (fun.isEmpty(keyControl.value)) keyControl.setValue(fun.generateKey());
       }
     } catch (error) {
       console.error(error);
@@ -901,7 +911,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         costo: fun.desformatearStNumber(element.costo_formula),
         precio: fun.desformatearStNumber(element.precio_formula),
         medida: unidades[element.medida_formula],
-        // _destroy: element._destroy ? element._destroy : null,
       };
       formulas.push(obj);
     });

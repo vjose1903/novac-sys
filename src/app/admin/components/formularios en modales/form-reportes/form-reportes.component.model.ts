@@ -9,5 +9,6 @@ export enum reportField {
   dateField = 'dateField',
   fromField = 'fromField',
   toDateField = 'toDateField',
-  switchesField = 'switchesField',
+  switchGroupField = 'switchGroupField',
+  simpleSwitchField = 'simpleSwitchField',
 }

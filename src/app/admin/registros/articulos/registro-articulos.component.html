@@ -20,21 +20,21 @@
                     <div class="col-6 d-flex align-items-center pl-0">
                       <div class="form-group switchDiv">
                         <input formControlName="is_detallable" class="apple-switch" type="checkbox" />
-                        <span class="ml-2 mb-0">Detallable</span>
+                        <span class="mb-0">Detallable</span>
                       </div>
                     </div>
                     @if (configApp.is_produccion && (!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima')) {
                     <div class="col-6 p-0 d-flex align-items-center">
                       <div class="form-group switchDiv">
                         <input formControlName="is_materia_prima" class="apple-switch" type="checkbox" />
-                        <span class="ml-1 mb-0">Funciona como materia prima</span>
+                        <span class="mb-0">Funciona como materia prima</span>
                       </div>
                     </div>
                     } @if (configApp.calcular_itbis) {
                     <div class="{{ !tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
                       <div class="form-group switchDiv">
                         <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
-                        <span class="ml-2 mb-0">Calcular itbis</span>
+                        <span class="mb-0">Calcular itbis</span>
                       </div>
                     </div>
                     } @if (false) {
@@ -42,7 +42,7 @@
                       <!-- <div *ngIf="tipoArticuloSelected?.descripcion === 'Materia prima' || tipoArticuloSelected?.descripcion === 'Producto terminado'" class="{{ tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"> -->
                       <div class="form-group switchDiv">
                         <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="cambiarCalcularSaco()" />
-                        <span class="ml-2 mb-0">Calcular saco</span>
+                        <span class="mb-0">Calcular saco</span>
                       </div>
                     </div>
                     }
@@ -264,8 +264,8 @@
                     </div>
                   </div>
                   <div class="SCROLLFORMULA">
-                    @for (formula of ARRAY_FORMULA.controls; track index_formula; let index_formula = $index) {
-                    <div [ngClass]="{ 'd-none': formula['controls']['_destroy'].value === '1' }" formArrayName="rowFormula">
+                    @for (formula of ARRAY_FORMULA.controls; track formula['controls'].key.value; let index_formula = $index) {
+                    <div formArrayName="rowFormula">
                       <div [formGroupName]="index_formula">
                         @if (index_formula > 0) {
                         <hr style="margin: 0.5rem 0rem 0.5rem 0rem; border: 0.5px solid #979797" />
@@ -291,7 +291,7 @@
                                 panelStyleClass="ingredienteDrop"
                                 [virtualScroll]="true"
                                 appendTo="body"
-                                [itemSize]="30"
+                                [virtualScrollItemSize]="30"
                                 id="articulo_id-{{ index_formula }}"
                               ></p-dropdown>
                             </div>

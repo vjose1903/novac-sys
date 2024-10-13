@@ -15,7 +15,7 @@
           <ng-template pTemplate>
             <div id="overlayExtra">
               <ul class="overlayExtra" role="menu">
-                @for (option of optionesExtra; track index_option; let index_option = $index) { @if (option.condition()) {
+                @for (option of optionesExtra; track option.key; let index_option = $index) { @if (option.condition()) {
                 <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
                   <div class="d-flex align-items-center">
                     <strong> {{ option.key }} - </strong> &nbsp;
@@ -185,7 +185,7 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                       </div>
                       <ul class="ulMovimientoViaje" role="menu">
-                        @for (camion of camiones; track index_camion; let index_camion = $index) {
+                        @for (camion of camiones; track camion.id; let index_camion = $index) {
                         <li
                           id="ulCamion-{{ index_camion }}"
                           role="menuitem"
@@ -224,7 +224,7 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                       </div>
                       <ul class="ulMovimientoViaje" role="menu">
-                        @for (chofer of choferes; track index_chofer; let index_chofer = $index) {
+                        @for (chofer of choferes; track chofer.id; let index_chofer = $index) {
                         <li id="ulChofer-{{ index_chofer }}" role="menuitem" class="hoverlable" [ngClass]="{ indicador: chofer_row == index_chofer && entidad_en_turno == 'chofer' }">
                           <div class="d-flex justify-content-between align-items-center">
                             <span id="dropdown-item" class="mb-0">
