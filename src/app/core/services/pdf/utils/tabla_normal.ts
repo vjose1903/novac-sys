@@ -79,7 +79,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
         } as TablaPdfMake)
       : { text: Array.isArray(contendio_) ? configuration.mensaje_contenido_vacio : '', margin: [0, 2, 0, 5] },
 
-    getTotalizacion(configuration, data_),
+    Array.isArray(contendio_) && contendio_.length > 0 ? getTotalizacion(configuration, data_) : { text: '' },
   ];
 
   return content;
@@ -108,11 +108,20 @@ function getTotalizacion(configuration, data) {
 
       if (item.bool) totalizacion.stack[0].columns[1][0].table.body.push(molde);
     }
-    // si no se entro nada en el stack lo pongo como un string vacio
-    if (totalizacion.stack[0].columns[1][0].table.body.length == 0) totalizacion = { text: '' };
-  } else {
-    totalizacion = { text: '' };
   }
+
+  if (!fun_.isEmpty(configuration?.customTotalizacion)) {
+    for (const customTotal of configuration.customTotalizacion) {
+      const molde = [
+        { text: customTotal.title, style: 'letra10', bold: true, alignment: 'right' },
+        { text: fun_.roundNumberToDecimal(data[customTotal.key]), style: 'letra10', bold: true, alignment: 'right' },
+      ];
+      totalizacion.stack[0].columns[1][0].table.body.push(molde);
+    }
+  }
+
+  if (totalizacion.stack[0].columns[1][0].table.body.length == 0) totalizacion = { text: '' };
+
   return totalizacion;
 }
 

@@ -93,6 +93,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ngOnChanges(change) {
     if (change.data && change.data.currentValue) {
+      this.data.map((item) => {
+        item.key_table = fun.generateKey();
+        return item;
+      });
       this.updateDataCopy(this.data);
 
       this.TablasComponent = this;

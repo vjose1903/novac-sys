@@ -115,7 +115,7 @@ export class FacturaC extends CrudG<FacturasI> {
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
       if (params.tipo != 'movimientos_vehiculo') {
-        params.inputs['switches'] = {
+        params.inputs['switchGroup'] = {
           title: 'Seleccione los metodos de pago deseados',
           array: [
             { label: 'Efectivo', value: true },
@@ -156,7 +156,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static requestReporte(params: { reporte; pdf }) {
-    if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switches.array, (item) => item.value == false)) {
+    if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switchGroup.array, (item) => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
       const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
@@ -165,7 +165,7 @@ export class FacturaC extends CrudG<FacturasI> {
       if (params.pdf.tipo != 'movimientos_vehiculo') {
         formas_pago = '(';
 
-        params.reporte.data.switches.array.forEach((item) => {
+        params.reporte.data.switchGroup.array.forEach((item) => {
           if (item.value) formas_pago += `'${item.label}',`;
         });
 

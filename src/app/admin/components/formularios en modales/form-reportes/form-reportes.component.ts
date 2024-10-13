@@ -43,6 +43,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   articuloClass = new ArticuloC();
   clienteClass = new ClienteC();
   dinamycSelectionReady: boolean = false;
+  dinamycSwitchReady: boolean = false;
 
   facturasSerieOptions = [
     { label: 'Todas', value: serie.no, disabled: false },
@@ -65,7 +66,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   async necesarioStart() {
     await this.createForm();
-    await this.checkDinamycSelections();
+    await this.checkDinamycFields();
     await this.agregateValidators();
 
     if (this.formarFecha.includes(this.inputs.tipo_reporte)) {
@@ -73,7 +74,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     }
   }
 
-  checkDinamycSelections() {
+  checkDinamycFields() {
     for (let index = 0; index < this.inputs?.dinamyc_selections?.length; index++) {
       const element = this.inputs.dinamyc_selections[index];
       element.id = fun.generateKey();
@@ -83,6 +84,15 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
     }
     setTimeout(() => (this.dinamycSelectionReady = true), 10);
+
+    for (let index = 0; index < this.inputs?.dinamyc_switches?.length; index++) {
+      const element = this.inputs.dinamyc_switches[index];
+      element.id = fun.generateKey();
+      this.form.addControl(element.formControl, this.fb.control(element.defaultValue ?? false));
+
+      if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
+    }
+    setTimeout(() => (this.dinamycSwitchReady = true), 10);
   }
 
   async getArticulos(name) {
@@ -245,34 +255,9 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       [reportField.billTypeField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
       [reportField.articuloField]: ['suplidor_prod'],
       [reportField.dateField]: ['cuadre'],
-      [reportField.fromField]: [
-        'notas',
-        'ventas_rango',
-        'suplidor_prod',
-        'recibos',
-        'cuentas_con_pagos',
-        'ventas_cliente',
-        'cuentas_cobrar_ant_saldo',
-        'movimientos_vehiculo',
-        'cuentas_pagar_ant_saldo',
-        'pago_facturas',
-        'cuentas_cobrar_cliente',
-        'cuentas_pagar_suplidor',
-      ],
-      [reportField.toDateField]: [
-        'notas',
-        'ventas_rango',
-        'suplidor_prod',
-        'recibos',
-        'cuentas_con_pagos',
-        'ventas_cliente',
-        'cuentas_cobrar_ant_saldo',
-        'movimientos_vehiculo',
-        'cuentas_pagar_ant_saldo',
-        'pago_facturas',
-        'cuentas_cobrar_cliente',
-        'cuentas_pagar_suplidor',
-      ],
+      [reportField.fromField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas', 'cuentas_cobrar_cliente'],
+      [reportField.toDateField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas', 'cuentas_cobrar_cliente'],
+      [reportField.simpleSwitchField]: ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo', 'cuentas_cobrar_cliente'],
     };
 
     return reportTypeMap[reportType].includes(this.inputs.tipo_reporte);
