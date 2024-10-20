@@ -46,7 +46,7 @@ export class NotaC extends CrudG<any> {
 
       const pick_nota = ['cliente', 'estado', 'fecha_equivalente', 'fecha_valida', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'usuario', 'facturas_aplicadas', 'tipo_factura_id'];
 
-      let temp_data_parsed = _.pick(fun.duplicarJson(data), pick_nota);
+      let temp_data_parsed = _.pick(fun.deepCloning(data), pick_nota);
 
       const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [{ old_key: 'tipo_factura', new_key: 'tipo_pdf' }]);
 
@@ -104,7 +104,7 @@ export class NotaC extends CrudG<any> {
       width: '60rem',
       height: '30rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };

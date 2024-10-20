@@ -113,7 +113,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   async parseTiposFacturas() {
     try {
-      const temp_tipos_facturas = fun.duplicarJson(Ss.factServ.lista_tipos_facturas);
+      const temp_tipos_facturas = fun.deepCloning(Ss.factServ.lista_tipos_facturas);
 
       for (let index = 0; index < temp_tipos_facturas.length; index++) {
         const tipo_factura_en_turno = temp_tipos_facturas[index];
@@ -128,7 +128,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   filtrarNCF() {
     if (this.filtro === 'todos') {
-      this.listaNCF = fun.duplicarJson(this.listaNCFBack);
+      this.listaNCF = fun.deepCloning(this.listaNCFBack);
     } else {
       this.listaNCF = this.listaNCFBack.filter((pack) => Number(pack.tipo_factura_id) === Number(this.filtro));
     }
@@ -165,7 +165,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       });
 
       this.listaNCF = tempNCF;
-      this.listaNCFBack = fun.duplicarJson(tempNCF);
+      this.listaNCFBack = fun.deepCloning(tempNCF);
 
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
@@ -245,7 +245,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.Desde = item.desde;
     this.Hasta = item.hasta;
 
-    this.ncfSelected = fun.duplicarJson(item);
+    this.ncfSelected = fun.deepCloning(item);
   }
 
   nuevoRegistro() {

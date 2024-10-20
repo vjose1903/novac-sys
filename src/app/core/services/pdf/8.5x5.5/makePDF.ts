@@ -169,7 +169,7 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
 
   entidades.forEach((entidad, index) => {
     if (firmas[tipo_pdf].includes(entidad)) {
-      const tabla_molde = fun.duplicarJson(innerTabla);
+      const tabla_molde = fun.deepCloning(innerTabla);
 
       tabla_molde.table.body.push([{ text: fun.Capitalice(entidad.split('_').join(' ')), alignment: 'center', style: 'letra10', border: [false, true, false, false] }]);
 

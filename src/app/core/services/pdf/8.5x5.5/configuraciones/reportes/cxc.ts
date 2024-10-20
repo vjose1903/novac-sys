@@ -2,9 +2,11 @@ export const config_cxc = {
   margin_general: [0, 0, 0, 0],
   isBreak: false,
   only_titulo: false,
-  widths: [24, 60, 73, 53, '*', 'auto'],
-  mostrar_total: true,
-  mostrar_bruto: false,
+  widths: [24, 60, 73, 53, '*', 'auto', 'auto'],
+  customTotalizacion: [
+    { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
+    { title: 'TOTAL PENDIENTE RD$', key: 'total' },
+  ],
   mensaje_contenido_vacio: 'El cliente buscado no tiene cuentas por cobrar.',
   info: [
     {
@@ -52,6 +54,18 @@ export const config_cxc = {
       style_body: 'letra10',
       key: 'cliente_nombre',
       alignment_body: 'left',
+    },
+    {
+      text: 'Facturado',
+      margin_titulo: [0, 0, 5, 0],
+      margin_body: [0, 0, 5, 0],
+      alignment_titulo: 'right',
+      noWrap: true,
+      style: 'letra10',
+      style_body: 'letra10',
+      key: 'total_factura',
+      alignment_body: 'right',
+      formato_numero: true,
     },
     {
       text: 'Pendiente',

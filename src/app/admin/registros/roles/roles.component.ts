@@ -255,7 +255,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
       width: '30rem',
       html: `<p> Seguro que desea eliminar el rol: <strong>${data.nombre}</strong> </p>`,
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'aceptar'), label: 'NO', disable: false },
           { clase: 'btn btn-verde', function: (instance) => this.eliminarRole(instance, data), label: 'SI', disable: false, },

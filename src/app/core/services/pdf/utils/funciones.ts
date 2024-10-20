@@ -101,6 +101,6 @@ export function desformatearStNumber(sTnum: any) {
 }
 // =========================================================================================================
 export function roundNumberToDecimal(num, tachado = false) {
-  const numberFOrmated = tachado && num < 1 ? '-' : roundNumber(num);
-  return numberFOrmated;
+  const numberFormated = tachado && num < 1 ? '-' : roundNumber(num);
+  return numberFormated;
 }

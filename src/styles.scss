@@ -6,7 +6,6 @@ $bodyfont: 'Poppins';
 @import './splash-styles.scss';
 @import './assets/my_styles/main.scss';
 
-
 .visually-hidden {
   display: none !important;
 }
@@ -195,6 +194,7 @@ body {
 .switchDiv {
   display: flex;
   align-items: center;
+  gap: 0.6rem;
 }
 
 .scroll-container {

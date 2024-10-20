@@ -20,21 +20,21 @@
                     <div class="col-6 d-flex align-items-center pl-0">
                       <div class="form-group switchDiv">
                         <input formControlName="is_detallable" class="apple-switch" type="checkbox" />
-                        <span class="ml-2 mb-0">Detallable</span>
+                        <span class="mb-0">Detallable</span>
                       </div>
                     </div>
                     @if (configApp.is_produccion && (!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima')) {
                     <div class="col-6 p-0 d-flex align-items-center">
                       <div class="form-group switchDiv">
                         <input formControlName="is_materia_prima" class="apple-switch" type="checkbox" />
-                        <span class="ml-1 mb-0">Funciona como materia prima</span>
+                        <span class="mb-0">Funciona como materia prima</span>
                       </div>
                     </div>
                     } @if (configApp.calcular_itbis) {
                     <div class="{{ !tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center">
                       <div class="form-group switchDiv">
                         <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
-                        <span class="ml-2 mb-0">Calcular itbis</span>
+                        <span class="mb-0">Calcular itbis</span>
                       </div>
                     </div>
                     } @if (false) {
@@ -42,7 +42,7 @@
                       <!-- <div *ngIf="tipoArticuloSelected?.descripcion === 'Materia prima' || tipoArticuloSelected?.descripcion === 'Producto terminado'" class="{{ tipoArticuloSelected?.descripcion !== 'Materia prima' ? 'col-4' : 'col-6' }} d-flex align-items-center"> -->
                       <div class="form-group switchDiv">
                         <input formControlName="calcular_saco" class="apple-switch" type="checkbox" (change)="cambiarCalcularSaco()" />
-                        <span class="ml-2 mb-0">Calcular saco</span>
+                        <span class="mb-0">Calcular saco</span>
                       </div>
                     </div>
                     }
@@ -256,46 +256,47 @@
                 <ng-container *ngxPermissionsOnly="permissions.articulo.read_formula">
                   <label class="control-label">Formula (1 {{ medida_config | uppercase }}) : </label>
                   <div class="row mb-2 p-0">
-                    <div class="col-5">Ingredientes</div>
+                    <div class="col-5 p-0">Ingredientes</div>
                     <div class="col-3 pr-0">Cantidad</div>
                     <div class="col-3">Costo</div>
-                    <div class="col-1"></div>
+                    <div class="col-1">
+                      <i (click)="addItem()" pTooltip="Agregar Ingrediente" tooltipPosition="top" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
+                    </div>
                   </div>
                   <div class="SCROLLFORMULA">
-                    @for (formula of ARRAY_FORMULA.controls; track index_formula; let index_formula = $index) {
-                    <div [ngClass]="{ 'd-none': formula['controls']['_destroy'].value === '1' }" formArrayName="rowFormula">
+                    @for (formula of ARRAY_FORMULA.controls; track formula['controls'].key.value; let index_formula = $index) {
+                    <div formArrayName="rowFormula">
                       <div [formGroupName]="index_formula">
                         @if (index_formula > 0) {
                         <hr style="margin: 0.5rem 0rem 0.5rem 0rem; border: 0.5px solid #979797" />
                         }
                         <div class="row mb-2">
+                          <!-- articulo -->
                           <div class="col-5 p-0">
                             <div class="form-group mb-0">
-                              <div>
-                                <p-dropdown
-                                  #dropdown
-                                  [placeholder]="'Seleccione ingrediente'"
-                                  [options]="listaMateriasPrimas"
-                                  formControlName="articulo_id"
-                                  optionLabel="nombre"
-                                  optionValue="id"
-                                  [filter]="true"
-                                  optionDisabled="optionDisabled"
-                                  filterBy="nombre"
-                                  (onHide)="saltar('ingrediente_producir', index_formula)"
-                                  (keydown.enter)="saltar('ingrediente_producir', index_formula)"
-                                  (onChange)="getCosto(index_formula, dropdown)"
-                                  styleClass="form-control min"
-                                  panelStyleClass="ingredienteDrop"
-                                  [virtualScroll]="true"
-                                  appendTo="body"
-                                  [itemSize]="30"
-                                  id="articulo_id-{{ index_formula }}"
-                                ></p-dropdown>
-                              </div>
+                              <p-dropdown
+                                #dropdown
+                                [placeholder]="'Seleccione ingrediente'"
+                                [options]="listaMateriasPrimas"
+                                formControlName="articulo_id"
+                                optionLabel="nombre"
+                                optionValue="id"
+                                [filter]="true"
+                                optionDisabled="optionDisabled"
+                                filterBy="nombre"
+                                (onHide)="saltar('ingrediente_producir', index_formula)"
+                                (keydown.enter)="saltar('ingrediente_producir', index_formula)"
+                                (onChange)="getCosto(index_formula, dropdown)"
+                                styleClass="form-control min"
+                                panelStyleClass="ingredienteDrop"
+                                [virtualScroll]="true"
+                                appendTo="body"
+                                [virtualScrollItemSize]="30"
+                                id="articulo_id-{{ index_formula }}"
+                              ></p-dropdown>
                             </div>
                           </div>
-                          <!--  -->
+                          <!-- cantidad -->
                           <div class="col-2 pr-0">
                             <div class="form-group mb-0">
                               <input
@@ -312,7 +313,7 @@
                               />
                             </div>
                           </div>
-                          <!--  -->
+                          <!-- medida -->
                           <div class="col-1 p-0">
                             <input
                               type="text"
@@ -324,17 +325,16 @@
                               autocomplete="off"
                             />
                           </div>
-                          <!--  -->
+                          <!-- costo -->
                           <div class="col-3 pr-0">
                             <div class="form-group mb-0">
                               <input type="text" id="costo_formula-{{ index_formula }}" tabindex="-1" formControlName="costo_formula" [ngClass]="{ badAlert: checkCostoFormula(formula) }" class="form-control disabled" autocomplete="off" />
                             </div>
                           </div>
+
                           <div *ngxPermissionsOnly="permissions.articulo.update_formula" class="col-1 p-0">
                             <div class="btns-formula">
-                              @if (index_formula == 0) {
-                              <i (click)="addItem()" pTooltip="Agregar Ingrediente" tooltipPosition="top" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
-                              } @if ((index_formula == 0 && ARRAY_FORMULA.controls.length > 1) || index_formula > 0) {
+                              @if ( ARRAY_FORMULA.controls.length > 1) {
                               <i (click)="removeItem(index_formula)" pTooltip="Quitar Ingrediente" tooltipPosition="top" class="fas btnArray fa-minus-square text-danger btnQuitar"></i>
                               }
                             </div>

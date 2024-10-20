@@ -6,29 +6,36 @@ import { ConfigureModalI, ModalClass } from '../../components/modal/modal-class'
 import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
+import { DateUtils } from '../../../core/typescript/date.utils';
+import { Validators } from '@angular/forms';
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
   }
 
+  static inputsIncludeSaldadas = [
+    {
+      label: 'Incluir Facturas Saldadas',
+      formControl: 'include_pagadas',
+      defaultValue: false,
+      disabledFunction: () => false,
+      validators: Validators.required,
+    },
+  ];
+
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
-      let objModal;
-      switch (params.tipo) {
-        case 'cuentas_cobrar_cliente':
-          objModal = ClienteC.reporteCxC(params);
-          break;
-        case 'cuentas_cobrar_ant_saldo':
-        case 'cuentas_con_pagos':
-        case 'ventas_cliente':
-          ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
-          objModal = ReporteC.objReporte;
+      //
 
-          break;
+      const reportIncludedInSwitches = ['cuentas_cobrar_ant_saldo', 'cuentas_cobrar_cliente'];
 
-        default:
-          break;
+      if (reportIncludedInSwitches.includes(params.tipo)) {
+        params.inputs['dinamyc_switches'] = ClienteC.inputsIncludeSaldadas;
       }
+
+      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
+      let objModal = ReporteC.objReporte;
+
       objModal['returnDataFromModal'] = returnDataFromModal;
 
       params.openNewModal(objModal);
@@ -43,7 +50,7 @@ export class ClienteC extends CrudG<any> {
   static async requestReporte(reporteParams, pdfParams) {
     let hasPermisoPreVenta = await Ss.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
 
-    let objTipo = { cuentas_cobrar_cliente: 1, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
+    let objTipo = { cuentas_cobrar_cliente: CxC.por_cliente, cuentas_cobrar_ant_saldo: reporteParams.data.tipo };
     let tipo;
     let requestParameters;
 
@@ -52,13 +59,19 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: objTipo[reporteParams.modal_id] };
         tipo = requestParameters['tipo'];
-        if (tipo == 1) requestParameters['cliente_id'] = reporteParams.data.id;
+
+        if (tipo == CxC.por_cliente) requestParameters['cliente_id'] = reporteParams.data.cliente_id;
+        requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
+        requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+        requestParameters['include_pagadas'] = reporteParams.data.include_pagadas ?? false;
+
         pdfParams.tipo = 'cuentas_cobrar';
+
         break;
 
       case 'cuentas_con_pagos':
       case 'ventas_cliente':
-        requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), cliente_id: reporteParams.data.cliente_id };
+        requestParameters = { desde: DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' }), hasta: DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' }), cliente_id: reporteParams.data.cliente_id };
 
         if (pdfParams.tipo == 'ventas_cliente') {
           requestParameters['tipo_factura_id'] = reporteParams.data.tipo_factura_id;
@@ -106,8 +119,14 @@ export class ClienteC extends CrudG<any> {
       component: BuscarClienteSuplidorComponent,
       width: '900px',
       height: '500px',
-      botones: { ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons), cancelar: { show: true, disable: false } },
+      botones: { ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons), cancelar: { show: true, disable: false } },
     };
     return objModal;
   }
+}
+
+export enum CxC {
+  por_cliente = 1,
+  detallado = 2,
+  agrupado = 3,
 }

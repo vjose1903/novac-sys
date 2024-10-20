@@ -93,8 +93,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
   route = inject(ActivatedRoute);
-  htmlServ = inject(HtmlElementsService)
-
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
     super();
@@ -162,14 +161,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
-      console.log('NotaC.base_comprobante ', NotaC.base_comprobante);
-      console.log('this.buscarPara ', this.buscarPara);
-      console.log('this.serieSelected ', this.serieSelected);
-
       const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.serieSelected][this.buscarPara]);
-      console.log('Ss.factServ.lista_tipos_facturas:  ', Ss.factServ.lista_tipos_facturas);
-      console.log('NotaC.base_comprobante[this.serieSelected]:  ', NotaC.base_comprobante[this.serieSelected]);
-      console.log('tipoFact:  ', tipoFact);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
@@ -239,7 +231,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async openSide() {
     this.pedirNotas(this.tServ.obj_paginate.default);
-    this.showSide = true;
   }
 
   async pedirNotas(params?: { per_page: number; page: number; search: string }) {
@@ -249,26 +240,33 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: this.buscarPara.includes('credito') ? NotaC.tipo_nota.credito : NotaC.tipo_nota.debito } };
 
-      const res = await this.notasClass.getAll(extra);
+      try {
+        const res = await this.notasClass.getAll(extra);
 
-      res['data'].forEach((nota) => {
-        nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
-        nota.total = Math.abs(nota.total);
-        nota.selectedColor = 'gris-claro';
-        nota.viewColor = 'gris-claro';
-        nota.view = 'far fa-eye-slash';
+        res['data'].forEach((nota) => {
+          nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
+          nota.total = Math.abs(nota.total);
+          nota.selectedColor = 'gris-claro';
+          nota.viewColor = 'gris-claro';
+          nota.view = 'far fa-eye-slash';
 
-        nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+          nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
-        nota.customStyles = {
-          actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
-          numero_comprobante: { width: '7rem' },
-        };
+          nota.customStyles = {
+            actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
+            numero_comprobante: { width: '7rem' },
+          };
 
-        this.notas.push(nota);
-      });
+          this.notas.push(nota);
+        });
+        this.showSide = true;
 
-      setTimeout(() => this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]), 10);
+        setTimeout(() => this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]), 10);
+      } catch (err) {
+        const error = err.error;
+
+        if (fun.isEmpty(error?.data) || error?.data?.length == 0) this.showSide = false;
+      }
       resolve(true);
     });
   }
@@ -296,7 +294,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     try {
       this.facturas.length = 0;
 
-      const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected };
+      const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected, movimientos_viaje: true };
       const res = await this.facturaClass.getFacturasByParams(args);
 
       res['data'].forEach((fact) => {
@@ -417,7 +415,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   selectTableConfig() {
     return new Promise<void>((resolve) => {
-      this.table_config = fun.duplicarJson(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
+      this.table_config = fun.deepCloning(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
       this.table_config['padre_functions'] = { data_request: (params) => this.pedirFactura(params) };
 
       this.verificateTableActions();
@@ -453,7 +451,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
 
-    if (valor == this.campos.ultimas50) this.pedirFactura(fun.duplicarJson(this.tServ.obj_paginate.default));
+    if (valor == this.campos.ultimas50) this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
 
     if (tipo == 'tipo_documento') {
       this.buscar_por = null;
@@ -645,7 +643,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       header: this.tipo_documento_selected == 'compra' ? 'Buscar Suplidor' : 'Buscar Cliente',
       width: '900px',
       height: '500px',
-      botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+      botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
     });
   }
 
@@ -717,7 +715,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
           botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: botonesDinamicos,
           },
         };

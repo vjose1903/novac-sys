@@ -37,10 +37,10 @@ export class ReciboC extends CrudG<ReciboI> {
       inputs: { data: data },
       id: `detalle_recibos`,
       header: 'Detalles Recibos',
-      width: '30rem',
+      width: '37rem',
       height: '10rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };

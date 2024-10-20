@@ -64,7 +64,7 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
     if (this.form.valid || this.inputs.data_detalle.is_defectuoso || !this.inputs.is_prefactura_selected) {
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
       modal.closeModal(this.modal.component_id);
-      const obj = { key: this.inputs.key, modal_id: this.modal.component_id };
+      const obj = { key: this.inputs.key, modal_id: this.modal.component_id, data: this.inputs.data_detalle };
 
       if (this.inputs.is_prefactura_selected) obj['data'] = this.form.getRawValue();
 

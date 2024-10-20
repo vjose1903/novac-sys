@@ -79,7 +79,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
         } as TablaPdfMake)
       : { text: Array.isArray(contendio_) ? configuration.mensaje_contenido_vacio : '', margin: [0, 2, 0, 5] },
 
-    getTotalizacion(configuration, data_),
+    Array.isArray(contendio_) && contendio_.length > 0 ? getTotalizacion(configuration, data_) : { text: '' },
   ];
 
   return content;
@@ -108,11 +108,20 @@ function getTotalizacion(configuration, data) {
 
       if (item.bool) totalizacion.stack[0].columns[1][0].table.body.push(molde);
     }
-    // si no se entro nada en el stack lo pongo como un string vacio
-    if (totalizacion.stack[0].columns[1][0].table.body.length == 0) totalizacion = { text: '' };
-  } else {
-    totalizacion = { text: '' };
   }
+
+  if (!fun_.isEmpty(configuration?.customTotalizacion)) {
+    for (const customTotal of configuration.customTotalizacion) {
+      const molde = [
+        { text: customTotal.title, style: 'letra10', bold: true, alignment: 'right' },
+        { text: fun_.roundNumberToDecimal(data[customTotal.key]), style: 'letra10', bold: true, alignment: 'right' },
+      ];
+      totalizacion.stack[0].columns[1][0].table.body.push(molde);
+    }
+  }
+
+  if (totalizacion.stack[0].columns[1][0].table.body.length == 0) totalizacion = { text: '' };
+
   return totalizacion;
 }
 
@@ -126,18 +135,20 @@ function formarCuerpo(data, configuration, detalle, j) {
   configuration.info.forEach((info, i) => {
     let obj = {};
     let text_ = '';
+    const value = detalle[info.key];
 
     if (info.key === 'index') {
       text_ = j + 1;
     } else {
       if (info.formato_fecha) {
-        text_ = fun_.my_dateFormater(detalle[info.key]);
+        text_ = fun_.my_dateFormater(value);
       } else if (info.formato_numero_tachado) {
-        text_ = fun_.roundNumberToDecimal(detalle[info.key], true);
+        if (isNaN(Number(value))) text_ = value;
+        else text_ = fun_.roundNumberToDecimal(value, true);
       } else if (info.formato_numero) {
-        text_ = fun_.roundNumberToDecimal(detalle[info.key]);
+        text_ = fun_.roundNumberToDecimal(value);
       } else {
-        text_ = detalle[info.key];
+        text_ = value;
       }
     }
 

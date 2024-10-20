@@ -20,22 +20,6 @@ export class fun {
 
   getWindowSize = windowSize.asObservable();
 
-  static getFacturasguardadas() {
-    return JSON.parse(localStorage.getItem('facturas_guardadas')) || [];
-  }
-
-  static setFacturasGuardadas(facturas) {
-    localStorage.removeItem('facturas_guardadas');
-    localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
-
-    const btn_side = document.getElementById('btn_side_facturas');
-
-    if (btn_side) {
-      if (facturas.length.length > 0) btn_side.setAttribute('data-cant-facturas', facturas.length);
-      else btn_side.removeAttribute('data-cant-facturas');
-    }
-  }
-
   // __________________________________________________________________________________________________
   // Nombre: reloadElectron
   // Descripcion : Esta funcion recarga el electron
@@ -85,11 +69,11 @@ export class fun {
     return fecha;
   }
   // __________________________________________________________________________________________________
-  // Nombre: duplicarJson
+  // Nombre: deepCloning
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
 
-  static duplicarJson(obj: Object | Array<any>) {
+  static deepCloning(obj: Object | Array<any>) {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
@@ -102,7 +86,7 @@ export class fun {
     Object.getOwnPropertyNames(obj).forEach(function (key) {
       let descriptor = Object.getOwnPropertyDescriptor(obj, key);
       if (descriptor.value && typeof descriptor.value === 'object') {
-        descriptor.value = fun.duplicarJson(descriptor.value);
+        descriptor.value = fun.deepCloning(descriptor.value);
       }
       Object.defineProperty(copy, key, descriptor);
     });
@@ -129,7 +113,7 @@ export class fun {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (fun.isEmpty(searchText)) resolve(copyData);
 
-        const data_filtered = fun.duplicarJson(copyData).filter((obj) => {
+        const data_filtered = fun.deepCloning(copyData).filter((obj) => {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
@@ -530,6 +514,7 @@ export class fun {
   // __________________________________________________________________________________________________
   static clickInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
+
     if (element) element.click();
   }
 
@@ -537,9 +522,8 @@ export class fun {
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
   // __________________________________________________________________________________________________
-  static enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-
+  static enfocarInput(arg, element?) {
+    element ??= document.getElementById(arg) as HTMLElement;
     if (element) element.focus();
   }
 
@@ -555,6 +539,15 @@ export class fun {
       const input = document.getElementById(inputId);
       if (input) input.blur();
     }
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: clickInputFantasma
+  // Descripcion : Esta funcion clickea el input fantasma
+  // __________________________________________________________________________________________________
+  static clickInputFantasma() {
+    const element = document.getElementById('input_fantasma');
+
+    if (element) element.click();
   }
 
   // __________________________________________________________________________________________________
@@ -603,6 +596,33 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: compare
+  // Descripcion : Esta funcion se utiliza para ordenar un arreglo
+  // __________________________________________________________________________________________________
+  static compare(a: any, b: any, keys: Array<string> | string, order: 'asc' | 'desc' = 'asc') {
+    if (typeof keys == 'string') keys = [keys];
+
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
+
+      if (typeof a === 'object' && typeof b === 'object') {
+        const valueA = a[key];
+        const valueB = b[key];
+
+        if (valueA < valueB) return order === 'asc' ? -1 : 1;
+        if (valueA > valueB) return order === 'asc' ? 1 : -1;
+      } else {
+        if (a === b) continue;
+        if (typeof a === 'number' && typeof b === 'number') return order === 'asc' ? a - b : b - a;
+        if (typeof a === 'string' && typeof b === 'string') return order === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+        if (a instanceof Date && b instanceof Date) return order === 'asc' ? a.getTime() - b.getTime() : b.getTime() - a.getTime();
+      }
+    }
+
+    return 0;
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: createNestedObject
   // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
   // __________________________________________________________________________________________________
@@ -622,7 +642,6 @@ export class fun {
   static async logout() {
     return new Promise((resolve) => {
       try {
-        localStorage.removeItem('facturas_guardadas');
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
         localStorage.removeItem('content-type');
@@ -743,7 +762,7 @@ export class fun {
   // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
   // _________________________________________________________________________________________________
   static pushAt(arr, index, newItem) {
-    const copyArr = fun.duplicarJson(arr);
+    const copyArr = fun.deepCloning(arr);
     arr.length = 0;
     const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
     newArr.forEach((item) => arr.push(item));

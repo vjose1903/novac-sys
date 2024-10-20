@@ -2,7 +2,7 @@ import { EmpleadoC } from './../registros/registro-empleados/empleado';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
-import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 const moment = require('../../core/javascript/moment');
@@ -50,19 +50,23 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
+    const isNumpad = event.code.toLowerCase().includes('numpad');
+
     event.stopPropagation();
-    const key = event.keyCode;
+    let key = event.keyCode;
+    if (isNumpad && event.keyCode != teclasCode._enter) key -= 48;
+
     const secuenciasAceptadas = [teclasCode._control, teclasCode._P, teclasCode._G, teclasCode._E];
 
     if (event.type == 'keydown') {
       if (!this.secuenciaKeys.includes(key) && secuenciasAceptadas.includes(key)) this.secuenciaKeys.push(key);
     } else if (event.type == 'keyup') {
-      const combinacion = _.join(this.secuenciaKeys, '_');
+      const combinacion = this.secuenciaKeys.join('_');
       this.secuenciaKeys = [];
 
       if (this.factServ.isVenta && combinacion == `${teclasCode._control}_${teclasCode._E}`) {
         if (fun.hasValue(document.activeElement.id)) fun.desEnfocarInput(document.activeElement.id);
-        document.getElementById('btnExtra').click();
+        fun.clickInput('btnExtra');
       }
 
       if (combinacion == `${teclasCode._control}_${teclasCode._P}`) {
@@ -78,11 +82,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (fun.hasValue(this.overlay?.item)) {
         if (this.overlay?.tipo == 'extra') {
           if (this.optionesExtra.length > 0) {
-            const option = _.find(this.optionesExtra, { keyboardCode: key });
-
             fun.desEnfocarInput(document.activeElement.id);
 
-            if (fun.hasValue(option)) this.selectOptionExtra(_.find(this.optionesExtra, { keyboardCode: key }), 'teclado');
+            const option = this.optionesExtra.find((opt) => opt.keyboardCode == key);
+
+            if (fun.hasValue(option)) this.selectOptionExtra(option, 'teclado');
           }
         }
 
@@ -349,7 +353,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (this.checkIfFacturacionEnProceso()) {
         this.objArchivo.factura_en_turno = this.formarFacturaAGuardar();
-        let comparar_con_localStorage = _.find(fun.getFacturasguardadas(), (item) => item.archivo_id == this.factura_guardada?.archivo_id);
+        let comparar_con_localStorage = FactsLocalStorage.getList().find((item) => item.archivo_id == this.factura_guardada?.archivo_id);
 
         const factura_en_turno_storage = comparar_con_localStorage ? _.omit(comparar_con_localStorage, ['archivo_id', 'cliente', 'suplidor']) : undefined;
         this.objArchivo['factura_en_turno_storage'] = factura_en_turno_storage;
@@ -362,10 +366,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // NOTE: TEMPORAL
 
   verificateSerieValidity() {
-    if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) {
-      const option = this.facturasSerieOptions.find((option) => option.value == serie.electronica);
-      option.disabled = true;
-    }
+    let disable = false;
+    if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) disable = true;
+
+    const option = this.facturasSerieOptions.find((option) => option.value == serie.electronica);
+    if (option) option.disabled = disable;
   }
 
   rellenarVariables() {
@@ -467,7 +472,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   rellenarCabezaFactura(factura: FacturasI) {
     return new Promise(async (resolve) => {
-      const original_factura = fun.duplicarJson(factura);
+      const original_factura = fun.deepCloning(factura);
       let productos_devueltos = fun.hasValue(original_factura?.productos_devueltos) ? original_factura?.productos_devueltos : [];
 
       this.factServ.propietario_factura = {};
@@ -476,7 +481,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (factura.id_documento) this.id_documento ??= factura.id_documento;
 
       if (!fun.objHas(factura, 'archivo_id') && [actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta, actionFacturacion.duplicate].includes(original_factura.action)) {
-        const factura_archivada = fun.getFacturasguardadas().find((factura) => factura.id_documento == factura?.id);
+        const factura_archivada = FactsLocalStorage.getList().find((factura) => factura.id_documento == factura?.id);
 
         if (fun.hasValue(factura_archivada)) {
           factura = factura_archivada;
@@ -496,7 +501,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       if (![actionFacturacion.duplicate].includes(original_factura.action)) this.setPropietario(factura);
 
-      const currentSerie = factura.numero_comprobante.includes('E') ? serie.electronica : serie.normal;
+      const currentSerie = fun.hasValue(factura?.numero_comprobante) && factura.numero_comprobante.includes('E') ? serie.electronica : serie.normal;
 
       this.factServ.setTipos(this.factServ.tipoDocumento, currentSerie).then((result) => {
         this.factServ
@@ -504,7 +509,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           .then(async (result) => {
             this.factura_pendiente = fun.hasValue(factura) && fun.objHas(factura, 'factura_pendiente') ? factura?.factura_pendiente : false;
 
-            const fecha_facturacion = factura?.fecha_equivalente ? factura?.fecha_equivalente : fun.duplicarJson(this.fechaFactura['back']);
+            const fecha_facturacion = factura?.fecha_equivalente ? factura?.fecha_equivalente : fun.deepCloning(this.fechaFactura['back']);
 
             this.fechaFactura['front'] = this.formarFechaFactura(fecha_facturacion)['FechaFactura'];
             this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -705,7 +710,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   actualizarLayServFactGuardada(factura) {
-    this.factura_guardada = fun.duplicarJson(factura);
+    this.factura_guardada = fun.deepCloning(factura);
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -1015,7 +1020,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   seleccionarCamion(camion?, index_camion?) {
     if (this.camiones.length) {
-      camion ??= fun.duplicarJson(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
+      camion ??= fun.deepCloning(fun.hasValue(camion) ? camion : this.camiones[this.camion_row]);
 
       if (this.checkCamionIsSelected(camion)) {
         _.pull(this.movimientosSelected, _.find(this.movimientosSelected, { vehiculo_id: camion.id }));
@@ -1033,9 +1038,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   seleccionarChofer(chofer?, index_chofer?) {
-    chofer ??= fun.duplicarJson(fun.hasValue(chofer) ? chofer : this.choferes[this.chofer_row]);
+    chofer ??= fun.deepCloning(fun.hasValue(chofer) ? chofer : this.choferes[this.chofer_row]);
 
-    const camion_en_turno = fun.duplicarJson(this.camiones[this.camion_row]);
+    const camion_en_turno = fun.deepCloning(this.camiones[this.camion_row]);
     const movimiento_en_turno = this.movimientosSelected.find((movimiento) => movimiento.vehiculo_id == camion_en_turno.id);
     movimiento_en_turno.user_id = this.checkChoferIsSelected(chofer) ? null : chofer.id;
 
@@ -1049,12 +1054,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   checkCamionIsSelected(camion?) {
-    camion ??= fun.duplicarJson(this.camiones[this.camion_row]);
+    camion ??= fun.deepCloning(this.camiones[this.camion_row]);
     return this.movimientosSelected.some((movimiento) => movimiento.vehiculo_id == camion.id);
   }
 
   checkChoferIsSelected(chofer) {
-    const camion_en_turno = fun.duplicarJson(this.camiones[this.camion_row]);
+    const camion_en_turno = fun.deepCloning(this.camiones[this.camion_row]);
     const movimiento_en_turno = this.movimientosSelected.find((movimiento) => movimiento.vehiculo_id == camion_en_turno.id);
 
     return fun.hasValue(movimiento_en_turno) ? movimiento_en_turno.user_id == chofer.id : false;
@@ -1166,7 +1171,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         camion.selected = false;
         return camion;
       });
-      this.copyCamiones = fun.duplicarJson(this.camiones);
+      this.copyCamiones = fun.deepCloning(this.camiones);
     });
   }
 
@@ -1178,7 +1183,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         return chofer;
       });
     });
-    this.copyChoferes = fun.duplicarJson(this.choferes);
+    this.copyChoferes = fun.deepCloning(this.choferes);
   }
 
   filterCamion(camionesFiltrados) {
@@ -1203,24 +1208,22 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
 
   abrirModalPropietario(params?: { include_contado: boolean }) {
-    if (fun.isEmpty(params)) {
-      params = { include_contado: false };
-    }
+    if (fun.isEmpty(params)) params = { include_contado: false };
     let documento = this.getDocumentoDescripcion();
+
     if (this.is_editando && (this.factServ.isVenta || this.factServ.isCompra)) {
       const entidad = this.factServ.isVenta ? 'Cliente' : 'Suplidor';
       fun.toastWarning(`Al editar una ${documento.descripcion}, no se le puede cambiar el ${entidad}.`, 'AVISO');
     } else {
-      const input_activo = document?.activeElement?.id;
+      fun.desEnfocarInput(document?.activeElement?.id);
 
-      let botones = fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons);
+      let botones = fun.deepCloning(ModalClass.noShowAceptarCancelarButtons);
 
       if (this.factServ.isCotizacion || this.factServ.isPreVenta) {
         const label = `Salir de ${this.factServ.isCotizacion ? 'Cotización' : 'Pre venta'}`;
         botones['dinamico'] = [{ clase: 'btn btn-gris', function: (instance) => this.router.navigateByUrl('/admin/dashboard') && this.closeModal(instance), label: label, disable: false }];
       }
 
-      if (fun.hasValue(input_activo)) fun.desEnfocarInput(input_activo);
       const include_contado = this.factServ.tipoDocumento === tipoDocFacturacion.cotizacion || params.include_contado;
 
       this.openNewModal({
@@ -1295,7 +1298,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 header: 'Confirmación',
                 width: '30rem',
                 botones: {
-                  ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+                  ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                   dinamico: [
                     { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
                     { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
@@ -1306,7 +1309,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               let articulos_a_cambiar = false;
 
               if (this.factServ.isCompra) {
-                const cuerpo_fact = fun.duplicarJson(this.cuerpoFactura);
+                const cuerpo_fact = fun.deepCloning(this.cuerpoFactura);
                 this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
               }
 
@@ -1331,7 +1334,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 header: 'Cantidad de efectivo',
                 width: '34.375rem',
                 botones: {
-                  ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+                  ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                   dinamico: [
                     { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
                     { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
@@ -1353,7 +1356,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const factura_a_guardar = this.formarData();
     factura_a_guardar['action'] = this.factServ.action != actionFacturacion.duplicate ? this.factServ.action : actionFacturacion.new;
     factura_a_guardar['factura_pendiente'] = this.factura_pendiente;
-    factura_a_guardar['productos_devueltos'] = fun.duplicarJson(this.factServ.productos_devueltos);
+    factura_a_guardar['productos_devueltos'] = fun.deepCloning(this.factServ.productos_devueltos);
 
     return factura_a_guardar;
   }
@@ -1361,11 +1364,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   agregarFacturaALocalStorage() {
     if (!this.factServ.propietario_factura) this.factServ.propietario_factura = this.form.value;
 
-    let facturas_localStorage = fun.getFacturasguardadas();
+    let facturas_localStorage = FactsLocalStorage.getList();
 
-    const factura_a_guardar = fun.duplicarJson(this.objArchivo.factura_en_turno);
+    const factura_a_guardar = fun.deepCloning(this.objArchivo.factura_en_turno);
 
-    let index_fact_archivada = _.findIndex(facturas_localStorage, (facts: any) => facts?.archivo_id == this.factura_guardada?.archivo_id);
+    let index_fact_archivada = facturas_localStorage.findIndex((facts: any) => facts?.archivo_id == this.factura_guardada?.archivo_id);
 
     if (!fun.isEmpty(this.factServ.propietario_factura.id)) {
       factura_a_guardar[this.factServ.isVenta || this.factServ.isPreVenta ? 'cliente' : 'suplidor'] = this.factServ.propietario_factura;
@@ -1375,15 +1378,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       factura_a_guardar['archivo_id'] = this.factura_guardada?.archivo_id;
       facturas_localStorage[index_fact_archivada] = factura_a_guardar;
     } else {
-      facturas_localStorage = _.orderBy(facturas_localStorage, ['archivo_id'], ['asc']);
+      facturas_localStorage = facturas_localStorage.sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
       factura_a_guardar['archivo_id'] = facturas_localStorage.length > 0 ? _.last(facturas_localStorage).archivo_id + 1 : 1;
 
       facturas_localStorage.push(factura_a_guardar);
     }
 
-    facturas_localStorage = _.orderBy(facturas_localStorage, ['archivo_id'], ['asc']);
+    facturas_localStorage = facturas_localStorage.sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
 
-    fun.setFacturasGuardadas(facturas_localStorage);
+    FactsLocalStorage.setList(facturas_localStorage);
   }
 
   procesoArchivarFactura(modalInstance, reset = false) {
@@ -1401,7 +1404,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.verificateArchivo().then(() => {
         let is_guardada = false;
 
-        if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = _.find(fun.getFacturasguardadas(), (fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
+        if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = _.find(FactsLocalStorage.getList(), (fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
 
         const texto_modal = is_guardada ? `Esta ${documento.descripcion} ya esta archivada ¿desea sobreescribirla?` : `¿Seguro que desea archivar esta ${documento.descripcion} para continuarla luego?`;
 
@@ -1633,13 +1636,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   revisarLocalStorage() {
-    const is_guardada = _.find(fun.getFacturasguardadas(), (fact: any) => fact.archivo_id === this.factura_guardada?.archivo_id);
+    const is_guardada = FactsLocalStorage.getList().find((fact: any) => fact.archivo_id === this.factura_guardada?.archivo_id);
 
     if (fun.hasValue(is_guardada)) this.quitarFacturaGuardada(this.factura_guardada?.archivo_id);
   }
 
   formarData() {
-    let cuerpo_fact = [...fun.duplicarJson(this.cuerpoFactura), ...this.factServ.productos_devueltos];
+    let cuerpo_fact = [...fun.deepCloning(this.cuerpoFactura), ...this.factServ.productos_devueltos];
 
     const cabecera_fact = {};
     cabecera_fact['id_documento'] = this.id_documento;

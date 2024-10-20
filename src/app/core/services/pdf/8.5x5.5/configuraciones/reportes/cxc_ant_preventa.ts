@@ -7,9 +7,11 @@ export const config_cxc_ant_preventa = {
     isBreak: false,
     pageOrient: 'landscape',
     only_titulo: false,
-    widths: [18, '*', 'auto', 60, 'auto', 'auto', 'auto', 'auto', 'auto'],
-    mostrar_total: true,
-    mostrar_bruto: false,
+    widths: [18, '*', 'auto', 60, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+    customTotalizacion: [
+      { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
+      { title: 'TOTAL PENDIENTE RD$', key: 'total' },
+    ],
     mensaje_contenido_vacio: 'No existen cuentas por cobrar.',
     info: [
       {
@@ -98,6 +100,18 @@ export const config_cxc_ant_preventa = {
         formato_numero_tachado: true,
       },
 
+      {
+        text: 'Facturado',
+        margin_titulo: [0, 0, 5, 0],
+        margin_body: [0, 0, 5, 0],
+        alignment_titulo: 'right',
+        noWrap: true,
+        style: 'letra10',
+        style_body: 'letra10',
+        key: 'total_factura',
+        alignment_body: 'right',
+        formato_numero: true,
+      },
       {
         text: 'Pendiente',
         margin_titulo: [0, 0, 10, 0],

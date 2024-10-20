@@ -1,25 +1,41 @@
 <form [formGroup]="form">
   <div class="row">
     <!-- ----- DINAMYC SELECTION -----  -->
-    @if (dinamycSelectionReady && inputs.tipo_reporte == 'movimientos_vehiculo') { @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
-    <div class="col-12 p-0">
-      <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
-      <p-dropdown
-        [options]="dinamyc_selection.items"
-        [formControlName]="dinamyc_selection.formControl"
-        [placeholder]="dinamyc_selection.placeholder"
-        [filter]="true"
-        [optionLabel]="dinamyc_selection.optionLabel ?? null"
-        [optionValue]="dinamyc_selection.optionValue ?? null"
-        (onFilter)="dinamyc_selection.searchFunction($event.filter)"
-        [disabled]="dinamyc_selection.disabledFunction()"
-        [emptyFilterMessage]="dinamyc_selection.notFoundText"
-        [resetFilterOnHide]="true"
-      />
-    </div>
-    } }
+    @if (dinamycSelectionReady && reportTypeHasfield(reportField.dynamicSelection)) { 
+      @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
+        <div class="col-12 p-0">
+          <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
+          <p-dropdown
+            [options]="dinamyc_selection.items"
+            [formControlName]="dinamyc_selection.formControl"
+            [placeholder]="dinamyc_selection.placeholder"
+            appendTo="body"
+            [filter]="true"
+            [optionLabel]="dinamyc_selection.optionLabel ?? null"
+            [optionValue]="dinamyc_selection.optionValue ?? null"
+            (onFilter)="dinamyc_selection.searchFunction($event.filter)"
+            [disabled]="dinamyc_selection.disabledFunction()"
+            [emptyFilterMessage]="dinamyc_selection.notFoundText"
+            [resetFilterOnHide]="true"
+          />
+        </div>
+      } 
+    }
+
+    <!-- ----- SIMPLE_SWITCH -----  -->
+    @if (dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) { 
+      @for (dinamyc_switch of inputs.dinamyc_switches; track dinamyc_switch.id) {
+        <div class="col-12 p-0">
+          <div class="form-group mb-2 switchDiv">
+            <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
+            <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
+          </div>
+        </div>
+      } 
+    }
+
     <!-- ----- SELECCION DE CLIENTE -----  -->
-    @if (inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'cuentas_con_pagos') {
+    @if ( reportTypeHasfield(reportField.customerField) ) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Seleccione cliente: <span style="color: red">*</span> </label>
 
@@ -28,6 +44,7 @@
         formControlName="cliente_id"
         placeholder="Ingrese el nombre del cliente"
         [filter]="true"
+        appendTo="body"
         optionLabel="nombre_completo"
         optionValue="id"
         (onFilter)="getClientes($event.filter)"
@@ -38,14 +55,14 @@
         <ng-template let-cliente pTemplate="item">
           <div class="">
             <span class="d-flex gap-2 w-100" style="font-size: 1rem"> <strong>Nombre: </strong> {{ cliente.nombre_completo }} </span>
-            <span class="d-flex gap-2 w-100" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad: </strong> {{ cliente.documento_identidad }} </span>
+            <span class="d-flex gap-2 w-100 no-wrap" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad: </strong> {{ cliente.documento_identidad }} </span>
           </div>
         </ng-template>
       </p-dropdown>
     </div>
     }
     <!-- ----- SERIE -----  -->
-    @if (inputs.tipo_reporte == 'ventas_diarias' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_cliente') {
+    @if ( reportTypeHasfield(reportField.serieField) ) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Serie: <span style="color: red">*</span> </label>
       <p-selectButton [options]="facturasSerieOptions" formControlName="serie" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
@@ -53,7 +70,7 @@
     }
 
     <!-- ----- CONDICION -----  -->
-    @if (inputs.tipo_reporte == 'ventas_cliente' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_diarias') {
+    @if (reportTypeHasfield(reportField.conditionField)) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Condicion: <span style="color: red">*</span> </label>
       <select formControlName="condicion" class="form-control">
@@ -66,7 +83,7 @@
     }
 
     <!-- ----- TIPO -----  -->
-    @if (inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'ventas_productos' || inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo' || inputs.tipo_reporte == 'notas') {
+    @if (reportTypeHasfield(reportField.typeField) ) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Tipo: <span style="color: red">*</span> </label>
       <select formControlName="tipo" class="form-control" (change)="changeTipo()">
@@ -79,7 +96,7 @@
     }
 
     <!-- ----- TIPO FACTURAS -----  -->
-    @if (inputs.tipo_reporte == 'ventas_diarias' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'ventas_cliente') {
+    @if (reportTypeHasfield(reportField.billTypeField)) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Tipo de factura: <span style="color: red">*</span> </label>
       <select formControlName="tipo_factura_id" class="form-control">
@@ -92,7 +109,7 @@
     }
 
     <!-- ----- SELECCION DE ARTICULO -----  -->
-    @if (inputs.tipo_reporte == 'suplidor_prod') {
+    @if (reportTypeHasfield(reportField.articuloField)) {
     <div class="col-12 p-0 mb-3">
       <label class="control-label mb-0 mt-2">Seleccione articulo: <span style="color: red">*</span> </label>
 
@@ -113,8 +130,7 @@
     }
 
     <!-- ----- FECHA -----  -->
-
-    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '1') || inputs.tipo_reporte == 'cuadre') {
+    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.dia_unico) || reportTypeHasfield(reportField.dateField)) {
     <div class="col-12 p-0">
       <label class="control-label mb-0 mt-2">Fecha: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha" formControlName="fecha" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
@@ -123,10 +139,10 @@
       }
     </div>
     }
+
     <!-- ----- DESDE -----  -->
 
-    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'
-    || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    @if (reportTypeHasfield(reportField.fromField) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
     <div class="col-6 pl-0">
       <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
@@ -135,9 +151,9 @@
       }
     </div>
     }
+
     <!-- ----- HASTA -----  -->
-    @if ( inputs.tipo_reporte == 'notas' || inputs.tipo_reporte == 'ventas_rango' || inputs.tipo_reporte == 'suplidor_prod' || inputs.tipo_reporte == 'recibos' || inputs.tipo_reporte == 'cuentas_con_pagos' || inputs.tipo_reporte == 'ventas_cliente'
-    || inputs.tipo_reporte == 'movimientos_vehiculo' || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == '2') ) {
+    @if ( reportTypeHasfield(reportField.toDateField)|| (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
     <div class="col-6 pr-0">
       <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
       <p-calendar inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
@@ -149,16 +165,16 @@
   </div>
 </form>
 
-@if (inputs.switches) {
+@if (inputs.switchGroup) {
 <div>
   <br />
-  @if (inputs.switches && inputs.switches?.title && fun.hasValue(inputs.switches.title)) {
-  <label class="control-label">{{ inputs.switches.title }} </label>
+  @if (inputs.switchGroup && inputs.switchGroup?.title && fun.hasValue(inputs.switchGroup.title)) {
+  <label class="control-label">{{ inputs.switchGroup.title }} </label>
   }
   <div>
-    @for (switch of inputs.switches.array; track switch) {
+    @for (switch of inputs.switchGroup.array; track switch) {
     <div class="form-group mb-2 switchDiv">
-      <input [(ngModel)]="switch.value" class="apple-switch ml-2" type="checkbox" />
+      <input [(ngModel)]="switch.value" class="apple-switch" type="checkbox" />
       <span class="ml-2">{{ switch.label }}</span>
     </div>
     }

@@ -13,6 +13,7 @@ import { RequestC } from '../../core/typescript/requests';
 import { Ss } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/typescript/config-interface';
 import { fun } from '../../core/services/functions.service';
+import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 
 @Component({
   selector: 'app-layout',
@@ -52,6 +53,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   chequiando_cuadre: boolean;
   hasPermisosValidated: boolean;
   actionFacturacion = actionFacturacion;
+  currentYear: number;
 
   constructor(private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
     super();
@@ -111,6 +113,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.ready = true;
     this.parseMenu();
     this.checkRouteActiva();
+    this.checkFacturasArchivadas();
     this.cdRef.detectChanges();
 
     this.validateUserAndLoadPermisos().then((result) => {
@@ -156,7 +159,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.imgUser = 'assets/img/transparente.png';
     this.noServer = false;
     this.activeIndex = 0;
-
+    this.currentYear = new Date().getFullYear();
     this.cuadre_hoy = false;
   }
 
@@ -249,6 +252,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   // =================================================================================
+  // CHECK FACTURAS ARCHIVADAS
+  // =================================================================================
+
+  checkFacturasArchivadas() {
+    FactsLocalStorage.verificateFacturasGuardadas();
+  }
+
+  // =================================================================================
   // NAVEGAR
   // =================================================================================
   isVistaActual(arg) {
@@ -260,7 +271,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     return res;
   }
 
-  cambiarMenu(args: { url; navigate }) {
+  cambiarMenu(args: { url; navigate; event }) {
+    
+
     let next_cambio_menu = '';
 
     if (args.navigate) {
@@ -268,6 +281,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
       if (this.actualPath !== next_cambio_menu) {
         this.runRouterNavigate({ bool: true, ruta: next_cambio_menu });
+        fun.enfocarInput(null, args.event.target);
+
       } else {
         fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
       }

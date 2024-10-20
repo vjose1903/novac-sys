@@ -1,4 +1,4 @@
-import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver, ViewChildren, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { MODALCONFIG, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
@@ -47,7 +47,11 @@ export class NewModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     MODALCONFIG.pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res && res.show) {
-        this.renderizarComponente(res);
+        this.renderizarComponente(res).then(() =>
+          setTimeout(() => {
+            fun.enfocarInput(`focusElement-${res.id}`);
+          }, 0),
+        );
       } else {
         this.resetConfig(res.id, res.accion);
       }
@@ -91,31 +95,34 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   renderizarComponente(config) {
-    this.handleConfig(config);
+    return new Promise<void>((resolve, reject) => {
+      this.handleConfig(config);
 
-    const currentConfig = this.searchInArray(this.modalsConfig, 'id', config.id);
+      const currentConfig = this.searchInArray(this.modalsConfig, 'id', config.id);
 
-    if (currentConfig.component) {
-      setTimeout(() => {
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentConfig.component as any);
+      if (currentConfig.component) {
+        setTimeout(() => {
+          let componentFactory = this.componentFactoryResolver.resolveComponentFactory(currentConfig.component as any);
 
-        const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
+          const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
 
-        let viewContainerRef = currentReceptor.viewContainerRef;
+          let viewContainerRef = currentReceptor.viewContainerRef;
 
-        viewContainerRef.clear();
-        viewContainerRef.remove();
+          viewContainerRef.clear();
+          viewContainerRef.remove();
 
-        const componente = viewContainerRef.createComponent(componentFactory);
+          const componente = viewContainerRef.createComponent(componentFactory);
 
-        componente['instance'].inputs = config['inputs'];
+          componente['instance'].inputs = config['inputs'];
 
-        if (componente['instance'].modal) componente['instance'].modal = { instance: this, component_id: config.id };
+          if (componente['instance'].modal) componente['instance'].modal = { instance: this, component_id: config.id };
 
-        currentConfig['instance'] = componente['instance'];
-      }, 1);
-    }
-    // setTimeout(() => this.checkModalStyle(config.id), 2500);
+          currentConfig['instance'] = componente['instance'];
+
+          resolve();
+        }, 1);
+      }
+    });
   }
 
   checkModalStyle(config) {

@@ -293,7 +293,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.form.patchValue(data);
     this.documentos_de_identidad = data.documentos_de_identidad;
     this.editando = true;
-    this.suplidorSelected = fun.duplicarJson(data);
+    this.suplidorSelected = fun.deepCloning(data);
 
     this.changeStateCampos(true);
 

@@ -12,6 +12,7 @@ import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { serie } from '../../core/typescript/constantes';
+import { flip } from '@popperjs/core';
 
 export enum comprobanteNormal {
   valor_fiscal = '01',
@@ -113,7 +114,7 @@ export class FacturaC extends CrudG<FacturasI> {
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
       if (params.tipo != 'movimientos_vehiculo') {
-        params.inputs['switches'] = {
+        params.inputs['switchGroup'] = {
           title: 'Seleccione los metodos de pago deseados',
           array: [
             { label: 'Efectivo', value: true },
@@ -141,8 +142,6 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static async getCamiones(name) {
-    console.log("name ", name);
-    
     if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
         const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false, info_vehiculo: true } };
@@ -156,7 +155,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static requestReporte(params: { reporte; pdf }) {
-    if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switches.array, (item) => item.value == false)) {
+    if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switchGroup.array, (item) => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
       const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
@@ -165,7 +164,7 @@ export class FacturaC extends CrudG<FacturasI> {
       if (params.pdf.tipo != 'movimientos_vehiculo') {
         formas_pago = '(';
 
-        params.reporte.data.switches.array.forEach((item) => {
+        params.reporte.data.switchGroup.array.forEach((item) => {
           if (item.value) formas_pago += `'${item.label}',`;
         });
 
@@ -218,7 +217,7 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean }) {
+  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean; movimientos_viaje?: boolean }) {
     const valor_enc = btoa(args.valor);
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
@@ -236,6 +235,7 @@ export class FacturaC extends CrudG<FacturasI> {
         tipo_factura_id: args.tipo_factura_id,
         is_adelantada: fun.objHas(args, 'adelantada') ? args.adelantada : '0',
         estado: fun.objHas(args, 'estado') ? args.estado : '0',
+        movimientos_viaje: args.movimientos_viaje ?? false,
       },
     };
 
@@ -245,10 +245,10 @@ export class FacturaC extends CrudG<FacturasI> {
   parseDataToPdf(data) {
     return new Promise((resolve) => {
       const pick_factura1 = ['Bruto', 'cliente', 'balance', 'condicion', 'descuento', 'identificador', 'detalle_facturas', 'numero_factura', 'devuelta', 'estado', 'fecha_completada', 'fecha_equivalente', 'fecha_valida', 'fecha_vencimiento'];
-      const pick_factura2 = ['fecha_viaje', 'forma_pago', 'id', 'is_viaje', 'monto', 'numero_comprobante', 'tipo', 'tipo_factura_id', 'itbis', 'suplidor', 'tipo_factura', 'total_factura', 'usuario', 'vendedor'];
+      const pick_factura2 = ['fecha_viaje', 'forma_pago', 'id', 'is_viaje', 'monto', 'numero_comprobante', 'tipo', 'tipo_factura_id', 'itbis', 'suplidor', 'tipo_factura', 'total_factura', 'usuario', 'vendedor', 'movimientos_viaje'];
       const pick_factura = [...pick_factura1, ...pick_factura2];
 
-      let temp_data_parsed = _.pick(fun.duplicarJson(data), pick_factura);
+      let temp_data_parsed = _.pick(fun.deepCloning(data), pick_factura);
 
       const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [
         { old_key: 'tipo_factura', new_key: 'tipo_pdf' },
@@ -284,7 +284,7 @@ export class FacturaC extends CrudG<FacturasI> {
       width: '30rem',
       height: '10rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
@@ -303,7 +303,7 @@ export class FacturaC extends CrudG<FacturasI> {
             header: dataModal.header,
             width: '900px',
             botones: {
-              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
             },
           };
@@ -338,7 +338,7 @@ export class FacturaC extends CrudG<FacturasI> {
         header: 'Historial de moviemientos a balance de factura',
         width: '700px',
         height: '400px',
-        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
       });
     }
   }

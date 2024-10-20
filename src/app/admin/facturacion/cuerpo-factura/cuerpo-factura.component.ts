@@ -2,7 +2,7 @@ import { RetornarDevueltoComponent } from './retornar-devuelto/retornar-devuelto
 import { FacturacionService } from './../facturacion.service';
 import { tipoDocFacturacion } from './../factura';
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, FormGroup } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
@@ -13,6 +13,7 @@ import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '../../../core/typescript/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -54,6 +55,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   dropdownMedidaOpen: boolean = false;
 
   lastCuerpoChange;
+  private destroy$ = new Subject<void>();
 
   constructor(private fb: UntypedFormBuilder, public factServ: FacturacionService) {
     super();
@@ -67,13 +69,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   ngOnDestroy() {
+    if (this.destroy$) this.destroy$.next();
+    if (this.destroy$) this.destroy$.complete();
     this._destroy_mixin();
   }
 
   escucharCambiosEnForm() {
-    this.form.valueChanges.subscribe((changes) => {
-      if (!fun.isEqual(this.lastCuerpoChange, fun.duplicarJson(this.factServ.getDetallesLlenos())) && fun.hasValue(this.factServ.getDetallesLlenos())) {
-        this.lastCuerpoChange = fun.duplicarJson(this.factServ.getDetallesLlenos());
+    this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((changes) => {
+      if (!fun.isEqual(this.lastCuerpoChange, fun.deepCloning(this.factServ.getDetallesLlenos())) && fun.hasValue(this.factServ.getDetallesLlenos())) {
+        this.lastCuerpoChange = fun.deepCloning(this.factServ.getDetallesLlenos());
         setTimeout(() => {
           this.emitirCambiosForm(this.factServ.getDetallesLlenos());
         }, 250);
@@ -92,11 +96,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fila.costo = fun.desformatearStNumber(fila.costo);
         this.calcularCantidadEnUnidades({ index: index });
 
-        if (fila.cantidad && fila.unidad) detalle_factura.push(fun.duplicarJson(fila));
+        if (fila.cantidad && fila.unidad) detalle_factura.push(fun.deepCloning(fila));
       }
     });
 
-    this.getCuerpoFactura.emit({ tipo: 'cuerpo', data: fun.duplicarJson(detalle_factura) });
+    this.getCuerpoFactura.emit({ tipo: 'cuerpo', data: fun.deepCloning(detalle_factura) });
   }
 
   async rellenarVariables() {
@@ -111,7 +115,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         this.sacos = [25, 50, 100];
 
         this.createForm().then(() => {
-          this.lastCuerpoChange = fun.duplicarJson(this.factServ.getDetallesLlenos());
+          this.lastCuerpoChange = fun.deepCloning(this.factServ.getDetallesLlenos());
           this.escucharCambiosEnForm();
         });
 
@@ -255,13 +259,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   addItem(): void {
-    this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as UntypedFormArray;
+    this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
     this.ARRAY_ROWFACTURAS.push(this.createItem());
   }
 
   removeItem(key: string) {
-    const index = _.findIndex(this.factServ.filasDetalle, (detalle) => detalle.value.key == key);
-    (this.form.get('rowFactura') as UntypedFormArray).removeAt(index);
+    const index = this.factServ.filasDetalle.findIndex((detalle) => detalle.value.key == key);
+    (this.form.get('rowFactura') as FormArray).removeAt(index);
   }
 
   // =============================================
@@ -434,7 +438,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
             width: '56.25rem',
             height: '31.25rem',
             botones: {
-              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             },
           });
 
@@ -932,7 +936,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         if (itemRetorno.tipo == 'defectuoso') articulo_devuelto = articulo_devuelto.value;
 
-        const retornar_info = this.parsearProductoDevueltos(fun.duplicarJson(itemRetorno.data?.origin), fun.duplicarJson(itemRetorno.data), false);
+        const retornar_info = this.parsearProductoDevueltos(fun.deepCloning(itemRetorno.data?.origin), fun.deepCloning(itemRetorno.data), false);
 
         if (retornar_info['cantidad'] == articulo_devuelto.cantidad) {
           if (itemRetorno.tipo == 'defectuoso') {
@@ -993,7 +997,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const current_detalle = _.find(this.factServ.filasDetalle, (detalle) => detalle.value.key == key);
     const index_current_detalle = _.findIndex(this.factServ.filasDetalle, (detalle) => detalle.value.key == key);
 
-    const origin_current_detalle = fun.duplicarJson(current_detalle.value);
+    const origin_current_detalle = fun.deepCloning(current_detalle.value);
 
     const medida = current_detalle.value.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : current_detalle.value.articulo.medida;
 
@@ -1076,7 +1080,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   parsearProductoDevueltos(producto_initial, data_remover, is_defectuoso) {
-    const articulo_a_retirar = fun.duplicarJson(producto_initial);
+    const articulo_a_retirar = fun.deepCloning(producto_initial);
 
     const medida = articulo_a_retirar.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo_a_retirar.articulo.medida;
 
@@ -1092,7 +1096,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     articulo_a_retirar['is_defectuoso'] = is_defectuoso;
     articulo_a_retirar['from_pre_factura'] = true;
     articulo_a_retirar['is_devuelto'] = true;
-    articulo_a_retirar['producto_initial'] = fun.duplicarJson(producto_initial);
+    articulo_a_retirar['producto_initial'] = fun.deepCloning(producto_initial);
 
     if (is_defectuoso) articulo_a_retirar.precio = fun.roundNumberToDecimal(fun.desformatearStNumber(articulo_a_retirar.precio) / 2);
     if (is_defectuoso) articulo_a_retirar.total /= 2;

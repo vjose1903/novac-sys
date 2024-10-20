@@ -17,15 +17,18 @@
 
       <div class="col-4">
         <!-- ================ CLIENTE  ================ -->
+
         @if (filter_key == filter_options.cliente) {
         <p-dropdown
           #dropdownCliente
           inputId="valorI"
           [(ngModel)]="clienteSelected"
           [options]="listaClientes"
-          [itemSize]="34"
+          [virtualScrollItemSize]="34"
           styleClass="custom inputE"
           [editable]="true"
+          (onShow)="dropdownClienteAction('show')"
+          (onHide)="dropdownClienteAction('hide')"
           (onChange)="getClientes($event)"
           optionLabel="nombre_completo"
           (onFocus)="dropdownCliente.show(); dropdownCliente.focus()"
@@ -36,7 +39,7 @@
           <ng-template let-cliente pTemplate="item">
             <div class="cliente-item">
               <span class="d-block" style="font-size: 1rem"> <strong>Nombre: </strong> {{ cliente.nombre_completo }} </span>
-              <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad</strong> {{ cliente.documento_identidad }} </span>
+              <span class="d-block no-wrap" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad</strong> {{ cliente.documento_identidad }} </span>
             </div>
           </ng-template>
         </p-dropdown>
@@ -49,14 +52,18 @@
           inputId="valorI"
           [(ngModel)]="filter_value"
           styleClass="form-control inputE UPPERCASE"
-          (keydown.enter)="desenfocarValor()"
-          (onBlur)="checkNumeroPreFactura()"
+          (onInput)="checkNumeroPreFactura($event)"
           mask="99999999"
           tabindex="-1"
           placeholder="________"
           (onFocus)="htmlServ.selectValue($event)"
           [autoClear]="false"
         ></p-inputMask>
+        }
+      </div>
+      <div class="col-1">
+        @if (filter_key != filter_options.todos) {
+        <btn-icon-circular [id]="'clearCotizacionFilter'" icon="fa-solid fa-delete-left" size="size-md" tooltip="Limpiar Filtros" icon_size="0.92rem" tooltipPosition="right" (clickFunction)="clearFilters()"> </btn-icon-circular>
         }
       </div>
     </div>

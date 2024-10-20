@@ -95,7 +95,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       this.conduceClass.getAll(extra).then((res) => {
         res['data'] = this.mapeoRecibos(res['data']);
 
-        this.lista_conduces = fun.duplicarJson(res['data']);
+        this.lista_conduces = fun.deepCloning(res['data']);
 
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       });
@@ -184,7 +184,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
             width: '900px',
             height: '40rem',
             botones: {
-              ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [
                 { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
                 {
@@ -211,7 +211,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       width: obj.width || '30rem',
       html: `<p> ${obj.texto} </p>`,
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
           { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {

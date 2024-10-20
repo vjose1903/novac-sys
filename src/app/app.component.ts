@@ -212,7 +212,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   async test() {
     // const obj = { nombre: 'victor', edad: 35, direccion: { calle: 'las maras-higuero', apto: 'amarillo' }, estudios: ['colegio inmaculada', 'ucateci'] };
     // console.log(`obj ANTES => `, obj);
-    // const obj2 = fun.duplicarJson(obj);
+    // const obj2 = fun.deepCloning(obj);
     // obj2.nombre = 'otro';
     // obj2.direccion.calle = 'el higuero-maras';
     // new ConfigArticuloC()

@@ -18,7 +18,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
-    if (this.config.focusRow && this.ready) {
+    if (!this.tServ.blockRowMovement && this.config.focusRow && this.ready) {
       const key = event.keyCode;
 
       if (key == teclasCode._arriba) this.mover_foco('up');
@@ -104,7 +104,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
     this.verificateBottons(this.config);
 
-    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.duplicarJson(this.tServ.obj_paginate.default));
+    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
   }
 
   ngOnDestroy() {
@@ -143,6 +143,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
     if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
     if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
+
+    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
+      setTimeout(() => {
+        fun.enfocarInput(`search-${this.realIdTabla}`);
+      }, 100);
+    }
 
     this.config.info.map((item) => {
       if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
@@ -192,6 +198,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   filter(event) {
+    if ([teclasCode._abajo, teclasCode._arriba, teclasCode._izquierda, teclasCode._derecha, teclasCode._enter].includes(event.keyCode)) return;
+
     const search = event.target.value;
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
@@ -259,11 +267,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   test() {
-    console.log('paginator --> ', fun.duplicarJson(this.tServ.getPaginationById(this.realIdTabla)));
+    console.log('paginator --> ', fun.deepCloning(this.tServ.getPaginationById(this.realIdTabla)));
   }
 
   localPagination(page, per_page, desde = '') {
-    const copyData = fun.duplicarJson(this.copyData);
+    const copyData = fun.deepCloning(this.copyData);
 
     const inicio = (page - 1) * per_page;
     const final = inicio + per_page;
@@ -432,9 +440,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorInput(column, key, index, value, data) {
-    let newData = fun.duplicarJson(this.tServ.rowsEditing.find((item) => item.id == data.id));
+    let newData = fun.deepCloning(this.tServ.rowsEditing.find((item) => item.id == data.id));
 
-    if (fun.isEmpty(newData) || this.tServ.rowsEditing.length == 0) newData = fun.duplicarJson(data);
+    if (fun.isEmpty(newData) || this.tServ.rowsEditing.length == 0) newData = fun.deepCloning(data);
 
     fun.setProperty(newData, key, value);
 
@@ -445,7 +453,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   updateDataCopy(data) {
-    this.copyData = fun.duplicarJson(data);
+    this.copyData = fun.deepCloning(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
@@ -549,7 +557,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (referencia === 'especificar') {
       input['value'] = especifico;
     } else {
-      const copia = fun.duplicarJson(this.data[index][referencia]);
+      const copia = fun.deepCloning(this.data[index][referencia]);
 
       if (formatear) {
         input['value'] = fun.roundNumberToDecimal(copia);

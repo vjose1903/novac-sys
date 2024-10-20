@@ -18,7 +18,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   ngOnInit(): void {}
 
   getValue(config) {
-    let value = _.get(this.inputs.data, config.key);
+    let value = fun.getProperty(this.inputs.data, config.key);
 
     if (config.tipo == 'number') value = fun.roundNumberToDecimal(value);
 

@@ -1,18 +1,19 @@
-import { tFacturaD } from './../../../facturacion/factura';
-
-import { serie } from './../../../../core/typescript/constantes';
 import { Permisos } from './../../../../core/typescript/permisos';
 import { Ss } from './../../../../core/services/singleton.service';
-import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-
-const moment = require('../../../../core/javascript/moment');
-
-import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { ArticuloC } from '../../../registros/articulos/articulo';
-import { ClienteC } from '../../../registros/registro-clientes/cliente';
-import { ModalI } from '../../modal/modal-class';
+import { Component, OnInit } from '@angular/core';
+import { tFacturaD } from './../../../facturacion/factura';
+import { dateRangeType, serie } from './../../../../core/typescript/constantes';
+// import { CxP } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
+import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { DateUtils } from '../../../../core/typescript/date.utils';
+import { ArticuloC } from '../../../registros/articulos/articulo';
+import { ClienteC, CxC } from '../../../registros/registro-clientes/cliente';
+import { ModalI } from '../../modal/modal-class';
+// import { TipoPagoReporte } from '../../../pagos/class/pagos/pagos';
+// import { TipoReciboReporte } from '../../../pagos/class/ingresos/recibos';
+import { reportField } from './form-reportes.component.model';
 
 @Component({
   selector: 'app-form-reportes',
@@ -42,6 +43,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   articuloClass = new ArticuloC();
   clienteClass = new ClienteC();
   dinamycSelectionReady: boolean = false;
+  dinamycSwitchReady: boolean = false;
 
   facturasSerieOptions = [
     { label: 'Todas', value: serie.no, disabled: false },
@@ -49,12 +51,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     { label: 'Electronica', value: serie.electronica, disabled: true },
   ];
 
+  dateRangeType = dateRangeType;
   constructor(private fb: UntypedFormBuilder) {
     super();
   }
 
   modal: any = {};
   inputs: any;
+  reportField = reportField;
 
   ngOnInit() {
     this.necesarioStart();
@@ -62,7 +66,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   async necesarioStart() {
     await this.createForm();
-    await this.checkDinamycSelections();
+    await this.checkDinamycFields();
     await this.agregateValidators();
 
     if (this.formarFecha.includes(this.inputs.tipo_reporte)) {
@@ -70,7 +74,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     }
   }
 
-  checkDinamycSelections() {
+  checkDinamycFields() {
     for (let index = 0; index < this.inputs?.dinamyc_selections?.length; index++) {
       const element = this.inputs.dinamyc_selections[index];
       element.id = fun.generateKey();
@@ -80,6 +84,15 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
     }
     setTimeout(() => (this.dinamycSelectionReady = true), 10);
+
+    for (let index = 0; index < this.inputs?.dinamyc_switches?.length; index++) {
+      const element = this.inputs.dinamyc_switches[index];
+      element.id = fun.generateKey();
+      this.form.addControl(element.formControl, this.fb.control(element.defaultValue ?? false));
+
+      if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
+    }
+    setTimeout(() => (this.dinamycSwitchReady = true), 10);
   }
 
   async getArticulos(name) {
@@ -118,18 +131,12 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     }
   }
 
-  getFirstDayOfMoth(date?) {
-    const month = moment(date).month() + 1;
-    const year = moment(date).year();
-    const temp = `${year}-${month}-01`;
-    return temp;
-  }
-
   agregateValidators() {
     let tipo_selected = null;
     let serie_selected = null;
     let condicion_selected = null;
-    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'movimientos_vehiculo'];
+    const desde_hasta_includes = ['ventas_rango', 'notas', 'cuentas_con_pagos', 'ventas_cliente', 'suplidor_prod', 'recibos', 'movimientos_vehiculo', 'pago_facturas'];
+    const desde_year_hasta_includes = ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo', 'cuentas_cobrar_cliente'];
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
 
     if (this.inputs.tipo_reporte == 'cuadre') {
@@ -148,6 +155,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       ];
 
       tipo_selected = 'detallado';
+      //
+    } else if (this.inputs.tipo_reporte == 'pago_facturas') {
+      this.tipos = [
+        // { id: TipoPagoReporte.detallado, label: 'Detallado' },
+        // { id: TipoPagoReporte.agrupado, label: 'Agrupado' },
+      ];
+
+      tipo_selected = 'detallado';
     } else if (this.inputs.tipo_reporte == 'ventas_rango') {
       this.tipos = [
         { id: 'detallado', label: 'Detallado' },
@@ -161,8 +176,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo') {
       this.tipos = [
-        { id: '2', label: 'Detallado' },
-        { id: '3', label: 'Agrupado' },
+        { id: CxC.detallado, label: 'Detallado' },
+        { id: CxC.agrupado, label: 'Agrupado' },
+      ];
+      //
+    } else if (this.inputs.tipo_reporte == 'cuentas_pagar_ant_saldo') {
+      this.tipos = [
+        // { id: CxP.detallado, label: 'Detallado' },
+        // { id: CxP.agrupado, label: 'Agrupado' },
       ];
       //
     } else if (this.inputs.tipo_reporte == 'notas') {
@@ -183,8 +204,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       }
     } else if (this.inputs.tipo_reporte == 'ventas_productos') {
       this.tipos = [
-        { id: '1', label: 'Dia único' },
-        { id: '2', label: 'Rango fechas' },
+        { id: dateRangeType.dia_unico, label: 'Dia único' },
+        { id: dateRangeType.rango_fecha, label: 'Rango fechas' },
       ];
       //
     }
@@ -207,19 +228,39 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     if (tipo_factura_includes.includes(this.inputs.tipo_reporte)) this.parseTipoFacturas();
 
     if (desde_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls();
+    if (desde_year_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls({ begin_of_year: true });
   }
 
-  setDesdeHastaControls() {
-    let desde_temp = new Date();
-    desde_temp.setDate(desde_temp.getDate() - 1);
+  setDesdeHastaControls(params?: { begin_of_year?: boolean }) {
+    if (fun.isEmpty(params)) params = {};
+    if (fun.isEmpty(params?.begin_of_year)) params.begin_of_year = false;
 
-    const desde = new Date(this.getFirstDayOfMoth(desde_temp));
+    const actual_date = new Date();
+    const desde = params.begin_of_year ? DateUtils.getFirstDayOfYear({ year: actual_date.getFullYear() }) : DateUtils.getFirstDayOfMonth({ month: actual_date.getMonth() + 1, year: actual_date.getFullYear() });
 
     this.form.controls.desde.setValue(desde);
-    this.form.controls.hasta.setValue(new Date());
+    this.form.controls.hasta.setValue(actual_date);
 
     this.setValidator('desde');
     this.setValidator('hasta');
+  }
+
+  reportTypeHasfield(reportType: string) {
+    const reportTypeMap = {
+      [reportField.dynamicSelection]: ['movimientos_vehiculo'],
+      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos', 'cuentas_cobrar_cliente'],
+      [reportField.serieField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
+      [reportField.conditionField]: ['ventas_cliente', 'ventas_rango', 'ventas_diarias'],
+      [reportField.typeField]: ['ventas_rango', 'recibos', 'ventas_productos', 'cuentas_cobrar_ant_saldo', 'notas', 'pago_facturas', 'cuentas_pagar_ant_saldo'],
+      [reportField.billTypeField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
+      [reportField.articuloField]: ['suplidor_prod'],
+      [reportField.dateField]: ['cuadre'],
+      [reportField.fromField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas', 'cuentas_cobrar_cliente'],
+      [reportField.toDateField]: ['notas', 'ventas_rango', 'suplidor_prod', 'recibos', 'cuentas_con_pagos', 'ventas_cliente', 'cuentas_cobrar_ant_saldo', 'movimientos_vehiculo', 'cuentas_pagar_ant_saldo', 'pago_facturas', 'cuentas_cobrar_cliente'],
+      [reportField.simpleSwitchField]: ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo', 'cuentas_cobrar_cliente'],
+    };
+
+    return reportTypeMap[reportType].includes(this.inputs.tipo_reporte);
   }
 
   parseTipoFacturas() {
@@ -236,7 +277,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
     this.tipos_facturas = [{ label: 'Todos', id: 0 }];
 
-    fun.duplicarJson(Ss.factServ.lista_tipos_facturas).forEach((tipo_factura) => {
+    fun.deepCloning(Ss.factServ.lista_tipos_facturas).forEach((tipo_factura) => {
       if (tipos_aceptados.includes(tipo_factura.descripcion)) {
         this.tipos_facturas.push({ label: tipo_factura.descripcion, id: Number(tipo_factura.id) });
       }
@@ -272,12 +313,22 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   createForm() {
-    this.form = this.fb.group({ cliente_id: [null], articulo_id: [null], tipo: [null], tipo_factura_id: [null], condicion: [null], fecha: [null], desde: [null], hasta: [null], serie: [null] });
+    this.form = this.fb.group({
+      cliente_id: [null],
+      articulo_id: [null],
+      tipo: [null],
+      tipo_factura_id: [null],
+      condicion: [null],
+      fecha: [null],
+      desde: [null],
+      hasta: [null],
+      serie: [null],
+    });
   }
 
   btn_aceptar() {
     const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
     modal.closeModal(this.modal.component_id);
-    modal.returnDataFromModal({ data: { ...this.form.value, switches: { ...this.inputs.switches } }, modal_id: this.modal.component_id });
+    modal.returnDataFromModal({ data: { ...this.form.value, switchGroup: { ...this.inputs.switchGroup } }, modal_id: this.modal.component_id });
   }
 }
