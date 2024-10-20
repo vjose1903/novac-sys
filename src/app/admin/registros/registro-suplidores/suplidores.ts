@@ -29,6 +29,16 @@ export class SuplidorC extends CrudG<any> {
     },
   ];
 
+  static inputsIncludeSaldadas = [
+    {
+      label: 'Incluir Facturas Saldadas',
+      formControl: 'include_pagadas',
+      defaultValue: false,
+      disabledFunction: () => false,
+      validators: Validators.required,
+    },
+  ];
+
   static async getSuplidores(name) {
     if (fun.hasValue(name)) {
       fun.awaitTyping().then((res) => {
@@ -66,6 +76,14 @@ export class SuplidorC extends CrudG<any> {
         params.inputs['dinamyc_selections'] = SuplidorC.inputsSelectSuplidor;
       }
 
+      const reportIncludedInSwitches = ['cuentas_pagar_ant_saldo', 'cuentas_pagar_suplidor'];
+
+      if (reportIncludedInSwitches.includes(params.tipo)) {
+        if (reportIncludedInSwitches.includes(params.tipo)) {
+          params.inputs['dinamyc_switches'] = SuplidorC.inputsIncludeSaldadas;
+        }
+      }
+
       objModal['returnDataFromModal'] = returnDataFromModal;
 
       params.openNewModal(objModal);
@@ -91,6 +109,7 @@ export class SuplidorC extends CrudG<any> {
         if (tipo == CxP.por_suplidor) requestParameters['suplidor_id'] = reporteParams.data.suplidor_id;
         requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
         requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
+        requestParameters['include_pagadas'] = reporteParams.data.include_pagadas ?? false;
 
         pdfParams.tipo = 'cuentas_pagar';
         break;

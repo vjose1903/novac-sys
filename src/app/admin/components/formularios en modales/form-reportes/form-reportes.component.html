@@ -1,38 +1,36 @@
+<!-- {{ this.inputs.tipo_reporte }} -->
+
 <form [formGroup]="form">
   <div class="row">
-    <!-- ----- DINAMYC SELECTION -----  -->
-    @if (dinamycSelectionReady && reportTypeHasfield(reportField.dynamicSelection)) { 
-      @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
-        <div class="col-12 p-0">
-          <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
-          <p-dropdown
-            [options]="dinamyc_selection.items"
-            [formControlName]="dinamyc_selection.formControl"
-            [placeholder]="dinamyc_selection.placeholder"
-            appendTo="body"
-            [filter]="true"
-            [optionLabel]="dinamyc_selection.optionLabel ?? null"
-            [optionValue]="dinamyc_selection.optionValue ?? null"
-            (onFilter)="dinamyc_selection.searchFunction($event.filter)"
-            [disabled]="dinamyc_selection.disabledFunction()"
-            [emptyFilterMessage]="dinamyc_selection.notFoundText"
-            [resetFilterOnHide]="true"
-          />
-        </div>
-      } 
-    }
-
     <!-- ----- SIMPLE_SWITCH -----  -->
-    @if (dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) { 
-      @for (dinamyc_switch of inputs.dinamyc_switches; track dinamyc_switch.id) {
-        <div class="col-12 p-0 mb-2">
-          <div class="switchDiv">
-            <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
-            <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
-          </div>
-        </div>
-      } 
-    }
+    @if (dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) { @for (dinamyc_switch of inputs.dinamyc_switches; track dinamyc_switch.id) {
+    <div class="col-12 p-0 mb-2">
+      <div class="switchDiv">
+        <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
+        <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
+      </div>
+    </div>
+    } }
+
+    <!-- ----- DINAMYC SELECTION -----  -->
+    @if (dinamycSelectionReady && reportTypeHasfield(reportField.dynamicSelection)) { @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
+    <div class="col-12 p-0">
+      <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
+      <p-dropdown
+        [options]="dinamyc_selection.items"
+        [formControlName]="dinamyc_selection.formControl"
+        [placeholder]="dinamyc_selection.placeholder"
+        appendTo="body"
+        [filter]="true"
+        [optionLabel]="dinamyc_selection.optionLabel ?? null"
+        [optionValue]="dinamyc_selection.optionValue ?? null"
+        (onFilter)="dinamyc_selection.searchFunction($event.filter)"
+        [disabled]="dinamyc_selection.disabledFunction()"
+        [emptyFilterMessage]="dinamyc_selection.notFoundText"
+        [resetFilterOnHide]="true"
+      />
+    </div>
+    } }
 
     <!-- ----- SELECCION DE CLIENTE -----  -->
     @if ( reportTypeHasfield(reportField.customerField) ) {

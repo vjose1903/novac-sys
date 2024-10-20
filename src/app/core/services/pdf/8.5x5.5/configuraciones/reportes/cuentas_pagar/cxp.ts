@@ -2,7 +2,7 @@ export const config_cxp = {
   margin_general: [0, 0, 0, 0],
   isBreak: false,
   only_titulo: false,
-  widths: [24, 60, 73, 53, '*', 'auto'],
+  widths: [24, 60, 73, 53, '*', 'auto', 'auto'],
   customTotalizacion: [
     { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
     { title: 'TOTAL PENDIENTE RD$', key: 'total' },
@@ -54,6 +54,18 @@ export const config_cxp = {
       style_body: 'letra10',
       key: 'suplidor_nombre',
       alignment_body: 'left',
+    },
+    {
+      text: 'Facturado',
+      margin_titulo: [0, 0, 5, 0],
+      margin_body: [0, 0, 5, 0],
+      alignment_titulo: 'right',
+      noWrap: true,
+      style: 'letra10',
+      style_body: 'letra10',
+      key: 'total_factura',
+      alignment_body: 'right',
+      formato_numero: true,
     },
     {
       text: 'Pendiente',
