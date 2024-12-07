@@ -120,6 +120,8 @@
         > .menuContent {
           position: absolute;
           display: grid;
+          gap: 1.5rem;
+          padding-top: 2rem;
 
           .menuList {
             display: flex;
@@ -127,7 +129,7 @@
             text-align: center;
             align-items: center;
             justify-content: flex-end;
-            min-height: 7rem;
+            min-height: 6rem;
             position: relative;
 
             .tituloMenu {
