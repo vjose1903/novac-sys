@@ -51,7 +51,7 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { 'text-align': 'left', width: '13%' } },
+      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { 'text-align': 'left', width: '6rem' } },
       { titulo: 'Concepto', tipo: tableCellType.text, key: 'comentario', puntosSuspensivos: true, lineClamp: 3, style: { 'text-align': 'left', 'padding-left': '0.3rem', width: '60%' } },
       { titulo: 'Monto', tipo: tableCellType.formatoNumero, key: 'monto', style: { 'text-align': 'right', width: '20%' } },
       {
