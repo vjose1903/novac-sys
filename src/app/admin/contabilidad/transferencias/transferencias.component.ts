@@ -86,6 +86,8 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   transferenciasType = transferenciasType;
   nombreBancoTerceroConfig = nombreBancoTerceroConfig;
 
+  dropdownFilterFocusInput = dropdownFilterFocusInput;
+
   htmlServ = inject(HtmlElementsService);
 
   bancosList: Array<ListBancoI> = [];
@@ -211,10 +213,6 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     const formulario = this.formGroup().getRawValue();
     dropdownCuenta.hide;
     if (fun.hasValue(formulario[fieldId])) this.saltar(transferenciaFormFieldId[fieldId]);
-  }
-
-  dropCuentaBancariaFocus(drop) {
-    dropdownFilterFocusInput(drop);
   }
 
   formatearMonto(formFieldName) {
@@ -365,7 +363,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   editarItem(transferencia: TransferenciaI) {
     this.validateOpenPeriod(DateUtils.parse(transferencia.fecha_equivalente), 'update').then(() => {
-      if (fun.hasValue(this.formGroup)) this.formGroup().reset();
+      if (fun.hasValue(this.formGroup())) this.formGroup().reset();
 
       setTimeout(() => {
         this.botonLabel = 'Editar';
@@ -384,7 +382,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   encapsulateMonth() {
-    if (fun.isEmpty(this.formGroup)) return;
+    if (fun.isEmpty(this.formGroup())) return;
 
     const formulario = this.formGroup().getRawValue();
     const currentDate = formulario[transferenciaFormAttr.fecha_equivalente];
@@ -396,7 +394,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   verificateFieldsState() {
-    if (fun.isEmpty(this.formGroup)) return;
+    if (fun.isEmpty(this.formGroup())) return;
 
     const formulario = this.formGroup().getRawValue();
     const funct = fun.hasValue(formulario?.[transferenciaFormAttr.id]) ? 'disable' : 'enable';
@@ -419,7 +417,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   borrar() {
-    if (fun.hasValue(this.formGroup)) this.formGroup().reset();
+    if (fun.hasValue(this.formGroup())) this.formGroup().reset();
     this.transferenciaSelected = undefined;
     this.enableDisableFields('disable');
     this.initVariables();

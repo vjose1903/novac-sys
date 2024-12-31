@@ -58,8 +58,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   permissions = Permisos;
   table_config: table_config = {
     info: [
-      { titulo: 'Divisa', tipo: tableCellType.img, key: 'img_divisa', rowTooltip: 'img_divisa_tooltip', style: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '4.3rem' } },
-      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', style: { width: '8%' } },
+      { titulo: 'Divisa', tipo: tableCellType.img, key: 'img_divisa', rowTooltip: 'img_divisa_tooltip', style: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '4rem' } },
+      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', style: { width: '9%' } },
       { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre', style: { 'text-align': 'start', 'padding-left': '1rem' } },
       { titulo: 'Rnc', tipo: tableCellType.text, key: 'documento_identidad', style: { width: '17.5%' } },
     ],

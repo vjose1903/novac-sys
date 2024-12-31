@@ -110,40 +110,7 @@
                     </div>
 
                     <div class="col-6 pr-0">
-                      <div class="form-group" appMsgError="divisa_id" [form]="form">
-                        <label class="control-label">Divisa: <span style="color: red">*</span></label>
-                        <p-dropdown
-                          #divisaDropdown
-                          [autoDisplayFirst]="false"
-                          inputId="campoDivisa"
-                          [options]="divisaServ.listaDivisas"
-                          appendTo="body"
-                          formControlName="divisa_id"
-                          optionLabel="nombre"
-                          optionValue="id"
-                          placeholder="Selecciona la divisa"
-                          styleClass="form-control min-padding"
-                          (keydown.enter)="saltar('campoDir')"
-                          (onChange)="changeDivisa($event)"
-                          (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
-                        >
-                          <ng-template pTemplate="selectedItem">
-                            @if (fun.hasValue(suplidorSelected) || fun.hasValue(form.controls.divisa_id.value)) {
-                            <div class="d-flex align-items-center">
-                              <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(form.controls.divisa_id.value, 'imagen.file_name'))"></img-component>
-                              <div>{{ imgServ.getDivisaInfoById(form.controls.divisa_id.value, 'nombre') }}</div>
-                            </div>
-                            }
-                          </ng-template>
-                          <ng-template let-divisa pTemplate="item">
-                            <div class="d-flex align-items-center">
-                              <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(divisa.imagen.file_name)"></img-component>
-                              <div>{{ divisa.nombre }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer"></span>
-                      </div>
+                      <form-divisa-input formControlName="divisa_id" inputId="campoDivisa" (keydownEnter)="saltar('campoDir')" (onChangeValue)="changeDivisa($event)"></form-divisa-input>
                     </div>
 
                     <div class="col-12 p-0">
@@ -171,13 +138,13 @@
               </div>
 
               <div class="botones">
-                <div class="p-0" style="display: flex; justify-content: space-between">
-                  <div>
-                    <button class="btn mr-2 btn-blanco" id="borrarBtn" (click)="borrar()">Borrar</button>
-                    <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2 btn-verde" id="sendBtn">{{ botonLabel }}</button>
+                <div class="p-0 w-100 mt-5 d-flex justify-content-between">
+                  <div class="d-flex column-gap-2">
+                    <button class="btn btn-blanco" id="borrarBtn" (click)="borrar()">Borrar</button>
+                    <button [disabled]="formIsInvalid()" (click)="submit()" class="btn btn-verde" id="sendBtn">{{ botonLabel }}</button>
                   </div>
-                  <div>
-                    <!-- <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button> -->
+                  <div class="d-flex column-gap-2">
+                    <!-- <button class="btn" value="" id="btn-blanco" (click)="test()">test</button> -->
                     <button class="btn btn-blanco" id="btnCerrar" (click)="borrar(); isCreando = false">Cerrar</button>
                   </div>
                 </div>

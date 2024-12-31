@@ -19,7 +19,6 @@
                     <label class="control-label">Descripcion: <span style="color: red">*</span></label>
                     <input type="text" formControlName="descripcion" [appCapitalice]="'formGroup'" id="campoDescripcion" class="form-control" autocomplete="off" />
                     <span id="msgContainer"></span>
-
                   </div>
                 </div>
                 <div class="col-12 p-0">
@@ -57,14 +56,13 @@
                 </div>
               </div>
             </form>
-            <div class="col-12 form-group p-0" style="display: flex; justify-content: space-between">
-              <div>
-                <a *ngIf="checkIfSomethingIsDiferrent()" class="btn mr-2" id="btn-blanco" (click)="reset()">Restablecer</a>
-
-                <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="requests()" class="btn ml-2" value="{{ botonLabel }}" id="btn-verde" />
+            <div class="col-12 p-0 w-100 mt-5 d-flex justify-content-between">
+              <div class="d-flex column-gap-2">
+                <button *ngIf="checkIfSomethingIsDiferrent()" (click)="reset()" class="btn btn-blanco">Restablecer</button>
+                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde">{{ botonLabel }}</button>
               </div>
               <div>
-                <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
+                <button class="btn btn-blanco" (click)="borrar(); isCreando = false">Cerrar</button>
               </div>
             </div>
           </div>

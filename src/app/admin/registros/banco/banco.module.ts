@@ -13,11 +13,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
 import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
 import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-bancaria.component';
-import { FormAutoCompleteModule } from './../../../core/components/form-auto-complete/form-auto-complete.module';
+import { FormAutoCompleteModule } from './../../../core/components/form-fields/form-auto-complete/form-auto-complete.module';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { FormDivisaInputModule } from '../../../core/components/form-fields/form-divisa-input/form-divisa-input.module';
 
 @NgModule({
   declarations: [BancoComponent, CuentaBancariaFormComponent, TipoCuentaBancariaComponent],
-  imports: [CommonModule, BancoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule, FormAutoCompleteModule, SelectButtonModule],
+  imports: [CommonModule, BancoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule, FormAutoCompleteModule, SelectButtonModule, FormDivisaInputModule],
 })
 export class BancoModule {}

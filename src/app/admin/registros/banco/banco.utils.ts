@@ -1,4 +1,4 @@
-import { IAutoCompleteConfig } from './../../../core/components/form-auto-complete/form-auto-complete.utils';
+import { IAutoCompleteConfig } from './../../../core/components/form-fields/form-auto-complete/form-auto-complete.utils';
 import { CrudG } from '../../../core/typescript/crud-g';
 import { CuentaBancariaI } from './cuenta-bancaria-form/cuenta_bancaria';
 

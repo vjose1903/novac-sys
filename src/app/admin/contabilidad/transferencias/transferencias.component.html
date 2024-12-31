@@ -58,7 +58,7 @@
                       emptyMessage="No existen cuantas bancarias"
                       [showClear]="true"
                       (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-                      (onFocus)="dropCuentaBancariaFocus(dropdownCuenta)"
+                      (onFocus)="dropdownFilterFocusInput(dropdownCuenta)"
                       (onHide)="dropCuentaBancariaHide(dropdownCuenta, transferenciaFormAttr.cuenta_bancaria_origen_id)"
                     >
                       <ng-template let-cuenta_bancaria pTemplate="item">
@@ -95,7 +95,7 @@
                       <label class="control-label" [requiredFieldLabel]="selectedTransferenciaType() === TransferenciaType.misCuentas">Cuenta Bancaria Destino: </label>
 
                       <p-dropdown
-                        #dropdownCuenta
+                        #dropdownMisCuentas
                         [inputId]="transferenciaFormFieldId.cuenta_bancaria_destino_id"
                         placeholder="Seleccione la cuenta"
                         filterPlaceholder="Buscar"
@@ -113,8 +113,8 @@
                         emptyMessage="No existen cuantas bancarias"
                         [showClear]="true"
                         (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-                        (onFocus)="dropCuentaBancariaFocus(dropdownCuenta)"
-                        (onHide)="dropCuentaBancariaHide(dropdownCuenta, transferenciaFormAttr.cuenta_bancaria_destino_id)"
+                        (onFocus)="dropdownFilterFocusInput(dropdownMisCuentas)"
+                        (onHide)="dropCuentaBancariaHide(dropdownMisCuentas, transferenciaFormAttr.cuenta_bancaria_destino_id)"
                       >
                         <ng-template let-cuenta_bancaria pTemplate="item">
                           <div class="cuenta_bancaria-item">
@@ -159,37 +159,7 @@
                 </div>
 
                 <div class="col-12 col-md-6 p-0 pr-md-3">
-                  <div class="form-group" [appMsgError]="transferenciaFormAttr.divisa_id" [form]="formGroup()">
-                    <label class="control-label" requiredFieldLabel>Divisa: </label>
-                    <p-dropdown
-                      #divisaDropdown
-                      [autoDisplayFirst]="false"
-                      [inputId]="transferenciaFormFieldId.divisa_id"
-                      [options]="divisaServ.listaDivisas"
-                      appendTo="body"
-                      [formControlName]="transferenciaFormAttr.divisa_id"
-                      optionLabel="nombre"
-                      optionValue="id"
-                      placeholder="Selecciona la divisa"
-                      styleClass="form-control min-padding"
-                      (keydown.enter)="saltar(transferenciaFormFieldId.divisa_id)"
-                      (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
-                    >
-                      <ng-template pTemplate="selectedItem">
-                        <div class="d-flex align-items-center" *ngIf="fun.hasValue(formGroup().controls[transferenciaFormAttr.divisa_id].value)">
-                          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(formGroup().controls.divisa_id.value, 'imagen.file_name'))"></img-component>
-                          <div>{{ imgServ.getDivisaInfoById(formGroup().controls.divisa_id.value, 'nombre') }}</div>
-                        </div>
-                      </ng-template>
-                      <ng-template let-divisa pTemplate="item">
-                        <div class="d-flex align-items-center">
-                          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(divisa.imagen.file_name)"></img-component>
-                          <div>{{ divisa.nombre }}</div>
-                        </div>
-                      </ng-template>
-                    </p-dropdown>
-                    <span id="msgContainer"></span>
-                  </div>
+                  <form-divisa-input [formControlName]="transferenciaFormAttr.divisa_id" [inputId]="transferenciaFormAttr.divisa_id" (keydownEnter)="saltar(transferenciaFormAttr.divisa_id)"></form-divisa-input>
                 </div>
 
                 <div class="col-12 col-md-6 p-0">
@@ -236,14 +206,14 @@
                 </div>
               </div>
             </form>
-            <div class="form-group p-0 mt-5" style="display: flex; justify-content: space-between">
+            <div class="p-0 w-100 mt-5 d-flex justify-content-between">
               <div class="d-flex column-gap-2">
-                <button (click)="borrar()" class="btn btn-blanco" style="max-width: 6rem">Borrar</button>
-                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde" style="max-width: 6rem">{{ botonLabel }}</button>
-                <!-- <button type="submit" (click)="checkIfSomethingIsDiferrent()" class="btn btn-gris" style="max-width: 6rem">test</button> -->
+                <button (click)="borrar()" class="btn btn-blanco">Borrar</button>
+                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde">{{ botonLabel }}</button>
+                <!-- <button type="submit" (click)="checkIfSomethingIsDiferrent()" class="btn btn-gris" >test</button> -->
               </div>
               <div>
-                <button class="btn btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem">Cerrar</button>
+                <button class="btn btn-blanco" (click)="borrar(); isCreando = false">Cerrar</button>
               </div>
             </div>
           </div>

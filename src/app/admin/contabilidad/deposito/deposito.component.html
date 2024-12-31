@@ -73,37 +73,7 @@
                 </div>
 
                 <div class="col-12 col-md-6 p-0 pr-md-3">
-                  <div class="form-group" [appMsgError]="depositoFormAttr.divisa_id" [form]="formGroup">
-                    <label class="control-label" requiredFieldLabel>Divisa: </label>
-                    <p-dropdown
-                      #divisaDropdown
-                      [autoDisplayFirst]="false"
-                      [inputId]="depositoFormFieldId.divisa_id"
-                      [options]="divisaServ.listaDivisas"
-                      appendTo="body"
-                      [formControlName]="depositoFormAttr.divisa_id"
-                      optionLabel="nombre"
-                      optionValue="id"
-                      placeholder="Selecciona la divisa"
-                      styleClass="form-control min-padding"
-                      (keydown.enter)="saltar(depositoFormFieldId.divisa_id)"
-                      (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
-                    >
-                      <ng-template pTemplate="selectedItem">
-                        <div class="d-flex align-items-center gap-2" *ngIf="fun.hasValue(formGroup.controls[depositoFormAttr.divisa_id].value)">
-                          <img-component style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'imagen.file_name'))"></img-component>
-                          <div>{{ imgServ.getDivisaInfoById(formGroup.controls.divisa_id.value, 'nombre') }}</div>
-                        </div>
-                      </ng-template>
-                      <ng-template let-divisa pTemplate="item">
-                        <div class="d-flex align-items-center gap-2">
-                          <img-component style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(divisa.imagen.file_name)"></img-component>
-                          <div>{{ divisa.nombre }}</div>
-                        </div>
-                      </ng-template>
-                    </p-dropdown>
-                    <span id="msgContainer"></span>
-                  </div>
+                  <form-divisa-input [formControlName]="depositoFormAttr.divisa_id" [inputId]="depositoFormFieldId.divisa_id" (keydownEnter)="saltar(depositoFormFieldId.divisa_id)"></form-divisa-input>
                 </div>
 
                 <div class="col-12 col-md-6 p-0">
@@ -150,7 +120,7 @@
                 </div>
               </div>
             </form>
-            <div class="form-group p-0 mt-5" style="display: flex; justify-content: space-between">
+            <div class="w-100 mt-5 d-flex justify-content-between">
               <div class="d-flex column-gap-2">
                 <button (click)="borrar()" class="btn btn-blanco" style="max-width: 6rem">Borrar</button>
                 <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde" style="max-width: 6rem">{{ botonLabel }}</button>

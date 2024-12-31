@@ -192,10 +192,10 @@
                 </form>
               </div>
               <div class="botones">
-                <div class="p-0" style="display: flex; justify-content: space-between">
-                  <div>
-                    <button class="btn mr-2 btn-blanco" id="borrarBtn" (click)="borrar()">Borrar</button>
-                    <button [disabled]="formIsInvalid()" (click)="submit()" class="btn mx-2 btn-verde" id="sendBtn">{{ botonLabel }}</button>
+                <div class="p-0 w-100 mt-5 d-flex justify-content-between">
+                  <div class="d-flex column-gap-2">
+                    <button class="btn btn-blanco" id="borrarBtn" (click)="borrar()">Borrar</button>
+                    <button [disabled]="formIsInvalid()" (click)="submit()" class="btn btn-verde" id="sendBtn">{{ botonLabel }}</button>
                   </div>
                   <div>
                     <!-- <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button> -->

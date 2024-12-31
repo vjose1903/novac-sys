@@ -11,9 +11,10 @@ import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../../components/new_tablas/tablas.module';
 import { ImgModule } from '../../components/img-component/img.module';
 import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer-edit.module';
+import { FormDivisaInputModule } from '../../../core/components/form-fields/form-divisa-input/form-divisa-input.module';
 
 @NgModule({
   declarations: [DepositoComponent],
-  imports: [CommonModule, DepositoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, ImgViewerEditModule, ImgModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, DepositoRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, ImgViewerEditModule, ImgModule, NgxPermissionsModule.forChild(), FormDivisaInputModule],
 })
 export class DepositoModule {}

@@ -1,0 +1,38 @@
+<div class="w-100 position-relative">
+  <div class="form-group" [id]="'section-' + fieldName()" [appMsgError]="fieldName()" [form]="formGroup()">
+    <label class="control-label" requiredFieldLabel>Divisa: </label>
+    <p-dropdown
+      #divisaDropdown
+      [autoDisplayFirst]="false"
+      [inputId]="inputId()"
+      [disabled]="disabled()"
+      [options]="divisaServ.listaDivisas"
+      appendTo="body"
+      [ngModel]="valueSignal()"
+      (ngModelChange)="this.returnValue($event); this.onTouched()"
+      optionLabel="nombre"
+      optionValue="id"
+      placeholder="Selecciona la divisa"
+      styleClass="form-control min-padding"
+      class="{{ getControlClass() }}"
+      (keydown.enter)="emitKeydown($event)"
+      (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
+    >
+      <ng-template pTemplate="selectedItem">
+        <div class="d-flex align-items-center gap-1" *ngIf="fun.hasValue(valueSignal())">
+          <div class="d-flex align-items-center" style="width: 2rem">
+            <img-component [imagenSrc]="imgServ.getImgUrlServer(imgServ.getDivisaInfoById(valueSignal(), 'imagen.file_name'))"></img-component>
+          </div>
+          <div class="puntos-suspensivos">{{ imgServ.getDivisaInfoById(valueSignal(), 'nombre') }}</div>
+        </div>
+      </ng-template>
+      <ng-template let-divisa pTemplate="item">
+        <div class="d-flex align-items-center">
+          <img-component class="mr-2" style="width: 2rem" [imagenSrc]="imgServ.getImgUrlServer(divisa.imagen.file_name)"></img-component>
+          <div>{{ divisa.nombre }}</div>
+        </div>
+      </ng-template>
+    </p-dropdown>
+    <span id="msgContainer"></span>
+  </div>
+</div>

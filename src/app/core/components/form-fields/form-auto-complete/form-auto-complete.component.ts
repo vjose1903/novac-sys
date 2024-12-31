@@ -1,9 +1,9 @@
 import { NgControl } from '@angular/forms';
 import { IAutoCompleteConfig, IAutoCompleteBtnNewOption } from './form-auto-complete.utils';
 import { Component, computed, EventEmitter, input, model, OnChanges, OnInit, Optional, Output, Self, signal, SimpleChanges } from '@angular/core';
-import { fun } from '../../services/functions.service';
-import { customFormsElements } from '../../typescript/custom-forms-elements/custom-forms-elements';
-import { isEmpty } from '../../services/pdf/utils/funciones';
+import { fun } from '../../../services/functions.service';
+import { customFormsElements } from '../../../typescript/custom-forms-elements/custom-forms-elements';
+import { isEmpty } from '../../../services/pdf/utils/funciones';
 
 @Component({
   selector: 'form-auto-complete',
@@ -12,7 +12,6 @@ import { isEmpty } from '../../services/pdf/utils/funciones';
 })
 export class FormAutoCompleteComponent extends customFormsElements implements OnInit, OnChanges {
   suggestions = input<any[]>([]);
-  field = input<string>('');
   newOptionValue = signal<any>('');
 
   config = model.required<IAutoCompleteConfig>();
@@ -72,6 +71,7 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
     }
 
     this.onChange(value);
+    this.writeValue(value);
   }
 
   emitKeydown(event: any) {
