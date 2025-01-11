@@ -17,9 +17,10 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
-  selector: 'app-registro-vehiculo',
-  templateUrl: './registro-vehiculo.component.html',
-  styleUrls: ['./registro-vehiculo.component.scss'],
+    selector: 'app-registro-vehiculo',
+    templateUrl: './registro-vehiculo.component.html',
+    styleUrls: ['./registro-vehiculo.component.scss'],
+    standalone: false
 })
 export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';

@@ -2,9 +2,10 @@ import { fun } from './../../../core/services/functions.service';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
-  selector: 'btn-icon-circular',
-  templateUrl: './btn-icon-circular.component.html',
-  styleUrls: ['./btn-icon-circular.component.scss'],
+    selector: 'btn-icon-circular',
+    templateUrl: './btn-icon-circular.component.html',
+    styleUrls: ['./btn-icon-circular.component.scss'],
+    standalone: false
 })
 export class BtnIconCircularComponent implements OnInit {
   @Input() id;

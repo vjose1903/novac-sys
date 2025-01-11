@@ -31,9 +31,10 @@ import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configu
 import { HtmlElementsService } from '../../core/services/html-elements.service';
 
 @Component({
-  selector: 'app-facturacion',
-  templateUrl: './facturacion.component.html',
-  styleUrls: ['./facturacion.component.scss'],
+    selector: 'app-facturacion',
+    templateUrl: './facturacion.component.html',
+    styleUrls: ['./facturacion.component.scss'],
+    standalone: false
 })
 export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;

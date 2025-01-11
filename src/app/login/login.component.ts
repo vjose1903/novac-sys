@@ -21,9 +21,10 @@ import { CurrentUserService } from '../core/services/current-user.service';
 import { FacturaC } from '../admin/facturacion/factura';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: false
 })
 export class LoginComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   form: UntypedFormGroup;

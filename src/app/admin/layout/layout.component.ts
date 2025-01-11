@@ -16,9 +16,10 @@ import { fun } from '../../core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 
 @Component({
-  selector: 'app-layout',
-  templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.scss'],
+    selector: 'app-layout',
+    templateUrl: './layout.component.html',
+    styleUrls: ['./layout.component.scss'],
+    standalone: false
 })
 export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   actualPath;

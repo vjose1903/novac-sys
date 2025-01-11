@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'img-component',
-  templateUrl: './img.component.html',
-  styleUrls: ['./img.component.scss'],
+    selector: 'img-component',
+    templateUrl: './img.component.html',
+    styleUrls: ['./img.component.scss'],
+    standalone: false
 })
 export class ImgComponent implements OnInit {
   errorImageSrc: String;

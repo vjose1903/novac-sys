@@ -4,9 +4,10 @@ import { fun } from '../../../core/services/functions.service';
 import { ModalI } from '../../components/modal/modal-class';
 import { table_config } from '../../components/new_tablas/tabla-class';
 @Component({
-  selector: 'app-detalle-nota',
-  templateUrl: './detalle-nota.component.html',
-  styleUrls: ['./detalle-nota.component.scss'],
+    selector: 'app-detalle-nota',
+    templateUrl: './detalle-nota.component.html',
+    styleUrls: ['./detalle-nota.component.scss'],
+    standalone: false
 })
 export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
   constructor() {

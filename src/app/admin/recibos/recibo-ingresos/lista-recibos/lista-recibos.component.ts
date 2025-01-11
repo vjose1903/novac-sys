@@ -14,9 +14,10 @@ import { ModalClass } from '../../../components/modal/modal-class';
 import { ConfigI } from '../../../../core/interface/config-interface';
 import { Ss } from '../../../../core/services/singleton.service';
 @Component({
-  selector: 'app-lista-recibos',
-  templateUrl: './lista-recibos.component.html',
-  styleUrls: ['./lista-recibos.component.scss'],
+    selector: 'app-lista-recibos',
+    templateUrl: './lista-recibos.component.html',
+    styleUrls: ['./lista-recibos.component.scss'],
+    standalone: false
 })
 export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestroy {
   table_config: table_config = {

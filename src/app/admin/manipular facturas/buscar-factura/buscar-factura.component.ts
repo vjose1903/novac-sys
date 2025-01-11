@@ -25,9 +25,10 @@ import { TitleCasePipe } from '@angular/common';
 import { seriesDGII } from '../../../core/typescript/constantes';
 
 @Component({
-  selector: 'app-buscar-factura',
-  templateUrl: './buscar-factura.component.html',
-  styleUrls: ['./buscar-factura.component.scss'],
+    selector: 'app-buscar-factura',
+    templateUrl: './buscar-factura.component.html',
+    styleUrls: ['./buscar-factura.component.scss'],
+    standalone: false
 })
 export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDestroy {
   facturas = [];

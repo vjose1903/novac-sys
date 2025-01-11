@@ -16,9 +16,10 @@ import { ModalClass } from '../../components/modal/modal-class';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-  selector: 'app-cuerpo-factura',
-  templateUrl: './cuerpo-factura.component.html',
-  styleUrls: ['./cuerpo-factura.component.scss'],
+    selector: 'app-cuerpo-factura',
+    templateUrl: './cuerpo-factura.component.html',
+    styleUrls: ['./cuerpo-factura.component.scss'],
+    standalone: false
 })
 export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;

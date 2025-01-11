@@ -7,9 +7,10 @@ import { fun } from '../../../../core/services/functions.service';
 import { timeStamp } from 'console';
 
 @Component({
-  selector: 'app-remover-articulo',
-  templateUrl: './remover-articulo.component.html',
-  styleUrls: ['./remover-articulo.component.scss'],
+    selector: 'app-remover-articulo',
+    templateUrl: './remover-articulo.component.html',
+    styleUrls: ['./remover-articulo.component.scss'],
+    standalone: false
 })
 export class RemoverArticuloComponent implements OnInit, ModalI {
   constructor(private fb: UntypedFormBuilder) {}

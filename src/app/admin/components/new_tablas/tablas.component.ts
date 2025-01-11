@@ -9,9 +9,10 @@ import { btnTableI, medidas, table_config, table_info } from './tabla-class';
 import { teclasCode } from '../../../core/typescript/constantes';
 
 @Component({
-  selector: 'dinamic-table',
-  templateUrl: './tablas.component.html',
-  styleUrls: ['./tablas.component.scss'],
+    selector: 'dinamic-table',
+    templateUrl: './tablas.component.html',
+    styleUrls: ['./tablas.component.scss'],
+    standalone: false
 })
 export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   ready = false;

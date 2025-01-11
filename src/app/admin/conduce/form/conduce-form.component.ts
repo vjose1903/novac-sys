@@ -22,9 +22,10 @@ import { ModalClass } from '../../components/modal/modal-class';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-conduce-form',
-  templateUrl: './conduce-form.component.html',
-  styleUrls: ['./conduce-form.component.scss'],
+    selector: 'app-conduce-form',
+    templateUrl: './conduce-form.component.html',
+    styleUrls: ['./conduce-form.component.scss'],
+    standalone: false
 })
 export class ConduceFormComponent extends MixinClass implements OnInit, OnDestroy {
   secuenciaKeys = [];

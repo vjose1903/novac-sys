@@ -7,9 +7,10 @@ import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { table_config } from '../../new_tablas/tabla-class';
 
 @Component({
-  selector: 'app-buscar-articulo',
-  templateUrl: './buscar-articulo.component.html',
-  styleUrls: ['./buscar-articulo.component.scss'],
+    selector: 'app-buscar-articulo',
+    templateUrl: './buscar-articulo.component.html',
+    styleUrls: ['./buscar-articulo.component.scss'],
+    standalone: false
 })
 export class BuscarArticuloComponent extends MixinClass implements OnInit, ModalI {
   articuloClass = new ArticuloC();

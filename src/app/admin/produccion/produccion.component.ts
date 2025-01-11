@@ -13,9 +13,10 @@ import { Ss } from '../../core/services/singleton.service';
 import { ModalClass } from '../components/modal/modal-class';
 const $ = require('jquery');
 @Component({
-  selector: 'app-produccion',
-  templateUrl: './produccion.component.html',
-  styleUrls: ['./produccion.component.scss'],
+    selector: 'app-produccion',
+    templateUrl: './produccion.component.html',
+    styleUrls: ['./produccion.component.scss'],
+    standalone: false
 })
 export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   producto_terminado_en_turno;

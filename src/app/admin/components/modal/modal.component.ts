@@ -6,9 +6,10 @@ import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
 
 @Component({
-  selector: 'app-new-modal',
-  templateUrl: './modal.component.html',
-  styleUrls: ['./modal.component.scss'],
+    selector: 'app-new-modal',
+    templateUrl: './modal.component.html',
+    styleUrls: ['./modal.component.scss'],
+    standalone: false
 })
 export class NewModalComponent implements OnInit, OnDestroy {
   @ViewChildren(ModalDirective) modal_receptor: ModalDirective;

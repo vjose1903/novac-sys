@@ -9,9 +9,10 @@ import { teclasCode } from '../../../../core/typescript/constantes';
 import { HtmlElementsService } from '../../../../core/services/html-elements.service';
 
 @Component({
-  selector: 'app-form-cantidad-efectivo',
-  templateUrl: './form-cantidad-efectivo.component.html',
-  styleUrls: ['./form-cantidad-efectivo.component.scss'],
+    selector: 'app-form-cantidad-efectivo',
+    templateUrl: './form-cantidad-efectivo.component.html',
+    styleUrls: ['./form-cantidad-efectivo.component.scss'],
+    standalone: false
 })
 export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   @HostListener('window:keyup', ['$event'])

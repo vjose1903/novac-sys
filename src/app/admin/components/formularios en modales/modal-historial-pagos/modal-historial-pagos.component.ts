@@ -4,9 +4,10 @@ import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
 @Component({
-  selector: 'app-modal-historial-pagos',
-  templateUrl: './modal-historial-pagos.component.html',
-  styleUrls: ['./modal-historial-pagos.component.scss'],
+    selector: 'app-modal-historial-pagos',
+    templateUrl: './modal-historial-pagos.component.html',
+    styleUrls: ['./modal-historial-pagos.component.scss'],
+    standalone: false
 })
 export class ModalHistorialPagosComponent extends MixinClass implements OnInit, ModalI {
   activeIndex = 0;

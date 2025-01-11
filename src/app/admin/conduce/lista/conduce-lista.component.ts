@@ -16,9 +16,10 @@ import { ConduceC } from '../coduce';
 import * as _ from 'lodash';
 
 @Component({
-  selector: 'app-conduce-lista',
-  templateUrl: './conduce-lista.component.html',
-  styleUrls: ['./conduce-lista.component.scss'],
+    selector: 'app-conduce-lista',
+    templateUrl: './conduce-lista.component.html',
+    styleUrls: ['./conduce-lista.component.scss'],
+    standalone: false
 })
 export class ConduceListaComponent extends MixinClass implements OnInit, OnDestroy {
   lista_conduces;

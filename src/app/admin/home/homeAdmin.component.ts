@@ -7,9 +7,10 @@ import { Ss } from '../../core/services/singleton.service';
 import { ConfigI } from '../../core/interface/config-interface';
 
 @Component({
-  selector: 'app-homeAdmin',
-  templateUrl: './homeAdmin.component.html',
-  styleUrls: ['./homeAdmin.component.scss'],
+    selector: 'app-homeAdmin',
+    templateUrl: './homeAdmin.component.html',
+    styleUrls: ['./homeAdmin.component.scss'],
+    standalone: false
 })
 export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy {
   constructor() {

@@ -13,9 +13,10 @@ import { Permisos } from '../../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 
 @Component({
-  selector: 'app-formulario-marca-modelo',
-  templateUrl: './formulario-marca-modelo.component.html',
-  styleUrls: ['./formulario-marca-modelo.component.scss'],
+    selector: 'app-formulario-marca-modelo',
+    templateUrl: './formulario-marca-modelo.component.html',
+    styleUrls: ['./formulario-marca-modelo.component.scss'],
+    standalone: false
 })
 export class FormularioMarcaModeloComponent extends MixinClass implements OnInit, ModalI {
   @Input() tipo_formulario;

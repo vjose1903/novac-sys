@@ -1,9 +1,10 @@
 import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'app-btncircular',
-  templateUrl: './btncircular.component.html',
-  styleUrls: ['./btncircular.component.scss'],
+    selector: 'app-btncircular',
+    templateUrl: './btncircular.component.html',
+    styleUrls: ['./btncircular.component.scss'],
+    standalone: false
 })
 export class BTNcircularComponent implements OnInit, AfterViewInit {
   @Input() nombreImg;

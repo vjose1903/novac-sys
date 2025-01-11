@@ -13,9 +13,10 @@ import { Router } from '@angular/router';
 import { IpcService } from '../../../core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 @Component({
-  selector: 'app-configuraciones',
-  templateUrl: './configuraciones.component.html',
-  styleUrls: ['./configuraciones.component.scss'],
+    selector: 'app-configuraciones',
+    templateUrl: './configuraciones.component.html',
+    styleUrls: ['./configuraciones.component.scss'],
+    standalone: false
 })
 export class ConfiguracionesComponent implements OnInit {
   configServ = Ss.configServ;

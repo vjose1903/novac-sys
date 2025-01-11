@@ -5,7 +5,8 @@ import { fun } from '../services/functions.service';
 import { Ss } from '../services/singleton.service';
 
 @Directive({
-  selector: '[appMsgError]',
+    selector: '[appMsgError]',
+    standalone: false
 })
 export class MsgErrorDirective {
   @Input('appMsgError') id;

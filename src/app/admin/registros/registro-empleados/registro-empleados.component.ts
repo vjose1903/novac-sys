@@ -15,9 +15,10 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 
 import { Permisos } from '../../../core/typescript/permisos';
 @Component({
-  selector: 'app-registro-empleados',
-  templateUrl: './registro-empleados.component.html',
-  styleUrls: ['./registro-empleados.component.scss'],
+    selector: 'app-registro-empleados',
+    templateUrl: './registro-empleados.component.html',
+    styleUrls: ['./registro-empleados.component.scss'],
+    standalone: false
 })
 export class RegistroEmpleadosComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;

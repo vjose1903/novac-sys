@@ -10,9 +10,10 @@ import { table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ConfigI } from '../../../../core/interface/config-interface';
 @Component({
-  selector: 'app-buscar-cliente-suplidor',
-  templateUrl: './buscar-cliente-suplidor.component.html',
-  styleUrls: ['./buscar-cliente-suplidor.component.scss'],
+    selector: 'app-buscar-cliente-suplidor',
+    templateUrl: './buscar-cliente-suplidor.component.html',
+    styleUrls: ['./buscar-cliente-suplidor.component.scss'],
+    standalone: false
 })
 export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit, ModalI {
   constructor(private tServ: TablasService) {

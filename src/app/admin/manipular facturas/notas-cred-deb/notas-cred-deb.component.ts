@@ -18,9 +18,10 @@ import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-im
 import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
-  selector: 'app-notas-cred-deb',
-  templateUrl: './notas-cred-deb.component.html',
-  styleUrls: ['./notas-cred-deb.component.scss'],
+    selector: 'app-notas-cred-deb',
+    templateUrl: './notas-cred-deb.component.html',
+    styleUrls: ['./notas-cred-deb.component.scss'],
+    standalone: false
 })
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   // factura;

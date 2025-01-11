@@ -33,9 +33,10 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from './admin/facturacion/facturacion.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
   @HostListener('window:keydown', ['$event'])

@@ -1,8 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'callback',
-  pure: false,
+    name: 'callback',
+    pure: false,
+    standalone: false
 })
 export class FiltroParaNgforPipe implements PipeTransform {
   transform(items: any[], callback: (item: any) => boolean): any {

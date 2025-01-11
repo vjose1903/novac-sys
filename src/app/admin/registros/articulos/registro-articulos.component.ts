@@ -20,9 +20,10 @@ const moment = require('../../../core/javascript/moment');
 const $ = require('jquery');
 
 @Component({
-  selector: 'app-registro-articulos',
-  templateUrl: './registro-articulos.component.html',
-  styleUrls: ['./registro-articulos.component.scss'],
+    selector: 'app-registro-articulos',
+    templateUrl: './registro-articulos.component.html',
+    styleUrls: ['./registro-articulos.component.scss'],
+    standalone: false
 })
 export class RegistroArticulosComponent extends MixinClass implements OnInit, OnDestroy, OnChanges {
   // =============================================

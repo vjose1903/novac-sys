@@ -8,9 +8,10 @@ import * as _ from 'lodash';
 import { FacturacionService } from '../facturacion.service';
 
 @Component({
-  selector: 'app-confirmacion-imprimir',
-  templateUrl: './confirmacion-imprimir.component.html',
-  styleUrls: ['./confirmacion-imprimir.component.scss'],
+    selector: 'app-confirmacion-imprimir',
+    templateUrl: './confirmacion-imprimir.component.html',
+    styleUrls: ['./confirmacion-imprimir.component.scss'],
+    standalone: false
 })
 export class ConfirmacionImprimirComponent implements OnInit, ModalI {
   @HostListener('window:keyup', ['$event'])

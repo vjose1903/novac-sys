@@ -17,9 +17,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 const moment = require('../../../../core/javascript/moment');
 
 @Component({
-  selector: 'app-ingresos',
-  templateUrl: './ingresos.component.html',
-  styleUrls: ['./ingresos.component.scss'],
+    selector: 'app-ingresos',
+    templateUrl: './ingresos.component.html',
+    styleUrls: ['./ingresos.component.scss'],
+    standalone: false
 })
 export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   clienteAdepositar: any;

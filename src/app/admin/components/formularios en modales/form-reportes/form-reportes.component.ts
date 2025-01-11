@@ -16,9 +16,10 @@ import { ModalI } from '../../modal/modal-class';
 import { reportField } from './form-reportes.component.model';
 
 @Component({
-  selector: 'app-form-reportes',
-  templateUrl: './form-reportes.component.html',
-  styleUrls: ['./form-reportes.component.scss'],
+    selector: 'app-form-reportes',
+    templateUrl: './form-reportes.component.html',
+    styleUrls: ['./form-reportes.component.scss'],
+    standalone: false
 })
 export class FormReportesComponent extends MixinClass implements OnInit, ModalI {
   fun = fun;

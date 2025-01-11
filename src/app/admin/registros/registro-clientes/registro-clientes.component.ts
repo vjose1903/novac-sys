@@ -13,9 +13,10 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
-  selector: 'app-registro-clientes',
-  templateUrl: './registro-clientes.component.html',
-  styleUrls: ['./registro-clientes.component.scss'],
+    selector: 'app-registro-clientes',
+    templateUrl: './registro-clientes.component.html',
+    styleUrls: ['./registro-clientes.component.scss'],
+    standalone: false
 })
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
