@@ -61,7 +61,7 @@
                 'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData })
               }"
               style="cursor: pointer; color: var(--letras)"
-              [ngStyle]="{ 'background-color': this.changeBackGroundColor(rowData) }"
+              [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
               #RowElement
               (click)="clickROW(rowData, getIndex(indexBody))"
             >
