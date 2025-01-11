@@ -1,5 +1,5 @@
 
-@import "./forms.scss";
+@use "./forms.scss" as *;
 
 .p-togglebutton {
   &.p-button {

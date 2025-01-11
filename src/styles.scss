@@ -1,10 +1,12 @@
+@use './animateCss.scss' as *;
+@use './splash-styles.scss' as *;
+@use './assets/my_styles/main.scss' as *;
+
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
+
 $bodyfont: 'Poppins';
 
-@import './animateCss.scss';
-@import './splash-styles.scss';
-@import './assets/my_styles/main.scss';
 
 .visually-hidden {
   display: none !important;

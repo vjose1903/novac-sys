@@ -76,7 +76,9 @@ function createWindow() {
       writeLogs('  ');
       writeLogs('  ');
       writeLogs(app.getVersion(), 'app.getVersion()');
+
       const electronScreen = screen;
+
       const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
       // Create the browser window.
@@ -103,10 +105,11 @@ function createWindow() {
       }, 250);
 
       // Emitted when the window is closed.
-      win.on('closed', (event) => (win = emptyWin));
+      win.on('closed', () => (win = emptyWin));
 
       resolve(win);
     } catch (error) {
+      console.error('CREATEW WINDOW error ', error);
       writeLogs(error, 'ERROR EJECUTANDO LA CARPETA PRINCIPAL');
       console.error(error);
     }
@@ -223,8 +226,9 @@ ipcMain.on(ELECTRON_SENDER, handleEvent);
 
 async function handleEvent(event: any, obj: string) {
   try {
-    var task = JSON.parse(obj) as MessageTaskInterface;
-    const parameters = JSON.parse(task.data);
+    const task = JSON.parse(obj) as MessageTaskInterface;
+    const parameters = task?.data ? JSON.parse(task.data) : task?.data;
+
     let res;
 
     switch (task.eventName) {
@@ -238,7 +242,6 @@ async function handleEvent(event: any, obj: string) {
         if (!serve) win.loadURL(appFilePath);
       //
       case ELECTRON_CHANGE_CONFIG_FILE:
-
         replace_in_file
           .replaceFunction(parameters)
           .then((res) => {
@@ -266,7 +269,6 @@ async function handleEvent(event: any, obj: string) {
       //
       case ELECTRON_PRINT_BASE64:
         writeLogs('INICIANDOO PROCESO DE IMPRESION');
-        
 
         const base64 = parameters.base64;
         const fileName = parameters.file;
@@ -285,7 +287,7 @@ async function handleEvent(event: any, obj: string) {
           });
 
         break;
-      // 
+      //
       case ELECTRON_EXPORT_CSV:
         writeLogs('INICIANDOO PROCESO DE EXPORTACION');
 
@@ -325,7 +327,8 @@ async function handleEvent(event: any, obj: string) {
         break;
     }
   } catch (error) {
-    writeLogs(error, 'HANDLE ECENT ERROR ');
+    console.error('HANDLE EVENTE error ', error);
+    writeLogs(error, 'HANDLE EVENT ERROR ');
   }
 }
 
@@ -485,22 +488,25 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // GENERAR EL CSV
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function generateCSV(params: { fileName: string; csvString: string }) {
+
   return new Promise(async (resolve, reject) => {
     try {
+
+      const fileName = params.fileName;
+      const csvString = params.csvString;
+            
       const documentsPath = app.getPath('documents');
       const targetFolder = path.join(documentsPath, 'NovacSystem');
-  
+      
       if (!fs.existsSync(targetFolder)) {
         fs.mkdirSync(targetFolder, { recursive: true });
       }
-  
-      const filePath = parsePath(path.join(targetFolder, `${params.fileName}.csv`));
+      
+      const filePath = parsePath(path.join(targetFolder, fileName));
+      
+      fs.writeFileSync(filePath, csvString, 'utf8');
 
-      writeLogs(filePath, 'filePath');
-  
-      fs.writeFileSync(filePath, params.csvString, 'utf8');
-
-      resolve({ success: true, filePath })
+      resolve({ success: true, filePath });
     } catch (error) {
       reject({ success: false, error });
     }

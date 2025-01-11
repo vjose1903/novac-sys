@@ -1,8 +1,10 @@
-import { tFacturaD } from './../../../admin/facturacion/factura';
 import { Injectable } from '@angular/core';
-import * as _ from 'lodash';
+
 const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
+
+// import * as pdfMake from 'pdfmake/build/pdfmake';
+// import { pdfFonts } from '../../typescript/pdfmake-fonts';
 
 import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
@@ -34,6 +36,7 @@ export class PdfService {
       data['reimprimir'] = reimprimir;
 
       data.fecha = fun.hasValue(data.fecha_equivalente) ? data.fecha_equivalente : data.fecha;
+
       try {
         switch (type_oPdf) {
           case 'recibo_ingreso':
@@ -116,7 +119,7 @@ export class PdfService {
 
   static createPdfFromBase64(docDefinition, file_, reimprimir_, callback = (arg) => {}) {
     try {
-      pdfMake.vfs = pdfFonts.pdfMake.vfs;
+      pdfMake.vfs = pdfFonts.vfs;
 
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
       pdfDocGenerator.getBase64((data) => {
@@ -132,6 +135,7 @@ export class PdfService {
         callback(respuesta);
       });
     } catch (error) {
+      console.error('>>>>.', error);
       const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no', body: error });
       callback(respuesta);
     }

@@ -9,7 +9,6 @@ import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
-import { PrimeNGConfig } from 'primeng/api';
 
 import {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
@@ -33,10 +32,10 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from './admin/facturacion/facturacion.service';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    standalone: false
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  standalone: false,
 })
 export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
   @HostListener('window:keydown', ['$event'])
@@ -73,8 +72,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public toastr: ToastrService,
     public sharedServ: SharedService,
     public permissionsService: NgxPermissionsService,
-
-    private config: PrimeNGConfig,
   ) {
     super();
   }
@@ -147,54 +144,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
 
     window.onresize = (e) => this.resize.bind(this)(e);
-
-    this.config.setTranslation({
-      startsWith: 'Empieza con',
-      contains: 'Contiene',
-      notContains: 'No contiene',
-      endsWith: 'Termina con',
-      equals: 'Igual',
-      notEquals: 'No igual',
-      noFilter: 'No Filtrar',
-      lt: 'Menos que',
-      lte: 'Menos o igual que',
-      gt: 'Mayor que',
-      gte: 'Mayor o igual que',
-      is: 'Es',
-      isNot: 'No es',
-      before: 'Antes',
-      after: 'Despues',
-      dateIs: 'Fecha es',
-      dateIsNot: 'Fecha no es',
-      dateBefore: 'Fecha es anterior',
-      dateAfter: 'Fecha es posterior',
-      clear: 'Limpiar',
-      apply: 'APlicar',
-      matchAll: 'Todos concuerdan',
-      matchAny: 'Nunguno concuerda',
-      addRule: 'Añadir regla',
-      removeRule: 'Remover regla',
-      accept: 'Si',
-      reject: 'No',
-      choose: 'Elegir',
-      upload: 'Subir',
-      cancel: 'Cancelar',
-      dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'sabado'],
-      dayNamesShort: ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'],
-      dayNamesMin: ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'],
-      monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      monthNamesShort: ['Ene.', 'Feb.', 'Mar.', 'Abr.', 'May', 'Jun.', 'Jul.', 'Ago.', 'Sep.', 'Oct.', 'Nov.', 'Dic.'],
-      dateFormat: 'dd/mm/yy',
-      firstDayOfWeek: 1,
-      today: 'Hoy',
-      weekHeader: 'Wk',
-      weak: 'Semana',
-      medium: 'Medio',
-      strong: 'Fuerte',
-      passwordPrompt: 'Ingrese contraseña',
-      emptyMessage: 'No hay registros',
-      emptyFilterMessage: 'No registros encontrados',
-    });
   }
 
   ngAfterViewInit(): void {
@@ -279,8 +228,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           if (fun.objHas(config, 'err')) {
             console.error(config);
           } else {
-            console.log(config);
-
             this.themeService.setTheme(config.color_app);
             this.configServ.setConfig = config;
             this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;

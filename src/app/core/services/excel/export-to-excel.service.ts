@@ -33,7 +33,7 @@ export class ExportToExcelService {
         csvData.push(...csvBody);
         
         const csvString = csvData.join('\n');
-        const fileName = `${config.fileName(exportData[config.fileNameDataKey])}.csv`
+        const fileName = `${config.fileName(exportData[config.fileNameDataKey])}`
 
         this.exportCsv(fileName, csvString).then(() => {
           Ss.loadServ.isLoading.next(false);

@@ -1,5 +1,5 @@
 
-@import "./btns.scss";
+@use "./btns.scss" as *;
 
 .white-content {
   .p-confirm-popup {

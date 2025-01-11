@@ -2,30 +2,32 @@ import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
-import { ConfigI } from './src/app/core/typescript/config-interface';
+import { ConfigI } from './src/app/core/interface/config-interface';
 
 const { exec } = require('child_process');
 
-import Functions from './electron/functions.js';
+import Functions from './electron/functions';
 import HandlerConfigFile from './electron/handler-config-file';
 
 import {
-  KEYWORD_ELECTRON_CHANGE_CONFIG_FILE,
-  KEYWORD_ELECTRON_EVENT_DECRYPT,
-  KEYWORD_ELECTRON_EVENT_ENCRYPT,
-  KEYWORD_ELECTRON_GET_APP_CONFIG,
-  KEYWORD_ELECTRON_PRINT_BASE64,
-  KEYWORD_ELECTRON_QUIT_APP,
-  KEYWORD_ELECTRON_RESPONSE,
-  KEYWORD_ELECTRON_SENDER,
-  KEYWORD_ELECTRON_SET_APP_CONFIG,
-  KEYWORD_ELECTRON_TEST,
-  KEYWORD_ELECTRON_RELOAD,
+  ELECTRON_CHANGE_CONFIG_FILE,
+  ELECTRON_EVENT_DECRYPT,
+  ELECTRON_EVENT_ENCRYPT,
+  ELECTRON_GET_APP_CONFIG,
+  ELECTRON_PRINT_BASE64,
+  ELECTRON_QUIT_APP,
+  ELECTRON_RESPONSE,
+  ELECTRON_SENDER,
+  ELECTRON_SET_APP_CONFIG,
+  ELECTRON_TEST,
+  ELECTRON_RELOAD,
   MessageTaskInterface,
-} from './electron/shared-electron-angular.js';
-import AppUpdater from './electron/auto-update.js';
-import ReplaceInFile from './electron/replace-in-file.js';
+  ELECTRON_EXPORT_CSV,
+} from './electron/shared-electron-angular';
+import AppUpdater from './electron/auto-update';
+import ReplaceInFile from './electron/replace-in-file';
 import DockerHandler from './electron/docker-handler';
+import { operativeSystemE } from './src/app/core/typescript/constantes';
 
 let emptyWin: BrowserWindow;
 let win: BrowserWindow;
@@ -36,7 +38,7 @@ let replace_in_file: ReplaceInFile;
 
 const args = process.argv.slice(1);
 const serve = args.some((val) => val === '--serve');
-const appFilePath: any = url.format({ pathname: path.join(app.getAppPath(), 'dist', 'browser' ,'index.html'), protocol: 'file:', slashes: true });
+const appFilePath: any = url.format({ pathname: path.join(app.getAppPath(), 'dist', 'browser', 'index.html'), protocol: 'file:', slashes: true });
 
 function createSplash(type = 'splash') {
   if (splash) {
@@ -46,7 +48,7 @@ function createSplash(type = 'splash') {
 
   splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
 
-  const splashUrl = url.format({ pathname: path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`), protocol: 'file:', slashes: true, });
+  const splashUrl = url.format({ pathname: path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`), protocol: 'file:', slashes: true });
 
   splash.loadURL(splashUrl);
   splash.center();
@@ -74,7 +76,9 @@ function createWindow() {
       writeLogs('  ');
       writeLogs('  ');
       writeLogs(app.getVersion(), 'app.getVersion()');
+
       const electronScreen = screen;
+
       const size = electronScreen.getPrimaryDisplay().workAreaSize;
 
       // Create the browser window.
@@ -101,11 +105,12 @@ function createWindow() {
       }, 250);
 
       // Emitted when the window is closed.
-      win.on('closed', (event) => (win = emptyWin));
+      win.on('closed', () => (win = emptyWin));
 
       resolve(win);
     } catch (error) {
-      writeLogs(error, 'ERROR EJECUTANDO LA CARPETA PRINCIPAL')
+      console.error('CREATEW WINDOW error ', error);
+      writeLogs(error, 'ERROR EJECUTANDO LA CARPETA PRINCIPAL');
       console.error(error);
     }
   });
@@ -217,99 +222,113 @@ async function beforeCreateWindow(win) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Handle angular events
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-ipcMain.on(KEYWORD_ELECTRON_SENDER, handleEvent);
+ipcMain.on(ELECTRON_SENDER, handleEvent);
 
 async function handleEvent(event: any, obj: string) {
   try {
-    var arg = JSON.parse(obj) as MessageTaskInterface;
+    const task = JSON.parse(obj) as MessageTaskInterface;
+    const parameters = task?.data ? JSON.parse(task.data) : task?.data;
 
     let res;
 
-    switch (arg.eventName) {
-      case KEYWORD_ELECTRON_TEST:
+    switch (task.eventName) {
+      case ELECTRON_TEST:
         // test function
         break;
       //
-      case KEYWORD_ELECTRON_RELOAD:
+      case ELECTRON_RELOAD:
         writeLogs('RECARGANDO ELECTRON');
         win.reload();
         if (!serve) win.loadURL(appFilePath);
       //
-      case KEYWORD_ELECTRON_CHANGE_CONFIG_FILE:
-        const obj = JSON.parse(arg.data);
-
+      case ELECTRON_CHANGE_CONFIG_FILE:
         replace_in_file
-          .replaceFunction(obj)
+          .replaceFunction(parameters)
           .then((res) => {
-            arg.response = res;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+            task.response = res;
+            event.reply(ELECTRON_RESPONSE, task);
           })
           .catch((err) => {
-            arg.response = err;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+            task.response = err;
+            event.reply(ELECTRON_RESPONSE, task);
           });
 
         break;
       //
-      case KEYWORD_ELECTRON_EVENT_DECRYPT:
-        res = Functions.desEncriptar(arg.data);
-        arg.response = res;
-        event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+      case ELECTRON_EVENT_DECRYPT:
+        res = Functions.desEncriptar(task.data);
+        task.response = res;
+        event.reply(ELECTRON_RESPONSE, task);
         break;
       //
-      case KEYWORD_ELECTRON_EVENT_ENCRYPT:
-        res = Functions.encriptar(arg.data);
-        arg.response = res;
-        event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+      case ELECTRON_EVENT_ENCRYPT:
+        res = Functions.encriptar(task.data);
+        task.response = res;
+        event.reply(ELECTRON_RESPONSE, task);
         break;
       //
-      case KEYWORD_ELECTRON_PRINT_BASE64:
+      case ELECTRON_PRINT_BASE64:
         writeLogs('INICIANDOO PROCESO DE IMPRESION');
-        const oPdf = JSON.parse(arg.data);
 
-        const base64 = oPdf.base64;
-        const fileName = oPdf.file;
-        const printer = oPdf.printer;
-        const type = oPdf['type'] ? oPdf['type'] : 'reporte';
-        const pageOrientation = oPdf['pageOrientation'] ? oPdf['pageOrientation'] : 'portrait';
+        const base64 = parameters.base64;
+        const fileName = parameters.file;
+        const printer = parameters.printer;
+        const type = parameters['type'] ? parameters['type'] : 'reporte';
+        const pageOrientation = parameters['pageOrientation'] ? parameters['pageOrientation'] : 'portrait';
 
         generatePdfFileFormBase64({ fileName, base64, type, pageOrientation, printer })
           .then((res) => {
-            arg.response = res;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+            task.response = res;
+            event.reply(ELECTRON_RESPONSE, task);
           })
           .catch((err) => {
-            arg.response = err;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+            task.response = err;
+            event.reply(ELECTRON_RESPONSE, task);
           });
 
         break;
       //
-      case KEYWORD_ELECTRON_GET_APP_CONFIG:
-        getConfigFile()
-          .then((config) => {
-            arg.response = config;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+      case ELECTRON_EXPORT_CSV:
+        writeLogs('INICIANDOO PROCESO DE EXPORTACION');
+
+        generateCSV(parameters)
+          .then((res) => {
+            task.response = res;
+            event.reply(ELECTRON_RESPONSE, task);
           })
           .catch((err) => {
-            arg.response = err;
-            event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+            task.response = err;
+            event.reply(ELECTRON_RESPONSE, task);
+          });
+
+        break;
+      //
+      case ELECTRON_GET_APP_CONFIG:
+        getConfigFile()
+          .then((config) => {
+            task.response = config;
+            event.reply(ELECTRON_RESPONSE, task);
+          })
+          .catch((err) => {
+            task.response = err;
+            event.reply(ELECTRON_RESPONSE, task);
           });
         break;
       //
-      case KEYWORD_ELECTRON_SET_APP_CONFIG:
-        Functions.setConfigFile(arg.data).then(() => {
-          arg.response = 'LISTO';
-          event.reply(KEYWORD_ELECTRON_RESPONSE, arg);
+      case ELECTRON_SET_APP_CONFIG:
+        Functions.setConfigFile(task.data).then(() => {
+          task.response = 'LISTO';
+          event.reply(ELECTRON_RESPONSE, task);
         });
         break;
       //
       default:
-        event.reply(KEYWORD_ELECTRON_RESPONSE);
+        event.reply(ELECTRON_RESPONSE);
         break;
     }
   } catch (error) {
-    writeLogs(error, 'HANDLE ECENT ERROR ')
+    console.error('HANDLE EVENTE error ', error);
+    writeLogs(error, 'HANDLE EVENT ERROR ');
   }
 }
 
@@ -345,9 +364,10 @@ function getConfigFile() {
     try {
       const serve_ = await getServer_();
       const pjson = require('./package.json');
-      const config = await getConfig();
+      const config: ConfigI = await getConfig();
 
       const printer_list = await getPrinters();
+      config['operative_system'] = isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows;
       config['is_development'] = serve_;
       config['gitUser'] = await getActualGitUser();
       config['printersList'] = ['Ninguna', ...printer_list];
@@ -465,6 +485,35 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// GENERAR EL CSV
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+function generateCSV(params: { fileName: string; csvString: string }) {
+
+  return new Promise(async (resolve, reject) => {
+    try {
+
+      const fileName = params.fileName;
+      const csvString = params.csvString;
+            
+      const documentsPath = app.getPath('documents');
+      const targetFolder = path.join(documentsPath, 'NovacSystem');
+      
+      if (!fs.existsSync(targetFolder)) {
+        fs.mkdirSync(targetFolder, { recursive: true });
+      }
+      
+      const filePath = parsePath(path.join(targetFolder, fileName));
+      
+      fs.writeFileSync(filePath, csvString, 'utf8');
+
+      resolve({ success: true, filePath });
+    } catch (error) {
+      reject({ success: false, error });
+    }
+  });
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // IMPRIMIR EL PDF
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function imprimir(params: { fileName: string; tipo: string; pageOrientation: string; printer: string }) {
@@ -496,7 +545,7 @@ function imprimir(params: { fileName: string; tipo: string; pageOrientation: str
 // PARA CREAR LA RUTA CORRECTA EN CASO DE SER COMPILADA O NO
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-export function contruirPath(path_temp) {
+export function parsePath(path_temp) {
   return isMacOs() ? path_temp : path_temp.split('/').join('\\');
 }
 
@@ -518,8 +567,7 @@ export function pathAdd(addToPath = '', resource = true): Promise<string> {
     }
 
     path_temp = path_temp + addToPath;
-    path_resolved = isMacOs() ? path_temp : path_temp.split('/').join('\\');
 
-    resolve(path_resolved);
+    resolve(parsePath(path_temp));
   });
 }
