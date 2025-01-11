@@ -54,7 +54,7 @@
     "ngx-toastr": "^18.0.0",
     "pdfmake": "^0.2.10",
     "primeicons": "7.0.0",
-    "primeng": "17.18.0",
+    "primeng": "19.0.5",
     "replace-in-file": "7.1.0"
   },
   "devDependencies": {
