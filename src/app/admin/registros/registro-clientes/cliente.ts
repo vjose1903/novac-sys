@@ -8,6 +8,8 @@ import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
 import { Validators } from '@angular/forms';
+import { ReporteViewModalConfigI } from '../../../core/interface/reporte-view-modal-config';
+import { csvConfig } from '../../../core/services/excel/configs/report/cuentas_con_pagos';
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
@@ -25,7 +27,10 @@ export class ClienteC extends CrudG<any> {
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
-      //
+      function returnDataFromModal(arg) {
+        ClienteC.requestReporte(arg, params);
+        resolve(arg);
+      }
 
       const reportIncludedInSwitches = ['cuentas_cobrar_ant_saldo', 'cuentas_cobrar_cliente'];
 
@@ -36,14 +41,11 @@ export class ClienteC extends CrudG<any> {
       ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
       let objModal = ReporteC.objReporte;
 
+      ReporteC.configCsv = csvConfig;
+
       objModal['returnDataFromModal'] = returnDataFromModal;
-
+      
       params.openNewModal(objModal);
-
-      function returnDataFromModal(arg) {
-        ClienteC.requestReporte(arg, params);
-        resolve(arg);
-      }
     });
   }
 
@@ -88,14 +90,15 @@ export class ClienteC extends CrudG<any> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then((response) => {
-      let objPdfView = {
-        ...response,
+      let objPdfView: ReporteViewModalConfigI = {
         titulo: pdfParams.inputs.titulo,
-        fileName: _.first(response.file.split('.')),
         openNewModal: pdfParams.openNewModal,
         viewerOptions: { width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem' },
+        ...response,
+        exportCsv: true
       };
-
+      
+      
       ReporteC.visualizarReporte(objPdfView);
     });
 

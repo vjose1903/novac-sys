@@ -1,3 +1,5 @@
+import { operativeSystemE } from "../typescript/constantes";
+
 export interface ConfigI {
   cliente:                     string;
   nombre_empresa:              string;
@@ -9,6 +11,7 @@ export interface ConfigI {
   color_app:                   colors;
   mode_app:                    modes;
   gitUser?:                    string;
+  operative_system?:           operativeSystemE;
   url_servidor:                string;
   url_servidor_respaldo:       string;
   url_servidor_descargas:      string;

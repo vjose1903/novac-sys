@@ -11,8 +11,8 @@ import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
 import { Ss } from '../singleton.service';
 import { MessageTask } from '../../models/message-task';
-import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
-import { ConfigI } from '../../typescript/config-interface';
+import { ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
+import { ConfigI } from '../../interface/config-interface';
 import { fun } from '../functions.service';
 
 @Injectable({ providedIn: 'root' })
@@ -140,7 +140,7 @@ export class PdfService {
   static imprimirBase64(oBase: { base64: string; file: string; type: string; printer: string; pageOrientation: string }) {
     try {
       return new Promise<any>((resolve, reject) => {
-        const task = new MessageTask(KEYWORD_ELECTRON_PRINT_BASE64, oBase);
+        const task = new MessageTask(ELECTRON_PRINT_BASE64, oBase);
 
         Ss._ipc
           .sendTask(task)

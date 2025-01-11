@@ -3,7 +3,7 @@ import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { fun } from '../../../../core/services/functions.service';
 import { SharedService } from '../../../../core/services/shared.service';
-import { ConfigI } from '../../../../core/typescript/config-interface';
+import { ConfigI } from '../../../../core/interface/config-interface';
 import { Ss } from '../../../../core/services/singleton.service';
 import { teclasCode } from '../../../../core/typescript/constantes';
 import { HtmlElementsService } from '../../../../core/services/html-elements.service';

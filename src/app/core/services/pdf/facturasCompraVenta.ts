@@ -3,7 +3,7 @@ import * as fun_ from './utils/funciones';
 import { styles_ } from './utils/files';
 import * as numLetra from './utils/numero_letras';
 import { Ss } from '../singleton.service';
-import { ConfigI } from '../../typescript/config-interface';
+import { ConfigI } from '../../interface/config-interface';
 import { infoPagare } from './8.5x5.5/infoPdfs';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA

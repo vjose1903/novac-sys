@@ -18,13 +18,13 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
-  KEYWORD_ELECTRON_QUIT_APP,
-  KEYWORD_ELECTRON_GET_APP_CONFIG,
-  KEYWORD_ELECTRON_RELOAD,
+  ELECTRON_QUIT_APP,
+  ELECTRON_GET_APP_CONFIG,
+  ELECTRON_RELOAD,
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';
-import { ConfigI } from './core/typescript/config-interface';
+import { ConfigI } from './core/interface/config-interface';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
@@ -125,7 +125,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
             break;
           //
-          case KEYWORD_ELECTRON_QUIT_APP:
+          case ELECTRON_QUIT_APP:
             this.cerrar_app();
 
             break;
@@ -270,7 +270,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   async getAppConfig() {
     return new Promise<any>((resolve, reject) => {
-      const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+      const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
 
       this._ipc
         .sendTask(task)

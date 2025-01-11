@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Ss } from '../../../core/services/singleton.service';
-import { ConfigI } from '../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/interface/config-interface';
 import { ModalI } from '../../components/modal/modal-class';
 import { SharedService } from '../../../core/services/shared.service';
 import { teclasCode } from '../../../core/typescript/constantes';

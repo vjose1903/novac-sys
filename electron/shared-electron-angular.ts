@@ -1,14 +1,15 @@
-export const KEYWORD_ELECTRON_TEST = 'electron-test';
-export const KEYWORD_ELECTRON_SENDER = 'electron-envio';
-export const KEYWORD_ELECTRON_RESPONSE = 'electron-respuesta';
-export const KEYWORD_ELECTRON_QUIT_APP = 'electron-quit-app';
-export const KEYWORD_ELECTRON_EVENT_DECRYPT = 'electron-desencriptar';
-export const KEYWORD_ELECTRON_EVENT_ENCRYPT = 'electron-encriptar';
-export const KEYWORD_ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
-export const KEYWORD_ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
-export const KEYWORD_ELECTRON_PRINT_BASE64 = 'electron-print-base64';
-export const KEYWORD_ELECTRON_CHANGE_CONFIG_FILE = 'electron-change-config-file';
-export const KEYWORD_ELECTRON_RELOAD = 'electron-reload';
+export const ELECTRON_TEST = 'electron-test';
+export const ELECTRON_SENDER = 'electron-envio';
+export const ELECTRON_RESPONSE = 'electron-respuesta';
+export const ELECTRON_QUIT_APP = 'electron-quit-app';
+export const ELECTRON_EVENT_DECRYPT = 'electron-desencriptar';
+export const ELECTRON_EVENT_ENCRYPT = 'electron-encriptar';
+export const ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
+export const ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
+export const ELECTRON_PRINT_BASE64 = 'electron-print-base64';
+export const ELECTRON_EXPORT_CSV = 'electron-export-csv';
+export const ELECTRON_CHANGE_CONFIG_FILE = 'electron-change-config-file';
+export const ELECTRON_RELOAD = 'electron-reload';
 export const ELECTRON_EVENT_CHECK_UPDATE = 'check-update';
 export const ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE = 'checking-for-update';
 export const ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE = 'update-available';
@@ -50,6 +51,6 @@ export interface PrintJob {
 
 export default class SharedElectronAngular {
   static sendEventToAngular(win, params: { event_name: string; info: any }) {
-    if (win) win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
+    if (win) win.webContents.send(ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
   }
 }

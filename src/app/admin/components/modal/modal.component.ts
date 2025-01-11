@@ -12,7 +12,7 @@ import { fun } from '../../../core/services/functions.service';
 })
 export class NewModalComponent implements OnInit, OnDestroy {
   @ViewChildren(ModalDirective) modal_receptor: ModalDirective;
-
+  fun = fun;
   constructor(private componentFactoryResolver: ComponentFactoryResolver, private cdRef: ChangeDetectorRef, public mServ: ModalService) {}
 
   private destroy$ = new Subject<void>();
@@ -167,7 +167,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
 
   dynamicFunction(configuration, btn) {
     const modal = _.find(this.modalsConfig, (config) => config.id === configuration.id);
-
+    
     if (fun.objHas(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
     else btn['function'](modal);
   }

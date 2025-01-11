@@ -1,5 +1,5 @@
 import { inputViewerOptions } from './../../components/pdf-viewer/pdf-viewer';
-import { ConfigI } from './../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';

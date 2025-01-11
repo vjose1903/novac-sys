@@ -11,7 +11,7 @@ import { ClienteC } from '../registros/registro-clientes/cliente';
 import { SuplidorC } from '../registros/registro-suplidores/suplidores';
 import { RequestC } from '../../core/typescript/requests';
 import { Ss } from '../../core/services/singleton.service';
-import { ConfigI } from '../../core/typescript/config-interface';
+import { ConfigI } from '../../core/interface/config-interface';
 import { fun } from '../../core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 

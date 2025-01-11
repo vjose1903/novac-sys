@@ -69,7 +69,8 @@ export class InterceptorService implements HttpInterceptor {
         console.log('response ', response);
         console.log(' ');
         if (fun.isEmpty(response.error)) {
-          fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
+          fun.toastError('Error <strong>desconocido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR');
+          
         } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
           fun.toastError(response.error.msg, 'ERROR');
           this.sharedServ.nextCanToast(false);

@@ -1,4 +1,4 @@
-import { inputViewerOptions, viewerOptions } from './../components/pdf-viewer/pdf-viewer';
+import { ReporteBackendResponseI, ReporteViewModalConfigI } from '../../core/interface/reporte-view-modal-config';
 import { PdfService } from '../../core/services/pdf/pdf.service';
 import { Ss } from '../../core/services/singleton.service';
 import { fun } from '../../core/services/functions.service';
@@ -7,13 +7,25 @@ import { FormReportesComponent } from '../components/formularios en modales/form
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import * as _ from 'lodash';
-import { ConfigI } from '../../core/typescript/config-interface';
+import { ConfigI } from '../../core/interface/config-interface';
+import { ExportToExcelService } from '../../core/services/excel/export-to-excel.service';
+import { inject } from '@angular/core';
+import { exportExcelConfigI } from '../../core/interface/export-to-excel.interface';
 
 export class ReporteC extends CrudG<any> {
   private static _objReporte;
+  private static _configCsv: exportExcelConfigI;
 
   constructor() {
     super('reportes');
+  }
+
+  static set configCsv(config: exportExcelConfigI) {
+    this._configCsv = config;
+  }
+
+  static get configCsv() {
+    return this._configCsv;
   }
 
   static set objReporte(params: { width?: string; id?: string; header?: string; botones?: any; inputs?: any; height?: any; returnDataFromModal?: Function }) {
@@ -65,12 +77,16 @@ export class ReporteC extends CrudG<any> {
     });
   }
 
-  static visualizarReporte(objPdfView: { openNewModal: Function; status: string; pageOrientation: string; file: any; base64: any; reimprimir: any; msg: any; titulo: string; viewerOptions: viewerOptions }) {
-    objPdfView['viewerOptions'] ??= {};
+  static visualizarReporte(objPdfView: ReporteViewModalConfigI) {
 
-    if (objPdfView.status == 'no') fun.toastError(objPdfView.msg, 'ERROR');
-    else {
-      objPdfView.openNewModal({
+    console.log("objPdfView:", objPdfView);
+    objPdfView['viewerOptions'] ??= {};
+    if (fun.isEmpty(objPdfView?.exportCsv)) objPdfView.exportCsv = false;
+
+    if (objPdfView.status == 'no') {
+      fun.toastError(objPdfView.msg, 'ERROR');
+    } else {
+      const modalViewReporte = {
         component: PdfViewerComponent,
         inputs: objPdfView,
         id: 'reporte_view',
@@ -81,10 +97,15 @@ export class ReporteC extends CrudG<any> {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
             { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-            { clase: 'btn btn-verde', function: (instance) => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false, },
+            { clase: 'btn btn-verde', function: (instance) => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false },
           ],
         },
-      });
+      };
+
+      if (objPdfView.exportCsv)
+        fun.pushAt(modalViewReporte.botones.dinamico, 1, { clase: 'btn btn-gris', function: (instance) => this.exportCsv(objPdfView.requestResult , instance), label: 'Exportar CSV', disable: false, icon: 'fa-solid fa-file-excel', iconColor: '#5fcf5f' });
+
+      objPdfView.openNewModal(modalViewReporte);
     }
 
     Ss.loadServ.isLoading.next(false);
@@ -111,6 +132,15 @@ export class ReporteC extends CrudG<any> {
           Ss.loadServ.isLoading.next(false);
           fun.toastError(err.msg, 'ERROR');
         });
+    });
+  }
+
+  static exportCsv(data: ReporteBackendResponseI, modalInstance?) {
+    const exportToExcelServ = new ExportToExcelService();
+    
+    exportToExcelServ.download(this._configCsv, data).then(() => {
+      fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+      if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
     });
   }
 }

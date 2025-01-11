@@ -22,7 +22,7 @@ import { fun } from '../../core/services/functions.service';
 import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
 import { seriesDGII, teclasCode, serie } from '../../core/typescript/constantes';
 import { Permisos } from '../../core/typescript/permisos';
-import { ConfigI } from '../../core/typescript/config-interface';
+import { ConfigI } from '../../core/interface/config-interface';
 import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../components/modal/modal-class';

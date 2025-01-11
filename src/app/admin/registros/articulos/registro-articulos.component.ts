@@ -12,7 +12,7 @@ import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { ConfigI } from '../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
 import { ModalClass } from '../../components/modal/modal-class';

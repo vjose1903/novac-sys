@@ -11,7 +11,7 @@ import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
-import { ConfigI } from '../../../../core/typescript/config-interface';
+import { ConfigI } from '../../../../core/interface/config-interface';
 import { Ss } from '../../../../core/services/singleton.service';
 @Component({
   selector: 'app-lista-recibos',

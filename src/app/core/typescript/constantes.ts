@@ -15,6 +15,11 @@ export const seriesDGII = [
   { label: 'Electronica', value: serie.electronica, disabled: false },
 ];
 
+export enum operativeSystemE {
+  windows = 'windows',
+  macOs = 'macOs',
+}
+
 export enum TypeNavigation {
   first_access = 0,
   reload = 1,

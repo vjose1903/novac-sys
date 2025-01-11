@@ -13,9 +13,9 @@ import { PdfService } from '../core/services/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
 import { Ss } from '../core/services/singleton.service';
-import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
+import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
-import { ConfigI } from '../core/typescript/config-interface';
+import { ConfigI } from '../core/interface/config-interface';
 import { fun } from '../core/services/functions.service';
 import { CurrentUserService } from '../core/services/current-user.service';
 import { FacturaC } from '../admin/facturacion/factura';
@@ -62,7 +62,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   ngOnDestroy() {}
 
   test() {
-    const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE);
+    const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE);
 
     this._ipc
       .sendTask(task)
@@ -112,7 +112,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
           );
         })
         .catch((error) => {
-          if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
+          if (error.status === 0) fun.toastError('El servidor está <strong>caido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR SERVIDOR');
         });
     }
   }

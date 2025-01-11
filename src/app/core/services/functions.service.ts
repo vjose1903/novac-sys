@@ -2,10 +2,10 @@ const moment = require('../javascript/moment');
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 
-import { ConfigI } from '../typescript/config-interface';
+import { ConfigI } from '../interface/config-interface';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
-import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
+import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
@@ -25,7 +25,7 @@ export class fun {
   // Descripcion : Esta funcion recarga el electron
   // _________________________________________________________________________________________________
   static reloadElectron() {
-    const task = new MessageTask(KEYWORD_ELECTRON_RELOAD);
+    const task = new MessageTask(ELECTRON_RELOAD);
 
     Ss._ipc
       .sendTask(task)
@@ -738,19 +738,19 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '', {enableHtml: true});
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '', {enableHtml: true});
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '', {enableHtml: true});
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '', {enableHtml: true});
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

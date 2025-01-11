@@ -5,8 +5,8 @@ import { Ss } from '../../../core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { MessageTask } from '../../../core/models/message-task';
-import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
-import { ConfigI } from '../../../core/typescript/config-interface';
+import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
+import { ConfigI } from '../../../core/interface/config-interface';
 import { fun } from '../../../core/services/functions.service';
 import { SharedService } from '../../../core/services/shared.service';
 import { Router } from '@angular/router';
@@ -360,7 +360,7 @@ export class ConfiguracionesComponent implements OnInit {
 
     if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
-    const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
+    const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE, objChange);
 
     this._ipc
       .sendTask(task)
