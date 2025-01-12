@@ -3,6 +3,11 @@
 }
 
 .p-dialog {
+  border: 0px solid transparent !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+  box-shadow: 0px 3px 11px 0px #00000057 !important;
+  
   .p-dialog-header {
     background-color: var(--primary02) !important;
     padding: 0.5rem 1rem !important;
@@ -11,17 +16,15 @@
     font-size: 1rem;
   }
 
-  // .p-widget-overlay {
-  //   z-index: 0 !important;
-  //   background-color: rgba(0, 0, 0, 0.4);
-  // }
-
   .p-dialog-content {
-    // height: -webkit-fill-available !important;
+    padding: 1rem !important;
     height: inherit !important;
     overflow: hidden;
   }
-  // }
+
+  .p-dialog-footer {
+    padding: 1rem !important;
+  }
 }
 
 .overlay {

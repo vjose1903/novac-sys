@@ -29,12 +29,13 @@
 
 .p-datepicker-panel {
   padding: 0rem !important;
-
+  border-radius: 0.4rem !important;
   .p-datepicker-calendar-container {
     .p-datepicker-calendar {
       .p-datepicker-header {
         background: var(--primary02) !important;
         padding: 0.3rem !important;
+        border-radius: 0.3rem 0.3rem 0 0 !important;
 
         .p-datepicker-prev-button,
         .p-datepicker-next-button {

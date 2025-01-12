@@ -11,14 +11,13 @@ import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { SpeedDialModule } from 'primeng/speeddial';
-import { InputSwitchModule } from 'primeng/inputswitch';
 import { DirectivesModule } from '../../../core/directive/directives.module';
 import { PipesModule } from '../../../core/pipe/pipes.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [NewTablasComponent, NewBTNACCIONESComponent],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, SelectModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule, InputSwitchModule, NgxPermissionsModule.forChild(), IconsArrayModule, ImgModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, SelectModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule,  NgxPermissionsModule.forChild(), IconsArrayModule, ImgModule],
   exports: [NewTablasComponent, NewBTNACCIONESComponent],
 })
 export class TablasModule {}

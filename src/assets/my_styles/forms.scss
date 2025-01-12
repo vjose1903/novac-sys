@@ -182,22 +182,6 @@ textarea {
   // }
 }
 
-p-inputswitch {
-  display: flex !important;
-}
-
-.p-inputswitch {
-  &.p-focus {
-    .p-inputswitch-slider {
-      @include primengFocus;
-    }
-  }
-  &.p-inputswitch-checked {
-    .p-inputswitch-slider {
-      background: #20b9d5 !important;
-    }
-  }
-}
 
 .p-inputtext:enabled {
   &:focus {
