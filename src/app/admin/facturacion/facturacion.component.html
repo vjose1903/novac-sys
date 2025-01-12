@@ -9,23 +9,21 @@
 
       @if (optionesExtra.length > 0 && factServ.isVenta) {
       <div class="ml-3">
-        <btn-icon-circular [id]="'btnExtra'" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
+        <btn-icon-circular id="btnExtra" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
-        <p-popover #overlayExtra [dismissable]="false" (onHide)="cerrarOverlay()">
-          <ng-template pTemplate>
-            <div id="overlayExtra">
-              <ul class="overlayExtra" role="menu">
-                @for (option of optionesExtra; track option.key; let index_option = $index) { @if (option.condition()) {
-                <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
-                  <div class="d-flex align-items-center">
-                    <strong> {{ option.key }} - </strong> &nbsp;
-                    <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
-                  </div>
-                </li>
-                } }
-              </ul>
-            </div>
-          </ng-template>
+        <p-popover #overlayExtra [dismissable]="false" styleClass="padding-sm" (onHide)="cerrarOverlay()">
+          <div id="overlayExtra">
+            <ul class="overlayExtra" role="menu">
+              @for (option of optionesExtra; track option.key; let index_option = $index) { @if (option.condition()) {
+              <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer br-4" (click)="selectOptionExtra(option, 'click')">
+                <div class="d-flex align-items-center">
+                  <strong> {{ option.key }} - </strong> &nbsp;
+                  <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
+                </div>
+              </li>
+              } }
+            </ul>
+          </div>
         </p-popover>
       </div>
       }
@@ -64,7 +62,7 @@
                   [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
                   [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
                 />
-                <p-popover [dismissable]="false" #tiposFacturas appendTo="body">
+                <p-popover [dismissable]="false" styleClass="padding-md" #tiposFacturas appendTo="body">
                   <div style="width: 21rem" [innerHtml]="factServ.htmlTiposFacturas"></div>
                 </p-popover>
               </div>
@@ -107,7 +105,7 @@
                   (blur)="gastosFacturas.hide()"
                   tabindex="-1"
                 />
-                <p-popover [dismissable]="false" #gastosFacturas appendTo="body">
+                <p-popover [dismissable]="false" styleClass="padding-md" #gastosFacturas appendTo="body">
                   <div style="width: 26rem" [innerHtml]="factServ.htmlTiposCostosGastos"></div>
                 </p-popover>
               </div>
@@ -172,82 +170,75 @@
                 </div>
               </div>
 
-              <p-popover [dismissable]="false" [dismissable]="getIndicadorMovimientoViaje('close_icon')" #overlayMovimientoViaje (onHide)="cerrarOverlay()">
-                <ng-template pTemplate>
-                  <div id="overlayMovimientoViaje" class="containMovimientoViaje">
-                    <div class="camionSelector pr-2">
-                      <span class="mb-2 titulos"><strong>Camion: </strong></span>
-                      <div class="filterOverlay">
-                        <input
-                          id="searchCamion"
-                          class="search-input form-control"
-                          [filterTarget]="filterCamionesTargets"
-                          [DataFilter]="copyCamiones"
-                          (onFilter)="filterMovimiento('camion', $event)"
-                          (blur)="checkMovimientoIsCompleted()"
-                          (focus)="moverFocoMovimientoViaje('camion')"
-                          (keydown.enter)="seleccionarCamion(null, camion_row)"
-                        />
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                      </div>
-                      <ul class="ulMovimientoViaje" role="menu">
-                        @for (camion of camiones; track camion.id; let index_camion = $index) {
-                        <li
-                          id="ulCamion-{{ index_camion }}"
-                          role="menuitem"
-                          class="hoverlable"
-                          [ngClass]="{ indicador: camion_row == index_camion && entidad_en_turno == 'camion', selected: camion_row == index_camion && entidad_en_turno == 'chofer' }"
-                        >
-                          <div class="d-flex justify-content-between align-items-center">
-                            <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' mr-1 c-help'"></i>
-                            <span id="dropdown-item" class="mb-0"> {{ getCamionInfo(camion, 'label') }} </span>
-                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
-                          </div>
-                        </li>
-                        } @if (camiones.length == 0) {
-                        <li role="menuitem" class="hoverlable">
-                          <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
-                        </li>
-                        }
-                      </ul>
+              <p-popover [dismissable]="false" [dismissable]="getIndicadorMovimientoViaje('close_icon')" styleClass="padding-sm" #overlayMovimientoViaje (onHide)="cerrarOverlay()">
+                <div id="overlayMovimientoViaje" class="containMovimientoViaje">
+                  <div class="camionSelector pr-2">
+                    <span class="mb-2 titulos"><strong>Camion: </strong></span>
+                    <div class="filterOverlay">
+                      <input
+                        id="searchCamion"
+                        class="search-input form-control"
+                        [filterTarget]="filterCamionesTargets"
+                        [DataFilter]="copyCamiones"
+                        (onFilter)="filterMovimiento('camion', $event)"
+                        (blur)="checkMovimientoIsCompleted()"
+                        (focus)="moverFocoMovimientoViaje('camion')"
+                        (keydown.enter)="seleccionarCamion(null, camion_row)"
+                      />
+                      <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
-                    <div class="choferSelector rayaLeft pl-2">
-                      <div class="overlayChofer {{ checkCamionIsSelected(null) ? 'd-none' : 'show' }}">
-                        <span class="label"> Seleccione primero el camión </span>
-                      </div>
-                      <span class="mb-2 titulos"><strong>Chofer: </strong></span>
-                      <div class="filterOverlay">
-                        <input
-                          id="searchChofer"
-                          class="search-input form-control"
-                          [filterTarget]="filterChoferesTargets"
-                          [DataFilter]="copyChoferes"
-                          (onFilter)="filterMovimiento('chofer', $event)"
-                          (blur)="checkMovimientoIsCompleted()"
-                          (focus)="moverFocoMovimientoViaje('chofer')"
-                          (keydown.enter)="seleccionarChofer(null, chofer_row)"
-                        />
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                      </div>
-                      <ul class="ulMovimientoViaje" role="menu">
-                        @for (chofer of choferes; track chofer.id; let index_chofer = $index) {
-                        <li id="ulChofer-{{ index_chofer }}" role="menuitem" class="hoverlable" [ngClass]="{ indicador: chofer_row == index_chofer && entidad_en_turno == 'chofer' }">
-                          <div class="d-flex justify-content-between align-items-center">
-                            <span id="dropdown-item" class="mb-0">
-                              {{ chofer.nombre_completo }}
-                            </span>
-                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarChofer(chofer, index_chofer)" [checked]="checkChoferIsSelected(chofer)" />
-                          </div>
-                        </li>
-                        } @if (camiones.length == 0) {
-                        <li role="menuitem" class="hoverlable">
-                          <span id="dropdown-item"> No existen choferes con las especificaciones introducidas. </span>
-                        </li>
-                        }
-                      </ul>
-                    </div>
+                    <ul class="ulMovimientoViaje" role="menu">
+                      @for (camion of camiones; track camion.id; let index_camion = $index) {
+                      <li id="ulCamion-{{ index_camion }}" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion && entidad_en_turno == 'camion', selected: camion_row == index_camion && entidad_en_turno == 'chofer' }">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' mr-1 c-help'"></i>
+                          <span id="dropdown-item" class="mb-0"> {{ getCamionInfo(camion, 'label') }} </span>
+                          <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
+                        </div>
+                      </li>
+                      } @if (camiones.length == 0) {
+                      <li role="menuitem" class="hoverlable">
+                        <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
+                      </li>
+                      }
+                    </ul>
                   </div>
-                </ng-template>
+                  <div class="choferSelector rayaLeft pl-2">
+                    <div class="overlayChofer {{ checkCamionIsSelected(null) ? 'd-none' : 'show' }}">
+                      <span class="label"> Seleccione primero el camión </span>
+                    </div>
+                    <span class="mb-2 titulos"><strong>Chofer: </strong></span>
+                    <div class="filterOverlay">
+                      <input
+                        id="searchChofer"
+                        class="search-input form-control"
+                        [filterTarget]="filterChoferesTargets"
+                        [DataFilter]="copyChoferes"
+                        (onFilter)="filterMovimiento('chofer', $event)"
+                        (blur)="checkMovimientoIsCompleted()"
+                        (focus)="moverFocoMovimientoViaje('chofer')"
+                        (keydown.enter)="seleccionarChofer(null, chofer_row)"
+                      />
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <ul class="ulMovimientoViaje" role="menu">
+                      @for (chofer of choferes; track chofer.id; let index_chofer = $index) {
+                      <li id="ulChofer-{{ index_chofer }}" role="menuitem" class="hoverlable" [ngClass]="{ indicador: chofer_row == index_chofer && entidad_en_turno == 'chofer' }">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span id="dropdown-item" class="mb-0">
+                            {{ chofer.nombre_completo }}
+                          </span>
+                          <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarChofer(chofer, index_chofer)" [checked]="checkChoferIsSelected(chofer)" />
+                        </div>
+                      </li>
+                      } @if (camiones.length == 0) {
+                      <li role="menuitem" class="hoverlable">
+                        <span id="dropdown-item"> No existen choferes con las especificaciones introducidas. </span>
+                      </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
               </p-popover>
             </div>
             } @if (factServ.isCompra) {

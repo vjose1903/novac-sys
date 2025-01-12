@@ -544,7 +544,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     this.confirmationModal({
       id: 'removerArticulo',
       header: 'Confirmar',
-      texto: `Seguro que desea remover el articulo <b class="negrita">${name}</b>`,
+      texto: `Seguro que desea remover el articulo <b class="negrita">${name ?? codigo ?? ''}</b>`,
       siFunction: (instance) => {
         this.procesoQuitarArticulo();
         instance.closeModal(instance.id, 'removerArticulo');

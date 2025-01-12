@@ -80,8 +80,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.archivarFactura();
       }
 
-      if (fun.hasValue(this.overlay?.item)) {
-        if (this.overlay?.tipo == 'extra') {
+      if (fun.hasValue(this.popover?.item)) {
+        if (this.popover?.tipo == 'extra') {
           if (this.optionesExtra.length > 0) {
             fun.desEnfocarInput(document.activeElement.id);
 
@@ -91,7 +91,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           }
         }
 
-        if (this.overlay?.tipo == 'movimiento') this.mover_indicador_camion(`${this.entidad_en_turno}_row`, key);
+        if (this.popover?.tipo == 'movimiento') this.mover_indicador_camion(`${this.entidad_en_turno}_row`, key);
       }
     }
   }
@@ -159,7 +159,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   userClass = new EmpleadoC();
   configArticuloClass = new ConfigArticuloC();
 
-  overlay;
+  popover;
   // camionesSelected = [];
 
   camiones = [];
@@ -329,7 +329,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.openNewModal({ component: modalConfig.component, inputs: modalConfig.inputs, id: modalConfig.id, header: modalConfig.header, width: modalConfig.width, height: modalConfig.height, botones: modalConfig.botones });
       }
 
-      if (fun.hasValue(this.overlay?.item)) this.cerrarOverlay();
+      if (fun.hasValue(this.popover?.item)) this.cerrarOverlay();
     }
   }
 
@@ -393,7 +393,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando, this.errorComprobante] = Array(5).fill(false);
         [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row, this.chofer_row] = Array(6).fill(0);
-        [this.NCFcompra, this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factServ.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.overlay] =
+        [this.NCFcompra, this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factServ.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.popover] =
           Array(9).fill(undefined);
 
         this.entidad_en_turno = 'camion';
@@ -999,10 +999,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   openOverlay(event, overlay, tipo) {
-    this.overlay = {};
-    this.overlay['item'] = overlay;
-    this.overlay['tipo'] = tipo;
-    this.overlay['item'].toggle(event);
+    this.popover = {};
+    this.popover['item'] = overlay;
+    this.popover['tipo'] = tipo;
+    console.log("this.popover ", this.popover);
+    console.log("event ", event);
+    
+    this.popover['item'].toggle(event);
 
     if (tipo == 'movimiento') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
     if (event) event.stopPropagation();
@@ -1104,14 +1107,16 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   cerrarOverlay() {
-    if (fun.hasValue(this.overlay?.item)) {
-      if (this.overlay['tipo'] == 'camion') {
+    console.log("ADNO AQUII");
+    
+    if (fun.hasValue(this.popover?.item)) {
+      if (this.popover['tipo'] == 'camion') {
         this.filterCamion(this.copyCamiones);
         this.camion_row = 0;
       }
 
-      this.overlay['item'].hide();
-      this.overlay = undefined;
+      this.popover['item'].hide();
+      this.popover = undefined;
     }
   }
 

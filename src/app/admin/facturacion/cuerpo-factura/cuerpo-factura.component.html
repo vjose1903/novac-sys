@@ -35,33 +35,31 @@
       @for (item_cuerpo of ARRAY_ROWFACTURAS?.controls; track item_cuerpo; let index_cuerpo = $index) {
       <div formArrayName="rowFactura">
         <div [formGroupName]="index_cuerpo">
-          <p-popover #dropRowConfig appendTo="body">
-            <ng-template pTemplate>
-              <ul class="dropRowConfig" role="menu">
-                @if (!item_cuerpo.controls.is_devuelto.value) {
-                <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable">
-                  <a class="" id="dropdown-item">
-                    <i class="far fa-trash-alt text-gris-oscuro btnConfig mr-1"></i>
-                    Quitar Producto
-                  </a>
-                </li>
-                } @if (item_cuerpo.controls.is_bad_price.value) {
-                <li role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
-                  <a class="" id="dropdown-item">
-                    <i class="fa-solid fa-triangle-exclamation text-gris-oscuro btnConfig mr-1"></i>
-                    Obtener {{ factServ.isCompra ? 'costo' : 'precio' }} actual
-                  </a>
-                </li>
-                } @if (hasArticulosDevueltos(index_cuerpo) || item_cuerpo.controls.is_devuelto.value) {
-                <li role="menuitem" (click)="retornarArticulosDevueltos(index_cuerpo, 'defectuoso', $event)" class="hoverlable">
-                  <a class="" id="dropdown-item">
-                    <i class="fa-solid fa-repeat text-gris-oscuro btnConfig mr-1"></i>
-                    Retornar articulos devueltos
-                  </a>
-                </li>
-                }
-              </ul>
-            </ng-template>
+          <p-popover #dropRowMenu appendTo="body">
+            <ul class="dropRowMenu" role="menu">
+              @if (item_cuerpo.controls.is_bad_price.value) {
+              <li role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
+                <a class="" id="dropdown-item">
+                  <i class="fa-solid fa-triangle-exclamation text-gris-oscuro mr-1"></i>
+                  Obtener {{ factServ.isCompra ? 'costo' : 'precio' }} actual
+                </a>
+              </li>
+              } @if (hasArticulosDevueltos(index_cuerpo) || item_cuerpo.controls.is_devuelto.value) {
+              <li role="menuitem" (click)="retornarArticulosDevueltos(index_cuerpo, 'defectuoso', $event)" class="hoverlable">
+                <a class="" id="dropdown-item">
+                  <i class="fa-solid fa-repeat text-gris-oscuro mr-1"></i>
+                  Retornar articulos devueltos
+                </a>
+              </li>
+              } @if (!item_cuerpo.controls.is_devuelto.value) {
+              <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable danger">
+                <a class="" id="dropdown-item">
+                  <i class="far fa-trash-alt mr-1"></i>
+                  Quitar Producto
+                </a>
+              </li>
+              }
+            </ul>
           </p-popover>
           <table class="table m-auto">
             <tbody>
@@ -71,7 +69,7 @@
                 <td class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
                   <div class="btn-group">
                     @if (checkIfRowContainArticulo(index_cuerpo)) {
-                    <div style="padding: 3px" (click)="abrirOverlay(dropRowConfig, $event)">
+                    <div style="padding: 3px" (click)="abrirOverlay(dropRowMenu, $event)">
                       <i class="fas fa-ellipsis-v btnConfig"></i>
                     </div>
                     } @if (!checkIfRowContainArticulo(index_cuerpo)) {

@@ -2,8 +2,8 @@
   display: grid;
   height: 100%;
   grid-template-areas:
-    "titulos-fact"
-    "contenido-fact";
+    'titulos-fact'
+    'contenido-fact';
 
   grid-template-rows: min-content auto;
 
@@ -23,17 +23,6 @@
 .filaFact {
   padding: 0rem 0.9rem;
   width: 100vw;
-}
-
-::ng-deep .p-dropdown-option {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  align-items: center;
-  display: flex;
-  padding-left: 0.5rem;
 }
 
 // ====================================================

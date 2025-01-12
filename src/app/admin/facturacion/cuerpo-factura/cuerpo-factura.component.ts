@@ -51,7 +51,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   articuloClass = new ArticuloC();
   minCodigo;
 
-  dropRowConfig: any;
+  dropRowMenu: any;
   configApp: ConfigI;
   dropdownMedidaOpen: boolean = false;
 
@@ -154,9 +154,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  abrirOverlay(dropRowConfig, event) {
-    this.dropRowConfig = dropRowConfig;
-    this.dropRowConfig.toggle(event);
+  abrirOverlay(dropRowMenu, event) {
+    this.dropRowMenu = dropRowMenu;
+    this.dropRowMenu.toggle(event);
   }
 
   readPrecio() {
@@ -728,7 +728,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const label = this.factServ.isCompra ? 'costo' : 'precio';
     this.confirmationModal({ id: 'get_actual_price', header: 'Confirmar', texto: `Seguro que desea obtener el ${label} actual`, siFunction: siFunction });
 
-    if (this.dropRowConfig) this.dropRowConfig.hide();
+    if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();
   }
 
@@ -767,7 +767,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
     });
 
-    if (this.dropRowConfig) this.dropRowConfig.hide();
+    if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();
   }
 
@@ -793,7 +793,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       botones: { aceptar: { show: true, disable: true }, cancelar: { show: true, disable: false } },
     });
 
-    if (this.dropRowConfig) this.dropRowConfig.hide();
+    if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();
   }
 

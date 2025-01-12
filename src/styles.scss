@@ -7,7 +7,6 @@
 
 $bodyfont: 'Poppins';
 
-
 .visually-hidden {
   display: none !important;
 }
@@ -45,7 +44,6 @@ $bodyfont: 'Poppins';
   font-family: 'Poppins' !important;
 }
 
-
 .h-96 {
   height: 96% !important;
 }
@@ -58,7 +56,18 @@ $bodyfont: 'Poppins';
   width: 30% !important;
 }
 
-.dropRowConfig {
+.btnConfigDis {
+  color: #adacac !important;
+  &:hover {
+    cursor: default !important;
+  }
+}
+
+.btnConfig {
+  color: #777676 !important;
+}
+
+.dropRowMenu {
   min-width: 250px;
   list-style: none;
   margin: 0;
@@ -74,18 +83,15 @@ $bodyfont: 'Poppins';
       }
       background: var(--primary02);
     }
-  }
-}
 
-.btnConfigDis {
-  color: #adacac !important;
-  &:hover {
-    cursor: default !important;
+    &.danger {
+      color: #c10202 !important;
+      &:hover {
+        color: #a10b0b !important;
+        background: #ff111142 !important;
+      }
+    }
   }
-}
-
-.btnConfig {
-  color: #777676 !important;
 }
 
 /* boton cuenta */
@@ -93,8 +99,6 @@ $bodyfont: 'Poppins';
   text-decoration-line: none;
   color: var(--primary04);
 }
-
-
 
 .form-control[type='text'],
 .form-control[type='number'] {
@@ -268,10 +272,6 @@ body {
 // ========================================================
 // CARDS
 // ========================================================
-
-.br-1 {
-  border-radius: 1rem !important;
-}
 
 .card-padding {
   padding: 1.5rem 1rem 1.5rem 1rem;
