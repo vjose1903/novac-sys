@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
+@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
 
 // .drag {
 //   -webkit-app-region: drag;
@@ -65,7 +65,7 @@
   }
 }
 
-$bodyfont: "Poppins";
+$bodyfont: 'Poppins';
 
 .fantasma {
   position: relative;
@@ -82,7 +82,7 @@ $bodyfont: "Poppins";
     width: 100%;
 
     display: grid;
-    grid-template-areas: "menu content";
+    grid-template-areas: 'menu content';
     grid-template-columns: 7.5rem auto;
     overflow: hidden;
 
@@ -90,8 +90,8 @@ $bodyfont: "Poppins";
       grid-area: menu;
       display: grid;
       grid-template-areas:
-        "title"
-        "sideBar";
+        'title'
+        'sideBar';
       grid-template-rows: min-content auto;
       z-index: 1;
       > .title {
@@ -210,9 +210,9 @@ $bodyfont: "Poppins";
       grid-area: content;
       display: grid;
       grid-template-areas:
-        "navBar"
-        "contenido"
-        "footer";
+        'navBar'
+        'contenido'
+        'footer';
 
       grid-template-rows: min-content auto min-content;
 
@@ -250,6 +250,50 @@ $bodyfont: "Poppins";
     }
   }
 }
+/* ============================================== */
+/*        CUENTA                                  */
+/* ============================================== */
+
+.popover-cuenta {
+  max-width: 300px;
+  min-width: 300px;
+  margin: 0;
+  background: #fff;
+  padding: 0;
+  list-style: none;
+
+  .popover-header {
+    background-color: var(--primary01);
+
+    h3 {
+      color: black;
+    }
+  }
+
+  /* botones de opciones */
+  .popover-item {
+    display: block;
+    color: #333;
+    padding: 15px 25px;
+    font-size: 14px;
+    font-family: $bodyfont;
+    cursor: pointer;
+
+    &:hover {
+      background: #efefef;
+      text-decoration: none;
+    }
+
+    &.danger {
+      color: #c10202 !important;
+      &:hover {
+        color: #a10b0b !important;
+        background: #ff111142 !important;
+      }
+    }
+  }
+}
+
 /* ============================================== */
 /*        LOADER                                  */
 /* ============================================== */

@@ -127,25 +127,26 @@
       <div class="navBar">
         <div class="right">
           <div class="btn-group dropCuenta" id="dropCuenta">
-            <span class="dropdown-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
+            <span class="popover-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
               <img class="rounded-circle" [src]="imgUser" alt="Admin" />
               Cuenta <span class="caret"></span>
             </span>
-            <p-overlayPanel [dismissable]="true" [showCloseIcon]="false" #dropdownCuenta styleClass="overlayCuenta" appendTo="body">
-              <ul class="dropdown-cuenta">
-                <div class="dropdown-header">
+
+            <p-popover [dismissable]="true" #dropdownCuenta styleClass="no-carret" appendTo="body">
+              <ul class="popover-cuenta">
+                <li class="popover-header">
                   <h3>{{ usuario?.nombre }}</h3>
                   <p>{{ usuario?.email }}</p>
-                </div>
-                <li role="menuitem">
-                  <a class="dropdown-item" id="dropdown-item" (click)="refreshPage(); dropdownCuenta.hide()"><i class="fas fa-undo-alt"></i>Recargar aplicación</a>
                 </li>
-                <li class="divider dropdown-divider"></li>
-                <li role="menuitem">
-                  <a class="dropdown-item" id="dropdown-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
+                <li>
+                  <a class="popover-item" id="popover-item" (click)="refreshPage(); dropdownCuenta.hide()"><i class="fas fa-undo-alt"></i>Recargar aplicación</a>
+                </li>
+                <li class="divider popover-divider"></li>
+                <li>
+                  <a class="popover-item danger" id="popover-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
                 </li>
               </ul>
-            </p-overlayPanel>
+            </p-popover>
           </div>
         </div>
       </div>

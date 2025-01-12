@@ -75,7 +75,7 @@
                 <form [formGroup]="form" action="">
                   @for (item of ARRAY_ROWARTICULOS.controls; track item; let index_cuerpo = $index) {
                     <div formArrayName="rowFactura">
-                      <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
+                      <p-popover #dropRowConfig  appendTo="body">
                         <ng-template pTemplate>
                           <ul class="dropRowConfig" role="menu">
                             <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable">
@@ -86,7 +86,7 @@
                             </li>
                           </ul>
                         </ng-template>
-                      </p-overlayPanel>
+                      </p-popover>
                       <div [formGroupName]="index_cuerpo">
                         <table class="table m-auto">
                           <tbody>

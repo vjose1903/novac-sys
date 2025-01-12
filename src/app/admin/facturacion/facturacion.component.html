@@ -11,7 +11,7 @@
       <div class="ml-3">
         <btn-icon-circular [id]="'btnExtra'" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
-        <p-overlayPanel #overlayExtra [dismissable]="false" [showCloseIcon]="true" styleClass="dropConfigs" (onHide)="cerrarOverlay()">
+        <p-popover #overlayExtra [dismissable]="false" (onHide)="cerrarOverlay()">
           <ng-template pTemplate>
             <div id="overlayExtra">
               <ul class="overlayExtra" role="menu">
@@ -26,7 +26,7 @@
               </ul>
             </div>
           </ng-template>
-        </p-overlayPanel>
+        </p-popover>
       </div>
       }
     </div>
@@ -64,9 +64,9 @@
                   [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
                   [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
                 />
-                <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
+                <p-popover [dismissable]="false" #tiposFacturas appendTo="body">
                   <div style="width: 21rem" [innerHtml]="factServ.htmlTiposFacturas"></div>
-                </p-overlayPanel>
+                </p-popover>
               </div>
 
               <div class="{{ factServ.isCompra ? 'col-6' : 'col-9' }} p-0">
@@ -107,13 +107,13 @@
                   (blur)="gastosFacturas.hide()"
                   tabindex="-1"
                 />
-                <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #gastosFacturas appendTo="body">
+                <p-popover [dismissable]="false" #gastosFacturas appendTo="body">
                   <div style="width: 26rem" [innerHtml]="factServ.htmlTiposCostosGastos"></div>
-                </p-overlayPanel>
+                </p-popover>
               </div>
               }
             </div>
-            
+
             @if (factServ.isVenta) {
             <div>
               <!-- ================== VENTA ================== -->
@@ -171,7 +171,8 @@
                   </div>
                 </div>
               </div>
-              <p-overlayPanel [dismissable]="false" [showCloseIcon]="getIndicadorMovimientoViaje('close_icon')" #overlayMovimientoViaje styleClass="dropConfigs" (onHide)="cerrarOverlay()">
+
+              <p-popover [dismissable]="false" [dismissable]="getIndicadorMovimientoViaje('close_icon')" #overlayMovimientoViaje (onHide)="cerrarOverlay()">
                 <ng-template pTemplate>
                   <div id="overlayMovimientoViaje" class="containMovimientoViaje">
                     <div class="camionSelector pr-2">
@@ -247,7 +248,7 @@
                     </div>
                   </div>
                 </ng-template>
-              </p-overlayPanel>
+              </p-popover>
             </div>
             } @if (factServ.isCompra) {
             <div>

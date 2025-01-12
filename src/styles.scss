@@ -58,12 +58,6 @@ $bodyfont: 'Poppins';
   width: 30% !important;
 }
 
-.dropConfigs {
-  .p-overlaypanel-content {
-    padding: 5px !important;
-  }
-}
-
 .dropRowConfig {
   min-width: 250px;
   list-style: none;
@@ -100,44 +94,7 @@ $bodyfont: 'Poppins';
   color: var(--primary04);
 }
 
-/* botones de opciones */
-.dropdown-item {
-  display: block;
-  color: #333;
-  padding: 15px 25px;
-  font-size: 14px;
-  font-family: $bodyfont;
-}
 
-.dropdown-item:hover {
-  border-radius: 2px;
-  background: var(--primary02);
-  // background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
-}
-
-.overlayCuenta {
-  .p-overlaypanel-content {
-    padding: 4px;
-    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.51);
-  }
-}
-
-.dropdown-cuenta {
-  max-width: 300px;
-  min-width: 300px;
-  margin: 0;
-  background: #fff;
-  padding: 0;
-  list-style: none;
-
-  .dropdown-header {
-    background-color: var(--transparente05);
-  }
-
-  .dropdown-header h3 {
-    color: black;
-  }
-}
 
 .form-control[type='text'],
 .form-control[type='number'] {
