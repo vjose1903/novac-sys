@@ -11,7 +11,7 @@
       <div class="ml-3">
         <btn-icon-circular [id]="'btnExtra'" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
-        <p-overlayPanel #overlayExtra [dismissable]="false" [showCloseIcon]="true"  styleClass="dropConfigs" (onHide)="cerrarOverlay()">
+        <p-overlayPanel #overlayExtra [dismissable]="false" [showCloseIcon]="true" styleClass="dropConfigs" (onHide)="cerrarOverlay()">
           <ng-template pTemplate>
             <div id="overlayExtra">
               <ul class="overlayExtra" role="menu">
@@ -68,6 +68,7 @@
                   <div style="width: 21rem" [innerHtml]="factServ.htmlTiposFacturas"></div>
                 </p-overlayPanel>
               </div>
+
               <div class="{{ factServ.isCompra ? 'col-6' : 'col-9' }} p-0">
                 <!-- ================== CONDICION ================== -->
                 <span class="titulos"><strong>Condición:</strong></span>
@@ -86,6 +87,7 @@
                   <option value="Crédito">Crédito</option>
                 </select>
               </div>
+
               @if (factServ.isCompra) {
               <div class="col-3 pr-0">
                 <!-- ================== GASTO ================== -->
@@ -111,6 +113,7 @@
               </div>
               }
             </div>
+            
             @if (factServ.isVenta) {
             <div>
               <!-- ================== VENTA ================== -->
@@ -140,16 +143,18 @@
               <!-- ================== FECHA VIAJE ================== -->
               <span class="mt-1"><strong>Fecha viaje:</strong></span>
               <div class="d-flex justify-content-between align-items-center">
-                <p-calendar
-                  inputId="fecha_viaje"
-                  inputStyleClass="minSize"
-                  [(ngModel)]="fecha_viaje"
-                  dateFormat="dd/mm/yy"
-                  placeholder="dd/mm/aaaa"
-                  [minDate]="datesAvailable.viaje.minDate"
-                  (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
-                  [disabled]="errorComprobante"
-                ></p-calendar>
+                <div class="flex-1">
+                  <p-datepicker
+                    inputId="fecha_viaje"
+                    inputStyleClass="minSize"
+                    [(ngModel)]="fecha_viaje"
+                    dateFormat="dd/mm/yy"
+                    placeholder="dd/mm/aaaa"
+                    [minDate]="datesAvailable.viaje.minDate"
+                    (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
+                    [disabled]="errorComprobante"
+                  ></p-datepicker>
+                </div>
                 <div class="ml-3 position-relative">
                   <btn-icon-circular
                     [id]="'btnCamion'"
@@ -263,7 +268,7 @@
               <div>
                 <!-- ================== FECHA VENCIMIENTO ================== -->
                 <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
-                <p-calendar
+                <p-datepicker
                   inputId="fecha_vencimiento"
                   inputStyleClass="minSize"
                   [(ngModel)]="fecha_vencimiento"
@@ -272,7 +277,7 @@
                   [minDate]="datesAvailable.viaje.minDate"
                   (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_vencimiento', value: fecha_vencimiento })"
                   [disabled]="errorComprobante"
-                ></p-calendar>
+                ></p-datepicker>
               </div>
               }
             </div>

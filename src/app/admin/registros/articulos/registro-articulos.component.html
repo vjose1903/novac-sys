@@ -274,7 +274,7 @@
                           <!-- articulo -->
                           <div class="col-5 p-0">
                             <div class="form-group mb-0">
-                              <p-dropdown
+                              <p-select
                                 #dropdown
                                 [placeholder]="'Seleccione ingrediente'"
                                 [options]="listaMateriasPrimas"
@@ -293,7 +293,7 @@
                                 appendTo="body"
                                 [virtualScrollItemSize]="30"
                                 id="articulo_id-{{ index_formula }}"
-                              ></p-dropdown>
+                              ></p-select>
                             </div>
                           </div>
                           <!-- cantidad -->

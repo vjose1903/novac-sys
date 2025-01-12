@@ -73,7 +73,7 @@
                     <div class="col-4 mb-2">
                       <div [appMsgError]="'color_app'" [form]="form">
                         <label class="control-label">Color aplicacion: </label>
-                        <p-dropdown [options]="colores" formControlName="color_app" placeholder="Seleccione un color">
+                        <p-select [options]="colores" formControlName="color_app" placeholder="Seleccione un color">
                           <ng-template pTemplate="selectedItem">
                             @if (form.controls['color_app'].value) {
                             <div class="d-flex align-items-center">
@@ -88,14 +88,14 @@
                               <div>{{ colorItem.label }}</div>
                             </div>
                           </ng-template>
-                        </p-dropdown>
+                        </p-select>
                         <span id="msgContainer_color_app"></span>
                       </div>
                     </div>
                     <!-- <div class="col-6 mb-2">
                       <div [appMsgError]="'printer_caja_selected'" [form]="form">
                         <label class="control-label">Impresora facturación seleccionada: </label>
-                        <p-dropdown [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
+                        <p-select [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
                           <ng-template pTemplate="selectedItem">
                             <div class="d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value">
                               <div>{{ form.controls['printer_caja_selected'].value }}</div>
@@ -106,14 +106,14 @@
                               <div>{{ printerItem }}</div>
                             </div>
                           </ng-template>
-                        </p-dropdown>
+                        </p-select>
                         <span id="msgContainer_printer_caja_selected"></span>
                       </div>
                     </div>
                     <div class="col-6 mb-2">
                       <div [appMsgError]="'printer_reportes_selected'" [form]="form">
                         <label class="control-label">Impresora reportes seleccionada: </label>
-                        <p-dropdown [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
+                        <p-select [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
                           <ng-template pTemplate="selectedItem">
                             <div class="d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value">
                               <div>{{ form.controls['printer_reportes_selected'].value }}</div>
@@ -124,7 +124,7 @@
                               <div>{{ printerItem }}</div>
                             </div>
                           </ng-template>
-                        </p-dropdown>
+                        </p-select>
                         <span id="msgContainer_printer_reportes_selected"></span>
                       </div>
                     </div> -->
@@ -172,7 +172,7 @@
                     <div class="col-4 mb-3">
                       <div>
                         <label class="control-label">Medida producto terminado: </label>
-                        <p-dropdown [options]="medidas_articulos" formControlName="medida_producto_terminado" placeholder="Seleccione una medida" optionLabel="value" optionValue="value"> </p-dropdown>
+                        <p-select [options]="medidas_articulos" formControlName="medida_producto_terminado" placeholder="Seleccione una medida" optionLabel="value" optionValue="value"> </p-select>
                       </div>
                     </div>
                     <div class="col-12 p-0 mt-3">
@@ -262,7 +262,7 @@
                             <div class="box-body">
                               <div [appMsgError]="item.pageSizeFormControlName" [form]="form" class="mb-2">
                                 <div class="mb-0">Tamaño del PDF</div>
-                                <p-dropdown [options]="paper_sizes" [formControlName]="item.pageSizeFormControlName" placeholder="Seleccione una tamaño de papel">
+                                <p-select [options]="paper_sizes" [formControlName]="item.pageSizeFormControlName" placeholder="Seleccione una tamaño de papel">
                                   <ng-template pTemplate="selectedItem">
                                     @if (form.controls[item.pageSizeFormControlName].value.label) {
                                     <div class="d-flex align-items-center">
@@ -275,19 +275,19 @@
                                       <div>{{ pageSize.label }}</div>
                                     </div>
                                   </ng-template>
-                                </p-dropdown>
+                                </p-select>
                                 <span [id]="'msgContainer_' + item.pageSizeFormControlName"></span>
                               </div>
                               <div [appMsgError]="item.printerFormControlName" [form]="form" class="mb-2">
                                 <div class="mb-0">Impresora:</div>
-                                <p-dropdown appendTo="body" [options]="config.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-dropdown>
+                                <p-select appendTo="body" [options]="config.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-select>
                                 <span [id]="'msgContainer_' + item.printerFormControlName"></span>
                               </div>
                               @if (item.plantillaFormControlName) {
                               <div class="mt-3">
                                 <div [appMsgError]="item.plantillaFormControlName" [form]="form">
                                   <div class="mb-0">Plantilla de impresion</div>
-                                  <p-dropdown appendTo="body" [options]="get_plantillas(item.key)" [formControlName]="item.plantillaFormControlName" placeholder="Seleccione una plantilla" optionLabel="value" optionValue="value"> </p-dropdown>
+                                  <p-select appendTo="body" [options]="get_plantillas(item.key)" [formControlName]="item.plantillaFormControlName" placeholder="Seleccione una plantilla" optionLabel="value" optionValue="value"> </p-select>
                                   <span [id]="'msgContainer_' + item.plantillaFormControlName"></span>
                                 </div>
                               </div>

@@ -45,14 +45,6 @@ $bodyfont: 'Poppins';
   font-family: 'Poppins' !important;
 }
 
-.ng-dropdown-panel {
-  z-index: 9999999 !important;
-}
-
-// html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
-//   right: 2px !important;
-//   top: 0 !important;
-// }
 
 .h-96 {
   height: 96% !important;
@@ -129,6 +121,7 @@ $bodyfont: 'Poppins';
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.51);
   }
 }
+
 .dropdown-cuenta {
   max-width: 300px;
   min-width: 300px;
@@ -543,28 +536,6 @@ input.apple-switch:checked:after {
 }
 .popover {
   min-width: var(--popInfo);
-}
-
-.bs-datepicker {
-  box-shadow: 0 0 10px 0 #000c;
-  .bs-datepicker-container {
-    padding: 0px !important;
-  }
-  .bs-datepicker-head {
-    border-radius: 0 !important;
-    background: var(--primary02) !important;
-    button[disabled] {
-      background: var(--transparente05);
-    }
-  }
-  .bs-datepicker-body table td span.selected {
-    background: var(--primary02) !important;
-  }
-}
-
-bs-datepicker-container,
-bs-daterangepicker-container {
-  z-index: 9999999 !important;
 }
 
 .btn.btn-link {

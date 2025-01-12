@@ -19,7 +19,7 @@
         <!-- ================ CLIENTE  ================ -->
 
         @if (filter_key == filter_options.cliente) {
-        <p-dropdown
+        <p-select
           #dropdownCliente
           inputId="valorI"
           [(ngModel)]="clienteSelected"
@@ -42,7 +42,7 @@
               <span class="d-block no-wrap" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad</strong> {{ cliente.documento_identidad }} </span>
             </div>
           </ng-template>
-        </p-dropdown>
+        </p-select>
         <!-- <input id="valorI" class="form-control inputE" [(ngModel)]="filter_value" (keydown.enter)="desenfocarValor()" (blur)="buscarDocumentos()" type="text" (focus)="htmlServ.selectValue($event)" placeholder="Nombre cliente" autocomplete="off" /> -->
         }
 

@@ -59,6 +59,7 @@
     "replace-in-file": "7.1.0"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "19.0.7",
     "@angular-eslint/builder": "17.4.0",
     "@angular-eslint/eslint-plugin": "17.4.0",
     "@angular-eslint/eslint-plugin-template": "17.4.0",

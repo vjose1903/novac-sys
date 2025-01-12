@@ -17,7 +17,7 @@
                 <div class="col-12 p-0 mb-3">
                   <div class="row">
                     <div class="col-6 p-0 pr-2">
-                      <div class="form-groupd-flex" style="flex-wrap: nowrap" [appMsgError]="'cedula'" [form]="form">
+                      <div class="form-groupd-flex" style="flex-wrap: nowrap" appMsgError="cedula" [form]="form">
                         <label class="control-label">Cedula: <span style="color: red">*</span></label>
                         <p-inputMask
                           (keydown.enter)="saltar('campoNombre')"
@@ -35,15 +35,26 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="col-6 p-0 pr-2">
-                  <div class="form-group" [appMsgError]="'nombre'" [form]="form">
+                  <div class="form-group" appMsgError="nombre" [form]="form">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                    <input type="text" formControlName="nombre" (keyup)="capitalice('nombre', htmlServ.getValue($event))" id="campoNombre" (keydown.enter)="saltar('campoApellido')" placeholder="Introduzca nombre" class="form-control" autocomplete="off" />
+                    <input
+                      type="text"
+                      formControlName="nombre"
+                      (keyup)="capitalice('nombre', htmlServ.getValue($event))"
+                      id="campoNombre"
+                      (keydown.enter)="saltar('campoApellido')"
+                      placeholder="Introduzca nombre"
+                      class="form-control"
+                      autocomplete="off"
+                    />
                     <span id="msgContainer_nombre"></span>
                   </div>
                 </div>
+
                 <div class="col-6 p-0 pl-2">
-                  <div class="form-group" [appMsgError]="'apellido'" [form]="form">
+                  <div class="form-group" appMsgError="apellido" [form]="form">
                     <label class="control-label">Apellido: <span style="color: red">*</span></label>
                     <input
                       type="text"
@@ -58,29 +69,33 @@
                     <span id="msgContainer_apellido"></span>
                   </div>
                 </div>
+
                 <div class="col-6 p-0 pr-2">
-                  <div class="form-group" [appMsgError]="'usuario'" [form]="form">
+                  <div class="form-group" appMsgError="usuario" [form]="form">
                     <label class="control-label">Usuario: <span style="color: red">*</span></label>
                     <input (keydown.enter)="saltar('campoTelefono')" type="text" id="campoUsuario" formControlName="usuario" placeholder="Introduzca usuario" class="form-control" autocomplete="off" />
                     <span id="msgContainer_usuario"></span>
                   </div>
                 </div>
+
                 <div class="col-6 p-0 pl-2">
-                  <div class="form-group" [appMsgError]="'telefono'" [form]="form">
+                  <div class="form-group" appMsgError="telefono" [form]="form">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
                     <p-inputMask (keydown.enter)="saltar('campoEmail')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
                     <span id="msgContainer_telefono"></span>
                   </div>
                 </div>
+
                 <div class="col-8 p-0 pr-2">
-                  <div class="form-group" [appMsgError]="'email'" [form]="form">
+                  <div class="form-group" appMsgError="email" [form]="form">
                     <label class="control-label">Email: <span style="color: red">*</span> </label>
                     <input id="campoEmail" (keydown.enter)="saltar('campoSexo')" type="text" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
                     <span id="msgContainer_email"></span>
                   </div>
                 </div>
+
                 <div class="col-4 p-0 pl-2">
-                  <div class="form-group" [appMsgError]="'sexo'" [form]="form">
+                  <div class="form-group" appMsgError="sexo" [form]="form">
                     <label class="control-label">Sexo: <span style="color: red">*</span></label>
                     <select id="campoSexo" (keydown.enter)="saltar('campoFecha')" formControlName="sexo" class="form-control">
                       <option value="" disabled selected hidden>Sexo</option>
@@ -90,13 +105,17 @@
                     <span id="msgContainer_sexo"></span>
                   </div>
                 </div>
-                <div class="col-6 p-0 pr-2" [appMsgError]="'fecha_nacimiento'" [form]="form">
-                  <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
-                  <p-calendar inputId="campoFecha" formControlName="fecha_nacimiento" dateFormat="dd/mm/yy" [maxDate]="maxDateBirth" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('campoRole')"></p-calendar>
-                  <span id="msgContainer_fecha_nacimiento"></span>
+
+                <div class="col-6 p-0 pr-2" >
+                  <div class="form-group" appMsgError="fecha_nacimiento" [form]="form">
+                    <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
+                    <p-datepicker inputId="campoFecha" formControlName="fecha_nacimiento" dateFormat="dd/mm/yy" [maxDate]="maxDateBirth" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('campoRole')"></p-datepicker>
+                    <span id="msgContainer_fecha_nacimiento"></span>
+                  </div>
                 </div>
+
                 <div class="col-6 p-0 pl-2">
-                  <div class="form-group" [appMsgError]="'ids_roles'" [form]="form">
+                  <div class="form-group" appMsgError="ids_roles" [form]="form">
                     <label class="control-label">Role: <span style="color: red">*</span></label>
                     <p-multiSelect
                       class="multiSelectPrimeng"
@@ -122,18 +141,20 @@
                     <span id="msgContainer_ids_roles"></span>
                   </div>
                 </div>
+
                 <div class="col-6 p-0 pr-2">
                   @if (!editando) {
-                  <div class="form-group" [appMsgError]="'password'" [form]="form">
+                  <div class="form-group" appMsgError="password" [form]="form">
                     <label class="control-label">Contraseña:<span style="color: red">*</span></label>
                     <input (keydown.enter)="saltar('campoConfirmPassword')" id="campoPassword" type="password" formControlName="password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
                     <span id="msgContainer_password"></span>
                   </div>
                   }
                 </div>
+
                 <div class="col-6 p-0 pl-2">
                   @if (!editando) {
-                  <div class="form-group" [appMsgError]="'confirm_password'" [form]="form">
+                  <div class="form-group" appMsgError="confirm_password" [form]="form">
                     <label class="control-label">Confirmar Contraseña:<span style="color: red">*</span></label>
                     <input type="password" id="campoConfirmPassword" compare="password" (keydown.enter)="saltar('send')" formControlName="confirm_password" placeholder="Introduzca contraseña" class="form-control" autocomplete="off" />
                     <span id="msgContainer_confirm_password"></span>

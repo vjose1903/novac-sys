@@ -156,7 +156,7 @@
                                       />
                                   }
                                   @if (inputDrop === 'uni-' + index_cuerpo) {
-                                    <p-dropdown
+                                    <p-select
                                       #pDropdownMedida
                                       panelStyleClass="panel-dropdown-unidad"
                                       styleClass="form-control entrada dropdown-unidad"
@@ -177,7 +177,7 @@
                                       (onFocus)="showDropdownMedida($event, pDropdownMedida)"
                                       (onBlur)="hideDropdownMedida(); calcularCantidadEnUnidades({ index: index_cuerpo })"
                                       >
-                                    </p-dropdown>
+                                    </p-select>
                                   }
                                 </div>
                               </td>

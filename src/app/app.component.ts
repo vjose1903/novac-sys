@@ -228,6 +228,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           if (fun.objHas(config, 'err')) {
             console.error(config);
           } else {
+
             this.themeService.setTheme(config.color_app);
             this.configServ.setConfig = config;
             this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;

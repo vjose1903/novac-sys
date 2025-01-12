@@ -48,9 +48,9 @@
         height: 100% !important;
 
         grid-template-areas:
-          "thead"
-          "tbody"
-          "tfoot";
+          'thead'
+          'tbody'
+          'tfoot';
 
         grid-template-rows: [head-start] min-content [body-start] auto [body-end] min-content [foot-end];
 
@@ -212,21 +212,25 @@
                 }
 
                 &.no-show-dropdown {
-                  .p-dropdown {
+                  .p-select {
                     display: none !important;
                   }
                 }
 
-                .p-dropdown {
-                  max-width: 3.2rem !important;
+                .p-select {
+                  max-width: 4.5rem !important;
                   border: 1px solid #a6a6a6a6 !important;
-                  .p-dropdown-trigger {
-                    width: 1rem !important;
-                    margin-right: 0.2rem;
+                  padding: 0.25rem 0.3rem;
+                  border-radius: 0.3rem;
+
+                  .p-select-dropdown {
+                    width: fit-content !important;
+                    margin-left: 0.5rem;
                   }
 
-                  .p-dropdown-label {
-                    padding: 0 0.3rem !important;
+                  .p-select-label {
+                    width: 2rem;
+                    padding: 0 !important;
                     background-color: transparent !important;
                     border: 0px solid transparent !important;
                   }

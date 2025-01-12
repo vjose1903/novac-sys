@@ -123,7 +123,7 @@
                     </span>
                     } @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing) {
                     <div>
-                      <p-dropdown
+                      <p-select
                         #dropdown
                         [virtualScroll]="true"
                         [virtualScrollItemSize]="34"
@@ -141,7 +141,7 @@
                         emptyFilterMessage="valor_buscado_no_se_encuentra"
                         (onChange)="changeValorInput(column, column.dropdown_key, getIndex(indexBody), dropdown.value, rowData)"
                       >
-                      </p-dropdown>
+                      </p-select>
                     </div>
                     }
                   </span>

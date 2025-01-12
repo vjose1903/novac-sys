@@ -6,7 +6,7 @@ import { ImgModule } from '../img-component/img.module';
 import { NewBTNACCIONESComponent } from './btnacciones/btnacciones.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
@@ -18,7 +18,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({
   declarations: [NewTablasComponent, NewBTNACCIONESComponent],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, DropdownModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule, InputSwitchModule, NgxPermissionsModule.forChild(), IconsArrayModule, ImgModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PipesModule, DirectivesModule, SelectModule, PaginatorModule, TooltipModule, TagModule, SpeedDialModule, InputSwitchModule, NgxPermissionsModule.forChild(), IconsArrayModule, ImgModule],
   exports: [NewTablasComponent, NewBTNACCIONESComponent],
 })
 export class TablasModule {}
