@@ -475,8 +475,8 @@
   </div>
 </div>
 
-@if (_sideBarOpened) {
-<p-sidebar
+
+<p-drawer
   #my_sidebar
   styleClass="my_sidebar  {{ _sideBarOpened ? 'side_open' : 'side_closed' }} {{ hasPermisoPreVenta ? (hasPermisoCotizacion ? 'x-large' : 'large') : hasPermisoCotizacion ? 'large' : '' }}"
   [position]="'right'"
@@ -492,6 +492,7 @@
   <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', factServ.tipoDocumento)">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
+  
   <div class="contendioSidebar w-100 h-100">
     <div class="head">
       <span class="tituloSidebar negrita">Documentos guardados</span>
@@ -553,5 +554,5 @@
       </ng-template>
     </div>
   </div>
-</p-sidebar>
-}
+</p-drawer>
+

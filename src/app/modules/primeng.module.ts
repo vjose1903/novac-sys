@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -12,7 +12,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { PopoverModule } from 'primeng/popover';
 import { DatePickerModule } from 'primeng/datepicker';
 
-const modulos = [DialogModule, ProgressBarModule, SidebarModule, TooltipModule, SelectModule, InputMaskModule, TagModule, TabViewModule, MultiSelectModule, PopoverModule, DatePickerModule];
+const modulos = [DialogModule, ProgressBarModule, DrawerModule, TooltipModule, SelectModule, InputMaskModule, TagModule, TabViewModule, MultiSelectModule, PopoverModule, DatePickerModule];
 
 @NgModule({
   declarations: [],
