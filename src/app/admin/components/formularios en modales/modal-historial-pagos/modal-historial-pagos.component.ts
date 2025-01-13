@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit, signal } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
 @Component({
-    selector: 'app-modal-historial-pagos',
-    templateUrl: './modal-historial-pagos.component.html',
-    styleUrls: ['./modal-historial-pagos.component.scss'],
-    standalone: false
+  selector: 'app-modal-historial-pagos',
+  templateUrl: './modal-historial-pagos.component.html',
+  styleUrls: ['./modal-historial-pagos.component.scss'],
+  standalone: false,
 })
 export class ModalHistorialPagosComponent extends MixinClass implements OnInit, ModalI {
-  activeIndex = 0;
+  activeIndex = signal(0);
+  processingTabChange = true;
 
   table_pagos_config: table_config = {
     info: [
@@ -38,36 +39,34 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
 
   constructor() {
     super();
+    effect(() => {
+      if (!this.processingTabChange) {
+        this.processingTabChange = true;
+        this.show = false;
+        const tipo = this.activeIndex() == 0 ? 'abonos' : 'notas';
+        const cantidad = this.arrayHasData(tipo).cant;
+        const opositeIndex = this.activeIndex() == 0 ? 1 : 0;
+
+        if (cantidad <= 0) this.activeIndex.set(opositeIndex);
+
+        setTimeout(() => (this.show = true), 10);
+        setTimeout(() => (this.processingTabChange = false), 250);
+      }
+    });
   }
   modal: any = {};
   inputs: any;
-  btn_aceptar() {
-    throw new Error('Method not implemented.');
-  }
 
   ngOnInit() {
-    this.activeIndex = this.arrayHasData('abonos').cant > 0 ? 0 : 1;
-  }
-
-  clickTabView(index) {
-    this.show = false;
-    const tipo = index == 0 ? 'abonos' : 'notas';
-    const cantidad = this.arrayHasData(tipo).cant;
-
-    if (index == 0) {
-      if (cantidad > 0) {
-        this.activeIndex = index;
-      } else this.activeIndex = 1;
-    } else {
-
-      if (cantidad > 0) {
-        this.activeIndex = index;
-      } else this.activeIndex = 0;
-    }
-    setTimeout(() => (this.show = true), 10);
+    this.activeIndex.set(this.arrayHasData('abonos').cant > 0 ? 0 : 1);
+    this.processingTabChange = false;
   }
 
   arrayHasData(tipo) {
     return { disable: this.inputs[tipo].length == 0, cant: this.inputs[tipo].length };
+  }
+
+  btn_aceptar() {
+    throw new Error('Method not implemented.');
   }
 }

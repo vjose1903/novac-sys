@@ -31,10 +31,10 @@ import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configu
 import { HtmlElementsService } from '../../core/services/html-elements.service';
 
 @Component({
-    selector: 'app-facturacion',
-    templateUrl: './facturacion.component.html',
-    styleUrls: ['./facturacion.component.scss'],
-    standalone: false
+  selector: 'app-facturacion',
+  templateUrl: './facturacion.component.html',
+  styleUrls: ['./facturacion.component.scss'],
+  standalone: false,
 })
 export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
@@ -1002,9 +1002,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.popover = {};
     this.popover['item'] = overlay;
     this.popover['tipo'] = tipo;
-    console.log("this.popover ", this.popover);
-    console.log("event ", event);
-    
+    console.log('this.popover ', this.popover);
+    console.log('event ', event);
+
     this.popover['item'].toggle(event);
 
     if (tipo == 'movimiento') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
@@ -1107,8 +1107,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   cerrarOverlay() {
-    console.log("ADNO AQUII");
-    
+    console.log('ADNO AQUII');
+
     if (fun.hasValue(this.popover?.item)) {
       if (this.popover['tipo'] == 'camion') {
         this.filterCamion(this.copyCamiones);
@@ -1397,7 +1397,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   procesoArchivarFactura(modalInstance, reset = false) {
     this.agregarFacturaALocalStorage();
-    this.getFacturasGuardadas();
+    // this.getFacturasGuardadas();
     this.closeModal(modalInstance);
 
     if (reset) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/${actionFacturacion.new}/0`).then((res_router) => this.resetVariables());

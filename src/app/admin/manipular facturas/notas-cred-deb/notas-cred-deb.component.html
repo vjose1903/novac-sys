@@ -1,129 +1,137 @@
 @if (facturasConDetalles) {
 <div class="h-99 w-100">
-  <p-tabView [scrollable]="true" [(activeIndex)]="tabIndex" (onClose)="onCloseTab($event)" styleClass="my_tabView rounded panel-padding-0">
-    @for (iteraFact of facturasConDetalles; track iteraFact) {
-    <p-tabPanel
-      id="p-tabView-fact-{{ iteraFact.id }}"
+  <p-tabs [scrollable]="true" [(value)]="tabIndex" (onClose)="onCloseTab($event)">
+    <p-tablist>
+      @for (iteraFact of facturasConDetalles; track iteraFact) {
+      <!-- [closable]="facturasConDetalles.length > 1" -->
+      <p-tab [value]="$index">
+        {{ iteraFact.numero_comprobante }}
+      </p-tab>
+      <!-- id="p-tabView-fact-{{ iteraFact.id }}"
       #tabPanel
-      [closable]="facturasConDetalles.length > 1"
-      headerStyleClass="p-tabView-fact-{{ iteraFact.id }}"
       [headerStyle]="changeHeaderStatus(iteraFact, tabPanel, 'p-tabView-fact-' + iteraFact.id)"
-      header="{{ iteraFact.numero_comprobante }}"
-    >
-      <div class="widget">
-        <div class="widget-header">
-          <div class="titulo">
-            <h3 style="margin: 0.4rem">
-              {{ tituloPag }}<b>{{ iteraFact.numero_comprobante }}</b>
-            </h3>
+      header="{{ iteraFact.numero_comprobante }}" -->
+      }
+    </p-tablist>
+
+    <p-tabpanels>
+      @for (iteraFact of facturasConDetalles; track iteraFact) {
+      <p-tabpanel [value]="$index">
+        <div class="widget">
+          <div class="widget-header">
+            <div class="titulo">
+              <h3 style="margin: 0.4rem">
+                {{ tituloPag }}<b>{{ iteraFact.numero_comprobante }}</b>
+              </h3>
+            </div>
           </div>
-        </div>
-        <div class="widget-content">
-          <div class="cardPrincipal sinPadding cardNota mt-2">
-            <div class="cabezaNota">
-              <div class="row">
-                <!-- ============ factura aplicada ============ -->
-                <div class="col-8 divRight p-0">
-                  <div class="row">
-                    <div class="col-12 text-center mb-2">
-                      <span class="infoFactuApli"> Informacion factura aplicada</span>
-                    </div>
-                    <div class="col-7 mt-2">
-                      <div class="row">
-                        <div class="col-12 p-0">
+          <div class="widget-content">
+            <div class="cardPrincipal sinPadding cardNota mt-2">
+              <div class="cabezaNota">
+                <div class="row">
+                  <!-- ============ factura aplicada ============ -->
+                  <div class="col-8 divRight p-0">
+                    <div class="row">
+                      <div class="col-12 text-center mb-2">
+                        <span class="infoFactuApli"> Informacion factura aplicada</span>
+                      </div>
+                      <div class="col-7 mt-2">
+                        <div class="row">
+                          <div class="col-12 p-0">
+                            <span class="d-block">
+                              <b class="negrita">{{ iteraFact.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
+                              >&nbsp;
+                              <span>{{ iteraFact.cliente?.nombre }}</span>
+                            </span>
+                            <span class="d-block">
+                              <b class="negrita">{{ iteraFact.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
+                              >&nbsp;
+                              <span>{{ iteraFact.cliente?.rnc }}</span>
+                            </span>
+                            <span class="d-block">
+                              <b class="negrita">Direccion :</b>&nbsp; <span>{{ iteraFact.cliente?.direccion }}</span>
+                            </span>
+                            <span class="d-block negrita"> Total facturado : &nbsp; {{ formatoNumero(iteraFact?.total_factura) }} </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-5 d-flex justify-content-center">
+                        <div class="infoFactura">
                           <span class="d-block">
-                            <b class="negrita">{{ iteraFact.tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
-                            >&nbsp;
-                            <span>{{ iteraFact.cliente?.nombre }}</span>
+                            <b class="negrita">Fecha facturación:</b>&nbsp; <span>{{ formatoFecha(iteraFact.fecha_equivalente) }}</span>
+                          </span>
+                          @if (iteraFact.condicion === 'Crédito') {
+                          <span class="d-block">
+                            <b class="negrita">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(iteraFact.fecha_vencimiento) }}</span>
+                          </span>
+                          }
+                          <span class="d-block">
+                            <b class="negrita">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(iteraFact.numero_factura) }}</span>
                           </span>
                           <span class="d-block">
-                            <b class="negrita">{{ iteraFact.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
-                            >&nbsp;
-                            <span>{{ iteraFact.cliente?.rnc }}</span>
+                            <b class="negrita">Valida hasta :</b> &nbsp; @if (iteraFact.numero_factura) {
+                            <span>{{ iteraFact.tipo_factura_id === 3 ? 'No aplica' : iteraFact.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(iteraFact.fecha_valida) }}</span>
+                            }
                           </span>
-                          <span class="d-block">
-                            <b class="negrita">Direccion :</b>&nbsp; <span>{{ iteraFact.cliente?.direccion }}</span>
-                          </span>
-                          <span class="d-block negrita"> Total facturado : &nbsp; {{ formatoNumero(iteraFact?.total_factura) }} </span>
                         </div>
                       </div>
                     </div>
-                    <div class="col-5 d-flex justify-content-center">
-                      <div class="infoFactura">
-                        <span class="d-block">
-                          <b class="negrita">Fecha facturación:</b>&nbsp; <span>{{ formatoFecha(iteraFact.fecha_equivalente) }}</span>
-                        </span>
-                        @if (iteraFact.condicion === 'Crédito') {
-                        <span class="d-block">
-                          <b class="negrita">Fecha vencimiento:</b>&nbsp; <span>{{ formatoFecha(iteraFact.fecha_vencimiento) }}</span>
-                        </span>
-                        }
-                        <span class="d-block">
-                          <b class="negrita">Fact No :</b>&nbsp; <span>{{ formatoNumeroFactura(iteraFact.numero_factura) }}</span>
-                        </span>
-                        <span class="d-block">
-                          <b class="negrita">Valida hasta :</b> &nbsp; @if (iteraFact.numero_factura) {
-                          <span>{{ iteraFact.tipo_factura_id === 3 ? 'No aplica' : iteraFact.FACTURA_DE === 'compra' ? { text: ' ' } : formatoFecha(iteraFact.fecha_valida) }}</span>
-                          }
-                        </span>
+                  </div>
+                  <!-- ============ nota ============ -->
+                  <div class="col-4">
+                    <div class="row">
+                      <div class="col-12 text-center mb-2">
+                        <span class="infoFactuApli"> Informacion nota {{ tipos[tipoNota] }}</span>
+                      </div>
+                      <div class="col-12">
+                        <div class="encabezadoRigth fecha">
+                          <span class="titulos w-100">
+                            Fecha : <strong> {{ fecha }}</strong>
+                          </span>
+                        </div>
+                        <div class="cuadroTotal">RD$ {{ formatoNumero(convertObj[tipoNota] * totalIndividual(iteraFact)) }}</div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <!-- ============ nota ============ -->
-                <div class="col-4">
-                  <div class="row">
-                    <div class="col-12 text-center mb-2">
-                      <span class="infoFactuApli"> Informacion nota {{ tipos[tipoNota] }}</span>
-                    </div>
-                    <div class="col-12">
-                      <div class="encabezadoRigth fecha">
-                        <span class="titulos w-100">
-                          Fecha : <strong> {{ fecha }}</strong>
-                        </span>
+              </div>
+              <!-- ======================================================================================================== -->
+              <div #cardTablaNotas id="cardTabla" class="cuerpoNota pb-2">
+                <div class="fantasma-cuerpo">
+                  <dinamic-table
+                    [cardTabla]="cardTablaNotas"
+                    [(data)]="iteraFact.detalle_facturas"
+                    [post_id]="'-' + iteraFact.id"
+                    [(TablasComponent)]="tablaComponent"
+                    [config]="table_config"
+                    (table_events)="handle_table_events($event)"
+                    style="width: 100%"
+                  ></dinamic-table>
+                </div>
+              </div>
+              <div class="pieNota">
+                <div class="row" style="border-top: 2px solid #c7c9ca">
+                  <div class="col-12 pt-2">
+                    <span class="w-100">
+                      Articulos seleccionados: <strong> {{ getCantidadArticulos(iteraFact) }}</strong> / <strong> {{ iteraFact.detalle_facturas.length }}</strong>
+                    </span>
+                  </div>
+                  <div class="col-8 p-0">
+                    <div class="d-flex justify-content-around align-items-center w-100 mt-3">
+                      <div>
+                        <app-btncircular [alto]="'100px'" [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
                       </div>
-                      <div class="cuadroTotal">RD$ {{ formatoNumero(convertObj[tipoNota] * totalIndividual(iteraFact)) }}</div>
+                      <div>
+                        <app-btncircular [alto]="'100px'" [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            <!-- ======================================================================================================== -->
-            <div #cardTablaNotas id="cardTabla" class="cuerpoNota pb-2">
-              <div class="fantasma-cuerpo">
-                <dinamic-table
-                  [cardTabla]="cardTablaNotas"
-                  [(data)]="iteraFact.detalle_facturas"
-                  [post_id]="'-' + iteraFact.id"
-                  [(TablasComponent)]="tablaComponent"
-                  [config]="table_config"
-                  (table_events)="handle_table_events($event)"
-                  style="width: 100%"
-                ></dinamic-table>
-              </div>
-            </div>
-            <div class="pieNota">
-              <div class="row" style="border-top: 2px solid #c7c9ca">
-                <div class="col-12 pt-2">
-                  <span class="w-100">
-                    Articulos seleccionados: <strong> {{ getCantidadArticulos(iteraFact) }}</strong> / <strong> {{ iteraFact.detalle_facturas.length }}</strong>
-                  </span>
-                </div>
-                <div class="col-8 p-0">
-                  <div class="d-flex justify-content-around align-items-center w-100 mt-3">
-                    <div>
-                      <app-btncircular [alto]="'100px'" [accion]="'Imprimir nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
-                    </div>
-                    <div>
-                      <app-btncircular [alto]="'100px'" [accion]="'Cancelar nota de ' + (tipoNota === 'credito' ? 'crédito' : 'dédito')" [nombreImg]="'cancelar'" (pulsar)="cancelarFactura()"></app-btncircular>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-4 p-0">
-                  <div class="mostrarNumeros">
-                    <div class="cuadroResumenTotal" style="max-height: 3rem">
-                      <span class="label text-poppins position-absolute left-0"> <strong>TOTAL GENERAL:</strong> </span>
-                      <h5 class="w-100 text-end mb-0">{{ formatoNumero(convertObj[tipoNota] * totalGlobal()) }}</h5>
+                  <div class="col-4 p-0">
+                    <div class="mostrarNumeros">
+                      <div class="cuadroResumenTotal" style="max-height: 3rem">
+                        <span class="label text-poppins position-absolute left-0"> <strong>TOTAL GENERAL:</strong> </span>
+                        <h5 class="w-100 text-end mb-0">{{ formatoNumero(convertObj[tipoNota] * totalGlobal()) }}</h5>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -131,10 +139,10 @@
             </div>
           </div>
         </div>
-      </div>
-    </p-tabPanel>
-    }
-  </p-tabView>
+      </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
 </div>
 }
 
