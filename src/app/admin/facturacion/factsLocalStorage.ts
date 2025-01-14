@@ -4,19 +4,18 @@ import { Ss } from './../../core/services/singleton.service';
 import { fun } from '../../core/services/functions.service';
 import { PreFacturaClass } from './preFacturas';
 import { tipoDocFacturacion } from './factura';
-import { computed, signal } from '@angular/core';
+import { computed, effect, signal } from '@angular/core';
+import { ObjectVar } from '../../core/typescript/constantes';
 
 export class FactsLocalStorage extends PreFacturaClass {
-  index_fact_archivada = signal(0);
+  index_fact_archivada = signal<number | string>(0);
+  sideBarTabsIndex = signal<ObjectVar<any>>({});
 
   facturas_localStorage = computed<any[]>(() => {
-    fun.logGreen("--- ANDO AQUII ---");
-    console.log("this.index_fact_archivada() ", this.index_fact_archivada());
-    
-    
-    const facturas_localStorage = FactsLocalStorage.getList().filter((item: any) => item.tipo === this.sideBarTabsIndex[this.index_fact_archivada()]);
-    console.log("facturas_localStorage ", facturas_localStorage);
-    
+    const facturas_localStorage = FactsLocalStorage.getList().filter((item: any) => {
+      return item.tipo === this.sideBarTabsIndex()[this.index_fact_archivada()];
+    });
+
     const htmlElement = document.getElementById('btn_side_facturas');
 
     if (facturas_localStorage.length > 0) {
@@ -37,12 +36,15 @@ export class FactsLocalStorage extends PreFacturaClass {
     { key: tipoDocFacturacion.venta, label: 'facturas de venta', title: 'Venta', singleTitle: 'factura de venta', color: 'green' },
     { key: tipoDocFacturacion.compra, label: 'facturas de compra', title: 'Compra', singleTitle: 'factura de compra', color: 'yellow' },
   ];
-  sideBarTabsIndex = {};
 
   constructor() {
     super();
     this.setActualModulo();
-    this.setVariables();
+    this.setVariables().then(() => {
+      const initialFacturas = this.facturas_localStorage();
+    });
+
+    effect(() => {});
   }
 
   setActualModulo() {
@@ -69,23 +71,26 @@ export class FactsLocalStorage extends PreFacturaClass {
   }
 
   async setVariables() {
-    const hasPermisoPreVenta = await Ss.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
-    const hasPermisoCotizacion = await Ss.permissionsService.hasPermission(Object.values(Permisos.cotizacion));
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const hasPermisoPreVenta = await Ss.permissionsService.hasPermission(Object.values(Permisos.pre_venta));
+        const hasPermisoCotizacion = await Ss.permissionsService.hasPermission(Object.values(Permisos.cotizacion));
 
-    if (hasPermisoPreVenta) fun.pushAt(this.sideBarTabs, 1, { key: tipoDocFacturacion.pre_venta, label: 'pre ventas', title: 'Pre-Venta', singleTitle: 'pre-venta', color: 'blue' });
-    if (hasPermisoCotizacion) this.sideBarTabs.push({ key: tipoDocFacturacion.cotizacion, label: 'cotizaciones', title: 'Cotización', singleTitle: 'cotización', color: 'red' });
+        if (hasPermisoPreVenta) fun.pushAt(this.sideBarTabs, 1, { key: tipoDocFacturacion.pre_venta, label: 'pre ventas', title: 'Pre-Venta', singleTitle: 'pre-venta', color: 'blue' });
+        if (hasPermisoCotizacion) this.sideBarTabs.push({ key: tipoDocFacturacion.cotizacion, label: 'cotizaciones', title: 'Cotización', singleTitle: 'cotización', color: 'red' });
 
-    for (let index = 0; index < this.sideBarTabs.length; index++) {
-      this.sideBarTabsIndex[index] = this.sideBarTabs[index].key;
-    }
+        const tempSideBarTabsIndex: ObjectVar<any> = {};
+        for (let index = 0; index < this.sideBarTabs.length; index++) {
+          tempSideBarTabsIndex[index] = this.sideBarTabs[index].key;
+        }
+        this.sideBarTabsIndex.set(tempSideBarTabsIndex);
 
-    console.log("--- ANDO AQUII ---");
-    console.log("this.sideBarTabsIndex ", this.sideBarTabsIndex);
-    console.log("this.actualModulo ", this.actualModulo);
-    console.log("this.actualModulo.key ", this.actualModulo.key);
-    console.log("===>  ", fun.getKeyByValue(this.sideBarTabsIndex, this.actualModulo.key));
-    
-    this.index_fact_archivada.set(Number(fun.getKeyByValue(this.sideBarTabsIndex, this.actualModulo.key)));
+        this.index_fact_archivada.set(Number(fun.getKeyByValue(this.sideBarTabsIndex(), this.actualModulo.key)));
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 
   getSideBarTabByKey(key: tipoDocFacturacion) {
@@ -93,7 +98,7 @@ export class FactsLocalStorage extends PreFacturaClass {
   }
 
   _toggleSidebar(where?, metodo?) {
-    this.index_fact_archivada = fun.getKeyByValue(this.sideBarTabsIndex, metodo);
+    this.index_fact_archivada.set(Number(fun.getKeyByValue(this.sideBarTabsIndex(), metodo)));
 
     if (where == 'visibleChange') {
       if (this.ant_event_change_visibility == 'visibleChange') {

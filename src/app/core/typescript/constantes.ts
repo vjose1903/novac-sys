@@ -107,3 +107,7 @@ export enum teclasCode {
   _y = 121,
   _z = 122,
 }
+
+export interface ObjectVar<T> {
+  [key: string]: T;
+}

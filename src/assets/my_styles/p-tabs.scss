@@ -1,0 +1,82 @@
+@use './forms.scss' as *;
+
+.p-tabs {
+  height: 100%;
+  display: grid !important;
+  grid-template-areas:
+    'p-tablist'
+    'p-tabpanels';
+
+  grid-template-rows: min-content auto;
+
+  .p-tablist {
+    grid-area: p-tablist;
+    .p-tablist-content {
+      .p-tablist-tab-list {
+        .p-tab {
+          padding: 0.6rem 1rem !important;
+          font-weight: 400 !important;
+          
+          &.p-tab-active {
+          }
+
+          &.p-disabled {
+            pointer-events: none;
+
+            div.d-flex {
+              pointer-events: all !important;
+              cursor: not-allowed !important;
+              
+            }
+          }
+        }
+      }
+    }
+
+    > .p-tabview-nav-btn {
+      background: grey;
+      @include primengFocus;
+    }
+  }
+
+  .p-tabpanels {
+    grid-area: p-tabpanels;
+    background-color: transparent !important;
+    border: 0px solid transparent !important;
+    height: 100%;
+    // overflow-y: auto;
+    > p-tabpanel {
+      height: 100%;
+      > .p-tabview-panel {
+        height: 100%;
+      }
+    }
+  }
+
+  &.rounded {
+    .p-tabview-nav li a,
+    .p-tabview-nav li {
+      border-radius: 1rem;
+    }
+  }
+
+  &.back-light {
+    > .p-tabview-nav-container {
+      background: #8e8e8e32;
+
+      > .p-tabview-nav-content .p-tabview-nav li {
+        background: white;
+      }
+    }
+  }
+
+  &.panel-padding-0 {
+    > .p-tabpanels {
+      padding: 0rem;
+    }
+  }
+}
+
+.tabViewTootip {
+  z-index: 9999999999 !important;
+}

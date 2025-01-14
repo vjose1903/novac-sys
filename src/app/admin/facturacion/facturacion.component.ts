@@ -2,7 +2,7 @@ import { EmpleadoC } from './../registros/registro-empleados/empleado';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
-import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, inject, effect } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 const moment = require('../../core/javascript/moment');
@@ -46,6 +46,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   hasPermisoCamiones: boolean;
   titulo: string;
 
+  console = console;
   datesAvailable = { viaje: { minDate: new Date() } };
 
   @HostListener('window:keydown', ['$event'])
@@ -174,6 +175,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   filterCamionesTargets;
   filterChoferesTargets;
+  ƒ;
   permissions = Permisos;
   configApp: ConfigI;
   timeInterval;
@@ -184,8 +186,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   facturasSerieOptions = seriesDGII;
   htmlServ = inject(HtmlElementsService);
+  factServ = inject(FacturacionService);
 
-  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, public factServ: FacturacionService) {
+  local_index_fact_archivada = this.index_fact_archivada();
+
+  constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router) {
     super();
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
@@ -1374,15 +1379,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     const factura_a_guardar = fun.deepCloning(this.objArchivo.factura_en_turno);
 
-    let index_fact_archivada = facturas_localStorage.findIndex((facts: any) => facts?.archivo_id == this.factura_guardada?.archivo_id);
+    let index_factura = facturas_localStorage.findIndex((facts: any) => facts?.archivo_id == this.factura_guardada?.archivo_id);
 
     if (!fun.isEmpty(this.factServ.propietario_factura.id)) {
       factura_a_guardar[this.factServ.isVenta || this.factServ.isPreVenta ? 'cliente' : 'suplidor'] = this.factServ.propietario_factura;
     }
 
-    if (fun.hasValue(index_fact_archivada) && index_fact_archivada >= 0) {
+    if (fun.hasValue(index_factura) && index_factura >= 0) {
       factura_a_guardar['archivo_id'] = this.factura_guardada?.archivo_id;
-      facturas_localStorage[index_fact_archivada] = factura_a_guardar;
+      facturas_localStorage[index_factura] = factura_a_guardar;
     } else {
       facturas_localStorage = facturas_localStorage.sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
       factura_a_guardar['archivo_id'] = facturas_localStorage.length > 0 ? _.last(facturas_localStorage).archivo_id + 1 : 1;
