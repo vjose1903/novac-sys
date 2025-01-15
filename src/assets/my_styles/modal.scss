@@ -1,6 +1,9 @@
 // .p-dialog-mask {
 //   z-index: 9999 !important;
 // }
+.p-dialog-mask.p-overlay-mask {
+  z-index: 999999 !important;
+}
 
 .p-dialog {
   border: 0px solid transparent !important;

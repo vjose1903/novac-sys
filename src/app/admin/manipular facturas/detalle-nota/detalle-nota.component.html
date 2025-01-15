@@ -17,7 +17,7 @@
 
   <div class="tabs">
     <div class="fantasma">
-      <p-tabs [(value)]="tabIndex" [scrollable]="true" (onChange)="clickTabView($event)">
+      <p-tabs [(value)]="tabIndex" [scrollable]="true" (valueChange)="clickTabView($event)">
 
         <p-tablist>
           @for (iteraFact of inputs.data.facturas_aplicadas; track $index) {

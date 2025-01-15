@@ -1,16 +1,18 @@
 @if (facturasConDetalles) {
 <div class="h-99 w-100">
-  <p-tabs [scrollable]="true" [(value)]="tabIndex" (onClose)="onCloseTab($event)">
+  <p-tabs [scrollable]="true" class="panel-padding-0" [(value)]="tabIndex">
     <p-tablist>
       @for (iteraFact of facturasConDetalles; track iteraFact) {
-      <!-- [closable]="facturasConDetalles.length > 1" -->
       <p-tab [value]="$index">
-        {{ iteraFact.numero_comprobante }}
+        <div class="d-flex justify-content-between align-items-center gap-3" [ngClass]="{ 'p-tab-danger': totalIndividualIsCero(iteraFact) }">
+          {{ iteraFact.numero_comprobante }}
+          @if (facturasConDetalles.length > 1) {
+          <div class="close-tab-btn" (click)="onCloseTab($event, $index)">
+            <i class="fa-regular fa-circle-xmark"></i>
+          </div>
+          }
+        </div>
       </p-tab>
-      <!-- id="p-tabView-fact-{{ iteraFact.id }}"
-      #tabPanel
-      [headerStyle]="changeHeaderStatus(iteraFact, tabPanel, 'p-tabView-fact-' + iteraFact.id)"
-      header="{{ iteraFact.numero_comprobante }}" -->
       }
     </p-tablist>
 

@@ -14,13 +14,15 @@
     .p-tablist-content {
       .p-tablist-tab-list {
         border-color: #d8d8d8 !important;
+        background: transparent !important;
+        padding-bottom: 0.2rem !important;
 
         .p-tab {
           padding: 0.6rem 1rem !important;
           margin: 0.2rem !important;
           border-radius: 0.6rem !important;
           font-weight: 400 !important;
-          background: #e8e8e8 !important;
+          background: #0000001f !important;
 
           &.p-tab-active {
             background: var(--primary07) !important;
@@ -43,7 +45,7 @@
           &:has(> .p-tab-danger) {
             background: #ffb5b5 !important;
             color: #8f0909 !important;
-            
+
             &.p-tab-active {
               background: #ff8989 !important;
               box-shadow: 0px 2.3px 0px 0px #d36363 !important;
@@ -51,6 +53,19 @@
               &.p-disabled {
                 filter: grayscale(0.6) !important;
               }
+            }
+          }
+
+          .close-tab-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.25rem;
+            cursor: pointer;
+
+            &:hover {
+              background: #ffffff42;
+              border-radius: 0.5rem;
             }
           }
         }
@@ -83,8 +98,8 @@
   }
 
   &.panel-padding-0 {
-    > .p-tabpanels {
-      padding: 0rem;
+    .p-tabpanels {
+      padding: 0rem !important;
     }
   }
 }
