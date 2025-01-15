@@ -3,6 +3,8 @@ import * as _ from 'lodash';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
+import { fun } from '../../../../core/services/functions.service';
+
 @Component({
   selector: 'app-modal-historial-pagos',
   templateUrl: './modal-historial-pagos.component.html',
@@ -40,7 +42,7 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
   constructor() {
     super();
     effect(() => {
-      if (!this.processingTabChange) {
+      if (fun.hasValue(this.activeIndex()) && !this.processingTabChange) {
         this.processingTabChange = true;
         this.show = false;
         const tipo = this.activeIndex() == 0 ? 'abonos' : 'notas';
