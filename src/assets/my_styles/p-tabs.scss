@@ -13,29 +13,48 @@
     grid-area: p-tablist;
     .p-tablist-content {
       .p-tablist-tab-list {
+        border-color: #d8d8d8 !important;
+
         .p-tab {
           padding: 0.6rem 1rem !important;
+          margin: 0.2rem !important;
+          border-radius: 0.6rem !important;
           font-weight: 400 !important;
-          
+          background: #e8e8e8 !important;
+
           &.p-tab-active {
+            background: var(--primary07) !important;
+            box-shadow: 0px 2.3px 0px 0px var(--primary08) !important;
           }
 
           &.p-disabled {
             pointer-events: none;
 
+            &.p-tab-active {
+              filter: grayscale(0.6) !important;
+            }
+
             div.d-flex {
               pointer-events: all !important;
               cursor: not-allowed !important;
-              
+            }
+          }
+
+          &:has(> .p-tab-danger) {
+            background: #ffb5b5 !important;
+            color: #8f0909 !important;
+            
+            &.p-tab-active {
+              background: #ff8989 !important;
+              box-shadow: 0px 2.3px 0px 0px #d36363 !important;
+
+              &.p-disabled {
+                filter: grayscale(0.6) !important;
+              }
             }
           }
         }
       }
-    }
-
-    > .p-tabview-nav-btn {
-      background: grey;
-      @include primengFocus;
     }
   }
 
@@ -50,13 +69,6 @@
       > .p-tabview-panel {
         height: 100%;
       }
-    }
-  }
-
-  &.rounded {
-    .p-tabview-nav li a,
-    .p-tabview-nav li {
-      border-radius: 1rem;
     }
   }
 

@@ -18,14 +18,18 @@ export class FactsLocalStorage extends PreFacturaClass {
 
     const htmlElement = document.getElementById('btn_side_facturas');
 
-    if (facturas_localStorage.length > 0) {
-      if (fun.hasValue(htmlElement)) htmlElement.setAttribute('data-cant-facturas', facturas_localStorage.length);
+    if (FactsLocalStorage.getList().length > 0) {
+      if (fun.hasValue(htmlElement)) htmlElement.setAttribute('data-cant-facturas', FactsLocalStorage.getList().length);
     } else {
       if (fun.hasValue(htmlElement)) htmlElement.removeAttribute('data-cant-facturas');
     }
 
     return facturas_localStorage.sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
   });
+
+  get index_archivada() {
+    return this.index_fact_archivada();
+  }
 
   ant_event_change_visibility;
   _sideBarOpened = false;
@@ -138,6 +142,12 @@ export class FactsLocalStorage extends PreFacturaClass {
     return { disable: array_fact.length == 0, cant: array_fact.length };
   }
 
+  reloadIndexFactArchivada() {
+    const ant_index_fact_archivada = this.index_fact_archivada();
+    this.index_fact_archivada.set(null);
+    setTimeout(() => this.index_fact_archivada.set(ant_index_fact_archivada), 100);
+  }
+
   quitarFacturaGuardada(archivo_id) {
     let index;
     const allFacturas = FactsLocalStorage.getList();
@@ -149,6 +159,8 @@ export class FactsLocalStorage extends PreFacturaClass {
 
       FactsLocalStorage.setList(allFacturas);
     }
+
+    this.reloadIndexFactArchivada();
   }
 
   static verificateFacturasGuardadas() {
