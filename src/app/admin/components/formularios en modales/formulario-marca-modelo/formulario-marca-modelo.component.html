@@ -20,8 +20,9 @@
                     }
                   </div>
                 </div>
+
                 <div class="row">
-                  <div class="col-12 mt-3">
+                  <div class="col-12 mt-3 p-0">
                     <div class="form-group">
                       <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
                       @if (marcaSelected) {
@@ -52,7 +53,7 @@
             @if (hasPermissionsModeloCreate) {
             <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
               <div class="row card card-padding sombra">
-                <div class="col-12">
+                <div class="col-12 p-0">
                   <div class="form-group">
                     <label class="control-label">Marca: <span style="color: red">*</span></label>
 
@@ -70,7 +71,7 @@
                     />
                   </div>
                 </div>
-                <div class="col-12">
+                <div class="col-12 p-0">
                   <div class="form-group">
                     <label class="control-label">Modelo: <span style="color: red">*</span></label>
                     <input (keyup)="capitalice('descripcion', htmlServ.getValue($event), formModelo)" (focus)="htmlServ.selectValue($event)" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
@@ -79,15 +80,14 @@
                     }
                   </div>
                 </div>
-                <div class="row">
-                  <div class="col-12 mt-3">
-                    <div class="form-group">
-                      <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
-                      @if (modeloSelected) {
-                      <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
-                      }
-                      <input [disabled]="!formModelo.valid" (click)="submit(formModelo)" type="submit" class="btn" value="{{ modeloSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
-                    </div>
+
+                <div class="col-12 mt-3 p-0">
+                  <div class="form-group">
+                    <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
+                    @if (modeloSelected) {
+                    <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
+                    }
+                    <input [disabled]="!formModelo.valid" (click)="submit(formModelo)" type="submit" class="btn" value="{{ modeloSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
                   </div>
                 </div>
               </div>
