@@ -209,9 +209,8 @@
               <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
             </div>
             }
-            <!-- <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)"> -->
+
             <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center">
-              <!-- <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button> -->
               <p-paginator
                 id="paginator-{{ realIdTabla }}"
                 [first]="tServ.getPaginationById(realIdTabla)?.page_front"
@@ -219,7 +218,7 @@
                 [pageLinkSize]="cantPagesView"
                 [totalRecords]="config.total_count"
                 [rowsPerPageOptions]="tServ.getPaginationById(realIdTabla)?.per_page_options"
-                styleClass="paginator-dinamic-table {{ config?.obj_paginate?.showDropDown ? '' : 'no-show-dropdown' }}"
+                styleClass="{{ config?.obj_paginate?.showDropDown ? '' : 'no-show-dropdown' }}"
                 dropdownAppendTo="body"
                 (onPageChange)="paginatorChange($event, realIdTabla)"
               ></p-paginator>
