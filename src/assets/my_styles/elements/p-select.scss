@@ -37,10 +37,9 @@
 }
 
 .p-overlay:has(.p-overlay-content .p-select-overlay) {
+  z-index: 999999 !important;
   max-width: min-content !important;
   .p-select-overlay {
-    z-index: 9999 !important;
-
     .p-select-header {
       padding: 0.2rem !important;
 
@@ -60,7 +59,7 @@
         .p-select-option {
           min-height: 2.2rem;
           text-wrap: wrap;
-          &.p-highlight {
+          &.p-select-option-selected {
             background-color: var(--transparente04) !important;
             color: black;
             font-weight: 600;

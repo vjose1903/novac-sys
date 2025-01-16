@@ -135,8 +135,8 @@
       border-radius: 0.3rem;
       width: 100% !important;
 
-      &.p-highlight {
-        background: var(--primary03) !important;
+      &.p-datepicker-month-selected {
+        background: var(--primary07) !important;
         @include primengFocus;
       }
 
@@ -156,8 +156,8 @@
     .p-datepicker-year {
       border-radius: 0.3rem;
       width: 100% !important;
-      &.p-highlight {
-        background: var(--primary03) !important;
+      &.p-datepicker-year-selected {
+        background: var(--primary07) !important;
         @include primengFocus;
       }
       &:focus {
