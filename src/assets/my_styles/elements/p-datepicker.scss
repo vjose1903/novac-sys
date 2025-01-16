@@ -28,8 +28,11 @@
 }
 
 .p-datepicker-panel {
+  margin-top: 0.3rem !important;
   padding: 0rem !important;
   border-radius: 0.4rem !important;
+  z-index: 999999 !important;
+
   .p-datepicker-calendar-container {
     .p-datepicker-calendar {
       .p-datepicker-header {
@@ -75,17 +78,43 @@
 
         tbody {
           tr {
-            td {
+            .p-datepicker-day-cell {
               padding: 0.5rem !important;
 
-              span {
+              .p-datepicker-day {
                 border-radius: 100%;
-                &.p-highlight {
-                  background: var(--primary03) !important;
+                &.p-datepicker-day-selected {
+                  background: var(--primary07) !important;
                 }
 
                 &:focus {
                   @include primengFocus;
+                }
+              }
+
+              &.p-datepicker-today {
+                .p-datepicker-day {
+                  position: relative;
+                  overflow: visible;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+
+                  background: var(--transparente03) !important;
+                  &:hover {
+                    background: var(--transparente04) !important;
+                    &::after {
+                      display: block;
+                    }
+                  }
+
+                  &::after {
+                    content: 'Hoy';
+                    color: #000000a1 !important;
+                    position: absolute;
+                    top: -1.3rem;
+                    display: none;
+                  }
                 }
               }
             }
