@@ -505,6 +505,13 @@ function generateCSV(params: { fileName: string; csvString: string }) {
       const filePath = parsePath(path.join(targetFolder, fileName));
       
       fs.writeFileSync(filePath, csvString, 'utf8');
+      
+      shell.openPath(targetFolder).then(() => {
+        writeLogs(`Carpeta abierta: ${targetFolder}`);
+      }).catch(err => {
+        writeLogs(err, 'Error al abrir la carpeta:');
+        console.error('Error al abrir la carpeta:', err);
+      });
 
       resolve({ success: true, filePath });
     } catch (error) {

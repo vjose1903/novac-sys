@@ -506,6 +506,12 @@ function generateCSV(params: { fileName: string; csvString: string }) {
       
       fs.writeFileSync(filePath, csvString, 'utf8');
 
+      shell.openPath(targetFolder).then(() => {
+        writeLogs(`Carpeta abierta: ${targetFolder}`);
+      }).catch(err => {
+        writeLogs(err, 'Error al abrir la carpeta:');
+      });
+      
       resolve({ success: true, filePath });
     } catch (error) {
       reject({ success: false, error });
