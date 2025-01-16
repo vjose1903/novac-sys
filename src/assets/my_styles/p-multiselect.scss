@@ -1,0 +1,97 @@
+@use './forms.scss' as *;
+@use './scrollbar.scss' as *;
+
+.p-multiselect {
+  width: 100%;
+  border-radius: 0.25rem !important;
+  background-color: #ffffffe8 !important;
+  color: #1d253b !important;
+  background: #ffffff;
+  border: 1px solid #ced4da !important;
+  box-shadow: 1px 1px 4px 0px rgba(29, 37, 59, 0.2392156863) !important;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  .p-multiselect-label-container {
+    .p-multiselect-label {
+      overflow: auto;
+      @include noScrollbar;
+
+      .p-multiselect-chip-item {
+        .p-multiselect-chip {
+          background: var(--primary04) !important;
+          border-radius: 0.4rem !important;
+        }
+      }
+    }
+  }
+
+  &.p-focus {
+    @include primengFocus;
+    background-color: var(--primary02) !important;
+    border-color: transparent !important;
+    box-shadow: 0px 0px 6px var(--primary08) !important;
+  }
+
+  .p-multiselect-label {
+    .multi-select-item-values {
+      overflow: auto;
+      display: flex;
+      column-gap: 0.5rem;
+      .multi-select-item {
+        background: var(--primary04) !important;
+        color: white;
+        padding: 0rem 0.5rem;
+        border-radius: 0.7rem;
+      }
+    }
+  }
+}
+
+.p-overlay:has(.p-overlay-content .p-multiselect-overlay) {
+  max-width: min-content !important;
+  .p-multiselect-overlay {
+    z-index: 9999 !important;
+
+    .p-multiselect-header {
+      padding: 0.2rem !important;
+
+      .p-multiselect-filter {
+        border: 1px solid #ced4da !important;
+        border-radius: 0.25rem !important;
+
+        &:focus {
+          @include primengFocus;
+          background-color: var(--primary01) !important;
+        }
+      }
+    }
+
+    .p-multiselect-list-container {
+      .p-multiselect-list {
+        .p-multiselect-option {
+          min-height: 2.2rem;
+          text-wrap: wrap;
+        }
+      }
+    }
+  }
+}
+
+.p-inputtext:enabled:focus {
+}
+.p-multiselect-close {
+  &:hover {
+    background: var(--primary01) !important;
+    color: var(--primary04) !important;
+  }
+}
+.p-disabled {
+  background-color: #e9ecef !important;
+  touch-action: none;
+  pointer-events: none;
+  opacity: 1;
+}
