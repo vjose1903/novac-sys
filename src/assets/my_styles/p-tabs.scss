@@ -102,8 +102,24 @@
       padding: 0rem !important;
     }
   }
-}
 
-.tabViewTootip {
-  z-index: 9999999999 !important;
+  &.panel-overflow-auto {
+    .p-tabpanels {
+      overflow-y: auto !important;
+    }
+  }
+
+  &.panel-overflow-hidden {
+    .p-tabpanels {
+      overflow-y: hidden !important;
+    }
+  }
+
+  &.back-light {
+    .p-tablist {
+      .p-tablist-content {
+        background: #8e8e8e32;
+      }
+    }
+  }
 }
