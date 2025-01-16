@@ -3,23 +3,6 @@
   outline: 0 !important;
 }
 
-.p-checkbox-box {
-  &.p-highlight {
-    &[aria-checked='true'] {
-      border-color: #20b9d5 !important;
-      background: #20b9d5 !important;
-    }
-    &[aria-checked='false'] {
-      border-color: #bd4848 !important;
-      background: #bd4848 !important;
-    }
-  }
-
-  &.focus {
-    @include primengFocus;
-  }
-}
-
 .p-tag {
   .p-tag-value {
     color: #fff !important;

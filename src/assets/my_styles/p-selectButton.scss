@@ -1,17 +1,31 @@
-
-@use "./forms.scss" as *;
-
 .p-selectbutton {
-  // .p-button {
-  //   background: $default-color;
-  //   &.p-highlight {
-  //     background: $theme-color !important;
-  //     border-color: $success-color !important;
-  //   }
-  //   &:focus {
-  //     @include primengFocus;
-  //   }
-  // }
+  padding: 0.4rem !important;
+  background: #a5a5a526 !important;
+  border-radius: 0.4rem !important;
+  display: flex !important;
+  gap: 0.3rem !important;
+
+  .p-togglebutton {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0.25rem !important;
+    padding: 0.3rem 0.5rem !important;
+    font-weight: 400 !important;
+    color: #a2a2a2 !important;
+    
+    &:hover {
+      background: #8080802a !important;
+    }
+    
+    &.p-togglebutton-checked {
+      background: var(--primary08) !important;
+      font-weight: 600 !important;
+      color: white !important;
+      &:hover {
+        background: var(--primary09) !important;
+      }
+    }
+  }
 }
 
 @media (min-width: 992px) {
