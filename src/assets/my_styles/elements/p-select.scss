@@ -3,31 +3,30 @@
 .p-select {
   display: flex !important;
   align-items: center !important;
-  background: #ffffff;
-  border: 1px solid #ced4da !important;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-  color: #1d253b !important;
-  border-radius: 0.25rem !important;
-  box-shadow: 1px 1px 4px 0px rgba(29, 37, 59, 0.2392156863) !important;
 
+  @include formField;
+
+  
   &.p-focus,
   &.p-select-open {
-    @include primengFocus;
-    background-color: var(--primary02) !important;
-    border-color: transparent !important;
-    box-shadow: 0px 0px 6px var(--primary08) !important;
+    @include formFieldFocus;
   }
-
+  
   &.p-disabled {
-    background-color: #e9ecef !important;
-    opacity: 1 !important;
-
+    @include formFieldDisabled;
+    
     .p-select-label {
       &.p-placeholder,
       &::placeholder {
         color: #717a82 !important;
         opacity: 1;
       }
+    }
+  }
+  
+  &.min {
+    .p-select-label {
+      padding: 0 0.1rem 0 0.1rem !important;
     }
   }
 
@@ -48,8 +47,7 @@
         border-radius: 0.25rem !important;
 
         &:focus {
-          @include primengFocus;
-          background-color: var(--primary01) !important;
+          @include formFieldFocus;
         }
       }
     }

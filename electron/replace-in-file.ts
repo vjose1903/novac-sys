@@ -20,6 +20,7 @@ export default class ReplaceInFile {
           console.log('  ');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+          console.log('promomiseList ', promomiseList);
           console.log('values ', values);
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');

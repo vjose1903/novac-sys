@@ -255,7 +255,7 @@
               <div>
                 <ng-container *ngxPermissionsOnly="permissions.articulo.read_formula">
                   <label class="control-label">Formula (1 {{ medida_config | uppercase }}) : </label>
-                  <div class="row mb-2 p-0">
+                  <div class="scroll-formula-titles row mb-2">
                     <div class="col-5 p-0">Ingredientes</div>
                     <div class="col-3 pr-0">Cantidad</div>
                     <div class="col-3">Costo</div>
@@ -263,7 +263,7 @@
                       <i (click)="addItem()" pTooltip="Agregar Ingrediente" tooltipPosition="top" class="fas btnArray fa-plus-square text-blue btnQuitar"></i>
                     </div>
                   </div>
-                  <div class="SCROLLFORMULA">
+                  <div class="scroll-formula-content">
                     @for (formula of ARRAY_FORMULA.controls; track formula['controls'].key.value; let index_formula = $index) {
                     <div formArrayName="rowFormula">
                       <div [formGroupName]="index_formula">
@@ -306,7 +306,7 @@
                                 (blur)="calculateCostoPT()"
                                 [id]="'cantidad_formula-' + index_formula"
                                 formControlName="cantidad_formula"
-                                class="form-control"
+                                class="form-control min"
                                 style="border-radius: 0.25rem 0rem 0rem 0.25rem !important"
                                 autocomplete="off"
                                 (keyup)="checkLongDecimales($event)"
@@ -321,14 +321,14 @@
                               tabindex="-1"
                               formControlName="medida_formula"
                               style="border-radius: 0rem 0.25rem 0.25rem 0rem !important; padding: 0.2rem"
-                              class="form-control disabled"
+                              class="form-control disabled min"
                               autocomplete="off"
                             />
                           </div>
                           <!-- costo -->
                           <div class="col-3 pr-0">
                             <div class="form-group mb-0">
-                              <input type="text" id="costo_formula-{{ index_formula }}" tabindex="-1" formControlName="costo_formula" [ngClass]="{ badAlert: checkCostoFormula(formula) }" class="form-control disabled" autocomplete="off" />
+                              <input type="text" id="costo_formula-{{ index_formula }}" tabindex="-1" formControlName="costo_formula" [ngClass]="{ badAlert: checkCostoFormula(formula) }" class="form-control disabled min" autocomplete="off" />
                             </div>
                           </div>
 

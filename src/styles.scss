@@ -56,16 +56,8 @@ $bodyfont: 'Poppins';
   width: 30% !important;
 }
 
-.btnConfigDis {
-  color: #adacac !important;
-  &:hover {
-    cursor: default !important;
-  }
-}
 
-.btnConfig {
-  color: #777676 !important;
-}
+
 
 .dropRowMenu {
   min-width: 250px;
@@ -576,33 +568,7 @@ input.apple-switch:checked:after {
   }
 }
 
-.sombreado2 {
-  background-color: rgba(187, 187, 187, 0.842);
-  width: 0.5rem !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-align: center !important;
 
-  vertical-align: inherit !important;
-
-  &:hover {
-    cursor: default;
-  }
-}
-
-.sombreado {
-  background-color: rgba(187, 187, 187, 0.842);
-  width: 1rem !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  > .btnBorrar {
-    transform: translate(0.2rem, -3rem) scale(0) !important;
-    // display: none;
-  }
-  &:hover {
-    cursor: pointer;
-  }
-}
 
 @mixin my_cards {
   border-radius: 1rem !important;

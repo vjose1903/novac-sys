@@ -154,9 +154,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  abrirOverlay(dropRowMenu, event) {
-    this.dropRowMenu = dropRowMenu;
-    this.dropRowMenu.toggle(event);
+  abrirOverlay(dropRowMenu, event, index_cuerpo) {
+    if (this.checkIfRowContainArticulo(index_cuerpo)) {
+      this.dropRowMenu = dropRowMenu;
+      this.dropRowMenu.toggle(event);
+    }
   }
 
   readPrecio() {

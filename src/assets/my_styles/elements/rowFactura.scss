@@ -1,12 +1,16 @@
+@use './forms.scss' as *;
+
 .entrada {
   border-radius: 0 !important;
   height: calc(1.5em + 0.3rem + 2px) !important;
-  padding: 0rem 0.3rem 0rem 0.5rem !important;
+  padding: 0rem 0.3rem 0rem 0.2rem !important;
   box-shadow: none !important;
+  border: 0px solid transparent !important;
+  outline: 2px solid #ced4da !important;
+
   &:focus {
-    background-color: var(--primary01);
-    border-color: #d4d4d4 !important;
-    box-shadow: 1px 1px #d4d4d4 !important;
+    @include formFieldFocus;
+    box-shadow: none !important;
   }
 
   & > .p-dropdown-label {
@@ -15,5 +19,39 @@
   }
   & > .p-dropdown-trigger {
     width: auto !important;
+  }
+}
+
+[tabindex='-1']:focus:not(:focus-visible) {
+  @include formFieldFocus;
+}
+
+.td-btnConfig {
+  width: 0.6rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+
+  vertical-align: inherit !important;
+
+  .btnConfig {
+    color: #777676;
+    padding: 3px;
+    cursor: default;
+    
+    background-color: #bbbbbbd7;
+    
+    &:not(.disabled):hover {
+      color: #454545 !important;
+      background-color: #a0a0a0d7;
+      cursor: pointer;
+    }
+
+    &.disabled {
+      color: #adacac !important;
+      &:hover {
+        cursor: not-allowed !important;
+      }
+    }
   }
 }

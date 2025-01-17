@@ -3,30 +3,30 @@
   <table class="table m-auto titulos-fact">
     <thead>
       <tr class="text-center">
-        <th class="tiCOD">Codigo</th>
-        <th class="tiCAN">Cantidad</th>
-        <th class="tiUNI text-center">Unidad</th>
-        <th class="tiDES" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripcion</th>
-        <th class="tiDESC">Descuento</th>
-        <th class="tiPRE">{{ factServ.isCompra ? 'Costo' : 'Precio' }}</th>
+        <th class="column-codigo">Código</th>
+        <th class="column-cantidad">Cantidad</th>
+        <th class="column-unidad text-center">Unidad</th>
+        <th class="column-descripcion" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripcion</th>
+        <th class="column-descuento">Descuento</th>
+        <th class="column-precio">{{ factServ.isCompra ? 'Costo' : 'Precio' }}</th>
         @if (configApp.calcular_itbis) {
-        <th class="tiITBIS">ITBIS</th>
+        <th class="column-itbis">ITBIS</th>
         }
-        <th class="tiTOT">Total</th>
+        <th class="column-total">Total</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td class="tiCOD p-0"></td>
-        <td class="tiCAN p-0"></td>
-        <td class="tiUNI p-0"></td>
-        <td class="tiDES p-0" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }"></td>
-        <td class="tiDESC p-0"></td>
-        <td class="tiPRE p-0"></td>
+        <td class="column-codigo p-0"></td>
+        <td class="column-cantidad p-0"></td>
+        <td class="column-unidad p-0"></td>
+        <td class="column-descripcion p-0" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }"></td>
+        <td class="column-descuento p-0"></td>
+        <td class="column-precio p-0"></td>
         @if (configApp.calcular_itbis) {
-        <td class="tiITBIS p-0"></td>
+        <td class="column-itbis p-0"></td>
         }
-        <td class="tiTOT p-0"></td>
+        <td class="column-total p-0"></td>
       </tr>
     </tbody>
   </table>
@@ -35,49 +35,48 @@
       @for (item_cuerpo of ARRAY_ROWFACTURAS?.controls; track item_cuerpo; let index_cuerpo = $index) {
       <div formArrayName="rowFactura">
         <div [formGroupName]="index_cuerpo">
-          <p-popover #dropRowMenu appendTo="body">
-            <ul class="dropRowMenu" role="menu">
-              @if (item_cuerpo.controls.is_bad_price.value) {
-              <li role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
-                <a class="" id="dropdown-item">
-                  <i class="fa-solid fa-triangle-exclamation text-gris-oscuro mr-1"></i>
-                  Obtener {{ factServ.isCompra ? 'costo' : 'precio' }} actual
-                </a>
-              </li>
-              } @if (hasArticulosDevueltos(index_cuerpo) || item_cuerpo.controls.is_devuelto.value) {
-              <li role="menuitem" (click)="retornarArticulosDevueltos(index_cuerpo, 'defectuoso', $event)" class="hoverlable">
-                <a class="" id="dropdown-item">
-                  <i class="fa-solid fa-repeat text-gris-oscuro mr-1"></i>
-                  Retornar articulos devueltos
-                </a>
-              </li>
-              } @if (!item_cuerpo.controls.is_devuelto.value) {
-              <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable danger">
-                <a class="" id="dropdown-item">
-                  <i class="far fa-trash-alt mr-1"></i>
-                  Quitar Producto
-                </a>
-              </li>
-              }
-            </ul>
-          </p-popover>
-          <table class="table m-auto">
+          <table class="table-cuerpo-factura">
             <tbody>
               <tr>
                 <!--  ::::::::::::  CONFIG  ::::::::::::  -->
                 @if (fun.hasValue(factServ.propietario_factura)) {
-                <td class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
-                  <div class="btn-group">
-                    @if (checkIfRowContainArticulo(index_cuerpo)) {
-                    <div style="padding: 3px" (click)="abrirOverlay(dropRowMenu, $event)">
-                      <i class="fas fa-ellipsis-v btnConfig"></i>
-                    </div>
-                    } @if (!checkIfRowContainArticulo(index_cuerpo)) {
-                    <div style="padding: 3px">
-                      <i class="fas fa-ellipsis-v btnConfigDis"></i>
-                    </div>
-                    }
+                <td class="td-btnConfig">
+                  <div
+                    class="btnConfig"
+                    [ngClass]="{ disabled: !checkIfRowContainArticulo(index_cuerpo) }"
+                    (mouseover)="selectedRow(index_cuerpo, true)"
+                    (mouseleave)="selectedRow(index_cuerpo, false)"
+                    (click)="abrirOverlay(dropRowMenu, $event, index_cuerpo)"
+                  >
+                    <i class="fas fa-ellipsis-v"></i>
                   </div>
+
+                  <p-popover #dropRowMenu appendTo="body">
+                    <ul class="dropRowMenu" role="menu">
+                      @if (item_cuerpo.controls.is_bad_price.value) {
+                      <li role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
+                        <a class="" id="dropdown-item">
+                          <i class="fa-solid fa-triangle-exclamation text-gris-oscuro mr-1"></i>
+                          Obtener {{ factServ.isCompra ? 'costo' : 'precio' }} actual
+                        </a>
+                      </li>
+                      } @if (hasArticulosDevueltos(index_cuerpo) || item_cuerpo.controls.is_devuelto.value) {
+                      <li role="menuitem" (click)="retornarArticulosDevueltos(index_cuerpo, 'defectuoso', $event)" class="hoverlable">
+                        <a class="" id="dropdown-item">
+                          <i class="fa-solid fa-repeat text-gris-oscuro mr-1"></i>
+                          Retornar articulos devueltos
+                        </a>
+                      </li>
+                      } @if (!item_cuerpo.controls.is_devuelto.value) {
+                      <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable danger">
+                        <a class="" id="dropdown-item">
+                          <i class="far fa-trash-alt mr-1"></i>
+                          Quitar Producto
+                        </a>
+                      </li>
+                      }
+                    </ul>
+                  </p-popover>
                 </td>
                 }
                 <!-- <td *ngIf="fun.hasValue(factServ.propietario_factura)" class="sombreado2">
@@ -88,8 +87,8 @@
                     </div>
                   </td> -->
                 <!--  ::::::::::::  CODIGO  ::::::::::::  -->
-                <td class="tiCOD p-0">
-                  <div class="form-group m-0">
+                <td class="column-codigo p-0">
+                  <div class="m-0">
                     <input
                       [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       type="text"
@@ -105,9 +104,9 @@
                   </div>
                 </td>
                 <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
-                <td class="tiCAN p-0">
+                <td class="column-cantidad p-0">
                   <!-- <div class="position-absolute" style="width: 20px; height: 20px; background:red; z-index:999999" (click)="$event.stopPropagation(); test()"></div> -->
-                  <div class="form-group m-0" class="position-relative">
+                  <div class="m-0" class="position-relative">
                     <input
                       [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       type="number"
@@ -124,8 +123,8 @@
                   </div>
                 </td>
                 <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
-                <td class="tiUNI p-0">
-                  <div class="form-group m-0">
+                <td class="column-unidad p-0">
+                  <div class="m-0">
                     @if (inputDrop !== 'unidad-' + index_cuerpo) {
                     <input
                       [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
@@ -166,14 +165,14 @@
                   </div>
                 </td>
                 <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
-                <td class="tiDES p-0">
-                  <div class="form-group m-0">
+                <td class="column-descripcion p-0">
+                  <div class="m-0">
                     <input type="text" class="form-control entrada inDES disabled" id="descripcion-{{ index_cuerpo }}" formControlName="descripcion" tabindex="-1" />
                   </div>
                 </td>
                 <!--  ::::::::::::  DESCUENTO  ::::::::::::  -->
-                <td class="tiDESC p-0">
-                  <div class="form-group m-0">
+                <td class="column-descuento p-0">
+                  <div class="m-0">
                     <input
                       [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                       type="text"
@@ -188,8 +187,8 @@
                   </div>
                 </td>
                 <!--  ::::::::::::  PRECIO \ COSTO ::::::::::::  -->
-                <td class="tiPRE p-0">
-                  <div class="form-group m-0" [pTooltip]="item_cuerpo.controls.is_bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
+                <td class="column-precio p-0">
+                  <div class="m-0" [pTooltip]="item_cuerpo.controls.is_bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
                     <div class="precio-div">
                       @if (item_cuerpo.controls.is_bad_price.value) {
                       <i class="fa-solid {{ getInfoBadPrice(index_cuerpo).icon }} iconArrow"></i>
@@ -210,15 +209,15 @@
                 </td>
                 <!--  ::::::::::::  ITBIS  ::::::::::::  -->
                 @if (configApp.calcular_itbis) {
-                <td class="tiITBIS p-0">
-                  <div class="form-group m-0">
+                <td class="column-itbis p-0">
+                  <div class="m-0">
                     <input type="text" class="form-control entrada inITBIS campoNumeros disabled" id="itbis-{{ index_cuerpo }}" formControlName="itbis" tabindex="-1" />
                   </div>
                 </td>
                 }
                 <!--  ::::::::::::  TOTAL  ::::::::::::  -->
-                <td class="tiTOT p-0">
-                  <div class="form-group m-0">
+                <td class="column-total p-0">
+                  <div class="m-0">
                     <input type="text" class="form-control entrada inTOT campoNumeros disabled" id="total-{{ index_cuerpo }}" formControlName="total" tabindex="-1" />
                   </div>
                 </td>

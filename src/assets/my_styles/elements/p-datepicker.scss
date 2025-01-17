@@ -50,7 +50,7 @@
           }
 
           &:focus {
-            @include primengFocus;
+            @include formFieldFocus;
           }
         }
 
@@ -88,7 +88,7 @@
                 }
 
                 &:focus {
-                  @include primengFocus;
+                  @include formFieldFocus;
                 }
               }
 
@@ -137,11 +137,11 @@
 
       &.p-datepicker-month-selected {
         background: var(--primary07) !important;
-        @include primengFocus;
+        @include formFieldFocus;
       }
 
       &:focus {
-        @include primengFocus;
+        @include formFieldFocus;
       }
     }
   }
@@ -158,10 +158,10 @@
       width: 100% !important;
       &.p-datepicker-year-selected {
         background: var(--primary07) !important;
-        @include primengFocus;
+        @include formFieldFocus;
       }
       &:focus {
-        @include primengFocus;
+        @include formFieldFocus;
       }
     }
   }

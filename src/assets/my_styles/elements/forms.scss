@@ -1,6 +1,30 @@
-@mixin primengFocus {
-  box-shadow: none !important;
-  outline: 0 !important;
+@mixin formField {
+  width: 100%;
+  background-color: #ffffffe8;
+  color: #1d253b !important;
+  box-shadow: 1px 1px 4px 0px #1d253b3d !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.25rem !important;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    @include formFieldFocus;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+@mixin formFieldDisabled {
+  background-color: #e9ecef !important;
+  opacity: 1 !important;
+}
+
+@mixin formFieldFocus {
+  border-color: transparent !important;
+  box-shadow: 0px 0px 6px var(--primary08) !important;
+  outline: 2px solid var(--primary08) !important;
 }
 
 .p-tag {
@@ -20,27 +44,12 @@
   padding: 0 !important;
 }
 
-
-@mixin campos {
-  background-color: #ffffffe8;
-  color: #1d253b !important;
-  box-shadow: 1px 1px 4px 0px #1d253b3d !important;
-  &:focus {
-    background-color: var(--primary02) !important;
-    border-color: transparent !important;
-    box-shadow: 0px 0px 6px var(--primary08) !important;
-  }
-  &:hover {
-    cursor: pointer;
-  }
-}
-
 textarea {
   width: 100% !important;
   border-radius: 0.25rem !important;
-  @include campos;
+  @include formField;
   &:focus {
-    @include primengFocus;
+    @include formFieldFocus;
   }
 }
 
@@ -50,10 +59,9 @@ textarea {
   width: 100%;
   border: 1px solid #a6a6a6a6 !important;
   border-radius: 0.25rem !important;
-  @include campos;
+  @include formField;
 }
 
-.p-inputmask,
 .form-control {
   width: 100%;
   border-radius: 0.25rem !important;
@@ -66,7 +74,7 @@ textarea {
     box-shadow: none;
   }
 
-  @include campos;
+  @include formField;
   &.min {
     height: 2rem !important;
     padding: 0.2rem !important;
@@ -91,14 +99,13 @@ textarea {
   }
 
   // > input:not(.apple-switch) {
-  //   @include campos;
+  //   @include formField;
   // }
 }
 
-
 .p-inputtext:enabled {
   &:focus {
-    @include primengFocus;
+    @include formFieldFocus;
   }
   &:hover {
     border-color: #20b9d5;

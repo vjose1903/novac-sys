@@ -29,13 +29,6 @@
     }
   }
 
-  &.p-focus {
-    @include primengFocus;
-    background-color: var(--primary02) !important;
-    border-color: transparent !important;
-    box-shadow: 0px 0px 6px var(--primary08) !important;
-  }
-
   .p-multiselect-label {
     .multi-select-item-values {
       overflow: auto;
@@ -48,6 +41,14 @@
         border-radius: 0.7rem;
       }
     }
+  }
+
+  &.p-focus {
+    @include formFieldFocus;
+  }
+
+  &.p-disabled {
+    @include formFieldDisabled;
   }
 }
 
@@ -64,8 +65,7 @@
         border-radius: 0.25rem !important;
 
         &:focus {
-          @include primengFocus;
-          background-color: var(--primary01) !important;
+          @include formFieldFocus;
         }
       }
     }
@@ -79,19 +79,4 @@
       }
     }
   }
-}
-
-.p-inputtext:enabled:focus {
-}
-.p-multiselect-close {
-  &:hover {
-    background: var(--primary01) !important;
-    color: var(--primary04) !important;
-  }
-}
-.p-disabled {
-  background-color: #e9ecef !important;
-  touch-action: none;
-  pointer-events: none;
-  opacity: 1;
 }

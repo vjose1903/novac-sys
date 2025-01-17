@@ -127,21 +127,10 @@ try {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// OBTENER LA CONFIGURACION DE LA APP
+// IS MACOS SYSTEM
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function isMacOs() {
   return process.platform === 'darwin';
-}
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// OBTENER LA CONFIGURACION DE LA APP
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function getConfig(): Promise<ConfigI> {
-  return new Promise<any>(async (resolve, reject) => {
-    const confTemp = (await Functions.getConfigFile()) as any;
-
-    const conf: ConfigI = JSON.parse(confTemp);
-    resolve(conf);
-  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -170,21 +159,24 @@ function beforeCreateSplash(splash) {
       HandlerConfigFile.checkConfigFile(splash)
         .then(async (is_config_ready) => {
           if (is_config_ready) {
-            const conf = await getConfig();
-            const serve_ = await getServer_();
+            Functions.getConfigFile()
+              .then(async (config) => {
+                // ----------- correr base de datos local --------------
+                writeLogs(config.is_db_local, 'config.is_db_local ');
 
-            // ----------- correr base de datos local --------------
-            writeLogs(conf.is_db_local, 'conf.is_db_local ');
-
-            if (conf.is_db_local) {
-              docker_handler
-                .checkAllInDocker()
-                .then((res_db) => continuarCargandoArchivos(resolve))
-                .catch((error_type) => createSplash(`splash_${error_type}_error`));
-              //
-            } else {
-              continuarCargandoArchivos(resolve);
-            }
+                if (config.is_db_local) {
+                  docker_handler
+                    .checkAllInDocker()
+                    .then((res_db) => continuarCargandoArchivos(resolve))
+                    .catch((error_type) => createSplash(`splash_${error_type}_error`));
+                  //
+                } else {
+                  continuarCargandoArchivos(resolve);
+                }
+              })
+              .catch((err) => {
+                createSplash('splash_config_error');
+              });
           }
         })
         .catch((err) => {
@@ -257,7 +249,7 @@ async function handleEvent(event: any, obj: string) {
       //
       case ELECTRON_EVENT_DECRYPT:
         res = Functions.desEncriptar(task.data);
-        task.response = res;
+        task.response = res.object;
         event.reply(ELECTRON_RESPONSE, task);
         break;
       //
@@ -304,7 +296,7 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case ELECTRON_GET_APP_CONFIG:
-        getConfigFile()
+        parseAppConfig()
           .then((config) => {
             task.response = config;
             event.reply(ELECTRON_RESPONSE, task);
@@ -359,12 +351,12 @@ async function getPrinters() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER EL ARCHIVO APP.CONFIG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function getConfigFile() {
+function parseAppConfig() {
   return new Promise(async (resolve, reject) => {
     try {
       const serve_ = await getServer_();
       const pjson = require('./package.json');
-      const config: ConfigI = await getConfig();
+      const config: ConfigI = await Functions.getConfigFile();
 
       const printer_list = await getPrinters();
       config['operative_system'] = isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows;
@@ -488,30 +480,31 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
 // GENERAR EL CSV
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function generateCSV(params: { fileName: string; csvString: string }) {
-
   return new Promise(async (resolve, reject) => {
     try {
-
       const fileName = params.fileName;
       const csvString = params.csvString;
-            
+
       const documentsPath = app.getPath('documents');
       const targetFolder = path.join(documentsPath, 'NovacSystem');
-      
+
       if (!fs.existsSync(targetFolder)) {
         fs.mkdirSync(targetFolder, { recursive: true });
       }
-      
+
       const filePath = parsePath(path.join(targetFolder, fileName));
-      
+
       fs.writeFileSync(filePath, csvString, 'utf8');
-      
-      shell.openPath(targetFolder).then(() => {
-        writeLogs(`Carpeta abierta: ${targetFolder}`);
-      }).catch(err => {
-        writeLogs(err, 'Error al abrir la carpeta:');
-        console.error('Error al abrir la carpeta:', err);
-      });
+
+      shell
+        .openPath(targetFolder)
+        .then(() => {
+          writeLogs(`Carpeta abierta: ${targetFolder}`);
+        })
+        .catch((err) => {
+          writeLogs(err, 'Error al abrir la carpeta:');
+          console.error('Error al abrir la carpeta:', err);
+        });
 
       resolve({ success: true, filePath });
     } catch (error) {
