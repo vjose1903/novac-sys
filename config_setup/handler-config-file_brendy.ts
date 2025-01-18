@@ -1,4 +1,4 @@
-import { ConfigI } from '../src/app/core/typescript/config-interface';
+import { ConfigI } from '../src/app/core/interface/config-interface';
 import * as fs from 'fs';
 import { pathAdd, writeLogs } from '../main';
 import Functions from './functions.js';
