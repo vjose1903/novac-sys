@@ -63,12 +63,12 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   ngOnDestroy() {}
 
   test() {
-    const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE);
+    // const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE);
 
-    this._ipc
-      .sendTask(task)
-      .then((res: string) => MODIFIED_CONFIG_FILE.next(res))
-      .catch((err) => console.error(err));
+    // this._ipc
+    //   .sendTask(task)
+    //   .then((res: string) => MODIFIED_CONFIG_FILE.next(res))
+    //   .catch((err) => console.error(err));
   }
 
   quitarFocoElectron() {

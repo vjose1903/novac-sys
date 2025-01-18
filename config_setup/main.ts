@@ -15,7 +15,6 @@ import {
   ELECTRON_EVENT_ENCRYPT,
   ELECTRON_GET_APP_CONFIG,
   ELECTRON_PRINT_BASE64,
-  ELECTRON_QUIT_APP,
   ELECTRON_RESPONSE,
   ELECTRON_SENDER,
   ELECTRON_SET_APP_CONFIG,
@@ -221,18 +220,19 @@ async function handleEvent(event: any, obj: string) {
     const task = JSON.parse(obj) as MessageTaskInterface;
     const parameters = task?.data ? JSON.parse(task.data) : task?.data;
     writeLogs(task, 'Nueva tarea recibida');
-    
+
     let res;
 
     switch (task.eventName) {
       case ELECTRON_TEST:
         // test function
         break;
-      //
+        //
       case ELECTRON_RELOAD:
         writeLogs('RECARGANDO ELECTRON');
         win.reload();
         if (!serve) win.loadURL(appFilePath);
+        break;
       //
       case ELECTRON_CHANGE_CONFIG_FILE:
         replace_in_file

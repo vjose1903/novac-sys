@@ -45,7 +45,6 @@ export default class Functions {
         let pathConfig = (await pathAdd(`/app_config.config`)) as string;
 
         writeLogs(pathConfig, 'pathConfig');
-        writeLogs(data, 'data');
 
         var encripted = this.encriptar(data);
         fs.writeFileSync(pathConfig, encripted, { encoding: 'utf-8' });

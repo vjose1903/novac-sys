@@ -15,7 +15,6 @@ import {
   ELECTRON_EVENT_ENCRYPT,
   ELECTRON_GET_APP_CONFIG,
   ELECTRON_PRINT_BASE64,
-  ELECTRON_QUIT_APP,
   ELECTRON_RESPONSE,
   ELECTRON_SENDER,
   ELECTRON_SET_APP_CONFIG,
@@ -228,11 +227,12 @@ async function handleEvent(event: any, obj: string) {
       case ELECTRON_TEST:
         // test function
         break;
-      //
+        //
       case ELECTRON_RELOAD:
         writeLogs('RECARGANDO ELECTRON');
         win.reload();
         if (!serve) win.loadURL(appFilePath);
+        break;
       //
       case ELECTRON_CHANGE_CONFIG_FILE:
         replace_in_file

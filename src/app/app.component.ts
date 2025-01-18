@@ -225,6 +225,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       this._ipc
         .sendTask(task)
         .then((config: ConfigI) => {
+          
           if (fun.objHas(config, 'err')) {
             console.error(config);
           } else {
