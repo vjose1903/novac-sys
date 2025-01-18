@@ -1,57 +1,81 @@
 @use './forms.scss' as *;
 
+
+@mixin entrada-focus {
+  border: 2px solid var(--primary08) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background-color: var(--primary01) !important;
+}
+
+
 .entrada {
   border-radius: 0 !important;
   height: calc(1.5em + 0.3rem + 2px) !important;
   padding: 0rem 0.3rem 0rem 0.2rem !important;
   box-shadow: none !important;
-  border: 0px solid transparent !important;
-  outline: 2px solid #ced4da !important;
+  border: 1px solid #ced4da !important;
 
   &:focus {
-    @include formFieldFocus;
-    box-shadow: none !important;
+    @include entrada-focus;
   }
 
-  & > .p-dropdown-label {
-    padding: 0 !important;
-    border-radius: 0 !important;
-  }
-  & > .p-dropdown-trigger {
-    width: auto !important;
+  &.p-select {
+    padding: 0rem 0.1rem 0rem 0.2rem !important;
+    .p-select-label {
+      padding: 0 !important;
+      font-size: 12px !important;
+    }
+
+    .p-select-dropdown {
+      width: auto !important;
+    }
+
+    &.p-focus {
+      @include entrada-focus;
+    }
   }
 }
 
-[tabindex='-1']:focus:not(:focus-visible) {
+.panel-dropdown-unidad {
+  min-width: 11rem;
+}
+
+[tabindex='-1']:focus:not(:focus-visible):not(.entrada) {
   @include formFieldFocus;
 }
 
-.td-btnConfig {
+.div-row-codigo {
+  display: grid;
+  grid-template-columns: 0px 1fr;
+  &.started {
+    grid-template-columns: min-content 1fr !important;
+  }
+}
+
+.btnConfig {
   width: 0.6rem !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-align: center !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  border-bottom: 1px solid #ced4da !important;
+  color: #777676;
+  padding: 3px;
+  cursor: default;
 
-  vertical-align: inherit !important;
+  background-color: #bbbbbbd7;
 
-  .btnConfig {
-    color: #777676;
-    padding: 3px;
-    cursor: default;
-    
-    background-color: #bbbbbbd7;
-    
-    &:not(.disabled):hover {
-      color: #454545 !important;
-      background-color: #a0a0a0d7;
-      cursor: pointer;
-    }
+  &:not(.disabled):hover {
+    color: #454545 !important;
+    background-color: #a0a0a0d7;
+    cursor: pointer;
+  }
 
-    &.disabled {
-      color: #adacac !important;
-      &:hover {
-        cursor: not-allowed !important;
-      }
+  &.disabled {
+    color: #adacac !important;
+    &:hover {
+      cursor: not-allowed !important;
     }
   }
 }

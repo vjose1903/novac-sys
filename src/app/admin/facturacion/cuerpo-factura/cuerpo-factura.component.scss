@@ -61,6 +61,7 @@
     width: 10%;
     overflow: hidden;
     text-align: left;
+    max-width: 2rem;
   }
 
   .column-descuento {
@@ -80,14 +81,3 @@
   }
 }
 
-::ng-deep {
-  .dropdown-unidad {
-    .p-dropdown-label {
-      font-size: 11px !important;
-    }
-  }
-
-  .panel-dropdown-unidad {
-    min-width: 11rem;
-  }
-}

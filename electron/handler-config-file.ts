@@ -68,7 +68,7 @@ export default class HandlerConfigFile {
     return new Promise<any>(async (resolve, reject) => {
       const config_path = await pathAdd('/app_config.config');
 
-      const existe_archivo_config = fs.existsSync(config_path);
+      const existe_archivo_config = fs.existsSync(config_path); 
 
       setTimeout(() => {
         writeLogs(existe_archivo_config, ':::::::: existe_archivo_config');

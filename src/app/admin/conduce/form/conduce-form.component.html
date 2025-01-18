@@ -74,55 +74,55 @@
             @if (ARRAY_ROWARTICULOS) {
             <form [formGroup]="form" action="">
               @for (item of ARRAY_ROWARTICULOS.controls; track item; let index_cuerpo = $index) {
-              <div formArrayName="rowFactura">
-                <p-popover #dropRowMenu appendTo="body">
-                  <ul class="dropRowMenu" role="menu">
-                    <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable danger">
-                      <a class="" id="dropdown-item">
-                        <i class="far fa-trash-alt"></i>
-                        Quitar Producto
-                      </a>
-                    </li>
-                  </ul>
-                </p-popover>
+              <ng-container formArrayName="rowFactura">
                 <div [formGroupName]="index_cuerpo">
+                  <p-popover #dropRowMenu appendTo="body">
+                    <ul class="dropRowMenu" role="menu">
+                      <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable danger">
+                        <a class="" id="dropdown-item">
+                          <i class="far fa-trash-alt"></i>
+                          Quitar Producto
+                        </a>
+                      </li>
+                    </ul>
+                  </p-popover>
                   <table class="table m-auto">
                     <tbody>
                       <tr>
-                        <!--  ::::::::::::  CONFIG  ::::::::::::  -->
-                        <td class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
-                          <div class="btn-group">
-                            @if (checkIfRowContainArticulo(index_cuerpo)) {
-                            <div style="padding: 3px" (click)="dropRowMenu.toggle($event)">
-                              <i class="fas fa-ellipsis-v btnConfig"></i>
-                            </div>
-                            } @if (!checkIfRowContainArticulo(index_cuerpo)) {
-                            <div style="padding: 3px">
-                              <i class="fas fa-ellipsis-v btnConfigDis"></i>
-                            </div>
-                            }
-                          </div>
-                        </td>
                         <!--  ::::::::::::  CODIGO  ::::::::::::  -->
                         <td class="COD_ p-0">
-                          <div class="form-group m-0">
-                            <input
-                              type="text"
-                              class="form-control entrada"
-                              [maxlength]="minCodigo"
-                              id="cod-{{ index_cuerpo }}"
-                              (focus)="verificarSecuencia(index_cuerpo)"
-                              (keydown.enter)="saltar('can-', index_cuerpo)"
-                              formControlName="cod"
-                              (keyup)="checkCodigo(index_cuerpo)"
-                              tabindex="-1"
-                              [ngClass]="{ disabled: disableCamposFactAdelantadas(index_cuerpo) }"
-                            />
+                          <div class="position-relative">
+                            <div class="div-row-codigo started">
+                              <!--  ::::::::::::  CONFIG  ::::::::::::  -->
+                              <div
+                                class="btnConfig"
+                                [ngClass]="{ disabled: !checkIfRowContainArticulo(index_cuerpo) }"
+                                (mouseover)="selectedRow(index_cuerpo, true)"
+                                (mouseleave)="selectedRow(index_cuerpo, false)"
+                                (click)="dropRowMenu.toggle($event)"
+                              >
+                                <i class="fas fa-ellipsis-v"></i>
+                              </div>
+
+                              <!--  ::::::::::::  CODIGO  ::::::::::::  -->
+                              <input
+                                type="text"
+                                class="form-control entrada"
+                                [maxlength]="minCodigo"
+                                id="cod-{{ index_cuerpo }}"
+                                (focus)="verificarSecuencia(index_cuerpo)"
+                                (keydown.enter)="saltar('can-', index_cuerpo)"
+                                formControlName="cod"
+                                (keyup)="checkCodigo(index_cuerpo)"
+                                tabindex="-1"
+                                [ngClass]="{ disabled: disableCamposFactAdelantadas(index_cuerpo) }"
+                              />
+                            </div>
                           </div>
                         </td>
                         <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
                         <td class="CAN_ p-0">
-                          <div class="form-group m-0">
+                          <div class="position-relative">
                             <input
                               type="number"
                               min="1"
@@ -139,7 +139,7 @@
                         </td>
                         <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
                         <td class="UNI_ p-0">
-                          <div class="form-group m-0">
+                          <div class="position-relative">
                             @if (inputDrop !== 'uni-' + index_cuerpo) {
                             <input
                               type="text"
@@ -151,11 +151,11 @@
                               formControlName="uni"
                               tabindex="-1"
                             />
-                            } @if (inputDrop === 'uni-' + index_cuerpo) {
+                            } @else {
                             <p-select
                               #pDropdownMedida
                               panelStyleClass="panel-dropdown-unidad"
-                              styleClass="form-control entrada dropdown-unidad"
+                              styleClass="form-control entrada"
                               inputId="uni-{{ index_cuerpo }}"
                               formControlName="uni"
                               appendTo="body"
@@ -179,7 +179,7 @@
                         </td>
                         <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
                         <td class="DES_ p-0">
-                          <div class="form-group m-0">
+                          <div class="position-relative">
                             <input type="text" class="form-control entrada inDES_ disabled" id="des-{{ index_cuerpo }}" formControlName="des" tabindex="-1" />
                           </div>
                         </td>
@@ -187,7 +187,7 @@
                     </tbody>
                   </table>
                 </div>
-              </div>
+              </ng-container>
               }
             </form>
             }

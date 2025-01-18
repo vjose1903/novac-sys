@@ -220,6 +220,7 @@ async function handleEvent(event: any, obj: string) {
   try {
     const task = JSON.parse(obj) as MessageTaskInterface;
     const parameters = task?.data ? JSON.parse(task.data) : task?.data;
+    writeLogs(task, 'Nueva tarea recibida');
 
     let res;
 
