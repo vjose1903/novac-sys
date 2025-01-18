@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
-import { PdfService } from '../core/services/pdf/pdf.service';
+import { PdfService } from '../core/services/reports/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
 import { Ss } from '../core/services/singleton.service';

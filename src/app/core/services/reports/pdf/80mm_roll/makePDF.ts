@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/indent */
-import * as fun_ from '../utils/funciones';
-import { styles_ } from '../utils/files';
-import { Ss } from '../../singleton.service';
-import { ConfigI } from '../../../interface/config-interface';
-import { getContentWithTablaNormal } from '../utils/tabla_normal';
+import * as fun_ from '../../utils/funciones';
+import { styles_ } from '../../utils/files';
+import { Ss } from '../../../singleton.service';
+import { ConfigI } from '../../../../interface/config-interface';
+import { getContentWithTablaNormal } from '../../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
 import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';

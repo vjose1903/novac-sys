@@ -9,7 +9,7 @@ import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
 import { NotaC } from './notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';

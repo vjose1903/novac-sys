@@ -26,7 +26,7 @@ import { ConfigI } from '../../core/interface/config-interface';
 import { Ss } from '../../core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../components/modal/modal-class';
-import { PdfService } from '../../core/services/pdf/pdf.service';
+import { PdfService } from '../../core/services/reports/pdf/pdf.service';
 import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configuracion_articulos/articulos_configuracion';
 import { HtmlElementsService } from '../../core/services/html-elements.service';
 

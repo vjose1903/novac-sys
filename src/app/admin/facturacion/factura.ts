@@ -10,7 +10,7 @@ import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.componen
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
-import { PdfService } from '../../core/services/pdf/pdf.service';
+import { PdfService } from '../../core/services/reports/pdf/pdf.service';
 import { serie } from '../../core/typescript/constantes';
 import { flip } from '@popperjs/core';
 

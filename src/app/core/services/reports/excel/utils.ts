@@ -1,4 +1,4 @@
-import { fun } from '../functions.service';
+import { fun } from '../../functions.service';
 export const makeFileName = (datos: string, prefix: string) => {
   let sufix = '';
 

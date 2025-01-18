@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as _ from 'lodash';
-import * as fun_ from '../utils/funciones';
-import { styles_ } from '../utils/files';
-import { Ss } from '../../singleton.service';
-import { ConfigI } from '../../../interface/config-interface';
-import { getContentWithTablaNormal } from '../utils/tabla_normal';
+import * as fun_ from '../../utils/funciones';
+import { styles_ } from '../../utils/files';
+import { Ss } from '../../../singleton.service';
+import { ConfigI } from '../../../../interface/config-interface';
+import { getContentWithTablaNormal } from '../../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes, infoTipoPdf, firmas } from './infoPdfs';
 import { config_notas } from './configuraciones/notas/notas';
 import { config_ventas } from './configuraciones/ventas';
@@ -12,8 +12,8 @@ import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
-import { fun } from '../../functions.service';
-import * as numLetra from '../utils/numero_letras';
+import { fun } from '../../../functions.service';
+import * as numLetra from '../../utils/numero_letras';
 
 const configuraciones = {
   notas_detallada: config_notas.detallada,

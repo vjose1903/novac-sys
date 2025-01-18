@@ -12,7 +12,7 @@ import { LoaderService } from '../../../loader/loader.service';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
 import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { NotaC } from '../notas-cred-deb/notas';

@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
 import { FacturaC } from '../../facturacion/factura';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
 import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ModalSeleccinarArticuloComponent } from '../../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';

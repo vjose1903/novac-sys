@@ -1,10 +1,10 @@
-import { fun } from './../functions.service';
+import { fun } from './../../functions.service';
 /* eslint-disable @typescript-eslint/indent */
-import { styles_ } from './utils/files';
-import { getContentWithTablaNormal } from './utils/tabla_normal';
-import { getContentWithTablaAgrupada } from './utils/tabla_agrupada';
-import { Ss } from '../singleton.service';
-import { ConfigI } from '../../interface/config-interface';
+import { styles_ } from '../utils/files';
+import { getContentWithTablaNormal } from '../utils/tabla_normal';
+import { getContentWithTablaAgrupada } from '../utils/tabla_agrupada';
+import { Ss } from '../../singleton.service';
+import { ConfigI } from '../../../interface/config-interface';
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
 import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
 import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cxc_ant_preventa';

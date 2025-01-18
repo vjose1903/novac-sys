@@ -11,11 +11,11 @@ import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
-import { Ss } from '../singleton.service';
-import { MessageTask } from '../../models/message-task';
-import { ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
-import { ConfigI } from '../../interface/config-interface';
-import { fun } from '../functions.service';
+import { Ss } from '../../singleton.service';
+import { MessageTask } from '../../../models/message-task';
+import { ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
+import { ConfigI } from '../../../interface/config-interface';
+import { fun } from '../../functions.service';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {

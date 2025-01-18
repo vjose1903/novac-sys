@@ -1,6 +1,6 @@
 import { ModalClass } from './../../components/modal/modal-class';
 import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
-import { PdfService } from './../../../core/services/pdf/pdf.service';
+import { PdfService } from './../../../core/services/reports/pdf/pdf.service';
 import { LoaderService } from './../../../loader/loader.service';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';

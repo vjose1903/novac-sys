@@ -5,7 +5,7 @@ import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
-import { PdfService } from '../../../../core/services/pdf/pdf.service';
+import { PdfService } from '../../../../core/services/reports/pdf/pdf.service';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';

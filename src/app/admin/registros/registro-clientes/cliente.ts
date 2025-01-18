@@ -9,7 +9,7 @@ import { fun } from '../../../core/services/functions.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
 import { Validators } from '@angular/forms';
 import { ReporteViewModalConfigI } from '../../../core/interface/reporte-view-modal-config';
-import { csvConfig } from '../../../core/services/excel/configs/report/cuentas_con_pagos';
+import { csvConfig } from '../../../core/services/reports/excel/configs/report/cuentas_con_pagos';
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
