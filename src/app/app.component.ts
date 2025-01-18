@@ -71,7 +71,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
-    public permissionsService: NgxPermissionsService,
+    public permissionsService: NgxPermissionsService
   ) {
     super();
   }
@@ -90,13 +90,13 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     Ss.sharedServ = this.sharedServ;
     Ss.cdRef = this.cdRef;
 
-    this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
+    this.loaderServ.isLoading.subscribe(v => (this.loading = v));
 
-    this.subModified = MODIFIED_CONFIG_FILE.subscribe((res) => {
+    this.subModified = MODIFIED_CONFIG_FILE.subscribe(res => {
       if (fun.hasValue(res)) this.getAppConfig();
     });
 
-    this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
+    this.sub = ELECTRON_EVENTS_OBSERVER.subscribe(res => {
       if (fun.hasValue(res)) {
         const info = res.info;
         switch (res.event_name) {
@@ -143,13 +143,13 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       }
     });
 
-    window.onresize = (e) => this.resize.bind(this)(e);
+    window.onresize = e => this.resize.bind(this)(e);
   }
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
 
-    this.getAppConfig().then((config) => {
+    this.getAppConfig().then(config => {
       setTimeout(() => {
         this.configReady = true;
         setTimeout(() => {
@@ -224,20 +224,14 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
       this._ipc
         .sendTask(task)
-        .then((config: ConfigI) => {
-          
-          if (fun.objHas(config, 'err')) {
-            console.error(config);
-          } else {
+        .then((config: any) => {
+          this.themeService.setTheme(config.color_app);
+          this.configServ.setConfig = config;
+          this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 
-            this.themeService.setTheme(config.color_app);
-            this.configServ.setConfig = config;
-            this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-
-            resolve(config);
-          }
+          resolve(config);
         })
-        .catch((err) => {
+        .catch(err => {
           console.error(err);
         });
     });

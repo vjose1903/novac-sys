@@ -32,5 +32,5 @@ export const makeFileName = (datos: string, prefix: string) => {
     sufix = `${cliente}`;
   }
 
-  return `${prefix}${fun.hasValue(sufix) ? `_${sufix}` : ''}.csv`.toLowerCase();
+  return `${prefix}${fun.hasValue(sufix) ? `_${sufix}` : ''}.xlsx`.toLowerCase();
 };

@@ -1,27 +1,28 @@
 const { autoUpdater } = require('electron-updater');
 
-
 import SharedElectronAngular, {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
   ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
   ELECTRON_EVENT_UPDATE_ERROR,
   ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
-  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE
+  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
 } from './shared-electron-angular';
 
 import { writeLogs } from '../main';
 
 export default class AppUpdater {
-  constructor(win) {
-    writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
+  constructor(win, serve_) {
+    if (!serve_) {
+      writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
 
-    const log = require('electron-log');
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
+      const log = require('electron-log');
+      log.transports.file.level = 'info';
+      autoUpdater.logger = log;
 
-    // this.checkUpdates(win);
-    this.checkForUpdates(win);
+      // this.checkUpdates(win);
+      this.checkForUpdates(win);
+    }
   }
 
   async checkUpdates(win) {
@@ -68,7 +69,7 @@ export default class AppUpdater {
     // AUTO UPDATE EVENTS
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, (info) => {
+    autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info => {
       writeLogs(info, 'ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
       SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info: { msg: 'Actualizacion no disponible...', body: info } });
       writeLogs(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
@@ -122,13 +123,13 @@ export default class AppUpdater {
       writeLogs(' FINAL - ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE >>>>>>>>>>>>');
     });
 
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, (progress) => {
+    autoUpdater.on(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, progress => {
       writeLogs(progress, ' ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS >>>>>>>>>>>>');
       SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, info: { msg: 'descarga porciento...', body: progress } });
       writeLogs('FINAL -  ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS >>>>>>>>>>>>');
     });
 
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, (error) => {
+    autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, error => {
       writeLogs(error, 'ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
       SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_ERROR, info: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
       writeLogs('FINAL - ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');

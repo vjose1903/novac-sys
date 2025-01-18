@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import { ELECTRON_RESPONSE, ELECTRON_SENDER, MessageTaskInterface } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
 import { ELECTRON_EVENTS_OBSERVER } from '../typescript/GLOBAL';
+import { fun } from './functions.service';
 
 @Injectable({
   providedIn: 'root',
@@ -66,7 +67,7 @@ export class IpcService {
       const tareas = this.colaDeMensajes.value;
 
       if (tareas.hasOwnProperty(arg.id)) {
-        (tareas[arg.id] as MessageTask).fn.next(arg.response);
+        (tareas[arg.id] as MessageTask).fn.next(arg);
         tareas[arg.id] = undefined;
         this.updateColaMensaje(tareas);
       } else {
@@ -76,15 +77,18 @@ export class IpcService {
   }
 
   sendTask(task: MessageTask) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<MessageTaskInterface>(async (resolve, reject) => {
       if (this.isElectron) {
         this.addColaMensaje(task);
         this.trigger(task.serialize());
 
         try {
-          const resultado = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
-
-          resolve(resultado);
+          const taskResult = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
+          if (taskResult.error == false || !('error' in taskResult) || fun.isEmpty(taskResult?.error)) {
+            resolve(taskResult.response);
+          } else {
+            reject(taskResult.response);
+          }
         } catch (error) {
           reject(error);
         }

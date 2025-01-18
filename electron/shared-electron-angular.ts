@@ -40,6 +40,7 @@ export interface MessageTaskInterface {
   eventName: string;
   data: any;
   response: any;
+  error?: boolean;
 }
 export interface PrintJob {
   print_width: number;

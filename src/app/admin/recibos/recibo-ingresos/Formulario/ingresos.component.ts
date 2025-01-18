@@ -17,10 +17,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 const moment = require('../../../../core/javascript/moment');
 
 @Component({
-    selector: 'app-ingresos',
-    templateUrl: './ingresos.component.html',
-    styleUrls: ['./ingresos.component.scss'],
-    standalone: false
+  selector: 'app-ingresos',
+  templateUrl: './ingresos.component.html',
+  styleUrls: ['./ingresos.component.scss'],
+  standalone: false,
 })
 export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   clienteAdepositar: any;
@@ -83,7 +83,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_recibos',
-    padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
+    padre_functions: { data_request: params => this.pedirNuevaData(params) },
     obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
@@ -113,7 +113,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private tServ: TablasService, private router: Router, private route: ActivatedRoute) {
+  constructor(
+    private tServ: TablasService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     super();
   }
 
@@ -138,8 +142,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   areAllSelected() {
-    const facturas_no_viaje = _.filter(this.facturas, (factura) => !factura.is_viaje);
-    return _.every(facturas_no_viaje, (factura) => factura.select);
+    const facturas_no_viaje = _.filter(this.facturas, factura => !factura.is_viaje);
+    return _.every(facturas_no_viaje, factura => factura.select);
   }
 
   getIcon() {
@@ -256,7 +260,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   isOneFacturaWithMonto() {
-    const valid = this.facturasSelected.some((factura) => factura.select && fun.desformatearStNumber(factura.monto) > 0);
+    const valid = this.facturasSelected.some(factura => factura.select && fun.desformatearStNumber(factura.monto) > 0);
     return valid;
   }
 
@@ -276,7 +280,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       id: 'cancelar_ingreso',
       header: 'Confirmación',
       texto: '¿Seguro de que desea cancelar la operacion?.',
-      siFunction: (instance) => {
+      siFunction: instance => {
         this.cancelarIgreso();
         instance.closeModal(instance.id, 'cancelar');
       },
@@ -331,7 +335,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
             id: 'move_to_viajes',
             header: 'Confirmación',
             texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
-            siFunction: (instance) => {
+            siFunction: instance => {
               this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
               instance.closeModal(instance.id, 'cancelar');
             },
@@ -344,16 +348,16 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       }
 
       if (params.iconKey == 'ver') {
-        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+        this.facturaClass.parseDataToPdf(params.data).then(dataFactura => {
           let botonesDinamicos = [
-            { clase: 'btn btn-gris', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-            { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
+            { clase: 'btn btn-gris', function: instance => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
           ];
           const toPDFData = { data: dataFactura, type: 'facturacion' };
 
           const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA' };
 
-          this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then((obj_modal) => this.openNewModal(obj_modal));
+          this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then(obj_modal => this.openNewModal(obj_modal));
         });
       }
     }
@@ -407,7 +411,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tableInputBlur(params) {
-    const factura_en_turno = this.facturasSelected.find((factura) => factura.id == params.data.id);
+    const factura_en_turno = this.facturasSelected.find(factura => factura.id == params.data.id);
     if (fun.hasValue(factura_en_turno)) {
       const total = factura_en_turno.balance;
       const monto = fun.desformatearStNumber(factura_en_turno.monto);
@@ -519,7 +523,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
-    } else if (this.facturasSelected.some((factura) => factura.monto == 0)) {
+    } else if (this.facturasSelected.some(factura => factura.monto == 0)) {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
@@ -534,7 +538,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+            { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
           ],
         },
@@ -554,24 +558,21 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       detalle_recibos: this.detalleYtotal.detalle,
     };
 
-    this.reciboClass.createUpdateOne(obj).then((res) => {
+    this.reciboClass.createUpdateOne(obj).then(res => {
       const recibo = res['data'].recibo;
 
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, actualPagination);
 
       this.resetVariables();
-      this.reciboClass.parseDataToPdf(recibo).then((recibo_parsed) => {
+      this.reciboClass.parseDataToPdf(recibo).then(recibo_parsed => {
         const obj_print = { data: recibo_parsed, type: 'recibo_ingreso' };
 
         PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })
-          .then(async (res) => {
-            if (res.status === 'si') {
-            } else fun.toastError(res.msg, 'ERROR');
-
+          .then(async res => {
             this.layServ.nextCheckCuadreToday(true);
           })
-          .catch((err) => fun.toastError(err.msg, 'ERROR'));
+          .catch(err => fun.toastError(err.msg, 'ERROR'));
       });
     });
   }

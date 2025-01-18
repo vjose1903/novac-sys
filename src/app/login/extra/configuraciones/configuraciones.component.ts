@@ -13,10 +13,10 @@ import { Router } from '@angular/router';
 import { IpcService } from '../../../core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 @Component({
-    selector: 'app-configuraciones',
-    templateUrl: './configuraciones.component.html',
-    styleUrls: ['./configuraciones.component.scss'],
-    standalone: false
+  selector: 'app-configuraciones',
+  templateUrl: './configuraciones.component.html',
+  styleUrls: ['./configuraciones.component.scss'],
+  standalone: false,
 })
 export class ConfiguracionesComponent implements OnInit {
   configServ = Ss.configServ;
@@ -72,9 +72,14 @@ export class ConfiguracionesComponent implements OnInit {
 
   configCopy;
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
-  constructor(private fb: UntypedFormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
+  constructor(
+    private fb: UntypedFormBuilder,
+    public sharedServ: SharedService,
+    private router: Router,
+    public _ipc: IpcService
+  ) {}
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
@@ -87,7 +92,7 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   createForm(data) {
-    const color_format = _.find(this.colores, (item) => item.descripcion == data.color_app);
+    const color_format = _.find(this.colores, item => item.descripcion == data.color_app);
 
     this.form = this.fb.group({
       nombre_empresa: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
@@ -143,7 +148,7 @@ export class ConfiguracionesComponent implements OnInit {
 
   getValuePageSize(data, key) {
     const size = _.get(data, key);
-    const page_size = _.find(this.paper_sizes, (item) => item.descripcion == size);
+    const page_size = _.find(this.paper_sizes, item => item.descripcion == size);
     return page_size;
   }
 
@@ -171,9 +176,9 @@ export class ConfiguracionesComponent implements OnInit {
   saltar(input) {}
 
   parseDocumentosAImprimir(config) {
-    return new Promise<any>((resolve) => {
+    return new Promise<any>(resolve => {
       const documentos_config = config.documentos_a_imprimir.split(',');
-      documentos_config.forEach((item) => this.documentos_a_imprimir_selected.push(_.find(this.documentos_a_imprimir, { key: item })));
+      documentos_config.forEach(item => this.documentos_a_imprimir_selected.push(_.find(this.documentos_a_imprimir, { key: item })));
       resolve(true);
     });
   }
@@ -261,7 +266,7 @@ export class ConfiguracionesComponent implements OnInit {
       'printer_reporte',
     ];
 
-    keys_to_omit.forEach((element) => (formulario = _.omit(formulario, [element])));
+    keys_to_omit.forEach(element => (formulario = _.omit(formulario, [element])));
 
     formulario['pages_sizes'] = pages_sizes;
     formulario['printer_selected'] = printer_selected;
@@ -279,7 +284,7 @@ export class ConfiguracionesComponent implements OnInit {
         let keysConfig = Object.keys(formulario);
         const cambios = [];
 
-        keysConfig.forEach((keyC) => {
+        keysConfig.forEach(keyC => {
           if (typeof this.configCopy[keyC] == 'string') {
             if (this.configCopy[keyC] != formulario[keyC]) cambios.push(keyC);
           } else {
@@ -365,7 +370,9 @@ export class ConfiguracionesComponent implements OnInit {
 
     this._ipc
       .sendTask(task)
-      .then((res: string) => {
+      .then(res => {
+        console.log('res ', res);
+
         this.sharedServ.nextCanToast(true);
         fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
         setTimeout(() => {
@@ -374,6 +381,6 @@ export class ConfiguracionesComponent implements OnInit {
           this.salir();
         }, 250);
       })
-      .catch((err) => console.error(err));
+      .catch(err => console.error(err));
   }
 }

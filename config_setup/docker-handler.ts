@@ -1,4 +1,4 @@
-import { cmd, writeLogs } from '../main';
+import { runTerminalCommand, writeLogs } from '../main';
 
 export default class DockerHandler {
   count_docker;
@@ -8,14 +8,14 @@ export default class DockerHandler {
     this.count_db = 1;
   }
 
-  async checkAllInDocker(first_resolve:any = null, first_reject:any = null) {
+  async checkAllInDocker(first_resolve: any = null, first_reject: any = null) {
     return new Promise<any>((resolve, reject) => {
       first_resolve ||= resolve;
       first_reject ||= reject;
 
       if (this.count_docker <= 20 && this.count_db <= 20) {
-        cmd('docker ps --filter "name=$$DOCKER_NAME$$" --format "{{.Status}}"', (res) => {
-          if (res.status) {
+        runTerminalCommand('docker ps --filter "name=$$DOCKER_NAME$$" --format "{{.Status}}"')
+          .then(res => {
             if (this.count_db == 1) writeLogs('Docker esta corriendo perfectamente.');
 
             if (res.STDOUT.toLowerCase().includes('up')) {
@@ -26,12 +26,12 @@ export default class DockerHandler {
               this.count_db += 1;
               setTimeout(() => this.checkAllInDocker(first_resolve, first_reject), 1000);
             }
-          } else {
-            writeLogs(res.STDERR, `ERROR: docker presenta fallos, intento #: ${this.count_docker}`);
+          })
+          .catch(err => {
+            writeLogs(err.STDERR, `ERROR: docker presenta fallos, intento #: ${this.count_docker}`);
             this.count_docker += 1;
             setTimeout(() => this.checkAllInDocker(first_resolve, first_reject), 1000);
-          }
-        });
+          });
       } else {
         const type_error = this.count_db > 20 ? 'db' : 'docker';
 

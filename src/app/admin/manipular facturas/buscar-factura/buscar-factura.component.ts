@@ -25,10 +25,10 @@ import { TitleCasePipe } from '@angular/common';
 import { seriesDGII } from '../../../core/typescript/constantes';
 
 @Component({
-    selector: 'app-buscar-factura',
-    templateUrl: './buscar-factura.component.html',
-    styleUrls: ['./buscar-factura.component.scss'],
-    standalone: false
+  selector: 'app-buscar-factura',
+  templateUrl: './buscar-factura.component.html',
+  styleUrls: ['./buscar-factura.component.scss'],
+  standalone: false,
 })
 export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDestroy {
   facturas = [];
@@ -86,7 +86,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     colores: true,
     filtrar: { local: false },
     id_tabla: 'lista_notas',
-    padre_functions: { data_request: (params) => this.pedirNotas(params) },
+    padre_functions: { data_request: params => this.pedirNotas(params) },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
 
@@ -96,7 +96,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   route = inject(ActivatedRoute);
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(
+    private router: Router,
+    private tServ: TablasService,
+    public loadServ: LoaderService
+  ) {
     super();
   }
 
@@ -108,7 +112,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   necesarioStart() {
-    this.verificatePermisos().then(async (res) => {
+    this.verificatePermisos().then(async res => {
       this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       this.completarTituloPag();
       // NOTE: temporal
@@ -124,7 +128,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       promomiseList.push(Ss.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)));
       promomiseList.push(Ss.permissionsService.hasPermission(Object.values(this.permissions.cotizacion)));
 
-      Promise.all(promomiseList).then((values) => {
+      Promise.all(promomiseList).then(values => {
         const permisos = ['hasPermisoPreVenta', 'hasPermisoCotizacion'];
 
         for (let index = 0; index < permisos.length; index++) {
@@ -139,7 +143,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   verificateSerieValidity() {
-    const option = this.series.find((option) => option.value == serie.electronica);
+    const option = this.series.find(option => option.value == serie.electronica);
     option.disabled = true;
   }
 
@@ -162,7 +166,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.serieSelected][this.buscarPara]);
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia === NotaC.base_comprobante[this.serieSelected][this.buscarPara]);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
@@ -221,7 +225,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       { condition: this.hasPermisoCotizacion, value: tipoDocFacturacion.cotizacion, label: 'Cotización' },
     ];
 
-    tipos.forEach((tipo) => {
+    tipos.forEach(tipo => {
       if (tipo.condition) this.tipos_documentos.push(tipo);
     });
   }
@@ -235,7 +239,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async pedirNotas(params?: { per_page: number; page: number; search: string }) {
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
       this.notas.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -244,7 +248,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       try {
         const res = await this.notasClass.getAll(extra);
 
-        res['data'].forEach((nota) => {
+        res['data'].forEach(nota => {
           nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
           nota.total = Math.abs(nota.total);
           nota.selectedColor = 'gris-claro';
@@ -298,7 +302,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected, movimientos_viaje: true };
       const res = await this.facturaClass.getFacturasByParams(args);
 
-      res['data'].forEach((fact) => {
+      res['data'].forEach(fact => {
         const pago_a_tiempo = this.getIsPagoAtiempo(fact);
         const estatus = this.getIsActiveInfo(fact);
 
@@ -349,7 +353,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       if (this.facturas.length > 0) {
         if (this.buscar_por == this.campos.numeroComprobante || (this.buscar_por == this.campos.numeroFactura && this.tipo_factura_id != '0')) {
-          this.facturaClass.parseDataToPdf(this.facturas[0]).then((factura_parsed) => {
+          this.facturaClass.parseDataToPdf(this.facturas[0]).then(factura_parsed => {
             const continuar = this.buscarPara != 'solo_ver' && (this.buscar_por == this.campos.numeroComprobante || this.buscar_por == this.campos.numeroFactura);
             this.facturaSelected = factura_parsed;
             const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
@@ -415,9 +419,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   selectTableConfig() {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       this.table_config = fun.deepCloning(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
-      this.table_config['padre_functions'] = { data_request: (params) => this.pedirFactura(params) };
+      this.table_config['padre_functions'] = { data_request: params => this.pedirFactura(params) };
 
       this.verificateTableActions();
       resolve();
@@ -448,7 +452,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     const actualPagination = await this.getActualPagination();
     if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
 
-    const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura, this.campos.cliente].map((item) => `${item}`);
+    const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura, this.campos.cliente].map(item => `${item}`);
 
     if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
 
@@ -509,7 +513,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         if (params.iconKey == 'view') {
           this.notaSelected = params.data;
 
-          this.notasClass.parseDataToPdf(params.data).then((data_parsed) => {
+          this.notasClass.parseDataToPdf(params.data).then(data_parsed => {
             this.mostrarFactura(data_parsed, 'nota', params.data);
           });
         }
@@ -517,7 +521,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     } else if (params.id_tabla == shearchDocumentTableId) {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
-          this.facturaClass.parseDataToPdf(params.data).then((factura_parsed) => {
+          this.facturaClass.parseDataToPdf(params.data).then(factura_parsed => {
             this.facturaSelected = factura_parsed;
             const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
             this.mostrarFactura(factura_parsed, tipo);
@@ -543,7 +547,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           const action = actions[params.iconKey].url;
           const label = actions[params.iconKey].modalLabel;
 
-          const si = (instance) => {
+          const si = instance => {
             this.goToFacturacionPage(params.data.tipo, action, params.data.id);
             this.closeModal(instance);
           };
@@ -558,7 +562,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   deleteRequest(params: { ids: string; tipo: string }) {
     const extra = { afterPath: `custom/delete`, parameters: params };
 
-    this.facturaClass.dynamic(extra).then(async (res) => {
+    this.facturaClass.dynamic(extra).then(async res => {
       const info = {
         pre_venta: { label: { singular: 'Pre_Venta', plural: 'Pre_Ventas' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
         venta: { label: { singular: 'Factura', plural: 'Facturas' }, key: 'numero_comprobante', key_label: { singular: 'número de comprobante', plural: 'números de comprobantes' } },
@@ -568,7 +572,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const current_info = info[this.tipo_documento_selected];
       if (res.data.error.length > 0) {
-        const indicadores_temp = res.data.error.map((documento) => documento[current_info.key]);
+        const indicadores_temp = res.data.error.map(documento => documento[current_info.key]);
         const indicadores = _.join(indicadores_temp, ', ');
 
         let msg = '';
@@ -653,7 +657,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   editarFactura() {
-    this.facturaClass.getAll({ afterPath: `custom/can_update`, parameters: { id: this.facturaSelected.id } }).then((res) => {
+    this.facturaClass.getAll({ afterPath: `custom/can_update`, parameters: { id: this.facturaSelected.id } }).then(res => {
       this.goToFacturacionPage(this.facturaSelected.tipo, actionFacturacion.update, this.facturaSelected.id);
     });
   }
@@ -684,12 +688,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   mostrarFactura(dataFactura, type, dataDB?, continuar?) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
 
     if (continuar) {
       botonesDinamicos.push({
         clase: 'btn btn-verde',
-        function: (instance) => {
+        function: instance => {
           this.continuarANotas(dataFactura.id);
           instance.closeModal(instance.id, 'cancelar');
         },
@@ -698,100 +702,101 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       });
     }
 
-    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
-      if (res.status === 'si') {
-        const inputs = {
-          show_estado: true,
-          estado_documento: dataFactura.estado,
-          base64: res.base64,
-          height: '40rem',
-          reimprimir: res.reimprimir,
-          fileName: _.first(res.file.split('.')),
-        };
+    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async res => {
+      const inputs = {
+        show_estado: true,
+        estado_documento: dataFactura.estado,
+        base64: res.base64,
+        height: '40rem',
+        reimprimir: res.reimprimir,
+        fileName: _.first(res.file.split('.')),
+      };
 
-        const obj_modal = {
-          component: PdfViewerComponent,
-          inputs: inputs,
-          id: 'mostrarFactura',
-          header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
-          width: '900px',
-          botones: {
-            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: botonesDinamicos,
+      const obj_modal = {
+        component: PdfViewerComponent,
+        inputs: inputs,
+        id: 'mostrarFactura',
+        header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
+        width: '900px',
+        botones: {
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+          dinamico: botonesDinamicos,
+        },
+      };
+
+      if (this.tipo_documento_selected != tipoDocFacturacion.cotizacion && this.tipo_documento_selected != tipoDocFacturacion.pre_venta) {
+        obj_modal.botones.dinamico.push({
+          clase: 'btn btn-gris ml-2',
+          function: instance => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
+          label: 'Ver detalles',
+          disable: false,
+        });
+      } else {
+        obj_modal.botones.dinamico.push({
+          clase: 'btn btn-gris ml-2',
+          function: instance => {
+            instance.closeModal(instance.id, 'mostrarFactura');
+            this.tableClickIcon({ id_tabla: shearchDocumentTableId, columnKey: 'actions', iconKey: 'make_bill', data: dataFactura });
           },
+          tooltip: fun.hasValue(dataFactura.fecha_completada) ? 'Cotización ya ha sido facturada' : null,
+          label: 'Facturar',
+          disable: {
+            function: () => fun.hasValue(dataFactura.fecha_completada),
+          },
+        });
+      }
+
+      if (this.para == 'Visualizar' || type == 'nota') {
+        const editButton = {
+          clase: 'btn btn-verde',
+          function: instance => {
+            this.editarFactura();
+            instance.closeModal(instance.id, 'mostrarFactura');
+          },
+          label: 'Editar',
+          disable: false,
         };
 
-        if (this.tipo_documento_selected != tipoDocFacturacion.cotizacion && this.tipo_documento_selected != tipoDocFacturacion.pre_venta) {
-          obj_modal.botones.dinamico.push({
-            clase: 'btn btn-gris ml-2',
-            function: (instance) => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
-            label: 'Ver detalles',
-            disable: false,
-          });
-        } else {
-          obj_modal.botones.dinamico.push({
-            clase: 'btn btn-gris ml-2',
-            function: (instance) => {
-              instance.closeModal(instance.id, 'mostrarFactura');
-              this.tableClickIcon({ id_tabla: shearchDocumentTableId, columnKey: 'actions', iconKey: 'make_bill', data: dataFactura });
-            },
-            tooltip: fun.hasValue(dataFactura.fecha_completada) ? 'Cotización ya ha sido facturada' : null,
-            label: 'Facturar',
-            disable: {
-              function: () => fun.hasValue(dataFactura.fecha_completada),
-            },
-          });
-        }
+        const rePrintButton = {
+          clase: 'btn btn-amarillo ml-2',
+          function: instance => this.reimprimirDocumento({ data: dataFactura, type: type }, instance),
+          label: 'Reimprimir',
+          disable: false,
+        };
 
-        if (this.para == 'Visualizar' || type == 'nota') {
-          const editButton = {
-            clase: 'btn btn-verde',
-            function: (instance) => {
-              this.editarFactura();
-              instance.closeModal(instance.id, 'mostrarFactura');
-            },
-            label: 'Editar',
-            disable: false,
-          };
+        const cloneButton = {
+          clase: 'btn btn-azul ml-2',
+          function: instance => {
+            this.goToFacturacionPage(dataFactura.tipo, actionFacturacion.duplicate, dataFactura.id);
+            instance.closeModal(instance.id, 'mostrarFactura');
+          },
+          label: 'Clonar',
+          disable: false,
+        };
 
-          const rePrintButton = {
-            clase: 'btn btn-amarillo ml-2',
-            function: (instance) => this.reimprimirDocumento({ data: dataFactura, type: type }, instance),
-            label: 'Reimprimir',
-            disable: false,
-          };
-
-          const cloneButton = {
-            clase: 'btn btn-azul ml-2',
-            function: (instance) => {
-              this.goToFacturacionPage(dataFactura.tipo, actionFacturacion.duplicate, dataFactura.id);
-              instance.closeModal(instance.id, 'mostrarFactura');
-            },
-            label: 'Clonar',
-            disable: false,
-          };
-
-          if (dataFactura.estado) obj_modal.botones.dinamico.push(rePrintButton);
-          if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(editButton);
-          if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(cloneButton);
-        }
-
-        this.openNewModal(obj_modal);
+        if (dataFactura.estado) obj_modal.botones.dinamico.push(rePrintButton);
+        if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(editButton);
+        if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(cloneButton);
       }
-    });
+
+      this.openNewModal(obj_modal);
+    }).catch((err)=>{
+      fun.toastError(err.msg, 'ERROR');
+    })
   }
 
   reimprimirDocumento(obj, modalInstance) {
     this.loadServ.isLoading.next(true);
     PdfService.generatePdf({ oPdf: obj, imprimir: true })
-      .then(async (res) => {
+      .then(async res => {
         this.loadServ.isLoading.next(false);
-        if (res.status === 'si') {
-          fun.toastSuccess(res.msg, 'CORRECTO');
-          modalInstance.closeModal(modalInstance.id, 'imprimir');
-        } else fun.toastError(res.msg, 'ERROR');
+
+        fun.toastSuccess(res.msg, 'CORRECTO');
+        modalInstance.closeModal(modalInstance.id, 'imprimir');
       })
-      .catch((err) => {
+      .catch(err => {
+        console.log('err ', err);
+
         this.loadServ.isLoading.next(false);
         fun.toastError(err.msg, 'ERROR');
       });

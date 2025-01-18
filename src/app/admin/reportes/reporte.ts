@@ -55,7 +55,7 @@ export class ReporteC extends CrudG<any> {
 
   static requestReporteAndMakePdf(requestParams, type, transformRequestResponse?) {
     return new Promise<any>((resolve, reject) => {
-      new ReporteC().getAll(requestParams).then((responseRequest) => {
+      new ReporteC().getAll(requestParams).then(responseRequest => {
         //
         if (fun.hasValue(transformRequestResponse)) responseRequest = transformRequestResponse(responseRequest);
 
@@ -65,11 +65,11 @@ export class ReporteC extends CrudG<any> {
         const obj = { data: responseRequest, type: type };
 
         PdfService.generatePdf({ oPdf: obj, imprimir: false })
-          .then(async (result) => {
+          .then(async result => {
             Ss.loadServ.isLoading.next(false);
             resolve({ ...result, requestResult: responseRequest });
           })
-          .catch(async (err) => {
+          .catch(async err => {
             Ss.loadServ.isLoading.next(false);
             reject(err);
           });
@@ -78,8 +78,7 @@ export class ReporteC extends CrudG<any> {
   }
 
   static visualizarReporte(objPdfView: ReporteViewModalConfigI) {
-
-    console.log("objPdfView:", objPdfView);
+    console.log('objPdfView:', objPdfView);
     objPdfView['viewerOptions'] ??= {};
     if (fun.isEmpty(objPdfView?.exportCsv)) objPdfView.exportCsv = false;
 
@@ -96,14 +95,21 @@ export class ReporteC extends CrudG<any> {
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-            { clase: 'btn btn-verde', function: (instance) => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false },
+            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+            { clase: 'btn btn-verde', function: instance => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false },
           ],
         },
       };
 
       if (objPdfView.exportCsv)
-        fun.pushAt(modalViewReporte.botones.dinamico, 1, { clase: 'btn btn-gris', function: (instance) => this.exportCsv(objPdfView.requestResult , instance), label: 'Exportar CSV', disable: false, icon: 'fa-solid fa-file-excel', iconColor: '#5fcf5f' });
+        fun.pushAt(modalViewReporte.botones.dinamico, 1, {
+          clase: 'btn btn-gris',
+          function: instance => this.exportCsv(objPdfView.requestResult, instance),
+          label: 'Exportar CSV',
+          disable: false,
+          icon: 'fa-solid fa-file-excel',
+          iconColor: '#5fcf5f',
+        });
 
       objPdfView.openNewModal(modalViewReporte);
     }
@@ -120,15 +126,13 @@ export class ReporteC extends CrudG<any> {
       objPdf['printer'] = configApp.printer_selected[entidad];
 
       PdfService.imprimirBase64(objPdf)
-        .then((res) => {
+        .then(res => {
           Ss.loadServ.isLoading.next(false);
 
-          if (res.status === 'si') {
-            fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-            if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
-          } else fun.toastError(res.msg, 'ERROR');
+          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
         })
-        .catch((err) => {
+        .catch(err => {
           Ss.loadServ.isLoading.next(false);
           fun.toastError(err.msg, 'ERROR');
         });
@@ -137,7 +141,7 @@ export class ReporteC extends CrudG<any> {
 
   static exportCsv(data: ReporteBackendResponseI, modalInstance?) {
     const exportToExcelServ = new ExportToExcelService();
-    
+
     exportToExcelServ.download(this._configCsv, data).then(() => {
       fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
       if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');

@@ -91,12 +91,12 @@ export class PdfService {
         }
 
         if (todo_true) {
-          this.createPdfFromBase64(obj.doc, obj.file, reimprimir, (res) => {
+          this.createPdfFromBase64(obj.doc, obj.file, reimprimir, res => {
             res['pageOrientation'] = obj.pageOrientation;
             if (params.imprimir) {
               this.imprimirBase64({ base64: res.base64, file: res.file, type: type_oPdf, printer: printer_selected, pageOrientation: res['pageOrientation'] })
-                .then((res_impresion) => resolve(res_impresion))
-                .catch((err_impresion) => reject(err_impresion));
+                .then(res_impresion => resolve(res_impresion))
+                .catch(err_impresion => reject(err_impresion));
             } else {
               resolve(res);
             }
@@ -117,12 +117,12 @@ export class PdfService {
     });
   }
 
-  static createPdfFromBase64(docDefinition, file_, reimprimir_, callback = (arg) => {}) {
+  static createPdfFromBase64(docDefinition, file_, reimprimir_, callback = arg => {}) {
     try {
       pdfMake.vfs = pdfFonts.vfs;
 
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-      pdfDocGenerator.getBase64((data) => {
+      pdfDocGenerator.getBase64(data => {
         const respuesta = this.makeStatusObj({
           msg: 'Pdf Base64 correcto',
           file: file_,
@@ -148,14 +148,11 @@ export class PdfService {
 
         Ss._ipc
           .sendTask(task)
-          .then((res) => {
-            if (res['status'] == 'no') reject(res);
-            else {
-              res['pageOrientation'] = oBase.pageOrientation;
-              resolve(res);
-            }
+          .then(res => {
+            res['pageOrientation'] = oBase.pageOrientation;
+            resolve(res);
           })
-          .catch((err) => reject(err));
+          .catch(err => reject(err));
       });
     } catch (error) {
       console.error(error);

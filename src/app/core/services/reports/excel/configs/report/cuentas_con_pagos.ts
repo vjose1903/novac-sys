@@ -9,7 +9,7 @@ export const csvConfig: exportExcelConfigI = {
     { title: 'Factura', key: 'numero_comprobante' },
     { title: 'Condición', key: 'condicion' },
     { title: 'Cliente', key: 'cliente_nombre' },
-    { title: 'Facturado', key: 'total_factura', formato_numero: true },
-    { title: 'Pendiente', key: 'total_pendiente', formato_numero: true },
+    { title: 'Facturado', key: 'total_factura', bodyFormat: '#,##0.00' },
+    { title: 'Pendiente', key: 'total_pendiente', bodyFormat: '#,##0.00' },
   ]
 };

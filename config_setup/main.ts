@@ -27,22 +27,23 @@ import AppUpdater from './electron/auto-update';
 import ReplaceInFile from './electron/replace-in-file';
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
+import ExportToExcel from './electron/exort-to-excel';
 
-let emptyWin: BrowserWindow;
-let win: BrowserWindow;
-let splash: BrowserWindow;
+let win: BrowserWindow | null;
+let splash: BrowserWindow | null;
 let auto_updater: AppUpdater;
+let export_to_excel: ExportToExcel;
 let docker_handler: DockerHandler;
 let replace_in_file: ReplaceInFile;
 
 const args = process.argv.slice(1);
-const serve = args.some((val) => val === '--serve');
+const serve = args.some(val => val === '--serve');
 const appFilePath: any = url.format({ pathname: path.join(app.getAppPath(), 'dist', 'browser', 'index.html'), protocol: 'file:', slashes: true });
 
 function createSplash(type = 'splash') {
   if (splash) {
     splash.close();
-    splash = emptyWin;
+    splash = null;
   }
 
   splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
@@ -53,14 +54,14 @@ function createSplash(type = 'splash') {
   splash.center();
 
   if (type == 'splash') {
-    beforeCreateSplash(splash).then((res) => {
-      splash.close();
-      createWindow().then((win) => beforeCreateWindow(win));
+    beforeCreateSplash(splash).then(res => {
+      splash?.close();
+      createWindow().then(win => beforeCreateWindow(win));
     });
   } else {
     shell.beep();
     setTimeout(() => {
-      splash.close();
+      splash?.close();
       app.quit();
     }, 6000);
   }
@@ -100,11 +101,11 @@ function createWindow() {
       win.setMenuBarVisibility(false);
 
       setTimeout(() => {
-        if (serve) win.webContents.openDevTools();
+        if (serve) win?.webContents.openDevTools();
       }, 250);
 
       // Emitted when the window is closed.
-      win.on('closed', () => (win = emptyWin));
+      win.on('closed', () => (win = null));
 
       resolve(win);
     } catch (error) {
@@ -138,7 +139,7 @@ function isMacOs() {
 async function getServer_(): Promise<boolean> {
   return new Promise<any>((resolve, reject) => {
     const args_ = process.argv.slice(1);
-    const serve_ = args_.some((val) => val === '--serve');
+    const serve_ = args_.some(val => val === '--serve');
     resolve(serve_);
   });
 }
@@ -156,29 +157,29 @@ function beforeCreateSplash(splash) {
       docker_handler = new DockerHandler();
 
       HandlerConfigFile.checkConfigFile(splash)
-        .then(async (is_config_ready) => {
+        .then(async is_config_ready => {
           if (is_config_ready) {
             Functions.getConfigFile()
-              .then(async (config) => {
+              .then(async config => {
                 // ----------- correr base de datos local --------------
                 writeLogs(config.is_db_local, 'config.is_db_local ');
 
                 if (config.is_db_local) {
                   docker_handler
                     .checkAllInDocker()
-                    .then((res_db) => continuarCargandoArchivos(resolve))
-                    .catch((error_type) => createSplash(`splash_${error_type}_error`));
+                    .then(res_db => continuarCargandoArchivos(resolve))
+                    .catch(error_type => createSplash(`splash_${error_type}_error`));
                   //
                 } else {
                   continuarCargandoArchivos(resolve);
                 }
               })
-              .catch((err) => {
+              .catch(err => {
                 createSplash('splash_config_error');
               });
           }
         })
-        .catch((err) => {
+        .catch(err => {
           createSplash('splash_config_error');
         });
     });
@@ -191,7 +192,10 @@ function beforeCreateSplash(splash) {
 function continuarCargandoArchivos(resolve) {
   // -------------- remplazar en archivos ----------------
   replace_in_file = new ReplaceInFile();
+  export_to_excel = new ExportToExcel(app);
+
   writeLogs(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
+
   setTimeout(() => resolve(true), 2000);
 }
 
@@ -202,11 +206,8 @@ function continuarCargandoArchivos(resolve) {
 async function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
   const serve_ = await getServer_();
+  auto_updater = new AppUpdater(win, serve_);
 
-  if (!serve_) {
-    writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
-    setTimeout(() => (auto_updater = new AppUpdater(win)), 2000);
-  }
   // ---------------------------------------
 }
 
@@ -227,21 +228,22 @@ async function handleEvent(event: any, obj: string) {
       case ELECTRON_TEST:
         // test function
         break;
-        //
+      //
       case ELECTRON_RELOAD:
         writeLogs('RECARGANDO ELECTRON');
-        win.reload();
-        if (!serve) win.loadURL(appFilePath);
+        win?.reload();
+        if (!serve) win?.loadURL(appFilePath);
         break;
       //
       case ELECTRON_CHANGE_CONFIG_FILE:
         replace_in_file
           .replaceFunction(parameters)
-          .then((res) => {
+          .then(res => {
             task.response = res;
             event.reply(ELECTRON_RESPONSE, task);
           })
-          .catch((err) => {
+          .catch(err => {
+            task.error = true;
             task.response = err;
             event.reply(ELECTRON_RESPONSE, task);
           });
@@ -270,11 +272,12 @@ async function handleEvent(event: any, obj: string) {
         const pageOrientation = parameters['pageOrientation'] ? parameters['pageOrientation'] : 'portrait';
 
         generatePdfFileFormBase64({ fileName, base64, type, pageOrientation, printer })
-          .then((res) => {
+          .then(res => {
             task.response = res;
             event.reply(ELECTRON_RESPONSE, task);
           })
-          .catch((err) => {
+          .catch(err => {
+            task.error = true;
             task.response = err;
             event.reply(ELECTRON_RESPONSE, task);
           });
@@ -284,12 +287,14 @@ async function handleEvent(event: any, obj: string) {
       case ELECTRON_EXPORT_CSV:
         writeLogs('INICIANDOO PROCESO DE EXPORTACION');
 
-        generateCSV(parameters)
-          .then((res) => {
+        export_to_excel
+          .generateCSV(parameters)
+          .then(res => {
             task.response = res;
             event.reply(ELECTRON_RESPONSE, task);
           })
-          .catch((err) => {
+          .catch(err => {
+            task.error = true;
             task.response = err;
             event.reply(ELECTRON_RESPONSE, task);
           });
@@ -298,11 +303,12 @@ async function handleEvent(event: any, obj: string) {
       //
       case ELECTRON_GET_APP_CONFIG:
         parseAppConfig()
-          .then((config) => {
+          .then(config => {
             task.response = config;
             event.reply(ELECTRON_RESPONSE, task);
           })
-          .catch((err) => {
+          .catch(err => {
+            task.error = true;
             task.response = err;
             event.reply(ELECTRON_RESPONSE, task);
           });
@@ -329,14 +335,19 @@ async function handleEvent(event: any, obj: string) {
 // OBTENER EL ACTUAL USUARIO DE GIT
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function getActualGitUser() {
-  return new Promise<any>(async (resolve, reject) => {
+  return new Promise<string>(async (resolve, reject) => {
     const serve_ = await getServer_();
 
     if (serve_) {
-      cmd(`git config --get user.name`, async (res_username) => {
-        const username = res_username.STDOUT.trim() != '' ? res_username.STDOUT.trim() : 'vjose1903';
-        resolve(username);
-      });
+      runTerminalCommand(`git config --get user.name`)
+        .then(res => {
+          const username = res.STDOUT.trim() != '' ? res.STDOUT.trim() : 'vjose1903';
+          resolve(username);
+        })
+        .catch(error => {
+          console.error('getActualGitUser', error);
+          reject(error);
+        });
     } else {
       resolve('vjose1903');
     }
@@ -344,9 +355,13 @@ function getActualGitUser() {
 }
 
 async function getPrinters() {
-  const printerPromise = await win.webContents.getPrintersAsync();
-  const printers_list = printerPromise.map((item) => item.name);
-  return printers_list;
+  const printerPromise = await win?.webContents.getPrintersAsync();
+  if (printerPromise) {
+    const printers_list = printerPromise.map(item => item.name);
+    return printers_list;
+  } else {
+    return [];
+  }
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -368,6 +383,7 @@ function parseAppConfig() {
 
       resolve(config);
     } catch (error) {
+      console.error('parseAppConfig', error);
       reject({ err: error, msg: 'Error buscando el archivo de configuracion' });
     }
   });
@@ -378,17 +394,17 @@ function parseAppConfig() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function borrarLogs() {
-  return new Promise<any>(async (resolve, reject) => {
+  return new Promise<boolean>(async resolve => {
     const carpeta = await pathAdd('/log');
 
     if (!fs.existsSync(carpeta)) {
-      fs.mkdir(carpeta, { recursive: true }, (err) => {
+      fs.mkdir(carpeta, { recursive: true }, err => {
         if (err) throw err;
       });
     } else {
       const comando = isMacOs() ? `rm -rf "${await pathAdd('/log/my_log.txt')}"` : `del "${await pathAdd('/log/my_log.txt')}"`;
 
-      cmd(comando);
+      runTerminalCommand(comando);
     }
 
     setTimeout(() => resolve(true), 1000);
@@ -398,19 +414,17 @@ function borrarLogs() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-export function cmd(command, callback = (arg) => {}) {
-  writeLogs(command, 'comando realizado en la funcion cmd');
+export function runTerminalCommand(command) {
+  return new Promise<{ msg: string; STDOUT: string; STDERR: string }>((resolve, reject) => {
+    writeLogs(command, 'comando realizado en la funcion runTerminalCommand');
 
-  exec(command, (error, stdout, stderr) => {
-    let obj;
-    if (error) {
-      obj = { status: false, STDOUT: stdout, STDERR: stderr, msg: error };
-
-      callback(obj);
-    } else {
-      obj = { status: true, msg: 'Comando realizado correctamente', STDOUT: stdout, STDERR: stderr };
-      callback(obj);
-    }
+    exec(command, (error, stdout, stderr) => {
+      if (Functions.isEmpty(error) && Functions.isEmpty(stderr)) {
+        resolve({ msg: 'Comando realizado correctamente', STDOUT: stdout, STDERR: stderr });
+      } else {
+        reject({ STDOUT: stdout, STDERR: stderr, msg: error });
+      }
+    });
   });
 }
 
@@ -419,7 +433,7 @@ export function cmd(command, callback = (arg) => {}) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 export async function writeLogs(msg, titulo?) {
-  // cmd('ls');
+  // runTerminalCommand('ls');
   if (win || splash) {
     const fs = require('fs');
 
@@ -432,7 +446,7 @@ export async function writeLogs(msg, titulo?) {
     else texto = msg;
 
     if (!fs.existsSync(carpeta)) {
-      fs.mkdir(carpeta, { recursive: true }, (err) => {
+      fs.mkdir(carpeta, { recursive: true }, err => {
         if (err) throw err;
         else escribirLogs(file, titulo, texto);
       });
@@ -449,12 +463,12 @@ async function escribirLogs(file, titulo, texto) {
   if (!fs.existsSync(file)) {
     const stream = fs.createWriteStream(file);
 
-    await stream.once('open', (fd) => {
+    await stream.once('open', () => {
       stream.write(titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`);
       stream.end();
     });
   } else {
-    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, (err) => {});
+    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, () => {});
   }
 }
 
@@ -466,50 +480,13 @@ function generatePdfFileFormBase64(params: { fileName: string; base64: string; t
     const pdfFileName = await pathAdd('/' + params.fileName);
 
     try {
-      fs.writeFile(pdfFileName, params.base64, { encoding: 'base64' }, (err) => {
+      fs.writeFile(pdfFileName, params.base64, { encoding: 'base64' }, () => {
         imprimir({ fileName: params.fileName, tipo: params.type, pageOrientation: params.pageOrientation, printer: params.printer })
-          .then((res) => resolve(res))
-          .catch((err) => reject(err));
+          .then(res => resolve(res))
+          .catch(err => reject(err));
       });
     } catch (err) {
       reject({ msg: 'Error generando reporte!!', status: false, error: err });
-    }
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// GENERAR EL CSV
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function generateCSV(params: { fileName: string; csvString: string }) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const fileName = params.fileName;
-      const csvString = params.csvString;
-
-      const documentsPath = app.getPath('documents');
-      const targetFolder = path.join(documentsPath, 'NovacSystem');
-
-      if (!fs.existsSync(targetFolder)) {
-        fs.mkdirSync(targetFolder, { recursive: true });
-      }
-
-      const filePath = parsePath(path.join(targetFolder, fileName));
-
-      fs.writeFileSync(filePath, csvString, 'utf8');
-
-      shell
-        .openPath(targetFolder)
-        .then(() => {
-          writeLogs(`Carpeta abierta: ${targetFolder}`);
-        })
-        .catch((err) => {
-          writeLogs(err, 'Error al abrir la carpeta:');
-          console.error('Error al abrir la carpeta:', err);
-        });
-
-      resolve({ success: true, filePath });
-    } catch (error) {
-      reject({ success: false, error });
     }
   });
 }
@@ -535,10 +512,11 @@ function imprimir(params: { fileName: string; tipo: string; pageOrientation: str
       comando = `${gsprint_path} -${params.pageOrientation} -colour -ghostscript "${ghostscript_path}" -dPDFFitPage -printer "${params.printer}" "${file_path}"`;
     }
 
-    cmd(comando, (res) => {
-      if (res.status) resolve({ msg: 'PDF impreso correctamente!!', status: 'si', STDOUT: res });
-      else reject({ msg: 'Error imprimiento PDF!!', status: 'no', err: res });
-    });
+    runTerminalCommand(comando)
+      .then(res => {
+        resolve({ msg: 'PDF impreso correctamente!!', STDOUT: res });
+      })
+      .catch(err => reject({ msg: 'Error imprimiento PDF!!', err }));
   });
 }
 
@@ -551,9 +529,8 @@ export function parsePath(path_temp) {
 }
 
 export function pathAdd(addToPath = '', resource = true): Promise<string> {
-  return new Promise<any>(async (resolve, reject) => {
+  return new Promise<string>(async resolve => {
     let path_temp;
-    let path_resolved;
     const pjson = require('./package.json');
     const serve_ = await getServer_();
 
