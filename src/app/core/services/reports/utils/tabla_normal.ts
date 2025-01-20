@@ -151,16 +151,8 @@ function formarCuerpo(data, configuration, detalle, j) {
       } else {
         text_ = value;
       }
-      console.log('  ');
-      console.log('info ', info);
-      console.log('1 text_ ', text_);
 
-      if (info.uppercase) {
-        console.log("ENTREEEE");
-        
-        text_ = fun.Capitalice(text_);
-      }
-      console.log('2 text_ ', text_);
+      if (info.uppercase) text_ = fun.Capitalice(text_);
     }
 
     obj = {

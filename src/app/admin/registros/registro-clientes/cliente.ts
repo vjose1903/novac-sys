@@ -9,7 +9,9 @@ import { fun } from '../../../core/services/functions.service';
 import { DateUtils } from '../../../core/typescript/date.utils';
 import { Validators } from '@angular/forms';
 import { ReporteViewModalConfigI } from '../../../core/interface/reporte-view-modal-config';
-import { csvConfig } from '../../../core/services/reports/excel/configs/report/cuentas_con_pagos';
+import { csvConfig as csvConfigCxc } from '../../../core/services/reports/excel/configs/report/cxc';
+import { csvConfig as csvConfigCxcAnt } from '../../../core/services/reports/excel/configs/report/cxc_ant';
+
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
@@ -41,10 +43,8 @@ export class ClienteC extends CrudG<any> {
       ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo };
       let objModal = ReporteC.objReporte;
 
-      ReporteC.configCsv = csvConfig;
-
       objModal['returnDataFromModal'] = returnDataFromModal;
-      
+
       params.openNewModal(objModal);
     });
   }
@@ -66,6 +66,12 @@ export class ClienteC extends CrudG<any> {
         requestParameters['desde'] = DateUtils.format({ date: reporteParams.data.desde, dateFormat: 'YYYY-MM-DD' });
         requestParameters['hasta'] = DateUtils.format({ date: reporteParams.data.hasta, dateFormat: 'YYYY-MM-DD' });
         requestParameters['include_pagadas'] = reporteParams.data.include_pagadas ?? false;
+
+        if (pdfParams.tipo == 'cuentas_cobrar_cliente') {
+          ReporteC.configCsv = csvConfigCxc;
+        } else if (pdfParams.tipo == 'cuentas_cobrar_ant_saldo') {
+          ReporteC.configCsv = csvConfigCxcAnt[tipo == CxC.detallado ? 'detallado' : 'agrupado'];
+        }
 
         pdfParams.tipo = 'cuentas_cobrar';
 
@@ -89,16 +95,15 @@ export class ClienteC extends CrudG<any> {
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
-    ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then((response) => {
+    ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
       let objPdfView: ReporteViewModalConfigI = {
         titulo: pdfParams.inputs.titulo,
         openNewModal: pdfParams.openNewModal,
         viewerOptions: { width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem' },
         ...response,
-        exportCsv: true
+        exportCsv: true,
       };
-      
-      
+
       ReporteC.visualizarReporte(objPdfView);
     });
 
@@ -107,24 +112,6 @@ export class ClienteC extends CrudG<any> {
 
       return requestResponse;
     }
-  }
-
-  static reporteCxC(params) {
-    params.inputs['data'] = [];
-    params.inputs['filtrarCliente'] = null;
-    params.inputs['metodo'] = 'venta';
-    params.inputs['palabra_a_buscar'] = ' ';
-
-    let objModal: ConfigureModalI = {
-      id: params.tipo,
-      inputs: params.inputs,
-      header: params.inputs.titulo,
-      component: BuscarClienteSuplidorComponent,
-      width: '900px',
-      height: '500px',
-      botones: { ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons), cancelar: { show: true, disable: false } },
-    };
-    return objModal;
   }
 }
 

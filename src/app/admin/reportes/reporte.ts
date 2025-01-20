@@ -79,7 +79,6 @@ export class ReporteC extends CrudG<any> {
   }
 
   static visualizarReporte(objPdfView: ReporteViewModalConfigI) {
-    console.log('objPdfView:', objPdfView);
     objPdfView['viewerOptions'] ??= {};
     if (fun.isEmpty(objPdfView?.exportCsv)) objPdfView.exportCsv = false;
 
@@ -143,13 +142,15 @@ export class ReporteC extends CrudG<any> {
   static exportCsv(data: ReporteBackendResponseI, modalInstance?) {
     const exportToExcelServ = new ExportToExcelService();
 
-    exportToExcelServ.download(this._configCsv, data).then(() => {
-      fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+    exportToExcelServ
+      .download(this._configCsv, data)
+      .then(() => {
+        fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
         if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
       })
       .catch(err => {
         console.error(err);
-        
+
         if (err.msg) {
           fun.toastError(err.msg, 'ERROR');
         } else {

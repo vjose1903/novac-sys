@@ -36,6 +36,8 @@ export class ExportToExcelService {
               value = fun_.roundNumberToDecimal(value);
             }
 
+            if (col.nullIfCero && fun.hasValue(value) && Number(value) == 0) return null;
+
             if (col.uppercase) value = fun.Capitalice(value);
             return value;
           });
