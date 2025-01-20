@@ -179,18 +179,16 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   generar(obj) {
-    PdfService.generatePdf({ oPdf: obj, imprimir: false })
-      .then(async res => {
-        const objBase = { base64: res.base64, filename: res.file, type: this.tipo_prueba };
-
-        const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
-        console.log("obj ", obj);
-
-        // this.abrirModalReporte(obj);
-      })
-      .catch(err => {
-        console.error(err);
-        fun.toastError(err.msg, 'ERROR');
-      });
+    //   PdfService.generatePdf({ oPdf: obj, imprimir: false })
+    //     .then(async res => {
+    //       const objBase = { base64: res.base64, filename: res.file, type: this.tipo_prueba };
+    //       const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+    //       console.log("obj ", obj);
+    //       // this.abrirModalReporte(obj);
+    //     })
+    //     .catch(err => {
+    //       console.error(err);
+    //       fun.toastError(err.msg, 'ERROR');
+    //     });
   }
 }

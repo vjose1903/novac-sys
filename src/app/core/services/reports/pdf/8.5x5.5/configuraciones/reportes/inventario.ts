@@ -30,6 +30,7 @@ export const config_inventario = {
       style_body: 'letra10',
       key: 'nombre',
       alignment_body: 'left',
+      uppercase: true,
     },
     {
       text: 'Cantidad',

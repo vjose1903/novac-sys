@@ -11,6 +11,7 @@ import { ConfigI } from '../../core/interface/config-interface';
 import { ExportToExcelService } from '../../core/services/reports/excel/export-to-excel.service';
 import { inject } from '@angular/core';
 import { exportExcelConfigI } from '../../core/interface/export-to-excel.interface';
+import { Console } from 'console';
 
 export class ReporteC extends CrudG<any> {
   private static _objReporte;
@@ -144,7 +145,16 @@ export class ReporteC extends CrudG<any> {
 
     exportToExcelServ.download(this._configCsv, data).then(() => {
       fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-      if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
-    });
+        if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
+      })
+      .catch(err => {
+        console.error(err);
+        
+        if (err.msg) {
+          fun.toastError(err.msg, 'ERROR');
+        } else {
+          fun.toastError('Error al exportar el reporte', 'ERROR');
+        }
+      });
   }
 }

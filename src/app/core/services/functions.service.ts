@@ -29,8 +29,8 @@ export class fun {
 
     Ss._ipc
       .sendTask(task)
-      .then((res) => {})
-      .catch((err) => console.error(err));
+      .then(res => {})
+      .catch(err => console.error(err));
   }
   // __________________________________________________________________________________________________
   // Nombre: removerDuplicados
@@ -108,12 +108,12 @@ export class fun {
       return array_string;
     }
 
-    const promise = new Promise((resolve) => {
-      fun.awaitTyping().then((res) => {
+    const promise = new Promise(resolve => {
+      fun.awaitTyping().then(res => {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (fun.isEmpty(searchText)) resolve(copyData);
 
-        const data_filtered = fun.deepCloning(copyData).filter((obj) => {
+        const data_filtered = fun.deepCloning(copyData).filter(obj => {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
@@ -130,7 +130,7 @@ export class fun {
   }
 
   static revisarNumber(input, id): any {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const precioTEMPO = input.value;
 
       const res = { number: null, error: true };
@@ -232,7 +232,7 @@ export class fun {
   // _________________________________________________________________________________________________
   static identifyObject(object: any | Array<any>, key = 'id') {
     if (Array.isArray(object)) {
-      object.map((item) => (item[key] = fun.generateKey()));
+      object.map(item => (item[key] = fun.generateKey()));
     } else {
       object[key] = fun.generateKey();
     }
@@ -260,16 +260,16 @@ export class fun {
 
       new DocumentosC()
         .getAll(extra)
-        .then((res) => {
+        .then(res => {
           for (const persona of res.data) {
-            persona.persona.documentos_de_identidad.map((doc) => {
+            persona.persona.documentos_de_identidad.map(doc => {
               doc.id = null;
               return doc;
             });
           }
           resolve(res);
         })
-        .catch((err) => reject(err));
+        .catch(err => reject(err));
     });
   }
 
@@ -353,8 +353,14 @@ export class fun {
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
   static Capitalice(str) {
-    const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
-    return fun.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
+    if (!fun.hasValue(str)) return str;
+
+    const upperCaseText = str
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    return upperCaseText;
   }
 
   // __________________________________________________________________________________________________
@@ -423,7 +429,7 @@ export class fun {
 
   static timeout;
   static awaitTyping(event?, waitingTime = 700) {
-    const promise = new Promise((resolve) => {
+    const promise = new Promise(resolve => {
       clearTimeout(fun.timeout);
       fun.timeout = setTimeout(() => {
         if (!event || event.keyCode != 13) resolve(event);
@@ -582,7 +588,7 @@ export class fun {
   // Descripcion : Esta funcion simula un evento de teclado
   // __________________________________________________________________________________________________
   static keyboardEvent(element: any, event: 'keyup' | 'keydown', keysArray: Array<string>): any {
-    keysArray.forEach((key) => {
+    keysArray.forEach(key => {
       element.dispatchEvent(new KeyboardEvent(event, { key: key }));
     });
   }
@@ -592,7 +598,7 @@ export class fun {
   // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
   // __________________________________________________________________________________________________
   static getKeyByValue(object, value): any {
-    return Object.keys(object).find((key) => object[key] == value);
+    return Object.keys(object).find(key => object[key] == value);
   }
 
   // __________________________________________________________________________________________________
@@ -640,7 +646,7 @@ export class fun {
   }
 
   static async logout() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       try {
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
@@ -738,19 +744,19 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '', {enableHtml: true});
+    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '', {enableHtml: true});
+    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '', {enableHtml: true});
+    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '', {enableHtml: true});
+    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -765,7 +771,7 @@ export class fun {
     const copyArr = fun.deepCloning(arr);
     arr.length = 0;
     const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
-    newArr.forEach((item) => arr.push(item));
+    newArr.forEach(item => arr.push(item));
   }
 
   // __________________________________________________________________________________________________
@@ -773,7 +779,7 @@ export class fun {
   // Descripcion : Esta funcion remueve un item  de un arreglo
   // _________________________________________________________________________________________________
   static pull(array, item_remove) {
-    const index = array.findIndex((item) => fun.isEqual(item, item_remove));
+    const index = array.findIndex(item => fun.isEqual(item, item_remove));
     array.splice(index, 1);
   }
 

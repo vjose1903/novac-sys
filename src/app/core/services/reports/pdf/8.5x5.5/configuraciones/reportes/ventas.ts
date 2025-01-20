@@ -57,6 +57,7 @@ export const config_ventas = {
         style_body: 'letra10',
         key: 'cliente_nombre',
         alignment_body: 'left',
+        uppercase: true,
       },
       {
         text: 'Total Venta',

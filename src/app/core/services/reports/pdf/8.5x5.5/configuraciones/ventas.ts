@@ -25,6 +25,7 @@ export const config_ventas = {
       style_body: 'letra10',
       key: 'descripcion',
       alignment_body: 'left',
+      uppercase: true,
     },
     {
       text: 'CANT.',

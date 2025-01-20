@@ -371,8 +371,6 @@ export class ConfiguracionesComponent implements OnInit {
     this._ipc
       .sendTask(task)
       .then(res => {
-        console.log('res ', res);
-
         this.sharedServ.nextCanToast(true);
         fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
         setTimeout(() => {
@@ -381,6 +379,11 @@ export class ConfiguracionesComponent implements OnInit {
           this.salir();
         }, 250);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        if (err.msg) fun.toastError(err.msg, 'ERROR');
+        else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
+        console.error(err);
+      });
   }
 }
+

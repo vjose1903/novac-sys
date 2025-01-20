@@ -38,6 +38,7 @@ export const config_recibos = {
         style_body: 'letra10',
         key: 'cliente_nombre',
         alignment_body: 'left',
+        uppercase: true,
       },
       {
         text: 'Met. pago',

@@ -5,6 +5,7 @@ import { ConfigI } from '../../../interface/config-interface';
 import { MessageTask } from '../../../models/message-task';
 import { ELECTRON_EXPORT_CSV } from '../../../../../../electron/shared-electron-angular';
 import * as fun_ from '../utils/funciones';
+import { fun } from '../../functions.service';
 
 @Injectable({
   providedIn: 'root',
@@ -35,12 +36,12 @@ export class ExportToExcelService {
               value = fun_.roundNumberToDecimal(value);
             }
 
+            if (col.uppercase) value = fun.Capitalice(value);
             return value;
           });
         });
 
         excelData.push(...csvBody);
-        console.log('excelData ', excelData);
 
         const fileName = `${config.fileName(exportData[config.fileNameDataKey])}`;
 
@@ -64,7 +65,7 @@ export class ExportToExcelService {
 
   private exportCsv(fileName: string, excelData: Array<string[]>, config: exportExcelConfigI) {
     return new Promise<any>((resolve, reject) => {
-      const task = new MessageTask(ELECTRON_EXPORT_CSV, { fileName, excelData, config });
+      const task = new MessageTask(ELECTRON_EXPORT_CSV, { fileName, excelData, configuration: config });
 
       Ss._ipc
         .sendTask(task)

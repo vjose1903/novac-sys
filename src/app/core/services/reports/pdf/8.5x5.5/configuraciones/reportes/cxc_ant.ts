@@ -31,6 +31,7 @@ export const config_cxc_ant = {
         style_body: 'letra10',
         key: 'cliente_nombre',
         alignment_body: 'left',
+        uppercase: true,
       },
       {
         text: 'Fecha',

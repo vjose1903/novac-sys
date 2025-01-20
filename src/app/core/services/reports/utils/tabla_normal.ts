@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/indent */
+import { fun } from '../../functions.service';
 import * as fun_ from './funciones';
 
 export function getContentWithTablaNormal(configuration, data, index_data?, index_info?) {
@@ -150,6 +151,16 @@ function formarCuerpo(data, configuration, detalle, j) {
       } else {
         text_ = value;
       }
+      console.log('  ');
+      console.log('info ', info);
+      console.log('1 text_ ', text_);
+
+      if (info.uppercase) {
+        console.log("ENTREEEE");
+        
+        text_ = fun.Capitalice(text_);
+      }
+      console.log('2 text_ ', text_);
     }
 
     obj = {

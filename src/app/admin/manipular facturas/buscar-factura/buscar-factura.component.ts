@@ -795,7 +795,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         modalInstance.closeModal(modalInstance.id, 'imprimir');
       })
       .catch(err => {
-        console.log('err ', err);
+        console.error('err ', err);
 
         this.loadServ.isLoading.next(false);
         fun.toastError(err.msg, 'ERROR');

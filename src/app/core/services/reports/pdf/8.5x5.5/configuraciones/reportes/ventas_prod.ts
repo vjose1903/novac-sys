@@ -46,6 +46,7 @@ export const config_ventas_prod = {
           style_body: 'letra10',
           key: 'nombre',
           alignment_body: 'left',
+          uppercase: true,
         },
         {
           text: 'Vendido',

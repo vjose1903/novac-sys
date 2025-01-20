@@ -34,6 +34,7 @@ export const config_suplidor_prod = {
       alignment_body: 'left',
       margin_titulo: [0, 0, 10, 0],
       margin_body: [0, 0, 10, 0],
+      uppercase: true,
     },
   ],
 };

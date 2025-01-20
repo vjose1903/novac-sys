@@ -33,6 +33,7 @@ export const config_conduce = {
       style_body: 'letra8',
       key: 'descripcion',
       alignment_body: 'left',
+      uppercase: true,
     },
   ],
 };

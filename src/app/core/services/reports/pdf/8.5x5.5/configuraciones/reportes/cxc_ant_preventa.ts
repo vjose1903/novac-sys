@@ -30,6 +30,7 @@ export const config_cxc_ant_preventa = {
         style: 'letra10',
         style_body: 'letra10',
         key: 'cliente_nombre',
+        uppercase: true,
         alignment_body: 'left',
       },
       {

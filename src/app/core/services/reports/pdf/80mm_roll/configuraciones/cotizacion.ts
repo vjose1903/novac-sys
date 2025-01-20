@@ -24,6 +24,7 @@ export const config_cotizacion = {
       style_body: 'letra8',
       key: 'descripcion',
       alignment_body: 'left',
+      uppercase: true,
     },
     {
       text: 'CANT.',

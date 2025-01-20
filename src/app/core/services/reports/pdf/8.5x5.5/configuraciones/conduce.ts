@@ -38,6 +38,7 @@ export const config_conduce = {
       style_body: 'letra10',
       key: 'descripcion',
       alignment_body: 'left',
+      uppercase: true,
     },
   ],
 };

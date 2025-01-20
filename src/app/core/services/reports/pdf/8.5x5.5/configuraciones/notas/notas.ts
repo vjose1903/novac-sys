@@ -107,6 +107,7 @@ export const config_notas = {
         style_body: 'letra11',
         key: 'articulo',
         alignment_body: 'left',
+        uppercase: true,
       },
       {
         text: 'Total',
