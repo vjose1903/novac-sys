@@ -67,16 +67,22 @@ export default class ExportToExcel {
   /**
    * Ajusta el ancho de las columnas mediante un muestreo aleatorio de celdas.
    */
-  private autoFitColumns(worksheet: any, porcentajeMuestra = 10, maxMuestra = 500) {
+  private autoFitColumns(worksheet: any, porcentajeMuestra = 10, maxMuestra = 999) {
     worksheet.columns.forEach((column: any) => {
       const totalCeldas = column.values.length - 1;
-      const muestra = Math.min(Math.ceil((porcentajeMuestra / 100) * totalCeldas), maxMuestra);
+      let muestra = totalCeldas;
 
-      const indicesAleatorios = new Set<number>();
+      if (totalCeldas > 100) {
+        muestra = Math.min(Math.ceil((porcentajeMuestra / 100) * totalCeldas), maxMuestra);
+      }
+
+      const indicesAleatorios = new Set<number>([0]);
       while (indicesAleatorios.size < muestra) {
         const randomIndex = Math.floor(Math.random() * totalCeldas) + 1;
         indicesAleatorios.add(randomIndex);
       }
+
+      console.log('indicesAleatorios ', indicesAleatorios);
 
       const maxLength = Array.from(indicesAleatorios).reduce((max, rowIndex) => {
         const cellValue = column.values[rowIndex] ? column.values[rowIndex].toString() : '';

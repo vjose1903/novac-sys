@@ -11,7 +11,6 @@ export interface ReporteViewModalConfigI {
   titulo: string;
   viewerOptions: viewerOptions;
   requestResult?: ReporteBackendResponseI;
-  exportCsv: boolean;
 }
 
 export interface ReporteBackendResponseI {

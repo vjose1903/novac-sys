@@ -12,7 +12,7 @@ import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/reports/pdf/pdf.service';
 import { serie } from '../../core/typescript/constantes';
-import { flip } from '@popperjs/core';
+import { csvConfig as csvConfigVentas } from '../../core/services/reports/excel/configs/report/ventas';
 
 export enum comprobanteNormal {
   valor_fiscal = '01',
@@ -158,6 +158,8 @@ export class FacturaC extends CrudG<FacturasI> {
     if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switchGroup.array, item => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
+      const configApp = Ss.configServ.getConfig({ isPromise: false });
+
       const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
       let formas_pago = '';
 
@@ -169,6 +171,22 @@ export class FacturaC extends CrudG<FacturasI> {
         });
 
         formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+
+
+        let configKey = '';
+        console.log('params', params);
+        console.log('params.reporte.tipo', params.reporte.tipo);
+        
+        if (params.reporte.data.tipo == 'detallado') {
+          configKey = `detallado${configApp.calcular_itbis ? '_itbis' : ''}`;
+        } else if (params.reporte.data.tipo == 'agrupado') {  
+          configKey = `agrupado${configApp.calcular_itbis ? '_itbis' : ''}`;
+        }
+        console.log('configApp.calcular_itbis', configApp.calcular_itbis);
+        console.log('configKey', configKey);
+        
+        ReporteC.configCsv = csvConfigVentas[configKey];
+        console.log('ReporteC.configCsv', ReporteC.configCsv);
       }
 
       requestParams.parameters['tipo_factura_id'] = params.reporte.data.tipo_factura_id;

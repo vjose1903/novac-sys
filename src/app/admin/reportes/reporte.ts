@@ -80,7 +80,6 @@ export class ReporteC extends CrudG<any> {
 
   static visualizarReporte(objPdfView: ReporteViewModalConfigI) {
     objPdfView['viewerOptions'] ??= {};
-    if (fun.isEmpty(objPdfView?.exportCsv)) objPdfView.exportCsv = false;
 
     if (objPdfView.status == 'no') {
       fun.toastError(objPdfView.msg, 'ERROR');
@@ -101,7 +100,7 @@ export class ReporteC extends CrudG<any> {
         },
       };
 
-      if (objPdfView.exportCsv)
+      if (fun.hasValue(this._configCsv))
         fun.pushAt(modalViewReporte.botones.dinamico, 1, {
           clase: 'btn btn-gris',
           function: instance => this.exportCsv(objPdfView.requestResult, instance),

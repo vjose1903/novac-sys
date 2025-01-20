@@ -11,6 +11,7 @@ import { Validators } from '@angular/forms';
 import { ReporteViewModalConfigI } from '../../../core/interface/reporte-view-modal-config';
 import { csvConfig as csvConfigCxc } from '../../../core/services/reports/excel/configs/report/cxc';
 import { csvConfig as csvConfigCxcAnt } from '../../../core/services/reports/excel/configs/report/cxc_ant';
+import { csvConfig as csvConfigVentasCliente } from '../../../core/services/reports/excel/configs/report/ventas_cliente';
 
 export class ClienteC extends CrudG<any> {
   constructor() {
@@ -85,8 +86,9 @@ export class ClienteC extends CrudG<any> {
           requestParameters['tipo_factura_id'] = reporteParams.data.tipo_factura_id;
           requestParameters['condicion'] = reporteParams.data.condicion;
           requestParameters['formas_pago'] = "('Efectivo','Tarjeta','Cheque','Transferencia')";
-        }
 
+          ReporteC.configCsv = csvConfigVentasCliente;
+        }
         break;
 
       default:
@@ -101,7 +103,6 @@ export class ClienteC extends CrudG<any> {
         openNewModal: pdfParams.openNewModal,
         viewerOptions: { width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem' },
         ...response,
-        exportCsv: true,
       };
 
       ReporteC.visualizarReporte(objPdfView);
