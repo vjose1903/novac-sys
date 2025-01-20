@@ -30,7 +30,7 @@ export default class ExportToExcel {
         const sheet = workbook.addWorksheet('Datos');
         excelData.forEach(row => sheet.addRow(row));
 
-        writeLogs(configuration, 'configuration');
+        this.autoFitColumns(sheet);
 
         configuration.columns.forEach((config: exportExcelColumnsI, index: number) => {
           if (Functions.hasValue(config.bodyFormat)) {
@@ -58,9 +58,32 @@ export default class ExportToExcel {
 
         resolve({ success: true, filePath });
       } catch (error) {
-        console.error(error)
+        console.error(error);
         reject({ success: false, error });
       }
+    });
+  }
+
+  /**
+   * Ajusta el ancho de las columnas mediante un muestreo aleatorio de celdas.
+   */
+  private autoFitColumns(worksheet: any, porcentajeMuestra = 10, maxMuestra = 500) {
+    worksheet.columns.forEach((column: any) => {
+      const totalCeldas = column.values.length - 1;
+      const muestra = Math.min(Math.ceil((porcentajeMuestra / 100) * totalCeldas), maxMuestra);
+
+      const indicesAleatorios = new Set<number>();
+      while (indicesAleatorios.size < muestra) {
+        const randomIndex = Math.floor(Math.random() * totalCeldas) + 1;
+        indicesAleatorios.add(randomIndex);
+      }
+
+      const maxLength = Array.from(indicesAleatorios).reduce((max, rowIndex) => {
+        const cellValue = column.values[rowIndex] ? column.values[rowIndex].toString() : '';
+        return Math.max(max, cellValue.length);
+      }, 0);
+
+      column.width = maxLength + 2;
     });
   }
 }
