@@ -27,7 +27,7 @@ import AppUpdater from './electron/auto-update';
 import ReplaceInFile from './electron/replace-in-file';
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
-import ExportToExcel from './electron/exort-to-excel';
+import ExportToExcel from './electron/export-to-excel';
 
 let win: BrowserWindow | null;
 let splash: BrowserWindow | null;

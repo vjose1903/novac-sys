@@ -177,7 +177,7 @@ export class FacturaC extends CrudG<FacturasI> {
         console.log('params', params);
         console.log('params.reporte.tipo', params.reporte.tipo);
         
-        if (params.reporte.data.tipo == 'detallado') {
+        if (params.reporte.data.tipo == 'detallado' || params.pdf.tipo == 'ventas_diarias') {
           configKey = `detallado${configApp.calcular_itbis ? '_itbis' : ''}`;
         } else if (params.reporte.data.tipo == 'agrupado') {  
           configKey = `agrupado${configApp.calcular_itbis ? '_itbis' : ''}`;
@@ -188,6 +188,7 @@ export class FacturaC extends CrudG<FacturasI> {
         ReporteC.configCsv = csvConfigVentas[configKey];
         console.log('ReporteC.configCsv', ReporteC.configCsv);
       }
+      
 
       requestParams.parameters['tipo_factura_id'] = params.reporte.data.tipo_factura_id;
       requestParams.parameters['tipo'] = params.reporte.data.tipo;

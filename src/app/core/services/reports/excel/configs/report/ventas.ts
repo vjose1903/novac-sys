@@ -3,7 +3,7 @@ import { makeFileName } from '../../utils';
 
 export const csvConfig: multipleExportExcelConfigI = {
   detallado: {
-    fileName: (datos: string) => makeFileName(datos, 'ventas_cliente'),
+    fileName: (datos: string) => makeFileName(datos, 'ventas'),
     fileNameDataKey: 'titulo_reporte',
     columns: [
       { title: 'Fecha', key: 'fecha_equivalente', formato_fecha: true },
@@ -14,7 +14,7 @@ export const csvConfig: multipleExportExcelConfigI = {
     ],
   },
   detallado_itbis: {
-    fileName: (datos: string) => makeFileName(datos, 'ventas_cliente'),
+    fileName: (datos: string) => makeFileName(datos, 'ventas'),
     fileNameDataKey: 'titulo_reporte',
     columns: [
       { title: 'Fecha', key: 'fecha_equivalente', formato_fecha: true },
@@ -27,7 +27,7 @@ export const csvConfig: multipleExportExcelConfigI = {
     ],
   },
   agrupado: {
-    fileName: (datos: string) => makeFileName(datos, 'ventas_cliente'),
+    fileName: (datos: string) => makeFileName(datos, 'ventas'),
     fileNameDataKey: 'titulo_reporte',
     columns: [
       { title: 'Fecha', key: 'fecha' },
@@ -39,7 +39,7 @@ export const csvConfig: multipleExportExcelConfigI = {
     ],
   },
   agrupado_itbis: {
-    fileName: (datos: string) => makeFileName(datos, 'ventas_cliente'),
+    fileName: (datos: string) => makeFileName(datos, 'ventas'),
     fileNameDataKey: 'titulo_reporte',
     columns: [
       { title: 'Fecha', key: 'fecha' },

@@ -1,7 +1,7 @@
-import { exportExcelColumnsI, exportExcelConfigI } from '../src/app/core/interface/export-to-excel.interface';
+import { exportExcelColumnsI, exportExcelConfigI } from '../src/app/core/interface/export-to-excel.interface.js';
 import { shell } from 'electron';
 import * as path from 'path';
-import { parsePath, writeLogs } from '../main';
+import { parsePath, writeLogs } from '../main.js';
 import Functions from './functions.js';
 
 const ExcelJS = require('exceljs');
@@ -70,22 +70,16 @@ export default class ExportToExcel {
   private autoFitColumns(worksheet: any, porcentajeMuestra = 10, maxMuestra = 999) {
     worksheet.columns.forEach((column: any) => {
       const totalCeldas = column.values.length - 1;
-      let muestra = totalCeldas;
+      const muestra = totalCeldas > 100 ? Math.min(Math.ceil((porcentajeMuestra / 100) * totalCeldas), maxMuestra) : totalCeldas;
 
-      if (totalCeldas > 100) {
-        muestra = Math.min(Math.ceil((porcentajeMuestra / 100) * totalCeldas), maxMuestra);
-      }
-
-      const indicesAleatorios = new Set<number>([0]);
+      const indicesAleatorios = new Set<number>([1]);
       while (indicesAleatorios.size < muestra) {
         const randomIndex = Math.floor(Math.random() * totalCeldas) + 1;
         indicesAleatorios.add(randomIndex);
       }
 
-      console.log('indicesAleatorios ', indicesAleatorios);
-
       const maxLength = Array.from(indicesAleatorios).reduce((max, rowIndex) => {
-        const cellValue = column.values[rowIndex] ? column.values[rowIndex].toString() : '';
+        const cellValue = column.values[rowIndex]?.toString() || '';
         return Math.max(max, cellValue.length);
       }, 0);
 
