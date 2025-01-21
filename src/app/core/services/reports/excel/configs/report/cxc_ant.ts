@@ -3,7 +3,7 @@ import { makeFileName } from '../../utils';
 
 export const csvConfig: multipleExportExcelConfigI = {
   detallado: {
-    fileName: (datos: string) => makeFileName(datos, 'cxc_ant_saldo_detallado'),
+    fileName: (datos: string, prefix: string = 'cxc_ant_saldo_detallado') => makeFileName(datos, prefix),
     fileNameDataKey: 'sub_titulo',
     columns: [
       { title: 'Cliente', key: 'cliente_nombre', uppercase: true },
@@ -17,7 +17,7 @@ export const csvConfig: multipleExportExcelConfigI = {
     ],
   },
   agrupado: {
-    fileName: (datos: string) => makeFileName(datos, 'cxc_ant_saldo_agrupado'),
+    fileName: (datos: string, prefix: string = 'cxc_ant_saldo_agrupado') => makeFileName(datos, prefix),
     fileNameDataKey: 'sub_titulo',
     columns: [
       { title: 'Cliente', key: 'cliente_nombre', uppercase: true },

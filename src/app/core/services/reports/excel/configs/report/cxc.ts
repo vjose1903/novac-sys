@@ -2,7 +2,7 @@ import { exportExcelConfigI } from '../../../../../interface/export-to-excel.int
 import { makeFileName } from '../../utils';
 
 export const csvConfig: exportExcelConfigI = {
-  fileName: (datos: string) => makeFileName(datos, 'cxc'),
+  fileName: (datos: string, prefix: string = 'cxc') => makeFileName(datos, prefix),
   fileNameDataKey: 'sub_titulo',
   columns: [
     { title: 'Fecha', key: 'fecha_equivalente', formato_fecha: true },

@@ -114,6 +114,8 @@ export class ArticuloC extends CrudG<ArticuloI> {
         break;
     }
 
+    
+
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {

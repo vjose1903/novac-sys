@@ -9,9 +9,11 @@ export interface exportExcelColumnsI {
 }
 
 export interface exportExcelConfigI {
-  fileName: (datos: string) => string;
+  prefix?: string;
+  fileName: (datos: string, prefix?: string) => string;
   columns: Array<exportExcelColumnsI>;
   fileNameDataKey: string;
+  indexToAddTitleRowInCols?: number;
 }
 
 export interface multipleExportExcelConfigI {

@@ -45,7 +45,7 @@ export class ExportToExcelService {
 
         excelData.push(...csvBody);
 
-        const fileName = `${config.fileName(exportData[config.fileNameDataKey])}`;
+        const fileName = `${config.fileName(exportData[config.fileNameDataKey], config.prefix)}`;
 
         this.exportCsv(fileName, excelData, config)
           .then(() => {
