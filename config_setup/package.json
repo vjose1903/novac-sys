@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "5.1.20",
+  "version": "5.1.21",
   "description": "Sistema facturacion e inventario NOVAC.",
   "author": {
     "name": "Victor Jose Vásquez Santos",
@@ -12,8 +12,8 @@
   "private": true,
   "scripts": {
     "ng": "ng",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "start": "npm-run-all -p ng:serve electron:serve",
     "build": "npm run electron:serve-tsc && ng build --stats-json --base-href ./",
     "build:dev": "npm run build -- -c dev",
