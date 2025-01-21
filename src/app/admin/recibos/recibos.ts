@@ -73,9 +73,6 @@ export class ReciboC extends CrudG<ReciboI> {
     requestParameters['tipo'] = reporteParams.data.tipo;
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
-
-    console.log("reporteParams.data.tipo ", reporteParams.data.tipo);
-    console.log("ReportGroupTypeE.detallado ", ReportGroupTypeE.detallado);
     
     ReporteC.configCsv = csvConfigReciboIngreso[reporteParams.data.tipo == ReportGroupTypeE.detallado ? 'detallado' : 'agrupado'];
 

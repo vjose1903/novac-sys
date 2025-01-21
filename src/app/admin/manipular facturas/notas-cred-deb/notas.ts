@@ -1,4 +1,3 @@
-import { inputViewerOptions } from './../../components/pdf-viewer/pdf-viewer';
 import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
 import { CrudG } from '../../../core/typescript/crud-g';
@@ -8,6 +7,7 @@ import { fun } from '../../../core/services/functions.service';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
 import { ModalClass } from '../../components/modal/modal-class';
 import { ReporteC } from '../../reportes/reporte';
+import { csvConfig } from '../../../core/services/reports/excel/configs/report/notas';
 
 export enum comprobanteNormal {
   debito = '03',
@@ -130,7 +130,7 @@ export class NotaC extends CrudG<any> {
     requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), tipo_factura_id: reporteParams.data.tipo };
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
-
+    ReporteC.configCsv = csvConfig;
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
       let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
 

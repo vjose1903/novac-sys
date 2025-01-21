@@ -114,9 +114,6 @@ export class FacturaC extends CrudG<FacturasI> {
   ];
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
-    console.log(" ");
-    console.log(" ---openModalReporteForm---");
-    
     return new Promise<any>((resolve, reject) => {
       if (params.tipo != 'movimientos_vehiculo') {
         params.inputs['switchGroup'] = {
@@ -160,9 +157,6 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static requestReporte(params: { reporte; pdf }) {
-    console.log(" ");
-    console.log(" ---requestReporte---");
-    
     if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switchGroup.array, item => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
@@ -170,9 +164,6 @@ export class FacturaC extends CrudG<FacturasI> {
 
       const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
       let formas_pago = '';
-      
-      console.log('params', params);
-      console.log('params.reporte.tipo', params.reporte.tipo);
 
       if (params.pdf.tipo != 'movimientos_vehiculo') {
         formas_pago = '(';
@@ -189,34 +180,30 @@ export class FacturaC extends CrudG<FacturasI> {
         if (params.reporte.data.tipo == ReportGroupTypeE.detallado || params.pdf.tipo == 'ventas_diarias') {
           configKey = `detallado${configApp.calcular_itbis ? '_itbis' : ''}`;
           if (params.pdf.tipo == 'ventas_diarias') prefix = params.pdf.tipo;
-
         } else if (params.reporte.data.tipo == ReportGroupTypeE.agrupado) {
           configKey = `agrupado${configApp.calcular_itbis ? '_itbis' : ''}`;
           prefix = 'ventas';
         }
-        console.log('configApp.calcular_itbis', configApp.calcular_itbis);
-        console.log('configKey', configKey);
 
         ReporteC.configCsv = csvConfigVentas[configKey];
         if (fun.hasValue(prefix)) ReporteC.configCsv.prefix = prefix;
-      }else{
+      } else {
         ReporteC.configCsv = csvConfigMovimientosVehiculo;
       }
-      
+
       requestParams.parameters['tipo_factura_id'] = params.reporte.data.tipo_factura_id;
       requestParams.parameters['tipo'] = params.reporte.data.tipo;
       requestParams.parameters['condicion'] = params.reporte.data.condicion;
       requestParams.parameters['desde'] = fun.my_dateFormater(params.reporte.data.desde, false);
       requestParams.parameters['hasta'] = fun.my_dateFormater(params.reporte.data.hasta, false);
-      
+
       for (let index = 0; index < FacturaC.inputsMovimientosViaje.length; index++) {
         const item = FacturaC.inputsMovimientosViaje[index];
         requestParams.parameters[item.formControl] = params.reporte.data[item.formControl];
       }
-      
+
       if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
-      
-      console.log('ReporteC.configCsv', ReporteC.configCsv);
+
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
         let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
 
