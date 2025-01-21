@@ -19,7 +19,7 @@
     }
 
     <!-- ----- FECHA -----  -->
-    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.dia_unico) || reportTypeHasfield(reportField.dateField)) {
+    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.one_day) || reportTypeHasfield(reportField.dateField)) {
     <div class="col-12 p-0">
       <div class="form-group">
         <label class="control-label mb-0">Fecha: <span style="color: red">*</span> </label>
@@ -33,7 +33,7 @@
 
     <!-- ----- DESDE -----  -->
 
-    @if (reportTypeHasfield(reportField.fromField) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
+    @if (reportTypeHasfield(reportField.fromField) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.range) ) {
     <div class="col-6 pl-0">
       <div class="form-group">
         <label class="control-label mb-0">Desde: <span style="color: red">*</span> </label>
@@ -46,7 +46,7 @@
     }
 
     <!-- ----- HASTA -----  -->
-    @if ( reportTypeHasfield(reportField.toDateField)|| (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
+    @if ( reportTypeHasfield(reportField.toDateField)|| (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.range) ) {
     <div class="col-6 pr-0">
       <div class="form-group">
         <label class="control-label mb-0">Hasta: <span style="color: red">*</span> </label>

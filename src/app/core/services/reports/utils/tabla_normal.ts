@@ -80,7 +80,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
         } as TablaPdfMake)
       : { text: Array.isArray(contendio_) ? configuration.mensaje_contenido_vacio : '', margin: [0, 2, 0, 5] },
 
-    Array.isArray(contendio_) && contendio_.length > 0 ? getTotalizacion(configuration, data_) : { text: '' },
+    Array.isArray(contendio_) && contendio_.length > 0 || data_ && 'contenido_titulo' in data_ && data_.contenido_titulo == 'TOTAL GENERAL' && index_info == 1 ? getTotalizacion(configuration, data_) : { text: '' },
   ];
 
   return content;
@@ -92,7 +92,9 @@ function getTotalizacion(configuration, data) {
     unbreakable: true,
   };
 
+
   if ((data.total >= 0 && (data?.contenido_grupo?.length > 0 || data?.contenido_reporte?.length > 0)) || data.total >= 1) {
+    
     const array = [
       { bool: configuration?.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.roundNumberToDecimal(data?.bruto) },
       { bool: configuration?.mostrar_descuento, title: 'DESCUENTO RD$ ', value: fun_.roundNumberToDecimal(data?.descuento) },

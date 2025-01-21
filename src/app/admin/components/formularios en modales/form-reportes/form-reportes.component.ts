@@ -3,7 +3,7 @@ import { Ss } from './../../../../core/services/singleton.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { tFacturaD } from './../../../facturacion/factura';
-import { dateRangeType, serie } from './../../../../core/typescript/constantes';
+import { serie } from './../../../../core/typescript/constantes';
 // import { CxP } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
@@ -14,12 +14,14 @@ import { ModalI } from '../../modal/modal-class';
 // import { TipoPagoReporte } from '../../../pagos/class/pagos/pagos';
 // import { TipoReciboReporte } from '../../../pagos/class/ingresos/recibos';
 import { reportField } from './form-reportes.component.model';
+import { ReportDateTypeE, ReportGroupTypeE } from '../../../../admin/reportes/reporte.utils';
+
 
 @Component({
-    selector: 'app-form-reportes',
-    templateUrl: './form-reportes.component.html',
-    styleUrls: ['./form-reportes.component.scss'],
-    standalone: false
+  selector: 'app-form-reportes',
+  templateUrl: './form-reportes.component.html',
+  styleUrls: ['./form-reportes.component.scss'],
+  standalone: false,
 })
 export class FormReportesComponent extends MixinClass implements OnInit, ModalI {
   fun = fun;
@@ -52,7 +54,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     { label: 'Electronica', value: serie.electronica, disabled: true },
   ];
 
-  dateRangeType = dateRangeType;
+  ReportDateTypeE = ReportDateTypeE;
   constructor(private fb: UntypedFormBuilder) {
     super();
   }
@@ -98,9 +100,9 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   async getArticulos(name) {
     if (fun.hasValue(name)) {
-      fun.awaitTyping().then((res) => {
+      fun.awaitTyping().then(res => {
         try {
-          this.articuloClass.getArticulosFiltrado({ buscar: name, fecha: this.Fecha, paginado: false, is_compra: true }).then((res) => (this.listaArticulos = res['data']));
+          this.articuloClass.getArticulosFiltrado({ buscar: name, fecha: this.Fecha, paginado: false, is_compra: true }).then(res => (this.listaArticulos = res['data']));
         } catch (error) {
           console.error(error);
           fun.toastError('Error buscando articulos registrados.', 'ERROR');
@@ -113,12 +115,12 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   async getClientes(name) {
     if (fun.hasValue(name)) {
-      fun.awaitTyping().then((res) => {
+      fun.awaitTyping().then(res => {
         const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false } };
 
-        this.clienteClass.getAll(extra).then((res) => {
-          res['data'].map((cliente) => {
-            cliente.documentos_de_identidad.map((docu) => {
+        this.clienteClass.getAll(extra).then(res => {
+          res['data'].map(cliente => {
+            cliente.documentos_de_identidad.map(docu => {
               if (docu.principal) cliente.documento_identidad = docu.documento;
             });
             return cliente;
@@ -151,11 +153,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'recibos') {
       this.tipos = [
-        { id: 'detallado', label: 'Detallado' },
-        { id: 'agrupado', label: 'Agrupado' },
+        { id: ReportGroupTypeE.detallado, label: 'Detallado' },
+        { id: ReportGroupTypeE.agrupado, label: 'Agrupado' },
       ];
 
-      tipo_selected = 'detallado';
+      tipo_selected = ReportGroupTypeE.detallado;
       //
     } else if (this.inputs.tipo_reporte == 'pago_facturas') {
       this.tipos = [
@@ -163,15 +165,15 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
         // { id: TipoPagoReporte.agrupado, label: 'Agrupado' },
       ];
 
-      tipo_selected = 'detallado';
+      tipo_selected = ReportGroupTypeE.detallado;
     } else if (this.inputs.tipo_reporte == 'ventas_rango') {
       this.tipos = [
-        { id: 'detallado', label: 'Detallado' },
-        { id: 'agrupado', label: 'Agrupado' },
+        { id: ReportGroupTypeE.detallado, label: 'Detallado' },
+        { id: ReportGroupTypeE.agrupado, label: 'Agrupado' },
       ];
 
       serie_selected = serie.no;
-      tipo_selected = 'detallado';
+      tipo_selected = ReportGroupTypeE.detallado;
       condicion_selected = 'todos';
 
       //
@@ -205,8 +207,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       }
     } else if (this.inputs.tipo_reporte == 'ventas_productos') {
       this.tipos = [
-        { id: dateRangeType.dia_unico, label: 'Dia único' },
-        { id: dateRangeType.rango_fecha, label: 'Rango fechas' },
+        { id: ReportDateTypeE.one_day, label: 'Dia único' },
+        { id: ReportDateTypeE.range, label: 'Rango fechas' },
       ];
       //
     }
@@ -278,7 +280,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
     this.tipos_facturas = [{ label: 'Todos', id: 0 }];
 
-    fun.deepCloning(Ss.factServ.lista_tipos_facturas).forEach((tipo_factura) => {
+    fun.deepCloning(Ss.factServ.lista_tipos_facturas).forEach(tipo_factura => {
       if (tipos_aceptados.includes(tipo_factura.descripcion)) {
         this.tipos_facturas.push({ label: tipo_factura.descripcion, id: Number(tipo_factura.id) });
       }
@@ -292,9 +294,9 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     const control = this.form.controls;
 
     if (this.inputs.tipo_reporte == 'ventas_productos') {
-      ['fecha', 'desde', 'hasta'].forEach((control) => this.removeValidator(control));
+      ['fecha', 'desde', 'hasta'].forEach(control => this.removeValidator(control));
 
-      if (control.tipo.value == '1') {
+      if (control.tipo.value == ReportDateTypeE.one_day) {
         this.form.controls.fecha.setValue(new Date());
         this.setValidator('fecha');
       } else {
@@ -328,7 +330,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   btn_aceptar() {
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
+    const modal = this.modal.instance.modalsConfig.find(config => config.id == this.modal.component_id);
     modal.closeModal(this.modal.component_id);
     modal.returnDataFromModal({ data: { ...this.form.value, switchGroup: { ...this.inputs.switchGroup } }, modal_id: this.modal.component_id });
   }

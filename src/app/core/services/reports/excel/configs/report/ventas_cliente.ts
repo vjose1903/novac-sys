@@ -1,9 +1,11 @@
 import { exportExcelConfigI } from '../../../../../interface/export-to-excel.interface';
+import { ReportTypeE } from '../../excel.interfaces';
 import { makeFileName } from '../../utils';
 
 export const csvConfig: exportExcelConfigI = {
-  fileName: (datos: string, prefix: string = 'cuentas_con_pagos') => makeFileName(datos, prefix),
+  fileName: (datos: string, prefix: string = 'ventas_cliente') => makeFileName(datos, prefix),
   fileNameDataKey: 'sub_titulo',
+  type: ReportTypeE.normal, 
   columns: [
     { title: 'Fecha', key: 'fecha_equivalente', formato_fecha: true },
     { title: 'Factura', key: 'numero_comprobante' },

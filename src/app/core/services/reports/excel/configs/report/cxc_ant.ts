@@ -1,10 +1,12 @@
 import { multipleExportExcelConfigI } from '../../../../../interface/export-to-excel.interface';
+import { ReportTypeE } from '../../excel.interfaces';
 import { makeFileName } from '../../utils';
 
 export const csvConfig: multipleExportExcelConfigI = {
   detallado: {
     fileName: (datos: string, prefix: string = 'cxc_ant_saldo_detallado') => makeFileName(datos, prefix),
     fileNameDataKey: 'sub_titulo',
+    type: ReportTypeE.normal, 
     columns: [
       { title: 'Cliente', key: 'cliente_nombre', uppercase: true },
       { title: 'Fecha', key: 'fecha_equivalente', formato_fecha: true },
@@ -19,6 +21,7 @@ export const csvConfig: multipleExportExcelConfigI = {
   agrupado: {
     fileName: (datos: string, prefix: string = 'cxc_ant_saldo_agrupado') => makeFileName(datos, prefix),
     fileNameDataKey: 'sub_titulo',
+    type: ReportTypeE.normal, 
     columns: [
       { title: 'Cliente', key: 'cliente_nombre', uppercase: true },
       { title: '0 - 30 Dias', key: 'cero_to_treinta', nullIfCero: true, bodyFormat: '#,##0.00' },

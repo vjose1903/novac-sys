@@ -13,6 +13,7 @@ import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/reports/pdf/pdf.service';
 import { serie } from '../../core/typescript/constantes';
 import { csvConfig as csvConfigVentas } from '../../core/services/reports/excel/configs/report/ventas';
+import { ReportGroupTypeE } from '../../admin/reportes/reporte.utils';
 
 export enum comprobanteNormal {
   valor_fiscal = '01',
@@ -184,11 +185,11 @@ export class FacturaC extends CrudG<FacturasI> {
         let configKey = '';
         let prefix = null;
 
-        if (params.reporte.data.tipo == 'detallado' || params.pdf.tipo == 'ventas_diarias') {
+        if (params.reporte.data.tipo == ReportGroupTypeE.detallado || params.pdf.tipo == 'ventas_diarias') {
           configKey = `detallado${configApp.calcular_itbis ? '_itbis' : ''}`;
           if (params.pdf.tipo == 'ventas_diarias') prefix = params.pdf.tipo;
 
-        } else if (params.reporte.data.tipo == 'agrupado') {
+        } else if (params.reporte.data.tipo == ReportGroupTypeE.agrupado) {
           configKey = `agrupado${configApp.calcular_itbis ? '_itbis' : ''}`;
           prefix = 'ventas';
         }

@@ -1,3 +1,5 @@
+import { ReportTypeE } from "../services/reports/excel/excel.interfaces";
+
 export interface exportExcelColumnsI {
   title: string;
   key: string;
@@ -13,7 +15,13 @@ export interface exportExcelConfigI {
   fileName: (datos: string, prefix?: string) => string;
   columns: Array<exportExcelColumnsI>;
   fileNameDataKey: string;
-  indexToAddTitleRowInCols?: number;
+  titleRowInCols?: exportExcelTitleRowInColsI;
+  type: ReportTypeE;
+}
+
+export interface exportExcelTitleRowInColsI {
+  index: number;
+  title: string;
 }
 
 export interface multipleExportExcelConfigI {

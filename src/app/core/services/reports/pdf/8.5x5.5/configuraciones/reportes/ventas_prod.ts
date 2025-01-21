@@ -20,7 +20,7 @@ export const config_ventas_prod = {
         },
       ],
     },
-    {
+    { 
       margin_general: [0, 0, 0, 0],
       isBreak: false,
       only_titulo: false,

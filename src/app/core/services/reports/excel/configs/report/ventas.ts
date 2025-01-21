@@ -1,10 +1,12 @@
 import { multipleExportExcelConfigI } from '../../../../../interface/export-to-excel.interface';
+import { ReportTypeE } from '../../excel.interfaces';
 import { makeFileName } from '../../utils';
 
 export const csvConfig: multipleExportExcelConfigI = {
   detallado: {
     fileName: (datos: string, prefix: string = 'ventas') => makeFileName(datos, prefix),
     fileNameDataKey: 'titulo_reporte',
+    type: ReportTypeE.normal,
     columns: [
       { title: 'Fecha', key: 'fecha_equivalente', formato_fecha: true },
       { title: 'Factura', key: 'numero_comprobante' },
@@ -16,6 +18,7 @@ export const csvConfig: multipleExportExcelConfigI = {
   detallado_itbis: {
     fileName: (datos: string, prefix: string = 'ventas') => makeFileName(datos, prefix),
     fileNameDataKey: 'titulo_reporte',
+    type: ReportTypeE.normal,
     columns: [
       { title: 'Fecha', key: 'fecha_equivalente', formato_fecha: true },
       { title: 'Factura', key: 'numero_comprobante' },
@@ -29,6 +32,7 @@ export const csvConfig: multipleExportExcelConfigI = {
   agrupado: {
     fileName: (datos: string, prefix: string = 'ventas') => makeFileName(datos, prefix),
     fileNameDataKey: 'titulo_reporte',
+    type: ReportTypeE.normal,
     columns: [
       { title: 'Fecha', key: 'fecha' },
       { title: 'Ventas al contado', key: 'ventas_contado', bodyFormat: '#,##0.00' },
@@ -41,6 +45,7 @@ export const csvConfig: multipleExportExcelConfigI = {
   agrupado_itbis: {
     fileName: (datos: string, prefix: string = 'ventas') => makeFileName(datos, prefix),
     fileNameDataKey: 'titulo_reporte',
+    type: ReportTypeE.normal, 
     columns: [
       { title: 'Fecha', key: 'fecha' },
       { title: 'Ventas al contado', key: 'ventas_contado', bodyFormat: '#,##0.00' },
