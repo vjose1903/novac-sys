@@ -14,7 +14,7 @@ export interface exportExcelConfigI {
   prefix?: string;
   fileName: (datos: string, prefix?: string) => string;
   columns: Array<exportExcelColumnsI>;
-  fileNameDataKey: string;
+  fileNameDataKey?: string;
   titleRowInCols?: exportExcelTitleRowInColsI;
   type: ReportTypeE;
 }

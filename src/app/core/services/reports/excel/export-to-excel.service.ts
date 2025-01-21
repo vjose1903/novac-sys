@@ -28,7 +28,7 @@ export class ExportToExcelService {
 
         this.addRows(config, excelData, exportData);
 
-        const fileName = `${config.fileName(exportData[config.fileNameDataKey], config.prefix)}`;
+        const fileName = `${config.fileName(exportData?.[config?.fileNameDataKey], config.prefix)}`;
 
         this.exportCsv(fileName, excelData, config)
           .then(() => {
