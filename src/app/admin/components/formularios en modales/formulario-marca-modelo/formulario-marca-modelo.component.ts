@@ -1,5 +1,5 @@
 import { HtmlElementsService } from './../../../../core/services/html-elements.service';
-import { Component, OnInit, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, inject, signal, effect } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { GLOBAL } from '../../../../core/typescript/GLOBAL';
 import * as _ from 'lodash';
@@ -16,10 +16,12 @@ import { NgxPermissionsService } from 'ngx-permissions';
   selector: 'app-formulario-marca-modelo',
   templateUrl: './formulario-marca-modelo.component.html',
   styleUrls: ['./formulario-marca-modelo.component.scss'],
+  standalone: false,
 })
 export class FormularioMarcaModeloComponent extends MixinClass implements OnInit, ModalI {
   @Input() tipo_formulario;
-  tabIndex;
+  tabIndex = signal(0);
+  processingTabChange = true;
 
   tituloTabla;
   @Output() accion_ = new EventEmitter<any>();
@@ -83,6 +85,25 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
+
+    effect(() => {
+      if (fun.hasValue(this.tabIndex()) && !this.processingTabChange) {
+        const has_permisos = { 0: this.hasPermissionsMarca, 1: this.hasPermissionsModelo };
+        this.processingTabChange = true;
+
+        if (has_permisos[this.tabIndex()]) {
+          const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex()]);
+          this.pedirNuevaData(actual_pagination);
+        } else {
+          fun.toastError('No tiene permisos para realizar esta accion', 'No Autorizado');
+          setTimeout(() => {
+            this.tabIndex.set(this.tabIndex() == 0 ? 1 : 0);
+          }, 1);
+        }
+
+        setTimeout(() => (this.processingTabChange = false), 250);
+      }
+    });
   }
 
   modal: any = {};
@@ -94,11 +115,11 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.tipo_formulario = this.inputs.tipo;
 
     if (this.tipo_formulario === 'marcas') {
-      this.tabIndex = 0;
+      this.tabIndex.set(0);
       this.tituloTabla = 'Marcas';
       this.campo1 = 'Marca';
     } else if (this.tipo_formulario === 'modelos') {
-      this.tabIndex = 1;
+      this.tabIndex.set(1);
       this.tituloTabla = 'Modelos';
       this.campo1 = 'Marca';
     }
@@ -112,6 +133,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.pedirNuevaData(this.tServ.obj_paginate.default);
 
     setTimeout(() => {
+      this.processingTabChange = false;
       if (this.tipo_formulario === 'modelos') fun.enfocarInput('marca_modal');
       else fun.enfocarInput('descripcion');
     }, 200);
@@ -166,25 +188,13 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.formModelo = this.fb.group({ descripcion: [null], marca_id: [null], id: [null] });
   }
 
-  clickTabView() {
-    const has_permisos = { 0: this.hasPermissionsMarca, 1: this.hasPermissionsModelo };
-
-    if (has_permisos[this.tabIndex]) {
-      const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex]);
-      this.pedirNuevaData(actual_pagination);
-    } else {
-      fun.toastError('No tiene permisos para realizar esta accion', 'No Autorizado');
-      setTimeout(() => (this.tabIndex = this.tabIndex == 0 ? 1 : 0), 1);
-    }
-  }
-
   async pedirNuevaData(params?: { per_page?: number; page?: number; search?: string }) {
-    if (!this.isShowMarcas()) {
-      this.getModelos(params);
-    } else if (this.isShowMarcas()) {
+    if (this.isShowMarcas()) {
       params['paginado'] = true;
       this.getMarcas(params);
       this.getMarcas({ paginado: false, search: ' ', page: 1, per_page: 1 });
+    } else {
+      this.getModelos(params);
     }
   }
 
@@ -222,7 +232,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   isShowMarcas() {
-    return this.componente[this.tabIndex] == 'listado_marcas';
+    return this.componente[this.tabIndex()] == 'listado_marcas';
   }
 
   tableClick_action(params) {
@@ -262,7 +272,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       siFunction: () => {
         const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
         clase.deleteOne(regisData.id).then((res) => {
-          const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex]);
+          const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex()]);
           this.pedirNuevaData(actual_pagination);
         });
       },

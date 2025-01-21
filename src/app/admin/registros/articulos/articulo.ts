@@ -2,6 +2,8 @@ import { CrudG } from '../../../core/typescript/crud-g';
 import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '../../../core/services/functions.service';
+import { csvConfig as ventas_producto_csvConfig } from '../../../core/services/reports/excel/configs/report/ventas_producto';
+import { ReportDateTypeE } from '../../reportes/reporte.utils';
 
 export enum tipos_articulos {
   veterinaria = 'veterinaria',
@@ -105,14 +107,17 @@ export class ArticuloC extends CrudG<ArticuloI> {
 
     switch (pdfParams.tipo) {
       case 'ventas_productos':
-        if (reporteParams.data.tipo == '1') requestParameters = { desde: fun.my_dateFormater(reporteParams.data.fecha, false) };
+        if (reporteParams.data.tipo == ReportDateTypeE.one_day) requestParameters = { desde: fun.my_dateFormater(reporteParams.data.fecha, false) };
         else requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false) };
 
+        ReporteC.configCsv = ventas_producto_csvConfig;
         break;
 
       default:
         break;
     }
+
+    
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 

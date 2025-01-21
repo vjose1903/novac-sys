@@ -1,28 +1,30 @@
 const { autoUpdater } = require('electron-updater');
 
-
 import SharedElectronAngular, {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
   ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
   ELECTRON_EVENT_UPDATE_ERROR,
   ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
-  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE
+  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
 } from './shared-electron-angular';
 
 import { writeLogs } from '../main';
 
 export default class AppUpdater {
-  constructor(win) {
-    writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
+  constructor(win, serve_) {
+    if (!serve_) {
+      writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
 
-    const log = require('electron-log');
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
+      const log = require('electron-log');
+      log.transports.file.level = 'info';
+      autoUpdater.logger = log;
 
-    // this.checkUpdates(win);
-    this.checkForUpdates(win);
+      // this.checkUpdates(win);
+      this.checkForUpdates(win);
+    }
   }
+
 
   async checkUpdates(win) {
     try {

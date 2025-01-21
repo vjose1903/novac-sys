@@ -2,7 +2,8 @@ import { Directive, ElementRef, EventEmitter, HostListener, Input, Output } from
 import { fun } from '../services/functions.service';
 
 @Directive({
-  selector: '[DataFilter]',
+    selector: '[DataFilter]',
+    standalone: false
 })
 export class DataFilterDirective {
   @Input('DataFilter') copyData: string;

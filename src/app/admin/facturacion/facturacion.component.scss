@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Orbitron&display=swap');
 
 .overlayExtra {
   max-width: 20rem;
@@ -26,7 +26,7 @@
 .containMovimientoViaje {
   display: grid;
 
-  grid-template-areas: "camionSelector choferSelector";
+  grid-template-areas: 'camionSelector choferSelector';
   grid-template-rows: auto auto;
 
   .camionSelector {
@@ -124,8 +124,8 @@
   height: 100%;
   display: grid;
   grid-template-areas:
-    "colTitulo"
-    "colCard";
+    'colTitulo'
+    'colCard';
 
   grid-template-rows: min-content auto;
 
@@ -141,9 +141,9 @@
   display: grid;
   height: 100%;
   grid-template-areas:
-    "cabezaFactura"
-    "cuerpoFactura"
-    "pieFactura";
+    'cabezaFactura'
+    'cuerpoFactura'
+    'pieFactura';
 
   grid-template-rows: min-content auto min-content;
   .cabezaFactura {
@@ -208,7 +208,7 @@
   width: 100%;
   background-color: var(--primary10);
   border-radius: 0.5rem;
-  font-family: "Orbitron", sans-serif;
+  font-family: 'Orbitron', sans-serif;
   font-size: 2rem;
   color: white;
   bottom: 1rem;
@@ -263,7 +263,6 @@
   }
 }
 
-
 .btn_side_bar_facturas {
   position: absolute;
   transform: translate(-1.6rem, 49vh);
@@ -302,11 +301,11 @@
 
 ::ng-deep .my_sidebar {
   z-index: 9999 !important;
-  padding: 0.5rem !important;
   opacity: 1 !important;
   box-shadow: -13px 0px 20px 0 #00000029 !important;
   flex-direction: inherit !important;
   display: block !important;
+  border: 0 solid transparent !important;
 
   &.large {
     width: 30rem !important;
@@ -314,29 +313,27 @@
   &.x-large {
     width: 40rem !important;
   }
-  .p-sidebar-header {
-    display: none;
-  }
-  .p-sidebar-content {
-    overflow: initial !important;
+  .p-drawer-content {
+    overflow: visible;
     padding: 0 !important;
 
-    > .contendioSidebar {
+    .contendioSidebar {
       overflow: hidden;
       display: grid;
 
       grid-template-areas:
-        "head"
-        "cuerpoContenidoSidar";
-      row-gap: 0.5rem;
+        'head'
+        'cuerpoContenidoSidar';
       grid-template-rows: min-content auto;
 
       > .head {
         grid-area: head;
         width: 100%;
         border-bottom: 1px solid var(--transparente05) !important;
+        padding: 1rem 0.5rem;
+
         > .tituloSidebar {
-          font-size: 1.5rem;
+          font-size: 1.4rem;
           color: var(--primary10);
           padding: 0;
           font-weight: 500;
@@ -353,12 +350,18 @@
       }
     }
   }
+  
+
+  .p-drawer-header {
+    display: none;
+  }
 
   &.side_open {
-    .p-sidebar-content {
+    .p-drawer-content {
       > .btn_side_bar_facturas {
+        transform: translate(-1rem, 49vh);
         > #triangualo {
-          transform: rotate(180deg) translate(-3px, 0px);
+          transform: rotate(180deg);
         }
       }
     }

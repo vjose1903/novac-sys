@@ -19,6 +19,11 @@ import { FormulariosEnModalesModule } from './admin/components/formularios en mo
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { ConfirmacionImprimirComponent } from './admin/facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
 import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
+import { primeNGLocales } from './core/typescript/primeNG.locales';
+import Nora from '@primeng/themes/nora';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+
+import { providePrimeNG } from 'primeng/config';
 
 @NgModule({
   declarations: [AppComponent, NgInitDirective, PageNotFoundComponent, ConfirmacionImprimirComponent],
@@ -38,6 +43,22 @@ import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
     NewModalModule,
     FormulariosEnModalesModule,
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true }, NgxExtendedPdfViewerService, provideHttpClient(withInterceptorsFromDi())],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
+    NgxExtendedPdfViewerService,
+    provideHttpClient(withInterceptorsFromDi()),
+    provideAnimationsAsync(),
+    providePrimeNG({
+      theme: {
+        preset: Nora,
+        options: {
+          prefix: 'p',
+          darkModeSelector: false || 'none',
+          cssLayer: false,
+        },
+      },
+      translation: primeNGLocales,
+    }),
+  ],
 })
 export class AppModule {}

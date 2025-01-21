@@ -8,11 +8,12 @@ import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
 import { table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { ConfigI } from '../../../../core/typescript/config-interface';
+import { ConfigI } from '../../../../core/interface/config-interface';
 @Component({
-  selector: 'app-buscar-cliente-suplidor',
-  templateUrl: './buscar-cliente-suplidor.component.html',
-  styleUrls: ['./buscar-cliente-suplidor.component.scss'],
+    selector: 'app-buscar-cliente-suplidor',
+    templateUrl: './buscar-cliente-suplidor.component.html',
+    styleUrls: ['./buscar-cliente-suplidor.component.scss'],
+    standalone: false
 })
 export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit, ModalI {
   constructor(private tServ: TablasService) {
@@ -65,7 +66,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
-    const configApp = Ss.configServ.getConfig({ isPromise: false });
+    
     const copyData = fun.deepCloning(this.dataFiltro);
 
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
@@ -77,7 +78,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
       });
 
       if (res.data && res.data.length > 0) {
-        const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
+        const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null };
         if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado && !this.isSuplidor) res.data.unshift(cliente_contado);
 
         res.data.map(async (entidad) => {

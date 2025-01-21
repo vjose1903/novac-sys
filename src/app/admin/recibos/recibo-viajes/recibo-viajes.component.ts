@@ -15,9 +15,10 @@ import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-recibo-viajes',
-  templateUrl: './recibo-viajes.component.html',
-  styleUrls: ['./recibo-viajes.component.scss'],
+    selector: 'app-recibo-viajes',
+    templateUrl: './recibo-viajes.component.html',
+    styleUrls: ['./recibo-viajes.component.scss'],
+    standalone: false
 })
 export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;

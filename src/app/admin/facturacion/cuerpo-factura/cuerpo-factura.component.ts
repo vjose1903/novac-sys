@@ -10,15 +10,16 @@ import { BuscarArticuloComponent } from '../../components/formularios en modales
 import { fun } from '../../../core/services/functions.service';
 import { RemoverArticuloComponent } from './remover-articulo/remover-articulo.component';
 import { razon_remover } from './remover-articulo/contantes';
-import { ConfigI } from '../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
 import { ModalClass } from '../../components/modal/modal-class';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-  selector: 'app-cuerpo-factura',
-  templateUrl: './cuerpo-factura.component.html',
-  styleUrls: ['./cuerpo-factura.component.scss'],
+    selector: 'app-cuerpo-factura',
+    templateUrl: './cuerpo-factura.component.html',
+    styleUrls: ['./cuerpo-factura.component.scss'],
+    standalone: false
 })
 export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;
@@ -50,7 +51,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   articuloClass = new ArticuloC();
   minCodigo;
 
-  dropRowConfig: any;
+  dropRowMenu: any;
   configApp: ConfigI;
   dropdownMedidaOpen: boolean = false;
 
@@ -153,9 +154,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  abrirOverlay(dropRowConfig, event) {
-    this.dropRowConfig = dropRowConfig;
-    this.dropRowConfig.toggle(event);
+  abrirOverlay(dropRowMenu, event, index_cuerpo) {
+    if (this.checkIfRowContainArticulo(index_cuerpo)) {
+      this.dropRowMenu = dropRowMenu;
+      this.dropRowMenu.toggle(event);
+    }
   }
 
   readPrecio() {
@@ -727,7 +730,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const label = this.factServ.isCompra ? 'costo' : 'precio';
     this.confirmationModal({ id: 'get_actual_price', header: 'Confirmar', texto: `Seguro que desea obtener el ${label} actual`, siFunction: siFunction });
 
-    if (this.dropRowConfig) this.dropRowConfig.hide();
+    if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();
   }
 
@@ -766,7 +769,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
     });
 
-    if (this.dropRowConfig) this.dropRowConfig.hide();
+    if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();
   }
 
@@ -792,7 +795,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       botones: { aceptar: { show: true, disable: true }, cancelar: { show: true, disable: false } },
     });
 
-    if (this.dropRowConfig) this.dropRowConfig.hide();
+    if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();
   }
 

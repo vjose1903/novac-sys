@@ -7,6 +7,7 @@ import { table_config } from '../../components/new_tablas/tabla-class';
   selector: 'app-detalle-nota',
   templateUrl: './detalle-nota.component.html',
   styleUrls: ['./detalle-nota.component.scss'],
+  standalone: false,
 })
 export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
   constructor() {
@@ -21,15 +22,13 @@ export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '50%' }, { 'padding-left': '1rem' }] },
-      { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', estilos: [{ width: '25%' }] },
-      { titulo: 'Unidad', key: 'unidad', tipo: 'text', estilos: [{ width: '25%' }] },
+      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', style: { 'text-align': 'left', width: '50%', 'padding-left': '1rem' } },
+      { titulo: 'Cantidad', key: 'cantidad', tipo: 'formatoNumero', style: { width: '25%' } },
+      { titulo: 'Unidad', key: 'unidad', tipo: 'text', style: { width: '25%' } },
     ],
     id_tabla: 'detalles_notas',
     obj_paginate: { show: false },
   };
-
-  show: boolean = true;
 
   ngOnInit(): void {
     this.parseInfo();
@@ -48,11 +47,6 @@ export class DetalleNotaComponent extends MixinClass implements OnInit, ModalI {
       });
       return factura_aplicada;
     });
-  }
-
-  clickTabView(index) {
-    this.show = false;
-    setTimeout(() => (this.show = true), 10);
   }
 
   numFormat(str) {

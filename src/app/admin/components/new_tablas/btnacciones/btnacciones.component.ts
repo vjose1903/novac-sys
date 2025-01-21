@@ -6,9 +6,10 @@ import { fun } from '../../../../core/services/functions.service';
 import { botonesTableI } from '../tabla-class';
 
 @Component({
-  selector: 'app-btnacciones',
-  templateUrl: './btnacciones.component.html',
-  styleUrls: ['./btnacciones.component.scss'],
+    selector: 'app-btnacciones',
+    templateUrl: './btnacciones.component.html',
+    styleUrls: ['./btnacciones.component.scss'],
+    standalone: false
 })
 export class NewBTNACCIONESComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() botones: botonesTableI;

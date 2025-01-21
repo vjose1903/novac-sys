@@ -7,9 +7,10 @@ import { ModalI } from '../../modal/modal-class';
 import { MovimientosC } from './movimiento-model';
 
 @Component({
-  selector: 'app-movimientos-form',
-  templateUrl: './movimientos-form.component.html',
-  styleUrls: ['./movimientos-form.component.scss'],
+    selector: 'app-movimientos-form',
+    templateUrl: './movimientos-form.component.html',
+    styleUrls: ['./movimientos-form.component.scss'],
+    standalone: false
 })
 export class MovimientosFormComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   form;

@@ -5,9 +5,10 @@ import { ModalI } from '../../modal/modal-class';
 import * as _ from 'lodash';
 
 @Component({
-  selector: 'app-pendiente-form',
-  templateUrl: './pendiente-form.component.html',
-  styleUrls: ['./pendiente-form.component.scss'],
+    selector: 'app-pendiente-form',
+    templateUrl: './pendiente-form.component.html',
+    styleUrls: ['./pendiente-form.component.scss'],
+    standalone: false
 })
 export class PendienteFormComponent implements OnInit, ModalI {
   time = { hour: 13, minute: 30 };

@@ -19,7 +19,7 @@
         <thead class="text-center position-relative thead letras {{ config.redondo ? 'redondo' : '' }} {{ config.colorTitulo ? 'colorTitulo' : 'noColorTitulo' }}">
           <tr id="titulosHeader-{{ realIdTabla }}" class="titulosHeader">
             @for (row of config.info; track $index; let index_head = $index) {
-            <th class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ realIdTabla }}_{{ row.key }}">
+            <th class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="row?.style ? row.style : {}">
               <span>
                 @switch (row?.tipo) { @case ('inputSwitch') {
                 <span>
@@ -61,7 +61,7 @@
                 'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData })
               }"
               style="cursor: pointer; color: var(--letras)"
-              [ngStyle]="{ 'background-color': this.changeBackGroundColor(rowData) }"
+              [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
               #RowElement
               (click)="clickROW(rowData, getIndex(indexBody))"
             >
@@ -123,7 +123,7 @@
                     </span>
                     } @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing) {
                     <div>
-                      <p-dropdown
+                      <p-select
                         #dropdown
                         [virtualScroll]="true"
                         [virtualScrollItemSize]="34"
@@ -141,7 +141,7 @@
                         emptyFilterMessage="valor_buscado_no_se_encuentra"
                         (onChange)="changeValorInput(column, column.dropdown_key, getIndex(indexBody), dropdown.value, rowData)"
                       >
-                      </p-dropdown>
+                      </p-select>
                     </div>
                     }
                   </span>
@@ -209,9 +209,8 @@
               <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
             </div>
             }
-            <!-- <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center" (resized)="divPaginatorChangeWidth($event)"> -->
+
             <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center">
-              <!-- <button class="btn mr-2" value="" id="btn-blanco" (click)="test()">test</button> -->
               <p-paginator
                 id="paginator-{{ realIdTabla }}"
                 [first]="tServ.getPaginationById(realIdTabla)?.page_front"
@@ -219,7 +218,7 @@
                 [pageLinkSize]="cantPagesView"
                 [totalRecords]="config.total_count"
                 [rowsPerPageOptions]="tServ.getPaginationById(realIdTabla)?.per_page_options"
-                styleClass="paginator-dinamic-table {{ config?.obj_paginate?.showDropDown ? '' : 'no-show-dropdown' }}"
+                styleClass="{{ config?.obj_paginate?.showDropDown ? '' : 'no-show-dropdown' }}"
                 dropdownAppendTo="body"
                 (onPageChange)="paginatorChange($event, realIdTabla)"
               ></p-paginator>

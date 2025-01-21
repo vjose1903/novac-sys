@@ -1,7 +1,8 @@
 import { Directive, Input, ViewContainerRef } from '@angular/core';
 
 @Directive({
-  selector: '[appModal]',
+    selector: '[appModal]',
+    standalone: false
 })
 export class ModalDirective {
   @Input('appModal') modal_id;

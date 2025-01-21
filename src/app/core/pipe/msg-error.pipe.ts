@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 
 @Pipe({
-  name: 'msgError',
+    name: 'msgError',
+    standalone: false
 })
 export class MsgErrorPipe implements PipeTransform {
   transform(formControl: UntypedFormGroup): unknown {

@@ -9,7 +9,6 @@ import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
-import { PrimeNGConfig } from 'primeng/api';
 
 import {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
@@ -18,13 +17,13 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
-  KEYWORD_ELECTRON_QUIT_APP,
-  KEYWORD_ELECTRON_GET_APP_CONFIG,
-  KEYWORD_ELECTRON_RELOAD,
+  ELECTRON_QUIT_APP,
+  ELECTRON_GET_APP_CONFIG,
+  ELECTRON_RELOAD,
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';
-import { ConfigI } from './core/typescript/config-interface';
+import { ConfigI } from './core/interface/config-interface';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
@@ -36,6 +35,7 @@ import { FacturacionService } from './admin/facturacion/facturacion.service';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  standalone: false,
 })
 export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
   @HostListener('window:keydown', ['$event'])
@@ -71,9 +71,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
-    public permissionsService: NgxPermissionsService,
-
-    private config: PrimeNGConfig,
+    public permissionsService: NgxPermissionsService
   ) {
     super();
   }
@@ -92,13 +90,13 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     Ss.sharedServ = this.sharedServ;
     Ss.cdRef = this.cdRef;
 
-    this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
+    this.loaderServ.isLoading.subscribe(v => (this.loading = v));
 
-    this.subModified = MODIFIED_CONFIG_FILE.subscribe((res) => {
+    this.subModified = MODIFIED_CONFIG_FILE.subscribe(res => {
       if (fun.hasValue(res)) this.getAppConfig();
     });
 
-    this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
+    this.sub = ELECTRON_EVENTS_OBSERVER.subscribe(res => {
       if (fun.hasValue(res)) {
         const info = res.info;
         switch (res.event_name) {
@@ -125,7 +123,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
             break;
           //
-          case KEYWORD_ELECTRON_QUIT_APP:
+          case ELECTRON_QUIT_APP:
             this.cerrar_app();
 
             break;
@@ -145,61 +143,13 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       }
     });
 
-    window.onresize = (e) => this.resize.bind(this)(e);
-
-    this.config.setTranslation({
-      startsWith: 'Empieza con',
-      contains: 'Contiene',
-      notContains: 'No contiene',
-      endsWith: 'Termina con',
-      equals: 'Igual',
-      notEquals: 'No igual',
-      noFilter: 'No Filtrar',
-      lt: 'Menos que',
-      lte: 'Menos o igual que',
-      gt: 'Mayor que',
-      gte: 'Mayor o igual que',
-      is: 'Es',
-      isNot: 'No es',
-      before: 'Antes',
-      after: 'Despues',
-      dateIs: 'Fecha es',
-      dateIsNot: 'Fecha no es',
-      dateBefore: 'Fecha es anterior',
-      dateAfter: 'Fecha es posterior',
-      clear: 'Limpiar',
-      apply: 'APlicar',
-      matchAll: 'Todos concuerdan',
-      matchAny: 'Nunguno concuerda',
-      addRule: 'Añadir regla',
-      removeRule: 'Remover regla',
-      accept: 'Si',
-      reject: 'No',
-      choose: 'Elegir',
-      upload: 'Subir',
-      cancel: 'Cancelar',
-      dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'sabado'],
-      dayNamesShort: ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'],
-      dayNamesMin: ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'],
-      monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      monthNamesShort: ['Ene.', 'Feb.', 'Mar.', 'Abr.', 'May', 'Jun.', 'Jul.', 'Ago.', 'Sep.', 'Oct.', 'Nov.', 'Dic.'],
-      dateFormat: 'dd/mm/yy',
-      firstDayOfWeek: 1,
-      today: 'Hoy',
-      weekHeader: 'Wk',
-      weak: 'Semana',
-      medium: 'Medio',
-      strong: 'Fuerte',
-      passwordPrompt: 'Ingrese contraseña',
-      emptyMessage: 'No hay registros',
-      emptyFilterMessage: 'No registros encontrados',
-    });
+    window.onresize = e => this.resize.bind(this)(e);
   }
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
 
-    this.getAppConfig().then((config) => {
+    this.getAppConfig().then(config => {
       setTimeout(() => {
         this.configReady = true;
         setTimeout(() => {
@@ -270,24 +220,18 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   async getAppConfig() {
     return new Promise<any>((resolve, reject) => {
-      const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+      const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
 
       this._ipc
         .sendTask(task)
-        .then((config: ConfigI) => {
-          if (fun.objHas(config, 'err')) {
-            console.error(config);
-          } else {
-            console.log(config);
+        .then((config: any) => {
+          this.themeService.setTheme(config.color_app);
+          this.configServ.setConfig = config;
+          this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 
-            this.themeService.setTheme(config.color_app);
-            this.configServ.setConfig = config;
-            this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-
-            resolve(config);
-          }
+          resolve(config);
         })
-        .catch((err) => {
+        .catch(err => {
           console.error(err);
         });
     });

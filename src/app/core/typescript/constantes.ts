@@ -15,15 +15,15 @@ export const seriesDGII = [
   { label: 'Electronica', value: serie.electronica, disabled: false },
 ];
 
+export enum operativeSystemE {
+  windows = 'windows',
+  macOs = 'macOs',
+}
+
 export enum TypeNavigation {
   first_access = 0,
   reload = 1,
   back_forward = 2,
-}
-
-export enum dateRangeType{
-  dia_unico = '1',
-  rango_fecha = '2',
 }
 
 export enum teclasCode {
@@ -101,4 +101,8 @@ export enum teclasCode {
   _x = 120,
   _y = 121,
   _z = 122,
+}
+
+export interface ObjectVar<T> {
+  [key: string]: T;
 }

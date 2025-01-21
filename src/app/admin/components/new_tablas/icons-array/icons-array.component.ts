@@ -6,9 +6,10 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import * as _ from 'lodash';
 
 @Component({
-  selector: 'icons-array',
-  templateUrl: './icons-array.component.html',
-  styleUrls: ['./icons-array.component.scss'],
+    selector: 'icons-array',
+    templateUrl: './icons-array.component.html',
+    styleUrls: ['./icons-array.component.scss'],
+    standalone: false
 })
 export class IconsArrayComponent {
   @Input() seleccionado;

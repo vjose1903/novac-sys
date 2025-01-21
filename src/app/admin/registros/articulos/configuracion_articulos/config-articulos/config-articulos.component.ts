@@ -6,9 +6,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ConfigArticuloC } from '../articulos_configuracion';
 
 @Component({
-  selector: 'app-config-articulos',
-  templateUrl: './config-articulos.component.html',
-  styleUrls: ['./config-articulos.component.scss'],
+    selector: 'app-config-articulos',
+    templateUrl: './config-articulos.component.html',
+    styleUrls: ['./config-articulos.component.scss'],
+    standalone: false
 })
 export class ConfigArticulosComponent implements OnInit, ModalI {
   form: UntypedFormGroup;

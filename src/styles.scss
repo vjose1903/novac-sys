@@ -1,10 +1,11 @@
+@use './animateCss.scss' as *;
+@use './splash-styles.scss' as *;
+@use './assets/my_styles/main.scss' as *;
+
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
-$bodyfont: 'Poppins';
 
-@import './animateCss.scss';
-@import './splash-styles.scss';
-@import './assets/my_styles/main.scss';
+$bodyfont: 'Poppins';
 
 .visually-hidden {
   display: none !important;
@@ -43,15 +44,6 @@ $bodyfont: 'Poppins';
   font-family: 'Poppins' !important;
 }
 
-.ng-dropdown-panel {
-  z-index: 9999999 !important;
-}
-
-// html[dir="ltr"] ngx-extended-pdf-viewer .dropdownToolbarButton::after {
-//   right: 2px !important;
-//   top: 0 !important;
-// }
-
 .h-96 {
   height: 96% !important;
 }
@@ -64,13 +56,10 @@ $bodyfont: 'Poppins';
   width: 30% !important;
 }
 
-.dropConfigs {
-  .p-overlaypanel-content {
-    padding: 5px !important;
-  }
-}
 
-.dropRowConfig {
+
+
+.dropRowMenu {
   min-width: 250px;
   list-style: none;
   margin: 0;
@@ -86,62 +75,21 @@ $bodyfont: 'Poppins';
       }
       background: var(--primary02);
     }
-  }
-}
 
-.btnConfigDis {
-  color: #adacac !important;
-  &:hover {
-    cursor: default !important;
+    &.danger {
+      color: #c10202 !important;
+      &:hover {
+        color: #a10b0b !important;
+        background: #ff111142 !important;
+      }
+    }
   }
-}
-
-.btnConfig {
-  color: #777676 !important;
 }
 
 /* boton cuenta */
 .button-basic:hover {
   text-decoration-line: none;
   color: var(--primary04);
-}
-
-/* botones de opciones */
-.dropdown-item {
-  display: block;
-  color: #333;
-  padding: 15px 25px;
-  font-size: 14px;
-  font-family: $bodyfont;
-}
-
-.dropdown-item:hover {
-  border-radius: 2px;
-  background: var(--primary02);
-  // background: linear-gradient(180deg, rgb(49, 231, 125) 0%, rgb(30, 171, 117) 100%);
-}
-
-.overlayCuenta {
-  .p-overlaypanel-content {
-    padding: 4px;
-    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.51);
-  }
-}
-.dropdown-cuenta {
-  max-width: 300px;
-  min-width: 300px;
-  margin: 0;
-  background: #fff;
-  padding: 0;
-  list-style: none;
-
-  .dropdown-header {
-    background-color: var(--transparente05);
-  }
-
-  .dropdown-header h3 {
-    color: black;
-  }
 }
 
 .form-control[type='text'],
@@ -316,10 +264,6 @@ body {
 // ========================================================
 // CARDS
 // ========================================================
-
-.br-1 {
-  border-radius: 1rem !important;
-}
 
 .card-padding {
   padding: 1.5rem 1rem 1.5rem 1rem;
@@ -543,28 +487,6 @@ input.apple-switch:checked:after {
   min-width: var(--popInfo);
 }
 
-.bs-datepicker {
-  box-shadow: 0 0 10px 0 #000c;
-  .bs-datepicker-container {
-    padding: 0px !important;
-  }
-  .bs-datepicker-head {
-    border-radius: 0 !important;
-    background: var(--primary02) !important;
-    button[disabled] {
-      background: var(--transparente05);
-    }
-  }
-  .bs-datepicker-body table td span.selected {
-    background: var(--primary02) !important;
-  }
-}
-
-bs-datepicker-container,
-bs-daterangepicker-container {
-  z-index: 9999999 !important;
-}
-
 .btn.btn-link {
   margin: 0 !important;
   padding: 0.3rem !important;
@@ -587,50 +509,6 @@ bs-daterangepicker-container {
       }
     }
   }
-}
-
-/* width */
-// ::-webkit-scrollbar {
-//   display: none;
-// }
-
-/* ====================================================== */
-/* SCROLL BAR*/
-/* ====================================================== */
-/* Customize website's scrollbar like Mac OS
-Not supports in Firefox and IE */
-
-::-webkit-scrollbar {
-  background-color: inherit;
-  width: 7px;
-  height: 7px;
-  &:hover {
-    cursor: pointer !important;
-  }
-}
-
-/* background of the scrollbar except button or resizer */
-::-webkit-scrollbar-track {
-  // background-color: #ffffff00;
-  background-color: inherit;
-}
-
-/* scrollbar itself */
-::-webkit-scrollbar-thumb {
-  background-color: #c1c1c1;
-  border-radius: 16px;
-  width: 7px;
-  height: 7px;
-
-  &:hover {
-    cursor: pointer !important;
-    background-color: #919191 !important;
-  }
-}
-
-/* set button(top and bottom of the scrollbar) */
-::-webkit-scrollbar-button {
-  display: none;
 }
 
 /* ====================================================== */
@@ -690,89 +568,7 @@ Not supports in Firefox and IE */
   }
 }
 
-.sombreado2 {
-  background-color: rgba(187, 187, 187, 0.842);
-  width: 0.5rem !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-align: center !important;
 
-  vertical-align: inherit !important;
-
-  &:hover {
-    cursor: default;
-  }
-}
-
-.sombreado {
-  background-color: rgba(187, 187, 187, 0.842);
-  width: 1rem !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  > .btnBorrar {
-    transform: translate(0.2rem, -3rem) scale(0) !important;
-    // display: none;
-  }
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-.multiSelectPrimeng {
-  .p-multiselect {
-    width: 100%;
-    border-radius: 0.25rem !important;
-    background-color: #ffffffe8 !important;
-    color: #1d253b !important;
-    box-shadow: 1px 1px 4px 0px #1d253b3d !important;
-    border: 1px solid #ced4da;
-    &:hover {
-      cursor: pointer;
-      border: 1px solid #ced4da;
-    }
-    .p-multiselect-label {
-      .multi-select-item-values {
-        overflow: auto;
-        display: flex;
-        column-gap: 0.5rem;
-        .multi-select-item {
-          background: var(--primary04) !important;
-          color: white;
-          padding: 0rem 0.5rem;
-          border-radius: 0.7rem;
-        }
-      }
-    }
-  }
-
-  .p-multiselect.p-multiselect-chip .p-multiselect-token {
-    background: var(--primary04) !important;
-  }
-  .p-checkbox .p-checkbox-box.p-highlight {
-    background: var(--primary02) !important;
-  }
-  .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
-    background: var(--primary04) !important;
-  }
-  .p-multiselect-panel .p-multiselect-items .p-multiselect-item:focus {
-    box-shadow: none !important;
-  }
-
-  .p-inputtext:enabled:focus {
-  }
-  .p-multiselect-close {
-    &:hover {
-      background: var(--primary01) !important;
-      color: var(--primary04) !important;
-    }
-  }
-  .p-disabled {
-    background-color: #e9ecef !important;
-    touch-action: none;
-    pointer-events: none;
-    opacity: 1;
-  }
-}
 
 @mixin my_cards {
   border-radius: 1rem !important;

@@ -1,0 +1,69 @@
+@use './forms.scss' as *;
+
+.p-select {
+  display: flex !important;
+  align-items: center !important;
+
+  @include formField;
+
+  
+  &.p-focus,
+  &.p-select-open {
+    @include formFieldFocus;
+  }
+  
+  &.p-disabled {
+    @include formFieldDisabled;
+    
+    .p-select-label {
+      &.p-placeholder,
+      &::placeholder {
+        color: #717a82 !important;
+        opacity: 1;
+      }
+    }
+  }
+  
+  &.min {
+    .p-select-label {
+      padding: 0 0.1rem 0 0.1rem !important;
+    }
+  }
+
+  .p-select-clear-icon {
+    margin-right: 0.5rem !important;
+  }
+}
+
+.p-overlay:has(.p-overlay-content .p-select-overlay) {
+  z-index: 999999 !important;
+  max-width: min-content !important;
+  .p-select-overlay {
+    .p-select-header {
+      padding: 0.2rem !important;
+
+      .p-select-filter {
+        border: 1px solid #ced4da !important;
+        border-radius: 0.25rem !important;
+
+        &:focus {
+          @include formFieldFocus;
+        }
+      }
+    }
+
+    .p-select-list-container {
+      .p-select-list {
+        .p-select-option {
+          min-height: 2.2rem;
+          text-wrap: wrap;
+          &.p-select-option-selected {
+            background-color: var(--transparente04) !important;
+            color: black;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}

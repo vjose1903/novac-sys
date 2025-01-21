@@ -11,9 +11,10 @@ import { ModalI } from '../../components/modal/modal-class';
 import * as _ from 'lodash';
 
 @Component({
-  selector: 'app-menu-opciones-extra',
-  templateUrl: './menu-opciones-extra.component.html',
-  styleUrls: ['./menu-opciones-extra.component.scss'],
+    selector: 'app-menu-opciones-extra',
+    templateUrl: './menu-opciones-extra.component.html',
+    styleUrls: ['./menu-opciones-extra.component.scss'],
+    standalone: false
 })
 export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ModalI {
   @ViewChild('dropdownCliente') dropdownCliente: ElementRef;

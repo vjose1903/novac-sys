@@ -48,7 +48,7 @@
               <div class="col-6 p-0 pr-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Fecha compra: <span style="color: red">*</span></label>
-                  <p-calendar
+                  <p-datepicker
                     inputId="campoFechaCompra"
                     [(ngModel)]="fechaCompra"
                     dateFormat="dd/mm/yy"
@@ -56,13 +56,13 @@
                     (onSelect)="setDateInputs(fechaCompra)"
                     (onClose)="setDateInputs(fechaCompra)"
                     (keydown.enter)="saltar('campoFechaValida')"
-                  ></p-calendar>
+                  ></p-datepicker>
                 </div>
               </div>
               <div class="col-6 p-0 pl-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Fecha validez: </label>
-                  <p-calendar inputId="campoFechaValida" [(ngModel)]="fechaValidez" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('send')"></p-calendar>
+                  <p-datepicker inputId="campoFechaValida" [(ngModel)]="fechaValidez" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('send')"></p-datepicker>
                 </div>
               </div>
               @if (is_editando) {

@@ -10,12 +10,12 @@ const routes: Routes = [
   {
     path: '',
     component: RegistroVehiculoComponent,
-    canActivate: [NgxPermissionsGuard],
-    data: {
-      permissions: {
-        only: Object.values(Permisos.vehiculo),
-      },
-    },
+    // canActivate: [NgxPermissionsGuard],
+    // data: {
+    //   permissions: {
+    //     only: Object.values(Permisos.vehiculo),
+    //   },
+    // },
   },
 ];
 

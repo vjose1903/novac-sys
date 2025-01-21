@@ -6,19 +6,20 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-electron": {
+    "novac-system": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist",
             "index": "src/index.html",
-            "browser": "src/main.ts",
+            "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": ["src/polyfills.ts"],
+            "aot": true,
             "assets": [
               "src/assets",
               "src/splash_config_error.html",
@@ -36,8 +37,6 @@
               }
             ],
             "styles": [
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/primeicons/primeicons.css",
               
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
@@ -61,7 +60,6 @@
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
               "fileReplacements": [
                 {
@@ -75,7 +73,6 @@
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
               "fileReplacements": [
                 {
@@ -89,7 +86,6 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "fileReplacements": [
                 {
@@ -101,26 +97,26 @@
           }
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "angular-electron:build"
+            "buildTarget": "novac-system:build"
           },
           "configurations": {
             "dev": {
-              "buildTarget": "angular-electron:build:dev"
+              "buildTarget": "novac-system:build:dev"
             },
             "web": {
-              "buildTarget": "angular-electron:build:web"
+              "buildTarget": "novac-system:build:web"
             },
             "production": {
-              "buildTarget": "angular-electron:build:production"
+              "buildTarget": "novac-system:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
           "options": {
-            "buildTarget": "angular-electron:build"
+            "buildTarget": "novac-system:build"
           }
         },
         "test": {

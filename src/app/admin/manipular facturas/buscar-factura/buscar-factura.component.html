@@ -137,7 +137,7 @@
   </div>
   <div class="col-12 abajo">
     @if (mostrarListaFacturas()) {
-    <div #cardTablaVerFacturas class="card sombra h-100 tablaContent br-1">
+    <div #cardTablaVerFacturas class="card sombra h-100 tablaContent br-10">
       <div class="divTabla">
         <dinamic-table [cardTabla]="cardTablaVerFacturas" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
       </div>
@@ -153,7 +153,7 @@
 <!-- SIDE NOTAS -->
 <!-- ============================================================================================================================================ -->
 
-<p-sidebar [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }" (onHide)="onHideSide()">
+<p-drawer [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }" (onHide)="onHideSide()">
   <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
     <div class="innerTablas">
       @if (notas.length) {
@@ -161,4 +161,4 @@
       }
     </div>
   </div>
-</p-sidebar>
+</p-drawer>

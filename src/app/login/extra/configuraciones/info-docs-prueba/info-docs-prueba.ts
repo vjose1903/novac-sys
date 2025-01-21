@@ -1,4 +1,4 @@
-import { PdfService } from './../../../../core/services/pdf/pdf.service';
+import { PdfService } from './../../../../core/services/reports/pdf/pdf.service';
 import { fun } from '../../../../core/services/functions.service';
 import { Injectable } from '@angular/core';
 import { facturaPrueba } from './8.5x5.5/factura';

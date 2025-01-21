@@ -9,24 +9,22 @@
 
       @if (optionesExtra.length > 0 && factServ.isVenta) {
       <div class="ml-3">
-        <btn-icon-circular [id]="'btnExtra'" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
+        <btn-icon-circular id="btnExtra" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
-        <p-overlayPanel #overlayExtra [dismissable]="false" [showCloseIcon]="true"  styleClass="dropConfigs" (onHide)="cerrarOverlay()">
-          <ng-template pTemplate>
-            <div id="overlayExtra">
-              <ul class="overlayExtra" role="menu">
-                @for (option of optionesExtra; track option.key; let index_option = $index) { @if (option.condition()) {
-                <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer" (click)="selectOptionExtra(option, 'click')">
-                  <div class="d-flex align-items-center">
-                    <strong> {{ option.key }} - </strong> &nbsp;
-                    <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
-                  </div>
-                </li>
-                } }
-              </ul>
-            </div>
-          </ng-template>
-        </p-overlayPanel>
+        <p-popover #overlayExtra [dismissable]="false" styleClass="padding-sm" (onHide)="cerrarOverlay()">
+          <div id="overlayExtra">
+            <ul class="overlayExtra" role="menu">
+              @for (option of optionesExtra; track option.key; let index_option = $index) { @if (option.condition()) {
+              <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer br-4" (click)="selectOptionExtra(option, 'click')">
+                <div class="d-flex align-items-center">
+                  <strong> {{ option.key }} - </strong> &nbsp;
+                  <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
+                </div>
+              </li>
+              } }
+            </ul>
+          </div>
+        </p-popover>
       </div>
       }
     </div>
@@ -64,10 +62,11 @@
                   [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
                   [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }"
                 />
-                <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #tiposFacturas appendTo="body">
+                <p-popover [dismissable]="false" styleClass="padding-md" #tiposFacturas appendTo="body">
                   <div style="width: 21rem" [innerHtml]="factServ.htmlTiposFacturas"></div>
-                </p-overlayPanel>
+                </p-popover>
               </div>
+
               <div class="{{ factServ.isCompra ? 'col-6' : 'col-9' }} p-0">
                 <!-- ================== CONDICION ================== -->
                 <span class="titulos"><strong>Condición:</strong></span>
@@ -86,6 +85,7 @@
                   <option value="Crédito">Crédito</option>
                 </select>
               </div>
+
               @if (factServ.isCompra) {
               <div class="col-3 pr-0">
                 <!-- ================== GASTO ================== -->
@@ -105,12 +105,13 @@
                   (blur)="gastosFacturas.hide()"
                   tabindex="-1"
                 />
-                <p-overlayPanel [dismissable]="false" [showCloseIcon]="false" #gastosFacturas appendTo="body">
+                <p-popover [dismissable]="false" styleClass="padding-md" #gastosFacturas appendTo="body">
                   <div style="width: 26rem" [innerHtml]="factServ.htmlTiposCostosGastos"></div>
-                </p-overlayPanel>
+                </p-popover>
               </div>
               }
             </div>
+
             @if (factServ.isVenta) {
             <div>
               <!-- ================== VENTA ================== -->
@@ -140,16 +141,18 @@
               <!-- ================== FECHA VIAJE ================== -->
               <span class="mt-1"><strong>Fecha viaje:</strong></span>
               <div class="d-flex justify-content-between align-items-center">
-                <p-calendar
-                  inputId="fecha_viaje"
-                  inputStyleClass="minSize"
-                  [(ngModel)]="fecha_viaje"
-                  dateFormat="dd/mm/yy"
-                  placeholder="dd/mm/aaaa"
-                  [minDate]="datesAvailable.viaje.minDate"
-                  (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
-                  [disabled]="errorComprobante"
-                ></p-calendar>
+                <div class="flex-1">
+                  <p-datepicker
+                    inputId="fecha_viaje"
+                    inputStyleClass="minSize"
+                    [(ngModel)]="fecha_viaje"
+                    dateFormat="dd/mm/yy"
+                    placeholder="dd/mm/aaaa"
+                    [minDate]="datesAvailable.viaje.minDate"
+                    (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
+                    [disabled]="errorComprobante"
+                  ></p-datepicker>
+                </div>
                 <div class="ml-3 position-relative">
                   <btn-icon-circular
                     [id]="'btnCamion'"
@@ -166,83 +169,77 @@
                   </div>
                 </div>
               </div>
-              <p-overlayPanel [dismissable]="false" [showCloseIcon]="getIndicadorMovimientoViaje('close_icon')" #overlayMovimientoViaje styleClass="dropConfigs" (onHide)="cerrarOverlay()">
-                <ng-template pTemplate>
-                  <div id="overlayMovimientoViaje" class="containMovimientoViaje">
-                    <div class="camionSelector pr-2">
-                      <span class="mb-2 titulos"><strong>Camion: </strong></span>
-                      <div class="filterOverlay">
-                        <input
-                          id="searchCamion"
-                          class="search-input form-control"
-                          [filterTarget]="filterCamionesTargets"
-                          [DataFilter]="copyCamiones"
-                          (onFilter)="filterMovimiento('camion', $event)"
-                          (blur)="checkMovimientoIsCompleted()"
-                          (focus)="moverFocoMovimientoViaje('camion')"
-                          (keydown.enter)="seleccionarCamion(null, camion_row)"
-                        />
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                      </div>
-                      <ul class="ulMovimientoViaje" role="menu">
-                        @for (camion of camiones; track camion.id; let index_camion = $index) {
-                        <li
-                          id="ulCamion-{{ index_camion }}"
-                          role="menuitem"
-                          class="hoverlable"
-                          [ngClass]="{ indicador: camion_row == index_camion && entidad_en_turno == 'camion', selected: camion_row == index_camion && entidad_en_turno == 'chofer' }"
-                        >
-                          <div class="d-flex justify-content-between align-items-center">
-                            <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' mr-1 c-help'"></i>
-                            <span id="dropdown-item" class="mb-0"> {{ getCamionInfo(camion, 'label') }} </span>
-                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
-                          </div>
-                        </li>
-                        } @if (camiones.length == 0) {
-                        <li role="menuitem" class="hoverlable">
-                          <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
-                        </li>
-                        }
-                      </ul>
+
+              <p-popover [dismissable]="false" [dismissable]="getIndicadorMovimientoViaje('close_icon')" styleClass="padding-sm" #overlayMovimientoViaje (onHide)="cerrarOverlay()">
+                <div id="overlayMovimientoViaje" class="containMovimientoViaje">
+                  <div class="camionSelector pr-2">
+                    <span class="mb-2 titulos"><strong>Camion: </strong></span>
+                    <div class="filterOverlay">
+                      <input
+                        id="searchCamion"
+                        class="search-input form-control"
+                        [filterTarget]="filterCamionesTargets"
+                        [DataFilter]="copyCamiones"
+                        (onFilter)="filterMovimiento('camion', $event)"
+                        (blur)="checkMovimientoIsCompleted()"
+                        (focus)="moverFocoMovimientoViaje('camion')"
+                        (keydown.enter)="seleccionarCamion(null, camion_row)"
+                      />
+                      <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
-                    <div class="choferSelector rayaLeft pl-2">
-                      <div class="overlayChofer {{ checkCamionIsSelected(null) ? 'd-none' : 'show' }}">
-                        <span class="label"> Seleccione primero el camión </span>
-                      </div>
-                      <span class="mb-2 titulos"><strong>Chofer: </strong></span>
-                      <div class="filterOverlay">
-                        <input
-                          id="searchChofer"
-                          class="search-input form-control"
-                          [filterTarget]="filterChoferesTargets"
-                          [DataFilter]="copyChoferes"
-                          (onFilter)="filterMovimiento('chofer', $event)"
-                          (blur)="checkMovimientoIsCompleted()"
-                          (focus)="moverFocoMovimientoViaje('chofer')"
-                          (keydown.enter)="seleccionarChofer(null, chofer_row)"
-                        />
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                      </div>
-                      <ul class="ulMovimientoViaje" role="menu">
-                        @for (chofer of choferes; track chofer.id; let index_chofer = $index) {
-                        <li id="ulChofer-{{ index_chofer }}" role="menuitem" class="hoverlable" [ngClass]="{ indicador: chofer_row == index_chofer && entidad_en_turno == 'chofer' }">
-                          <div class="d-flex justify-content-between align-items-center">
-                            <span id="dropdown-item" class="mb-0">
-                              {{ chofer.nombre_completo }}
-                            </span>
-                            <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarChofer(chofer, index_chofer)" [checked]="checkChoferIsSelected(chofer)" />
-                          </div>
-                        </li>
-                        } @if (camiones.length == 0) {
-                        <li role="menuitem" class="hoverlable">
-                          <span id="dropdown-item"> No existen choferes con las especificaciones introducidas. </span>
-                        </li>
-                        }
-                      </ul>
-                    </div>
+                    <ul class="ulMovimientoViaje" role="menu">
+                      @for (camion of camiones; track camion.id; let index_camion = $index) {
+                      <li id="ulCamion-{{ index_camion }}" role="menuitem" class="hoverlable" [ngClass]="{ indicador: camion_row == index_camion && entidad_en_turno == 'camion', selected: camion_row == index_camion && entidad_en_turno == 'chofer' }">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' mr-1 c-help'"></i>
+                          <span id="dropdown-item" class="mb-0"> {{ getCamionInfo(camion, 'label') }} </span>
+                          <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
+                        </div>
+                      </li>
+                      } @if (camiones.length == 0) {
+                      <li role="menuitem" class="hoverlable">
+                        <span id="dropdown-item"> No existen camiones con las especificaciones introducidas. </span>
+                      </li>
+                      }
+                    </ul>
                   </div>
-                </ng-template>
-              </p-overlayPanel>
+                  <div class="choferSelector rayaLeft pl-2">
+                    <div class="overlayChofer {{ checkCamionIsSelected(null) ? 'd-none' : 'show' }}">
+                      <span class="label"> Seleccione primero el camión </span>
+                    </div>
+                    <span class="mb-2 titulos"><strong>Chofer: </strong></span>
+                    <div class="filterOverlay">
+                      <input
+                        id="searchChofer"
+                        class="search-input form-control"
+                        [filterTarget]="filterChoferesTargets"
+                        [DataFilter]="copyChoferes"
+                        (onFilter)="filterMovimiento('chofer', $event)"
+                        (blur)="checkMovimientoIsCompleted()"
+                        (focus)="moverFocoMovimientoViaje('chofer')"
+                        (keydown.enter)="seleccionarChofer(null, chofer_row)"
+                      />
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <ul class="ulMovimientoViaje" role="menu">
+                      @for (chofer of choferes; track chofer.id; let index_chofer = $index) {
+                      <li id="ulChofer-{{ index_chofer }}" role="menuitem" class="hoverlable" [ngClass]="{ indicador: chofer_row == index_chofer && entidad_en_turno == 'chofer' }">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span id="dropdown-item" class="mb-0">
+                            {{ chofer.nombre_completo }}
+                          </span>
+                          <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarChofer(chofer, index_chofer)" [checked]="checkChoferIsSelected(chofer)" />
+                        </div>
+                      </li>
+                      } @if (camiones.length == 0) {
+                      <li role="menuitem" class="hoverlable">
+                        <span id="dropdown-item"> No existen choferes con las especificaciones introducidas. </span>
+                      </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </p-popover>
             </div>
             } @if (factServ.isCompra) {
             <div>
@@ -263,7 +260,7 @@
               <div>
                 <!-- ================== FECHA VENCIMIENTO ================== -->
                 <span class="mt-1"><strong>Fecha vencimiento:</strong></span>
-                <p-calendar
+                <p-datepicker
                   inputId="fecha_vencimiento"
                   inputStyleClass="minSize"
                   [(ngModel)]="fecha_vencimiento"
@@ -272,7 +269,7 @@
                   [minDate]="datesAvailable.viaje.minDate"
                   (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_vencimiento', value: fecha_vencimiento })"
                   [disabled]="errorComprobante"
-                ></p-calendar>
+                ></p-datepicker>
               </div>
               }
             </div>
@@ -478,8 +475,7 @@
   </div>
 </div>
 
-@if (_sideBarOpened) {
-<p-sidebar
+<p-drawer
   #my_sidebar
   styleClass="my_sidebar  {{ _sideBarOpened ? 'side_open' : 'side_closed' }} {{ hasPermisoPreVenta ? (hasPermisoCotizacion ? 'x-large' : 'large') : hasPermisoCotizacion ? 'large' : '' }}"
   [position]="'right'"
@@ -495,66 +491,65 @@
   <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', factServ.tipoDocumento)">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
+
   <div class="contendioSidebar w-100 h-100">
     <div class="head">
       <span class="tituloSidebar negrita">Documentos guardados</span>
     </div>
+    
     <div class="cuerpoContenidoSidar w-100">
-      <p-tabView [(activeIndex)]="index_fact_archivada" styleClass="my_tabView" (onChange)="clickTabView($event.index)">
-        @for (docTab of sideBarTabs; track $index) {
-        <p-tabPanel
-          [disabled]="countCantFactSaved(docTab.key).disable"
-          [tooltip]="'No tiene ' + docTab.label + ' guardadas'"
-          headerStyleClass="{{ countCantFactSaved(docTab.key).disable ? 'noTabView' : '' }}"
-          tooltipDisabled="true"
-          tooltipStyleClass="{{ countCantFactSaved(docTab.key).disable ? 'd-block' : 'd-none' }} tabViewTootip"
-        >
-          <ng-template pTemplate="header">
-            {{ docTab.title }}
-            @if (!countCantFactSaved(docTab.key).disable) {
-            <span> &nbsp;({{ countCantFactSaved(docTab.key).cant }})</span>
-            }
-          </ng-template>
-          <ng-container *ngTemplateOutlet="facturas_guardadas; context: { docTab: docTab }"> </ng-container>
-        </p-tabPanel>
-        }
-      </p-tabView>
-      <ng-template #facturas_guardadas let-docTab="docTab">
-        @if (facturas_localStorage?.length === 0) {
-        <h6 class="mt-3 no_fact">No tiene {{ docTab.label }} guardadas por el momento!!</h6>
-        } @if (facturas_localStorage?.length > 0) {
-        <div class="h-100">
-          @for (fact of facturas_localStorage; track $index) {
-          <div class="factura_guardada mb-2" (click)="rellenarFacturaArchivada(fact)">
-            <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
-            <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
-              <i class="fas fa-history {{ fact.factura_pendiente ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}" pTooltip="factura pendiente" tooltipPosition="left"></i>
-              <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura de viaje" tooltipPosition="left"></i>
-              <i class="fa-regular fa-copyright {{ fact.action == 'bill_from_cotizacion' ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura desde cotización" tooltipPosition="left"></i>
-              <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar documento" tooltipPosition="left"></i>
-              <span class="negrita text-mayuscula text-separado-2 texto-borde-{{ docTab.color }} texto-{{ docTab.color }}">{{ my_capitalize(fact?.tipo) }} </span>
-              @if (fact?.action == 'update') {
-              <span class="text-gris-oscuro"> (Editando)</span>
-              }
-              <br />
-              <span class="clienteFactura">
-                <span class="negrita"> {{ fact?.tipo === 'compra' ? 'Suplidor' : 'Cliente' }}:</span>
-                {{ getNombreFacturaGuardada(fact) }}
-              </span>
-              <br />
-              <!-- <i class="fa-regular fa-copyright"></i> -->
-              <span class="info_factura"> <span class="negrita"> Condición:</span> {{ fact?.condicion }} </span>
-              <br />
-              <span class="info_factura"> <span class="negrita"> Articulos:</span> {{ fact?.detalle_facturas.length }} </span>
-              <br />
-              <span class="info_factura"> <span class="negrita"> Total facturado:</span> {{ formatoNumero(fact?.total_factura) }} </span>
+      <p-tabs [(value)]="index_fact_archivada">
+        <p-tablist>
+          @for (docTab of sideBarTabs; track $index) {
+          <p-tab [value]="$index" [disabled]="countCantFactSaved(docTab.key).disable">
+            <div class="d-flex align-items-center gap-2" pTooltip="No tiene {{ docTab.label }} guardadas" [tooltipDisabled]="!countCantFactSaved(docTab.key).disable">
+              {{ docTab.title }}
+              <span *ngIf="!countCantFactSaved(docTab.key).disable"> &nbsp;({{ countCantFactSaved(docTab.key).cant }})</span>
             </div>
-          </div>
+          </p-tab>
           }
-        </div>
-        }
-      </ng-template>
+        </p-tablist>
+
+        <p-tabpanels>
+          @for (docTab of sideBarTabs; track $index) {
+          <p-tabpanel [value]="$index">
+            @if (facturas_localStorage()?.length === 0) {
+            <h6 class="mt-3 no_fact">No tiene {{ docTab.label }} guardadas por el momento!!</h6>
+            } @else {
+            <div class="h-100">
+              @for (fact of facturas_localStorage(); track $index) {
+              <div class="factura_guardada mb-2" (click)="rellenarFacturaArchivada(fact)">
+                <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
+                <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
+                  <i class="fas fa-history {{ fact.factura_pendiente ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}" pTooltip="factura pendiente" tooltipPosition="left"></i>
+                  <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura de viaje" tooltipPosition="left"></i>
+                  <i class="fa-regular fa-copyright {{ fact.action == 'bill_from_cotizacion' ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura desde cotización" tooltipPosition="left"></i>
+                  <i class="btn_borrar_factura_gurdada far fa-trash-alt" (click)="abrirModalFacturaGuardada(fact, $event)" pTooltip="Quitar documento" tooltipPosition="left"></i>
+                  <span class="negrita text-mayuscula text-separado-2 texto-borde-{{ docTab.color }} texto-{{ docTab.color }}">{{ my_capitalize(fact?.tipo) }} </span>
+                  @if (fact?.action == 'update') {
+                  <span class="text-gris-oscuro"> (Editando)</span>
+                  }
+                  <br />
+                  <span class="clienteFactura">
+                    <span class="negrita"> {{ fact?.tipo === 'compra' ? 'Suplidor' : 'Cliente' }}:</span>
+                    {{ getNombreFacturaGuardada(fact) }}
+                  </span>
+                  <br />
+                  <!-- <i class="fa-regular fa-copyright"></i> -->
+                  <span class="info_factura"> <span class="negrita"> Condición:</span> {{ fact?.condicion }} </span>
+                  <br />
+                  <span class="info_factura"> <span class="negrita"> Articulos:</span> {{ fact?.detalle_facturas.length }} </span>
+                  <br />
+                  <span class="info_factura"> <span class="negrita"> Total facturado:</span> {{ formatoNumero(fact?.total_factura) }} </span>
+                </div>
+              </div>
+              }
+            </div>
+            }
+          </p-tabpanel>
+          }
+        </p-tabpanels>
+      </p-tabs>
     </div>
   </div>
-</p-sidebar>
-}
+</p-drawer>

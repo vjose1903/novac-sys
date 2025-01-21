@@ -8,9 +8,10 @@ import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-retornar-devuelto',
-  templateUrl: './retornar-devuelto.component.html',
-  styleUrls: ['./retornar-devuelto.component.scss'],
+    selector: 'app-retornar-devuelto',
+    templateUrl: './retornar-devuelto.component.html',
+    styleUrls: ['./retornar-devuelto.component.scss'],
+    standalone: false
 })
 export class RetornarDevueltoComponent extends MixinClass implements OnInit, ModalI, DoCheck {
   constructor(private fb: UntypedFormBuilder) {

@@ -1,13 +1,13 @@
 import { ModalClass } from './../../components/modal/modal-class';
 import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
-import { PdfService } from './../../../core/services/pdf/pdf.service';
+import { PdfService } from './../../../core/services/reports/pdf/pdf.service';
 import { LoaderService } from './../../../loader/loader.service';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { Ss } from './../../../core/services/singleton.service';
 import { ModalService } from './../../components/modal/modal.service';
 import { table_config } from './../../components/new_tablas/tabla-class';
-import { ConfigI } from './../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/interface/config-interface';
 import { Permisos } from './../../../core/typescript/permisos';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from './../../../core/typescript/MixinClass';
@@ -19,6 +19,7 @@ import * as _ from 'lodash';
   selector: 'app-conduce-lista',
   templateUrl: './conduce-lista.component.html',
   styleUrls: ['./conduce-lista.component.scss'],
+  standalone: false,
 })
 export class ConduceListaComponent extends MixinClass implements OnInit, OnDestroy {
   lista_conduces;
@@ -43,7 +44,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_conduces',
-    padre_functions: { data_request: (params) => this.getConduces(params) },
+    padre_functions: { data_request: params => this.getConduces(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
@@ -55,7 +56,12 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   conduceClass = new ConduceC();
 
-  constructor(public mServ: ModalService, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(
+    public mServ: ModalService,
+    private router: Router,
+    private tServ: TablasService,
+    public loadServ: LoaderService
+  ) {
     super();
   }
 
@@ -92,7 +98,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       this.lista_conduces = [];
       if (fun.hasValue(this.tablaComponent)) this.tablaComponent.changeTableConfig([{ total_count: 0 }]);
 
-      this.conduceClass.getAll(extra).then((res) => {
+      this.conduceClass.getAll(extra).then(res => {
         res['data'] = this.mapeoRecibos(res['data']);
 
         this.lista_conduces = fun.deepCloning(res['data']);
@@ -103,7 +109,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
   }
 
   mapeoRecibos(data) {
-    data.map((conduce) => {
+    data.map(conduce => {
       conduce['numero_conduce'] = _.padStart(conduce.numero_conduce, 8, '0');
       conduce['cantidad_productos'] = conduce.detalle_conduces.length;
 
@@ -140,14 +146,14 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     if (event.columnKey) {
       switch (event.iconKey) {
         case 'ver':
-          this.conduceClass.parseDataToPdf(conduce_selected).then((conduce_parsed) => {
+          this.conduceClass.parseDataToPdf(conduce_selected).then(conduce_parsed => {
             this.makeConducePdf(conduce_parsed);
           });
           break;
 
         case 'anular':
           const texto_modal = `Seguro de que desea anular el conduce <b class="negrita"> #${conduce_selected.numero_conduce} </b>`;
-          const siFunction = (instance) => {
+          const siFunction = instance => {
             this.anularRecibo(conduce_selected.id);
             instance.closeModal(instance.id, 'anular_conduce');
           };
@@ -166,42 +172,43 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     this.loadServ.isLoading.next(true);
 
     PdfService.generatePdf({ oPdf: obj, imprimir: false })
-      .then(async (res) => {
-        if (res.status === 'si') {
-          const fileName = res.file;
-          const base64 = res.base64;
-          const pageOrientation = res.pageOrientation;
+      .then(async res => {
+        const fileName = res.file;
+        const base64 = res.base64;
+        const pageOrientation = res.pageOrientation;
 
-          const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', reimprimir: true, fileName: _.first(res.file.split('.')) };
+        const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
-          this.loadServ.isLoading.next(false);
+        this.loadServ.isLoading.next(false);
 
-          this.openNewModal({
-            component: PdfViewerComponent,
-            inputs: obj_pdf,
-            id: 'revision_conduce',
-            header: obj_pdf.titulo,
-            width: '900px',
-            height: '40rem',
-            botones: {
-              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [
-                { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-                {
-                  clase: 'btn btn-verde',
-                  function: (instance) => {
-                    this.imprimir_base64(fileName, base64, pageOrientation);
-                    instance.closeModal(instance.id, 'cancel');
-                  },
-                  label: 'Imprimir',
-                  disable: false,
+        this.openNewModal({
+          component: PdfViewerComponent,
+          inputs: obj_pdf,
+          id: 'revision_conduce',
+          header: obj_pdf.titulo,
+          width: '900px',
+          height: '40rem',
+          botones: {
+            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+            dinamico: [
+              { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+              {
+                clase: 'btn btn-verde',
+                function: instance => {
+                  this.imprimir_base64(fileName, base64, pageOrientation);
+                  instance.closeModal(instance.id, 'cancel');
                 },
-              ],
-            },
-          });
-        }
+                label: 'Imprimir',
+                disable: false,
+              },
+            ],
+          },
+        });
       })
-      .catch(() => this.loadServ.isLoading.next(false));
+      .catch((err) => {
+        fun.toastError(err.msg, 'ERROR');
+        this.loadServ.isLoading.next(false);
+      });
   }
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
@@ -213,10 +220,10 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
+          { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, obj.id), label: 'NO', disable: false },
           {
             clase: 'btn btn-verde',
-            function: (instance) => obj.siFunction(instance),
+            function: instance => obj.siFunction(instance),
             label: 'SI',
             disable: false,
           },
@@ -229,11 +236,11 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     const obj = { base64: base64, file: fileName, type: 'conduce', printer: this.configApp.printer_selected.conduce, pageOrientation: pageOrientation };
     try {
       PdfService.imprimirBase64(obj)
-        .then(async (res) => {
+        .then(async res => {
           if (res['status'] === 'si') fun.toastSuccess('Conduce de mercancía reimpreso !!', 'CORRECTO');
           else fun.toastError(res['msg'], 'ERROR');
         })
-        .catch((err) => {
+        .catch(err => {
           console.error(err);
 
           fun.toastError(err['msg'], 'ERROR');
@@ -248,7 +255,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       const extra = { afterPath: `revertir/by_id/${id}` };
       const actualPagination = this.tServ.getPaginationById('listado_conduces');
 
-      this.conduceClass.dynamic(extra).then((res) => this.getConduces(actualPagination));
+      this.conduceClass.dynamic(extra).then(res => this.getConduces(actualPagination));
     } catch (error) {}
   }
 }

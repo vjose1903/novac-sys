@@ -4,7 +4,7 @@ import { Ss } from '../services/singleton.service';
 
 import * as _ from 'lodash';
 import { AppConfig } from '../../../environments/environment';
-import { ConfigI } from './config-interface';
+import { ConfigI } from '../interface/config-interface';
 import { fun } from '../services/functions.service';
 
 export interface extraArgs {

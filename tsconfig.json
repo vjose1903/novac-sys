@@ -19,7 +19,11 @@
     "checkJs": false,
     "useDefineForClassFields": false
   },
-  "files": ["src/main.ts", "src/polyfills.ts"],
+  "files": [
+    "src/main.ts", 
+    "src/polyfills.ts",
+    "node_modules/@angular/localize/init" 
+  ],
   "include": ["src/*/.ts"],
   "exclude": ["node_modules"],
   "angularCompilerOptions": {

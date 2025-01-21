@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json.schemastore.org/vsls",
+  "excludeFiles": [
+    "/scripts",
+    "/print",
+    "/resources",
+    "/node_modules",
+    "/log",
+    "/electron",
+    "/dist",
+    "/.nx",
+    "package.json",
+    "package-lock.json",
+    "/e2e",
+    "/config_setup"
+  ],
+  "includeFiles": ["**/*.js", "**/*.css"]
+}

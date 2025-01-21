@@ -3,9 +3,10 @@ import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import { BehaviorSubject, lastValueFrom, skip, take } from 'rxjs';
 import * as fs from 'fs';
-import { KEYWORD_ELECTRON_RESPONSE, KEYWORD_ELECTRON_SENDER, MessageTaskInterface } from '../../../../electron/shared-electron-angular';
+import { ELECTRON_RESPONSE, ELECTRON_SENDER, MessageTaskInterface } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
 import { ELECTRON_EVENTS_OBSERVER } from '../typescript/GLOBAL';
+import { fun } from './functions.service';
 
 @Injectable({
   providedIn: 'root',
@@ -61,12 +62,12 @@ export class IpcService {
   }
 
   listenEvents() {
-    this._ipc.on(KEYWORD_ELECTRON_RESPONSE, (event, obj) => {
+    this._ipc.on(ELECTRON_RESPONSE, (event, obj) => {
       const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
       const tareas = this.colaDeMensajes.value;
 
       if (tareas.hasOwnProperty(arg.id)) {
-        (tareas[arg.id] as MessageTask).fn.next(arg.response);
+        (tareas[arg.id] as MessageTask).fn.next(arg);
         tareas[arg.id] = undefined;
         this.updateColaMensaje(tareas);
       } else {
@@ -76,15 +77,18 @@ export class IpcService {
   }
 
   sendTask(task: MessageTask) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<MessageTaskInterface>(async (resolve, reject) => {
       if (this.isElectron) {
         this.addColaMensaje(task);
         this.trigger(task.serialize());
 
         try {
-          const resultado = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
-
-          resolve(resultado);
+          const taskResult = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
+          if (taskResult.error == false || !('error' in taskResult) || fun.isEmpty(taskResult?.error)) {
+            resolve(taskResult.response);
+          } else {
+            reject(taskResult.response);
+          }
         } catch (error) {
           reject(error);
         }
@@ -96,7 +100,7 @@ export class IpcService {
 
   private trigger(arg: any) {
     if (this.isElectron) {
-      this._ipc.send(KEYWORD_ELECTRON_SENDER, arg);
+      this._ipc.send(ELECTRON_SENDER, arg);
     }
   }
 

@@ -6,7 +6,7 @@ import { MixinClass } from '../../core/typescript/MixinClass';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { FacturaC } from './factura';
 import { ModalClass } from '../components/modal/modal-class';
-import { PdfService } from '../../core/services/pdf/pdf.service';
+import { PdfService } from '../../core/services/reports/pdf/pdf.service';
 
 export class PreFacturaClass extends MixinClass {
   facturaClass = new FacturaC();

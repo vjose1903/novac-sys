@@ -6,9 +6,10 @@ import { EmpleadoC } from '../../../registros/registro-empleados/empleado';
 import { ModalI } from '../../modal/modal-class';
 
 @Component({
-  selector: 'app-change-password',
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.scss'],
+    selector: 'app-change-password',
+    templateUrl: './change-password.component.html',
+    styleUrls: ['./change-password.component.scss'],
+    standalone: false
 })
 export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   form: UntypedFormGroup;

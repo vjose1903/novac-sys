@@ -3,7 +3,7 @@
     <!-- ----- SIMPLE_SWITCH -----  -->
     @if (dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) { @for (dinamyc_switch of inputs.dinamyc_switches; track dinamyc_switch.id) {
     <div class="col-12 p-0">
-      <div class="form-group mb-2 switchDiv">
+      <div class="form-group switchDiv">
         <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
         <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
       </div>
@@ -12,151 +12,169 @@
 
     <!-- ----- SERIE -----  -->
     @if ( reportTypeHasfield(reportField.serieField) ) {
-    <div class="col-12 p-0 mb-2">
-      <label class="control-label mb-0 mt-2">Serie: <span style="color: red">*</span> </label>
+    <div class="col-12 p-0">
+      <label class="control-label mb-0">Serie: <span style="color: red">*</span> </label>
       <p-selectButton [options]="facturasSerieOptions" formControlName="serie" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
     </div>
     }
 
     <!-- ----- FECHA -----  -->
-    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.dia_unico) || reportTypeHasfield(reportField.dateField)) {
-    <div class="col-12 p-0 mb-2">
-      <label class="control-label mb-0 mt-2">Fecha: <span style="color: red">*</span> </label>
-      <p-calendar inputId="fecha" formControlName="fecha" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
-      @if (!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)) {
-      <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
-      }
+    @if ((inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.one_day) || reportTypeHasfield(reportField.dateField)) {
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label mb-0">Fecha: <span style="color: red">*</span> </label>
+        <p-datepicker inputId="fecha" formControlName="fecha" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+        @if (!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)) {
+        <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+        }
+      </div>
     </div>
     }
 
     <!-- ----- DESDE -----  -->
 
-    @if (reportTypeHasfield(reportField.fromField) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
-    <div class="col-6 pl-0 mb-2">
-      <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
-      <p-calendar inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
-      @if (!form.controls['desde'].valid && (form.controls['desde'].dirty || form.controls['desde'].touched)) {
-      <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
-      }
+    @if (reportTypeHasfield(reportField.fromField) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.range) ) {
+    <div class="col-6 pl-0">
+      <div class="form-group">
+        <label class="control-label mb-0">Desde: <span style="color: red">*</span> </label>
+        <p-datepicker inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+        @if (!form.controls['desde'].valid && (form.controls['desde'].dirty || form.controls['desde'].touched)) {
+        <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+        }
+      </div>
     </div>
     }
 
     <!-- ----- HASTA -----  -->
-    @if ( reportTypeHasfield(reportField.toDateField)|| (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == dateRangeType.rango_fecha) ) {
-    <div class="col-6 pr-0 mb-2">
-      <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
-      <p-calendar inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
-      @if (!form.controls['hasta'].valid && (form.controls['hasta'].dirty || form.controls['hasta'].touched)) {
-      <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
-      }
+    @if ( reportTypeHasfield(reportField.toDateField)|| (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.range) ) {
+    <div class="col-6 pr-0">
+      <div class="form-group">
+        <label class="control-label mb-0">Hasta: <span style="color: red">*</span> </label>
+        <p-datepicker inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+        @if (!form.controls['hasta'].valid && (form.controls['hasta'].dirty || form.controls['hasta'].touched)) {
+        <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+        }
+      </div>
     </div>
     }
 
     <!-- ----- DINAMYC SELECTION -----  -->
     @if (dinamycSelectionReady && reportTypeHasfield(reportField.dynamicSelection)) { @for (dinamyc_selection of inputs.dinamyc_selections; track dinamyc_selection.id) {
-    <div class="col-12 p-0 mb-2">
-      <label class="control-label mb-0 mt-2">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
-      <p-dropdown
-        [options]="dinamyc_selection.items"
-        [formControlName]="dinamyc_selection.formControl"
-        [placeholder]="dinamyc_selection.placeholder"
-        appendTo="body"
-        [filter]="true"
-        [optionLabel]="dinamyc_selection.optionLabel ?? null"
-        [optionValue]="dinamyc_selection.optionValue ?? null"
-        (onFilter)="dinamyc_selection.searchFunction($event.filter)"
-        [disabled]="dinamyc_selection.disabledFunction()"
-        [emptyFilterMessage]="dinamyc_selection.notFoundText"
-        [resetFilterOnHide]="true"
-      />
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label mb-0">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
+        <p-select
+          [options]="dinamyc_selection.items"
+          [formControlName]="dinamyc_selection.formControl"
+          [placeholder]="dinamyc_selection.placeholder"
+          appendTo="body"
+          [filter]="true"
+          [optionLabel]="dinamyc_selection.optionLabel ?? null"
+          [optionValue]="dinamyc_selection.optionValue ?? null"
+          (onFilter)="dinamyc_selection.searchFunction($event.filter)"
+          [disabled]="dinamyc_selection.disabledFunction()"
+          [emptyFilterMessage]="dinamyc_selection.notFoundText"
+          [resetFilterOnHide]="true"
+        />
+      </div>
     </div>
     } }
 
     <!-- ----- SELECCION DE CLIENTE -----  -->
     @if ( reportTypeHasfield(reportField.customerField) ) {
-    <div class="col-12 p-0 mb-2">
-      <label class="control-label mb-0 mt-2">Seleccione cliente: <span style="color: red">*</span> </label>
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label mb-0">Seleccione cliente: <span style="color: red">*</span> </label>
 
-      <p-dropdown
-        [options]="listaClientes"
-        formControlName="cliente_id"
-        placeholder="Ingrese el nombre del cliente"
-        [filter]="true"
-        appendTo="body"
-        optionLabel="nombre_completo"
-        optionValue="id"
-        (onFilter)="getClientes($event.filter)"
-        [disabled]="listaClientes.length == 0"
-        emptyFilterMessage="Cliente no encontrado"
-        [resetFilterOnHide]="true"
-      >
-        <ng-template let-cliente pTemplate="item">
-          <div class="">
-            <span class="d-flex gap-2 w-100" style="font-size: 1rem"> <strong>Nombre: </strong> {{ cliente.nombre_completo }} </span>
-            <span class="d-flex gap-2 w-100 no-wrap" style="font-size: 0.8rem; color: #787878"> <strong>documento de identidad: </strong> {{ cliente.documento_identidad }} </span>
-          </div>
-        </ng-template>
-      </p-dropdown>
+        <p-select
+          [options]="listaClientes"
+          formControlName="cliente_id"
+          placeholder="Ingrese el nombre del cliente"
+          [filter]="true"
+          appendTo="body"
+          optionLabel="nombre_completo"
+          optionValue="id"
+          (onFilter)="getClientes($event.filter)"
+          [disabled]="listaClientes.length == 0"
+          emptyFilterMessage="Cliente no encontrado"
+          [resetFilterOnHide]="true"
+        >
+          <ng-template let-cliente pTemplate="item">
+            <div class="">
+              <span class="d-flex gap-2 w-100" style="font-size: 1rem"> <strong>Nombre: </strong> {{ cliente.nombre_completo }} </span>
+              <span class="d-flex gap-2 w-100 no-wrap" style="font-size: 0.8rem; color: #00000054"> <strong>documento de identidad: </strong> {{ cliente.documento_identidad }} </span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
     </div>
     }
 
     <!-- ----- CONDICION -----  -->
     @if (reportTypeHasfield(reportField.conditionField)) {
-    <div class="col-12 p-0 mb-2">
-      <label class="control-label mb-0 mt-2">Condicion: <span style="color: red">*</span> </label>
-      <select formControlName="condicion" class="form-control">
-        <option disabled>Seleccione</option>
-        @for (condicion of condiciones; track condicion.id) {
-        <option [value]="condicion.id">{{ condicion.label }}</option>
-        }
-      </select>
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label mb-0">Condicion: <span style="color: red">*</span> </label>
+        <select formControlName="condicion" class="form-control">
+          <option disabled>Seleccione</option>
+          @for (condicion of condiciones; track condicion.id) {
+          <option [value]="condicion.id">{{ condicion.label }}</option>
+          }
+        </select>
+      </div>
     </div>
     }
 
     <!-- ----- TIPO -----  -->
     @if (reportTypeHasfield(reportField.typeField) ) {
-    <div class="col-12 p-0 mb-2">
-      <label class="control-label mb-0 mt-2">Tipo: <span style="color: red">*</span> </label>
-      <select formControlName="tipo" class="form-control" (change)="changeTipo()">
-        <option disabled>Seleccione</option>
-        @for (tipo of tipos; track tipo) {
-        <option [value]="tipo.id">{{ tipo.label }}</option>
-        }
-      </select>
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label mb-0">Tipo: <span style="color: red">*</span> </label>
+        <select formControlName="tipo" class="form-control" (change)="changeTipo()">
+          <option disabled>Seleccione</option>
+          @for (tipo of tipos; track tipo) {
+          <option [value]="tipo.id">{{ tipo.label }}</option>
+          }
+        </select>
+      </div>
     </div>
     }
 
     <!-- ----- TIPO FACTURAS -----  -->
     @if (reportTypeHasfield(reportField.billTypeField)) {
-    <div class="col-12 p-0 mb-2">
-      <label class="control-label mb-0 mt-2">Tipo de factura: <span style="color: red">*</span> </label>
-      <select formControlName="tipo_factura_id" class="form-control">
-        <option disabled>Seleccione</option>
-        @for (tipo of tipos_facturas; track tipo) {
-        <option [value]="tipo.id">{{ tipo.label }}</option>
-        }
-      </select>
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label mb-0">Tipo de factura: <span style="color: red">*</span> </label>
+        <select formControlName="tipo_factura_id" class="form-control">
+          <option disabled>Seleccione</option>
+          @for (tipo of tipos_facturas; track tipo) {
+          <option [value]="tipo.id">{{ tipo.label }}</option>
+          }
+        </select>
+      </div>
     </div>
     }
 
     <!-- ----- SELECCION DE ARTICULO -----  -->
     @if (reportTypeHasfield(reportField.articuloField)) {
-    <div class="col-12 p-0 mb-2">
-      <label class="control-label mb-0 mt-2">Seleccione articulo: <span style="color: red">*</span> </label>
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label mb-0">Seleccione articulo: <span style="color: red">*</span> </label>
 
-      <p-dropdown
-        [options]="listaArticulos"
-        formControlName="articulo_id"
-        placeholder="Ingrese el nombre de un articulo"
-        [filter]="true"
-        optionLabel="nombre"
-        optionValue="id"
-        (onFilter)="getArticulos($event.filter)"
-        [disabled]="listaArticulos.length == 0"
-        emptyFilterMessage="Articulo no encontrado"
-        [resetFilterOnHide]="true"
-        appendTo="body"
-      />
+        <p-select
+          [options]="listaArticulos"
+          formControlName="articulo_id"
+          placeholder="Ingrese el nombre de un articulo"
+          [filter]="true"
+          optionLabel="nombre"
+          optionValue="id"
+          (onFilter)="getArticulos($event.filter)"
+          [disabled]="listaArticulos.length == 0"
+          emptyFilterMessage="Articulo no encontrado"
+          [resetFilterOnHide]="true"
+          appendTo="body"
+        />
+      </div>
     </div>
     }
   </div>
@@ -164,16 +182,18 @@
 
 @if (inputs.switchGroup) {
 <div>
-  @if (inputs.switchGroup && inputs.switchGroup?.title && fun.hasValue(inputs.switchGroup.title)) {
-  <label class="control-label">{{ inputs.switchGroup.title }} </label>
-  }
-  <div>
-    @for (switch of inputs.switchGroup.array; track switch) {
-    <div class="form-group mb-2 switchDiv">
-      <input [(ngModel)]="switch.value" class="apple-switch" type="checkbox" />
-      <span class="ml-2">{{ switch.label }}</span>
-    </div>
+  <div class="form-group">
+    @if (inputs.switchGroup && inputs.switchGroup?.title && fun.hasValue(inputs.switchGroup.title)) {
+    <label class="control-label">{{ inputs.switchGroup.title }} </label>
     }
+    <div>
+      @for (switch of inputs.switchGroup.array; track switch) {
+      <div class="form-group mb-2 switchDiv">
+        <input [(ngModel)]="switch.value" class="apple-switch" type="checkbox" />
+        <span class="ml-2">{{ switch.label }}</span>
+      </div>
+      }
+    </div>
   </div>
 </div>
 }

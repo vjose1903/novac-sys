@@ -1,4 +1,4 @@
-import { ConfigI } from './../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
@@ -9,7 +9,7 @@ import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
 import { NotaC } from './notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
@@ -21,6 +21,7 @@ import { ModalClass } from '../../components/modal/modal-class';
   selector: 'app-notas-cred-deb',
   templateUrl: './notas-cred-deb.component.html',
   styleUrls: ['./notas-cred-deb.component.scss'],
+  standalone: false,
 })
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   // factura;
@@ -54,9 +55,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   table_config: table_config = {
     info: [
-      { titulo: ' ', tipo: 'switch', select_all: true, key: 'select', estilos: [{ width: '3.5rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', estilos: [{ 'text-align': 'left' }, { width: '20rem' }, { 'padding-left': '0.5rem' }] },
-      { titulo: 'Cantidad', key: 'cantidad_', tipo: 'text', estilos: [{ width: '7rem' }] },
+      { titulo: ' ', tipo: 'switch', select_all: true, key: 'select', style: { width: '3.5rem' } },
+      { titulo: 'Articulo', tipo: 'text', key: 'descripcion', style: { 'text-align': 'left', width: '20rem', 'padding-left': '0.5rem' } },
+      { titulo: 'Cantidad', key: 'cantidad_', tipo: 'text', style: { width: '7rem' } },
       { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero' },
       { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
       {
@@ -67,9 +68,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         inputType: 'text',
         textAlign: 'end',
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
-        estilos: [{ width: '8rem' }],
+        style: { width: '8rem' },
       },
-      { titulo: 'Total nota', key: 'total_nota', tipo: 'input', textAlign: 'end', disable: [{ kind: 'always' }], estilos: [{ width: '8rem' }] },
+      { titulo: 'Total nota', key: 'total_nota', tipo: 'input', textAlign: 'end', disable: [{ kind: 'always' }], style: { width: '8rem' } },
     ],
     id_tabla: 'notas',
     obj_paginate: { show: false },
@@ -141,20 +142,23 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         inputType: 'number',
         textAlign: 'end',
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
-        estilos: [{ width: '6rem' }],
+        style: { width: '6rem' },
       });
       resolve(true);
     });
   }
+  
 
   agregarItbisEnTabla() {
     const base = this.tipoNota == 'credito' ? 7 : 6;
-    fun.pushAt(this.table_config.info, base, { titulo: 'Itbis', key: 'itbis', tipo: 'formatoNumero', text_color: 'colorItbis', alert_msg: 'A partir de los 30 días el ITBIS queda retenido.', estilos: [{ 'padding-left': '2rem' }] });
-    fun.pushAt(this.table_config.info, base + 1, { titulo: 'Itbis real', key: 'itbis_real', tipo: 'input', textAlign: 'end', inputType: 'text', disable: [{ kind: 'always' }], estilos: [{ width: '7rem' }] });
+    fun.pushAt(this.table_config.info, base, { titulo: 'Itbis', key: 'itbis', tipo: 'formatoNumero', text_color: 'colorItbis', alert_msg: 'A partir de los 30 días el ITBIS queda retenido.', style: { 'padding-left': '2rem' } });
+    fun.pushAt(this.table_config.info, base + 1, { titulo: 'Itbis real', key: 'itbis_real', tipo: 'input', textAlign: 'end', inputType: 'text', disable: [{ kind: 'always' }], style: { width: '7rem' } });
   }
 
-  onCloseTab(eventData) {
-    _.pullAt(this.facturasConDetalles, [eventData.index]);
+  onCloseTab(event, index) {
+    event.stopPropagation();
+
+    fun.pullAt(this.facturasConDetalles, index);
   }
 
   async getFacturas() {
@@ -429,12 +433,14 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return suma;
   }
 
-  changeHeaderStatus(iteraFact, tabPanel, idTab): any {
-    if (tabPanel) {
-      const element = document.getElementsByClassName(idTab);
+  totalIndividualIsCero(iteraFact): any {
+    return this.totalIndividual(iteraFact) == 0;
 
-      if (element.item(0)) element.item(0).setAttribute('style', this.totalIndividual(iteraFact) == 0 ? 'background: #efc2c2' : '');
-    }
+    // if (tabPanel) {
+    //   const element = document.getElementsByClassName(idTab);
+
+    //   if (element.item(0)) element.item(0).setAttribute('style', this.totalIndividual(iteraFact) == 0 ? 'background: #efc2c2' : '');
+    // }
   }
 
   totalGlobal() {
