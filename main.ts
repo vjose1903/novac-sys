@@ -28,6 +28,7 @@ import ReplaceInFile from './electron/replace-in-file';
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
 import ExportToExcel from './electron/export-to-excel';
+import LogProcessor from './electron/write-logs';
 
 let win: BrowserWindow | null;
 let splash: BrowserWindow | null;
@@ -35,10 +36,12 @@ let auto_updater: AppUpdater;
 let export_to_excel: ExportToExcel;
 let docker_handler: DockerHandler;
 let replace_in_file: ReplaceInFile;
+const Console: LogProcessor = LogProcessor.getInstance();
 
 const args = process.argv.slice(1);
 const serve = args.some(val => val === '--serve');
-const appFilePath: any = url.format({ pathname: path.join(app.getAppPath(), 'dist', 'browser', 'index.html'), protocol: 'file:', slashes: true });
+
+const appFilePath = `file://${path.join(app.getAppPath(), 'dist', 'browser', 'index.html')}`;
 
 function createSplash(type = 'splash') {
   if (splash) {
@@ -48,7 +51,10 @@ function createSplash(type = 'splash') {
 
   splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
 
-  const splashUrl = url.format({ pathname: path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`), protocol: 'file:', slashes: true });
+  const splashUrl = `file://${path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`)}`;
+
+  writeLogs(' ----- CREATE SPLASH ------');
+  writeLogs(splashUrl, 'splashUrl');
 
   splash.loadURL(splashUrl);
   splash.center();
@@ -94,6 +100,14 @@ function createWindow() {
       if (serve) {
         win.loadURL('http://localhost:5220');
       } else {
+        // const a = await runTerminalCommand(`dir ${path.join(app.getAppPath(), 'dist', 'browser')}`);
+        // const b = await runTerminalCommand(`dir ${path.join(app.getAppPath(), 'dist')}`);
+        const c = await runTerminalCommand(`dir ${path.join(app.getAppPath())}`);
+
+        // writeLogs(a, '#### a ' );
+        // writeLogs(b, '#### b ' );
+        writeLogs(c, '#### c ');
+        writeLogs('appFilePath ', appFilePath);
         win.loadURL(appFilePath);
       }
 
@@ -105,19 +119,26 @@ function createWindow() {
       }, 250);
 
       // Emitted when the window is closed.
-      win.on('closed', () => (win = null));
+      win.on('closed', () => this.closeApp());
 
       resolve(win);
     } catch (error) {
       console.error('CREATEW WINDOW error ', error);
       writeLogs(error, 'ERROR EJECUTANDO LA CARPETA PRINCIPAL');
+      this.closeApp();
+      createSplash(`splash_error_deconocido`);
       console.error(error);
     }
   });
 }
 
 try {
-  app.on('ready', () => createSplash());
+  app.on('ready', () => {
+    // -------- borrar el archivo de logs --------
+    Console.clean().then(async () => {
+      createSplash();
+    });
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => app.quit());
@@ -129,7 +150,14 @@ try {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // IS MACOS SYSTEM
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function isMacOs() {
+export function closeApp() {
+  win = null;
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// IS MACOS SYSTEM
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+export function isMacOs() {
   return process.platform === 'darwin';
 }
 
@@ -149,40 +177,37 @@ async function getServer_(): Promise<boolean> {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function beforeCreateSplash(splash) {
   return new Promise<any>(async (resolve, reject) => {
-    // -------- borrar el archivo de logs --------
-    borrarLogs().then(async () => {
-      writeLogs(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
+    writeLogs(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
-      // ----------- inicializando docker handler --------------
-      docker_handler = new DockerHandler();
+    // ----------- inicializando docker handler --------------
+    docker_handler = new DockerHandler();
 
-      HandlerConfigFile.checkConfigFile(splash)
-        .then(async is_config_ready => {
-          if (is_config_ready) {
-            Functions.getConfigFile()
-              .then(async config => {
-                // ----------- correr base de datos local --------------
-                writeLogs(config.is_db_local, 'config.is_db_local ');
+    HandlerConfigFile.checkConfigFile(splash)
+      .then(async is_config_ready => {
+        if (is_config_ready) {
+          Functions.getConfigFile()
+            .then(async config => {
+              // ----------- correr base de datos local --------------
+              writeLogs(config.is_db_local, 'config.is_db_local ');
 
-                if (config.is_db_local) {
-                  docker_handler
-                    .checkAllInDocker()
-                    .then(res_db => continuarCargandoArchivos(resolve))
-                    .catch(error_type => createSplash(`splash_${error_type}_error`));
-                  //
-                } else {
-                  continuarCargandoArchivos(resolve);
-                }
-              })
-              .catch(err => {
-                createSplash('splash_config_error');
-              });
-          }
-        })
-        .catch(err => {
-          createSplash('splash_config_error');
-        });
-    });
+              if (config.is_db_local) {
+                docker_handler
+                  .checkAllInDocker()
+                  .then(res_db => continuarCargandoArchivos(resolve))
+                  .catch(error_type => createSplash(`splash_${error_type}_error`));
+                //
+              } else {
+                continuarCargandoArchivos(resolve);
+              }
+            })
+            .catch(err => {
+              createSplash('splash_config_error');
+            });
+        }
+      })
+      .catch(err => {
+        createSplash('splash_config_error');
+      });
   });
 }
 
@@ -390,28 +415,6 @@ function parseAppConfig() {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// BORRA EL ARCHIVO DE LOGS
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-function borrarLogs() {
-  return new Promise<boolean>(async resolve => {
-    const carpeta = await pathAdd('/log');
-
-    if (!fs.existsSync(carpeta)) {
-      fs.mkdir(carpeta, { recursive: true }, err => {
-        if (err) throw err;
-      });
-    } else {
-      const comando = isMacOs() ? `rm -rf "${await pathAdd('/log/my_log.txt')}"` : `del "${await pathAdd('/log/my_log.txt')}"`;
-
-      runTerminalCommand(comando);
-    }
-
-    setTimeout(() => resolve(true), 1000);
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export function runTerminalCommand(command) {
@@ -433,26 +436,8 @@ export function runTerminalCommand(command) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 export async function writeLogs(msg, titulo?) {
-  // runTerminalCommand('ls');
   if (win || splash) {
-    const fs = require('fs');
-
-    const carpeta = await pathAdd('/log');
-    const file = await pathAdd('/log/my_log.txt');
-
-    let texto = '';
-    if (typeof msg === 'object') texto = JSON.stringify(msg, null, '\t');
-    else if (typeof msg === 'number') texto = msg.toString();
-    else texto = msg;
-
-    if (!fs.existsSync(carpeta)) {
-      fs.mkdir(carpeta, { recursive: true }, err => {
-        if (err) throw err;
-        else escribirLogs(file, titulo, texto);
-      });
-    } else {
-      escribirLogs(file, titulo, texto);
-    }
+    Console.log(msg, titulo);
   }
 }
 

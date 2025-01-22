@@ -25,6 +25,7 @@
               "src/splash_config_error.html",
               "src/splash_db_error.html",
               "src/splash_docker_error.html",
+              "src/splash_error_desconocido.html",
               "src/splash.html",
               "src/favicon.ico",
               "src/favicon.icns",
@@ -38,20 +39,20 @@
             ],
             "styles": [
               "node_modules/primeicons/primeicons.css",
-              
+
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "node_modules/@fortawesome/fontawesome-free/css/solid.css",
               "node_modules/@fortawesome/fontawesome-free/css/regular.css",
               "node_modules/@fortawesome/fontawesome-free/css/brands.css",
               "node_modules/@fortawesome/fontawesome-free/css/fontawesome.css",
-              
+
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/animate.css/animate.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.scss"
             ],
             "scripts": [],
-            
+
             "allowedCommonJsDependencies": ["rxjs", "rxjs/operators"]
           },
           "configurations": {
