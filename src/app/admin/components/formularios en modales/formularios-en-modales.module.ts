@@ -17,6 +17,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -29,6 +30,7 @@ const components = [
   ModalSeleccinarArticuloComponent,
   BuscarClienteSuplidorComponent,
   BuscarArticuloComponent,
+  ConfirmacionImprimirComponent
 ];
 
 @NgModule({

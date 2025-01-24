@@ -6,6 +6,7 @@ import { PhotoDataI } from './img-viewer-edit.utils';
   selector: 'img-viewer-edit',
   templateUrl: './img-viewer-edit.component.html',
   styleUrls: ['./img-viewer-edit.component.scss'],
+  standalone: false,
 })
 export class ImgViewerEdit implements OnInit {
   nameFile = '';
@@ -36,7 +37,9 @@ export class ImgViewerEdit implements OnInit {
     if (files && files.length > 0) {
       reader.readAsDataURL(file);
 
-      reader.onload = (e) => {
+      reader.onload = e => {
+        if (!reader.result) return;
+
         const base64 = reader.result.toString().split(',')[1];
 
         const fileNameWithoutExtension = file.name.split('.').slice(0, -1).join('.');

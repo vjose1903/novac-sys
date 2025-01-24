@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
-import { BehaviorSubject, lastValueFrom, skip, take } from 'rxjs';
+import { BehaviorSubject, filter, lastValueFrom, skip, take } from 'rxjs';
 import * as fs from 'fs';
-import { ELECTRON_RESPONSE, ELECTRON_SENDER, MessageTaskInterface } from '../../../../electron/shared-electron-angular';
+import { ELECTRON_FOCUS_WINDOW, ELECTRON_RESPONSE, ELECTRON_SENDER, MessageTaskInterface } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
-import { ELECTRON_EVENTS_OBSERVER } from '../typescript/GLOBAL';
 import { fun } from './functions.service';
 
 @Injectable({
@@ -26,6 +25,10 @@ export class IpcService {
   };
 
   colaDeMensajes = new BehaviorSubject<any>({});
+
+  // Añadir nuevo Subject para eventos
+  private electronEvents = new BehaviorSubject<MessageTaskInterface>(null);
+  public electronEvents$ = this.electronEvents.asObservable();
 
   get isElectron(): boolean {
     return !!(window && window.process && window.process.type);
@@ -63,7 +66,12 @@ export class IpcService {
 
   listenEvents() {
     this._ipc.on(ELECTRON_RESPONSE, (event, obj) => {
-      const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
+      console.log('  ');
+      console.log(' ----- listenEvents -----');
+
+      console.log('obj ', obj);
+
+      const arg = obj ? (typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface)) : {} as MessageTaskInterface;
       const tareas = this.colaDeMensajes.value;
 
       if (tareas.hasOwnProperty(arg.id)) {
@@ -71,7 +79,7 @@ export class IpcService {
         tareas[arg.id] = undefined;
         this.updateColaMensaje(tareas);
       } else {
-        ELECTRON_EVENTS_OBSERVER.next(obj);
+        this.electronEvents.next(obj);
       }
     });
   }
@@ -113,6 +121,20 @@ export class IpcService {
       const list = this.colaDeMensajes.getValue();
       list[task.id] = task;
       this.colaDeMensajes.next(list);
+    }
+  }
+
+  // Añadir método helper para escuchar eventos específicos
+  public onElectronEvent(eventName: string) {
+    return this.electronEvents$.pipe(
+      filter((event: MessageTaskInterface) => event?.eventName === eventName)
+    );
+  }
+
+  // Añade este método para solicitar focus
+  public focusWindow(): void {
+    if (this.isElectron) {
+      this.sendTask(new MessageTask(ELECTRON_FOCUS_WINDOW, {}));
     }
   }
 }

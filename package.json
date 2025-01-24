@@ -14,21 +14,25 @@
     "ng": "ng",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "clean-actualizacion": "rimraf ./actualizacion",
-    "clean-dist": "rimraf ./dist",
+
+    "clean": "npm-run-all clean:*",
+    "clean:actualizacion": "rimraf ./actualizacion",
+    "clean:dist": "rimraf ./dist",
+
     "start": "npm-run-all -p ng:serve electron:serve",
-    "build": "npm run clean-dist && npm run electron:serve-tsc && ng build --stats-json --base-href ./",
-    "build:prod": "npm run build -- -c production",
-    "electron:serve-tsc": "tsc -p tsconfig.serve.json",
     "ng:serve": "ng serve --port 5220 -c web",
-    "electron:builder-windows": "npm run clean-actualizacion && electron-builder build --windows --x64",
     "electron:serve": "wait-on tcp:5220 && npm run electron:serve-tsc && npx electron . --serve",
-    "electron:local": "npm run build:prod && npx electron .",
-    "electron:build": "npm run build:prod && electron-builder build",
-    "electron:windows64": "npm run electron:serve-tsc && npm run build:prod && npm run electron:builder-windows -- -p always",
-    "electron:windows-local": "npm run electron:serve-tsc && npm run build:prod && npm run electron:builder-windows",
-    "electron:macos-local": "npm run electron:serve-tsc && npm run build:prod && electron-builder build --mac",
-    "electron:solo": "npm run electron:serve-tsc && npm run electron:builder-windows",
+    "electron:serve-tsc": "tsc -p tsconfig.serve.json",
+
+    "build": "npm run clean:dist && npm run electron:serve-tsc && ng build --stats-json --base-href ./",
+    "build:prod": "npm run build -- -c production",
+
+    "electron:builder-windows": "npm run clean:actualizacion && electron-builder build --windows --x64",
+
+    "windows:dev": "npm run build:prod && npm run electron:builder-windows",
+    "windows:prod": "npm run build:prod && npm run electron:builder-windows -- -p always",
+    "macos": "npm run build:prod && electron-builder build --mac",
+
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "bundle-report": "webpack-bundle-analyzer dist/stats.json"
   },

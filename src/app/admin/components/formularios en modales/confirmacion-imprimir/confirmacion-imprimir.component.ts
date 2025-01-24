@@ -1,11 +1,11 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { Ss } from '../../../core/services/singleton.service';
-import { ConfigI } from '../../../core/interface/config-interface';
-import { ModalI } from '../../components/modal/modal-class';
-import { SharedService } from '../../../core/services/shared.service';
-import { teclasCode } from '../../../core/typescript/constantes';
+import { Ss } from '../../../../core/services/singleton.service';
+import { ConfigI } from '../../../../core/interface/config-interface';
+import { ModalI } from '../../modal/modal-class';
+import { SharedService } from '../../../../core/services/shared.service';
+import { teclasCode } from '../../../../core/typescript/constantes';
 import * as _ from 'lodash';
-import { FacturacionService } from '../facturacion.service';
+import { FacturacionService } from '../../../facturacion/facturacion.service';
 
 @Component({
     selector: 'app-confirmacion-imprimir',

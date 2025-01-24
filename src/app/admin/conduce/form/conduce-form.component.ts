@@ -16,7 +16,7 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
-import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { ConfirmacionImprimirComponent } from '../../components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '../../../core/typescript/constantes';
 import { ModalClass } from '../../components/modal/modal-class';
 import { Router } from '@angular/router';
