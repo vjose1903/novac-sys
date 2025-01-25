@@ -10,10 +10,18 @@ import SharedElectronAngular, {
 } from './shared-electron-angular';
 
 import { writeLogs } from '../main';
+import { BrowserWindow } from 'electron';
 
 export default class AppUpdater {
+  win: BrowserWindow;
+  serve_: boolean;
   constructor(win, serve_) {
-    if (!serve_) {
+    this.win = win;
+    this.serve_ = serve_;
+  }
+
+  init(){
+    if (!this.serve_) {
       writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
 
       const log = require('electron-log');
@@ -21,7 +29,7 @@ export default class AppUpdater {
       autoUpdater.logger = log;
 
       // this.checkUpdates(win);
-      this.checkForUpdates(win);
+      this.checkForUpdates(this.win);
     }
   }
 

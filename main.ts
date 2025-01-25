@@ -1,7 +1,6 @@
-import { app, BrowserWindow, screen, ipcMain, shell, Tray, Menu } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as url from 'url';
 import { ConfigI } from './src/app/core/interface/config-interface';
 
 const { exec } = require('child_process');
@@ -24,7 +23,6 @@ import SharedElectronAngular, {
   ELECTRON_SHOW_CLOSE_CONFIRMATION,
   MessageTaskInterface,
   ELECTRON_EXPORT_CSV,
-  ELECTRON_TO_ANGULAR,
   ELECTRON_FOCUS_WINDOW,
 } from './electron/shared-electron-angular';
 import AppUpdater from './electron/auto-update';
@@ -40,7 +38,6 @@ let auto_updater: AppUpdater;
 let export_to_excel: ExportToExcel;
 let docker_handler: DockerHandler;
 let replace_in_file: ReplaceInFile;
-let tray: Tray | null;
 const Console: LogProcessor = LogProcessor.getInstance();
 
 const args = process.argv.slice(1);
@@ -55,7 +52,7 @@ function createSplash(type = 'splash') {
     splash = null;
   }
 
-  splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
+  splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true, icon: iconPath });
 
   const splashUrl = `file://${path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`)}`;
 
@@ -104,6 +101,10 @@ function createWindow() {
 
       if (serve) {
         win.loadURL('http://localhost:5220').catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
+
+        setTimeout(() => {
+          win?.webContents.openDevTools();
+        }, 250);
       } else {
         win.loadURL(appFilePath).catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
       }
@@ -111,36 +112,20 @@ function createWindow() {
       win.maximize();
       win.setMenuBarVisibility(false);
 
-      setTimeout(() => {
-        if (serve) win?.webContents.openDevTools();
-      }, 250);
+      // Evento cuando ya se ha destruido la ventana
+      win.on('closed', () => (win = null));
 
-      // Emitted when the window is closed.
-      win.on('closed', () => {
-        closeApp();
-      });
-
-      // Agregar listener para minimizar
+      // Evento cuando se intenta cerrar la ventana con el boton de cerrar
       win.on('close', (event: any) => {
-        writeLogs(' ----- WINDOW CLOSE -----');
         event.preventDefault();
         sendCloseConfirmation();
       });
-
-      // Agregar listener para restaurar
-      ipcMain.on('restore-window', () => {
-        writeLogs(' ----- WINDOW RESTORED -----');
-        showWindow();
-      });
-
-      createTrayIcon(); // Llamar a la función que crea el ícono en la bandeja
 
       resolve(win);
     } catch (error) {
       console.error('CREATEW WINDOW error ', error);
       writeLogs(error, 'ERROR EJECUTANDO LA CARPETA PRINCIPAL');
       closeAppAndSplashError('ERROR EJECUTANDO LA CARPETA PRINCIPAL: ' + error);
-      console.error(error);
     }
   });
 }
@@ -154,37 +139,10 @@ try {
   });
 
   // Quit when all windows are closed.
-  app.on('window-all-closed', () => {
-    closeApp();
-  });
+  app.on('window-all-closed', () => closeApp());
 } catch (e) {
   // Catch Error
   throw e;
-}
-
-// Función para crear el ícono en la bandeja del sistema
-function createTrayIcon() {
-  if (!tray) {
-    tray = new Tray(iconPath);
-
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        label: 'Mostrar aplicación',
-        click: () => showWindow(),
-      },
-      {
-        label: 'Salir',
-        click: () => sendCloseConfirmation(),
-      },
-    ]);
-
-    tray.setTitle('Novac System');
-    tray.setToolTip('Novac System');
-    tray.setContextMenu(contextMenu);
-
-    // Doble clic en el ícono de la bandeja para mostrar la ventana
-    tray.on('double-click', () => showWindow());
-  }
 }
 
 // Función para mostrar y restaurar la ventana
@@ -202,44 +160,31 @@ function showWindow() {
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Send close confirmation
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -=-=-=-=-=-=-=-=-=-=-=-=-=-
 export function sendCloseConfirmation() {
   writeLogs(' ----- SEND CLOSE CONFIRMATION -----');
   showWindow();
-  console.log('win ', win);
   SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_SHOW_CLOSE_CONFIRMATION, data: {} });
-  win?.focus();
 }
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Close the app AND SPLASH ERROR
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export function closeAppAndSplashError(error: string) {
-  closeApp();
   createSplash(`splash_error_desconocido`);
+  closeApp();
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Close the app
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export function closeApp() {
-  if (tray) {
-    tray.destroy();
-    tray = null;
+  if (win) {
+    win.destroy();
+    app.quit();
+
+    writeLogs('###### CIERRE DE LA APLICACION ######');
   }
-  win = null;
-  app.quit();
-
-  console.log(' ');
-  console.log(' ');
-  console.log(' ');
-  console.log(' ');
-  console.log(' ----- CLOSE APP -----');
-  writeLogs(' ###### CIERRE DE LA APLICACION ###### ');
-  console.log(' ');
-  console.log(' ');
-  console.log(' ');
-  console.log(' ');
-
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -320,7 +265,7 @@ async function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
   const serve_ = await getServer_();
   auto_updater = new AppUpdater(win, serve_);
-
+  auto_updater.init();
   // ---------------------------------------
 }
 
@@ -563,7 +508,7 @@ async function escribirLogs(file, titulo, texto) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; pageOrientation: string; printer: string }) {
   return new Promise(async (resolve, reject) => {
-    const pdfFileName = await pathAdd('/' + params.fileName);
+    const pdfFileName = await pathAdd(`/${params.fileName}`);
 
     try {
       fs.writeFile(pdfFileName, params.base64, { encoding: 'base64' }, () => {

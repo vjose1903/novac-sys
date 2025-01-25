@@ -66,11 +66,6 @@ export class IpcService {
 
   listenEvents() {
     this._ipc.on(ELECTRON_RESPONSE, (event, obj) => {
-      console.log('  ');
-      console.log(' ----- listenEvents -----');
-
-      console.log('obj ', obj);
-
       const arg = obj ? (typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface)) : {} as MessageTaskInterface;
       const tareas = this.colaDeMensajes.value;
 

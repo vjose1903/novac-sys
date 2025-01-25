@@ -31,7 +31,7 @@ button:disabled {
   }
 
   &.bg-red {
-    background: #fc2c2ca8;
+    background: #fc2c2c;
     color: #3a0303e0 !important;
 
     &:hover {
@@ -165,6 +165,18 @@ input[type="text"] {
     cursor: pointer;
     background-color: #306ed4;
     color: white;
+  }
+}
+
+.btn-danger,
+#btn-danger {
+  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  background-color: #fc2c2c;
+  color: white;
+  &:hover {
+    cursor: pointer;
+    filter: brightness(0.6);
+    cursor: pointer;
   }
 }
 
