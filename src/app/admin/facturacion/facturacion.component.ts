@@ -24,7 +24,7 @@ import { seriesDGII, teclasCode, serie } from '../../core/typescript/constantes'
 import { Permisos } from '../../core/typescript/permisos';
 import { ConfigI } from '../../core/interface/config-interface';
 import { Ss } from '../../core/services/singleton.service';
-import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
+import { ConfirmacionImprimirComponent } from '../components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { PdfService } from '../../core/services/reports/pdf/pdf.service';
 import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configuracion_articulos/articulos_configuracion';

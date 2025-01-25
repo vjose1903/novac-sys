@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, shell, Tray, Menu } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
@@ -9,7 +9,7 @@ const { exec } = require('child_process');
 import Functions from './electron/functions';
 import HandlerConfigFile from './electron/handler-config-file';
 
-import {
+import SharedElectronAngular, {
   ELECTRON_CHANGE_CONFIG_FILE,
   ELECTRON_EVENT_DECRYPT,
   ELECTRON_EVENT_ENCRYPT,
@@ -20,14 +20,19 @@ import {
   ELECTRON_SET_APP_CONFIG,
   ELECTRON_TEST,
   ELECTRON_RELOAD,
+  ELECTRON_CLOSE_CONFIRMATION,
+  ELECTRON_SHOW_CLOSE_CONFIRMATION,
   MessageTaskInterface,
   ELECTRON_EXPORT_CSV,
+  ELECTRON_TO_ANGULAR,
+  ELECTRON_FOCUS_WINDOW,
 } from './electron/shared-electron-angular';
 import AppUpdater from './electron/auto-update';
 import ReplaceInFile from './electron/replace-in-file';
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
 import ExportToExcel from './electron/export-to-excel';
+import LogProcessor from './electron/write-logs';
 
 let win: BrowserWindow | null;
 let splash: BrowserWindow | null;
@@ -35,10 +40,14 @@ let auto_updater: AppUpdater;
 let export_to_excel: ExportToExcel;
 let docker_handler: DockerHandler;
 let replace_in_file: ReplaceInFile;
+let tray: Tray | null;
+const Console: LogProcessor = LogProcessor.getInstance();
 
 const args = process.argv.slice(1);
 const serve = args.some(val => val === '--serve');
-const appFilePath: any = url.format({ pathname: path.join(app.getAppPath(), 'dist', 'browser', 'index.html'), protocol: 'file:', slashes: true });
+
+const appFilePath = `file://${path.join(app.getAppPath(), 'dist', 'browser', 'index.html')}`;
+const iconPath = path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', 'assets', 'icons', isMacOs() ? 'mac/icon.icns' : 'win/icon.ico');
 
 function createSplash(type = 'splash') {
   if (splash) {
@@ -48,7 +57,9 @@ function createSplash(type = 'splash') {
 
   splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true });
 
-  const splashUrl = url.format({ pathname: path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`), protocol: 'file:', slashes: true });
+  const splashUrl = `file://${path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`)}`;
+
+  writeLogs(' ----- CREATE SPLASH ------');
 
   splash.loadURL(splashUrl);
   splash.center();
@@ -87,14 +98,14 @@ function createWindow() {
         minWidth: size.width,
         height: size.height,
         minHeight: size.height,
-        icon: isMacOs() ? __dirname + '/icons/mac/icon.icns' : __dirname + '/icons/win/icon.ico',
+        icon: iconPath,
         webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
       });
 
       if (serve) {
-        win.loadURL('http://localhost:5220');
+        win.loadURL('http://localhost:5220').catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
       } else {
-        win.loadURL(appFilePath);
+        win.loadURL(appFilePath).catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
       }
 
       win.maximize();
@@ -105,31 +116,136 @@ function createWindow() {
       }, 250);
 
       // Emitted when the window is closed.
-      win.on('closed', () => (win = null));
+      win.on('closed', () => {
+        closeApp();
+      });
+
+      // Agregar listener para minimizar
+      win.on('close', (event: any) => {
+        writeLogs(' ----- WINDOW CLOSE -----');
+        event.preventDefault();
+        sendCloseConfirmation();
+      });
+
+      // Agregar listener para restaurar
+      ipcMain.on('restore-window', () => {
+        writeLogs(' ----- WINDOW RESTORED -----');
+        showWindow();
+      });
+
+      createTrayIcon(); // Llamar a la función que crea el ícono en la bandeja
 
       resolve(win);
     } catch (error) {
       console.error('CREATEW WINDOW error ', error);
       writeLogs(error, 'ERROR EJECUTANDO LA CARPETA PRINCIPAL');
+      closeAppAndSplashError('ERROR EJECUTANDO LA CARPETA PRINCIPAL: ' + error);
       console.error(error);
     }
   });
 }
 
 try {
-  app.on('ready', () => createSplash());
+  app.on('ready', () => {
+    // -------- borrar el archivo de logs --------
+    Console.clean().then(async () => {
+      createSplash();
+    });
+  });
 
   // Quit when all windows are closed.
-  app.on('window-all-closed', () => app.quit());
+  app.on('window-all-closed', () => {
+    closeApp();
+  });
 } catch (e) {
   // Catch Error
   throw e;
 }
 
+// Función para crear el ícono en la bandeja del sistema
+function createTrayIcon() {
+  if (!tray) {
+    tray = new Tray(iconPath);
+
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Mostrar aplicación',
+        click: () => showWindow(),
+      },
+      {
+        label: 'Salir',
+        click: () => sendCloseConfirmation(),
+      },
+    ]);
+
+    tray.setTitle('Novac System');
+    tray.setToolTip('Novac System');
+    tray.setContextMenu(contextMenu);
+
+    // Doble clic en el ícono de la bandeja para mostrar la ventana
+    tray.on('double-click', () => showWindow());
+  }
+}
+
+// Función para mostrar y restaurar la ventana
+function showWindow() {
+  return new Promise<void>((resolve, reject) => {
+    writeLogs(' ----- SHOW WINDOW -----');
+    if (win) {
+      if (win.isMinimized()) win.restore();
+      if (!win.isVisible()) win.show();
+      win.focus();
+    }
+    resolve();
+  });
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Send close confirmation
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+export function sendCloseConfirmation() {
+  writeLogs(' ----- SEND CLOSE CONFIRMATION -----');
+  showWindow();
+  console.log('win ', win);
+  SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_SHOW_CLOSE_CONFIRMATION, data: {} });
+  win?.focus();
+}
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Close the app AND SPLASH ERROR
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+export function closeAppAndSplashError(error: string) {
+  closeApp();
+  createSplash(`splash_error_desconocido`);
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Close the app
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+export function closeApp() {
+  if (tray) {
+    tray.destroy();
+    tray = null;
+  }
+  win = null;
+  app.quit();
+
+  console.log(' ');
+  console.log(' ');
+  console.log(' ');
+  console.log(' ');
+  console.log(' ----- CLOSE APP -----');
+  writeLogs(' ###### CIERRE DE LA APLICACION ###### ');
+  console.log(' ');
+  console.log(' ');
+  console.log(' ');
+  console.log(' ');
+
+}
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // IS MACOS SYSTEM
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function isMacOs() {
+export function isMacOs() {
   return process.platform === 'darwin';
 }
 
@@ -149,40 +265,37 @@ async function getServer_(): Promise<boolean> {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function beforeCreateSplash(splash) {
   return new Promise<any>(async (resolve, reject) => {
-    // -------- borrar el archivo de logs --------
-    borrarLogs().then(async () => {
-      writeLogs(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
+    writeLogs(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
-      // ----------- inicializando docker handler --------------
-      docker_handler = new DockerHandler();
+    // ----------- inicializando docker handler --------------
+    docker_handler = new DockerHandler();
 
-      HandlerConfigFile.checkConfigFile(splash)
-        .then(async is_config_ready => {
-          if (is_config_ready) {
-            Functions.getConfigFile()
-              .then(async config => {
-                // ----------- correr base de datos local --------------
-                writeLogs(config.is_db_local, 'config.is_db_local ');
+    HandlerConfigFile.checkConfigFile(splash)
+      .then(async is_config_ready => {
+        if (is_config_ready) {
+          Functions.getConfigFile()
+            .then(async config => {
+              // ----------- correr base de datos local --------------
+              writeLogs(config.is_db_local, 'config.is_db_local ');
 
-                if (config.is_db_local) {
-                  docker_handler
-                    .checkAllInDocker()
-                    .then(res_db => continuarCargandoArchivos(resolve))
-                    .catch(error_type => createSplash(`splash_${error_type}_error`));
-                  //
-                } else {
-                  continuarCargandoArchivos(resolve);
-                }
-              })
-              .catch(err => {
-                createSplash('splash_config_error');
-              });
-          }
-        })
-        .catch(err => {
-          createSplash('splash_config_error');
-        });
-    });
+              if (config.is_db_local) {
+                docker_handler
+                  .checkAllInDocker()
+                  .then(res_db => continuarCargandoArchivos(resolve))
+                  .catch(error_type => createSplash(`splash_${error_type}_error`));
+                //
+              } else {
+                continuarCargandoArchivos(resolve);
+              }
+            })
+            .catch(err => {
+              createSplash('splash_config_error');
+            });
+        }
+      })
+      .catch(err => {
+        createSplash('splash_config_error');
+      });
   });
 }
 
@@ -321,6 +434,19 @@ async function handleEvent(event: any, obj: string) {
         });
         break;
       //
+      case ELECTRON_CLOSE_CONFIRMATION:
+        writeLogs(' ----- CLOSE CONFIRMATION -----');
+        closeApp();
+        break;
+      //
+      case ELECTRON_FOCUS_WINDOW:
+        writeLogs(' ----- FOCUS WINDOW -----');
+        showWindow().then(() => {
+          task.data = 'FOCUS LISTO';
+          event.reply(ELECTRON_RESPONSE, task);
+        });
+        break;
+      //
       default:
         event.reply(ELECTRON_RESPONSE);
         break;
@@ -390,28 +516,6 @@ function parseAppConfig() {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// BORRA EL ARCHIVO DE LOGS
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-function borrarLogs() {
-  return new Promise<boolean>(async resolve => {
-    const carpeta = await pathAdd('/log');
-
-    if (!fs.existsSync(carpeta)) {
-      fs.mkdir(carpeta, { recursive: true }, err => {
-        if (err) throw err;
-      });
-    } else {
-      const comando = isMacOs() ? `rm -rf "${await pathAdd('/log/my_log.txt')}"` : `del "${await pathAdd('/log/my_log.txt')}"`;
-
-      runTerminalCommand(comando);
-    }
-
-    setTimeout(() => resolve(true), 1000);
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // FUNCION PARA EJECUTAR COMANDOS DE CONSOLA
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export function runTerminalCommand(command) {
@@ -433,26 +537,8 @@ export function runTerminalCommand(command) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 export async function writeLogs(msg, titulo?) {
-  // runTerminalCommand('ls');
   if (win || splash) {
-    const fs = require('fs');
-
-    const carpeta = await pathAdd('/log');
-    const file = await pathAdd('/log/my_log.txt');
-
-    let texto = '';
-    if (typeof msg === 'object') texto = JSON.stringify(msg, null, '\t');
-    else if (typeof msg === 'number') texto = msg.toString();
-    else texto = msg;
-
-    if (!fs.existsSync(carpeta)) {
-      fs.mkdir(carpeta, { recursive: true }, err => {
-        if (err) throw err;
-        else escribirLogs(file, titulo, texto);
-      });
-    } else {
-      escribirLogs(file, titulo, texto);
-    }
+    Console.log(msg, titulo);
   }
 }
 

@@ -14,7 +14,7 @@ import { NotaC } from './notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { ConfirmacionImprimirComponent } from '../../components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
@@ -147,7 +147,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       resolve(true);
     });
   }
-  
+
 
   agregarItbisEnTabla() {
     const base = this.tipoNota == 'credito' ? 7 : 6;

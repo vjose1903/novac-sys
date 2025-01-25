@@ -1,7 +1,10 @@
 export const ELECTRON_TEST = 'electron-test';
+export const ELECTRON_TO_ANGULAR = 'electron-to-angular';
 export const ELECTRON_SENDER = 'electron-envio';
 export const ELECTRON_RESPONSE = 'electron-respuesta';
-export const ELECTRON_QUIT_APP = 'electron-quit-app';
+export const ELECTRON_FOCUS_WINDOW = 'electron-focus-window';
+export const ELECTRON_CLOSE_CONFIRMATION = 'electron-close-confirmation';
+export const ELECTRON_SHOW_CLOSE_CONFIRMATION = 'electron-show-close-confirmation';
 export const ELECTRON_EVENT_DECRYPT = 'electron-desencriptar';
 export const ELECTRON_EVENT_ENCRYPT = 'electron-encriptar';
 export const ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
@@ -36,10 +39,10 @@ export interface Printer {
 }
 
 export interface MessageTaskInterface {
-  id: string;
+  id?: string;
   eventName: string;
   data: any;
-  response: any;
+  response?: any;
   error?: boolean;
 }
 export interface PrintJob {
@@ -51,7 +54,7 @@ export interface PrintJob {
 }
 
 export default class SharedElectronAngular {
-  static sendEventToAngular(win, params: { event_name: string; info: any }) {
-    if (win) win.webContents.send(ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
+  static sendEventToAngular(win, params: MessageTaskInterface) {
+    if (win) win.webContents.send(ELECTRON_RESPONSE, { eventName: params.eventName, data: params.data });
   }
 }

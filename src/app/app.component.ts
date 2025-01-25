@@ -1,7 +1,11 @@
+import { PrimengModule } from './modules/primeng.module';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NewModalModule } from './admin/components/modal/modal.module';
+import { FormulariosEnModalesModule } from './admin/components/formularios en modales/formularios-en-modales.module';
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
-import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
+import { MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { Ss } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
@@ -17,25 +21,29 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
-  ELECTRON_QUIT_APP,
+  ELECTRON_CLOSE_CONFIRMATION,
+  ELECTRON_SHOW_CLOSE_CONFIRMATION,
   ELECTRON_GET_APP_CONFIG,
-  ELECTRON_RELOAD,
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';
-import { ConfigI } from './core/interface/config-interface';
+import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { MixinClass } from './core/typescript/MixinClass';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from './admin/facturacion/facturacion.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { log } from 'console';
+import { ModalClass } from './admin/components/modal/modal-class';
 
 @Component({
   selector: 'app-root',
+  imports: [CommonModule, PrimengModule, FormsModule, ReactiveFormsModule, NewModalModule, FormulariosEnModalesModule, RouterModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  standalone: false,
 })
 export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
   @HostListener('window:keydown', ['$event'])
@@ -96,23 +104,22 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       if (fun.hasValue(res)) this.getAppConfig();
     });
 
-    this.sub = ELECTRON_EVENTS_OBSERVER.subscribe(res => {
+    this._ipc.electronEvents$.subscribe(res => {
       if (fun.hasValue(res)) {
-        const info = res.info;
-        switch (res.event_name) {
+        const data = res.data;
+        switch (res.eventName) {
           case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
-            fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
-
+            fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
             break;
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
-            fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, info);
+            fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, data);
             break;
           //
           case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
             this.visible = true;
-            fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, info);
-            this.downloadProgression(info.body);
+            fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
+            this.downloadProgression(data.body);
             break;
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
@@ -120,17 +127,20 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             break;
           //
           case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
-            fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
+            fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
             break;
           //
-          case ELECTRON_QUIT_APP:
-            this.cerrar_app();
+          case ELECTRON_SHOW_CLOSE_CONFIRMATION:
+            console.log(' ----- ELECTRON_SHOW_CLOSE_CONFIRMATION -----');
+            console.log('res ', res);
 
+            this.cerrar_app();
+            this.enfocarApp();
             break;
           //
           case ELECTRON_EVENT_UPDATE_ERROR:
-            fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, info);
-            fun.toastError(info.msg, 'ERRROR');
+            fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
+            fun.toastError(data.msg, 'ERRROR');
             this.visible = false;
             break;
           //
@@ -157,6 +167,10 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
         }, 2000);
       }, 250);
     });
+  }
+
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
   }
 
   async test() {
@@ -186,16 +200,33 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       id: 'cerrar_app',
       header: 'CONFIRMACION DE CIERRE',
       width: '56.25rem',
-      height: '31.25rem',
       botones: {
-        aceptar: { show: true, disable: false },
-        cancelar: { show: true, disable: false },
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [
+          { clase: 'btn btn-red', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: instance => {
+              this.sendCloseConfirmation();
+              instance.closeModal(instance.id, 'cancel');
+            },
+            label: 'Continuar',
+            disable: false,
+          },
+        ],
       },
     });
   }
 
-  ngAfterContentChecked() {
-    this.cdRef.detectChanges();
+  sendCloseConfirmation() {
+    const task = new MessageTask(ELECTRON_CLOSE_CONFIRMATION);
+    console.log('task ', task);
+
+    this._ipc.sendTask(task);
+  }
+  enfocarApp() {
+    console.log('enfocar');
+    this._ipc.focusWindow();
   }
 
   resize() {
@@ -221,6 +252,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   async getAppConfig() {
     return new Promise<any>((resolve, reject) => {
       const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
+      console.log('task ', task);
 
       this._ipc
         .sendTask(task)
