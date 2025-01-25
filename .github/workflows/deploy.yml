@@ -15,7 +15,7 @@ jobs:
       - name: Install Node.js and NPM
         uses: actions/setup-node@v1
         with:
-          node-version: 20
+          node-version: 22.13.1
 
       - name: Install dependencies
         run: npm i
