@@ -1,3 +1,4 @@
+// Elements
 @use './elements/backgrounds.scss' as *;
 @use './elements/border-radius.scss' as *;
 @use './elements/btns.scss' as *;
@@ -20,4 +21,5 @@
 @use './elements/spacers.scss' as *;
 @use './elements/tablas.scss' as *;
 
-
+// Fonts
+@use './fonts/fonts.scss' as *;

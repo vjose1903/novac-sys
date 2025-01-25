@@ -2,10 +2,6 @@
 @use './splash-styles.scss' as *;
 @use './assets/my_styles/main.scss' as *;
 
-/* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700');
-
-$bodyfont: 'Poppins';
 
 .visually-hidden {
   display: none !important;
@@ -40,9 +36,6 @@ $bodyfont: 'Poppins';
   text-align: end;
 }
 
-.text-poppins {
-  font-family: 'Poppins' !important;
-}
 
 .h-96 {
   height: 96% !important;
@@ -116,7 +109,6 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: $bodyfont;
 }
 
 .backnegro {
