@@ -105,52 +105,50 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
 
     this._ipc.electronEvents$.subscribe(res => {
-      if (fun.hasValue(res)) {
-        const data = res.data;
-        switch (res.eventName) {
-          case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
-            fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
-            fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, data);
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
-            this.visible = true;
-            fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
-            this.downloadProgression(data.body);
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
-            this.visible = false;
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
-            fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
-            break;
-          //
-          case ELECTRON_SHOW_CLOSE_CONFIRMATION:
-            console.log(' ----- ELECTRON_SHOW_CLOSE_CONFIRMATION -----');
-            console.log('res ', res);
-
-            this.cerrar_app();
-            this.enfocarApp();
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_ERROR:
-            fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
-            fun.toastError(data.msg, 'ERRROR');
-            this.visible = false;
-            break;
-          //
-          case 'test':
-            break;
-          //
-          default:
-            break;
+      Ss.zone.run(() => {
+        if (fun.hasValue(res)) {
+          const data = res.data;
+          switch (res.eventName) {
+            case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
+              fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
+              fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, data);
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
+              this.visible = true;
+              fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
+              this.downloadProgression(data.body);
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
+              this.visible = false;
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
+              fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
+              break;
+            //
+            case ELECTRON_SHOW_CLOSE_CONFIRMATION:
+              this.cerrar_app();
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_ERROR:
+              fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
+              fun.toastError(data.msg, 'ERRROR');
+              this.visible = false;
+              break;
+            //
+            case 'test':
+              break;
+            //
+            default:
+              break;
+          }
         }
-      }
+      });
     });
 
     window.onresize = e => this.resize.bind(this)(e);
@@ -162,9 +160,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     this.getAppConfig().then(config => {
       setTimeout(() => {
         this.configReady = true;
-        setTimeout(() => {
-          this.test();
-        }, 2000);
       }, 250);
     });
   }
@@ -195,38 +190,40 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   cerrar_app() {
-    this.openNewModal({
-      html: `<p> ESTAS A PUNTO DE CERRAR EL PROGRAMA NOVAC, ¿Desea continuar? </p>`,
-      id: 'cerrar_app',
-      header: 'CONFIRMACION DE CIERRE',
-      width: '56.25rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-red', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: instance => {
-              this.sendCloseConfirmation();
-              instance.closeModal(instance.id, 'cancel');
+    Ss.zone.run(() => {
+      this.openNewModal({
+        html: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
+        id: 'cerrar_app',
+        header: 'CONFIRMACION DE CIERRE',
+        width: '40rem',
+        botones: {
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+          dinamico: [
+            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cancelar', disable: false },
+            {
+              clase: 'btn btn-danger',
+              function: instance => {
+                this.sendCloseConfirmation();
+                instance.closeModal(instance.id, 'cancel');
+              },
+              label: 'Cerrar',
+              disable: false,
             },
-            label: 'Continuar',
-            disable: false,
-          },
-        ],
-      },
+          ],
+        },
+      });
     });
   }
 
   sendCloseConfirmation() {
     const task = new MessageTask(ELECTRON_CLOSE_CONFIRMATION);
-    console.log('task ', task);
-
     this._ipc.sendTask(task);
   }
+
   enfocarApp() {
-    console.log('enfocar');
-    this._ipc.focusWindow();
+    Ss.zone.run(() => {
+      this._ipc.focusWindow();
+    });
   }
 
   resize() {
@@ -252,7 +249,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   async getAppConfig() {
     return new Promise<any>((resolve, reject) => {
       const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
-      console.log('task ', task);
 
       this._ipc
         .sendTask(task)
