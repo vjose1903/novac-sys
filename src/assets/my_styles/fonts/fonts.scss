@@ -1,0 +1,45 @@
+// Definir una variable para la ruta de la fuente
+$font-path: '../../fonts';
+
+// Lista de variaciones que deseas generar
+$font-variations: (
+  // Poppins
+  ('Poppins-Bold.woff2', 700, normal, 'Poppins', 'poppins'),
+  ('Poppins-Medium.woff2', 500, normal, 'Poppins', 'poppins'),
+  ('Poppins-Regular.woff2', 400, normal, 'Poppins', 'poppins'),
+  ('Poppins-Light.woff2', 300, normal, 'Poppins', 'poppins'),
+  ('Poppins-Thin.woff2', 100, normal, 'Poppins', 'poppins'),
+  // Glamour
+  ('Orbitron-Black.woff2', 900, normal, 'Orbitron', 'orbitron'),
+  ('Orbitron-ExtraBold.woff2', 800, normal, 'Orbitron', 'orbitron'),
+  ('Orbitron-Bold.woff2', 700, normal, 'Orbitron', 'orbitron'),
+  ('Orbitron-SemiBold.woff2', 600, normal, 'Orbitron', 'orbitron'),
+  ('Orbitron-Medium.woff2', 500, normal, 'Orbitron', 'orbitron'),
+  ('Orbitron-Regular.woff2', 400, normal, 'Orbitron', 'orbitron')
+);
+
+// Definir el @font-face utilizando un @for
+@for $i from 1 through length($font-variations) {
+  $font-variation: nth($font-variations, $i);
+  $font-name: nth($font-variation, 1);
+  $font-weight: nth($font-variation, 2);
+  $font-style: nth($font-variation, 3);
+  $font-family-name: nth($font-variation, 4);
+  $font-directory: nth($font-variation, 5);
+
+  @font-face {
+    font-family: '#{$font-family-name}';
+    src: url('#{$font-path}/#{$font-directory}/#{$font-name}') format('truetype');
+    font-display: swap;
+    font-weight: $font-weight;
+    font-style: $font-style;
+  }
+}
+
+.text-orbitron {
+  font-family: 'Orbitron' !important;
+}
+
+.text-poppins {
+  font-family: 'Poppins' !important;
+}

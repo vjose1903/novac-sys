@@ -1,81 +1,87 @@
-<div style="height: 100%">
-  <p-tabView [(activeIndex)]="tabIndex" styleClass="my_tabView panelsStyle anularPadding" (onChange)="clickTabView()">
-    <p-tabPanel header="Marcas">
-      <form [formGroup]="formMarca" class="h-100">
-        <div class="row h-100">
-          @if (hasPermissionsMarcaCreate) {
-          <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
-            <div class="card card-padding sombra">
-              <div>
-                <div class="form-group">
-                  <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
-                  <input (keyup)="capitalice('descripcion', htmlServ.getValue($event), formMarca)" (focus)="htmlServ.selectValue($event)" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
-                  @if (!formMarca.controls['descripcion'].valid && (formMarca.controls['descripcion'].dirty || formMarca.controls['descripcion'].touched)) {
-                  <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                  }
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-12 mt-3">
+<div class="h-100 w-100">
+  <p-tabs [(value)]="tabIndex">
+    <p-tablist>
+      <p-tab [value]="0">Marcas</p-tab>
+      <p-tab [value]="1">Modelos</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel [value]="0">
+        <form [formGroup]="formMarca" class="h-100">
+          <div class="row h-100">
+            @if (hasPermissionsMarcaCreate) {
+            <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
+              <div class="card card-padding sombra">
+                <div>
                   <div class="form-group">
-                    <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
-                    @if (marcaSelected) {
-                    <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
+                    <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
+                    <input (keyup)="capitalice('descripcion', htmlServ.getValue($event), formMarca)" (focus)="htmlServ.selectValue($event)" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
+                    @if (!formMarca.controls['descripcion'].valid && (formMarca.controls['descripcion'].dirty || formMarca.controls['descripcion'].touched)) {
+                    <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
                     }
-                    <input [disabled]="!formMarca.valid" (click)="submit(formMarca)" type="submit" class="btn" value="{{ marcaSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-12 mt-3 p-0">
+                    <div class="form-group">
+                      <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
+                      @if (marcaSelected) {
+                      <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
+                      }
+                      <input [disabled]="!formMarca.valid" (click)="submit(formMarca)" type="submit" class="btn" value="{{ marcaSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          }
+            }
 
-          <div class="{{ hasPermissionsMarcaCreate ? 'col-6' : 'col-12' }} p-0">
-            <div #cardMarca class="h-100">
-              <dinamic-table [cardTabla]="cardMarca" [(data)]="listadoMarcas" [seleccionado]="marcaSelected?.id" [(TablasComponent)]="tablaMarcaComponent" [config]="table_marca_config" (table_events)="handle_table_events($event)"></dinamic-table>
+            <div class="{{ hasPermissionsMarcaCreate ? 'col-6' : 'col-12' }} p-0">
+              <div #cardMarca class="h-100">
+                <dinamic-table [cardTabla]="cardMarca" [(data)]="listadoMarcas" [seleccionado]="marcaSelected?.id" [(TablasComponent)]="tablaMarcaComponent" [config]="table_marca_config" (table_events)="handle_table_events($event)"></dinamic-table>
+              </div>
             </div>
           </div>
-        </div>
-      </form>
-    </p-tabPanel>
+        </form>
+      </p-tabpanel>
 
-    <!---------------------------------------------------------------------------------------------------------------------------------------------------->
+      <!---------------------------------------------------------------------------------------------------------------------------------------------------->
 
-    <p-tabPanel header="Modelos">
-      <form [formGroup]="formModelo" class="h-100">
-        <div class="row h-100">
-          @if (hasPermissionsModeloCreate) {
-          <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
-            <div class="row card card-padding sombra">
-              <div class="col-12">
-                <div class="form-group">
-                  <label class="control-label">Marca: <span style="color: red">*</span></label>
+      <p-tabpanel [value]="1">
+        <form [formGroup]="formModelo" class="h-100">
+          <div class="row h-100">
+            @if (hasPermissionsModeloCreate) {
+            <div class="col-6 contenedorRegistro" style="padding-left: 0 !important">
+              <div class="row card card-padding sombra">
+                <div class="col-12 p-0">
+                  <div class="form-group">
+                    <label class="control-label">Marca: <span style="color: red">*</span></label>
 
-                  <p-dropdown
-                    inputId="marca_modal"
-                    [options]="listaMarcas"
-                    formControlName="marca_id"
-                    placeholder="Seleccione una marca"
-                    [filter]="true"
-                    filterBy="descripcion"
-                    optionLabel="descripcion"
-                    optionValue="id"
-                    emptyFilterMessage="Marca no encontrada"
-                    [resetFilterOnHide]="true"
-                  />
+                    <p-select
+                      inputId="marca_modal"
+                      [options]="listaMarcas"
+                      formControlName="marca_id"
+                      placeholder="Seleccione una marca"
+                      [filter]="true"
+                      filterBy="descripcion"
+                      optionLabel="descripcion"
+                      optionValue="id"
+                      emptyFilterMessage="Marca no encontrada"
+                      [resetFilterOnHide]="true"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div class="col-12">
-                <div class="form-group">
-                  <label class="control-label">Modelo: <span style="color: red">*</span></label>
-                  <input (keyup)="capitalice('descripcion', htmlServ.getValue($event), formModelo)" (focus)="htmlServ.selectValue($event)" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
-                  @if (!formModelo.controls['descripcion'].valid && (formModelo.controls['descripcion'].dirty || formModelo.controls['descripcion'].touched)) {
-                  <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                  }
+                <div class="col-12 p-0">
+                  <div class="form-group">
+                    <label class="control-label">Modelo: <span style="color: red">*</span></label>
+                    <input (keyup)="capitalice('descripcion', htmlServ.getValue($event), formModelo)" (focus)="htmlServ.selectValue($event)" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
+                    @if (!formModelo.controls['descripcion'].valid && (formModelo.controls['descripcion'].dirty || formModelo.controls['descripcion'].touched)) {
+                    <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
+                    }
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-12 mt-3">
+
+                <div class="col-12 mt-3 p-0">
                   <div class="form-group">
                     <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
                     @if (modeloSelected) {
@@ -86,23 +92,23 @@
                 </div>
               </div>
             </div>
-          </div>
-          }
-          <div class="{{ hasPermissionsModeloCreate ? 'col-6' : 'col-12' }} p-0">
-            <div #cardModelo class="h-100">
-              <dinamic-table
-                [cardTabla]="cardModelo"
-                [(data)]="listadoModelos"
-                [seleccionado]="modeloSelected?.id"
-                [(TablasComponent)]="tablaModeloComponent"
-                [config]="table_modelo_config"
-                (table_events)="handle_table_events($event)"
-              ></dinamic-table>
+            }
+            <div class="{{ hasPermissionsModeloCreate ? 'col-6' : 'col-12' }} p-0">
+              <div #cardModelo class="h-100">
+                <dinamic-table
+                  [cardTabla]="cardModelo"
+                  [(data)]="listadoModelos"
+                  [seleccionado]="modeloSelected?.id"
+                  [(TablasComponent)]="tablaModeloComponent"
+                  [config]="table_modelo_config"
+                  (table_events)="handle_table_events($event)"
+                ></dinamic-table>
+              </div>
             </div>
           </div>
-        </div>
-      </form>
-    </p-tabPanel>
+        </form>
+      </p-tabpanel>
+    </p-tabpanels>
     <!---------------------------------------------------------------------------------------------------------------------------------------------------->
-  </p-tabView>
+  </p-tabs>
 </div>

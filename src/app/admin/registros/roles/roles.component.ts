@@ -10,9 +10,10 @@ import { Permisos } from '../../../core/typescript/permisos';
 import { ModalClass } from '../../components/modal/modal-class';
 
 @Component({
-  selector: 'app-roles',
-  templateUrl: './roles.component.html',
-  styleUrls: ['./roles.component.scss'],
+    selector: 'app-roles',
+    templateUrl: './roles.component.html',
+    styleUrls: ['./roles.component.scss'],
+    standalone: false
 })
 export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   titulo;

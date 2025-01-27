@@ -1,7 +1,11 @@
+import { PrimengModule } from './modules/primeng.module';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NewModalModule } from './admin/components/modal/modal.module';
+import { FormulariosEnModalesModule } from './admin/components/formularios en modales/formularios-en-modales.module';
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from './core/services/ipc.service';
-import { ELECTRON_EVENTS_OBSERVER, MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
+import { MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
 import * as _ from 'lodash';
 import { Ss } from './core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
@@ -9,7 +13,6 @@ import { LayoutService } from './admin/layout/layout.service';
 import { ConfigurationService } from './core/services/configuration.service';
 import { ThemeService } from './core/services/theme.service';
 import { MessageTask } from './core/models/message-task';
-import { PrimeNGConfig } from 'primeng/api';
 
 import {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
@@ -18,22 +21,27 @@ import {
   ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
   ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
   ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
-  KEYWORD_ELECTRON_QUIT_APP,
-  KEYWORD_ELECTRON_GET_APP_CONFIG,
-  KEYWORD_ELECTRON_RELOAD,
+  ELECTRON_CLOSE_CONFIRMATION,
+  ELECTRON_SHOW_CLOSE_CONFIRMATION,
+  ELECTRON_GET_APP_CONFIG,
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';
-import { ConfigI } from './core/typescript/config-interface';
+import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from './core/services/shared.service';
 import { fun } from './core/services/functions.service';
 import { MixinClass } from './core/typescript/MixinClass';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from './admin/facturacion/facturacion.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { log } from 'console';
+import { ModalClass } from './admin/components/modal/modal-class';
 
 @Component({
   selector: 'app-root',
+  imports: [CommonModule, PrimengModule, FormsModule, ReactiveFormsModule, NewModalModule, FormulariosEnModalesModule, RouterModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -71,9 +79,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     public themeService: ThemeService,
     public toastr: ToastrService,
     public sharedServ: SharedService,
-    public permissionsService: NgxPermissionsService,
-
-    private config: PrimeNGConfig,
+    public permissionsService: NgxPermissionsService
   ) {
     super();
   }
@@ -92,121 +98,74 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     Ss.sharedServ = this.sharedServ;
     Ss.cdRef = this.cdRef;
 
-    this.loaderServ.isLoading.subscribe((v) => (this.loading = v));
+    this.loaderServ.isLoading.subscribe(v => (this.loading = v));
 
-    this.subModified = MODIFIED_CONFIG_FILE.subscribe((res) => {
+    this.subModified = MODIFIED_CONFIG_FILE.subscribe(res => {
       if (fun.hasValue(res)) this.getAppConfig();
     });
 
-    this.sub = ELECTRON_EVENTS_OBSERVER.subscribe((res) => {
-      if (fun.hasValue(res)) {
-        const info = res.info;
-        switch (res.event_name) {
-          case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
-            fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
-
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
-            fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, info);
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
-            this.visible = true;
-            fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, info);
-            this.downloadProgression(info.body);
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
-            this.visible = false;
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
-            fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, info);
-            break;
-          //
-          case KEYWORD_ELECTRON_QUIT_APP:
-            this.cerrar_app();
-
-            break;
-          //
-          case ELECTRON_EVENT_UPDATE_ERROR:
-            fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, info);
-            fun.toastError(info.msg, 'ERRROR');
-            this.visible = false;
-            break;
-          //
-          case 'test':
-            break;
-          //
-          default:
-            break;
+    this._ipc.electronEvents$.subscribe(res => {
+      Ss.zone.run(() => {
+        if (fun.hasValue(res)) {
+          const data = res.data;
+          switch (res.eventName) {
+            case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
+              fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
+              fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, data);
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
+              this.visible = true;
+              fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
+              this.downloadProgression(data.body);
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
+              this.visible = false;
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
+              fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
+              break;
+            //
+            case ELECTRON_SHOW_CLOSE_CONFIRMATION:
+              this.cerrar_app();
+              break;
+            //
+            case ELECTRON_EVENT_UPDATE_ERROR:
+              fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
+              fun.toastError(data.msg, 'ERRROR');
+              this.visible = false;
+              break;
+            //
+            case 'test':
+              break;
+            //
+            default:
+              break;
+          }
         }
-      }
+      });
     });
 
-    window.onresize = (e) => this.resize.bind(this)(e);
-
-    this.config.setTranslation({
-      startsWith: 'Empieza con',
-      contains: 'Contiene',
-      notContains: 'No contiene',
-      endsWith: 'Termina con',
-      equals: 'Igual',
-      notEquals: 'No igual',
-      noFilter: 'No Filtrar',
-      lt: 'Menos que',
-      lte: 'Menos o igual que',
-      gt: 'Mayor que',
-      gte: 'Mayor o igual que',
-      is: 'Es',
-      isNot: 'No es',
-      before: 'Antes',
-      after: 'Despues',
-      dateIs: 'Fecha es',
-      dateIsNot: 'Fecha no es',
-      dateBefore: 'Fecha es anterior',
-      dateAfter: 'Fecha es posterior',
-      clear: 'Limpiar',
-      apply: 'APlicar',
-      matchAll: 'Todos concuerdan',
-      matchAny: 'Nunguno concuerda',
-      addRule: 'Añadir regla',
-      removeRule: 'Remover regla',
-      accept: 'Si',
-      reject: 'No',
-      choose: 'Elegir',
-      upload: 'Subir',
-      cancel: 'Cancelar',
-      dayNames: ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'sabado'],
-      dayNamesShort: ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'],
-      dayNamesMin: ['Dom.', 'Lun.', 'Mar.', 'Mié.', 'Jue.', 'Vie.', 'Sáb.'],
-      monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-      monthNamesShort: ['Ene.', 'Feb.', 'Mar.', 'Abr.', 'May', 'Jun.', 'Jul.', 'Ago.', 'Sep.', 'Oct.', 'Nov.', 'Dic.'],
-      dateFormat: 'dd/mm/yy',
-      firstDayOfWeek: 1,
-      today: 'Hoy',
-      weekHeader: 'Wk',
-      weak: 'Semana',
-      medium: 'Medio',
-      strong: 'Fuerte',
-      passwordPrompt: 'Ingrese contraseña',
-      emptyMessage: 'No hay registros',
-      emptyFilterMessage: 'No registros encontrados',
-    });
+    window.onresize = e => this.resize.bind(this)(e);
   }
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
 
-    this.getAppConfig().then((config) => {
+    this.getAppConfig().then(config => {
       setTimeout(() => {
         this.configReady = true;
-        setTimeout(() => {
-          this.test();
-        }, 2000);
       }, 250);
     });
+  }
+
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
   }
 
   async test() {
@@ -231,21 +190,40 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   cerrar_app() {
-    this.openNewModal({
-      html: `<p> ESTAS A PUNTO DE CERRAR EL PROGRAMA NOVAC, ¿Desea continuar? </p>`,
-      id: 'cerrar_app',
-      header: 'CONFIRMACION DE CIERRE',
-      width: '56.25rem',
-      height: '31.25rem',
-      botones: {
-        aceptar: { show: true, disable: false },
-        cancelar: { show: true, disable: false },
-      },
+    Ss.zone.run(() => {
+      this.openNewModal({
+        html: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
+        id: 'cerrar_app',
+        header: 'CONFIRMACION DE CIERRE',
+        width: '40rem',
+        botones: {
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+          dinamico: [
+            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cancelar', disable: false },
+            {
+              clase: 'btn btn-danger',
+              function: instance => {
+                this.sendCloseConfirmation();
+                instance.closeModal(instance.id, 'cancel');
+              },
+              label: 'Cerrar',
+              disable: false,
+            },
+          ],
+        },
+      });
     });
   }
 
-  ngAfterContentChecked() {
-    this.cdRef.detectChanges();
+  sendCloseConfirmation() {
+    const task = new MessageTask(ELECTRON_CLOSE_CONFIRMATION);
+    this._ipc.sendTask(task);
+  }
+
+  enfocarApp() {
+    Ss.zone.run(() => {
+      this._ipc.focusWindow();
+    });
   }
 
   resize() {
@@ -270,24 +248,18 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   async getAppConfig() {
     return new Promise<any>((resolve, reject) => {
-      const task = new MessageTask(KEYWORD_ELECTRON_GET_APP_CONFIG);
+      const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
 
       this._ipc
         .sendTask(task)
-        .then((config: ConfigI) => {
-          if (fun.objHas(config, 'err')) {
-            console.error(config);
-          } else {
-            console.log(config);
+        .then((config: any) => {
+          this.themeService.setTheme(config.color_app);
+          this.configServ.setConfig = config;
+          this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 
-            this.themeService.setTheme(config.color_app);
-            this.configServ.setConfig = config;
-            this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-
-            resolve(config);
-          }
+          resolve(config);
         })
-        .catch((err) => {
+        .catch(err => {
           console.error(err);
         });
     });

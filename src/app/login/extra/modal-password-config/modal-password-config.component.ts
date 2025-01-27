@@ -7,9 +7,10 @@ import { SharedService } from '../../../core/services/shared.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 
 @Component({
-  selector: 'app-modal-password-config',
-  templateUrl: './modal-password-config.component.html',
-  styleUrls: ['./modal-password-config.component.scss'],
+    selector: 'app-modal-password-config',
+    templateUrl: './modal-password-config.component.html',
+    styleUrls: ['./modal-password-config.component.scss'],
+    standalone: false
 })
 export class ModalPasswordConfigComponent extends MixinClass implements OnInit, ModalI {
   public modal: any = {};

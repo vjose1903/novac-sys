@@ -4,9 +4,10 @@ import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
 
 @Component({
-  selector: 'app-detalle-factura',
-  templateUrl: './detalle-factura.component.html',
-  styleUrls: ['./detalle-factura.component.scss'],
+    selector: 'app-detalle-factura',
+    templateUrl: './detalle-factura.component.html',
+    styleUrls: ['./detalle-factura.component.scss'],
+    standalone: false
 })
 export class DetalleFacturaComponent implements OnInit, ModalI {
   constructor() {}

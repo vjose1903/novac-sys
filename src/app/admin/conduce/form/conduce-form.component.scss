@@ -89,19 +89,19 @@
 // TAMAÑO DE LOS TITULOS
 // ====================================================
 
-.tiCOD_ {
+.column-codigo_ {
   width: 17%;
 }
 
-.tiCAN_ {
+.column-cantidad_ {
   width: 8.5%;
 }
 
-.tiUNI_ {
+.column-unidad_ {
   width: 16%;
 }
 
-.tiDES_ {
+.column-descripcion_ {
   width: 58.5%;
 }
 
@@ -128,18 +128,7 @@
 //   overflow-x: hidden;
 // }
 
-.conFlow {
-  overflow: auto !important;
-}
 
-.sinFLow {
-  overflow: hidden !important;
-}
-
-
-.btnBorrar {
-  transition: all 0.3s;
-}
 
 // ======================================================
 // ======================================================

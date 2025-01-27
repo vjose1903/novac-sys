@@ -10,9 +10,11 @@ import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.componen
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
-import { PdfService } from '../../core/services/pdf/pdf.service';
+import { PdfService } from '../../core/services/reports/pdf/pdf.service';
 import { serie } from '../../core/typescript/constantes';
-import { flip } from '@popperjs/core';
+import { csvConfig as csvConfigVentas } from '../../core/services/reports/excel/configs/report/ventas';
+import { csvConfig as csvConfigMovimientosVehiculo } from '../../core/services/reports/excel/configs/report/movimientos_vehiculo';
+import { ReportGroupTypeE } from '../../admin/reportes/reporte.utils';
 
 export enum comprobanteNormal {
   valor_fiscal = '01',
@@ -143,9 +145,9 @@ export class FacturaC extends CrudG<FacturasI> {
 
   static async getCamiones(name) {
     if (fun.hasValue(name)) {
-      fun.awaitTyping().then((res) => {
+      fun.awaitTyping().then(res => {
         const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false, info_vehiculo: true } };
-        new VehiculoC().getAll(extra).then((res) => {
+        new VehiculoC().getAll(extra).then(res => {
           FacturaC.inputsMovimientosViaje[0].items = res['data'];
         });
       });
@@ -155,20 +157,38 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   static requestReporte(params: { reporte; pdf }) {
-    if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switchGroup.array, (item) => item.value == false)) {
+    if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switchGroup.array, item => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
+      const configApp = Ss.configServ.getConfig({ isPromise: false });
+
       const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
       let formas_pago = '';
 
       if (params.pdf.tipo != 'movimientos_vehiculo') {
         formas_pago = '(';
 
-        params.reporte.data.switchGroup.array.forEach((item) => {
+        params.reporte.data.switchGroup.array.forEach(item => {
           if (item.value) formas_pago += `'${item.label}',`;
         });
 
         formas_pago = `${formas_pago.slice(0, formas_pago.length - 1)})`;
+
+        let configKey = '';
+        let prefix = null;
+
+        if (params.reporte.data.tipo == ReportGroupTypeE.detallado || params.pdf.tipo == 'ventas_diarias') {
+          configKey = `detallado${configApp.calcular_itbis ? '_itbis' : ''}`;
+          if (params.pdf.tipo == 'ventas_diarias') prefix = params.pdf.tipo;
+        } else if (params.reporte.data.tipo == ReportGroupTypeE.agrupado) {
+          configKey = `agrupado${configApp.calcular_itbis ? '_itbis' : ''}`;
+          prefix = 'ventas';
+        }
+
+        ReporteC.configCsv = csvConfigVentas[configKey];
+        if (fun.hasValue(prefix)) ReporteC.configCsv.prefix = prefix;
+      } else {
+        ReporteC.configCsv = csvConfigMovimientosVehiculo;
       }
 
       requestParams.parameters['tipo_factura_id'] = params.reporte.data.tipo_factura_id;
@@ -184,7 +204,7 @@ export class FacturaC extends CrudG<FacturasI> {
 
       if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
 
-      ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then((response) => {
+      ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
         let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
 
         ReporteC.visualizarReporte(objPdfView);
@@ -194,7 +214,7 @@ export class FacturaC extends CrudG<FacturasI> {
     function transformRequestResponse(requestResponse) {
       const configApp = Ss.configServ.getConfig({ isPromise: false });
 
-      requestResponse.contenido_reporte = requestResponse.contenido_reporte.map((item) => {
+      requestResponse.contenido_reporte = requestResponse.contenido_reporte.map(item => {
         const largo_nombre = configApp.calcular_itbis && params.pdf.tipo != 'movimientos_vehiculo' ? 58 : 48;
 
         if (fun.objHas(item, 'cliente_nombre') && item.cliente_nombre.length > largo_nombre) item.cliente_nombre = `${item.cliente_nombre.substring(0, largo_nombre)} ...`;
@@ -214,7 +234,7 @@ export class FacturaC extends CrudG<FacturasI> {
 
   getFacturaById(id: number) {
     const extra = { parameters: { actual_price: true, movimientos_viaje: true } };
-    return new Promise((resolve) => this.getOne(id, extra).then((res) => resolve(res)));
+    return new Promise(resolve => this.getOne(id, extra).then(res => resolve(res)));
   }
 
   getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean; movimientos_viaje?: boolean }) {
@@ -243,7 +263,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   parseDataToPdf(data) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const pick_factura1 = ['Bruto', 'cliente', 'balance', 'condicion', 'descuento', 'identificador', 'detalle_facturas', 'numero_factura', 'devuelta', 'estado', 'fecha_completada', 'fecha_equivalente', 'fecha_valida', 'fecha_vencimiento'];
       const pick_factura2 = ['fecha_viaje', 'forma_pago', 'id', 'is_viaje', 'monto', 'numero_comprobante', 'tipo', 'tipo_factura_id', 'itbis', 'suplidor', 'tipo_factura', 'total_factura', 'usuario', 'vendedor', 'movimientos_viaje'];
       const pick_factura = [...pick_factura1, ...pick_factura2];
@@ -264,7 +284,7 @@ export class FacturaC extends CrudG<FacturasI> {
       if (fun.hasValue(data_parsed.cliente) && data_parsed.cliente.nombre.length > 80) data_parsed.cliente.nombre = `${data_parsed.cliente.nombre.substring(0, 80)}...`;
       if (fun.hasValue(data_parsed.suplidor) && data_parsed.suplidor.nombre.length > 80) data_parsed.suplidor.nombre = `${data_parsed.suplidor.nombre.substring(0, 80)}...`;
 
-      data_parsed.detalle_facturas.forEach((detalle) => {
+      data_parsed.detalle_facturas.forEach(detalle => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {
           detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${detalle.unidad}`;
           data_parsed.contenido_reporte.push(detalle);
@@ -285,15 +305,15 @@ export class FacturaC extends CrudG<FacturasI> {
       height: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+        dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
   }
 
   handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?) {
     return new Promise<any>((resolve, reject) => {
-      PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
-        if (res.status === 'si') {
+      PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
+        .then(async res => {
           const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')), viewerOptions: { height: '40rem' } };
 
           const obj_modal = {
@@ -304,15 +324,18 @@ export class FacturaC extends CrudG<FacturasI> {
             width: '900px',
             botones: {
               ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+              dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
             },
           };
 
           if (fun.hasValue(botones_dinamicos)) obj_modal.botones.dinamico = botones_dinamicos;
 
           resolve(obj_modal);
-        }
-      });
+        })
+        .catch(err => {
+          fun.toastError(err.msg, 'ERROR');
+          reject(err);
+        });
     });
   }
 

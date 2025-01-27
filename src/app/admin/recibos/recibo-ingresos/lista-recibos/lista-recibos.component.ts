@@ -5,18 +5,19 @@ import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
-import { PdfService } from '../../../../core/services/pdf/pdf.service';
+import { PdfService } from '../../../../core/services/reports/pdf/pdf.service';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
 import { table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
-import { ConfigI } from '../../../../core/typescript/config-interface';
+import { ConfigI } from '../../../../core/interface/config-interface';
 import { Ss } from '../../../../core/services/singleton.service';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
   styleUrls: ['./lista-recibos.component.scss'],
+  standalone: false,
 })
 export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestroy {
   table_config: table_config = {
@@ -40,7 +41,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_recibos',
-    padre_functions: { data_request: (params) => this.getRecibos(params) },
+    padre_functions: { data_request: params => this.getRecibos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
@@ -52,7 +53,11 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   permissions = Permisos;
   configApp: ConfigI;
-  constructor(private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(
+    private router: Router,
+    private tServ: TablasService,
+    public loadServ: LoaderService
+  ) {
     super();
   }
 
@@ -74,7 +79,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   mapeoRecibos(data) {
-    data.map((recibo) => {
+    data.map(recibo => {
       recibo['numero_recibo'] = _.padStart(recibo.numero_recibo, 8, '0');
       recibo['numero_factura'] = recibo.detalle_recibos.length === 1 ? recibo.detalle_recibos[0].descripcion.split(' ')[1] : 'Varios...';
       recibo['ver'] = 'far fa-eye';
@@ -115,7 +120,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
-      this.reciboClass.getAll(extra).then((res) => {
+      this.reciboClass.getAll(extra).then(res => {
         res['data'] = this.mapeoRecibos(res['data']);
         this.lista_recibos = fun.deepCloning(res['data']);
 
@@ -139,7 +144,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
         case 'anular':
           const texto_modal = `Seguro de que desea anular el recibo <b class="negrita"> #${recibo_selected.numero_recibo} </b>`;
-          const siFunction = (instance) => {
+          const siFunction = instance => {
             this.anularRecibo(recibo_selected.id);
             instance.closeModal(instance.id, 'anular_recibo');
           };
@@ -154,8 +159,8 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   makeReciboPdf(arg) {
-    const recibo_selected = _.find(this.lista_recibos, (recibo) => recibo.id === arg.id);
-    this.reciboClass.parseDataToPdf(recibo_selected).then((recibo_parsed) => {
+    const recibo_selected = _.find(this.lista_recibos, recibo => recibo.id === arg.id);
+    this.reciboClass.parseDataToPdf(recibo_selected).then(recibo_parsed => {
       const obj = { data: recibo_parsed, type: 'recibo_ingreso', retunBase64: true };
       this.generarPdf(obj);
     });
@@ -165,43 +170,44 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     this.loadServ.isLoading.next(true);
 
     PdfService.generatePdf({ oPdf: obj, imprimir: false })
-      .then(async (res) => {
-        if (res.status === 'si') {
-          const fileName = res.file;
-          const base64 = res.base64;
-          const pageOrientation = res.pageOrientation;
+      .then(async res => {
+        const fileName = res.file;
+        const base64 = res.base64;
+        const pageOrientation = res.pageOrientation;
 
-          const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', reimprimir: true, fileName: _.first(res.file.split('.')) };
+        const obj_pdf = { base64: res.base64, titulo: 'Revisión de recibo de ingreso', reimprimir: true, fileName: _.first(res.file.split('.')) };
 
-          this.loadServ.isLoading.next(false);
+        this.loadServ.isLoading.next(false);
 
-          this.openNewModal({
-            component: PdfViewerComponent,
-            inputs: obj_pdf,
-            id: 'revision_recibo',
-            header: obj_pdf.titulo,
-            width: '900px',
-            height: '40rem',
-            botones: {
-              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [
-                { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-                { clase: 'btn btn-gris', function: (instance) => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },
-                {
-                  clase: 'btn btn-verde',
-                  function: (instance) => {
-                    this.imprimir_base64(fileName, base64, pageOrientation);
-                    instance.closeModal(instance.id, 'cancel');
-                  },
-                  label: 'Imprimir',
-                  disable: false,
+        this.openNewModal({
+          component: PdfViewerComponent,
+          inputs: obj_pdf,
+          id: 'revision_recibo',
+          header: obj_pdf.titulo,
+          width: '900px',
+          height: '40rem',
+          botones: {
+            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+            dinamico: [
+              { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+              { clase: 'btn btn-gris', function: instance => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },
+              {
+                clase: 'btn btn-verde',
+                function: instance => {
+                  this.imprimir_base64(fileName, base64, pageOrientation);
+                  instance.closeModal(instance.id, 'cancel');
                 },
-              ],
-            },
-          });
-        }
+                label: 'Imprimir',
+                disable: false,
+              },
+            ],
+          },
+        });
       })
-      .catch(() => this.loadServ.isLoading.next(false));
+      .catch(err => {
+        fun.toastError(err.msg, 'ERROR');
+        this.loadServ.isLoading.next(false);
+      });
   }
 
   verDetalles(data) {
@@ -213,11 +219,11 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     const obj = { base64: base64, file: fileName, type: 'recibo_ingreso', printer: this.configApp.printer_selected.recibo_ingreso, pageOrientation: pageOrientation };
     try {
       PdfService.imprimirBase64(obj)
-        .then(async (res) => {
+        .then(async res => {
           if (res['status'] === 'si') fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
           else fun.toastError(res['msg'], 'ERROR');
         })
-        .catch((err) => {
+        .catch(err => {
           console.error(err);
 
           fun.toastError(err['msg'], 'ERROR');
@@ -232,7 +238,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       const extra = { afterPath: `revertir/by_id/${id}` };
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
 
-      this.reciboClass.dynamic(extra).then((res) => this.getRecibos(actualPagination));
+      this.reciboClass.dynamic(extra).then(res => this.getRecibos(actualPagination));
     } catch (error) {}
   }
 }

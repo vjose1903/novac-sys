@@ -13,9 +13,10 @@ import { Permisos } from '../../core/typescript/permisos';
 import { InventarioC } from './inventario';
 
 @Component({
-  selector: 'app-inventario',
-  templateUrl: './inventario.component.html',
-  styleUrls: ['./inventario.component.scss'],
+    selector: 'app-inventario',
+    templateUrl: './inventario.component.html',
+    styleUrls: ['./inventario.component.scss'],
+    standalone: false
 })
 export class InventarioComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;

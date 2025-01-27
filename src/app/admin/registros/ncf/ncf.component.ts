@@ -13,9 +13,10 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
-  selector: 'app-ncf',
-  templateUrl: './ncf.component.html',
-  styleUrls: ['./ncf.component.scss'],
+    selector: 'app-ncf',
+    templateUrl: './ncf.component.html',
+    styleUrls: ['./ncf.component.scss'],
+    standalone: false
 })
 export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   form;

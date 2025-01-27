@@ -9,13 +9,13 @@ import * as _ from 'lodash';
 
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
-import { PdfService } from '../core/services/pdf/pdf.service';
+import { PdfService } from '../core/services/reports/pdf/pdf.service';
 import { RequestC } from '../core/typescript/requests';
 import { MixinClass } from '../core/typescript/MixinClass';
 import { Ss } from '../core/services/singleton.service';
-import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
+import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '../core/models/message-task';
-import { ConfigI } from '../core/typescript/config-interface';
+import { ConfigI } from '../core/interface/config-interface';
 import { fun } from '../core/services/functions.service';
 import { CurrentUserService } from '../core/services/current-user.service';
 import { FacturaC } from '../admin/facturacion/factura';
@@ -24,6 +24,7 @@ import { FacturaC } from '../admin/facturacion/factura';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
+  standalone: false,
 })
 export class LoginComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   form: UntypedFormGroup;
@@ -37,9 +38,14 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   configServ = Ss.configServ;
   configApp: ConfigI;
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
-  constructor(private fb: UntypedFormBuilder, private router: Router, public _ipc: IpcService, public currentUserServ: CurrentUserService) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    private router: Router,
+    public _ipc: IpcService,
+    public currentUserServ: CurrentUserService
+  ) {
     super();
   }
 
@@ -61,14 +67,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   ngOnDestroy() {}
 
-  test() {
-    const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE);
-
-    this._ipc
-      .sendTask(task)
-      .then((res: string) => MODIFIED_CONFIG_FILE.next(res))
-      .catch((err) => console.error(err));
-  }
+  test() {}
 
   quitarFocoElectron() {
     if (document.getElementById('imagenLogo')) document.getElementById('imagenLogo').click();
@@ -102,17 +101,17 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     } else {
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
-        .then((res) => {
+        .then(res => {
           setTimeout(
             () =>
               this.currentUserServ.setUser(res.data).then(() => {
                 this.router.navigateByUrl('/admin/dashboard');
               }),
-            250,
+            250
           );
         })
-        .catch((error) => {
-          if (error.status === 0) fun.toastError('El servidor esta caido, favor llamar a Victor Vásquez', 'ERROR SERVIDOR');
+        .catch(error => {
+          if (error.status === 0) fun.toastError('El servidor está <strong>caido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR SERVIDOR');
         });
     }
   }
@@ -143,7 +142,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     // const data_ = venta_contado_consumo;
     // const data_ = nota_credito;
 
-    new FacturaC().parseDataToPdf(data_).then(async (factura_parsed) => {
+    new FacturaC().parseDataToPdf(data_).then(async factura_parsed => {
       const obj = { data: factura_parsed, type: 'facturacion' };
       this.tipo_prueba = obj.type;
       this.generar(obj);
@@ -180,13 +179,16 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   generar(obj) {
-    PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async (res) => {
-      if (res.status === 'si') {
-        const objBase = { base64: res.base64, filename: res.file, type: this.tipo_prueba };
-
-        const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
-        // this.abrirModalReporte(obj);
-      }
-    });
+    //   PdfService.generatePdf({ oPdf: obj, imprimir: false })
+    //     .then(async res => {
+    //       const objBase = { base64: res.base64, filename: res.file, type: this.tipo_prueba };
+    //       const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+    //       console.log("obj ", obj);
+    //       // this.abrirModalReporte(obj);
+    //     })
+    //     .catch(err => {
+    //       console.error(err);
+    //       fun.toastError(err.msg, 'ERROR');
+    //     });
   }
 }

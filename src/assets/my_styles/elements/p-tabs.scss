@@ -1,0 +1,125 @@
+@use './forms.scss' as *;
+
+.p-tabs {
+  height: 100%;
+  display: grid !important;
+  grid-template-areas:
+    'p-tablist'
+    'p-tabpanels';
+
+  grid-template-rows: min-content auto;
+
+  .p-tablist {
+    grid-area: p-tablist;
+    .p-tablist-content {
+      .p-tablist-tab-list {
+        border-color: #d8d8d8 !important;
+        background: transparent !important;
+        padding-bottom: 0.2rem !important;
+
+        .p-tab {
+          padding: 0.6rem 1rem !important;
+          margin: 0.2rem !important;
+          border-radius: 0.6rem !important;
+          font-weight: 400 !important;
+          background: #0000001f !important;
+
+          &.p-tab-active {
+            background: var(--primary07) !important;
+            box-shadow: 0px 2.3px 0px 0px var(--primary08) !important;
+          }
+
+          &.p-disabled {
+            pointer-events: none;
+
+            &.p-tab-active {
+              filter: grayscale(0.6) !important;
+            }
+
+            div.d-flex {
+              pointer-events: all !important;
+              cursor: not-allowed !important;
+            }
+          }
+
+          &:has(> .p-tab-danger) {
+            background: #ffb5b5 !important;
+            color: #8f0909 !important;
+
+            &.p-tab-active {
+              background: #ff8989 !important;
+              box-shadow: 0px 2.3px 0px 0px #d36363 !important;
+
+              &.p-disabled {
+                filter: grayscale(0.6) !important;
+              }
+            }
+          }
+
+          .close-tab-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.25rem;
+            cursor: pointer;
+
+            &:hover {
+              background: #ffffff42;
+              border-radius: 0.5rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .p-tabpanels {
+    grid-area: p-tabpanels;
+    background-color: transparent !important;
+    border: 0px solid transparent !important;
+    height: 100%;
+    // overflow-y: auto;
+    > p-tabpanel {
+      height: 100%;
+      > .p-tabview-panel {
+        height: 100%;
+      }
+    }
+  }
+
+  &.back-light {
+    > .p-tabview-nav-container {
+      background: #8e8e8e32;
+
+      > .p-tabview-nav-content .p-tabview-nav li {
+        background: white;
+      }
+    }
+  }
+
+  &.panel-padding-0 {
+    .p-tabpanels {
+      padding: 0rem !important;
+    }
+  }
+
+  &.panel-overflow-auto {
+    .p-tabpanels {
+      overflow-y: auto !important;
+    }
+  }
+
+  &.panel-overflow-hidden {
+    .p-tabpanels {
+      overflow-y: hidden !important;
+    }
+  }
+
+  &.back-light {
+    .p-tablist {
+      .p-tablist-content {
+        background: #8e8e8e32;
+      }
+    }
+  }
+}

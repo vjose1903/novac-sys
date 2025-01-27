@@ -18,6 +18,7 @@ import { NotaC } from '../manipular facturas/notas-cred-deb/notas';
   selector: 'app-reportes',
   templateUrl: './reportes.component.html',
   styleUrls: ['./reportes.component.scss'],
+  standalone: false,
 })
 export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   reporteClass = new ReporteC();
@@ -41,14 +42,13 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     notas: NotaC,
   };
 
-  constructor(public loadServ: LoaderService) {
+  constructor(public loadServ: LoaderService ) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'reportes', is_routing: true });
-    Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then((result) => (this.hasPermisoCamiones = result));
-    
+    Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then(result => (this.hasPermisoCamiones = result));
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -63,6 +63,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   openReporteForm(params: { tipo: string; titulo: string }) {
+    ReporteC.configCsv = undefined;
     const obj = { tipo: 'reportes', titulo: params.titulo, tipo_reporte: params.tipo };
     this.instancesClases[params.tipo.toString()].openModalReporteForm({ tipo: params.tipo, inputs: obj, openNewModal: this.openNewModal.bind(this) });
   }

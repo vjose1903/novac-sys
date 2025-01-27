@@ -6,24 +6,37 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-electron": {
+    "novac-system": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "prefix": "app",
+          "style": "scss"
+        },
+        "@schematics/angular:directive": {
+          "prefix": "app"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
-      "projectType": "application",
+      "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "sourceMap": true,
             "outputPath": "dist",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
             "polyfills": ["src/polyfills.ts"],
+            "tsConfig": "src/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
               "src/splash_config_error.html",
               "src/splash_db_error.html",
               "src/splash_docker_error.html",
+              "src/splash_error_desconocido.html",
               "src/splash.html",
               "src/favicon.ico",
               "src/favicon.icns",
@@ -36,32 +49,42 @@
               }
             ],
             "styles": [
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/primeicons/primeicons.css",
-              
+
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "node_modules/@fortawesome/fontawesome-free/css/solid.css",
               "node_modules/@fortawesome/fontawesome-free/css/regular.css",
               "node_modules/@fortawesome/fontawesome-free/css/brands.css",
               "node_modules/@fortawesome/fontawesome-free/css/fontawesome.css",
-              
+
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/animate.css/animate.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.scss"
             ],
             "scripts": [],
-            
+
             "allowedCommonJsDependencies": ["rxjs", "rxjs/operators"]
           },
           "configurations": {
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
             "dev": {
               "optimization": false,
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
               "fileReplacements": [
                 {
@@ -75,7 +98,6 @@
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
               "fileReplacements": [
                 {
@@ -83,44 +105,30 @@
                   "with": "src/environments/environment.web.ts"
                 }
               ]
-            },
-            "production": {
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ]
             }
           }
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "angular-electron:build"
+            "buildTarget": "novac-system:build"
           },
           "configurations": {
             "dev": {
-              "buildTarget": "angular-electron:build:dev"
+              "buildTarget": "novac-system:build:dev"
             },
             "web": {
-              "buildTarget": "angular-electron:build:web"
+              "buildTarget": "novac-system:build:web"
             },
             "production": {
-              "buildTarget": "angular-electron:build:production"
+              "buildTarget": "novac-system:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
           "options": {
-            "buildTarget": "angular-electron:build"
+            "buildTarget": "novac-system:build"
           }
         },
         "test": {
@@ -147,6 +155,7 @@
         }
       }
     },
+
     "angular-electron-e2e": {
       "root": "e2e",
       "projectType": "application",
@@ -159,15 +168,6 @@
           }
         }
       }
-    }
-  },
-  "schematics": {
-    "@schematics/angular:component": {
-      "prefix": "app",
-      "style": "scss"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
     }
   }
 }

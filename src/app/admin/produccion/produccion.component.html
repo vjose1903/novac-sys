@@ -9,7 +9,7 @@
               <div class="form-group">
                 <label class="control-label mt-1 mb-0">Nombre producto: <span style="color: red">*</span></label>
                 <div>
-                  <p-dropdown
+                  <p-select
                     [placeholder]="'Seleccione producto'"
                     [options]="listaProductos"
                     [(ngModel)]="producto_terminado_en_turno"
@@ -24,7 +24,7 @@
                     [virtualScroll]="true"
                     [virtualScrollItemSize]="30"
                     id="articulo_id"
-                  ></p-dropdown>
+                  ></p-select>
                 </div>
               </div>
             </div>

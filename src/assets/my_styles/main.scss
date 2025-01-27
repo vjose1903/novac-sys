@@ -1,13 +1,25 @@
-@import './modal.scss';
-@import './tablas.scss';
-@import './tabView.scss';
-@import './forms.scss';
-@import './btns.scss';
-@import './overlayPanel.scss';
-@import './inputs.scss';
-@import './height.scss';
-@import './p-calendar.scss';
-@import './selectButton.scss';
-@import './rowFactura.scss';
-@import './spacers.scss';
-@import './layout.scss';
+// Elements
+@use './elements/backgrounds.scss' as *;
+@use './elements/border-radius.scss' as *;
+@use './elements/btns.scss' as *;
+@use './elements/flex.scss' as *;
+@use './elements/forms.scss' as *;
+@use './elements/height.scss' as *;
+@use './elements/inputs.scss' as *;
+@use './elements/layout.scss' as *;
+@use './elements/modal.scss' as *;
+@use './elements/p-datepicker.scss' as *;
+@use './elements/p-inputMask.scss' as *;
+@use './elements/p-multiselect.scss' as *;
+@use './elements/p-paginator.scss' as *;
+@use './elements/p-popover.scss' as *;
+@use './elements/p-select.scss' as *;
+@use './elements/p-selectButton.scss' as *;
+@use './elements/p-tabs.scss' as *;
+@use './elements/rowFactura.scss' as *;
+@use './elements/scrollbar.scss' as *;
+@use './elements/spacers.scss' as *;
+@use './elements/tablas.scss' as *;
+
+// Fonts
+@use './fonts/fonts.scss' as *;

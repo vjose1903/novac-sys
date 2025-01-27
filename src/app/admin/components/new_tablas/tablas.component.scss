@@ -26,21 +26,21 @@
   grid-template-rows: [filter-start] min-content [filter-end fantasma-start] auto [fantasma-end];
   grid-template-columns: [filter-start fantasma-start] auto [filter-end fantasma-end];
 
-  > .searchDiv {
+  .searchDiv {
     // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;
     grid-area: filter-start / filter-start / filter-end / filter-end;
   }
 
-  > .divTableFantasma {
+  .divTableFantasma {
     // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;
     grid-area: fantasma-start / fantasma-start / fantasma-end / fantasma-end;
 
     position: relative;
 
-    > .divTable {
+    .divTable {
       position: absolute;
 
-      > .myTable {
+      .myTable {
         box-shadow: 0px 1px 5px 1px #00000014;
         border-radius: 10px;
 
@@ -48,13 +48,13 @@
         height: 100% !important;
 
         grid-template-areas:
-          "thead"
-          "tbody"
-          "tfoot";
+          'thead'
+          'tbody'
+          'tfoot';
 
         grid-template-rows: [head-start] min-content [body-start] auto [body-end] min-content [foot-end];
 
-        > .thead {
+        .thead {
           grid-area: thead;
           display: table;
           width: 100%;
@@ -99,7 +99,7 @@
           grid-row: body-start / body-end;
           overflow-y: auto;
 
-          > .tbody {
+          .tbody {
             overflow: auto;
             height: 100%;
             > tr {
@@ -159,12 +159,12 @@
                   position: relative;
                   display: flex;
                   align-items: center;
-                  > .inputTabla {
+                  .inputTabla {
                     &.refresh {
                       padding-right: 2rem;
                     }
                   }
-                  > .icon {
+                  .icon {
                     cursor: pointer;
                     position: absolute;
                     right: 0.5rem;
@@ -181,68 +181,10 @@
           }
         }
 
-        > .tfoot {
-          padding-top: 0.5rem;
+        .tfoot {
           grid-area: tfoot;
-          > .pieTabla {
-            ::ng-deep {
-              padding: 0.3rem 0rem 0.3rem 0.7rem;
-
-              .paginator-dinamic-table {
-                border: 0px solid transparent !important;
-                background: transparent !important;
-                .p-paginator-element {
-                  &:hover {
-                    background-color: var(--transparente04) !important;
-                  }
-                }
-
-                > .p-paginator-pages {
-                  .p-paginator-page {
-                    font-size: 0.75rem;
-                    min-width: 2rem;
-                    height: 2rem;
-                    &.p-highlight {
-                      background-color: var(--primary07) !important;
-                    }
-                    &:hover {
-                      background-color: var(--primary09) !important;
-                    }
-                  }
-                }
-
-                &.no-show-dropdown {
-                  .p-dropdown {
-                    display: none !important;
-                  }
-                }
-
-                .p-dropdown {
-                  max-width: 3.2rem !important;
-                  border: 1px solid #a6a6a6a6 !important;
-                  .p-dropdown-trigger {
-                    width: 1rem !important;
-                    margin-right: 0.2rem;
-                  }
-
-                  .p-dropdown-label {
-                    padding: 0 0.3rem !important;
-                    background-color: transparent !important;
-                    border: 0px solid transparent !important;
-                  }
-                }
-
-                .p-paginator-rpp-options {
-                  height: 2rem;
-                  display: flex;
-                  align-items: center;
-                  &:hover,
-                  &:focus {
-                    background-color: var(--primary07) !important;
-                  }
-                }
-              }
-            }
+          .pieTabla {
+            padding: 0.3rem 0rem 0.3rem 0.7rem;
           }
         }
       }

@@ -42,6 +42,9 @@ export interface ButtonI {
   function?: Function;
   function_in_other_component?: string;
   disable?: boolean | btnDisabled;
+  icon?: string;
+  iconSize?: string;
+  iconColor?: string;
   tooltip?: string;
 }
 

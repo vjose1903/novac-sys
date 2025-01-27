@@ -13,9 +13,10 @@ import { table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
-  selector: 'app-registro-suplidores',
-  templateUrl: './registro-suplidores.component.html',
-  styleUrls: ['./registro-suplidores.component.scss'],
+    selector: 'app-registro-suplidores',
+    templateUrl: './registro-suplidores.component.html',
+    styleUrls: ['./registro-suplidores.component.scss'],
+    standalone: false
 })
 export class RegistroSuplidoresComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;

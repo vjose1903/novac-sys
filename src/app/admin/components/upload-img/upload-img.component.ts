@@ -3,9 +3,10 @@ import { fun } from '../../../core/services/functions.service';
 import { RequestC } from '../../../core/typescript/requests';
 
 @Component({
-  selector: 'app-upload-img',
-  templateUrl: './upload-img.component.html',
-  styleUrls: ['./upload-img.component.scss'],
+    selector: 'app-upload-img',
+    templateUrl: './upload-img.component.html',
+    styleUrls: ['./upload-img.component.scss'],
+    standalone: false
 })
 export class UploadImgComponent implements OnInit {
   nameFile = '';

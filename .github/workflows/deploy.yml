@@ -15,14 +15,14 @@ jobs:
       - name: Install Node.js and NPM
         uses: actions/setup-node@v1
         with:
-          node-version: 20
+          node-version: 22.13.1
 
       - name: Install dependencies
-        run: npm i --legacy-peer-deps
+        run: npm i
 
       - name: Build Novac App
         id: build-novac-app
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
           GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
-        run: npm run electron:windows64
+        run: npm run windows:prod

@@ -6,9 +6,10 @@ import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
 
 @Component({
-  selector: 'app-modal-seleccinar-articulo',
-  templateUrl: './modal-seleccinar-articulo.component.html',
-  styleUrls: ['./modal-seleccinar-articulo.component.scss'],
+    selector: 'app-modal-seleccinar-articulo',
+    templateUrl: './modal-seleccinar-articulo.component.html',
+    styleUrls: ['./modal-seleccinar-articulo.component.scss'],
+    standalone: false
 })
 export class ModalSeleccinarArticuloComponent extends MixinClass implements OnInit, ModalI {
   table_config: table_config = {

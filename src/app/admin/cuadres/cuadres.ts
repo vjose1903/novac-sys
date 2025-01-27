@@ -1,5 +1,5 @@
 import { Ss } from './../../core/services/singleton.service';
-import { PdfService } from './../../core/services/pdf/pdf.service';
+import { PdfService } from './../../core/services/reports/pdf/pdf.service';
 import { CuadreCajaC } from './../../core/typescript/cuadre_caja';
 import { fun } from './../../core/services/functions.service';
 import { ReporteC } from '../reportes/reporte';

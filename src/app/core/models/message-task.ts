@@ -6,6 +6,7 @@ export class MessageTask {
   id: string;
   eventName: string;
   data: any;
+  error: boolean;
 
   fn = new BehaviorSubject<any>({});
 
@@ -26,7 +27,7 @@ export class MessageTask {
   }
 
   asJson(): any {
-    return { id: this.id, eventName: this.eventName, data: this.data };
+    return { id: this.id, eventName: this.eventName, data: this.data, error: this.error };
   }
 
   serialize(): string {

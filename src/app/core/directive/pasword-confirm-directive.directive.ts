@@ -3,14 +3,15 @@ import { NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@an
 import { Subscription } from 'rxjs';
 
 @Directive({
-  selector: '[compare]',
-  providers: [
-    {
-      provide: NG_VALIDATORS,
-      useExisting: PaswordConfirmDirective,
-      multi: true,
-    },
-  ],
+    selector: '[compare]',
+    providers: [
+        {
+            provide: NG_VALIDATORS,
+            useExisting: PaswordConfirmDirective,
+            multi: true,
+        },
+    ],
+    standalone: false
 })
 export class PaswordConfirmDirective {
   @Input('compare') appConfirmPassword: string;

@@ -12,6 +12,7 @@ import { teclasCode } from '../../../core/typescript/constantes';
   selector: 'dinamic-table',
   templateUrl: './tablas.component.html',
   styleUrls: ['./tablas.component.scss'],
+  standalone: false,
 })
 export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   ready = false;
@@ -83,7 +84,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.TablasComponent = this;
     this.TablasComponentChange.emit(this.TablasComponent);
 
-    this.verificateConfig();
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
     setTimeout(() => (this.ready = true), 250);
   }
@@ -94,19 +94,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.handleConfig();
   }
 
-  verificateConfig() {
-    if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
-    }
-    this.verificateBottons(this.config);
-
-    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
-  }
-
   ngOnDestroy() {
     if (this.destroy$) this.destroy$.next();
     if (this.destroy$) this.destroy$.complete();
@@ -114,6 +101,37 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.deletePaginationById(this.realIdTabla);
     this.tServ.resetRowEditing();
     clearInterval(this.tablaInterval);
+  }
+
+  handleConfig() {
+    if (!this.config.padding) this.config.padding = '0rem';
+    if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
+    if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
+    if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
+    if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
+    if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
+
+    if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
+    }
+
+    this.verificateBottons(this.config);
+
+    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
+
+    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
+      setTimeout(() => {
+        fun.enfocarInput(`search-${this.realIdTabla}`);
+      }, 100);
+    }
+
+    this.config.info.map((item) => {
+      if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
+    });
   }
 
   verificateBottons(config: table_config) {
@@ -133,25 +151,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     config.info.forEach((info) => {
       if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach((icon) => (icon.id ??= fun.generateKey()));
-    });
-  }
-
-  handleConfig() {
-    if (!this.config.padding) this.config.padding = '0rem';
-    if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
-    if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
-    if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
-    if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
-    if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
-
-    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
-      setTimeout(() => {
-        fun.enfocarInput(`search-${this.realIdTabla}`);
-      }, 100);
-    }
-
-    this.config.info.map((item) => {
-      if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
     });
   }
 
@@ -369,7 +368,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   changeStylesTitles() {
     for (let i = 0; i < this.config.info.length; i++) {
-      const info: any = this.config.info[i];
+      const info: table_info = this.config.info[i];
 
       let list_estilos_titulos = '';
       if (info.estilos && info.estilos.length > 0) {
@@ -377,17 +376,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           const estilos = info.estilos[j];
           const key = Object.keys(estilos)[0];
           const value = Object.values(estilos)[0];
-
-          list_estilos_titulos += `${key}: ${value} !important; `;
-        }
-      }
-
-      if (fun.hasValue(info.style)) {
-        const keys = Object.keys(info.style);
-
-        for (let index = 0; index < keys.length; index++) {
-          const key = keys[index];
-          const value = info.style[key];
 
           list_estilos_titulos += `${key}: ${value} !important; `;
         }

@@ -11,8 +11,8 @@ export default class ReplaceInFile {
     return new Promise((resolve, reject) => {
       const promomiseList = <any>[];
 
-      promomiseList.push(this.cambiarLogos(params.logos_changes));
-      promomiseList.push(this.cambiarHandlerConfig(params.configReplacement));
+      if (params.logos_changes) promomiseList.push(this.cambiarLogos(params.logos_changes));
+      if (params.configReplacement) promomiseList.push(this.cambiarHandlerConfig(params.configReplacement));
 
       Promise.all(promomiseList)
         .then((values) => {
@@ -20,6 +20,8 @@ export default class ReplaceInFile {
           console.log('  ');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+          console.log('params ', params);
+          console.log('promomiseList ', promomiseList);
           console.log('values ', values);
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');

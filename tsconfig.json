@@ -19,8 +19,11 @@
     "checkJs": false,
     "useDefineForClassFields": false
   },
-  "files": ["src/main.ts", "src/polyfills.ts"],
-  "include": ["src/*/.ts"],
+  "files": [
+    "src/main.ts", 
+    "src/polyfills.ts"
+  ],
+  "include": ["src/*/.ts", "main.ts"],
   "exclude": ["node_modules"],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

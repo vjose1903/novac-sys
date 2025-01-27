@@ -1,8 +1,7 @@
 import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { UntypedFormGroup, FormArray, UntypedFormBuilder, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { customValidators } from '../../../core/typescript/custom-validators';
@@ -16,6 +15,7 @@ import { Permisos } from '../../../core/typescript/permisos';
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
+  standalone: false,
 })
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
@@ -58,7 +58,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   };
   tablaComponent;
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();

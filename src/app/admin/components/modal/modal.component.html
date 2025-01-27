@@ -37,7 +37,10 @@
         @for (dynamic_boton of modalConfig?.botones?.dinamico; track dynamic_boton.btn_id ) {
         <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
           <button type="button" [disabled]="disabledButton(dynamic_boton || false)" class="btn {{ dynamic_boton.clase }}" (click)="dynamicFunction(modalConfig, dynamic_boton)">
-            {{ dynamic_boton.label }}
+            <span class="d-flex gap-2 align-items-center">
+               <i *ngIf="fun.hasValue(dynamic_boton.icon)" [class]="dynamic_boton.icon" [ngStyle]="{'font-size': dynamic_boton.iconSize ?? '1rem', color: dynamic_boton.iconColor ?? 'black' }"></i>
+              {{ dynamic_boton.label }}
+            </span>
           </button>
         </span>
         } @if (modalConfig?.botones?.cancelar?.show) {

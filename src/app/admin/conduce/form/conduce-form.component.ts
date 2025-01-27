@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
 import { FacturaC } from '../../facturacion/factura';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
+import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
 import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ModalSeleccinarArticuloComponent } from '../../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
@@ -14,17 +14,18 @@ import { fun } from '../../../core/services/functions.service';
 import { ModalService } from '../../components/modal/modal.service';
 import { Permisos } from '../../../core/typescript/permisos';
 import { table_config } from '../../components/new_tablas/tabla-class';
-import { ConfigI } from '../../../core/typescript/config-interface';
+import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from '../../../core/services/singleton.service';
-import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
+import { ConfirmacionImprimirComponent } from '../../components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '../../../core/typescript/constantes';
 import { ModalClass } from '../../components/modal/modal-class';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-conduce-form',
-  templateUrl: './conduce-form.component.html',
-  styleUrls: ['./conduce-form.component.scss'],
+    selector: 'app-conduce-form',
+    templateUrl: './conduce-form.component.html',
+    styleUrls: ['./conduce-form.component.scss'],
+    standalone: false
 })
 export class ConduceFormComponent extends MixinClass implements OnInit, OnDestroy {
   secuenciaKeys = [];
@@ -543,7 +544,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     this.confirmationModal({
       id: 'removerArticulo',
       header: 'Confirmar',
-      texto: `Seguro que desea remover el articulo <b class="negrita">${name}</b>`,
+      texto: `Seguro que desea remover el articulo <b class="negrita">${name ?? codigo ?? ''}</b>`,
       siFunction: (instance) => {
         this.procesoQuitarArticulo();
         instance.closeModal(instance.id, 'removerArticulo');

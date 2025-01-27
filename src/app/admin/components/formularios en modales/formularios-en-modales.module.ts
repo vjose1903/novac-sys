@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { TabViewModule } from 'primeng/tabview';
+import { TabsModule } from 'primeng/tabs';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '../new_tablas/tablas.module';
 import { ChangePasswordComponent } from './change-password/change-password.component';
@@ -17,6 +17,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -29,11 +30,12 @@ const components = [
   ModalSeleccinarArticuloComponent,
   BuscarClienteSuplidorComponent,
   BuscarArticuloComponent,
+  ConfirmacionImprimirComponent
 ];
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabViewModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule],
+  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabsModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}

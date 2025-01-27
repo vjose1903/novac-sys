@@ -21,7 +21,7 @@
                   [ngClass]="{ disabled: !!cliente }"
                   value=""
                   tabindex="-1"
-                  />
+                />
                 <button class="btn btn-gris" (click)="goBack()">Atras</button>
                 <button [disabled]="!cliente" class="btn btn-gris ml-2" (click)="cancelarConduce()">Nueva Busqueda</button>
               </div>
@@ -31,16 +31,16 @@
       </div>
       <div class="col-7">
         @if (facturas_adelantadas.length > 0) {
-          <div class="row">
-            <div class="col-12 mb-3">
-              <h3>Ventas adelantadas</h3>
-            </div>
-            <div class="col-12">
-              <div #cardTablaAdelantadas id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
-                <dinamic-table [cardTabla]="cardTablaAdelantadas" [(data)]="facturas_adelantadas" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
-              </div>
+        <div class="row">
+          <div class="col-12 mb-3">
+            <h3>Ventas adelantadas</h3>
+          </div>
+          <div class="col-12">
+            <div #cardTablaAdelantadas id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
+              <dinamic-table [cardTabla]="cardTablaAdelantadas" [(data)]="facturas_adelantadas" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
             </div>
           </div>
+        </div>
         }
       </div>
     </div>
@@ -48,170 +48,166 @@
   <!-- ================================================================================================================================================ -->
   <!-- ================================================================================================================================================ -->
   @if (cliente) {
-    <div class="col-12 mt-3 abajo">
-      <div class="card sombra bordeRedondeado h-100 cardConduce">
-        <div class="cuerpo">
-          <div class="fantasma-cuerpo">
-            <table class="table mb-0 titles">
-              <thead>
-                <tr class="text-center">
-                  <th class="tiCOD_">Codigo</th>
-                  <th class="tiCAN_">Cantidad</th>
-                  <th class="tiUNI_">Unidad</th>
-                  <th class="tiDES_">Descripcion</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="COD_ p-0"></td>
-                  <td class="CAN_ p-0"></td>
-                  <td class="UNI_ p-0"></td>
-                  <td class="DES_ p-0"></td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="body">
-              @if (ARRAY_ROWARTICULOS) {
-                <form [formGroup]="form" action="">
-                  @for (item of ARRAY_ROWARTICULOS.controls; track item; let index_cuerpo = $index) {
-                    <div formArrayName="rowFactura">
-                      <p-overlayPanel #dropRowConfig styleClass="dropConfigs" appendTo="body">
-                        <ng-template pTemplate>
-                          <ul class="dropRowConfig" role="menu">
-                            <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable">
-                              <a class="" id="dropdown-item">
-                                <i class="far fa-trash-alt text-red btnBorrar"></i>
-                                Quitar Producto
-                              </a>
-                            </li>
-                          </ul>
-                        </ng-template>
-                      </p-overlayPanel>
-                      <div [formGroupName]="index_cuerpo">
-                        <table class="table m-auto">
-                          <tbody>
-                            <tr>
+  <div class="col-12 mt-3 abajo">
+    <div class="card sombra bordeRedondeado h-100 cardConduce">
+      <div class="cuerpo">
+        <div class="fantasma-cuerpo">
+          <table class="table mb-0 titles">
+            <thead>
+              <tr class="text-center">
+                <th class="column-codigo_">Codigo</th>
+                <th class="column-cantidad_">Cantidad</th>
+                <th class="column-unidad_">Unidad</th>
+                <th class="column-descripcion_">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="COD_ p-0"></td>
+                <td class="CAN_ p-0"></td>
+                <td class="UNI_ p-0"></td>
+                <td class="DES_ p-0"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="body">
+            @if (ARRAY_ROWARTICULOS) {
+            <form [formGroup]="form" action="">
+              @for (item of ARRAY_ROWARTICULOS.controls; track item; let index_cuerpo = $index) {
+              <ng-container formArrayName="rowFactura">
+                <div [formGroupName]="index_cuerpo">
+                  <p-popover #dropRowMenu appendTo="body">
+                    <ul class="dropRowMenu" role="menu">
+                      <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable danger">
+                        <a class="" id="dropdown-item">
+                          <i class="far fa-trash-alt"></i>
+                          Quitar Producto
+                        </a>
+                      </li>
+                    </ul>
+                  </p-popover>
+                  <table class="table m-auto">
+                    <tbody>
+                      <tr>
+                        <!--  ::::::::::::  CODIGO  ::::::::::::  -->
+                        <td class="COD_ p-0">
+                          <div class="position-relative">
+                            <div class="div-row-codigo started">
                               <!--  ::::::::::::  CONFIG  ::::::::::::  -->
-                              <td class="sombreado2" (mouseover)="selectedRow(index_cuerpo, true)" (mouseleave)="selectedRow(index_cuerpo, false)">
-                                <div class="btn-group">
-                                  @if (checkIfRowContainArticulo(index_cuerpo)) {
-                                    <div style="padding: 3px" (click)="dropRowConfig.toggle($event)">
-                                      <i class="fas fa-ellipsis-v btnConfig"></i>
-                                    </div>
-                                  }
-                                  @if (!checkIfRowContainArticulo(index_cuerpo)) {
-                                    <div style="padding: 3px">
-                                      <i class="fas fa-ellipsis-v btnConfigDis"></i>
-                                    </div>
-                                  }
-                                </div>
-                              </td>
+                              <div
+                                class="btnConfig"
+                                [ngClass]="{ disabled: !checkIfRowContainArticulo(index_cuerpo) }"
+                                (mouseover)="selectedRow(index_cuerpo, true)"
+                                (mouseleave)="selectedRow(index_cuerpo, false)"
+                                (click)="dropRowMenu.toggle($event)"
+                              >
+                                <i class="fas fa-ellipsis-v"></i>
+                              </div>
+
                               <!--  ::::::::::::  CODIGO  ::::::::::::  -->
-                              <td class="COD_ p-0">
-                                <div class="form-group m-0">
-                                  <input
-                                    type="text"
-                                    class="form-control entrada"
-                                    [maxlength]="minCodigo"
-                                    id="cod-{{ index_cuerpo }}"
-                                    (focus)="verificarSecuencia(index_cuerpo)"
-                                    (keydown.enter)="saltar('can-', index_cuerpo)"
-                                    formControlName="cod"
-                                    (keyup)="checkCodigo(index_cuerpo)"
-                                    tabindex="-1"
-                                    [ngClass]="{ disabled: disableCamposFactAdelantadas(index_cuerpo) }"
-                                    />
-                                </div>
-                              </td>
-                              <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
-                              <td class="CAN_ p-0">
-                                <div class="form-group m-0">
-                                  <input
-                                    type="number"
-                                    min="1"
-                                    class="form-control entrada input_cantidad {{ verSiExcede(index_cuerpo) ? 'badAlert' : '' }}"
-                                    id="can-{{ index_cuerpo }}"
-                                    (focus)="verificarSecuencia(index_cuerpo)"
-                                    (keydown.enter)="saltar('uni-', index_cuerpo)"
-                                    formControlName="can"
-                                    [max]="getMaxCan(index_cuerpo)"
-                                    (blur)="saliDeCantidad(index_cuerpo); excedeMaxCan(index_cuerpo)"
-                                    tabindex="-1"
-                                    />
-                                </div>
-                              </td>
-                              <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
-                              <td class="UNI_ p-0">
-                                <div class="form-group m-0">
-                                  @if (inputDrop !== 'uni-' + index_cuerpo) {
-                                    <input
-                                      type="text"
-                                      class="form-control entrada input-unidad"
-                                      id="uni-{{ index_cuerpo }}"
-                                      (focus)="setInputDrop(index_cuerpo); verificarSecuencia(index_cuerpo)"
-                                      [pTooltip]="filasDetalle[index_cuerpo].value.unidad ?? ''"
-                                      tooltipPosition="top"
-                                      formControlName="uni"
-                                      tabindex="-1"
-                                      />
-                                  }
-                                  @if (inputDrop === 'uni-' + index_cuerpo) {
-                                    <p-dropdown
-                                      #pDropdownMedida
-                                      panelStyleClass="panel-dropdown-unidad"
-                                      styleClass="form-control entrada dropdown-unidad"
-                                      inputId="uni-{{ index_cuerpo }}"
-                                      formControlName="uni"
-                                      appendTo="body"
-                                      optionLabel="value"
-                                      optionValue="value"
-                                      [options]="filasDetalle[index_cuerpo].value.unidades"
-                                      placeholder="medida"
-                                      [filter]="false"
-                                      [virtualScroll]="true"
-                                      [virtualScrollItemSize]="30"
-                                      [autoDisplayFirst]="false"
-                                      (onChange)="selectMedidaChange($event, index_cuerpo)"
-                                      (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-                                      (keyup.enter)="selectMedida(index_cuerpo)"
-                                      (onFocus)="showDropdownMedida($event, pDropdownMedida)"
-                                      (onBlur)="hideDropdownMedida(); calcularCantidadEnUnidades({ index: index_cuerpo })"
-                                      >
-                                    </p-dropdown>
-                                  }
-                                </div>
-                              </td>
-                              <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
-                              <td class="DES_ p-0">
-                                <div class="form-group m-0">
-                                  <input type="text" class="form-control entrada inDES_ disabled" id="des-{{ index_cuerpo }}" formControlName="des" tabindex="-1" />
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  }
-                </form>
+                              <input
+                                type="text"
+                                class="form-control entrada"
+                                [maxlength]="minCodigo"
+                                id="cod-{{ index_cuerpo }}"
+                                (focus)="verificarSecuencia(index_cuerpo)"
+                                (keydown.enter)="saltar('can-', index_cuerpo)"
+                                formControlName="cod"
+                                (keyup)="checkCodigo(index_cuerpo)"
+                                tabindex="-1"
+                                [ngClass]="{ disabled: disableCamposFactAdelantadas(index_cuerpo) }"
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
+                        <td class="CAN_ p-0">
+                          <div class="position-relative">
+                            <input
+                              type="number"
+                              min="1"
+                              class="form-control entrada input_cantidad {{ verSiExcede(index_cuerpo) ? 'badAlert' : '' }}"
+                              id="can-{{ index_cuerpo }}"
+                              (focus)="verificarSecuencia(index_cuerpo)"
+                              (keydown.enter)="saltar('uni-', index_cuerpo)"
+                              formControlName="can"
+                              [max]="getMaxCan(index_cuerpo)"
+                              (blur)="saliDeCantidad(index_cuerpo); excedeMaxCan(index_cuerpo)"
+                              tabindex="-1"
+                            />
+                          </div>
+                        </td>
+                        <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
+                        <td class="UNI_ p-0">
+                          <div class="position-relative">
+                            @if (inputDrop !== 'uni-' + index_cuerpo) {
+                            <input
+                              type="text"
+                              class="form-control entrada input-unidad"
+                              id="uni-{{ index_cuerpo }}"
+                              (focus)="setInputDrop(index_cuerpo); verificarSecuencia(index_cuerpo)"
+                              [pTooltip]="filasDetalle[index_cuerpo].value.unidad ?? ''"
+                              tooltipPosition="top"
+                              formControlName="uni"
+                              tabindex="-1"
+                            />
+                            } @else {
+                            <p-select
+                              #pDropdownMedida
+                              panelStyleClass="panel-dropdown-unidad"
+                              styleClass="form-control entrada"
+                              inputId="uni-{{ index_cuerpo }}"
+                              formControlName="uni"
+                              appendTo="body"
+                              optionLabel="value"
+                              optionValue="value"
+                              [options]="filasDetalle[index_cuerpo].value.unidades"
+                              placeholder="medida"
+                              [filter]="false"
+                              [virtualScroll]="true"
+                              [virtualScrollItemSize]="30"
+                              [autoDisplayFirst]="false"
+                              (onChange)="selectMedidaChange($event, index_cuerpo)"
+                              (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                              (keyup.enter)="selectMedida(index_cuerpo)"
+                              (onFocus)="showDropdownMedida($event, pDropdownMedida)"
+                              (onBlur)="hideDropdownMedida(); calcularCantidadEnUnidades({ index: index_cuerpo })"
+                            >
+                            </p-select>
+                            }
+                          </div>
+                        </td>
+                        <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
+                        <td class="DES_ p-0">
+                          <div class="position-relative">
+                            <input type="text" class="form-control entrada inDES_ disabled" id="des-{{ index_cuerpo }}" formControlName="des" tabindex="-1" />
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-container>
               }
-            </div>
-          </div>
-        </div>
-        <div class="row pt-2 botones">
-          <div class="col-12 mb-2">
-            <span class="titulos w-100">
-              Articulos a despachar: <strong> {{ getCantidadArticulos() }}</strong>
-            </span>
-          </div>
-          <div class="col-2 ml-4">
-            <app-btncircular [alto]="'100px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (pulsar)="imprimirConduce()"></app-btncircular>
-          </div>
-          <div class="col-2">
-            <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (pulsar)="modalCancelarConduce()"></app-btncircular>
+            </form>
+            }
           </div>
         </div>
       </div>
+      <div class="row pt-2 botones">
+        <div class="col-12 mb-2">
+          <span class="titulos w-100">
+            Articulos a despachar: <strong> {{ getCantidadArticulos() }}</strong>
+          </span>
+        </div>
+        <div class="col-2 ml-4">
+          <app-btncircular [alto]="'100px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (pulsar)="imprimirConduce()"></app-btncircular>
+        </div>
+        <div class="col-2">
+          <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (pulsar)="modalCancelarConduce()"></app-btncircular>
+        </div>
+      </div>
     </div>
+  </div>
   }
 </div>
