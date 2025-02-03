@@ -111,7 +111,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "novac-system:build"
+            "buildTarget": "novac-system:build",
+            "hmr": true
           },
           "configurations": {
             "dev": {
