@@ -3,6 +3,7 @@ import { shell } from 'electron';
 import * as path from 'path';
 import { parsePath, writeLogs } from '../main.js';
 import Functions from './functions.js';
+import * as fs from 'fs';
 
 const ExcelJS = require('exceljs');
 
@@ -11,6 +12,20 @@ export default class ExportToExcel {
 
   constructor(app: Electron.App) {
     this.app = app;
+  }
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  // ASEGURA QUE EL DIRECTORIO DE EXPORTACION EXISTA
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  private async ensureDirectoryExists(path: string): Promise<void> {
+    try {
+      if (!fs.existsSync(path)) {
+        writeLogs('-=-=-=-= NO EXITSE CARPETA DE EXPORTACION PASANDO A CREARLA -=-=-=-=');
+        await fs.promises.mkdir(path, { recursive: true });
+      }
+    } catch (error) {
+      console.error('Error al crear el directorio de logs:', error.message);
+    }
   }
 
   generateCSV(params: { fileName: string; excelData: Array<string[]>; configuration: exportExcelConfigI }) {
@@ -25,10 +40,13 @@ export default class ExportToExcel {
         const filePath = parsePath(path.join(targetFolder, fileName));
         writeLogs(filePath, 'filePath');
 
-        // TODO: hacer en el configuration un metodo para crear el nombre del seet
+        await this.ensureDirectoryExists(targetFolder);
+
+        // TODO: hacer en el configuration un metodo para crear el nombre del sheet
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Datos');
         excelData.forEach(row => sheet.addRow(row));
+
 
         this.autoFitColumns(sheet);
 
