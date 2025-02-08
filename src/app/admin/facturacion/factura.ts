@@ -367,7 +367,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 }
 
-export class TiposFacturaC extends CrudG<any> {
+export class TiposFacturaC extends CrudG<TipoFacturaI> {
   constructor() {
     super('tipo_facturas');
   }

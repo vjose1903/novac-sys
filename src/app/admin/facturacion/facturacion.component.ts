@@ -1758,7 +1758,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let documento = this.getDocumentoDescripcion();
     console.log("cabecera_fact ", JSON.stringify(cabecera_fact));
-    console.log("cabecera_fact ", JSON.stringify(cabecera_fact));
     
     
 

@@ -409,7 +409,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         let excede = true;
 
         const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
-        await this.articuloClass.getAll(extra).then((res) => {
+        await this.articuloClass.getAll(extra).then((res: any) => {
           excede = res['data'];
 
           if (excede) {

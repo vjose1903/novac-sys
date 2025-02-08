@@ -1,4 +1,4 @@
-import { TiposFacturaC, actionFacturacion } from './../facturacion/factura';
+import { TiposFacturaC, actionFacturacion, TipoFacturaI } from './../facturacion/factura';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
@@ -128,8 +128,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     return new Promise(async (resolve, reject) => {
       await this.tipoFacturaClass
         .getAll()
-        .then((tiposFacturas) => {
-          tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
+        .then((tiposFacturas: any) => {
+          tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']) as TipoFacturaI[];
           Ss.factServ.lista_tipos_facturas = tiposFacturas;
 
           resolve(Ss.factServ.lista_tipos_facturas);

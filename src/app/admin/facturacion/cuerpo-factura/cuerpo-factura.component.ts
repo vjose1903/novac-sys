@@ -517,7 +517,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: sumCantidad } };
 
-        await this.articuloClass.getAll(extra).then((res) => {
+        await this.articuloClass.getAll(extra).then((res: any) => {
           excede = res['data'];
 
           if (!excede || from_pre_factura || this.factServ.isCompra || this.factServ.isCotizacion) {

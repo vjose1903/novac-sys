@@ -135,7 +135,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   async getMarcas() {
     try {
-      const res = await this.marcasClass.getAll();
+      const res = await this.marcasClass.getAll() as any;
 
       this.listaMarcas = res;
     } catch (error) {

@@ -10,10 +10,10 @@ import { table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ConfigI } from '../../../../core/interface/config-interface';
 @Component({
-    selector: 'app-buscar-cliente-suplidor',
-    templateUrl: './buscar-cliente-suplidor.component.html',
-    styleUrls: ['./buscar-cliente-suplidor.component.scss'],
-    standalone: false
+  selector: 'app-buscar-cliente-suplidor',
+  templateUrl: './buscar-cliente-suplidor.component.html',
+  styleUrls: ['./buscar-cliente-suplidor.component.scss'],
+  standalone: false,
 })
 export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit, ModalI {
   constructor(private tServ: TablasService) {
@@ -32,7 +32,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     focusRow: true,
     focusSearchInput: true,
     id_tabla: 'buscar_cliente_suplidor',
-    padre_functions: { data_request: (params) => this.buscarClientesOrSuplidor(params) },
+    padre_functions: { data_request: params => this.buscarClientesOrSuplidor(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
   };
@@ -66,37 +66,39 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
-    
     const copyData = fun.deepCloning(this.dataFiltro);
 
     let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
 
     const classDinamic = this.isSuplidor ? 'suplidorClass' : 'clienteClass';
     try {
-      const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } }).catch((error) => {
-        if (where === 'init') this.closeThis({ tipo: 'data_no_found', modal_id: this.modal.component_id });
-      });
+      this[classDinamic]
+        .getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } })
+        .then(res => {
+          if (res.data && res.data.length > 0) {
+            const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null };
+            if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado && !this.isSuplidor) res.data.unshift(cliente_contado);
 
-      if (res.data && res.data.length > 0) {
-        const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null };
-        if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado && !this.isSuplidor) res.data.unshift(cliente_contado);
+            res.data.map(async entidad => {
+              entidad.nombre = entidad.nombre ? fun.Capitalice(entidad.nombre) : '----------';
+              entidad.apellido = entidad.apellido ? fun.Capitalice(entidad.apellido) : '----------';
+              entidad.telefono = entidad.telefono ?? '----------';
 
-        res.data.map(async (entidad) => {
-          entidad.nombre = entidad.nombre ? fun.Capitalice(entidad.nombre) : '----------';
-          entidad.apellido = entidad.apellido ? fun.Capitalice(entidad.apellido) : '----------';
-          entidad.telefono = entidad.telefono ?? '----------';
+              const doc = entidad?.documentos_de_identidad?.find(documento => documento.principal);
+              entidad.documento_identidad = doc ? doc.documento : '----------';
+              return entidad;
+            });
 
-          const doc = entidad?.documentos_de_identidad?.find((documento) => documento.principal);
-          entidad.documento_identidad = doc ? doc.documento : '----------';
-          return entidad;
+            this.dataFiltro = res.data;
+          } else {
+            this.dataFiltro = copyData;
+          }
+
+          this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+        })
+        .catch(error => {
+          if (where === 'init') this.closeThis({ tipo: 'data_no_found', modal_id: this.modal.component_id });
         });
-
-        this.dataFiltro = res.data;
-      } else {
-        this.dataFiltro = copyData;
-      }
-
-      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {}
   }
 
@@ -106,7 +108,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   closeThis(arg?) {
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
+    const modal = this.modal.instance.modalsConfig.find(config => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
     if (arg) modal.returnDataFromModal(arg);
     return modal;
