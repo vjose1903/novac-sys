@@ -641,7 +641,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const itbis = articulo?.calcular_itbis ? precioOcosto * 0.18 : 0;
       const total = (precioOcosto + itbis) * cantidad;
 
-      if (descuento >= 0 || fun.isEmpty(descuento)) {
+      if (descuento == 0 || fun.isEmpty(descuento)) {
         if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
           formGroup.controls['descuento_valor'].reset();
 

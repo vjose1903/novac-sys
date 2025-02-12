@@ -156,13 +156,23 @@ export class fun {
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
+  static redondearNum(numero, decimales) {
+    const factor = Math.pow(10, decimales);
+    const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor
+    return numberRounded.toFixed(decimales);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: roundNumberToDecimal
+  // Descripcion : Esta funcion redondea a 2 decimales
+  // _________________________________________________________________________________________________
 
   static roundNumberToDecimal(number, cant = 2): string {
     if (fun.isEmpty(number)) return number;
 
     if (typeof number == 'string' || isNaN(number)) number = parseFloat(fun.desformatearStNumber(number));
 
-    const numerRounded = number.toFixed(cant);
+    const numerRounded = fun.redondearNum(number, cant);
 
     // Formateamos el número con comas para separar millares
     const partes = numerRounded.split('.');
