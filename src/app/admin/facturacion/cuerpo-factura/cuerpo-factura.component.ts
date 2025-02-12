@@ -641,7 +641,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const itbis = articulo?.calcular_itbis ? precioOcosto * 0.18 : 0;
       const total = (precioOcosto + itbis) * cantidad;
 
-      if (descuento >= 0 || fun.isEmpty(descuento)) {
+      if (descuento == 0 || fun.isEmpty(descuento)) {
         if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
           formGroup.controls['descuento_valor'].reset();
 
@@ -662,7 +662,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
           fun.enfocarAndSelectInput(`desc-${index}`);
         } else {
-          let currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key == key);
+          let currentDescuento = this.listaDeDescuentos.find((item) => item.key == key);
 
           if (fun.hasValue(currentDescuento)) currentDescuento.valor = descuento;
           else this.listaDeDescuentos.push({ key: key, valor: descuento });
@@ -681,8 +681,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   sacarDescuento(key) {
-    const currentDescuento = _.find(this.listaDeDescuentos, (item) => item.key == key);
-    if (fun.hasValue(currentDescuento)) _.remove(this.listaDeDescuentos, currentDescuento);
+    const currentDescuento = this.listaDeDescuentos.find((item) => item.key == key);
+    if (fun.hasValue(currentDescuento)) this.listaDeDescuentos = this.listaDeDescuentos.filter((item) => item.key != key);
   }
 
   enviarTotalesGenerales() {
