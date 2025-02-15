@@ -13,6 +13,11 @@ export const styles_ = {
   letra15: { fontSize: 15 },
   letra16: { fontSize: 16 },
   letra17: { fontSize: 17 },
+  monospace6: { font: 'SpaceMono', fontSize: 6 }, 
+  monospace8: { font: 'SpaceMono', fontSize: 8 }, 
+  monospace10: { font: 'SpaceMono', fontSize: 10 }, 
+  monospace12: { font: 'SpaceMono', fontSize: 12 }, 
+  monospace14: { font: 'SpaceMono', fontSize: 14 }, 
 };
 // ==========
 
