@@ -186,11 +186,13 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
     const row = [];
     const br_ = i !== 0 && i % _break === 0;
 
+    const max_longitud_descripcion = 35;
     const longitud_descripcion = detalle.descripcion.length;
-    const descripcion = longitud_descripcion > 35 ? `${detalle.descripcion.slice(0, 35)}...` : detalle.descripcion;
+    const descripcion = longitud_descripcion > max_longitud_descripcion ? `${detalle.descripcion.slice(0, max_longitud_descripcion)}...` : detalle.descripcion;
+
     row.push(
       { text: i + 1, style: 'letra11', alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
-      { text: descripcion, style: 'monospace10',  pageBreak: br_ ? 'before' : 'none' },
+      { text: descripcion, style: 'monospace10', margin: [0, -1, 0, 0],  pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.cantidad, style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
         text: fun_.roundNumberToDecimal(is_venta ? detalle.precio : detalle.costo),

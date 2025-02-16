@@ -284,6 +284,20 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: normalizarTexto
+  // Descripcion : Esta funcion normaliza un texto para que no tenga acentos
+  // _________________________________________________________________________________________________
+
+  static  normalizarTexto(texto: string): string {
+    const textoMinusculas = texto.toLowerCase();
+  
+    const textoSinAcentos = textoMinusculas.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  
+    return textoSinAcentos;
+  }
+
+  
+  // __________________________________________________________________________________________________
   // Nombre: roundDecenaMayor
   // Descripcion : Esta funcion redondea un numero a la decena mayor al mismo
   // _________________________________________________________________________________________________

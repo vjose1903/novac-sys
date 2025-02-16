@@ -6,7 +6,7 @@ export const config_cotizacion = {
   break: 10,
   only_titulo: false,
   pageOrient: 'portrait',
-  widths: [24, 240, '*', '*', '*', '*'],
+  widths: [15, 240, '*', '*', '*', '*'],
   mostrar_total: false,
 
   info: [
@@ -26,8 +26,9 @@ export const config_cotizacion = {
       alignment_titulo: 'left',
       noWrap: true,
       style: 'letra10',
-      style_body: 'letra10',
+      style_body: 'monospace11',
       key: 'descripcion',
+      margin_body: [0, -2, 0, 0],
       alignment_body: 'left',
       uppercase: true,
     },

@@ -16,6 +16,7 @@ export const styles_ = {
   monospace6: { font: 'SpaceMono', fontSize: 6 }, 
   monospace8: { font: 'SpaceMono', fontSize: 8 }, 
   monospace10: { font: 'SpaceMono', fontSize: 10 }, 
+  monospace11: { font: 'SpaceMono', fontSize: 11 }, 
   monospace12: { font: 'SpaceMono', fontSize: 12 }, 
   monospace14: { font: 'SpaceMono', fontSize: 14 }, 
 };
