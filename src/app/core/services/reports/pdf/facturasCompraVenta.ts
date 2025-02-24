@@ -146,11 +146,11 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           table: {
             margin: [0, 0, 0, 0],
             headerRows: 1,
-            widths: [20, 240, '*', '*', '*', '*'],
+            widths: [15, 240, '*', '*', '*', '*'],
             body: [
               [
                 { text: ' #', style: 'letra11', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
-                { text: 'Articulo', style: 'letra11', bold: true, margin: [-5, 0, 0, 0] },
+                { text: 'Articulo', style: 'letra11', bold: true, margin: [0, 0, 0, 0] },
                 { text: 'Cantidad', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
                 is_venta ? { text: 'Precio', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
                 { text: 'Itbis', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
@@ -186,9 +186,13 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
     const row = [];
     const br_ = i !== 0 && i % _break === 0;
 
+    const max_longitud_descripcion = 35;
+    const longitud_descripcion = detalle.descripcion.length;
+    const descripcion = longitud_descripcion > max_longitud_descripcion ? `${detalle.descripcion.slice(0, max_longitud_descripcion)}...` : detalle.descripcion;
+
     row.push(
       { text: i + 1, style: 'letra11', alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
-      { text: detalle.descripcion, style: 'letra11', pageBreak: br_ ? 'before' : 'none' },
+      { text: descripcion, style: 'monospace10', margin: [0, -1, 0, 0],  pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.cantidad, style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
         text: fun_.roundNumberToDecimal(is_venta ? detalle.precio : detalle.costo),
@@ -208,7 +212,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
   const content = [
     {
       table: {
-        widths: [20, 225, '*', '*', '*', '*'],
+        widths: [15, 240, '*', '*', '*', '*'],
         body: tempBody,
       },
       margin: [0, -2, 0, 0],

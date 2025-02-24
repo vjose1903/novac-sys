@@ -3,9 +3,6 @@ import { Injectable } from '@angular/core';
 const pdfMake = require('pdfmake/build/pdfmake.js');
 const pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
-// import * as pdfMake from 'pdfmake/build/pdfmake';
-// import { pdfFonts } from '../../typescript/pdfmake-fonts';
-
 import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
@@ -119,7 +116,19 @@ export class PdfService {
 
   static createPdfFromBase64(docDefinition, file_, reimprimir_, callback = arg => {}) {
     try {
-      pdfMake.vfs = pdfFonts.vfs;
+
+      pdfMake.addFonts( {
+        SpaceMono: {
+            normal: `${window.location.origin}/assets/fonts/pdf/SpaceMono-Regular.ttf`,
+            bold: `${window.location.origin}/assets/fonts/pdf/SpaceMono-Bold.ttf`,
+        },
+        Roboto: {
+          normal: `${window.location.origin}/assets/fonts/pdf/Roboto-Regular.ttf`,
+          bold: `${window.location.origin}/assets/fonts/pdf/Roboto-Bold.ttf`,
+        }
+
+    })
+    
 
       const pdfDocGenerator = pdfMake.createPdf(docDefinition);
       pdfDocGenerator.getBase64(data => {

@@ -11,7 +11,7 @@ import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/d
 import { ModalClass } from '../components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '../../core/services/reports/pdf/pdf.service';
-import { serie } from '../../core/typescript/constantes';
+import { serie, unidadAbrev } from '../../core/typescript/constantes';
 import { csvConfig as csvConfigVentas } from '../../core/services/reports/excel/configs/report/ventas';
 import { csvConfig as csvConfigMovimientosVehiculo } from '../../core/services/reports/excel/configs/report/movimientos_vehiculo';
 import { ReportGroupTypeE } from '../../admin/reportes/reporte.utils';
@@ -286,7 +286,7 @@ export class FacturaC extends CrudG<FacturasI> {
 
       data_parsed.detalle_facturas.forEach(detalle => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {
-          detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${detalle.unidad}`;
+          detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${unidadAbrev[fun.normalizarTexto(detalle.unidad)]}.`;
           data_parsed.contenido_reporte.push(detalle);
         }
       });

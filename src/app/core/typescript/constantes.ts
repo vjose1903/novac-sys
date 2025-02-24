@@ -26,6 +26,26 @@ export enum TypeNavigation {
   back_forward = 2,
 }
 
+
+export enum unidadAbrev {
+  barril = 'BARR',
+  bolsa = 'BOL',
+  botella = 'BOTELLA',
+  caja = 'CAJ ',
+  docena = 'DOC',
+  fardo = 'FARD',
+  galon = 'GL',
+  kilogramo = 'KG',
+  libra = 'LB',
+  litro = 'LITRO',
+  tanque = 'TANQUE',
+  unidad = 'UND',
+  saco = 'SAC',
+  quintal =' Q',
+  miligramo = 'MG',
+  onzas = 'OZ',
+}
+
 export enum teclasCode {
   _esc = 27,
   _derecha = 39,
