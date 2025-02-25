@@ -58,8 +58,6 @@ export class ModalClass extends LayoutClass {
   openNewModal(params: ConfigureModalI) {
     const modal_configuration = {};
     modal_configuration['show'] = true;
-
-    modal_configuration['show'] = true;
     modal_configuration['component'] = fun.objHas(params, 'component') ? params.component : undefined;
     modal_configuration['width'] = fun.objHas(params, 'width') ? params.width : '50rem';
     modal_configuration['height'] = fun.objHas(params, 'height') ? params.height : undefined;
