@@ -1264,7 +1264,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    let si = instance => {
+    let siFunct = instance => {
       if (this.factServ.action !== actionFacturacion.update) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento}/${actionFacturacion.new}/0`).then(res_router => this.resetVariables());
       else if (this.factServ.action == actionFacturacion.update || this.factServ.action == actionFacturacion.bill_from_cotizacion) this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
 
@@ -1273,7 +1273,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let documento = this.getDocumentoDescripcion();
 
-    let obj = { id: 'cancelar_factura', header: 'Confirmación', texto: `Seguro que desea cancelar la ${documento.descripcion}`, siFunction: si };
+    let obj = { id: 'cancelar_factura', header: 'Confirmación', texto: `Seguro que desea cancelar la ${documento.descripcion}`, siFunction: siFunct };
 
     this.confirmationModal(obj);
   }
@@ -1375,7 +1375,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   agregarFacturaALocalStorage() {
     if (!this.factServ.propietario_factura) this.factServ.propietario_factura = this.form.value;
 
-    let facturas_localStorage = FactsLocalStorage.getList();
+    let facturas_localStorage = (FactsLocalStorage.getList() || []).sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
 
     const factura_a_guardar = fun.deepCloning(this.objArchivo.factura_en_turno);
 
@@ -1389,13 +1389,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       factura_a_guardar['archivo_id'] = this.factura_guardada?.archivo_id;
       facturas_localStorage[index_factura] = factura_a_guardar;
     } else {
-      facturas_localStorage = facturas_localStorage.sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
+      
       factura_a_guardar['archivo_id'] = facturas_localStorage.length > 0 ? _.last(facturas_localStorage).archivo_id + 1 : 1;
 
       facturas_localStorage.push(factura_a_guardar);
     }
 
-    facturas_localStorage = facturas_localStorage.sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
+    facturas_localStorage.sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
 
     FactsLocalStorage.setList(facturas_localStorage);
 
@@ -1761,20 +1761,20 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     
     
 
-    // if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
-    // else res = await this.facturaClass.createOne(cabecera_fact);
+    if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
+    else res = await this.facturaClass.createOne(cabecera_fact);
 
-    // if (this.factura_guardada) this.revisarLocalStorage();
+    if (this.factura_guardada) this.revisarLocalStorage();
 
-    // this.facturaClass.parseDataToPdf(res['data']).then(async factura_parsed => {
-    //   const obj = { data: factura_parsed, type: documento.tipo };
+    this.facturaClass.parseDataToPdf(res['data']).then(async factura_parsed => {
+      const obj = { data: factura_parsed, type: documento.tipo };
 
-    //   PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(`Error imprimiendo la ${documento.descripcion}.`, 'ERROR'));
+      PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(`Error imprimiendo la ${documento.descripcion}.`, 'ERROR'));
 
-    //   this.layServ.nextCheckCuadreToday(true);
+      this.layServ.nextCheckCuadreToday(true);
 
-    //   if (this.factServ.action == actionFacturacion.update) this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
-    //   else await this.resetVariables();
-    // });
+      if (this.factServ.action == actionFacturacion.update) this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
+      else await this.resetVariables();
+    });
   }
 }

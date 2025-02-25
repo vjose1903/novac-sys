@@ -1,7 +1,7 @@
 <div class="row BuscarFacturaRow">
   <div class="col-12 titulo">
     <h3 class="mb-0">
-      Buscar facturas:@if (para) {
+      Buscar facturas: @if (para) {
       <b>{{ para }}</b>
       }
     </h3>
@@ -144,9 +144,6 @@
     </div>
     }
   </div>
-  @if (mostrarListaFacturas() && para != 'Visualizar') {
-  <button [disabled]="!(idsFacturasSeleccionadas.length > 0)" [disabled]="" class="btn btn-verde footer" value="" (click)="continuarANotas()">Continuar</button>
-  }
 </div>
 
 <!-- ============================================================================================================================================ -->

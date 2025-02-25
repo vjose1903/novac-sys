@@ -112,8 +112,8 @@ export class ModalClass extends LayoutClass {
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
-          { clase: 'btn btn-verde', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
+          { clase: 'btn btn-blanco w-9', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
+          { clase: 'btn btn-verde w-9', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
         ],
       },
     };

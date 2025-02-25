@@ -654,8 +654,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               botones: {
                 ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
-                  { clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
+                  { clase: 'btn btn-blanco w-9', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'No', disable: false },
+                  { btn_id: 'btnConfirmar w-9', clase: 'btn btn-verde w-9', function_in_other_component: 'btn_aceptar', label: 'Si', disable: true },
                 ],
               },
             });
