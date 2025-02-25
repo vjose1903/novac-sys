@@ -227,7 +227,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
     if (this.inputs.code == tipoDocFacturacion.cotizacion) {
       botonesDinamicos.push({
-        clase: 'btn btn-gris ml-2',
+        clase: 'btn btn-gris',
         function: (instance) => {
           instance.closeModal(instance.id, 'mostrarFactura');
           this.tableClickIcon({ id_tabla: 'mostrar_documento', columnKey: 'actions', iconKey: 'rellenar_factura', data: dataFactura });

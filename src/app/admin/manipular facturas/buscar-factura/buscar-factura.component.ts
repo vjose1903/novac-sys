@@ -718,6 +718,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         id: 'mostrarFactura',
         header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
         width: '900px',
+        height: '70vh',
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: botonesDinamicos,
@@ -726,14 +727,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
       if (this.tipo_documento_selected != tipoDocFacturacion.cotizacion && this.tipo_documento_selected != tipoDocFacturacion.pre_venta) {
         obj_modal.botones.dinamico.push({
-          clase: 'btn btn-gris ml-2',
+          clase: 'btn btn-gris',
           function: instance => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
           label: 'Ver detalles',
           disable: false,
         });
       } else {
         obj_modal.botones.dinamico.push({
-          clase: 'btn btn-gris ml-2',
+          clase: 'btn btn-gris',
           function: instance => {
             instance.closeModal(instance.id, 'mostrarFactura');
             this.tableClickIcon({ id_tabla: shearchDocumentTableId, columnKey: 'actions', iconKey: 'make_bill', data: dataFactura });
@@ -758,14 +759,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         };
 
         const rePrintButton = {
-          clase: 'btn btn-amarillo ml-2',
+          clase: 'btn btn-amarillo',
           function: instance => this.reimprimirDocumento({ data: dataFactura, type: type }, instance),
           label: 'Reimprimir',
           disable: false,
         };
 
         const cloneButton = {
-          clase: 'btn btn-azul ml-2',
+          clase: 'btn btn-azul',
           function: instance => {
             this.goToFacturacionPage(dataFactura.tipo, actionFacturacion.duplicate, dataFactura.id);
             instance.closeModal(instance.id, 'mostrarFactura');

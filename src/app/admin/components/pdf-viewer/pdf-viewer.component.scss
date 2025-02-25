@@ -17,16 +17,11 @@ span.canceladaContent {
 }
 
 ::ng-deep {
-  ngx-extended-pdf-viewer * {
-    -webkit-box-sizing: content-box !important;
-    -moz-box-sizing: content-box !important;
-    box-sizing: content-box !important;
-  }
-
-  ngx-extended-pdf-viewer .pdfViewer .canvasWrapper {
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
+  ngx-extended-pdf-viewer .zoom {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
   }
 }
