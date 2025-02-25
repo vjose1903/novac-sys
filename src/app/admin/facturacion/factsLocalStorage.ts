@@ -10,8 +10,10 @@ import { ObjectVar } from '../../core/typescript/constantes';
 export class FactsLocalStorage extends PreFacturaClass {
   index_fact_archivada = signal<number | string>(0);
   sideBarTabsIndex = signal<ObjectVar<any>>({});
+  triggerReload = signal<boolean>(false);
 
   facturas_localStorage = computed<any[]>(() => {
+    this.triggerReload();
     const facturas_localStorage = FactsLocalStorage.getList().filter((item: any) => {
       return item.tipo === this.sideBarTabsIndex()[this.index_fact_archivada()];
     });
@@ -98,7 +100,7 @@ export class FactsLocalStorage extends PreFacturaClass {
   }
 
   getSideBarTabByKey(key: tipoDocFacturacion) {
-    return this.sideBarTabs.find((item) => item.key == key);
+    return this.sideBarTabs.find(item => item.key == key);
   }
 
   _toggleSidebar(where?, metodo?) {
@@ -122,19 +124,12 @@ export class FactsLocalStorage extends PreFacturaClass {
   static setList(facturas) {
     localStorage.removeItem('facturas_guardadas');
 
-    facturas.map((factura) => {
+    facturas.map(factura => {
       factura['archivo_date'] ??= new Date();
       return factura;
     });
 
     localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
-
-    const btn_side = document.getElementById('btn_side_facturas');
-
-    if (btn_side) {
-      if (fun.hasValue(facturas)) btn_side.setAttribute('data-cant-facturas', facturas.length);
-      else btn_side.removeAttribute('data-cant-facturas');
-    }
   }
 
   countCantFactSaved(tipo) {
@@ -143,20 +138,20 @@ export class FactsLocalStorage extends PreFacturaClass {
   }
 
   reloadIndexFactArchivada() {
-    const ant_index_fact_archivada = this.index_fact_archivada();
-    this.index_fact_archivada.set(null);
-    setTimeout(() => this.index_fact_archivada.set(ant_index_fact_archivada), 100);
+    this.triggerReload.set(!this.triggerReload());
   }
 
   quitarFacturaGuardada(archivo_id) {
     let index;
     const allFacturas = FactsLocalStorage.getList();
+    
     if (archivo_id) {
-      if (this.factura_guardada?.archivo_id == archivo_id) this.factura_guardada = undefined;
       index = allFacturas.findIndex((item: any) => item.archivo_id === archivo_id);
 
-      fun.pullAt(allFacturas, index);
-
+      if (fun.hasValue(index)) {
+        fun.pullAt(allFacturas, index);
+        if (this.factura_guardada?.archivo_id == archivo_id) this.factura_guardada = undefined;
+      }
       FactsLocalStorage.setList(allFacturas);
     }
 
@@ -167,7 +162,7 @@ export class FactsLocalStorage extends PreFacturaClass {
     const facturas = FactsLocalStorage.getList();
     if (fun.hasValue(facturas)) {
       const validFacturas = [];
-      facturas.forEach((factura) => {
+      facturas.forEach(factura => {
         const timeArchivada = DateUtils.diffHours(factura.archivo_date);
 
         if (timeArchivada < 24) validFacturas.push(factura);
@@ -177,12 +172,12 @@ export class FactsLocalStorage extends PreFacturaClass {
     }
   }
 
-  abrirModalFacturaGuardada(fact, e) {
+  openModalRemoveFactura(fact, e) {
     const confirmationObj = {
       id: 'quitar_factura',
       texto: 'Estas seguro que desea quitar esta factura de la lista.',
       header: 'Confirmación',
-      siFunction: (instance) => {
+      siFunction: instance => {
         this.quitarFacturaGuardada(fact.archivo_id);
         instance.closeModal(instance.id, 'quitar_factura');
       },
