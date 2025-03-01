@@ -10,7 +10,7 @@ import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
 import { FacturaC } from '../../facturacion/factura';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
 import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -54,7 +54,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     filtrar: { local: false },
     colores: true,
     id_tabla: 'lista_viajes',
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
   config_viaje_selected: table_config = {

@@ -44,8 +44,13 @@ export interface table_info {
   iconsArray?: Array<iconsI>;
   key_value?: string;
   div_class?: string;
+  sort?: sortInfo;
 }
 
+interface sortInfo {
+  key: string;
+  order: 'asc' | 'desc' | null;
+}
 interface keySourceArray {
   value: any;
   clase: string;
@@ -139,6 +144,8 @@ export interface table_config {
   obj_paginate?: paginateI;
   botones?: botonesTableI;
 }
+
+export const default_per_page = [10, 15, 20, 30, 50, 100];
 
 export enum medidas {
   Libra = 'Libras',

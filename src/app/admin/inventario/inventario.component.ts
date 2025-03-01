@@ -8,7 +8,7 @@ import { ReporteC } from '../reportes/reporte';
 import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
 import { fun } from '../../core/services/functions.service';
 import { Ss } from '../../core/services/singleton.service';
-import { table_config } from '../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../components/new_tablas/tabla-class';
 import { Permisos } from '../../core/typescript/permisos';
 import { InventarioC } from './inventario';
 
@@ -35,7 +35,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     id_tabla: 'lista_inventario',
     padre_functions: { data_request: (params) => this.getArticulos(params), handleBtnsDinamic: (params) => this.movimientoInventario(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { dinamico: [{ show: true, icon: 'fas fa-dolly', permiso: this.permissions.movimiento_inventario.create, name: 'movimiento_inventario', tooltip: 'Movimientos de inventario' }] },
   };
 

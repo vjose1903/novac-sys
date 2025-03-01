@@ -9,7 +9,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ConfigI } from '../../../core/interface/config-interface';
@@ -91,7 +91,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     id_tabla: 'lista_articulos',
     padre_functions: { data_request: (params) => this.getArticulos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.articulo.update }, borrar: { show: true, permiso: this.permissions.articulo.destroy } },
   };
   tablaComponent;

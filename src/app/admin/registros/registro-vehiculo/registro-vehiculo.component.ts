@@ -11,7 +11,7 @@ import { EmpleadoC } from '../registro-empleados/empleado';
 import { VehiculoC } from './vehiculo';
 import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ModalClass } from '../../components/modal/modal-class';
@@ -57,7 +57,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_vehiculos',
     padre_functions: { data_request: (params) => this.getVehiculos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.vehiculo.update }, borrar: { show: true, permiso: this.permissions.vehiculo.destroy } },
   };
   tablaComponent;

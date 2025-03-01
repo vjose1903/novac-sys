@@ -8,7 +8,7 @@ import { customValidators } from '../../../core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 
 @Component({
@@ -53,7 +53,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_clientes',
     padre_functions: { data_request: (params) => this.getClientes(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
   };
   tablaComponent;

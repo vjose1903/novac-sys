@@ -6,7 +6,7 @@ import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 import { SuplidorC } from '../../../registros/registro-suplidores/suplidores';
 import { fun } from '../../../../core/services/functions.service';
-import { table_config, table_info } from '../../new_tablas/tabla-class';
+import { default_per_page, table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ConfigI } from '../../../../core/interface/config-interface';
 @Component({
@@ -34,7 +34,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     id_tabla: 'buscar_cliente_suplidor',
     padre_functions: { data_request: (params) => this.buscarClientesOrSuplidor(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
   tablaComponent: any;
 

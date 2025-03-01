@@ -5,7 +5,7 @@ import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { ModalClass } from '../../components/modal/modal-class';
 
@@ -35,7 +35,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     id_tabla: 'lista_roles',
     padre_functions: { data_request: (params) => this.getRoles(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.role.update }, borrar: { show: true, permiso: this.permissions.role.destroy } },
   };
   tablaRolesComponent;

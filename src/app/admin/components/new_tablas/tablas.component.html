@@ -1,232 +1,248 @@
 <div #dinamicTable class="dinamicTable position-relative" [sizeCatcher]="cardTabla" [ngStyle]="{ padding: config.padding }">
   <!-- FILTER -->
   @if (config?.filtrar?.show) {
-  <div id="searchDiv-{{ realIdTabla }}" class="searchDiv d-flex align-items-center" style="max-width: 17rem; z-index: 9">
-    <label class="search-label mr-2" for="search">Busqueda </label>
-    @if (config?.filtrar?.local) {
-    <input id="search-{{ realIdTabla }}" class="search-input form-control min" [filterTarget]="config.filterTargets" [DataFilter]="copyData" (onFilter)="dataLocalFilter($event)" (keyup)="filter($event)" />
-    } @if (!config?.filtrar?.local) {
-    <input id="search-{{ realIdTabla }}" class="search-input form-control min" (keyup)="filter($event)" />
-    }
-  </div>
+    <div id="searchDiv-{{ realIdTabla }}" class="searchDiv d-flex align-items-center" style="max-width: 17rem; z-index: 9">
+      <label class="search-label mr-2" for="search">Busqueda </label>
+      @if (config?.filtrar?.local) {
+        <input id="search-{{ realIdTabla }}" class="search-input form-control min" [filterTarget]="config.filterTargets" [DataFilter]="copyData" (onFilter)="dataLocalFilter($event)" (keyup)="filter($event)" />
+      }
+      @if (!config?.filtrar?.local) {
+        <input id="search-{{ realIdTabla }}" class="search-input form-control min" (keyup)="filter($event)" />
+      }
+    </div>
   }
   <!-- TABLA -->
   <div #fantasma class="divTableFantasma h-100">
     <div #divTable class="divTable" [sizeCatcher]="fantasma">
       @if (config.info) {
-      <table class="myTable" id="content_{{ realIdTabla }}">
-        <!-- THEAD -->
-        <thead class="text-center position-relative thead letras {{ config.redondo ? 'redondo' : '' }} {{ config.colorTitulo ? 'colorTitulo' : 'noColorTitulo' }}">
-          <tr id="titulosHeader-{{ realIdTabla }}" class="titulosHeader">
-            @for (row of config.info; track $index; let index_head = $index) {
-            <th class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="row?.style ? row.style : {}">
-              <span>
-                @switch (row?.tipo) { @case ('inputSwitch') {
-                <span>
-                  @if (!row?.select_all) {
-                  {{ row?.titulo }}
-                  } @if (row?.select_all) {
-                  <input class="apple-switch" type="checkbox" [checked]="are_all_selected(row)" [pTooltip]="are_all_selected(row) ? 'Deseleccionar todo' : 'Seleccionar todo'" tooltipPosition="top" (change)="changeValorSelectAll(row)" />
-                  }
-                </span>
-                } @default {
-                <span>
-                  <span class="titulo" [pTooltip]="row.tooltip || ''" tooltipPosition="top"> {{ row.titulo }} </span>
-                </span>
-                } }
-              </span>
-              @if (row.alert_msg) {
-              <i class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
-              }
-            </th>
-            }
-            <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" [ngStyle]="config?.botones?.styles">
-              <span class="titulo"> Acciones </span>
-            </th>
-          </tr>
-        </thead>
-        <!-- TBODY -->
-        <div class="divBody">
-          <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
-            @if (data) { @for (rowData of data; track $index; let indexBody = $index) {
-            <tr
-              class="text-center"
-              id="row-{{ realIdTabla }}-{{ getIndex(indexBody) }}"
-              [ngClass]="{
-                greenTd: checkBackgroundTr({ tipo: 'greenTd', dato: rowData }),
-                danger: checkBackgroundTr({ tipo: 'danger', dato: rowData }),
-                warning: rowData?.panico > 0 && config?.colores,
-                'bg-selected': config?.colores && fun.hasValue(seleccionado) && seleccionado == rowData?.id,
-                'bg-light': config.focusRow && RowElement.id == row_id,
-                'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData })
-              }"
-              style="cursor: pointer; color: var(--letras)"
-              [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
-              #RowElement
-              (click)="clickROW(rowData, getIndex(indexBody))"
-            >
-              @for (column of config.info; track $index; let index_column = $index) {
-              <td
-                class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
-                id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
-                [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)"
-              >
-                <span class="titulo_sm"> {{ column?.titulo_sm }} </span>
-                <span [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
-                  @switch (column.tipo) { @case ('index') {
-                  <span class="d-flex justify-content-center align-items-center">
-                    <span class="text-bold-700">{{ (tServ.getPaginationById(realIdTabla).page - 1) * tServ.getPaginationById(realIdTabla).per_page + (getIndex(indexBody) + 1) }}</span>
-                  </span>
-                  } @case ('cantidades') {
-                  <span id="{{ column.key }}-{{ getIndex(indexBody) }}" pTooltip="{{ cantidadesTooltip(rowData, column) }}" [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'" style="width: 100%">
-                    {{ cantidadesLabel(rowData, column) }}
-                  </span>
-                  } @case ('img') {
-                  <span class="d-flex justify-content-center align-items-center">
-                    <img-component
-                      [alt]="column.alt ? column.alt : rowData[column.rowAlt] ? rowData[column.rowAlt] : ''"
-                      [imagenSrc]="getValueForm(column, rowData)"
-                      [imgStyle]="column.imgStyle ? column.imgStyle : rowData[column.rowImgStyle] ? rowData[column.rowImgStyle] : 'circular'"
-                    ></img-component>
-                  </span>
-                  } @case ('icon') {
-                  <span>
-                    <icons-array [column]="column" [indexBody]="getIndex(indexBody)" [realIdTabla]="realIdTabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="data" (icon_click)="iconsClick($event)"></icons-array>
-                  </span>
-                  } @case ('tag') {
-                  <div (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
-                    @if (fun.hasValue(getValueForm(column, rowData))) {
-                    <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: rowData, column: column }"></ng-container>
-                    }
-                  </div>
-                  } @case ('color') {
-                  <span class="d-flex justify-content-center align-items-center">
-                    <div class="show_color" [ngStyle]="getColor(getValueForm(column, rowData))"></div>
-                  </span>
-                  } @case ('switch') {
-                  <span class="d-flex justify-content-center align-items-center">
-                    @if (column.remplace && seleccionado != rowData?.id) {
-                    <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
-                      <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
-                    </span>
-                    } @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace) {
-                    <div class="table_switch">
-                      <input class="apple-switch" [ngClass]="{ disabled: disableInput(rowData, column) }" type="checkbox" (change)="changeValorCheck(rowData, column, getIndex(indexBody))" [checked]="getValueForm(column, rowData)" />
-                    </div>
-                    }
-                  </span>
-                  } @case ('dropDown') {
-                  <span>
-                    @if (column.remplace && seleccionado != rowData?.id && !rowData?.is_editing) {
-                    <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
-                      <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
-                    </span>
-                    } @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing) {
-                    <div>
-                      <p-select
-                        #dropdown
-                        [virtualScroll]="true"
-                        [virtualScrollItemSize]="34"
-                        [dropdownIcon]="'pi pi-sort'"
-                        [disabled]="disableInput(rowData, column)"
-                        [options]="column.data"
-                        [filter]="true"
-                        filterBy="nombre_largo,hora_sorteo"
-                        [ngModel]="rowData[column.dropdown_key]"
-                        [placeholder]="getDropPlaceholder(column.placeholder)"
-                        [optionLabel]="column.optionLabel"
-                        [optionValue]="column.optionValue"
-                        styleClass="form-control min"
-                        appendTo="body"
-                        emptyFilterMessage="valor_buscado_no_se_encuentra"
-                        (onChange)="changeValorInput(column, column.dropdown_key, getIndex(indexBody), dropdown.value, rowData)"
-                      >
-                      </p-select>
-                    </div>
-                    }
-                  </span>
-                  } @case ('input') {
-                  <span>
-                    @if (column.remplace && seleccionado != rowData?.id && !rowData?.is_editing) {
-                    <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
-                      <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
-                    </span>
-                    } @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing) {
-                    <div class="table_input">
-                      <input
-                        #inputTable
-                        [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
-                        class="form-control m-0 inputTabla {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
-                        id="input-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
-                        [min]="rowData.min_ ? rowData.min_ : 0"
-                        [max]="rowData.max_ ? rowData.max_ : null"
-                        type="{{ column.inputType ? column.inputType : 'text' }}"
-                        [value]="getValueForm(column, rowData)"
-                        [disabled]="disableInput(rowData, column)"
-                        (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
-                        (blur)="checkNumber($event.target, column, getIndex(indexBody)); handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
-                        (keyup)="changeValorInput(column, column.key, getIndex(indexBody), htmlServ.getValue($event), rowData)"
-                      />
-                      <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), htmlServ.getValue($event), dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
-                      @if (column.can_reset) {
-                      <i pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, rowData)"></i>
+        <table class="myTable" id="content_{{ realIdTabla }}">
+          <!-- THEAD -->
+          <thead class="text-center position-relative thead letras {{ config.redondo ? 'redondo' : '' }} {{ config.colorTitulo ? 'colorTitulo' : 'noColorTitulo' }}">
+            <tr id="titulosHeader-{{ realIdTabla }}" class="titulosHeader">
+              @for (row of config.info; track $index; let index_head = $index) {
+                <th class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }" id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="row?.style ? row.style : {}" (click)="sort(row)">
+                  <span [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }">
+                    @switch (row?.tipo) {
+                      @case ('inputSwitch') {
+                        <span [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }">
+                          @if (!row?.select_all) {
+                            {{ row?.titulo }}
+                          }
+                          @if (row?.select_all) {
+                            <input class="apple-switch" type="checkbox" [checked]="are_all_selected(row)" [pTooltip]="are_all_selected(row) ? 'Deseleccionar todo' : 'Seleccionar todo'" tooltipPosition="top" (change)="changeValorSelectAll(row)" />
+                          }
+                        </span>
                       }
-                    </div>
+                      @default {
+                        <span class="titulo" [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }" [pTooltip]="row.tooltip || ''" tooltipPosition="top"> {{ row.titulo }} </span>
+                      }
+                    }
+                    @if (fun.hasValue(row?.sort)) {
+                      <div class="sort-icon" [ngClass]="{ 'order-asc': row?.sort?.order == 'asc', 'order-desc': row?.sort?.order == 'desc' }"></div>
                     }
                   </span>
-                  } @default {
-                  <span id="{{ column.key }}-{{ getIndex(indexBody) }}" class=" {{ rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'text-black' }}" style="width: 100%">
-                    {{ getValueForm(column, rowData) }}
-                    {{ column.alerta && config?.colores && rowData.danger ? '(Inactivo)' : '' }}
-                  </span>
-                  } }
-                </span>
-              </td>
-              } @if (fun.hasValue(config.botones)) {
-              <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
-                <span class="titulo_sm"> Acciones </span>
-                <app-btnacciones
-                  [index_body]="getIndex(indexBody)"
-                  [id_tabla]="realIdTabla"
-                  [dato]="rowData"
-                  [data]="data"
-                  [botones]="config.botones"
-                  (functionsBtnDinamic)="functionsBtnDinamic($event)"
-                  (clickBoton)="handle_table_events('click_action', $event)"
-                ></app-btnacciones>
-              </td>
+                  @if (row.alert_msg) {
+                    <i class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
+                  }
+                </th>
               }
+              <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" [ngStyle]="config?.botones?.styles">
+                <span class="titulo"> Acciones </span>
+              </th>
             </tr>
-            } }
-          </tbody>
-        </div>
-        <!-- TFOOT -->
-        <tfoot class="tfoot w-100">
-          @if (config?.obj_paginate && config?.obj_paginate.show != false) {
-          <div id="paginationDiv-{{ realIdTabla }}" class="pieTabla d-flex align-items-center justify-content-between w-100">
-            @if (config?.obj_paginate.showTotal) {
-            <div>
-              <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
-            </div>
-            }
-
-            <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center">
-              <p-paginator
-                id="paginator-{{ realIdTabla }}"
-                [first]="tServ.getPaginationById(realIdTabla)?.page_front"
-                [rows]="tServ.getPaginationById(realIdTabla)?.per_page"
-                [pageLinkSize]="cantPagesView"
-                [totalRecords]="config.total_count"
-                [rowsPerPageOptions]="tServ.getPaginationById(realIdTabla)?.per_page_options"
-                styleClass="{{ config?.obj_paginate?.showDropDown ? '' : 'no-show-dropdown' }}"
-                dropdownAppendTo="body"
-                (onPageChange)="paginatorChange($event, realIdTabla)"
-              ></p-paginator>
-            </div>
+          </thead>
+          <!-- TBODY -->
+          <div class="divBody">
+            <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
+              @if (data) {
+                @for (rowData of data; track $index; let indexBody = $index) {
+                  <tr
+                    class="text-center"
+                    id="row-{{ realIdTabla }}-{{ getIndex(indexBody) }}"
+                    [ngClass]="{
+                      greenTd: checkBackgroundTr({ tipo: 'greenTd', dato: rowData }),
+                      danger: checkBackgroundTr({ tipo: 'danger', dato: rowData }),
+                      warning: rowData?.panico > 0 && config?.colores,
+                      'bg-selected': config?.colores && fun.hasValue(seleccionado) && seleccionado == rowData?.id,
+                      'bg-light': config.focusRow && RowElement.id == row_id,
+                      'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData }),
+                    }"
+                    style="cursor: pointer; color: var(--letras)"
+                    [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
+                    #RowElement
+                    (click)="clickROW(rowData, getIndex(indexBody))">
+                    @for (column of config.info; track $index; let index_column = $index) {
+                      <td
+                        class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
+                        id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
+                        [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                        <span class="titulo_sm"> {{ column?.titulo_sm }} </span>
+                        <span [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
+                          @switch (column.tipo) {
+                            @case ('index') {
+                              <span class="d-flex justify-content-center align-items-center">
+                                <span class="text-bold-700">{{ (tServ.getPaginationById(realIdTabla).page - 1) * tServ.getPaginationById(realIdTabla).per_page + (getIndex(indexBody) + 1) }}</span>
+                              </span>
+                            }
+                            @case ('cantidades') {
+                              <span id="{{ column.key }}-{{ getIndex(indexBody) }}" pTooltip="{{ cantidadesTooltip(rowData, column) }}" [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'" style="width: 100%">
+                                {{ cantidadesLabel(rowData, column) }}
+                              </span>
+                            }
+                            @case ('img') {
+                              <span class="d-flex justify-content-center align-items-center">
+                                <img-component
+                                  [alt]="column.alt ? column.alt : rowData[column.rowAlt] ? rowData[column.rowAlt] : ''"
+                                  [imagenSrc]="getValueForm(column, rowData)"
+                                  [imgStyle]="column.imgStyle ? column.imgStyle : rowData[column.rowImgStyle] ? rowData[column.rowImgStyle] : 'circular'"></img-component>
+                              </span>
+                            }
+                            @case ('icon') {
+                              <span>
+                                <icons-array [column]="column" [indexBody]="getIndex(indexBody)" [realIdTabla]="realIdTabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="data" (icon_click)="iconsClick($event)"></icons-array>
+                              </span>
+                            }
+                            @case ('tag') {
+                              <div (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
+                                @if (fun.hasValue(getValueForm(column, rowData))) {
+                                  <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: rowData, column: column }"></ng-container>
+                                }
+                              </div>
+                            }
+                            @case ('color') {
+                              <span class="d-flex justify-content-center align-items-center">
+                                <div class="show_color" [ngStyle]="getColor(getValueForm(column, rowData))"></div>
+                              </span>
+                            }
+                            @case ('switch') {
+                              <span class="d-flex justify-content-center align-items-center">
+                                @if (column.remplace && seleccionado != rowData?.id) {
+                                  <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                                    <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                                  </span>
+                                }
+                                @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace) {
+                                  <div class="table_switch">
+                                    <input class="apple-switch" [ngClass]="{ disabled: disableInput(rowData, column) }" type="checkbox" (change)="changeValorCheck(rowData, column, getIndex(indexBody))" [checked]="getValueForm(column, rowData)" />
+                                  </div>
+                                }
+                              </span>
+                            }
+                            @case ('dropDown') {
+                              <span>
+                                @if (column.remplace && seleccionado != rowData?.id && !rowData?.is_editing) {
+                                  <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                                    <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                                  </span>
+                                }
+                                @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing) {
+                                  <div>
+                                    <p-select
+                                      #dropdown
+                                      [virtualScroll]="true"
+                                      [virtualScrollItemSize]="34"
+                                      [dropdownIcon]="'pi pi-sort'"
+                                      [disabled]="disableInput(rowData, column)"
+                                      [options]="column.data"
+                                      [filter]="true"
+                                      filterBy="nombre_largo,hora_sorteo"
+                                      [ngModel]="rowData[column.dropdown_key]"
+                                      [placeholder]="getDropPlaceholder(column.placeholder)"
+                                      [optionLabel]="column.optionLabel"
+                                      [optionValue]="column.optionValue"
+                                      styleClass="form-control min"
+                                      appendTo="body"
+                                      emptyFilterMessage="valor_buscado_no_se_encuentra"
+                                      (onChange)="changeValorInput(column, column.dropdown_key, getIndex(indexBody), dropdown.value, rowData)">
+                                    </p-select>
+                                  </div>
+                                }
+                              </span>
+                            }
+                            @case ('input') {
+                              <span>
+                                @if (column.remplace && seleccionado != rowData?.id && !rowData?.is_editing) {
+                                  <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                                    <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
+                                  </span>
+                                }
+                                @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing) {
+                                  <div class="table_input">
+                                    <input
+                                      #inputTable
+                                      [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
+                                      class="form-control m-0 inputTabla {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
+                                      id="input-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
+                                      [min]="rowData.min_ ? rowData.min_ : 0"
+                                      [max]="rowData.max_ ? rowData.max_ : null"
+                                      type="{{ column.inputType ? column.inputType : 'text' }}"
+                                      [value]="getValueForm(column, rowData)"
+                                      [disabled]="disableInput(rowData, column)"
+                                      (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
+                                      (blur)="checkNumber($event.target, column, getIndex(indexBody)); handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
+                                      (keyup)="changeValorInput(column, column.key, getIndex(indexBody), htmlServ.getValue($event), rowData)" />
+                                    <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), htmlServ.getValue($event), dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
+                                    @if (column.can_reset) {
+                                      <i pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, rowData)"></i>
+                                    }
+                                  </div>
+                                }
+                              </span>
+                            }
+                            @default {
+                              <span id="{{ column.key }}-{{ getIndex(indexBody) }}" class=" {{ rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'text-black' }}" style="width: 100%">
+                                {{ getValueForm(column, rowData) }}
+                                {{ column.alerta && config?.colores && rowData.danger ? '(Inactivo)' : '' }}
+                              </span>
+                            }
+                          }
+                        </span>
+                      </td>
+                    }
+                    @if (fun.hasValue(config.botones)) {
+                      <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
+                        <span class="titulo_sm"> Acciones </span>
+                        <app-btnacciones
+                          [index_body]="getIndex(indexBody)"
+                          [id_tabla]="realIdTabla"
+                          [dato]="rowData"
+                          [data]="data"
+                          [botones]="config.botones"
+                          (functionsBtnDinamic)="functionsBtnDinamic($event)"
+                          (clickBoton)="handle_table_events('click_action', $event)"></app-btnacciones>
+                      </td>
+                    }
+                  </tr>
+                }
+              }
+            </tbody>
           </div>
-          }
-        </tfoot>
-      </table>
+          <!-- TFOOT -->
+          <tfoot class="tfoot w-100">
+            @if (config?.obj_paginate && config?.obj_paginate.show != false) {
+              <div id="paginationDiv-{{ realIdTabla }}" class="pieTabla d-flex align-items-center justify-content-between w-100">
+                @if (config?.obj_paginate.showTotal) {
+                  <div>
+                    <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
+                  </div>
+                }
+
+                <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center">
+                  <p-paginator
+                    id="paginator-{{ realIdTabla }}"
+                    [first]="tServ.getPaginationById(realIdTabla)?.page_front"
+                    [rows]="tServ.getPaginationById(realIdTabla)?.per_page"
+                    [pageLinkSize]="cantPagesView"
+                    [totalRecords]="config.total_count"
+                    [rowsPerPageOptions]="tServ.getPaginationById(realIdTabla)?.per_page_options"
+                    styleClass="{{ config?.obj_paginate?.showDropDown ? '' : 'no-show-dropdown' }}"
+                    dropdownAppendTo="body"
+                    (onPageChange)="paginatorChange($event, realIdTabla)"></p-paginator>
+                </div>
+              </div>
+            }
+          </tfoot>
+        </table>
       }
     </div>
   </div>
@@ -234,11 +250,14 @@
 
 <!-- Reemplazador de inputs -->
 <ng-template #remplaceTemplate let-dato="dato" let-column="column" let-index="index">
-  @switch (column?.remplace?.with) { @case ('text') {
-  {{ getValueForm(column, dato) }}
-  } @case ('tag') {
-  <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: dato, column: column }"></ng-container>
-  } }
+  @switch (column?.remplace?.with) {
+    @case ('text') {
+      {{ getValueForm(column, dato) }}
+    }
+    @case ('tag') {
+      <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: dato, column: column }"></ng-container>
+    }
+  }
 </ng-template>
 
 <!-- tag -->
@@ -256,7 +275,6 @@
       width: column.tag_apretada ? 'auto' : '-webkit-fill-available',
       overflow: 'hidden',
       'text-overflow': 'ellipsis',
-      display: 'inline-block'
-    }"
-  ></p-tag>
+      display: 'inline-block',
+    }"></p-tag>
 </ng-template>

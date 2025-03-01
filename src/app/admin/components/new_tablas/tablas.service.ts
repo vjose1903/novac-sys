@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
-import { paginateI } from './tabla-class';
+import { default_per_page, paginateI, table_config } from './tabla-class';
 
 @Injectable({
   providedIn: 'root',
@@ -16,13 +16,30 @@ export class TablasService {
       page: 1,
       page_front: 0,
       per_page: 20,
-      per_page_options: [10, 15, 20, 30],
+      per_page_options: default_per_page,
       search: ' ',
       is_local: false,
     },
   };
 
   blockRowMovement = false;
+
+  parseSort(table_config: table_config) {
+    const sort: { order_by?: string } = {};
+    const order_by = [];
+
+    table_config.info.forEach(info => {
+      if (fun.hasValue(info.sort) && fun.hasValue(info.sort.order)) {
+        order_by.push(`${info.sort.key}:${info.sort.order}`);
+      }
+    });
+
+    if (order_by.length > 0) {
+      sort.order_by = order_by.join(',');
+    }
+
+    return sort;
+  }
 
   initPagination(id, params?: paginateI) {
     return new Promise<void>((resolve, reject) => {
@@ -37,7 +54,7 @@ export class TablasService {
   }
 
   modifyPaginationById(id, params: Array<paginateI>) {
-    params.forEach((param) => {
+    params.forEach(param => {
       const key = _.keys(param)[0];
 
       this.obj_paginate[id][key] = param[key];
@@ -69,7 +86,7 @@ export class TablasService {
     return new Promise<any>((resolve, reject) => {
       let res = { can_edit: false };
 
-      const is_some_editing = params.listado.some((item) => item.is_editing);
+      const is_some_editing = params.listado.some(item => item.is_editing);
       res.can_edit = !is_some_editing;
       resolve(res);
     });
@@ -84,11 +101,11 @@ export class TablasService {
       for (let i = 0; i < params.column.disable.length; i++) {
         const element = params.column.disable[i];
 
-        if (params.column.disable.some((conf) => conf.kind === 'always')) temp_res = true;
+        if (params.column.disable.some(conf => conf.kind === 'always')) temp_res = true;
 
         if (temp_res) break;
 
-        if (params.column.disable.some((conf) => conf.kind === 'selected')) temp_res = Number(params.dato.id) !== Number(params.seleccionado || 0);
+        if (params.column.disable.some(conf => conf.kind === 'selected')) temp_res = Number(params.dato.id) !== Number(params.seleccionado || 0);
 
         if (temp_res) break;
 
@@ -100,7 +117,7 @@ export class TablasService {
 
         if (element.kind == 'campo') {
           if (element.value.length == 0) temp_res = params.dato[element.target] ? false : true;
-          else temp_res = element.value.some((value) => value == params.dato[element.target]);
+          else temp_res = element.value.some(value => value == params.dato[element.target]);
         }
       }
       res = temp_res;
@@ -112,9 +129,9 @@ export class TablasService {
   modifyRowsEditing(newData, kind: 'add' | 'remove') {
     return new Promise<any>((resolve, reject) => {
       newData = fun.deepCloning(newData);
-      const row_editing = this.rowsEditing.find((item) => item.id == newData.id);
+      const row_editing = this.rowsEditing.find(item => item.id == newData.id);
 
-      const index_editing = this.rowsEditing.findIndex((row_edit) => row_edit.id == row_editing?.id);
+      const index_editing = this.rowsEditing.findIndex(row_edit => row_edit.id == row_editing?.id);
 
       if (kind == 'add') {
         if (fun.hasValue(row_editing)) {
@@ -134,7 +151,7 @@ export class TablasService {
 
   mouseMoveEvent(event, row, column, id) {
     if (row.iconsMoveEvents) {
-      row.iconsMoveEvents.forEach((moveEvent) => {
+      row.iconsMoveEvents.forEach(moveEvent => {
         if (column === moveEvent.key) {
           if (event === 'hover') {
             for (let i = 0; i < moveEvent.hover.length; i++) {

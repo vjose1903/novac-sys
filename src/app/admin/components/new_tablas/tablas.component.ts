@@ -224,6 +224,18 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.modifyPaginationById(this.realIdTabla, [{ search: search }]);
   }
 
+  sort(row) {
+    if (fun.hasValue(row?.sort)) {
+      const { key, order } = row.sort;
+      let newOrder = null;
+      order == null ? (newOrder = 'asc') : order == 'asc' ? (newOrder = 'desc') : (newOrder = null);
+      row.sort.order = newOrder;
+
+      const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
+      this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: actualPagination.search });
+    }
+  }
+
   getPaginatorPageByNumber(number) {
     let paginatorPage = undefined;
     const paginator = document.getElementById(`paginator-${this.realIdTabla}`);

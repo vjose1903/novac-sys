@@ -2,7 +2,6 @@
 @use './splash-styles.scss' as *;
 @use './assets/my_styles/main.scss' as *;
 
-
 .visually-hidden {
   display: none !important;
 }
@@ -36,7 +35,6 @@
   text-align: end;
 }
 
-
 .h-96 {
   height: 96% !important;
 }
@@ -48,9 +46,6 @@
 .w-30 {
   width: 30% !important;
 }
-
-
-
 
 .dropRowMenu {
   min-width: 250px;
@@ -286,14 +281,11 @@ body {
 }
 
 .c-help {
-  &:hover {
-    cursor: help !important;
-  }
+  cursor: help !important;
 }
+
 .c-pointer {
-  &:hover {
-    cursor: pointer !important;
-  }
+  cursor: pointer !important;
 }
 // ========================================================
 // TEXT_COLOR
@@ -559,8 +551,6 @@ input.apple-switch:checked:after {
     }
   }
 }
-
-
 
 @mixin my_cards {
   border-radius: 1rem !important;

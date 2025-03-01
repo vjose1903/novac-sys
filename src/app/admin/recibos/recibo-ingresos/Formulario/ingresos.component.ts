@@ -11,7 +11,7 @@ import { PdfService } from '../../../../core/services/reports/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { fun } from '../../../../core/services/functions.service';
-import { table_config } from '../../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
 const moment = require('../../../../core/javascript/moment');
@@ -47,7 +47,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       },
 
       { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
-      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente' },
+      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente', sort: { key: 'fecha_equivalente', order: null } },
       { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
@@ -84,7 +84,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     padding: '0.5rem',
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: params => this.pedirNuevaData(params) },
-    obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
   tablaComponent;
@@ -104,6 +104,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   recibiendo = 0;
   restando = 0;
   totalRegistros;
+  totalPaginas;
   debiendo;
   facturasSelected: Array<any> = [];
 
@@ -151,7 +152,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any }) {
+  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any, order_by?: string }) {
     this.facturas.length = 0;
 
     this.totalFacturado = 0;
@@ -164,6 +165,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const parameters = { page: params.page, per_page: params.per_page, paginado: true };
 
     if (fun.hasValue(params.factura_a_buscar)) parameters['factura_a_buscar'] = params.factura_a_buscar;
+
+    if (fun.hasValue(params.order_by)) parameters['order_by'] = params.order_by;
 
     const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
 
@@ -212,8 +215,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       return factura;
     });
 
-    this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
-
     this.totalFacturado = res.data.balances.total_facturado;
 
     this.totalPagado = res.data.balances.abonado;
@@ -230,6 +231,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     setTimeout(() => {
       this.tablaComponent.changeTableConfig([{ total_count: res.data.facturas.total_registros }]);
       this.totalRegistros = res.data.facturas.total_registros;
+      this.totalPaginas = res.data.facturas.total_paginas;
 
       if (res.data.page != params.page) {
         this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
@@ -314,6 +316,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
     if (fun.hasValue(this.clienteAdepositar)) {
+      const order_by = this.tServ.parseSort(this.table_config);
+      params = { ...params, ...order_by };
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, params);
     } else {
       fun.toastWarning('Debe de seleccionar un cliente para continuar.', 'AVISO');

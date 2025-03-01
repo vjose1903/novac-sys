@@ -1,4 +1,4 @@
-import { table_config } from './../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from './../../components/new_tablas/tabla-class';
 export const shearchDocumentTableId = 'facturas_params';
 export class BuscarFacturaC {
   static tables_config = {
@@ -40,7 +40,7 @@ export class BuscarFacturaC {
       colores: true,
       padding: '0.5rem',
       id_tabla: shearchDocumentTableId,
-      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     } as table_config,
 
     compra: {
@@ -65,7 +65,7 @@ export class BuscarFacturaC {
       colores: true,
       padding: '0.5rem',
       id_tabla: shearchDocumentTableId,
-      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     } as table_config,
 
     pre_venta: {
@@ -98,7 +98,7 @@ export class BuscarFacturaC {
       colores: true,
       padding: '0.5rem',
       id_tabla: shearchDocumentTableId,
-      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     } as table_config,
 
     cotizacion: {
@@ -124,7 +124,7 @@ export class BuscarFacturaC {
       colores: true,
       padding: '0.5rem',
       id_tabla: shearchDocumentTableId,
-      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+      obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     } as table_config,
   };
 }

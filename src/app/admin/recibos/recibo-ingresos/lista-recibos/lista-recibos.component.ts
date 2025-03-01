@@ -9,7 +9,7 @@ import { PdfService } from '../../../../core/services/reports/pdf/pdf.service';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
-import { table_config } from '../../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { ConfigI } from '../../../../core/interface/config-interface';
 import { Ss } from '../../../../core/services/singleton.service';
@@ -43,7 +43,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: params => this.getRecibos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
   tablaComponent;
 

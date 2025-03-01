@@ -16,8 +16,7 @@
               placeholder="Nombre Cliente"
               class="form-control mb-4"
               autocomplete="off"
-              [ngClass]="{ disabled: !!clienteAdepositar }"
-            />
+              [ngClass]="{ disabled: !!clienteAdepositar }" />
             <button class="btn btn-gris" routerLink="/admin/recibos/lista_ingresos">Atras</button>
             <button [disabled]="!clienteAdepositar" class="btn btn-gris ml-2" (click)="cancelarIgreso()">Nueva Busqueda</button>
           </div>
@@ -25,80 +24,90 @@
       </div>
       <div class="col-8 pl-0">
         @if (clienteAdepositar) {
-        <div class="clienteAdepositar">
-          <div class="nombre_cliente">
-            <h3 class="negrita mb-0">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h3>
-          </div>
-          <div class="cuerpo">
-            <div class="cajas">
-              <div class="centro">
-                <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
-                  <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
-                </span>
-              </div>
-              <div class="izquierda pr-2">
-                <span class="w-100 detalleBalance badge bg-info mb-2">
-                  <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
-                </span>
-                @if (facturasSelected.length) {
-                <span class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
-                  <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo) }}</span>
-                </span>
-                } @if (facturasSelected.length) {
-                <span class="w-100 detalleBalance badge bg-warning mb-2">
-                  <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando) }}</span>
-                </span>
-                }
-              </div>
-              <div class="derecha pl-2">
-                <span class="w-100 detalleBalance badge blue text-shadow text-white mb-2">
-                  <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
-                </span>
-                <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
-                  <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotasCredito) }}</span>
-                </span>
-                <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
-                  <span> Debiendo:</span> <span>RD$ {{ formatoNumero(totalFacturado + totalNotasDebito - totalPagado - totalNotasCredito) }}</span>
-                </span>
+          <div class="clienteAdepositar">
+            <div class="nombre_cliente">
+              <h3 class="negrita mb-0">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h3>
+            </div>
+            <div class="cuerpo">
+              <div class="cajas">
+                <div class="centro">
+                  <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
+                    <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
+                  </span>
+                </div>
+                <div class="izquierda pr-2">
+                  <span class="w-100 detalleBalance badge bg-info mb-2">
+                    <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
+                  </span>
+                  @if (facturasSelected.length) {
+                    <span class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
+                      <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo) }}</span>
+                    </span>
+                  }
+                  @if (facturasSelected.length) {
+                    <span class="w-100 detalleBalance badge bg-warning mb-2">
+                      <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando) }}</span>
+                    </span>
+                  }
+                </div>
+                <div class="derecha pl-2">
+                  <span class="w-100 detalleBalance badge blue text-shadow text-white mb-2">
+                    <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
+                  </span>
+                  <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
+                    <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotasCredito) }}</span>
+                  </span>
+                  <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
+                    <span> Debiendo:</span> <span>RD$ {{ formatoNumero(totalFacturado + totalNotasDebito - totalPagado - totalNotasCredito) }}</span>
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="porcentaje">
-            @if (clienteAdepositar) {
-            <div class="d-flex justify-content-between">
-              <span class="negrita">Porcentaje de pago</span>
+            <div class="porcentaje">
+              @if (clienteAdepositar) {
+                <div class="d-flex justify-content-between">
+                  <span class="negrita">Porcentaje de pago</span>
+                </div>
+              }
+              <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
             </div>
-            }
-            <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
           </div>
-        </div>
         }
       </div>
     </div>
   </div>
   <div class="col-12 medio">
     @if (facturas && facturas?.length) {
-    <div class="card sombra cardFacturas br-10">
-      <div class="bonton_select_all">
-        <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
-      </div>
-      <div class="divFantasma">
-        <div #cardTabla id="cardTabla" class="tablaIngresos">
-          <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      <div class="card sombra cardFacturas br-10">
+        <div class="header">
+          <div class="d-flex align-items-center gap-3">
+            @if (totalPaginas > 1) {
+              <div class="more-pages animated flash slower infinite">
+                <strong class="mr-2">Atención: </strong> Existen múltiples páginas
+              </div>
+            }
+            <div>
+              <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+            </div>
+          </div>
         </div>
-        <span class="w-90 facturas-seleccionadas">
-          Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ totalRegistros }}</strong>
-        </span>
+        <div class="divFantasma">
+          <div #cardTabla id="cardTabla" class="tablaIngresos">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
+          <span class="w-90 facturas-seleccionadas">
+            Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ totalRegistros }}</strong>
+          </span>
+        </div>
       </div>
-    </div>
     }
   </div>
   <div class="col-12 abajo">
     @if (facturas && facturas?.length) {
-    <div class="d-flex justify-content-end">
-      <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
-      <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
-    </div>
+      <div class="d-flex justify-content-end">
+        <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
+        <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      </div>
     }
   </div>
 </div>
