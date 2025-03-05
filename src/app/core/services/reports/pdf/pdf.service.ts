@@ -1,8 +1,3 @@
-import { Injectable } from '@angular/core';
-
-const pdfMake = require('pdfmake/build/pdfmake.js');
-const pdfFonts = require('pdfmake/build/vfs_fonts.js');
-
 import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
@@ -13,6 +8,11 @@ import { MessageTask } from '../../../models/message-task';
 import { ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
 import { ConfigI } from '../../../interface/config-interface';
 import { fun } from '../../functions.service';
+import { Injectable } from '@angular/core';
+
+import { vfs } from '../utils/vfs_fonts';
+import { fonts } from '../utils/pdfFonts';
+const pdfMake = require('pdfmake/build/pdfmake');
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
@@ -88,7 +88,7 @@ export class PdfService {
         }
 
         if (todo_true) {
-          this.createPdfFromBase64(obj.doc, obj.file, reimprimir, res => {
+          this.createPdfFromBase64(obj.doc, obj.file, reimprimir).then(res => {
             res['pageOrientation'] = obj.pageOrientation;
             if (params.imprimir) {
               this.imprimirBase64({ base64: res.base64, file: res.file, type: type_oPdf, printer: printer_selected, pageOrientation: res['pageOrientation'] })
@@ -97,7 +97,7 @@ export class PdfService {
             } else {
               resolve(res);
             }
-          });
+          }).catch(err => reject(err));
         } else {
           const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
           fun.toastError('Error generando el pdf.', 'ERROR');
@@ -114,40 +114,31 @@ export class PdfService {
     });
   }
 
-  static createPdfFromBase64(docDefinition, file_, reimprimir_, callback = arg => {}) {
-    try {
+  static createPdfFromBase64(docDefinition, file_, reimprimir_) {
+    return new Promise<any>((resolve, reject) => {
+      try {
+        pdfMake.vfs = vfs;
+        pdfMake.fonts = fonts;
 
-      pdfMake.addFonts( {
-        SpaceMono: {
-            normal: `${window.location.origin}/assets/fonts/pdf/SpaceMono-Regular.ttf`,
-            bold: `${window.location.origin}/assets/fonts/pdf/SpaceMono-Bold.ttf`,
-        },
-        Roboto: {
-          normal: `${window.location.origin}/assets/fonts/pdf/Roboto-Regular.ttf`,
-          bold: `${window.location.origin}/assets/fonts/pdf/Roboto-Bold.ttf`,
-        }
+        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+        pdfDocGenerator.getBase64(data => {
+          const respuesta = this.makeStatusObj({
+            msg: 'Pdf Base64 correcto',
+            file: file_,
+            status: 'si',
+            reimprimir: reimprimir_,
+            base64: data,
+            dd: docDefinition,
+          });
 
-    })
-    
-
-      const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-      pdfDocGenerator.getBase64(data => {
-        const respuesta = this.makeStatusObj({
-          msg: 'Pdf Base64 correcto',
-          file: file_,
-          status: 'si',
-          reimprimir: reimprimir_,
-          base64: data,
-          dd: docDefinition,
+          resolve(respuesta);
         });
-
-        callback(respuesta);
-      });
-    } catch (error) {
-      console.error('>>>>.', error);
-      const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no', body: error });
-      callback(respuesta);
-    }
+      } catch (error) {
+        console.error('>>>>.', error);
+        const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no', body: error });
+        reject(respuesta);
+      }
+    });
   }
 
   static imprimirBase64(oBase: { base64: string; file: string; type: string; printer: string; pageOrientation: string }) {

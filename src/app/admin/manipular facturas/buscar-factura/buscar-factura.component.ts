@@ -707,7 +707,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         show_estado: true,
         estado_documento: dataFactura.estado,
         base64: res.base64,
-        height: '40rem',
         reimprimir: res.reimprimir,
         fileName: _.first(res.file.split('.')),
       };

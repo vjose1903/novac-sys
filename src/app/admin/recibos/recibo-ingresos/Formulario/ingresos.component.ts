@@ -47,7 +47,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       },
 
       { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
-      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente', sort: { key: 'fecha_equivalente', order: null } },
+      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente', sort: { key: 'fecha_equivalente', order: null }, style: { width: '9rem' } },
       { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
@@ -57,14 +57,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         tipo: 'switch',
         key: 'select',
         select_all: false,
-        estilos: [{ width: '7rem', padding: '0.6rem 0rem' }],
+        style: { width: '7rem', padding: '0.6rem 0rem' },
       },
       {
         titulo: 'Pago Total',
         tipo: 'switch',
         key: 'pagoT',
         select_all: false,
-        estilos: [{ width: '6rem', padding: '0.6rem 0rem' }],
+        style: { width: '6rem', padding: '0.6rem 0rem' },
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
       },
       {

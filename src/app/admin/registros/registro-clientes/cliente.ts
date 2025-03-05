@@ -98,10 +98,11 @@ export class ClienteC extends CrudG<any> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
+      console.log("RESPONSE ", response);
+
       let objPdfView: ReporteViewModalConfigI = {
         titulo: pdfParams.inputs.titulo,
         openNewModal: pdfParams.openNewModal,
-        viewerOptions: { width: tipo == 1 ? '57rem' : '64rem', height: tipo == 1 ? '76vh' : '47rem' },
         ...response,
       };
 

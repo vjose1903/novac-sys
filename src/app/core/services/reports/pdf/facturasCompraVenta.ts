@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from '../utils/funciones';
-import { styles_ } from '../utils/files';
+import { defaultStyle, styles_ } from '../utils/files';
 import * as numLetra from '../utils/numero_letras';
 import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../interface/config-interface';
@@ -35,6 +35,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
+    defaultStyle
   };
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };

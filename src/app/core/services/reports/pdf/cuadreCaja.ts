@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from '../utils/funciones';
-import { styles_ } from '../utils/files';
+import { defaultStyle, styles_ } from '../utils/files';
 import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../interface/config-interface';
 
@@ -20,6 +20,7 @@ export function makePDF(data) {
         logo: `data:image/png;base64,${configApp.logo_impresion}`,
       },
       styles: styles_,
+      defaultStyle
     };
 
     const obj = { doc: dd, file: 'cuadre.pdf', type: 'base64', pageOrientation:'portrait' };

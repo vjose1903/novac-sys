@@ -1,6 +1,6 @@
 import { fun } from './../../functions.service';
 /* eslint-disable @typescript-eslint/indent */
-import { styles_ } from '../utils/files';
+import { defaultStyle, styles_ } from '../utils/files';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { getContentWithTablaAgrupada } from '../utils/tabla_agrupada';
 import { Ss } from '../../singleton.service';
@@ -77,6 +77,7 @@ export function makeReporte(data) {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
+    defaultStyle
   };
 
   const obj = { doc: dd, file: 'reporte.pdf', type: 'base64', pageOrientation: pageO };

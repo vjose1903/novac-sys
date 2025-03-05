@@ -59,7 +59,6 @@
           display: table;
           width: 100%;
           table-layout: fixed;
-          font-size: 0.8rem !important;
 
           &:not(&.colorTitulo) {
             border-bottom: 1px solid #808080a8 !important;
@@ -235,7 +234,7 @@
   width: 15px;
   display: inline-block;
   transform: translate(3px, -4px);
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -288,8 +287,9 @@
     display: none;
   }
 
+  .divTable thead,
   .divTable tbody {
-    font-size: 0.9rem;
+    font-size: 0.75rem !important;
   }
 }
 
@@ -301,8 +301,9 @@
     display: none;
   }
 
+  .divTable thead,
   .divTable tbody {
-    font-size: 0.65rem;
+    font-size: 0.65rem !important;
   }
 }
 
@@ -317,12 +318,13 @@
   .titulo_sm {
     display: flex;
     align-items: center;
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
     font-weight: 600;
   }
 
+  .divTable thead,
   .divTable tbody {
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
   }
 
   .tableTD {
