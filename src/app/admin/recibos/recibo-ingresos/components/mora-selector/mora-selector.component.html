@@ -1,0 +1,47 @@
+<div class="d-flex gap-2 align-items-center justify-content-center w-100">
+  <span>
+    {{ getValueForm(column, rowData) }}
+  </span>
+  <div>
+    <span class="btn-mora" (click)="(moraCalculator.hasMora ? null : null)" [ngClass]="{ disabled: !moraCalculator.hasMora, open: popoverMora?.overlayVisible }" (click)="popoverMora.toggle($event)">
+      @if (moraCalculator.hasMora) {
+        {{ porcentajeSelected != mora_personalizada ? porcentajeSelected + '%' : 'P' }}
+      } @else {
+        <i class="fa-solid fa-ban"></i>
+      }
+    </span>
+  </div>
+</div>
+
+<p-popover #popoverMora>
+  <div class="d-flex flex-column gap-3 w-100 p-2">
+    <span class="d-flex gap-2 align-items-center justify-content-center">
+      Dias de retraso:
+      <span class="badge bg-warning text-black p-1">
+        {{ formatoNumero(moraCalculator.getDiasRetraso(), 0) }}
+      </span>
+    </span>
+
+    <div class="d-flex flex-column">
+      <span class="text-w-600 mb-2">Porcentajes</span>
+
+      @for (porcentaje of porcentajes; track $index) {
+        <div class="d-flex flex-column gap-0">
+          <div class="porcentaje-item pt-1">
+            <span>{{ porcentaje == mora_personalizada ? 'Personalizado' : porcentaje + '%' }}</span>
+
+            <div class="d-flex align-items-center justify-content-center">
+              <input class="apple-switch size-sm" type="checkbox" (change)="changePorcentaje(porcentaje)" [checked]="porcentajeSelected == porcentaje" />
+            </div>
+          </div>
+
+          <hr class="rayaBottom sm pb-1" [ngClass]="{ 'd-none': $last && porcentajeSelected != mora_personalizada }" />
+        </div>
+      }
+    </div>
+
+    @if (porcentajeSelected == mora_personalizada) {
+      <input class="form-control min" [(ngModel)]="rowData.mora" />
+    }
+  </div>
+</p-popover>

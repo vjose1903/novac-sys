@@ -1,0 +1,64 @@
+/* ====================================================== */
+/* CHECK APPLE */
+/* ====================================================== */
+
+input.apple-switch {
+  position: relative;
+  appearance: none;
+  outline: none;
+  width: 35px;
+  min-width: 35px;
+  height: 23px;
+  background-color: #ffffff;
+  border: 1px solid #d9dadc;
+  border-radius: 50px;
+  box-shadow: inset -13px 0 0 0 #e6e5e5;
+  transition-duration: 500ms;
+  &.disabled {
+    filter: brightness(0.9) !important;
+    pointer-events: none !important;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 17.5px;
+    height: 16.2px;
+    background-color: transparent;
+    border-radius: 50%;
+    box-shadow: 1px 1px 6px #48484833;
+    transition-duration: 500ms;
+  }
+
+  &:checked {
+    border-color: var(--primary07);
+    box-shadow: inset 13px 0px 0 0 var(--primary07);
+
+    &:after {
+      left: 14px;
+      box-shadow: 1px 4px 1px #0000000f;
+    }
+  }
+
+  &.size-sm {
+    width: 30px;
+    height: 19px;
+    min-width: 30px;
+    box-shadow: inset -12px 0 0 0 #e6e5e5;
+
+    &:after {
+      width: 15.5px;
+      height: 13.5px;
+    }
+
+    &:checked {
+      box-shadow: inset 12px 0px 0 0 var(--primary07);
+
+      &:after {
+        left: 12px;
+      }
+    }
+  }
+}

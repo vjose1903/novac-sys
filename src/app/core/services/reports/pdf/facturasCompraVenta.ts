@@ -327,7 +327,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
                               <rect height="180" width="517" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
 
                               <text transform="translate(8, 15)" style="font-size: 7px" >DESPUÉS DE LA FECHA DE VENCIMIENTO DE ESTA FACTURA </text>
-                              <text transform="translate(8, 25)" style="font-size: 7px" > QUE SON 30 DÍAS, SE GENERARÁ UN 2% DE RECARGO</text>
+                              <text transform="translate(8, 25)" style="font-size: 7px" > QUE SON 30 DÍAS, SE GENERARÁ UN 2% DE MORA</text>
 
                               <text transform="translate(250, 20)" style="font-size: 12px" font-weight="bold">Unica de Cambio </text>
 

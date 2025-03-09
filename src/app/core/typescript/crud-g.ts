@@ -51,13 +51,13 @@ export class CrudG<T> {
 
       if (fun.objHas(data, 'id') && data.id !== 0) {
         this.updateOne(data, arg, tipo).then(
-          (res) => resolve(res),
-          (err) => reject(err),
+          res => resolve(res),
+          err => reject(err)
         );
       } else {
         this.createOne(data, arg, tipo).then(
-          (res) => resolve(res),
-          (err) => reject(err),
+          res => resolve(res),
+          err => reject(err)
         );
       }
     });
@@ -106,8 +106,8 @@ export class CrudG<T> {
   private getUrlInUse() {
     const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
-    // const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
-    const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
+    const url = configApp.is_development ? AppConfig[configApp.machineId] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
+    // const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;
   }
 

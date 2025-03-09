@@ -14,6 +14,7 @@ import { fun } from '../../../../core/services/functions.service';
 import { default_per_page, table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
+import { MoraSelectorComponent } from '../components/mora-selector/mora-selector.component';
 const moment = require('../../../../core/javascript/moment');
 
 @Component({
@@ -47,10 +48,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       },
 
       { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
-      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente', sort: { key: 'fecha_equivalente', order: null }, style: { width: '9rem' } },
-      { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
-      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
-      { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
+      { titulo: 'Fecha Fact.', alert_msg: 'Fecha de facturacion de la factura', tipo: 'date', key: 'fecha_equivalente', sort: { key: 'fecha_equivalente', order: null }, style: { width: '9rem' } },
+      { titulo: 'Fecha Venc.', alert_msg: 'Fecha de vencimiento de la factura', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
+      { titulo: 'Monto', tipo: 'formatoNumero', key: 'total_factura' },
+      { titulo: 'Pendiente', tipo: 'formatoNumero', key: 'balance' },
+      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora' } } },
 
       {
         titulo: 'Seleccione',
@@ -152,7 +154,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any, order_by?: string }) {
+  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any; order_by?: string }) {
     this.facturas.length = 0;
 
     this.totalFacturado = 0;

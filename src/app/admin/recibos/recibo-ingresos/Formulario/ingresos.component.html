@@ -104,7 +104,7 @@
   </div>
   <div class="col-12 abajo">
     @if (facturas && facturas?.length) {
-      <div class="d-flex justify-content-end">
+      <div class="d-flex justify-content-end gap-3">
         <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
         <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
       </div>

@@ -11,6 +11,7 @@ export interface ConfigI {
   color_app:                   colors;
   mode_app:                    modes;
   gitUser?:                    string;
+  machineId?:                  string;
   operative_system?:           operativeSystemE;
   url_servidor:                string;
   url_servidor_respaldo:       string;

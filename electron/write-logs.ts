@@ -13,14 +13,13 @@ export default class LogProcessor {
   private logDirPath: string;
   private logFilePath: string;
 
-  private constructor() {
-    this.initVars();
-  }
+  private constructor() {}
 
   // Singleton para garantizar una única instancia
   public static getInstance(): LogProcessor {
     if (!LogProcessor.instance) {
       LogProcessor.instance = new LogProcessor();
+      LogProcessor.instance.initVars();
     }
     return LogProcessor.instance;
   }
