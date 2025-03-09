@@ -53,7 +53,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       { titulo: 'Monto', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Pendiente', tipo: 'formatoNumero', key: 'balance' },
       { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora' } } },
-
       {
         titulo: 'Seleccione',
         tipo: 'switch',
@@ -129,15 +128,15 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.necesarioStart();
   }
 
+  ngOnDestroy() {
+    this._destroy_mixin();
+  }
+
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
       this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
-  }
-
-  ngOnDestroy() {
-    this._destroy_mixin();
   }
 
   formatoNumero(num) {
@@ -396,15 +395,15 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   verificateFacturasSelected(factura, method, index, value) {
-    const factura_en_turno = _.find(this.facturasSelected, { id: factura.id });
+    const factura_en_turno = this.facturasSelected.find(fact => fact.id == factura.id);
 
-    const index_factura_en_turno = _.findIndex(this.facturasSelected, { id: factura.id });
+    const index_factura_en_turno = this.facturasSelected.findIndex(fact => fact.id == factura.id);
 
     if (method == 'insert') {
       if (value) {
         if (fun.isEmpty(factura_en_turno)) this.facturasSelected.push(factura);
       } else {
-        _.pull(this.facturasSelected, factura_en_turno);
+        this.facturasSelected.splice(index_factura_en_turno, 1);
       }
     } else if (method == 'modify') {
       this.facturasSelected[index_factura_en_turno] = fun.deepCloning(factura);
@@ -421,8 +420,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     if (fun.hasValue(factura_en_turno)) {
       const total = factura_en_turno.balance;
       const monto = fun.desformatearStNumber(factura_en_turno.monto);
+      const mora = fun.desformatearStNumber(factura_en_turno.mora);
 
-      if (monto > total) {
+      if (monto > mora + total) {
         this.ExisteMontoMayor = true;
         fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
         fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
@@ -433,8 +433,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tableInputChange(params) {
+    console.log('params ', params);
+    const balance = fun.desformatearStNumber(params.data.balance);
+    const mora = fun.desformatearStNumber(params.data.mora);
+    const monto = fun.desformatearStNumber(params.value);
+    const monto_original = params.value;
+
     if (params.key == 'pagoT' && params.value) {
-      const monto = params.data.select ? fun.roundNumberToDecimal(params.data.balance) : '0.00';
+      const monto = params.data.select ? fun.roundNumberToDecimal(balance + mora) : '0.00';
       this.verificateFacturasSelected(params.data, 'modify', params.index, monto);
     }
 
@@ -442,13 +448,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (params.data.select) {
         if (fun.isEmpty(params.value)) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
 
-        const total = params.data.balance;
-        const monto_desformateado = fun.isEmpty(params.value) ? null : fun.desformatearStNumber(params.value);
-        const monto_original = fun.isEmpty(params.value) ? null : params.value;
+        if (monto == balance + mora) params.data.pagoT = true;
 
-        if (monto_desformateado == total) params.data.pagoT = true;
-
-        if (monto_desformateado > total) {
+        if (monto > balance + mora) {
           this.ExisteMontoMayor = true;
           fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
           fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
@@ -461,7 +463,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     if (params.key == 'select') {
-      const factura = _.find(this.facturas, { id: params.data.id });
+      const factura = this.facturas.find(fact => fact.id == params.data.id);
+
       if (!params.value) {
         factura.pagoT = false;
         params.data.monto = '0.00';

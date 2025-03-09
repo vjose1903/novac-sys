@@ -10,8 +10,8 @@ export class MoraCalculator {
     return hasMora;
   }
 
-  getMora(porcentaje: number | string) {
-    if (!this.hasMora || porcentaje === mora_personalizada) return 0;
+  getMora(porcentaje: number | string): string {
+    if (!this.hasMora || porcentaje === mora_personalizada) return '0';
 
     // Calcular la mora basada en el porcentaje del balance
     const balanceMora = this.factura.balance * (Number(porcentaje) / 100);
@@ -21,7 +21,7 @@ export class MoraCalculator {
     const diasEnMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0).getDate();
 
     // Calcular mora final: (balance * porcentaje) * diasRetraso / diasEnMes
-    return fun.roundNumberToDecimal(Number(((balanceMora * this.getDiasRetraso()) / diasEnMes).toFixed(2)));
+    return fun.roundNumberToDecimal((balanceMora * this.getDiasRetraso()) / diasEnMes);
   }
 
   getDiasRetraso() {
