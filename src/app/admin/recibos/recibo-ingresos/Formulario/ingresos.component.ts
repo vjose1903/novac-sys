@@ -1,12 +1,12 @@
 import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { Ss } from './../../../../core/services/singleton.service';
 import { ClienteC } from './../../../registros/registro-clientes/cliente';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import * as _ from 'lodash';
 import { TablasService } from '../../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../../core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
-import { FacturaC } from '../../../facturacion/factura';
+import { FacturaC, FacturasI } from '../../../facturacion/factura';
 import { PdfService } from '../../../../core/services/reports/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
@@ -15,6 +15,7 @@ import { default_per_page, table_config } from '../../../components/new_tablas/t
 import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MoraSelectorComponent } from '../components/mora-selector/mora-selector.component';
+import { Location } from '@angular/common';
 const moment = require('../../../../core/javascript/moment');
 
 @Component({
@@ -52,7 +53,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       { titulo: 'Fecha Venc.', alert_msg: 'Fecha de vencimiento de la factura', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Monto', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Pendiente', tipo: 'formatoNumero', key: 'balance' },
-      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora' } } },
+      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora', returnDara: data => this.getDataFromMoraSelector.bind(this)(data) } } },
       {
         titulo: 'Seleccione',
         tipo: 'switch',
@@ -102,18 +103,37 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   totalNotasDebito: number;
   totalNotasCredito: number;
   totalPagadoPorciento: number;
-  recibiendo = 0;
-  restando = 0;
   totalRegistros;
   totalPaginas;
-  debiendo;
-  facturasSelected: Array<any> = [];
+  debiendo_sin_mora;
+
+  facturasSelected = signal<FacturasI[]>([]);
+  mora = signal<Number>(0);
+
+  // this.recibiendo = this.facturasSelected().reduce((sum, item) => fun.desformatearStNumber(item.monto) + sum, 0);
+  //   this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
+
+  recibiendo = computed(() => this.facturasSelected().reduce((sum, item) => fun.desformatearStNumber(item.monto) + sum, 0));
+
+  restando = computed(() => {
+    const debiendo = this.debiendo_con_mora();
+    const recibiendo = this.recibiendo();
+
+    console.log('  ');
+    console.log('debiendo ', debiendo);
+    console.log('recibiendo ', recibiendo);
+    console.log('restando ', debiendo - recibiendo);
+
+    return debiendo - recibiendo <= 1 ? 0 : debiendo - recibiendo;
+  });
+  debiendo_con_mora = computed(() => this.debiendo_sin_mora + this.mora());
 
   clienteClass = new ClienteC();
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
   htmlServ = inject(HtmlElementsService);
+  location= inject(Location);
 
   constructor(
     private tServ: TablasService,
@@ -139,12 +159,16 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
+  goBack() {
+    this.location.back();
+  }
+
   formatoNumero(num) {
     return fun.roundNumberToDecimal(num);
   }
 
   areAllSelected() {
-    const facturas_no_viaje = _.filter(this.facturas, factura => !factura.is_viaje);
+    const facturas_no_viaje = this.facturas.filter(factura => !factura.is_viaje);
     return _.every(facturas_no_viaje, factura => factura.select);
   }
 
@@ -172,7 +196,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
 
     await res.data.facturas.data.map((factura, index) => {
-      let factura_selected = _.find(this.facturasSelected, { id: factura.id });
+      let factura_selected = this.facturasSelected().find(fact => fact.id == factura.id);
+
       if (fun.hasValue(params.factura_a_buscar) && factura.id == params.factura_a_buscar) {
         factura_selected = factura;
         factura_selected.monto = '0.00';
@@ -222,9 +247,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalNotasCredito = res.data.balances.notas_credito;
     this.totalNotasDebito = res.data.balances.notas_debito;
 
-    this.debiendo = res.data.balances.debiendo;
-
-    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
+    this.debiendo_sin_mora = this.totalFacturado + this.totalNotasDebito - this.totalPagado - this.totalNotasCredito;
 
     this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
     this.totalPagadoPorciento = parseFloat(fun.roundNumberToDecimal(this.totalPagadoPorciento));
@@ -246,6 +269,22 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }, 100);
   }
 
+  getDataFromMoraSelector(data: FacturasI[]) {
+    fun.awaitTyping(null, 10).then(() => {
+      const total_mora = data.reduce((sum, item, index) => {
+        const index_factura = this.facturas.findIndex(fact => fact.id == item.id);
+        this.verificateFacturasSelected(item, 'modify', index_factura, item.monto, item.mora);
+        const mora = fun.desformatearStNumber(item.mora);
+
+        if (fun.hasValue(mora) && !isNaN(mora) && mora > 0) return mora + sum;
+        else return sum;
+      }, 0);
+
+      // verificateFacturasSelected(factura, method, index, monto, mora?)
+      this.mora.set(total_mora);
+    });
+  }
+
   async necesarioStart() {
     this.checkRoute();
   }
@@ -263,13 +302,13 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   isOneFacturaWithMonto() {
-    const valid = this.facturasSelected.some(factura => factura.select && fun.desformatearStNumber(factura.monto) > 0);
+    const valid = this.facturasSelected().some(factura => factura.select && fun.desformatearStNumber(factura.monto) > 0);
     return valid;
   }
 
   cancelarIgreso() {
     this.facturas.length = 0;
-    this.facturasSelected = [];
+    this.facturasSelected.set([]);
     this.clienteAdepositar = undefined;
     (document.getElementById('clienteI') as any).value = null;
 
@@ -292,7 +331,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   getCantidadArticulos() {
-    return this.facturasSelected.length;
+    return this.facturasSelected().length;
   }
 
   async getDataFromModal(arg, search?) {
@@ -329,7 +368,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.forma_pago = null;
     this.devuelta = null;
     this.detalleYtotal = undefined;
-    this.facturasSelected.length = 0;
+    this.facturasSelected.set([]);
   }
 
   tableClickIcon(params) {
@@ -390,33 +429,35 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       }
       if (!fact.is_viaje) this.verificateFacturasSelected(fact, 'insert', index, !allSelected);
     });
-
-    this.sumarTotalRecibo();
   }
 
-  verificateFacturasSelected(factura, method, index, value) {
-    const factura_en_turno = this.facturasSelected.find(fact => fact.id == factura.id);
-
-    const index_factura_en_turno = this.facturasSelected.findIndex(fact => fact.id == factura.id);
+  verificateFacturasSelected(factura, method, index, monto, mora?) {
+    const factura_en_turno = this.facturasSelected().find(fact => fact.id == factura.id);
 
     if (method == 'insert') {
-      if (value) {
-        if (fun.isEmpty(factura_en_turno)) this.facturasSelected.push(factura);
+      if (monto) {
+        if (fun.isEmpty(factura_en_turno)) this.facturasSelected.update(facts => [...facts, factura]);
       } else {
-        this.facturasSelected.splice(index_factura_en_turno, 1);
+        this.facturasSelected.update(facts => facts.filter(fact => fact.id != factura.id));
       }
     } else if (method == 'modify') {
-      this.facturasSelected[index_factura_en_turno] = fun.deepCloning(factura);
+      this.facturasSelected.update(facts => facts.map(fact => (fact.id == factura.id ? fun.deepCloning(factura) : fact)));
 
-      this.facturasSelected[index_factura_en_turno].monto = value;
-      this.tablaComponent.resetInput('monto', 'especificar', index, true, value);
+      this.facturasSelected.update(facts =>
+        facts.map(fact => {
+          if (fact.id == factura.id) {
+            return fun.hasValue(mora) ? { ...fact, monto: monto, mora: mora } : { ...fact, monto: monto };
+          } else {
+            return fact;
+          }
+        })
+      );
+      this.tablaComponent.resetInput('monto', 'especificar', index, true, monto);
     }
-
-    this.sumarTotalRecibo();
   }
 
   tableInputBlur(params) {
-    const factura_en_turno = this.facturasSelected.find(factura => factura.id == params.data.id);
+    const factura_en_turno = this.facturasSelected().find(factura => factura.id == params.data.id);
     if (fun.hasValue(factura_en_turno)) {
       const total = factura_en_turno.balance;
       const monto = fun.desformatearStNumber(factura_en_turno.monto);
@@ -475,11 +516,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  sumarTotalRecibo() {
-    this.recibiendo = _.reduce(this.facturasSelected, (sum, item) => fun.desformatearStNumber(item.monto) + sum, 0);
-    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
-  }
-
   async abrirModalFiltro(nombre) {
     if (fun.hasValue(nombre)) {
       const obj = {
@@ -505,8 +541,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const temp = [];
     let total = 0;
 
-    for (let i = 0; i < this.facturasSelected.length; i++) {
-      const fact = this.facturasSelected[i];
+    for (let i = 0; i < this.facturasSelected().length; i++) {
+      const fact = this.facturasSelected()[i];
 
       temp.push({
         cabecera_factura_id: fact.id,
@@ -532,7 +568,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
-    } else if (this.facturasSelected.some(factura => factura.monto == 0)) {
+    } else if (this.facturasSelected().some(factura => factura.monto == 0)) {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();

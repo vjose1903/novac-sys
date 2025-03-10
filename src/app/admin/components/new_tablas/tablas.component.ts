@@ -190,7 +190,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   getComponentInputs(rowData: any, column: table_info): { [key: string]: any } {
-    const baseInputs = { rowData, column };
+    const baseInputs = { rowData, column, allData: this.data };
     return { ...baseInputs, ...(column.rowTransform?.inputs || {}) };
   }
 

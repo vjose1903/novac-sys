@@ -10,6 +10,17 @@ export class MoraCalculator {
     return hasMora;
   }
 
+
+  test(){
+    console.log('  ');
+
+    const fecha_actual = new Date().getTime();
+    console.log('fecha_actual ', fecha_actual);
+    console.log('this.getFechaCompare() ', this.getFechaCompare());
+    const hasMora = fecha_actual > new Date(this.getFechaCompare()).getTime();
+    console.log('hasMora ', hasMora);
+  }
+
   getMora(porcentaje: number | string): string {
     if (!this.hasMora || porcentaje === mora_personalizada) return '0';
 
@@ -34,13 +45,15 @@ export class MoraCalculator {
   }
 
   getFechaCompare() {
+    const fecha_actual = new Date().getTime();
     const pagos = this.factura?.pagos || [];
-    if (pagos.length > 0) {
+
+    if (pagos.length > 0 && fecha_actual > new Date(this.factura.fecha_vencimiento).getTime()) {
       const pago = pagos.sort((a, b) => new Date(b.fecha_equivalente).getTime() - new Date(a.fecha_equivalente).getTime())[0];
       return pago.fecha_equivalente;
     }
 
-    return this.factura.fecha_equivalente;
+    return this.factura.fecha_vencimiento;
   }
 }
 

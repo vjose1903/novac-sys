@@ -1,12 +1,12 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { fun } from '../../../../../core/services/functions.service';
 import { table_info } from '../../../../components/new_tablas/tabla-class';
 import { MoraCalculator, mora_personalizada } from '../../utils/mora-calculator';
 import { CommonModule } from '@angular/common';
-import { Popover, PopoverModule } from 'primeng/popover';
+import { PopoverModule } from 'primeng/popover';
 import { FormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
-import { HtmlElementsService } from '../../../../../core/services/html-elements.service';
+import { FacturasI } from '../../../../../admin/facturacion/factura';
 
 @Component({
   selector: 'app-mora-selector',
@@ -15,9 +15,11 @@ import { HtmlElementsService } from '../../../../../core/services/html-elements.
   styleUrl: './mora-selector.component.scss',
 })
 export class MoraSelectorComponent implements OnInit {
-  @Input() rowData: any;
+  @Input() allData: FacturasI[];
+  @Input() rowData: FacturasI;
   @Input() column: table_info;
   @Input() key: string;
+  @Input() returnDara: (data: FacturasI[]) => void;
 
   mora_personalizada = mora_personalizada;
   moraCalculator!: MoraCalculator;
@@ -43,10 +45,12 @@ export class MoraSelectorComponent implements OnInit {
       mora = fun.desformatearStNumber(mora);
       this.rowData.monto = fun.roundNumberToDecimal(balance + mora);
     }
+
+    this.returnDara(this.allData);
   }
 
   formatoNumero(num, decimales = 2) {
-    let numformat = '0.00';
+    let numformat = '0';
     if (num) numformat = fun.roundNumberToDecimal(num, decimales);
     return numformat;
   }

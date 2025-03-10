@@ -1,13 +1,12 @@
 <div class="d-flex gap-2 align-items-center justify-content-center w-100">
-  <span>
+  <span class="text">
     {{ getValueForm(column, rowData) }}
   </span>
   <div>
     <span
       class="btn-mora"
-      (click)="(moraCalculator.hasMora ? null : null)"
       [ngClass]="{ disabled: !moraCalculator.hasMora, open: popoverMora?.overlayVisible }"
-      (click)="popoverMora.toggle($event)"
+      (click)="moraCalculator.hasMora && popoverMora.toggle($event)"
       [pTooltip]="!moraCalculator.hasMora ? 'No hay mora' : porcentajeSelected == mora_personalizada ? 'Personalizada' : ''">
       @if (moraCalculator.hasMora) {
         {{ porcentajeSelected != mora_personalizada ? porcentajeSelected + '%' : 'P' }}

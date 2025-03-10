@@ -390,6 +390,10 @@ body {
     background-color: #e9e61e;
   }
 
+  &.bg-orange {
+    background-color: #ffa711;
+  }
+
   &.disable {
     filter: brightness(1.6) contrast(0.5);
   }
