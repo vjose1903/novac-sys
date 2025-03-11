@@ -16,6 +16,7 @@ import { ModalClass } from '../../../components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MoraSelectorComponent } from '../components/mora-selector/mora-selector.component';
 import { Location } from '@angular/common';
+import Big from 'big.js';
 const moment = require('../../../../core/javascript/moment');
 
 @Component({
@@ -105,10 +106,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   totalPagadoPorciento: number;
   totalRegistros;
   totalPaginas;
-  debiendo_sin_mora;
+  debiendo_sin_mora = signal<number>(0);
 
   facturasSelected = signal<FacturasI[]>([]);
-  mora = signal<Number>(0);
+  mora = signal<number>(0);
 
   // this.recibiendo = this.facturasSelected().reduce((sum, item) => fun.desformatearStNumber(item.monto) + sum, 0);
   //   this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
@@ -119,21 +120,19 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const debiendo = this.debiendo_con_mora();
     const recibiendo = this.recibiendo();
 
-    console.log('  ');
-    console.log('debiendo ', debiendo);
-    console.log('recibiendo ', recibiendo);
-    console.log('restando ', debiendo - recibiendo);
-
     return debiendo - recibiendo <= 1 ? 0 : debiendo - recibiendo;
   });
-  debiendo_con_mora = computed(() => this.debiendo_sin_mora + this.mora());
+
+  debiendo_con_mora = computed(() => {
+    return Number(this.debiendo_sin_mora()) + Number(this.mora());
+  });
 
   clienteClass = new ClienteC();
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
   htmlServ = inject(HtmlElementsService);
-  location= inject(Location);
+  location = inject(Location);
 
   constructor(
     private tServ: TablasService,
@@ -247,7 +246,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalNotasCredito = res.data.balances.notas_credito;
     this.totalNotasDebito = res.data.balances.notas_debito;
 
-    this.debiendo_sin_mora = this.totalFacturado + this.totalNotasDebito - this.totalPagado - this.totalNotasCredito;
+    this.debiendo_sin_mora.set(this.totalFacturado + this.totalNotasDebito - this.totalPagado - this.totalNotasCredito);
 
     this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
     this.totalPagadoPorciento = parseFloat(fun.roundNumberToDecimal(this.totalPagadoPorciento));
@@ -280,7 +279,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         else return sum;
       }, 0);
 
-      // verificateFacturasSelected(factura, method, index, monto, mora?)
       this.mora.set(total_mora);
     });
   }
@@ -339,6 +337,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
       this.is_print = arg.is_print;
+
       this.sendIngreso();
     }
 
@@ -474,7 +473,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tableInputChange(params) {
-    console.log('params ', params);
     const balance = fun.desformatearStNumber(params.data.balance);
     const mora = fun.desformatearStNumber(params.data.mora);
     const monto = fun.desformatearStNumber(params.value);
@@ -489,7 +487,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (params.data.select) {
         if (fun.isEmpty(params.value)) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
 
-        if (monto == balance + mora) params.data.pagoT = true;
+        if (monto == balance + mora) [params.newData.pagoT, params.data.pagoT] = Array(2).fill(true);
 
         if (monto > balance + mora) {
           this.ExisteMontoMayor = true;
@@ -538,31 +536,34 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   formarDetalleRecibos() {
-    const temp = [];
-    let total = 0;
+    return this.facturasSelected().reduce(
+      (acc, fact) => {
+        const monto = Big(fun.desformatearStNumber(fact.monto));
+        const mora = fun.desformatearStNumber(fact.mora);
+        const deposito = monto.minus(mora).toNumber();
 
-    for (let i = 0; i < this.facturasSelected().length; i++) {
-      const fact = this.facturasSelected()[i];
+        acc.detalle.push({
+          cabecera_factura_id: fact.id,
+          pago_total: fact.pagoT,
+          deposito: deposito,
+          mora: mora,
+          descripcion:
+            this.tipo_recibo === 'Pago factura'
+              ? fact.pagoT
+                ? 'Saldo ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
+                : 'Abono ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
+              : '',
+          pago_a_tiempo: fact.pago_a_tiempo,
+        });
 
-      temp.push({
-        cabecera_factura_id: fact.id,
-        pago_total: fact.pagoT,
-        deposito: fun.desformatearStNumber(fact.monto),
-        descripcion:
-          this.tipo_recibo === 'Pago factura'
-            ? fact.pagoT
-              ? 'Saldo ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-              : 'Abono ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-            : '',
-        pago_a_tiempo: fact.pago_a_tiempo,
-      });
+        acc.bruto += deposito;
+        acc.mora += mora;
+        acc.total_recibo += monto.toNumber();
 
-      total += fun.desformatearStNumber(fact.monto);
-    }
-
-    const obj = { total_recibo: total, detalle: temp };
-
-    return obj;
+        return acc;
+      },
+      { bruto: 0, mora: 0, total_recibo: 0, detalle: [] }
+    );
   }
 
   async confirmarIgreso() {
@@ -594,6 +595,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   async sendIngreso() {
     const obj = {
       cliente_id: this.clienteAdepositar.id,
+      bruto: this.detalleYtotal.bruto,
+      mora: this.detalleYtotal.mora,
       total: this.detalleYtotal.total_recibo,
       forma_pago: this.forma_pago,
       tipo_factura_id: 17,
