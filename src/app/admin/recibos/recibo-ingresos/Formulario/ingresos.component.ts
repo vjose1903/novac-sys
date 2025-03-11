@@ -111,9 +111,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   facturasSelected = signal<FacturasI[]>([]);
   mora = signal<number>(0);
 
-  // this.recibiendo = this.facturasSelected().reduce((sum, item) => fun.desformatearStNumber(item.monto) + sum, 0);
-  //   this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
-
   recibiendo = computed(() => this.facturasSelected().reduce((sum, item) => fun.desformatearStNumber(item.monto) + sum, 0));
 
   restando = computed(() => {
