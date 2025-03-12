@@ -600,6 +600,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       numero_recibo: null,
       estado: true,
       detalle_recibos: this.detalleYtotal.detalle,
+      balance_cliente: this.restando()
     };
 
     this.reciboClass.createUpdateOne(obj).then(res => {
