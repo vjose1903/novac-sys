@@ -554,7 +554,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
         acc.bruto += deposito;
         acc.mora += mora;
-        acc.total_recibo += monto.toNumber();
+        acc.total_recibo += monto.toNumber() + mora;
 
         return acc;
       },
