@@ -2,23 +2,19 @@ import { fun } from '../../../../core/services/functions.service';
 import { FacturasI } from '../../../facturacion/factura';
 
 export class MoraCalculator {
-  constructor(public factura: FacturasI) {}
+  fecha_actual: number;
+  constructor(public factura: FacturasI) {
+    this.fecha_actual = new Date().setHours(0, 0, 0, 0);
+  }
 
   get hasMora() {
-    const fecha_actual = new Date().getTime();
-    const hasMora = fecha_actual > new Date(this.getFechaCompare()).getTime();
+    this.fecha_actual = new Date().setHours(0, 0, 0, 0);
+    const hasMora = this.fecha_actual > new Date(this.getFechaCompare()).setHours(0, 0, 0, 0);
     return hasMora;
   }
 
-
-  test(){
-    console.log('  ');
-
-    const fecha_actual = new Date().getTime();
-    console.log('fecha_actual ', fecha_actual);
-    console.log('this.getFechaCompare() ', this.getFechaCompare());
-    const hasMora = fecha_actual > new Date(this.getFechaCompare()).getTime();
-    console.log('hasMora ', hasMora);
+  test(porcentaje: number | string) {
+    const mora = this.getMora(porcentaje );
   }
 
   getMora(porcentaje: number | string): string {
@@ -37,18 +33,17 @@ export class MoraCalculator {
 
   getDiasRetraso() {
     // Calcular días de retraso
-    const fechaVencimiento = new Date(this.getFechaCompare());
-    const fechaActual = new Date();
-    const diasRetraso = Math.floor((fechaActual.getTime() - fechaVencimiento.getTime()) / (1000 * 60 * 60 * 24));
+    const fechaVencimiento = new Date(this.getFechaCompare()).setHours(0, 0, 0, 0);
+    const fechaActual = new Date().setHours(0, 0, 0, 0);
+    const diasRetraso = Math.floor((fechaActual - fechaVencimiento) / (1000 * 60 * 60 * 24));
 
     return diasRetraso;
   }
 
   getFechaCompare() {
-    const fecha_actual = new Date().getTime();
     const pagos = this.factura?.pagos || [];
 
-    if (pagos.length > 0 && fecha_actual > new Date(this.factura.fecha_vencimiento).getTime()) {
+    if (pagos.length > 0 && this.fecha_actual > new Date(this.factura.fecha_vencimiento).setHours(0, 0, 0, 0)) {
       const pago = pagos.sort((a, b) => new Date(b.fecha_equivalente).getTime() - new Date(a.fecha_equivalente).getTime())[0];
       return pago.fecha_equivalente;
     }

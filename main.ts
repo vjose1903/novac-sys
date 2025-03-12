@@ -25,7 +25,7 @@ import SharedElectronAngular, {
   ELECTRON_EXPORT_CSV,
   ELECTRON_FOCUS_WINDOW,
 } from './electron/shared-electron-angular';
-import AppUpdater from './electron/auto-update';
+import AppUpdate from './electron/auto-update';
 import ReplaceInFile from './electron/replace-in-file';
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
@@ -35,7 +35,7 @@ import MachineId from './electron/machine-id';
 
 let win: BrowserWindow | null;
 let splash: BrowserWindow | null;
-let auto_updater: AppUpdater;
+let auto_updater: AppUpdate;
 let export_to_excel: ExportToExcel;
 let docker_handler: DockerHandler;
 let replace_in_file: ReplaceInFile;
@@ -266,7 +266,7 @@ function continuarCargandoArchivos(resolve) {
 async function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
   const serve_ = await getServer_();
-  auto_updater = new AppUpdater(win, serve_);
+  auto_updater = new AppUpdate(win, serve_);
   auto_updater.init();
   // ---------------------------------------
 }
@@ -451,7 +451,7 @@ function parseAppConfig() {
       config['operative_system'] = isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows;
       config['is_development'] = serve_;
       config['gitUser'] = await getActualGitUser();
-      config['machineId'] = machineId.machineId;
+      config['machineId'] = machineId.value;
       config['printersList'] = ['Ninguna', ...printer_list];
       config['app_version'] = pjson.version;
 

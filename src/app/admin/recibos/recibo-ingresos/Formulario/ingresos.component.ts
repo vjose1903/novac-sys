@@ -41,7 +41,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         tipo: 'icon',
         key: 'actions',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '6%' }, { color: 'var(--transparente00)' }],
+        style: { width: '6%', color: 'var(--transparente00)' },
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
           { key: 'historyPagos', rowTooltip: 'tooltip_history', text_color: 'colorEstado' },
@@ -49,7 +49,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         ],
       },
 
-      { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
+      { titulo: 'NCF', tipo: 'text', style: { width: '6rem' }, key: 'numero_comprobante' },
       { titulo: 'Fecha Fact.', alert_msg: 'Fecha de facturacion de la factura', tipo: 'date', key: 'fecha_equivalente', sort: { key: 'fecha_equivalente', order: null }, style: { width: '9rem' } },
       { titulo: 'Fecha Venc.', alert_msg: 'Fecha de vencimiento de la factura', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Monto', tipo: 'formatoNumero', key: 'total_factura' },
@@ -60,22 +60,24 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         tipo: 'switch',
         key: 'select',
         select_all: false,
-        style: { width: '7rem', padding: '0.6rem 0rem' },
+        style: { width: '5rem' },
       },
       {
         titulo: 'Pago Total',
         tipo: 'switch',
         key: 'pagoT',
         select_all: false,
-        style: { width: '6rem', padding: '0.6rem 0rem' },
+        style: { width: '5rem' },
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
       },
       {
-        titulo: 'Monto a pagar',
+        titulo: 'Monto',
+        alert_msg: 'Monto a pagar',
         tipo: 'input',
         key: 'monto',
         can_reset: false,
         inputEvents: 'formatoNumero',
+        style: { width: '13%' },
         checkNumber: true,
         disable: [
           { kind: 'campo', target: 'select', value: [false] },
@@ -227,9 +229,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           { key: 'pedido', estilos: 'font-size: 1rem !important' },
           { key: 'ver', estilos: 'font-size: 1rem !important' },
         ],
-        select: { width: '6rem' },
-        pagoT: { width: '6rem' },
-        numero_comprobante: { width: '7rem' },
       };
 
       this.facturas.push(factura);

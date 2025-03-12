@@ -2,7 +2,7 @@ import { machineId } from 'node-machine-id';
 
 export default class MachineId {
   private static instance: MachineId;
-  machineId: string;
+  value: string;
 
   private constructor() {}
 
@@ -19,6 +19,6 @@ export default class MachineId {
   // MÉTODO PARA INICIALIZAR LAS VARIABLES
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   private async initVars() {
-    this.machineId = await machineId();
+    this.value = await machineId();
   }
 }
