@@ -1,0 +1,29 @@
+.btn-mora {
+  width: 28px;
+  height: 25px;
+  border-radius: 6px;
+  border: 1px solid #cccccc;
+  background: #80808040;
+  color: grey;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &.open,
+  &:hover {
+    background: #ffffff;
+    color: #5b5b5b;
+  }
+
+  &.disabled {
+    cursor: not-allowed !important;
+  }
+}
+
+.porcentaje-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -61,7 +61,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   realIdTabla;
 
   htmlServ = inject(HtmlElementsService);
-  constructor(public tServ: TablasService, private zone: NgZone, public cdRef: ChangeDetectorRef) {
+  constructor(
+    public tServ: TablasService,
+    private zone: NgZone,
+    public cdRef: ChangeDetectorRef
+  ) {
     cdRef.detach();
     this.tablaInterval = setInterval(() => this.cdRef.detectChanges(), 500);
   }
@@ -75,7 +79,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   ngOnInit() {
     this.realIdTabla = this.config.id_tabla + this.post_id;
 
-    new fun().getWindowSize.pipe(takeUntil(this.destroy$)).subscribe((res) => {
+    new fun().getWindowSize.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
         this.setCantPagView(res.innerWidth, 'width_page');
       }
@@ -109,7 +113,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
     if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
     if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
-    if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
+    if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, info => _.values(_.pick(info, ['key']))[0]);
 
     if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
@@ -129,7 +133,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       }, 100);
     }
 
-    this.config.info.map((item) => {
+    this.config.info.map(item => {
       if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
     });
   }
@@ -142,21 +146,21 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         const btnObj = config.botones[key];
 
         if (Array.isArray(btnObj)) {
-          btnObj.forEach((btn) => verificateId(btn));
+          btnObj.forEach(btn => verificateId(btn));
         } else {
           verificateId(btnObj);
         }
       }
     }
 
-    config.info.forEach((info) => {
-      if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach((icon) => (icon.id ??= fun.generateKey()));
+    config.info.forEach(info => {
+      if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach(icon => (icon.id ??= fun.generateKey()));
     });
   }
 
   changeTableConfig(array) {
     this.zone.run(() => {
-      array.forEach((element) => {
+      array.forEach(element => {
         const key = _.keys(element)[0];
         this.config[key] = element[key];
       });
@@ -164,20 +168,30 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   getValueForm(column: table_info, data) {
+    const value = fun.getProperty(data, column.key);
     switch (column.tipo) {
       case 'textList':
-        return _.reduce(_.get(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${_.get(item, column.key_value)}`, '');
+        return value.reduce((acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${fun.getProperty(item, column.key_value)}`, '');
 
       case 'formatoNumero':
-        return this.formatoNumero(_.get(data, column.key));
+        return this.formatoNumero(value);
 
       case 'date':
-        const fecha = fun.date_formater({ date: _.get(data, column.key), dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
+        const fecha = fun.date_formater({ date: value, dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
         return fecha;
 
       default:
-        return _.get(data, column.key);
+        return value;
     }
+  }
+
+  getComponent(rowData: any, column: table_info): any {
+    return column.rowTransform?.component && typeof column.rowTransform?.component == 'function' ? column.rowTransform?.component(rowData) : null;
+  }
+
+  getComponentInputs(rowData: any, column: table_info): { [key: string]: any } {
+    const baseInputs = { rowData, column, allData: this.data };
+    return { ...baseInputs, ...(column.rowTransform?.inputs || {}) };
   }
 
   checkBackgroundTr(params: { tipo: string; dato: any }) {
@@ -290,12 +304,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const dataParsed = _.slice(copyData, inicio, final);
 
     this.data.length = 0;
-    dataParsed.forEach((dato) => this.data.push(dato));
+    dataParsed.forEach(dato => this.data.push(dato));
   }
 
   dataLocalFilter(newData) {
     this.data.length = 0;
-    newData.forEach((dato) => this.data.push(dato));
+    newData.forEach(dato => this.data.push(dato));
     const id = this.realIdTabla;
     const actualPagination = this.tServ.getPaginationById(id);
 
@@ -364,11 +378,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       for (let i = 0; i < backgroundConfig.length; i++) {
         const backConfig = backgroundConfig[i];
 
-        if (backConfig.some((conf) => conf.kind === 'selected') && fun.hasValue(this.seleccionado)) temp_res = Number(dato.id) !== Number(this.seleccionado || 0);
+        if (backConfig.some(conf => conf.kind === 'selected') && fun.hasValue(this.seleccionado)) temp_res = Number(dato.id) !== Number(this.seleccionado || 0);
 
         if (!temp_res && backConfig.kind === 'campo') {
           if (backConfig.value.length === 0) temp_res = dato[backConfig.target];
-          else temp_res = backConfig.value.some((value) => value == dato[backConfig.target]);
+          else temp_res = backConfig.value.some(value => value == dato[backConfig.target]);
         }
 
         if (temp_res) res = backConfig.color;
@@ -413,7 +427,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   checkNumber(input, column, index_body) {
     if (column.checkNumber) {
       const id = `input-${this.realIdTabla}-${column.key}-${this.getIndex(index_body)}`;
-      fun.revisarNumber(input, id).then((res) => {
+      fun.revisarNumber(input, id).then(res => {
         if (!res.error && column.inputEvents != 'formatoNumero') {
           input.value = fun.is_number(input.value) ? res.number : null;
         }
@@ -440,7 +454,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorInput(column, key, index, value, data) {
-    let newData = fun.deepCloning(this.tServ.rowsEditing.find((item) => item.id == data.id));
+    let newData = fun.deepCloning(this.tServ.rowsEditing.find(item => item.id == data.id));
 
     if (fun.isEmpty(newData) || this.tServ.rowsEditing.length == 0) newData = fun.deepCloning(data);
 
@@ -524,7 +538,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       for (let i = 0; i < objIcon.showCondition.length; i++) {
         const conditionObj = objIcon.showCondition[i];
 
-        if (objIcon.showCondition.some((conf) => conf.kind === 'selected')) {
+        if (objIcon.showCondition.some(conf => conf.kind === 'selected')) {
           const is_selected = data.id == (this.seleccionado || 0);
           res = conditionObj.value == is_selected;
         }
@@ -533,7 +547,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
         if (conditionObj.kind === 'campo') {
           if (conditionObj.value.length == 0) res = data[conditionObj.target] ? false : true;
-          else res = conditionObj.value.some((value) => value == data[conditionObj.target]);
+          else res = conditionObj.value.some(value => value == data[conditionObj.target]);
         }
       }
     } else {

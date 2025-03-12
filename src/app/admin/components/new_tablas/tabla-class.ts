@@ -1,4 +1,4 @@
-export type tableRowType = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
+export type tableRowType = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date' | 'none';
 
 export interface table_info {
   id?: string;
@@ -34,6 +34,7 @@ export interface table_info {
   color?: string;
   text_color?: string;
   dateFormat?: any;
+  rowTransform?: RowTransformI;
   hours?: any;
   imgStyle?: 'circular' | 'cuadrada';
   rowImgStyle?: 'circular' | 'cuadrada';
@@ -45,6 +46,11 @@ export interface table_info {
   key_value?: string;
   div_class?: string;
   sort?: sortInfo;
+}
+
+export interface RowTransformI {
+  component: (rowData: any) => any;
+  inputs?: any;
 }
 
 interface sortInfo {

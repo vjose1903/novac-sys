@@ -1,4 +1,5 @@
 // Elements
+@use './elements/apple-switch.scss' as *;
 @use './elements/backgrounds.scss' as *;
 @use './elements/border-radius.scss' as *;
 @use './elements/btns.scss' as *;
@@ -19,7 +20,9 @@
 @use './elements/rowFactura.scss' as *;
 @use './elements/scrollbar.scss' as *;
 @use './elements/spacers.scss' as *;
-@use './elements/tablas.scss' as *;
 @use './elements/size.scss' as *;
+@use './elements/tablas.scss' as *;
+@use './elements/text.scss' as *;
+
 // Fonts
 @use './fonts/fonts.scss' as *;
