@@ -73,7 +73,7 @@ export class ReciboC extends CrudG<ReciboI> {
     requestParameters['tipo'] = reporteParams.data.tipo;
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
-    
+
     ReporteC.configCsv = csvConfigReciboIngreso[reporteParams.data.tipo == ReportGroupTypeE.detallado ? 'detallado' : 'agrupado'];
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
@@ -96,7 +96,7 @@ export class ReciboC extends CrudG<ReciboI> {
       data_parsed['numero_documento'] = data_parsed['identificador'];
       data_parsed['usuario'] = data.user.nombre_completo;
 
-      const documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
+      const documento = data.cliente.documentos_de_identidad.find(documento => documento.principal);
       data_parsed['cliente']['rnc'] = documento ? documento.documento : '----------';
 
       data_parsed['contenido_reporte'].map((detalle) => {

@@ -192,6 +192,7 @@ export class DateUtils {
     return date;
   }
 
+
   /**
    * Retorna la diferencia en horas entre 2 horas establecidas.
    * @param time1 String || Date hora de inicio para comparar
@@ -247,5 +248,30 @@ export class DateUtils {
     }
 
     return undefined;
+  }
+
+  /**
+   * Calcula el número de días entre dos fechas
+   * @param fecha1 Primera fecha a comparar
+   * @param fecha2 Segunda fecha a comparar
+   * @returns número de días entre las dos fechas
+   * @example
+   * ```typescript
+   * const fecha1 = new Date('2024-01-01');
+   * const fecha2 = new Date('2024-03-01');
+   * const dias = diffDays(fecha1, fecha2); // retorna 60
+   * ```
+   */
+  static diffDays(fecha1: Date, fecha2: Date): number {
+    // Normalizar las fechas a la 1 AM
+    const fecha1Normalizada = new Date(fecha1.getFullYear(), fecha1.getMonth(), fecha1.getDate(), 1, 0, 0, 0);
+    const fecha2Normalizada = new Date(fecha2.getFullYear(), fecha2.getMonth(), fecha2.getDate(), 1, 0, 0, 0);
+
+    // Asegurarse de que fecha1 es la más reciente
+    const fechaMayor = fecha1Normalizada > fecha2Normalizada ? fecha1Normalizada : fecha2Normalizada;
+    const fechaMenor = fecha1Normalizada > fecha2Normalizada ? fecha2Normalizada : fecha1Normalizada;
+
+    // Calcular días totales
+    return Math.floor((fechaMayor.getTime() - fechaMenor.getTime()) / (1000 * 60 * 60 * 24));
   }
 }

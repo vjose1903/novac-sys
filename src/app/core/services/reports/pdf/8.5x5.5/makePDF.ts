@@ -212,7 +212,7 @@ function parseResumen(data, tipo_pdf) {
       key: 'bruto',
       item: [
         { text: 'Bruto:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.Bruto), alignment: 'right', style: 'letra11', bold: true },
+        { text: fun_.roundNumberToDecimal(data?.Bruto || data?.bruto), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
@@ -227,6 +227,13 @@ function parseResumen(data, tipo_pdf) {
       item: [
         { text: 'Descuento:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
         { text: fun_.roundNumberToDecimal(data?.descuento), alignment: 'right', style: 'letra11', bold: true },
+      ],
+    },
+    {
+      key: 'mora',
+      item: [
+        { text: 'Mora', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(data?.mora), bold: true, alignment: 'right', style: 'letra11' },
       ],
     },
     {

@@ -124,6 +124,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         res['data'] = this.mapeoRecibos(res['data']);
         this.lista_recibos = fun.deepCloning(res['data']);
 
+
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       });
     } catch (error) {}
@@ -159,7 +160,8 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   makeReciboPdf(arg) {
-    const recibo_selected = _.find(this.lista_recibos, recibo => recibo.id === arg.id);
+    const recibo_selected = this.lista_recibos.find(recibo => recibo.id === arg.id);
+
     this.reciboClass.parseDataToPdf(recibo_selected).then(recibo_parsed => {
       const obj = { data: recibo_parsed, type: 'recibo_ingreso', retunBase64: true };
       this.generarPdf(obj);
