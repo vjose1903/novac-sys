@@ -8,6 +8,7 @@ export const config_recibo_ingreso = {
   only_titulo: false,
   widths: [20, 'auto', 'auto', '*', '*', '*', '*', '*'],
   mostrar_total: false,
+  mostrar_balance_cliente: true,
 
   info: [
     {

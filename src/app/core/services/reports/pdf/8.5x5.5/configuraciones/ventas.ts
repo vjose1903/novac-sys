@@ -5,6 +5,7 @@ export const config_ventas = {
   widths: ['auto', '*', 'auto', 'auto'],
   pageOrient: 'portrait',
   mostrar_total: false,
+  mostrar_balance_cliente: false,
   info: [
     {
       text: '#',
