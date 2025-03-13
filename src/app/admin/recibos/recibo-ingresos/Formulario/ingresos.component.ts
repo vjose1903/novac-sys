@@ -17,6 +17,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MoraSelectorComponent } from '../components/mora-selector/mora-selector.component';
 import { Location } from '@angular/common';
 import Big from 'big.js';
+import { MoraSelectorService } from '../components/mora-selector/mora-selector.service';
 const moment = require('../../../../core/javascript/moment');
 
 @Component({
@@ -54,7 +55,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       { titulo: 'Fecha Venc.', alert_msg: 'Fecha de vencimiento de la factura', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Monto', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Pendiente', tipo: 'formatoNumero', key: 'balance' },
-      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora', returnDara: data => this.getDataFromMoraSelector.bind(this)(data) } } },
+      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora',  returnDara: data => this.getDataFromMoraSelector.bind(this)(data) } } },
       {
         titulo: 'Seleccione',
         tipo: 'switch',
@@ -132,6 +133,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   htmlServ = inject(HtmlElementsService);
   location = inject(Location);
+  moraSelectorService = inject(MoraSelectorService);
 
   constructor(
     private tServ: TablasService,
@@ -264,6 +266,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }, 100);
   }
 
+  changeMoraGeneral(porcentaje: number) {
+    console.log(porcentaje);
+    this.moraSelectorService.setPorcentajeMora(porcentaje);
+  }
+
   getDataFromMoraSelector(data: FacturasI[]) {
     fun.awaitTyping(null, 10).then(() => {
       const total_mora = data.reduce((sum, item, index) => {
@@ -299,6 +306,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const valid = this.facturasSelected().some(factura => factura.select && fun.desformatearStNumber(factura.monto) > 0);
     return valid;
   }
+
+  
 
   cancelarIgreso() {
     this.facturas.length = 0;
@@ -350,6 +359,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
+    // TODO: hacer paginacion local
     if (fun.hasValue(this.clienteAdepositar)) {
       const order_by = this.tServ.parseSort(this.table_config);
       params = { ...params, ...order_by };

@@ -1,30 +1,40 @@
 <div class="d-flex gap-2 align-items-center justify-content-center w-100">
   <span class="text">
-    {{ getValueForm(column, rowData) }}
+    @if (showMora) {
+      {{ getValueForm(column, rowData) }}
+    }
   </span>
   <div>
-    <span
-      class="btn-mora"
-      [ngClass]="{ disabled: !moraCalculator.hasMora, open: popoverMora?.overlayVisible }"
-      (click)="moraCalculator.hasMora && popoverMora.toggle($event)"
-      [pTooltip]="!moraCalculator.hasMora ? 'No hay mora' : porcentajeSelected == mora_personalizada ? 'Personalizada' : ''">
-      @if (moraCalculator.hasMora) {
+    @if (showMora) {
+      <span
+        class="btn-mora"
+        [ngClass]="{ disabled: !moraCalculator.hasMora, open: popoverMora?.overlayVisible }"
+        (click)="moraCalculator.hasMora && popoverMora.toggle($event)"
+        [pTooltip]="!moraCalculator.hasMora ? 'No hay mora' : porcentajeSelected == mora_personalizada ? 'Personalizada' : ''">
+        @if (moraCalculator.hasMora) {
+          {{ porcentajeSelected != mora_personalizada ? porcentajeSelected + '%' : 'P' }}
+        } @else {
+          <i class="fa-solid fa-ban"></i>
+        }
+      </span>
+    } @else {
+      <span class="btn-mora" [ngClass]="{ open: popoverMora?.overlayVisible }" (click)="popoverMora.toggle($event)">
         {{ porcentajeSelected != mora_personalizada ? porcentajeSelected + '%' : 'P' }}
-      } @else {
-        <i class="fa-solid fa-ban"></i>
-      }
-    </span>
+      </span>
+    }
   </div>
 </div>
 
 <p-popover #popoverMora>
   <div class="d-flex flex-column gap-3 w-100 p-2">
-    <span class="d-flex gap-2 align-items-center justify-content-between">
-      Dias de retraso:
-      <span class="badge bg-warning text-black p-1">
-        {{ formatoNumero(moraCalculator.getDiasRetraso(), 0) }}
+    @if (showMora) {
+      <span class="d-flex gap-2 align-items-center justify-content-between">
+        Dias de retraso:
+        <span class="badge bg-warning text-black p-1">
+          {{ formatoNumero(moraCalculator.getDiasRetraso(), 0) }}
+        </span>
       </span>
-    </span>
+    }
 
     <div class="d-flex flex-column">
       <span class="text-w-600 mb-2">Porcentajes</span>

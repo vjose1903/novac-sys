@@ -32,7 +32,8 @@ const configuraciones = {
   ventas_rango_agrupado: config_ventas.agrupado,
   ventas_rango_agrupado_itbis: config_ventas.agrupado_itbis,
 
-  cxc: config_cxc,
+  cxc: config_cxc.sin_mora,
+  cxc_mora: config_cxc.con_mora,
   cxc_preventa: config_cxc_preventa,
   ventas_cliente: config_ventas_cliente,
 

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { fun } from '../../../../../core/services/functions.service';
 import { table_info } from '../../../../components/new_tablas/tabla-class';
 import { MoraCalculator, mora_personalizada } from '../../utils/mora-calculator';
@@ -7,6 +7,8 @@ import { PopoverModule } from 'primeng/popover';
 import { FormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
 import { FacturasI } from '../../../../../admin/facturacion/factura';
+import { MoraSelectorService } from './mora-selector.service';
+import { skip, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-mora-selector',
@@ -14,27 +16,51 @@ import { FacturasI } from '../../../../../admin/facturacion/factura';
   templateUrl: './mora-selector.component.html',
   styleUrl: './mora-selector.component.scss',
 })
-export class MoraSelectorComponent implements OnInit {
+export class MoraSelectorComponent implements OnInit, OnDestroy {
   @Input() allData: FacturasI[];
   @Input() rowData: FacturasI;
   @Input() column: table_info;
   @Input() key: string;
   @Input() returnDara: (data: FacturasI[]) => void;
+  @Input() showMora: boolean = true;
+  @Input() showMoraPersonalizada: boolean = true;
+  @Input() subscribeChanges: boolean = true;
+  @Output() changePorcentajeMora = new EventEmitter<number>();
 
   mora_personalizada = mora_personalizada;
   moraCalculator!: MoraCalculator;
   porcentajes = [0, 1, 1.5, 2, mora_personalizada];
-  porcentajeSelected: number | string = 2;
   customMora: number = 0;
+  porcentajeSelected: number | string = 2;
+  moraSelectorService = inject(MoraSelectorService);
+  
+  private onDestroy$: Subject<void> = new Subject<void>();
 
   ngOnInit(): void {
-    this.moraCalculator = new MoraCalculator(this.rowData);
+    if (this.showMora) {
+      this.moraCalculator = new MoraCalculator(this.rowData);
 
-    this.recalcMora();
+      this.recalcMora();
+    }
+
+    if (!this.showMoraPersonalizada) this.porcentajes = this.porcentajes.filter(porcentaje => porcentaje != mora_personalizada);
+
+    if (this.subscribeChanges) {
+      this.moraSelectorService.porcentajeMora$.pipe(skip(1), takeUntil(this.onDestroy$)).subscribe((porcentaje: number) => {
+        console.log('%c --> ', 'color: red', porcentaje);
+        this.porcentajeSelected = porcentaje;
+        this.recalcMora();
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 
   recalcMora() {
-    this.setMora(this.moraCalculator.getMora(this.porcentajeSelected));
+    this.setMora(this.moraCalculator.getMora({ porcentaje: this.porcentajeSelected }) as string);
   }
 
   setMora(mora: string) {
@@ -62,7 +88,9 @@ export class MoraSelectorComponent implements OnInit {
 
   changePorcentaje(porcentaje: number | string) {
     this.porcentajeSelected = porcentaje;
-    if (porcentaje != mora_personalizada) this.recalcMora();
+    if (this.showMora && porcentaje != mora_personalizada) this.recalcMora();
+
+    this.changePorcentajeMora.emit(Number(porcentaje));
   }
 
   changePersonalizedMora(event: any) {

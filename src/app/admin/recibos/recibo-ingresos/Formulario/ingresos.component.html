@@ -94,9 +94,13 @@
             @if (totalPaginas > 1) {
               <div class="more-pages animated flash slower infinite"><strong class="mr-2">Atención: </strong> Existen múltiples páginas</div>
             }
-            <div>
-              <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+
+            <div class="d-flex align-items-center gap-2">
+              Mora General
+              <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
             </div>
+
+            <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
           </div>
         </div>
         <div class="divFantasma">
