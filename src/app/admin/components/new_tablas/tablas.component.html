@@ -56,7 +56,7 @@
           <div class="divBody">
             <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
               @if (data) {
-                @for (rowData of data; track $index; let indexBody = $index) {
+                @for (rowData of data; track config.track_key ? rowData[config.track_key] : $index; let indexBody = $index) {
                   <tr
                     class="text-center"
                     id="row-{{ realIdTabla }}-{{ getIndex(indexBody) }}"

@@ -94,7 +94,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ngAfterViewInit() {
     this.changeStylesTitles();
-    if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
     this.handleConfig();
   }
 
@@ -286,6 +285,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           }
         }
 
+        this.handle_table_events('paginatorChange', { page, per_page, data: this.data });
+
         this.cdRef.detectChanges();
       });
     }, 150);
@@ -295,13 +296,28 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     console.log('paginator --> ', fun.deepCloning(this.tServ.getPaginationById(this.realIdTabla)));
   }
 
+  reloadPagination() {
+    this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'reloadPagination');
+  }
+
   localPagination(page, per_page, desde = '') {
     const copyData = fun.deepCloning(this.copyData);
 
     const inicio = (page - 1) * per_page;
     const final = inicio + per_page;
 
-    const dataParsed = _.slice(copyData, inicio, final);
+    let dataParsed = copyData.slice(inicio, final);
+
+    dataParsed = dataParsed.map(item => {
+      const key = this.config.obj_paginate?.key ?? 'id';
+
+      const previousItem = this.data.find(data => data[key] == item[key]);
+      if (fun.hasValue(previousItem)) {
+        item = previousItem;
+      }
+
+      return item;
+    });
 
     this.data.length = 0;
     dataParsed.forEach(dato => this.data.push(dato));
@@ -470,6 +486,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.copyData = fun.deepCloning(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
+      this.changeTableConfig([{ total_count: data.length }]);
       this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
     }
     this.cdRef.detectChanges();

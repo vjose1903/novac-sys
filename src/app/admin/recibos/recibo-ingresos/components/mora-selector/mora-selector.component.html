@@ -45,7 +45,7 @@
             <span>{{ porcentaje == mora_personalizada ? 'Personalizado' : porcentaje + '%' }}</span>
 
             <div class="d-flex align-items-center justify-content-center">
-              <input class="apple-switch size-sm" type="checkbox" (change)="changePorcentaje(porcentaje)" [checked]="porcentajeSelected == porcentaje" />
+              <input [disabled]="porcentaje == porcentajeSelected" class="apple-switch size-sm" type="checkbox" (change)="changePorcentaje(porcentaje)" [checked]="porcentajeSelected == porcentaje" />
             </div>
           </div>
 

@@ -97,6 +97,7 @@ export interface paginateI {
   per_page?: number;
   per_page_options?: Array<number>;
   search?: string;
+  key?: string;
   is_local?: boolean;
 }
 
@@ -128,6 +129,7 @@ interface filtarI {
 }
 
 export interface table_config {
+  track_key?: string;
   focusSearchInput?: boolean;
   padding?: string;
   padre_functions?: padreFunctionsI;
@@ -189,6 +191,10 @@ export class TablaClass {
         this.tableInputBlur(event.info);
         break;
 
+      case 'paginatorChange':
+        this.tablePaginatorChange(event.info);
+        break;
+
       default:
         break;
     }
@@ -199,4 +205,5 @@ export class TablaClass {
   tableClickIcon(arg) {}
   tableInputChange(arg) {}
   tableInputBlur(arg) {}
+  tablePaginatorChange(arg) {}
 }

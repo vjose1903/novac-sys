@@ -1,4 +1,4 @@
-import { Component, DestroyRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, input, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { fun } from '../../../../../core/services/functions.service';
 import { table_info } from '../../../../components/new_tablas/tabla-class';
 import { MoraCalculator, mora_personalizada } from '../../utils/mora-calculator';
@@ -25,30 +25,32 @@ export class MoraSelectorComponent implements OnInit, OnDestroy {
   @Input() showMora: boolean = true;
   @Input() showMoraPersonalizada: boolean = true;
   @Input() subscribeChanges: boolean = true;
+  @Input() porcentajeSelected: number | string = 2;
+  @Output() porcentajeSelectedChange = new EventEmitter<number | string>();
   @Output() changePorcentajeMora = new EventEmitter<number>();
 
   mora_personalizada = mora_personalizada;
   moraCalculator!: MoraCalculator;
   porcentajes = [0, 1, 1.5, 2, mora_personalizada];
   customMora: number = 0;
-  porcentajeSelected: number | string = 2;
   moraSelectorService = inject(MoraSelectorService);
-  
+
   private onDestroy$: Subject<void> = new Subject<void>();
 
   ngOnInit(): void {
+    
     if (this.showMora) {
       this.moraCalculator = new MoraCalculator(this.rowData);
 
-      this.recalcMora();
+      // this.recalcMora();
     }
 
     if (!this.showMoraPersonalizada) this.porcentajes = this.porcentajes.filter(porcentaje => porcentaje != mora_personalizada);
 
     if (this.subscribeChanges) {
       this.moraSelectorService.porcentajeMora$.pipe(skip(1), takeUntil(this.onDestroy$)).subscribe((porcentaje: number) => {
-        console.log('%c --> ', 'color: red', porcentaje);
         this.porcentajeSelected = porcentaje;
+        this.porcentajeSelectedChange.emit(porcentaje);
         this.recalcMora();
       });
     }
@@ -88,6 +90,8 @@ export class MoraSelectorComponent implements OnInit, OnDestroy {
 
   changePorcentaje(porcentaje: number | string) {
     this.porcentajeSelected = porcentaje;
+    this.rowData.porcentaje_mora = porcentaje;
+    this.porcentajeSelectedChange.emit(porcentaje);
     if (this.showMora && porcentaje != mora_personalizada) this.recalcMora();
 
     this.changePorcentajeMora.emit(Number(porcentaje));

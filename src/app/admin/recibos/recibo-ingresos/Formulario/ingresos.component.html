@@ -97,7 +97,7 @@
 
             <div class="d-flex align-items-center gap-2">
               Mora General
-              <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
+              <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" [(porcentajeSelected)]="porcentajeSelected" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
             </div>
 
             <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>

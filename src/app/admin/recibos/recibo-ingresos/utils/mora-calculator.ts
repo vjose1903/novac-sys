@@ -21,7 +21,7 @@ export class MoraCalculator {
   getMora(args: { porcentaje: number | string; formateado?: boolean }): string | number {
     let { porcentaje, formateado = true } = args;
 
-    if (!this.hasMora || porcentaje === mora_personalizada) return '0';
+    if (!this.hasMora || porcentaje === mora_personalizada) return '0.00';
 
     // Calcular la mora basada en el porcentaje del balance
     const balanceMora = this.factura.balance * (Number(porcentaje) / 100);
