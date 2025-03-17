@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
+
 export class MoraSelectorService {
   private _porcentajeMora: BehaviorSubject<number> = new BehaviorSubject<number>(2);
 
@@ -14,4 +15,9 @@ export class MoraSelectorService {
   setPorcentajeMora(porcentaje: number) {
     this._porcentajeMora.next(porcentaje);
   }
+}
+
+export enum MoraSelectorKeyI {
+  mora = 'mora',
+  porcentaje_mora = 'porcentaje_mora',
 }

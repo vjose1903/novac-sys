@@ -55,7 +55,7 @@
     </div>
 
     @if (porcentajeSelected == mora_personalizada) {
-      <input class="form-control min" (keyup)="changePersonalizedMora($event)" [(ngModel)]="rowData.mora" (focus)="onFocusMora($event)" (blur)="onBlurMora()" />
+      <input class="form-control min" (keyup)="changePersonalizedMora($event)" [(ngModel)]="customMora" (click)="onFocusMora($event)" (blur)="onBlurMora()" />
     }
   </div>
 </p-popover>

@@ -17,7 +17,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MoraSelectorComponent } from '../components/mora-selector/mora-selector.component';
 import { Location } from '@angular/common';
 import Big from 'big.js';
-import { MoraSelectorService } from '../components/mora-selector/mora-selector.service';
+import { MoraSelectorKeyI, MoraSelectorService } from '../components/mora-selector/mora-selector.service';
 import { MoraCalculator } from '../utils/mora-calculator';
 const moment = require('../../../../core/javascript/moment');
 
@@ -29,7 +29,7 @@ const moment = require('../../../../core/javascript/moment');
 })
 export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   clienteAdepositar: any;
-  all_facturas = [];
+  all_facturas = signal<FacturasI[]>([]);
   facturas = [];
   tipo_recibo = 'Pago factura';
   is_print = false;
@@ -58,7 +58,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       { titulo: 'Fecha Venc.', alert_msg: 'Fecha de vencimiento de la factura', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Monto', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Pendiente', tipo: 'formatoNumero', key: 'balance' },
-      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora', returnDara: data => this.getDataFromMoraSelector.bind(this)(data) } } },
+      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora', returnData: data => this.getDataFromMoraSelector.bind(this)(data) } } },
       {
         titulo: 'Seleccione',
         tipo: 'switch',
@@ -110,15 +110,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   totalNotasDebito: number;
   totalNotasCredito: number;
   totalPagadoPorciento: number;
-  totalRegistros;
-  totalPaginas;
   debiendo_sin_mora = signal<number>(0);
 
   facturasSelected = signal<FacturasI[]>([]);
-  mora = signal<number>(0);
   porcentajeSelected = 2;
 
-  recibiendo = computed(() => this.facturasSelected().reduce((sum, item) => fun.desformatearStNumber(item.monto) + sum, 0));
+  recibiendo = computed(() => {
+    return this.facturasSelected().reduce((sum, item) => fun.desformatearStNumber(item.monto) + sum, 0);
+  });
 
   restando = computed(() => {
     const debiendo = this.debiendo_con_mora();
@@ -127,8 +126,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return debiendo - recibiendo <= 1 ? 0 : debiendo - recibiendo;
   });
 
+  mora_general = computed(() => this.all_facturas().reduce((sum, item) => fun.desformatearStNumber(item.mora) + sum, 0));
+
   debiendo_con_mora = computed(() => {
-    return Number(this.debiendo_sin_mora()) + Number(this.mora());
+    return Number(this.debiendo_sin_mora()) + Number(this.mora_general());
   });
 
   clienteClass = new ClienteC();
@@ -172,8 +173,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   areAllSelected() {
-    const facturas_no_viaje = this.facturas.filter(factura => !factura.is_viaje);
-    return _.every(facturas_no_viaje, factura => factura.select);
+    return this.facturas.every(factura => factura.select);
+  }
+
+  areAllSelectedPagoTotal() {
+    return this.facturas.every(factura => factura.pagoT);
   }
 
   getIcon() {
@@ -206,17 +210,16 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         factura_selected = factura;
         factura_selected.monto = '0.00';
         factura_selected.pagoT = false;
-        this.verificateFacturasSelected(factura_selected, 'insert', index, true);
+        this.verificateFacturasSelected(factura_selected, 'insert', index, factura_selected.monto);
       }
 
-      // TODO: tratar la mora como el monto y modificarlo desde aqui y no desde el componente de mora selector
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
       factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
       factura.select = fun.hasValue(factura_selected);
       factura.pagoT = fun.hasValue(factura_selected) ? factura_selected.pagoT : false;
       factura.pago_a_tiempo = factura.fecha_vencimiento ? (factura.fecha_vencimiento > fechaA ? true : false) : true;
       factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
-      factura.monto = fun.hasValue(factura_selected) ? factura_selected.monto : '0.00';
+      factura.monto = fun.hasValue(factura_selected) ? fun.roundNumberToDecimal(factura_selected.monto) : '0.00';
 
       const moraCalculator = new MoraCalculator(factura);
 
@@ -227,8 +230,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         factura.porcentaje_mora = this.porcentajeSelected;
         factura.mora = moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
       }
-
-      this.mora.update(mora => mora + fun.desformatearStNumber(factura.mora));
 
       const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
 
@@ -256,7 +257,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       return factura;
     });
 
-    this.all_facturas = fun.deepCloning(this.facturas);
+    this.all_facturas.set(fun.deepCloning(this.facturas));
 
     this.totalFacturado = res.data.balances.total_facturado;
 
@@ -270,9 +271,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalPagadoPorciento = parseFloat(fun.roundNumberToDecimal(this.totalPagadoPorciento));
 
     setTimeout(() => {
-      this.totalRegistros = res.data.facturas.total_registros;
-      this.totalPaginas = res.data.facturas.total_paginas;
-
       if (res.data.page != params.page) {
         this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
         this.tablaComponent.reloadPagination();
@@ -285,49 +283,47 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tablePaginatorChange(arg) {
-    console.log('arg -> ', arg);
-
     const temp = fun.deepCloning(this.facturas);
     this.facturas.length = 0;
 
     temp.forEach(item => {
-      const moraCalculator = new MoraCalculator(item);
-      if (fun.hasValue(item.porcentaje_mora)) item;
+      let factura_selected = this.facturasSelected().find(fact => fact.id == item.id);
 
-      const porcentaje = item.porcentaje_mora ?? this.porcentajeSelected;
-
-      item.mora = moraCalculator.getMora({ porcentaje });
+      if (fun.hasValue(factura_selected)) {
+        item = factura_selected;
+        item.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item.monto));
+      }
 
       this.facturas.push(item);
     });
   }
 
-  getDataFromMoraSelector(data: FacturasI[]) {
-    fun.awaitTyping(null, 10).then(() => {
-      data.forEach((item, index) => {
-        const index_factura = this.facturas.findIndex(fact => fact.id == item.id);
-        this.verificateFacturasSelected(item, 'modify', index_factura, item.monto, item.mora);
-      });
+  getDataFromMoraSelector(data: { key: MoraSelectorKeyI; value: string | number; factura_id: number }) {
+    const index_factura_tabla = this.facturas.findIndex(fact => fact.id == data.factura_id);
+    const item_tabla = this.facturas[index_factura_tabla];
 
-      const total_mora = this.all_facturas.reduce((sum, item, index) => {
-        const factura_modificada = data.find(fact => fact.id == item.id);
-        if (factura_modificada) {
-          this.all_facturas[index] = factura_modificada;
-        } else {
-          const moraCalculator = new MoraCalculator(item);
-          this.all_facturas[index].mora = moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
-        }
+    if (data.key == MoraSelectorKeyI.mora) {
+      item_tabla.mora = data.value;
 
-        item = this.all_facturas[index];
+      if (item_tabla.select && item_tabla.pagoT) {
+        item_tabla.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item_tabla.balance) + fun.desformatearStNumber(item_tabla.mora));
+      }
 
-        const mora = fun.desformatearStNumber(item.mora);
+      this.verificateFacturasSelected(item_tabla, 'modify', index_factura_tabla, item_tabla.monto, item_tabla.mora);
+    } else {
+      item_tabla.porcentaje_mora = data.value;
 
-        if (fun.hasValue(mora) && !isNaN(mora) && mora > 0) return mora + sum;
-        else return sum;
-      }, 0);
+      const moraCalculator = new MoraCalculator(item_tabla);
+      item_tabla.mora = moraCalculator.getMora({ porcentaje: data.value });
 
-      this.mora.set(total_mora);
-    });
+      if (item_tabla.select && item_tabla.pagoT) {
+        item_tabla.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item_tabla.balance) + fun.desformatearStNumber(item_tabla.mora));
+      }
+
+      this.verificateFacturasSelected(item_tabla, 'modify', index_factura_tabla, item_tabla.monto, item_tabla.mora, data.value);
+    }
+
+    this.all_facturas.update(facts => facts.map(fact => (fact.id == data.factura_id ? fun.deepCloning(item_tabla) : fact)));
   }
 
   async necesarioStart() {
@@ -356,7 +352,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.facturasSelected.set([]);
     this.clienteAdepositar = undefined;
     this.debiendo_sin_mora.set(0);
-    this.mora.set(0);
+    this.all_facturas.set([]);
     (document.getElementById('clienteI') as any).value = null;
 
     this.resetVariables();
@@ -464,49 +460,86 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   selectAll() {
     const allSelected = this.areAllSelected();
 
-    this.facturas.forEach((fact, index) => {
+    this.facturas.map((fact, index) => {
       if (allSelected) {
-        if (!fact.is_viaje && fact.select) {
-          this.facturas[index].pagoT = false;
-          this.facturas[index].select = false;
-          this.facturas[index].monto = '0.00';
-
-          this.tablaComponent.resetInput('monto', 'especificar', index, true, '0.00');
-        }
+        fact.pagoT = false;
+        fact.select = false;
+        fact.monto = '0.00';
       } else {
-        if (!fact.is_viaje && !fact.select) this.facturas[index].select = true;
+        fact.select = true;
       }
-      if (!fact.is_viaje) this.verificateFacturasSelected(fact, 'insert', index, !allSelected);
     });
+
+    this.all_facturas.update(facts =>
+      facts.map(item => {
+        const factura_index = this.facturas.findIndex(fact => fact.id == item.id);
+        const factura = this.facturas[factura_index];
+
+        const modify = allSelected ? item.select : !item.select;
+        item.select = !allSelected;
+
+        if (modify) this.verificateFacturasSelected(factura ?? item, 'insert', factura_index, item.monto);
+
+        return { ...item, select: !allSelected, monto: fun.hasValue(factura) ? factura.monto : item.monto };
+      })
+    );
   }
 
-  verificateFacturasSelected(factura, method, index, monto, mora?) {
-    const factura_en_turno = this.facturasSelected().find(fact => fact.id == factura.id);
+  selectAllPagoTotal() {
+    const allSelected = this.areAllSelectedPagoTotal();
+
+    this.facturas.forEach(fact => (fact.pagoT = !allSelected));
+
+    this.all_facturas.update(facts =>
+      facts.map(item => {
+        const factura_index = this.facturas.findIndex(fact => fact.id == item.id);
+        const factura = this.facturas[factura_index];
+
+        const balance = fun.desformatearStNumber(item.balance);
+        const mora = fun.desformatearStNumber(item.mora);
+
+        const new_monto = fun.roundNumberToDecimal(balance + mora);
+
+        this.verificateFacturasSelected(factura ?? item, 'modify', factura_index, new_monto);
+
+        return { ...item, pagoT: !allSelected, monto: new_monto };
+      })
+    );
+  }
+
+  verificateFacturasSelected(factura: FacturasI, method: 'insert' | 'modify', index: number, monto: number | string, mora?: number | string, porcentaje_mora?: number | string) {
+    const factura_en_turno = factura ? this.facturasSelected().find(fact => fact.id == factura?.id) : undefined;
 
     if (method == 'insert') {
-      if (monto) {
-        if (fun.isEmpty(factura_en_turno)) this.facturasSelected.update(facts => [...facts, factura]);
+      if (fun.isEmpty(factura_en_turno)) {
+        this.facturasSelected.update(facts => [...facts, factura]);
       } else {
         this.facturasSelected.update(facts => facts.filter(fact => fact.id != factura.id));
       }
     } else if (method == 'modify') {
-      this.facturasSelected.update(facts => facts.map(fact => (fact.id == factura.id ? fun.deepCloning(factura) : fact)));
-
       this.facturasSelected.update(facts =>
         facts.map(fact => {
           if (fact.id == factura.id) {
-            return fun.hasValue(mora) ? { ...fact, monto: monto, mora: mora } : { ...fact, monto: monto };
+            const new_mora = fun.hasValue(mora) ? mora : factura.mora;
+            const new_porcentaje_mora = fun.hasValue(porcentaje_mora) ? porcentaje_mora : factura.porcentaje_mora;
+
+            return { ...fact, monto: monto, mora: new_mora, porcentaje_mora: new_porcentaje_mora };
           } else {
             return fact;
           }
         })
       );
+    }
+
+    if (this.tablaComponent && index >= 0) {
+      monto = factura.pagoT ? monto : factura.monto;
       this.tablaComponent.resetInput('monto', 'especificar', index, true, monto);
     }
   }
 
   tableInputBlur(params) {
     const factura_en_turno = this.facturasSelected().find(factura => factura.id == params.data.id);
+
     if (fun.hasValue(factura_en_turno)) {
       const total = factura_en_turno.balance;
       const monto = fun.desformatearStNumber(factura_en_turno.monto);
@@ -523,21 +556,28 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tableInputChange(params) {
+    const factura = this.facturas.find(fact => fact.id == params.data.id);
+
     const balance = fun.desformatearStNumber(params.data.balance);
     const mora = fun.desformatearStNumber(params.data.mora);
-    const monto = fun.desformatearStNumber(params.value);
+    let monto = fun.desformatearStNumber(params.value);
     const monto_original = params.value;
 
-    if (params.key == 'pagoT' && params.value) {
-      const monto = params.data.select ? fun.roundNumberToDecimal(balance + mora) : '0.00';
-      this.verificateFacturasSelected(params.data, 'modify', params.index, monto);
+    if (params.key == 'pagoT') {
+      if (params.value) {
+        monto = factura.select ? fun.roundNumberToDecimal(balance + mora) : '0.00';
+      } else {
+        monto = fun.roundNumberToDecimal(balance + mora);
+      }
+
+      factura.pagoT = params.value;
     }
 
-    if (params.key == 'monto' && params.value != params.data.monto) {
-      if (params.data.select) {
+    if (params.key == 'monto' && params.value != factura.monto) {
+      if (factura.select) {
         if (fun.isEmpty(params.value)) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
 
-        if (monto == balance + mora) [params.newData.pagoT, params.data.pagoT] = Array(2).fill(true);
+        if (monto == balance + mora) [params.newData.pagoT, factura.pagoT] = Array(2).fill(true);
 
         if (monto > balance + mora) {
           this.ExisteMontoMayor = true;
@@ -547,21 +587,32 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.ExisteMontoMayor = false;
         }
 
-        this.verificateFacturasSelected(params.newData, 'modify', params.index, monto_original);
+        factura.monto = monto_original;
       }
     }
 
     if (params.key == 'select') {
-      const factura = this.facturas.find(fact => fact.id == params.data.id);
-
       if (!params.value) {
         factura.pagoT = false;
-        params.data.monto = '0.00';
-        this.tablaComponent.resetInput('monto', 'especificar', params.index, true, '0.00');
+        monto = '0.00';
       }
 
-      this.verificateFacturasSelected(factura, 'insert', params.index, params.value);
+      factura.select = params.value;
     }
+
+    this.all_facturas.update(facts =>
+      facts.map(item => {
+        if (item.id == factura.id) {
+          item = fun.deepCloning(factura);
+
+          const action = params.key == 'select' ? 'insert' : 'modify';
+
+          this.verificateFacturasSelected(factura, action, params.index, monto);
+        }
+
+        return item;
+      })
+    );
   }
 
   async abrirModalFiltro(nombre) {

@@ -58,7 +58,7 @@
                 </div>
                 <div class="derecha pl-2">
                   <span class="w-100 detalleBalance badge text-shadow bg-orange text-white mb-2">
-                    <span>Mora:</span> <span>RD$ {{ formatoNumero(mora()) }}</span>
+                    <span>Mora:</span> <span>RD$ {{ formatoNumero(mora_general()) }}</span>
                   </span>
 
                   <span class="w-100 detalleBalance badge bg-blue text-shadow text-white mb-2">
@@ -91,7 +91,7 @@
       <div class="card sombra cardFacturas br-10">
         <div class="header">
           <div class="d-flex align-items-center gap-3">
-            @if (totalPaginas > 1) {
+            @if (this.all_facturas().length > this.tablaComponent?.config.obj_paginate.per_page) {
               <div class="more-pages animated flash slower infinite"><strong class="mr-2">Atención: </strong> Existen múltiples páginas</div>
             }
 
@@ -99,6 +99,10 @@
               Mora General
               <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" [(porcentajeSelected)]="porcentajeSelected" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
             </div>
+
+            @if (areAllSelected()) {
+              <input class="apple-switch" type="checkbox" (change)="selectAllPagoTotal()" [checked]="areAllSelectedPagoTotal()" pTooltip="{{ areAllSelectedPagoTotal() ? 'Deseleccionar pago total' : 'Marcar pago total' }}" tooltipPosition="left" />
+            }
 
             <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
           </div>
@@ -108,7 +112,7 @@
             <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
           </div>
           <span class="w-90 facturas-seleccionadas">
-            Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ totalRegistros }}</strong>
+            Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ this.all_facturas().length }}</strong>
           </span>
         </div>
       </div>

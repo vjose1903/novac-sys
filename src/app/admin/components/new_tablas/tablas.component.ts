@@ -52,7 +52,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   @Output() dataChange = new EventEmitter<any>();
 
   cantPagesView: number = 5;
-  total_registros;
   private destroy$ = new Subject<void>();
 
   fun = fun;
