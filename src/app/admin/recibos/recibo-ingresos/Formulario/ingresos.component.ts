@@ -280,6 +280,16 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   changeMoraGeneral(porcentaje: number) {
     this.moraSelectorService.setPorcentajeMora(porcentaje);
+
+    this.all_facturas.update(facts =>
+      facts.map(fact => {
+        const factura_tabla = this.facturas.find(item => fact.id == item.id);
+        if (fun.hasValue(factura_tabla)) return fact;
+
+        const moraCalculator = new MoraCalculator(fact);
+        return { ...fact, porcentaje_mora: porcentaje, mora: moraCalculator.getMora({ porcentaje: porcentaje }) };
+      })
+    );
   }
 
   tablePaginatorChange(arg) {
@@ -291,6 +301,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
       if (fun.hasValue(factura_selected)) {
         item = factura_selected;
+        item.porcentaje_mora = factura_selected.porcentaje_mora ?? this.porcentajeSelected;
         item.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item.monto));
       }
 
@@ -320,6 +331,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         item_tabla.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item_tabla.balance) + fun.desformatearStNumber(item_tabla.mora));
       }
 
+      // TODO: verificar por que no se le esta modificando el valor de la porcentaje_mora al cambiarlo
       this.verificateFacturasSelected(item_tabla, 'modify', index_factura_tabla, item_tabla.monto, item_tabla.mora, data.value);
     }
 
