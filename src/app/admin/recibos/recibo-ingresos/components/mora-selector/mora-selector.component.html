@@ -25,37 +25,39 @@
   </div>
 </div>
 
-<p-popover #popoverMora>
-  <div class="d-flex flex-column gap-3 w-100 p-2">
-    @if (showMora) {
-      <span class="d-flex gap-2 align-items-center justify-content-between">
-        Dias de retraso:
-        <span class="badge bg-warning text-black p-1">
-          {{ formatoNumero(moraCalculator.getDiasRetraso(), 0) }}
+<p-popover #popoverMora appendTo="body">
+  <ng-template #content>
+    <div class="d-flex flex-column gap-3 w-100 p-2">
+      @if (showMora) {
+        <span class="d-flex gap-2 align-items-center justify-content-between">
+          Dias de retraso:
+          <span class="badge bg-warning text-black p-1">
+            {{ formatoNumero(moraCalculator.getDiasRetraso(), 0) }}
+          </span>
         </span>
-      </span>
-    }
+      }
 
-    <div class="d-flex flex-column">
-      <span class="text-w-600 mb-2">Porcentajes</span>
+      <div class="d-flex flex-column">
+        <span class="text-w-600 mb-2">Porcentajes</span>
 
-      @for (porcentaje of porcentajes; track $index) {
-        <div class="d-flex flex-column gap-0">
-          <div class="porcentaje-item pt-1">
-            <span>{{ porcentaje == mora_personalizada ? 'Personalizado' : porcentaje + '%' }}</span>
+        @for (porcentaje of porcentajes; track $index) {
+          <div class="d-flex flex-column gap-0">
+            <div class="porcentaje-item pt-1">
+              <span>{{ porcentaje == mora_personalizada ? 'Personalizado' : porcentaje + '%' }}</span>
 
-            <div class="d-flex align-items-center justify-content-center">
-              <input [disabled]="porcentaje == porcentajeSelected" class="apple-switch size-sm" type="checkbox" (change)="changePorcentaje(porcentaje)" [checked]="porcentajeSelected == porcentaje" />
+              <div class="d-flex align-items-center justify-content-center">
+                <input [disabled]="porcentaje == porcentajeSelected" class="apple-switch size-sm" type="checkbox" (change)="changePorcentaje(porcentaje, popoverMora)" [checked]="porcentajeSelected == porcentaje" />
+              </div>
             </div>
-          </div>
 
-          <hr class="rayaBottom sm pb-1" [ngClass]="{ 'd-none': $last && porcentajeSelected != mora_personalizada }" />
-        </div>
+            <hr class="rayaBottom sm pb-1" [ngClass]="{ 'd-none': $last && porcentajeSelected != mora_personalizada }" />
+          </div>
+        }
+      </div>
+
+      @if (porcentajeSelected == mora_personalizada) {
+        <input class="form-control min" (keyup)="changePersonalizedMora($event)" [(ngModel)]="customMora" (click)="onFocusMora($event)" (blur)="onBlurMora()" />
       }
     </div>
-
-    @if (porcentajeSelected == mora_personalizada) {
-      <input class="form-control min" (keyup)="changePersonalizedMora($event)" [(ngModel)]="customMora" (click)="onFocusMora($event)" (blur)="onBlurMora()" />
-    }
-  </div>
+  </ng-template>
 </p-popover>

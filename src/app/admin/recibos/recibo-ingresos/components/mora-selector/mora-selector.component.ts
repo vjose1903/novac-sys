@@ -3,7 +3,7 @@ import { fun } from '../../../../../core/services/functions.service';
 import { table_info } from '../../../../components/new_tablas/tabla-class';
 import { MoraCalculator, mora_personalizada } from '../../utils/mora-calculator';
 import { CommonModule } from '@angular/common';
-import { PopoverModule } from 'primeng/popover';
+import { Popover, PopoverModule } from 'primeng/popover';
 import { FormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
 import { FacturasI } from '../../../../../admin/facturacion/factura';
@@ -39,6 +39,7 @@ export class MoraSelectorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (this.showMora) {
       this.moraCalculator = new MoraCalculator(this.rowData);
+      this.porcentajeSelected = this.rowData.porcentaje_mora ?? this.porcentajeSelected;
     }
 
     if (!this.showMoraPersonalizada) this.porcentajes = this.porcentajes.filter(porcentaje => porcentaje != mora_personalizada);
@@ -68,14 +69,20 @@ export class MoraSelectorComponent implements OnInit, OnDestroy {
     return this.formatoNumero(value);
   }
 
-  changePorcentaje(porcentaje: number | string) {
+  changePorcentaje(porcentaje: number | string, op?: Popover) {
     this.porcentajeSelected = porcentaje;
     this.porcentajeSelectedChange.emit(porcentaje);
 
     this.changePorcentajeMora.emit(Number(porcentaje));
     this.returnData && this.returnData({ key: MoraSelectorKeyI.porcentaje_mora, value: porcentaje, factura_id: this.rowData?.id });
 
-    if (porcentaje != mora_personalizada) this.customMora = 0;
+    this.customMora = this.rowData?.mora ?? 0;
+
+    if (op) {
+      setTimeout(() => {
+        op.align();
+      }, 700);
+    }
   }
 
   changePersonalizedMora(event: any) {

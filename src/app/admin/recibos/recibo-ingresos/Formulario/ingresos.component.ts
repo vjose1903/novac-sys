@@ -93,7 +93,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     padding: '0.5rem',
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: params => this.pedirNuevaData(params) },
-    obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: true, key: 'id' },
+    obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: [3, ...default_per_page], search: ' ', is_local: true, key: 'id' },
   };
 
   tablaComponent;
@@ -295,15 +295,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   tablePaginatorChange(arg) {
     const temp = fun.deepCloning(this.facturas);
     this.facturas.length = 0;
-
     temp.forEach(item => {
       let factura_selected = this.facturasSelected().find(fact => fact.id == item.id);
+      let factura_from_all = this.all_facturas().find(fact => fact.id == item.id);
+      if (fun.hasValue(factura_selected)) item = factura_selected;
 
-      if (fun.hasValue(factura_selected)) {
-        item = factura_selected;
-        item.porcentaje_mora = factura_selected.porcentaje_mora ?? this.porcentajeSelected;
-        item.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item.monto));
-      }
+      item.porcentaje_mora = factura_selected?.porcentaje_mora || factura_from_all?.porcentaje_mora || this.porcentajeSelected;
+      item.pagoT = factura_selected?.pagoT || false;
+      item.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item.monto));
 
       this.facturas.push(item);
     });
@@ -332,6 +331,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       }
 
       // TODO: verificar por que no se le esta modificando el valor de la porcentaje_mora al cambiarlo
+
       this.verificateFacturasSelected(item_tabla, 'modify', index_factura_tabla, item_tabla.monto, item_tabla.mora, data.value);
     }
 
@@ -504,6 +504,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.all_facturas.update(facts =>
       facts.map(item => {
+        item.pagoT = !allSelected;
+
         const factura_index = this.facturas.findIndex(fact => fact.id == item.id);
         const factura = this.facturas[factura_index];
 
@@ -514,7 +516,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
         this.verificateFacturasSelected(factura ?? item, 'modify', factura_index, new_monto);
 
-        return { ...item, pagoT: !allSelected, monto: new_monto };
+        return { ...item, monto: new_monto };
       })
     );
   }
@@ -533,9 +535,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         facts.map(fact => {
           if (fact.id == factura.id) {
             const new_mora = fun.hasValue(mora) ? mora : factura.mora;
+
             const new_porcentaje_mora = fun.hasValue(porcentaje_mora) ? porcentaje_mora : factura.porcentaje_mora;
 
-            return { ...fact, monto: monto, mora: new_mora, porcentaje_mora: new_porcentaje_mora };
+            return { ...fact, pagoT: factura.pagoT, monto: monto, mora: new_mora, porcentaje_mora: new_porcentaje_mora };
           } else {
             return fact;
           }
