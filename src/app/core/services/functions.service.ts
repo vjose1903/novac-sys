@@ -141,11 +141,10 @@ export class fun {
         if (isNaN(Number(fun.desformatearStNumber(newNumber)))) {
           fun.toastError('Valor introducido es invalido', 'ERROR');
           if (document.getElementById(id)) document.getElementById(id).focus();
-          return;
+        } else {
+          res.number = newNumber;
+          res.error = false;
         }
-
-        res.number = newNumber;
-        res.error = false;
       }
 
       resolve(res);
