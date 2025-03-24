@@ -9,7 +9,6 @@ export const config_cxc_ant_preventa = {
     only_titulo: false,
     widths: [18, '*', 'auto', 60, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
     customTotalizacion: [
-      { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
       { title: 'TOTAL PENDIENTE RD$', key: 'total' },
     ],
     mensaje_contenido_vacio: 'No existen cuentas por cobrar.',

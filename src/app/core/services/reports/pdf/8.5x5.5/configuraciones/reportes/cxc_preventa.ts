@@ -4,7 +4,6 @@ export const config_cxc_preventa = {
   only_titulo: false,
   widths: [24, 60, 'auto', 'auto', '*', 'auto', 'auto'],
   customTotalizacion: [
-    { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
     { title: 'TOTAL PENDIENTE RD$', key: 'total' },
   ],
   mensaje_contenido_vacio: 'El cliente buscado no tiene cuentas por cobrar.',

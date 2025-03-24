@@ -9,7 +9,6 @@ export const config_cxc_ant = {
     only_titulo: false,
     widths: ['auto', '*', 60, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
     customTotalizacion: [
-      { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
       { title: 'TOTAL PENDIENTE RD$', key: 'total' },
     ],
     mensaje_contenido_vacio: 'No existen cuentas por cobrar.',
@@ -128,7 +127,6 @@ export const config_cxc_ant = {
     only_titulo: false,
     widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
     customTotalizacion: [
-      { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
       { title: 'TOTAL PENDIENTE RD$', key: 'total' },
     ],
     mensaje_contenido_vacio: 'No existen cuentas por cobrar.',
