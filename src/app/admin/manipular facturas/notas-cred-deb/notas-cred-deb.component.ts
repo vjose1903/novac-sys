@@ -1,6 +1,6 @@
 import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
 import { ActivatedRoute, Router } from '@angular/router';
@@ -25,11 +25,11 @@ import { ModalClass } from '../../components/modal/modal-class';
 })
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   // factura;
+  @Input() id_factura: number;
+  @Input() tipoNota: any;
 
   tabIndex = 0;
-  idsFacturas: number[];
   facturasConDetalles: Array<FacturasI>;
-  tipoNota: any;
   tituloPag = '';
   configApp: ConfigI;
 
@@ -80,7 +80,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   tablaComponent;
 
-  constructor(private activeRoute: ActivatedRoute, private router: Router) {
+  constructor(private router: Router) {
     super();
   }
 
@@ -88,9 +88,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this._init_mixin({ component: 'notas', is_routing: true });
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
 
-    this.idsFacturas = this.activeRoute.snapshot.params['ids'];
+    console.log('this.id_factura', this.id_factura);
+    console.log('this.tipoNota', this.tipoNota);
 
-    this.tipoNota = this.activeRoute.snapshot.params['tipo'];
+    // this.id_factura = this.activeRoute.snapshot.params['ids'];
+
+    // this.tipoNota = this.activeRoute.snapshot.params['tipo'];
     this.fecha = moment().format('DD/MM/YYYY');
 
     if (this.tipoNota === 'credito') {
@@ -163,10 +166,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getFacturas() {
     return new Promise(async (resolve) => {
-      this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura) => {
+      this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.id_factura } }).then((res_factura) => {
         let tempFactData = res_factura['data'] as FacturasI[];
 
-        this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.idsFacturas}` }).then((res) => {
+        this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.id_factura}` }).then((res) => {
           const devueltos = res['data'];
 
           for (let indexFact = 0; indexFact < tempFactData.length; indexFact++) {

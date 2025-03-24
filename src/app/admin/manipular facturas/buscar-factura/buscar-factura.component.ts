@@ -699,7 +699,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async res => {
       const inputs = {
         show_estado: true,
-        estado_documento: dataFactura.estado,
+        estado_documento: factura.estado,
         base64: res.base64,
         reimprimir: res.reimprimir,
         fileName: _.first(res.file.split('.')),
@@ -711,6 +711,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           id: 'mostrarFactura',
           header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
+          height: '70vh',
           botones: {
             ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: botonesDinamicos,

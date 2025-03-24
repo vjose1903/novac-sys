@@ -10,7 +10,7 @@ import { primeNGLocales } from './core/typescript/primeNG.locales';
 import Nora from '@primeng/themes/nora';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-import { provideRouter, withRouterConfig } from "@angular/router";
+import { provideRouter, withRouterConfig, withComponentInputBinding } from "@angular/router";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,7 +22,8 @@ export const appConfig: ApplicationConfig = {
       routes,
       withRouterConfig({
         onSameUrlNavigation: 'reload'
-      })
+      }),
+      withComponentInputBinding()
     ),
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
     provideHttpClient(withInterceptorsFromDi()),
