@@ -6,13 +6,13 @@
     <div class="d-flex justify-content-between align-items-end rayaBottom mb-3 pb-2">
       <div class="colores w-70">
         @if (viajes?.length && viajes_pendientes_cant > 0) {
-        <span class="badge text-shadow red text-white">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
+        <span class="badge text-shadow bg-red text-white">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
         } @if (viajes?.length && viajes_pendientes_cant > 0 && viajes_completados_cant > 0) {
-        <span class="badge text-shadow blue text-white">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
+        <span class="badge text-shadow bg-blue text-white">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
         } @if (viajes?.length == 0) {
-        <span class="badge text-shadow green text-white">No tiene viajes pendientes</span>
+        <span class="badge text-shadow bg-green text-white">No tiene viajes pendientes</span>
         } @if (viajes?.length > 0 && viajes_pendientes_cant == 0) {
-        <span class="badge text-shadow green text-white">Todos los viajes fueron completados</span>
+        <span class="badge text-shadow bg-green text-white">Todos los viajes fueron completados</span>
         }
       </div>
 

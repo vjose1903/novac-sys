@@ -2,7 +2,7 @@ import { HtmlElementsService } from './../../../core/services/html-elements.serv
 import { Router } from '@angular/router';
 import { ClienteC } from './../../registros/registro-clientes/cliente';
 import { MixinClass } from './../../../core/typescript/MixinClass';
-import { table_config } from './../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from './../../components/new_tablas/tabla-class';
 import { FacturaC, tipoDocFacturacion } from './../factura';
 import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
@@ -70,7 +70,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     colores: true,
     id_tabla: 'lista_documentos',
     padre_functions: { data_request: (params) => this.buscarDocumentos(params) },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
   facturaClass = new FacturaC();

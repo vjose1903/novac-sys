@@ -4,7 +4,7 @@ import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 
 import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { table_config } from '../../new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../new_tablas/tabla-class';
 
 @Component({
     selector: 'app-buscar-articulo',
@@ -30,7 +30,7 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
     focusRow: true,
     id_tabla: 'buscar_articulo',
     padre_functions: { data_request: (params) => this.buscarArticulos(params) },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
   tablaComponent;

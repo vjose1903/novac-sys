@@ -1,5 +1,7 @@
 .alert_msg {
   color: #8080806b;
+  margin-right: 0.2rem;
+  cursor: help !important;
 }
 
 .index {
@@ -38,10 +40,12 @@
     position: relative;
 
     .divTable {
+      overflow: auto;
       position: absolute;
+      border-radius: 13px;
+      box-shadow: 0px 1px 5px 1px #00000014;
 
       .myTable {
-        box-shadow: 0px 1px 5px 1px #00000014;
         border-radius: 10px;
 
         display: grid !important;
@@ -59,7 +63,6 @@
           display: table;
           width: 100%;
           table-layout: fixed;
-          font-size: 0.8rem !important;
 
           &:not(&.colorTitulo) {
             border-bottom: 1px solid #808080a8 !important;
@@ -90,7 +93,8 @@
             }
 
             .titulo {
-              cursor: default !important;
+              cursor: default;
+              user-select: none;
             }
           }
         }
@@ -202,7 +206,9 @@
     > button {
       background: var(--primary05) !important;
       border-color: var(--primary05) !important;
-      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+      box-shadow:
+        0 4px 6px rgba(50, 50, 93, 0.11),
+        0 1px 3px rgba(0, 0, 0, 0.08) !important;
 
       @include speeddial-icons;
       &:hover {
@@ -227,6 +233,55 @@
   }
 }
 
+.sort-icon {
+  position: relative;
+  width: 15px;
+  display: inline-block;
+  transform: translate(3px, -4px);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(-4px);
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 8px solid #80808038; /* Flecha hacia arriba */
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(7px); /* Desplazar hacia abajo */
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 8px solid #80808038; /* Flecha hacia abajo */
+  }
+
+  /* ordenado ascendente */
+  &.order-asc {
+    &::after {
+      /* Flecha hacia arriba */
+      border-bottom-color: var(--primary09);
+    }
+  }
+
+  /* ordenado descendente */
+  &.order-desc {
+    &::before {
+      /* Flecha hacia abajo */
+      border-top-color: var(--primary09);
+    }
+  }
+}
+
 @media (min-width: 992px) {
   // =====================================================================================================================================================================
   // PANTALLAS LG ========================================================================================================================================================
@@ -236,8 +291,9 @@
     display: none;
   }
 
+  .divTable thead,
   .divTable tbody {
-    font-size: 0.9rem;
+    font-size: 0.8rem !important;
   }
 }
 
@@ -249,8 +305,9 @@
     display: none;
   }
 
+  .divTable thead,
   .divTable tbody {
-    font-size: 0.65rem;
+    font-size: 0.65rem !important;
   }
 }
 
@@ -265,12 +322,13 @@
   .titulo_sm {
     display: flex;
     align-items: center;
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
     font-weight: 600;
   }
 
+  .divTable thead,
   .divTable tbody {
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
   }
 
   .tableTD {

@@ -7,7 +7,7 @@ import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
 import { ProduccionC } from './produccion';
 
 import { fun } from '../../core/services/functions.service';
-import { medidas, table_config } from '../components/new_tablas/tabla-class';
+import { default_per_page, medidas, table_config } from '../components/new_tablas/tabla-class';
 import { ConfigI } from '../../core/interface/config-interface';
 import { Ss } from '../../core/services/singleton.service';
 import { ModalClass } from '../components/modal/modal-class';
@@ -39,7 +39,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     ],
     colores: true,
     id_tabla: 'lista_produccion',
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: true },
     botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
   };
   tablaComponent;

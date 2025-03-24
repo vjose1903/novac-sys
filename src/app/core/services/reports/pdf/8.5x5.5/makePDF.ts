@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as _ from 'lodash';
 import * as fun_ from '../../utils/funciones';
-import { styles_ } from '../../utils/files';
+import { defaultStyle, styles_ } from '../../utils/files';
 import { Ss } from '../../../singleton.service';
 import { ConfigI } from '../../../../interface/config-interface';
 import { getContentWithTablaNormal } from '../../utils/tabla_normal';
@@ -44,6 +44,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
+    defaultStyle,
   };
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: pageO };
@@ -120,16 +121,38 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
     ...tabla_detalles,
     // ---------- DETALLE RESUMEN ----------
     {
-      margin: [15, 5, 15, 0],
+      margin: [5, 5, 10, 0],
       stack: [
         {
           columns: [
             {
-              alignment: 'left',
-              text: [
-                { text: 'Realizado por: ', bold: true, style: 'letra10' },
-                { text: data?.usuario, style: 'letra10' },
-              ],
+              layout: 'noBorders',
+              table: {
+                headerRows: 0,
+                widths: ['*'],
+                body: [
+                  [
+                    {
+                      alignment: 'left',
+                      text: [
+                        { text: 'Realizado por: ', bold: true, style: 'letra10' },
+                        { text: data?.usuario, style: 'letra10' },
+                      ],
+                    },
+                  ],
+                  configuration['mostrar_balance_cliente'] && data?.balance_cliente && data?.balance_cliente >= 1
+                    ? [
+                        {
+                          alignment: 'left',
+                          text: [
+                            { text: 'Balance cliente: ', bold: true, style: 'letra10' },
+                            { text: fun_.roundNumberToDecimal(data?.balance_cliente), style: 'letra10' },
+                          ],
+                        },
+                      ]
+                    : [{ text: '' }],
+                ],
+              },
             },
 
             {
@@ -192,7 +215,7 @@ function parseTipoPdf(data, tipo_pdf) {
     },
   ];
 
-  partes.forEach((parte) => {
+  partes.forEach(parte => {
     if (infoTipoPdf[tipo_pdf].includes(parte.key)) {
       parte.item['margin'] = [0, contenido.length ? 2 : 15, 15, 0];
       contenido.push(parte.item);
@@ -211,7 +234,7 @@ function parseResumen(data, tipo_pdf) {
       key: 'bruto',
       item: [
         { text: 'Bruto:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.Bruto), alignment: 'right', style: 'letra11', bold: true },
+        { text: fun_.roundNumberToDecimal(data?.Bruto || data?.bruto), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
     {
@@ -226,6 +249,13 @@ function parseResumen(data, tipo_pdf) {
       item: [
         { text: 'Descuento:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
         { text: fun_.roundNumberToDecimal(data?.descuento), alignment: 'right', style: 'letra11', bold: true },
+      ],
+    },
+    {
+      key: 'mora',
+      item: [
+        { text: 'Mora', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(data?.mora), bold: true, alignment: 'right', style: 'letra11' },
       ],
     },
     {
@@ -251,7 +281,7 @@ function parseResumen(data, tipo_pdf) {
     },
   ];
 
-  partes.forEach((parte) => {
+  partes.forEach(parte => {
     if (infoResumenPartes[tipo_pdf].includes(parte.key)) resumen.push(parte.item);
   });
 
@@ -321,7 +351,7 @@ function parseInfoFactura(data, tipo_pdf) {
     },
   ];
 
-  partes.forEach((parte) => {
+  partes.forEach(parte => {
     if (infoFacturaPartes[tipo_pdf].includes(parte.key)) {
       parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
       contenido.push(parte.item);
@@ -377,7 +407,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
     },
   ];
 
-  partes.forEach((parte) => {
+  partes.forEach(parte => {
     if (infoPropietarioPartes[tipo_pdf].includes(parte.key)) {
       parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
       contenido.push(parte.item);

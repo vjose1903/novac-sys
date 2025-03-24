@@ -67,10 +67,13 @@ export class ReporteC extends CrudG<any> {
 
         PdfService.generatePdf({ oPdf: obj, imprimir: false })
           .then(async result => {
+            console.log("ANDO AQUIII RES");
+
             Ss.loadServ.isLoading.next(false);
             resolve({ ...result, requestResult: responseRequest });
           })
           .catch(async err => {
+            console.log("ANDO AQUIII ERR");
             Ss.loadServ.isLoading.next(false);
             reject(err);
           });
@@ -89,8 +92,8 @@ export class ReporteC extends CrudG<any> {
         inputs: objPdfView,
         id: 'reporte_view',
         header: objPdfView.titulo,
-        width: objPdfView?.viewerOptions?.width ?? '57rem',
-        height: objPdfView?.viewerOptions?.height ?? '76vh',
+        width: '57rem',
+        height: '75vh',
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [

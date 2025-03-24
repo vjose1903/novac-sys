@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as fun_ from '../../utils/funciones';
-import { styles_ } from '../../utils/files';
+import { defaultStyle, styles_ } from '../../utils/files';
 import { Ss } from '../../../singleton.service';
 import { ConfigI } from '../../../../interface/config-interface';
 import { getContentWithTablaNormal } from '../../utils/tabla_normal';
@@ -40,6 +40,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
       barcode: fun_.my_barcode(data.identificador),
     },
     styles: styles_,
+    defaultStyle
   };
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };

@@ -1,4 +1,4 @@
-export type tableRowType = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date';
+export type tableRowType = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date' | 'none';
 
 export interface table_info {
   id?: string;
@@ -34,6 +34,7 @@ export interface table_info {
   color?: string;
   text_color?: string;
   dateFormat?: any;
+  rowTransform?: RowTransformI;
   hours?: any;
   imgStyle?: 'circular' | 'cuadrada';
   rowImgStyle?: 'circular' | 'cuadrada';
@@ -44,8 +45,18 @@ export interface table_info {
   iconsArray?: Array<iconsI>;
   key_value?: string;
   div_class?: string;
+  sort?: sortInfo;
 }
 
+export interface RowTransformI {
+  component: (rowData: any) => any;
+  inputs?: any;
+}
+
+interface sortInfo {
+  key: string;
+  order: 'asc' | 'desc' | null;
+}
 interface keySourceArray {
   value: any;
   clase: string;
@@ -86,6 +97,7 @@ export interface paginateI {
   per_page?: number;
   per_page_options?: Array<number>;
   search?: string;
+  key?: string;
   is_local?: boolean;
 }
 
@@ -117,6 +129,7 @@ interface filtarI {
 }
 
 export interface table_config {
+  track_key?: string;
   focusSearchInput?: boolean;
   padding?: string;
   padre_functions?: padreFunctionsI;
@@ -139,6 +152,8 @@ export interface table_config {
   obj_paginate?: paginateI;
   botones?: botonesTableI;
 }
+
+export const default_per_page = [10, 15, 20, 30, 50, 100];
 
 export enum medidas {
   Libra = 'Libras',
@@ -176,6 +191,10 @@ export class TablaClass {
         this.tableInputBlur(event.info);
         break;
 
+      case 'paginatorChange':
+        this.tablePaginatorChange(event.info);
+        break;
+
       default:
         break;
     }
@@ -186,4 +205,5 @@ export class TablaClass {
   tableClickIcon(arg) {}
   tableInputChange(arg) {}
   tableInputBlur(arg) {}
+  tablePaginatorChange(arg) {}
 }

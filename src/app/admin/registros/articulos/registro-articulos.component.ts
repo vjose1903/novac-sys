@@ -9,7 +9,7 @@ import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 
 import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ConfigI } from '../../../core/interface/config-interface';
@@ -20,10 +20,10 @@ const moment = require('../../../core/javascript/moment');
 const $ = require('jquery');
 
 @Component({
-    selector: 'app-registro-articulos',
-    templateUrl: './registro-articulos.component.html',
-    styleUrls: ['./registro-articulos.component.scss'],
-    standalone: false
+  selector: 'app-registro-articulos',
+  templateUrl: './registro-articulos.component.html',
+  styleUrls: ['./registro-articulos.component.scss'],
+  standalone: false,
 })
 export class RegistroArticulosComponent extends MixinClass implements OnInit, OnDestroy, OnChanges {
   // =============================================
@@ -81,17 +81,17 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '12%' }, { padding: '0.5rem 0rem' }, { 'padding-left': '1rem' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '37%' }, { 'text-align': 'left' }] },
-      { titulo: 'Medida', tipo: 'text', key: 'medida', estilos: [{ width: '13%' }, { padding: '0.5rem 0rem' }] },
-      { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal', estilos: [{ width: '20%' }] },
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', style: { width: '3.5rem', padding: '0.5rem 0rem', 'padding-left': '0.2rem' } },
+      { titulo: 'Articulo', tipo: 'text', key: 'nombre', style: { width: '37%', 'text-align': 'left' } },
+      { titulo: 'Medida', tipo: 'text', key: 'medida', style: { padding: '0.5rem 0rem' } },
+      { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal' },
     ],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_articulos',
-    padre_functions: { data_request: (params) => this.getArticulos(params) },
+    padre_functions: { data_request: params => this.getArticulos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.articulo.update }, borrar: { show: true, permiso: this.permissions.articulo.destroy } },
   };
   tablaComponent;
@@ -99,7 +99,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor(
+    private cdRef: ChangeDetectorRef,
+    private fb: UntypedFormBuilder,
+    private router: Router,
+    private tServ: TablasService,
+    private permissionsService: NgxPermissionsService
+  ) {
     super();
   }
 
@@ -109,7 +115,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
     this.medida_config = this.configApp.medida_producto_terminado;
 
-    this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then((result) => {
+    this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then(result => {
       this.hasPermissionUpdateFormula = result;
     });
 
@@ -144,16 +150,16 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   getConfiguracionArticulo() {
-    this.configArticuloClass.getOne(1).then((cofig_articulos) => {
+    this.configArticuloClass.getOne(1).then(cofig_articulos => {
       this.cofig_articulos = cofig_articulos.data;
     });
   }
 
   getMateriasP() {
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
       const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
 
-      this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.materia_prima }).then((res) => {
+      this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.materia_prima }).then(res => {
         this.listaMateriasPrimas = fun.deepCloning(res['data']);
 
         this.listaMateriasPrimasIndexed = this.listaMateriasPrimas.reduce((acu: any, item: any) => {
@@ -168,7 +174,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   getTipoArticulos() {
     this.listaTipoArticulos = [];
-    this.tipoArticuloClass.getAll().then((res) => {
+    this.tipoArticuloClass.getAll().then(res => {
       this.listaTipoArticulos = fun.deepCloning(res.data);
     });
   }
@@ -183,7 +189,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+          { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
           { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
         ],
       },
@@ -203,16 +209,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     this.listaArticulos.length = 0;
-    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then((res) => {
-      res.data.map(async (arti) => {
-        arti.customStyles = {
-          codigo: { width: '12%' },
-          nombre: { width: '37%', 'text-align': 'left', 'padding-left': '0.5rem' },
-          medida: { width: '13%' },
-          precio_principal: { width: '20%' },
-        };
-      });
-
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then(res => {
       this.listaArticulos = res.data;
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
@@ -230,7 +227,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   revisarPrecio(id) {
     const input = this.form.controls[id];
 
-    fun.revisarNumber(input, id).then((res) => {
+    fun.revisarNumber(input, id).then(res => {
       if (!res.error) input.setValue(res.number);
     });
   }
@@ -244,7 +241,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   async selectTipoArticulo(tipo) {
-    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == Number(tipo));
+    this.tipoArticuloSelected = this.listaTipoArticulos.find(val => val.id == Number(tipo));
     this.modificateValidators();
 
     if (this.tipoArticuloSelected.codigo == 'materia_prima') {
@@ -254,7 +251,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
 
     if (this.tipoArticuloSelected.codigo == 'producto_terminado') {
-      await this.getMateriasP().then((res) => {
+      await this.getMateriasP().then(res => {
         this.addItem();
         this.resetCompradoEn(this.medida_config);
         this.is_combo = true;
@@ -402,7 +399,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     const fields = ['medida_alerta', 'medida_contenido_padre', 'medida_contenido_hijo', 'cantidad_contenido_padre', 'cantidad_contenido_hijo', 'precio_padre', 'precio_libra', 'precio_hijo'];
 
-    fields.forEach((field) => {
+    fields.forEach(field => {
       if (fun.hasValue(this.form)) this.form.controls[field].reset(null);
     });
 
@@ -491,7 +488,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     let extra = { afterPath: '', parameters: { costos: true } };
 
-    this.articuloClass.getOne(this.ARRAY_FORMULA.value[index].articulo_id, extra).then((res) => {
+    this.articuloClass.getOne(this.ARRAY_FORMULA.value[index].articulo_id, extra).then(res => {
       let costo_en_turno;
       let medida_en_turno;
       for (const unidad_en_turno of arrayUnidades) {
@@ -631,7 +628,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     if (this.form.valid && !this.articulo_no_paquete) {
       if (this.tipoArticuloSelected.codigo == 'producto_terminado') {
-        res = formulario.rowFormula.some((fila) => fun.isEmpty(fila.articulo_id) || fun.isEmpty(fila.cantidad_formula));
+        res = formulario.rowFormula.some(fila => fun.isEmpty(fila.articulo_id) || fun.isEmpty(fila.cantidad_formula));
 
         if (res) return res;
         else {
@@ -666,7 +663,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   fillDropAlerta(medida) {
-    return new Promise<any>((resolve) => {
+    return new Promise<any>(resolve => {
       if (medida == 'Quintal') this.optionsAlerta = ['Quintal', 'Libra'];
       else if (medida == 'Libra') this.optionsAlerta = ['Libra'];
       else if (medida == 'Saco') this.optionsAlerta = ['Saco', 'Libra'];
@@ -773,7 +770,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
 
-    this.tipoArticuloSelected = this.listaTipoArticulos.find((val) => val.id == Number(articulo.tipo_articulo_id));
+    this.tipoArticuloSelected = this.listaTipoArticulos.find(val => val.id == Number(articulo.tipo_articulo_id));
     this.is_combo = articulo.is_combo;
 
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
@@ -904,7 +901,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const array = this.ARRAY_FORMULA.value;
     const formulas = [];
     const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' };
-    array.forEach((element) => {
+    array.forEach(element => {
       const obj = {
         id: fun.hasValue(element.id) ? Number(element.id) : null,
         articulo_combo: Number(element.articulo_id),
@@ -923,7 +920,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       data: regisData,
       texto: `¿Está seguro que desea eliminar el artículo <b> ${regisData.nombre}</b>?`,
       siFunction: () => {
-        this.articuloClass.deleteOne(regisData.id).then((res) => {
+        this.articuloClass.deleteOne(regisData.id).then(res => {
           const actualPagination = this.tServ.getPaginationById('lista_articulos');
           this.getArticulos(actualPagination);
           this.borrar();
@@ -970,7 +967,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       obj['formulas_productos_terminados'] = this.formarFormula();
     }
 
-    this.articuloClass.createUpdateOne(obj).then((res) => {
+    this.articuloClass.createUpdateOne(obj).then(res => {
       this.necesarioStart();
       this.borrar();
     });

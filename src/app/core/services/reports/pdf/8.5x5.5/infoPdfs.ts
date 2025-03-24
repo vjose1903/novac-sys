@@ -16,7 +16,7 @@ export const infoTipoPdf = {
 export const infoResumenPartes = {
   notas: ['total'],
   ventas: ['bruto', 'descuento', 'total', 'efectivo', 'cambio'],
-  recibo_ingreso: ['total'],
+  recibo_ingreso: ['bruto', 'mora', 'total'],
   conduce: [],
   cotizacion: ['bruto', 'descuento', 'itbis', 'total'],
   cuadre_caja: [],

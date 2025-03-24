@@ -5,6 +5,7 @@ export const config_pre_factura = {
   widths: ['auto', '*', 'auto', 'auto'],
   pageOrient: 'portrait',
   mostrar_total: false,
+  mostrar_balance_cliente: false,
   info: [
     {
       text: '#',

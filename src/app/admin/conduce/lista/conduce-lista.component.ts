@@ -6,7 +6,7 @@ import { TablasService } from './../../components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { Ss } from './../../../core/services/singleton.service';
 import { ModalService } from './../../components/modal/modal.service';
-import { table_config } from './../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from './../../components/new_tablas/tabla-class';
 import { ConfigI } from '../../../core/interface/config-interface';
 import { Permisos } from './../../../core/typescript/permisos';
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -46,7 +46,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_conduces',
     padre_functions: { data_request: params => this.getConduces(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
   tablaComponent;

@@ -18,7 +18,7 @@ import { BuscarClienteSuplidorComponent } from '../../components/formularios en 
 import { NotaC } from '../notas-cred-deb/notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
 import { TitleCasePipe } from '@angular/common';
@@ -86,7 +86,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     filtrar: { local: false },
     id_tabla: 'lista_notas',
     padre_functions: { data_request: params => this.pedirNotas(params) },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
   tablaNotasComponent;
@@ -696,16 +696,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       });
     }
 
-    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
-      .then(async res => {
-        const inputs = {
-          show_estado: true,
-          estado_documento: factura.estado,
-          base64: res.base64,
-          height: '40rem',
-          reimprimir: res.reimprimir,
-          fileName: _.first(res.file.split('.')),
-        };
+    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async res => {
+      const inputs = {
+        show_estado: true,
+        estado_documento: dataFactura.estado,
+        base64: res.base64,
+        reimprimir: res.reimprimir,
+        fileName: _.first(res.file.split('.')),
+      };
 
         const obj_modal = {
           component: PdfViewerComponent,

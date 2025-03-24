@@ -57,7 +57,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     info: [
       { titulo: ' ', tipo: 'switch', select_all: true, key: 'select', style: { width: '3.5rem' } },
       { titulo: 'Articulo', tipo: 'text', key: 'descripcion', style: { 'text-align': 'left', width: '20rem', 'padding-left': '0.5rem' } },
-      { titulo: 'Cantidad', key: 'cantidad_', tipo: 'text', style: { width: '7rem' } },
+      { titulo: 'Cantidad', key: 'cantidad_', tipo: 'text', style: { width: '7rem', 'text-align': 'center' } },
       { titulo: 'Descuento', key: 'descuento_valor', tipo: 'formatoNumero' },
       { titulo: 'Precio', key: 'precio', tipo: 'formatoNumero' },
       {

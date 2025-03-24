@@ -314,7 +314,7 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise<any>((resolve, reject) => {
       PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
         .then(async res => {
-          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')), viewerOptions: { height: '40rem' } };
+          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.'))};
 
           const obj_modal = {
             component: PdfViewerComponent,
@@ -322,6 +322,7 @@ export class FacturaC extends CrudG<FacturasI> {
             id: dataModal.id,
             header: dataModal.header,
             width: '900px',
+            height: '70vh',
             botones: {
               ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
               dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],

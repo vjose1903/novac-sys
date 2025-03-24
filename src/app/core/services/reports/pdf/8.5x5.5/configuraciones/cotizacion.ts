@@ -8,6 +8,7 @@ export const config_cotizacion = {
   pageOrient: 'portrait',
   widths: [15, 240, '*', '*', '*', '*'],
   mostrar_total: false,
+  mostrar_balance_cliente: false,
 
   info: [
     {

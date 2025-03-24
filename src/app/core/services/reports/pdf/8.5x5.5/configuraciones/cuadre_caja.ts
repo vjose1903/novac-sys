@@ -5,6 +5,7 @@ export const config_cuadre_caja = {
   pageOrient: 'portrait',
   widths: ['*', 'auto'],
   mostrar_total: false,
+  mostrar_balance_cliente: false,
   info: [
     {
       text: 'Descripción',

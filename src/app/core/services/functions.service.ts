@@ -141,11 +141,10 @@ export class fun {
         if (isNaN(Number(fun.desformatearStNumber(newNumber)))) {
           fun.toastError('Valor introducido es invalido', 'ERROR');
           if (document.getElementById(id)) document.getElementById(id).focus();
-          return;
+        } else {
+          res.number = newNumber;
+          res.error = false;
         }
-
-        res.number = newNumber;
-        res.error = false;
       }
 
       resolve(res);
@@ -158,7 +157,7 @@ export class fun {
   // _________________________________________________________________________________________________
   static redondearNum(numero, decimales) {
     const factor = Math.pow(10, decimales);
-    const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor
+    const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor;
     return numberRounded.toFixed(decimales);
   }
 
@@ -178,7 +177,7 @@ export class fun {
     const partes = numerRounded.split('.');
     const enteros = partes[0];
     const decimales = partes[1];
-    const numeroFormateado = enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decimales;
+    const numeroFormateado = `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cant >= 1 ? `.${decimales}` : ''}`;
 
     return numeroFormateado;
   }
@@ -288,15 +287,14 @@ export class fun {
   // Descripcion : Esta funcion normaliza un texto para que no tenga acentos
   // _________________________________________________________________________________________________
 
-  static  normalizarTexto(texto: string): string {
+  static normalizarTexto(texto: string): string {
     const textoMinusculas = texto.toLowerCase();
-  
+
     const textoSinAcentos = textoMinusculas.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  
+
     return textoSinAcentos;
   }
 
-  
   // __________________________________________________________________________________________________
   // Nombre: roundDecenaMayor
   // Descripcion : Esta funcion redondea un numero a la decena mayor al mismo

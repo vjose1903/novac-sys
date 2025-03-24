@@ -9,7 +9,7 @@ import { PdfService } from '../../../../core/services/reports/pdf/pdf.service';
 import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
 import { fun } from '../../../../core/services/functions.service';
 import { Permisos } from '../../../../core/typescript/permisos';
-import { table_config } from '../../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '../../../components/new_tablas/tabla-class';
 import { ModalClass } from '../../../components/modal/modal-class';
 import { ConfigI } from '../../../../core/interface/config-interface';
 import { Ss } from '../../../../core/services/singleton.service';
@@ -22,16 +22,16 @@ import { Ss } from '../../../../core/services/singleton.service';
 export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestroy {
   table_config: table_config = {
     info: [
-      { titulo: 'No. recibo', estilos: [{ width: '8%' }], key: 'numero_recibo', tipo: 'text' },
-      { titulo: 'Fecha recibo', estilos: [{ width: '10%' }], key: 'fecha_equivalente', tipo: 'date' },
-      { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
-      { titulo: 'No. factura', key: 'numero_factura', tipo: 'text', estilos: [{ width: '12%' }] },
-      { titulo: 'Total recibido', key: 'total', tipo: 'formatoNumero', estilos: [{ width: '12%' }, { 'text-align': 'end' }] },
+      { titulo: 'No. recibo', style: { width: '8%' }, key: 'numero_recibo', tipo: 'text' },
+      { titulo: 'Fecha recibo', style: { width: '10%' }, key: 'fecha_equivalente', tipo: 'date' },
+      { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: 'text', style: { 'text-align': 'start', 'padding-left': '1.5rem' } },
+      { titulo: 'No. factura', key: 'numero_factura', tipo: 'text', style: { width: '12%' } },
+      { titulo: 'Total recibido', key: 'total', tipo: 'formatoNumero', style: { width: '12%', 'text-align': 'end' } },
       {
         titulo: 'Acciones',
         tipo: 'icon',
         key: 'actions',
-        estilos: [{ width: '9%' }, { color: '#000' }],
+        style: { width: '9%', color: '#000' },
         iconsArray: [
           { key: 'ver', rowTooltip: 'tooltip_ver', text_color: 'colorNegro' },
           { key: 'anular', rowTooltip: 'tooltip_anular', text_color: 'colorNegro' },
@@ -43,7 +43,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     id_tabla: 'listado_recibos',
     padre_functions: { data_request: params => this.getRecibos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
   tablaComponent;
 
@@ -93,13 +93,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       ];
 
       recibo['customStyles'] = {
-        'cliente.nombre_completo': { 'text-align': 'start', 'padding-left': '1.5rem' },
-        numero_recibo: { width: '8%' },
-        fecha_equivalente: { width: '10%' },
-        numero_factura: { width: '12%' },
-        total: { width: '12%', 'text-align': 'end', 'padding-right': '1.5rem' },
         actions: [
-          { key: 'actions', isTd: true, estilos: 'width: 9% !important; padding-left: 1rem !important' },
           { key: 'ver', estilos: 'font-size:1rem !important' },
           { key: 'anular', estilos: 'margin-left: 1rem !important; font-size:1rem !important' },
         ],
@@ -159,7 +153,8 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   makeReciboPdf(arg) {
-    const recibo_selected = _.find(this.lista_recibos, recibo => recibo.id === arg.id);
+    const recibo_selected = this.lista_recibos.find(recibo => recibo.id === arg.id);
+
     this.reciboClass.parseDataToPdf(recibo_selected).then(recibo_parsed => {
       const obj = { data: recibo_parsed, type: 'recibo_ingreso', retunBase64: true };
       this.generarPdf(obj);

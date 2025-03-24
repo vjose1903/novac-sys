@@ -11,7 +11,10 @@ import { SharedService } from '../core/services/shared.service';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
-  constructor(public loadServ: LoaderService, public sharedServ: SharedService) {}
+  constructor(
+    public loadServ: LoaderService,
+    public sharedServ: SharedService
+  ) {}
   requestCount: number = 0;
 
   private startRequest(args?): void {
@@ -50,11 +53,11 @@ export class InterceptorService implements HttpInterceptor {
     }
 
     return next.handle(request).pipe(
-      map((event) => {
+      map(event => {
         if (event instanceof HttpResponse) {
           if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
 
-          ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
+          ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach(header => {
             const headerValue = event.headers.get(header);
             if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue);
           });
@@ -65,12 +68,8 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
-        console.log(' ');
-        console.log('response ', response);
-        console.log(' ');
         if (fun.isEmpty(response.error)) {
           fun.toastError('Error <strong>desconocido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR');
-          
         } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
           fun.toastError(response.error.msg, 'ERROR');
           this.sharedServ.nextCanToast(false);
@@ -85,7 +84,7 @@ export class InterceptorService implements HttpInterceptor {
       }),
       finalize(() => {
         this.endRequest(spinner);
-      }),
+      })
     );
   }
 

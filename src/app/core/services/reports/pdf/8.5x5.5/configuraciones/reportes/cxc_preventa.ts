@@ -2,7 +2,7 @@ export const config_cxc_preventa = {
   margin_general: [0, 0, 0, 0],
   isBreak: false,
   only_titulo: false,
-  widths: [24, 60, 'auto', 'auto', 53, '*', 'auto', 'auto'],
+  widths: [24, 60, 'auto', 'auto', '*', 'auto', 'auto'],
   customTotalizacion: [
     { title: 'TOTAL FACTURADO RD$', key: 'facturado' },
     { title: 'TOTAL PENDIENTE RD$', key: 'total' },
@@ -54,16 +54,6 @@ export const config_cxc_preventa = {
       style_body: 'letra10',
       key: 'condicion',
       alignment_body: 'left',
-    },
-    {
-      text: 'Cliente',
-      alignment_titulo: 'left',
-      noWrap: true,
-      style: 'letra10',
-      style_body: 'letra10',
-      key: 'cliente_nombre',
-      alignment_body: 'left',
-      uppercase: true,
     },
     {
       text: 'Facturado',

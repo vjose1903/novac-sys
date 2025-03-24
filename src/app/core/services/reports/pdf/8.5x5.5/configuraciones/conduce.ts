@@ -8,6 +8,7 @@ export const config_conduce = {
   pageOrient: 'portrait',
   widths: [24, 'auto', '*'],
   mostrar_total: false,
+  mostrar_balance_cliente: false,
 
   info: [
     {

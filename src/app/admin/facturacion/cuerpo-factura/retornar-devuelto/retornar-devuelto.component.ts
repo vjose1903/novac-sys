@@ -1,6 +1,6 @@
 import { HtmlElementsService } from './../../../../core/services/html-elements.service';
 import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { table_config } from './../../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from './../../../components/new_tablas/tabla-class';
 import { fun } from './../../../../core/services/functions.service';
 import { ModalI } from './../../../components/modal/modal-class';
 import { Component, DoCheck, OnInit, inject } from '@angular/core';
@@ -32,7 +32,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     colores: true,
     id_tabla: 'retornar_articulo',
     filtrar: { show: false, local: true },
-    obj_paginate: { show: true, showTotal: false, showDropDown: false, page: 1, per_page: 9999, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    obj_paginate: { show: true, showTotal: false, showDropDown: false, page: 1, per_page: 9999, per_page_options: default_per_page, search: ' ', is_local: true },
   };
 
   articuloSelected;

@@ -17,9 +17,11 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
 
   table_pagos_config: table_config = {
     info: [
+      { titulo: 'Fecha abono', tipo: 'text', key: 'fecha_equivalente' },
       { titulo: 'NO. recibo', tipo: 'text', key: 'numero_recibo' },
       { titulo: 'Abonado', tipo: 'formatoNumero', key: 'deposito' },
-      { titulo: 'Fecha abono', tipo: 'text', key: 'fecha_equivalente' },
+      { titulo: 'Mora', tipo: 'formatoNumero', key: 'mora' },
+      { titulo: 'Total', tipo: 'formatoNumero', key: 'total' },
     ],
     colores: true,
     id_tabla: 'listado_pagos',
@@ -62,6 +64,11 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
   ngOnInit() {
     this.activeIndex.set(this.arrayHasData('abonos').cant > 0 ? 0 : 1);
     this.processingTabChange = false;
+
+    this.inputs['abonos'] = this.inputs['abonos'].map(abono => {
+      abono.total = abono.deposito + abono.mora;
+      return abono;
+    });
   }
 
   arrayHasData(tipo) {
