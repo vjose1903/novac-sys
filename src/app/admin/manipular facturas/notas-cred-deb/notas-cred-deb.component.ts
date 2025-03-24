@@ -1,9 +1,9 @@
 import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC } from '../../facturacion/factura';
@@ -25,11 +25,11 @@ import { ModalClass } from '../../components/modal/modal-class';
 })
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   // factura;
+  @Input() id_factura: number;
+  @Input() tipoNota: any;
 
   tabIndex = 0;
-  idsFacturas: number[];
   facturasConDetalles: Array<FacturasI>;
-  tipoNota: any;
   tituloPag = '';
   configApp: ConfigI;
 
@@ -80,7 +80,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   tablaComponent;
 
-  constructor(private activeRoute: ActivatedRoute, private router: Router) {
+  constructor(private router: Router) {
     super();
   }
 
@@ -88,9 +88,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this._init_mixin({ component: 'notas', is_routing: true });
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
 
-    this.idsFacturas = this.activeRoute.snapshot.params['ids'];
-
-    this.tipoNota = this.activeRoute.snapshot.params['tipo'];
     this.fecha = moment().format('DD/MM/YYYY');
 
     if (this.tipoNota === 'credito') {
@@ -119,16 +116,16 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    this.getFacturas().then(async (datos) => {
+    this.getFacturas().then(async datos => {
       this.facturasConDetalles = datos as FacturasI[];
       await this.getPaqueteComprobante();
     });
   }
 
   async getPaqueteComprobante() {
-    const TipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === this.tipoFactura);
+    const TipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia === this.tipoFactura);
 
-    this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` }).then((res) => {
+    this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` }).then(res => {
       this.paqueteComprobante = res['data'];
     });
   }
@@ -148,7 +145,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     });
   }
 
-
   agregarItbisEnTabla() {
     const base = this.tipoNota == 'credito' ? 7 : 6;
     fun.pushAt(this.table_config.info, base, { titulo: 'Itbis', key: 'itbis', tipo: 'formatoNumero', text_color: 'colorItbis', alert_msg: 'A partir de los 30 días el ITBIS queda retenido.', style: { 'padding-left': '2rem' } });
@@ -162,11 +158,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async getFacturas() {
-    return new Promise(async (resolve) => {
-      this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.idsFacturas } }).then((res_factura) => {
+    return new Promise(async resolve => {
+      this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.id_factura } }).then(res_factura => {
         let tempFactData: FacturasI[] = res_factura['data'];
 
-        this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.idsFacturas}` }).then((res) => {
+        this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.id_factura}` }).then(res => {
           const devueltos = res['data'];
 
           for (let indexFact = 0; indexFact < tempFactData.length; indexFact++) {
@@ -334,7 +330,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       id: 'archivar_factura',
       texto: 'Seguro que desea cancelar la operación',
       header: 'Confirmación',
-      siFunction: (instance) => {
+      siFunction: instance => {
         this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
         this.closeModal(instance);
       },
@@ -359,7 +355,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   //  MODAL IMPRIMIR
   // =============================================
   imprimirFactura() {
-    const facturasLlenas = _.filter(this.facturasConDetalles, (factura) => this.totalIndividual(factura) > 0);
+    const facturasLlenas = _.filter(this.facturasConDetalles, factura => this.totalIndividual(factura) > 0);
 
     if (facturasLlenas.length == 0) {
       fun.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
@@ -378,7 +374,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           botones: {
             ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
-              { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+              { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
               { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
             ],
           },
@@ -409,8 +405,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco w-9', function: (instance) => this.closeModal(instance), label: 'No', disable: false },
-          { clase: 'btn btn-verde w-9', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
+          { clase: 'btn btn-blanco w-9', function: instance => this.closeModal(instance), label: 'No', disable: false },
+          { clase: 'btn btn-verde w-9', function: instance => obj.siFunction(instance), label: 'Si', disable: false },
         ],
       },
     });
@@ -427,7 +423,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         const number = parseFloat(String(item.total_nota).replace(',', ''));
         return acumulado + number;
       },
-      0,
+      0
     );
 
     return suma;
@@ -449,12 +445,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async formarNota() {
-    const TipoFact = Ss.factServ.lista_tipos_facturas.filter((tipo) => tipo.referencia === this.tipoFactura);
+    const TipoFact = Ss.factServ.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
     const fecha_valida = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
 
     let dataToSend;
     if (this.facturasConDetalles.length > 0) {
-      const facturasLlenas = _.filter(this.facturasConDetalles, (factura) => this.totalIndividual(factura) > 0);
+      const facturasLlenas = _.filter(this.facturasConDetalles, factura => this.totalIndividual(factura) > 0);
       const { cliente_id } = facturasLlenas[0];
 
       dataToSend = {
@@ -471,7 +467,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           cabecera_factura_id: factura.id,
           total: this.totalIndividual(factura),
 
-          detalles_facturas_notas: _.filter(factura.detalle_facturas, (data) => data.select == true && fun.desformatearStNumber(data.total_nota) > 0).map((detalle) => {
+          detalles_facturas_notas: _.filter(factura.detalle_facturas, data => data.select == true && fun.desformatearStNumber(data.total_nota) > 0).map(detalle => {
             let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
 
             objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
@@ -500,10 +496,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     const res = await this.notasClass.createOne(dataToSend);
 
-    this.notasClass.parseDataToPdf(res['data']).then((data_parsed) => {
+    this.notasClass.parseDataToPdf(res['data']).then(data_parsed => {
       const objToPdf = { data: data_parsed, type: 'nota' };
 
-      PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch((err) => fun.toastError(err.msg, 'ERROR'));
+      PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch(err => fun.toastError(err.msg, 'ERROR'));
       this.layServ.nextCheckCuadreToday(true);
       this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
     });

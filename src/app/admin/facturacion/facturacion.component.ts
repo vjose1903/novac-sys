@@ -2,7 +2,7 @@ import { EmpleadoC } from './../registros/registro-empleados/empleado';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
-import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, inject, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, inject, effect, OnChanges, SimpleChanges, Input } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 const moment = require('../../core/javascript/moment');
@@ -36,8 +36,11 @@ import { HtmlElementsService } from '../../core/services/html-elements.service';
   styleUrls: ['./facturacion.component.scss'],
   standalone: false,
 })
-export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnDestroy, AfterViewInit {
+export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
+  @Input() tipo_documento: any;
+  @Input() id_documento: any;
+  @Input() action: any;
 
   secuenciaKeys = [];
   info_cambio: any;
@@ -100,7 +103,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   fechaFactura;
   FechaFacturaMostrar: any;
 
-  id_documento: any;
   factura_a_rellenar: FacturasI;
   form: UntypedFormGroup;
   fecha;
@@ -192,7 +194,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   constructor(
     private fb: UntypedFormBuilder,
-    private route: ActivatedRoute,
+
     private router: Router
   ) {
     super();
@@ -203,26 +205,24 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngOnInit() {
-    this._init_mixin({ component: 'cabeza_factura', is_routing: true });
-
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
   }
 
-  ngOnDestroy(): void {
-    this._destroy_mixin();
-    clearInterval(this.timeInterval);
-  }
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('%c changes', 'color: red', changes);
+    this._init_mixin({ component: 'cabeza_factura', is_routing: true });
 
-  ngAfterViewInit() {
     this.validatePermisos().then(result => {
       this.rellenarVariables().then(() => {
+        console.log('%c this.factServ.action ', 'color: cyan', this.factServ.action);
+        console.log('%c this.factServ.tipoDocumento ', 'color: cyan', this.factServ.tipoDocumento);
         if (this.factServ.action == actionFacturacion.update) {
           this.is_editando = true;
           this.procesoRelleno({ id: this.id_documento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.update });
           //
         } else if (this.factServ.action == actionFacturacion.bill_from_cotizacion) {
           this.procesoRelleno({ id: this.id_documento, tipo: tipoDocFacturacion.venta, action: actionFacturacion.bill_from_cotizacion });
-          //
+          //ƒ
         } else if (this.factServ.action == actionFacturacion.bill_from_pre_venta) {
           this.procesoRelleno({ id: this.id_documento, tipo: tipoDocFacturacion.venta, action: actionFacturacion.bill_from_pre_venta });
           //
@@ -243,6 +243,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.getConfiguracionArticulo();
     });
   }
+
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    clearInterval(this.timeInterval);
+  }
+
+  ngAfterViewInit() {}
 
   getConfiguracionArticulo() {
     this.configArticuloClass.getOne(1).then(cofig_articulos => (this.cofig_articulos = cofig_articulos.data as ConfigArticuloI));
@@ -387,7 +394,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return new Promise<void>(resolve => {
       this.isInitialized = false;
 
-      this.factServ.tipoDocumento = this.route.snapshot.params['tipo'];
+      this.factServ.tipoDocumento = this.tipo_documento;
+      this.factServ.action = this.action;
       this.factServ.productos_devueltos.length = 0;
       // NOTE: TEMPORAL
       this.verificateSerieValidity();
@@ -402,8 +410,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando, this.errorComprobante] = Array(5).fill(false);
         [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row, this.chofer_row] = Array(6).fill(0);
-        [this.NCFcompra, this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factServ.action, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.popover] =
-          Array(9).fill(undefined);
+        [this.NCFcompra, this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.popover] = Array(8).fill(undefined);
 
         this.entidad_en_turno = 'camion';
         this.cuerpoFactura.length = 0;
@@ -413,9 +420,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.info_cambio = {};
         this.fechaFactura = {};
         this.CostoYgasto = '';
-
-        this.factServ.action = this.route.snapshot.params['action'];
-        this.id_documento = this.route.snapshot.params['id'];
 
         this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
         this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -435,25 +439,24 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           if (fun.hasValue(this.form)) this.form.reset();
         }
         this.isInitialized = true;
+
         resolve();
       });
     });
   }
 
   checkPath(factura) {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const actualPath = fun.getActualPath();
-      const res = { same_modulo: true };
 
       if (!actualPath.includes(factura.tipo) || !this.factServ.action.includes(factura.action)) {
         const action_route = fun.hasValue(factura.action) ? factura?.action : 'new';
 
-        res.same_modulo = false;
         this.router.navigateByUrl(`/admin/factura/${factura.tipo}/${action_route}/${this.id_documento ?? 0}`).then(result => {
-          this.rellenarVariables().then(() => resolve(res));
+          this.rellenarVariables().then(() => resolve());
         });
       } else {
-        resolve(res);
+        resolve();
       }
     });
   }
@@ -662,7 +665,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.confirmationModal(confirmationObj);
     } else {
       this.info_cambio['bool'] = true;
-      this.info_cambio['verificar'] = true;
       this.runFinalizarCambioMenu(this.info_cambio);
 
       callback({ bool: true });
@@ -670,6 +672,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   rellenarFacturaArchivada(factura) {
+    console.log('%c this.factServ.tipoDocumento ', 'color: yellow', this.factServ.tipoDocumento);
+    console.log('%c this.factServ.action ', 'color: yellow', this.factServ.action);
+    console.log('%c this.id_documento ', 'color: yellow', this.id_documento);
+
     if (fun.hasValue(factura)) {
       if (this.factura_guardada && this.factura_guardada?.archivo_id == factura.archivo_id) {
         fun.toastWarning(`Ya esta ${this.getSideBarTabByKey(this.factura_guardada.tipo)['singleTitle']} esta seleccionada.`, 'AVISO');
@@ -697,8 +703,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 id: 'archivar_factura',
                 texto: result.texto_modal,
                 header: 'Confirmación',
-                siFunction: instance => siFunction(instance),
-                noFunction: instance => noFunction(instance),
+                siFunction: instance => siFunction.bind(this)(instance),
+                noFunction: instance => noFunction.bind(this)(instance),
                 cancelarFunction: instance => cancelarRelleno(instance),
                 width: '30rem',
               };
@@ -726,7 +732,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
       this.info_cambio = arg;
-      this.info_cambio['verificar'] = true;
       this.checkSituaciones().then(result => {
         if (result.factura_en_proceso) {
           this.procesoCambio(result.abrirModal, result.texto_modal, callback);

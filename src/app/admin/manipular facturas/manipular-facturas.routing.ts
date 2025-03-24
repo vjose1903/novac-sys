@@ -5,11 +5,11 @@ import { NotasCredDebComponent } from './notas-cred-deb/notas-cred-deb.component
 
 const routes: Routes = [
   {
-    path: 'buscarFactura/:para',
+    path: 'buscarFactura/:buscarPara',
     component: BuscarFacturaComponent,
   },
   {
-    path: 'nota/:tipo/:ids',
+    path: 'nota/:tipoNota/:id_factura',
     component: NotasCredDebComponent,
   },
 ];
