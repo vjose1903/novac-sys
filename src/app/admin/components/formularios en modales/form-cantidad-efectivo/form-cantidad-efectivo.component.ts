@@ -81,6 +81,10 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       fun.enfocarInput(campo);
     }
     if (campo === 'send') {
+        console.log("this.efectivo ", this.efectivo);
+        console.log("fun.desformatearStNumber(this.inputs.total_factura) ", fun.desformatearStNumber(this.inputs.total_factura));
+
+
       if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < fun.desformatearStNumber(this.inputs.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         fun.enfocarInput('inputEfectivo');

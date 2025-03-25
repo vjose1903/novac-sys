@@ -438,6 +438,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         } else {
           if (fun.hasValue(this.form)) this.form.reset();
         }
+        this.cuerpo.RESETCUERPO();
         this.isInitialized = true;
 
         resolve();
@@ -966,8 +967,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     if (is_enforcar) {
-      fun.logGreen('ENFOCAR');
-
       setTimeout(() => fun.enfocarInput(siguiente_input), 10);
     } else fun.desEnfocarInput(salioDe);
 
@@ -1471,7 +1470,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   prueba(arg?) {}
 
   resetVariables() {
-    this.cuerpo.RESETCUERPO();
+    
     this.rellenarVariables().then(() => {
       setTimeout(() => {
         if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario();

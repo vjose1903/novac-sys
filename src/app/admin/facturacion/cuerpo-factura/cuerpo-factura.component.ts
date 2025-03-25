@@ -653,7 +653,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
           formGroup.controls['descuento_valor'].reset();
 
-          if (fun.hasValue(total) && total > 0) detalle['total'] = fun.roundNumberToDecimal(total);
+          if (fun.hasValue(total) && total > 0) {
+            detalle['total'] = fun.roundNumberToDecimal(total);
+          }
           this.sacarDescuento(key);
         }
       } else {
@@ -711,7 +713,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     fun.revisarNumber(input, `${formControlName}-${index}`).then(res => {
       if (!res.error) {
         const value = fun.roundNumberToDecimal(res.number) != '0.00' ? fun.roundNumberToDecimal(res.number) : null;
-
         input.setValue(value);
       } else {
         input.setValue(null);
@@ -722,12 +723,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   handleInputEvent(type, formControlName, index) {
     let input = (this.factServ.filasDetalle[index] as FormGroup).controls[formControlName];
 
-    if (fun.hasValue(input.value)) {
-      if (type == 'focus') input.setValue(fun.desformatearStNumber(input.value));
-      if (type == 'blur') {
-        this.revisarPrecio(formControlName, index);
-        setTimeout(() => this.calcularMontosRow(index), 10);
-      }
+    if (type == 'focus' && fun.hasValue(input.value)) input.setValue(fun.desformatearStNumber(input.value));
+    if (type == 'blur') {
+      this.revisarPrecio(formControlName, index);
+      setTimeout(() => this.calcularMontosRow(index), 10);
     }
   }
 
