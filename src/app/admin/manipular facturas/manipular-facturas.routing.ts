@@ -5,7 +5,7 @@ import { NotasCredDebComponent } from './notas-cred-deb/notas-cred-deb.component
 
 const routes: Routes = [
   {
-    path: 'buscarFactura/:para',
+    path: 'buscarFactura/:buscarPara',
     component: BuscarFacturaComponent,
   },
   {

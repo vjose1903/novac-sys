@@ -2,10 +2,8 @@ import { HtmlElementsService } from './../../../core/services/html-elements.serv
 import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
 import { serie } from './../../../core/typescript/constantes';
-import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
-import * as _ from 'lodash';
-const moment = require('../../../core/javascript/moment');
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { TablasService } from '../../components/new_tablas/tablas.service';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { LoaderService } from '../../../loader/loader.service';
@@ -24,17 +22,20 @@ import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
 import { TitleCasePipe } from '@angular/common';
 import { seriesDGII } from '../../../core/typescript/constantes';
 
+import * as _ from 'lodash';
+const moment = require('../../../core/javascript/moment');
+
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
   styleUrls: ['./buscar-factura.component.scss'],
   standalone: false,
 })
-export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDestroy {
+export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnDestroy {
+  @Input() buscarPara: any;
   facturas = [];
 
   facturaSelected: any;
-  buscarPara: any;
   para: string;
 
   noExistenComprobantes = false;
@@ -92,7 +93,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   tablaNotasComponent;
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
-  route = inject(ActivatedRoute);
   htmlServ = inject(HtmlElementsService);
 
   constructor(
@@ -103,9 +103,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     super();
   }
 
-  ngOnInit() {
+  ngOnChanges(changes: SimpleChanges): void {
     this._init_mixin({ component: 'buscar_factura', is_routing: true });
-    this.buscarPara = this.route.snapshot.params['para'];
 
     this.necesarioStart();
   }
@@ -151,8 +150,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   iniciarCambioMenu(arg, callback) {
+    console.log('%c arg ', 'color: red', arg);
+
     if (arg.bool) {
-      arg['verificar'] = true;
       this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }

@@ -858,7 +858,7 @@ export class fun {
   // Nombre: pick
   // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
   // _________________________________________________________________________________________________
-  static pick(obj, props): any {
+  static pick(obj: any, props: Array<string>): any {
     const result = {};
 
     for (let index = 0; index < props.length; index++) {

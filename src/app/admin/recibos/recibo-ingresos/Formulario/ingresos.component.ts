@@ -329,9 +329,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (item_tabla.select && item_tabla.pagoT) {
         item_tabla.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item_tabla.balance) + fun.desformatearStNumber(item_tabla.mora));
       }
-
-      // TODO: verificar por que no se le esta modificando el valor de la porcentaje_mora al cambiarlo
-
+      
       this.verificateFacturasSelected(item_tabla, 'modify', index_factura_tabla, item_tabla.monto, item_tabla.mora, data.value);
     }
 

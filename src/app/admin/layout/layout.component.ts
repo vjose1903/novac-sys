@@ -16,10 +16,10 @@ import { fun } from '../../core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 
 @Component({
-    selector: 'app-layout',
-    templateUrl: './layout.component.html',
-    styleUrls: ['./layout.component.scss'],
-    standalone: false
+  selector: 'app-layout',
+  templateUrl: './layout.component.html',
+  styleUrls: ['./layout.component.scss'],
+  standalone: false,
 })
 export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   actualPath;
@@ -56,7 +56,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   actionFacturacion = actionFacturacion;
   currentYear: number;
 
-  constructor(private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
+  constructor(
+    private router: Router,
+    private cdRef: ChangeDetectorRef,
+    private currentUserServ: CurrentUserService
+  ) {
     super();
 
     this.subRouter = this.router.events.subscribe((routerEvent: Event | RouterEvent) => {
@@ -86,21 +90,21 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.initVariables();
     this._init_mixin({ component: 'layout', is_routing: false });
 
-    this.subCheckCuadreToday = this.layServ.CHECKCUADRETODAY.subscribe((res) => {
+    this.subCheckCuadreToday = this.layServ.CHECKCUADRETODAY.subscribe(res => {
       if (res) {
         this.checkCuadre();
         this.layServ.nextCheckCuadreToday(false);
       }
     });
 
-    this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
+    this.subLogOut = this.layServ.LOGOUT.subscribe(res => {
       if (res && res.bool) this.logOut();
       else {
         if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
       }
     });
 
-    this.subCurrentUser = this.currentUserServ.CURENTUSER.subscribe((res) => {
+    this.subCurrentUser = this.currentUserServ.CURENTUSER.subscribe(res => {
       if (res) this.setUser(res);
     });
 
@@ -117,8 +121,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.checkFacturasArchivadas();
     this.cdRef.detectChanges();
 
-    this.validateUserAndLoadPermisos().then((result) => {
-      this.getTiposFacturas().then((res) => {
+    this.validateUserAndLoadPermisos().then(result => {
+      this.getTiposFacturas().then(res => {
         this.hasPermisosValidated = result;
       });
     });
@@ -134,7 +138,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
           resolve(Ss.factServ.lista_tipos_facturas);
         })
-        .catch((error) => {
+        .catch(error => {
           fun.logBlue('error: ', error);
           if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
           reject(error);
@@ -146,8 +150,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     return new Promise<any>(async (resolve, reject) => {
       await this.currentUserServ
         .validateUser()
-        .then((result) => resolve(true))
-        .catch((error) => {
+        .then(result => resolve(true))
+        .catch(error => {
           fun.logBlue('error: ', error);
           if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
           reject(error);
@@ -175,7 +179,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     if (!this.chequiando_cuadre) {
       let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [{ key: 'spinner', value: 'no_show' }] };
       this.chequiando_cuadre = true;
-      new CuadreCajaC().getAll(extra).then((res) => {
+      new CuadreCajaC().getAll(extra).then(res => {
         this.cuadre_hoy = res['data'].existe_cuadre_hoy;
         this.chequiando_cuadre = false;
       });
@@ -226,7 +230,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   getLayoutActiveRoute(module, paths?) {
     if (fun.hasValue(paths) || paths?.length > 0) {
-      return paths.some((path) => this.actualPath.includes(`/${module}/${path}`));
+      return paths.some(path => this.actualPath.includes(`/${module}/${path}`));
     } else {
       return this.actualPath.includes(`/${module}`);
     }
@@ -273,8 +277,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   cambiarMenu(args: { url; navigate; event }) {
-    
-
     let next_cambio_menu = '';
 
     if (args.navigate) {
@@ -283,7 +285,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (this.actualPath !== next_cambio_menu) {
         this.runRouterNavigate({ bool: true, ruta: next_cambio_menu });
         fun.enfocarInput(null, args.event.target);
-
       } else {
         fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
       }
@@ -293,8 +294,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   finalizarCambioMenu(arg) {
-    if (arg.bool && arg.verificar) this.ready = false;
-
     if (arg.bool) {
       this.actualModule = undefined;
       this.router.navigateByUrl(arg.ruta);
