@@ -16,7 +16,7 @@ import { fun } from '../../core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 
 @Component({
-  selector: 'app-layout',
+  selector: 'app-layout', 
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
   standalone: false,
