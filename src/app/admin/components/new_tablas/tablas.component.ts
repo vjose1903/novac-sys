@@ -468,17 +468,19 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.handle_table_events('inputBlur', obj);
   }
 
-  changeValorInput(column, key, index, value, data) {
-    let newData = fun.deepCloning(this.tServ.rowsEditing.find(item => item.id == data.id));
+  changeValorInput(event, column, key, index, value, data) {
+    fun.awaitTyping(event, 250).then(() => {
+      let newData = fun.deepCloning(this.tServ.rowsEditing.find(item => item.id == data.id));
 
-    if (fun.isEmpty(newData) || this.tServ.rowsEditing.length == 0) newData = fun.deepCloning(data);
+      if (fun.isEmpty(newData) || this.tServ.rowsEditing.length == 0) newData = fun.deepCloning(data);
 
-    fun.setProperty(newData, key, value);
+      fun.setProperty(newData, key, value);
 
-    this.tServ.modifyRowsEditing(newData, 'add');
+      this.tServ.modifyRowsEditing(newData, 'add');
 
-    const obj = { data, newData, index, key, value, id_tabla: this.realIdTabla };
-    this.handle_table_events('inputChange', obj);
+      const obj = { data, newData, index, key, value, id_tabla: this.realIdTabla };
+      this.handle_table_events('inputChange', obj);
+    });
   }
 
   updateDataCopy(data) {
