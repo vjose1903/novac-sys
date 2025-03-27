@@ -1,12 +1,12 @@
 import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, signal, computed } from '@angular/core';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
 import { Router } from '@angular/router';
 import { MixinClass } from '../../../core/typescript/MixinClass';
 import { ArticuloC } from '../../registros/articulos/articulo';
-import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC } from '../../facturacion/factura';
+import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC, request_factura_campo, tipoDocFacturacion, DetalleFactura } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
 import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
@@ -24,12 +24,17 @@ import { ModalClass } from '../../components/modal/modal-class';
   standalone: false,
 })
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
-  // factura;
   @Input() id_factura: number;
   @Input() tipoNota: any;
+  factura = signal<FacturasI>(null);
+  detallesFactura = signal<DetalleFactura[]>([]);
+  cliente_id!: number;
 
-  tabIndex = 0;
-  facturasConDetalles: Array<FacturasI>;
+  totalGlobal = computed(() => {
+    const total = this.detallesFactura().reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.total_nota), 0);
+    return total;
+  });
+
   tituloPag = '';
   configApp: ConfigI;
 
@@ -122,8 +127,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async necesarioStart() {
-    this.getFacturas().then(async datos => {
-      this.facturasConDetalles = datos as FacturasI[];
+    this.getFactura().then(async datos => {
+      this.factura.set(datos);
+      this.detallesFactura.set(datos.detalle_facturas);
+      this.cliente_id = datos.cliente_id;
+
       await this.getPaqueteComprobante();
     });
   }
@@ -157,59 +165,52 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     fun.pushAt(this.table_config.info, base + 1, { titulo: 'Itbis real', key: 'itbis_real', tipo: 'input', textAlign: 'end', inputType: 'text', disable: [{ kind: 'always' }], style: { width: '7rem' } });
   }
 
-  onCloseTab(event, index) {
-    event.stopPropagation();
-
-    fun.pullAt(this.facturasConDetalles, index);
-  }
-
-  async getFacturas() {
+  async getFactura(): Promise<FacturasI> {
     return new Promise(async resolve => {
-      this.facturaClass.getAll({ afterPath: `custom/get_group`, parameters: { ids: this.id_factura } }).then(res_factura => {
-        let tempFactData: FacturasI[] = res_factura['data'];
+      const args = { campo: request_factura_campo.cabecera_factura_id, valor: this.id_factura, tipo_factura_id: 0, adelantada: false, paginado: false, tipo: tipoDocFacturacion.venta };
+      const res_factura = await this.facturaClass.getFacturasByParams(args);
 
-        this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.id_factura}` }).then(res => {
-          const devueltos = res['data'];
+      const factura: FacturasI = res_factura['data'][0] as FacturasI;
+      console.log('%c factura', 'color: yellow; font-weight: bold;', factura);
 
-          for (let indexFact = 0; indexFact < tempFactData.length; indexFact++) {
-            const factura = tempFactData[indexFact];
+      this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.id_factura}` }).then(res => {
+        const devueltos = res['data'];
 
-            const dias_de_creada = Math.round(moment().diff(factura.fecha_equivalente, 'days', true));
+        const dias_de_creada = Math.round(moment().diff(factura.fecha_equivalente, 'days', true));
 
-            for (let indexDetalles = 0; indexDetalles < factura.detalle_facturas.length; indexDetalles++) {
-              const detalle = factura.detalle_facturas[indexDetalles];
-              const devueto = devueltos[factura.id]?.detalles[detalle.id] || 0;
+        for (let indexDetalles = 0; indexDetalles < factura.detalle_facturas.length; indexDetalles++) {
+          const detalle = factura.detalle_facturas[indexDetalles];
+          const devueto = devueltos[factura.id]?.detalles[detalle.id] || 0;
 
-              detalle['select'] = false;
-              detalle['cant'] = detalle.cantidad - devueto;
-              detalle['cant'] = detalle.cantidad - devueto;
-              detalle['cant_nota'] = 0;
-              detalle['colorItbis'] = dias_de_creada >= 30 ? 'red' : 'black';
-              detalle['can_return_itbis'] = dias_de_creada < 30;
+          detalle['select'] = false;
+          detalle['cant'] = detalle.cantidad - devueto;
+          detalle['cant'] = detalle.cantidad - devueto;
+          detalle['cant_nota'] = 0;
+          detalle['colorItbis'] = dias_de_creada >= 30 ? 'red' : 'black';
+          detalle['can_return_itbis'] = dias_de_creada < 30;
 
-              detalle['customStyles'] = {
-                select: { width: '3.5rem' },
-                descripcion: { 'text-align': 'left', width: '20rem', 'padding-left': '0.5rem' },
-                cant_nota: { width: '6rem' },
-                cantidad_: { width: '7rem' },
-                precio_real: { width: '8rem', 'padding-right': '0.8rem' },
-                itbis_real: { width: '7rem', 'padding-right': '0.8rem' },
-                total_nota: { width: '7.3rem' },
-              };
+          detalle['customStyles'] = {
+            select: { width: '3.5rem' },
+            descripcion: { 'text-align': 'left', width: '20rem', 'padding-left': '0.5rem' },
+            cant_nota: { width: '6rem' },
+            cantidad_: { width: '7rem' },
+            precio_real: { width: '8rem', 'padding-right': '0.8rem' },
+            itbis_real: { width: '7rem', 'padding-right': '0.8rem' },
+            total_nota: { width: '7.3rem' },
+          };
 
-              detalle['min_'] = 0;
-              detalle['max_'] = this.tipoNota == 'credito' ? detalle.cantidad - devueto : null;
+          detalle['min_'] = 0;
+          detalle['max_'] = this.tipoNota == 'credito' ? detalle.cantidad - devueto : null;
 
-              detalle['total_nota'] = '0.00';
-              detalle['cantidad'] = detalle.cantidad - devueto;
-              detalle['cantidad_'] = `${fun.roundNumberToDecimal(detalle['cantidad'])} ${detalle['unidad']}`;
-              detalle['precio_real'] = fun.roundNumberToDecimal(detalle.precio);
-              detalle['itbis_real'] = fun.roundNumberToDecimal(detalle.itbis);
+          detalle['total_nota'] = '0.00';
+          detalle['cantidad'] = detalle.cantidad - devueto;
+          detalle['cantidad_'] = `${fun.roundNumberToDecimal(detalle['cantidad'])} ${detalle['unidad']}`;
+          detalle['precio_real'] = fun.roundNumberToDecimal(detalle.precio);
+          detalle['itbis_real'] = fun.roundNumberToDecimal(detalle.itbis);
 
-              resolve(tempFactData);
-            }
-          }
-        });
+          console.log('%c factura', 'color: green; font-weight: bold;', factura);
+          resolve(factura);
+        }
       });
     });
   }
@@ -352,40 +353,33 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
   }
 
-  getCantidadArticulos(factura_en_turno) {
-    const detalles_selected = _.filter(factura_en_turno.detalle_facturas, { select: true });
-    return detalles_selected.length;
+  getCantidadArticulos() {
+    return this.detallesFactura().filter(detalle => detalle.select).length;
   }
 
   // =============================================
   //  MODAL IMPRIMIR
   // =============================================
   imprimirFactura() {
-    const facturasLlenas = _.filter(this.facturasConDetalles, factura => this.totalIndividual(factura) > 0);
-
-    if (facturasLlenas.length == 0) {
-      fun.toastWarning('Nota de ' + this.tipoNota + ' no puede estar vacía.', 'Aviso');
+    if (this.totalGlobal() == 0) {
+      fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
     } else {
-      if (this.totalGlobal() == 0) {
-        fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
-      } else {
-        const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: `nota_${this.tipoNota}`, is_viaje: false };
+      const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: `nota_${this.tipoNota}`, is_viaje: false };
 
-        this.openNewModal({
-          component: ConfirmacionImprimirComponent,
-          inputs: obj,
-          id: 'confirmacionImprimir',
-          header: 'Confirmación',
-          width: '30rem',
-          botones: {
-            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [
-              { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-              { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
-            ],
-          },
-        });
-      }
+      this.openNewModal({
+        component: ConfirmacionImprimirComponent,
+        inputs: obj,
+        id: 'confirmacionImprimir',
+        header: 'Confirmación',
+        width: '30rem',
+        botones: {
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+          dinamico: [
+            { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
+            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
+          ],
+        },
+      });
     }
   }
 
@@ -422,83 +416,49 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     modalInstance.closeModal(modalInstance.id, 'cancelar');
   }
 
-  totalIndividual(dataFact) {
-    const suma = _.reduce(
-      dataFact.detalle_facturas,
-      (acumulado, item) => {
-        const number = parseFloat(String(item.total_nota).replace(',', ''));
-        return acumulado + number;
-      },
-      0
-    );
-
-    return suma;
-  }
-
-  totalIndividualIsCero(iteraFact): any {
-    return this.totalIndividual(iteraFact) == 0;
-
-    // if (tabPanel) {
-    //   const element = document.getElementsByClassName(idTab);
-
-    //   if (element.item(0)) element.item(0).setAttribute('style', this.totalIndividual(iteraFact) == 0 ? 'background: #efc2c2' : '');
-    // }
-  }
-
-  totalGlobal() {
-    const total = _.reduce(this.facturasConDetalles, (acumulado, item) => acumulado + this.totalIndividual(item), 0);
-    return total;
-  }
-
   async formarNota() {
     const TipoFact = Ss.factServ.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
     const fecha_valida = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
 
-    let dataToSend;
-    if (this.facturasConDetalles.length > 0) {
-      const facturasLlenas = _.filter(this.facturasConDetalles, factura => this.totalIndividual(factura) > 0);
-      const { cliente_id } = facturasLlenas[0];
+    const dataToSend = {
+      cliente_id: this.cliente_id,
+      user_id: null,
+      fecha_valida,
+      tipo_factura_id: TipoFact[0].id,
+      total: this.totalGlobal(),
+      facturas_aplicadas: [],
+    };
 
-      dataToSend = {
-        cliente_id,
-        user_id: null,
-        fecha_valida,
-        tipo_factura_id: TipoFact[0].id,
-        total: this.totalGlobal(),
-        facturas_aplicadas: [],
-      };
+    const objTemp = {
+      cabecera_factura_id: this.factura().id,
+      total: this.totalGlobal(),
 
-      for (const factura of facturasLlenas) {
-        const objTemp = {
-          cabecera_factura_id: factura.id,
-          total: this.totalIndividual(factura),
+      detalles_facturas_notas: this.detallesFactura()
+        .filter(data => data.select == true && fun.desformatearStNumber(data.total_nota) > 0)
+        .map(detalle => {
+          let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
 
-          detalles_facturas_notas: _.filter(factura.detalle_facturas, data => data.select == true && fun.desformatearStNumber(data.total_nota) > 0).map(detalle => {
-            let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
+          objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
+          objDetalleTemp['itbis'] = detalle.can_return_itbis ? objDetalleTemp.itbis : 0;
+          objDetalleTemp['cantidad_en_unidades'] = detalle.cantidad_en_unidades_nota;
+          objDetalleTemp['cantidad'] = detalle.cant_nota;
+          objDetalleTemp['detalle_factura_id'] = detalle.id;
+          objDetalleTemp['itbis_real'] = fun.desformatearStNumber(objDetalleTemp['itbis_real']);
+          objDetalleTemp['itbis'] = fun.desformatearStNumber(objDetalleTemp['itbis']);
+          objDetalleTemp['precio_real'] = fun.desformatearStNumber(objDetalleTemp['precio_real']);
+          objDetalleTemp['precio'] = fun.desformatearStNumber(objDetalleTemp['precio']);
 
-            objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
-            objDetalleTemp['itbis'] = detalle.can_return_itbis ? objDetalleTemp.itbis : 0;
-            objDetalleTemp['cantidad_en_unidades'] = detalle.cantidad_en_unidades_nota;
-            objDetalleTemp['cantidad'] = detalle.cant_nota;
-            objDetalleTemp['detalle_factura_id'] = detalle.id;
-            objDetalleTemp['itbis_real'] = fun.desformatearStNumber(objDetalleTemp['itbis_real']);
-            objDetalleTemp['itbis'] = fun.desformatearStNumber(objDetalleTemp['itbis']);
-            objDetalleTemp['precio_real'] = fun.desformatearStNumber(objDetalleTemp['precio_real']);
-            objDetalleTemp['precio'] = fun.desformatearStNumber(objDetalleTemp['precio']);
+          objDetalleTemp = fun.remplaceKeyFromJson(objDetalleTemp, [{ old_key: 'descuento_valor', new_key: 'descuento' }]);
 
-            objDetalleTemp = fun.remplaceKeyFromJson(objDetalleTemp, [{ old_key: 'descuento_valor', new_key: 'descuento' }]);
+          objDetalleTemp['descuento_real'] = 0;
 
-            objDetalleTemp['descuento_real'] = 0;
+          delete objDetalleTemp.total_nota;
+          delete objDetalleTemp.cantidad_en_unidades_nota;
+          return objDetalleTemp;
+        }),
+    };
 
-            delete objDetalleTemp.total_nota;
-            delete objDetalleTemp.cantidad_en_unidades_nota;
-            return objDetalleTemp;
-          }),
-        };
-
-        dataToSend.facturas_aplicadas.push(objTemp);
-      }
-    }
+    dataToSend.facturas_aplicadas.push(objTemp);
 
     const res = await this.notasClass.createOne(dataToSend);
 

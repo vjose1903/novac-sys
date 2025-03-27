@@ -38,6 +38,16 @@ export enum comprobanteElectronico {
   comprobantes_pago_exterior = '47',
 }
 
+export enum request_factura_campo {
+  todas = '0',
+  cliente_id = '1',
+  numero_comprobante = '2',
+  numero_factura = '3',
+  last_50 = '4',
+  suplidor_id = '5',
+  cabecera_factura_id = '6',
+}
+
 export const comprobante = {
   normal: {
     valor_fiscal: comprobanteNormal.valor_fiscal,
@@ -237,17 +247,17 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise(resolve => this.getOne(id, extra).then(res => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean; movimientos_viaje?: boolean }) {
-    const valor_enc = btoa(args.valor);
+  getFacturasByParams(args: { campo: string; valor: string | number; tipo_factura_id: number; tipo: string; page?: number; per_page?: number; paginado?: boolean; adelantada?: boolean; pagada?: any; estado?: boolean; movimientos_viaje?: boolean }) {
+    const valor_enc = btoa(args.valor.toString());
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
 
     const extra = {
       afterPath: `custom/get_documentos`,
       parameters: {
-        page: args.page,
-        per_page: args.per_page,
-        paginado: args.paginado,
+        page: args.page ?? 1,
+        per_page: args.per_page ?? 20,
+        paginado: args.paginado ?? false,
         tipo: args.tipo,
         pagada: args.pagada,
         campo: args.campo,
@@ -314,7 +324,7 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise<any>((resolve, reject) => {
       PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
         .then(async res => {
-          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.'))};
+          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
 
           const obj_modal = {
             component: PdfViewerComponent,

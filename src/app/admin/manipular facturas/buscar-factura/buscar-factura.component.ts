@@ -1,5 +1,5 @@
 import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
+import { actionFacturacion, deleteDocumentosTypes, request_factura_campo, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from './../../../core/services/singleton.service';
 import { serie } from './../../../core/typescript/constantes';
 import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input } from '@angular/core';
@@ -63,11 +63,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   buscar_por = null;
 
   campos = {
-    cliente: 1,
-    numeroComprobante: 2,
-    numeroFactura: 3,
-    ultimas50: 4,
-    suplidor: 5,
+    cliente: request_factura_campo.cliente_id,
+    numeroComprobante: request_factura_campo.numero_comprobante,
+    numeroFactura: request_factura_campo.numero_factura,
+    ultimas50: request_factura_campo.last_50,
+    suplidor: request_factura_campo.suplidor_id,
   };
 
   fun = fun;

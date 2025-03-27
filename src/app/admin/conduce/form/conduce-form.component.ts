@@ -5,7 +5,7 @@ import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray, FormGroup } fro
 import * as _ from 'lodash';
 import { ArticuloC } from '../../registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
-import { FacturaC } from '../../facturacion/factura';
+import { FacturaC, request_factura_campo } from '../../facturacion/factura';
 import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
 import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
@@ -564,7 +564,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   async buscarFacturasAdelantadas(id) {
     try {
-      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
+      this.facturaClass.getFacturasByParams({ campo: request_factura_campo.cliente_id, valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
         (res) => {
           this.facturas_adelantadas = res['data'];
           this.facturas_adelantadas.map((factura) => {

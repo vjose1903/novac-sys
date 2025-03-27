@@ -3,10 +3,34 @@
   width: 100%;
   display: grid;
   grid-template-areas:
-    'header'
+  'header'
+  'content'
+  'footer';
+  
+  grid-template-rows: min-content auto min-content;
+  
+  // Si no tiene header, ajustamos el template
+  &:not(:has(.widget-header)) {
+    grid-template-areas:
     'content'
     'footer';
-  grid-template-rows: min-content auto min-content;
+    grid-template-rows: auto min-content;
+  }
+  
+  // Si no tiene footer, ajustamos el template
+  &:not(:has(.widget-footer)) {
+    grid-template-areas:
+    'header'
+    'content';
+    grid-template-rows: min-content auto;
+  }
+  
+  // Si no tiene ni header ni footer, solo dejamos el content
+  &:not(:has(.widget-header)):not(:has(.widget-footer)) {
+    grid-template-areas:
+      'content';
+      grid-template-rows: auto;
+    }
 
   &.rounded {
     border-radius: 8px !important;
