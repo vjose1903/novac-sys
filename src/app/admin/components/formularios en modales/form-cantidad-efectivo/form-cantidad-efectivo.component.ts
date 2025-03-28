@@ -9,10 +9,10 @@ import { teclasCode } from '../../../../core/typescript/constantes';
 import { HtmlElementsService } from '../../../../core/services/html-elements.service';
 
 @Component({
-    selector: 'app-form-cantidad-efectivo',
-    templateUrl: './form-cantidad-efectivo.component.html',
-    styleUrls: ['./form-cantidad-efectivo.component.scss'],
-    standalone: false
+  selector: 'app-form-cantidad-efectivo',
+  templateUrl: './form-cantidad-efectivo.component.html',
+  styleUrls: ['./form-cantidad-efectivo.component.scss'],
+  standalone: false,
 })
 export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   @HostListener('window:keyup', ['$event'])
@@ -43,7 +43,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   modal: any = {};
   inputs: any;
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
   ngOnInit() {
     this.efectivo = fun.hasValue(this.inputs.efectivo) ? this.formatoNumero(this.inputs.efectivo) : '0.00';
@@ -81,11 +81,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       fun.enfocarInput(campo);
     }
     if (campo === 'send') {
-        console.log("this.efectivo ", this.efectivo);
-        console.log("fun.desformatearStNumber(this.inputs.total_factura) ", fun.desformatearStNumber(this.inputs.total_factura));
-
-
-      if (this.inputs.tipo_modal != 'no_devuelta' && this.efectivo < fun.desformatearStNumber(this.inputs.total_factura)) {
+      if (this.inputs.tipo_modal != 'no_devuelta' && parseFloat(fun.desformatearStNumber(this.efectivo)) < fun.desformatearStNumber(this.inputs.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         fun.enfocarInput('inputEfectivo');
       } else {
@@ -99,7 +95,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   revisarPrecio(input) {
-    fun.revisarNumber(input, `inputEfectivo`).then((res) => {
+    fun.revisarNumber(input, `inputEfectivo`).then(res => {
       if (!res.error) input.value = res.number;
     });
   }
@@ -126,7 +122,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const efectivo = fun.desformatearStNumber(this.efectivo);
     const obj = { dinero: efectivo, devuelta: this.devuelta ? devuelta_ : 0, forma_pago: this.formaPago, decision_cambio: this.cambiar_articulos === 'si' ? true : false };
 
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id === this.modal.component_id);
+    const modal = this.modal.instance.modalsConfig.find(config => config.id === this.modal.component_id);
     modal.closeModal(this.modal.component_id);
 
     if (this.factura_de == 'compra') {
@@ -163,8 +159,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modal.instance.modalsConfig.find((modal) => modal.id == this.modal.component_id);
-    const btn = modal.botones.dinamico.find((boton) => boton.btn_id == 'btnConfirmar');
+    const modal = this.modal.instance.modalsConfig.find(modal => modal.id == this.modal.component_id);
+    const btn = modal.botones.dinamico.find(boton => boton.btn_id == 'btnConfirmar');
 
     btn.disable = validate;
   }

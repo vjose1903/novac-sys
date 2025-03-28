@@ -1,9 +1,28 @@
 import { DateUtils } from '../../../../core/typescript/date.utils';
 import { fun } from '../../../../core/services/functions.service';
-import { FacturasI } from '../../../facturacion/factura';
+import { FacturasI, Pago } from '../../../facturacion/factura';
 
 export class MoraCalculator {
-  constructor(public factura: FacturasI) {}
+  last_pago_valido: Pago;
+  factura_is_vencida: boolean;
+  abonos_a_mora: number = 0;
+
+  constructor(public factura: FacturasI) {
+    const fechaActual = this.getFechaActual();
+
+    const pagos = this.factura.pagos.sort((a, b) => new Date(b.fecha_equivalente).getTime() - new Date(a.fecha_equivalente).getTime());
+
+    // sumar los pagos recientes que no tienen pago a capital
+    for (let i = 0; i < pagos.length; i++) {
+      const pago = pagos[i];
+      if (fun.desformatearStNumber(pago.deposito) > 0) break;
+      this.abonos_a_mora += fun.desformatearStNumber(pago.mora);
+    }
+
+    this.last_pago_valido = pagos.find(pago => fun.desformatearStNumber(pago.deposito) > 0);
+
+    this.factura_is_vencida = fechaActual > new Date(this.factura.fecha_vencimiento).setHours(1, 0, 0, 0);
+  }
 
   private getFechaActual(): number {
     return new Date().setHours(1, 0, 0, 0);
@@ -31,7 +50,22 @@ export class MoraCalculator {
     const diasEnMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0).getDate();
 
     // Calcular mora final: (balance * porcentaje) * diasRetraso / diasEnMes
-    const mora = (balanceMora * this.getDiasRetraso()) / diasEnMes;
+    let mora = (balanceMora * this.getDiasRetraso()) / diasEnMes;
+
+    if (this.abonos_a_mora > 0) {
+      let abono_mora = this.abonos_a_mora;
+
+      if (mora - this.abonos_a_mora <= 0) {
+        // Calcular porcentaje de la mora pagada
+        const porcentajePagado = this.abonos_a_mora / ((this.factura.balance * (2 / 100) * this.getDiasRetraso()) / diasEnMes);
+
+        // Ajustar la nueva mora proporcionalmente
+        mora = mora * (1 - porcentajePagado);
+      } else {
+        mora = mora - abono_mora;
+      }
+    }
+
     return formateado ? fun.roundNumberToDecimal(mora) : mora;
   }
 
@@ -46,12 +80,12 @@ export class MoraCalculator {
   }
 
   getFechaCompare() {
-    const fechaActual = this.getFechaActual();
     const pagos = this.factura?.pagos || [];
 
-    if (pagos.length > 0 && fechaActual > new Date(this.factura.fecha_vencimiento).setHours(1, 0, 0, 0)) {
-      const pago = pagos.sort((a, b) => new Date(b.fecha_equivalente).getTime() - new Date(a.fecha_equivalente).getTime())[0];
-      return pago.fecha_equivalente;
+    if (pagos.length > 0 && this.factura_is_vencida) {
+      if (this.last_pago_valido) {
+        return this.last_pago_valido.fecha_equivalente;
+      }
     }
 
     return this.factura.fecha_vencimiento;

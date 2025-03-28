@@ -654,34 +654,33 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   formarDetalleRecibos() {
-    return this.facturasSelected().reduce(
-      (acc, fact) => {
-        const monto = Big(fun.desformatearStNumber(fact.monto));
-        const mora = fun.desformatearStNumber(fact.mora);
-        const deposito = monto.minus(mora).toNumber();
+    const formatFechaFactura = (fact) => 
+      `${fact.pagoT ? 'Saldo' : 'Abono'} ${fact.numero_comprobante} ${moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')}`;
 
-        acc.detalle.push({
-          cabecera_factura_id: fact.id,
-          pago_total: fact.pagoT,
-          deposito: deposito,
-          mora: mora,
-          descripcion:
-            this.tipo_recibo === 'Pago factura'
-              ? fact.pagoT
-                ? 'Saldo ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-                : 'Abono ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-              : '',
-          pago_a_tiempo: fact.pago_a_tiempo,
-        });
+    return this.facturasSelected().reduce((acc, fact) => {
+      const monto = Big(fun.desformatearStNumber(fact.monto));
+      const mora = fun.desformatearStNumber(fact.mora);
+      
+      // Calcula la mora recibida y el depósito
+      const mora_received = Math.min(monto.toNumber(), mora);
+      const deposito = Math.max(0, monto.minus(mora_received).toNumber());
 
-        acc.bruto += deposito;
-        acc.mora += mora;
-        acc.total_recibo += monto.toNumber();
+      acc.detalle.push({
+        cabecera_factura_id: fact.id,
+        pago_total: fact.pagoT,
+        deposito,
+        mora: mora_received,
+        descripcion: this.tipo_recibo === 'Pago factura' ? formatFechaFactura(fact) : '',
+        pago_a_tiempo: fact.pago_a_tiempo,
+      });
 
-        return acc;
-      },
-      { bruto: 0, mora: 0, total_recibo: 0, detalle: [] }
-    );
+      // Actualiza los totales
+      acc.bruto += deposito;
+      acc.mora += mora_received;
+      acc.total_recibo += monto.toNumber();
+
+      return acc;
+    }, { bruto: 0, mora: 0, total_recibo: 0, detalle: [] });
   }
 
   async confirmarIgreso() {
@@ -724,6 +723,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       detalle_recibos: this.detalleYtotal.detalle,
       balance_cliente: this.restando(),
     };
+
+    console.log('%c obj ', 'color: magenta; font-weight: bold;', obj);
+    
 
     this.reciboClass.createUpdateOne(obj).then(res => {
       const recibo = res['data'].recibo;

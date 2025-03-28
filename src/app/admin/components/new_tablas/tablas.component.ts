@@ -137,7 +137,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   verificateBottons(config: table_config) {
-    const verificateId = (boton: btnTableI) => (boton.btn_id ??= fun.generateKey());
+    const verificateId = (boton: btnTableI) => (boton.btn_id ??= `${fun.generateKey()}-${boton.icon}`);
 
     if (config.botones) {
       for (const key in config.botones) {
@@ -152,7 +152,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
 
     config.info.forEach(info => {
-      if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach(icon => (icon.id ??= fun.generateKey()));
+      if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach(icon => (icon.id ??= `${fun.generateKey()}-${icon.key}`));
     });
   }
 
