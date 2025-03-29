@@ -67,13 +67,10 @@ export class ReporteC extends CrudG<any> {
 
         PdfService.generatePdf({ oPdf: obj, imprimir: false })
           .then(async result => {
-            console.log("ANDO AQUIII RES");
-
             Ss.loadServ.isLoading.next(false);
             resolve({ ...result, requestResult: responseRequest });
           })
           .catch(async err => {
-            console.log("ANDO AQUIII ERR");
             Ss.loadServ.isLoading.next(false);
             reject(err);
           });
