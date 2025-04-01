@@ -111,6 +111,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   }
 
   necesarioStart() {
+    this.borrar();
     this.verificatePermisos().then(async res => {
       this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       this.completarTituloPag();
@@ -497,7 +498,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   borrar(tipo = '') {
     this.resetFacturas();
-    if (tipo != 'salir') (document.getElementById('valorI') as any).value = null;
+    const input_valor = document.getElementById('valorI') as any;
+    if (tipo != 'salir' && input_valor) input_valor.value = null;
 
     this.tipo_documento_selected = tipoDocFacturacion.venta;
     this.tipo_factura_id = null;

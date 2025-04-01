@@ -1,8 +1,9 @@
 <div class="row BuscarFacturaRow">
   <div class="col-12 titulo">
     <h3 class="mb-0">
-      Buscar facturas:@if (para) {
-      <b>{{ para }}</b>
+      Buscar facturas:
+      @if (para) {
+        <b>{{ para }}</b>
       }
     </h3>
   </div>
@@ -13,15 +14,21 @@
         <div class="card card-padding sombra">
           <!-- ================ TIPO DOCUMENTO  ================ -->
           @if (buscarPara == 'solo_ver') {
-          <div class="form-group">
-            <label class="control-label mb-0">Tipo: </label>
-            <select id="tipoI" [(ngModel)]="tipo_documento_selected" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))" (change)="changeSelect('tipo_documento', htmlServ.getValue($event))" value="">
-              <option [value]="null" selected disabled>Escoger tipo</option>
-              @for (tipo of tipos_documentos; track $index) {
-              <option [value]="tipo.value">{{ tipo.label }}</option>
-              }
-            </select>
-          </div>
+            <div class="form-group">
+              <label class="control-label mb-0">Tipo: </label>
+              <select
+                id="tipoI"
+                [(ngModel)]="tipo_documento_selected"
+                class="form-control inputE"
+                (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
+                (change)="changeSelect('tipo_documento', htmlServ.getValue($event))"
+                value="">
+                <option [value]="null" selected disabled>Escoger tipo</option>
+                @for (tipo of tipos_documentos; track $index) {
+                  <option [value]="tipo.value">{{ tipo.label }}</option>
+                }
+              </select>
+            </div>
           }
 
           <!-- ================ BUSCAR POR  ================ -->
@@ -35,15 +42,16 @@
               (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
               (change)="changeSelect('buscar_por', htmlServ.getValue($event))"
               value=""
-              [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected)"
-            >
+              [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected)">
               <option [value]="null" selected disabled>Escoger tipo</option>
               @if (tipo_documento_selected != 'compra') {
-              <option value="1">Por cliente</option>
-              } @if (tipo_documento_selected == 'compra') {
-              <option value="5">Por suplidor</option>
-              } @if (tipo_documento_selected != 'cotizacion') {
-              <option value="2">Por número comprobante</option>
+                <option value="1">Por cliente</option>
+              }
+              @if (tipo_documento_selected == 'compra') {
+                <option value="5">Por suplidor</option>
+              }
+              @if (tipo_documento_selected != 'cotizacion') {
+                <option value="2">Por número comprobante</option>
               }
               <option value="3">Por número {{ tipo_documento_selected == 'cotizacion' ? 'cotización' : 'factura' }}</option>
               <option value="4">Ultimas 50 {{ tipo_documento_selected == 'cotizacion' ? 'cotizaciones' : 'facturas' }}</option>
@@ -53,99 +61,94 @@
             <!-- ================ TIPO FACTURA  ================ -->
 
             @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected != 'cotizacion') {
-            <div class="form-group mr-2">
-              <label class="control-label mb-0">Tipo factura : </label>
-              <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))">
-                <option [value]="null" selected disabled>Escoger tipo</option>
-                <option value="3">Factura de consumo</option>
-                <option value="2">Factura con Valor Fiscal</option>
-                <!-- <option value="1">Factura sin comprobante</option> -->
-                <option value="0">Todas</option>
-              </select>
-            </div>
+              <div class="form-group mr-2">
+                <label class="control-label mb-0">Tipo factura : </label>
+                <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))">
+                  <option [value]="null" selected disabled>Escoger tipo</option>
+                  <option value="3">Factura de consumo</option>
+                  <option value="2">Factura con Valor Fiscal</option>
+                  <!-- <option value="1">Factura sin comprobante</option> -->
+                  <option value="0">Todas</option>
+                </select>
+              </div>
             }
 
             <!-- ================ VALOR A BUSCAR  ================ -->
 
             @if (buscar_por && buscar_por != campos.ultimas50) {
-            <div class="form-group">
-              <label class="control-label mb-0">{{ getProperties('label') + ' ' }} : </label>
-              @if (buscar_por == campos.cliente || buscar_por == campos.suplidor) {
-              <input
-                id="valorI"
-                class="form-control inputE"
-                (keydown.enter)="saltar('cliente', htmlServ.getValue($event))"
-                type="text"
-                (focus)="htmlServ.selectValue($event)"
-                [placeholder]="getProperties('placeHolder')"
-                autocomplete="off"
-                [disabled]="tipo_documento_selected != 'cotizacion' && fun.isEmpty(tipo_factura_id)"
-              />
-              }
-              <!-- ================ NUMERO COMPROBANTE  ================ -->
-              @if (buscar_por == campos.numeroComprobante) {
-              <p-inputMask
-                inputId="valorI"
-                styleClass="form-control inputE UPPERCASE"
-                (keydown.enter)="saltar('buscarFactura', htmlServ.getValue($event))"
-                mask="B9999999999"
-                tabindex="-1"
-                placeholder="B__________"
-                (onFocus)="htmlServ.selectValue($event)"
-                [autoClear]="false"
-              ></p-inputMask>
-              }
-              <!-- ================ NUMERO FACTURA  ================ -->
-              @if (buscar_por == campos.numeroFactura) {
-              <input
-                id="valorI"
-                class="form-control inputE input_cantidad"
-                (keydown.enter)="saltar('buscarFactura', htmlServ.getValue($event))"
-                type="number"
-                (focus)="htmlServ.selectValue($event)"
-                [placeholder]="getProperties('placeHolder')"
-                autocomplete="off"
-              />
-              }
-            </div>
+              <div class="form-group">
+                <label class="control-label mb-0">{{ getProperties('label') + ' ' }} : </label>
+                @if (buscar_por == campos.cliente || buscar_por == campos.suplidor) {
+                  <input
+                    id="valorI"
+                    class="form-control inputE"
+                    (keydown.enter)="saltar('cliente', htmlServ.getValue($event))"
+                    type="text"
+                    (focus)="htmlServ.selectValue($event)"
+                    [placeholder]="getProperties('placeHolder')"
+                    autocomplete="off"
+                    [disabled]="tipo_documento_selected != 'cotizacion' && fun.isEmpty(tipo_factura_id)" />
+                }
+                <!-- ================ NUMERO COMPROBANTE  ================ -->
+                @if (buscar_por == campos.numeroComprobante) {
+                  <p-inputMask
+                    inputId="valorI"
+                    styleClass="form-control inputE UPPERCASE"
+                    (keydown.enter)="saltar('buscarFactura', htmlServ.getValue($event))"
+                    mask="B9999999999"
+                    tabindex="-1"
+                    placeholder="B__________"
+                    (onFocus)="htmlServ.selectValue($event)"
+                    [autoClear]="false"></p-inputMask>
+                }
+                <!-- ================ NUMERO FACTURA  ================ -->
+                @if (buscar_por == campos.numeroFactura) {
+                  <input
+                    id="valorI"
+                    class="form-control inputE input_cantidad"
+                    (keydown.enter)="saltar('buscarFactura', htmlServ.getValue($event))"
+                    type="number"
+                    (focus)="htmlServ.selectValue($event)"
+                    [placeholder]="getProperties('placeHolder')"
+                    autocomplete="off" />
+                }
+              </div>
             }
           </div>
         </div>
       </div>
       <div class="col-6">
         @if (buscarPara.includes('nota')) {
-
-        <div class="w-100 h-100 d-flex justify-content-between flex-column">
-          <btn-icon-circular
-            [id]="'btnNota'"
-            [icon]="'fas fa-history'"
-            [size]="'size-lg'"
-            [tooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
-            [tooltipPosition]="'top'"
-            (clickFunction)="openSide()"
-          >
-          </btn-icon-circular>
-          @if (mostrarListaFacturas()) {
-          <div class="w-100 d-flex justify-content-end">
-            <p-selectButton [options]="series" [(ngModel)]="serieSelected" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+          <div class="w-100 h-100 d-flex justify-content-between flex-column">
+            <btn-icon-circular
+              [id]="'btnNota'"
+              [icon]="'fas fa-history'"
+              [size]="'size-lg'"
+              [tooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
+              [tooltipPosition]="'top'"
+              (clickFunction)="openSide()">
+            </btn-icon-circular>
+            @if (mostrarListaFacturas()) {
+              <div class="w-100 d-flex justify-content-end">
+                <p-selectButton [options]="series" [(ngModel)]="serieSelected" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+              </div>
+            }
           </div>
-          }
-        </div>
         }
       </div>
     </div>
   </div>
   <div class="col-12 abajo">
     @if (mostrarListaFacturas()) {
-    <div #cardTablaVerFacturas class="card sombra h-100 tablaContent br-10">
-      <div class="divTabla">
-        <dinamic-table [cardTabla]="cardTablaVerFacturas" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      <div #cardTablaVerFacturas class="card sombra h-100 tablaContent br-10">
+        <div class="divTabla">
+          <dinamic-table [cardTabla]="cardTablaVerFacturas" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        </div>
       </div>
-    </div>
     }
   </div>
   @if (mostrarListaFacturas() && para != 'Visualizar') {
-  <button [disabled]="!(idsFacturasSeleccionadas.length > 0)" [disabled]="" class="btn btn-verde footer" value="" (click)="continuarANotas()">Continuar</button>
+    <button [disabled]="!(idsFacturasSeleccionadas.length > 0)" [disabled]="" class="btn btn-verde footer" value="" (click)="continuarANotas()">Continuar</button>
   }
 </div>
 
@@ -157,7 +160,7 @@
   <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
     <div class="innerTablas">
       @if (notas.length) {
-      <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
       }
     </div>
   </div>
