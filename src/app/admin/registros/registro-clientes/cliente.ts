@@ -129,8 +129,6 @@ export class ClienteC extends CrudG<any> {
         let mora = 0;
         let total_general = 0;
 
-        console.log("ANTES ", JSON.parse(JSON.stringify(requestResponse.contenido_reporte)));
-        
 
         requestResponse.contenido_reporte.map(factura => {
           factura.balance = factura.total_pendiente;

@@ -116,7 +116,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   porcentajeSelected = 2;
 
   recibiendo = computed(() => {
-    return this.facturasSelected().reduce((sum, item) => fun.desformatearStNumber(item.monto) + sum, 0);
+    return this.facturasSelected().reduce((sum, item) => {
+      if (fun.hasValue(item.monto) && !isNaN(fun.desformatearStNumber(item.monto))) sum += fun.desformatearStNumber(item.monto);
+      return sum;
+    }, 0);
   });
 
   restando = computed(() => {
@@ -210,7 +213,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         factura_selected = factura;
         factura_selected.monto = '0.00';
         factura_selected.pagoT = false;
-        this.verificateFacturasSelected(factura_selected, 'insert', index, factura_selected.monto);
+        this.verificateFacturasSelected(factura_selected, 'insert', factura_selected.monto);
       }
 
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
@@ -319,7 +322,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         item_tabla.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item_tabla.balance) + fun.desformatearStNumber(item_tabla.mora));
       }
 
-      this.verificateFacturasSelected(item_tabla, 'modify', index_factura_tabla, item_tabla.monto, item_tabla.mora);
+      this.verificateFacturasSelected(item_tabla, 'modify', item_tabla.monto, item_tabla.mora);
     } else {
       item_tabla.porcentaje_mora = data.value;
 
@@ -329,8 +332,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (item_tabla.select && item_tabla.pagoT) {
         item_tabla.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item_tabla.balance) + fun.desformatearStNumber(item_tabla.mora));
       }
-      
-      this.verificateFacturasSelected(item_tabla, 'modify', index_factura_tabla, item_tabla.monto, item_tabla.mora, data.value);
+
+      this.verificateFacturasSelected(item_tabla, 'modify', item_tabla.monto, item_tabla.mora, data.value);
     }
 
     this.all_facturas.update(facts => facts.map(fact => (fact.id == data.factura_id ? fun.deepCloning(item_tabla) : fact)));
@@ -353,7 +356,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   isOneFacturaWithMonto() {
-    const valid = this.facturasSelected().some(factura => factura.select && fun.desformatearStNumber(factura.monto) > 0);
+    let valid = this.facturasSelected().some(factura => factura.select && fun.desformatearStNumber(factura.monto) > 0);
+
+    if (valid) valid = !this.facturasSelected().some(factura => factura.select && (isNaN(fun.desformatearStNumber(factura.monto)) || fun.isEmpty(fun.desformatearStNumber(factura.monto))));
+
     return valid;
   }
 
@@ -512,14 +518,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
         const new_monto = fun.roundNumberToDecimal(balance + mora);
 
-        this.verificateFacturasSelected(factura ?? item, 'modify', factura_index, new_monto);
+        this.verificateFacturasSelected(factura ?? item, 'modify', new_monto);
 
         return { ...item, monto: new_monto };
       })
     );
   }
 
-  verificateFacturasSelected(factura: FacturasI, method: 'insert' | 'modify', index: number, monto: number | string, mora?: number | string, porcentaje_mora?: number | string) {
+  verificateFacturasSelected(factura: FacturasI, method: 'insert' | 'modify', monto: number | string, mora?: number | string, porcentaje_mora?: number | string) {
     const factura_en_turno = factura ? this.facturasSelected().find(fact => fact.id == factura?.id) : undefined;
 
     if (method == 'insert') {
@@ -543,11 +549,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         })
       );
     }
-
-    if (this.tablaComponent && index >= 0) {
-      monto = factura.pagoT ? monto : factura.monto;
-      this.tablaComponent.resetInput('monto', 'especificar', index, true, monto);
-    }
   }
 
   tableInputBlur(params) {
@@ -557,6 +558,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       const total = factura_en_turno.balance;
       const monto = fun.desformatearStNumber(factura_en_turno.monto);
       const mora = fun.desformatearStNumber(factura_en_turno.mora);
+
+      if (isNaN(monto) || fun.isEmpty(monto)) {
+        fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+        return;
+      }
 
       if (monto > mora + total) {
         this.ExisteMontoMayor = true;
@@ -574,33 +580,30 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     const balance = fun.desformatearStNumber(params.data.balance);
     const mora = fun.desformatearStNumber(params.data.mora);
     let monto = fun.desformatearStNumber(params.value);
-    const monto_original = params.value;
 
     if (params.key == 'pagoT') {
-      if (params.value) {
-        monto = factura.select ? fun.roundNumberToDecimal(balance + mora) : '0.00';
-      } else {
-        monto = fun.roundNumberToDecimal(balance + mora);
-      }
+      monto = fun.roundNumberToDecimal(balance + mora);
 
       factura.pagoT = params.value;
+      this.tablaComponent.resetInput('monto', 'especificar', params.index, true, monto);
     }
 
     if (params.key == 'monto' && params.value != factura.monto) {
       if (factura.select) {
-        if (fun.isEmpty(params.value)) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+        if (fun.isEmpty(params.value)) {
+          fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+        }
 
         if (monto == balance + mora) [params.newData.pagoT, factura.pagoT] = Array(2).fill(true);
 
         if (monto > balance + mora) {
           this.ExisteMontoMayor = true;
-          fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+
+          fun.toastError('Monto no puede ser mayor al total de la factura', 'AVISO');
           fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
         } else {
           this.ExisteMontoMayor = false;
         }
-
-        factura.monto = monto_original;
       }
     }
 
@@ -608,6 +611,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (!params.value) {
         factura.pagoT = false;
         monto = '0.00';
+        this.tablaComponent.resetInput('monto', 'especificar', params.index, true, monto);
       }
 
       factura.select = params.value;
@@ -620,7 +624,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
           const action = params.key == 'select' ? 'insert' : 'modify';
 
-          this.verificateFacturasSelected(factura, action, params.index, monto);
+          this.verificateFacturasSelected(factura, action, monto);
         }
 
         return item;
@@ -650,34 +654,33 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   formarDetalleRecibos() {
-    return this.facturasSelected().reduce(
-      (acc, fact) => {
-        const monto = Big(fun.desformatearStNumber(fact.monto));
-        const mora = fun.desformatearStNumber(fact.mora);
-        const deposito = monto.minus(mora).toNumber();
+    const formatFechaFactura = (fact) => 
+      `${fact.pagoT ? 'Saldo' : 'Abono'} ${fact.numero_comprobante} ${moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')}`;
 
-        acc.detalle.push({
-          cabecera_factura_id: fact.id,
-          pago_total: fact.pagoT,
-          deposito: deposito,
-          mora: mora,
-          descripcion:
-            this.tipo_recibo === 'Pago factura'
-              ? fact.pagoT
-                ? 'Saldo ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-                : 'Abono ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-              : '',
-          pago_a_tiempo: fact.pago_a_tiempo,
-        });
+    return this.facturasSelected().reduce((acc, fact) => {
+      const monto = Big(fun.desformatearStNumber(fact.monto));
+      const mora = fun.desformatearStNumber(fact.mora);
+      
+      // Calcula la mora recibida y el depósito
+      const mora_received = Math.min(monto.toNumber(), mora);
+      const deposito = Math.max(0, monto.minus(mora_received).toNumber());
 
-        acc.bruto += deposito;
-        acc.mora += mora;
-        acc.total_recibo += monto.toNumber();
+      acc.detalle.push({
+        cabecera_factura_id: fact.id,
+        pago_total: fact.pagoT,
+        deposito,
+        mora: mora_received,
+        descripcion: this.tipo_recibo === 'Pago factura' ? formatFechaFactura(fact) : '',
+        pago_a_tiempo: fact.pago_a_tiempo,
+      });
 
-        return acc;
-      },
-      { bruto: 0, mora: 0, total_recibo: 0, detalle: [] }
-    );
+      // Actualiza los totales
+      acc.bruto += deposito;
+      acc.mora += mora_received;
+      acc.total_recibo += monto.toNumber();
+
+      return acc;
+    }, { bruto: 0, mora: 0, total_recibo: 0, detalle: [] });
   }
 
   async confirmarIgreso() {
@@ -720,6 +723,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       detalle_recibos: this.detalleYtotal.detalle,
       balance_cliente: this.restando(),
     };
+    
 
     this.reciboClass.createUpdateOne(obj).then(res => {
       const recibo = res['data'].recibo;

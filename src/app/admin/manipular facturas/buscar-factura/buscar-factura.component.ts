@@ -150,8 +150,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   }
 
   iniciarCambioMenu(arg, callback) {
-    console.log('%c arg ', 'color: red', arg);
-
     if (arg.bool) {
       this.runFinalizarCambioMenu(arg);
       callback({ bool: true });

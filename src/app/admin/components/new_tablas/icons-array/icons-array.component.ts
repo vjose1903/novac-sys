@@ -2,16 +2,16 @@ import { HtmlElementsService } from './../../../../core/services/html-elements.s
 import { ModalClass } from '../../modal/modal-class';
 import { TablasService } from '../tablas.service';
 import { fun } from '../../../../core/services/functions.service';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'icons-array',
-    templateUrl: './icons-array.component.html',
-    styleUrls: ['./icons-array.component.scss'],
-    standalone: false
+  selector: 'icons-array',
+  templateUrl: './icons-array.component.html',
+  styleUrls: ['./icons-array.component.scss'],
+  standalone: false,
 })
-export class IconsArrayComponent {
+export class IconsArrayComponent implements OnInit {
   @Input() seleccionado;
   @Input() column;
   @Input() indexBody;
@@ -19,11 +19,20 @@ export class IconsArrayComponent {
   @Input() rowData;
   @Input() data;
 
+  fun = fun;
   @Output() icon_click = new EventEmitter<any>();
 
   htmlServ = inject(HtmlElementsService);
 
   constructor(public tServ: TablasService) {}
+
+  ngOnInit(): void {}
+
+  verificateIconId(objIcon) {
+    if (objIcon.id) return objIcon.id;
+
+    return `${fun.generateKey()}-${objIcon.key}`;
+  }
 
   getIconKey(objIcon) {
     let res = '';
@@ -40,7 +49,7 @@ export class IconsArrayComponent {
 
     if (typeof objIcon.key == 'object') {
       const source = objIcon.key.source;
-      const clase_in_turn = objIcon.key.clases.find((item) => item.value == dato[source]);
+      const clase_in_turn = objIcon.key.clases.find(item => item.value == dato[source]);
 
       res = clase_in_turn?.clase;
     }
@@ -54,7 +63,7 @@ export class IconsArrayComponent {
       for (let i = 0; i < objIcon.showCondition.length; i++) {
         const conditionObj = objIcon.showCondition[i];
 
-        if (objIcon.showCondition.some((conf) => conf.kind === 'selected')) {
+        if (objIcon.showCondition.some(conf => conf.kind === 'selected')) {
           const is_selected = data.id == (this.seleccionado || 0);
           res = conditionObj.value == is_selected;
         }
@@ -63,7 +72,7 @@ export class IconsArrayComponent {
 
         if (conditionObj.kind === 'campo') {
           if (conditionObj.value.length == 0) res = data[conditionObj.target] ? false : true;
-          else res = conditionObj.value.some((value) => value == data[conditionObj.target]);
+          else res = conditionObj.value.some(value => value == data[conditionObj.target]);
         }
       }
     } else {
@@ -103,8 +112,8 @@ export class IconsArrayComponent {
 
   checkIfIsEdited(data, obj_click) {
     const row_editing_id = data.id;
-    const original_row = this.data.find((item) => item.id == row_editing_id);
-    const editing_row = this.tServ.rowsEditing.find((item) => item.id == row_editing_id);
+    const original_row = this.data.find(item => item.id == row_editing_id);
+    const editing_row = this.tServ.rowsEditing.find(item => item.id == row_editing_id);
 
     if (fun.isEqual(original_row, editing_row)) {
       data.is_editing = false;
@@ -112,7 +121,7 @@ export class IconsArrayComponent {
     } else {
       const texto_modal = `¿Seguro que desea cancelar la edición?, al cancelar los cambios quedarán descartados.`;
 
-      const siFunction = (instance) => {
+      const siFunction = instance => {
         data.is_editing = false;
         this.tServ.modifyRowsEditing(editing_row, 'remove').then(() => this.handle_table_events('clickIcon', obj_click));
         new ModalClass().closeModal(instance);

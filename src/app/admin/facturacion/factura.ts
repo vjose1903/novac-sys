@@ -518,6 +518,7 @@ export interface Pago {
   balance_anterior_factura: number;
   pago_total: boolean;
   deposito: number;
+  mora: number;
   descripcion: string;
   pago_a_tiempo: boolean;
   is_ultimo: boolean;
