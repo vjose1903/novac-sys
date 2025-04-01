@@ -1,6 +1,6 @@
 import { ConfigI } from '../../../core/interface/config-interface';
 import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy, Input, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, signal, computed, effect } from '@angular/core';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
 import { Router } from '@angular/router';
@@ -26,8 +26,10 @@ import { ModalClass } from '../../components/modal/modal-class';
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   @Input() id_factura: number;
   @Input() tipoNota: any;
+
   factura = signal<FacturasI>(null);
   detallesFactura = signal<DetalleFactura[]>([]);
+  detalleNota = signal<DetalleFactura[]>([]);
   cliente_id!: number;
 
   totalGlobal = computed(() => {
@@ -43,7 +45,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   fecha: string;
   convertObj = { credito: -1, debito: 1 };
   info = [];
-  detalleNota = [];
   tipoFactura: any;
 
   paqueteComprobante;
@@ -87,18 +88,16 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   constructor(private router: Router) {
     super();
+
+    effect(() => {
+      console.log('%c detalleNota', 'color: red; font-weight: bold;', this.detalleNota());
+    });
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true });
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
 
-    console.log('this.id_factura', this.id_factura);
-    console.log('this.tipoNota', this.tipoNota);
-
-    // this.id_factura = this.activeRoute.snapshot.params['ids'];
-
-    // this.tipoNota = this.activeRoute.snapshot.params['tipo'];
     this.fecha = moment().format('DD/MM/YYYY');
 
     if (this.tipoNota === 'credito') {
@@ -216,50 +215,54 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async checkCantidadEnUnidades() {
-    for (let i = 0; i < this.detalleNota.length; i++) {
-      const detalle = this.detalleNota[i];
+    this.detalleNota.update(detalles => {
+      detalles.map(detalle => {
+        if (!detalle.cantidad_en_unidades_nota) detalle.cantidad_en_unidades_nota = 0;
 
-      if (!detalle.cantidad_en_unidades_nota) detalle.cantidad_en_unidades_nota = 0;
+        const unidad = detalle.peso_saco ? `${detalle.unidad}_${detalle.peso_saco}` : detalle.unidad;
+        const unidad_minima = detalle.contenidos[unidad];
+        if (detalle.cant_nota) detalle.cantidad_en_unidades_nota = Number(detalle.cant_nota) * unidad_minima;
+      });
 
-      const unidad = detalle.peso_saco ? `${detalle.unidad}_${detalle.peso_saco}` : detalle.unidad;
-      const unidad_minima = detalle.contenidos[unidad];
-      detalle.cantidad_en_unidades_nota = detalle.cant_nota * unidad_minima;
-    }
+      return detalles;
+    });
   }
 
   async selectAll(info) {}
 
   tableInputChange(params) {
+    const data = params.data as DetalleFactura;
+
     if (params.key == 'select') {
       if (!params.value) {
-        params.data.total_nota = '0.00';
-        params.data.cant_nota = 0;
-        params.data.precio_real = fun.roundNumberToDecimal(params.data.precio);
+        data.total_nota = '0.00';
+        data.cant_nota = 0;
+        data.precio_real = fun.roundNumberToDecimal(data.precio);
 
-        const itbis = this.configApp.calcular_itbis ? params.data.precio_real * 0.18 : 0;
-        params.data.itbis_real = fun.roundNumberToDecimal(itbis);
+        const itbis = this.configApp.calcular_itbis ? data.precio_real * 0.18 : 0;
+        data.itbis_real = fun.roundNumberToDecimal(itbis);
 
-        const index = _.findIndex(this.detalleNota, { id: params.data.id });
-        _.pullAt(this.detalleNota, index);
+        this.detalleNota.update(detalles => detalles.filter(detalle => detalle.id != data.id));
       } else {
-        this.detalleNota.push(params.data);
+        this.detalleNota.update(detalles => [...detalles, data]);
       }
     }
+
     fun.awaitTyping().then(() => {
       if (params.key == 'cant_nota') {
         const cant_nota = fun.desformatearStNumber(params.value);
 
         if (isNaN(cant_nota)) {
-          params.data.cant_nota = 0;
-          params.data.total_nota = '0.00';
+          data.cant_nota = 0;
+          data.total_nota = '0.00';
         }
 
         if (this.tipoNota == 'credito') {
-          if (cant_nota > params.data.cant) {
+          if (cant_nota > data.cant) {
             fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
             fun.enfocarInput(`input-${params.id_tabla}-${params.key}-${params.index}`);
           } else {
-            params.data.cant_nota = cant_nota;
+            data.cant_nota = cant_nota;
             this.sumarTotalRow(params);
           }
         }
@@ -267,7 +270,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
       if (params.key == 'precio_real') {
         let msg;
-        let precio = fun.desformatearStNumber(params.data.precio);
+        let precio = fun.desformatearStNumber(data.precio);
         let precio_real = fun.desformatearStNumber(params.value);
 
         if (this.tipoNota == 'credito') {
@@ -284,8 +287,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         } else {
           const itbis = this.configApp.calcular_itbis ? precio_real * 0.18 : 0;
 
-          params.data.precio_real = precio_real;
-          params.data.itbis_real = fun.roundNumberToDecimal(itbis);
+          data.precio_real = precio_real;
+          data.itbis_real = fun.roundNumberToDecimal(itbis);
           this.sumarTotalRow(params);
         }
       }

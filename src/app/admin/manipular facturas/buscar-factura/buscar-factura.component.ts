@@ -41,7 +41,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   noExistenComprobantes = false;
   paqueteComprobante: any;
   tipo_factura_id = null;
-  valor_a_buscar: any;
+  valor_a_buscar: any = null;
 
   notasClass = new NotaC();
   articuloClass = new ArticuloC();
@@ -297,7 +297,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     try {
       this.facturas.length = 0;
 
-      const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected, movimientos_viaje: true };
+      const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
+      const args = { campo: this.buscar_por, valor: valor, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected, movimientos_viaje: true };
       const res = await this.facturaClass.getFacturasByParams(args);
 
       res['data'].forEach(fact => {
@@ -696,14 +697,15 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
       });
     }
 
-    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async res => {
-      const inputs = {
-        show_estado: true,
-        estado_documento: factura.estado,
-        base64: res.base64,
-        reimprimir: res.reimprimir,
-        fileName: _.first(res.file.split('.')),
-      };
+    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
+      .then(async res => {
+        const inputs = {
+          show_estado: true,
+          estado_documento: factura.estado,
+          base64: res.base64,
+          reimprimir: res.reimprimir,
+          fileName: _.first(res.file.split('.')),
+        };
 
         const obj_modal = {
           component: PdfViewerComponent,

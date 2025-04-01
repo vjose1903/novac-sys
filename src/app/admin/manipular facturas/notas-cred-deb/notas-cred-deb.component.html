@@ -2,7 +2,9 @@
   <div class="widget gap-2">
     <div class="widget-header">
       <div class="titulo">
-        <h3 class="mb-0"> {{ tituloPag }}<b>{{ factura().numero_comprobante }}</b> </h3>
+        <h3 class="mb-0">
+          {{ tituloPag }}<b>{{ factura().numero_comprobante }}</b>
+        </h3>
       </div>
     </div>
     <div class="widget-content">
@@ -19,13 +21,13 @@
                   <div class="row">
                     <div class="col-12 p-0">
                       <span class="d-block">
-                        <b class="negrita">{{ factura().tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b
-                        >&nbsp;
+                        <b class="negrita">{{ factura().tipo === 'compra' ? 'Suplidor :' : 'Cliente :' }}</b>
+                        &nbsp;
                         <span>{{ factura().cliente?.nombre }}</span>
                       </span>
                       <span class="d-block">
-                        <b class="negrita">{{ factura().tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b
-                        >&nbsp;
+                        <b class="negrita">{{ factura().tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b>
+                        &nbsp;
                         <span>{{ factura().cliente?.rnc }}</span>
                       </span>
                       <span class="d-block">

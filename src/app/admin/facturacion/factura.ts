@@ -498,7 +498,7 @@ export interface DetalleFactura {
   cant: number;
   cant_nota: number | string;
   total_nota: string | number;
-  cantidad_en_unidades_nota: null;
+  cantidad_en_unidades_nota: number | null;
   [propName: string]: any;
 }
 
