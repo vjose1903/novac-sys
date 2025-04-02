@@ -194,7 +194,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   checkBackgroundTr(params: { tipo: string; dato: any }) {
     let res = false;
-    if (fun.objHas(params.dato, params.tipo)) res = _.get(params.dato, params.tipo);
+    if (fun.objHas(params.dato, params.tipo)) res = fun.getProperty(params.dato, params.tipo);
 
     return res;
     // dato?.danger && config?.colores;
