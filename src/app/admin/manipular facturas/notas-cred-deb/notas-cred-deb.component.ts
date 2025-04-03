@@ -27,8 +27,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   @Input() id_factura: number;
   @Input() tipoNota: any;
 
-  factura = signal<FacturasI>(null);
-  detallesFactura = signal<DetalleFactura[]>([]);
+  factura!: FacturasI;
+
   detalleNota = signal<DetalleFactura[]>([]);
   cliente_id!: number;
 
@@ -37,7 +37,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   });
 
   cantArticulosSelected = computed(() => {
-    return this.detallesFactura().filter(detalle => detalle.select).length;
+    return this.detalleNota().filter(detalle => Number(detalle.cant_nota) > 0).length;
   });
 
   tituloPag = '';
@@ -134,8 +134,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async necesarioStart() {
     this.getFactura().then(async datos => {
-      this.factura.set(datos);
-      this.detallesFactura.set(datos.detalle_facturas);
+      this.factura = datos;
+
       this.cliente_id = datos.cliente_id;
 
       await this.getPaqueteComprobante();
@@ -349,15 +349,20 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       this.sumarTotalRow(data, precio_real);
     }
 
-    this.checkCantidadEnUnidades();
-
     // Actualización del estado
     this.detalleNota.update(detalles => detalles.map(detalle => (detalle.id === data.id ? { ...detalle, ...data, precio_real: precio_real_value } : detalle)));
   }
 
   sumarTotalRow(data: DetalleFactura, precio_real: number) {
+    // TODO: REVISAR POR QUE LA ULTIMA NO SE SUMA EL TOTAL
     const descuento = data.descuento_valor / data.cantidad;
     const precio = fun.desformatearStNumber(data.precio);
+
+    console.log('  ');
+    console.log('data ', data);
+    console.log('descuento ', descuento);
+    console.log('precio ', precio);
+    console.log('precio_real ', precio_real);
 
     if (fun.isEmpty(precio_real) || isNaN(precio_real)) {
       data.total_nota = '0.00';
@@ -367,18 +372,22 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     let total = 0;
 
     if (this.isCredito) {
+      console.log(' --- isCredito --- ');
       const itbis = data.calcular_itbis && data.can_return_itbis ? precio * 0.18 : 0;
       const precio_itbis = precio + itbis;
       total += Number(data.cant_nota) * (precio_itbis - descuento);
     }
+    console.log('total ', total);
 
     if (precio != precio_real) {
+      console.log(' --- precio != precio_real --- ');
       const itbis_real = fun.desformatearStNumber(data.itbis_real);
       const precio_itbis_real = precio_real + itbis_real;
       const total_real = data.cant * (precio_itbis_real - descuento);
 
       total += Math.abs(data.total - total_real);
     }
+    console.log('total ', total);
 
     data.total_nota = this.formatoNumero(total);
   }
@@ -445,19 +454,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
   }
 
-  obtenerSaco(descripcion, tipo) {
-    let result = '' as any;
-    const split = _.split(descripcion, '(')[1];
-    const splitFinal = _.split(split, ' ')[0];
-
-    if (tipo === 'descripcion') {
-      result = 'Saco de ' + splitFinal + ' libras';
-    } else {
-      result = _.parseInt(splitFinal);
-    }
-    return result;
-  }
-
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
     this.openNewModal({
       id: obj.id,
@@ -491,45 +487,51 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       facturas_aplicadas: [],
     };
 
+    this.checkCantidadEnUnidades();
+
     const objTemp = {
-      cabecera_factura_id: this.factura().id,
+      cabecera_factura_id: this.factura.id,
       total: this.totalGlobal(),
 
-      detalles_facturas_notas: this.detallesFactura()
-        .filter(data => data.select == true && fun.desformatearStNumber(data.total_nota) > 0)
+      detalles_facturas_notas: this.detalleNota()
+        .filter(detalle => Number(detalle.cant_nota) > 0)
         .map(detalle => {
-          let objDetalleTemp = _.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
+          const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota } = detalle;
+
+          let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
 
           objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
-          objDetalleTemp['itbis'] = detalle.can_return_itbis ? objDetalleTemp.itbis : 0;
-          objDetalleTemp['cantidad_en_unidades'] = detalle.cantidad_en_unidades_nota;
-          objDetalleTemp['cantidad'] = detalle.cant_nota;
-          objDetalleTemp['detalle_factura_id'] = detalle.id;
+          objDetalleTemp['itbis'] = can_return_itbis ? fun.desformatearStNumber(objDetalleTemp.itbis) : 0;
+          objDetalleTemp['cantidad_en_unidades'] = cantidad_en_unidades_nota;
+          objDetalleTemp['cantidad'] = cant_nota;
+          objDetalleTemp['detalle_factura_id'] = id;
           objDetalleTemp['itbis_real'] = fun.desformatearStNumber(objDetalleTemp['itbis_real']);
           objDetalleTemp['itbis'] = fun.desformatearStNumber(objDetalleTemp['itbis']);
           objDetalleTemp['precio_real'] = fun.desformatearStNumber(objDetalleTemp['precio_real']);
           objDetalleTemp['precio'] = fun.desformatearStNumber(objDetalleTemp['precio']);
-
-          objDetalleTemp = fun.remplaceKeyFromJson(objDetalleTemp, [{ old_key: 'descuento_valor', new_key: 'descuento' }]);
+          objDetalleTemp['descuento'] = detalle.descuento_valor;
 
           objDetalleTemp['descuento_real'] = 0;
 
           delete objDetalleTemp.total_nota;
           delete objDetalleTemp.cantidad_en_unidades_nota;
+          delete objDetalleTemp.descuento_valor;
+
           return objDetalleTemp;
         }),
     };
 
     dataToSend.facturas_aplicadas.push(objTemp);
+    console.log('dataToSend ', dataToSend);
 
-    const res = await this.notasClass.createOne(dataToSend);
+    // const res = await this.notasClass.createOne(dataToSend);
 
-    this.notasClass.parseDataToPdf(res['data']).then(data_parsed => {
-      const objToPdf = { data: data_parsed, type: 'nota' };
+    // this.notasClass.parseDataToPdf(res['data']).then(data_parsed => {
+    //   const objToPdf = { data: data_parsed, type: 'nota' };
 
-      PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch(err => fun.toastError(err.msg, 'ERROR'));
-      this.layServ.nextCheckCuadreToday(true);
-      this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
-    });
+    //   PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch(err => fun.toastError(err.msg, 'ERROR'));
+    //   this.layServ.nextCheckCuadreToday(true);
+    //   this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
+    // });
   }
 }
