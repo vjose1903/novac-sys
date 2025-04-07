@@ -96,9 +96,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   constructor(private router: Router) {
     super();
 
-    effect(() => {
-      console.log('%c detalleNota', 'color: yellow; font-weight: bold;', this.detalleNota());
-    });
+    effect(() => {});
   }
 
   ngOnInit() {
@@ -354,17 +352,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   sumarTotalRow(data: DetalleFactura, precio_real: number) {
-    // TODO: REVISAR POR QUE LA ULTIMA NO SE SUMA EL TOTAL
     const descuento = data.descuento_valor / data.cantidad;
     const precio = fun.desformatearStNumber(data.precio);
+    const precio_real_value = fun.desformatearStNumber(precio_real);
 
-    console.log('  ');
-    console.log('data ', data);
-    console.log('descuento ', descuento);
-    console.log('precio ', precio);
-    console.log('precio_real ', precio_real);
-
-    if (fun.isEmpty(precio_real) || isNaN(precio_real)) {
+    if (fun.isEmpty(precio_real_value) || isNaN(precio_real_value)) {
       data.total_nota = '0.00';
       return;
     }
@@ -372,22 +364,18 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     let total = 0;
 
     if (this.isCredito) {
-      console.log(' --- isCredito --- ');
       const itbis = data.calcular_itbis && data.can_return_itbis ? precio * 0.18 : 0;
       const precio_itbis = precio + itbis;
       total += Number(data.cant_nota) * (precio_itbis - descuento);
     }
-    console.log('total ', total);
 
-    if (precio != precio_real) {
-      console.log(' --- precio != precio_real --- ');
+    if (precio != precio_real_value) {
       const itbis_real = fun.desformatearStNumber(data.itbis_real);
-      const precio_itbis_real = precio_real + itbis_real;
+      const precio_itbis_real = precio_real_value + itbis_real;
       const total_real = data.cant * (precio_itbis_real - descuento);
 
       total += Math.abs(data.total - total_real);
     }
-    console.log('total ', total);
 
     data.total_nota = this.formatoNumero(total);
   }
@@ -522,7 +510,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     };
 
     dataToSend.facturas_aplicadas.push(objTemp);
-    console.log('dataToSend ', dataToSend);
 
     // const res = await this.notasClass.createOne(dataToSend);
 

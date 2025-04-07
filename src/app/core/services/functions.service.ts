@@ -450,14 +450,14 @@ export class fun {
   // _________________________________________________________________________________________________
 
   static timeout;
-  static awaitTyping(event?, waitingTime = 700) {
-    const promise = new Promise(resolve => {
-      clearTimeout(fun.timeout);
-      fun.timeout = setTimeout(() => {
-        if (!event || event.keyCode != 13) resolve(event);
-      }, waitingTime);
+  static awaitTyping(event?: KeyboardEvent, waitingTime = 700): Promise<void> {
+    return new Promise(resolve => {
+      if (fun.timeout) clearTimeout(fun.timeout);
+
+      if (event?.key === 'Enter' || event?.keyCode === 13) return resolve();
+
+      fun.timeout = setTimeout(resolve, waitingTime);
     });
-    return promise;
   }
 
   // __________________________________________________________________________________________________
