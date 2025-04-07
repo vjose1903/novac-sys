@@ -9,11 +9,11 @@ import { ArticuloC } from '../../registros/articulos/articulo';
 import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC, request_factura_campo, tipoDocFacturacion, DetalleFactura } from '../../facturacion/factura';
 import { NcfC } from '../../registros/ncf/ncf';
 import { ClienteC } from '../../registros/registro-clientes/cliente';
-import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
+
 import { NotaC } from './notas';
 import { fun } from '../../../core/services/functions.service';
 import { Permisos } from '../../../core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { table_config, transformType } from '../../components/new_tablas/tabla-class';
 import { ConfirmacionImprimirComponent } from '../../components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '../../components/modal/modal-class';
 
@@ -76,7 +76,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         inputEvents: 'formatoNumero',
         inputType: 'text',
         textAlign: 'end',
-        disable: [{ kind: 'campo', target: 'select', value: [false] }],
+        disable: [
+          { kind: 'campo', target: 'select', value: [false] },
+          { kind: 'campo', target: 'cant_nota', type: 'notEqual', transform: transformType.number, value: [0] },
+        ],
         style: { width: '8rem', 'padding-right': '0.5rem' },
       },
       { titulo: 'Total nota', key: 'total_nota', tipo: 'input', textAlign: 'end', disable: [{ kind: 'always' }], style: { width: '8rem' } },
@@ -156,7 +159,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         tipo: 'input',
         inputType: 'number',
         textAlign: 'end',
-        disable: [{ kind: 'campo', target: 'select', value: [false] }],
+        disable: [
+          { kind: 'campo', target: 'select', value: [false] },
+          { kind: 'compare', source: 'precio', target: 'precio_real', transform: transformType.number, type: 'notEqual' },
+        ],
         style: { width: '6rem' },
       });
       resolve(true);
@@ -226,7 +232,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     const { data, id_tabla, column, index } = params;
     const { key } = column;
 
-    const current_detalle = this.detalleNota().find(factura => factura.id == data.id);
+    const current_detalle = this.detalleNota().find(detalle => detalle.id == data.id);
+    const detalle_factura = this.factura.detalle_facturas.find(detalle => detalle.id == data.id);
 
     if (fun.hasValue(current_detalle)) {
       const total_nota = fun.desformatearStNumber(current_detalle.total_nota);
@@ -256,6 +263,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
           return;
         }
+
+        detalle_factura.precio_real = fun.roundNumberToDecimal(precio_real);
       }
 
       if (key == 'cant_nota') {

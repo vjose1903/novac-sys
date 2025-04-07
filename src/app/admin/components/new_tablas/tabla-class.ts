@@ -53,6 +53,13 @@ export interface RowTransformI {
   inputs?: any;
 }
 
+export enum transformType {
+  text = 'text',
+  number = 'number',
+  date = 'date',
+  boolean = 'boolean',
+}
+
 interface sortInfo {
   key: string;
   order: 'asc' | 'desc' | null;

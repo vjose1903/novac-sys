@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import * as _ from 'lodash';
 import { fun } from '../../../core/services/functions.service';
-import { default_per_page, paginateI, table_config } from './tabla-class';
+import { default_per_page, paginateI, table_config, table_info, transformType } from './tabla-class';
+import { DateUtils } from '../../../core/typescript/date.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -55,7 +55,7 @@ export class TablasService {
 
   modifyPaginationById(id, params: Array<paginateI>) {
     params.forEach(param => {
-      const key = _.keys(param)[0];
+      const key = Object.keys(param)[0];
 
       this.obj_paginate[id][key] = param[key];
 
@@ -75,7 +75,7 @@ export class TablasService {
   }
 
   getColor(myColor) {
-    const color = _.replace(myColor, '#', '');
+    const color = myColor.replace('#', '');
     const oscuro = fun.darken(color, 20);
 
     const style = { background: `linear-gradient(145deg, ${myColor}, ${oscuro})` };
@@ -92,38 +92,67 @@ export class TablasService {
     });
   }
 
-  disabledInput(params: { dato: any; column: any; config?: any; seleccionado: any }) {
-    let res = false;
+  disabledInput(params: { dato: any; column: table_info; config?: any; seleccionado: any }) {
+    const { dato, column, config, seleccionado } = params;
 
-    if (fun.objHas(params.column, 'disable')) {
-      let temp_res = false;
-
-      for (let i = 0; i < params.column.disable.length; i++) {
-        const element = params.column.disable[i];
-
-        if (params.column.disable.some(conf => conf.kind === 'always')) temp_res = true;
-
-        if (temp_res) break;
-
-        if (params.column.disable.some(conf => conf.kind === 'selected')) temp_res = Number(params.dato.id) !== Number(params.seleccionado || 0);
-
-        if (temp_res) break;
-
-        if (element.kind == 'has_value') {
-          temp_res = fun.hasValue(params.dato[element.target]);
-        }
-
-        if (temp_res) break;
-
-        if (element.kind == 'campo') {
-          if (element.value.length == 0) temp_res = params.dato[element.target] ? false : true;
-          else temp_res = element.value.some(value => value == params.dato[element.target]);
-        }
-      }
-      res = temp_res;
+    // Si la columna no tiene configuración de disable, retornamos false
+    if (!fun.objHas(column, 'disable')) {
+      return false;
     }
 
-    return fun.hasValue(params?.config?.read) && params?.config?.read ? true : res;
+    // Si el config tiene read=true, retornamos true inmediatamente || Verificar si está configurado como siempre deshabilitado
+    if ((fun.hasValue(params?.config?.read) && params?.config?.read) || column.disable.some(conf => conf.kind === 'always')) {
+      return true;
+    }
+
+    // Verificar si está seleccionado
+    if (column.disable.some(conf => conf.kind === 'selected')) {
+      return Number(dato.id) !== Number(seleccionado || 0);
+    }
+
+    // Función auxiliar para transformar valores
+    const transformValue = (value: any, type: transformType): any => {
+      switch (type) {
+        case transformType.number:
+          return fun.desformatearStNumber(value);
+        case transformType.date:
+          return DateUtils.format({ date: value, dateFormat: 'YYYY-MM-DD' });
+        case transformType.boolean:
+          return value == 'true';
+        case transformType.text:
+          return value.toString();
+        default:
+          return value;
+      }
+    };
+
+    // Evaluar cada regla de deshabilitación
+    return column.disable.some(element => {
+      const source_value = fun.hasValue(element.source) ? dato[element.source] : fun.hasValue(column.key_value) ? dato[column.key_value] : dato[column.key];
+      const target_value = dato[element.target];
+
+      let transformedSourceValue = element.transform ? transformValue(source_value, element.transform) : source_value;
+      let transformedTargetValue = element.transform ? transformValue(target_value, element.transform) : target_value;
+
+      switch (element.kind) {
+        case 'has_value':
+          return fun.hasValue(transformedTargetValue);
+        case 'compare':
+          return element.type == 'equal' ? transformedSourceValue == transformedTargetValue : transformedSourceValue != transformedTargetValue;
+        case 'campo':
+          if (element.value.length == 0) {
+            return !transformedTargetValue;
+          } else {
+            if (element.type == 'equal' || !('type' in element)) {
+              return element.value.some(value => value == transformedTargetValue);
+            } else {
+              return element.value.some(value => value != transformedTargetValue);
+            }
+          }
+        default:
+          return false;
+      }
+    });
   }
 
   modifyRowsEditing(newData, kind: 'add' | 'remove') {
