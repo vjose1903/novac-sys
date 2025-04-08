@@ -1,8 +1,8 @@
-import { CrudG } from '../../../core/typescript/crud-g';
+import { CrudG } from '@core/typescript/crud-g';
 import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
-import { fun } from '../../../core/services/functions.service';
-import { csvConfig as ventas_producto_csvConfig } from '../../../core/services/reports/excel/configs/report/ventas_producto';
+import { fun } from '@core/services/functions.service';
+import { csvConfig as ventas_producto_csvConfig } from '@core/services/reports/excel/configs/report/ventas_producto';
 import { ReportDateTypeE } from '../../reportes/reporte.utils';
 
 export enum tipos_articulos {

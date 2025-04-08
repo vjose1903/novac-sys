@@ -5,9 +5,9 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map, finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
 import * as _ from 'lodash';
-import { Ss } from '../core/services/singleton.service';
-import { fun } from '../core/services/functions.service';
-import { SharedService } from '../core/services/shared.service';
+import { Ss } from '@core/services/singleton.service';
+import { fun } from '@core/services/functions.service';
+import { SharedService } from '@core/services/shared.service';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {

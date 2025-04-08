@@ -1,4 +1,4 @@
-import { CrudG } from '../../../core/typescript/crud-g';
+import { CrudG } from '@core/typescript/crud-g';
 
 export class VehiculoC extends CrudG<any> {
   constructor() {

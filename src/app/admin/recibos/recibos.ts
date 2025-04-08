@@ -1,10 +1,10 @@
-import { fun } from '../../core/services/functions.service';
-import { CrudG } from '../../core/typescript/crud-g';
-import { ModalClass } from '../components/modal/modal-class';
+import { fun } from '@core/services/functions.service';
+import { CrudG } from '@core/typescript/crud-g';
+import { ModalClass } from '@components/modal/modal-class';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ReporteC } from '../reportes/reporte';
 import * as _ from 'lodash';
-import { csvConfig as csvConfigReciboIngreso } from '../../core/services/reports/excel/configs/report/recibo_ingreso';
+import { csvConfig as csvConfigReciboIngreso } from '@core/services/reports/excel/configs/report/recibo_ingreso';
 import { ReportGroupTypeE } from '../reportes/reporte.utils';
 export interface ReciboI {
   id?: number;

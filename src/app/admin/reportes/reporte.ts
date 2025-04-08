@@ -1,16 +1,16 @@
-import { ReporteBackendResponseI, ReporteViewModalConfigI } from '../../core/interface/reporte-view-modal-config';
-import { PdfService } from '../../core/services/reports/pdf/pdf.service';
-import { Ss } from '../../core/services/singleton.service';
-import { fun } from '../../core/services/functions.service';
-import { CrudG } from '../../core/typescript/crud-g';
-import { FormReportesComponent } from '../components/formularios en modales/form-reportes/form-reportes.component';
-import { ModalClass } from '../components/modal/modal-class';
-import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
+import { ReporteBackendResponseI, ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { Ss } from '@core/services/singleton.service';
+import { fun } from '@core/services/functions.service';
+import { CrudG } from '@core/typescript/crud-g';
+import { FormReportesComponent } from '@components/formularios en modales/form-reportes/form-reportes.component';
+import { ModalClass } from '@components/modal/modal-class';
+import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import * as _ from 'lodash';
-import { ConfigI } from '../../core/interface/config-interface';
-import { ExportToExcelService } from '../../core/services/reports/excel/export-to-excel.service';
+import { ConfigI } from '@core/interface/config-interface';
+import { ExportToExcelService } from '@core/services/reports/excel/export-to-excel.service';
 import { inject } from '@angular/core';
-import { exportExcelConfigI } from '../../core/interface/export-to-excel.interface';
+import { exportExcelConfigI } from '@core/interface/export-to-excel.interface';
 import { Console } from 'console';
 
 export class ReporteC extends CrudG<any> {

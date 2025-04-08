@@ -1,10 +1,10 @@
-import { ClienteC } from './../registros/registro-clientes/cliente';
+import { ClienteC } from '@registros/registro-clientes/cliente';
 import { FacturaC, tipoDocFacturacion } from './../facturacion/factura';
-import { fun } from './../../core/services/functions.service';
+import { fun } from '@core/services/functions.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { Ss } from '../../core/services/singleton.service';
-import { ConfigI } from '../../core/interface/config-interface';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Ss } from '@core/services/singleton.service';
+import { ConfigI } from '@core/interface/config-interface';
 
 @Component({
     selector: 'app-homeAdmin',

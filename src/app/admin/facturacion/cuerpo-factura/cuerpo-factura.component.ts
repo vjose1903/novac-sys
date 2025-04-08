@@ -4,15 +4,15 @@ import { tipoDocFacturacion } from './../factura';
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { ArticuloC } from '../../registros/articulos/articulo';
-import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
-import { fun } from '../../../core/services/functions.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { ArticuloC } from '@registros/articulos/articulo';
+import { BuscarArticuloComponent } from '@components/formularios en modales/buscar-articulo/buscar-articulo.component';
+import { fun } from '@core/services/functions.service';
 import { RemoverArticuloComponent } from './remover-articulo/remover-articulo.component';
 import { razon_remover } from './remover-articulo/contantes';
-import { ConfigI } from '../../../core/interface/config-interface';
-import { Ss } from '../../../core/services/singleton.service';
-import { ModalClass } from '../../components/modal/modal-class';
+import { ConfigI } from '@core/interface/config-interface';
+import { Ss } from '@core/services/singleton.service';
+import { ModalClass } from '@components/modal/modal-class';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({

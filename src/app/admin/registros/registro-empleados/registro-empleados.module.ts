@@ -5,9 +5,9 @@ import { RegistroEmpleadosRoutingModule } from './registro-empleados.routing';
 import { RegistroEmpleadosComponent } from './registro-empleados.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PrimengModule } from '../../../modules/primeng.module';
-import { TablasModule } from '../../components/new_tablas/tablas.module';
-import { DirectivesModule } from '../../../core/directive/directives.module';
-import { PipesModule } from '../../../core/pipe/pipes.module';
+import { TablasModule } from '@components/new_tablas/tablas.module';
+import { DirectivesModule } from '@core/directive/directives.module';
+import { PipesModule } from '@core/pipe/pipes.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 @NgModule({

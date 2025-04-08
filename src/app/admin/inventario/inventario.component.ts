@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
 import * as _ from 'lodash';
-import { TablasService } from '../components/new_tablas/tablas.service';
-import { MixinClass } from '../../core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
-import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
+import { ArticuloC, TipoArticuloC } from '@registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
-import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
-import { fun } from '../../core/services/functions.service';
-import { Ss } from '../../core/services/singleton.service';
-import { default_per_page, table_config } from '../components/new_tablas/tabla-class';
-import { Permisos } from '../../core/typescript/permisos';
+import { MovimientosFormComponent } from '@components/formularios en modales/movimientos-form/movimientos-form.component';
+import { fun } from '@core/services/functions.service';
+import { Ss } from '@core/services/singleton.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
 import { InventarioC } from './inventario';
 
 @Component({

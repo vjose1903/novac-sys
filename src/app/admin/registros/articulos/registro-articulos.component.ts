@@ -1,21 +1,21 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, OnChanges, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, Validators, FormArray, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
 
-import { fun } from '../../../core/services/functions.service';
-import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { ConfigI } from '../../../core/interface/config-interface';
-import { Ss } from '../../../core/services/singleton.service';
+import { ConfigI } from '@core/interface/config-interface';
+import { Ss } from '@core/services/singleton.service';
 import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
-import { ModalClass } from '../../components/modal/modal-class';
+import { ModalClass } from '@components/modal/modal-class';
 const moment = require('../../../core/javascript/moment');
 const $ = require('jquery');
 

@@ -1,16 +1,16 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { MovimientosC } from './../../components/formularios en modales/movimientos-form/movimiento-model';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { MovimientosC } from '@components/formularios en modales/movimientos-form/movimiento-model';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { EmpleadoC } from '../../registros/registro-empleados/empleado';
-import { VehiculoC } from '../../registros/registro-vehiculo/vehiculo';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { EmpleadoC } from '@registros/registro-empleados/empleado';
+import { VehiculoC } from '@registros/registro-vehiculo/vehiculo';
 import { ReciboC } from '../recibos';
 import { FacturaC } from '../../facturacion/factura';
-import { fun } from '../../../core/services/functions.service';
-import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 

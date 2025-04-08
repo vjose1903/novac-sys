@@ -1,5 +1,5 @@
 import { ReporteC } from '../reportes/reporte';
-import { csvConfig as csvConfigInventario } from '../../core/services/reports/excel/configs/report/inventario';
+import { csvConfig as csvConfigInventario } from '@core/services/reports/excel/configs/report/inventario';
 import * as _ from 'lodash';
 
 export class InventarioC {

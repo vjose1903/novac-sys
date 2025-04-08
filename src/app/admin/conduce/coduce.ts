@@ -1,6 +1,6 @@
-import { fun } from './../../core/services/functions.service';
-import { CrudG } from '../../core/typescript/crud-g';
-import { unidadAbrev } from '../../core/typescript/constantes';
+import { fun } from '@core/services/functions.service';
+import { CrudG } from '@core/typescript/crud-g';
+import { unidadAbrev } from '@core/typescript/constantes';
 
 export class ConduceC extends CrudG<any> {
   constructor() {

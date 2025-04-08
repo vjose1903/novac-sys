@@ -6,7 +6,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { InterceptorService } from './loader/interceptor.service';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { NgxExtendedPdfViewerModule, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
-import { primeNGLocales } from './core/typescript/primeNG.locales';
+import { primeNGLocales } from '@core/typescript/primeNG.locales';
 import Nora from '@primeng/themes/nora';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';

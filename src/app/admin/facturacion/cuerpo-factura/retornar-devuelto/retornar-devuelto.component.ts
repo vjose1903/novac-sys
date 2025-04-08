@@ -1,8 +1,8 @@
-import { HtmlElementsService } from './../../../../core/services/html-elements.service';
-import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { default_per_page, table_config } from './../../../components/new_tablas/tabla-class';
-import { fun } from './../../../../core/services/functions.service';
-import { ModalI } from './../../../components/modal/modal-class';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { fun } from '@core/services/functions.service';
+import { ModalI } from '@components/modal/modal-class';
 import { Component, DoCheck, OnInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';

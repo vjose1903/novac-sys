@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { RegistroVehiculoRoutingModule } from './registro-vehiculo.routing';
 import { RegistroVehiculoComponent } from './registro-vehiculo.component';
-import { TablasModule } from '../../components/new_tablas/tablas.module';
+import { TablasModule } from '@components/new_tablas/tablas.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { PrimengModule } from '../../../modules/primeng.module';

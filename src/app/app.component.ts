@@ -1,18 +1,18 @@
 import { PrimengModule } from './modules/primeng.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NewModalModule } from './admin/components/modal/modal.module';
-import { FormulariosEnModalesModule } from './admin/components/formularios en modales/formularios-en-modales.module';
+import { NewModalModule } from './core/components/modal/modal.module';
+import { FormulariosEnModalesModule } from './core/components/formularios en modales/formularios-en-modales.module';
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
-import { IpcService } from './core/services/ipc.service';
-import { MODIFIED_CONFIG_FILE } from './core/typescript/GLOBAL';
+import { IpcService } from '@core/services/ipc.service';
+import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import { Ss } from './core/services/singleton.service';
+import { Ss } from '@core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
-import { LayoutService } from './admin/layout/layout.service';
-import { ConfigurationService } from './core/services/configuration.service';
-import { ThemeService } from './core/services/theme.service';
-import { MessageTask } from './core/models/message-task';
+import { LayoutService } from '@admin/layout/layout.service';
+import { ConfigurationService } from '@core/services/configuration.service';
+import { ThemeService } from '@core/services/theme.service';
+import { MessageTask } from '@core/models/message-task';
 
 import {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
@@ -29,15 +29,15 @@ import {
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { SharedService } from './core/services/shared.service';
-import { fun } from './core/services/functions.service';
-import { MixinClass } from './core/typescript/MixinClass';
+import { SharedService } from '@core/services/shared.service';
+import { fun } from '@core/services/functions.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { FacturacionService } from './admin/facturacion/facturacion.service';
+import { FacturacionService } from '@admin/facturacion/facturacion.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { log } from 'console';
-import { ModalClass } from './admin/components/modal/modal-class';
+import { ModalClass } from './core/components/modal/modal-class';
 
 @Component({
   selector: 'app-root',

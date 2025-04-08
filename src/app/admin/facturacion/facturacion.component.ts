@@ -1,4 +1,4 @@
-import { EmpleadoC } from './../registros/registro-empleados/empleado';
+import { EmpleadoC } from '@registros/registro-empleados/empleado';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
@@ -9,26 +9,26 @@ const moment = require('../../core/javascript/moment');
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { FacturacionService } from './facturacion.service';
-import { ArticuloC } from '../registros/articulos/articulo';
+import { ArticuloC } from '@registros/articulos/articulo';
 import { tipoDocFacturacion, FacturasI, tFacturaD, actionFacturacion, comprobanteNormal, comprobanteElectronico } from './factura';
-import { NcfC } from '../registros/ncf/ncf';
-import { PendienteFormComponent } from '../components/formularios en modales/pendiente-form/pendiente-form.component';
-import { FormCantidadEfectivoComponent } from '../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
-import { BuscarClienteSuplidorComponent } from '../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { NcfC } from '@registros/ncf/ncf';
+import { PendienteFormComponent } from '@components/formularios en modales/pendiente-form/pendiente-form.component';
+import { FormCantidadEfectivoComponent } from '@components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
+import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { FactsLocalStorage } from './factsLocalStorage';
-import { ClienteC } from '../registros/registro-clientes/cliente';
-import { SuplidorC } from '../registros/registro-suplidores/suplidores';
-import { fun } from '../../core/services/functions.service';
-import { VehiculoC } from '../registros/registro-vehiculo/vehiculo';
-import { seriesDGII, teclasCode, serie } from '../../core/typescript/constantes';
-import { Permisos } from '../../core/typescript/permisos';
-import { ConfigI } from '../../core/interface/config-interface';
-import { Ss } from '../../core/services/singleton.service';
-import { ConfirmacionImprimirComponent } from '../components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
-import { ModalClass } from '../components/modal/modal-class';
-import { PdfService } from '../../core/services/reports/pdf/pdf.service';
-import { ConfigArticuloC, ConfigArticuloI } from '../registros/articulos/configuracion_articulos/articulos_configuracion';
-import { HtmlElementsService } from '../../core/services/html-elements.service';
+import { ClienteC } from '@registros/registro-clientes/cliente';
+import { SuplidorC } from '@registros/registro-suplidores/suplidores';
+import { fun } from '@core/services/functions.service';
+import { VehiculoC } from '@registros/registro-vehiculo/vehiculo';
+import { seriesDGII, teclasCode, serie } from '@core/typescript/constantes';
+import { Permisos } from '@core/typescript/permisos';
+import { ConfigI } from '@core/interface/config-interface';
+import { Ss } from '@core/services/singleton.service';
+import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
+import { ModalClass } from '@components/modal/modal-class';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { ConfigArticuloC, ConfigArticuloI } from '@registros/articulos/configuracion_articulos/articulos_configuracion';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 
 @Component({
   selector: 'app-facturacion',

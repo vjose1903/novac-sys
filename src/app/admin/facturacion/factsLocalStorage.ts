@@ -1,11 +1,11 @@
-import { DateUtils } from './../../core/typescript/date.utils';
-import { Permisos } from './../../core/typescript/permisos';
-import { Ss } from './../../core/services/singleton.service';
-import { fun } from '../../core/services/functions.service';
+import { DateUtils } from '@core/typescript/date.utils';
+import { Permisos } from '@core/typescript/permisos';
+import { Ss } from '@core/services/singleton.service';
+import { fun } from '@core/services/functions.service';
 import { PreFacturaClass } from './preFacturas';
 import { tipoDocFacturacion } from './factura';
 import { computed, effect, signal } from '@angular/core';
-import { ObjectVar } from '../../core/typescript/constantes';
+import { ObjectVar } from '@core/typescript/constantes';
 
 export class FactsLocalStorage extends PreFacturaClass {
   index_fact_archivada = signal<number | string>(0);

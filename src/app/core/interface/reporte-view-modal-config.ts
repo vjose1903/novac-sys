@@ -1,4 +1,4 @@
-import { viewerOptions } from "../../admin/components/pdf-viewer/pdf-viewer";
+import { viewerOptions } from "../components/pdf-viewer/pdf-viewer";
 
 export interface ReporteViewModalConfigI {
   openNewModal: Function;

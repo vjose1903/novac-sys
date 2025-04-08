@@ -1,15 +1,15 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject, resource, computed, WritableSignal, signal } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { customValidators } from '../../../core/typescript/custom-validators';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { customValidators } from '@core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { ProvinciaC, ProvinciaI } from '../../../core/typescript/classes/provincia.model';
-import { fun } from '../../../core/services/functions.service';
-import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
 import { toSignal } from '@angular/core/rxjs-interop';
 

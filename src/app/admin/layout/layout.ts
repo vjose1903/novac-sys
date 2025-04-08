@@ -1,9 +1,7 @@
-import { fun } from './../../core/services/functions.service';
 import { Subscription } from 'rxjs';
-import { Ss } from '../../core/services/singleton.service';
-import { TablaClass } from '../components/new_tablas/tabla-class';
-import * as _ from 'lodash';
-import { Permisos } from '../../core/typescript/permisos';
+import { Ss } from '@core/services/singleton.service';
+import { TablaClass } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
 
 export class LayoutClass extends TablaClass {
   constructor() {

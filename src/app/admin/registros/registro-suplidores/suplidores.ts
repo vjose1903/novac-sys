@@ -1,7 +1,7 @@
-import { CrudG } from '../../../core/typescript/crud-g';
+import { CrudG } from '@core/typescript/crud-g';
 import { ReporteC } from '../../reportes/reporte';
-import { fun } from '../../../core/services/functions.service';
-import { csvConfig as csvConfigSuplidorProd } from '../../../core/services/reports/excel/configs/report/suplidor_prod';
+import { fun } from '@core/services/functions.service';
+import { csvConfig as csvConfigSuplidorProd } from '@core/services/reports/excel/configs/report/suplidor_prod';
 import * as _ from 'lodash';
 
 

@@ -1,16 +1,16 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { Ss } from './../../../core/services/singleton.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Ss } from '@core/services/singleton.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import * as _ from 'lodash';
 
 const moment = require('../../../core/javascript/moment');
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
-import { fun } from '../../../core/services/functions.service';
-import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
 
 @Component({
   selector: 'app-ncf',

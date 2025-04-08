@@ -1,26 +1,26 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { Component, OnInit, OnDestroy, AfterViewInit, HostListener, inject } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray, FormGroup } from '@angular/forms';
 import * as _ from 'lodash';
-import { ArticuloC } from '../../registros/articulos/articulo';
+import { ArticuloC } from '@registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
 import { FacturaC, request_factura_campo } from '../../facturacion/factura';
-import { PdfService } from '../../../core/services/reports/pdf/pdf.service';
-import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
-import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
-import { ModalSeleccinarArticuloComponent } from '../../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
-import { fun } from '../../../core/services/functions.service';
-import { ModalService } from '../../components/modal/modal.service';
-import { Permisos } from '../../../core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
-import { ConfigI } from '../../../core/interface/config-interface';
-import { Ss } from '../../../core/services/singleton.service';
-import { ConfirmacionImprimirComponent } from '../../components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
-import { teclasCode } from '../../../core/typescript/constantes';
-import { ModalClass } from '../../components/modal/modal-class';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { BuscarArticuloComponent } from '@components/formularios en modales/buscar-articulo/buscar-articulo.component';
+import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { ModalSeleccinarArticuloComponent } from '@components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
+import { fun } from '@core/services/functions.service';
+import { ModalService } from '@components/modal/modal.service';
+import { Permisos } from '@core/typescript/permisos';
+import { table_config } from '@components/new_tablas/tabla-class';
+import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
+import { teclasCode } from '@core/typescript/constantes';
+import { ModalClass } from '@components/modal/modal-class';
 import { Router } from '@angular/router';
-
+import { Ss } from '@core/services/singleton.service';
+import { ConfigI } from '@core/interface/config-interface';
+  
 @Component({
     selector: 'app-conduce-form',
     templateUrl: './conduce-form.component.html',

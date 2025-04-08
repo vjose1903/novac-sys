@@ -1,24 +1,24 @@
-import { HtmlElementsService } from './../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { AfterViewInit, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MODIFIED_CONFIG_FILE } from '../core/typescript/GLOBAL';
-import { IpcService } from '../core/services/ipc.service';
+import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
+import { IpcService } from '@core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import * as _ from 'lodash';
 
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
-import { PdfService } from '../core/services/reports/pdf/pdf.service';
-import { RequestC } from '../core/typescript/requests';
-import { MixinClass } from '../core/typescript/MixinClass';
-import { Ss } from '../core/services/singleton.service';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { RequestC } from '@core/typescript/requests';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Ss } from '@core/services/singleton.service';
 import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
-import { MessageTask } from '../core/models/message-task';
-import { ConfigI } from '../core/interface/config-interface';
-import { fun } from '../core/services/functions.service';
-import { CurrentUserService } from '../core/services/current-user.service';
-import { FacturaC } from '../admin/facturacion/factura';
+import { MessageTask } from '@core/models/message-task';
+import { ConfigI } from '@core/interface/config-interface';
+import { fun } from '@core/services/functions.service';
+import { CurrentUserService } from '@core/services/current-user.service';
+import { FacturaC } from '@admin/facturacion/factura';
 
 @Component({
   selector: 'app-login',

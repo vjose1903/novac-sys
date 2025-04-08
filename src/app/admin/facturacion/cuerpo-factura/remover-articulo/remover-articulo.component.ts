@@ -1,9 +1,9 @@
-import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, inject } from '@angular/core';
-import { ModalI } from '../../../../admin/components/modal/modal-class';
+import { ModalI } from '@components/modal/modal-class';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { fun } from '../../../../core/services/functions.service';
+import { fun } from '@core/services/functions.service';
 import { timeStamp } from 'console';
 
 @Component({

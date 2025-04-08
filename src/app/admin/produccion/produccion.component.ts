@@ -1,16 +1,16 @@
-import { HtmlElementsService } from './../../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import * as _ from 'lodash';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { TablasService } from '../components/new_tablas/tablas.service';
-import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { ArticuloC, tipos_articulos } from '@registros/articulos/articulo';
 import { ProduccionC } from './produccion';
 
-import { fun } from '../../core/services/functions.service';
-import { default_per_page, medidas, table_config } from '../components/new_tablas/tabla-class';
-import { ConfigI } from '../../core/interface/config-interface';
-import { Ss } from '../../core/services/singleton.service';
-import { ModalClass } from '../components/modal/modal-class';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, medidas, table_config } from '@components/new_tablas/tabla-class';
+import { ConfigI } from '@core/interface/config-interface';
+import { Ss } from '@core/services/singleton.service';
+import { ModalClass } from '@components/modal/modal-class';
 const $ = require('jquery');
 @Component({
     selector: 'app-produccion',

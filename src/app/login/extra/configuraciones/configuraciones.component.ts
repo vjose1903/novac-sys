@@ -1,16 +1,16 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { Ss } from '../../../core/services/singleton.service';
-import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
+import { Ss } from '@core/services/singleton.service';
+import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import { MessageTask } from '../../../core/models/message-task';
+import { MessageTask } from '@core/models/message-task';
 import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
-import { ConfigI } from '../../../core/interface/config-interface';
-import { fun } from '../../../core/services/functions.service';
-import { SharedService } from '../../../core/services/shared.service';
+import { ConfigI } from '@core/interface/config-interface';
+import { fun } from '@core/services/functions.service';
+import { SharedService } from '@core/services/shared.service';
 import { Router } from '@angular/router';
-import { IpcService } from '../../../core/services/ipc.service';
+import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 @Component({
   selector: 'app-configuraciones',

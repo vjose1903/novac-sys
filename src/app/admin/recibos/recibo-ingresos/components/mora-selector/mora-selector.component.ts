@@ -1,12 +1,12 @@
-import { Component, DestroyRef, EventEmitter, inject, input, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { fun } from '../../../../../core/services/functions.service';
-import { table_info } from '../../../../components/new_tablas/tabla-class';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { fun } from '@core/services/functions.service';
+import { table_info } from '@components/new_tablas/tabla-class';
 import { MoraCalculator, mora_personalizada } from '../../utils/mora-calculator';
 import { CommonModule } from '@angular/common';
 import { Popover, PopoverModule } from 'primeng/popover';
 import { FormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
-import { FacturasI } from '../../../../../admin/facturacion/factura';
+import { FacturasI } from '@admin/facturacion/factura';
 import { MoraSelectorService, MoraSelectorKeyI } from './mora-selector.service';
 import { skip, Subject, takeUntil } from 'rxjs';
 
