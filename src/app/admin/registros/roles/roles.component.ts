@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MixinClass } from '../../../core/typescript/MixinClass';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { fun } from '../../../core/services/functions.service';
-import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
-import { ModalClass } from '../../components/modal/modal-class';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
+import { ModalClass } from '@components/modal/modal-class';
 
 @Component({
     selector: 'app-roles',

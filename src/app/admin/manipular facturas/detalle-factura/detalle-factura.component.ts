@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalI } from '../../components/modal/modal-class';
+import { ModalI } from '@components/modal/modal-class';
 import * as _ from 'lodash';
-import { fun } from '../../../core/services/functions.service';
+import { fun } from '@core/services/functions.service';
 
 @Component({
     selector: 'app-detalle-factura',

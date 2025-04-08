@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { fun } from '../../../core/services/functions.service';
-import { ModalI } from '../../components/modal/modal-class';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { fun } from '@core/services/functions.service';
+import { ModalI } from '@components/modal/modal-class';
+import { table_config } from '@components/new_tablas/tabla-class';
 @Component({
   selector: 'app-detalle-nota',
   templateUrl: './detalle-nota.component.html',

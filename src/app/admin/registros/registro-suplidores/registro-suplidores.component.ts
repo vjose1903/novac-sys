@@ -1,16 +1,16 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { customValidators } from '../../../core/typescript/custom-validators';
-import { pattern } from '../../../core/typescript/constantes';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { customValidators } from '@core/typescript/custom-validators';
+import { pattern } from '@core/typescript/constantes';
 import { SuplidorC } from './suplidores';
-import { fun } from '../../../core/services/functions.service';
-import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
 
 @Component({
     selector: 'app-registro-suplidores',

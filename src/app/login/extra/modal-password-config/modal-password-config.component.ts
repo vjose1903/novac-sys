@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { ModalI } from '../../../admin/components/modal/modal-class';
-import { fun } from '../../../core/services/functions.service';
-import { SharedService } from '../../../core/services/shared.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
+import { ModalI } from '@components/modal/modal-class';
+import { fun } from '@core/services/functions.service';
+import { SharedService } from '@core/services/shared.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 
 @Component({
     selector: 'app-modal-password-config',

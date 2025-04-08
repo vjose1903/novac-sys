@@ -1,19 +1,19 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { customValidators } from '../../../core/typescript/custom-validators';
-import { pattern } from '../../../core/typescript/constantes';
-import { TablasService } from '../../components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { customValidators } from '@core/typescript/custom-validators';
+import { pattern } from '@core/typescript/constantes';
+import { TablasService } from '@components/new_tablas/tablas.service';
 import { EmpleadoC } from './empleado';
-import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
-import { fun } from '../../../core/services/functions.service';
+import { ChangePasswordComponent } from '@components/formularios en modales/change-password/change-password.component';
+import { fun } from '@core/services/functions.service';
 import { RolesC } from '../roles/roles';
-import { default_per_page, table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 
-import { Permisos } from '../../../core/typescript/permisos';
+import { Permisos } from '@core/typescript/permisos';
 @Component({
     selector: 'app-registro-empleados',
     templateUrl: './registro-empleados.component.html',

@@ -1,5 +1,5 @@
-import { DateUtils } from '../../../../core/typescript/date.utils';
-import { fun } from '../../../../core/services/functions.service';
+import { DateUtils } from '@core/typescript/date.utils';
+import { fun } from '@core/services/functions.service';
 import { FacturasI, Pago } from '../../../facturacion/factura';
 
 export class MoraCalculator {

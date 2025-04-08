@@ -1,20 +1,20 @@
-import { Ss } from './../../core/services/singleton.service';
-import { VehiculoC } from './../registros/registro-vehiculo/vehiculo';
+import { Ss } from '@core/services/singleton.service';
+import { VehiculoC } from '@registros/registro-vehiculo/vehiculo';
 import { Validators } from '@angular/forms';
-import { ModalHistorialPagosComponent } from './../components/formularios en modales/modal-historial-pagos/modal-historial-pagos.component';
-import { CrudG } from '../../core/typescript/crud-g';
+import { ModalHistorialPagosComponent } from '@components/formularios en modales/modal-historial-pagos/modal-historial-pagos.component';
+import { CrudG } from '@core/typescript/crud-g';
 import * as _ from 'lodash';
-import { fun } from '../../core/services/functions.service';
+import { fun } from '@core/services/functions.service';
 const moment = require('../../core/javascript/moment');
-import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
+import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
-import { ModalClass } from '../components/modal/modal-class';
+import { ModalClass } from '@components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
-import { PdfService } from '../../core/services/reports/pdf/pdf.service';
-import { serie, unidadAbrev } from '../../core/typescript/constantes';
-import { csvConfig as csvConfigVentas } from '../../core/services/reports/excel/configs/report/ventas';
-import { csvConfig as csvConfigMovimientosVehiculo } from '../../core/services/reports/excel/configs/report/movimientos_vehiculo';
-import { ReportGroupTypeE } from '../../admin/reportes/reporte.utils';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { serie, unidadAbrev } from '@core/typescript/constantes';
+import { csvConfig as csvConfigVentas } from '@core/services/reports/excel/configs/report/ventas';
+import { csvConfig as csvConfigMovimientosVehiculo } from '@core/services/reports/excel/configs/report/movimientos_vehiculo';
+import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 
 export enum comprobanteNormal {
   valor_fiscal = '01',

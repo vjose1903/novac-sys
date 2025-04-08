@@ -1,18 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { Router } from '@angular/router';
-import { TablasService } from '../../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
-import { PdfService } from '../../../../core/services/reports/pdf/pdf.service';
-import { PdfViewerComponent } from '../../../components/pdf-viewer/pdf-viewer.component';
-import { fun } from '../../../../core/services/functions.service';
-import { Permisos } from '../../../../core/typescript/permisos';
-import { default_per_page, table_config } from '../../../components/new_tablas/tabla-class';
-import { ModalClass } from '../../../components/modal/modal-class';
-import { ConfigI } from '../../../../core/interface/config-interface';
-import { Ss } from '../../../../core/services/singleton.service';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
+import { fun } from '@core/services/functions.service';
+import { Permisos } from '@core/typescript/permisos';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { ModalClass } from '@components/modal/modal-class';
+import { ConfigI } from '@core/interface/config-interface';
+import { Ss } from '@core/services/singleton.service';
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',

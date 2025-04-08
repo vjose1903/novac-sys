@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NgxPermissionsGuard } from 'ngx-permissions';
 import { NcfComponent } from './ncf.component';
-import { Permisos } from '../../../core/typescript/permisos';
+import { Permisos } from '@core/typescript/permisos';
 
 // const permisos = ['nota_create', 'nota_read_all', 'nota_read_one', 'nota_update', 'nota_cancelar_nota', 'nota_get_filtrados'];
 

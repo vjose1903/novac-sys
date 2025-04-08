@@ -1,14 +1,14 @@
-import { Permisos } from './../../../core/typescript/permisos';
-import { Ss } from './../../../core/services/singleton.service';
-import { CrudG } from '../../../core/typescript/crud-g';
+import { Permisos } from '@core/typescript/permisos';
+import { Ss } from '@core/services/singleton.service';
+import { CrudG } from '@core/typescript/crud-g';
 import { ReporteC } from '../../reportes/reporte';
-import { fun } from '../../../core/services/functions.service';
-import { DateUtils } from '../../../core/typescript/date.utils';
+import { fun } from '@core/services/functions.service';
+import { DateUtils } from '@core/typescript/date.utils';
 import { Validators } from '@angular/forms';
-import { ReporteViewModalConfigI } from '../../../core/interface/reporte-view-modal-config';
-import { csvConfig as csvConfigCxc } from '../../../core/services/reports/excel/configs/report/cxc';
-import { csvConfig as csvConfigCxcAnt } from '../../../core/services/reports/excel/configs/report/cxc_ant';
-import { csvConfig as csvConfigVentasCliente } from '../../../core/services/reports/excel/configs/report/ventas_cliente';
+import { ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
+import { csvConfig as csvConfigCxc } from '@core/services/reports/excel/configs/report/cxc';
+import { csvConfig as csvConfigCxcAnt } from '@core/services/reports/excel/configs/report/cxc_ant';
+import { csvConfig as csvConfigVentasCliente } from '@core/services/reports/excel/configs/report/ventas_cliente';
 import { MoraCalculator } from '../../recibos/recibo-ingresos/utils/mora-calculator';
 
 export class ClienteC extends CrudG<any> {

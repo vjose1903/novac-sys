@@ -4,15 +4,15 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
-import { CurrentUserService } from '../../core/services/current-user.service';
-import { ClienteC } from '../registros/registro-clientes/cliente';
-import { SuplidorC } from '../registros/registro-suplidores/suplidores';
-import { RequestC } from '../../core/typescript/requests';
-import { Ss } from '../../core/services/singleton.service';
-import { ConfigI } from '../../core/interface/config-interface';
-import { fun } from '../../core/services/functions.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { CuadreCajaC } from '@core/typescript/cuadre_caja';
+import { CurrentUserService } from '@core/services/current-user.service';
+import { ClienteC } from '@registros/registro-clientes/cliente';
+import { SuplidorC } from '@registros/registro-suplidores/suplidores';
+import { RequestC } from '@core/typescript/requests';
+import { Ss } from '@core/services/singleton.service';
+import { ConfigI } from '@core/interface/config-interface';
+import { fun } from '@core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 
 @Component({

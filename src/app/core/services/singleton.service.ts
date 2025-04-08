@@ -2,12 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Injectable, NgZone } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { LoaderService } from '../../loader/loader.service';
-import { LayoutService } from '../../admin/layout/layout.service';
+import { LayoutService } from '@admin/layout/layout.service';
 import { ConfigurationService } from './configuration.service';
 import { IpcService } from './ipc.service';
 import { SharedService } from './shared.service';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { FacturacionService } from '../../admin/facturacion/facturacion.service';
+import { FacturacionService } from '@admin/facturacion/facturacion.service';
 
 @Injectable({
   providedIn: 'root',

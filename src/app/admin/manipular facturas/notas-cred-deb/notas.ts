@@ -1,13 +1,13 @@
-import { ConfigI } from '../../../core/interface/config-interface';
-import { Ss } from './../../../core/services/singleton.service';
-import { CrudG } from '../../../core/typescript/crud-g';
+import { ConfigI } from '@core/interface/config-interface';
+import { Ss } from '@core/services/singleton.service';
+import { CrudG } from '@core/typescript/crud-g';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
-import { fun } from '../../../core/services/functions.service';
+import { fun } from '@core/services/functions.service';
 import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
-import { ModalClass } from '../../components/modal/modal-class';
+import { ModalClass } from '@components/modal/modal-class';
 import { ReporteC } from '../../reportes/reporte';
-import { csvConfig } from '../../../core/services/reports/excel/configs/report/notas';
+import { csvConfig } from '@core/services/reports/excel/configs/report/notas';
 
 export enum comprobanteNormal {
   debito = '03',

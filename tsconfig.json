@@ -19,7 +19,10 @@
     "checkJs": false,
     "useDefineForClassFields": false,
     "paths": {
-      "@core/*": ["app/core/*"]
+      "@core/*": ["app/core/*"],
+      "@components/*": ["app/core/components/*"],
+      "@registros/*": ["app/admin/registros/*"],
+      "@admin/*": ["app/admin/*"]
     }
   },
   "files": [

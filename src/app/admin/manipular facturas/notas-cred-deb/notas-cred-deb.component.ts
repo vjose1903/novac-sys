@@ -5,16 +5,16 @@ import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
 import { Router } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ArticuloC } from '../../registros/articulos/articulo';
+import { ArticuloC } from '@registros/articulos/articulo';
 import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC } from '../../facturacion/factura';
-import { NcfC } from '../../registros/ncf/ncf';
-import { ClienteC } from '../../registros/registro-clientes/cliente';
+import { NcfC } from '@registros/ncf/ncf';
+import { ClienteC } from '@registros/registro-clientes/cliente';
 import { NotaC } from './notas';
 import { fun } from '@core/services/functions.service';
 import { Permisos } from '@core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
-import { ConfirmacionImprimirComponent } from '../../components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
-import { ModalClass } from '../../components/modal/modal-class';
+import { table_config } from '@components/new_tablas/tabla-class';
+import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
+import { ModalClass } from '@components/modal/modal-class';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 
 @Component({

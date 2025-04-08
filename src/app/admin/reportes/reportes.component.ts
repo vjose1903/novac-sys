@@ -1,16 +1,16 @@
-import { Permisos } from './../../core/typescript/permisos';
-import { Ss } from './../../core/services/singleton.service';
+import { Permisos } from '@core/typescript/permisos';
+import { Ss } from '@core/services/singleton.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LoaderService } from '../../loader/loader.service';
-import { MixinClass } from '../../core/typescript/MixinClass';
+import { MixinClass } from '@core/typescript/MixinClass';
 import * as _ from 'lodash';
 import { ReporteC } from './reporte';
-import { ClienteC } from '../registros/registro-clientes/cliente';
+import { ClienteC } from '@registros/registro-clientes/cliente';
 import { FacturaC } from '../facturacion/factura';
-import { ArticuloC } from '../registros/articulos/articulo';
+import { ArticuloC } from '@registros/articulos/articulo';
 import { InventarioC } from '../inventario/inventario';
 import { ReciboC } from '../recibos/recibos';
-import { SuplidorC } from '../registros/registro-suplidores/suplidores';
+import { SuplidorC } from '@registros/registro-suplidores/suplidores';
 import { CuadreC } from './../cuadres/cuadres';
 import { NotaC } from '../manipular facturas/notas-cred-deb/notas';
 
