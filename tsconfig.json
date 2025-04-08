@@ -14,10 +14,13 @@
     "module": "ES2022",
     "typeRoots": ["node_modules/@types"],
     "lib": ["ES2023", "dom"],
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "allowJs": true,
     "checkJs": false,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "paths": {
+      "@core/*": ["app/core/*"]
+    }
   },
   "files": [
     "src/main.ts", 
