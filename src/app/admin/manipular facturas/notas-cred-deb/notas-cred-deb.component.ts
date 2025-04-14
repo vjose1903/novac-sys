@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
 import { Router } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ArticuloC } from '@registros/articulos/articulo';
+import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';
 import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC, DetalleFactura, request_factura_campo, tipoDocFacturacion } from '../../facturacion/factura';
 import { NcfC } from '@registros/ncf/ncf';
 import { ClienteC } from '@registros/registro-clientes/cliente';
@@ -191,17 +191,18 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           const detalle = factura.detalle_facturas[indexDetalles];
           const devueto = devueltos[factura.id]?.detalles[detalle.id] || 0;
 
+          const articulo = detalle.articulo as ArticuloI;
+          detalle['articulo'] = { ...articulo , descripcion: articulo.nombre };
           detalle['select'] = false;
-          detalle['cant'] = detalle.cantidad - devueto;
-          detalle['cant_nota'] = 0;
           detalle['colorItbis'] = dias_de_creada >= 30 ? 'red' : 'black';
           detalle['can_return_itbis'] = dias_de_creada < 30;
 
           detalle['min_'] = 0;
           detalle['max_'] = this.isCredito ? detalle.cantidad - devueto : null;
-
+          
           detalle['total_nota'] = '0.00';
           detalle['cantidad'] = detalle.cantidad - devueto;
+          detalle['cant_nota'] = 0;
           detalle['cantidad_'] = `${fun.roundNumberToDecimal(detalle['cantidad'])} ${detalle['unidad']}`;
           detalle['precio_real'] = fun.roundNumberToDecimal(detalle.precio);
           detalle['itbis_real'] = fun.roundNumberToDecimal(detalle.itbis);
@@ -275,7 +276,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           return;
         }
 
-        if (this.isCredito && cant_nota > data.cant) {
+        if (this.isCredito && cant_nota > data.cantidad) {
           fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
           fun.enfocarInput(inputId);
 
@@ -316,7 +317,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     if (key === 'cant_nota') {
       let cant_nota = fun.desformatearStNumber(value);
 
-      if (this.isCredito && cant_nota > data.cant) {
+      if (this.isCredito && cant_nota > data.cantidad) {
         fun.toastError('Nota de crédito no puede ser mayor a la factura original', 'ERROR');
         fun.enfocarInput(`input-${id_tabla}-${key}-${index}`);
       } else {
@@ -352,7 +353,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     // Actualización del estado
     this.detalleNota.update(detalles => detalles.map(detalle => (detalle.id === data.id ? { ...detalle, ...data, precio_real: precio_real_value, cant_nota: cant_nota_value } : detalle)));
-    console.log('--> ', this.detalleNota());
   }
 
   sumarTotalRow(data: DetalleFactura, cant_nota: number, precio_real: number) {
@@ -376,7 +376,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     if (precio != precio_real_value) {
       const itbis_real = fun.desformatearStNumber(data.itbis_real);
       const precio_itbis_real = precio_real_value + itbis_real;
-      const total_real = data.cant * (precio_itbis_real - descuento);
+      const total_real = data.cantidad * (precio_itbis_real - descuento);
 
       total += Math.abs(data.total - total_real);
     }
@@ -488,7 +488,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       detalles_facturas_notas: this.detalleNota()
         .filter(detalle => fun.desformatearStNumber(detalle.total_nota) > 0)
         .map(detalle => {
-          const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota } = detalle;
+          const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota, cantidad} = detalle;
 
           let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'articulo', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
 
@@ -496,6 +496,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           objDetalleTemp['itbis'] = can_return_itbis ? fun.desformatearStNumber(objDetalleTemp.itbis) : 0;
           objDetalleTemp['cantidad_en_unidades'] = cantidad_en_unidades_nota;
           objDetalleTemp['cantidad'] = cant_nota;
+          objDetalleTemp['cantidad_origin'] = cantidad;
           objDetalleTemp['detalle_factura_id'] = id;
           objDetalleTemp['itbis_real'] = fun.desformatearStNumber(objDetalleTemp['itbis_real']);
           objDetalleTemp['itbis'] = fun.desformatearStNumber(objDetalleTemp['itbis']);
@@ -515,6 +516,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     dataToSend.facturas_aplicadas.push(objTemp);
 
+    console.log('--> ', JSON.stringify(dataToSend));
     console.log('--> ', dataToSend);
 
     // const res = await this.notasClass.createOne(dataToSend);
