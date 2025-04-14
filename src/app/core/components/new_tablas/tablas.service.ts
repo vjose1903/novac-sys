@@ -92,16 +92,15 @@ export class TablasService {
     });
   }
 
-  disabledInput(params: { dato: any; column: table_info; config?: any; seleccionado: any }) {
-    const { dato, column, config, seleccionado } = params;
-
+  disabledInput(params: { dato: any; column: table_info; config?: any; seleccionado: any; all_data: any }) {
+    const { dato, column, config, seleccionado, all_data } = params;
     // Si la columna no tiene configuración de disable, retornamos false
     if (!fun.objHas(column, 'disable')) {
       return false;
     }
 
     // Si el config tiene read=true, retornamos true inmediatamente || Verificar si está configurado como siempre deshabilitado
-    if ((fun.hasValue(params?.config?.read) && params?.config?.read) || column.disable.some(conf => conf.kind === 'always')) {
+    if ((fun.hasValue(config.read) && config.read) || column.disable.some(conf => conf.kind === 'always')) {
       return true;
     }
 
@@ -128,8 +127,21 @@ export class TablasService {
 
     // Evaluar cada regla de deshabilitación
     return column.disable.some(element => {
-      const source_value = fun.hasValue(element.source) ? dato[element.source] : fun.hasValue(column.key_value) ? dato[column.key_value] : dato[column.key];
-      const target_value = dato[element.target];
+      const global = fun.hasValue(element?.global) ? element.global : false;
+      const is_equal = element?.type == 'equal' || !('type' in element);
+
+      const getSourceValue = item => {
+        if (fun.hasValue(element.source)) {
+          return fun.getProperty(item, element.source);
+        } else if (fun.hasValue(column.key_value)) {
+          return fun.getProperty(item, column.key_value);
+        } else {
+          return fun.getProperty(item, column.key);
+        }
+      };
+
+      const source_value = getSourceValue(dato);
+      const target_value = fun.getProperty(dato, element.target);
 
       let transformedSourceValue = element.transform ? transformValue(source_value, element.transform) : source_value;
       let transformedTargetValue = element.transform ? transformValue(target_value, element.transform) : target_value;
@@ -138,15 +150,39 @@ export class TablasService {
         case 'has_value':
           return fun.hasValue(transformedTargetValue);
         case 'compare':
-          return element.type == 'equal' ? transformedSourceValue == transformedTargetValue : transformedSourceValue != transformedTargetValue;
+          if (global) {
+            return all_data.some(item => {
+              const source_value = getSourceValue(item);
+              const target_value = fun.getProperty(item, element.target);
+              const transformed_source_value = element.transform ? transformValue(source_value, element.transform) : source_value;
+              const transformed_target_value = element.transform ? transformValue(target_value, element.transform) : target_value;
+
+              return is_equal ? transformed_source_value == transformed_target_value : transformed_source_value != transformed_target_value;
+            });
+          } else {
+            return is_equal ? transformedSourceValue == transformedTargetValue : transformedSourceValue != transformedTargetValue;
+          }
         case 'campo':
-          if (element.value.length == 0) {
+          if (fun.isEmpty(element.value)) {
             return !transformedTargetValue;
           } else {
-            if (element.type == 'equal' || !('type' in element)) {
-              return element.value.some(value => value == transformedTargetValue);
+            if (global) {
+              return all_data.some(item => {
+                const target_value = fun.getProperty(item, element.target);
+                const transformed_target_value = element.transform ? transformValue(target_value, element.transform) : target_value;
+
+                if (is_equal) {
+                  return element.value.some(value => value == transformed_target_value);
+                } else {
+                  return element.value.some(value => value != transformed_target_value);
+                }
+              });
             } else {
-              return element.value.some(value => value != transformedTargetValue);
+              if (is_equal) {
+                return element.value.some(value => value == transformedTargetValue);
+              } else {
+                return element.value.some(value => value != transformedTargetValue);
+              }
             }
           }
         default:

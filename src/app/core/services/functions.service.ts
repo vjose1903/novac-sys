@@ -471,25 +471,27 @@ export class fun {
     }
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: isEmpty
-  // Descripcion : Esta funcion valida que si una variable esta vacia
-  // __________________________________________________________________________________________________
+// __________________________________________________________________________________________________
+  /**
+   * Nombre: isEmpty
+   * Descripción: Esta función valida si una variable está vacía.
+   * @param value La variable a evaluar.
+   * @returns true si la variable está vacía, false en caso contrario.
+   * @example fun.isEmpty(variable)
+   */
 
-  static isEmpty(value) {
-    return (
-      // es null o indefinido
-      value === null ||
-      value === undefined ||
-      // es una fecha invalida
-      (value instanceof Date && isNaN(value.getTime())) ||
-      // si tiene longitud 0
-      (value.hasOwnProperty('length') && value.length == 0) ||
-      // si es un string vacio o con lleno de espacios
-      (typeof value == 'string' && value.trim().length == 0) ||
-      // si es un objeto y no tiene propiedades
-      (value.constructor == Object && Object.keys(value).length == 0)
-    );
+  static isEmpty(value: any) {
+    if (value == null) return true;
+
+    if (typeof value === 'string') return value.trim().length === 0;
+
+    if (Array.isArray(value)) return value.length === 0;
+
+    if (value instanceof Date) return isNaN(value.getTime());
+    
+    if (typeof value === 'object') return Object.keys(value).length === 0;
+
+    return false;
   }
 
   // __________________________________________________________________________________________________
@@ -840,8 +842,7 @@ export class fun {
   // Descripcion : Esta funcion retorna el valor de una propiedad de un objeto
   // _________________________________________________________________________________________________
   static getProperty(obj, prop) {
-    const props_split = prop.split('.');
-    return props_split.reduce((objeto, property) => (typeof objeto == 'undefined' || objeto === null ? objeto : objeto[property]), obj);
+    return prop.split('.').reduce((objeto, property) => objeto?.[property], obj);
   }
 
   // __________________________________________________________________________________________________

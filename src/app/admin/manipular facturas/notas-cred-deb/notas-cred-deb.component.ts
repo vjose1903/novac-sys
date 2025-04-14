@@ -78,7 +78,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         textAlign: 'end',
         disable: [
           { kind: 'campo', target: 'select', value: [false] },
-          { kind: 'campo', target: 'cant_nota', type: 'notEqual', transform: transformType.number, value: [0] },
+          { kind: 'campo', target: 'cant_nota', type: 'notEqual', transform: transformType.number, value: [0], global: true },
         ],
         style: { width: '8rem', 'padding-right': '0.5rem' },
       },
@@ -161,7 +161,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         textAlign: 'end',
         disable: [
           { kind: 'campo', target: 'select', value: [false] },
-          { kind: 'compare', source: 'precio', target: 'precio_real', transform: transformType.number, type: 'notEqual' },
+          { kind: 'compare', source: 'precio', target: 'precio_real', transform: transformType.number, type: 'notEqual', global: true },
         ],
         style: { width: '6rem' },
       });
@@ -177,7 +177,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   async getFactura(): Promise<FacturasI> {
     return new Promise(async resolve => {
-      const args = { campo: request_factura_campo.cabecera_factura_id, valor: this.id_factura, tipo_factura_id: 0, adelantada: false, paginado: false, tipo: tipoDocFacturacion.venta };
+      const args = { campo: request_factura_campo.cabecera_factura_id, valor: this.id_factura, tipo_factura_id: 0, adelantada: false, paginado: false, tipo: tipoDocFacturacion.venta, extra_params: { articulo_in_detalle: true } };
       const res_factura = await this.facturaClass.getFacturasByParams(args);
 
       const factura: FacturasI = res_factura['data'][0] as FacturasI;
@@ -352,6 +352,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     // Actualización del estado
     this.detalleNota.update(detalles => detalles.map(detalle => (detalle.id === data.id ? { ...detalle, ...data, precio_real: precio_real_value, cant_nota: cant_nota_value } : detalle)));
+    console.log('--> ', this.detalleNota());
   }
 
   sumarTotalRow(data: DetalleFactura, cant_nota: number, precio_real: number) {
@@ -489,7 +490,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         .map(detalle => {
           const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota } = detalle;
 
-          let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
+          let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'articulo', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
 
           objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
           objDetalleTemp['itbis'] = can_return_itbis ? fun.desformatearStNumber(objDetalleTemp.itbis) : 0;
@@ -514,14 +515,16 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     dataToSend.facturas_aplicadas.push(objTemp);
 
-    const res = await this.notasClass.createOne(dataToSend);
+    console.log('--> ', dataToSend);
 
-    this.notasClass.parseDataToPdf(res['data']).then(data_parsed => {
-      const objToPdf = { data: data_parsed, type: 'nota' };
+    // const res = await this.notasClass.createOne(dataToSend);
 
-      PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch(err => fun.toastError(err.msg, 'ERROR'));
-      this.layServ.nextCheckCuadreToday(true);
-      this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
-    });
+    // this.notasClass.parseDataToPdf(res['data']).then(data_parsed => {
+    //   const objToPdf = { data: data_parsed, type: 'nota' };
+
+    //   PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch(err => fun.toastError(err.msg, 'ERROR'));
+    //   this.layServ.nextCheckCuadreToday(true);
+    //   this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
+    // });
   }
 }

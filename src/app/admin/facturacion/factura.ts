@@ -15,6 +15,7 @@ import { serie, unidadAbrev } from '@core/typescript/constantes';
 import { csvConfig as csvConfigVentas } from '@core/services/reports/excel/configs/report/ventas';
 import { csvConfig as csvConfigMovimientosVehiculo } from '@core/services/reports/excel/configs/report/movimientos_vehiculo';
 import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
+import { ArticuloI } from '@registros/articulos/articulo';
 
 export enum comprobanteNormal {
   valor_fiscal = '01',
@@ -247,10 +248,11 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise(resolve => this.getOne(id, extra).then(res => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: string | number; tipo_factura_id: number; tipo: string; page?: number; per_page?: number; paginado?: boolean; adelantada?: boolean; pagada?: any; estado?: boolean; movimientos_viaje?: boolean }) {
+  getFacturasByParams(args: { campo: string; valor: string | number; tipo_factura_id: number; tipo: string; page?: number; per_page?: number; paginado?: boolean; adelantada?: boolean; pagada?: any; estado?: boolean; movimientos_viaje?: boolean, extra_params?: any }) {
     const valor_enc = btoa(args.valor.toString());
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
+    args.extra_params ??= {};
 
     const extra = {
       afterPath: `custom/get_documentos`,
@@ -266,6 +268,7 @@ export class FacturaC extends CrudG<FacturasI> {
         is_adelantada: fun.objHas(args, 'adelantada') ? args.adelantada : '0',
         estado: fun.objHas(args, 'estado') ? args.estado : '0',
         movimientos_viaje: args.movimientos_viaje ?? false,
+        ...args.extra_params,
       },
     };
 
@@ -484,7 +487,7 @@ export interface DetalleFactura {
   retirado_en_venta: number;
   calcular_saco: boolean;
   detalle_factura_nota: null;
-  articulo: string;
+  articulo: string | ArticuloI;
   se_calcula_saco: boolean;
   precio: number;
   costo: number;

@@ -546,7 +546,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   disableInput(dato, column) {
-    return this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado });
+    return this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado, all_data: this.data });
   }
 
   showIcon(objIcon, data) {
@@ -600,7 +600,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorCheck(dato, column, index) {
-    const is_disable = this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado });
+    const is_disable = this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado, all_data: this.data });
 
     if (!is_disable) {
       const key = column.key;

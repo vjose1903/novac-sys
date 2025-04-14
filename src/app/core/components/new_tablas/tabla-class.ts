@@ -90,9 +90,12 @@ interface iconsI {
 }
 
 export interface iconDisableItem {
-  kind?: 'always' | 'selected' | 'has_value' | 'campo';
+  kind?: 'always' | 'selected' | 'has_value' | 'campo' | 'compare';
   target?: string;
   value?: Array<any>;
+  type?: 'equal' | 'notEqual';
+  transform?: transformType;
+  global?: boolean;
 }
 export interface paginateI {
   show?: boolean;
