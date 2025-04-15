@@ -490,7 +490,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         .map(detalle => {
           const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota, cantidad} = detalle;
 
-          let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'articulo', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor']);
+          let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'articulo', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor', 'descripcion']);
 
           objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
           objDetalleTemp['itbis'] = can_return_itbis ? fun.desformatearStNumber(objDetalleTemp.itbis) : 0;
