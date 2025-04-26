@@ -1,4 +1,4 @@
-import { DateUtils } from '@core/typescript/date.utils';
+import { DateUtils } from '@vjose1903/dateutils';
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 import { fun } from '@core/services/functions.service';

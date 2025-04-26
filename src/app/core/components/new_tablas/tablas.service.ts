@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { default_per_page, paginateI, table_config, table_info, transformType } from './tabla-class';
 import { fun } from '@core/services/functions.service';
-import { DateUtils } from '../../../core/typescript/date.utils';
+import { DateUtils } from '@vjose1903/dateutils';
 
 @Injectable({
   providedIn: 'root',

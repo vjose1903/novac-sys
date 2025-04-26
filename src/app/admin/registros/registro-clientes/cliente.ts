@@ -3,7 +3,7 @@ import { Ss } from '@core/services/singleton.service';
 import { CrudG } from '@core/typescript/crud-g';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '@core/services/functions.service';
-import { DateUtils } from '@core/typescript/date.utils';
+import { DateUtils } from '@vjose1903/dateutils';
 import { Validators } from '@angular/forms';
 import { ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
 import { csvConfig as csvConfigCxc } from '@core/services/reports/excel/configs/report/cxc';

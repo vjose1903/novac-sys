@@ -1,4 +1,4 @@
-import { DateUtils } from '@core/typescript/date.utils';
+import { DateUtils } from '@vjose1903/dateutils';
 import { fun } from '@core/services/functions.service';
 import { FacturasI, Pago } from '../../../facturacion/factura';
 

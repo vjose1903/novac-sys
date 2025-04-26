@@ -7,7 +7,7 @@ import { serie } from '@core/typescript/constantes';
 // import { CxP } from '@registros/registro-suplidores/suplidores';
 import { fun } from '@core/services/functions.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { DateUtils } from '@core/typescript/date.utils';
+import { DateUtils } from '@vjose1903/dateutils';
 import { ArticuloC } from '@registros/articulos/articulo';
 import { ClienteC, CxC } from '@registros/registro-clientes/cliente';
 import { ModalI } from '@components/modal/modal-class';

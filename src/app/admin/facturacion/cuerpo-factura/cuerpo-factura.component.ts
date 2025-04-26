@@ -646,8 +646,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       const precioOcosto = this.factServ.isCompra ? costo : precio;
 
-      const itbis = articulo?.calcular_itbis ? precioOcosto * 0.18 : 0;
-      const total = (precioOcosto + itbis) * cantidad;
+      const total = precioOcosto * cantidad - descuento;
+      const itbis = articulo?.calcular_itbis ? total * 0.18 : 0;
 
       if (descuento == 0 || fun.isEmpty(descuento)) {
         if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
@@ -667,10 +667,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
 
       if (fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
-        let nuevoTotal = 0;
-        nuevoTotal = total - descuento;
 
-        if (nuevoTotal < 0) {
+        if (total < 0) {
           fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
           fun.enfocarAndSelectInput(`descuento_valor-${index}`);
         } else {
@@ -679,7 +677,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           if (fun.hasValue(currentDescuento)) currentDescuento.valor = descuento;
           else this.listaDeDescuentos.push({ key: key, valor: descuento });
 
-          detalle['total'] = fun.roundNumberToDecimal(nuevoTotal);
+          detalle['total'] = fun.roundNumberToDecimal(total);
           detalle['itbis'] = fun.roundNumberToDecimal(itbis);
           this.ajustarSecuencia();
         }

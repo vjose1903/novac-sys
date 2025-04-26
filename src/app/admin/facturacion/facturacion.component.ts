@@ -29,6 +29,7 @@ import { ModalClass } from '@components/modal/modal-class';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { ConfigArticuloC, ConfigArticuloI } from '@registros/articulos/configuracion_articulos/articulos_configuracion';
 import { HtmlElementsService } from '@core/services/html-elements.service';
+import { DateUtils } from '@vjose1903/dateutils';
 
 @Component({
   selector: 'app-facturacion',
@@ -1414,7 +1415,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       factura_a_guardar['archivo_id'] = this.factura_guardada?.archivo_id;
       facturas_localStorage[index_factura] = factura_a_guardar;
     } else {
-      
       factura_a_guardar['archivo_id'] = facturas_localStorage.length > 0 ? _.last(facturas_localStorage).archivo_id + 1 : 1;
 
       facturas_localStorage.push(factura_a_guardar);
@@ -1717,9 +1717,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let fecha_valida = null;
 
-    if (fun.hasValue(this.paqueteComprobante?.fecha_valida) && moment(this.paqueteComprobante?.fecha_valida).isValid()) {
-      fecha_valida = moment(this.paqueteComprobante?.fecha_valida).format('YYYY-MM-DD');
-      fecha_valida = moment(fecha_valida).add(8, 'hours').format();
+    if (fun.hasValue(this.paqueteComprobante?.fecha_valida) && DateUtils.isValid(new Date(this.paqueteComprobante?.fecha_valida))) {
+      fecha_valida = DateUtils.format({ date: this.paqueteComprobante?.fecha_valida, dateFormat: 'YYYY-MM-DD' });
     }
 
     cabecera_fact['fecha_valida'] = fecha_valida;
@@ -1781,9 +1780,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
-    console.log("cabecera_fact ", JSON.stringify(cabecera_fact));
-    
-    
+    console.log('cabecera_fact ', JSON.stringify(cabecera_fact));
 
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
     else res = await this.facturaClass.createOne(cabecera_fact);

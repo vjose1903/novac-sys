@@ -16,6 +16,7 @@ import { table_config, transformType } from '@components/new_tablas/tabla-class'
 import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { ModalClass } from '@components/modal/modal-class';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import Big from 'big.js';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -303,7 +304,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         data.total_nota = '0.00';
         data.cant_nota = 0;
         data.precio_real = fun.roundNumberToDecimal(data.precio);
-        data.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? data.precio_real * 0.18 : 0);
+        // data.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? data.precio_real * 0.18 : 0);
 
         this.detalleNota.update(detalles => detalles.filter(detalle => detalle.id !== data.id));
       } else {
@@ -345,6 +346,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         fun.enfocarInput(inputId);
       }
 
+      // TODO: hablar con papi a ver como es que se maneja el itbis en las notas de credito y debito
       data.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? precio_real * 0.18 : 0);
       this.sumarTotalRow(data, cant_nota_value, precio_real);
 
@@ -356,7 +358,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   sumarTotalRow(data: DetalleFactura, cant_nota: number, precio_real: number) {
-    const descuento = data.descuento_valor / data.cantidad;
+    const descuento_big = Big(data.descuento_valor);
+    const descuento = descuento_big.div(data.cantidad).toNumber();
     const precio = fun.desformatearStNumber(data.precio);
     const precio_real_value = fun.desformatearStNumber(precio_real);
 
@@ -365,21 +368,35 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       return;
     }
 
+    console.log(" ")
+    console.log(" ")
+    console.log(" ------------------------------")
+    console.log(" precio ", precio)
+    console.log(" ------------------------------")
+    console.log(" descuento ", data.descuento_valor)
+    console.log(" descuento_equivalente ", descuento)
+    console.log(" cant_nota ", cant_nota)
+
+
     let total = 0;
 
     if (this.isCredito) {
+
       const itbis = data.calcular_itbis && data.can_return_itbis ? precio * 0.18 : 0;
       const precio_itbis = precio + itbis;
       total += cant_nota * (precio_itbis - descuento);
     }
-
+    console.log('total', total);
+    
+    
     if (precio != precio_real_value) {
       const itbis_real = fun.desformatearStNumber(data.itbis_real);
       const precio_itbis_real = precio_real_value + itbis_real;
       const total_real = data.cantidad * (precio_itbis_real - descuento);
-
+      
       total += Math.abs(data.total - total_real);
     }
+    console.log('total', total);
 
     data.total_nota = fun.roundNumberToDecimal(total);
   }
