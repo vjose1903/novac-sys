@@ -618,7 +618,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       let conteo = 0;
 
       factura.detalle_facturas.map(async (detalle) => {
-        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Funda: 'Funda' };
+        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Bolsa: 'Bol.' };
 
         const contenidos_format = this.formatContenidos(detalle.contenidos);
 

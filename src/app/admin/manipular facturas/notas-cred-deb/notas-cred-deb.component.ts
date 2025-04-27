@@ -509,11 +509,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
           let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'articulo', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor', 'descripcion']);
 
+          // TODO: VER COMO AGREGO EL CODIGO Y PROBAR LO DE LA DESCRIPCION NO ME CONVENCE
           objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
           objDetalleTemp['itbis'] = can_return_itbis ? fun.desformatearStNumber(objDetalleTemp.itbis) : 0;
           objDetalleTemp['cantidad_en_unidades'] = cantidad_en_unidades_nota;
           objDetalleTemp['cantidad'] = cant_nota;
           objDetalleTemp['cantidad_origin'] = cantidad;
+          objDetalleTemp['codigo'] = cantidad;
           objDetalleTemp['detalle_factura_id'] = id;
           objDetalleTemp['itbis_real'] = fun.desformatearStNumber(objDetalleTemp['itbis_real']);
           objDetalleTemp['itbis'] = fun.desformatearStNumber(objDetalleTemp['itbis']);

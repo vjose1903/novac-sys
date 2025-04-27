@@ -175,7 +175,7 @@ export enum medidas {
   Galon = 'Galones',
   Onza = 'Onzas',
   Producto = 'Productos',
-  Funda = 'Fundas',
+  Bolsa = 'Bolsas',
 }
 
 export class TablaClass {
