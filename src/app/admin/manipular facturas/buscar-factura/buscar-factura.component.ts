@@ -1,8 +1,8 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { actionFacturacion, deleteDocumentosTypes, request_factura_campo, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from '@core/services/singleton.service';
-import { serie } from '@core/typescript/constantes';
-import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input } from '@angular/core';
+import { serie, seriesDgiiI } from '@core/typescript/constantes';
+import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input, computed, signal, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -54,8 +54,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   showSide: boolean = false;
   TablasComponent;
   permissions = Permisos;
-  series = seriesDGII;
-  serieSelected = serie.normal;
 
   tipos_documentos = [];
   tipo_documento_selected = tipoDocFacturacion.venta;
@@ -70,7 +68,18 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     suplidor: request_factura_campo.suplidor_id,
   };
 
+  serieSelected = signal<serie>(serie.all);
+  facturasSerieOptions: seriesDgiiI[] = [];
   fun = fun;
+  serie = serie;
+
+  comprobantes_masks = {
+    [serie.normal]: { mask: 'B9999999999', placeholder: 'B__________' },
+    [serie.electronica]: { mask: 'E999999999999', placeholder: 'E____________' },
+    [serie.no]: { mask: ' ', placeholder: ' ' },
+  };
+
+  comprobante_mask_selected = computed(() => this.comprobantes_masks[this.serieSelected()]);
 
   table_config;
 
@@ -114,10 +123,15 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     this.verificatePermisos().then(async res => {
       this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       this.completarTituloPag();
-      // NOTE: temporal
-      this.verificateSerieValidity();
+
       fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
     });
+
+    this.getSeriesOptions();
+  }
+
+  getSeriesOptions(includeAll: boolean = true) {
+    this.facturasSerieOptions = seriesDGII({ includeAll });
   }
 
   verificatePermisos() {
@@ -141,11 +155,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     });
   }
 
-  verificateSerieValidity() {
-    const option = this.series.find(option => option.value == serie.electronica);
-    option.disabled = true;
-  }
-
   pressEscResponse(res) {
     if (fun.hasValue(res)) fun.enfocarInput('valorI');
   }
@@ -164,7 +173,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia === NotaC.base_comprobante[this.serieSelected][this.buscarPara]);
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia === NotaC.base_comprobante[this.serieSelected()][this.buscarPara]);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
@@ -460,6 +469,20 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
       setTimeout(() => {
         this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       }, 100);
+    }
+
+    if (tipo == 'buscar_por') {
+      this.getSeriesOptions(valor != this.campos.numeroComprobante);
+
+      if (valor == this.campos.numeroComprobante) {
+        if (this.serieSelected() == serie.all) {
+          this.serieSelected.set(serie.no);
+        }
+      } else {
+        if (this.serieSelected() == serie.no) {
+          this.serieSelected.set(serie.all);
+        }
+      }
     }
   }
 

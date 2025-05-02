@@ -187,7 +187,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   isInitialized = false;
   cofig_articulos: ConfigArticuloI;
 
-  facturasSerieOptions = seriesDGII;
+  facturasSerieOptions = seriesDGII();
   htmlServ = inject(HtmlElementsService);
   factServ = inject(FacturacionService);
 
@@ -378,16 +378,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  // NOTE: TEMPORAL
-
-  verificateSerieValidity() {
-    let disable = false;
-    if (this.factServ.tipoDocumento != tipoDocFacturacion.compra) disable = true;
-
-    const option = this.facturasSerieOptions.find(option => option.value == serie.electronica);
-    // if (option) option.disabled = disable;
-  }
-
   rellenarVariables() {
     return new Promise<void>(resolve => {
       this.isInitialized = false;
@@ -395,8 +385,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factServ.tipoDocumento = this.tipo_documento;
       this.factServ.action = this.action;
       this.factServ.productos_devueltos.length = 0;
-      // NOTE: TEMPORAL
-      this.verificateSerieValidity();
 
       if (this.factServ.isVenta) this.titulo = 'Factura de venta';
       else if (this.factServ.isCompra) this.titulo = 'Factura de compra';

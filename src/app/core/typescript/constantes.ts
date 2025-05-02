@@ -8,12 +8,31 @@ export enum serie {
   no = 0,
   normal = 'normal',
   electronica = 'electronica',
+  all = 'all',
 }
 
-export const seriesDGII = [
-  { label: 'Normal', value: serie.normal, disabled: false },
-  { label: 'Electronica', value: serie.electronica, disabled: false },
-];
+export interface seriesDgiiI {
+  label: string;
+  value: serie;
+  disabled?: boolean;
+}
+
+export const seriesDGII = (args?: { includeAll?: boolean; disableNormal?: boolean; disableElectronica?: boolean; disableAll?: boolean }): seriesDgiiI[] => {
+  args ??= {};
+  args.includeAll ??= false;
+  args.disableNormal ??= false;
+  args.disableElectronica ??= false;
+  args.disableAll ??= false;
+
+  const list: seriesDgiiI[] = [
+    { label: 'Normal', value: serie.normal, disabled: args.disableNormal },
+    { label: 'Electronica', value: serie.electronica, disabled: args.disableElectronica },
+  ];
+
+  if (args.includeAll) list.unshift({ label: 'Todas', value: serie.all, disabled: args.disableAll });
+
+  return list;
+};
 
 export enum operativeSystemE {
   windows = 'windows',
@@ -25,7 +44,6 @@ export enum TypeNavigation {
   reload = 1,
   back_forward = 2,
 }
-
 
 export enum unidadAbrev {
   barril = 'BARR',
@@ -41,7 +59,7 @@ export enum unidadAbrev {
   tanque = 'TANQUE',
   unidad = 'UND',
   saco = 'SAC',
-  quintal =' Q',
+  quintal = ' Q',
   miligramo = 'MG',
   onzas = 'OZ',
 }
