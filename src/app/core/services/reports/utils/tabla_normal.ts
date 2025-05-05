@@ -2,11 +2,11 @@
 import { fun } from '../../functions.service';
 import * as fun_ from './funciones';
 
-export function getContentWithTablaNormal(configuration, data, index_data?, index_info?) {
-  return makeTablaNormal(configuration, data, index_data, index_info);
+export function getContentWithTablaNormal(configuration, data, is_electronica = false, index_data?, index_info?) {
+  return makeTablaNormal(configuration, data, index_data, index_info, is_electronica);
 }
 
-export function makeTablaNormal(configuration, data, index_data?, index_info?) {
+export function makeTablaNormal(configuration, data, index_data?, index_info?, is_electronica?) {
   const data_ = data.tipo_tabla === 'normal' ? data : data.contenido_reporte[index_data];
 
   const contendio_ = data.tipo_tabla === 'normal' ? data_.contenido_reporte : index_info == 0 ? data_.contenido_titulo : data_.contenido_grupo;
@@ -43,7 +43,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
 
   if (!configuration.only_titulo && Array.isArray(contendio_)) {
     contendio_.forEach((detalle, j) => {
-      const row = formarCuerpo(data, configuration, detalle, j);
+      const row = formarCuerpo(data, configuration, detalle, j, is_electronica);
       body.push(row as TablaRowPdfMake);
     });
   }
@@ -80,7 +80,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?) {
         } as TablaPdfMake)
       : { text: Array.isArray(contendio_) ? configuration.mensaje_contenido_vacio : '', margin: [0, 2, 0, 5] },
 
-    Array.isArray(contendio_) && contendio_.length > 0 || data_ && 'contenido_titulo' in data_ && data_.contenido_titulo == 'TOTAL GENERAL' && index_info == 1 ? getTotalizacion(configuration, data_) : { text: '' },
+    (Array.isArray(contendio_) && contendio_.length > 0) || (data_ && 'contenido_titulo' in data_ && data_.contenido_titulo == 'TOTAL GENERAL' && index_info == 1) ? getTotalizacion(configuration, data_) : { text: '' },
   ];
 
   return content;
@@ -92,9 +92,7 @@ function getTotalizacion(configuration, data) {
     unbreakable: true,
   };
 
-
   if ((data.total >= 0 && (data?.contenido_grupo?.length > 0 || data?.contenido_reporte?.length > 0)) || data.total >= 1) {
-    
     const array = [
       { bool: configuration?.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.roundNumberToDecimal(data?.bruto) },
       { bool: configuration?.mostrar_descuento, title: 'DESCUENTO RD$ ', value: fun_.roundNumberToDecimal(data?.descuento) },
@@ -128,7 +126,7 @@ function getTotalizacion(configuration, data) {
   return totalizacion;
 }
 
-function formarCuerpo(data, configuration, detalle, j) {
+function formarCuerpo(data, configuration, detalle, j, is_electronica) {
   const row = [];
 
   const brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
@@ -138,7 +136,7 @@ function formarCuerpo(data, configuration, detalle, j) {
   configuration.info.forEach((info, i) => {
     let obj = {};
     let text_ = '';
-    const value = detalle[info.key];
+    const value = fun.getProperty(detalle, info.key);
 
     if (info.key === 'index') {
       text_ = j + 1;
@@ -155,6 +153,14 @@ function formarCuerpo(data, configuration, detalle, j) {
       }
 
       if (info.uppercase) text_ = fun.Capitalice(text_);
+
+      if ('maxLength' in info && info.maxLength) {
+        const raw_descripcion = text_.trim();
+        const longitud_descripcion = raw_descripcion.length;
+        text_ = longitud_descripcion > info.maxLength ? `${raw_descripcion.slice(0, info.maxLength)}` : raw_descripcion;
+      }
+
+      if (is_electronica && 'showExento' in info && info.showExento && !detalle.calcular_itbis) text_ = `${text_} - E`;
     }
 
     obj = {

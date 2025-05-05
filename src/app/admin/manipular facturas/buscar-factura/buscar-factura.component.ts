@@ -70,6 +70,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   serieSelected = signal<serie>(serie.all);
   facturasSerieOptions: seriesDgiiI[] = [];
+  notasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
+  notaSerieSelected = signal<serie>(serie.all);
+
   fun = fun;
   serie = serie;
 
@@ -173,7 +176,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia === NotaC.base_comprobante[this.serieSelected()][this.buscarPara]);
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[this.serieSelected()][this.buscarPara]);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
@@ -250,7 +253,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
       this.notas.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: this.buscarPara.includes('credito') ? NotaC.tipo_nota.credito : NotaC.tipo_nota.debito } };
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: '' } };
+
+      console.log('this.buscarPara ', this.buscarPara);
+
+      extra.parameters.tipo_nota = NotaC.base_comprobante[this.notaSerieSelected()][this.buscarPara];
+      
 
       try {
         const res = await this.notasClass.getAll(extra);
@@ -283,6 +291,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     });
   }
 
+  changeNotaSerie(serie) {
+    this.notaSerieSelected.set(serie);
+    this.pedirNotas(this.tServ.obj_paginate.default);
+  }
+
   mostrarListaFacturas() {
     let res = false;
     if (this.facturas && this.facturas.length > 0) {
@@ -308,6 +321,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
       const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
       const args = { campo: this.buscar_por, valor: valor, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected, movimientos_viaje: true };
+
       const res = await this.facturaClass.getFacturasByParams(args);
 
       res['data'].forEach(fact => {
@@ -362,7 +376,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
       this.facturas.sort((a, b) => fun.compare(a, b, ['fecha_equivalente'], 'desc'));
 
       if (this.facturas.length > 0) {
-        if (this.buscar_por == this.campos.numeroComprobante || (this.buscar_por == this.campos.numeroFactura && this.tipo_factura_id != '0')) {
+        if (this.buscar_por == this.campos.numeroComprobante) {
+          console.log("this.facturas[0] ", this.facturas[0]);
+          // this.facturas[0].detalle_facturas.push(this.facturas[0].detalle_facturas[0])
+          
           this.facturaClass.parseDataToPdf(this.facturas[0]).then(factura_parsed => {
             const crear_nota = this.buscarPara.includes('nota');
             this.facturaSelected = factura_parsed;
@@ -535,6 +552,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
           this.notaSelected = params.data;
 
           this.notasClass.parseDataToPdf(params.data).then(data_parsed => {
+            console.log("data_parsed ", data_parsed);
+            
             this.mostrarFactura({ factura: data_parsed, type: 'nota', dataDB: params.data });
           });
         }

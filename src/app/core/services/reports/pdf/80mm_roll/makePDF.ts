@@ -12,6 +12,7 @@ import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_pre_venta } from './configuraciones/pre_venta';
 import { config_notas } from './configuraciones/notas';
+import { serie } from '@core/typescript/constantes';
 
 const configuraciones = {
   pre_venta: config_pre_venta,
@@ -27,6 +28,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const is_compra = data?.tipo == 'compra' ? true : false;
 
   const is_suplidor = is_compra;
+  const is_electronica = data?.serie == serie.electronica;
 
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
@@ -34,13 +36,13 @@ export function makePDF(data, file_name, tipo_pdf?) {
     pageSize: { width: 200, height: 'auto' },
     pageOrientation: 'portrait',
     pageMargins: [5, 20, 5, 20],
-    content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf),
+    content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf, is_electronica),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
       barcode: fun_.my_barcode(data.identificador),
     },
     styles: styles_,
-    defaultStyle
+    defaultStyle,
   };
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };
@@ -51,12 +53,12 @@ export function makePDF(data, file_name, tipo_pdf?) {
 // CONTENIDO
 // ==========================================================================================================================================================
 
-function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf) {
+function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf, is_electronica) {
   const configuration = configuraciones[tipo_pdf];
 
   data.tipo_tabla = 'normal';
 
-  const tabla_detalles = getContentWithTablaNormal(configuration, data);
+  const tabla_detalles = getContentWithTablaNormal(configuration, data, is_electronica);
 
   const content = [
     {

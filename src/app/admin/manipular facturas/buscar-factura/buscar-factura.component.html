@@ -10,7 +10,7 @@
 
   <div class="col-12 p-0 arriba">
     <div class="row">
-      <div class="col-6">
+      <div class="col-7">
         <div class="card card-padding sombra">
           <!-- ================ TIPO DOCUMENTO  ================ -->
           <div class="d-flex gap-3">
@@ -128,7 +128,7 @@
           </div>
         </div>
       </div>
-      <div class="col-6">
+      <div class="col-5">
         <div class="w-100 h-100 d-flex justify-content-between flex-column">
           @if (buscarPara.includes('nota')) {
             <btn-icon-circular
@@ -160,11 +160,16 @@
 <!-- ============================================================================================================================================ -->
 
 <p-drawer [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }" (onHide)="onHideSide()">
-  <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
-    <div class="innerTablas">
-      @if (notas.length) {
-        <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
-      }
+  <div class="w-100 h-100 d-flex flex-column gap-2">
+    <div>
+      <p-selectButton [options]="notasSerieOptions" [ngModel]="notaSerieSelected()" (ngModelChange)="changeNotaSerie($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+    </div>
+    <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
+      <div class="innerTablas">
+        @if (notas.length) {
+          <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        }
+      </div>
     </div>
   </div>
 </p-drawer>

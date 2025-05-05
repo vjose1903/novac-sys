@@ -78,7 +78,7 @@ export function makeReporte(data) {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
-    defaultStyle
+    defaultStyle,
   };
 
   const obj = { doc: dd, file: 'reporte.pdf', type: 'base64', pageOrientation: pageO };

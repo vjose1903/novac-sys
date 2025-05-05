@@ -7,6 +7,8 @@ export function my_barcode(code) {
 
   return canvas.toDataURL('image/png');
 }
+
+export const pageBreak = { text: '', pageBreak: 'before' };
 // =========================================================================================================
 export function my_capitalize(str) {
   const ultimoCaracte = str.length + 1;
@@ -38,6 +40,7 @@ export function my_stringJoin(str, target) {
 }
 
 // =========================================================================================================
+
 export function my_dateFormater(str) {
   let dateObj = new Date(str);
   let month = String(dateObj.getMonth() + 1).padStart(2, '0');

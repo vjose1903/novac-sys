@@ -49,7 +49,7 @@ export enum unidadAbrev {
   barril = 'BARR',
   bolsa = 'BOL',
   botella = 'BOTELLA',
-  caja = 'CAJ ',
+  caja = 'CAJ',
   docena = 'DOC',
   fardo = 'FARD',
   galon = 'GL',

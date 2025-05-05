@@ -5,7 +5,7 @@ export const infoPagare = {
 };
 
 export const infoTipoPdf = {
-  notas: ['tipo_pdf'],
+  notas: ['tipo_pdf', 'razon'],
   ventas: ['condicion', 'tipo_factura'],
   recibo_ingreso: ['tipo_pdf'],
   conduce: ['tipo_pdf'],
@@ -14,7 +14,7 @@ export const infoTipoPdf = {
 };
 
 export const infoResumenPartes = {
-  notas: ['total'],
+  notas: ['bruto', 'itbis', 'total'],
   ventas: ['bruto', 'descuento', 'total', 'efectivo', 'cambio'],
   recibo_ingreso: ['bruto', 'mora', 'total'],
   conduce: [],
@@ -22,8 +22,12 @@ export const infoResumenPartes = {
   cuadre_caja: [],
 };
 
+export const excludeFacturaPartesByTipoFactura = {
+  valida: [25],
+};
+
 export const infoFacturaPartes = {
-  notas: ['ncf', 'no_documento', 'fecha', 'valida'],
+  notas: ['ncf', 'ncf_modificado', 'no_documento', 'fecha', 'valida'],
   ventas: ['ncf', 'no_documento', 'fecha', 'fecha_vencimiento', 'valida'],
   recibo_ingreso: ['no_documento', 'fecha'],
   conduce: ['no_documento', 'fecha'],

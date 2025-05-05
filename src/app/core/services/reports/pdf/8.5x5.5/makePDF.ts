@@ -5,7 +5,7 @@ import { defaultStyle, styles_ } from '../../utils/files';
 import { Ss } from '../../../singleton.service';
 import { ConfigI } from '../../../../interface/config-interface';
 import { getContentWithTablaNormal } from '../../utils/tabla_normal';
-import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes, infoTipoPdf, firmas } from './infoPdfs';
+import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes, infoTipoPdf, firmas, excludeFacturaPartesByTipoFactura } from './infoPdfs';
 import { config_notas } from './configuraciones/notas/notas';
 import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
@@ -14,10 +14,12 @@ import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { fun } from '../../../functions.service';
 import * as numLetra from '../../utils/numero_letras';
+import { serie } from '@core/typescript/constantes';
 
 const configuraciones = {
   notas_detallada: config_notas.detallada,
   notas_agrupada: config_notas.agrupada,
+  notas_electronica: config_notas.electronica,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
   conduce: config_conduce,
@@ -26,10 +28,16 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
+  console.log('file_name ', file_name);
+  console.log('base_tipo_pdf ', base_tipo_pdf);
+  console.log('post_tipo_pdf ', post_tipo_pdf);
+
   const tipo_pdf = `${base_tipo_pdf}${post_tipo_pdf}`;
+  console.log('tipo_pdf ', tipo_pdf);
   const is_compra = data?.tipo === 'compra' ? true : false;
 
   const is_suplidor = is_compra;
+  const is_electronica = data?.serie == serie.electronica;
 
   const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
   const configuration = configuraciones[tipo_pdf];
@@ -38,8 +46,9 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const dd = {
     pageSize: configuration.pageSize,
     pageMargins: configuration.pageMargins,
-    header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf: base_tipo_pdf }),
-    content: contenidoPDF({ data, configApp, configuration, tipo_pdf: base_tipo_pdf }),
+    header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf: base_tipo_pdf, is_electronica }),
+    content: contenidoPDF({ data, configApp, configuration, tipo_pdf: base_tipo_pdf, is_electronica }),
+    footer: (currentPage, pageCount, pageSize) => pieFacturaVenta(data, is_electronica),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
@@ -54,8 +63,8 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 // ==========================================================================================================================================================
 // Cabecera
 // ==========================================================================================================================================================
-function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSize: any; is_suplidor: boolean; configApp: ConfigI; tipo_pdf: any }) {
-  const { data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf } = args;
+function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSize: any; is_suplidor: boolean; configApp: ConfigI; tipo_pdf: any; is_electronica: boolean }) {
+  const { data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf, is_electronica } = args;
   const header = [
     {
       margin: [15, 15, 15, 0],
@@ -95,7 +104,7 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
           margin: [0, 10, 0, 0],
           columns: [
             { stack: parseInfoPropietario(data, tipo_pdf, is_suplidor), width: '*' },
-            { stack: parseInfoFactura(data, tipo_pdf), width: 'auto' },
+            { stack: parseInfoFactura(data, tipo_pdf, is_electronica), width: 'auto' },
           ],
         },
       ],
@@ -109,12 +118,12 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
 // CONTENIDO
 // ==========================================================================================================================================================
 
-function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; configuration: any }) {
-  const { data, configApp, tipo_pdf, configuration } = args;
+function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; configuration: any; is_electronica: boolean }) {
+  const { data, configApp, tipo_pdf, configuration, is_electronica } = args;
 
   data.tipo_tabla = 'normal';
 
-  const tabla_detalles = getContentWithTablaNormal(configuration, data);
+  const tabla_detalles = getContentWithTablaNormal(configuration, data, is_electronica);
 
   const content = [
     // ---------- TABLA ----------
@@ -179,12 +188,16 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
   return content;
 }
 
+function pieFacturaVenta(data, is_electronica) {
+  return is_electronica ? getQRCode(data) : { text: '' };
+}
+
 function parseFirmasPdf(args: { tipo_pdf: any }) {
   const { tipo_pdf } = args;
 
   if (!firmas[tipo_pdf].length) return [{ text: '' }];
 
-  const mainTable = { margin: [0, 40, 0, 0], layout: 'noBorders', table: { headerRows: 0, widths: [], body: [[]] } };
+  const mainTable = { margin: [0, -10, 0, 0], layout: 'noBorders', table: { headerRows: 0, widths: [], body: [[]] } };
 
   const innerTabla = { table: { headerRows: 0, widths: [160], body: [] } };
 
@@ -213,6 +226,10 @@ function parseTipoPdf(data, tipo_pdf) {
       key: 'tipo_pdf',
       item: [{ text: data?.tipo_pdf, alignment: 'right', bold: true, style: 'letra10' }],
     },
+    {
+      key: 'razon',
+      item: [{ text: data?.razon, alignment: 'right', bold: true, style: 'letra10' }],
+    },
   ];
 
   partes.forEach(parte => {
@@ -233,7 +250,7 @@ function parseResumen(data, tipo_pdf) {
     {
       key: 'bruto',
       item: [
-        { text: 'Bruto:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
+        { text: 'Total Excento:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
         { text: fun_.roundNumberToDecimal(data?.Bruto || data?.bruto), alignment: 'right', style: 'letra11', bold: true },
       ],
     },
@@ -288,7 +305,7 @@ function parseResumen(data, tipo_pdf) {
   return resumen;
 }
 
-function parseInfoFactura(data, tipo_pdf) {
+function parseInfoFactura(data, tipo_pdf, is_electronica) {
   const contenido = [];
   if (!infoFacturaPartes[tipo_pdf].length) return [{ text: '' }];
 
@@ -299,8 +316,8 @@ function parseInfoFactura(data, tipo_pdf) {
         alignment: 'left',
         noWrap: true,
         text: [
-          { text: 'Fecha: ', bold: true, style: 'letra10' },
-          { text: `${fun_.my_dateFormater(data?.fecha || '')} - ${fun_.my_houreFormater(data?.fecha || '')}`, style: 'letra10' },
+          { text: `${is_electronica ? 'Fecha Emisión' : 'Fecha factura'} : `, bold: true, style: 'letra10' },
+          { text: `${fun_.my_dateFormater(data?.fecha || '')} ${is_electronica ? '' : `- ${fun_.my_houreFormater(data?.fecha || '')}`}`, style: 'letra10' },
         ],
       },
     },
@@ -310,7 +327,7 @@ function parseInfoFactura(data, tipo_pdf) {
         alignment: 'left',
         noWrap: true,
         text: [
-          { text: 'Fecha vencimiento: ', bold: true, style: 'letra10' },
+          { text: 'Fecha limite pago: ', bold: true, style: 'letra10' },
           { text: fun_.my_dateFormater(data?.fecha_vencimiento), style: 'letra10' },
         ],
       },
@@ -321,8 +338,19 @@ function parseInfoFactura(data, tipo_pdf) {
         alignment: 'left',
         noWrap: true,
         text: [
-          { text: 'NCF: ', bold: true, style: 'letra10' },
+          { text: `${data?.serie == serie.electronica ? 'eNCF' : 'NCF'} : `, bold: true, style: 'letra10' },
           { text: data?.numero_comprobante || '', style: 'letra10' },
+        ],
+      },
+    },
+    {
+      key: 'ncf_modificado',
+      item: {
+        alignment: 'left',
+        noWrap: true,
+        text: [
+          { text: `NCF modificado: `, bold: true, style: 'letra10' },
+          { text: data?.ncf_modificado || '', style: 'letra10' },
         ],
       },
     },
@@ -332,7 +360,7 @@ function parseInfoFactura(data, tipo_pdf) {
         alignment: 'left',
         noWrap: true,
         text: [
-          { text: 'No. Documento: ', bold: true, style: 'letra10' },
+          { text: 'Doc No : ', bold: true, style: 'letra10' },
           { text: fun_.my_padStart(data?.numero_documento || '', 8, '0'), style: 'letra10' },
         ],
       },
@@ -344,7 +372,7 @@ function parseInfoFactura(data, tipo_pdf) {
         alignment: 'left',
         noWrap: true,
         text: [
-          { text: 'Válida Hasta: ', bold: true, style: 'letra10' },
+          { text: 'Fecha vencimiento: ', bold: true, style: 'letra10' },
           { text: data.tipo_factura_id === 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida), style: 'letra10' },
         ],
       },
@@ -352,9 +380,11 @@ function parseInfoFactura(data, tipo_pdf) {
   ];
 
   partes.forEach(parte => {
-    if (infoFacturaPartes[tipo_pdf].includes(parte.key)) {
-      parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
-      contenido.push(parte.item);
+    if (infoFacturaPartes[tipo_pdf].includes(parte.key) && (!('tipo_factura_id' in data) || (data?.tipo_factura_id && !excludeFacturaPartesByTipoFactura[parte.key]?.includes(data?.tipo_factura_id)))) {
+      if (fun.hasValue(parte.item.text[1].text)) {
+        parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
+        contenido.push(parte.item);
+      }
     }
   });
 
@@ -373,7 +403,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
         alignment: 'left',
         noWrap: true,
         text: [
-          is_suplidor ? { text: 'Suplidor: ', bold: true, style: 'letra10' } : { text: 'Cliente: ', bold: true, style: 'letra10' },
+          { text: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, bold: true, style: 'letra10' },
           is_suplidor ? { text: data?.suplidor.nombre || '', style: 'letra10' } : { text: `${data?.cliente.nombre || ''} ${data?.cliente.apellido || ''}`, style: 'letra10' },
         ],
       },
@@ -383,7 +413,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
       noWrap: true,
       item: {
         alignment: 'left',
-        text: [{ text: 'Doc. identidad : ', bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.rnc || '', style: 'letra10' } : { text: data?.cliente.rnc || '', style: 'letra10' }],
+        text: [{ text: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.rnc || '', style: 'letra10' } : { text: data?.cliente.rnc || '', style: 'letra10' }],
       },
     },
     {
@@ -415,4 +445,25 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   });
 
   return contenido;
+}
+
+function getQRCode(data) {
+  return {
+    margin: [15, 0, 0, 0],
+    stack: [
+      { qr: data.qr_url_dgii, fit: '100', margin: [0, 2, 0, 2] },
+      {
+        text: [
+          { text: 'Código de Seguridad : ', style: 'letra9', bold: true },
+          { text: data.security_code, style: 'letra9' },
+        ],
+      },
+      {
+        text: [
+          { text: 'Fecha Firma : ', style: 'letra9', bold: true },
+          { text: data.fecha_hora_firma, style: 'letra9' },
+        ],
+      },
+    ],
+  };
 }

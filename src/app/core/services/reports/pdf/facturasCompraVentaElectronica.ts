@@ -5,6 +5,9 @@ import * as numLetra from '../utils/numero_letras';
 import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../interface/config-interface';
 import { infoPagare } from './8.5x5.5/infoPdfs';
+import { DetalleFactura } from '@admin/facturacion/factura';
+import { pageBreak } from '../utils/funciones';
+import { fun } from '@core/services/functions.service';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -12,13 +15,15 @@ function getPageMargin(is_contado) {
   let margins = [];
 
   if (is_contado) {
-    margins = [15, 135, 15, 0];
+    margins = [15, 135, 15, 85];
   } else {
-    margins = [15, 148.6, 15, 0];
+    margins = [15, 148.6, 15, 90];
   }
 
   return margins;
 }
+
+const tableColumnsWidth = [15, 190, 60, 60, 60, 60, 70];
 
 export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const is_venta = data.tipo === 'venta' ? true : false;
@@ -30,13 +35,16 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     pageSize: is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 },
     pageMargins: getPageMargin(is_contado),
     header: (currentPage, pageCount, pageSize) => cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp),
-    content: contenidoFacturaVenta(data, is_contado, is_venta, configApp),
+    content: processContenidoFactura(data, is_contado, is_venta, configApp),
+    footer: (currentPage, pageCount, pageSize) => pieFacturaVenta(data),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
-    defaultStyle
+    defaultStyle,
   };
+
+  console.log('footer ', JSON.stringify(pieFacturaVenta(data)));
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };
 
@@ -64,7 +72,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           ],
         },
         {
-          margin: [0, -40, 0, 0],
+          margin: [-80, -40, 0, 0],
           stack: [
             { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
             { text: configApp.direccion_empresa, alignment: 'center', style: 'letra10' },
@@ -84,13 +92,16 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           margin: [0, 10, 0, 0],
           text: [
             {
-              text: [is_venta ? { text: 'Cliente : ', style: 'letra10' } : { text: 'Suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' }],
+              text: [
+                is_venta ? { text: 'Razón Social Cliente : ', style: 'letra10' } : { text: ' Razón Social Suplidor : ', style: 'letra10' },
+                is_venta ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' },
+              ],
             },
           ],
         },
 
         {
-          text: [is_venta ? { text: 'Rnc cliente : ', style: 'letra10' } : { text: 'Rnc suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.rnc, style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
+          text: [{ text: `RNC ${is_venta ? 'cliente' : 'suplidor'} : `, style: 'letra10' }, is_venta ? { text: data.cliente.rnc, style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
           margin: [0, 4, 0, 0],
         },
 
@@ -108,9 +119,8 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           stack: [
             {
               text: [
-                { text: 'Fecha : ', style: 'letra10' },
+                { text: 'Fecha Emisión: ', style: 'letra10' },
                 { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra10' },
-                { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra10' },
               ],
               margin: [0, -10, 0, 0],
             },
@@ -118,14 +128,14 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
               ? { text: '' }
               : {
                   text: [
-                    { text: 'Fecha vencimiento : ', style: 'letra10' },
+                    { text: 'Fecha limite pago : ', style: 'letra10' },
                     { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra10' },
                   ],
                   margin: [0, 3, 0, 0],
                 },
             {
               text: [
-                { text: 'NCF : ', style: 'letra10' },
+                { text: 'eNCF : ', style: 'letra10' },
                 { text: data.numero_comprobante, style: 'letra10' },
               ],
               margin: [0, 3, 0, 0],
@@ -137,8 +147,12 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
               ],
               margin: [0, 3, 0, 0],
             },
+
             {
-              text: [{ text: 'Valida hasta : ', style: 'letra10' }, data.tipo_factura_id == 3 ? { text: 'No aplica.', style: 'letra10' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra10' }],
+              text: [
+                { text: 'Fecha vencimiento : ', style: 'letra10' },
+                data.tipo_factura_id == 23 ? { text: 'No aplica.', style: 'letra10' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra10' },
+              ],
               margin: [0, 3, 0, 3],
             },
           ],
@@ -147,21 +161,21 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           table: {
             margin: [0, 0, 0, 0],
             headerRows: 1,
-            widths: [15, 240, '*', '*', '*', '*'],
+            widths: tableColumnsWidth,
             body: [
               [
-                { text: ' #', style: 'letra11', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
-                { text: 'Articulo', style: 'letra11', bold: true, margin: [0, 0, 0, 0] },
-                { text: 'Cantidad', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 5, 0] },
-                is_venta ? { text: 'Precio', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] } : { text: 'Costo', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 18, 0] },
-                { text: 'Itbis', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 17, 0] },
-                { text: 'Total', style: 'letra11', bold: true, alignment: 'right', margin: [0, 0, 18, 0] }, // margin: [12, 0, 0, 0]
+                { text: ' #', style: 'letra10', bold: true, alignment: 'center', margin: [4, 0, 0, 0] },
+                { text: 'Articulo', style: 'letra10', bold: true, margin: [0, 0, 0, 0], unbreakable: true },
+                { text: 'Cantidad', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 0, 0], unbreakable: true },
+                is_venta ? { text: 'Precio', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 0, 0] } : { text: 'Costo', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 0, 0] },
+                { text: 'Itbis', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 0, 0] },
+                { text: 'Descuento', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 0, 0] },
+                { text: 'Total', style: 'letra10', bold: true, alignment: 'right', margin: [0, 0, 0, 0] }, // margin: [12, 0, 0, 0]
               ],
 
-              [1, 'Sample value 1', 'value 2', 'value 4', 'value 5', 'value 6'],
+              [1, 'Sample value 1', '100.00 UND.', '9,999.99', '0.00', '9,999.99', '999,999.99'],
             ],
           },
-
           layout: {
             hLineWidth: (i, node) => 1,
             vLineWidth: (i, node) => 0,
@@ -177,60 +191,170 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 }
 
 // ==========================================================================================================================================================
-// CONTENIDO
-// =========================================================~=================================================================================================
-function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
-  const tempBody = [];
-  const _break = is_contado ? 9 : 18;
+// PIE
+// ==========================================================================================================================================================
+function pieFacturaVenta(data) {
+  return getQRCode(data);
+}
 
-  data.contenido_reporte.forEach((detalle, i) => {
-    const row = [];
-    const br_ = i !== 0 && i % _break === 0;
+function agruparArticulosPorPagina(articulos: any[], itemsPorPagina: number): { articulos: any[]; totalizacion?: { total_excento: number; total_gravado: number; itbis: number; total_pagina: number } }[] {
+  const resultado = [];
 
-    const max_longitud_descripcion = 35;
-    const longitud_descripcion = detalle.descripcion.length;
-    const descripcion = longitud_descripcion > max_longitud_descripcion ? `${detalle.descripcion.slice(0, max_longitud_descripcion)}...` : detalle.descripcion;
+  for (let i = 0; i < articulos.length; i += itemsPorPagina) {
+    const grupo = articulos.slice(i, i + itemsPorPagina);
+    const totalizacion = parseTotalizacion(grupo);
 
-    row.push(
-      { text: i + 1, style: 'letra11', alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
-      { text: descripcion, style: 'monospace10', margin: [0, -1, 0, 0],  pageBreak: br_ ? 'before' : 'none' },
-      { text: detalle.cantidad, style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
-      {
-        text: fun_.roundNumberToDecimal(is_venta ? detalle.precio : detalle.costo),
-        style: 'letra11',
-        alignment: 'right',
-        margin: [0, 0, 14, 0],
-        pageBreak: br_ ? 'before' : 'none',
-      },
-      { text: fun_.roundNumberToDecimal(detalle.itbis), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
-      { text: fun_.roundNumberToDecimal(detalle.total), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
-    );
-    tempBody.push(row);
+    resultado.push({ articulos: grupo, totalizacion });
+  }
+
+  return resultado;
+}
+
+function parseTotalizacion(detalles: DetalleFactura[]): { total_excento: number; total_gravado: number; itbis: number; total_pagina: number } {
+  let total_excento = 0;
+  let total_gravado = 0;
+  let itbis = 0;
+  let total_pagina = 0;
+
+  const articulos_grabados = detalles.filter(detalle => detalle.calcular_itbis);
+  const articulos_excentos = detalles.filter(detalle => !detalle.calcular_itbis);
+
+  articulos_grabados.forEach(articulo => {
+    total_gravado += articulo.total;
+    itbis += articulo.itbis;
   });
 
+  articulos_excentos.forEach(articulo => (total_excento += articulo.total));
+
+  total_pagina = total_excento + total_gravado + itbis;
+
+  return { total_excento, total_gravado, itbis, total_pagina };
+}
+
+// ==========================================================================================================================================================
+// CONTENIDO
+// =========================================================~=================================================================================================
+function processContenidoFactura(data, is_contado, is_venta, configApp: ConfigI) {
+  const contenido = [];
+  const _break = is_contado ? 5 : 18;
+  const articulosAgrupados = agruparArticulosPorPagina(data.detalle_facturas, _break);
+
+  articulosAgrupados.forEach((detalles_per_page, index) => {
+    const detalles = makeTableDetalles(detalles_per_page.articulos, is_venta);
+    contenido.push(detalles);
+
+    if (index < articulosAgrupados.length - 1) {
+      contenido.push({
+        columns: [
+          { width: '*', stack: [] },
+          tableTotalizacion({
+            is_general: false,
+            total_excento: detalles_per_page.totalizacion.total_excento,
+            total_gravado: detalles_per_page.totalizacion.total_gravado,
+            itbis: detalles_per_page.totalizacion.itbis,
+            total_factura: detalles_per_page.totalizacion.total_pagina,
+          }),
+        ],
+      });
+      contenido.push(pageBreak);
+    }
+  });
+
+  return [...contenido, ...afterContent(data, is_contado, is_venta, configApp)];
+}
+
+function makeTableDetalles(detalles_per_page, is_venta) {
+  const tableTemplate = {
+    table: {
+      widths: tableColumnsWidth,
+      body: [],
+    },
+    margin: [0, -4, 0, 0],
+    layout: {
+      hLineWidth: (i, node) => 1,
+      vLineWidth: (i, node) => 0,
+      hLineColor: (i, node) => (i == node.table.body.length ? 'black' : 'gray'),
+      vLineColor: (i, node) => 'white',
+    },
+  };
+
+  detalles_per_page.forEach((detalle, i) => {
+    const row = [];
+
+    const raw_descripcion = detalle.descripcion.trim();
+    const max_longitud_descripcion = 26;
+    const longitud_descripcion = raw_descripcion.length;
+    const descripcion = longitud_descripcion > max_longitud_descripcion ? `${raw_descripcion.slice(0, max_longitud_descripcion)}` : raw_descripcion;
+
+    row.push(
+      { text: i + 1, style: 'letra10', alignment: 'center' },
+      { text: `${descripcion} ${detalle.calcular_itbis ? '' : '- E'}`, style: 'monospace10', margin: [0, -1, 0, 0] },
+      { text: detalle.cantidad, style: 'letra10', alignment: 'right', margin: [0, 0, 0, 0] },
+      {
+        text: fun_.roundNumberToDecimal(is_venta ? detalle.precio : detalle.costo),
+        style: 'letra10',
+        alignment: 'right',
+        margin: [0, 0, 0, 0],
+      },
+      { text: fun_.roundNumberToDecimal(detalle.itbis), style: 'letra10', alignment: 'right', margin: [0, 0, 0, 0] },
+      { text: fun_.roundNumberToDecimal(detalle.descuento_valor), style: 'letra10', alignment: 'right', margin: [0, 0, 0, 0] },
+      { text: fun_.roundNumberToDecimal(detalle.total), style: 'letra10', alignment: 'right', margin: [0, 0, 0, 0] }
+    );
+    tableTemplate.table.body.push(row);
+  });
+
+  return tableTemplate;
+}
+
+function tableTotalizacion(args: { is_general: boolean; total_excento: number; total_gravado: number; itbis: number; total_factura: number; descuento?: number }) {
+  const { is_general, total_excento, total_gravado, itbis, total_factura, descuento } = args;
+
+  const parts = [
+    { key: 'total_excento', text: 'Subtotal Excento', value: total_excento },
+    { key: 'total_gravado', text: 'Subtotal Gravado', value: total_gravado },
+    { key: 'itbis', text: 'Total Itbis', value: itbis },
+    { key: 'descuento', text: 'Descuento', value: descuento },
+    { key: 'total_factura', text: 'Total', value: total_factura },
+  ];
+
+  const keys_summary = ['total_excento', 'total_gravado', 'itbis', 'total_factura'];
+
+  const template = {
+    width: 'auto',
+    margin: [0, 0, 2, 0],
+    table: { widths: ['*', 'auto'], body: [] },
+    layout: 'noBorders',
+  };
+
+  template.table.body = parts.reduce((acc, part) => {
+    if ((!is_general && !keys_summary.includes(part.key)) || fun.isEmpty(part.value) || part.value < 1) {
+      return acc;
+    } else {
+      acc.push([
+        { text: `${part.text}${is_general ? '' : ' Página'} RD$ :`, style: 'letra10', bold: true, alignment: 'right' },
+        { text: fun_.roundNumberToDecimal(part.value), style: 'letra10', alignment: 'right' },
+      ]);
+
+      return acc;
+    }
+  }, []);
+
+  return template;
+}
+
+function afterContent(data, is_contado, is_venta, configApp: ConfigI) {
   const numero_letra = numLetra.NumeroALetras(data.total_factura);
 
+  const totalizacion = parseTotalizacion(data.detalle_facturas);
+
   const content = [
-    {
-      table: {
-        widths: [15, 240, '*', '*', '*', '*'],
-        body: tempBody,
-      },
-      margin: [0, -2, 0, 0],
-      layout: {
-        hLineWidth: (i, node) => (i % _break == 0 && node.table.body.length != _break ? 0 : 1),
-        vLineWidth: (i, node) => 0,
-        hLineColor: (i, node) => (i == node.table.body.length ? 'black' : 'gray'),
-        vLineColor: (i, node) => 'white',
-      },
-    },
     {
       columns: [
         {
           width: '*',
           stack: [
             {
-              margin: [0, 2, 0, 2],
+              margin: [0, 2, 0, 0],
               text: [
                 { text: 'Realizada Por :  ', style: 'letra10', bold: true },
                 { text: data.usuario, style: 'letra10' },
@@ -240,58 +364,26 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
               ],
             },
             formatMovimientosViajes(data),
+            is_venta && !is_contado
+              ? { text: '' }
+              : {
+                  margin: [100, 30, 0, 0],
+                  table: {
+                    widths: [100, 20, 100],
+                    body: [
+                      [
+                        { text: 'Revisada Por', style: 'letra10', bold: true, alignment: 'center', border: [false, true, false, false] },
+                        { text: '', border: [false, false, false, false] },
+                        { text: 'Cliente', style: 'letra10', bold: true, alignment: 'center', border: [false, true, false, false] },
+                      ],
+                    ],
+                  },
+                },
           ],
         },
-        {
-          width: 'auto',
-          margin: [0, 0, 19, 0],
-          table: {
-            widths: ['*', 'auto'],
-            body: [
-              [
-                { text: 'Bruto RD$: ', style: 'letra11', bold: true, alignment: 'right' },
-                { text: fun_.roundNumberToDecimal(data.Bruto), style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0] },
-              ],
-              [
-                { text: 'Itbis RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                { text: fun_.roundNumberToDecimal(data.itbis), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
-              ],
-              [
-                { text: 'Descuento RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                { text: fun_.roundNumberToDecimal(data.descuento), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
-              ],
-              [
-                { text: 'TOTAL RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                { text: fun_.roundNumberToDecimal(data.total_factura), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
-              ],
-              data.tipo === 'compra'
-                ? [{ text: '' }, { text: '' }]
-                : [
-                    { text: 'Devuelta RD$: ', style: 'letra11', bold: true, alignment: 'right', margin: [0, -2, 0, 0] },
-                    { text: fun_.roundNumberToDecimal(data.devuelta), style: 'letra11', alignment: 'right', margin: [0, -2, 0, 0] },
-                  ],
-            ],
-          },
-          layout: 'noBorders',
-        },
+        tableTotalizacion({ is_general: true, total_excento: totalizacion.total_excento, total_gravado: totalizacion.total_gravado, itbis: data.itbis, total_factura: data.total_factura, descuento: data.descuento }),
       ],
     },
-    // -----------------------
-    is_venta && !is_contado
-      ? { text: '' }
-      : {
-          table: {
-            widths: [130, 20, 130],
-            body: [
-              [
-                { text: 'Revisada Por', style: 'letra10', bold: true, alignment: 'center', border: [false, true, false, false] },
-                { text: '', border: [false, false, false, false] },
-                { text: 'Cliente', style: 'letra10', bold: true, alignment: 'center', border: [false, true, false, false] },
-              ],
-            ],
-          },
-        },
-
     {
       stack: [
         is_venta
@@ -384,12 +476,33 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
   return content;
 }
 
+function getQRCode(data) {
+  return {
+    margin: [15, 0, 0, 0],
+    stack: [
+      { qr: data.qr_url_dgii, fit: '100', margin: [0, 2, 0, 2] },
+      {
+        text: [
+          { text: 'Código de Seguridad : ', style: 'letra9', bold: true },
+          { text: data.security_code, style: 'letra9' },
+        ],
+      },
+      {
+        text: [
+          { text: 'Fecha Firma : ', style: 'letra9', bold: true },
+          { text: data.fecha_hora_firma, style: 'letra9' },
+        ],
+      },
+    ],
+  };
+}
+
 function formatMovimientosViajes(data) {
   if (!data.is_viaje) return [{ text: '' }];
 
   const movimientosRows = [];
 
-  data.movimientos_viaje.forEach((movimiento) => {
+  data.movimientos_viaje.forEach(movimiento => {
     movimientosRows.push([
       {
         // camión
