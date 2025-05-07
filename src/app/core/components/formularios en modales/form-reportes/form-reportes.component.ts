@@ -2,7 +2,6 @@ import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { tFacturaD } from '@admin/facturacion/factura';
 import { serie } from '@core/typescript/constantes';
 // import { CxP } from '@registros/registro-suplidores/suplidores';
 import { fun } from '@core/services/functions.service';
@@ -15,6 +14,7 @@ import { ModalI } from '@components/modal/modal-class';
 // import { TipoReciboReporte } from '../../../pagos/class/ingresos/recibos';
 import { reportField } from './form-reportes.component.model';
 import { ReportDateTypeE, ReportGroupTypeE } from '@admin/reportes/reporte.utils';
+import { tFacturaKey } from '@admin/facturacion/factura';
 
 
 @Component({
@@ -191,8 +191,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'notas') {
       this.tipos = [
-        { label: 'Crédito', id: Ss.factServ.tipoFacturaId(tFacturaD.nota_de_credito) },
-        { label: 'Dédito', id: Ss.factServ.tipoFacturaId(tFacturaD.nota_de_debito) },
+        { label: 'Crédito', id: Ss.factServ.tipoFacturaId(tFacturaKey.nota_de_credito) },
+        { label: 'Dédito', id: Ss.factServ.tipoFacturaId(tFacturaKey.nota_de_debito) },
         { label: 'Todas', id: 0 },
       ];
       //
@@ -268,14 +268,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   parseTipoFacturas() {
     const tipos_aceptados = [
-      tFacturaD.factura_con_valor_fiscal,
-      tFacturaD.factura_de_consumo,
-      tFacturaD.comprobante_de_compras,
-      tFacturaD.comprobante_para_gastos_menores,
-      tFacturaD.comprobante_de_regimen_especiales,
-      tFacturaD.comprobante_gubernamental,
-      tFacturaD.comprobante_para_exportaciones,
-      tFacturaD.comprobantes_para_pago_al_exterior,
+      tFacturaKey.factura_de_credito_fiscal,
+      tFacturaKey.factura_de_consumo,
+      tFacturaKey.comprobante_compras,
+      tFacturaKey.gastos_menores,
+      tFacturaKey.regimenes_especiales,
+      tFacturaKey.gubernamental,
+      tFacturaKey.comprobante_de_exportaciones,
+      tFacturaKey.comprobante_pagos_al_exterior,
     ];
 
     this.tipos_facturas = [{ label: 'Todos', id: 0 }];

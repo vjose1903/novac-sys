@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { FacturacionService } from './facturacion.service';
 import { ArticuloC } from '@registros/articulos/articulo';
-import { tipoDocFacturacion, FacturasI, tFacturaD, actionFacturacion, comprobanteNormal, comprobanteElectronico } from './factura';
+import { tipoDocFacturacion, FacturasI, actionFacturacion, comprobanteNormal, comprobanteElectronico, tFacturaKey } from './factura';
 import { NcfC } from '@registros/ncf/ncf';
 import { PendienteFormComponent } from '@components/formularios en modales/pendiente-form/pendiente-form.component';
 import { FormCantidadEfectivoComponent } from '@components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
@@ -502,15 +502,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
 
       const value_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? '02' : factura.tipo_factura_id;
-      const by_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? 'referencia' : 'id';
+      const by_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? 'key' : 'id';
 
       if (![actionFacturacion.duplicate].includes(original_factura.action)) this.setPropietario(factura);
 
-      const currentSerie = fun.hasValue(factura?.numero_comprobante) && factura.numero_comprobante.includes('E') ? serie.electronica : serie.normal;
+      // TODO: colocar electronica por defecto
+      const currentSerie = fun.hasValue(factura?.numero_comprobante) && factura.numero_comprobante.includes('E') ? serie.electronica : fun.hasValue(factura.serie) ? factura.serie : serie.normal;
+      console.log('%c currentSerie ', 'color: red; font-weight: bold;', currentSerie);
 
       this.factServ.setTipos(this.factServ.tipoDocumento, currentSerie).then(result => {
         this.factServ
-          .setTipoFacturaSelected(value_buscar, by_buscar)
+          .setTipoFacturaSelected(value_buscar, 'rellenarCabezaFactura', by_buscar)
           .then(async result => {
             this.factura_pendiente = fun.hasValue(factura) && fun.objHas(factura, 'factura_pendiente') ? factura?.factura_pendiente : false;
 
@@ -810,7 +812,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   async calcularPorcientoComprobante() {
     return new Promise(async resolve => {
       if (this.factServ.isVenta) {
-        if (this.factServ.tipoFactura.referencia != '00' && this.factServ.tipoFactura.referencia != comprobanteNormal.factura_consumo && this.factServ.tipoFactura.referencia != comprobanteElectronico.factura_consumo) {
+        if (this.factServ.tipoFactura.referencia != '00' && this.factServ.tipoFactura.referencia != comprobanteNormal.factura_de_consumo && this.factServ.tipoFactura.referencia != comprobanteElectronico.factura_de_consumo) {
           try {
             const paquete = await this.ncfClass.getAll({ afterPath: `custom/${this.factServ.tipoFactura.id}/true` });
 
@@ -862,7 +864,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async changeSerie() {
-    this.factServ.setTipos(this.factServ.tipoDocumento, this.factServ.serieType, true).then(result => {
+    console.log('this.factServ.tipoDocumento ', this.factServ.tipoDocumento);
+    console.log('this.factServ.serieType ', this.factServ.serieType());
+
+    this.factServ.setTipos(this.factServ.tipoDocumento, this.factServ.serieType(), true).then(result => {
       this.errorComprobante = false;
       setTimeout(() => this.checkTipoFactura('changeSerie'), 0);
     });
@@ -870,7 +875,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   async checkTipoFactura(where) {
     this.factServ
-      .setTipoFacturaSelected(this.factServ.tipoFacturaReferenciaSelected)
+      .setTipoFacturaSelected(this.factServ.tipoFacturaReferenciaSelected, 'checkTipoFactura', 'referencia')
       .then(result => {
         if (this.factServ.isCompra) {
           const ncf_prefix = `${this.factServ.isComprobanteNormal ? 'B' : 'E'}${this.factServ.tipoFacturaReferenciaSelected}`;
@@ -1008,8 +1013,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         (this.condicion_fact == 'Crédito' && this.factServ.tipoDocumento != tipoDocFacturacion.cotizacion) ||
         this.modo_factura == 'viaje' ||
         this.modo_factura == 'adelantada' ||
-        this.factServ.tipoFactura?.referencia == comprobanteNormal.valor_fiscal ||
-        this.factServ.tipoFactura?.referencia == comprobanteElectronico.valor_fiscal ||
+        this.factServ.tipoFactura?.referencia == comprobanteNormal.factura_de_credito_fiscal ||
+        this.factServ.tipoFactura?.referencia == comprobanteElectronico.factura_de_credito_fiscal ||
         fun.hasValue(this.factServ.pre_venta_selected)
       ) {
         is_disabled = true;
@@ -1383,6 +1388,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     factura_a_guardar['factura_pendiente'] = this.factura_pendiente;
     factura_a_guardar['productos_devueltos'] = fun.deepCloning(this.factServ.productos_devueltos);
 
+    console.log('%c factura_a_guardar ', 'color: yellow', factura_a_guardar);
+
     return factura_a_guardar;
   }
 
@@ -1723,7 +1730,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['is_viaje'] = this.is_viaje;
     cabecera_fact['is_nota'] = false;
     cabecera_fact['movimientos_viaje'] = this.movimientosSelected;
-    cabecera_fact['serie'] = this.factServ.serieType;
+    cabecera_fact['serie'] = this.factServ.serieType();
 
     cabecera_fact['pre_factura'] = fun.hasValue(this.factServ.pre_venta_selected) ? this.factServ.pre_venta_selected?.id : null;
 
@@ -1745,13 +1752,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     //
 
     if (this.factServ.isPreVenta) {
-      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaD.pre_venta);
+      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaKey.pre_venta);
     } else if (this.factServ.isCotizacion) {
-      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaD.cotizacion);
+      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaKey.cotizacion);
     } else if (this.factServ.isVenta) {
-      cabecera_fact['FACTURA_DE'] = this.condicion_fact == 'Contado' ? Ss.factServ.tipoFacturaId(tFacturaD.venta_contado) : Ss.factServ.tipoFacturaId(tFacturaD.venta_credito);
+      cabecera_fact['FACTURA_DE'] = this.condicion_fact == 'Contado' ? Ss.factServ.tipoFacturaId(tFacturaKey.venta_contado) : Ss.factServ.tipoFacturaId(tFacturaKey.venta_credito);
     } else if (this.factServ.isCompra) {
-      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaD.compra);
+      cabecera_fact['FACTURA_DE'] = Ss.factServ.tipoFacturaId(tFacturaKey.compra);
     }
 
     cabecera_fact['tipo'] = this.factServ.tipoDocumento;
@@ -1773,7 +1780,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
 
-    if (this.factura_guardada) this.revisarLocalStorage();
+    // if (this.factura_guardada) this.revisarLocalStorage();
 
     this.facturaClass.parseDataToPdf(res['data']).then(async factura_parsed => {
       const obj = { data: factura_parsed, type: documento.tipo };

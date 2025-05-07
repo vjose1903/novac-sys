@@ -51,6 +51,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     footer: (currentPage, pageCount, pageSize) => pieFacturaVenta(data, is_electronica),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
+      qrCodeImage: fun_.my_qrcode(data?.qr_url_dgii || ''),
     },
     styles: styles_,
     defaultStyle,
@@ -448,10 +449,11 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
 }
 
 function getQRCode(data) {
+  const size = 58;
   return {
     margin: [15, 0, 0, 0],
     stack: [
-      { qr: data.qr_url_dgii, fit: '100', margin: [0, 2, 0, 2] },
+      { image: 'qrCodeImage', width: size, height: size, margin: [0, 2, 0, 2] },
       {
         text: [
           { text: 'Código de Seguridad : ', style: 'letra9', bold: true },

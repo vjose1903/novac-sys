@@ -33,7 +33,7 @@
 
     <div class="d-flex">
       <span [pTooltip]="factServ.isCompra ? '' : 'Función en construcción, solo disponible en el módulo de compras'" tooltipPosition="left">
-        <p-selectButton [options]="facturasSerieOptions" [(ngModel)]="factServ.serieType" (ngModelChange)="changeSerie()" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+        <p-selectButton [options]="facturasSerieOptions" [ngModel]="factServ.serieType()" (ngModelChange)="factServ.serieType.set($event)" (ngModelChange)="changeSerie()" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
       </span>
     </div>
   </div>

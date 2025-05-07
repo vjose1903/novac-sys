@@ -132,7 +132,7 @@ export const config_notas = {
     pageMargins: [15, 127, 15, 90],
     margin_general: [0, 0, 0, 0],
     isBreak: true,
-    break: 9,
+    break: 5,
     pageOrient: 'portrait',
     only_titulo: false,
     widths: [15, 190, 60, 60, 60, 60, 70],

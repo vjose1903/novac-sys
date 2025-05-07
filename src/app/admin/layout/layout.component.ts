@@ -136,6 +136,9 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
           tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']) as TipoFacturaI[];
           Ss.factServ.lista_tipos_facturas = tiposFacturas;
 
+          console.log("%c  lista_tipos_facturas", "color: red; font-weight: bold;", Ss.factServ.lista_tipos_facturas);
+          
+
           resolve(Ss.factServ.lista_tipos_facturas);
         })
         .catch(error => {

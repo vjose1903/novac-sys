@@ -15,7 +15,7 @@ function getPageMargin(is_contado) {
   let margins = [];
 
   if (is_contado) {
-    margins = [15, 135, 15, 85];
+    margins = [15, 135, 15, 90];
   } else {
     margins = [15, 148.6, 15, 90];
   }
@@ -39,6 +39,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     footer: (currentPage, pageCount, pageSize) => pieFacturaVenta(data),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
+      qrCodeImage: fun_.my_qrcode(data?.qr_url_dgii || ''),
     },
     styles: styles_,
     defaultStyle,
@@ -236,7 +237,7 @@ function parseTotalizacion(detalles: DetalleFactura[]): { total_excento: number;
 // =========================================================~=================================================================================================
 function processContenidoFactura(data, is_contado, is_venta, configApp: ConfigI) {
   const contenido = [];
-  const _break = is_contado ? 5 : 18;
+  const _break = is_contado ? 5 : 14;
   const articulosAgrupados = agruparArticulosPorPagina(data.detalle_facturas, _break);
 
   articulosAgrupados.forEach((detalles_per_page, index) => {
@@ -327,7 +328,8 @@ function tableTotalizacion(args: { is_general: boolean; total_excento: number; t
   };
 
   template.table.body = parts.reduce((acc, part) => {
-    if ((!is_general && !keys_summary.includes(part.key)) || fun.isEmpty(part.value) || part.value < 1) {
+    // if ((!is_general && !keys_summary.includes(part.key)) || fun.isEmpty(part.value) || part.value < 1) {
+    if ((!is_general && !keys_summary.includes(part.key)) ) {
       return acc;
     } else {
       acc.push([
@@ -477,10 +479,11 @@ function afterContent(data, is_contado, is_venta, configApp: ConfigI) {
 }
 
 function getQRCode(data) {
+  const size = 58;
   return {
     margin: [15, 0, 0, 0],
     stack: [
-      { qr: data.qr_url_dgii, fit: '100', margin: [0, 2, 0, 2] },
+      { image: 'qrCodeImage', width: size, height: size, margin: [0, 2, 0, 2] },
       {
         text: [
           { text: 'Código de Seguridad : ', style: 'letra9', bold: true },
