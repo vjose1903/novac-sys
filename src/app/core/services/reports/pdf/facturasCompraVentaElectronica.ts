@@ -4,10 +4,11 @@ import { defaultStyle, styles_ } from '../utils/files';
 import * as numLetra from '../utils/numero_letras';
 import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../interface/config-interface';
+import { agruparArticulosPorPagina, parseTotalizacion } from '../utils/facturacion_electronica';
 import { infoPagare } from './8.5x5.5/infoPdfs';
-import { DetalleFactura } from '@admin/facturacion/factura';
 import { pageBreak } from '../utils/funciones';
 import { fun } from '@core/services/functions.service';
+
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
@@ -198,39 +199,9 @@ function pieFacturaVenta(data) {
   return getQRCode(data);
 }
 
-function agruparArticulosPorPagina(articulos: any[], itemsPorPagina: number): { articulos: any[]; totalizacion?: { total_excento: number; total_gravado: number; itbis: number; total_pagina: number } }[] {
-  const resultado = [];
 
-  for (let i = 0; i < articulos.length; i += itemsPorPagina) {
-    const grupo = articulos.slice(i, i + itemsPorPagina);
-    const totalizacion = parseTotalizacion(grupo);
 
-    resultado.push({ articulos: grupo, totalizacion });
-  }
 
-  return resultado;
-}
-
-function parseTotalizacion(detalles: DetalleFactura[]): { total_excento: number; total_gravado: number; itbis: number; total_pagina: number } {
-  let total_excento = 0;
-  let total_gravado = 0;
-  let itbis = 0;
-  let total_pagina = 0;
-
-  const articulos_grabados = detalles.filter(detalle => detalle.calcular_itbis);
-  const articulos_excentos = detalles.filter(detalle => !detalle.calcular_itbis);
-
-  articulos_grabados.forEach(articulo => {
-    total_gravado += articulo.total;
-    itbis += articulo.itbis;
-  });
-
-  articulos_excentos.forEach(articulo => (total_excento += articulo.total));
-
-  total_pagina = total_excento + total_gravado + itbis;
-
-  return { total_excento, total_gravado, itbis, total_pagina };
-}
 
 // ==========================================================================================================================================================
 // CONTENIDO
@@ -241,7 +212,7 @@ function processContenidoFactura(data, is_contado, is_venta, configApp: ConfigI)
   const articulosAgrupados = agruparArticulosPorPagina(data.detalle_facturas, _break);
 
   articulosAgrupados.forEach((detalles_per_page, index) => {
-    const detalles = makeTableDetalles(detalles_per_page.articulos, is_venta);
+    const detalles = makeTableDetalles(detalles_per_page.articulos, is_venta, index * _break);
     contenido.push(detalles);
 
     if (index < articulosAgrupados.length - 1) {
@@ -264,7 +235,7 @@ function processContenidoFactura(data, is_contado, is_venta, configApp: ConfigI)
   return [...contenido, ...afterContent(data, is_contado, is_venta, configApp)];
 }
 
-function makeTableDetalles(detalles_per_page, is_venta) {
+function makeTableDetalles(detalles_per_page, is_venta, offset) {
   const tableTemplate = {
     table: {
       widths: tableColumnsWidth,
@@ -288,7 +259,7 @@ function makeTableDetalles(detalles_per_page, is_venta) {
     const descripcion = longitud_descripcion > max_longitud_descripcion ? `${raw_descripcion.slice(0, max_longitud_descripcion)}` : raw_descripcion;
 
     row.push(
-      { text: i + 1, style: 'letra10', alignment: 'center' },
+      { text: offset + i + 1, style: 'letra10', alignment: 'center' },
       { text: `${descripcion} ${detalle.calcular_itbis ? '' : '- E'}`, style: 'monospace10', margin: [0, -1, 0, 0] },
       { text: detalle.cantidad, style: 'letra10', alignment: 'right', margin: [0, 0, 0, 0] },
       {
@@ -328,8 +299,7 @@ function tableTotalizacion(args: { is_general: boolean; total_excento: number; t
   };
 
   template.table.body = parts.reduce((acc, part) => {
-    // if ((!is_general && !keys_summary.includes(part.key)) || fun.isEmpty(part.value) || part.value < 1) {
-    if ((!is_general && !keys_summary.includes(part.key)) ) {
+    if ((!is_general && !keys_summary.includes(part.key)) || fun.isEmpty(part.value) || part.value < 1) {
       return acc;
     } else {
       acc.push([

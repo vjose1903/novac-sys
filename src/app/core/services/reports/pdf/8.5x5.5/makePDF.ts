@@ -15,6 +15,8 @@ import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { fun } from '../../../functions.service';
 import * as numLetra from '../../utils/numero_letras';
 import { serie } from '@core/typescript/constantes';
+import { agruparArticulosPorPagina, parseTotalizacion } from '../../utils/facturacion_electronica';
+import { pageBreak } from '../../utils/funciones';
 
 const configuraciones = {
   notas_detallada: config_notas.detallada,
@@ -102,7 +104,7 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
           ],
         },
         {
-          margin: [0, 10, 0, 0],
+          margin: [0, 5, 0, 0],
           columns: [
             { stack: parseInfoPropietario(data, tipo_pdf, is_suplidor), width: '*' },
             { stack: parseInfoFactura(data, tipo_pdf, is_electronica), width: 'auto' },
@@ -122,16 +124,22 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
 function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; configuration: any; is_electronica: boolean }) {
   const { data, configApp, tipo_pdf, configuration, is_electronica } = args;
 
-  data.tipo_tabla = 'normal';
+  let tabla_detalles = [];
+  const totalizacion = parseTotalizacion(data.contenido_reporte);
 
-  const tabla_detalles = getContentWithTablaNormal(configuration, data, is_electronica);
+  if (is_electronica) {
+    tabla_detalles = processContenidoElectronico(configuration, data, is_electronica, tipo_pdf);
+  } else {
+    data.tipo_tabla = 'normal';
+    tabla_detalles = getContentWithTablaNormal(configuration, data, is_electronica);
+  }
 
   const content = [
     // ---------- TABLA ----------
     ...tabla_detalles,
     // ---------- DETALLE RESUMEN ----------
     {
-      margin: [5, 5, 10, 0],
+      margin: [5, 2, 10, 0],
       stack: [
         {
           columns: [
@@ -161,6 +169,9 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
                         },
                       ]
                     : [{ text: '' }],
+                  [
+                    parseFirmasPdf({ tipo_pdf })
+                  ],
                 ],
               },
             },
@@ -170,7 +181,7 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
               table: {
                 headerRows: 0,
                 widths: ['*', 'auto'],
-                body: [...parseResumen(data, tipo_pdf)],
+                body: [...parseResumen({ data, tipo_pdf, is_electronica, is_general: true, resumen_data: totalizacion })],
               },
             },
           ],
@@ -179,14 +190,52 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
     },
   ];
 
-  const detalle_resumen_stack = _.last(content);
+  // const detalle_resumen_stack = _.last(content);
 
-  detalle_resumen_stack.stack.push(parseFirmasPdf({ tipo_pdf }));
+  // detalle_resumen_stack.stack.push(parseFirmasPdf({ tipo_pdf }));
 
   // -------- BARCODE --------
   // if (cierrePdf['barcode'].includes(tipo_pdf)) detalle_resumen_stack.stack.push({ margin: [0, 20, 0, 0], image: 'barcode', width: 295, height: 70 } as any);
 
   return content;
+}
+
+function processContenidoElectronico(configuration, data, is_electronica, tipo_pdf) {
+  const contenido = [];
+  const _break = configuration.break;
+  console.log('data ', data);
+
+  const articulosAgrupados = agruparArticulosPorPagina(data.contenido_reporte, _break);
+
+  articulosAgrupados.forEach((detalles_per_page, index) => {
+    // const detalles = makeTableDetalles(detalles_per_page.articulos, is_venta, index * _break);
+    const data_tabla = {
+      tipo_tabla: 'normal',
+      contenido_reporte: detalles_per_page.articulos,
+    };
+
+    const detalles = getContentWithTablaNormal(configuration, data_tabla, is_electronica);
+    contenido.push(detalles);
+
+    if (index < articulosAgrupados.length - 1) {
+      contenido.push({
+        columns: [
+          { width: '*', stack: [] },
+          {
+            layout: 'noBorders',
+            table: {
+              headerRows: 0,
+              widths: ['*', 'auto'],
+              body: [...parseResumen({ data, tipo_pdf, is_electronica, is_general: false, resumen_data: detalles_per_page.totalizacion })],
+            },
+          },
+        ],
+      });
+      contenido.push(pageBreak);
+    }
+  });
+
+  return contenido;
 }
 
 function pieFacturaVenta(data, is_electronica) {
@@ -198,22 +247,26 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
 
   if (!firmas[tipo_pdf].length) return [{ text: '' }];
 
-  const mainTable = { margin: [0, -10, 0, 0], layout: 'noBorders', table: { headerRows: 0, widths: [], body: [[]] } };
-
-  const innerTabla = { table: { headerRows: 0, widths: [160], body: [] } };
+  const mainTable = { margin: [0, 30, 0, 0], table: { widths: [], body: [[]] } };
 
   const entidades = ['realizado_por', 'cliente', 'recibido_por', 'entregado_por'];
 
   entidades.forEach((entidad, index) => {
     if (firmas[tipo_pdf].includes(entidad)) {
-      const tabla_molde = fun.deepCloning(innerTabla);
 
-      tabla_molde.table.body.push([{ text: fun.Capitalice(entidad.split('_').join(' ')), alignment: 'center', style: 'letra10', border: [false, true, false, false] }]);
 
-      mainTable.table.widths.push(170);
-      mainTable.table.body[0].push(tabla_molde);
+      mainTable.table.widths.push(100);
+      mainTable.table.body[0].push({ text: fun.Capitalice(entidad.split('_').join(' ')), alignment: 'center', style: 'letra10', border: [false, true, false, false] });
+
+      if (index < firmas[tipo_pdf].length - 1) {
+        mainTable.table.widths.push(20);
+        mainTable.table.body[0].push({ text: '', border: [false, false, false, false] });
+      }
     }
   });
+
+  console.log('mainTable ', JSON.stringify(mainTable));
+  
 
   return mainTable;
 }
@@ -229,7 +282,7 @@ function parseTipoPdf(data, tipo_pdf) {
     },
     {
       key: 'razon',
-      item: [{ text: data?.razon, alignment: 'right', bold: true, style: 'letra10' }],
+      item: [{ text: data?.razon, alignment: 'right', bold: false, style: 'letra10' }],
     },
   ];
 
@@ -243,64 +296,88 @@ function parseTipoPdf(data, tipo_pdf) {
   return contenido;
 }
 
-function parseResumen(data, tipo_pdf) {
+function parseResumen(args: { data: any; tipo_pdf: any; is_electronica: boolean; is_general: boolean; resumen_data?: any }) {
+  const { data, tipo_pdf, is_electronica, is_general, resumen_data } = args;
+
   const resumen = [];
   if (!infoResumenPartes[tipo_pdf].length) return [{ text: '' }];
 
   const partes = [
     {
+      key: 'total_excento',
+      item: [
+        { text: 'Total Excento', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(resumen_data?.total_excento || 0), alignment: 'right', style: 'letra10', bold: true },
+      ],
+    },
+    {
+      key: 'total_gravado',
+      item: [
+        { text: 'Total Gravado', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(resumen_data?.total_gravado || 0), alignment: 'right', style: 'letra10', bold: true },
+      ],
+    },
+    {
       key: 'bruto',
       item: [
-        { text: 'Total Excento:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.Bruto || data?.bruto), alignment: 'right', style: 'letra11', bold: true },
+        { text: 'Total Excento', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(data?.Bruto || data?.bruto || 0), alignment: 'right', style: 'letra10', bold: true },
       ],
     },
     {
       key: 'itbis',
       item: [
-        { text: 'Itbis:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.itbis), alignment: 'right', style: 'letra11', bold: true },
+        { text: 'Itbis', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(resumen_data?.itbis || data?.itbis || 0), alignment: 'right', style: 'letra10', bold: true },
       ],
     },
     {
       key: 'descuento',
       item: [
-        { text: 'Descuento:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.descuento), alignment: 'right', style: 'letra11', bold: true },
+        { text: 'Descuento', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(resumen_data?.descuento || data?.descuento || 0), alignment: 'right', style: 'letra10', bold: true },
       ],
     },
     {
       key: 'mora',
       item: [
-        { text: 'Mora', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.mora), bold: true, alignment: 'right', style: 'letra11' },
+        { text: 'Mora', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(data?.mora || 0), bold: true, alignment: 'right', style: 'letra10' },
       ],
     },
     {
       key: 'total',
       item: [
-        { text: 'Total:', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.total), alignment: 'right', style: 'letra11', bold: true },
+        { text: 'Total', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(resumen_data?.total_pagina || data?.total || 0), alignment: 'right', style: 'letra10', bold: true },
       ],
     },
     {
       key: 'efectivo',
       item: [
-        { text: 'Efectivo', bold: true, alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.total + data?.devuelta), bold: true, alignment: 'right', style: 'letra11' },
+        { text: 'Efectivo', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(data?.total + data?.devuelta || 0), bold: true, alignment: 'right', style: 'letra10' },
       ],
     },
     {
       key: 'cambio',
       item: [
-        { text: 'Cambio', alignment: 'right', style: 'letra11', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.devuelta), alignment: 'right', style: 'letra11' },
+        { text: 'Cambio', alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+        { text: fun_.roundNumberToDecimal(data?.devuelta || 0), alignment: 'right', style: 'letra10' },
       ],
     },
   ];
 
   partes.forEach(parte => {
-    if (infoResumenPartes[tipo_pdf].includes(parte.key)) resumen.push(parte.item);
+    if (is_electronica) {
+      const valor = parte.item[1].text;
+      parte.item[0].text = `${parte.item[0].text} ${is_general ? '' : 'Página'} RD$ :`;
+      // if (infoResumenPartes[tipo_pdf].includes(parte.key) && fun_.desformatearStNumber(valor) >= 1) resumen.push(parte.item);
+      if (infoResumenPartes[tipo_pdf].includes(parte.key)) resumen.push(parte.item);
+      
+    } else {
+      if (infoResumenPartes[tipo_pdf].includes(parte.key)) resumen.push(parte.item);
+    }
   });
 
   return resumen;

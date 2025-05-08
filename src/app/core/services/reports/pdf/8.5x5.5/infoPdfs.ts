@@ -13,8 +13,9 @@ export const infoTipoPdf = {
   cuadre_caja: ['tipo_pdf'],
 };
 
+
 export const infoResumenPartes = {
-  notas: ['bruto', 'itbis', 'total'],
+  notas: ['total_excento', 'total_gravado', 'itbis', 'descuento', 'total'],
   ventas: ['bruto', 'descuento', 'total', 'efectivo', 'cambio'],
   recibo_ingreso: ['bruto', 'mora', 'total'],
   conduce: [],

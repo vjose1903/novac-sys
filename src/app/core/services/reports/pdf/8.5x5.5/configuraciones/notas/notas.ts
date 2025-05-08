@@ -129,7 +129,7 @@ export const config_notas = {
   // =============================================
   electronica: {
     pageSize: { width: 600, height: 398 },
-    pageMargins: [15, 127, 15, 90],
+    pageMargins: [15, 123, 15, 90],
     margin_general: [0, 0, 0, 0],
     isBreak: true,
     break: 5,
