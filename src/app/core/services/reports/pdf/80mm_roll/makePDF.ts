@@ -58,7 +58,7 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf, is_electr
 
   data.tipo_tabla = 'normal';
 
-  const tabla_detalles = getContentWithTablaNormal(configuration, data, is_electronica);
+  const tabla_detalles = getContentWithTablaNormal({ configuration, data, is_electronica });
 
   const content = [
     {

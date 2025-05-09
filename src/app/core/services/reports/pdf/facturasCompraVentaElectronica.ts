@@ -16,9 +16,9 @@ function getPageMargin(is_contado) {
   let margins = [];
 
   if (is_contado) {
-    margins = [15, 135, 15, 90];
+    margins = [15, 135, 15, 80];
   } else {
-    margins = [15, 148.6, 15, 90];
+    margins = [15, 148.6, 15, 80];
   }
 
   return margins;
@@ -451,7 +451,7 @@ function afterContent(data, is_contado, is_venta, configApp: ConfigI) {
 function getQRCode(data) {
   const size = 58;
   return {
-    margin: [15, 0, 0, 0],
+    margin: [15, -15, 0, 0],
     stack: [
       { image: 'qrCodeImage', width: size, height: size, margin: [0, 2, 0, 2] },
       {

@@ -11,7 +11,7 @@ export function getContentWithTablaAgrupada(configuracion, data, is_electronica 
     for (let index_info = 0; index_info < configuracion.info.length; index_info++) {
       const config = configuracion.info[index_info];
 
-      const tabla = getContentWithTablaNormal(config, data, is_electronica, index_contenido, index_info);
+      const tabla = getContentWithTablaNormal({ configuration: config, data, is_electronica, index_data: index_contenido, index_info });
 
       cont_.push(tabla);
     }

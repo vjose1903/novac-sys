@@ -23,11 +23,19 @@ export function parseTotalizacion(detalles: DetalleFactura[]): { total_excento: 
   const articulos_excentos = detalles.filter(detalle => !detalle.calcular_itbis);
 
   articulos_grabados.forEach(articulo => {
-    total_gravado += articulo.total;
-    itbis += articulo.itbis;
+    const descuento = articulo.descuento ?? articulo.descuento_valor ?? 0;
+    const itbis_ = articulo.itbis ?? 0;
+
+    total_gravado += articulo.total + descuento - itbis_;
+    itbis += itbis_;
   });
 
-  articulos_excentos.forEach(articulo => (total_excento += articulo.total));
+  articulos_excentos.forEach(articulo => {
+    const descuento = articulo.descuento ?? articulo.descuento_valor ?? 0;
+    const itbis_ = articulo.itbis ?? 0;
+
+    total_excento += articulo.total + descuento - itbis_;
+  });
 
   total_pagina = total_excento + total_gravado + itbis;
 

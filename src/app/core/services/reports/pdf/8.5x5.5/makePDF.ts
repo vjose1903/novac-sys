@@ -30,12 +30,7 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
-  console.log('file_name ', file_name);
-  console.log('base_tipo_pdf ', base_tipo_pdf);
-  console.log('post_tipo_pdf ', post_tipo_pdf);
-
   const tipo_pdf = `${base_tipo_pdf}${post_tipo_pdf}`;
-  console.log('tipo_pdf ', tipo_pdf);
   const is_compra = data?.tipo === 'compra' ? true : false;
 
   const is_suplidor = is_compra;
@@ -53,7 +48,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     footer: (currentPage, pageCount, pageSize) => pieFacturaVenta(data, is_electronica),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
-      qrCodeImage: fun_.my_qrcode(data?.qr_url_dgii || ''),
+      qrCodeImage: is_electronica ? fun_.my_qrcode(data?.qr_url_dgii || '') : '',
     },
     styles: styles_,
     defaultStyle,
@@ -82,6 +77,7 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
               width: 'auto',
             },
             {
+              margin: [-50, 0, 0, 0],
               stack: [
                 { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
                 { text: configApp.direccion_empresa, alignment: 'center', style: 'letra10' },
@@ -131,7 +127,7 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
     tabla_detalles = processContenidoElectronico(configuration, data, is_electronica, tipo_pdf);
   } else {
     data.tipo_tabla = 'normal';
-    tabla_detalles = getContentWithTablaNormal(configuration, data, is_electronica);
+    tabla_detalles = getContentWithTablaNormal({ configuration, data, is_electronica });
   }
 
   const content = [
@@ -169,9 +165,7 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
                         },
                       ]
                     : [{ text: '' }],
-                  [
-                    parseFirmasPdf({ tipo_pdf })
-                  ],
+                  [parseFirmasPdf({ tipo_pdf })],
                 ],
               },
             },
@@ -203,18 +197,13 @@ function contenidoPDF(args: { data: any; configApp: ConfigI; tipo_pdf: any; conf
 function processContenidoElectronico(configuration, data, is_electronica, tipo_pdf) {
   const contenido = [];
   const _break = configuration.break;
-  console.log('data ', data);
 
   const articulosAgrupados = agruparArticulosPorPagina(data.contenido_reporte, _break);
 
   articulosAgrupados.forEach((detalles_per_page, index) => {
-    // const detalles = makeTableDetalles(detalles_per_page.articulos, is_venta, index * _break);
-    const data_tabla = {
-      tipo_tabla: 'normal',
-      contenido_reporte: detalles_per_page.articulos,
-    };
+    const data_tabla = { tipo_tabla: 'normal', contenido_reporte: detalles_per_page.articulos };
 
-    const detalles = getContentWithTablaNormal(configuration, data_tabla, is_electronica);
+    const detalles = getContentWithTablaNormal({ configuration, data: data_tabla, is_electronica, offset: index * _break });
     contenido.push(detalles);
 
     if (index < articulosAgrupados.length - 1) {
@@ -253,8 +242,6 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
 
   entidades.forEach((entidad, index) => {
     if (firmas[tipo_pdf].includes(entidad)) {
-
-
       mainTable.table.widths.push(100);
       mainTable.table.body[0].push({ text: fun.Capitalice(entidad.split('_').join(' ')), alignment: 'center', style: 'letra10', border: [false, true, false, false] });
 
@@ -264,9 +251,6 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
       }
     }
   });
-
-  console.log('mainTable ', JSON.stringify(mainTable));
-  
 
   return mainTable;
 }
@@ -299,236 +283,107 @@ function parseTipoPdf(data, tipo_pdf) {
 function parseResumen(args: { data: any; tipo_pdf: any; is_electronica: boolean; is_general: boolean; resumen_data?: any }) {
   const { data, tipo_pdf, is_electronica, is_general, resumen_data } = args;
 
-  const resumen = [];
   if (!infoResumenPartes[tipo_pdf].length) return [{ text: '' }];
 
-  const partes = [
-    {
-      key: 'total_excento',
-      item: [
-        { text: 'Total Excento', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(resumen_data?.total_excento || 0), alignment: 'right', style: 'letra10', bold: true },
-      ],
-    },
-    {
-      key: 'total_gravado',
-      item: [
-        { text: 'Total Gravado', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(resumen_data?.total_gravado || 0), alignment: 'right', style: 'letra10', bold: true },
-      ],
-    },
-    {
-      key: 'bruto',
-      item: [
-        { text: 'Total Excento', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.Bruto || data?.bruto || 0), alignment: 'right', style: 'letra10', bold: true },
-      ],
-    },
-    {
-      key: 'itbis',
-      item: [
-        { text: 'Itbis', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(resumen_data?.itbis || data?.itbis || 0), alignment: 'right', style: 'letra10', bold: true },
-      ],
-    },
-    {
-      key: 'descuento',
-      item: [
-        { text: 'Descuento', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(resumen_data?.descuento || data?.descuento || 0), alignment: 'right', style: 'letra10', bold: true },
-      ],
-    },
-    {
-      key: 'mora',
-      item: [
-        { text: 'Mora', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.mora || 0), bold: true, alignment: 'right', style: 'letra10' },
-      ],
-    },
-    {
-      key: 'total',
-      item: [
-        { text: 'Total', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(resumen_data?.total_pagina || data?.total || 0), alignment: 'right', style: 'letra10', bold: true },
-      ],
-    },
-    {
-      key: 'efectivo',
-      item: [
-        { text: 'Efectivo', bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.total + data?.devuelta || 0), bold: true, alignment: 'right', style: 'letra10' },
-      ],
-    },
-    {
-      key: 'cambio',
-      item: [
-        { text: 'Cambio', alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
-        { text: fun_.roundNumberToDecimal(data?.devuelta || 0), alignment: 'right', style: 'letra10' },
-      ],
-    },
-  ];
+  const componentesResumen = {
+    total_excento: { label: 'Total Excento', valor: resumen_data?.total_excento || 0 },
+    total_gravado: { label: 'Total Gravado', valor: resumen_data?.total_gravado || 0 },
+    bruto: { label: 'Total Excento', valor: data?.Bruto || data?.bruto || 0 },
+    itbis: { label: 'Itbis', valor: resumen_data?.itbis || data?.itbis || 0 },
+    descuento: { label: 'Descuento', valor: resumen_data?.descuento || data?.descuento || 0 },
+    mora: { label: 'Mora', valor: data?.mora || 0 },
+    total: { label: 'Total', valor: resumen_data?.total_pagina || data?.total || 0 },
+    efectivo: { label: 'Efectivo', valor: data?.total + data?.devuelta || 0 },
+    cambio: { label: 'Cambio', valor: data?.devuelta || 0 },
+  };
 
-  partes.forEach(parte => {
-    if (is_electronica) {
-      const valor = parte.item[1].text;
-      parte.item[0].text = `${parte.item[0].text} ${is_general ? '' : 'Página'} RD$ :`;
-      // if (infoResumenPartes[tipo_pdf].includes(parte.key) && fun_.desformatearStNumber(valor) >= 1) resumen.push(parte.item);
-      if (infoResumenPartes[tipo_pdf].includes(parte.key)) resumen.push(parte.item);
-      
-    } else {
-      if (infoResumenPartes[tipo_pdf].includes(parte.key)) resumen.push(parte.item);
-    }
-  });
+  const baseProps = {
+    label: { bold: true, alignment: 'right', style: 'letra10', margin: [0, 0, 10, 0] },
+    valor: { alignment: 'right', style: 'letra10', bold: true },
+  };
 
-  return resumen;
+  return infoResumenPartes[tipo_pdf]
+    .filter(key => {
+      const valor = fun_.roundNumberToDecimal(componentesResumen[key].valor);
+      return fun_.desformatearStNumber(valor) >= 1;
+    })
+    .map(key => {
+      const componente = componentesResumen[key];
+      const textoLabel = is_electronica ? `${componente.label} ${is_general ? '' : 'Página'} RD$ :` : componente.label;
+
+      return [
+        { ...baseProps.label, text: textoLabel },
+        { ...baseProps.valor, text: fun_.roundNumberToDecimal(componente.valor) },
+      ];
+    });
 }
 
 function parseInfoFactura(data, tipo_pdf, is_electronica) {
-  const contenido = [];
   if (!infoFacturaPartes[tipo_pdf].length) return [{ text: '' }];
 
-  const partes = [
-    {
-      key: 'fecha',
-      item: {
-        alignment: 'left',
-        noWrap: true,
-        text: [
-          { text: `${is_electronica ? 'Fecha Emisión' : 'Fecha factura'} : `, bold: true, style: 'letra10' },
-          { text: `${fun_.my_dateFormater(data?.fecha || '')} ${is_electronica ? '' : `- ${fun_.my_houreFormater(data?.fecha || '')}`}`, style: 'letra10' },
-        ],
-      },
-    },
-    {
-      key: 'fecha_vencimiento',
-      item: {
-        alignment: 'left',
-        noWrap: true,
-        text: [
-          { text: 'Fecha limite pago: ', bold: true, style: 'letra10' },
-          { text: fun_.my_dateFormater(data?.fecha_vencimiento), style: 'letra10' },
-        ],
-      },
-    },
-    {
-      key: 'ncf',
-      item: {
-        alignment: 'left',
-        noWrap: true,
-        text: [
-          { text: `${data?.serie == serie.electronica ? 'eNCF' : 'NCF'} : `, bold: true, style: 'letra10' },
-          { text: data?.numero_comprobante || '', style: 'letra10' },
-        ],
-      },
-    },
-    {
-      key: 'ncf_modificado',
-      item: {
-        alignment: 'left',
-        noWrap: true,
-        text: [
-          { text: `NCF modificado: `, bold: true, style: 'letra10' },
-          { text: data?.ncf_modificado || '', style: 'letra10' },
-        ],
-      },
-    },
-    {
-      key: 'no_documento',
-      item: {
-        alignment: 'left',
-        noWrap: true,
-        text: [
-          { text: 'Doc No : ', bold: true, style: 'letra10' },
-          { text: fun_.my_padStart(data?.numero_documento || '', 8, '0'), style: 'letra10' },
-        ],
-      },
-    },
+  const partesConfig = {
+    fecha: { label: `${is_electronica ? 'Fecha Emisión' : 'Fecha factura'} : `, valor: `${fun_.my_dateFormater(data?.fecha || '')} ${is_electronica ? '' : `- ${fun_.my_houreFormater(data?.fecha || '')}`}` },
+    fecha_vencimiento: { label: 'Fecha limite pago: ', valor: fun_.my_dateFormater(data?.fecha_vencimiento) },
+    ncf: { label: `${data?.serie == serie.electronica ? 'eNCF' : 'NCF'} : `, valor: data?.numero_comprobante || '' },
+    ncf_modificado: { label: 'NCF modificado: ', valor: data?.ncf_modificado || '' },
+    no_documento: { label: 'Doc No : ', valor: fun_.my_padStart(data?.numero_documento || '', 8, '0') },
+    valida: { label: 'Fecha vencimiento: ', valor: data.tipo_factura_id === 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida) },
+  };
 
-    {
-      key: 'valida',
-      item: {
-        alignment: 'left',
-        noWrap: true,
-        text: [
-          { text: 'Fecha vencimiento: ', bold: true, style: 'letra10' },
-          { text: data.tipo_factura_id === 3 ? 'No aplica.' : fun_.my_dateFormater(data?.fecha_valida), style: 'letra10' },
-        ],
-      },
-    },
-  ];
+  const baseProps = { alignment: 'left', noWrap: true };
 
-  partes.forEach(parte => {
-    if (infoFacturaPartes[tipo_pdf].includes(parte.key) && (!('tipo_factura_id' in data) || (data?.tipo_factura_id && !excludeFacturaPartesByTipoFactura[parte.key]?.includes(data?.tipo_factura_id)))) {
-      if (fun.hasValue(parte.item.text[1].text)) {
-        parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
-        contenido.push(parte.item);
-      }
-    }
-  });
-
-  return contenido;
+  return infoFacturaPartes[tipo_pdf]
+    .filter(key => (!('tipo_factura_id' in data) || (data?.tipo_factura_id && !excludeFacturaPartesByTipoFactura[key]?.includes(data?.tipo_factura_id))) && fun.hasValue(partesConfig[key].valor))
+    .map((key, index) => ({
+      ...baseProps,
+      margin: [0, index ? 3 : 0, 0, 0],
+      text: [
+        { text: partesConfig[key].label, bold: true, style: 'letra10' },
+        { text: partesConfig[key].valor, style: 'letra10' },
+      ],
+    }));
 }
 
 function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
-  const contenido = [];
-  const numero_letra = numLetra.NumeroALetras(data?.total);
   if (!infoPropietarioPartes[tipo_pdf].length) return [{ text: '' }];
 
-  const partes = [
-    {
-      key: 'nombre',
-      item: {
-        alignment: 'left',
-        noWrap: true,
-        text: [
-          { text: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, bold: true, style: 'letra10' },
-          is_suplidor ? { text: data?.suplidor.nombre || '', style: 'letra10' } : { text: `${data?.cliente.nombre || ''} ${data?.cliente.apellido || ''}`, style: 'letra10' },
-        ],
-      },
-    },
-    {
-      key: 'doc_identidad',
-      noWrap: true,
-      item: {
-        alignment: 'left',
-        text: [{ text: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.rnc || '', style: 'letra10' } : { text: data?.cliente.rnc || '', style: 'letra10' }],
-      },
-    },
-    {
-      key: 'direccion',
-      noWrap: true,
-      item: {
-        alignment: 'left',
-        text: [{ text: 'Dirección: ', bold: true, style: 'letra10' }, is_suplidor ? { text: data?.suplidor.direccion || '', style: 'letra10' } : { text: data?.cliente.direccion || '', style: 'letra10' }],
-      },
-    },
-    {
-      key: 'recibido',
-      item: {
-        alignment: 'left',
-        text: [
-          { text: 'Recibido: ', bold: true, style: 'letra10' },
-          { text: fun_.roundNumberToDecimal(data?.total), style: 'letra10' },
-          { text: ` - ${fun_.my_capitalize(numero_letra)}`, style: 'letra10' },
-        ],
-      },
-    },
-  ];
+  const numero_letra = numLetra.NumeroALetras(data?.total);
 
-  partes.forEach(parte => {
-    if (infoPropietarioPartes[tipo_pdf].includes(parte.key)) {
-      parte.item['margin'] = [0, contenido.length ? 3 : 0, 0, 0];
-      contenido.push(parte.item);
-    }
+  const propietario = is_suplidor ? data?.suplidor : data?.cliente;
+
+  const propietarioConfig = {
+    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: propietario.nombre || '' },
+    doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario.rnc || '' },
+    direccion: { label: 'Dirección: ', valor: propietario.direccion || '' },
+    recibido: { label: 'Recibido: ', valorArray: [fun_.roundNumberToDecimal(data?.total), ` - ${fun_.my_capitalize(numero_letra)}`] },
+  };
+
+  const baseProps = { alignment: 'left', noWrap: true };
+
+  return infoPropietarioPartes[tipo_pdf].map((key, index) => {
+    const config = propietarioConfig[key];
+    return {
+      ...baseProps,
+      margin: [0, index ? 3 : 0, 0, 0],
+      text:
+        key === 'recibido'
+          ? [
+              { text: config.label, bold: true, style: 'letra10' },
+              { text: config.valorArray[0], style: 'letra10' },
+              { text: config.valorArray[1], style: 'letra10' },
+            ]
+          : [
+              { text: config.label, bold: true, style: 'letra10' },
+              { text: config.valor, style: 'letra10' },
+            ],
+    };
   });
-
-  return contenido;
 }
 
 function getQRCode(data) {
   const size = 58;
   return {
-    margin: [15, 0, 0, 0],
+    margin: [15, -15, 0, 0],
     stack: [
       { image: 'qrCodeImage', width: size, height: size, margin: [0, 2, 0, 2] },
       {

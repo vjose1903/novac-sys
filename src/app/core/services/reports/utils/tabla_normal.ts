@@ -2,11 +2,12 @@
 import { fun } from '../../functions.service';
 import * as fun_ from './funciones';
 
-export function getContentWithTablaNormal(configuration, data, is_electronica = false, index_data?, index_info?) {
-  return makeTablaNormal(configuration, data, index_data, index_info, is_electronica);
+export function getContentWithTablaNormal(args: { configuration: any; data: any; is_electronica?: boolean; index_data?: number; index_info?: number; offset?: number }) {
+  const { configuration, data, is_electronica = false, index_data, index_info, offset = 0 } = args;
+  return makeTablaNormal(configuration, data, index_data, index_info, is_electronica, offset);
 }
 
-export function makeTablaNormal(configuration, data, index_data?, index_info?, is_electronica?) {
+export function makeTablaNormal(configuration, data, index_data?, index_info?, is_electronica?, offset = 0) {
   const data_ = data.tipo_tabla === 'normal' ? data : data.contenido_reporte[index_data];
 
   const contendio_ = data.tipo_tabla === 'normal' ? data_.contenido_reporte : index_info == 0 ? data_.contenido_titulo : data_.contenido_grupo;
@@ -43,7 +44,7 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?, i
 
   if (!configuration.only_titulo && Array.isArray(contendio_)) {
     contendio_.forEach((detalle, j) => {
-      const row = formarCuerpo(data, configuration, detalle, j, is_electronica);
+      const row = formarCuerpo(data, configuration, detalle, j, is_electronica, offset);
       body.push(row as TablaRowPdfMake);
     });
   }
@@ -126,7 +127,7 @@ function getTotalizacion(configuration, data) {
   return totalizacion;
 }
 
-function formarCuerpo(data, configuration, detalle, j, is_electronica) {
+function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 0) {
   const row = [];
 
   const brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
@@ -139,7 +140,7 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica) {
     const value = fun.getProperty(detalle, info.key);
 
     if (info.key === 'index') {
-      text_ = j + 1;
+      text_ = offset +j + 1;
     } else {
       if (info.formato_fecha) {
         text_ = fun_.my_dateFormater(value);
