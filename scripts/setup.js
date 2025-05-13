@@ -51,7 +51,6 @@ const files = [
   { tipo: 'reemplazo', file_name: 'environment.web.ts', path: 'src/environments/environment.web.ts' },
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
   { tipo: 'reemplazo', file_name: 'package.json', path: 'package.json' },
-  { tipo: 'reemplazo', file_name: 'photos.service.ts', path: 'src/app/core/services/photos.service.ts' },
   { tipo: 'reemplazo', file_name: 'main.ts', path: 'main.ts' },
 ];
 
