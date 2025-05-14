@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { FacturacionService } from './facturacion.service';
 import { ArticuloC } from '@registros/articulos/articulo';
-import { tipoDocFacturacion, FacturasI, actionFacturacion, comprobanteNormal, comprobanteElectronico, tFacturaKey } from './factura';
+import { tipoDocFacturacion, FacturasI, actionFacturacion, comprobanteNormal, comprobanteElectronico, tFacturaKey, comprobante } from './factura';
 import { NcfC } from '@registros/ncf/ncf';
 import { PendienteFormComponent } from '@components/formularios en modales/pendiente-form/pendiente-form.component';
 import { FormCantidadEfectivoComponent } from '@components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
@@ -226,12 +226,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           //
         } else if (this.factServ.action == actionFacturacion.duplicate) {
           this.procesoRelleno({ id: this.id_documento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.duplicate }).then(res => {
-            this.abrirModalPropietario({ include_contado: true });
+            this.abrirModalPropietario('onchange', { include_contado: true });
           });
           //
         } else {
           setTimeout(() => {
-            if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario();
+            if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario('onchange 2');
             else fun.enfocarInput('tipoFact');
           }, 5);
         }
@@ -391,7 +391,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       else if (this.factServ.isPreVenta) this.titulo = 'Pre factura';
       else if (this.factServ.isCotizacion) this.titulo = 'Cotización';
 
-      this.factServ.setTipos(this.factServ.tipoDocumento, serie.normal).then(result => {
+      this.factServ.setTipos(this.factServ.tipoDocumento, serie.electronica).then(result => {
         //
         [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando, this.errorComprobante] = Array(5).fill(false);
@@ -766,7 +766,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const dont_have_propietario = fun.isEmpty(this.factServ?.propietario_factura) || fun.isEmpty(this.factServ?.propietario_factura?.id);
 
       if (this.factServ.isVenta || this.factServ.isPreVenta) {
-        if (sali_de == 'venta' && (condicion == 'Crédito' || tipo_factura_referencia == '01') && dont_have_propietario && (fun.isEmpty(voy_a) || voy_a != 'fecha_viaje')) buscar = true;
+        if (sali_de == 'venta' && (condicion == 'Crédito' || tipo_factura_referencia == comprobante[this.factServ.serieType()].factura_de_credito_fiscal) && dont_have_propietario && (fun.isEmpty(voy_a) || voy_a != 'fecha_viaje')) buscar = true;
 
         if (sali_de == 'venta' && valor == 'adelantada' && dont_have_propietario) buscar = true;
 
@@ -780,7 +780,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         if (sali_de == 'fecha_vencimiento' && dont_have_propietario) buscar = true;
       }
 
-      if (buscar) this.abrirModalPropietario();
+      if (buscar) this.abrirModalPropietario('checkCambiosModoyCondicionFactura');
     }, 250);
   }
 
@@ -985,7 +985,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       setTimeout(() => fun.enfocarInput(siguiente_input), 10);
     } else fun.desEnfocarInput(salioDe);
 
-    if (is_buscar_cliente) this.abrirModalPropietario();
+    if (is_buscar_cliente) this.abrirModalPropietario('saltar');
     if (is_enforcar_cuerpo) this.cuerpo.seleccionarCampoEnTurno();
   }
 
@@ -1170,7 +1170,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     setTimeout(() => {
       if (this.movimientosSelected.length && !this.movimientosSelected.some(mov => fun.isEmpty(mov.user_id))) {
         if (fun.isEmpty(where) || where != 'teclado') {
-          if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura?.id)) this.abrirModalPropietario();
+          if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura?.id)) this.abrirModalPropietario('salio de camion');
           else this.cuerpo.seleccionarCampoEnTurno();
 
           this.cerrarOverlay();
@@ -1237,7 +1237,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================
 
-  abrirModalPropietario(params?: { include_contado: boolean }) {
+  abrirModalPropietario(where, params?: { include_contado: boolean }) {
+    console.log('where ', where);
+    
     if (fun.isEmpty(params)) params = { include_contado: false };
     let documento = this.getDocumentoDescripcion();
 
@@ -1488,7 +1490,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   resetVariables() {
     this.rellenarVariables().then(() => {
       setTimeout(() => {
-        if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario();
+        if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario('reset');
         else fun.enfocarInput('tipoFact');
       }, 5);
     });
@@ -1637,7 +1639,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const balance = _.parseInt(this.factServ.propietario_factura.balance);
       const maxCred = _.parseInt(this.factServ.propietario_factura.maximo_credito);
 
-      if (this.factServ.tipoDocumento != tipoDocFacturacion.cotizacion) {
+      if (this.factServ.tipoDocumento != tipoDocFacturacion.cotizacion && this.condicion_fact != 'Contado') {
         if (balance > maxCred - 1000 && balance < maxCred) {
           fun.toastWarning(`Credito actual RD$${this.formatoNumero(balance)} limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
         } else if (balance > maxCred) {

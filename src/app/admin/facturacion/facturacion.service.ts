@@ -23,7 +23,7 @@ export class FacturacionService {
   cotizacion_selected;
   productos_devueltos = [];
   filasDetalle;
-  serieType = signal(serie.normal);
+  serieType = signal(serie.electronica);
 
   public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
     if (fun.hasValue(Ss.configServ)) {

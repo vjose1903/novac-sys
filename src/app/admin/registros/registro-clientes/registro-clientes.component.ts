@@ -113,11 +113,16 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         direccion: [{ value: null, disabled: true }, Validators.required],
         sexo: [{ value: null, disabled: true }, Validators.required],
         telefono: [{ value: null, disabled: true }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
-        limite_credito: [{ value: null, disabled: true }, Validators.required],
+        limite_credito: [{ value: 30, disabled: true }, Validators.required],
         maximo_credito: [{ value: null, disabled: true }, Validators.required],
         vendedor_id: [{ value: null, disabled: true }, Validators.required],
         provincia_id: [{ value: null, disabled: true }],
         municipio_id: [{ value: null, disabled: true }, Validators.required],
+      });
+      this.form.valueChanges.subscribe(val => {
+        console.log(' ');
+        console.log('val ', val);
+        console.log('this.form ', this.form);
       });
 
       resolve();
@@ -168,7 +173,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   getVendedores() {
     const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'vendedor' } };
-    this.empleadosClass.getAll(extra).then(res => (this.vendedores = res['data']));
+    this.empleadosClass.getAll(extra).then(res => {
+      this.vendedores = res['data'];
+      this.form.controls.vendedor_id.setValue(this.vendedores[0].id);
+    });
   }
 
   async getClientes(params?: { per_page?: number; page?: number; search?: string }) {
@@ -279,14 +287,15 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
               const persona = fun.hasValue(is_cliente) ? is_cliente?.persona : _.head(res['data']).persona;
               persona.id = id_anterior;
 
-              const documento_persona = _.find(persona.documentos_de_identidad, item => item.principal);
+              const documento_persona = persona.documentos_de_identidad.find(item => item.principal);
 
               if (fun.hasValue(documento_persona)) {
                 this.doc_is_cedula = documento_persona.descripcion == 'cedula' ? true : false;
                 this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
               }
 
-              this.form.patchValue(persona);
+              const default_values = this.getFormDefaultValues();
+              this.form.patchValue({ ...persona, ...default_values });
 
               this.patchDocumentos(persona.documentos_de_identidad);
 
@@ -403,6 +412,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     }, 200);
   }
 
+  getFormDefaultValues() {
+    return { limite_credito: 30, vendedor_id: this.vendedores[0].id };
+  }
+
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
     this.doc_is_cedula = true;
@@ -412,6 +425,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.changeStateCampos(false);
     this.clienteSelected = undefined;
     this.isCreando = true;
+
+    // valores por defecto formulario
+    const default_values = this.getFormDefaultValues();
+
+    this.form.patchValue(default_values);
 
     setTimeout(() => {
       fun.enfocarInput('cedula');

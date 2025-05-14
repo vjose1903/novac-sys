@@ -70,6 +70,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   serieSelected = signal<serie>(serie.all);
   facturasSerieOptions: seriesDgiiI[] = [];
+
   notasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
   notaSerieSelected = signal<serie>(serie.all);
 
@@ -113,6 +114,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     public loadServ: LoaderService
   ) {
     super();
+
+    effect(() => {
+      if (this.serieSelected() && this.buscar_por == request_factura_campo.last_50) {
+        console.log('this.serieSelected ', this.serieSelected());
+        this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -258,7 +266,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
       console.log('this.buscarPara ', this.buscarPara);
 
       extra.parameters.tipo_nota = NotaC.base_comprobante[this.notaSerieSelected()][this.buscarPara];
-      
 
       try {
         const res = await this.notasClass.getAll(extra);
@@ -320,7 +327,18 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
       this.facturas.length = 0;
 
       const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
-      const args = { campo: this.buscar_por, valor: valor, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected, movimientos_viaje: true };
+
+      const args = {
+        campo: this.buscar_por,
+        valor: valor,
+        tipo_factura_id: this.tipo_factura_id,
+        page: params.page,
+        per_page: params.per_page,
+        paginado: true,
+        tipo: this.tipo_documento_selected,
+        movimientos_viaje: true,
+        extra_params: { serie: this.serieSelected() },
+      };
 
       const res = await this.facturaClass.getFacturasByParams(args);
 
@@ -377,9 +395,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
       if (this.facturas.length > 0) {
         if (this.buscar_por == this.campos.numeroComprobante) {
-          console.log("this.facturas[0] ", this.facturas[0]);
+          console.log('this.facturas[0] ', this.facturas[0]);
           // this.facturas[0].detalle_facturas.push(this.facturas[0].detalle_facturas[0])
-          
+
           this.facturaClass.parseDataToPdf(this.facturas[0]).then(factura_parsed => {
             const crear_nota = this.buscarPara.includes('nota');
             this.facturaSelected = factura_parsed;
@@ -552,8 +570,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
           this.notaSelected = params.data;
 
           this.notasClass.parseDataToPdf(params.data).then(data_parsed => {
-            console.log("data_parsed ", data_parsed);
-            
+            console.log('data_parsed ', data_parsed);
+
             this.mostrarFactura({ factura: data_parsed, type: 'nota', dataDB: params.data });
           });
         }
@@ -813,7 +831,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
           };
 
           if (factura.estado) obj_modal.botones.dinamico.push(rePrintButton);
-          if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(editButton);
+          if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion' && factura.serie != serie.electronica) obj_modal.botones.dinamico.push(editButton);
           if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(cloneButton);
         }
 

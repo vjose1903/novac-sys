@@ -64,7 +64,7 @@
 
           <div class="form-group flex-1">
             <label class="control-label mb-0">Serie factura: </label>
-            <p-selectButton [options]="facturasSerieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+            <p-selectButton [options]="facturasSerieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
           </div>
 
           <div class="d-flex gap-3">
@@ -162,7 +162,7 @@
 <p-drawer [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }" (onHide)="onHideSide()">
   <div class="w-100 h-100 d-flex flex-column gap-2">
     <div>
-      <p-selectButton [options]="notasSerieOptions" [ngModel]="notaSerieSelected()" (ngModelChange)="changeNotaSerie($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+      <p-selectButton [options]="notasSerieOptions" [ngModel]="notaSerieSelected()" (ngModelChange)="changeNotaSerie($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
     </div>
     <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
       <div class="innerTablas">

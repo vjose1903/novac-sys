@@ -19,7 +19,7 @@
         [closable]="modalConfig.closable"
         [transitionOptions]="modalConfig.transitionOptions"
         (onHide)="onHideModal(modalConfig.id)">
-        <div [ngStyle]="{ height: modalConfig.height, width: modalConfig.width }" style="transition: all 0.5s">
+        <div [ngStyle]="{ height: modalConfig.height, width: modalConfig.width, 'min-height': modalConfig.minHeight }" style="transition: all 0.5s">
           @if (modalConfig.html) {
             <div [innerHtml]="modalConfig.html"></div>
           } @else {

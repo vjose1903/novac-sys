@@ -16,6 +16,7 @@ export interface ConfigureModalI {
   component?: any;
   width?: string;
   height?: string;
+  minHeight?: string;
   botones?: ButtonsObjI;
   closable?: boolean;
   closableEsc?: boolean;
@@ -61,6 +62,7 @@ export class ModalClass extends LayoutClass {
     modal_configuration['show'] = true;
     modal_configuration['component'] = fun.objHas(params, 'component') ? params.component : undefined;
     modal_configuration['width'] = fun.objHas(params, 'width') ? params.width : '50rem';
+    modal_configuration['minHeight'] = fun.objHas(params, 'minHeight') ? params.minHeight : undefined;
     modal_configuration['height'] = fun.objHas(params, 'height') ? params.height : undefined;
     modal_configuration['inputs'] = fun.objHas(params, 'inputs') ? params.inputs : undefined;
     modal_configuration['header'] = fun.objHas(params, 'header') ? params.header : undefined;

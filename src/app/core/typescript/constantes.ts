@@ -11,6 +11,14 @@ export enum serie {
   all = 'all',
 }
 
+export enum TrackStatusEnum {
+  NOT_FOUND = 'No encontrado',
+  ACCEPTED = 'Aceptado',
+  REJECTED = 'Rechazado',
+  IN_PROCESS = 'En Proceso',
+  CONDITIONAL_ACCEPTED = 'Aceptado Condicional',
+}
+
 export interface seriesDgiiI {
   label: string;
   value: serie;

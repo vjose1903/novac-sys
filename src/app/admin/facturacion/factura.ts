@@ -17,11 +17,6 @@ import { csvConfig as csvConfigMovimientosVehiculo } from '@core/services/report
 import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { ArticuloI } from '@registros/articulos/articulo';
 
-
-
-
-
-
 export enum comprobanteNormal {
   factura_de_credito_fiscal = '01',
   factura_de_consumo = '02',
@@ -199,6 +194,7 @@ export class FacturaC extends CrudG<FacturasI> {
 
         if (params.reporte.data.tipo == ReportGroupTypeE.detallado || params.pdf.tipo == 'ventas_diarias') {
           configKey = `detallado${configApp.calcular_itbis ? '_itbis' : ''}`;
+
           if (params.pdf.tipo == 'ventas_diarias') prefix = params.pdf.tipo;
         } else if (params.reporte.data.tipo == ReportGroupTypeE.agrupado) {
           configKey = `agrupado${configApp.calcular_itbis ? '_itbis' : ''}`;
@@ -216,6 +212,7 @@ export class FacturaC extends CrudG<FacturasI> {
       requestParams.parameters['condicion'] = params.reporte.data.condicion;
       requestParams.parameters['desde'] = fun.my_dateFormater(params.reporte.data.desde, false);
       requestParams.parameters['hasta'] = fun.my_dateFormater(params.reporte.data.hasta, false);
+      requestParams.parameters['serie'] = params.reporte.data.serie;
 
       for (let index = 0; index < FacturaC.inputsMovimientosViaje.length; index++) {
         const item = FacturaC.inputsMovimientosViaje[index];
@@ -319,6 +316,8 @@ export class FacturaC extends CrudG<FacturasI> {
         'serie',
         'qr_url_dgii',
         'fecha_hora_firma',
+        'is_aceptada',
+        'dgii_message',
         'security_code',
       ];
       const pick_factura = [...pick_factura1, ...pick_factura2];
@@ -356,8 +355,8 @@ export class FacturaC extends CrudG<FacturasI> {
       inputs: { data: data },
       id: `detalle_factura`,
       header: 'Detalles Factura',
-      width: '30rem',
-      height: '10rem',
+      width: '35rem',
+      minHeight: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
@@ -457,8 +456,6 @@ export enum tFacturaKey {
   pre_venta = 'pre_venta',
   cotizacion = 'cotizacion',
 }
-
-
 
 export interface TipoFacturaI {
   id: number;
