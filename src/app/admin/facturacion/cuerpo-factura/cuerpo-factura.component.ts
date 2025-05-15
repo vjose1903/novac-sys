@@ -108,6 +108,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async rellenarVariables() {
+    console.log('%c ---rellenarVariables ---', 'color: cyan; font-weight: bold;');
+    
     return new Promise(async (resolve, reject) => {
       try {
         this.listaDeDescuentos.length = 0;
