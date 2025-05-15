@@ -31,7 +31,7 @@ export default class HandlerConfigFile {
     vende_sin_inventario: false,
     facturacion_electronica: true,
     medida_producto_terminado: 'Quintal',
-    serie_default: serie.normal,
+    serie_default: serie.electronica,
 
     printer_selected: {
       venta_contado: 'Ninguna',
