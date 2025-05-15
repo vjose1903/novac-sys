@@ -24,7 +24,10 @@ const routes: Routes = [
         path: 'factura',
         loadChildren: () => import('../facturacion/facturacion.module').then((m) => m.FacturacionModule),
       },
-
+      {
+        path: 'ecf',
+        loadChildren: () => import('../facturacion-electronica/facturacion-electronica.module').then((m) => m.FacturacionElectronicaModule),
+      },
       {
         path: 'produccion',
         component: ProduccionComponent,
@@ -41,17 +44,14 @@ const routes: Routes = [
         path: 'recibos',
         loadChildren: () => import('../recibos/recibos.module').then((m) => m.RecibosModule),
       },
-
       {
         path: 'inventario',
         component: InventarioComponent,
       },
-
       {
         path: 'conduce',
         loadChildren: () => import('../conduce/conduce.module').then((m) => m.ConduceModule),
       },
-
       {
         path: 'reportes',
         component: ReportesComponent,

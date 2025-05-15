@@ -51,6 +51,7 @@
               </h4>
             </div>
           </div>
+
           <div *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.flatt" class="menuList">
             <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('manipular') }" [innerText]="'Manipular\ndocumentos'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('manipular') }" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu({ event: $event, url: 'manipular', navigate: false })" />
@@ -81,6 +82,30 @@
               </h4>
             </div>
           </div>
+
+          <div *ngxPermissionsOnly="menuPermissionsObj.facturacionElectonica.flatt" class="menuList">
+            <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('ecf') }" [innerText]="'Facturación\nelectrónica'"></h5>
+            <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('ecf') }" src="assets/img/dgii-btn.png" alt="Dgii" (click)="cambiarMenu({ event: $event, url: 'ecf', navigate: false })" />
+            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('ecf') }">
+              <h4
+                class="opcion"
+                *ngxPermissionsOnly="menuPermissionsObj.facturacionElectonica.recepcion"
+                [ngClass]="{ activa: actualRuta == 'ecf_received' }"
+                (click)="cambiarMenu({ event: $event, url: 'ecf/ecf_received', navigate: true })"
+              >
+                Facturas recibidas
+              </h4>
+              <h4
+                class="opcion"
+                *ngxPermissionsOnly="menuPermissionsObj.facturacionElectonica.commertialApproval"
+                [ngClass]="{ activa: actualRuta == 'commertial_approval_received' }"
+                (click)="cambiarMenu({ event: $event, url: 'ecf/commertial_approval_received', navigate: true })"
+              >
+                Aprobacion comercial recibida
+              </h4>
+            </div>
+          </div>
+
           <div *ngxPermissionsOnly="menuPermissionsObj.ingresos.recibosIngresos" class="menuList">
             <h5 class="tituloMenu" [ngClass]="{ tituloMenuA: isVistaActual('lista_ingresos') }" [innerText]="'Recibos de ingresos'"></h5>
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('lista_ingresos') }" src="assets/img/reciboIngreso.png" alt="Recibo" (click)="cambiarMenu({ event: $event, url: 'recibos/lista_ingresos', navigate: true })" />
