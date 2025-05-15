@@ -382,6 +382,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return new Promise<void>(resolve => {
       this.isInitialized = false;
 
+      console.log('%c this.tipo_documento ', 'color: magenta; font-weight: bold;', this.tipo_documento);
+      console.log('%c this.action ', 'color: magenta; font-weight: bold;', this.action);
+
       this.factServ.tipoDocumento = this.tipo_documento;
       this.factServ.action = this.action;
       this.factServ.productos_devueltos.length = 0;

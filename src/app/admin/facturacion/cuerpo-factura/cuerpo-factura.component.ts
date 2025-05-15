@@ -593,6 +593,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           } else {
             console.log('  ');
             console.log('  ');
+            console.log('%c this.factServ.tipoDocumento ', 'color: magenta; font-weight: bold;', this.factServ.tipoDocumento);
+            console.log('%c this.factServ.isCompra ', 'color: magenta; font-weight: bold;', this.factServ.isCompra);
             console.log('%c this.precioCostoKey ', 'color: lime; font-weight: bold;', this.precioCostoKey);
             console.log('unidadaSelected ', unidadaSelected);
             console.log('unidades ', unidades);
