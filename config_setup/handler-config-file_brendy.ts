@@ -29,7 +29,7 @@ export default class HandlerConfigFile {
     is_produccion: true,
     facturacion_editar_precio: true,
     vende_sin_inventario: true,
-    facturacion_electronica: false,
+    use_ecf: false,
     medida_producto_terminado: 'Producto',
     serie_default: serie.normal,
 

@@ -62,6 +62,7 @@
     "pdfmake": "0.2.18",
     "primeicons": "7.0.0",
     "primeng": "19.0.10",
+    "qrcode": "1.5.4",
     "replace-in-file": "7.1.0"
   },
   "devDependencies": {

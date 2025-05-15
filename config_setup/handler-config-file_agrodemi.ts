@@ -29,7 +29,7 @@ export default class HandlerConfigFile {
     is_produccion: true,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
-    facturacion_electronica: true,
+    use_ecf: true,
     medida_producto_terminado: 'Quintal',
     serie_default: serie.electronica,
 

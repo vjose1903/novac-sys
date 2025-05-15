@@ -4,6 +4,7 @@ import { pathAdd, writeLogs } from '../main';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
 import { serie } from '../src/app/core/typescript/constantes.js';
+
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
@@ -28,9 +29,9 @@ export default class HandlerConfigFile {
     is_produccion: true,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
-    facturacion_normal: true,
+    use_ecf: true,
     medida_producto_terminado: 'Quintal',
-    serie_default: serie.normal,
+    serie_default: serie.electronica,
 
     printer_selected: {
       venta_contado: 'Ninguna',

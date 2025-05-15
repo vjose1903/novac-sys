@@ -24,6 +24,7 @@ import SharedElectronAngular, {
   MessageTaskInterface,
   ELECTRON_EXPORT_CSV,
   ELECTRON_FOCUS_WINDOW,
+  ELECTRON_OPEN_WEB_BROWSER,
 } from './electron/shared-electron-angular';
 import AppUpdate from './electron/auto-update';
 import ReplaceInFile from './electron/replace-in-file';
@@ -32,6 +33,7 @@ import { operativeSystemE } from './src/app/core/typescript/constantes';
 import ExportToExcel from './electron/export-to-excel';
 import LogProcessor from './electron/write-logs';
 import MachineId from './electron/machine-id';
+import OpenBrowser from './electron/open-web-browser';
 
 let win: BrowserWindow | null;
 let splash: BrowserWindow | null;
@@ -40,6 +42,7 @@ let export_to_excel: ExportToExcel;
 let docker_handler: DockerHandler;
 let replace_in_file: ReplaceInFile;
 const Console: LogProcessor = LogProcessor.getInstance();
+const openBrowser: OpenBrowser = OpenBrowser.getInstance();
 const machineId: MachineId = MachineId.getInstance();
 
 const args = process.argv.slice(1);
@@ -295,6 +298,9 @@ async function handleEvent(event: any, obj: string) {
         if (!serve) win?.loadURL(appFilePath);
         break;
       //
+      case ELECTRON_OPEN_WEB_BROWSER:
+        openBrowser.open(parameters.url);
+        break
       case ELECTRON_CHANGE_CONFIG_FILE:
         replace_in_file
           .replaceFunction(parameters)
