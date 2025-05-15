@@ -8,7 +8,7 @@
           <th class="column-unidad text-center">Unidad</th>
           <th class="column-descripcion" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripcion</th>
           <th class="column-descuento">Descuento</th>
-          <th class="column-precio">{{ factServ.isCompra ? 'Costo' : 'Precio' }}</th>
+          <th class="column-precio">{{ fun.Capitalice(precioCostoKey) }}</th>
           @if (configApp.calcular_itbis) {
             <th class="column-itbis">ITBIS</th>
           }
@@ -182,12 +182,12 @@
                           }
                           <input
                             type="text"
-                            (blur)="handleInputEvent('blur', factServ.isCompra ? 'costo' : 'precio', index_cuerpo); calcularMontosRow(index_cuerpo)"
+                            (blur)="handleInputEvent('blur', precioCostoKey, index_cuerpo); calcularMontosRow(index_cuerpo)"
                             (focus)="verificarSecuencia(index_cuerpo)"
                             class="form-control entrada campoNumeros {{ factServ.isVenta ? 'inPRE' : '' }}"
                             (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
-                            id="{{ factServ.isCompra ? 'costo' : 'precio' }}-{{ index_cuerpo }}"
-                            [formControlName]="factServ.isCompra ? 'costo' : 'precio'"
+                            id="{{ precioCostoKey }}-{{ index_cuerpo }}"
+                            [formControlName]="precioCostoKey"
                             [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.is_bad_price.value }"
                             tabindex="-1" />
                         </div>
