@@ -1,4 +1,4 @@
-import { operativeSystemE } from "../typescript/constantes";
+import { operativeSystemE, serie } from "../typescript/constantes";
 
 export interface ConfigI {
   cliente:                     string;
@@ -32,6 +32,7 @@ export interface ConfigI {
   vende_sin_inventario:        boolean;
   facturacion_electronica?:    boolean;
   documentos_a_imprimir:       string;
+  serie_default:               serie;
   medida_producto_terminado:   string;
 }
 
