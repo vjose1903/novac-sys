@@ -14,7 +14,7 @@ export default class DockerHandler {
       first_reject ||= reject;
 
       if (this.count_docker <= 20 && this.count_db <= 20) {
-        runTerminalCommand('docker ps --filter "name=agrodemi-prod" --format "{{.Status}}"')
+        runTerminalCommand('docker ps --filter "name=agrodemi-dev" --format "{{.Status}}"')
           .then(res => {
             if (this.count_db == 1) writeLogs('Docker esta corriendo perfectamente.');
 
