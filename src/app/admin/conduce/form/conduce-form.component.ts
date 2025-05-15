@@ -5,7 +5,7 @@ import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray, FormGroup } fro
 import * as _ from 'lodash';
 import { ArticuloC } from '@registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
-import { FacturaC } from '../../facturacion/factura';
+import { FacturaC, request_factura_campo } from '../../facturacion/factura';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { BuscarArticuloComponent } from '@components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
@@ -14,13 +14,13 @@ import { fun } from '@core/services/functions.service';
 import { ModalService } from '@components/modal/modal.service';
 import { Permisos } from '@core/typescript/permisos';
 import { table_config } from '@components/new_tablas/tabla-class';
-import { ConfigI } from '@core/interface/config-interface';
-import { Ss } from '@core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '@core/typescript/constantes';
 import { ModalClass } from '@components/modal/modal-class';
 import { Router } from '@angular/router';
-
+import { Ss } from '@core/services/singleton.service';
+import { ConfigI } from '@core/interface/config-interface';
+  
 @Component({
     selector: 'app-conduce-form',
     templateUrl: './conduce-form.component.html',
@@ -409,7 +409,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         let excede = true;
 
         const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
-        await this.articuloClass.getAll(extra).then((res) => {
+        await this.articuloClass.getAll(extra).then((res: any) => {
           excede = res['data'];
 
           if (excede) {
@@ -564,7 +564,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   async buscarFacturasAdelantadas(id) {
     try {
-      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
+      this.facturaClass.getFacturasByParams({ campo: request_factura_campo.cliente_id, valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
         (res) => {
           this.facturas_adelantadas = res['data'];
           this.facturas_adelantadas.map((factura) => {
@@ -618,7 +618,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       let conteo = 0;
 
       factura.detalle_facturas.map(async (detalle) => {
-        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Funda: 'Funda' };
+        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Bolsa: 'Bol.' };
 
         const contenidos_format = this.formatContenidos(detalle.contenidos);
 

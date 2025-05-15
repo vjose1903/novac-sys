@@ -96,8 +96,9 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   async getStock() {
     const extra = { afterPath: `custom/stock` };
-    this.articuloClass.getAll(extra).then((result) => (this.cant_inventario = result['data'].stock));
+    this.articuloClass.getAll(extra).then((result: any) => (this.cant_inventario = result['data'].stock));
   }
+
 
   async getArticulos(params?: { per_page?: number; page?: number; search?: string }) {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];

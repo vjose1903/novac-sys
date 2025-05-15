@@ -10,58 +10,68 @@
 
   <div class="col-12 p-0 arriba">
     <div class="row">
-      <div class="col-6">
+      <div class="col-7">
         <div class="card card-padding sombra">
           <!-- ================ TIPO DOCUMENTO  ================ -->
-          @if (buscarPara == 'solo_ver') {
-            <div class="form-group">
-              <label class="control-label mb-0">Tipo: </label>
+          <div class="d-flex gap-3">
+            @if (buscarPara == 'solo_ver') {
+              <div class="form-group flex-1">
+                <label class="control-label mb-0">Tipo: </label>
+                <select
+                  id="tipoI"
+                  [(ngModel)]="tipo_documento_selected"
+                  class="form-control inputE"
+                  (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
+                  (change)="changeSelect('tipo_documento', htmlServ.getValue($event))"
+                  value="">
+                  <option [value]="null" selected disabled>Escoger tipo</option>
+                  @for (tipo of tipos_documentos; track $index) {
+                    <option [value]="tipo.value">{{ tipo.label }}</option>
+                  }
+                </select>
+              </div>
+            }
+
+            <!-- ================ BUSCAR POR  ================ -->
+            <div class="form-group flex-2">
+              <label class="control-label mb-0">Buscar {{ tipo_documento_selected == 'cotizacion' ? 'cotización' : 'factura' }} por : </label>
+
               <select
-                id="tipoI"
-                [(ngModel)]="tipo_documento_selected"
+                id="buscarPorI"
+                [(ngModel)]="buscar_por"
                 class="form-control inputE"
                 (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
-                (change)="changeSelect('tipo_documento', htmlServ.getValue($event))"
-                value="">
+                (change)="changeSelect('buscar_por', htmlServ.getValue($event))"
+                value=""
+                [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected)">
                 <option [value]="null" selected disabled>Escoger tipo</option>
-                @for (tipo of tipos_documentos; track $index) {
-                  <option [value]="tipo.value">{{ tipo.label }}</option>
+                @if (tipo_documento_selected != 'compra') {
+                  <option value="1">Por cliente</option>
                 }
+                @if (tipo_documento_selected == 'compra') {
+                  <option value="5">Por suplidor</option>
+                }
+                @if (tipo_documento_selected != 'cotizacion') {
+                  <option value="2">Por número comprobante</option>
+                }
+                <option value="3">Por número {{ tipo_documento_selected == 'cotizacion' ? 'cotización' : 'factura' }}</option>
+                <option value="4">Ultimas 50 {{ tipo_documento_selected == 'cotizacion' ? 'cotizaciones' : 'facturas' }}</option>
               </select>
             </div>
-          }
-
-          <!-- ================ BUSCAR POR  ================ -->
-          <div class="form-group">
-            <label class="control-label mb-0">Buscar {{ tipo_documento_selected == 'cotizacion' ? 'cotización' : 'factura' }} por : </label>
-
-            <select
-              id="buscarPorI"
-              [(ngModel)]="buscar_por"
-              class="form-control inputE"
-              (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
-              (change)="changeSelect('buscar_por', htmlServ.getValue($event))"
-              value=""
-              [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected)">
-              <option [value]="null" selected disabled>Escoger tipo</option>
-              @if (tipo_documento_selected != 'compra') {
-                <option value="1">Por cliente</option>
-              }
-              @if (tipo_documento_selected == 'compra') {
-                <option value="5">Por suplidor</option>
-              }
-              @if (tipo_documento_selected != 'cotizacion') {
-                <option value="2">Por número comprobante</option>
-              }
-              <option value="3">Por número {{ tipo_documento_selected == 'cotizacion' ? 'cotización' : 'factura' }}</option>
-              <option value="4">Ultimas 50 {{ tipo_documento_selected == 'cotizacion' ? 'cotizaciones' : 'facturas' }}</option>
-            </select>
           </div>
-          <div class="d-flex">
+
+          <!-- SERIE FACTURA -->
+
+          <div class="form-group flex-1">
+            <label class="control-label mb-0">Serie factura: </label>
+            <p-selectButton [options]="facturasSerieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+          </div>
+
+          <div class="d-flex gap-3">
             <!-- ================ TIPO FACTURA  ================ -->
 
             @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected != 'cotizacion') {
-              <div class="form-group mr-2">
+              <div class="form-group flex-1">
                 <label class="control-label mb-0">Tipo factura : </label>
                 <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))">
                   <option [value]="null" selected disabled>Escoger tipo</option>
@@ -76,12 +86,12 @@
             <!-- ================ VALOR A BUSCAR  ================ -->
 
             @if (buscar_por && buscar_por != campos.ultimas50) {
-              <div class="form-group">
+              <div class="form-group flex-2">
                 <label class="control-label mb-0">{{ getProperties('label') + ' ' }} : </label>
                 @if (buscar_por == campos.cliente || buscar_por == campos.suplidor) {
                   <input
                     id="valorI"
-                    class="form-control inputE"
+                    class="form-control inputE w-100"
                     (keydown.enter)="saltar('cliente', htmlServ.getValue($event))"
                     type="text"
                     (focus)="htmlServ.selectValue($event)"
@@ -92,12 +102,13 @@
                 <!-- ================ NUMERO COMPROBANTE  ================ -->
                 @if (buscar_por == campos.numeroComprobante) {
                   <p-inputMask
+                    [disabled]="fun.isEmpty(serieSelected) || serieSelected() == serie.no"
                     inputId="valorI"
                     styleClass="form-control inputE UPPERCASE"
                     (keydown.enter)="saltar('buscarFactura', htmlServ.getValue($event))"
-                    mask="B9999999999"
+                    [mask]="comprobante_mask_selected().mask"
                     tabindex="-1"
-                    placeholder="B__________"
+                    [placeholder]="comprobante_mask_selected().placeholder"
                     (onFocus)="htmlServ.selectValue($event)"
                     [autoClear]="false"></p-inputMask>
                 }
@@ -117,9 +128,9 @@
           </div>
         </div>
       </div>
-      <div class="col-6">
-        @if (buscarPara.includes('nota')) {
-          <div class="w-100 h-100 d-flex justify-content-between flex-column">
+      <div class="col-5">
+        <div class="w-100 h-100 d-flex justify-content-between flex-column">
+          @if (buscarPara.includes('nota')) {
             <btn-icon-circular
               [id]="'btnNota'"
               [icon]="'fas fa-history'"
@@ -128,13 +139,8 @@
               [tooltipPosition]="'top'"
               (clickFunction)="openSide()">
             </btn-icon-circular>
-            @if (mostrarListaFacturas()) {
-              <div class="w-100 d-flex justify-content-end">
-                <p-selectButton [options]="series" [(ngModel)]="serieSelected" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
-              </div>
-            }
-          </div>
-        }
+          }
+        </div>
       </div>
     </div>
   </div>
@@ -147,9 +153,6 @@
       </div>
     }
   </div>
-  @if (mostrarListaFacturas() && para != 'Visualizar') {
-    <button [disabled]="!(idsFacturasSeleccionadas.length > 0)" [disabled]="" class="btn btn-verde footer" value="" (click)="continuarANotas()">Continuar</button>
-  }
 </div>
 
 <!-- ============================================================================================================================================ -->
@@ -157,11 +160,16 @@
 <!-- ============================================================================================================================================ -->
 
 <p-drawer [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }" (onHide)="onHideSide()">
-  <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
-    <div class="innerTablas">
-      @if (notas.length) {
-        <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
-      }
+  <div class="w-100 h-100 d-flex flex-column gap-2">
+    <div>
+      <p-selectButton [options]="notasSerieOptions" [ngModel]="notaSerieSelected()" (ngModelChange)="changeNotaSerie($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+    </div>
+    <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
+      <div class="innerTablas">
+        @if (notas.length) {
+          <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+        }
+      </div>
     </div>
   </div>
 </p-drawer>

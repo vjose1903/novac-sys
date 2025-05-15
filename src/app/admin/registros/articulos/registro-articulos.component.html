@@ -141,7 +141,7 @@
                       <option value="Caja">Caja</option>
                       <option value="Unidad">Unidad</option>
                       <option value="Galon">Galón</option>
-                      <option value="Funda">Funda</option>
+                      <option value="Bolsa">Bolsa</option>
                     </select>
                     @if (!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)) {
                     <div class="alerta text-danger ml-1" style="font-size: 12px">Seleccione una opcion</div>
@@ -495,7 +495,7 @@
                       <option value="Libra">Libra</option>
                       } @if (form.controls['medida'].value === 'Caja') {
                       <option value="Paquete">Paquete</option>
-                      } @if (form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Producto' || form.controls['medida'].value === 'Funda') {
+                      } @if (form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Producto' || form.controls['medida'].value === 'Bolsa') {
                       <option value="Unidad">Unidad</option>
                       } @if (form.controls['medida'].value === 'Galon') {
                       <option value="Onza">Onza</option>

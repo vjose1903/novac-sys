@@ -22,18 +22,6 @@ export class BuscarFacturaC {
           iconsArray: [
             { id: 'duplicate', key: 'duplicate', tooltip: 'Duplicar factura' },
             { key: 'view', tooltip: 'Ver factura', text_color: 'viewColor' },
-            {
-              id: 'select',
-              key: {
-                key: 'selected',
-                source: 'is_selected',
-                clases: [
-                  { value: true, clase: 'far fa-check-square' },
-                  { value: false, clase: 'far fa-square' },
-                ],
-              },
-              rowTooltip: 'tooltip_select',
-            },
           ],
         },
       ],

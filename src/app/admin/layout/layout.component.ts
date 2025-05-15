@@ -1,4 +1,4 @@
-import { TiposFacturaC, actionFacturacion } from './../facturacion/factura';
+import { TiposFacturaC, actionFacturacion, TipoFacturaI } from './../facturacion/factura';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
@@ -14,6 +14,10 @@ import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
 import { fun } from '@core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
+import { serie } from '@core/typescript/constantes';
+import { MessageTask } from '@core/models/message-task';
+import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../../electron/shared-electron-angular';
+import { IpcService } from '@core/services/ipc.service';
 
 @Component({
   selector: 'app-layout',
@@ -32,6 +36,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   imgUser;
   versionApp: any;
+  configApp: ConfigI;
   noServer;
   subCheckCuadreToday: Subscription;
   subLogOut: Subscription;
@@ -56,10 +61,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   actionFacturacion = actionFacturacion;
   currentYear: number;
 
+  my_capitalize = fun.Capitalice;
+  
   constructor(
     private router: Router,
     private cdRef: ChangeDetectorRef,
-    private currentUserServ: CurrentUserService
+    private currentUserServ: CurrentUserService,
+    public _ipc: IpcService
   ) {
     super();
 
@@ -108,10 +116,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       if (res) this.setUser(res);
     });
 
-    this.configServ.getConfig().then((config: ConfigI) => {
-      fun.logYellow('config ', config);
-      this.versionApp = config.app_version;
-    });
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.versionApp = this.configApp.app_version;
+
+    fun.logYellow('config ', this.configApp);
   }
 
   ngAfterViewInit() {
@@ -132,9 +140,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     return new Promise(async (resolve, reject) => {
       await this.tipoFacturaClass
         .getAll()
-        .then(tiposFacturas => {
-          tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
+        .then((tiposFacturas: any) => {
+          tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']) as TipoFacturaI[];
           Ss.factServ.lista_tipos_facturas = tiposFacturas;
+
+          console.log('%c  lista_tipos_facturas', 'color: red; font-weight: bold;', Ss.factServ.lista_tipos_facturas);
 
           resolve(Ss.factServ.lista_tipos_facturas);
         })
@@ -144,6 +154,35 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
           reject(error);
         });
     });
+  }
+
+  changeSerieDefault() {
+    fun.logYellow('changeSerieDefault');
+
+    const logos_changes = {};
+    const prev_serie_default = this.configApp.serie_default;
+    const new_config = { ...this.configApp, serie_default: this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica };
+
+    const replacement = {
+      serie_default: { source: prev_serie_default, target: new_config.serie_default },
+    };
+
+    const objChange = { new_config, configReplacement: replacement };
+
+    if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
+
+    const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE, objChange);
+
+    this._ipc
+      .sendTask(task)
+      .then(res => {
+        this.refreshPage();
+      })
+      .catch(err => {
+        console.error(err);
+        if (err.msg) fun.toastError(err.msg, 'ERROR');
+        else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
+      });
   }
 
   validateUserAndLoadPermisos() {

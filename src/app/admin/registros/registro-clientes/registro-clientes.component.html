@@ -7,171 +7,214 @@
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
         @if (isCreando || clienteSelected) {
-        <div class="contenedorRegistro" class="form {{ isCreando || clienteSelected ? 'showForm' : 'hideForm' }} ">
-          <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
-            <h4 class="mb-0">Formulario</h4>
-          </div>
-          <div class="card cardFormClass">
-            <form [formGroup]="form">
-              <div class="row">
-                <div class="col-6 p-0">
-                  <app-upload-img (getPhotoData)="getPhotoData($event)" [id]="'img'"></app-upload-img>
-                </div>
-                <div class="col-6 p-0">
-                  <div class="row">
-                    <div class="pr-0 col-12">
-                      <div>
-                        <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
-                        <label>
-                          <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc
-                          <span style="color: red">*</span>
-                        </label>
+          <div class="contenedorRegistro" class="form {{ isCreando || clienteSelected ? 'showForm' : 'hideForm' }} ">
+            <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
+              <h4 class="mb-0">Formulario</h4>
+            </div>
+            <div class="card cardFormClass">
+              <form [formGroup]="form">
+                <div class="row">
+                  <div class="col-6 p-0 mb-3">
+                    <app-upload-img (getPhotoData)="getPhotoData($event)" [id]="'img'"></app-upload-img>
+                  </div>
+                  <div class="col-6 p-0 mb-3">
+                    <div class="row">
+                      <div class="pr-0 col-12">
+                        <div>
+                          <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
+                          <label>
+                            <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc
+                            <span style="color: red">*</span>
+                          </label>
+                        </div>
+                        @if (doc_is_cedula) {
+                          <div class="form-group" [appMsgError]="'cedula'" [form]="form">
+                            <div class="input-group d-flex" style="flex-wrap: nowrap">
+                              <p-inputMask
+                                (keydown.enter)="saltar('campoNombre')"
+                                (keyup)="checkDocumento('cedula', $event)"
+                                mask="999-9999999-9"
+                                tabindex="-1"
+                                styleClass="form-control with-right-btn"
+                                inputId="cedula"
+                                placeholder="___-_______-_"
+                                formControlName="cedula"
+                                [autoClear]="false"></p-inputMask>
+                              <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
+                                <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                              </div>
+                            </div>
+                            <span id="msgContainer_cedula"></span>
+                          </div>
+                        }
+                        @if (!doc_is_cedula) {
+                          <div class="form-group" [appMsgError]="'rnc'" [form]="form">
+                            <div class="input-group d-flex" style="flex-wrap: nowrap">
+                              <p-inputMask
+                                (keydown.enter)="saltar('campoNombre')"
+                                (keyup)="checkDocumento('rnc', $event)"
+                                mask="999-99999-9"
+                                tabindex="-1"
+                                styleClass="form-control with-right-btn"
+                                inputId="rnc"
+                                placeholder="___-_____-_"
+                                formControlName="rnc"
+                                [autoClear]="false"></p-inputMask>
+                              <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
+                                <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                              </div>
+                            </div>
+                            <span id="msgContainer_rnc"></span>
+                          </div>
+                        }
                       </div>
-                      @if (doc_is_cedula) {
-                      <div class="form-group" [appMsgError]="'cedula'" [form]="form">
-                        <div class="input-group d-flex" style="flex-wrap: nowrap">
-                          <p-inputMask
-                            (keydown.enter)="saltar('campoNombre')"
-                            (keyup)="checkDocumento('cedula', $event)"
-                            mask="999-9999999-9"
-                            tabindex="-1"
-                            styleClass="form-control with-right-btn"
-                            inputId="cedula"
-                            placeholder="___-_______-_"
-                            formControlName="cedula"
-                            [autoClear]="false"
-                          ></p-inputMask>
-                          <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                            <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                      <div class="pr-0 col-12">
+                        <div class="form-group" [appMsgError]="'nombre'" [form]="form">
+                          <label class="control-label">Nombre: <span style="color: red">*</span></label>
+                          <input
+                            id="campoNombre"
+                            (keyup)="capitalice('nombre', htmlServ.getValue($event))"
+                            (keydown.enter)="saltar('campoApellido')"
+                            type="text"
+                            formControlName="nombre"
+                            placeholder="Introduzca nombre"
+                            class="form-control"
+                            autocomplete="off"
+                            autofocus />
+                          <span id="msgContainer_nombre"></span>
+                        </div>
+                      </div>
+                      <div class="pr-0 col-12 mb-3">
+                        <div class="form-group" [appMsgError]="'apellido'" [form]="form">
+                          <label class="control-label">Apellido: <span style="color: red">*</span></label>
+                          <input
+                            id="campoApellido"
+                            (keyup)="capitalice('apellido', htmlServ.getValue($event))"
+                            (keydown.enter)="saltar('campoTelefono')"
+                            type="text"
+                            formControlName="apellido"
+                            placeholder="Introduzca apellido"
+                            class="form-control"
+                            autocomplete="off" />
+                          <span id="msgContainer_apellido"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 p-0 pr-2">
+                    <div class="form-group" [appMsgError]="'telefono'" [form]="form">
+                      <label class="control-label">Telefono: <span style="color: red">*</span></label>
+                      <p-inputMask (keydown.enter)="saltar('campoSexo')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
+                      <span id="msgContainer_telefono"></span>
+                    </div>
+                  </div>
+                  <div class="col-6 p-0 pl-2">
+                    <div class="form-group" [appMsgError]="'sexo'" [form]="form">
+                      <label class="control-label">Sexo: <span style="color: red">*</span></label>
+                      <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
+                        <option [value]="null" disabled>Sexo</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                      </select>
+                      <span id="msgContainer_sexo"></span>
+                    </div>
+                  </div>
+                  <div class="col-6 p-0 pr-2">
+                    <div class="form-group" [appMsgError]="'limite_credito'" [form]="form">
+                      <label class="control-label">Dias credito: <span style="color: red">*</span></label>
+                      <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
+                        <option [value]="null" disabled>Seleccione</option>
+                        <option value="15">15 dias</option>
+                        <option value="30">30 dias</option>
+                      </select>
+                      <span id="msgContainer_limite_credito"></span>
+                    </div>
+                  </div>
+                  <div class="col-6 p-0 pl-2">
+                    <div class="form-group" [appMsgError]="'maximo_credito'" [form]="form">
+                      <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
+                      <input type="text" class="form-control" (blur)="revisarPrecio('maximo_credito')" formControlName="maximo_credito" id="maximo_credito" (keydown.enter)="saltar('campoVendedor')" placeholder="cantidad maxima" autocomplete="off" />
+                      <span id="msgContainer_maximo_credito"> </span>
+                    </div>
+                  </div>
+                  <div class="col-6 p-0 pr-2">
+                    <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
+                      <label class="control-label">Vendedor: <span style="color: red">*</span></label>
+                      <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
+                        <option [value]="null" disabled>Seleccione</option>
+                        @for (item of vendedores; track item.id) {
+                          <option value="{{ item.id }}">{{ item.nombre_completo }}</option>
+                        }
+                      </select>
+                      <span id="msgContainer_vendedor_id"></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12 p-0">
+                    <div class="row">
+                      <div class="col-12 col-md-6 pl-0">
+                        <div class="form-group">
+                          <label class="control-label">Provincia: <span style="color: red">*</span></label>
+                          @if (provincias.value() !== undefined) {
+                            <p-select
+                              inputId="provincia_select"
+                              [options]="provincias.value()"
+                              formControlName="provincia_id"
+                              placeholder="Seleccione una provincia"
+                              [filter]="true"
+                              filterBy="nombre"
+                              appendTo="body"
+                              optionLabel="nombre"
+                              optionValue="id"
+                              emptyFilterMessage="Marca no encontrada"
+                              (onChange)="form.controls.municipio_id.setValue(null);"
+                              [resetFilterOnHide]="true" />
+                          }
+                        </div>
+                      </div>
+                      <div class="col-12 col-md-6 pr-0">
+                        <div class="form-group">
+                          <label class="control-label">Municipio: <span style="color: red">*</span></label>
+                          <div class="w-100" [pTooltip]="fun.hasValue(this.documento_identidad()) ? (fun.isEmpty(provincia_id()) ? 'Debe de seleccionar una provincia primero' : null) : null">
+                            <p-select
+                              inputId="municipio_select"
+                              [options]="municipios()"
+                              formControlName="municipio_id"
+                              placeholder="Seleccione un municipio"
+                              [filter]="true"
+                              filterBy="nombre"
+                              optionLabel="nombre"
+                              optionValue="id"
+                              appendTo="body"
+                              emptyFilterMessage="Municipio no encontrado"
+                              [resetFilterOnHide]="true" />
                           </div>
                         </div>
-                        <span id="msgContainer_cedula"></span>
-                      </div>
-                      } @if (!doc_is_cedula) {
-                      <div class="form-group" [appMsgError]="'rnc'" [form]="form">
-                        <div class="input-group d-flex" style="flex-wrap: nowrap">
-                          <p-inputMask
-                            (keydown.enter)="saltar('campoNombre')"
-                            (keyup)="checkDocumento('rnc', $event)"
-                            mask="999-99999-9"
-                            tabindex="-1"
-                            styleClass="form-control with-right-btn"
-                            inputId="rnc"
-                            placeholder="___-_____-_"
-                            formControlName="rnc"
-                            [autoClear]="false"
-                          ></p-inputMask>
-                          <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                            <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
-                          </div>
-                        </div>
-                        <span id="msgContainer_rnc"></span>
-                      </div>
-                      }
-                    </div>
-                    <div class="pr-0 col-12">
-                      <div class="form-group" [appMsgError]="'nombre'" [form]="form">
-                        <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                        <input
-                          id="campoNombre"
-                          (keyup)="capitalice('nombre', htmlServ.getValue($event))"
-                          (keydown.enter)="saltar('campoApellido')"
-                          type="text"
-                          formControlName="nombre"
-                          placeholder="Introduzca nombre"
-                          class="form-control"
-                          autocomplete="off"
-                          autofocus
-                        />
-                        <span id="msgContainer_nombre"></span>
-                      </div>
-                    </div>
-                    <div class="pr-0 col-12 mb-3">
-                      <div class="form-group" [appMsgError]="'apellido'" [form]="form">
-                        <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                        <input
-                          id="campoApellido"
-                          (keyup)="capitalice('apellido', htmlServ.getValue($event))"
-                          (keydown.enter)="saltar('campoTelefono')"
-                          type="text"
-                          formControlName="apellido"
-                          placeholder="Introduzca apellido"
-                          class="form-control"
-                          autocomplete="off"
-                        />
-                        <span id="msgContainer_apellido"></span>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="col-6 p-0 pr-2 mt-4">
-                  <div class="form-group" [appMsgError]="'telefono'" [form]="form">
-                    <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                    <p-inputMask (keydown.enter)="saltar('campoSexo')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
-                    <span id="msgContainer_telefono"></span>
+
+                  <div class="col-12 p-0">
+                    <div class="form-group" [appMsgError]="'direccion'" [form]="form">
+                      <label class="control-label">Direccion <span style="color: red">*</span></label>
+                      <textarea id="campoDir" (keyup)="capitalice('direccion', htmlServ.getValue($event))" formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
+                      <span id="msgContainer_direccion"></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12 form-group p-0" style="display: flex; justify-content: space-between">
+                    <div>
+                      <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                      <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+                    </div>
+                    <div>
+                      <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
+                    </div>
                   </div>
                 </div>
-                <div class="col-6 p-0 pl-2 mt-4">
-                  <div class="form-group" [appMsgError]="'sexo'" [form]="form">
-                    <label class="control-label">Sexo: <span style="color: red">*</span></label>
-                    <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
-                      <option [value]="null" disabled>Sexo</option>
-                      <option value="M">Masculino</option>
-                      <option value="F">Femenino</option>
-                    </select>
-                    <span id="msgContainer_sexo"></span>
-                  </div>
-                </div>
-                <div class="col-6 p-0 pr-2">
-                  <div class="form-group" [appMsgError]="'limite_credito'" [form]="form">
-                    <label class="control-label">Dias credito: <span style="color: red">*</span></label>
-                    <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
-                      <option [value]="null" disabled>Seleccione</option>
-                      <option value="15">15 dias</option>
-                      <option value="30">30 dias</option>
-                    </select>
-                    <span id="msgContainer_limite_credito"></span>
-                  </div>
-                </div>
-                <div class="col-6 p-0 pl-2">
-                  <div class="form-group" [appMsgError]="'maximo_credito'" [form]="form">
-                    <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
-                    <input type="text" class="form-control" (blur)="revisarPrecio('maximo_credito')" formControlName="maximo_credito" id="maximo_credito" (keydown.enter)="saltar('campoVendedor')" placeholder="cantidad maxima" autocomplete="off" />
-                    <span id="msgContainer_maximo_credito"> </span>
-                  </div>
-                </div>
-                <div class="col-6 p-0 pr-2">
-                  <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
-                    <label class="control-label">Vendedor: <span style="color: red">*</span></label>
-                    <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
-                      <option [value]="null" disabled>Seleccione</option>
-                      @for (item of vendedores; track item.id) {
-                      <option value="{{ item.id }}">{{ item.nombre_completo }}</option>
-                      }
-                    </select>
-                    <span id="msgContainer_vendedor_id"></span>
-                  </div>
-                </div>
-                <div class="col-12 p-0">
-                  <div class="form-group" [appMsgError]="'direccion'" [form]="form">
-                    <label class="control-label">Direccion <span style="color: red">*</span></label>
-                    <textarea id="campoDir" (keyup)="capitalice('direccion', htmlServ.getValue($event))" formControlName="direccion" class="form-control" cols="30" rows="3"></textarea>
-                    <span id="msgContainer_direccion"></span>
-                  </div>
-                </div>
-                <div class="col-12 form-group p-0" style="display: flex; justify-content: space-between">
-                  <div>
-                    <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-                    <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
-                  </div>
-                  <div>
-                    <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
-                  </div>
-                </div>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
-        </div>
         }
       </ng-container>
 

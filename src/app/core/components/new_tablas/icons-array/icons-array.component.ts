@@ -82,7 +82,7 @@ export class IconsArrayComponent implements OnInit {
   }
 
   disableInput(dato, column) {
-    return this.tServ.disabledInput({ dato: dato, column: column, seleccionado: this.seleccionado });
+    return this.tServ.disabledInput({ dato: dato, column: column, seleccionado: this.seleccionado, all_data: this.data });
   }
 
   iconBtn(key, index, data, e, objIcon) {

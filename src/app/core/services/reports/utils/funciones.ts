@@ -7,6 +7,37 @@ export function my_barcode(code) {
 
   return canvas.toDataURL('image/png');
 }
+
+export function my_qrcode(code, size = 200) {
+  // Necesitamos instalar la biblioteca qrcode: npm install qrcode
+  const QRCode = require('qrcode');
+
+  // Crear un elemento canvas
+  const canvas = document.createElement('canvas');
+
+  // Establecer dimensiones exactas
+  canvas.width = size;
+  canvas.height = size;
+
+  // Opciones de configuración para el QR
+  const options = {
+    width: size,
+    margin: 1, // Margen mínimo
+    color: {
+      dark: '#000000', // Color de los módulos QR
+      light: '#FFFFFF', // Color de fondo
+    },
+    errorCorrectionLevel: 'M', // L, M, Q, H - nivel de corrección de errores (M es un buen balance)
+  };
+
+  // Generar QR de forma síncrona
+  QRCode.toCanvas(canvas, code, options);
+
+  // Devolver como imagen en formato base64, igual que my_barcode
+  return canvas.toDataURL('image/png');
+}
+
+export const pageBreak = { text: '', pageBreak: 'before' };
 // =========================================================================================================
 export function my_capitalize(str) {
   const ultimoCaracte = str.length + 1;
@@ -38,6 +69,7 @@ export function my_stringJoin(str, target) {
 }
 
 // =========================================================================================================
+
 export function my_dateFormater(str) {
   let dateObj = new Date(str);
   let month = String(dateObj.getMonth() + 1).padStart(2, '0');

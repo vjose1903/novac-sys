@@ -32,9 +32,15 @@
     </div>
 
     <div class="d-flex">
-      <span [pTooltip]="factServ.isCompra ? '' : 'Función en construcción, solo disponible en el módulo de compras'" tooltipPosition="left">
-        <p-selectButton [options]="facturasSerieOptions" [(ngModel)]="factServ.serieType" (ngModelChange)="changeSerie()" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
-      </span>
+      <p-selectButton
+        [options]="facturasSerieOptions"
+        [ngModel]="factServ.serieType()"
+        (ngModelChange)="factServ.serieType.set($event)"
+        (ngModelChange)="changeSerie()"
+        optionLabel="label"
+        optionValue="value"
+        optionDisabled="disabled"
+        [allowEmpty]="false" />
     </div>
   </div>
 
@@ -295,7 +301,7 @@
                     [icon_size]="'1rem'"
                     [tooltip]="factServ.isCompra ? 'Buscar suplidor' : 'Buscar cliente'"
                     [tooltipPosition]="'right'"
-                    (clickFunction)="abrirModalPropietario()">
+                    (clickFunction)="abrirModalPropietario('btn')">
                   </btn-icon-circular>
                 </span>
               </div>

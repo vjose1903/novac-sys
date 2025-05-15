@@ -8,5 +8,13 @@ if (AppConfig.production) {
   enableProdMode();
 }
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+const bootstrap = () => bootstrapApplication(AppComponent, appConfig);
+
+if (module['hot']) {
+  module['hot'].accept();
+  module['hot'].dispose(() => {
+    // Aquí puedes realizar cualquier limpieza necesaria
+  });
+}
+
+bootstrap().catch(err => console.error(err));

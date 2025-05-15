@@ -15,49 +15,64 @@ import { serie, unidadAbrev } from '@core/typescript/constantes';
 import { csvConfig as csvConfigVentas } from '@core/services/reports/excel/configs/report/ventas';
 import { csvConfig as csvConfigMovimientosVehiculo } from '@core/services/reports/excel/configs/report/movimientos_vehiculo';
 import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
+import { ArticuloI } from '@registros/articulos/articulo';
 
 export enum comprobanteNormal {
-  valor_fiscal = '01',
-  factura_consumo = '02',
+  factura_de_credito_fiscal = '01',
+  factura_de_consumo = '02',
+  nota_de_debito = '03',
+  nota_de_credito = '04',
   comprobante_compras = '11',
   gastos_menores = '13',
-  comprobante_regimen_especiales = '14',
-  comprobante_gubernamental = '15',
-  comprobante_exportaciones = '16',
-  comprobantes_pago_exterior = '17',
+  regimenes_especiales = '14',
+  gubernamental = '15',
+  comprobante_de_exportaciones = '16',
+  comprobante_pagos_al_exterior = '17',
 }
 
 export enum comprobanteElectronico {
-  valor_fiscal = '31',
-  factura_consumo = '32',
+  factura_de_credito_fiscal = '31',
+  nota_de_debito = '33',
+  nota_de_credito = '34',
+  factura_de_consumo = '32',
   comprobante_compras = '41',
   gastos_menores = '43',
-  comprobante_regimen_especiales = '44',
-  comprobante_gubernamental = '45',
-  comprobante_exportaciones = '46',
-  comprobantes_pago_exterior = '47',
+  regimenes_especiales = '44',
+  gubernamental = '45',
+  comprobante_de_exportaciones = '46',
+  comprobante_pagos_al_exterior = '47',
+}
+
+export enum request_factura_campo {
+  todas = '0',
+  cliente_id = '1',
+  numero_comprobante = '2',
+  numero_factura = '3',
+  last_50 = '4',
+  suplidor_id = '5',
+  cabecera_factura_id = '6',
 }
 
 export const comprobante = {
   normal: {
-    valor_fiscal: comprobanteNormal.valor_fiscal,
-    factura_consumo: comprobanteNormal.factura_consumo,
-    comprobante_compras: comprobanteNormal.comprobante_compras,
+    factura_de_credito_fiscal: comprobanteNormal.factura_de_credito_fiscal,
+    factura_de_consumo: comprobanteNormal.factura_de_consumo,
+    compras: comprobanteNormal.comprobante_compras,
     gastos_menores: comprobanteNormal.gastos_menores,
-    comprobante_regimen_especiales: comprobanteNormal.comprobante_regimen_especiales,
-    comprobante_gubernamental: comprobanteNormal.comprobante_gubernamental,
-    comprobante_exportaciones: comprobanteNormal.comprobante_exportaciones,
-    comprobantes_pago_exterior: comprobanteNormal.comprobantes_pago_exterior,
+    regimenes_especiales: comprobanteNormal.regimenes_especiales,
+    gubernamental: comprobanteNormal.gubernamental,
+    comprobante_de_exportaciones: comprobanteNormal.comprobante_de_exportaciones,
+    comprobante_pagos_al_exterior: comprobanteNormal.comprobante_pagos_al_exterior,
   },
   electronica: {
-    valor_fiscal: comprobanteElectronico.valor_fiscal,
-    factura_consumo: comprobanteElectronico.factura_consumo,
-    comprobante_compras: comprobanteElectronico.comprobante_compras,
+    factura_de_credito_fiscal: comprobanteElectronico.factura_de_credito_fiscal,
+    factura_de_consumo: comprobanteElectronico.factura_de_consumo,
+    compras: comprobanteElectronico.comprobante_compras,
     gastos_menores: comprobanteElectronico.gastos_menores,
-    comprobante_regimen_especiales: comprobanteElectronico.comprobante_regimen_especiales,
-    comprobante_gubernamental: comprobanteElectronico.comprobante_gubernamental,
-    comprobante_exportaciones: comprobanteElectronico.comprobante_exportaciones,
-    comprobantes_pago_exterior: comprobanteElectronico.comprobantes_pago_exterior,
+    regimenes_especiales: comprobanteElectronico.regimenes_especiales,
+    gubernamental: comprobanteElectronico.gubernamental,
+    comprobante_de_exportaciones: comprobanteElectronico.comprobante_de_exportaciones,
+    comprobante_pagos_al_exterior: comprobanteElectronico.comprobante_pagos_al_exterior,
   },
 };
 
@@ -179,6 +194,7 @@ export class FacturaC extends CrudG<FacturasI> {
 
         if (params.reporte.data.tipo == ReportGroupTypeE.detallado || params.pdf.tipo == 'ventas_diarias') {
           configKey = `detallado${configApp.calcular_itbis ? '_itbis' : ''}`;
+
           if (params.pdf.tipo == 'ventas_diarias') prefix = params.pdf.tipo;
         } else if (params.reporte.data.tipo == ReportGroupTypeE.agrupado) {
           configKey = `agrupado${configApp.calcular_itbis ? '_itbis' : ''}`;
@@ -196,6 +212,7 @@ export class FacturaC extends CrudG<FacturasI> {
       requestParams.parameters['condicion'] = params.reporte.data.condicion;
       requestParams.parameters['desde'] = fun.my_dateFormater(params.reporte.data.desde, false);
       requestParams.parameters['hasta'] = fun.my_dateFormater(params.reporte.data.hasta, false);
+      requestParams.parameters['serie'] = params.reporte.data.serie;
 
       for (let index = 0; index < FacturaC.inputsMovimientosViaje.length; index++) {
         const item = FacturaC.inputsMovimientosViaje[index];
@@ -237,17 +254,31 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise(resolve => this.getOne(id, extra).then(res => resolve(res)));
   }
 
-  getFacturasByParams(args: { campo: string; valor: string; tipo_factura_id: number; page: number; per_page: number; paginado: boolean; tipo: string; adelantada?: boolean; pagada?: any; estado?: boolean; movimientos_viaje?: boolean }) {
-    const valor_enc = btoa(args.valor);
+  getFacturasByParams(args: {
+    campo: string;
+    valor: string | number;
+    tipo_factura_id: number;
+    tipo: string;
+    page?: number;
+    per_page?: number;
+    paginado?: boolean;
+    adelantada?: boolean;
+    pagada?: any;
+    estado?: boolean;
+    movimientos_viaje?: boolean;
+    extra_params?: any;
+  }) {
+    const valor_enc = btoa(args.valor.toString());
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
+    args.extra_params ??= {};
 
     const extra = {
       afterPath: `custom/get_documentos`,
       parameters: {
-        page: args.page,
-        per_page: args.per_page,
-        paginado: args.paginado,
+        page: args.page ?? 1,
+        per_page: args.per_page ?? 20,
+        paginado: args.paginado ?? false,
         tipo: args.tipo,
         pagada: args.pagada,
         campo: args.campo,
@@ -256,6 +287,7 @@ export class FacturaC extends CrudG<FacturasI> {
         is_adelantada: fun.objHas(args, 'adelantada') ? args.adelantada : '0',
         estado: fun.objHas(args, 'estado') ? args.estado : '0',
         movimientos_viaje: args.movimientos_viaje ?? false,
+        ...args.extra_params,
       },
     };
 
@@ -265,7 +297,29 @@ export class FacturaC extends CrudG<FacturasI> {
   parseDataToPdf(data) {
     return new Promise(resolve => {
       const pick_factura1 = ['Bruto', 'cliente', 'balance', 'condicion', 'descuento', 'identificador', 'detalle_facturas', 'numero_factura', 'devuelta', 'estado', 'fecha_completada', 'fecha_equivalente', 'fecha_valida', 'fecha_vencimiento'];
-      const pick_factura2 = ['fecha_viaje', 'forma_pago', 'id', 'is_viaje', 'monto', 'numero_comprobante', 'tipo', 'tipo_factura_id', 'itbis', 'suplidor', 'tipo_factura', 'total_factura', 'usuario', 'vendedor', 'movimientos_viaje'];
+      const pick_factura2 = [
+        'fecha_viaje',
+        'forma_pago',
+        'id',
+        'is_viaje',
+        'monto',
+        'numero_comprobante',
+        'tipo',
+        'tipo_factura_id',
+        'itbis',
+        'suplidor',
+        'tipo_factura',
+        'total_factura',
+        'usuario',
+        'vendedor',
+        'movimientos_viaje',
+        'serie',
+        'qr_url_dgii',
+        'fecha_hora_firma',
+        'is_aceptada',
+        'dgii_message',
+        'security_code',
+      ];
       const pick_factura = [...pick_factura1, ...pick_factura2];
 
       let temp_data_parsed = _.pick(fun.deepCloning(data), pick_factura);
@@ -301,8 +355,8 @@ export class FacturaC extends CrudG<FacturasI> {
       inputs: { data: data },
       id: `detalle_factura`,
       header: 'Detalles Factura',
-      width: '30rem',
-      height: '10rem',
+      width: '35rem',
+      minHeight: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
@@ -314,7 +368,7 @@ export class FacturaC extends CrudG<FacturasI> {
     return new Promise<any>((resolve, reject) => {
       PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
         .then(async res => {
-          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.'))};
+          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
 
           const obj_modal = {
             component: PdfViewerComponent,
@@ -368,7 +422,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 }
 
-export class TiposFacturaC extends CrudG<any> {
+export class TiposFacturaC extends CrudG<TipoFacturaI> {
   constructor() {
     super('tipo_facturas');
   }
@@ -380,25 +434,25 @@ export class FacturasAplicadasC extends CrudG<any> {
   }
 }
 
-export enum tFacturaD {
-  factura_sin_comprobante = 'Factura sin comprobante',
-  factura_con_valor_fiscal = 'Factura con valor fiscal',
-  factura_de_consumo = 'Factura de consumo',
-  nota_de_debito = 'Nota de debito',
-  nota_de_credito = 'Nota de credito',
-  comprobante_de_compras = 'Comprobante de compras',
-  registro_de_unico_ingreso = 'Registro de unico ingreso',
-  comprobante_para_gastos_menores = 'Comprobante para gastos menores',
-  comprobante_de_regimen_especiales = 'Comprobante de regimen especiales',
-  comprobante_gubernamental = 'Comprobante gubernamental',
-  comprobante_para_exportaciones = 'Comprobante para exportaciones',
-  comprobantes_para_pago_al_exterior = 'Comprobantes para pago al exterior',
-  venta_contado = 'Venta Contado',
-  compra = 'Compra',
-  conduce = 'Conduce',
-  produccion = 'Produccion',
-  recibo_ingreso = 'Recibo_ingreso',
-  venta_credito = 'Venta Credito',
+export enum tFacturaKey {
+  factura_sin_comprobante = 'factura_sin_comprobante',
+  factura_de_credito_fiscal = 'factura_de_credito_fiscal',
+  factura_de_consumo = 'factura_de_consumo',
+  nota_de_debito = 'nota_de_debito',
+  nota_de_credito = 'nota_de_credito',
+  comprobante_compras = 'comprobante_compras',
+  registro_unico_ingreso = 'registro_unico_ingreso',
+  gastos_menores = 'gastos_menores',
+  regimenes_especiales = 'regimenes_especiales',
+  gubernamental = 'gubernamental',
+  comprobante_de_exportaciones = 'comprobante_de_exportaciones',
+  comprobante_pagos_al_exterior = 'comprobante_pagos_al_exterior',
+  venta_contado = 'venta_contado',
+  venta_credito = 'venta_credito',
+  compra = 'compra',
+  conduce = 'conduce',
+  produccion = 'produccion',
+  recibo_ingreso = 'recibo_ingreso',
   pre_venta = 'pre_venta',
   cotizacion = 'cotizacion',
 }
@@ -408,6 +462,7 @@ export interface TipoFacturaI {
   descripcion: string;
   referencia: string;
   serie: serie;
+  key: string;
   updated_at: any;
   created_at: any;
 }
@@ -474,7 +529,7 @@ export interface DetalleFactura {
   retirado_en_venta: number;
   calcular_saco: boolean;
   detalle_factura_nota: null;
-  articulo: string;
+  articulo: string | ArticuloI;
   se_calcula_saco: boolean;
   precio: number;
   costo: number;
@@ -488,7 +543,7 @@ export interface DetalleFactura {
   cant: number;
   cant_nota: number | string;
   total_nota: string | number;
-  cantidad_en_unidades_nota: null;
+  cantidad_en_unidades_nota: number | null;
   [propName: string]: any;
 }
 

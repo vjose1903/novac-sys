@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ClienteC } from '@registros/registro-clientes/cliente';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
-import { FacturaC, tipoDocFacturacion } from './../factura';
+import { FacturaC, request_factura_campo, tipoDocFacturacion } from './../factura';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
 import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
@@ -32,9 +32,9 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   clienteSelected;
 
   filter_options = {
-    todos: '0',
-    cliente: '1',
-    numero_documento: '3',
+    todos: request_factura_campo.todas,
+    cliente: request_factura_campo.cliente_id,
+    numero_documento: request_factura_campo.numero_factura,
   };
 
   tipo_documento_selected;

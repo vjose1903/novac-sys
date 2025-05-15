@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/indent */
 import { getContentWithTablaNormal } from './tabla_normal';
 
-export function getContentWithTablaAgrupada(configuracion, data) {
+export function getContentWithTablaAgrupada(configuracion, data, is_electronica = false) {
   const content = [];
 
   for (let index_contenido = 0; index_contenido < data.contenido_reporte.length; index_contenido++) {
@@ -11,7 +11,7 @@ export function getContentWithTablaAgrupada(configuracion, data) {
     for (let index_info = 0; index_info < configuracion.info.length; index_info++) {
       const config = configuracion.info[index_info];
 
-      const tabla = getContentWithTablaNormal(config, data, index_contenido, index_info);
+      const tabla = getContentWithTablaNormal({ configuration: config, data, is_electronica, index_data: index_contenido, index_info });
 
       cont_.push(tabla);
     }

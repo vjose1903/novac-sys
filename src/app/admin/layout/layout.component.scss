@@ -114,6 +114,7 @@
         > .menuContent {
           position: absolute;
           display: grid;
+          gap: 0.5rem;
 
           .menuList {
             display: flex;
@@ -177,7 +178,8 @@
               }
 
               > .opcion {
-                font-size: 1rem !important;
+                margin-bottom: 0;
+                font-size: 1rem ;
                 padding: 0.5rem;
                 background-color: var(--primary04);
                 &.activa {

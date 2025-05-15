@@ -37,6 +37,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   altoTbody;
 
   @Input() TablasComponent;
+  @Input() emptyMessage;
   @Output() TablasComponentChange = new EventEmitter<any>();
 
   @Input() cardTabla;
@@ -194,7 +195,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   checkBackgroundTr(params: { tipo: string; dato: any }) {
     let res = false;
-    if (fun.objHas(params.dato, params.tipo)) res = _.get(params.dato, params.tipo);
+    if (fun.objHas(params.dato, params.tipo)) res = fun.getProperty(params.dato, params.tipo);
 
     return res;
     // dato?.danger && config?.colores;
@@ -214,7 +215,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const search = event.target.value;
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
-      fun.awaitTyping({ evento: event }).then(() => {
+      fun.awaitTyping(event).then(() => {
         if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
           const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
 
@@ -546,7 +547,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   disableInput(dato, column) {
-    return this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado });
+    return this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado, all_data: this.data });
   }
 
   showIcon(objIcon, data) {
@@ -600,7 +601,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorCheck(dato, column, index) {
-    const is_disable = this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado });
+    const is_disable = this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado, all_data: this.data });
 
     if (!is_disable) {
       const key = column.key;

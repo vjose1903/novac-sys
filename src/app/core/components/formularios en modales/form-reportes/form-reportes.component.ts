@@ -2,12 +2,11 @@ import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { tFacturaD } from '@admin/facturacion/factura';
-import { serie } from '@core/typescript/constantes';
+import { serie, seriesDGII, seriesDgiiI } from '@core/typescript/constantes';
 // import { CxP } from '@registros/registro-suplidores/suplidores';
 import { fun } from '@core/services/functions.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { DateUtils } from '@core/typescript/date.utils';
+import { DateUtils } from '@vjose1903/dateutils';
 import { ArticuloC } from '@registros/articulos/articulo';
 import { ClienteC, CxC } from '@registros/registro-clientes/cliente';
 import { ModalI } from '@components/modal/modal-class';
@@ -15,7 +14,7 @@ import { ModalI } from '@components/modal/modal-class';
 // import { TipoReciboReporte } from '../../../pagos/class/ingresos/recibos';
 import { reportField } from './form-reportes.component.model';
 import { ReportDateTypeE, ReportGroupTypeE } from '@admin/reportes/reporte.utils';
-
+import { tFacturaKey } from '@admin/facturacion/factura';
 
 @Component({
   selector: 'app-form-reportes',
@@ -48,11 +47,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   dinamycSelectionReady: boolean = false;
   dinamycSwitchReady: boolean = false;
 
-  facturasSerieOptions = [
-    { label: 'Todas', value: serie.no, disabled: false },
-    { label: 'Normal', value: serie.normal, disabled: true },
-    { label: 'Electronica', value: serie.electronica, disabled: true },
-  ];
+  facturasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
 
   ReportDateTypeE = ReportDateTypeE;
   constructor(private fb: UntypedFormBuilder) {
@@ -146,7 +141,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       this.form.controls.fecha.setValue(new Date());
       //
     } else if (this.inputs.tipo_reporte == 'ventas_diarias') {
-      serie_selected = serie.no;
+      serie_selected = serie.all;
       tipo_selected = 'ventas_diarias';
       condicion_selected = 'todos';
 
@@ -172,7 +167,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
         { id: ReportGroupTypeE.agrupado, label: 'Agrupado' },
       ];
 
-      serie_selected = serie.no;
+      serie_selected = serie.all;
       tipo_selected = ReportGroupTypeE.detallado;
       condicion_selected = 'todos';
 
@@ -191,14 +186,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       //
     } else if (this.inputs.tipo_reporte == 'notas') {
       this.tipos = [
-        { label: 'Crédito', id: Ss.factServ.tipoFacturaId(tFacturaD.nota_de_credito) },
-        { label: 'Dédito', id: Ss.factServ.tipoFacturaId(tFacturaD.nota_de_debito) },
+        { label: 'Crédito', id: Ss.factServ.tipoFacturaId(tFacturaKey.nota_de_credito) },
+        { label: 'Dédito', id: Ss.factServ.tipoFacturaId(tFacturaKey.nota_de_debito) },
         { label: 'Todas', id: 0 },
       ];
       //
     } else if (this.inputs.tipo_reporte == 'cuentas_con_pagos' || this.inputs.tipo_reporte == 'ventas_cliente') {
       this.setValidator('cliente_id');
-      serie_selected = serie.no;
+      serie_selected = serie.all;
 
       if (this.inputs.tipo_reporte == 'ventas_cliente') {
         this.setValidator('tipo');
@@ -268,14 +263,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   parseTipoFacturas() {
     const tipos_aceptados = [
-      tFacturaD.factura_con_valor_fiscal,
-      tFacturaD.factura_de_consumo,
-      tFacturaD.comprobante_de_compras,
-      tFacturaD.comprobante_para_gastos_menores,
-      tFacturaD.comprobante_de_regimen_especiales,
-      tFacturaD.comprobante_gubernamental,
-      tFacturaD.comprobante_para_exportaciones,
-      tFacturaD.comprobantes_para_pago_al_exterior,
+      tFacturaKey.factura_de_credito_fiscal,
+      tFacturaKey.factura_de_consumo,
+      tFacturaKey.comprobante_compras,
+      tFacturaKey.gastos_menores,
+      tFacturaKey.regimenes_especiales,
+      tFacturaKey.gubernamental,
+      tFacturaKey.comprobante_de_exportaciones,
+      tFacturaKey.comprobante_pagos_al_exterior,
     ];
 
     this.tipos_facturas = [{ label: 'Todos', id: 0 }];

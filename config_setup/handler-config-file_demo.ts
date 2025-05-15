@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import { pathAdd, writeLogs } from '../main.js';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
+import { serie } from '../src/app/core/typescript/constantes.js';
 
 const logos = require('../logos.json');
 
@@ -30,6 +31,7 @@ export default class HandlerConfigFile {
     vende_sin_inventario: false,
     facturacion_electronica: false,
     medida_producto_terminado: 'Producto',
+    serie_default: serie.normal,
 
     printer_selected: {
       venta_contado: 'Ninguna',

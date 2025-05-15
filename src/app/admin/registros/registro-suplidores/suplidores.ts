@@ -5,6 +5,10 @@ import { csvConfig as csvConfigSuplidorProd } from '@core/services/reports/excel
 import * as _ from 'lodash';
 
 
+export interface SuplidorI {
+  [key: string]: any;
+}
+
 export class SuplidorC extends CrudG<any> {
   constructor() {
     super('suplidores');

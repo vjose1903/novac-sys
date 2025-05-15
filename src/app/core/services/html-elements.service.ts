@@ -16,7 +16,7 @@ export class HtmlElementsService {
     return inputElement ? inputElement.id : '';
   }
 
-  getValue(event: any) {
+  getValue(event: any): any {
     const inputElement = event.target as HTMLInputElement;
     return inputElement ? inputElement.value : null;
   }

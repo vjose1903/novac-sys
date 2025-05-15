@@ -8,12 +8,39 @@ export enum serie {
   no = 0,
   normal = 'normal',
   electronica = 'electronica',
+  all = 'all',
 }
 
-export const seriesDGII = [
-  { label: 'Normal', value: serie.normal, disabled: false },
-  { label: 'Electronica', value: serie.electronica, disabled: false },
-];
+export enum TrackStatusEnum {
+  NOT_FOUND = 'No encontrado',
+  ACCEPTED = 'Aceptado',
+  REJECTED = 'Rechazado',
+  IN_PROCESS = 'En Proceso',
+  CONDITIONAL_ACCEPTED = 'Aceptado Condicional',
+}
+
+export interface seriesDgiiI {
+  label: string;
+  value: serie;
+  disabled?: boolean;
+}
+
+export const seriesDGII = (args?: { includeAll?: boolean; disableNormal?: boolean; disableElectronica?: boolean; disableAll?: boolean }): seriesDgiiI[] => {
+  args ??= {};
+  args.includeAll ??= false;
+  args.disableNormal ??= false;
+  args.disableElectronica ??= false;
+  args.disableAll ??= false;
+
+  const list: seriesDgiiI[] = [
+    { label: 'Normal', value: serie.normal, disabled: args.disableNormal },
+    { label: 'Electronica', value: serie.electronica, disabled: args.disableElectronica },
+  ];
+
+  if (args.includeAll) list.unshift({ label: 'Todas', value: serie.all, disabled: args.disableAll });
+
+  return list;
+};
 
 export enum operativeSystemE {
   windows = 'windows',
@@ -26,12 +53,11 @@ export enum TypeNavigation {
   back_forward = 2,
 }
 
-
 export enum unidadAbrev {
   barril = 'BARR',
   bolsa = 'BOL',
   botella = 'BOTELLA',
-  caja = 'CAJ ',
+  caja = 'CAJ',
   docena = 'DOC',
   fardo = 'FARD',
   galon = 'GL',
@@ -41,7 +67,7 @@ export enum unidadAbrev {
   tanque = 'TANQUE',
   unidad = 'UND',
   saco = 'SAC',
-  quintal =' Q',
+  quintal = ' Q',
   miligramo = 'MG',
   onzas = 'OZ',
 }

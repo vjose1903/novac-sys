@@ -12,9 +12,9 @@
 
     <!-- ----- SERIE -----  -->
     @if ( reportTypeHasfield(reportField.serieField) ) {
-    <div class="col-12 p-0">
+    <div class="col-12 p-0 mb-2">
       <label class="control-label mb-0">Serie: <span style="color: red">*</span> </label>
-      <p-selectButton [options]="facturasSerieOptions" formControlName="serie" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+      <p-selectButton [options]="facturasSerieOptions" formControlName="serie" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
     </div>
     }
 

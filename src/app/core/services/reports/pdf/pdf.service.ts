@@ -1,6 +1,7 @@
 import * as _8_5x5_5 from './8.5x5.5/makePDF';
 import * as roll80mm from './80mm_roll/makePDF';
 import * as facturasCompraVenta from './facturasCompraVenta';
+import * as facturasCompraVentaElectronica from './facturasCompraVentaElectronica';
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
 import { Ss } from '../../singleton.service';
@@ -12,6 +13,7 @@ import { Injectable } from '@angular/core';
 
 import { vfs } from '../utils/vfs_fonts';
 import { fonts } from '../utils/pdfFonts';
+import { serie } from '@core/typescript/constantes';
 const pdfMake = require('pdfmake/build/pdfmake');
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +28,8 @@ export class PdfService {
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
       const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+
+      console.log('data ', data);
 
       let options;
       let printer_selected = config.printer_selected[type_oPdf];
@@ -50,13 +54,19 @@ export class PdfService {
           case 'nota':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
-            const tipo_pdf = `_${config.plantillas_impresion['nota'].toLowerCase()}`;
+            let tipo_pdf = `_${config.plantillas_impresion['nota'].toLowerCase()}`;
+
+            console.log('%c data.serie ', 'color: red; font-weight: bold;', data.serie);
+            
+            if (data.serie == serie.electronica) tipo_pdf = '_electronica';
 
             obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
             break;
 
           case 'facturacion':
-            options = { '80mm_roll': roll80mm, '8.5x5.5': facturasCompraVenta, '8.5x11': facturasCompraVenta };
+            const file_maker = data.serie == serie.electronica ? facturasCompraVentaElectronica : facturasCompraVenta;
+
+            options = { '80mm_roll': roll80mm, '8.5x5.5': file_maker, '8.5x11': file_maker };
             const tipo_documento = this.getFacturacionType(data);
             printer_selected = config.printer_selected[tipo_documento];
             obj = options[config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', 'ventas');
@@ -88,16 +98,18 @@ export class PdfService {
         }
 
         if (todo_true) {
-          this.createPdfFromBase64(obj.doc, obj.file, reimprimir).then(res => {
-            res['pageOrientation'] = obj.pageOrientation;
-            if (params.imprimir) {
-              this.imprimirBase64({ base64: res.base64, file: res.file, type: type_oPdf, printer: printer_selected, pageOrientation: res['pageOrientation'] })
-                .then(res_impresion => resolve(res_impresion))
-                .catch(err_impresion => reject(err_impresion));
-            } else {
-              resolve(res);
-            }
-          }).catch(err => reject(err));
+          this.createPdfFromBase64(obj.doc, obj.file, reimprimir)
+            .then(res => {
+              res['pageOrientation'] = obj.pageOrientation;
+              if (params.imprimir) {
+                this.imprimirBase64({ base64: res.base64, file: res.file, type: type_oPdf, printer: printer_selected, pageOrientation: res['pageOrientation'] })
+                  .then(res_impresion => resolve(res_impresion))
+                  .catch(err_impresion => reject(err_impresion));
+              } else {
+                resolve(res);
+              }
+            })
+            .catch(err => reject(err));
         } else {
           const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
           fun.toastError('Error generando el pdf.', 'ERROR');

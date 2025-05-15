@@ -53,6 +53,13 @@ export interface RowTransformI {
   inputs?: any;
 }
 
+export enum transformType {
+  text = 'text',
+  number = 'number',
+  date = 'date',
+  boolean = 'boolean',
+}
+
 interface sortInfo {
   key: string;
   order: 'asc' | 'desc' | null;
@@ -83,9 +90,12 @@ interface iconsI {
 }
 
 export interface iconDisableItem {
-  kind?: 'always' | 'selected' | 'has_value' | 'campo';
+  kind?: 'always' | 'selected' | 'has_value' | 'campo' | 'compare';
   target?: string;
   value?: Array<any>;
+  type?: 'equal' | 'notEqual';
+  transform?: transformType;
+  global?: boolean;
 }
 export interface paginateI {
   show?: boolean;
@@ -165,7 +175,7 @@ export enum medidas {
   Galon = 'Galones',
   Onza = 'Onzas',
   Producto = 'Productos',
-  Funda = 'Fundas',
+  Bolsa = 'Bolsas',
 }
 
 export class TablaClass {

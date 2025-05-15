@@ -65,7 +65,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     { backend: 'Unidad', front: 'Unidad' },
     { backend: 'Saco', front: 'Saco' },
     { backend: 'Galon', front: 'Galón' },
-    { backend: 'Funda', front: 'Funda' },
+    { backend: 'Bolsa', front: 'Bolsa' },
   ];
 
   articuloClass = new ArticuloC();
@@ -220,7 +220,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   showContenido(value) {
-    const array = ['Caja', 'Saco', 'Galon', 'Funda', 'Producto'];
+    const array = ['Caja', 'Saco', 'Galon', 'Bolsa', 'Producto'];
     return array.includes(value);
   }
 
@@ -671,7 +671,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       else if (medida == 'Unidad') this.optionsAlerta = ['Unidad'];
       else if (medida == 'Galon') this.optionsAlerta = ['Galon', 'Onza'];
       else if (medida == 'Producto') this.optionsAlerta = ['Producto', 'Unidad'];
-      else if (medida == 'Funda') this.optionsAlerta = ['Funda', 'Unidad'];
+      else if (medida == 'Bolsa') this.optionsAlerta = ['Bolsa', 'Unidad'];
       resolve(true);
     });
   }

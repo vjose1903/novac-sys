@@ -103,6 +103,7 @@
           <h4 class="mb-0">Listado de comprobantes</h4>
           <button *ngxPermissionsOnly="permissions.secuencia_comprobante.create" [disabled]="ncfSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
+        
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">
             <dinamic-table [cardTabla]="cardTabla" [(data)]="listaNCF" [seleccionado]="ncfSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
