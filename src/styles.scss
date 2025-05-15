@@ -35,7 +35,6 @@
   text-align: end;
 }
 
-
 .dropRowMenu {
   min-width: 250px;
   list-style: none;
@@ -529,73 +528,74 @@ body {
 
   .colFormularioListado {
     grid-area: colFormularioListado;
-    > div {
-      > .form {
-        transition: all 0.3s;
-        &.showForm {
-          width: 50%;
-          margin-right: 0.5rem;
-        }
 
-        &.hideForm {
-          width: 0%;
-          overflow: hidden;
-        }
-
-        display: grid;
-        grid-template-areas:
-          'titulo_card_area'
-          'card_content_area';
-        grid-template-rows: min-content auto;
-
-        > .tituloFormClass {
-          grid-area: titulo_card_area;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          min-height: 3.3rem;
-        }
-
-        > .cardFormClass {
-          grid-area: card_content_area;
-          padding: 0.8rem;
-          border-radius: 1rem !important;
-          height: min-content;
-          background-color: white;
-          box-shadow: 0px 4px 14px -6px black;
-        }
+    .form {
+      height: 100%;
+      transition: all 0.3s;
+      &.showForm {
+        width: 50%;
+        margin-right: 0.5rem;
       }
 
-      > .list {
-        transition: all 0.3s;
-        &.FormList {
-          width: 50%;
-        }
+      &.hideForm {
+        width: 0%;
+        overflow: hidden;
+      }
 
-        &.onlyList {
+      display: grid;
+      grid-template-areas:
+        'titulo_card_area'
+        'card_content_area';
+      grid-template-rows: min-content auto;
+
+      .tituloFormClass {
+        grid-area: titulo_card_area;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 3.3rem;
+      }
+
+      .cardFormClass {
+        grid-area: card_content_area;
+        padding: 0.8rem;
+        border-radius: 1rem !important;
+        height: min-content;
+        background-color: white;
+        box-shadow: 0px 4px 14px -6px black;
+      }
+    }
+
+    .list {
+      height: 100%;
+      transition: all 0.3s;
+      &.FormList {
+        width: 50%;
+      }
+
+      &.onlyList {
+        width: 100%;
+      }
+
+      display: grid;
+      grid-template-areas:
+        'titulo_card_area'
+        'card_content_area';
+      grid-template-rows: min-content auto;
+
+      .tituloCardClass {
+        grid-area: titulo_card_area;
+      }
+
+      .cardContentClass {
+        grid-area: card_content_area;
+        border-radius: 1rem !important;
+        position: relative;
+        .divTabla {
+          position: absolute;
+          height: 100%;
           width: 100%;
-        }
-
-        display: grid;
-        grid-template-areas:
-          'titulo_card_area'
-          'card_content_area';
-        grid-template-rows: min-content auto;
-
-        > .tituloCardClass {
-          grid-area: titulo_card_area;
-        }
-
-        > .cardContentClass {
-          grid-area: card_content_area;
-          border-radius: 1rem !important;
-          position: relative;
-          > .divTabla {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-            @include my_cards;
-          }
+          @include my_cards;
         }
       }
     }

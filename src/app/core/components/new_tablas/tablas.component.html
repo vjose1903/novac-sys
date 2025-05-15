@@ -54,8 +54,8 @@
           </thead>
           <!-- TBODY -->
           <div class="divBody">
-            <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
-              @if (data) {
+            @if (data && data.length > 0) {
+              <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
                 @for (rowData of data; track config.track_key ? rowData[config.track_key] : $index; let indexBody = $index) {
                   <tr
                     class="text-center"
@@ -77,7 +77,7 @@
                         class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
                         id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
                         [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
-                        <span class="titulo_sm"  [ngStyle]="column?.style ? column.style : {}"> {{ column?.titulo_sm }} </span>
+                        <span class="titulo_sm" [ngStyle]="column?.style ? column.style : {}"> {{ column?.titulo_sm }} </span>
                         <span [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
                           <div class="d-flex w-100" [ngClass]="{ 'gap-2': fun.hasValue(column?.rowTransform) && column?.tipo != 'none' }">
                             @if (fun.hasValue(column?.rowTransform)) {
@@ -228,8 +228,12 @@
                     }
                   </tr>
                 }
-              }
-            </tbody>
+              </tbody>
+            } @else {
+              <div class="d-flex justify-content-center align-items-center h-100">
+                <h5 class="text-c-black-60 text-italic">{{ emptyMessage || 'No hay datos' }}</h5>
+              </div>
+            }
           </div>
           <!-- TFOOT -->
           <tfoot class="tfoot w-100">

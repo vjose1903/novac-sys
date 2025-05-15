@@ -1,5 +1,6 @@
 import { CrudG } from '@core/typescript/crud-g';
 import { FacturasI } from '../../facturacion/factura';
+import { SuplidorI } from '@registros/registro-suplidores/suplidores';
 
 export interface CommertialApprovalI {
   id: number;
@@ -11,6 +12,8 @@ export interface CommertialApprovalI {
   detalleMotivoRechazo: null;
   cabecera_factura_id?: number;
   cabecera_factura?: FacturasI;
+  suplidor_id?: number;
+  suplidor?: SuplidorI;
 }
 
 export class CommertialApprovalC extends CrudG<CommertialApprovalI> {

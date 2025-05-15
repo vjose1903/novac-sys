@@ -37,6 +37,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   altoTbody;
 
   @Input() TablasComponent;
+  @Input() emptyMessage;
   @Output() TablasComponentChange = new EventEmitter<any>();
 
   @Input() cardTabla;

@@ -1,1 +1,26 @@
-<p>facturas-recibidas works!</p>
+<div class="row rowResgitro">
+  <div class="col-12 p-0 colTitulo">
+    <h4 class="negrita mb-0">Comprobantes electrónicos recibidos</h4>
+  </div>
+
+  <div class="col-12 p-0 colFormularioListado">
+    <div class="list onlyList">
+      <div class="tituloCardClass">
+        <h4 class="mb-0">Listado</h4>
+      </div>
+
+      <div #cardTabla id="cardTabla" class="card cardContentClass">
+        <div class="divTabla">
+          <dinamic-table
+            [cardTabla]="cardTabla"
+            [(data)]="facturasRecibidasList"
+            [seleccionado]="facturaRecibidaSelected?.id"
+            [(TablasComponent)]="tablaComponent"
+            [config]="table_config"
+            (table_events)="handle_table_events($event)"
+            [emptyMessage]="'No hay comprobantes electrónicos recibidos'"></dinamic-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

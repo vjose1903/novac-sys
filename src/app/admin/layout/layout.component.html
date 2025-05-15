@@ -88,20 +88,20 @@
             <img class="iconosMenu" [ngClass]="{ iconosMenuA: isVistaActual('ecf') }" src="assets/img/dgii-btn.png" alt="Dgii" (click)="cambiarMenu({ event: $event, url: 'ecf', navigate: false })" />
             <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isVistaActual('ecf') }">
               <h4
-                class="opcion"
+                class="opcion text-s-12"
                 *ngxPermissionsOnly="menuPermissionsObj.facturacionElectonica.recepcion"
                 [ngClass]="{ activa: actualRuta == 'ecf_received' }"
                 (click)="cambiarMenu({ event: $event, url: 'ecf/ecf_received', navigate: true })"
               >
-                Facturas recibidas
+                Comprobantes recibidos
               </h4>
               <h4
-                class="opcion"
+                class="opcion text-s-12"
                 *ngxPermissionsOnly="menuPermissionsObj.facturacionElectonica.commertialApproval"
                 [ngClass]="{ activa: actualRuta == 'commertial_approval_received' }"
                 (click)="cambiarMenu({ event: $event, url: 'ecf/commertial_approval_received', navigate: true })"
               >
-                Aprobacion comercial recibida
+                Aprobación comercial recibida
               </h4>
             </div>
           </div>
