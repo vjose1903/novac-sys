@@ -575,7 +575,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       this.setInputDrop(undefined);
 
       if (unidadaSelected) {
-        const medidaSelected = _.find(unidades, unidad => unidad.value === unidadaSelected);
+        const medidaSelected = unidades.find(unidad => unidad.value === unidadaSelected);
 
         this.precioDetalle = medidaSelected.precio;
         const costoDetalle = medidaSelected.costo;
@@ -587,6 +587,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
               fun.enfocarInput(`unidad-${index}`);
             }, 200);
           } else {
+            console.log('  ');
+            console.log('  ');
+            console.log('unidadaSelected ', unidadaSelected);
+            console.log('unidades ', unidades);
+            console.log('medidaSelected ', medidaSelected);
+
+            console.log('this.precioDetalle ', this.precioDetalle);
+            console.log('costoDetalle ', costoDetalle);
+
             detalle['precio'] = fun.roundNumberToDecimal(this.precioDetalle);
             detalle['costo'] = fun.roundNumberToDecimal(costoDetalle);
             formGroup.patchValue(detalle);
@@ -667,7 +676,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
 
       if (fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
-
         if (total < 0) {
           fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
           fun.enfocarAndSelectInput(`descuento_valor-${index}`);
@@ -829,6 +837,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   llenarRowDespuesDeFiltro(obj) {
     const articulo = obj.data;
+
+    console.log('articulo', articulo);
 
     const index = obj.index;
 
