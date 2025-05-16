@@ -107,6 +107,7 @@ export class ConfiguracionesComponent implements OnInit {
       url_servidor_descargas: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
       config_password: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
       usa_url_principal: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
+      serie_default: [{ value: this.getValue(data, 'serie_default'), disabled: false }],
       // printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
       // printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
       is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],

@@ -30,6 +30,7 @@ export interface table_info {
   row_tag_color?: string;
   tag_apretada?: boolean;
   con_hora?: boolean;
+  capitalice?: boolean;
   disable?: any;
   color?: string;
   text_color?: string;

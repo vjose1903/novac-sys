@@ -1706,7 +1706,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let fecha_valida = null;
 
     if (fun.hasValue(this.paqueteComprobante?.fecha_valida) && DateUtils.isValid(new Date(this.paqueteComprobante?.fecha_valida))) {
-      fecha_valida = DateUtils.format({ date: this.paqueteComprobante?.fecha_valida, dateFormat: 'YYYY-MM-DD' });
+      const formatConfig = { dateFormat: 'YYYY-MM-DD', include_hour: true, hourFormat: 'HH:MM:SS', separator: ' ' };
+
+      fecha_valida = DateUtils.format({ date: DateUtils.add(4, 'hours', this.paqueteComprobante?.fecha_valida), ...formatConfig });
     }
 
     cabecera_fact['fecha_valida'] = fecha_valida;

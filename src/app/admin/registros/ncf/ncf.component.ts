@@ -11,6 +11,7 @@ import { NcfC } from './ncf';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
+import { DateUtils } from '@vjose1903/dateutils';
 
 @Component({
   selector: 'app-ncf',
@@ -97,13 +98,13 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this._destroy_mixin();
   }
 
-  setDateInputs(actual) {
-    actual = moment(actual).format('MM/DD/YYYY');
-    const anio = moment(new Date(actual)).add(1, 'year').format('YYYY');
+  setDateInputs(buyDateSelected) {
+    buyDateSelected = DateUtils.format({ date: buyDateSelected, dateFormat: 'MM/DD/YYYY' });
+    const anio = DateUtils.add(1, 'years', buyDateSelected).getFullYear();
 
-    const newFecha = moment('12/31/' + anio).format('MM/DD/YYYY');
+    const newFecha = DateUtils.format({ date: '12/31/' + anio, dateFormat: 'MM/DD/YYYY' });
 
-    this.fechaCompra = new Date(actual);
+    this.fechaCompra = new Date(buyDateSelected);
     this.fechaValidez = new Date(newFecha);
   }
 
@@ -158,7 +159,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           ncf.colorEstado = ncf.estado ? 'green' : 'red';
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
-
 
           tempNCF.push(ncf);
         }
@@ -294,27 +294,29 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async submit() {
-    const obj = {
-      id: this.ncfSelected ? this.ncfSelected.id : null,
-      tipo_factura_id: this.tipo_articulo_id,
-      desde: this.Desde,
-      hasta: this.Hasta,
-      fecha_compra: moment(this.fechaCompra, 'DD/MM/YYYY').format(),
-      fecha_valida: moment(this.fechaValidez, 'DD/MM/YYYY').format(),
-      secuencia: this.ncfSelected ? this.ncfSelected.secuencia : this.Desde,
-      estado: this.is_editando ? this.estado : false,
-      usado: this.is_editando ? this.usado : false,
-      status: true,
-    };
-
     try {
-      const res = await this.ncfClass.createUpdateOne(obj);
-      const actualPagination = this.tServ.getPaginationById('lista_ncf');
-      this.getPaquetesNCF(actualPagination);
+      const formatConfig = { dateFormat: 'YYYY-MM-DD', include_hour: true, hourFormat: 'HH:MM:SS', separator: ' ' };
 
+      const obj = {
+        id: this.ncfSelected?.id || null,
+        tipo_factura_id: this.tipo_articulo_id,
+        desde: this.Desde,
+        hasta: this.Hasta,
+        fecha_compra: DateUtils.format({ date: DateUtils.add(8, 'hours', this.fechaCompra), ...formatConfig }),
+        fecha_valida: DateUtils.format({ date: DateUtils.add(8, 'hours', this.fechaValidez), ...formatConfig }),
+        secuencia: this.ncfSelected?.secuencia || this.Desde,
+        estado: this.is_editando ? this.estado : false,
+        usado: this.is_editando ? this.usado : false,
+        status: true,
+      };
+
+      await this.ncfClass.createUpdateOne(obj);
+
+      this.getPaquetesNCF(this.tServ.getPaginationById('lista_ncf'));
       this.borrar();
     } catch (error) {
       console.error(error);
+      fun.toastError('Error al guardar el NCF', 'ERROR');
     }
   }
 }
