@@ -168,9 +168,15 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   getValueForm(column: table_info, data) {
     const value = fun.getProperty(data, column.key);
+
+    const evaluar_value = item => (fun.hasValue(column.capitalice) ? fun.Capitalice(item) : item);
     switch (column.tipo) {
       case 'textList':
-        return value.reduce((acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${fun.getProperty(item, column.key_value)}`, '');
+        return value.reduce((acumulado, item) => {
+          const value = fun.getProperty(item, column.key_value);
+
+          return acumulado + `${acumulado.length ? ',' : ''}  ${evaluar_value(value)}`;
+        }, '');
 
       case 'formatoNumero':
         return this.formatoNumero(value);
@@ -180,7 +186,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         return fecha;
 
       default:
-        return value;
+        return evaluar_value(value);
     }
   }
 

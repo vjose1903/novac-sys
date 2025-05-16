@@ -351,8 +351,12 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
 
   const propietario = is_suplidor ? data?.suplidor : data?.cliente;
 
+  const max_length = 60;
+
+  const evaluar_nombre = propietario.nombre_completo.length > max_length ? `${propietario.nombre_completo.substring(0, max_length)}...` : propietario.nombre_completo;
+
   const propietarioConfig = {
-    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: propietario.nombre || '' },
+    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.Capitalice(evaluar_nombre) || '' },
     doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario.rnc || '' },
     direccion: { label: 'Dirección: ', valor: propietario.direccion || '' },
     recibido: { label: 'Recibido: ', valorArray: [fun_.roundNumberToDecimal(data?.total), ` - ${fun_.my_capitalize(numero_letra)}`] },

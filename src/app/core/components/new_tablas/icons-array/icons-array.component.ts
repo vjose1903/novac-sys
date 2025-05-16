@@ -18,6 +18,7 @@ export class IconsArrayComponent implements OnInit {
   @Input() realIdTabla;
   @Input() rowData;
   @Input() data;
+  @Input() config;
 
   fun = fun;
   @Output() icon_click = new EventEmitter<any>();
@@ -82,7 +83,7 @@ export class IconsArrayComponent implements OnInit {
   }
 
   disableInput(dato, column) {
-    return this.tServ.disabledInput({ dato: dato, column: column, seleccionado: this.seleccionado, all_data: this.data });
+    return this.tServ.disabledInput({ dato: dato, column: column, config: this.config, seleccionado: this.seleccionado, all_data: this.data });
   }
 
   iconBtn(key, index, data, e, objIcon) {

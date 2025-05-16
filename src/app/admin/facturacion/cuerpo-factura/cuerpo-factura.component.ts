@@ -54,7 +54,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   dropRowMenu: any;
   configApp: ConfigI;
   dropdownMedidaOpen: boolean = false;
-
+  precioCostoKey: string;
   lastCuerpoChange;
   private destroy$ = new Subject<void>();
 
@@ -108,6 +108,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async rellenarVariables() {
+    console.log('%c ---rellenarVariables ---', 'color: cyan; font-weight: bold;');
+    
     return new Promise(async (resolve, reject) => {
       try {
         this.listaDeDescuentos.length = 0;
@@ -128,6 +130,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         for (let index = 1; index <= 25; index++) await this.addItem();
 
         this.factServ.filasDetalle = (this.form.controls['rowFactura'] as UntypedFormArray).controls;
+
+        this.precioCostoKey = this.factServ.isCompra ? 'costo' : 'precio';
+
+        console.log('%c this.precioCostoKey ', 'color: lime; font-weight: bold;', this.precioCostoKey);
 
         resolve(true);
       } catch (error) {
@@ -589,6 +595,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           } else {
             console.log('  ');
             console.log('  ');
+            console.log('%c this.factServ.tipoDocumento ', 'color: magenta; font-weight: bold;', this.factServ.tipoDocumento);
+            console.log('%c this.factServ.isCompra ', 'color: magenta; font-weight: bold;', this.factServ.isCompra);
+            console.log('%c this.precioCostoKey ', 'color: lime; font-weight: bold;', this.precioCostoKey);
             console.log('unidadaSelected ', unidadaSelected);
             console.log('unidades ', unidades);
             console.log('medidaSelected ', medidaSelected);
@@ -599,6 +608,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
             detalle['precio'] = fun.roundNumberToDecimal(this.precioDetalle);
             detalle['costo'] = fun.roundNumberToDecimal(costoDetalle);
             formGroup.patchValue(detalle);
+
+            console.log('formGroup ', formGroup.getRawValue());
 
             this.calcularMontosRow(index).then(() => {
               this.factServ.isCompra ? fun.enfocarInput(`costo-${index}`) : this.seleccionarCampoEnTurno();

@@ -28,7 +28,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     info: [
       { titulo: 'No. conduce', estilos: [{ width: '11%' }], key: 'numero_conduce', tipo: 'text' },
       { titulo: 'Fecha conduce', estilos: [{ width: '10%' }], key: 'fecha_equivalente', tipo: 'date' },
-      { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: 'text', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
+      { titulo: 'Cliente', key: 'cliente.nombre_completo', tipo: 'text', capitalice: true, estilos: [{ 'text-align': 'start' }, { 'padding-left': '1.5rem' }] },
       { titulo: 'Cantidad de productos', key: 'cantidad_productos', tipo: 'text', estilos: [{ width: '10%' }, { 'text-align': 'center' }] },
       {
         titulo: 'Acciones',

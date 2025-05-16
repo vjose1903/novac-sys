@@ -213,7 +213,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
 
     this.validatePermisos().then(result => {
-      this.rellenarVariables().then(() => {
+      this.rellenarVariables().then(async () => {
+        console.log('ANDO AQUIII');
+        await this.cuerpo.rellenarVariables();
+        console.log('ANDO AQUIII 2');
         if (this.factServ.action == actionFacturacion.update) {
           this.is_editando = true;
           this.procesoRelleno({ id: this.id_documento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.update });
@@ -381,7 +384,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   rellenarVariables() {
     return new Promise<void>(resolve => {
       this.isInitialized = false;
-
       this.factServ.tipoDocumento = this.tipo_documento;
       this.factServ.action = this.action;
       this.factServ.productos_devueltos.length = 0;
@@ -456,7 +458,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       try {
         this.checkPath(factura).then(res => {
           this.rellenarCabezaFactura(factura).then(factura_rellenada => {
-            //
             this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas'], fun.objHas(factura_rellenada, 'archivo_id')).then(res => {
               setTimeout(() => {
                 this._sideBarOpened = false;
@@ -508,8 +509,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       // TODO: colocar electronica por defecto
       const currentSerie = fun.hasValue(factura?.numero_comprobante) && factura.numero_comprobante.includes('E') ? serie.electronica : fun.hasValue(factura.serie) ? factura.serie : serie.normal;
-      console.log('%c currentSerie ', 'color: red; font-weight: bold;', currentSerie);
-
       this.factServ.setTipos(this.factServ.tipoDocumento, currentSerie).then(result => {
         this.factServ
           .setTipoFacturaSelected(value_buscar, 'rellenarCabezaFactura', by_buscar)
@@ -864,9 +863,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async changeSerie() {
-    console.log('this.factServ.tipoDocumento ', this.factServ.tipoDocumento);
-    console.log('this.factServ.serieType ', this.factServ.serieType());
-
     this.factServ.setTipos(this.factServ.tipoDocumento, this.factServ.serieType(), true).then(result => {
       this.errorComprobante = false;
       setTimeout(() => this.checkTipoFactura('changeSerie'), 0);
@@ -1238,8 +1234,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
 
   abrirModalPropietario(where, params?: { include_contado: boolean }) {
-    console.log('where ', where);
-    
     if (fun.isEmpty(params)) params = { include_contado: false };
     let documento = this.getDocumentoDescripcion();
 
@@ -1389,9 +1383,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     factura_a_guardar['action'] = this.factServ.action != actionFacturacion.duplicate ? this.factServ.action : actionFacturacion.new;
     factura_a_guardar['factura_pendiente'] = this.factura_pendiente;
     factura_a_guardar['productos_devueltos'] = fun.deepCloning(this.factServ.productos_devueltos);
-
-    console.log('%c factura_a_guardar ', 'color: yellow', factura_a_guardar);
-
     return factura_a_guardar;
   }
 
@@ -1715,7 +1706,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let fecha_valida = null;
 
     if (fun.hasValue(this.paqueteComprobante?.fecha_valida) && DateUtils.isValid(new Date(this.paqueteComprobante?.fecha_valida))) {
-      fecha_valida = DateUtils.format({ date: this.paqueteComprobante?.fecha_valida, dateFormat: 'YYYY-MM-DD' });
+      const formatConfig = { dateFormat: 'YYYY-MM-DD', include_hour: true, hourFormat: 'HH:MM:SS', separator: ' ' };
+
+      fecha_valida = DateUtils.format({ date: DateUtils.add(4, 'hours', this.paqueteComprobante?.fecha_valida), ...formatConfig });
     }
 
     cabecera_fact['fecha_valida'] = fecha_valida;
@@ -1777,8 +1770,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     let res;
 
     let documento = this.getDocumentoDescripcion();
-    console.log('cabecera_fact ', JSON.stringify(cabecera_fact));
-
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
 

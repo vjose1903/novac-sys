@@ -29,8 +29,6 @@ export class PdfService {
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
       const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
 
-      console.log('data ', data);
-
       let options;
       let printer_selected = config.printer_selected[type_oPdf];
 
@@ -56,8 +54,6 @@ export class PdfService {
 
             let tipo_pdf = `_${config.plantillas_impresion['nota'].toLowerCase()}`;
 
-            console.log('%c data.serie ', 'color: red; font-weight: bold;', data.serie);
-            
             if (data.serie == serie.electronica) tipo_pdf = '_electronica';
 
             obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
