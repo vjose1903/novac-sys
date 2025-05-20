@@ -105,7 +105,7 @@ function createWindow() {
       });
 
       if (serve) {
-        win.loadURL('http://localhost:5220').catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
+        win.loadURL('http://localhost:5223').catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
 
         setTimeout(() => {
           win?.webContents.openDevTools();
