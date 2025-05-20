@@ -160,7 +160,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   changeTableConfig(array) {
     this.zone.run(() => {
       array.forEach(element => {
-        const key = _.keys(element)[0];
+        const key = Object.keys(element)[0];
         this.config[key] = element[key];
       });
     });
@@ -218,7 +218,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   filter(event) {
     if ([teclasCode._abajo, teclasCode._arriba, teclasCode._izquierda, teclasCode._derecha, teclasCode._enter].includes(event.keyCode)) return;
 
-    const search = event.target.value;
+    const search = event.target.value;    
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
