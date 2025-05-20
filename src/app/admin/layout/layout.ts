@@ -1,8 +1,8 @@
 import { Subscription } from 'rxjs';
-import { Ss } from '../../core/services/singleton.service';
-import { TablaClass } from '../components/new_tablas/tabla-class';
-import * as _ from 'lodash';
-import { Permisos } from '../../core/typescript/permisos';
+import { Ss } from '@core/services/singleton.service';
+import { TablaClass } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
+
 export class LayoutClass extends TablaClass {
   constructor() {
     super();
@@ -33,6 +33,11 @@ export class LayoutClass extends TablaClass {
       notaCredito: Object.values(Permisos.nota_credito),
       notaDebito: Object.values(Permisos.nota_debito),
       vizualizar: [Permisos.factura_compra.get_facturas_by_params, Permisos.factura_venta.get_facturas_by_params],
+      flatt: [],
+    },
+    facturacionElectonica: {
+      recepcion: Object.values(Permisos.ecf_reception),
+      commertialApproval: Object.values(Permisos.commertial_approval_reception),
       flatt: [],
     },
     ingresos: {

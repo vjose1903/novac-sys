@@ -1,15 +1,21 @@
 <div class="retornarContent">
   <h2>
     <strong>Articulo: </strong>
-    <span *ngIf="fun.hasValue(inputs?.nombre)"> {{ inputs?.nombre }} </span>
-    <span *ngIf="fun.isEmpty(inputs?.nombre)" style="color: #585858ba"> Seleccione un articulo para retornar. </span>
+    @if (fun.hasValue(inputs?.nombre)) {
+      <span> {{ inputs?.nombre }} </span>
+    }
+    @if (fun.isEmpty(inputs?.nombre)) {
+      <span style="color: #585858ba"> Seleccione un articulo para retornar. </span>
+    }
   </h2>
 
-  <div *ngIf="!inputs?.is_articulo_selected" class="tablaRetornar mb-3">
-    <div #cardTablaArticulo id="cardTabla" class="h-100 d-flex">
-      <dinamic-table [cardTabla]="cardTablaArticulo" [(data)]="inputs.devueltos_list" [seleccionado]="articuloSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+  @if (!inputs?.is_articulo_selected) {
+    <div class="tablaRetornar mb-3">
+      <div #cardTablaArticulo id="cardTabla" class="h-100 d-flex">
+        <dinamic-table [cardTabla]="cardTablaArticulo" [(data)]="inputs.devueltos_list" [seleccionado]="articuloSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      </div>
     </div>
-  </div>
+  }
 
   <div class="rayaHorizontal">
     <p class="my-1">Ingrese la cantidad de articulos devueltos que desea retornar.</p>
@@ -17,92 +23,94 @@
 
   <form [formGroup]="form">
     <div class="row">
-      <div *ngIf="inputs?.data?.is_devuelto" class="col-12 p-0">
-        <div class="row">
-          <div class="col-12 py-2">
-            <span class="w-100 badge text-shadow bg-secondary text-white">
-              <span>Cant. devuelto:</span> <span> {{ getCurrentDevuelto(inputs?.data?.cantidad) }}</span>
-            </span>
-          </div>
-
-          <div class="col-12 p-0">
-            <hr class="rayaBottom" />
-          </div>
-          <div class="col-12">
-            <div class="form-group">
-              <label class="control-label my-1">Retornar: </label>
-              <input
-                id="devuelto"
-                min="1"
-                [max]="inputs?.data?.cantidad"
-                (focus)="$event.target.select()"
-                (blur)="checkCantidad('devuelto')"
-                (keydown.enter)="saltar($event.target.id)"
-                type="number"
-                class="form-control input_cantidad"
-                formControlName="devuelto"
-                placeholder="Introduzca la cantidad"
-                autocomplete="off"
-              />
+      @if (inputs?.data?.is_devuelto) {
+        <div class="col-12 p-0">
+          <div class="row">
+            <div class="col-12 py-2">
+              <span class="w-100 badge text-shadow bg-secondary text-white">
+                <span>Cant. devuelto:</span> <span> {{ getCurrentDevuelto(inputs?.data?.cantidad) }}</span>
+              </span>
+            </div>
+            <div class="col-12 p-0">
+              <hr class="rayaBottom" />
+            </div>
+            <div class="col-12">
+              <div class="form-group">
+                <label class="control-label my-1">Retornar: </label>
+                <input
+                  id="devuelto"
+                  min="1"
+                  [max]="inputs?.data?.cantidad"
+                  (focus)="htmlServ.selectValue($event)"
+                  (blur)="checkCantidad('devuelto')"
+                  (keydown.enter)="saltar(htmlServ.getId($event))"
+                  type="number"
+                  class="form-control input_cantidad"
+                  formControlName="devuelto"
+                  placeholder="Introduzca la cantidad"
+                  autocomplete="off"
+                  />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      }
 
-      <div *ngIf="!inputs?.data?.is_devuelto" class="col-12 p-0">
-        <div class="row">
-          <div class="col-6 py-2 rayaRight">
-            <span class="w-100 badge bg-secondary text-shadow text-white" [ngClass]="{ disable: fun.isEmpty(inputs?.articulo_solo_devuelto?.cantidad) }">
-              <span>Cant. devuelto:</span> <span> {{ getCurrentDevuelto(inputs?.articulo_solo_devuelto?.cantidad) }}</span>
-            </span>
-          </div>
-          <div class="col-6 py-2">
-            <span class="w-100 badge bg-danger text-shadow text-white" [ngClass]="{ disable: fun.isEmpty(inputs?.articulo_defectuoso?.cantidad) }">
-              <span>Cant. Defectuoso:</span> <span> {{ getCurrentDevuelto(inputs?.articulo_defectuoso?.cantidad) }}</span>
-            </span>
-          </div>
-          <div class="col-12 p-0">
-            <hr class="rayaBottom" />
-          </div>
-
-          <div class="col-6 rayaRight">
-            <div class="form-group">
-              <label class="control-label my-1">Retornar devuelto: </label>
-              <input
-                id="solo_devuelto"
-                min="1"
-                [max]="inputs?.articulo_solo_devuelto?.cantidad"
-                (focus)="$event.target.select()"
-                (blur)="checkCantidad('solo_devuelto')"
-                (keydown.enter)="saltar($event.target.id)"
-                type="number"
-                class="form-control input_cantidad"
-                formControlName="solo_devuelto"
-                [placeholder]="fun.isEmpty(inputs?.articulo_solo_devuelto?.cantidad) ? 'No hay devueltos' : 'Introduzca la cantidad'"
-                autocomplete="off"
-              />
+      @if (!inputs?.data?.is_devuelto) {
+        <div class="col-12 p-0">
+          <div class="row">
+            <div class="col-6 py-2 rayaRight">
+              <span class="w-100 badge bg-secondary text-shadow text-white" [ngClass]="{ disable: fun.isEmpty(inputs?.articulo_solo_devuelto?.cantidad) }">
+                <span>Cant. devuelto:</span> <span> {{ getCurrentDevuelto(inputs?.articulo_solo_devuelto?.cantidad) }}</span>
+              </span>
             </div>
-          </div>
-          <div class="col-6">
-            <div class="form-group">
-              <label class="control-label my-1">Retornar defectuoso: </label>
-              <input
-                id="defectuoso"
-                min="1"
-                [max]="inputs?.articulo_solo_devuelto?.cantidad"
-                (focus)="$event.target.select()"
-                (blur)="checkCantidad('defectuoso')"
-                (keydown.enter)="saltar($event.target.id)"
-                type="number"
-                class="form-control input_cantidad"
-                formControlName="defectuoso"
-                [placeholder]="fun.isEmpty(inputs?.articulo_defectuoso?.cantidad) ? 'No hay devueltos' : 'Introduzca la cantidad'"
-                autocomplete="off"
-              />
+            <div class="col-6 py-2">
+              <span class="w-100 badge bg-danger text-shadow text-white" [ngClass]="{ disable: fun.isEmpty(inputs?.articulo_defectuoso?.cantidad) }">
+                <span>Cant. Defectuoso:</span> <span> {{ getCurrentDevuelto(inputs?.articulo_defectuoso?.cantidad) }}</span>
+              </span>
+            </div>
+            <div class="col-12 p-0">
+              <hr class="rayaBottom" />
+            </div>
+            <div class="col-6 rayaRight">
+              <div class="form-group">
+                <label class="control-label my-1">Retornar devuelto: </label>
+                <input
+                  id="solo_devuelto"
+                  min="1"
+                  [max]="inputs?.articulo_solo_devuelto?.cantidad"
+                  (focus)="htmlServ.selectValue($event)"
+                  (blur)="checkCantidad('solo_devuelto')"
+                  (keydown.enter)="saltar(htmlServ.getId($event))"
+                  type="number"
+                  class="form-control input_cantidad"
+                  formControlName="solo_devuelto"
+                  [placeholder]="fun.isEmpty(inputs?.articulo_solo_devuelto?.cantidad) ? 'No hay devueltos' : 'Introduzca la cantidad'"
+                  autocomplete="off"
+                  />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label class="control-label my-1">Retornar defectuoso: </label>
+                <input
+                  id="defectuoso"
+                  min="1"
+                  [max]="inputs?.articulo_solo_devuelto?.cantidad"
+                  (focus)="htmlServ.selectValue($event)"
+                  (blur)="checkCantidad('defectuoso')"
+                  (keydown.enter)="saltar(htmlServ.getId($event))"
+                  type="number"
+                  class="form-control input_cantidad"
+                  formControlName="defectuoso"
+                  [placeholder]="fun.isEmpty(inputs?.articulo_defectuoso?.cantidad) ? 'No hay devueltos' : 'Introduzca la cantidad'"
+                  autocomplete="off"
+                  />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      }
     </div>
   </form>
 </div>

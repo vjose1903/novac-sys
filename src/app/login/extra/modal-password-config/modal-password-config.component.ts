@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import { ModalI } from '../../../admin/components/modal/modal-class';
-import { fun } from '../../../core/services/functions.service';
-import { SharedService } from '../../../core/services/shared.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
+import { ModalI } from '@components/modal/modal-class';
+import { fun } from '@core/services/functions.service';
+import { SharedService } from '@core/services/shared.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 
 @Component({
-  selector: 'app-modal-password-config',
-  templateUrl: './modal-password-config.component.html',
-  styleUrls: ['./modal-password-config.component.scss'],
+    selector: 'app-modal-password-config',
+    templateUrl: './modal-password-config.component.html',
+    styleUrls: ['./modal-password-config.component.scss'],
+    standalone: false
 })
 export class ModalPasswordConfigComponent extends MixinClass implements OnInit, ModalI {
   public modal: any = {};

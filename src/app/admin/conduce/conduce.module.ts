@@ -1,5 +1,5 @@
-import { BtncircularModule } from './../components/btncircular/btncircular.module';
-import { TablasModule } from './../components/new_tablas/tablas.module';
+import { BtncircularModule } from '@components/btncircular/btncircular.module';
+import { TablasModule } from '@components/new_tablas/tablas.module';
 import { PrimengModule } from './../../modules/primeng.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';

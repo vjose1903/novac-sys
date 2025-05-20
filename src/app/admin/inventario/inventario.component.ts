@@ -1,21 +1,22 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
 import * as _ from 'lodash';
-import { TablasService } from '../components/new_tablas/tablas.service';
-import { MixinClass } from '../../core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
-import { ArticuloC, TipoArticuloC } from '../registros/articulos/articulo';
+import { ArticuloC, TipoArticuloC } from '@registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
-import { MovimientosFormComponent } from '../components/formularios en modales/movimientos-form/movimientos-form.component';
-import { fun } from '../../core/services/functions.service';
-import { Ss } from '../../core/services/singleton.service';
-import { table_config } from '../components/new_tablas/tabla-class';
-import { Permisos } from '../../core/typescript/permisos';
+import { MovimientosFormComponent } from '@components/formularios en modales/movimientos-form/movimientos-form.component';
+import { fun } from '@core/services/functions.service';
+import { Ss } from '@core/services/singleton.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
 import { InventarioC } from './inventario';
 
 @Component({
-  selector: 'app-inventario',
-  templateUrl: './inventario.component.html',
-  styleUrls: ['./inventario.component.scss'],
+    selector: 'app-inventario',
+    templateUrl: './inventario.component.html',
+    styleUrls: ['./inventario.component.scss'],
+    standalone: false
 })
 export class InventarioComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
@@ -34,7 +35,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     id_tabla: 'lista_inventario',
     padre_functions: { data_request: (params) => this.getArticulos(params), handleBtnsDinamic: (params) => this.movimientoInventario(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { dinamico: [{ show: true, icon: 'fas fa-dolly', permiso: this.permissions.movimiento_inventario.create, name: 'movimiento_inventario', tooltip: 'Movimientos de inventario' }] },
   };
 
@@ -95,8 +96,9 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   async getStock() {
     const extra = { afterPath: `custom/stock` };
-    this.articuloClass.getAll(extra).then((result) => (this.cant_inventario = result['data'].stock));
+    this.articuloClass.getAll(extra).then((result: any) => (this.cant_inventario = result['data'].stock));
   }
+
 
   async getArticulos(params?: { per_page?: number; page?: number; search?: string }) {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
@@ -109,7 +111,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
         arti.customStyles = { codigo: { width: '5.5rem', 'text-align': 'left' }, nombre: { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
       });
 
-      this.listaArticulos = fun.duplicarJson(res.data);
+      this.listaArticulos = fun.deepCloning(res.data);
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }

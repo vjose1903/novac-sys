@@ -1,9 +1,9 @@
 import { ConfigI } from '../src/app/core/typescript/config-interface';
 import * as fs from 'fs';
-import { pathAdd, puts } from '../main';
+import { pathAdd, writeLogs } from '../main';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
-
+import { serie } from '../src/app/core/typescript/constantes.js';
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
@@ -18,8 +18,8 @@ export default class HandlerConfigFile {
     nombre_empresa: 'D` Vásquez Services y Asociados, S.R.L',
     rnc_empresa: '130-74935-3',
     telefono_empresa: '(809) 573-3934',
-    url_servidor: 'http://novac-vasquez.ddns.net:9092',
-    url_servidor_descargas: 'http://novac-vasquez.ddns.net:9092',
+    url_servidor: 'https://vasquez.inspot-technology.com',
+    url_servidor_descargas: 'https://vasquez.inspot-technology.com',
     url_servidor_respaldo: 'http://10.0.0.9:9092',
     usa_url_principal: true,
     has_contabilidad: true,
@@ -28,7 +28,9 @@ export default class HandlerConfigFile {
     is_produccion: false,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
+    use_ecf: false,
     medida_producto_terminado: 'Producto',
+    serie_default: serie.normal,
 
     printer_selected: {
       venta_contado: 'Ninguna',
@@ -70,7 +72,7 @@ export default class HandlerConfigFile {
       const existe_archivo_config = fs.existsSync(config_path);
 
       setTimeout(() => {
-        puts(existe_archivo_config, ':::::::: existe_archivo_config');
+        writeLogs(existe_archivo_config, ':::::::: existe_archivo_config');
 
         if (!existe_archivo_config) {
           Functions.setConfigFile(JSON.stringify(this.default_config))
@@ -78,7 +80,7 @@ export default class HandlerConfigFile {
               console.log(' ');
               console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
               console.log(' ');
-              puts('------ ARCHIVO DE CONFIGURACION CREADO ------');
+              writeLogs('------ ARCHIVO DE CONFIGURACION CREADO ------');
 
               setTimeout(() => resolve(true), 500);
             })

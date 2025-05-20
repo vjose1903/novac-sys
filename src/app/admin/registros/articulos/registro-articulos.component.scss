@@ -8,9 +8,14 @@
   border-radius: 12px;
 }
 
-.SCROLLFORMULA {
+.scroll-formula-titles {
+  padding: 0 0.9rem 0 0.3rem !important;
+}
+
+.scroll-formula-content {
   max-height: 14rem !important;
   overflow: hidden auto;
+  padding: 0.2rem;
 }
 
 .raya {
@@ -32,7 +37,7 @@
     line-height: 2em;
   }
   input + label:before {
-    content: "";
+    content: '';
     position: absolute;
     display: block;
     left: 0;
@@ -46,7 +51,7 @@
     transition: all 0.3s;
   }
   input + label:after {
-    content: "";
+    content: '';
     position: absolute;
     display: block;
     left: 0px;
@@ -72,7 +77,7 @@
 
 .btns-formula {
   justify-content: center;
-  column-gap: 0.3rem;
+  column-gap: 0.2rem;
   display: flex;
   align-items: center;
   height: 100%;
@@ -84,21 +89,21 @@
 /* ============================================== */
 
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch {
+  &input[type='checkbox'].ios8-switch {
     position: absolute;
     margin: 8px 0 0 16px;
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch + label {
+  &input[type='checkbox'].ios8-switch + label {
     position: relative;
     padding: 5px 0 0 50px;
     line-height: 2em;
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch + label:before {
-    content: "";
+  &input[type='checkbox'].ios8-switch + label:before {
+    content: '';
     position: absolute;
     display: block;
     left: 0;
@@ -113,8 +118,8 @@ mdb-checkbox .form-check {
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch + label:after {
-    content: "";
+  &input[type='checkbox'].ios8-switch + label:after {
+    content: '';
     position: absolute;
     display: block;
     left: 0px;
@@ -129,17 +134,17 @@ mdb-checkbox .form-check {
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch + label:hover:after {
+  &input[type='checkbox'].ios8-switch + label:hover:after {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch:checked + label:after {
+  &input[type='checkbox'].ios8-switch:checked + label:after {
     margin-left: 16px;
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch:checked + label:before {
+  &input[type='checkbox'].ios8-switch:checked + label:before {
     background: var(--primary07);
   }
 }

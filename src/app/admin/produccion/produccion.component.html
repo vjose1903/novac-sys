@@ -9,7 +9,7 @@
               <div class="form-group">
                 <label class="control-label mt-1 mb-0">Nombre producto: <span style="color: red">*</span></label>
                 <div>
-                  <p-dropdown
+                  <p-select
                     [placeholder]="'Seleccione producto'"
                     [options]="listaProductos"
                     [(ngModel)]="producto_terminado_en_turno"
@@ -22,9 +22,9 @@
                     (onChange)="getIngredients()"
                     styleClass="form-control min"
                     [virtualScroll]="true"
-                    [itemSize]="30"
+                    [virtualScrollItemSize]="30"
                     id="articulo_id"
-                  ></p-dropdown>
+                  ></p-select>
                 </div>
               </div>
             </div>
@@ -39,7 +39,7 @@
                       (keydown.enter)="saltar('medida_producir')"
                       id="cantidad_producir"
                       [(ngModel)]="cantidad_producir"
-                      (focus)="$event.target.select()"
+                      (focus)="htmlServ.selectValue($event)"
                       placeholder="Cantidad a producir"
                       class="form-control inputE input_cantidad"
                       autocomplete="off"
@@ -50,7 +50,9 @@
                   <div class="col-8 pr-0">
                     <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
                       <option [value]="null" disabled></option>
-                      <option *ngFor="let item of optionsMedidas" value="{{ item }}">{{ item }}</option>
+                      @for (item of optionsMedidas; track $index) {
+                      <option value="{{ item }}">{{ item }}</option>
+                      }
                     </select>
                   </div>
                 </div>
@@ -73,30 +75,34 @@
               <div class="text-center tituloIngre">Inventario</div>
 
               <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                <div *ngFor="let ingrediente of ingredientes; let i = index" class="ingredientesList d-flex">
+                @for (ingrediente of ingredientes; track ingrediente.id; let index = $index) {
+                <div class="ingredientesList d-flex">
                   <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
-
                   <div style="width: 100%">
-                    <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="i != 0 ? 'top' : 'bottom'" [escape]="false">
+                    <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index != 0 ? 'top' : 'bottom'" [escape]="false">
                       {{ lookprincipal(ingrediente) }}
                     </span>
                   </div>
                 </div>
+                }
               </div>
             </div>
             <div class="col-6 p-0 bordes fondoBlanco">
               <div class="text-center tituloIngre">Producción</div>
-              <div id="produccion_scroll" *ngIf="ingredientesParaProduccion.length > 0" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                <div *ngFor="let ingrediente of ingredientesParaProduccion; let index_ingrediente = index" class="ingredientesList d-flex">
+              @if (ingredientesParaProduccion.length > 0) {
+              <div id="produccion_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
+                @for (ingrediente of ingredientesParaProduccion; track ingrediente.id; let index_ingrediente = $index) {
+                <div class="ingredientesList d-flex">
                   <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
-
                   <div class="" style="width: 100%">
                     <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'" [escape]="false">
                       {{ lookprincipal(ingrediente) }}
                     </span>
                   </div>
                 </div>
+                }
               </div>
+              }
             </div>
           </div>
         </div>
@@ -115,7 +121,7 @@
   </div>
   <div class="col-12 abajo">
     <div class="d-flex justify-content-end w-100">
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP', 'Seguro de que desea cancelar la produccion.', null)" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
+      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP', 'Seguro de que desea cancelar la produccion.', null)" type="submit" class="btn btn-blanco" value="Cancelar" />
       <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar', 'Seguro de que desea confirmar la produccion.', null)" type="submit" class="btn" value="Confirmar" id="btn-verde" />
     </div>
   </div>

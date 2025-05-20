@@ -14,11 +14,15 @@
         <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
           <option value="0" disabled>Filtro por tipo de articulos</option>
           <option value="todos">Todos</option>
-          <option *ngFor="let tipo of tipo_articulos" value="{{ tipo.codigo }}">{{ tipo.descripcion }}</option>
+          @for (tipo of tipo_articulos; track tipo.id) {
+            <option value="{{ tipo.codigo }}">{{ tipo.descripcion }}</option>
+          }
         </select>
 
         <div class="mr-3" style="margin-top: 0.2rem">
-          <btn-icon-circular [id]="'btnNota'" [icon]="'fas fa-print'" [size]="'size-lg'" [tooltip]="'Reporte de inventario'" [tooltipPosition]="'right'" (clickFunction)="makeReporte()"> </btn-icon-circular>
+          <div class="d-flex align-items-center justify-content-center gap-2">
+            <btn-icon-circular id="btnNota" icon="fas fa-print" size="size-lg" tooltip="Reporte de inventario" tooltipPosition="right" (clickFunction)="makeReporte()"> </btn-icon-circular>
+          </div>
         </div>
 
         <!-- <i class=" btn-circle-icon size-lg  btnReporte" (click)="makeReporte()" style="z-index: 999999" pTooltip="" tooltipPosition="right"></i> -->

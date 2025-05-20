@@ -1,29 +1,34 @@
-import { Ss } from './../../../../core/services/singleton.service';
-import { ClienteC } from './../../../registros/registro-clientes/cliente';
-import { NotaC } from './../../../manipular facturas/notas-cred-deb/notas';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { ClienteC } from '@registros/registro-clientes/cliente';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import * as _ from 'lodash';
-import * as moment from '../../../../core/javascript/moment';
-import { NgSelectConfig } from '@ng-select/ng-select';
-import { TablasService } from '../../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../../core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
-import { FacturaC } from '../../../facturacion/factura';
-import { PdfService } from '../../../../core/services/pdf/pdf.service';
-import { FormCantidadEfectivoComponent } from '../../../components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
-import { BuscarClienteSuplidorComponent } from '../../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
-import { fun } from '../../../../core/services/functions.service';
-import { table_config } from '../../../components/new_tablas/tabla-class';
-import { ModalClass } from '../../../components/modal/modal-class';
+import { FacturaC, FacturasI } from '../../../facturacion/factura';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { FormCantidadEfectivoComponent } from '@components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
+import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { ModalClass } from '@components/modal/modal-class';
 import { Router, ActivatedRoute } from '@angular/router';
+import { MoraSelectorComponent } from '../components/mora-selector/mora-selector.component';
+import { Location } from '@angular/common';
+import Big from 'big.js';
+import { MoraSelectorKeyI, MoraSelectorService } from '../components/mora-selector/mora-selector.service';
+import { MoraCalculator } from '../utils/mora-calculator';
+const moment = require('../../../../core/javascript/moment');
 
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
   styleUrls: ['./ingresos.component.scss'],
+  standalone: false,
 })
 export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   clienteAdepositar: any;
+  all_facturas = signal<FacturasI[]>([]);
   facturas = [];
   tipo_recibo = 'Pago factura';
   is_print = false;
@@ -32,13 +37,14 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   // =============================================
 
   table_config: table_config = {
+    track_key: 'id',
     info: [
       {
         titulo: '1',
         tipo: 'icon',
         key: 'actions',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '6%' }, { color: 'var(--transparente00)' }],
+        style: { width: '6%', color: 'var(--transparente00)' },
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
           { key: 'historyPagos', rowTooltip: 'tooltip_history', text_color: 'colorEstado' },
@@ -46,33 +52,35 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         ],
       },
 
-      { titulo: 'NCF', tipo: 'text', estilos: [{ width: '7rem' }], key: 'numero_comprobante' },
-      { titulo: 'Fecha Facturacion', tipo: 'date', key: 'fecha_equivalente' },
-      { titulo: 'Fecha Vencimiento', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
-      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
-      { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
-
+      { titulo: 'NCF', tipo: 'text', style: { width: '6rem' }, key: 'numero_comprobante' },
+      { titulo: 'Fecha Fact.', alert_msg: 'Fecha de facturacion de la factura', tipo: 'date', key: 'fecha_equivalente', sort: { key: 'fecha_equivalente', order: null }, style: { width: '9rem' } },
+      { titulo: 'Fecha Venc.', alert_msg: 'Fecha de vencimiento de la factura', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
+      { titulo: 'Monto', tipo: 'formatoNumero', key: 'total_factura' },
+      { titulo: 'Pendiente', tipo: 'formatoNumero', key: 'balance' },
+      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora', returnData: data => this.getDataFromMoraSelector.bind(this)(data) } } },
       {
         titulo: 'Seleccione',
         tipo: 'switch',
         key: 'select',
         select_all: false,
-        estilos: [{ width: '7rem', padding: '0.6rem 0rem' }],
+        style: { width: '5rem' },
       },
       {
         titulo: 'Pago Total',
         tipo: 'switch',
         key: 'pagoT',
         select_all: false,
-        estilos: [{ width: '6rem', padding: '0.6rem 0rem' }],
+        style: { width: '5rem' },
         disable: [{ kind: 'campo', target: 'select', value: [false] }],
       },
       {
-        titulo: 'Monto a pagar',
+        titulo: 'Monto',
+        alert_msg: 'Monto a pagar',
         tipo: 'input',
         key: 'monto',
         can_reset: false,
         inputEvents: 'formatoNumero',
+        style: { width: '13%' },
         checkNumber: true,
         disable: [
           { kind: 'campo', target: 'select', value: [false] },
@@ -83,8 +91,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_recibos',
-    padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
-    obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    padre_functions: { data_request: params => this.pedirNuevaData(params) },
+    obj_paginate: { show: true, showTotal: false, page: 1, per_page: 20, per_page_options: [3, ...default_per_page], search: ' ', is_local: true, key: 'id' },
   };
 
   tablaComponent;
@@ -101,24 +109,54 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   totalNotasDebito: number;
   totalNotasCredito: number;
   totalPagadoPorciento: number;
-  recibiendo = 0;
-  restando = 0;
-  totalRegistros;
-  debiendo;
-  facturasSelected: Array<any> = [];
+  debiendo_sin_mora = signal<number>(0);
+
+  facturasSelected = signal<FacturasI[]>([]);
+  porcentajeSelected = 2;
+
+  recibiendo = computed(() => {
+    return this.facturasSelected().reduce((sum, item) => {
+      if (fun.hasValue(item.monto) && !isNaN(fun.desformatearStNumber(item.monto))) sum += fun.desformatearStNumber(item.monto);
+      return sum;
+    }, 0);
+  });
+
+  restando = computed(() => {
+    const debiendo = this.debiendo_con_mora();
+    const recibiendo = this.recibiendo();
+
+    return debiendo - recibiendo <= 1 ? 0 : debiendo - recibiendo;
+  });
+
+  mora_general = computed(() => this.all_facturas().reduce((sum, item) => fun.desformatearStNumber(item.mora) + sum, 0));
+
+  debiendo_con_mora = computed(() => {
+    return Number(this.debiendo_sin_mora()) + Number(this.mora_general());
+  });
 
   clienteClass = new ClienteC();
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
-  constructor(private config: NgSelectConfig, private tServ: TablasService, private router: Router, private route: ActivatedRoute) {
+  htmlServ = inject(HtmlElementsService);
+  location = inject(Location);
+  moraSelectorService = inject(MoraSelectorService);
+
+  constructor(
+    private tServ: TablasService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     super();
-    this.config.notFoundText = 'Articulo no existe';
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'ingresos', is_routing: true });
     this.necesarioStart();
+  }
+
+  ngOnDestroy() {
+    this._destroy_mixin();
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -128,8 +166,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    this._destroy_mixin();
+  goBack() {
+    this.location.back();
   }
 
   formatoNumero(num) {
@@ -137,8 +175,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   areAllSelected() {
-    const facturas_no_viaje = _.filter(this.facturas, (factura) => !factura.is_viaje);
-    return _.every(facturas_no_viaje, (factura) => factura.select);
+    return this.facturas.every(factura => factura.select);
+  }
+
+  areAllSelectedPagoTotal() {
+    return this.facturas.every(factura => factura.pagoT);
   }
 
   getIcon() {
@@ -146,7 +187,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return { icon: allSelected ? 'fa-check-square' : 'fa-square', tooltip: allSelected ? 'Deseleccionar Todos' : 'Seleccionar Todos' };
   }
 
-  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any }) {
+  async pedirFacturasPorCliente(cliente_id, params?: { per_page?: number; page?: number; search?: string; factura_a_buscar?: any; order_by?: string }) {
     this.facturas.length = 0;
 
     this.totalFacturado = 0;
@@ -156,28 +197,42 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalPagadoPorciento = 0;
 
     const fechaA = moment().format('YYYY-MM-DD');
-    const parameters = { page: params.page, per_page: params.per_page, paginado: true };
+    const parameters = { page: params.page, per_page: params.per_page, paginado: false };
 
     if (fun.hasValue(params.factura_a_buscar)) parameters['factura_a_buscar'] = params.factura_a_buscar;
 
+    if (fun.hasValue(params.order_by)) parameters['order_by'] = params.order_by;
+
     const res = await this.clienteClass.getAll({ afterPath: `custom/get_balances/${cliente_id}`, parameters: parameters });
 
-    await res.data.facturas.data.map((factura, index) => {
-      let factura_selected = _.find(this.facturasSelected, { id: factura.id });
+    await res.data.facturas.data.map((factura: FacturasI, index) => {
+      let factura_selected = this.facturasSelected().find(fact => fact.id == factura.id);
+
       if (fun.hasValue(params.factura_a_buscar) && factura.id == params.factura_a_buscar) {
         factura_selected = factura;
         factura_selected.monto = '0.00';
         factura_selected.pagoT = false;
-        this.verificateFacturasSelected(factura_selected, 'insert', index, true);
+        this.verificateFacturasSelected(factura_selected, 'insert', factura_selected.monto);
       }
 
       factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
       factura.fechaV = factura.condicion === 'Crédito' ? moment(factura.fecha_vencimiento).format('DD/MM/YYYY') : null;
       factura.select = fun.hasValue(factura_selected);
       factura.pagoT = fun.hasValue(factura_selected) ? factura_selected.pagoT : false;
-      factura.pago_a_tiempo = factura.fecha_vencimiento > fechaA ? true : false;
+      factura.pago_a_tiempo = factura.fecha_vencimiento ? (factura.fecha_vencimiento > fechaA ? true : false) : true;
       factura.colorFecha = moment(factura.fecha_vencimiento).format('YYYY-MM-DD') < fechaA ? 'red' : 'black';
-      factura.monto = fun.hasValue(factura_selected) ? factura_selected.monto : '0.00';
+      factura.monto = fun.hasValue(factura_selected) ? fun.roundNumberToDecimal(factura_selected.monto) : '0.00';
+
+      const moraCalculator = new MoraCalculator(factura);
+
+      if (fun.hasValue(factura_selected)) {
+        factura.porcentaje_mora = factura_selected.porcentaje_mora ?? this.porcentajeSelected;
+        factura.mora = factura_selected.mora ?? moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
+      } else {
+        factura.porcentaje_mora = this.porcentajeSelected;
+        factura.mora = moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
+      }
+
       const modalMoviemientos = factura.pagos.length > 0 || factura.notas.length > 0;
 
       factura.tooltip_pedido = 'Modificar datos del pedido';
@@ -197,9 +252,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           { key: 'pedido', estilos: 'font-size: 1rem !important' },
           { key: 'ver', estilos: 'font-size: 1rem !important' },
         ],
-        select: { width: '6rem' },
-        pagoT: { width: '6rem' },
-        numero_comprobante: { width: '7rem' },
       };
 
       this.facturas.push(factura);
@@ -207,7 +259,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       return factura;
     });
 
-    this.facturas = _.orderBy(this.facturas, ['id'], ['desc']);
+    this.all_facturas.set(fun.deepCloning(this.facturas));
 
     this.totalFacturado = res.data.balances.total_facturado;
 
@@ -215,27 +267,75 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalNotasCredito = res.data.balances.notas_credito;
     this.totalNotasDebito = res.data.balances.notas_debito;
 
-    this.debiendo = res.data.balances.debiendo;
-
-    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
+    this.debiendo_sin_mora.set(this.totalFacturado + this.totalNotasDebito - this.totalPagado - this.totalNotasCredito);
 
     this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
     this.totalPagadoPorciento = parseFloat(fun.roundNumberToDecimal(this.totalPagadoPorciento));
 
     setTimeout(() => {
-      this.tablaComponent.changeTableConfig([{ total_count: res.data.facturas.total_registros }]);
-      this.totalRegistros = res.data.facturas.total_registros;
-
       if (res.data.page != params.page) {
         this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
-
-        setTimeout(() => {
-          Ss.cdRef.detectChanges();
-          const actualPagination = this.tServ.getPaginationById('listado_recibos');
-          Ss.cdRef.detectChanges();
-        }, 500);
+        this.tablaComponent.reloadPagination();
       }
     }, 100);
+  }
+
+  changeMoraGeneral(porcentaje: number) {
+    this.moraSelectorService.setPorcentajeMora(porcentaje);
+
+    this.all_facturas.update(facts =>
+      facts.map(fact => {
+        const factura_tabla = this.facturas.find(item => fact.id == item.id);
+        if (fun.hasValue(factura_tabla)) return fact;
+
+        const moraCalculator = new MoraCalculator(fact);
+        return { ...fact, porcentaje_mora: porcentaje, mora: moraCalculator.getMora({ porcentaje: porcentaje }) };
+      })
+    );
+  }
+
+  tablePaginatorChange(arg) {
+    const temp = fun.deepCloning(this.facturas);
+    this.facturas.length = 0;
+    temp.forEach(item => {
+      let factura_selected = this.facturasSelected().find(fact => fact.id == item.id);
+      let factura_from_all = this.all_facturas().find(fact => fact.id == item.id);
+      if (fun.hasValue(factura_selected)) item = factura_selected;
+
+      item.porcentaje_mora = factura_selected?.porcentaje_mora || factura_from_all?.porcentaje_mora || this.porcentajeSelected;
+      item.pagoT = factura_selected?.pagoT || false;
+      item.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item.monto));
+
+      this.facturas.push(item);
+    });
+  }
+
+  getDataFromMoraSelector(data: { key: MoraSelectorKeyI; value: string | number; factura_id: number }) {
+    const index_factura_tabla = this.facturas.findIndex(fact => fact.id == data.factura_id);
+    const item_tabla = this.facturas[index_factura_tabla];
+
+    if (data.key == MoraSelectorKeyI.mora) {
+      item_tabla.mora = data.value;
+
+      if (item_tabla.select && item_tabla.pagoT) {
+        item_tabla.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item_tabla.balance) + fun.desformatearStNumber(item_tabla.mora));
+      }
+
+      this.verificateFacturasSelected(item_tabla, 'modify', item_tabla.monto, item_tabla.mora);
+    } else {
+      item_tabla.porcentaje_mora = data.value;
+
+      const moraCalculator = new MoraCalculator(item_tabla);
+      item_tabla.mora = moraCalculator.getMora({ porcentaje: data.value });
+
+      if (item_tabla.select && item_tabla.pagoT) {
+        item_tabla.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item_tabla.balance) + fun.desformatearStNumber(item_tabla.mora));
+      }
+
+      this.verificateFacturasSelected(item_tabla, 'modify', item_tabla.monto, item_tabla.mora, data.value);
+    }
+
+    this.all_facturas.update(facts => facts.map(fact => (fact.id == data.factura_id ? fun.deepCloning(item_tabla) : fact)));
   }
 
   async necesarioStart() {
@@ -255,19 +355,25 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   isOneFacturaWithMonto() {
-    const valid = this.facturasSelected.some((factura) => factura.select && fun.desformatearStNumber(factura.monto) > 0);
+    let valid = this.facturasSelected().some(factura => factura.select && fun.desformatearStNumber(factura.monto) > 0);
+
+    if (valid) valid = !this.facturasSelected().some(factura => factura.select && (isNaN(fun.desformatearStNumber(factura.monto)) || fun.isEmpty(fun.desformatearStNumber(factura.monto))));
+
     return valid;
   }
 
   cancelarIgreso() {
     this.facturas.length = 0;
-    this.facturasSelected = [];
+    this.facturasSelected.set([]);
     this.clienteAdepositar = undefined;
+    this.debiendo_sin_mora.set(0);
+    this.all_facturas.set([]);
     (document.getElementById('clienteI') as any).value = null;
 
     this.resetVariables();
 
     setTimeout(() => fun.enfocarInput('clienteI'), 250);
+    this.router.navigateByUrl('/admin/recibos/ingresos/0/0');
   }
 
   abrirModalDinamicText(tipo) {
@@ -275,7 +381,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       id: 'cancelar_ingreso',
       header: 'Confirmación',
       texto: '¿Seguro de que desea cancelar la operacion?.',
-      siFunction: (instance) => {
+      siFunction: instance => {
         this.cancelarIgreso();
         instance.closeModal(instance.id, 'cancelar');
       },
@@ -284,7 +390,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   getCantidadArticulos() {
-    return this.facturasSelected.length;
+    return this.facturasSelected().length;
   }
 
   async getDataFromModal(arg, search?) {
@@ -292,6 +398,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.devuelta = arg.obj.devuelta;
       this.forma_pago = arg.obj.forma_pago;
       this.is_print = arg.is_print;
+
       this.sendIngreso();
     }
 
@@ -301,7 +408,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       } else {
         this.clienteAdepositar = arg.data;
         (document.getElementById('clienteI') as any).value = arg.data.nombre_completo;
-        const parameters = { ...this.tServ.obj_paginate.default, factura_a_buscar: arg?.factura_a_buscar };
+        const parameters = { ...this.table_config.obj_paginate, factura_a_buscar: arg?.factura_a_buscar };
         this.pedirFacturasPorCliente(arg.data.id, parameters);
       }
     }
@@ -309,6 +416,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
     if (fun.hasValue(this.clienteAdepositar)) {
+      const order_by = this.tServ.parseSort(this.table_config);
+      params = { ...params, ...order_by };
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, params);
     } else {
       fun.toastWarning('Debe de seleccionar un cliente para continuar.', 'AVISO');
@@ -319,7 +428,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.forma_pago = null;
     this.devuelta = null;
     this.detalleYtotal = undefined;
-    this.facturasSelected.length = 0;
+    this.facturasSelected.set([]);
   }
 
   tableClickIcon(params) {
@@ -330,7 +439,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
             id: 'move_to_viajes',
             header: 'Confirmación',
             texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
-            siFunction: (instance) => {
+            siFunction: instance => {
               this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
               instance.closeModal(instance.id, 'cancelar');
             },
@@ -339,20 +448,20 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         }
       }
       if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
-        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal);
+        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal.bind(this));
       }
 
       if (params.iconKey == 'ver') {
-        this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+        this.facturaClass.parseDataToPdf(params.data).then(dataFactura => {
           let botonesDinamicos = [
-            { clase: 'btn btn-gris mr-2', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-            { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
+            { clase: 'btn btn-gris', function: instance => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
           ];
           const toPDFData = { data: dataFactura, type: 'facturacion' };
 
           const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA' };
 
-          this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then((obj_modal) => this.openNewModal(obj_modal));
+          this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then(obj_modal => this.openNewModal(obj_modal));
         });
       }
     }
@@ -366,52 +475,95 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   selectAll() {
     const allSelected = this.areAllSelected();
 
-    this.facturas.forEach((fact, index) => {
+    this.facturas.map((fact, index) => {
       if (allSelected) {
-        if (!fact.is_viaje && fact.select) {
-          this.facturas[index].pagoT = false;
-          this.facturas[index].select = false;
-          this.facturas[index].monto = '0.00';
-
-          this.tablaComponent.resetInput('monto', 'especificar', index, true, '0.00');
-        }
+        fact.pagoT = false;
+        fact.select = false;
+        fact.monto = '0.00';
       } else {
-        if (!fact.is_viaje && !fact.select) this.facturas[index].select = true;
+        fact.select = true;
       }
-      if (!fact.is_viaje) this.verificateFacturasSelected(fact, 'insert', index, !allSelected);
     });
 
-    this.sumarTotalRecibo();
+    this.all_facturas.update(facts =>
+      facts.map(item => {
+        const factura_index = this.facturas.findIndex(fact => fact.id == item.id);
+        const factura = this.facturas[factura_index];
+
+        const modify = allSelected ? item.select : !item.select;
+        item.select = !allSelected;
+
+        if (modify) this.verificateFacturasSelected(factura ?? item, 'insert', factura_index, item.monto);
+
+        return { ...item, select: !allSelected, monto: fun.hasValue(factura) ? factura.monto : item.monto };
+      })
+    );
   }
 
-  verificateFacturasSelected(factura, method, index, value) {
-    const factura_en_turno = _.find(this.facturasSelected, { id: factura.id });
+  selectAllPagoTotal() {
+    const allSelected = this.areAllSelectedPagoTotal();
 
-    const index_factura_en_turno = _.findIndex(this.facturasSelected, { id: factura.id });
+    this.facturas.forEach(fact => (fact.pagoT = !allSelected));
+
+    this.all_facturas.update(facts =>
+      facts.map(item => {
+        item.pagoT = !allSelected;
+
+        const factura_index = this.facturas.findIndex(fact => fact.id == item.id);
+        const factura = this.facturas[factura_index];
+
+        const balance = fun.desformatearStNumber(item.balance);
+        const mora = fun.desformatearStNumber(item.mora);
+
+        const new_monto = fun.roundNumberToDecimal(balance + mora);
+
+        this.verificateFacturasSelected(factura ?? item, 'modify', new_monto);
+
+        return { ...item, monto: new_monto };
+      })
+    );
+  }
+
+  verificateFacturasSelected(factura: FacturasI, method: 'insert' | 'modify', monto: number | string, mora?: number | string, porcentaje_mora?: number | string) {
+    const factura_en_turno = factura ? this.facturasSelected().find(fact => fact.id == factura?.id) : undefined;
 
     if (method == 'insert') {
-      if (value) {
-        if (fun.isEmpty(factura_en_turno)) this.facturasSelected.push(factura);
+      if (fun.isEmpty(factura_en_turno)) {
+        this.facturasSelected.update(facts => [...facts, factura]);
       } else {
-        _.pull(this.facturasSelected, factura_en_turno);
+        this.facturasSelected.update(facts => facts.filter(fact => fact.id != factura.id));
       }
     } else if (method == 'modify') {
-      this.facturasSelected[index_factura_en_turno] = fun.duplicarJson(factura);
+      this.facturasSelected.update(facts =>
+        facts.map(fact => {
+          if (fact.id == factura.id) {
+            const new_mora = fun.hasValue(mora) ? mora : factura.mora;
 
-      this.facturasSelected[index_factura_en_turno].monto = value;
-      this.tablaComponent.resetInput('monto', 'especificar', index, true, value);
+            const new_porcentaje_mora = fun.hasValue(porcentaje_mora) ? porcentaje_mora : factura.porcentaje_mora;
+
+            return { ...fact, pagoT: factura.pagoT, monto: monto, mora: new_mora, porcentaje_mora: new_porcentaje_mora };
+          } else {
+            return fact;
+          }
+        })
+      );
     }
-
-    this.sumarTotalRecibo();
   }
 
   tableInputBlur(params) {
-    const factura_en_turno = this.facturasSelected.find((factura) => factura.id == params.data.id);
+    const factura_en_turno = this.facturasSelected().find(factura => factura.id == params.data.id);
+
     if (fun.hasValue(factura_en_turno)) {
       const total = factura_en_turno.balance;
       const monto = fun.desformatearStNumber(factura_en_turno.monto);
+      const mora = fun.desformatearStNumber(factura_en_turno.mora);
 
-      if (monto > total) {
+      if (isNaN(monto) || fun.isEmpty(monto)) {
+        fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+        return;
+      }
+
+      if (monto > mora + total) {
         this.ExisteMontoMayor = true;
         fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
         fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
@@ -422,48 +574,61 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   tableInputChange(params) {
-    if (params.key == 'pagoT' && params.value) {
-      const monto = params.data.select ? fun.roundNumberToDecimal(params.data.balance) : '0.00';
-      this.verificateFacturasSelected(params.data, 'modify', params.index, monto);
+    const factura = this.facturas.find(fact => fact.id == params.data.id);
+
+    const balance = fun.desformatearStNumber(params.data.balance);
+    const mora = fun.desformatearStNumber(params.data.mora);
+    let monto = fun.desformatearStNumber(params.value);
+
+    if (params.key == 'pagoT') {
+      monto = fun.roundNumberToDecimal(balance + mora);
+
+      factura.pagoT = params.value;
+      this.tablaComponent.resetInput('monto', 'especificar', params.index, true, monto);
     }
 
-    if (params.key == 'monto' && params.value != params.data.monto) {
-      if (params.data.select) {
-        if (fun.isEmpty(params.value)) fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+    if (params.key == 'monto' && params.value != factura.monto) {
+      if (factura.select) {
+        if (fun.isEmpty(params.value)) {
+          fun.toastWarning('Debe de introducir un Monto', 'AVISO');
+        }
 
-        const total = params.data.balance;
-        const monto_desformateado = fun.isEmpty(params.value) ? null : fun.desformatearStNumber(params.value);
-        const monto_original = fun.isEmpty(params.value) ? null : params.value;
+        if (monto == balance + mora) [params.newData.pagoT, factura.pagoT] = Array(2).fill(true);
 
-        if (monto_desformateado == total) params.data.pagoT = true;
-
-        if (monto_desformateado > total) {
+        if (monto > balance + mora) {
           this.ExisteMontoMayor = true;
-          fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');
+
+          fun.toastError('Monto no puede ser mayor al total de la factura', 'AVISO');
           fun.enfocarInput(`input-${params.id_tabla}-monto-${params.index}`);
         } else {
           this.ExisteMontoMayor = false;
         }
-
-        this.verificateFacturasSelected(params.newData, 'modify', params.index, monto_original);
       }
     }
 
     if (params.key == 'select') {
-      const factura = _.find(this.facturas, { id: params.data.id });
       if (!params.value) {
         factura.pagoT = false;
-        params.data.monto = '0.00';
-        this.tablaComponent.resetInput('monto', 'especificar', params.index, true, '0.00');
+        monto = '0.00';
+        this.tablaComponent.resetInput('monto', 'especificar', params.index, true, monto);
       }
 
-      this.verificateFacturasSelected(factura, 'insert', params.index, params.value);
+      factura.select = params.value;
     }
-  }
 
-  sumarTotalRecibo() {
-    this.recibiendo = _.reduce(this.facturasSelected, (sum, item) => fun.desformatearStNumber(item.monto) + sum, 0);
-    this.restando = this.debiendo - this.recibiendo <= 1 ? 0 : this.debiendo - this.recibiendo;
+    this.all_facturas.update(facts =>
+      facts.map(item => {
+        if (item.id == factura.id) {
+          item = fun.deepCloning(factura);
+
+          const action = params.key == 'select' ? 'insert' : 'modify';
+
+          this.verificateFacturasSelected(factura, action, monto);
+        }
+
+        return item;
+      })
+    );
   }
 
   async abrirModalFiltro(nombre) {
@@ -481,44 +646,46 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
       });
       fun.desEnfocarInput('clienteI');
     }
   }
 
   formarDetalleRecibos() {
-    const temp = [];
-    let total = 0;
+    const formatFechaFactura = (fact) => 
+      `${fact.pagoT ? 'Saldo' : 'Abono'} ${fact.numero_comprobante} ${moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')}`;
 
-    for (let i = 0; i < this.facturasSelected.length; i++) {
-      const fact = this.facturasSelected[i];
+    return this.facturasSelected().reduce((acc, fact) => {
+      const monto = Big(fun.desformatearStNumber(fact.monto));
+      const mora = fun.desformatearStNumber(fact.mora);
+      
+      // Calcula la mora recibida y el depósito
+      const mora_received = Math.min(monto.toNumber(), mora);
+      const deposito = Math.max(0, monto.minus(mora_received).toNumber());
 
-      temp.push({
+      acc.detalle.push({
         cabecera_factura_id: fact.id,
         pago_total: fact.pagoT,
-        deposito: fun.desformatearStNumber(fact.monto),
-        descripcion:
-          this.tipo_recibo === 'Pago factura'
-            ? fact.pagoT
-              ? 'Saldo ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-              : 'Abono ' + fact.numero_comprobante + ' ' + moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')
-            : '',
+        deposito,
+        mora: mora_received,
+        descripcion: this.tipo_recibo === 'Pago factura' ? formatFechaFactura(fact) : '',
         pago_a_tiempo: fact.pago_a_tiempo,
       });
 
-      total += fun.desformatearStNumber(fact.monto);
-    }
+      // Actualiza los totales
+      acc.bruto += deposito;
+      acc.mora += mora_received;
+      acc.total_recibo += monto.toNumber();
 
-    const obj = { total_recibo: total, detalle: temp };
-
-    return obj;
+      return acc;
+    }, { bruto: 0, mora: 0, total_recibo: 0, detalle: [] });
   }
 
   async confirmarIgreso() {
     if (this.ExisteMontoMayor) {
       fun.toastError('Revisar pagos, existe uno con un monto mayor al balance de la factura', 'ERROR');
-    } else if (this.facturasSelected.some((factura) => factura.monto == 0)) {
+    } else if (this.facturasSelected().some(factura => factura.monto == 0)) {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
@@ -531,14 +698,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         header: 'Cantidad de efectivo',
         width: '34.375rem',
         botones: {
-          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            {
-              clase: 'btn btn-blanco mr-2',
-              function: (instance) => this.closeModal(instance),
-              label: 'Cancelar',
-              disable: false,
-            },
+            { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
           ],
         },
@@ -549,6 +711,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   async sendIngreso() {
     const obj = {
       cliente_id: this.clienteAdepositar.id,
+      bruto: this.detalleYtotal.bruto,
+      mora: this.detalleYtotal.mora,
       total: this.detalleYtotal.total_recibo,
       forma_pago: this.forma_pago,
       tipo_factura_id: 17,
@@ -556,26 +720,25 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       numero_recibo: null,
       estado: true,
       detalle_recibos: this.detalleYtotal.detalle,
+      balance_cliente: this.restando(),
     };
+    
 
-    this.reciboClass.createUpdateOne(obj).then((res) => {
+    this.reciboClass.createUpdateOne(obj).then(res => {
       const recibo = res['data'].recibo;
 
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
       this.pedirFacturasPorCliente(this.clienteAdepositar.id, actualPagination);
 
       this.resetVariables();
-      this.reciboClass.parseDataToPdf(recibo).then((recibo_parsed) => {
+      this.reciboClass.parseDataToPdf(recibo).then(recibo_parsed => {
         const obj_print = { data: recibo_parsed, type: 'recibo_ingreso' };
 
         PdfService.generatePdf({ oPdf: obj_print, imprimir: this.is_print })
-          .then(async (res) => {
-            if (res.status === 'si') {
-            } else fun.toastError(res.msg, 'ERROR');
-
+          .then(async res => {
             this.layServ.nextCheckCuadreToday(true);
           })
-          .catch((err) => fun.toastError(err.msg, 'ERROR'));
+          .catch(err => fun.toastError(err.msg, 'ERROR'));
       });
     });
   }

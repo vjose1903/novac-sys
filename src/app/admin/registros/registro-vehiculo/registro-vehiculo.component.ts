@@ -1,24 +1,26 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
-import { MarcaC, ModeloC } from '../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
+import { GLOBAL } from '@core/typescript/GLOBAL';
+import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { EmpleadoC } from '../registro-empleados/empleado';
 import { VehiculoC } from './vehiculo';
-import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
-import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
+import { FormularioMarcaModeloComponent } from '@components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { ModalClass } from '../../components/modal/modal-class';
+import { ModalClass } from '@components/modal/modal-class';
 
 @Component({
-  selector: 'app-registro-vehiculo',
-  templateUrl: './registro-vehiculo.component.html',
-  styleUrls: ['./registro-vehiculo.component.scss'],
+    selector: 'app-registro-vehiculo',
+    templateUrl: './registro-vehiculo.component.html',
+    styleUrls: ['./registro-vehiculo.component.scss'],
+    standalone: false
 })
 export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
@@ -55,13 +57,16 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_vehiculos',
     padre_functions: { data_request: (params) => this.getVehiculos(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.vehiculo.update }, borrar: { show: true, permiso: this.permissions.vehiculo.destroy } },
   };
   tablaComponent;
   formPermissions = [Permisos.vehiculo.create, Permisos.vehiculo.update];
   hasPermissionsMarca: boolean;
   hasPermissionsModelo: boolean;
+
+  htmlServ = inject(HtmlElementsService);
+  fun = fun;
   constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
     super();
   }
@@ -95,6 +100,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.getMarcas();
     this.checkPermisos();
   }
+
   checkPermisos() {
     this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then((result) => (this.hasPermissionsMarca = result));
     this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then((result) => (this.hasPermissionsModelo = result));
@@ -109,6 +115,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       (err: any) => {},
     );
   }
+
   async getVehiculos(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -128,7 +135,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   async getMarcas() {
     try {
-      const res = await this.marcasClass.getAll();
+      const res = await this.marcasClass.getAll() as any;
 
       this.listaMarcas = res;
     } catch (error) {
@@ -152,6 +159,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       telefono_no_empleado: [{ value: null, disabled: true }, Validators.required],
       estado: [true],
     });
+    this.verificateMarcaIsSelected();
   }
 
   saltar(campo, array?, i?) {
@@ -199,14 +207,23 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     if (fun.hasValue(this.form)) this.form.controls[campo].reset(null);
   }
 
-  async selectMarca(callback = (arg) => {}) {
-    const marca_selected_id = this.form.controls.marca.value;
-    if (marca_selected_id) {
-      const res = await this.modeloClass.getAll({ afterPath: `por_marca/${marca_selected_id}` });
-      this.listaModelos = res;
-      if (fun.hasValue(this.form)) this.form.controls.modelo.reset();
-      callback(true);
-    }
+  async selectMarca() {
+    return new Promise<void>(async (resolve, reject) => {
+      const marca_selected_id = this.form.controls.marca.value;
+      if (marca_selected_id) {
+        const res = await this.modeloClass.getAll({ afterPath: `por_marca/${marca_selected_id}` });
+        this.listaModelos = res;
+        if (fun.hasValue(this.form)) this.form.controls.modelo.reset();
+        this.verificateMarcaIsSelected();
+        resolve();
+      }
+    });
+  }
+
+  verificateMarcaIsSelected() {
+    const formulario = this.form.getRawValue();
+    const func = fun.hasValue(formulario.marca) ? 'enable' : 'disable';
+    this.form.controls.modelo[func]({ emitEvent: false });
   }
 
   // =============================================
@@ -247,17 +264,16 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.boton = 'Editar';
 
     await this.form.patchValue(this.vehiculoSelected);
+    this.verificateMarcaIsSelected();
 
     if (!this.vehiculoSelected.user_id) this.form.controls.user_id.setValue(-1);
 
     const marca_id = this.listaMarcas.find((marca) => marca.descripcion === this.vehiculoSelected.marca).id;
 
     this.form.controls.marca.setValue(marca_id);
-    this.selectMarca((res) => {
-      if (res) {
-        const modelo_id = this.listaModelos.find((modelo) => modelo.descripcion == this.vehiculoSelected.modelo).id;
-        this.form.controls.modelo.setValue(modelo_id);
-      }
+    this.selectMarca().then(() => {
+      const modelo_id = this.listaModelos.find((modelo) => modelo.descripcion == this.vehiculoSelected.modelo).id;
+      this.form.controls.modelo.setValue(modelo_id);
     });
 
     this.selectPropietario();
@@ -265,6 +281,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   nuevoRegistro() {
     this.isCreando = true;
+    this.verificateMarcaIsSelected();
   }
 
   capitalice(control, arg) {
@@ -280,7 +297,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       header: 'Mantenimiento marca & modelo',
       width: '1000px',
       height: '650px',
-      botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+      botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
     });
   }
 

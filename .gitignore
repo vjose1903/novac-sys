@@ -8,6 +8,7 @@
 /app-builds
 /release
 /resources/*
+.nx/*
 /log/*
 main.js
 app_config.config
@@ -17,6 +18,10 @@ app_config.config
 *.txt
 *.js
 !/scripts/*
+
+# Exceptuar eslint.config.js
+!eslint.config.js
+
 # dependencies
 /resources
 /log

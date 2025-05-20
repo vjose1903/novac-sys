@@ -1,0 +1,25 @@
+<div class="position-relative">
+  @if (windowsWidth >= 768) {
+  <span>
+    @for (btn of botones?.dinamico; track btn.btn_id) { @if (btn?.show) {
+    <span pTooltip="{{ btn?.tooltip || dato[btn?.tooltipKey] }}" (click)="handleFunctionsBtnDinamic($event, btn, dato)" tooltipPosition="left" *ngxPermissionsOnly="btn?.permiso">
+      <i class="table-btn-icon  {{ btn?.icon }}"></i>
+    </span>
+    } } @if (botones?.mostrar?.show) {
+    <span pTooltip="Mostrar" (click)="clickBtn($event, dato, 'mostrar')" tooltipPosition="left" *ngxPermissionsOnly="botones?.mostrar?.permiso">
+      <i class="table-btn-icon far fa-eye"></i>
+    </span>
+    } @if (botones?.editar?.show) {
+    <span pTooltip="Editar" (click)="clickBtn($event, dato, 'update')" tooltipPosition="left" *ngxPermissionsOnly="botones?.editar?.permiso">
+      <i class="table-btn-icon fas fa-pencil-alt"></i>
+    </span>
+    } @if (botones?.borrar?.show) {
+    <span pTooltip="Borrar" (click)="clickBtn($event, dato, 'delete')" tooltipPosition="left" *ngxPermissionsOnly="botones?.borrar?.permiso">
+      <i class="table-btn-icon far fa-trash-alt"></i>
+    </span>
+    }
+  </span>
+  } @else {
+  <p-speedDial id="speedDial-{{ index_body }}" [model]="items" [type]="items.length > 3 ? 'semi-circle' : 'linear'" [radius]="15 * items.length" className="btn-table-cellphone" direction="left" appendTo="body"></p-speedDial>
+  }
+</div>

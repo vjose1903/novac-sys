@@ -1,4 +1,3 @@
-import * as moment from '../javascript/moment';
 import { BehaviorSubject } from 'rxjs';
 import * as _ from 'lodash';
 import { fun } from '../services/functions.service';
@@ -7,6 +6,7 @@ export class MessageTask {
   id: string;
   eventName: string;
   data: any;
+  error: boolean;
 
   fn = new BehaviorSubject<any>({});
 
@@ -26,10 +26,8 @@ export class MessageTask {
     });
   }
 
-
-
   asJson(): any {
-    return { id: this.id, eventName: this.eventName, data: this.data };
+    return { id: this.id, eventName: this.eventName, data: this.data, error: this.error };
   }
 
   serialize(): string {

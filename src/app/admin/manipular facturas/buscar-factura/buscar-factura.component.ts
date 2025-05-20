@@ -1,42 +1,47 @@
-import { actionFacturacion, deleteDocumentosTypes, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
-import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { actionFacturacion, deleteDocumentosTypes, request_factura_campo, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
+import { Ss } from '@core/services/singleton.service';
+import { serie, seriesDgiiI } from '@core/typescript/constantes';
+import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input, computed, signal, effect } from '@angular/core';
+import { Router } from '@angular/router';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { LoaderService } from '../../../loader/loader.service';
-import { ArticuloC } from '../../registros/articulos/articulo';
+import { ArticuloC } from '@registros/articulos/articulo';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
-import { NcfC } from '../../registros/ncf/ncf';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
-import { PdfViewerComponent } from '../../components/pdf-viewer/pdf-viewer.component';
-import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { NcfC } from '@registros/ncf/ncf';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
+import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { NotaC } from '../notas-cred-deb/notas';
-import { fun } from '../../../core/services/functions.service';
-import { Permisos } from '../../../core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
-import { ModalClass } from '../../components/modal/modal-class';
+import { fun } from '@core/services/functions.service';
+import { Permisos } from '@core/typescript/permisos';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { ModalClass } from '@components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
 import { TitleCasePipe } from '@angular/common';
+import { seriesDGII } from '@core/typescript/constantes';
+
+import * as _ from 'lodash';
+const moment = require('../../../core/javascript/moment');
 
 @Component({
   selector: 'app-buscar-factura',
   templateUrl: './buscar-factura.component.html',
   styleUrls: ['./buscar-factura.component.scss'],
+  standalone: false,
 })
-export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDestroy {
+export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnDestroy {
+  @Input() buscarPara: any;
   facturas = [];
 
   facturaSelected: any;
-  buscarPara: any;
   para: string;
 
   noExistenComprobantes = false;
   paqueteComprobante: any;
   tipo_factura_id = null;
-  valor_a_buscar: any;
+  valor_a_buscar: any = null;
 
   notasClass = new NotaC();
   articuloClass = new ArticuloC();
@@ -48,23 +53,37 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   notaSelected: string;
   showSide: boolean = false;
   TablasComponent;
-  idsFacturasSeleccionadas = [];
   permissions = Permisos;
 
   tipos_documentos = [];
-  tipo_documento_selected = tipoDocFacturacion.venta;
+  tipo_documento_selected = signal<tipoDocFacturacion>(tipoDocFacturacion.venta);
 
   buscar_por = null;
 
   campos = {
-    cliente: 1,
-    numeroComprobante: 2,
-    numeroFactura: 3,
-    ultimas50: 4,
-    suplidor: 5,
+    cliente: request_factura_campo.cliente_id,
+    numeroComprobante: request_factura_campo.numero_comprobante,
+    numeroFactura: request_factura_campo.numero_factura,
+    ultimas50: request_factura_campo.last_50,
+    suplidor: request_factura_campo.suplidor_id,
   };
 
+  serieSelected = signal<serie>(serie.all);
+  facturasSerieOptions: seriesDgiiI[] = [];
+
+  notasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
+  notaSerieSelected = signal<serie>(serie.all);
+
   fun = fun;
+  serie = serie;
+
+  comprobantes_masks = {
+    [serie.normal]: { mask: 'B9999999999', placeholder: 'B__________' },
+    [serie.electronica]: { mask: 'E999999999999', placeholder: 'E____________' },
+    [serie.no]: { mask: ' ', placeholder: ' ' },
+  };
+
+  comprobante_mask_selected = computed(() => this.comprobantes_masks[this.serieSelected()]);
 
   table_config;
 
@@ -80,32 +99,52 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     colores: true,
     filtrar: { local: false },
     id_tabla: 'lista_notas',
-    padre_functions: { data_request: (params) => this.pedirNotas(params) },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    padre_functions: { data_request: params => this.pedirNotas(params) },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
   tablaNotasComponent;
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
+  htmlServ = inject(HtmlElementsService);
 
-  constructor(private route: ActivatedRoute, private router: Router, private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(
+    private router: Router,
+    private tServ: TablasService,
+    public loadServ: LoaderService
+  ) {
     super();
+
+    effect(() => {
+      if (this.serieSelected() && this.buscar_por == request_factura_campo.last_50) this.loadFacturasChangingSerie();
+    });
   }
 
-  ngOnInit() {
+  ngOnChanges(changes: SimpleChanges): void {
     this._init_mixin({ component: 'buscar_factura', is_routing: true });
-    this.buscarPara = this.route.snapshot.params['para'];
 
     this.necesarioStart();
   }
 
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    this.borrar('salir');
+  }
+
   necesarioStart() {
-    this.verificatePermisos().then(async (res) => {
+    this.borrar();
+    this.verificatePermisos().then(async res => {
       this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       this.completarTituloPag();
 
       fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
     });
+
+    this.getSeriesOptions();
+  }
+
+  getSeriesOptions(includeAll: boolean = true) {
+    this.facturasSerieOptions = seriesDGII({ includeAll });
   }
 
   verificatePermisos() {
@@ -115,7 +154,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       promomiseList.push(Ss.permissionsService.hasPermission(Object.values(this.permissions.pre_venta)));
       promomiseList.push(Ss.permissionsService.hasPermission(Object.values(this.permissions.cotizacion)));
 
-      Promise.all(promomiseList).then((values) => {
+      Promise.all(promomiseList).then(values => {
         const permisos = ['hasPermisoPreVenta', 'hasPermisoCotizacion'];
 
         for (let index = 0; index < permisos.length; index++) {
@@ -135,20 +174,21 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   iniciarCambioMenu(arg, callback) {
     if (arg.bool) {
-      arg['verificar'] = true;
       this.runFinalizarCambioMenu(arg);
       callback({ bool: true });
     }
   }
 
-  ngOnDestroy(): void {
-    this._destroy_mixin();
-    this.borrar('salir');
+  async loadFacturasChangingSerie() {
+    const actualPagination = await this.getActualPagination();
+    if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
+    this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
   }
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = Ss.factServ.lista_tipos_facturas.find((tipo) => tipo.referencia === NotaC.base_comprobante[this.buscarPara]);
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[this.serieSelected()][this.buscarPara]);
+
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
       this.paqueteComprobante = res['data'] as any;
@@ -206,7 +246,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
       { condition: this.hasPermisoCotizacion, value: tipoDocFacturacion.cotizacion, label: 'Cotización' },
     ];
 
-    tipos.forEach((tipo) => {
+    tipos.forEach(tipo => {
       if (tipo.condition) this.tipos_documentos.push(tipo);
     });
   }
@@ -217,38 +257,51 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async openSide() {
     this.pedirNotas(this.tServ.obj_paginate.default);
-    this.showSide = true;
   }
 
   async pedirNotas(params?: { per_page: number; page: number; search: string }) {
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
       this.notas.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: this.buscarPara.includes('credito') ? NotaC.tipo_nota.credito : NotaC.tipo_nota.debito } };
+      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: '' } };
 
-      const res = await this.notasClass.getAll(extra);
+      extra.parameters.tipo_nota = NotaC.base_comprobante[this.notaSerieSelected()][this.buscarPara];
 
-      res['data'].forEach((nota) => {
-        nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
-        nota.total = Math.abs(nota.total);
-        nota.selectedColor = 'gris-claro';
-        nota.viewColor = 'gris-claro';
-        nota.view = 'far fa-eye-slash';
+      try {
+        const res = await this.notasClass.getAll(extra);
 
-        nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+        res['data'].forEach(nota => {
+          nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
+          nota.total = Math.abs(nota.total);
+          nota.selectedColor = 'gris-claro';
+          nota.viewColor = 'gris-claro';
+          nota.view = 'far fa-eye-slash';
 
-        nota.customStyles = {
-          actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
-          numero_comprobante: { width: '7rem' },
-        };
+          nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
-        this.notas.push(nota);
-      });
+          nota.customStyles = {
+            actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
+            numero_comprobante: { width: '7rem' },
+          };
 
-      setTimeout(() => this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]), 10);
+          this.notas.push(nota);
+        });
+        this.showSide = true;
+
+        setTimeout(() => this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]), 10);
+      } catch (err) {
+        const error = err.error;
+
+        if (fun.isEmpty(error?.data) || error?.data?.length == 0) this.showSide = false;
+      }
       resolve(true);
     });
+  }
+
+  changeNotaSerie(serie) {
+    this.notaSerieSelected.set(serie);
+    this.pedirNotas(this.tServ.obj_paginate.default);
   }
 
   mostrarListaFacturas() {
@@ -269,92 +322,118 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async pedirFactura(params?: { per_page?: number; page?: number; search?: string }) {
-    const documento_descripcion = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Cotización' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
+    return new Promise<void>(async (resolve, reject) => {
+      const documento_descripcion = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'Cotización' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
 
-    try {
-      this.facturas.length = 0;
+      try {
+        this.facturas.length = 0;
 
-      const args = { campo: this.buscar_por, valor: this.valor_a_buscar, tipo_factura_id: this.tipo_factura_id, page: params.page, per_page: params.per_page, paginado: true, tipo: this.tipo_documento_selected };
-      const res = await this.facturaClass.getFacturasByParams(args);
+        const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
 
-      res['data'].forEach((fact) => {
-        const pago_a_tiempo = this.getIsPagoAtiempo(fact);
-        const estatus = this.getIsActiveInfo(fact);
-
-        fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
-        fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
-        fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
-        fact.is_active = estatus.icon;
-        fact.is_active_tooltip = estatus.tooltip;
-        fact.is_active_color = estatus.color;
-        fact.monto = fun.roundNumberToDecimal(fact.balance);
-
-        fact.viewColor = 'gris-claro';
-        fact.view = 'far fa-eye-slash';
-        fact.delete = 'far fa-trash-alt';
-        fact.duplicate = 'fa-regular fa-copy';
-        fact.make_bill = 'fas fa-external-link-alt';
-
-        fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
-
-        fact.is_selected = this.idsFacturasSeleccionadas.includes(fact.id);
-        fact.tooltip_select = 'Seleccionar Factura';
-
-        fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
-
-        fact.customStyles = {
-          condicion: { width: '6rem' },
-          secuencia: { width: '7rem' },
-          numero_comprobante: { width: '7rem' },
-          estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
-          actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
-            { key: 'view', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'duplicate', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'delete', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'make_bill', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'selected', estilos: 'font-size: 1.2rem !important;' },
-          ],
+        const args = {
+          campo: this.buscar_por,
+          valor: valor,
+          tipo_factura_id: this.tipo_factura_id,
+          page: params.page,
+          per_page: params.per_page,
+          paginado: true,
+          tipo: this.tipo_documento_selected(),
+          movimientos_viaje: true,
+          extra_params: { serie: this.serieSelected() },
         };
 
-        if (this.para == 'Visualizar') _.pull(fact.customStyles.actions, _.find(fact.customStyles.actions, { key: 'selected' }));
+        const res = await this.facturaClass.getFacturasByParams(args);
 
-        this.facturas.push(fact);
-      });
+        res['data'].forEach(fact => {
+          const pago_a_tiempo = this.getIsPagoAtiempo(fact);
+          const estatus = this.getIsActiveInfo(fact);
 
-      this.facturas = _.orderBy(this.facturas, ['fecha_equivalente'], ['desc']);
+          fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
+          fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
+          fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
+          fact.is_active = estatus.icon;
+          fact.is_active_tooltip = estatus.tooltip;
+          fact.is_active_color = estatus.color;
+          fact.monto = fun.roundNumberToDecimal(fact.balance);
 
-      if (this.facturas.length > 0) {
-        if (this.buscar_por == this.campos.numeroComprobante || (this.buscar_por == this.campos.numeroFactura && this.tipo_factura_id != '0')) {
-          this.facturaClass.parseDataToPdf(this.facturas[0]).then((factura_parsed) => {
-            const continuar = this.buscarPara != 'solo_ver' && (this.buscar_por == this.campos.numeroComprobante || this.buscar_por == this.campos.numeroFactura);
-            this.facturaSelected = factura_parsed;
-            const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
-            this.mostrarFactura(factura_parsed, tipo, null, continuar);
-          });
-        } else {
-          setTimeout(() => this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]), 100);
+          fact.viewColor = 'gris-claro';
+          fact.view = 'far fa-eye-slash';
+          fact.delete = 'far fa-trash-alt';
+          fact.duplicate = 'fa-regular fa-copy';
+          fact.make_bill = 'fas fa-external-link-alt';
+
+          fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
+
+          fact.tooltip_select = 'Seleccionar Factura';
+
+          fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+
+          fact.customStyles = {
+            condicion: { width: '6rem' },
+            secuencia: { width: '7rem' },
+            numero_comprobante: { width: '9rem' },
+            fecha_equivalente: { width: '6.5rem' },
+            fechaV: { width: '6.5rem' },
+            estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
+            actions: [
+              { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
+              { key: 'view', estilos: 'font-size: 1.2rem !important;' },
+              { key: 'duplicate', estilos: 'font-size: 1.2rem !important;' },
+              { key: 'delete', estilos: 'font-size: 1.2rem !important;' },
+              { key: 'make_bill', estilos: 'font-size: 1.2rem !important;' },
+            ],
+          };
+
+          if (this.para == 'Visualizar')
+            fun.pull(
+              fact.customStyles.actions,
+              fact.customStyles.actions.find(item => item.key == 'selected')
+            );
+
+          this.facturas.push(fact);
+        });
+
+        this.facturas.sort((a, b) => fun.compare(a, b, ['fecha_equivalente'], 'desc'));
+
+        if (this.facturas.length > 0) {
+          if (this.buscar_por == this.campos.numeroComprobante) {
+            // this.facturas[0].detalle_facturas.push(this.facturas[0].detalle_facturas[0])
+
+            this.facturaClass.parseDataToPdf(this.facturas[0]).then(factura_parsed => {
+              const crear_nota = this.buscarPara.includes('nota');
+              this.facturaSelected = factura_parsed;
+              const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
+              this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota });
+            });
+          } else {
+            setTimeout(() => {
+              this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+            }, 100);
+          }
         }
+
+        resolve();
+      } catch (error) {
+        if (this.buscar_por == this.campos.cliente) {
+          fun.toastError(`Este cliente no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
+        } else if (this.buscar_por == this.campos.suplidor) {
+          fun.toastError(`Este suplidor no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
+        } else if (this.buscar_por == this.campos.numeroFactura) {
+          fun.toastError(`No existen ${documento_descripcion} con este número.`, 'ERROR');
+        } else if (this.buscar_por == this.campos.numeroComprobante) {
+          fun.toastError(`La ${documento_descripcion} buscada no existe`, 'ERROR');
+        }
+        fun.enfocarAndSelectInput('valorI');
+        console.error(error);
+        reject();
       }
-    } catch (error) {
-      if (this.buscar_por == this.campos.cliente) {
-        fun.toastError(`Este cliente no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
-      } else if (this.buscar_por == this.campos.suplidor) {
-        fun.toastError(`Este suplidor no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
-      } else if (this.buscar_por == this.campos.numeroFactura) {
-        fun.toastError(`No existen ${documento_descripcion} con este número.`, 'ERROR');
-      } else if (this.buscar_por == this.campos.numeroComprobante) {
-        fun.toastError(`La ${documento_descripcion} buscada no existe`, 'ERROR');
-      }
-      fun.enfocarAndSelectInput('valorI');
-      console.error(error);
-    }
+    });
   }
 
   getIsActiveInfo(documento) {
     let res = { icon: null, tooltip: null, color: null };
 
-    if (this.tipo_documento_selected == tipoDocFacturacion.compra) {
+    if (this.tipo_documento_selected() == tipoDocFacturacion.compra) {
       res.icon = documento.estado ? (documento.balance < 1 ? 'fas fa-check' : 'fas fa-exclamation-triangle') : 'fas fa-times';
       res.tooltip = documento.estado ? (documento.balance < 1 ? 'Factura saldada' : 'Factura pendiente de pago') : 'Factura anulada';
       res.color = documento.estado ? (documento.balance < 1 ? 'green' : 'yellow') : 'red';
@@ -392,9 +471,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   selectTableConfig() {
-    return new Promise<void>((resolve) => {
-      this.table_config = fun.duplicarJson(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
-      this.table_config['padre_functions'] = { data_request: (params) => this.pedirFactura(params) };
+    return new Promise<void>(resolve => {
+      this.table_config = fun.deepCloning(BuscarFacturaC.tables_config[this.tipo_documento_selected()]);
+      this.table_config['padre_functions'] = {
+        data_request: params => {
+          this.pedirFactura(params);
+        },
+      };
 
       this.verificateTableActions();
       resolve();
@@ -402,21 +485,17 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   verificateTableActions() {
-    const td_actions = _.find(this.table_config.info, { key: 'actions' });
+    const td_actions = this.table_config.info.find(item => item.key == 'actions');
 
-    if (this.buscarPara == 'solo_ver') {
-      const btn_select = _.find(td_actions.iconsArray, { id: 'select' });
-      if (fun.hasValue(btn_select)) _.pull(td_actions.iconsArray, btn_select);
-    } else {
-      const btn_duplicate = _.find(td_actions.iconsArray, { id: 'duplicate' });
-      if (fun.hasValue(btn_duplicate)) _.pull(td_actions.iconsArray, btn_duplicate);
+    if (this.buscarPara != 'solo_ver') {
+      const btn_duplicate = td_actions.iconsArray.find(item => item.id == 'duplicate');
+      if (fun.hasValue(btn_duplicate)) fun.pull(td_actions.iconsArray, btn_duplicate);
     }
   }
 
   async changeSelect(tipo, valor) {
     this.tipo_factura_id = null;
     this.valor_a_buscar = null;
-    this.idsFacturasSeleccionadas.length = 0;
 
     const valorInput = document.getElementById('valorI') as any;
     if (fun.hasValue(valorInput)) valorInput.value = null;
@@ -425,17 +504,31 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     const actualPagination = await this.getActualPagination();
     if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
 
-    const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura, this.campos.cliente].map((item) => `${item}`);
+    const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura, this.campos.cliente].map(item => `${item}`);
 
     if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
 
-    if (valor == this.campos.ultimas50) this.pedirFactura(fun.duplicarJson(this.tServ.obj_paginate.default));
+    if (valor == this.campos.ultimas50) this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
 
     if (tipo == 'tipo_documento') {
       this.buscar_por = null;
       setTimeout(() => {
         this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       }, 100);
+    }
+
+    if (tipo == 'buscar_por') {
+      this.getSeriesOptions(valor != this.campos.numeroComprobante);
+
+      if (valor == this.campos.numeroComprobante) {
+        if (this.serieSelected() == serie.all) {
+          this.serieSelected.set(serie.no);
+        }
+      } else {
+        if (this.serieSelected() == serie.no) {
+          this.serieSelected.set(serie.all);
+        }
+      }
     }
   }
 
@@ -445,12 +538,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (tipo == 'label') {
       if (this.buscar_por == this.campos.cliente) res = 'Cliente';
       if (this.buscar_por == this.campos.numeroComprobante) res = 'Numero Comprobante';
-      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Número Cotización' : 'Número Factura';
+      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'Número Cotización' : 'Número Factura';
       if (this.buscar_por == this.campos.suplidor) res = 'Suplidor';
     } else {
       if (this.buscar_por == this.campos.cliente) res = 'Nombre Cliente';
       if (this.buscar_por == this.campos.numeroComprobante) res = 'Escriba numero de comprobante';
-      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Escriba número de Cotización' : 'Escriba número de Factura';
+      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'Escriba número de Cotización' : 'Escriba número de Factura';
       if (this.buscar_por == this.campos.suplidor) res = 'Nombre Suplidor';
     }
     return res;
@@ -472,9 +565,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
   borrar(tipo = '') {
     this.resetFacturas();
-    if (tipo != 'salir') (document.getElementById('valorI') as any).value = null;
+    const input_valor = document.getElementById('valorI') as any;
+    if (tipo != 'salir' && input_valor) input_valor.value = null;
 
-    this.tipo_documento_selected = tipoDocFacturacion.venta;
+    this.tipo_documento_selected.set(tipoDocFacturacion.venta);
     this.tipo_factura_id = null;
     this.buscar_por = null;
     fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
@@ -486,28 +580,23 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         if (params.iconKey == 'view') {
           this.notaSelected = params.data;
 
-          this.notasClass.parseDataToPdf(params.data).then((data_parsed) => {
-            this.mostrarFactura(data_parsed, 'nota', params.data);
+          this.notasClass.parseDataToPdf(params.data).then(data_parsed => {
+            this.mostrarFactura({ factura: data_parsed, type: 'nota', dataDB: params.data });
           });
         }
       }
     } else if (params.id_tabla == shearchDocumentTableId) {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
-          this.facturaClass.parseDataToPdf(params.data).then((factura_parsed) => {
+          this.facturaClass.parseDataToPdf(params.data).then(factura_parsed => {
             this.facturaSelected = factura_parsed;
-            const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
-            this.mostrarFactura(factura_parsed, tipo);
+            const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
+            this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota: this.buscarPara.includes('nota') });
           });
         }
 
-        if (params.idIcon == 'select') {
-          params.data.is_selected = !params.data.is_selected;
-          params.data.is_selected ? this.idsFacturasSeleccionadas.push(params.data.id) : _.pull(this.idsFacturasSeleccionadas, params.data.id);
-        }
-
         if (params.iconKey == 'delete') {
-          const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion || this.tipo_documento_selected == tipoDocFacturacion.compra ? deleteDocumentosTypes.delete : deleteDocumentosTypes.anular;
+          const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion || this.tipo_documento_selected() == tipoDocFacturacion.compra ? deleteDocumentosTypes.delete : deleteDocumentosTypes.anular;
           this.deleteRequest({ ids: params.data.id, tipo: tipo });
         }
 
@@ -516,11 +605,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           const actions = { duplicate: { url: actionFacturacion.duplicate, modalLabel: 'duplicar', modalId: 'duplicate_bill' }, make_bill: { url: actionFacturacion.bill_from_cotizacion, modalLabel: 'facturar', modalId: 'make_bill' } };
 
           const titleCasePipe = new TitleCasePipe();
-          const tipoDocumento = titleCasePipe.transform(tipoDocFacturacionLabel[this.tipo_documento_selected]);
+          const tipoDocumento = titleCasePipe.transform(tipoDocFacturacionLabel[this.tipo_documento_selected()]);
           const action = actions[params.iconKey].url;
           const label = actions[params.iconKey].modalLabel;
 
-          const si = (instance) => {
+          const si = instance => {
             this.goToFacturacionPage(params.data.tipo, action, params.data.id);
             this.closeModal(instance);
           };
@@ -535,7 +624,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   deleteRequest(params: { ids: string; tipo: string }) {
     const extra = { afterPath: `custom/delete`, parameters: params };
 
-    this.facturaClass.dynamic(extra).then(async (res) => {
+    this.facturaClass.dynamic(extra).then(async res => {
       const info = {
         pre_venta: { label: { singular: 'Pre_Venta', plural: 'Pre_Ventas' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
         venta: { label: { singular: 'Factura', plural: 'Facturas' }, key: 'numero_comprobante', key_label: { singular: 'número de comprobante', plural: 'números de comprobantes' } },
@@ -543,9 +632,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         cotizacion: { label: { singular: 'Cotización', plural: 'Cotizaciones' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
       };
 
-      const current_info = info[this.tipo_documento_selected];
+      const current_info = info[this.tipo_documento_selected()];
       if (res.data.error.length > 0) {
-        const indicadores_temp = res.data.error.map((documento) => documento[current_info.key]);
+        const indicadores_temp = res.data.error.map(documento => documento[current_info.key]);
         const indicadores = _.join(indicadores_temp, ', ');
 
         let msg = '';
@@ -585,7 +674,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
         break;
 
       case 'buscarPorI':
-        siguiente_input = this.buscar_por == this.campos.numeroComprobante || this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'valorI' : 'campoTipoFact';
+        siguiente_input = this.buscar_por == this.campos.numeroComprobante || this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'valorI' : 'campoTipoFact';
         break;
 
       case 'campoTipoFact':
@@ -612,16 +701,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async abrirModalFiltro(nombre) {
-    const obj = { data: null, palabra_a_buscar: nombre, metodo: this.tipo_documento_selected };
+    const obj = { data: null, palabra_a_buscar: nombre, metodo: this.tipo_documento_selected(), include_contado: false };
 
     this.openNewModal({
       component: BuscarClienteSuplidorComponent,
       inputs: obj,
       id: 'buscarClienteOsuplidor',
-      header: this.tipo_documento_selected == 'compra' ? 'Buscar Suplidor' : 'Buscar Cliente',
+      header: this.tipo_documento_selected() == 'compra' ? 'Buscar Suplidor' : 'Buscar Cliente',
       width: '900px',
       height: '500px',
-      botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+      botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
     });
   }
 
@@ -630,7 +719,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   editarFactura() {
-    this.facturaClass.getAll({ afterPath: `custom/can_update`, parameters: { id: this.facturaSelected.id } }).then((res) => {
+    this.facturaClass.getAll({ afterPath: `custom/can_update`, parameters: { id: this.facturaSelected.id } }).then(res => {
       this.goToFacturacionPage(this.facturaSelected.tipo, actionFacturacion.update, this.facturaSelected.id);
     });
   }
@@ -653,35 +742,36 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
 
     if (this.noExistenComprobantes == false) {
-      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${idFactSelect ?? this.idsFacturasSeleccionadas.join(',')}`;
+      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${idFactSelect}`;
       this.router.navigateByUrl(url);
     }
   }
 
-  mostrarFactura(dataFactura, type, dataDB?, continuar?) {
-    const toPDFData = { data: dataFactura, type: type };
+  mostrarFactura(args: { factura: any; type: string; dataDB?: any; crear_nota?: boolean }) {
+    const { factura, type, dataDB, crear_nota } = args;
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+    const toPDFData = { data: factura, type: type };
 
-    if (continuar) {
+    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+
+    if (crear_nota) {
       botonesDinamicos.push({
-        clase: 'btn btn-verde mr-2',
-        function: (instance) => {
-          this.continuarANotas(dataFactura.id);
+        clase: 'btn btn-verde',
+        function: instance => {
+          this.continuarANotas(factura.id);
           instance.closeModal(instance.id, 'cancelar');
         },
-        label: 'Continuar',
+        label: 'Crear Nota',
         disable: false,
       });
     }
 
-    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false }).then(async (res) => {
-      if (res.status === 'si') {
+    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
+      .then(async res => {
         const inputs = {
           show_estado: true,
-          estado_documento: dataFactura.estado,
+          estado_documento: factura.estado,
           base64: res.base64,
-          height: '40rem',
           reimprimir: res.reimprimir,
           fileName: _.first(res.file.split('.')),
         };
@@ -692,38 +782,39 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           id: 'mostrarFactura',
           header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
+          height: '70vh',
           botones: {
-            ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: botonesDinamicos,
           },
         };
 
-        if (this.tipo_documento_selected != tipoDocFacturacion.cotizacion && this.tipo_documento_selected != tipoDocFacturacion.pre_venta) {
+        if (this.tipo_documento_selected() != tipoDocFacturacion.cotizacion && this.tipo_documento_selected() != tipoDocFacturacion.pre_venta) {
           obj_modal.botones.dinamico.push({
-            clase: 'btn btn-gris ml-2',
-            function: (instance) => this.verDetalles(type == 'nota' ? dataDB : dataFactura, type),
+            clase: 'btn btn-gris',
+            function: instance => this.verDetalles(type == 'nota' ? dataDB : factura, type),
             label: 'Ver detalles',
             disable: false,
           });
         } else {
           obj_modal.botones.dinamico.push({
-            clase: 'btn btn-gris ml-2',
-            function: (instance) => {
+            clase: 'btn btn-gris',
+            function: instance => {
               instance.closeModal(instance.id, 'mostrarFactura');
-              this.tableClickIcon({ id_tabla: shearchDocumentTableId, columnKey: 'actions', iconKey: 'make_bill', data: dataFactura });
+              this.tableClickIcon({ id_tabla: shearchDocumentTableId, columnKey: 'actions', iconKey: 'make_bill', data: factura });
             },
-            tooltip: fun.hasValue(dataFactura.fecha_completada) ? 'Cotización ya ha sido facturada' : null,
+            tooltip: fun.hasValue(factura.fecha_completada) ? 'Cotización ya ha sido facturada' : null,
             label: 'Facturar',
             disable: {
-              function: () => fun.hasValue(dataFactura.fecha_completada),
+              function: () => fun.hasValue(factura.fecha_completada),
             },
           });
         }
 
         if (this.para == 'Visualizar' || type == 'nota') {
           const editButton = {
-            clase: 'btn btn-verde ml-2',
-            function: (instance) => {
+            clase: 'btn btn-verde',
+            function: instance => {
               this.editarFactura();
               instance.closeModal(instance.id, 'mostrarFactura');
             },
@@ -732,43 +823,46 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
           };
 
           const rePrintButton = {
-            clase: 'btn btn-amarillo ml-2',
-            function: (instance) => this.reimprimirDocumento({ data: dataFactura, type: type }, instance),
+            clase: 'btn btn-amarillo',
+            function: instance => this.reimprimirDocumento({ data: factura, type: type }, instance),
             label: 'Reimprimir',
             disable: false,
           };
 
           const cloneButton = {
-            clase: 'btn btn-azul ml-2',
-            function: (instance) => {
-              this.goToFacturacionPage(dataFactura.tipo, actionFacturacion.duplicate, dataFactura.id);
+            clase: 'btn btn-azul',
+            function: instance => {
+              this.goToFacturacionPage(factura.tipo, actionFacturacion.duplicate, factura.id);
               instance.closeModal(instance.id, 'mostrarFactura');
             },
             label: 'Clonar',
             disable: false,
           };
 
-          if (dataFactura.estado) obj_modal.botones.dinamico.push(rePrintButton);
-          if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(editButton);
-          if (this.buscarPara == 'solo_ver' && dataFactura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(cloneButton);
+          if (factura.estado) obj_modal.botones.dinamico.push(rePrintButton);
+          if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion' && factura.serie != serie.electronica) obj_modal.botones.dinamico.push(editButton);
+          if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(cloneButton);
         }
 
         this.openNewModal(obj_modal);
-      }
-    });
+      })
+      .catch(err => {
+        fun.toastError(err.msg, 'ERROR');
+      });
   }
 
   reimprimirDocumento(obj, modalInstance) {
     this.loadServ.isLoading.next(true);
     PdfService.generatePdf({ oPdf: obj, imprimir: true })
-      .then(async (res) => {
+      .then(async res => {
         this.loadServ.isLoading.next(false);
-        if (res.status === 'si') {
-          fun.toastSuccess(res.msg, 'CORRECTO');
-          modalInstance.closeModal(modalInstance.id, 'imprimir');
-        } else fun.toastError(res.msg, 'ERROR');
+
+        fun.toastSuccess(res.msg, 'CORRECTO');
+        modalInstance.closeModal(modalInstance.id, 'imprimir');
       })
-      .catch((err) => {
+      .catch(err => {
+        console.error('err ', err);
+
         this.loadServ.isLoading.next(false);
         fun.toastError(err.msg, 'ERROR');
       });
@@ -802,7 +896,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnDest
 
         const actualPagination = await this.getActualPagination();
 
-        this.buscar_por = this.tipo_documento_selected == tipoDocFacturacion.compra ? this.campos.suplidor : this.campos.cliente;
+        this.buscar_por = this.tipo_documento_selected() == tipoDocFacturacion.compra ? this.campos.suplidor : this.campos.cliente;
         this.valor_a_buscar = arg.data.id;
 
         this.pedirFactura(actualPagination);

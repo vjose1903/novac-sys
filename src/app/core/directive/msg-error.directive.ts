@@ -5,7 +5,8 @@ import { fun } from '../services/functions.service';
 import { Ss } from '../services/singleton.service';
 
 @Directive({
-  selector: '[appMsgError]',
+    selector: '[appMsgError]',
+    standalone: false
 })
 export class MsgErrorDirective {
   @Input('appMsgError') id;
@@ -84,7 +85,6 @@ export class MsgErrorDirective {
 
           if (fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
             response.render = true;
-            console.log('errors ', errors);
 
             if (errors.required) response.msg = 'Este campo es requerido.';
             else if (errors.minlength) response.msg = `Cant. mínima de letras es: ${errors.minlength.requiredLength}.`;

@@ -1,11 +1,11 @@
-import * as moment from '../javascript/moment';
+const moment = require('../javascript/moment');
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 
-import { ConfigI } from '../typescript/config-interface';
+import { ConfigI } from '../interface/config-interface';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
-import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
+import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
@@ -20,33 +20,17 @@ export class fun {
 
   getWindowSize = windowSize.asObservable();
 
-  static getFacturasguardadas() {
-    return JSON.parse(localStorage.getItem('facturas_guardadas')) || [];
-  }
-
-  static setFacturasGuardadas(facturas) {
-    localStorage.removeItem('facturas_guardadas');
-    localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
-
-    const btn_side = document.getElementById('btn_side_facturas');
-
-    if (btn_side) {
-      if (facturas.length.length > 0) btn_side.setAttribute('data-cant-facturas', facturas.length);
-      else btn_side.removeAttribute('data-cant-facturas');
-    }
-  }
-
   // __________________________________________________________________________________________________
   // Nombre: reloadElectron
   // Descripcion : Esta funcion recarga el electron
   // _________________________________________________________________________________________________
   static reloadElectron() {
-    const task = new MessageTask(KEYWORD_ELECTRON_RELOAD);
+    const task = new MessageTask(ELECTRON_RELOAD);
 
     Ss._ipc
       .sendTask(task)
-      .then((res) => {})
-      .catch((err) => console.error(err));
+      .then(res => {})
+      .catch(err => console.error(err));
   }
   // __________________________________________________________________________________________________
   // Nombre: removerDuplicados
@@ -85,11 +69,11 @@ export class fun {
     return fecha;
   }
   // __________________________________________________________________________________________________
-  // Nombre: duplicarJson
+  // Nombre: deepCloning
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
 
-  static duplicarJson(obj: Object | Array<any>) {
+  static deepCloning(obj: Object | Array<any>) {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
@@ -102,7 +86,7 @@ export class fun {
     Object.getOwnPropertyNames(obj).forEach(function (key) {
       let descriptor = Object.getOwnPropertyDescriptor(obj, key);
       if (descriptor.value && typeof descriptor.value === 'object') {
-        descriptor.value = fun.duplicarJson(descriptor.value);
+        descriptor.value = fun.deepCloning(descriptor.value);
       }
       Object.defineProperty(copy, key, descriptor);
     });
@@ -124,12 +108,12 @@ export class fun {
       return array_string;
     }
 
-    const promise = new Promise((resolve) => {
-      fun.awaitTyping().then((res) => {
+    const promise = new Promise(resolve => {
+      fun.awaitTyping().then(res => {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (fun.isEmpty(searchText)) resolve(copyData);
 
-        const data_filtered = fun.duplicarJson(copyData).filter((obj) => {
+        const data_filtered = fun.deepCloning(copyData).filter(obj => {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
@@ -146,7 +130,7 @@ export class fun {
   }
 
   static revisarNumber(input, id): any {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const precioTEMPO = input.value;
 
       const res = { number: null, error: true };
@@ -157,11 +141,10 @@ export class fun {
         if (isNaN(Number(fun.desformatearStNumber(newNumber)))) {
           fun.toastError('Valor introducido es invalido', 'ERROR');
           if (document.getElementById(id)) document.getElementById(id).focus();
-          return;
+        } else {
+          res.number = newNumber;
+          res.error = false;
         }
-
-        res.number = newNumber;
-        res.error = false;
       }
 
       resolve(res);
@@ -172,25 +155,29 @@ export class fun {
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
+  static redondearNum(numero, decimales) {
+    const factor = Math.pow(10, decimales);
+    const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor;
+    return numberRounded.toFixed(decimales);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: roundNumberToDecimal
+  // Descripcion : Esta funcion redondea a 2 decimales
+  // _________________________________________________________________________________________________
 
   static roundNumberToDecimal(number, cant = 2): string {
-    if (fun.isEmpty(number)) {
-      this.logRed('No se puede redondear una variable vacia');
-      return number;
-    }
-    if (typeof number == 'string') number = parseFloat(fun.desformatearStNumber(number));
+    if (fun.isEmpty(number)) return number;
 
-    if (isNaN(number)) {
-      this.logRed('No es un numero valido.');
-      return number;
-    }
-    const numerRounded = number.toFixed(cant);
+    if (typeof number == 'string' || isNaN(number)) number = parseFloat(fun.desformatearStNumber(number));
+
+    const numerRounded = fun.redondearNum(number, cant);
 
     // Formateamos el número con comas para separar millares
     const partes = numerRounded.split('.');
     const enteros = partes[0];
     const decimales = partes[1];
-    const numeroFormateado = enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decimales;
+    const numeroFormateado = `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cant >= 1 ? `.${decimales}` : ''}`;
 
     return numeroFormateado;
   }
@@ -245,7 +232,19 @@ export class fun {
   // Descripcion : Esta funcion retorna un id unico
   // _________________________________________________________________________________________________
   static generateKey(): string {
-    return moment().unix() + '' + Math.round(Math.random() * 10000);
+    return `${moment().unix()}${Math.round(Math.random() * 10000)}`;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: identifyObject
+  // Descripcion : Esta funcion le agrega una propiedad id a un objeto
+  // _________________________________________________________________________________________________
+  static identifyObject(object: any | Array<any>, key = 'id') {
+    if (Array.isArray(object)) {
+      object.map(item => (item[key] = fun.generateKey()));
+    } else {
+      object[key] = fun.generateKey();
+    }
   }
 
   // __________________________________________________________________________________________________
@@ -270,17 +269,30 @@ export class fun {
 
       new DocumentosC()
         .getAll(extra)
-        .then((res) => {
+        .then(res => {
           for (const persona of res.data) {
-            persona.persona.documentos_de_identidad.map((doc) => {
+            persona.persona.documentos_de_identidad.map(doc => {
               doc.id = null;
               return doc;
             });
           }
           resolve(res);
         })
-        .catch((err) => reject(err));
+        .catch(err => reject(err));
     });
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: normalizarTexto
+  // Descripcion : Esta funcion normaliza un texto para que no tenga acentos
+  // _________________________________________________________________________________________________
+
+  static normalizarTexto(texto: string): string {
+    const textoMinusculas = texto.toLowerCase();
+
+    const textoSinAcentos = textoMinusculas.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    return textoSinAcentos;
   }
 
   // __________________________________________________________________________________________________
@@ -363,8 +375,14 @@ export class fun {
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
   static Capitalice(str) {
-    const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
-    return fun.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
+    if (!fun.hasValue(str)) return str;
+
+    const upperCaseText = str
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    return upperCaseText;
   }
 
   // __________________________________________________________________________________________________
@@ -432,14 +450,14 @@ export class fun {
   // _________________________________________________________________________________________________
 
   static timeout;
-  static awaitTyping(event?, waitingTime = 700) {
-    const promise = new Promise((resolve) => {
-      clearTimeout(fun.timeout);
-      fun.timeout = setTimeout(() => {
-        if (!event || event.keyCode != 13) resolve(event);
-      }, waitingTime);
+  static awaitTyping(event?: KeyboardEvent, waitingTime = 700): Promise<void> {
+    return new Promise(resolve => {
+      if (fun.timeout) clearTimeout(fun.timeout);
+
+      if (event?.key === 'Enter' || event?.keyCode === 13) return resolve();
+
+      fun.timeout = setTimeout(resolve, waitingTime);
     });
-    return promise;
   }
 
   // __________________________________________________________________________________________________
@@ -453,25 +471,27 @@ export class fun {
     }
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: isEmpty
-  // Descripcion : Esta funcion valida que si una variable esta vacia
-  // __________________________________________________________________________________________________
+// __________________________________________________________________________________________________
+  /**
+   * Nombre: isEmpty
+   * Descripción: Esta función valida si una variable está vacía.
+   * @param value La variable a evaluar.
+   * @returns true si la variable está vacía, false en caso contrario.
+   * @example fun.isEmpty(variable)
+   */
 
-  static isEmpty(value) {
-    return (
-      // es null o indefinido
-      value === null ||
-      value === undefined ||
-      // es una fecha invalida
-      (value instanceof Date && isNaN(value.getTime())) ||
-      // si tiene longitud 0
-      (value.hasOwnProperty('length') && value.length == 0) ||
-      // si es un string vacio o con lleno de espacios
-      (typeof value == 'string' && value.trim().length == 0) ||
-      // si es un objeto y no tiene propiedades
-      (value.constructor == Object && Object.keys(value).length == 0)
-    );
+  static isEmpty(value: any) {
+    if (value == null) return true;
+
+    if (typeof value === 'string') return value.trim().length === 0;
+
+    if (Array.isArray(value)) return value.length === 0;
+
+    if (value instanceof Date) return isNaN(value.getTime());
+    
+    if (typeof value === 'object') return Object.keys(value).length === 0;
+
+    return false;
   }
 
   // __________________________________________________________________________________________________
@@ -524,6 +544,7 @@ export class fun {
   // __________________________________________________________________________________________________
   static clickInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
+
     if (element) element.click();
   }
 
@@ -531,9 +552,8 @@ export class fun {
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
   // __________________________________________________________________________________________________
-  static enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
-
+  static enfocarInput(arg, element?) {
+    element ??= document.getElementById(arg) as HTMLElement;
     if (element) element.focus();
   }
 
@@ -549,6 +569,15 @@ export class fun {
       const input = document.getElementById(inputId);
       if (input) input.blur();
     }
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: clickInputFantasma
+  // Descripcion : Esta funcion clickea el input fantasma
+  // __________________________________________________________________________________________________
+  static clickInputFantasma() {
+    const element = document.getElementById('input_fantasma');
+
+    if (element) element.click();
   }
 
   // __________________________________________________________________________________________________
@@ -583,7 +612,7 @@ export class fun {
   // Descripcion : Esta funcion simula un evento de teclado
   // __________________________________________________________________________________________________
   static keyboardEvent(element: any, event: 'keyup' | 'keydown', keysArray: Array<string>): any {
-    keysArray.forEach((key) => {
+    keysArray.forEach(key => {
       element.dispatchEvent(new KeyboardEvent(event, { key: key }));
     });
   }
@@ -593,7 +622,34 @@ export class fun {
   // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
   // __________________________________________________________________________________________________
   static getKeyByValue(object, value): any {
-    return Object.keys(object).find((key) => object[key] == value);
+    return Object.keys(object).find(key => object[key] == value);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: compare
+  // Descripcion : Esta funcion se utiliza para ordenar un arreglo
+  // __________________________________________________________________________________________________
+  static compare(a: any, b: any, keys: Array<string> | string, order: 'asc' | 'desc' = 'asc') {
+    if (typeof keys == 'string') keys = [keys];
+
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
+
+      if (typeof a === 'object' && typeof b === 'object') {
+        const valueA = a[key];
+        const valueB = b[key];
+
+        if (valueA < valueB) return order === 'asc' ? -1 : 1;
+        if (valueA > valueB) return order === 'asc' ? 1 : -1;
+      } else {
+        if (a === b) continue;
+        if (typeof a === 'number' && typeof b === 'number') return order === 'asc' ? a - b : b - a;
+        if (typeof a === 'string' && typeof b === 'string') return order === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+        if (a instanceof Date && b instanceof Date) return order === 'asc' ? a.getTime() - b.getTime() : b.getTime() - a.getTime();
+      }
+    }
+
+    return 0;
   }
 
   // __________________________________________________________________________________________________
@@ -614,9 +670,8 @@ export class fun {
   }
 
   static async logout() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       try {
-        localStorage.removeItem('facturas_guardadas');
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
         localStorage.removeItem('content-type');
@@ -713,19 +768,19 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -737,10 +792,10 @@ export class fun {
   // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
   // _________________________________________________________________________________________________
   static pushAt(arr, index, newItem) {
-    const copyArr = fun.duplicarJson(arr);
+    const copyArr = fun.deepCloning(arr);
     arr.length = 0;
     const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
-    newArr.forEach((item) => arr.push(item));
+    newArr.forEach(item => arr.push(item));
   }
 
   // __________________________________________________________________________________________________
@@ -748,10 +803,7 @@ export class fun {
   // Descripcion : Esta funcion remueve un item  de un arreglo
   // _________________________________________________________________________________________________
   static pull(array, item_remove) {
-    console.log('item_remove ', item_remove);
-    console.log('array ', array);
-
-    const index = array.findIndex((item) => fun.isEqual(item, item_remove));
+    const index = array.findIndex(item => fun.isEqual(item, item_remove));
     array.splice(index, 1);
   }
 
@@ -790,8 +842,7 @@ export class fun {
   // Descripcion : Esta funcion retorna el valor de una propiedad de un objeto
   // _________________________________________________________________________________________________
   static getProperty(obj, prop) {
-    const props_split = prop.split('.');
-    return props_split.reduce((objeto, property) => (typeof objeto == 'undefined' || objeto === null ? objeto : objeto[property]), obj);
+    return prop.split('.').reduce((objeto, property) => objeto?.[property], obj);
   }
 
   // __________________________________________________________________________________________________
@@ -808,7 +859,7 @@ export class fun {
   // Nombre: pick
   // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
   // _________________________________________________________________________________________________
-  static pick(obj, props): any {
+  static pick(obj: any, props: Array<string>): any {
     const result = {};
 
     for (let index = 0; index < props.length; index++) {

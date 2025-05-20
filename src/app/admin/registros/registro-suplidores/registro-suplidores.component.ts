@@ -1,20 +1,22 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { customValidators } from '../../../core/typescript/custom-validators';
-import { pattern } from '../../../core/typescript/constantes';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { customValidators } from '@core/typescript/custom-validators';
+import { pattern } from '@core/typescript/constantes';
 import { SuplidorC } from './suplidores';
-import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
 
 @Component({
-  selector: 'app-registro-suplidores',
-  templateUrl: './registro-suplidores.component.html',
-  styleUrls: ['./registro-suplidores.component.scss'],
+    selector: 'app-registro-suplidores',
+    templateUrl: './registro-suplidores.component.html',
+    styleUrls: ['./registro-suplidores.component.scss'],
+    standalone: false
 })
 export class RegistroSuplidoresComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;
@@ -49,11 +51,13 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     id_tabla: 'lista_suplidores',
     padre_functions: { data_request: (params) => this.getSuplidores(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy } },
   };
   tablaComponent;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private tServ: TablasService) {
     super();
@@ -290,7 +294,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.form.patchValue(data);
     this.documentos_de_identidad = data.documentos_de_identidad;
     this.editando = true;
-    this.suplidorSelected = fun.duplicarJson(data);
+    this.suplidorSelected = fun.deepCloning(data);
 
     this.changeStateCampos(true);
 

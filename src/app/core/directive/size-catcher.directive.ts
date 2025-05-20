@@ -2,7 +2,8 @@ import { Directive, ElementRef, Input, Renderer2, OnInit, OnDestroy } from '@ang
 import { fun } from '../services/functions.service';
 
 @Directive({
-  selector: '[sizeCatcher]',
+    selector: '[sizeCatcher]',
+    standalone: false
 })
 export class SizeCatcherDirective implements OnInit, OnDestroy {
   @Input('sizeCatcher') targetElement: HTMLDivElement;

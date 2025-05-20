@@ -1,15 +1,17 @@
-import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { table_config } from './../../../components/new_tablas/tabla-class';
-import { fun } from './../../../../core/services/functions.service';
-import { ModalI } from './../../../components/modal/modal-class';
-import { Component, DoCheck, OnInit } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { fun } from '@core/services/functions.service';
+import { ModalI } from '@components/modal/modal-class';
+import { Component, DoCheck, OnInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-retornar-devuelto',
-  templateUrl: './retornar-devuelto.component.html',
-  styleUrls: ['./retornar-devuelto.component.scss'],
+    selector: 'app-retornar-devuelto',
+    templateUrl: './retornar-devuelto.component.html',
+    styleUrls: ['./retornar-devuelto.component.scss'],
+    standalone: false
 })
 export class RetornarDevueltoComponent extends MixinClass implements OnInit, ModalI, DoCheck {
   constructor(private fb: UntypedFormBuilder) {
@@ -30,12 +32,14 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     colores: true,
     id_tabla: 'retornar_articulo',
     filtrar: { show: false, local: true },
-    obj_paginate: { show: true, showTotal: false, showDropDown: false, page: 1, per_page: 9999, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    obj_paginate: { show: true, showTotal: false, showDropDown: false, page: 1, per_page: 9999, per_page_options: default_per_page, search: ' ', is_local: true },
   };
 
   articuloSelected;
 
   tablaComponent;
+
+  htmlServ = inject(HtmlElementsService)
 
   ngOnInit() {
     this.createForm();
@@ -49,7 +53,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     this.form.controls['defectuoso'].disable();
     this.form.controls['solo_devuelto'].disable();
 
-    this.articuloSelected = fun.duplicarJson(event.data);
+    this.articuloSelected = fun.deepCloning(event.data);
 
     const currentControl = this.articuloSelected.is_defectuoso ? 'defectuoso' : 'solo_devuelto';
     this.form.controls[currentControl].enable();
@@ -58,8 +62,8 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     this.inputs['articulo_solo_devuelto'] = null;
     this.inputs['articulo_defectuoso'] = null;
 
-    this.inputs[currentKey] = fun.duplicarJson(event.data);
-    this.inputs['data'] = fun.duplicarJson(event.data.producto_initial);
+    this.inputs[currentKey] = fun.deepCloning(event.data);
+    this.inputs['data'] = fun.deepCloning(event.data.producto_initial);
 
     this.enfocarInitInput();
   }

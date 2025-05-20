@@ -6,24 +6,37 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-electron": {
+    "novac-system": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "prefix": "app",
+          "style": "scss"
+        },
+        "@schematics/angular:directive": {
+          "prefix": "app"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
-      "projectType": "application",
+      "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "sourceMap": true,
             "outputPath": "dist",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
+            "polyfills": ["src/polyfills.ts"],
             "tsConfig": "src/tsconfig.app.json",
-            "polyfills": "src/polyfills.ts",
+            "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
               "src/splash_config_error.html",
               "src/splash_db_error.html",
               "src/splash_docker_error.html",
+              "src/splash_error_desconocido.html",
               "src/splash.html",
               "src/favicon.ico",
               "src/favicon.icns",
@@ -36,12 +49,7 @@
               }
             ],
             "styles": [
-              "node_modules/primeng/resources/themes/nova/theme.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/primeicons/primeicons.css",
-
-              "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
-              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
 
               "node_modules/@fortawesome/fontawesome-free/css/all.css",
               "node_modules/@fortawesome/fontawesome-free/css/solid.css",
@@ -51,24 +59,33 @@
 
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/animate.css/animate.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.scss"
             ],
             "scripts": [],
-            "customWebpackConfig": {
-              "path": "./angular.webpack.js"
-            },
+
             "allowedCommonJsDependencies": ["rxjs", "rxjs/operators"]
           },
           "configurations": {
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
             "dev": {
               "optimization": false,
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -81,56 +98,38 @@
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.web.ts"
                 }
               ]
-            },
-            "production": {
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ]
             }
           }
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "angular-electron:build"
+            "buildTarget": "novac-system:build",
+            "hmr": true
           },
           "configurations": {
             "dev": {
-              "browserTarget": "angular-electron:build:dev"
+              "buildTarget": "novac-system:build:dev"
             },
             "web": {
-              "browserTarget": "angular-electron:build:web"
+              "buildTarget": "novac-system:build:web"
             },
             "production": {
-              "browserTarget": "angular-electron:build:production"
+              "buildTarget": "novac-system:build:production"
             }
           }
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
-            "browserTarget": "angular-electron:build"
+            "buildTarget": "novac-system:build"
           }
         },
         "test": {
@@ -157,6 +156,7 @@
         }
       }
     },
+
     "angular-electron-e2e": {
       "root": "e2e",
       "projectType": "application",
@@ -169,15 +169,6 @@
           }
         }
       }
-    }
-  },
-  "schematics": {
-    "@schematics/angular:component": {
-      "prefix": "app",
-      "style": "scss"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
     }
   }
 }

@@ -237,6 +237,13 @@ export const Permisos = {
   device: {
     login: 'device_login',
   },
+  pre_venta: {
+    create: 'pre_venta_create',
+    read_all: 'pre_venta_read_all',
+    read_one: 'pre_venta_read_one',
+    update: 'pre_venta_update',
+    comprobar_serial: 'pre_venta_comprobar_serial',
+  },
   cotizacion: {
     create: 'cotizacion_create',
     read_all: 'cotizacion_read_all',
@@ -244,11 +251,13 @@ export const Permisos = {
     update: 'cotizacion_update',
     destroy: 'cotizacion_destroy',
   },
-  pre_venta: {
-    create: 'pre_venta_create',
-    read_all: 'pre_venta_read_all',
-    read_one: 'pre_venta_read_one',
-    update: 'pre_venta_update',
-    comprobar_serial: 'pre_venta_comprobar_serial',
+  ecf_reception: {
+    read_all: 'ecf_reception_read_all',
+    read_one: 'ecf_reception_read_one',
+    response_receive: 'ecf_reception_response_receive',
+  },
+  commertial_approval_reception: {
+    read_all: 'commertial_approval_reception_read_all',
+    read_one: 'commertial_approval_reception_read_one',
   },
 };

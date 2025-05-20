@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { pathAdd, puts } from '../main';
+import { pathAdd, writeLogs } from '../main';
 import Functions from './functions.js';
 const logosJson = require('../logos.json');
 
@@ -11,8 +11,8 @@ export default class ReplaceInFile {
     return new Promise((resolve, reject) => {
       const promomiseList = <any>[];
 
-      promomiseList.push(this.cambiarLogos(params.logos_changes));
-      promomiseList.push(this.cambiarHandlerConfig(params.configReplacement));
+      if (params.logos_changes) promomiseList.push(this.cambiarLogos(params.logos_changes));
+      if (params.configReplacement) promomiseList.push(this.cambiarHandlerConfig(params.configReplacement));
 
       Promise.all(promomiseList)
         .then((values) => {
@@ -20,6 +20,8 @@ export default class ReplaceInFile {
           console.log('  ');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+          console.log('params ', params);
+          console.log('promomiseList ', promomiseList);
           console.log('values ', values);
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
           console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
@@ -97,12 +99,12 @@ export default class ReplaceInFile {
         for (const file_path of params.file_paths) {
           let file_data = fs.readFileSync(file_path, 'utf-8') as any;
 
-          puts("." );
-          puts("." );
-          puts("==============================================" );
-          puts(params.source, "params.source" );
-          puts(params.target, "params.target" );
-          puts(file_data, "file_data" );
+          writeLogs("." );
+          writeLogs("." );
+          writeLogs("==============================================" );
+          writeLogs(params.source, "params.source" );
+          writeLogs(params.target, "params.target" );
+          writeLogs(file_data, "file_data" );
 
           file_data = file_data.replaceAll(params.source, params.target);
 

@@ -1,20 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Component, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { Ss } from '../../../core/services/singleton.service';
-import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
+import { Ss } from '@core/services/singleton.service';
+import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
 import * as _ from 'lodash';
-import { MessageTask } from '../../../core/models/message-task';
-import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
-import { ConfigI } from '../../../core/typescript/config-interface';
-import { fun } from '../../../core/services/functions.service';
-import { SharedService } from '../../../core/services/shared.service';
+import { MessageTask } from '@core/models/message-task';
+import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
+import { ConfigI } from '@core/interface/config-interface';
+import { fun } from '@core/services/functions.service';
+import { SharedService } from '@core/services/shared.service';
 import { Router } from '@angular/router';
-import { IpcService } from '../../../core/services/ipc.service';
+import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
   styleUrls: ['./configuraciones.component.scss'],
+  standalone: false,
 })
 export class ConfiguracionesComponent implements OnInit {
   configServ = Ss.configServ;
@@ -70,12 +72,19 @@ export class ConfiguracionesComponent implements OnInit {
 
   configCopy;
 
-  constructor(private fb: UntypedFormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
+  htmlServ = inject(HtmlElementsService);
+
+  constructor(
+    private fb: UntypedFormBuilder,
+    public sharedServ: SharedService,
+    private router: Router,
+    public _ipc: IpcService
+  ) {}
 
   ngOnInit(): void {
     this.configServ.getConfig().then((config: ConfigI) => {
       this.config = config;
-      this.configCopy = fun.duplicarJson(config);
+      this.configCopy = fun.deepCloning(config);
       this.parseDocumentosAImprimir(config).then(() => this.createForm(config));
 
       fun.logGreen('this.config', this.config);
@@ -83,7 +92,7 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   createForm(data) {
-    const color_format = _.find(this.colores, (item) => item.descripcion == data.color_app);
+    const color_format = _.find(this.colores, item => item.descripcion == data.color_app);
 
     this.form = this.fb.group({
       nombre_empresa: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
@@ -98,6 +107,7 @@ export class ConfiguracionesComponent implements OnInit {
       url_servidor_descargas: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
       config_password: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
       usa_url_principal: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
+      serie_default: [{ value: this.getValue(data, 'serie_default'), disabled: false }],
       // printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
       // printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
       is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
@@ -139,7 +149,7 @@ export class ConfiguracionesComponent implements OnInit {
 
   getValuePageSize(data, key) {
     const size = _.get(data, key);
-    const page_size = _.find(this.paper_sizes, (item) => item.descripcion == size);
+    const page_size = _.find(this.paper_sizes, item => item.descripcion == size);
     return page_size;
   }
 
@@ -167,9 +177,9 @@ export class ConfiguracionesComponent implements OnInit {
   saltar(input) {}
 
   parseDocumentosAImprimir(config) {
-    return new Promise<any>((resolve) => {
+    return new Promise<any>(resolve => {
       const documentos_config = config.documentos_a_imprimir.split(',');
-      documentos_config.forEach((item) => this.documentos_a_imprimir_selected.push(_.find(this.documentos_a_imprimir, { key: item })));
+      documentos_config.forEach(item => this.documentos_a_imprimir_selected.push(_.find(this.documentos_a_imprimir, { key: item })));
       resolve(true);
     });
   }
@@ -257,7 +267,7 @@ export class ConfiguracionesComponent implements OnInit {
       'printer_reporte',
     ];
 
-    keys_to_omit.forEach((element) => (formulario = _.omit(formulario, [element])));
+    keys_to_omit.forEach(element => (formulario = _.omit(formulario, [element])));
 
     formulario['pages_sizes'] = pages_sizes;
     formulario['printer_selected'] = printer_selected;
@@ -275,7 +285,7 @@ export class ConfiguracionesComponent implements OnInit {
         let keysConfig = Object.keys(formulario);
         const cambios = [];
 
-        keysConfig.forEach((keyC) => {
+        keysConfig.forEach(keyC => {
           if (typeof this.configCopy[keyC] == 'string') {
             if (this.configCopy[keyC] != formulario[keyC]) cambios.push(keyC);
           } else {
@@ -357,11 +367,11 @@ export class ConfiguracionesComponent implements OnInit {
 
     if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
-    const task = new MessageTask(KEYWORD_ELECTRON_CHANGE_CONFIG_FILE, objChange);
+    const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE, objChange);
 
     this._ipc
       .sendTask(task)
-      .then((res: string) => {
+      .then(res => {
         this.sharedServ.nextCanToast(true);
         fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
         setTimeout(() => {
@@ -370,6 +380,11 @@ export class ConfiguracionesComponent implements OnInit {
           this.salir();
         }, 250);
       })
-      .catch((err) => console.error(err));
+      .catch(err => {
+        if (err.msg) fun.toastError(err.msg, 'ERROR');
+        else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
+        console.error(err);
+      });
   }
 }
+

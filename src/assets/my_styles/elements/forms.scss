@@ -1,0 +1,131 @@
+@mixin formField {
+  width: 100%;
+  background-color: #ffffffe8;
+  color: #1d253b !important;
+  box-shadow: 1px 1px 4px 0px #1d253b3d !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.25rem !important;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    @include formFieldFocus;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+@mixin formFieldDisabled {
+  background-color: #e9ecef !important;
+  opacity: 1 !important;
+}
+
+@mixin formFieldFocus {
+  border-color: transparent !important;
+  box-shadow: 0px 0px 6px var(--primary08) !important;
+  outline: 2px solid var(--primary08) !important;
+}
+
+.p-tag {
+  .p-tag-value {
+    color: #fff !important;
+    &.dark_font {
+      color: #1d253b !important;
+    }
+  }
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.p-inputgroup-addon {
+  padding: 0 !important;
+}
+
+textarea {
+  width: 100% !important;
+  border-radius: 0.25rem !important;
+  @include formField;
+  &:focus {
+    @include formFieldFocus;
+  }
+}
+
+.inputE {
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  padding: 0.2rem 0.7rem !important;
+  width: 100%;
+  border: 1px solid #a6a6a6a6 !important;
+  border-radius: 0.25rem !important;
+  @include formField;
+}
+
+.form-control {
+  width: 100%;
+  border-radius: 0.25rem !important;
+
+  &:hover {
+    border-color: #ced4da !important;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  @include formField;
+  &.min {
+    height: 2rem !important;
+    padding: 0.2rem !important;
+  }
+
+  &.disabled,
+  &:disabled {
+    background-color: #e9ecef;
+    touch-action: none !important;
+    pointer-events: none !important;
+  }
+
+  &.with-right-btn {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+}
+
+.form-group {
+  > label {
+    color: #1d253b;
+  }
+
+  // > input:not(.apple-switch) {
+  //   @include formField;
+  // }
+}
+
+.p-inputtext:enabled {
+  &:focus {
+    @include formFieldFocus;
+  }
+  &:hover {
+    border-color: #20b9d5;
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}

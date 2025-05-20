@@ -1,0 +1,105 @@
+.p-popover {
+  border: 0 solid transparent !important;
+  border-radius: 0.4rem !important;
+  overflow: hidden !important;
+  box-shadow: 0px 5px 10px 0px #00000043 !important;
+
+  .p-popover-content {
+    background: white !important;
+    color: #1d253b !important;
+    padding: 0 !important;
+  }
+
+  &::before,
+  &::after {
+    border-bottom-color: white !important;
+  }
+
+  &.no-carret {
+    &::before,
+    &::after {
+      border-bottom-color: transparent !important;
+    }
+  }
+
+  &.padding-sm {
+    .p-popover-content {
+      padding: 0.5rem !important;
+    }
+  }
+
+  &.padding-md {
+    .p-popover-content {
+      padding: 1rem !important;
+    }
+  }
+
+  &.padding-lg {
+    .p-popover-content {
+      padding: 1.5rem !important;
+    }
+  }
+}
+
+.p-popover-close {
+  background: var(--primary09) !important;
+  border-radius: 50%;
+}
+
+.datta-dark {
+  .p-popover {
+    background: transparent !important;
+    .p-popover-content {
+      // background: $menu-dark-background !important;
+      color: #ffffffcc !important;
+      border-radius: 0.3rem;
+    }
+    &::before,
+    &::after {
+      // border-bottom-color: $menu-dark-background !important;
+    }
+
+    &.oscuro {
+      .p-popover-content {
+        background: #262a31 !important;
+      }
+      &::before,
+      &::after {
+        border-bottom-color: #262a31 !important;
+      }
+    }
+  }
+}
+
+.filterOverlay {
+  position: relative;
+  display: flex;
+  align-items: center;
+  input {
+    padding-right: 2.3rem;
+  }
+  i {
+    position: absolute;
+    right: 0.8rem;
+    color: #0000004a;
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}

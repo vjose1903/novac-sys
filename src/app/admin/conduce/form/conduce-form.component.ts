@@ -1,29 +1,31 @@
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray, FormGroup } from '@angular/forms';
 import * as _ from 'lodash';
-import { ArticuloC } from '../../registros/articulos/articulo';
+import { ArticuloC } from '@registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
-import { FacturaC } from '../../facturacion/factura';
-import { PdfService } from '../../../core/services/pdf/pdf.service';
-import { BuscarArticuloComponent } from '../../components/formularios en modales/buscar-articulo/buscar-articulo.component';
-import { BuscarClienteSuplidorComponent } from '../../components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
-import { ModalSeleccinarArticuloComponent } from '../../components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
-import { fun } from '../../../core/services/functions.service';
-import { ModalService } from '../../components/modal/modal.service';
-import { Permisos } from '../../../core/typescript/permisos';
-import { table_config } from '../../components/new_tablas/tabla-class';
-import { ConfigI } from '../../../core/typescript/config-interface';
-import { Ss } from '../../../core/services/singleton.service';
-import { ConfirmacionImprimirComponent } from '../../facturacion/confirmacion-imprimir/confirmacion-imprimir.component';
-import { teclasCode } from '../../../core/typescript/constantes';
-import { ModalClass } from '../../components/modal/modal-class';
+import { FacturaC, request_factura_campo } from '../../facturacion/factura';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { BuscarArticuloComponent } from '@components/formularios en modales/buscar-articulo/buscar-articulo.component';
+import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
+import { ModalSeleccinarArticuloComponent } from '@components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
+import { fun } from '@core/services/functions.service';
+import { ModalService } from '@components/modal/modal.service';
+import { Permisos } from '@core/typescript/permisos';
+import { table_config } from '@components/new_tablas/tabla-class';
+import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
+import { teclasCode } from '@core/typescript/constantes';
+import { ModalClass } from '@components/modal/modal-class';
 import { Router } from '@angular/router';
-
+import { Ss } from '@core/services/singleton.service';
+import { ConfigI } from '@core/interface/config-interface';
+  
 @Component({
-  selector: 'app-conduce-form',
-  templateUrl: './conduce-form.component.html',
-  styleUrls: ['./conduce-form.component.scss'],
+    selector: 'app-conduce-form',
+    templateUrl: './conduce-form.component.html',
+    styleUrls: ['./conduce-form.component.scss'],
+    standalone: false
 })
 export class ConduceFormComponent extends MixinClass implements OnInit, OnDestroy {
   secuenciaKeys = [];
@@ -96,6 +98,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   formPermissions = [Permisos.role.create, Permisos.role.update];
 
   configApp: ConfigI;
+
+  htmlServ = inject(HtmlElementsService);
   constructor(private fb: UntypedFormBuilder, public mServ: ModalService, private router: Router) {
     super();
   }
@@ -240,7 +244,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
             header: 'BUSCAR ARTICULO',
             width: '56.25rem',
             height: '31.25rem',
-            botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+            botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           });
           fun.enfocarInput('input_fantasma');
         } else {
@@ -377,7 +381,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         header: 'Buscar cliente',
         width: '900px',
         height: '500px',
-        botones: fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
       });
 
       fun.desEnfocarInput('clienteI');
@@ -405,7 +409,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         let excede = true;
 
         const extra = { afterPath: `check_excede/${articulo.id}`, parameters: { cantidad: cantidad } };
-        await this.articuloClass.getAll(extra).then((res) => {
+        await this.articuloClass.getAll(extra).then((res: any) => {
           excede = res['data'];
 
           if (excede) {
@@ -540,7 +544,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     this.confirmationModal({
       id: 'removerArticulo',
       header: 'Confirmar',
-      texto: `Seguro que desea remover el articulo <b class="negrita">${name}</b>`,
+      texto: `Seguro que desea remover el articulo <b class="negrita">${name ?? codigo ?? ''}</b>`,
       siFunction: (instance) => {
         this.procesoQuitarArticulo();
         instance.closeModal(instance.id, 'removerArticulo');
@@ -560,7 +564,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   async buscarFacturasAdelantadas(id) {
     try {
-      this.facturaClass.getFacturasByParams({ campo: '1', valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
+      this.facturaClass.getFacturasByParams({ campo: request_factura_campo.cliente_id, valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
         (res) => {
           this.facturas_adelantadas = res['data'];
           this.facturas_adelantadas.map((factura) => {
@@ -614,7 +618,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       let conteo = 0;
 
       factura.detalle_facturas.map(async (detalle) => {
-        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Funda: 'Funda' };
+        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Bolsa: 'Bol.' };
 
         const contenidos_format = this.formatContenidos(detalle.contenidos);
 
@@ -648,10 +652,10 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               width: '900px',
               height: '400px',
               botones: {
-                ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+                ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
-                  { clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'NO', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'SI', disable: true },
+                  { clase: 'btn btn-blanco w-9', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'No', disable: false },
+                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde w-9', function_in_other_component: 'btn_aceptar', label: 'Si', disable: true },
                 ],
               },
             });
@@ -803,9 +807,9 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         header: 'Confirmación',
         width: '30rem',
         botones: {
-          ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+            { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
           ],
         },

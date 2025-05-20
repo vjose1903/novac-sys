@@ -1,13 +1,15 @@
-import { fun } from './../../../../../core/services/functions.service';
-import { ModalI } from './../../../../components/modal/modal-class';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { fun } from '@core/services/functions.service';
+import { ModalI } from '@components/modal/modal-class';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ConfigArticuloC } from '../articulos_configuracion';
 
 @Component({
-  selector: 'app-config-articulos',
-  templateUrl: './config-articulos.component.html',
-  styleUrls: ['./config-articulos.component.scss'],
+    selector: 'app-config-articulos',
+    templateUrl: './config-articulos.component.html',
+    styleUrls: ['./config-articulos.component.scss'],
+    standalone: false
 })
 export class ConfigArticulosComponent implements OnInit, ModalI {
   form: UntypedFormGroup;
@@ -16,6 +18,7 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
   update_articulos = true;
   configArticuloClass = new ConfigArticuloC();
 
+  htmlServ = inject(HtmlElementsService)
   constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {

@@ -1,5 +1,5 @@
-import * as moment from '../javascript/moment';
-import { ModalClass } from '../../admin/components/modal/modal-class';
+const moment = require('../javascript/moment');
+import { ModalClass } from '@components/modal/modal-class';
 import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
 
@@ -74,19 +74,19 @@ export class MixinClass extends ModalClass {
 
   // =========================================================================================================
   logBlue(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logYellow(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logRed(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logGreen(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   eliminarRegistro(obj) {
@@ -99,16 +99,16 @@ export class MixinClass extends ModalClass {
       width: '510px',
       html: `<p> ${obj?.texto} </p>`,
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => noFunction(instance), label: 'NO', disable: false },
+          { clase: 'btn btn-blanco w-9', function: (instance) => noFunction(instance), label: 'No', disable: false },
           {
-            clase: 'btn btn-verde',
+            clase: 'btn btn-verde w-9',
             function: (instance) => {
               obj.siFunction();
               instance.closeModal('borrar', 'cancelar');
             },
-            label: 'SI',
+            label: 'Si',
             disable: false,
           },
         ],

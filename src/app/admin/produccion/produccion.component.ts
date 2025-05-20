@@ -1,19 +1,22 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
 import * as _ from 'lodash';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { TablasService } from '../components/new_tablas/tablas.service';
-import { ArticuloC, tipos_articulos } from '../registros/articulos/articulo';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { ArticuloC, tipos_articulos } from '@registros/articulos/articulo';
 import { ProduccionC } from './produccion';
-import * as $ from 'jquery';
-import { fun } from '../../core/services/functions.service';
-import { medidas, table_config } from '../components/new_tablas/tabla-class';
-import { ConfigI } from '../../core/typescript/config-interface';
-import { Ss } from '../../core/services/singleton.service';
-import { ModalClass } from '../components/modal/modal-class';
+
+import { fun } from '@core/services/functions.service';
+import { default_per_page, medidas, table_config } from '@components/new_tablas/tabla-class';
+import { ConfigI } from '@core/interface/config-interface';
+import { Ss } from '@core/services/singleton.service';
+import { ModalClass } from '@components/modal/modal-class';
+const $ = require('jquery');
 @Component({
-  selector: 'app-produccion',
-  templateUrl: './produccion.component.html',
-  styleUrls: ['./produccion.component.scss'],
+    selector: 'app-produccion',
+    templateUrl: './produccion.component.html',
+    styleUrls: ['./produccion.component.scss'],
+    standalone: false
 })
 export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   producto_terminado_en_turno;
@@ -36,7 +39,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     ],
     colores: true,
     id_tabla: 'lista_produccion',
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: true },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: true },
     botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
   };
   tablaComponent;
@@ -46,6 +49,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   articuloEditando: any;
   articuloClass = new ArticuloC();
   produccionClass = new ProduccionC();
+
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private tServ: TablasService) {
     super();
@@ -345,15 +350,10 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       width: '510px',
       html: `<p> ${texto_modal} </p>`,
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => this.closeModal(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => functions[tipo](instance, data),
-            label: 'SI',
-            disable: false,
-          },
+          { clase: 'btn btn-blanco w-9', function: (instance) => this.closeModal(instance), label: 'No', disable: false },
+          { clase: 'btn btn-verde w-9', function: (instance) => functions[tipo](instance, data), label: 'Si', disable: false },
         ],
       },
     });
@@ -379,7 +379,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async confirmarProduccion() {
-    const obj = fun.duplicarJson(this.lista_produccion);
+    const obj = fun.deepCloning(this.lista_produccion);
     const produccion_send = {};
 
     const detalle = [];

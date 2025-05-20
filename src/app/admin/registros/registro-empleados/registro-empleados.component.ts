@@ -1,22 +1,24 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-import * as moment from '../../../core/javascript/moment';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { customValidators } from '../../../core/typescript/custom-validators';
-import { pattern } from '../../../core/typescript/constantes';
-import { TablasService } from '../../components/new_tablas/tablas.service';
+const moment = require('../../../core/javascript/moment');
+import { MixinClass } from '@core/typescript/MixinClass';
+import { customValidators } from '@core/typescript/custom-validators';
+import { pattern } from '@core/typescript/constantes';
+import { TablasService } from '@components/new_tablas/tablas.service';
 import { EmpleadoC } from './empleado';
-import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
-import { fun } from '../../../core/services/functions.service';
+import { ChangePasswordComponent } from '@components/formularios en modales/change-password/change-password.component';
+import { fun } from '@core/services/functions.service';
 import { RolesC } from '../roles/roles';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 
-import { Permisos } from '../../../core/typescript/permisos';
+import { Permisos } from '@core/typescript/permisos';
 @Component({
-  selector: 'app-registro-empleados',
-  templateUrl: './registro-empleados.component.html',
-  styleUrls: ['./registro-empleados.component.scss'],
+    selector: 'app-registro-empleados',
+    templateUrl: './registro-empleados.component.html',
+    styleUrls: ['./registro-empleados.component.scss'],
+    standalone: false
 })
 export class RegistroEmpleadosComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;
@@ -49,13 +51,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     id_tabla: 'lista_empleados',
     padre_functions: { data_request: (params) => this.getEmpleados(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.user.update }, borrar: { show: true, permiso: this.permissions.user.destroy } },
   };
   tablaComponent;
   formPermissions = [Permisos.user.create, Permisos.user.update];
   maxDateBirth = new Date();
 
+  htmlServ = inject(HtmlElementsService)
 
   constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
     super();

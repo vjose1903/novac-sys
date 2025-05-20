@@ -1,23 +1,23 @@
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Router } from '@angular/router';
-import { ModalClass } from './../../components/modal/modal-class';
-import { PdfViewerComponent } from './../../components/pdf-viewer/pdf-viewer.component';
-import { PdfService } from './../../../core/services/pdf/pdf.service';
-import { ClienteC } from './../../registros/registro-clientes/cliente';
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { table_config } from './../../components/new_tablas/tabla-class';
-import { FacturaC, tipoDocFacturacion } from './../factura';
-import { TablasService } from './../../components/new_tablas/tablas.service';
-import { fun } from './../../../core/services/functions.service';
-import { Component, OnInit } from '@angular/core';
-import { ModalI } from '../../components/modal/modal-class';
+import { ClienteC } from '@registros/registro-clientes/cliente';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { FacturaC, request_factura_campo, tipoDocFacturacion } from './../factura';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { fun } from '@core/services/functions.service';
+import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
+import { ModalI } from '@components/modal/modal-class';
 import * as _ from 'lodash';
 
 @Component({
-  selector: 'app-menu-opciones-extra',
-  templateUrl: './menu-opciones-extra.component.html',
-  styleUrls: ['./menu-opciones-extra.component.scss'],
+    selector: 'app-menu-opciones-extra',
+    templateUrl: './menu-opciones-extra.component.html',
+    styleUrls: ['./menu-opciones-extra.component.scss'],
+    standalone: false
 })
 export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ModalI {
+  @ViewChild('dropdownCliente') dropdownCliente: ElementRef;
   constructor(private tServ: TablasService, private router: Router) {
     super();
   }
@@ -32,9 +32,9 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   clienteSelected;
 
   filter_options = {
-    todos: '0',
-    cliente: '1',
-    numero_documento: '3',
+    todos: request_factura_campo.todas,
+    cliente: request_factura_campo.cliente_id,
+    numero_documento: request_factura_campo.numero_factura,
   };
 
   tipo_documento_selected;
@@ -42,7 +42,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   tipos_filtro = [
     { key: this.filter_options.todos, label: 'Todos' },
     { key: this.filter_options.cliente, label: 'Cliente' },
-    { key: this.filter_options.numero_documento, label: 'Número de Documento' },
+    { key: this.filter_options.numero_documento, label: 'No. de Cotización' },
   ];
 
   table_config;
@@ -70,11 +70,13 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     colores: true,
     id_tabla: 'lista_documentos',
     padre_functions: { data_request: (params) => this.buscarDocumentos(params) },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
   facturaClass = new FacturaC();
   clienteClass = new ClienteC();
+
+  htmlServ = inject(HtmlElementsService);
 
   ngOnInit(): void {
     this.filter_key = this.filter_options.todos;
@@ -82,23 +84,48 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   }
 
   selectFiltro() {
-    this.clienteSelected = undefined;
-    this.filter_value = '';
+    this.clearFilterValues();
 
     if (this.filter_key == this.filter_options.todos) {
-      this.buscarDocumentos(this.tServ.obj_paginate.default);
+      this.showAllDocuments();
     } else {
       setTimeout(() => fun.enfocarInput('valorI'), 100);
     }
   }
 
-  desenfocarValor() {
-    fun.desEnfocarInput('valorI');
+  dropdownClienteAction(action: 'show' | 'hide') {
+    setTimeout(() => {
+      this.tServ.blockRowMovement = action === 'show';
+      if (action === 'hide') fun.desEnfocarInput('valorI');
+    }, 100);
   }
 
-  async checkNumeroPreFactura() {
-    if (this.filter_value.length < 8 || this.filter_value.includes('_')) fun.toastWarning('Numero de Pre-venta incompleto', 'Aviso');
-    else this.buscarDocumentos(this.tServ.obj_paginate.default);
+  clearFilterValues() {
+    this.clienteSelected = null;
+    this.filter_value = '';
+  }
+
+  showAllDocuments() {
+    this.buscarDocumentos(this.tServ.obj_paginate.default);
+  }
+
+  clearFilters() {
+    const currentFilterKey = this.filter_key;
+    this.filter_key = this.filter_options.todos;
+    this.clearFilterValues();
+    this.clearClienteFilter();
+    this.showAllDocuments();
+
+    this.filter_key = currentFilterKey;
+  }
+
+  async checkNumeroPreFactura(evento) {
+    setTimeout(() => {
+      if (this.filter_value.length < 8 || this.filter_value.includes('_')) fun.toastWarning('Numero de Pre-venta incompleto', 'Aviso');
+      else this.buscarDocumentos(this.tServ.obj_paginate.default);
+      evento.stopPropagation();
+      evento.preventDefault();
+    }, 0);
   }
 
   async getClientes(arg) {
@@ -196,11 +223,11 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   mostrarFactura(dataFactura, type) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any }];
 
     if (this.inputs.code == tipoDocFacturacion.cotizacion) {
       botonesDinamicos.push({
-        clase: 'btn btn-gris ml-2',
+        clase: 'btn btn-gris',
         function: (instance) => {
           instance.closeModal(instance.id, 'mostrarFactura');
           this.tableClickIcon({ id_tabla: 'mostrar_documento', columnKey: 'actions', iconKey: 'rellenar_factura', data: dataFactura });

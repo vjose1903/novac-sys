@@ -1,10 +1,11 @@
-import { fun } from '../../core/services/functions.service';
-import { CrudG } from '../../core/typescript/crud-g';
-import { ModalClass } from '../components/modal/modal-class';
+import { fun } from '@core/services/functions.service';
+import { CrudG } from '@core/typescript/crud-g';
+import { ModalClass } from '@components/modal/modal-class';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ReporteC } from '../reportes/reporte';
 import * as _ from 'lodash';
-
+import { csvConfig as csvConfigReciboIngreso } from '@core/services/reports/excel/configs/report/recibo_ingreso';
+import { ReportGroupTypeE } from '../reportes/reporte.utils';
 export interface ReciboI {
   id?: number;
   user_id?: number;
@@ -37,11 +38,11 @@ export class ReciboC extends CrudG<ReciboI> {
       inputs: { data: data },
       id: `detalle_recibos`,
       header: 'Detalles Recibos',
-      width: '30rem',
+      width: '35rem',
       height: '10rem',
       botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
       },
     };
   }
@@ -73,6 +74,8 @@ export class ReciboC extends CrudG<ReciboI> {
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
+    ReporteC.configCsv = csvConfigReciboIngreso[reporteParams.data.tipo == ReportGroupTypeE.detallado ? 'detallado' : 'agrupado'];
+
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
       let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
 
@@ -93,7 +96,7 @@ export class ReciboC extends CrudG<ReciboI> {
       data_parsed['numero_documento'] = data_parsed['identificador'];
       data_parsed['usuario'] = data.user.nombre_completo;
 
-      const documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
+      const documento = data.cliente.documentos_de_identidad.find(documento => documento.principal);
       data_parsed['cliente']['rnc'] = documento ? documento.documento : '----------';
 
       data_parsed['contenido_reporte'].map((detalle) => {

@@ -75,4 +75,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
           GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
-        run: npm run electron:windows64
+        run: npm run windows:prod

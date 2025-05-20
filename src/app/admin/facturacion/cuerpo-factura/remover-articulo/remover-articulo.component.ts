@@ -1,21 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalI } from '../../../../admin/components/modal/modal-class';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Component, OnInit, inject } from '@angular/core';
+import { ModalI } from '@components/modal/modal-class';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { fun } from '../../../../core/services/functions.service';
+import { fun } from '@core/services/functions.service';
 import { timeStamp } from 'console';
 
 @Component({
-  selector: 'app-remover-articulo',
-  templateUrl: './remover-articulo.component.html',
-  styleUrls: ['./remover-articulo.component.scss'],
+    selector: 'app-remover-articulo',
+    templateUrl: './remover-articulo.component.html',
+    styleUrls: ['./remover-articulo.component.scss'],
+    standalone: false
 })
 export class RemoverArticuloComponent implements OnInit, ModalI {
   constructor(private fb: UntypedFormBuilder) {}
   modal: any = {};
   inputs: any;
-
   form;
+
+  htmlServ = inject(HtmlElementsService);
+
   ngOnInit(): void {
     this.createForm();
   }
@@ -61,7 +65,7 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
     if (this.form.valid || this.inputs.data_detalle.is_defectuoso || !this.inputs.is_prefactura_selected) {
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
       modal.closeModal(this.modal.component_id);
-      const obj = { key: this.inputs.key, modal_id: this.modal.component_id };
+      const obj = { key: this.inputs.key, modal_id: this.modal.component_id, data: this.inputs.data_detalle };
 
       if (this.inputs.is_prefactura_selected) obj['data'] = this.form.getRawValue();
 

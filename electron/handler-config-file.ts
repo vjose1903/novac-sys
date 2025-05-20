@@ -1,8 +1,9 @@
-import { ConfigI } from '../src/app/core/typescript/config-interface.js';
+import { ConfigI } from '../src/app/core/interface/config-interface';
 import * as fs from 'fs';
-import { pathAdd, puts } from '../main.js';
+import { pathAdd, writeLogs } from '../main';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
+import { serie } from '../src/app/core/typescript/constantes.js';
 
 const logos = require('../logos.json');
 
@@ -15,12 +16,12 @@ export default class HandlerConfigFile {
     direccion_empresa: 'La Vega República Dominicana',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Inspot Technology',
-    rnc_empresa: '000-00000-0',
-    telefono_empresa: '(809) 879-0161',
-    url_servidor: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
-    url_servidor_descargas: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
-    url_servidor_respaldo: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
+    nombre_empresa: 'Agropecuaria Delia y Milo, S.R.L AGRODEMI',
+    rnc_empresa: '131-99603-5',
+    telefono_empresa: '(809)-573-0060',
+    url_servidor: 'https://agrodemi.inspot-technology.com',
+    url_servidor_descargas: 'https://agrodemi.inspot-technology.com',
+    url_servidor_respaldo: 'http://10.0.0.9:9090',
     usa_url_principal: true,
     has_contabilidad: true,
     is_db_local: false,
@@ -28,7 +29,9 @@ export default class HandlerConfigFile {
     is_produccion: false,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
-    medida_producto_terminado: 'Producto',
+    use_ecf: true,
+    medida_producto_terminado: 'Quintal',
+    serie_default: serie.electronica,
 
     printer_selected: {
       venta_contado: 'Ninguna',
@@ -70,7 +73,7 @@ export default class HandlerConfigFile {
       const existe_archivo_config = fs.existsSync(config_path);
 
       setTimeout(() => {
-        puts(existe_archivo_config, ':::::::: existe_archivo_config');
+        writeLogs(existe_archivo_config, ':::::::: existe_archivo_config');
 
         if (!existe_archivo_config) {
           Functions.setConfigFile(JSON.stringify(this.default_config))
@@ -78,7 +81,7 @@ export default class HandlerConfigFile {
               console.log(' ');
               console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
               console.log(' ');
-              puts('------ ARCHIVO DE CONFIGURACION CREADO ------');
+              writeLogs('------ ARCHIVO DE CONFIGURACION CREADO ------');
 
               setTimeout(() => resolve(true), 500);
             })
