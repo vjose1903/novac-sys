@@ -56,7 +56,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   permissions = Permisos;
 
   tipos_documentos = [];
-  tipo_documento_selected = tipoDocFacturacion.venta;
+  tipo_documento_selected = signal<tipoDocFacturacion>(tipoDocFacturacion.venta);
 
   buscar_por = null;
 
@@ -116,10 +116,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     super();
 
     effect(() => {
-      if (this.serieSelected() && this.buscar_por == request_factura_campo.last_50) {
-        console.log('this.serieSelected ', this.serieSelected());
-        this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
-      }
+      if (this.serieSelected() && this.buscar_por == request_factura_campo.last_50) this.loadFacturasChangingSerie();
     });
   }
 
@@ -127,6 +124,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     this._init_mixin({ component: 'buscar_factura', is_routing: true });
 
     this.necesarioStart();
+  }
+
+  ngOnDestroy(): void {
+    this._destroy_mixin();
+    this.borrar('salir');
   }
 
   necesarioStart() {
@@ -177,9 +179,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     }
   }
 
-  ngOnDestroy(): void {
-    this._destroy_mixin();
-    this.borrar('salir');
+  async loadFacturasChangingSerie() {
+    const actualPagination = await this.getActualPagination();
+    if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
+    this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
   }
 
   async getPaqueteComprobante() {
@@ -263,8 +266,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: '' } };
 
-      console.log('this.buscarPara ', this.buscarPara);
-
       extra.parameters.tipo_nota = NotaC.base_comprobante[this.notaSerieSelected()][this.buscarPara];
 
       try {
@@ -321,112 +322,118 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   }
 
   async pedirFactura(params?: { per_page?: number; page?: number; search?: string }) {
-    const documento_descripcion = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Cotización' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
+    return new Promise<void>(async (resolve, reject) => {
+      const documento_descripcion = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'Cotización' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
 
-    try {
-      this.facturas.length = 0;
+      try {
+        this.facturas.length = 0;
 
-      const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
+        const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
 
-      const args = {
-        campo: this.buscar_por,
-        valor: valor,
-        tipo_factura_id: this.tipo_factura_id,
-        page: params.page,
-        per_page: params.per_page,
-        paginado: true,
-        tipo: this.tipo_documento_selected,
-        movimientos_viaje: true,
-        extra_params: { serie: this.serieSelected() },
-      };
-
-      const res = await this.facturaClass.getFacturasByParams(args);
-
-      res['data'].forEach(fact => {
-        const pago_a_tiempo = this.getIsPagoAtiempo(fact);
-        const estatus = this.getIsActiveInfo(fact);
-
-        fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
-        fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
-        fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
-        fact.is_active = estatus.icon;
-        fact.is_active_tooltip = estatus.tooltip;
-        fact.is_active_color = estatus.color;
-        fact.monto = fun.roundNumberToDecimal(fact.balance);
-
-        fact.viewColor = 'gris-claro';
-        fact.view = 'far fa-eye-slash';
-        fact.delete = 'far fa-trash-alt';
-        fact.duplicate = 'fa-regular fa-copy';
-        fact.make_bill = 'fas fa-external-link-alt';
-
-        fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
-
-        fact.tooltip_select = 'Seleccionar Factura';
-
-        fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
-
-        fact.customStyles = {
-          condicion: { width: '6rem' },
-          secuencia: { width: '7rem' },
-          numero_comprobante: { width: '9rem' },
-          fecha_equivalente: { width: '6.5rem' },
-          fechaV: { width: '6.5rem' },
-          estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
-          actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
-            { key: 'view', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'duplicate', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'delete', estilos: 'font-size: 1.2rem !important;' },
-            { key: 'make_bill', estilos: 'font-size: 1.2rem !important;' },
-          ],
+        const args = {
+          campo: this.buscar_por,
+          valor: valor,
+          tipo_factura_id: this.tipo_factura_id,
+          page: params.page,
+          per_page: params.per_page,
+          paginado: true,
+          tipo: this.tipo_documento_selected(),
+          movimientos_viaje: true,
+          extra_params: { serie: this.serieSelected() },
         };
 
-        if (this.para == 'Visualizar')
-          fun.pull(
-            fact.customStyles.actions,
-            fact.customStyles.actions.find(item => item.key == 'selected')
-          );
+        const res = await this.facturaClass.getFacturasByParams(args);
 
-        this.facturas.push(fact);
-      });
+        res['data'].forEach(fact => {
+          const pago_a_tiempo = this.getIsPagoAtiempo(fact);
+          const estatus = this.getIsActiveInfo(fact);
 
-      this.facturas.sort((a, b) => fun.compare(a, b, ['fecha_equivalente'], 'desc'));
+          fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
+          fact.fechaV = fun.hasValue(fact?.fecha_vencimiento) && moment(fact?.fecha_vencimiento).isValid() ? moment(fact.fecha_vencimiento).format('DD/MM/YYYY') : '';
+          fact.colorFechaV = pago_a_tiempo ? 'black' : 'red';
+          fact.is_active = estatus.icon;
+          fact.is_active_tooltip = estatus.tooltip;
+          fact.is_active_color = estatus.color;
+          fact.monto = fun.roundNumberToDecimal(fact.balance);
 
-      if (this.facturas.length > 0) {
-        if (this.buscar_por == this.campos.numeroComprobante) {
-          console.log('this.facturas[0] ', this.facturas[0]);
-          // this.facturas[0].detalle_facturas.push(this.facturas[0].detalle_facturas[0])
+          fact.viewColor = 'gris-claro';
+          fact.view = 'far fa-eye-slash';
+          fact.delete = 'far fa-trash-alt';
+          fact.duplicate = 'fa-regular fa-copy';
+          fact.make_bill = 'fas fa-external-link-alt';
 
-          this.facturaClass.parseDataToPdf(this.facturas[0]).then(factura_parsed => {
-            const crear_nota = this.buscarPara.includes('nota');
-            this.facturaSelected = factura_parsed;
-            const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
-            this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota });
-          });
-        } else {
-          setTimeout(() => this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]), 100);
+          fact.coti_preventa_tooltip = fact?.estado ? (fun.hasValue(fact?.fecha_completada) ? `${documento_descripcion} ya ha sido facturada` : `Crear Factura desde ${documento_descripcion}`) : `${documento_descripcion} está anulada.`;
+
+          fact.tooltip_select = 'Seleccionar Factura';
+
+          fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+
+          fact.customStyles = {
+            condicion: { width: '6rem' },
+            secuencia: { width: '7rem' },
+            numero_comprobante: { width: '9rem' },
+            fecha_equivalente: { width: '6.5rem' },
+            fechaV: { width: '6.5rem' },
+            estado: [{ key: 'estado', isTd: true, estilos: 'width: 2rem !important;' }],
+            actions: [
+              { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
+              { key: 'view', estilos: 'font-size: 1.2rem !important;' },
+              { key: 'duplicate', estilos: 'font-size: 1.2rem !important;' },
+              { key: 'delete', estilos: 'font-size: 1.2rem !important;' },
+              { key: 'make_bill', estilos: 'font-size: 1.2rem !important;' },
+            ],
+          };
+
+          if (this.para == 'Visualizar')
+            fun.pull(
+              fact.customStyles.actions,
+              fact.customStyles.actions.find(item => item.key == 'selected')
+            );
+
+          this.facturas.push(fact);
+        });
+
+        this.facturas.sort((a, b) => fun.compare(a, b, ['fecha_equivalente'], 'desc'));
+
+        if (this.facturas.length > 0) {
+          if (this.buscar_por == this.campos.numeroComprobante) {
+            // this.facturas[0].detalle_facturas.push(this.facturas[0].detalle_facturas[0])
+
+            this.facturaClass.parseDataToPdf(this.facturas[0]).then(factura_parsed => {
+              const crear_nota = this.buscarPara.includes('nota');
+              this.facturaSelected = factura_parsed;
+              const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
+              this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota });
+            });
+          } else {
+            setTimeout(() => {
+              this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+            }, 100);
+          }
         }
+
+        resolve();
+      } catch (error) {
+        if (this.buscar_por == this.campos.cliente) {
+          fun.toastError(`Este cliente no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
+        } else if (this.buscar_por == this.campos.suplidor) {
+          fun.toastError(`Este suplidor no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
+        } else if (this.buscar_por == this.campos.numeroFactura) {
+          fun.toastError(`No existen ${documento_descripcion} con este número.`, 'ERROR');
+        } else if (this.buscar_por == this.campos.numeroComprobante) {
+          fun.toastError(`La ${documento_descripcion} buscada no existe`, 'ERROR');
+        }
+        fun.enfocarAndSelectInput('valorI');
+        console.error(error);
+        reject();
       }
-    } catch (error) {
-      if (this.buscar_por == this.campos.cliente) {
-        fun.toastError(`Este cliente no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
-      } else if (this.buscar_por == this.campos.suplidor) {
-        fun.toastError(`Este suplidor no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
-      } else if (this.buscar_por == this.campos.numeroFactura) {
-        fun.toastError(`No existen ${documento_descripcion} con este número.`, 'ERROR');
-      } else if (this.buscar_por == this.campos.numeroComprobante) {
-        fun.toastError(`La ${documento_descripcion} buscada no existe`, 'ERROR');
-      }
-      fun.enfocarAndSelectInput('valorI');
-      console.error(error);
-    }
+    });
   }
 
   getIsActiveInfo(documento) {
     let res = { icon: null, tooltip: null, color: null };
 
-    if (this.tipo_documento_selected == tipoDocFacturacion.compra) {
+    if (this.tipo_documento_selected() == tipoDocFacturacion.compra) {
       res.icon = documento.estado ? (documento.balance < 1 ? 'fas fa-check' : 'fas fa-exclamation-triangle') : 'fas fa-times';
       res.tooltip = documento.estado ? (documento.balance < 1 ? 'Factura saldada' : 'Factura pendiente de pago') : 'Factura anulada';
       res.color = documento.estado ? (documento.balance < 1 ? 'green' : 'yellow') : 'red';
@@ -465,8 +472,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   selectTableConfig() {
     return new Promise<void>(resolve => {
-      this.table_config = fun.deepCloning(BuscarFacturaC.tables_config[this.tipo_documento_selected]);
-      this.table_config['padre_functions'] = { data_request: params => this.pedirFactura(params) };
+      this.table_config = fun.deepCloning(BuscarFacturaC.tables_config[this.tipo_documento_selected()]);
+      this.table_config['padre_functions'] = {
+        data_request: params => {
+          this.pedirFactura(params);
+        },
+      };
 
       this.verificateTableActions();
       resolve();
@@ -527,12 +538,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     if (tipo == 'label') {
       if (this.buscar_por == this.campos.cliente) res = 'Cliente';
       if (this.buscar_por == this.campos.numeroComprobante) res = 'Numero Comprobante';
-      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Número Cotización' : 'Número Factura';
+      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'Número Cotización' : 'Número Factura';
       if (this.buscar_por == this.campos.suplidor) res = 'Suplidor';
     } else {
       if (this.buscar_por == this.campos.cliente) res = 'Nombre Cliente';
       if (this.buscar_por == this.campos.numeroComprobante) res = 'Escriba numero de comprobante';
-      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'Escriba número de Cotización' : 'Escriba número de Factura';
+      if (this.buscar_por == this.campos.numeroFactura) res = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'Escriba número de Cotización' : 'Escriba número de Factura';
       if (this.buscar_por == this.campos.suplidor) res = 'Nombre Suplidor';
     }
     return res;
@@ -557,7 +568,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     const input_valor = document.getElementById('valorI') as any;
     if (tipo != 'salir' && input_valor) input_valor.value = null;
 
-    this.tipo_documento_selected = tipoDocFacturacion.venta;
+    this.tipo_documento_selected.set(tipoDocFacturacion.venta);
     this.tipo_factura_id = null;
     this.buscar_por = null;
     fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
@@ -570,8 +581,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
           this.notaSelected = params.data;
 
           this.notasClass.parseDataToPdf(params.data).then(data_parsed => {
-            console.log('data_parsed ', data_parsed);
-
             this.mostrarFactura({ factura: data_parsed, type: 'nota', dataDB: params.data });
           });
         }
@@ -581,13 +590,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
         if (params.iconKey == 'view') {
           this.facturaClass.parseDataToPdf(params.data).then(factura_parsed => {
             this.facturaSelected = factura_parsed;
-            const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
+            const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
             this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota: this.buscarPara.includes('nota') });
           });
         }
 
         if (params.iconKey == 'delete') {
-          const tipo = this.tipo_documento_selected == tipoDocFacturacion.cotizacion || this.tipo_documento_selected == tipoDocFacturacion.compra ? deleteDocumentosTypes.delete : deleteDocumentosTypes.anular;
+          const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion || this.tipo_documento_selected() == tipoDocFacturacion.compra ? deleteDocumentosTypes.delete : deleteDocumentosTypes.anular;
           this.deleteRequest({ ids: params.data.id, tipo: tipo });
         }
 
@@ -596,7 +605,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
           const actions = { duplicate: { url: actionFacturacion.duplicate, modalLabel: 'duplicar', modalId: 'duplicate_bill' }, make_bill: { url: actionFacturacion.bill_from_cotizacion, modalLabel: 'facturar', modalId: 'make_bill' } };
 
           const titleCasePipe = new TitleCasePipe();
-          const tipoDocumento = titleCasePipe.transform(tipoDocFacturacionLabel[this.tipo_documento_selected]);
+          const tipoDocumento = titleCasePipe.transform(tipoDocFacturacionLabel[this.tipo_documento_selected()]);
           const action = actions[params.iconKey].url;
           const label = actions[params.iconKey].modalLabel;
 
@@ -623,7 +632,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
         cotizacion: { label: { singular: 'Cotización', plural: 'Cotizaciones' }, key: 'numero_factura', key_label: { singular: 'número', plural: 'números' } },
       };
 
-      const current_info = info[this.tipo_documento_selected];
+      const current_info = info[this.tipo_documento_selected()];
       if (res.data.error.length > 0) {
         const indicadores_temp = res.data.error.map(documento => documento[current_info.key]);
         const indicadores = _.join(indicadores_temp, ', ');
@@ -665,7 +674,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
         break;
 
       case 'buscarPorI':
-        siguiente_input = this.buscar_por == this.campos.numeroComprobante || this.tipo_documento_selected == tipoDocFacturacion.cotizacion ? 'valorI' : 'campoTipoFact';
+        siguiente_input = this.buscar_por == this.campos.numeroComprobante || this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'valorI' : 'campoTipoFact';
         break;
 
       case 'campoTipoFact':
@@ -692,13 +701,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   }
 
   async abrirModalFiltro(nombre) {
-    const obj = { data: null, palabra_a_buscar: nombre, metodo: this.tipo_documento_selected, include_contado: false };
+    const obj = { data: null, palabra_a_buscar: nombre, metodo: this.tipo_documento_selected(), include_contado: false };
 
     this.openNewModal({
       component: BuscarClienteSuplidorComponent,
       inputs: obj,
       id: 'buscarClienteOsuplidor',
-      header: this.tipo_documento_selected == 'compra' ? 'Buscar Suplidor' : 'Buscar Cliente',
+      header: this.tipo_documento_selected() == 'compra' ? 'Buscar Suplidor' : 'Buscar Cliente',
       width: '900px',
       height: '500px',
       botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
@@ -780,7 +789,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
           },
         };
 
-        if (this.tipo_documento_selected != tipoDocFacturacion.cotizacion && this.tipo_documento_selected != tipoDocFacturacion.pre_venta) {
+        if (this.tipo_documento_selected() != tipoDocFacturacion.cotizacion && this.tipo_documento_selected() != tipoDocFacturacion.pre_venta) {
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-gris',
             function: instance => this.verDetalles(type == 'nota' ? dataDB : factura, type),
@@ -887,7 +896,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
         const actualPagination = await this.getActualPagination();
 
-        this.buscar_por = this.tipo_documento_selected == tipoDocFacturacion.compra ? this.campos.suplidor : this.campos.cliente;
+        this.buscar_por = this.tipo_documento_selected() == tipoDocFacturacion.compra ? this.campos.suplidor : this.campos.cliente;
         this.valor_a_buscar = arg.data.id;
 
         this.pedirFactura(actualPagination);

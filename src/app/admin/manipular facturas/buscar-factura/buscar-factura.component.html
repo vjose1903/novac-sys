@@ -19,7 +19,8 @@
                 <label class="control-label mb-0">Tipo: </label>
                 <select
                   id="tipoI"
-                  [(ngModel)]="tipo_documento_selected"
+                  [ngModel]="tipo_documento_selected()"
+                  (ngModelChange)="tipo_documento_selected.set($event)"
                   class="form-control inputE"
                   (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
                   (change)="changeSelect('tipo_documento', htmlServ.getValue($event))"
@@ -34,7 +35,7 @@
 
             <!-- ================ BUSCAR POR  ================ -->
             <div class="form-group flex-2">
-              <label class="control-label mb-0">Buscar {{ tipo_documento_selected == 'cotizacion' ? 'cotización' : 'factura' }} por : </label>
+              <label class="control-label mb-0">Buscar {{ tipo_documento_selected() == 'cotizacion' ? 'cotización' : 'factura' }} por : </label>
 
               <select
                 id="buscarPorI"
@@ -43,19 +44,19 @@
                 (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
                 (change)="changeSelect('buscar_por', htmlServ.getValue($event))"
                 value=""
-                [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected)">
+                [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected())">
                 <option [value]="null" selected disabled>Escoger tipo</option>
-                @if (tipo_documento_selected != 'compra') {
+                @if (tipo_documento_selected() != 'compra') {
                   <option value="1">Por cliente</option>
                 }
-                @if (tipo_documento_selected == 'compra') {
+                @if (tipo_documento_selected() == 'compra') {
                   <option value="5">Por suplidor</option>
                 }
-                @if (tipo_documento_selected != 'cotizacion') {
+                @if (tipo_documento_selected() != 'cotizacion') {
                   <option value="2">Por número comprobante</option>
                 }
-                <option value="3">Por número {{ tipo_documento_selected == 'cotizacion' ? 'cotización' : 'factura' }}</option>
-                <option value="4">Ultimas 50 {{ tipo_documento_selected == 'cotizacion' ? 'cotizaciones' : 'facturas' }}</option>
+                <option value="3">Por número {{ tipo_documento_selected() == 'cotizacion' ? 'cotización' : 'factura' }}</option>
+                <option value="4">Ultimas 50 {{ tipo_documento_selected() == 'cotizacion' ? 'cotizaciones' : 'facturas' }}</option>
               </select>
             </div>
           </div>
@@ -70,7 +71,7 @@
           <div class="d-flex gap-3">
             <!-- ================ TIPO FACTURA  ================ -->
 
-            @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected != 'cotizacion') {
+            @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected() != 'cotizacion') {
               <div class="form-group flex-1">
                 <label class="control-label mb-0">Tipo factura : </label>
                 <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))">
@@ -97,7 +98,7 @@
                     (focus)="htmlServ.selectValue($event)"
                     [placeholder]="getProperties('placeHolder')"
                     autocomplete="off"
-                    [disabled]="tipo_documento_selected != 'cotizacion' && fun.isEmpty(tipo_factura_id)" />
+                    [disabled]="tipo_documento_selected() != 'cotizacion' && fun.isEmpty(tipo_factura_id)" />
                 }
                 <!-- ================ NUMERO COMPROBANTE  ================ -->
                 @if (buscar_por == campos.numeroComprobante) {
