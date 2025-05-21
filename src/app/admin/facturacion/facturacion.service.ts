@@ -100,14 +100,23 @@ export class FacturacionService {
         this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == tFacturaKey.pre_venta && tipo_factura.serie == this.serieType());
       }
 
-      this.setTipoFacturaSelected(this.tipoFactura.id, 'setTipos', 'id');
+      this.setTipoFacturaSelected({ value: this.tipoFactura.id, by: 'id' });
       resolve(true);
     });
   }
 
-  setTipoFacturaSelected(value, where, by = 'key') {
+  setTipoFacturaSelected(args: { value: any; by: string; equivalentSerie?: boolean }) {
+    const { value, by, equivalentSerie = false } = args;
+
     return new Promise<any>((resolve, reject) => {
-      this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => (by == 'id' ? tipo_factura[by] == value : tipo_factura[by] == value && tipo_factura.serie == this.serieType()));
+      const originalTipoFactura = this.lista_tipos_facturas.find(tipo_factura => (by == 'id' ? tipo_factura[by] == value : tipo_factura[by] == value));
+
+      if (equivalentSerie) {
+        this.tipoFactura = this.lista_tipos_facturas.find(item => item.key == originalTipoFactura.key && item.serie == this.serieType());
+      } else {
+        this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => (by == 'id' ? tipo_factura[by] == value : tipo_factura[by] == value && tipo_factura.serie == this.serieType()));
+      }
+
       this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
 
       resolve(value);

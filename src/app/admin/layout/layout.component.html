@@ -181,7 +181,13 @@
           }
           <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
         </div>
-        <div class="footer">Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez</div>
+        <div class="footer w-100">
+          <span class="machine-id" (click)="copyMachineId()" >
+            {{ configApp.machineId }}
+          </span>
+
+          <span> Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
+        </div>
         @if (cuadre_hoy) {
           <div class="cuadre_hoy">
             <div class="msg">Hoy ya existe un cuadre</div>
