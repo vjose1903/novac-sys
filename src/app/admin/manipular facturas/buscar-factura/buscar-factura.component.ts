@@ -588,7 +588,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     } else if (params.id_tabla == shearchDocumentTableId) {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
+          console.log('%c params.data ', 'color: red; font-weight: bold;', fun.deepCloning(params.data));
           this.facturaClass.parseDataToPdf(params.data).then(factura_parsed => {
+            console.log('%c factura_parsed ', 'color: green; font-weight: bold;', fun.deepCloning(factura_parsed));
             this.facturaSelected = factura_parsed;
             const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
             this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota: this.buscarPara.includes('nota') });
@@ -870,6 +872,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   verDetalles(data, tipo) {
     let configModal;
+
+    console.log('%c data ', 'color: red; font-weight: bold;', data);
+    
     if (tipo == 'nota') configModal = this.notasClass.modalVerDetalles(data);
     if (tipo == 'facturacion') configModal = this.facturaClass.modalVerDetalles(data);
 

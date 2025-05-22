@@ -16,7 +16,7 @@ import { fun } from '@core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 import { serie } from '@core/typescript/constantes';
 import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../../electron/shared-electron-angular';
+import { ELECTRON_CHANGE_CONFIG_FILE, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 
@@ -185,6 +185,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       });
   }
 
+  verificarActualizaciones() {
+    const task = new MessageTask(ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE);
+    
+    this._ipc.sendTask(task).then(res => {
+      console.log('res ---> ', res);
+    });
+  }
+
   validateUserAndLoadPermisos() {
     return new Promise<any>(async (resolve, reject) => {
       await this.currentUserServ
@@ -226,7 +234,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   copyMachineId() {
-    this.copyToClipboardServ.copyText(this.configApp.machineId).then(() => {  
+    this.copyToClipboardServ.copyText(this.configApp.machineId).then(() => {
       fun.toastInfo('ID de la máquina copiado al portapapeles', 'COPIADO');
     });
   }
