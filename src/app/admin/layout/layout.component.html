@@ -166,6 +166,12 @@
                       <strong>Serie por defecto:</strong> {{ my_capitalize(configApp.serie_default) }}
                     </div>
                   </li>
+                  <li>
+                    <div class="popover-item" id="popover-item" (click)="verificarActualizaciones(); dropdownCuenta.hide()">
+                      <i class="fas fa-cloud-arrow-down"></i>
+                      Verificar actualizaciones
+                    </div>
+                  </li>
                   <li class="divider popover-divider"></li>
                   <li>
                     <a class="popover-item danger" id="popover-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
@@ -181,7 +187,13 @@
           }
           <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
         </div>
-        <div class="footer">Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez</div>
+        <div class="footer w-100">
+          <span class="machine-id" (click)="copyMachineId()" >
+            {{ configApp.machineId }}
+          </span>
+
+          <span> Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
+        </div>
         @if (cuadre_hoy) {
           <div class="cuadre_hoy">
             <div class="msg">Hoy ya existe un cuadre</div>

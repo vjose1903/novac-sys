@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "description": "Sistema facturacion e inventario NOVAC.",
   "author": {
     "name": "Victor Jose Vásquez Santos",
@@ -18,8 +18,8 @@
     "clean:actualizacion": "rimraf ./actualizacion",
     "clean:dist": "rimraf ./dist",
     "start": "npm-run-all -p ng:serve electron:serve",
-    "ng:serve": "ng serve --port 5220 -c web",
-    "electron:serve": "wait-on tcp:5220 && npm run electron:serve-tsc && npx electron . --serve",
+    "ng:serve": "ng serve --port $$PORT_APP$$ -c web",
+    "electron:serve": "wait-on tcp:$$PORT_APP$$ && npm run electron:serve-tsc && npx electron . --serve",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
     "build": "npm run clean:dist && npm run electron:serve-tsc && ng build --stats-json --base-href ./",
     "build:prod": "npm run build -- -c production",
@@ -42,7 +42,7 @@
     "@popperjs/core": "2.11.8",
     "@primeng/themes": "19.0.5",
     "@types/big.js": "6.2.2",
-    "@vjose1903/dateutils": "1.0.20",
+    "@vjose1903/dateutils": "1.0.21",
     "big.js": "6.2.2",
     "animate.css": "~4.1.1",
     "bootstrap": "^4.6.2",

@@ -1,12 +1,27 @@
-.home{
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.home {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // position: relative;
 }
 
-.version{
-    color: #b3b3b3;
-    font-size: 0.8rem;
+.version {
+  color: #b3b3b3;
+  font-size: 0.8rem;
+}
+
+.machine-id {
+  position: absolute;
+  font-size: 0.7rem;
+  bottom: 1rem;
+  right:  1rem;
+  opacity: 0.5;
+  cursor: copy;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
 }

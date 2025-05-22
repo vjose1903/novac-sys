@@ -16,6 +16,7 @@ import { csvConfig as csvConfigVentas } from '@core/services/reports/excel/confi
 import { csvConfig as csvConfigMovimientosVehiculo } from '@core/services/reports/excel/configs/report/movimientos_vehiculo';
 import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { ArticuloI } from '@registros/articulos/articulo';
+import { DateUtils } from '@vjose1903/dateutils';
 
 export enum comprobanteNormal {
   factura_de_credito_fiscal = '01',
@@ -329,7 +330,7 @@ export class FacturaC extends CrudG<FacturasI> {
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
 
-      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format();
+      // data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format();
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
       if (data_parsed.tipo_pdf == 'COTIZACION') data_parsed.tipo_pdf = 'COTIZACIÓN';
       data_parsed.total = data_parsed.total_factura;
@@ -398,14 +399,14 @@ export class FacturaC extends CrudG<FacturasI> {
     if (pagos.length > 0 || notas.length > 0) {
       for (let i = 0; i < pagos.length; i++) {
         const pago = pagos[i];
-        pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
-        pago.fecha_equivalente = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
+        pago.numero_recibo = pago.numero_recibo.toString().padStart(8, '0');
+        pago.fecha_equivalente = DateUtils.format({ date: pago.fecha_equivalente, dateFormat: 'DD/MM/YYYY' });
       }
 
       for (let i = 0; i < notas.length; i++) {
         const nota = notas[i];
         nota.total = Math.abs(nota.total);
-        nota.fecha_equivalente = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
+        nota.fecha_equivalente = DateUtils.format({ date: nota.fecha_equivalente, dateFormat: 'DD/MM/YYYY' });
       }
 
       const obj = { abonos: pagos, notas: notas };

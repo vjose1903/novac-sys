@@ -1,5 +1,5 @@
 import { TiposFacturaC, actionFacturacion, TipoFacturaI } from './../facturacion/factura';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, inject } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 import * as _ from 'lodash';
@@ -16,8 +16,9 @@ import { fun } from '@core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 import { serie } from '@core/typescript/constantes';
 import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../../electron/shared-electron-angular';
+import { ELECTRON_CHANGE_CONFIG_FILE, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
+import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 
 @Component({
   selector: 'app-layout',
@@ -62,7 +63,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   currentYear: number;
 
   my_capitalize = fun.Capitalice;
-  
+
+  copyToClipboardServ = inject(CopyToClipboardService);
   constructor(
     private router: Router,
     private cdRef: ChangeDetectorRef,
@@ -144,8 +146,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
           tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']) as TipoFacturaI[];
           Ss.factServ.lista_tipos_facturas = tiposFacturas;
 
-          console.log('%c  lista_tipos_facturas', 'color: red; font-weight: bold;', Ss.factServ.lista_tipos_facturas);
-
           resolve(Ss.factServ.lista_tipos_facturas);
         })
         .catch(error => {
@@ -183,6 +183,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         if (err.msg) fun.toastError(err.msg, 'ERROR');
         else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
       });
+  }
+
+  verificarActualizaciones() {
+    const task = new MessageTask(ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE);
+    
+    this._ipc.sendTask(task).then(res => {
+      console.log('res ---> ', res);
+    });
   }
 
   validateUserAndLoadPermisos() {
@@ -223,6 +231,12 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.chequiando_cuadre = false;
       });
     }
+  }
+
+  copyMachineId() {
+    this.copyToClipboardServ.copyText(this.configApp.machineId).then(() => {
+      fun.toastInfo('ID de la máquina copiado al portapapeles', 'COPIADO');
+    });
   }
 
   ngAfterContentChecked() {

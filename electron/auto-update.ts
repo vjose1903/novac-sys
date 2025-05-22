@@ -1,4 +1,4 @@
-import { autoUpdater, type UpdateDownloadedEvent, type AppUpdater } from 'electron-updater';
+import { autoUpdater, type UpdateDownloadedEvent, type AppUpdater, UpdateCheckResult, UpdateInfo } from 'electron-updater';
 
 import SharedElectronAngular, {
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
@@ -11,6 +11,7 @@ import SharedElectronAngular, {
 
 import { writeLogs } from '../main';
 import { BrowserWindow } from 'electron';
+import { sharedState } from './shared-state';
 
 export default class AppUpdate {
   win: BrowserWindow;
@@ -54,19 +55,8 @@ export default class AppUpdate {
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
       writeLogs(info, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
 
-      // TODO: hacer que esto sea decidido por el usuario
-      // Iniciar la descarga de la actualización
-      this.autoUpdater.downloadUpdate();
-
+      // Ahora solo enviamos la información al front y dejamos que el usuario decida
       SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, data: info });
-
-      const dialogOpts = {
-        type: 'info',
-        buttons: ['ok'],
-        title: 'Actualización disponible',
-        message: 'Novac System presenta una nueva actualizacion se empezará a descargar ahora.',
-        detail: `Version a descargar: ${info.version}`,
-      };
 
       writeLogs('FINAL - ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
     });
@@ -75,21 +65,12 @@ export default class AppUpdate {
       writeLogs(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
       writeLogs(event, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
 
-      const dialogOpts = {
-        type: 'info',
-        buttons: ['Reiniciar'],
-        title: 'Actualizacion descargada',
-        message: process.platform == 'win32' ? event.releaseNotes : event.releaseName,
-        detail: 'Para que las actualizaciones sean efectivas debe de reiniciar la aplicacion.',
-      };
-
       SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, data: { msg: 'descarga finalizada...' } });
-      this.autoUpdater.quitAndInstall();
 
-      // dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      //   SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, data: { msg: 'descarga finalizada...', body: returnValue } });
-      //   if (returnValue.response == 0) this.autoUpdater.quitAndInstall();
-      // });
+      // Configurar la variable global para indicar que estamos cerrando para actualizar
+      sharedState.isUpdaterClosing = true;
+
+      this.autoUpdater.quitAndInstall();
 
       writeLogs(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
     });
@@ -110,6 +91,36 @@ export default class AppUpdate {
       writeLogs(error, 'ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
       SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_ERROR, data: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
       writeLogs('FINAL - ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
+    });
+  }
+
+  async downloadUpdate() {
+    writeLogs('Iniciando descarga de actualización por solicitud del usuario');
+    this.autoUpdater.downloadUpdate();
+  }
+
+  async verificateUpdateAvailable() {
+    return new Promise<UpdateInfo | null>((resolve, reject) => {
+      try {
+        writeLogs('Simulando verificación de actualizaciones (MODO PRUEBA)');
+
+        writeLogs('Iniciando verificación de actualizaciones');
+        this.autoUpdater.checkForUpdates().then(res => {
+          writeLogs(res, 'RESPUESTA DE VERIFICACION DE ACTUALIZACIONES');
+
+          setTimeout(() => {
+            if (res) {
+              writeLogs('Actualización disponible');
+              resolve(res.updateInfo);
+            } else {
+              writeLogs('No hay actualizaciones disponibles');
+              resolve(null);
+            }
+          }, 1000);
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 }

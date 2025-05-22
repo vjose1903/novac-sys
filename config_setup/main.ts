@@ -2,7 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ConfigI } from './src/app/core/interface/config-interface';
-
+ 
 const { exec } = require('child_process');
 
 import Functions from './electron/functions';
@@ -25,6 +25,8 @@ import SharedElectronAngular, {
   ELECTRON_EXPORT_CSV,
   ELECTRON_FOCUS_WINDOW,
   ELECTRON_OPEN_WEB_BROWSER,
+  ELECTRON_EVENT_DOWNLOAD_UPDATE,
+  ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE,
 } from './electron/shared-electron-angular';
 import AppUpdate from './electron/auto-update';
 import ReplaceInFile from './electron/replace-in-file';
@@ -34,6 +36,7 @@ import ExportToExcel from './electron/export-to-excel';
 import LogProcessor from './electron/write-logs';
 import MachineId from './electron/machine-id';
 import OpenBrowser from './electron/open-web-browser';
+import { sharedState } from './electron/shared-state';
 
 let win: BrowserWindow | null;
 let splash: BrowserWindow | null;
@@ -122,8 +125,12 @@ function createWindow() {
 
       // Evento cuando se intenta cerrar la ventana con el boton de cerrar
       win.on('close', (event: any) => {
-        event.preventDefault();
-        sendCloseConfirmation();
+        if (!sharedState.isUpdaterClosing) {
+          event.preventDefault();
+          sendCloseConfirmation();
+        } else {
+          closeApp();
+        }
       });
 
       resolve(win);
@@ -292,6 +299,27 @@ async function handleEvent(event: any, obj: string) {
         // test function
         break;
       //
+      case ELECTRON_EVENT_DOWNLOAD_UPDATE:
+        writeLogs('Descargando actualización');
+        auto_updater.downloadUpdate();
+        break;
+      //
+      case ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE:
+        writeLogs('Verificando actualizaciones');
+        auto_updater.verificateUpdateAvailable().then(res => {
+          task.response = res;
+          console.log('task', task);
+          console.log('res', res);
+
+          event.reply(ELECTRON_RESPONSE, task);
+
+        }).catch(err => {
+          task.error = true;
+          task.response = err;
+          event.reply(ELECTRON_RESPONSE, task);
+        });
+        break;
+      //
       case ELECTRON_RELOAD:
         writeLogs('RECARGANDO ELECTRON');
         win?.reload();
@@ -300,7 +328,7 @@ async function handleEvent(event: any, obj: string) {
       //
       case ELECTRON_OPEN_WEB_BROWSER:
         openBrowser.open(parameters.url);
-        break
+        break;
       case ELECTRON_CHANGE_CONFIG_FILE:
         replace_in_file
           .replaceFunction(parameters)

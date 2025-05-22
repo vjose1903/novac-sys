@@ -76,8 +76,11 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
         .getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } })
         .then(res => {
           if (res.data && res.data.length > 0) {
-            const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null };
-            if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado && !this.isSuplidor) res.data.unshift(cliente_contado);
+            const contado_name = 'Cliente contado';
+            const cliente_contado = { id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null };
+            const busqueda_include_contado = contado_name.includes(palabra_a_buscar);
+
+            if (this.inputs?.include_contado && !this.isSuplidor && busqueda_include_contado) res.data.unshift(cliente_contado);
 
             res.data.map(async entidad => {
               entidad.nombre = entidad.nombre ? fun.Capitalice(entidad.nombre) : '----------';
@@ -104,6 +107,8 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
   tableClickRow(event) {
     const modal = this.closeThis();
+
+    if (this.inputs?.after_select) event.data.after_select = this.inputs.after_select
     modal.returnDataFromModal({ data: event.data, modal_id: this.modal.component_id });
   }
 

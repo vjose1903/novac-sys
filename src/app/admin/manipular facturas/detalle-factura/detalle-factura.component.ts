@@ -6,6 +6,7 @@ import { ModalDetalleFacturaI } from './detalle-factura.model';
 import { MessageTask } from '@core/models/message-task';
 import { ELECTRON_OPEN_WEB_BROWSER } from '../../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
+import { DateUtils } from '@vjose1903/dateutils';
 
 @Component({
   selector: 'app-detalle-factura',
@@ -20,12 +21,18 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   TrackStatusEnum = TrackStatusEnum;
   serie = serie;
   fun = fun;
-  detalles: ModalDetalleFacturaI[] = [{ label: 'Forma de pago', key: 'forma_pago', tipo: 'string' }];
+  detalles: ModalDetalleFacturaI[] = [
+    { label: 'Forma de pago', key: 'forma_pago', tipo: 'string', div_clase: 'col-12 col-md-6 p-0 ' },
+    { label: 'Fecha', key: 'fecha_equivalente', tipo: 'date', div_clase: 'col-12 col-md-6 p-0 pl-md-3' },
+    { label: 'Comprobante', key: 'numero_comprobante', tipo: 'tag', div_clase: 'col-12 p-0', clase_string: 'text-black mb-0', bg_tag: '#bfbfbf' },
+  ];
   _ipc = inject(IpcService);
 
   constructor() {}
 
   ngOnInit(): void {
+    console.log(" ---> ", this.getValue({ label: 'Fecha', key: 'fecha_equivalente', tipo: 'date', div_clase: 'col-12 col-md-6 p-0 pl-md-3' }));
+    
     this.validateElectronicInfoceDetails();
   }
 
@@ -38,6 +45,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
         label: 'Estado Ecf',
         key: 'is_aceptada',
         tipo: 'tag',
+        div_clase: 'col-12 pl-0',
         clase_string: is_aceptada == TrackStatusEnum.ACCEPTED ? 'text-success' : is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED ? 'text-warning' : is_aceptada == TrackStatusEnum.REJECTED ? 'text-danger' : 'text-secondary',
         bg_tag: is_aceptada == TrackStatusEnum.ACCEPTED ? '#98ff98' : is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED ? '#ffff98' : is_aceptada == TrackStatusEnum.REJECTED ? '#fb9898' : '#bfbfbf',
       });
@@ -58,6 +66,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
     let value = fun.getProperty(this.inputs.data, config.key);
 
     if (config.tipo == 'number') value = fun.roundNumberToDecimal(value);
+    if (config.tipo == 'date') value = DateUtils.format({ date: value, dateFormat: 'dd/MM/yyyy', include_hour: true, hourFormat: 'hh:mm a', separator: ' ' });
 
     if (config.transform) value = config.transform(value);
     return value;

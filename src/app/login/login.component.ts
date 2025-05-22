@@ -19,6 +19,7 @@ import { ConfigI } from '@core/interface/config-interface';
 import { fun } from '@core/services/functions.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { FacturaC } from '@admin/facturacion/factura';
+import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 
 @Component({
   selector: 'app-login',
@@ -39,6 +40,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   configApp: ConfigI;
 
   htmlServ = inject(HtmlElementsService);
+  copyToClipboardServ = inject(CopyToClipboardService);
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -131,6 +133,14 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
   getDataFromModal(arg, search?) {
     this.router.navigateByUrl('/auth/config');
+  }
+
+  copyMachineId() {
+    this.copyToClipboardServ.copyText(this.configApp.machineId).then(() => {
+      Ss.sharedServ.canToast = true;
+      fun.toastInfo('ID de la máquina copiado al portapapeles', 'COPIADO');
+      Ss.sharedServ.canToast = false;
+    });
   }
 
   onHideModal(arg) {}

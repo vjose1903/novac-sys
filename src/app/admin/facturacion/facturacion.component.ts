@@ -50,7 +50,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   hasPermisoCamiones: boolean;
   titulo: string;
 
-  console = console;
   datesAvailable = { viaje: { minDate: new Date() } };
 
   @HostListener('window:keydown', ['$event'])
@@ -214,9 +213,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     this.validatePermisos().then(result => {
       this.rellenarVariables().then(async () => {
-        console.log('ANDO AQUIII');
         await this.cuerpo.rellenarVariables();
-        console.log('ANDO AQUIII 2');
+
         if (this.factServ.action == actionFacturacion.update) {
           this.is_editando = true;
           this.procesoRelleno({ id: this.id_documento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.update });
@@ -229,12 +227,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           //
         } else if (this.factServ.action == actionFacturacion.duplicate) {
           this.procesoRelleno({ id: this.id_documento, tipo: this.factServ.tipoDocumento, action: actionFacturacion.duplicate }).then(res => {
-            this.abrirModalPropietario('onchange', { include_contado: true });
+            this.abrirModalPropietario();
           });
           //
         } else {
           setTimeout(() => {
-            if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario('onchange 2');
+            if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario();
             else fun.enfocarInput('tipoFact');
           }, 5);
         }
@@ -502,16 +500,24 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         }
       }
 
-      const value_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? '02' : factura.tipo_factura_id;
-      const by_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? 'key' : 'id';
+      let value_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? '02' : factura.tipo_factura_id;
+      let by_buscar = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion ? 'key' : 'id';
 
       if (![actionFacturacion.duplicate].includes(original_factura.action)) this.setPropietario(factura);
 
       // TODO: colocar electronica por defecto
-      const currentSerie = fun.hasValue(factura?.numero_comprobante) && factura.numero_comprobante.includes('E') ? serie.electronica : fun.hasValue(factura.serie) ? factura.serie : serie.normal;
+
+      let currentSerie = fun.hasValue(factura?.numero_comprobante) && factura.numero_comprobante.includes('E') ? serie.electronica : fun.hasValue(factura.serie) ? factura.serie : serie.normal;
+
+      let equivalentSerie = false;
+      if ([actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta, actionFacturacion.duplicate].includes(original_factura.action) && this.configApp.serie_default != currentSerie) {
+        currentSerie = this.configApp.serie_default;
+        equivalentSerie = true;
+      }
+
       this.factServ.setTipos(this.factServ.tipoDocumento, currentSerie).then(result => {
         this.factServ
-          .setTipoFacturaSelected(value_buscar, 'rellenarCabezaFactura', by_buscar)
+          .setTipoFacturaSelected({ value: value_buscar, by: by_buscar, equivalentSerie })
           .then(async result => {
             this.factura_pendiente = fun.hasValue(factura) && fun.objHas(factura, 'factura_pendiente') ? factura?.factura_pendiente : false;
 
@@ -779,7 +785,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         if (sali_de == 'fecha_vencimiento' && dont_have_propietario) buscar = true;
       }
 
-      if (buscar) this.abrirModalPropietario('checkCambiosModoyCondicionFactura');
+      if (buscar) this.abrirModalPropietario();
     }, 250);
   }
 
@@ -871,7 +877,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   async checkTipoFactura(where) {
     this.factServ
-      .setTipoFacturaSelected(this.factServ.tipoFacturaReferenciaSelected, 'checkTipoFactura', 'referencia')
+      .setTipoFacturaSelected({ value: this.factServ.tipoFacturaReferenciaSelected, by: 'referencia' })
       .then(result => {
         if (this.factServ.isCompra) {
           const ncf_prefix = `${this.factServ.isComprobanteNormal ? 'B' : 'E'}${this.factServ.tipoFacturaReferenciaSelected}`;
@@ -981,7 +987,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       setTimeout(() => fun.enfocarInput(siguiente_input), 10);
     } else fun.desEnfocarInput(salioDe);
 
-    if (is_buscar_cliente) this.abrirModalPropietario('saltar');
+    if (is_buscar_cliente) this.abrirModalPropietario();
     if (is_enforcar_cuerpo) this.cuerpo.seleccionarCampoEnTurno();
   }
 
@@ -1166,7 +1172,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     setTimeout(() => {
       if (this.movimientosSelected.length && !this.movimientosSelected.some(mov => fun.isEmpty(mov.user_id))) {
         if (fun.isEmpty(where) || where != 'teclado') {
-          if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura?.id)) this.abrirModalPropietario('salio de camion');
+          if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura?.id)) this.abrirModalPropietario();
           else this.cuerpo.seleccionarCampoEnTurno();
 
           this.cerrarOverlay();
@@ -1233,8 +1239,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL PARA FILTRAR CLIENTES & SUPLIDORES
   // =============================================
 
-  abrirModalPropietario(where, params?: { include_contado: boolean }) {
-    if (fun.isEmpty(params)) params = { include_contado: false };
+  abrirModalPropietario(args?: { send_factura?: boolean }) {
     let documento = this.getDocumentoDescripcion();
 
     if (this.is_editando && (this.factServ.isVenta || this.factServ.isCompra)) {
@@ -1250,11 +1255,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         botones['dinamico'] = [{ clase: 'btn btn-gris', function: instance => this.router.navigateByUrl('/admin/dashboard') && this.closeModal(instance), label: label, disable: false }];
       }
 
-      const include_contado = this.factServ.tipoDocumento === tipoDocFacturacion.cotizacion || params.include_contado;
+      const include_contado = this.factServ.isVenta || this.factServ.isCotizacion;
+
+      let after_select = { send_factura: args?.send_factura };
+      if (Object.values(after_select).every(value => fun.isEmpty(value))) after_select = null;
 
       this.openNewModal({
         component: BuscarClienteSuplidorComponent,
-        inputs: { metodo: this.factServ.tipoDocumento, include_contado: include_contado, palabra_a_buscar: ' ' },
+        inputs: { metodo: this.factServ.tipoDocumento, include_contado, palabra_a_buscar: ' ', after_select },
         id: 'buscarCliente',
         header: this.factServ.isCompra ? 'BUSCAR SUPLIDOR' : 'BUSCAR CLIENTE',
         width: '56.25rem',
@@ -1297,81 +1305,105 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL enviarABaseDatos
   // =============================================
   async imprimirFactura() {
-    let documento = this.getDocumentoDescripcion();
+    const documento = this.getDocumentoDescripcion();
+
+    // Verificación de propietario
     if (!this.factServ.propietario_factura) {
-      if (this.factServ.isCompra) fun.toastWarning(`${documento.descripcion} no tiene suplidor seleccionado`, 'Aviso');
-      else fun.toastWarning(`${documento.descripcion} no tiene cliente seleccionado`, 'Aviso');
-    } else {
-      if (this.cuerpoFactura.length == 0) {
-        fun.toastWarning(`${documento.descripcion} incompleta!!!`, 'Aviso');
-        fun.enfocarInput('codigo-0');
-      } else {
-        if (this.TOTAL == 0) {
-          fun.toastWarning(`Total de la ${documento.descripcion} no puede ser 0`, 'Aviso');
-          fun.enfocarInput('codigo-0');
-        } else {
-          if (this.is_viaje && !this.getIndicadorMovimientoViaje()) {
-            fun.toastWarning(`Debe seleccionar al menos un camión y un chofer para el viaje.`, 'Aviso');
-            document.getElementById('btnCamion').click();
-          } else {
-            if (this.factServ.tipoDocumento != tipoDocFacturacion.compra && (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.isPreVenta || this.factServ.isCotizacion)) {
-              const obj = { metodo: this.factServ.tipoDocumento, condicion_fact: this.condicion_fact, is_viaje: this.is_viaje, modo_factura: this.modo_factura };
-
-              this.openNewModal({
-                component: ConfirmacionImprimirComponent,
-                inputs: obj,
-                id: 'confirmacionImprimir',
-                header: 'Confirmación',
-                width: '30rem',
-                botones: {
-                  ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-                  dinamico: [
-                    { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
-                  ],
-                },
-              });
-            } else {
-              let articulos_a_cambiar = false;
-
-              if (this.factServ.isCompra) {
-                const cuerpo_fact = fun.deepCloning(this.cuerpoFactura);
-                this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
-              }
-
-              if (this.articulosAcambiar.length > 0) articulos_a_cambiar = true;
-
-              const obj = {
-                modo_factura: this.modo_factura,
-                condicion_fact: this.condicion_fact,
-                metodo: this.factServ.tipoDocumento,
-                total_factura: this.TOTAL,
-                efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
-                tipo_modal: 'devuelta',
-                formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
-                factura_de: this.factServ.tipoDocumento,
-                cambios_articulos: articulos_a_cambiar,
-              };
-
-              this.openNewModal({
-                component: FormCantidadEfectivoComponent,
-                inputs: obj,
-                id: 'cambioEfectivo',
-                header: 'Cantidad de efectivo',
-                width: '34.375rem',
-                botones: {
-                  ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-                  dinamico: [
-                    { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-                    { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
-                  ],
-                },
-              });
-            }
-          }
-        }
-      }
+      const entidad = this.factServ.isCompra ? 'suplidor' : 'cliente';
+      return fun.toastWarning(`${documento.descripcion} no tiene ${entidad} seleccionado`, 'Aviso');
     }
+
+    // Verificación de cuerpo de factura
+    if (this.cuerpoFactura.length === 0) {
+      fun.toastWarning(`${documento.descripcion} incompleta!!!`, 'Aviso');
+      return fun.enfocarInput('codigo-0');
+    }
+
+    // Verificación de total
+    if (this.TOTAL == 0) {
+      fun.toastWarning(`Total de la ${documento.descripcion} no puede ser 0`, 'Aviso');
+      return fun.enfocarInput('codigo-0');
+    }
+
+    // Verificación de viaje
+    if (this.is_viaje && !this.getIndicadorMovimientoViaje()) {
+      fun.toastWarning(`Debe seleccionar al menos un camión y un chofer para el viaje.`, 'Aviso');
+      return document.getElementById('btnCamion').click();
+    }
+
+    // Verificación FC > 250k
+    if (this.factServ.isVenta && this.factServ.tipoFacturaReferenciaSelected == comprobanteElectronico.factura_de_consumo && fun.desformatearStNumber(this.TOTAL) > 250000 && fun.isEmpty(this.factServ?.propietario_factura?.id)) {
+      fun.toastWarning('Se debe seleccionar un cliente, para las Facturas de Consumo Electrónico, con valor mayor a RD$250,000.00', 'Aviso');
+      return this.abrirModalPropietario({ send_factura: true });
+    }
+
+    // Procesar según el tipo de documento
+    if (this.factServ.tipoDocumento != tipoDocFacturacion.compra && (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.isPreVenta || this.factServ.isCotizacion)) {
+      return this.abrirModalConfirmacionImprimir();
+    } else {
+      return this.abrirModalCantidadEfectivo();
+    }
+  }
+
+  private abrirModalConfirmacionImprimir() {
+    const obj = {
+      metodo: this.factServ.tipoDocumento,
+      condicion_fact: this.condicion_fact,
+      is_viaje: this.is_viaje,
+      modo_factura: this.modo_factura,
+    };
+
+    this.openNewModal({
+      component: ConfirmacionImprimirComponent,
+      inputs: obj,
+      id: 'confirmacionImprimir',
+      header: 'Confirmación',
+      width: '30rem',
+      botones: {
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [
+          { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
+          { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
+        ],
+      },
+    });
+  }
+
+  private async abrirModalCantidadEfectivo() {
+    let articulos_a_cambiar = false;
+
+    if (this.factServ.isCompra) {
+      const cuerpo_fact = fun.deepCloning(this.cuerpoFactura);
+      this.newCuerpo = await this.revisarPrecios(cuerpo_fact);
+      articulos_a_cambiar = this.articulosAcambiar.length > 0;
+    }
+
+    const obj = {
+      modo_factura: this.modo_factura,
+      condicion_fact: this.condicion_fact,
+      metodo: this.factServ.tipoDocumento,
+      total_factura: this.TOTAL,
+      efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
+      tipo_modal: 'devuelta',
+      formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
+      factura_de: this.factServ.tipoDocumento,
+      cambios_articulos: articulos_a_cambiar,
+    };
+
+    this.openNewModal({
+      component: FormCantidadEfectivoComponent,
+      inputs: obj,
+      id: 'cambioEfectivo',
+      header: 'Cantidad de efectivo',
+      width: '34.375rem',
+      botones: {
+        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+        dinamico: [
+          { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
+          { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
+        ],
+      },
+    });
   }
 
   getDocumentoDescripcion() {
@@ -1481,7 +1513,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   resetVariables() {
     this.rellenarVariables().then(() => {
       setTimeout(() => {
-        if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario('reset');
+        if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario();
         else fun.enfocarInput('tipoFact');
       }, 5);
     });
@@ -1638,7 +1670,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         }
       }
 
-      if (this.factServ.action == actionFacturacion.duplicate) {
+      if (arg?.data?.after_select?.send_factura) {
+        this.imprimirFactura();
+      } else if (this.factServ.action == actionFacturacion.duplicate) {
         fun.enfocarAndSelectInput('tipoFact');
       } else {
         this.cuerpo.seleccionarCampoEnTurno();
@@ -1712,7 +1746,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     cabecera_fact['fecha_valida'] = fecha_valida;
-    cabecera_fact['tipo_factura_id'] = this.factServ.tipoFactura.id;
+    cabecera_fact['tipo_factura_id'] = this.factServ?.tipoFactura?.id;
     cabecera_fact['numero_comprobante'] = this.factServ.isCompra ? this.NCFcompra() : null;
     cabecera_fact['costoYgasto'] = this.factServ.isCompra ? this.CostoYgasto() : null;
     cabecera_fact['numero_factura'] = null;
@@ -1773,7 +1807,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
     else res = await this.facturaClass.createOne(cabecera_fact);
 
-    // if (this.factura_guardada) this.revisarLocalStorage();
+    if (this.factura_guardada) this.revisarLocalStorage();
 
     this.facturaClass.parseDataToPdf(res['data']).then(async factura_parsed => {
       const obj = { data: factura_parsed, type: documento.tipo };

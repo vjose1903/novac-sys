@@ -24,6 +24,7 @@ import {
   ELECTRON_CLOSE_CONFIRMATION,
   ELECTRON_SHOW_CLOSE_CONFIRMATION,
   ELECTRON_GET_APP_CONFIG,
+  ELECTRON_EVENT_DOWNLOAD_UPDATE,
 } from '../../electron/shared-electron-angular';
 
 import { Subscription } from 'rxjs';
@@ -115,6 +116,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
             //
             case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
               fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, data);
+              this.mostrar_modal_actualizacion(data);
               break;
             //
             case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
@@ -131,14 +133,21 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
               fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
               break;
             //
-            case ELECTRON_SHOW_CLOSE_CONFIRMATION:
-              this.cerrar_app();
-              break;
             //
             case ELECTRON_EVENT_UPDATE_ERROR:
               fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
               fun.toastError(data.msg, 'ERRROR');
               this.visible = false;
+              break;
+            //
+            case ELECTRON_SHOW_CLOSE_CONFIRMATION:
+              const token = fun.getAuthToken();
+
+              if (fun.hasValue(token)) {
+                this.cerrar_app();
+              } else {
+                this.sendCloseConfirmation();
+              }
               break;
             //
             case 'test':
@@ -230,8 +239,42 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     fun.setWindowSize(window);
   }
 
+  mostrar_modal_actualizacion(info) {
+    Ss.zone.run(() => {
+      this.openNewModal({
+        html: `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`,
+        id: 'actualizar_app',
+        header: 'ACTUALIZACIÓN DISPONIBLE',
+        width: '40rem',
+        botones: {
+          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+          dinamico: [
+            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cancelar', disable: false },
+            {
+              clase: 'btn btn-verde',
+              function: instance => {
+                this.iniciar_descarga_actualizacion();
+                instance.closeModal(instance.id, 'cancel');
+              },
+              label: 'Actualizar',
+              disable: false,
+            },
+          ],
+        },
+      });
+    });
+  }
+
+  iniciar_descarga_actualizacion() {
+    const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
+    this._ipc.sendTask(task).then(res => {
+      console.log('res ---> ', res);
+      this.visible = true;
+    });
+  }
+
   downloadProgression(object) {
-    this.zone.run(() => {
+    Ss.zone.run(() => {
       if (this.counter == 1) this.visible = true;
 
       this.counter++;
