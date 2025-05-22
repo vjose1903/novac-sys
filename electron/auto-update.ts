@@ -102,8 +102,6 @@ export default class AppUpdate {
   async verificateUpdateAvailable() {
     return new Promise<UpdateInfo | null>((resolve, reject) => {
       try {
-        writeLogs('Simulando verificación de actualizaciones (MODO PRUEBA)');
-
         writeLogs('Iniciando verificación de actualizaciones');
         this.autoUpdater.checkForUpdates().then(res => {
           writeLogs(res, 'RESPUESTA DE VERIFICACION DE ACTUALIZACIONES');

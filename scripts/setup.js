@@ -52,6 +52,7 @@ const files = [
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
   { tipo: 'reemplazo', file_name: 'package.json', path: 'package.json' },
   { tipo: 'reemplazo', file_name: 'main.ts', path: 'main.ts' },
+  { tipo: 'reemplazo', file_name: 'deploy.yml', path: '.github/workflows/deploy.yml' },
 ];
 
 function makeSetup(tipo) {

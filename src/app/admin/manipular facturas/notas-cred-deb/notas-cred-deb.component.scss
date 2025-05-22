@@ -1,3 +1,10 @@
+.titulo-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
 .cardNota {
   display: grid;
   overflow: hidden;
@@ -7,10 +14,6 @@
     'pieNota';
 
   grid-template-rows: min-content auto min-content;
-
-  .titulo {
-    grid-area: titulo;
-  }
 
   .cabezaNota {
     grid-area: cabezaNota;

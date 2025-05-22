@@ -6,10 +6,10 @@ const moment = require('../../../core/javascript/moment');
 import { Router } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';
-import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC, DetalleFactura, request_factura_campo, tipoDocFacturacion } from '../../facturacion/factura';
+import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC, DetalleFactura, request_factura_campo, tipoDocFacturacion, TipoFacturaI } from '../../facturacion/factura';
 import { NcfC } from '@registros/ncf/ncf';
 import { ClienteC } from '@registros/registro-clientes/cliente';
-import { NotaC } from './notas';
+import { comprobanteElectronico, comprobanteNormal, NotaC } from './notas';
 import { fun } from '@core/services/functions.service';
 import { Permisos } from '@core/typescript/permisos';
 import { table_config, transformType } from '@components/new_tablas/tabla-class';
@@ -17,6 +17,8 @@ import { ConfirmacionImprimirComponent } from '@components/formularios en modale
 import { ModalClass } from '@components/modal/modal-class';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import Big from 'big.js';
+import { serie, seriesDGII, seriesDgiiI } from '@core/typescript/constantes';
+import { DateUtils } from '@vjose1903/dateutils';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -27,6 +29,7 @@ import Big from 'big.js';
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   @Input() id_factura: number;
   @Input() tipoNota: any;
+  @Input() serie: serie;
 
   factura!: FacturasI;
 
@@ -49,7 +52,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   fecha: string;
   convertObj = { credito: -1, debito: 1 };
   info = [];
-  tipoFactura: any;
+
+  tipoFactura: TipoFacturaI;
 
   paqueteComprobante;
   is_print = false;
@@ -62,6 +66,9 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   clienteClass = new ClienteC();
   ncfClass = new NcfC();
   permissions = Permisos;
+
+  serieSelected = signal<serie>(null);
+  serieOptions: seriesDgiiI[] = seriesDGII({ includeAll: false });
 
   table_config: table_config = {
     info: [
@@ -100,7 +107,14 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   constructor(private router: Router) {
     super();
 
-    effect(() => {});
+    effect(async () => {
+      if (this.serieSelected()) {
+        const type = this.isCredito ? 'nota_credito' : 'nota_debito';
+        this.tipoFactura = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[this.serieSelected()][type] && tipo.serie == this.serieSelected());
+
+        await this.getPaqueteComprobante();
+      }
+    });
   }
 
   ngOnInit() {
@@ -108,14 +122,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.configApp = Ss.configServ.getConfig({ isPromise: false });
 
     this.fecha = moment().format('DD/MM/YYYY');
-
+    this.serieSelected.set(this.serie);
     if (this.isCredito) {
       this.tituloPag = 'Nota de crédito aplicada a factura ';
-      this.tipoFactura = '04';
+
       this.agregarColumnaDevolver();
     } else {
       this.tituloPag = 'Nota de débito aplicada a factura ';
-      this.tipoFactura = '03';
     }
 
     if (this.configApp.calcular_itbis) this.agregarItbisEnTabla();
@@ -139,13 +152,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       this.factura = datos;
 
       this.cliente_id = datos.cliente_id;
-
-      await this.getPaqueteComprobante();
     });
   }
 
   async getPaqueteComprobante() {
-    const TipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia === this.tipoFactura);
+    const TipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia === this.tipoFactura.referencia);
 
     this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` }).then(res => {
       this.paqueteComprobante = res['data'];
@@ -159,6 +170,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         key: 'cant_nota',
         tipo: 'input',
         inputType: 'number',
+        // interactWithMouse: true,
         textAlign: 'end',
         disable: [
           { kind: 'campo', target: 'select', value: [false] },
@@ -193,14 +205,14 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           const devueto = devueltos[factura.id]?.detalles[detalle.id] || 0;
 
           const articulo = detalle.articulo as ArticuloI;
-          detalle['articulo'] = { ...articulo , descripcion: articulo.nombre };
+          detalle['articulo'] = { ...articulo, descripcion: articulo.nombre };
           detalle['select'] = false;
           detalle['colorItbis'] = dias_de_creada >= 30 ? 'red' : 'black';
           detalle['can_return_itbis'] = dias_de_creada < 30;
 
           detalle['min_'] = 0;
           detalle['max_'] = this.isCredito ? detalle.cantidad - devueto : null;
-          
+
           detalle['total_nota'] = '0.00';
           detalle['cantidad'] = detalle.cantidad - devueto;
           detalle['cant_nota'] = 0;
@@ -291,6 +303,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         }
       }
     }
+    Ss.cdRef.detectChanges();
   }
 
   tableInputChange(params) {
@@ -298,15 +311,24 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     const { key, value, id_tabla, index } = params;
     let precio_real_value = data.precio_real;
     let cant_nota_value = fun.desformatearStNumber(data.cant_nota);
+    const detalle_factura = this.factura.detalle_facturas.find(detalle => detalle.id == data.id);
+
     // Manejo del checkbox de selección
+
     if (key === 'select') {
       if (!value) {
-        data.total_nota = '0.00';
-        data.cant_nota = 0;
-        data.precio_real = fun.roundNumberToDecimal(data.precio);
-        // data.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? data.precio_real * 0.18 : 0);
+        setTimeout(() => {
+          // Actualizar también en el objeto factura.detalle_facturas
+          if (detalle_factura) {
+            detalle_factura.total_nota = '0.00';
+            detalle_factura.cant_nota = '0';
+            detalle_factura.precio_real = fun.roundNumberToDecimal(detalle_factura.precio);
+          }
+          // data.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? data.precio_real * 0.18 : 0);
 
-        this.detalleNota.update(detalles => detalles.filter(detalle => detalle.id !== data.id));
+          this.detalleNota.update(detalles => detalles.filter(detalle => detalle.id !== data.id));
+          Ss.cdRef.detectChanges();
+        }, 500);
       } else {
         this.detalleNota.update(detalles => [...detalles, data]);
       }
@@ -347,14 +369,15 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       }
 
       // TODO: hablar con papi a ver como es que se maneja el itbis en las notas de credito y debito
-      data.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? precio_real * 0.18 : 0);
-      this.sumarTotalRow(data, cant_nota_value, precio_real);
+      detalle_factura.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? precio_real * 0.18 : 0);
+      this.sumarTotalRow(detalle_factura, cant_nota_value, precio_real);
 
       precio_real_value = precio_real;
     }
 
     // Actualización del estado
     this.detalleNota.update(detalles => detalles.map(detalle => (detalle.id === data.id ? { ...detalle, ...data, precio_real: precio_real_value, cant_nota: cant_nota_value } : detalle)));
+    Ss.cdRef.detectChanges();
   }
 
   sumarTotalRow(data: DetalleFactura, cant_nota: number, precio_real: number) {
@@ -368,35 +391,21 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       return;
     }
 
-    console.log(" ")
-    console.log(" ")
-    console.log(" ------------------------------")
-    console.log(" precio ", precio)
-    console.log(" ------------------------------")
-    console.log(" descuento ", data.descuento_valor)
-    console.log(" descuento_equivalente ", descuento)
-    console.log(" cant_nota ", cant_nota)
-
-
     let total = 0;
 
     if (this.isCredito) {
-
       const itbis = data.calcular_itbis && data.can_return_itbis ? precio * 0.18 : 0;
       const precio_itbis = precio + itbis;
       total += cant_nota * (precio_itbis - descuento);
     }
-    console.log('total', total);
-    
-    
+
     if (precio != precio_real_value) {
       const itbis_real = fun.desformatearStNumber(data.itbis_real);
       const precio_itbis_real = precio_real_value + itbis_real;
       const total_real = data.cantidad * (precio_itbis_real - descuento);
-      
+
       total += Math.abs(data.total - total_real);
     }
-    console.log('total', total);
 
     data.total_nota = fun.roundNumberToDecimal(total);
   }
@@ -484,15 +493,21 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async formarNota() {
-    const TipoFact = Ss.factServ.lista_tipos_facturas.filter(tipo => tipo.referencia === this.tipoFactura);
-    const fecha_valida = this.paqueteComprobante.fecha_valida !== null ? moment(this.paqueteComprobante.fecha_valida).format('DD/MM/YYYY') : null;
+    let fecha_valida = null;
+
+    if (fun.hasValue(this.paqueteComprobante?.fecha_valida) && DateUtils.isValid(new Date(this.paqueteComprobante?.fecha_valida))) {
+      const formatConfig = { dateFormat: 'YYYY-MM-DD', include_hour: true, hourFormat: 'HH:MM:SS', separator: ' ' };
+
+      fecha_valida = DateUtils.format({ date: DateUtils.add(4, 'hours', this.paqueteComprobante?.fecha_valida), ...formatConfig });
+    }
 
     const dataToSend = {
       cliente_id: this.cliente_id,
       user_id: null,
       fecha_valida,
-      tipo_factura_id: TipoFact[0].id,
+      tipo_factura_id: this.tipoFactura.id,
       total: this.totalGlobal(),
+      serie: this.serieSelected(),
       facturas_aplicadas: [],
     };
 
@@ -505,7 +520,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       detalles_facturas_notas: this.detalleNota()
         .filter(detalle => fun.desformatearStNumber(detalle.total_nota) > 0)
         .map(detalle => {
-          const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota, cantidad} = detalle;
+          const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota, cantidad } = detalle;
 
           let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'articulo', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor', 'descripcion']);
 
@@ -534,9 +549,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     };
 
     dataToSend.facturas_aplicadas.push(objTemp);
-
-    console.log('--> ', JSON.stringify(dataToSend));
-    console.log('--> ', dataToSend);
 
     const res = await this.notasClass.createOne(dataToSend);
 
