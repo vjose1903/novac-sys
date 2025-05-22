@@ -141,6 +141,15 @@
               (clickFunction)="openSide()">
             </btn-icon-circular>
           }
+
+          @if (buscarPara.includes('nota') && mostrarListaFacturas()) {
+            <div class="d-flex justify-content-end">
+              <div class="form-group mb-0">
+                <label class="control-label mb-0">Serie {{ para }}: </label>
+                <p-selectButton [options]="makeNotasSerieOptions" [ngModel]="makeNotaSerieSelected()" (ngModelChange)="makeNotaSerieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+              </div>
+            </div>
+          }
         </div>
       </div>
     </div>

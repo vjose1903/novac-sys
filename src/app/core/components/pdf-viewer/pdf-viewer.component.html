@@ -1,7 +1,7 @@
 <div class="position-relative w-100 h-100">
   @if (inputs?.show_estado && !inputs?.estado_documento) {
     <span class="canceladaContent">
-      <span class="canceladaContent"> FACTURA ANULADA </span>
+      <span class="canceladaContent"> {{ inputs?.documento | uppercase }} ANULADA </span>
     </span>
   }
   <ngx-extended-pdf-viewer

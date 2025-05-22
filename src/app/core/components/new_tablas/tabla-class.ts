@@ -20,6 +20,7 @@ export interface table_info {
   checkNumber?: boolean;
   can_reset?: boolean;
   inputType?: string;
+  interactWithMouse?: boolean;
   inputEvents?: string;
   textAlign?: 'start' | 'center' | 'end';
   tooltip?: string;
@@ -202,6 +203,10 @@ export class TablaClass {
         this.tableInputBlur(event.info);
         break;
 
+      case 'inputFocus':
+        this.tableInputFocus(event.info);
+        break;
+
       case 'paginatorChange':
         this.tablePaginatorChange(event.info);
         break;
@@ -216,5 +221,6 @@ export class TablaClass {
   tableClickIcon(arg) {}
   tableInputChange(arg) {}
   tableInputBlur(arg) {}
+  tableInputFocus(arg) {}
   tablePaginatorChange(arg) {}
 }

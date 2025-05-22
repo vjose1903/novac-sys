@@ -2,7 +2,7 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { actionFacturacion, deleteDocumentosTypes, request_factura_campo, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from '@core/services/singleton.service';
 import { serie, seriesDgiiI } from '@core/typescript/constantes';
-import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input, computed, signal, effect } from '@angular/core';
+import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input, computed, signal, effect, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -23,6 +23,7 @@ import { TitleCasePipe } from '@angular/common';
 import { seriesDGII } from '@core/typescript/constantes';
 
 import * as _ from 'lodash';
+import { ConfigI } from '@core/interface/config-interface';
 const moment = require('../../../core/javascript/moment');
 
 @Component({
@@ -31,7 +32,7 @@ const moment = require('../../../core/javascript/moment');
   styleUrls: ['./buscar-factura.component.scss'],
   standalone: false,
 })
-export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnDestroy {
+export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChanges, OnDestroy {
   @Input() buscarPara: any;
   facturas = [];
 
@@ -48,6 +49,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
   facturaClass = new FacturaC();
   tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
+  configApp: ConfigI;
 
   notas: any = [];
   notaSelected: string;
@@ -68,11 +70,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     suplidor: request_factura_campo.suplidor_id,
   };
 
-  serieSelected = signal<serie>(serie.all);
   facturasSerieOptions: seriesDgiiI[] = [];
+  serieSelected = signal<serie>(serie.all);
 
   notasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
   notaSerieSelected = signal<serie>(serie.all);
+
+  makeNotasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: false });
+  makeNotaSerieSelected = signal<serie>(serie.electronica);
 
   fun = fun;
   serie = serie;
@@ -91,8 +96,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   table_notas_config: table_config = {
     info: [
+      { titulo: '1', tipo: 'icon', key: 'estado', style: { width: '2rem', color: 'var(--transparente00)' }, iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+      { titulo: 'Estado', tipo: 'text', key: 'estado' },
       { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
-      { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '7rem' }] },
+      { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', style: { width: '7rem' } },
       { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total' },
       { titulo: 'Acciones', tipo: 'icon', key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }] },
     ],
@@ -118,6 +125,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     effect(() => {
       if (this.serieSelected() && this.buscar_por == request_factura_campo.last_50) this.loadFacturasChangingSerie();
     });
+  }
+
+  ngOnInit(): void {
+    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.makeNotaSerieSelected.set(this.configApp.serie_default);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -187,7 +199,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[this.serieSelected()][this.buscarPara]);
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[this.makeNotaSerieSelected()][this.buscarPara]);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
@@ -272,11 +284,17 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
         const res = await this.notasClass.getAll(extra);
 
         res['data'].forEach(nota => {
+          nota.tipo = this.buscarPara;
+          const estatus = this.getIsActiveInfo(nota);
+
           nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
           nota.total = Math.abs(nota.total);
           nota.selectedColor = 'gris-claro';
           nota.viewColor = 'gris-claro';
           nota.view = 'far fa-eye-slash';
+          nota.is_active = estatus.icon;
+          nota.is_active_tooltip = estatus.tooltip;
+          nota.is_active_color = estatus.color;
 
           nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
@@ -446,6 +464,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
         res.color = documento.estado ? (fun.hasValue(documento.fecha_completada) ? 'green' : 'yellow') : 'red';
 
         //
+      } else if (documento.tipo == tipoDocFacturacion.nota_credito || documento.tipo == tipoDocFacturacion.nota_debito) {
+        res.icon = documento.estado ? 'fas fa-check' : 'fas fa-times';
+        res.tooltip = documento.estado ? 'Nota Activa' : 'Nota Inactiva';
+        res.color = documento.estado ? 'green' : 'red';
       } else {
         res.icon = documento.estado ? 'fas fa-check' : 'fas fa-times';
         res.tooltip = documento.estado ? 'Factura Activa' : 'Factura Inactiva';
@@ -588,9 +610,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     } else if (params.id_tabla == shearchDocumentTableId) {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
-          console.log('%c params.data ', 'color: red; font-weight: bold;', fun.deepCloning(params.data));
           this.facturaClass.parseDataToPdf(params.data).then(factura_parsed => {
-            console.log('%c factura_parsed ', 'color: green; font-weight: bold;', fun.deepCloning(factura_parsed));
             this.facturaSelected = factura_parsed;
             const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
             this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota: this.buscarPara.includes('nota') });
@@ -744,7 +764,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
     if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
 
     if (this.noExistenComprobantes == false) {
-      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${idFactSelect}`;
+      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${idFactSelect}/${this.makeNotaSerieSelected()}`;
       this.router.navigateByUrl(url);
     }
   }
@@ -774,6 +794,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
           show_estado: true,
           estado_documento: factura.estado,
           base64: res.base64,
+          documento: type == 'nota' ? 'Nota' : 'Factura',
           reimprimir: res.reimprimir,
           fileName: _.first(res.file.split('.')),
         };
@@ -794,7 +815,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
         if (this.tipo_documento_selected() != tipoDocFacturacion.cotizacion && this.tipo_documento_selected() != tipoDocFacturacion.pre_venta) {
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-gris',
-            function: instance => this.verDetalles(type == 'nota' ? dataDB : factura, type),
+            function: instance => this.verDetalles(type == 'nota' ? dataDB : factura),
             label: 'Ver detalles',
             disable: false,
           });
@@ -870,13 +891,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnChanges, OnD
       });
   }
 
-  verDetalles(data, tipo) {
-    let configModal;
-
-    console.log('%c data ', 'color: red; font-weight: bold;', data);
-    
-    if (tipo == 'nota') configModal = this.notasClass.modalVerDetalles(data);
-    if (tipo == 'facturacion') configModal = this.facturaClass.modalVerDetalles(data);
+  verDetalles(data) {
+    const tipo = this.buscarPara.includes('nota') ? 'Nota' : 'Factura';
+    const configModal = this.facturaClass.modalVerDetalles(data, tipo);
 
     this.openNewModal(configModal);
   }

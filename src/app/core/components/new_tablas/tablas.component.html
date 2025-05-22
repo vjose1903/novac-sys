@@ -108,7 +108,15 @@
                                 }
                                 @case ('icon') {
                                   <span class="w-100">
-                                    <icons-array [column]="column" [config]="config" [indexBody]="getIndex(indexBody)" [realIdTabla]="realIdTabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="data" (icon_click)="iconsClick($event)"></icons-array>
+                                    <icons-array
+                                      [column]="column"
+                                      [config]="config"
+                                      [indexBody]="getIndex(indexBody)"
+                                      [realIdTabla]="realIdTabla"
+                                      [seleccionado]="seleccionado"
+                                      [rowData]="rowData"
+                                      [data]="data"
+                                      (icon_click)="iconsClick($event)"></icons-array>
                                   </span>
                                 }
                                 @case ('tag') {
@@ -135,7 +143,14 @@
                                     }
                                     @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace) {
                                       <div class="table_switch">
-                                        <input class="apple-switch" [ngClass]="{ disabled: disableInput(rowData, column) }" type="checkbox" (change)="changeValorCheck(rowData, column, getIndex(indexBody))" [checked]="getValueForm(column, rowData)" />
+                                        <input
+                                          class="apple-switch"
+                                          [ngClass]="{ disabled: disableInput(rowData, column) }"
+                                          type="checkbox"
+                                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
+                                          (blur)="handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
+                                          (change)="changeValorCheck(rowData, column, getIndex(indexBody))"
+                                          [checked]="getValueForm(column, rowData)" />
                                       </div>
                                     }
                                   </span>
@@ -190,6 +205,8 @@
                                           type="{{ column.inputType ? column.inputType : 'text' }}"
                                           [value]="getValueForm(column, rowData)"
                                           [disabled]="disableInput(rowData, column)"
+                                          (mouseleave)="column.interactWithMouse ? inputTable.blur() : null"
+                                          (mouseenter)="column.interactWithMouse ? inputTable.focus() : null"
                                           (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
                                           (blur)="checkNumber($event.target, column, getIndex(indexBody)); handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
                                           (keyup)="changeValorInput($event, column, column.key, getIndex(indexBody), htmlServ.getValue($event), rowData)" />

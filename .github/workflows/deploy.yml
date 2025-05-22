@@ -20,6 +20,9 @@ jobs:
       - name: Install dependencies
         run: npm i
 
+      - name: Ejecutar script de configuración
+        run: node ./scripts/start.js -p -c agrodemi
+        
       - name: Build Novac App
         id: build-novac-app
         env:

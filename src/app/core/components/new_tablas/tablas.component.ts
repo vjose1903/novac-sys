@@ -472,7 +472,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
 
     const obj = { column, data, index: index_body, id_tabla: this.realIdTabla };
-    this.handle_table_events('inputBlur', obj);
+    this.handle_table_events(type == 'blur' ? 'inputBlur' : 'inputFocus', obj);
   }
 
   changeValorInput(event, column, key, index, value, data) {

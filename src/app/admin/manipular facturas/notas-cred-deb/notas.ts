@@ -4,8 +4,6 @@ import { CrudG } from '@core/typescript/crud-g';
 import * as _ from 'lodash';
 const moment = require('../../../core/javascript/moment');
 import { fun } from '@core/services/functions.service';
-import { DetalleNotaComponent } from '../detalle-nota/detalle-nota.component';
-import { ModalClass } from '@components/modal/modal-class';
 import { ReporteC } from '../../reportes/reporte';
 import { csvConfig } from '@core/services/reports/excel/configs/report/notas';
 import { serie, unidadAbrev } from '@core/typescript/constantes';
@@ -55,8 +53,6 @@ export class NotaC extends CrudG<any> {
       const pick_nota = [...pick_nota1, ...pick_nota2];
 
       let temp_data_parsed = _.pick(fun.deepCloning(data), pick_nota);
-
-      console.log('%c temp_data_parsed ', 'color: red', temp_data_parsed);
 
       temp_data_parsed.ncf_modificado = temp_data_parsed.facturas_aplicadas[0]?.cabecera_factura?.numero_comprobante || '';
 
@@ -117,21 +113,6 @@ export class NotaC extends CrudG<any> {
     });
 
     return detalles;
-  }
-
-  modalVerDetalles(data) {
-    return {
-      component: DetalleNotaComponent,
-      inputs: { data: data },
-      id: `detalle_nota`,
-      header: 'Detalles Notas',
-      width: '60rem',
-      height: '30rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
-      },
-    };
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
