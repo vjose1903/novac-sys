@@ -1,37 +1,37 @@
-import { ConfigI } from '../src/app/core/interface/config-interface.js';
+import { ConfigI } from '../../src/app/core/interface/config-interface.js';
 import * as fs from 'fs';
-import { pathAdd, writeLogs } from '../main.js';
+import { pathAdd, writeLogs } from '../../main.js';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
-import { serie } from '../src/app/core/typescript/constantes.js';
+import { serie } from '../../src/app/core/typescript/constantes.js';
 
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config: ConfigI = {
-    cliente: 'demo',
-    color_app: 'blue',
-    mode_app: 'light',
+    cliente: 'agrodemi',
+    color_app: 'green',
+    mode_app:  'light',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-    direccion_empresa: 'La Vega República Dominicana',
+    direccion_empresa: 'Autopista Duarte Km0 El Higüero, La Vega',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Inspot Technology',
-    rnc_empresa: '000-00000-0',
-    telefono_empresa: '(809) 879-0161',
-    url_servidor: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
-    url_servidor_descargas: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
-    url_servidor_respaldo: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
+    nombre_empresa: 'Agropecuaria Delia y Milo, S.R.L AGRODEMI',
+    rnc_empresa: '131-99603-5',
+    telefono_empresa: '(809)-573-0060',
+    url_servidor: 'https://agrodemi.inspot-technology.com',
+    url_servidor_descargas: 'https://agrodemi.inspot-technology.com',
+    url_servidor_respaldo: 'http://10.0.0.9:9090',
     usa_url_principal: true,
     has_contabilidad: true,
     is_db_local: false,
-    calcular_itbis: true,
-    is_produccion: false,
+    calcular_itbis: false,
+    is_produccion: true,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
-    use_ecf: false,
-    medida_producto_terminado: 'Producto',
-    serie_default: serie.normal,
+    use_ecf: true,
+    medida_producto_terminado: 'Quintal',
+    serie_default: serie.electronica,
 
     printer_selected: {
       venta_contado: 'Ninguna',
@@ -60,10 +60,10 @@ export default class HandlerConfigFile {
     },
 
     plantillas_impresion: {
-      nota: 'Detallada',
+      nota: 'Agrupada',
     },
 
-    documentos_a_imprimir: 'conduce',
+    documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota,cotizacion',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {

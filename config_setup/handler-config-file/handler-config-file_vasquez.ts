@@ -1,37 +1,36 @@
-import { ConfigI } from '../src/app/core/interface/config-interface';
+import { ConfigI } from '../src/app/core/typescript/config-interface';
 import * as fs from 'fs';
-import { pathAdd, writeLogs } from '../main';
+import { pathAdd, writeLogs } from '../../main.js';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
-import { serie } from '../src/app/core/typescript/constantes.js';
-
+import { serie } from '../../src/app/core/typescript/constantes.js';
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config: ConfigI = {
-    cliente: 'agrodemi',
+    cliente: 'vasquez',
     color_app: 'green',
-    mode_app:  'light',
+    mode_app: 'light',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-    direccion_empresa: 'Autopista Duarte Km0 El Higüero, La Vega',
+    direccion_empresa: 'C. Juana Saltitopa No. 37, Villa Real, La Vega. R.D.',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Agropecuaria Delia y Milo, S.R.L AGRODEMI',
-    rnc_empresa: '131-99603-5',
-    telefono_empresa: '(809)-573-0060',
-    url_servidor: 'https://agrodemi.inspot-technology.com',
-    url_servidor_descargas: 'https://agrodemi.inspot-technology.com',
-    url_servidor_respaldo: 'http://10.0.0.9:9090',
+    nombre_empresa: 'D` Vásquez Services y Asociados, S.R.L',
+    rnc_empresa: '130-74935-3',
+    telefono_empresa: '(809) 573-3934',
+    url_servidor: 'https://vasquez.inspot-technology.com',
+    url_servidor_descargas: 'https://vasquez.inspot-technology.com',
+    url_servidor_respaldo: 'http://10.0.0.9:9092',
     usa_url_principal: true,
     has_contabilidad: true,
     is_db_local: false,
-    calcular_itbis: false,
-    is_produccion: true,
+    calcular_itbis: true,
+    is_produccion: false,
     facturacion_editar_precio: false,
     vende_sin_inventario: false,
-    use_ecf: true,
-    medida_producto_terminado: 'Quintal',
-    serie_default: serie.electronica,
+    use_ecf: false,
+    medida_producto_terminado: 'Producto',
+    serie_default: serie.normal,
 
     printer_selected: {
       venta_contado: 'Ninguna',
@@ -60,7 +59,7 @@ export default class HandlerConfigFile {
     },
 
     plantillas_impresion: {
-      nota: 'Agrupada',
+      nota: 'Detallada',
     },
 
     documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota,cotizacion',

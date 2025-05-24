@@ -1,34 +1,34 @@
-import { ConfigI } from '../src/app/core/interface/config-interface';
+import { ConfigI } from '../../src/app/core/interface/config-interface.js';
 import * as fs from 'fs';
-import { pathAdd, writeLogs } from '../main';
+import { pathAdd, writeLogs } from '../../main.js';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
-import { serie } from '../src/app/core/typescript/constantes.js';
+import { serie } from '../../src/app/core/typescript/constantes.js';
 
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   static default_config: ConfigI = {
-    cliente: 'brendy',
-    color_app: 'red',
+    cliente: 'demo',
+    color_app: 'blue',
     mode_app: 'light',
     config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-    direccion_empresa: 'El higuerito, frente a la escuela, La Vega Rep. Dom.',
+    direccion_empresa: 'La Vega República Dominicana',
     logo_empresa: logos.logo_empresa,
     logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Panaderia & Reposteria Brendy',
-    rnc_empresa: '132-35083-9',
-    telefono_empresa: '(829)-423-1678',
-    url_servidor: 'https://novac-brendy.ddns.net',
-    url_servidor_descargas: 'https://novac-brendy.ddns.net',
-    url_servidor_respaldo: 'http://localhost:9091',
-    usa_url_principal: false,
-    has_contabilidad: false,
-    is_db_local: true,
-    calcular_itbis: false,
-    is_produccion: true,
-    facturacion_editar_precio: true,
-    vende_sin_inventario: true,
+    nombre_empresa: 'Inspot Technology',
+    rnc_empresa: '000-00000-0',
+    telefono_empresa: '(809) 879-0161',
+    url_servidor: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
+    url_servidor_descargas: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
+    url_servidor_respaldo: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
+    usa_url_principal: true,
+    has_contabilidad: true,
+    is_db_local: false,
+    calcular_itbis: true,
+    is_produccion: false,
+    facturacion_editar_precio: false,
+    vende_sin_inventario: false,
     use_ecf: false,
     medida_producto_terminado: 'Producto',
     serie_default: serie.normal,
@@ -47,23 +47,23 @@ export default class HandlerConfigFile {
     },
 
     pages_sizes: {
-      venta_contado: '80mm_roll',
-      venta_credito: '80mm_roll',
-      pre_venta: '80mm_roll',
-      cotizacion: '80mm_roll',
-      compra: '80mm_roll',
-      recibo_ingreso: '80mm_roll',
-      conduce: '80mm_roll',
-      nota: '80mm_roll',
-      cuadre_caja: '80mm_roll',
+      venta_contado: '8.5x5.5',
+      venta_credito: '8.5x11',
+      pre_venta: '8.5x5.5',
+      cotizacion: '8.5x5.5',
+      compra: '8.5x5.5',
+      recibo_ingreso: '8.5x5.5',
+      conduce: '8.5x5.5',
+      nota: '8.5x5.5',
+      cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',
     },
 
     plantillas_impresion: {
-      nota: 'Agrupada',
+      nota: 'Detallada',
     },
 
-    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cotizacion',
+    documentos_a_imprimir: 'conduce',
   };
 
   static checkConfigFile(win: BrowserWindow): Promise<any> {
