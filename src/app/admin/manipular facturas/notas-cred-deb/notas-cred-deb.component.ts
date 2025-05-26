@@ -35,12 +35,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   detalleNota = signal<DetalleFactura[]>([]);
 
-  itbisGeneral = computed(() => this.detalleNota().reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.itbis_real), 0) );
-  totalGeneral = computed(() => this.detalleNota().reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.total_nota), 0) );
+  itbisGeneral = computed(() => this.detalleNota().reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.itbis_real), 0));
+  totalGeneral = computed(() => this.detalleNota().reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.total_nota), 0));
   brutoGeneral = computed(() => Big(this.totalGeneral()).minus(this.itbisGeneral()).toNumber());
 
   cliente_id!: number;
-
 
   cantArticulosSelected = computed(() => {
     return this.detalleNota().filter(detalle => fun.desformatearStNumber(detalle.total_nota) > 0).length;
@@ -201,9 +200,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         const devueltos = res['data'];
 
         const dias_de_creada = Math.round(DateUtils.diffDays(factura.fecha_equivalente));
-        console.log("DateUtils.diffDays(factura.fecha_equivalente) ", DateUtils.diffDays(factura.fecha_equivalente));
-        console.log("dias_de_creada ", dias_de_creada);
-        
 
         for (let indexDetalles = 0; indexDetalles < factura.detalle_facturas.length; indexDetalles++) {
           const detalle = factura.detalle_facturas[indexDetalles];
@@ -397,7 +393,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     let total = 0;
 
     // TODO: como tomar el precio y el itbis segun si es el mismo precio o no
-    // const precio =  
+    // const precio =
 
     if (this.isCredito) {
       const itbis = data.calcular_itbis && data.can_return_itbis ? precio * 0.18 : 0;
@@ -551,8 +547,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
         return objDetalleTemp;
       });
-
-
 
     const objTemp = {
       cabecera_factura_id: this.factura.id,

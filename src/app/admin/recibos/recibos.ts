@@ -35,7 +35,7 @@ export class ReciboC extends CrudG<ReciboI> {
   modalVerDetalles(data) {
     return {
       component: DetalleFacturaComponent,
-      inputs: { data: data },
+      inputs: { data: data, documento: 'recibo' },
       id: `detalle_recibos`,
       header: 'Detalles Recibos',
       width: '35rem',

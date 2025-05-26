@@ -97,11 +97,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   table_notas_config: table_config = {
     info: [
       { titulo: '1', tipo: 'icon', key: 'estado', style: { width: '2rem', color: 'var(--transparente00)' }, iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
-      { titulo: 'Estado', tipo: 'text', key: 'estado' },
       { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
-      { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', style: { width: '7rem' } },
+      { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante' },
       { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total' },
-      { titulo: 'Acciones', tipo: 'icon', key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }] },
+      { titulo: 'Acciones', tipo: 'icon', key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }], style: { width: '5rem' } },
     ],
     colores: true,
     filtrar: { local: false },
@@ -287,7 +286,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           nota.tipo = this.buscarPara;
           const estatus = this.getIsActiveInfo(nota);
 
-          nota.secuencia = _.padStart(nota.numero_factura, 8, '0');
+          nota.secuencia = nota.numero_documento.toString().padStart(8, '0');
           nota.total = Math.abs(nota.total);
           nota.selectedColor = 'gris-claro';
           nota.viewColor = 'gris-claro';
@@ -300,15 +299,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
           nota.customStyles = {
             actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
-            numero_comprobante: { width: '7rem' },
           };
 
           this.notas.push(nota);
         });
+
         this.showSide = true;
 
         setTimeout(() => this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]), 10);
       } catch (err) {
+        console.error(err);
         const error = err.error;
 
         if (fun.isEmpty(error?.data) || error?.data?.length == 0) this.showSide = false;
@@ -421,7 +421,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
               const crear_nota = this.buscarPara.includes('nota');
               this.facturaSelected = factura_parsed;
               const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
-              this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota });
+              this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota, documento: 'factura' });
             });
           } else {
             setTimeout(() => {
@@ -603,7 +603,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           this.notaSelected = params.data;
 
           this.notasClass.parseDataToPdf(params.data).then(data_parsed => {
-            this.mostrarFactura({ factura: data_parsed, type: 'nota', dataDB: params.data });
+            this.mostrarFactura({ factura: data_parsed, type: 'nota', dataDB: params.data, documento: 'nota' });
           });
         }
       }
@@ -613,7 +613,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           this.facturaClass.parseDataToPdf(params.data).then(factura_parsed => {
             this.facturaSelected = factura_parsed;
             const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
-            this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota: this.buscarPara.includes('nota') });
+            this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota: this.buscarPara.includes('nota'), documento: 'factura' });
           });
         }
 
@@ -769,8 +769,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     }
   }
 
-  mostrarFactura(args: { factura: any; type: string; dataDB?: any; crear_nota?: boolean }) {
-    const { factura, type, dataDB, crear_nota } = args;
+  mostrarFactura(args: { factura: any; type: string; dataDB?: any; crear_nota?: boolean; documento?: string }) {
+    const { factura, type, dataDB, crear_nota, documento } = args;
 
     const toPDFData = { data: factura, type: type };
 
@@ -794,16 +794,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           show_estado: true,
           estado_documento: factura.estado,
           base64: res.base64,
-          documento: type == 'nota' ? 'Nota' : 'Factura',
+          documento: documento,
           reimprimir: res.reimprimir,
-          fileName: _.first(res.file.split('.')),
+          fileName: res.file.split('.')[0],
         };
 
         const obj_modal = {
           component: PdfViewerComponent,
           inputs: inputs,
           id: 'mostrarFactura',
-          header: type == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
+          header: documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA',
           width: '900px',
           height: '70vh',
           botones: {
@@ -815,7 +815,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         if (this.tipo_documento_selected() != tipoDocFacturacion.cotizacion && this.tipo_documento_selected() != tipoDocFacturacion.pre_venta) {
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-gris',
-            function: instance => this.verDetalles(type == 'nota' ? dataDB : factura),
+            function: instance => this.verDetalles(type == 'nota' ? dataDB : factura, documento),
             label: 'Ver detalles',
             disable: false,
           });
@@ -891,9 +891,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
       });
   }
 
-  verDetalles(data) {
-    const tipo = this.buscarPara.includes('nota') ? 'Nota' : 'Factura';
-    const configModal = this.facturaClass.modalVerDetalles(data, tipo);
+  verDetalles(data, documento) {
+    const configModal = this.facturaClass.modalVerDetalles(data, documento);
 
     this.openNewModal(configModal);
   }

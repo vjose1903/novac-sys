@@ -16,7 +16,7 @@ import { DateUtils } from '@vjose1903/dateutils';
 })
 export class DetalleFacturaComponent implements OnInit, ModalI {
   modal: any = {};
-  inputs: any;
+  inputs: { data: any; documento: string };
 
   TrackStatusEnum = TrackStatusEnum;
   serie = serie;
@@ -31,13 +31,28 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   constructor() {}
 
   ngOnInit(): void {
-    console.log(" ---> ", this.getValue({ label: 'Fecha', key: 'fecha_equivalente', tipo: 'date', div_clase: 'col-12 col-md-6 p-0 pl-md-3' }));
-    
+    this.validateDetails();
     this.validateElectronicInfoceDetails();
   }
 
+  validateDetails() {
+    if (this.inputs.documento == 'recibo') {
+      this.detalles = this.detalles.filter(d => d.key != 'numero_comprobante');
+    }
+
+    if (this.inputs.documento == 'nota') {
+      this.detalles = this.detalles
+        .filter(d => d.key != 'forma_pago')
+        .map(item => {
+          if (item.key == 'fecha_equivalente') return { ...item, div_clase: 'col-12 col-md-6 p-0' };
+          if (item.key == 'numero_comprobante') return { ...item, div_clase: 'col-12 col-md-6 p-0 pl-md-3' };
+
+          return { ...item, label: item.label.replace('Forma de pago', 'Tipo de nota') };
+        });
+    }
+  }
+
   validateElectronicInfoceDetails() {
-    console.log('this.inputs.data ', this.inputs.data);
     if (this.inputs.data?.serie == serie.electronica) {
       const is_aceptada = this.inputs.data.is_aceptada;
 

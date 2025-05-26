@@ -353,7 +353,7 @@ export class FacturaC extends CrudG<FacturasI> {
   modalVerDetalles(data, documento = 'Factura') {
     return {
       component: DetalleFacturaComponent,
-      inputs: { data: data },
+      inputs: { data, documento: documento.toLowerCase() },
       id: `detalle_factura`,
       header: `Detalles ${documento}`,
       width: '35rem',
