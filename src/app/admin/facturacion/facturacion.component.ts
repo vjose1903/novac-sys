@@ -30,6 +30,7 @@ import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { ConfigArticuloC, ConfigArticuloI } from '@registros/articulos/configuracion_articulos/articulos_configuracion';
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { DateUtils } from '@vjose1903/dateutils';
+import Big from 'big.js';
 
 @Component({
   selector: 'app-facturacion',
@@ -790,17 +791,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   getCalculosDinero(arg) {
-    this.TOTAL = fun.roundNumberToDecimal(arg.total);
-    this.ITBIS = fun.roundNumberToDecimal(arg.itbis);
-    this.DESCUENTO = fun.roundNumberToDecimal(arg.descuento);
+    this.TOTAL = arg.total;
+    this.ITBIS = arg.itbis;
+    this.DESCUENTO = arg.descuento;
 
     this.calcularBruto();
   }
 
   calcularBruto() {
     setTimeout(() => {
-      const suma = fun.desformatearStNumber(this.TOTAL) + fun.desformatearStNumber(this.DESCUENTO) - fun.desformatearStNumber(this.ITBIS);
-      this.BRUTO = fun.roundNumberToDecimal(suma);
+      const suma = Big(fun.desformatearStNumber(this.TOTAL)).plus(fun.desformatearStNumber(this.DESCUENTO)).minus(fun.desformatearStNumber(this.ITBIS));
+      this.BRUTO = fun.roundNumberToDecimal(suma.toNumber());
     }, 5);
   }
 
