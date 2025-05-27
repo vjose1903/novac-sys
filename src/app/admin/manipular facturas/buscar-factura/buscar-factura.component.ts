@@ -411,7 +411,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           this.facturas.push(fact);
         });
 
-        this.facturas.sort((a, b) => fun.compare(a, b, ['fecha_equivalente'], 'desc'));
 
         if (this.facturas.length > 0) {
           if (this.buscar_por == this.campos.numeroComprobante) {
