@@ -315,9 +315,6 @@ async function handleEvent(event: any, obj: string) {
           .verificateUpdateAvailable()
           .then(res => {
             task.response = res;
-            console.log('task', task);
-            console.log('res', res);
-
             event.reply(ELECTRON_RESPONSE, task);
           })
           .catch(err => {

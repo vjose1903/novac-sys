@@ -2,7 +2,6 @@ import { TiposFacturaC, actionFacturacion, TipoFacturaI } from './../facturacion
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, inject } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-import * as _ from 'lodash';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { CuadreCajaC } from '@core/typescript/cuadre_caja';
@@ -19,7 +18,7 @@ import { MessageTask } from '@core/models/message-task';
 import { ELECTRON_CHANGE_CONFIG_FILE, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
-
+import { MENU_CONFIG } from './utils/menu-items';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
@@ -29,7 +28,9 @@ import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service
 export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   actualPath;
   actualRuta;
-  actualModule;
+  nextModule;
+
+  menuItems = MENU_CONFIG;
 
   showLoading;
 
@@ -138,12 +139,32 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
   }
 
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
+  }
+
+  ngOnDestroy() {
+    this._destroy_mixin();
+    if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
+    if (this.subLogOut) this.subLogOut.unsubscribe();
+    if (this.subRouter) this.subRouter.unsubscribe();
+  }
+
+  initVariables() {
+    this.showLoading = true;
+    this.imgUser = 'assets/img/transparente.png';
+    this.noServer = false;
+    this.activeIndex = 0;
+    this.currentYear = new Date().getFullYear();
+    this.cuadre_hoy = false;
+  }
+
   getTiposFacturas() {
     return new Promise(async (resolve, reject) => {
       await this.tipoFacturaClass
         .getAll()
         .then((tiposFacturas: any) => {
-          tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']) as TipoFacturaI[];
+          tiposFacturas = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
           Ss.factServ.lista_tipos_facturas = tiposFacturas;
 
           resolve(Ss.factServ.lista_tipos_facturas);
@@ -187,7 +208,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   verificarActualizaciones() {
     const task = new MessageTask(ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE);
-    
+
     this._ipc.sendTask(task).then(res => {
       console.log('res ---> ', res);
     });
@@ -204,22 +225,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
           reject(error);
         });
     });
-  }
-
-  initVariables() {
-    this.showLoading = true;
-    this.imgUser = 'assets/img/transparente.png';
-    this.noServer = false;
-    this.activeIndex = 0;
-    this.currentYear = new Date().getFullYear();
-    this.cuadre_hoy = false;
-  }
-
-  ngOnDestroy() {
-    this._destroy_mixin();
-    if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
-    if (this.subLogOut) this.subLogOut.unsubscribe();
-    if (this.subRouter) this.subRouter.unsubscribe();
   }
 
   checkCuadre() {
@@ -239,10 +244,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
   }
 
-  ngAfterContentChecked() {
-    this.cdRef.detectChanges();
-  }
-
   setUser(usuario) {
     this.usuario = usuario;
 
@@ -252,9 +253,29 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   parseMenu() {
     for (const keyFather in this.menuPermissionsObj) {
-      for (const keyChild in this.menuPermissionsObj[keyFather]) {
-        const subMenuProp = this.menuPermissionsObj[keyFather][keyChild];
-        this.menuPermissionsObj[keyFather].flatt = _.union(this.menuPermissionsObj[keyFather].flatt, subMenuProp);
+      // Buscar el menuItem que tenga el id igual al keyFather
+      const fatherMenuItem = this.menuItems.find(item => item.id === keyFather);
+
+      if (fatherMenuItem) {
+        for (const keyChild in this.menuPermissionsObj[keyFather]) {
+          const subMenuProp = this.menuPermissionsObj[keyFather][keyChild];
+
+          if (keyChild === 'flatt') {
+            // Asignar el flatt al father
+            fatherMenuItem.permission = [...(fatherMenuItem.permission || []), ...(subMenuProp || [])];
+          } else {
+            // Buscar el subItem que tenga el id igual al keyChild
+            const childMenuItem = fatherMenuItem.subItems?.find(subItem => subItem.id === keyChild);
+
+            if (childMenuItem) {
+              // Asignar los permisos al child
+              childMenuItem.permission = subMenuProp;
+            }
+
+            // Agregar al flatt del father
+            this.menuPermissionsObj[keyFather].flatt = [...new Set([...(this.menuPermissionsObj[keyFather].flatt || []), ...(subMenuProp || [])])];
+          }
+        }
       }
     }
   }
@@ -278,33 +299,16 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   // =================================================================================
-  // CHECK LAYOUT ACTIVE ROUTE
-  // =================================================================================
-
-  getLayoutActiveRoute(module, paths?) {
-    if (fun.hasValue(paths) || paths?.length > 0) {
-      return paths.some(path => this.actualPath.includes(`/${module}/${path}`));
-    } else {
-      return this.actualPath.includes(`/${module}`);
-    }
-  }
-
-  // =================================================================================
   // CHECK ROUTE ACTIVA
   // =================================================================================
 
   checkRouteActiva() {
     this.actualPath = fun.getActualPath();
 
-    const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
+    const pathSplit = this.actualPath.split('/').filter(item => fun.hasValue(item.trim()));
 
-    if (pathSplit.length >= 3) {
-      this.actualModule = pathSplit[1];
-      this.actualRuta = _.join(pathSplit.slice(2, pathSplit.length), '/');
-    } else {
-      this.actualModule = undefined;
-      this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
-    }
+    this.nextModule = undefined;
+    this.actualRuta = pathSplit.join('/').replace('/admin/', '');
 
     this.ready = true;
   }
@@ -320,35 +324,28 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
   // NAVEGAR
   // =================================================================================
-  isVistaActual(arg) {
-    let res = false;
 
-    if ((fun.hasValue(this.actualModule) && arg == this.actualModule) || (fun.hasValue(this.actualPath) && this.actualPath.includes(arg)) || (fun.hasValue(this.actualRuta) && this.actualRuta.includes(arg))) {
-      res = true;
+  cambiarMenu(args: { url: string; navigate: boolean; event: any }) {
+    if (!args.navigate) {
+      this.nextModule = args.url;
+
+      return;
     }
-    return res;
-  }
 
-  cambiarMenu(args: { url; navigate; event }) {
-    let next_cambio_menu = '';
+    const nextCambioMenu = `/admin/${args.url}`;
 
-    if (args.navigate) {
-      next_cambio_menu = `/admin/${args.url}`;
-
-      if (this.actualPath !== next_cambio_menu) {
-        this.runRouterNavigate({ bool: true, ruta: next_cambio_menu });
-        fun.enfocarInput(null, args.event.target);
-      } else {
-        fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
-      }
-    } else {
-      this.actualModule = args.url;
+    if (this.actualPath === nextCambioMenu) {
+      fun.toastWarning('Ya se encuentra en este módulo.', 'AVISO');
+      return;
     }
+
+    this.runRouterNavigate({ bool: true, ruta: nextCambioMenu });
+    fun.enfocarInput(null, args.event.target);
   }
 
   finalizarCambioMenu(arg) {
     if (arg.bool) {
-      this.actualModule = undefined;
+      this.nextModule = undefined;
       this.router.navigateByUrl(arg.ruta);
     } else {
       this.checkRouteActiva();

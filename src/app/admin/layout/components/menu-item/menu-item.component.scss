@@ -1,0 +1,77 @@
+.menuList {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 7rem;
+  position: relative;
+
+  .tituloMenu {
+    transform: scale(0);
+    font-size: inherit;
+    // position: absolute;
+    transition: all 0.2s;
+    margin: 0;
+    width: 100%;
+
+    &.tituloMenuA {
+      font-weight: 600;
+    }
+  }
+
+  &:hover .tituloMenu,
+  .tituloMenuA {
+    // transform: scale(0.8) translate(0px, -7.7rem);
+    transform: scale(1);
+  }
+  text-align: center;
+
+  .iconosMenu {
+    border: 3px solid #4141417a;
+    border-radius: 50%;
+    margin: 0rem auto 0px auto;
+    filter: grayscale(50%);
+    height: 4.5rem;
+    width: 4.5rem;
+    &.iconosMenuA {
+      background: var(--primary10);
+      filter: grayscale(10%) contrast(-20%);
+    }
+
+    &:hover {
+      filter: grayscale(10%);
+      transform: scale(1.05);
+      filter: contrast(-20%);
+    }
+  }
+
+  .subMenuFactura {
+    overflow: hidden;
+    max-height: 0;
+    transition: all 0.5s;
+    width: 100%;
+
+    &.subMenuFacturaA {
+      margin-top: 0.5rem;
+      max-height: 100rem;
+      background-color: var(--primary04);
+      color: white;
+    }
+
+    .opcion {
+      margin-bottom: 0;
+      font-size: 1rem;
+      padding: 0.5rem;
+      background-color: var(--primary04);
+      &.activa {
+        background-color: var(--primary09) !important;
+      }
+      &:hover {
+        width: 100%;
+        filter: brightness(0.6);
+        cursor: pointer;
+      }
+    }
+  }
+}

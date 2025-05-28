@@ -30,18 +30,18 @@ export class LayoutClass extends TablaClass {
       flatt: [],
     },
     manipularFacturas: {
-      notaCredito: Object.values(Permisos.nota_credito),
-      notaDebito: Object.values(Permisos.nota_debito),
+      nota_credito: Object.values(Permisos.nota_credito),
+      nota_debito: Object.values(Permisos.nota_debito),
       vizualizar: [Permisos.factura_compra.get_facturas_by_params, Permisos.factura_venta.get_facturas_by_params],
       flatt: [],
     },
     facturacionElectonica: {
-      recepcion: Object.values(Permisos.ecf_reception),
-      commertialApproval: Object.values(Permisos.commertial_approval_reception),
+      ecf_received: Object.values(Permisos.ecf_reception),
+      commertial_approval: Object.values(Permisos.commertial_approval_reception),
       flatt: [],
     },
     ingresos: {
-      recibosIngresos: Object.values(Permisos.recibo_ingreso),
+      recibos_ingresos: Object.values(Permisos.recibo_ingreso),
       viajes: [Permisos.factura_venta.get_viajes_sin_completar],
       flatt: [],
     },
@@ -50,7 +50,7 @@ export class LayoutClass extends TablaClass {
       flatt: [],
     },
     registro: {
-      user: Object.values(Permisos.user),
+      empleados: Object.values(Permisos.user),
       clientes: Object.values(Permisos.cliente),
       suplidores: Object.values(Permisos.suplidor),
       articulos: Object.values(Permisos.articulo),
