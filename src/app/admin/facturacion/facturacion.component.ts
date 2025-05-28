@@ -392,7 +392,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       else if (this.factServ.isPreVenta) this.titulo = 'Pre factura';
       else if (this.factServ.isCotizacion) this.titulo = 'Cotización';
 
-      this.factServ.setTipos(this.factServ.tipoDocumento, this.configApp.serie_default).then(result => {
+      const useNormalSerie = [this.factServ.isCotizacion, this.factServ.isPreVenta].some(condition => condition);
+
+      const serieSelected = useNormalSerie ? serie.normal : this.configApp.serie_default;
+
+      this.factServ.setTipos(this.factServ.tipoDocumento, serieSelected).then(result => {
         //
         [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando, this.errorComprobante] = Array(5).fill(false);
