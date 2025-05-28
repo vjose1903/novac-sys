@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, AfterViewInit } from '@angular/core';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { MenuClickEvent, MenuItemI, SubMenuItemI } from '../../utils/menu-items';
 import { fun } from '@core/services/functions.service';
-
+import { Subject } from 'rxjs';
 @Component({
   selector: 'app-menu-item',
   imports: [CommonModule, NgxPermissionsModule],
@@ -12,32 +12,16 @@ import { fun } from '@core/services/functions.service';
 })
 export class MenuItemComponent implements AfterViewInit {
   @Input() menuItem!: MenuItemI;
-  @Input() actualPath!: string;
+  @Input() actualPath: string = '';
   @Input() nextModule!: string;
 
   @Output() menuClick = new EventEmitter<MenuClickEvent>();
   @Output() subMenuClick = new EventEmitter<MenuClickEvent>();
 
+  private destroy$ = new Subject<void>();
+
   get menuItemId(): string {
     return `menu-item-${this.menuItem.id}`;
-  }
-
-  ngAfterViewInit(): void {
-    // Hacer scroll al elemento activo después de que la vista se haya inicializado
-    this.scrollToActiveIfNeeded();
-  }
-
-  private scrollToActiveIfNeeded(): void {
-    if (this.isActive) {
-      setTimeout(() => fun.scrollTo({ id: this.menuItemId, behavior: 'smooth', block: 'center', inline: 'center' }), 100);
-    }
-  }
-
-  private isRouteActive(module: string, paths?: string[]): boolean {
-    if (fun.hasValue(paths) && paths!.length > 0) {
-      return paths!.some(path => this.actualPath.includes(`/${module}/${path}`));
-    }
-    return this.actualPath.includes(`/${module}`) || (this.nextModule && this.nextModule.includes(module));
   }
 
   get isActive(): boolean {
@@ -59,6 +43,26 @@ export class MenuItemComponent implements AfterViewInit {
 
   get isSubMenuActive(): boolean {
     return this.isActive;
+  }
+
+  ngAfterViewInit(): void {
+    this.scrollToActiveIfNeeded();
+  }
+
+  private scrollToActiveIfNeeded(): void {
+    if (this.isActive) {
+      setTimeout(() => fun.scrollTo({ id: this.menuItemId, behavior: 'smooth', block: 'center', inline: 'center' }), 300);
+    }
+  }
+
+  private isRouteActive(module: string, paths?: string[]): boolean {
+    if (fun.isEmpty(this.actualPath)) return false;
+
+    if (fun.hasValue(paths) && paths!.length > 0) {
+      return paths!.some(path => this.actualPath.includes(`/${module}/${path}`));
+    }
+
+    return this.actualPath.includes(`/${module}`) || (this.nextModule && this.nextModule.includes(module));
   }
 
   onMenuClick(event: Event): void {

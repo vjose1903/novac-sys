@@ -5,86 +5,84 @@
 }
 
 <div class="fantasma">
-  @if (hasPermisosValidated) {
-    <div class="layout">
-      <div class="menu">
-        <div class="title">
-          <span class="titulo" (click)="cambiarMenu({ event: $event, url: 'dashboard', navigate: true })">Menu</span>
-        </div>
-
-        <div class="sideBar">
-          <div class="menuContent">
-            <ng-container *ngFor="let menuItem of menuItems; let first = first; let last = last">
-              <app-menu-item [menuItem]="menuItem" [actualPath]="actualPath" [nextModule]="nextModule" (menuClick)="cambiarMenu($event)" (subMenuClick)="cambiarMenu($event)"> </app-menu-item>
-            </ng-container>
-          </div>
-        </div>
+  <div class="layout">
+    <div class="menu">
+      <div class="title">
+        <span class="titulo" (click)="cambiarMenu({ event: $event, url: 'dashboard', navigate: true })">Menu</span>
       </div>
 
-      <div class="content">
-        <div class="navBar">
-          <div class="right">
-            <div class="btn-group dropCuenta" id="dropCuenta">
-              <span class="popover-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
-                <img class="rounded-circle" [src]="imgUser" alt="Admin" />
-                Cuenta <span class="caret"></span>
-              </span>
-
-              <p-popover [dismissable]="true" #dropdownCuenta styleClass="no-carret" appendTo="body">
-                <ul class="popover-cuenta">
-                  <li class="popover-header">
-                    <h4 class="mb-1">{{ usuario?.nombre }}</h4>
-                    <p class="mb-0">{{ usuario?.email }}</p>
-                  </li>
-                  <li>
-                    <a class="popover-item" id="popover-item" (click)="refreshPage(); dropdownCuenta.hide()">
-                      <i class="fas fa-undo-alt"></i>
-                      Recargar aplicación
-                    </a>
-                  </li>
-                  <li>
-                    <div class="popover-item" id="popover-item" (click)="changeSerieDefault(); dropdownCuenta.hide()">
-                      <i class="fas fa-file-invoice-dollar"></i>
-                      <strong>Serie por defecto:</strong> {{ my_capitalize(configApp.serie_default) }}
-                    </div>
-                  </li>
-                  <li>
-                    <div class="popover-item" id="popover-item" (click)="verificarActualizaciones(); dropdownCuenta.hide()">
-                      <i class="fas fa-cloud-arrow-down"></i>
-                      Verificar actualizaciones
-                    </div>
-                  </li>
-                  <li class="divider popover-divider"></li>
-                  <li>
-                    <a class="popover-item danger" id="popover-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
-                  </li>
-                </ul>
-              </p-popover>
-            </div>
-          </div>
+      <div class="sideBar">
+        <div class="menuContent">
+          <ng-container *ngFor="let menuItem of menuItems; let first = first; let last = last">
+            <app-menu-item [menuItem]="menuItem" [actualPath]="actualPath" [nextModule]="nextModule" (menuClick)="cambiarMenu($event)" (subMenuClick)="cambiarMenu($event)"> </app-menu-item>
+          </ng-container>
         </div>
-        <div class="contenido">
-          @if (ready) {
-            <router-outlet></router-outlet>
-          }
-
-          <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
-        </div>
-
-        <div class="footer w-100">
-          <span class="machine-id" (click)="copyMachineId()">
-            {{ configApp.machineId }}
-          </span>
-
-          <span> Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
-        </div>
-
-        @if (cuadre_hoy) {
-          <div class="cuadre_hoy">
-            <div class="msg">Hoy ya existe un cuadre</div>
-          </div>
-        }
       </div>
     </div>
-  }
+
+    <div class="content">
+      <div class="navBar">
+        <div class="right">
+          <div class="btn-group dropCuenta" id="dropCuenta">
+            <span class="popover-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
+              <img class="rounded-circle" [src]="imgUser" alt="Admin" />
+              Cuenta <span class="caret"></span>
+            </span>
+
+            <p-popover [dismissable]="true" #dropdownCuenta styleClass="no-carret" appendTo="body">
+              <ul class="popover-cuenta">
+                <li class="popover-header">
+                  <h4 class="mb-1">{{ usuario?.nombre }}</h4>
+                  <p class="mb-0">{{ usuario?.email }}</p>
+                </li>
+                <li>
+                  <a class="popover-item" id="popover-item" (click)="refreshPage(); dropdownCuenta.hide()">
+                    <i class="fas fa-undo-alt"></i>
+                    Recargar aplicación
+                  </a>
+                </li>
+                <li>
+                  <div class="popover-item" id="popover-item" (click)="changeSerieDefault(); dropdownCuenta.hide()">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <strong>Serie por defecto:</strong> {{ my_capitalize(configApp.serie_default) }}
+                  </div>
+                </li>
+                <li>
+                  <div class="popover-item" id="popover-item" (click)="verificarActualizaciones(); dropdownCuenta.hide()">
+                    <i class="fas fa-cloud-arrow-down"></i>
+                    Verificar actualizaciones
+                  </div>
+                </li>
+                <li class="divider popover-divider"></li>
+                <li>
+                  <a class="popover-item danger" id="popover-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
+                </li>
+              </ul>
+            </p-popover>
+          </div>
+        </div>
+      </div>
+      <div class="contenido">
+        @if (ready) {
+          <router-outlet></router-outlet>
+        }
+
+        <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
+      </div>
+
+      <div class="footer w-100">
+        <span class="machine-id" (click)="copyMachineId()">
+          {{ configApp.machineId }}
+        </span>
+
+        <span> Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
+      </div>
+
+      @if (cuadre_hoy) {
+        <div class="cuadre_hoy">
+          <div class="msg">Hoy ya existe un cuadre</div>
+        </div>
+      }
+    </div>
+  </div>
 </div>

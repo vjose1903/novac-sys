@@ -5,7 +5,8 @@ import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { LayoutComponent } from './layout.component';
-
+import { PermissionsGuardService } from '@core/guard/permissions.guard';
+import { Permisos } from '@core/typescript/permisos';
 const routes: Routes = [
   {
     path: 'admin',
@@ -22,11 +23,11 @@ const routes: Routes = [
       },
       {
         path: 'factura',
-        loadChildren: () => import('../facturacion/facturacion.module').then((m) => m.FacturacionModule),
+        loadChildren: () => import('../facturacion/facturacion.module').then(m => m.FacturacionModule),
       },
       {
         path: 'ecf',
-        loadChildren: () => import('../facturacion-electronica/facturacion-electronica.module').then((m) => m.FacturacionElectronicaModule),
+        loadChildren: () => import('../facturacion-electronica/facturacion-electronica.module').then(m => m.FacturacionElectronicaModule),
       },
       {
         path: 'produccion',
@@ -34,15 +35,15 @@ const routes: Routes = [
       },
       {
         path: 'registros',
-        loadChildren: () => import('../registros/registros.module').then((m) => m.RegistrosModule),
+        loadChildren: () => import('../registros/registros.module').then(m => m.RegistrosModule),
       },
       {
         path: 'manipular',
-        loadChildren: () => import('../manipular facturas/manipular-facturas.module').then((m) => m.ManipularFacturasModule),
+        loadChildren: () => import('../manipular facturas/manipular-facturas.module').then(m => m.ManipularFacturasModule),
       },
       {
         path: 'recibos',
-        loadChildren: () => import('../recibos/recibos.module').then((m) => m.RecibosModule),
+        loadChildren: () => import('../recibos/recibos.module').then(m => m.RecibosModule),
       },
       {
         path: 'inventario',
@@ -50,17 +51,12 @@ const routes: Routes = [
       },
       {
         path: 'conduce',
-        loadChildren: () => import('../conduce/conduce.module').then((m) => m.ConduceModule),
+        loadChildren: () => import('../conduce/conduce.module').then(m => m.ConduceModule),
       },
       {
         path: 'reportes',
         component: ReportesComponent,
-        // canActivate: [NgxPermissionsGuard],
-        // data: {
-        //   permissions: {
-        //     only: Object.values(Permisos.reporte),
-        //   },
-        // },
+        canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.reporte), 'admin/dashboard')],
       },
     ],
   },

@@ -1,19 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NgxPermissionsGuard } from 'ngx-permissions';
 import { Permisos } from '@core/typescript/permisos';
 import { RolesComponent } from './roles.component';
+import { PermissionsGuardService } from '@core/guard/permissions.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: RolesComponent,
-    // canActivate: [NgxPermissionsGuard],
-    // data: {
-    //   permissions: {
-    //     only: Object.values(Permisos.role),
-    //   },
-    // },
+    canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.role), 'admin/dashboard')],
   },
 ];
 
