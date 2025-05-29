@@ -508,6 +508,7 @@ export interface FacturasI {
   vendedor: string;
   notas: any;
   pagos: Pago[];
+  is_ncf_modificado?: boolean;
   ncf_modificado?: string;
   ncf_modificado_por_id?: number;
   ncf_modificado_at?: Date;
