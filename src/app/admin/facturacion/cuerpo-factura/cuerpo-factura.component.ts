@@ -741,7 +741,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       detalle[campoToSolve] = actual_price_value;
       formGroup.patchValue(detalle);
 
-      this.calcularMontosRow(index).then(result => instance.closeModal(instance.id, 'get_actual_price'));
+      this.calcularMontosRow(index).then(result => instance.closeModal(instance.id));
     };
 
     const label = this.factServ.isCompra ? 'costo' : 'precio';

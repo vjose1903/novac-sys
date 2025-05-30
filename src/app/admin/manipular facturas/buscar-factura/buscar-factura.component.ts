@@ -21,9 +21,11 @@ import { ModalClass } from '@components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
 import { TitleCasePipe } from '@angular/common';
 import { seriesDGII } from '@core/typescript/constantes';
+import { AppConfig } from '@environments/environment';
 
 import * as _ from 'lodash';
 import { ConfigI } from '@core/interface/config-interface';
+import { DateUtils } from '@vjose1903/dateutils';
 const moment = require('../../../core/javascript/moment');
 
 @Component({
@@ -113,6 +115,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
   htmlServ = inject(HtmlElementsService);
+  certificacionDate = AppConfig.DGII_CERTIFICATION_DATE;
 
   constructor(
     private router: Router,
@@ -410,7 +413,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
           this.facturas.push(fact);
         });
-
 
         if (this.facturas.length > 0) {
           if (this.buscar_por == this.campos.numeroComprobante) {
@@ -773,14 +775,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
     const toPDFData = { data: factura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false }];
 
     if (crear_nota) {
       botonesDinamicos.push({
         clase: 'btn btn-verde',
         function: instance => {
           this.continuarANotas(factura.id);
-          instance.closeModal(instance.id, 'cancelar');
+          instance.closeModal(instance.id);
         },
         label: 'Crear Nota',
         disable: false,
@@ -822,7 +824,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           obj_modal.botones.dinamico.push({
             clase: 'btn btn-gris',
             function: instance => {
-              instance.closeModal(instance.id, 'mostrarFactura');
+              instance.closeModal(instance.id);
               this.tableClickIcon({ id_tabla: shearchDocumentTableId, columnKey: 'actions', iconKey: 'make_bill', data: factura });
             },
             tooltip: fun.hasValue(factura.fecha_completada) ? 'Cotización ya ha sido facturada' : null,
@@ -838,7 +840,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
             clase: 'btn btn-verde',
             function: instance => {
               this.editarFactura();
-              instance.closeModal(instance.id, 'mostrarFactura');
+              instance.closeModal(instance.id);
             },
             label: 'Editar',
             disable: false,
@@ -855,15 +857,33 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
             clase: 'btn btn-azul',
             function: instance => {
               this.goToFacturacionPage(factura.tipo, actionFacturacion.duplicate, factura.id);
-              instance.closeModal(instance.id, 'mostrarFactura');
+              instance.closeModal(instance.id);
             },
             label: 'Clonar',
             disable: false,
           };
 
+          const reemplaceButton = {
+            clase: 'btn btn-danger',
+            function: instance => {
+              this.confirmarReemplazarENCF(factura, instance);
+            },
+            label: 'Reemplazar eNCF',
+            disable: false,
+          };
+
           if (factura.estado) obj_modal.botones.dinamico.push(rePrintButton);
-          if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion' && factura.serie != serie.electronica) obj_modal.botones.dinamico.push(editButton);
-          if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion') obj_modal.botones.dinamico.push(cloneButton);
+          if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion') {
+            obj_modal.botones.dinamico.push(cloneButton);
+
+            if (factura.serie != serie.electronica) {
+              obj_modal.botones.dinamico.push(editButton);
+
+              const isAfterCertificationDate = DateUtils.compareDates(this.certificacionDate, DateUtils.format({ date: factura.fecha_equivalente, dateFormat: 'YYYY-MM-DD' })) >= 0;
+
+              if (isAfterCertificationDate) obj_modal.botones.dinamico.push(reemplaceButton);
+            }
+          }
         }
 
         this.openNewModal(obj_modal);
@@ -873,6 +893,29 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
       });
   }
 
+
+  confirmarReemplazarENCF(factura, modalPdfInstance) {
+    const obj = {
+      id: 'reemplazarENCF',
+      header: 'Confirmación',
+      texto: `Seguro que desea reemplazar a eNCF la factura <strong>${factura.numero_comprobante}</strong>?`,
+      siFunction: (instance) => {
+        this.reemplazarENCF(factura, [modalPdfInstance, instance]);
+      },
+    };
+
+    this.confirmationModal(obj);
+  }
+
+  reemplazarENCF(factura, modalInstances) {
+    console.log('factura ', factura);
+
+    this.facturaClass.updateOne({ id: factura.id }, { afterPath: `dgii/eNCF/replace` }).then(res => {
+      fun.toastSuccess(res.msg, 'CORRECTO');
+      modalInstances.forEach(instance => instance.closeModal(instance.id));
+    })
+  }
+
   reimprimirDocumento(obj, modalInstance) {
     this.loadServ.isLoading.next(true);
     PdfService.generatePdf({ oPdf: obj, imprimir: true })
@@ -880,7 +923,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         this.loadServ.isLoading.next(false);
 
         fun.toastSuccess(res.msg, 'CORRECTO');
-        modalInstance.closeModal(modalInstance.id, 'imprimir');
+        modalInstance.closeModal(modalInstance.id);
       })
       .catch(err => {
         console.error('err ', err);

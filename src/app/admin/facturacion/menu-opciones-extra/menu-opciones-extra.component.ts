@@ -223,13 +223,13 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   mostrarFactura(dataFactura, type) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any }];
+    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id), label: 'Cerrar', disable: false as any }];
 
     if (this.inputs.code == tipoDocFacturacion.cotizacion) {
       botonesDinamicos.push({
         clase: 'btn btn-gris',
         function: (instance) => {
-          instance.closeModal(instance.id, 'mostrarFactura');
+          instance.closeModal(instance.id);
           this.tableClickIcon({ id_tabla: 'mostrar_documento', columnKey: 'actions', iconKey: 'rellenar_factura', data: dataFactura });
         },
         label: 'Facturar',

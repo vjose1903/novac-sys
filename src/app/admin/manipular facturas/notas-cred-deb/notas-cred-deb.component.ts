@@ -492,7 +492,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
+    modalInstance.closeModal(modalInstance.id);
   }
 
   async formarNota() {

@@ -249,7 +249,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           dinamico: [
             {
               clase: 'btn btn-blanco',
-              function: instance => instance.closeModal(instance.id, 'cancel'),
+              function: instance => instance.closeModal(instance.id),
               label: 'Cancelar',
               disable: false,
             },
@@ -257,7 +257,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
               clase: 'btn btn-danger',
               function: instance => {
                 this.sendCloseConfirmation();
-                instance.closeModal(instance.id, 'cancel');
+                instance.closeModal(instance.id);
               },
               label: 'Cerrar',
               disable: false,
@@ -285,7 +285,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
           dinamico: [
             {
               clase: 'btn btn-blanco',
-              function: instance => instance.closeModal(instance.id, 'cancel'),
+              function: instance => instance.closeModal(instance.id),
               label: 'Cancelar',
               disable: false,
             },
@@ -293,7 +293,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
               clase: 'btn btn-verde',
               function: instance => {
                 this.iniciar_descarga_actualizacion();
-                instance.closeModal(instance.id, 'cancel');
+                instance.closeModal(instance.id);
               },
               label: 'Actualizar',
               disable: false,

@@ -127,6 +127,6 @@ export class ModalClass extends LayoutClass {
   }
 
   closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
+    modalInstance.closeModal(modalInstance.id);
   }
 }

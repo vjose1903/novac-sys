@@ -286,7 +286,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
         this.ncfClass.deleteOne(comprobanteData.id).then(res => {
           const actualPagination = this.tServ.getPaginationById('lista_ncf');
           this.getPaquetesNCF(actualPagination);
-          instance.closeModal(instance.id, 'eliminar_comprobante');
+          instance.closeModal(instance.id);
         });
       },
     };

@@ -15,6 +15,7 @@ const setup_ = {
     DOCKER_NAME: 'demo',
     NAME_UPDATE_REPO: 'novac-system-demo',
     CUSTOM_ACCESS: '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',
+    DGII_DATE: '',
   },
   agrodemi: {
     TITLE_APP: 'Novac System - AGRODEMI',
@@ -24,6 +25,7 @@ const setup_ = {
     DOCKER_NAME: 'agrodemi',
     NAME_UPDATE_REPO: 'novac-system-agrodemi',
     CUSTOM_ACCESS: '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',
+    DGII_DATE: '2025-05-15',
   },
   brendy: {
     TITLE_APP: 'Novac System - Panaderia Brendy',
@@ -33,6 +35,7 @@ const setup_ = {
     DOCKER_NAME: 'brendy',
     NAME_UPDATE_REPO: 'novac-system-brendy',
     CUSTOM_ACCESS: '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',
+    DGII_DATE: '',
   },
   vasquez: {
     TITLE_APP: 'Novac System - D` Vásquez Services',
@@ -42,6 +45,7 @@ const setup_ = {
     DOCKER_NAME: 'vasquez',
     NAME_UPDATE_REPO: 'novac-system-vasquez',
     CUSTOM_ACCESS: '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',
+    DGII_DATE: '',
   },
 };
 
@@ -53,6 +57,7 @@ const files = [
   { tipo: 'reemplazo', file_name: 'auto-update.ts', path: 'electron/auto-update.ts' },
   { tipo: 'reemplazo', file_name: 'environment.ts', path: 'src/environments/environment.ts' },
   { tipo: 'reemplazo', file_name: 'environment.web.ts', path: 'src/environments/environment.web.ts' },
+  { tipo: 'reemplazo', file_name: 'environment.prod.ts', path: 'src/environments/environment.prod.ts' },
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
   { tipo: 'reemplazo', file_name: 'package.json', path: 'package.json' },
   { tipo: 'reemplazo', file_name: 'main.ts', path: 'main.ts' },

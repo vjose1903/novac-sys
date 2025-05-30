@@ -179,7 +179,7 @@ export class FactsLocalStorage extends PreFacturaClass {
       header: 'Confirmación',
       siFunction: instance => {
         this.quitarFacturaGuardada(fact.archivo_id);
-        instance.closeModal(instance.id, 'quitar_factura');
+        instance.closeModal(instance.id);
       },
       width: '30rem',
     };

@@ -91,7 +91,7 @@ export class MixinClass extends ModalClass {
 
   eliminarRegistro(obj) {
     const noFunction = (instance: any) => {
-      instance.closeModal('borrar', 'cancelar');
+      instance.closeModal('borrar');
     };
     this.openNewModal({
       id: 'borrar',
@@ -106,7 +106,7 @@ export class MixinClass extends ModalClass {
             clase: 'btn btn-verde w-9',
             function: (instance) => {
               obj.siFunction();
-              instance.closeModal('borrar', 'cancelar');
+              instance.closeModal('borrar');
             },
             label: 'Si',
             disable: false,

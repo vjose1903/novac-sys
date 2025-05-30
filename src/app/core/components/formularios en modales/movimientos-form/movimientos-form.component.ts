@@ -109,7 +109,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
       const obj = { bool: true, body: res.articulo };
 
       const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-      modal.closeModal('inventario', 'cancelar');
+      modal.closeModal('inventario');
       modal.returnDataFromModal({ data: obj, modal_id: this.modal.component_id });
     });
   }
