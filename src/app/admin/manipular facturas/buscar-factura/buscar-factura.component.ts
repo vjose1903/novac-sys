@@ -911,7 +911,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     console.log('factura ', factura);
 
     this.facturaClass.updateOne({ id: factura.id }, { afterPath: `dgii/eNCF/replace` }).then(res => {
-      fun.toastSuccess(res.msg, 'CORRECTO');
+      console.log('res ', res);
+      
       modalInstances.forEach(instance => instance.closeModal(instance.id));
     })
   }
