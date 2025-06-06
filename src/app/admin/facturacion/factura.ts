@@ -296,7 +296,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   parseDataToPdf(data) {
-    return new Promise(resolve => {
+    return new Promise<FacturasI>(resolve => {
       const pick_factura1 = ['Bruto', 'cliente', 'balance', 'condicion', 'descuento', 'identificador', 'detalle_facturas', 'numero_factura', 'devuelta', 'estado', 'fecha_completada', 'fecha_equivalente', 'fecha_valida', 'fecha_vencimiento'];
       const pick_factura2 = [
         'fecha_viaje',
@@ -320,6 +320,8 @@ export class FacturaC extends CrudG<FacturasI> {
         'is_aceptada',
         'dgii_message',
         'security_code',
+        'is_ncf_modificado',
+        'document_reference',
       ];
       const pick_factura = [...pick_factura1, ...pick_factura2];
 
@@ -509,9 +511,7 @@ export interface FacturasI {
   notas: any;
   pagos: Pago[];
   is_ncf_modificado?: boolean;
-  ncf_modificado?: string;
-  ncf_modificado_por_id?: number;
-  ncf_modificado_at?: Date;
+  document_reference?: DocumentoReferenced;
   [propName: string]: any;
 }
 
@@ -520,6 +520,14 @@ export interface Cliente {
   telefono: string;
   direccion: string;
   rnc: string;
+}
+
+export interface DocumentoReferenced {
+  id: number;
+  document_referenced: FacturasI;
+  document_origin: FacturasI;
+  referenced_at: Date;
+  referenced_by: any;
 }
 
 export interface DetalleFactura {

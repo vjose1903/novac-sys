@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { actionFacturacion, deleteDocumentosTypes, request_factura_campo, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
+import { actionFacturacion, deleteDocumentosTypes, FacturasI, request_factura_campo, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
 import { Ss } from '@core/services/singleton.service';
 import { serie, seriesDgiiI } from '@core/typescript/constantes';
 import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input, computed, signal, effect, OnInit } from '@angular/core';
@@ -770,7 +770,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     }
   }
 
-  mostrarFactura(args: { factura: any; type: string; dataDB?: any; crear_nota?: boolean; documento?: string }) {
+  mostrarFactura(args: { factura: FacturasI; type: string; dataDB?: any; crear_nota?: boolean; documento?: string }) {
     const { factura, type, dataDB, crear_nota, documento } = args;
 
     const toPDFData = { data: factura, type: type };
@@ -798,6 +798,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           documento: documento,
           reimprimir: res.reimprimir,
           fileName: res.file.split('.')[0],
+          factura: factura,
         };
 
         const obj_modal = {
@@ -893,13 +894,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
       });
   }
 
-
   confirmarReemplazarENCF(factura, modalPdfInstance) {
     const obj = {
       id: 'reemplazarENCF',
       header: 'Confirmación',
       texto: `Seguro que desea reemplazar a eNCF la factura <strong>${factura.numero_comprobante}</strong>?`,
-      siFunction: (instance) => {
+      siFunction: instance => {
         this.reemplazarENCF(factura, [modalPdfInstance, instance]);
       },
     };
@@ -908,13 +908,19 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   reemplazarENCF(factura, modalInstances) {
-    console.log('factura ', factura);
-
     this.facturaClass.updateOne({ id: factura.id }, { afterPath: `dgii/eNCF/replace` }).then(res => {
-      console.log('res ', res);
-      
       modalInstances.forEach(instance => instance.closeModal(instance.id));
-    })
+
+      this.beforeReemplazarENCF();
+    });
+  }
+
+  async beforeReemplazarENCF() {
+    const actualPagination = await this.getActualPagination();
+
+    if (this.buscar_por == request_factura_campo.last_50) {
+      this.pedirFactura(actualPagination);
+    }
   }
 
   reimprimirDocumento(obj, modalInstance) {
@@ -965,6 +971,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
         this.pedirFactura(actualPagination);
       }
+    }
+
+    if (arg.modal_id == 'reemplazarENCF') {
     }
   }
 }

@@ -1,8 +1,14 @@
 <div class="position-relative w-100 h-100">
   @if (inputs?.show_estado && !inputs?.estado_documento) {
-    <span class="canceladaContent">
-      <span class="canceladaContent"> {{ inputs?.documento | uppercase }} ANULADA </span>
-    </span>
+    <div class="canceladaContent">
+      <span class="canceladaInfo">
+        <span class="canceladaTitle"> {{ inputs?.documento | uppercase }} ANULADA </span>
+
+        @if (fun.hasValue(ncf_referenced) && inputs?.factura?.is_ncf_modificado) {
+          <span class="canceladaDescription"> Reemplazado por: {{ ncf_referenced }} </span>
+        }
+      </span>
+    </div>
   }
   <ngx-extended-pdf-viewer
     [base64Src]="inputs?.base64"
@@ -15,6 +21,5 @@
     [enablePrint]="inputs?.viewerOptions?.enablePrint || false"
     [textLayer]="inputs?.viewerOptions?.textLayer || false"
     [showTextEditor]="false"
-    [showDrawEditor]="false"
-  ></ngx-extended-pdf-viewer>
+    [showDrawEditor]="false"></ngx-extended-pdf-viewer>
 </div>
