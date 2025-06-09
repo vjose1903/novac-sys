@@ -99,7 +99,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   tipoFacturas;
   precioEnTurno: any;
-  ExisteMontoMayor: boolean;
+  ExisteMontoMayor: boolean = false;
   detalleYtotal: any;
   devuelta: any;
   forma_pago: any;
@@ -626,9 +626,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         return;
       }
 
-      const total_plus_mora = Big(total).plus(mora).toNumber();
+      const total_plus_mora = fun.desformatearStNumber(fun.roundNumberToDecimal(Big(total).plus(mora).toNumber()));
 
-      if (monto > total_plus_mora) {
+      if (monto > total_plus_mora + 0.4) {
         this.ExisteMontoMayor = true;
 
         fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');

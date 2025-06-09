@@ -155,7 +155,7 @@ export class fun {
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
-  static redondearNum(numero, decimales) {
+  static redondearNum(numero, decimales = 2) {
     const factor = Math.pow(10, decimales);
     const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor;
     return numberRounded.toFixed(decimales);
