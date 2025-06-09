@@ -286,15 +286,15 @@ function parseResumen(args: { data: any; tipo_pdf: any; is_electronica: boolean;
   if (!infoResumenPartes[tipo_pdf].length) return [{ text: '' }];
 
   const componentesResumen = {
-    total_excento: { label: 'Total Excento', valor: resumen_data?.total_excento || 0 },
-    total_gravado: { label: 'Total Gravado', valor: resumen_data?.total_gravado || 0 },
-    bruto: { label: 'Total Excento', valor: data?.Bruto || data?.bruto || 0 },
-    itbis: { label: 'Itbis', valor: resumen_data?.itbis || data?.itbis || 0 },
-    descuento: { label: 'Descuento', valor: resumen_data?.descuento || data?.descuento || 0 },
-    mora: { label: 'Mora', valor: data?.mora || 0 },
-    total: { label: 'Total', valor: resumen_data?.total_pagina || data?.total || 0 },
-    efectivo: { label: 'Efectivo', valor: data?.total + data?.devuelta || 0 },
-    cambio: { label: 'Cambio', valor: data?.devuelta || 0 },
+    total_excento: { label: 'Total Excento:', valor: resumen_data?.total_excento || 0 },
+    total_gravado: { label: 'Total Gravado:', valor: resumen_data?.total_gravado || 0 },
+    bruto: { label: 'Bruto:', valor: data?.Bruto || data?.bruto || 0 },
+    itbis: { label: 'Itbis:', valor: resumen_data?.itbis || data?.itbis || 0 },
+    descuento: { label: 'Descuento:', valor: resumen_data?.descuento || data?.descuento || 0 },
+    mora: { label: 'Mora:', valor: data?.mora || 0 },
+    total: { label: 'Total:', valor: resumen_data?.total_pagina || data?.total || 0 },
+    efectivo: { label: 'Efectivo:', valor: data?.total + data?.devuelta || 0 },
+    cambio: { label: 'Cambio:', valor: data?.devuelta || 0 },
   };
 
   const baseProps = {

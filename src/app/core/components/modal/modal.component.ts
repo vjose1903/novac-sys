@@ -162,7 +162,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
       modal['instance'].btn_aceptar();
     } else {
       modal.returnDataFromModal({ bool: bool, inputs: modal.inputs, id: modal.id });
-      modal.closeModal(modal.id, 'aceptar');
+      modal.closeModal(modal.id);
     }
   }
 

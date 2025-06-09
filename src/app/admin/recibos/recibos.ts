@@ -35,14 +35,14 @@ export class ReciboC extends CrudG<ReciboI> {
   modalVerDetalles(data) {
     return {
       component: DetalleFacturaComponent,
-      inputs: { data: data },
+      inputs: { data: data, documento: 'recibo' },
       id: `detalle_recibos`,
       header: 'Detalles Recibos',
       width: '35rem',
       height: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+        dinamico: [{ clase: 'btn btn-blanco', function: (instance) => instance.closeModal(instance.id), label: 'Cerrar', disable: false }],
       },
     };
   }

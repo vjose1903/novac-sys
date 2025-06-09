@@ -34,11 +34,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   factura!: FacturasI;
 
   detalleNota = signal<DetalleFactura[]>([]);
-  cliente_id!: number;
 
-  totalGlobal = computed(() => {
-    return this.detalleNota().reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.total_nota), 0);
-  });
+  itbisGeneral = computed(() => this.detalleNota().reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.itbis_real), 0));
+  totalGeneral = computed(() => this.detalleNota().reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.total_nota), 0));
+  brutoGeneral = computed(() => Big(this.totalGeneral()).minus(this.itbisGeneral()).toNumber());
+
+  cliente_id!: number;
 
   cantArticulosSelected = computed(() => {
     return this.detalleNota().filter(detalle => fun.desformatearStNumber(detalle.total_nota) > 0).length;
@@ -198,7 +199,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       this.facturaAplicadasClass.getAll({ afterPath: `custom/get_cantidad_devuelto/${this.id_factura}` }).then(res => {
         const devueltos = res['data'];
 
-        const dias_de_creada = Math.round(moment().diff(factura.fecha_equivalente, 'days', true));
+        const dias_de_creada = Math.round(DateUtils.diffDays(factura.fecha_equivalente));
 
         for (let indexDetalles = 0; indexDetalles < factura.detalle_facturas.length; indexDetalles++) {
           const detalle = factura.detalle_facturas[indexDetalles];
@@ -250,10 +251,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     const detalle_factura = this.factura.detalle_facturas.find(detalle => detalle.id == data.id);
 
     if (fun.hasValue(current_detalle)) {
-      const total_nota = fun.desformatearStNumber(current_detalle.total_nota);
       const precio_real = fun.desformatearStNumber(current_detalle.precio_real);
       const precio = fun.desformatearStNumber(current_detalle.precio);
-      const cantidad = fun.desformatearStNumber(current_detalle.cantidad);
       const cant_nota = fun.desformatearStNumber(current_detalle.cant_nota);
 
       const inputId = `input-${id_tabla}-${key}-${index}`;
@@ -393,13 +392,17 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     let total = 0;
 
+    // TODO: como tomar el precio y el itbis segun si es el mismo precio o no
+    // const precio =
+
     if (this.isCredito) {
       const itbis = data.calcular_itbis && data.can_return_itbis ? precio * 0.18 : 0;
-      const precio_itbis = precio + itbis;
+      const precio_itbis = Big(precio).plus(itbis).toNumber();
       total += cant_nota * (precio_itbis - descuento);
     }
 
     if (precio != precio_real_value) {
+      // TODO: preguntar que si se toma el itbis_real sin estar afectado por la disminucion o si se toma el itbis tal cual estuvo al inicio
       const itbis_real = fun.desformatearStNumber(data.itbis_real);
       const precio_itbis_real = precio_real_value + itbis_real;
       const total_real = data.cantidad * (precio_itbis_real - descuento);
@@ -450,7 +453,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   //  MODAL IMPRIMIR
   // =============================================
   imprimirFactura() {
-    if (this.totalGlobal() == 0) {
+    if (this.totalGeneral() == 0) {
       fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
     } else {
       const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: `nota_${this.tipoNota}`, is_viaje: false };
@@ -489,7 +492,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
+    modalInstance.closeModal(modalInstance.id);
   }
 
   async formarNota() {
@@ -506,46 +509,50 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       user_id: null,
       fecha_valida,
       tipo_factura_id: this.tipoFactura.id,
-      total: this.totalGlobal(),
+      bruto: this.brutoGeneral(),
+      itbis: this.itbisGeneral(),
+      total: this.totalGeneral(),
       serie: this.serieSelected(),
       facturas_aplicadas: [],
     };
 
     this.checkCantidadEnUnidades();
 
+    const detalles = this.detalleNota()
+      .filter(detalle => fun.desformatearStNumber(detalle.total_nota) > 0)
+      .map(detalle => {
+        const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota, cantidad } = detalle;
+
+        let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'articulo', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor', 'descripcion']);
+
+        // TODO: VER COMO AGREGO EL CODIGO Y PROBAR LO DE LA DESCRIPCION NO ME CONVENCE
+        objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
+        objDetalleTemp['itbis'] = can_return_itbis ? fun.desformatearStNumber(objDetalleTemp.itbis) : 0;
+        objDetalleTemp['cantidad_en_unidades'] = cantidad_en_unidades_nota;
+        objDetalleTemp['cantidad'] = cant_nota;
+        objDetalleTemp['cantidad_origin'] = cantidad;
+        objDetalleTemp['codigo'] = cantidad;
+        objDetalleTemp['detalle_factura_id'] = id;
+        objDetalleTemp['itbis_real'] = fun.desformatearStNumber(objDetalleTemp['itbis_real']);
+        objDetalleTemp['itbis'] = fun.desformatearStNumber(objDetalleTemp['itbis']);
+        objDetalleTemp['precio_real'] = fun.desformatearStNumber(objDetalleTemp['precio_real']);
+        objDetalleTemp['precio'] = fun.desformatearStNumber(objDetalleTemp['precio']);
+        objDetalleTemp['descuento'] = detalle.descuento_valor;
+
+        objDetalleTemp['descuento_real'] = 0;
+
+        delete objDetalleTemp.total_nota;
+        delete objDetalleTemp.cantidad_en_unidades_nota;
+        delete objDetalleTemp.descuento_valor;
+
+        return objDetalleTemp;
+      });
+
     const objTemp = {
       cabecera_factura_id: this.factura.id,
-      total: this.totalGlobal(),
+      total: this.totalGeneral(),
 
-      detalles_facturas_notas: this.detalleNota()
-        .filter(detalle => fun.desformatearStNumber(detalle.total_nota) > 0)
-        .map(detalle => {
-          const { id, can_return_itbis, cant_nota, cantidad_en_unidades_nota, cantidad } = detalle;
-
-          let objDetalleTemp = fun.pick(detalle, ['detalle_factura_id', 'articulo_id', 'articulo', 'unidad', 'cantidad_en_unidades_nota', 'itbis', 'itbis_real', 'costo', 'precio', 'precio_real', 'total_nota', 'descuento_valor', 'descripcion']);
-
-          // TODO: VER COMO AGREGO EL CODIGO Y PROBAR LO DE LA DESCRIPCION NO ME CONVENCE
-          objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
-          objDetalleTemp['itbis'] = can_return_itbis ? fun.desformatearStNumber(objDetalleTemp.itbis) : 0;
-          objDetalleTemp['cantidad_en_unidades'] = cantidad_en_unidades_nota;
-          objDetalleTemp['cantidad'] = cant_nota;
-          objDetalleTemp['cantidad_origin'] = cantidad;
-          objDetalleTemp['codigo'] = cantidad;
-          objDetalleTemp['detalle_factura_id'] = id;
-          objDetalleTemp['itbis_real'] = fun.desformatearStNumber(objDetalleTemp['itbis_real']);
-          objDetalleTemp['itbis'] = fun.desformatearStNumber(objDetalleTemp['itbis']);
-          objDetalleTemp['precio_real'] = fun.desformatearStNumber(objDetalleTemp['precio_real']);
-          objDetalleTemp['precio'] = fun.desformatearStNumber(objDetalleTemp['precio']);
-          objDetalleTemp['descuento'] = detalle.descuento_valor;
-
-          objDetalleTemp['descuento_real'] = 0;
-
-          delete objDetalleTemp.total_nota;
-          delete objDetalleTemp.cantidad_en_unidades_nota;
-          delete objDetalleTemp.descuento_valor;
-
-          return objDetalleTemp;
-        }),
+      detalles_facturas_notas: detalles,
     };
 
     dataToSend.facturas_aplicadas.push(objTemp);

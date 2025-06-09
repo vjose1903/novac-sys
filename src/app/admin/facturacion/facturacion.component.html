@@ -32,15 +32,17 @@
     </div>
 
     <div class="d-flex">
-      <p-selectButton
-        [options]="facturasSerieOptions"
-        [ngModel]="factServ.serieType()"
-        (ngModelChange)="factServ.serieType.set($event)"
-        (ngModelChange)="changeSerie()"
-        optionLabel="label"
-        optionValue="value"
-        optionDisabled="disabled"
-        [allowEmpty]="false" />
+      @if (!factServ.isCotizacion && !factServ.isPreVenta) {
+        <p-selectButton
+          [options]="facturasSerieOptions"
+          [ngModel]="factServ.serieType()"
+          (ngModelChange)="factServ.serieType.set($event)"
+          (ngModelChange)="changeSerie()"
+          optionLabel="label"
+          optionValue="value"
+          optionDisabled="disabled"
+          [allowEmpty]="false" />
+      }
     </div>
   </div>
 

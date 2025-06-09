@@ -296,7 +296,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   parseDataToPdf(data) {
-    return new Promise(resolve => {
+    return new Promise<FacturasI>(resolve => {
       const pick_factura1 = ['Bruto', 'cliente', 'balance', 'condicion', 'descuento', 'identificador', 'detalle_facturas', 'numero_factura', 'devuelta', 'estado', 'fecha_completada', 'fecha_equivalente', 'fecha_valida', 'fecha_vencimiento'];
       const pick_factura2 = [
         'fecha_viaje',
@@ -320,6 +320,8 @@ export class FacturaC extends CrudG<FacturasI> {
         'is_aceptada',
         'dgii_message',
         'security_code',
+        'is_ncf_modificado',
+        'document_reference',
       ];
       const pick_factura = [...pick_factura1, ...pick_factura2];
 
@@ -353,14 +355,14 @@ export class FacturaC extends CrudG<FacturasI> {
   modalVerDetalles(data, documento = 'Factura') {
     return {
       component: DetalleFacturaComponent,
-      inputs: { data: data },
+      inputs: { data, documento: documento.toLowerCase() },
       id: `detalle_factura`,
       header: `Detalles ${documento}`,
       width: '35rem',
       minHeight: '10rem',
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+        dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false }],
       },
     };
   }
@@ -380,7 +382,7 @@ export class FacturaC extends CrudG<FacturasI> {
             height: '70vh',
             botones: {
               ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
+              dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false }],
             },
           };
 
@@ -508,6 +510,8 @@ export interface FacturasI {
   vendedor: string;
   notas: any;
   pagos: Pago[];
+  is_ncf_modificado?: boolean;
+  document_reference?: DocumentoReferenced;
   [propName: string]: any;
 }
 
@@ -516,6 +520,14 @@ export interface Cliente {
   telefono: string;
   direccion: string;
   rnc: string;
+}
+
+export interface DocumentoReferenced {
+  id: number;
+  document_referenced: FacturasI;
+  document_origin: FacturasI;
+  referenced_at: Date;
+  referenced_by: any;
 }
 
 export interface DetalleFactura {

@@ -13,10 +13,10 @@ import { Permisos } from '@core/typescript/permisos';
 import { InventarioC } from './inventario';
 
 @Component({
-    selector: 'app-inventario',
-    templateUrl: './inventario.component.html',
-    styleUrls: ['./inventario.component.scss'],
-    standalone: false
+  selector: 'app-inventario',
+  templateUrl: './inventario.component.html',
+  styleUrls: ['./inventario.component.scss'],
+  standalone: false,
 })
 export class InventarioComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
@@ -26,14 +26,15 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   permissions = Permisos;
   table_roles_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '5.5rem' }, { 'text-align': 'left' }] },
-      { titulo: 'Articulo', tipo: 'text', key: 'nombre', estilos: [{ width: '35rem' }, { 'text-align': 'left' }] },
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', style: { width: '5.5rem', 'text-align': 'left' } },
+      { titulo: 'Articulo', tipo: 'text', key: 'nombre', style: { width: '30rem', 'text-align': 'left' } },
       { titulo: 'Cantidad', tipo: 'cantidades', key: 'cantidades' },
       { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal' },
+      { titulo: 'Costo', tipo: 'formatoNumero', key: 'costo_principal' },
     ],
     padding: '0.5rem',
     id_tabla: 'lista_inventario',
-    padre_functions: { data_request: (params) => this.getArticulos(params), handleBtnsDinamic: (params) => this.movimientoInventario(params) },
+    padre_functions: { data_request: params => this.getArticulos(params), handleBtnsDinamic: params => this.movimientoInventario(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { dinamico: [{ show: true, icon: 'fas fa-dolly', permiso: this.permissions.movimiento_inventario.create, name: 'movimiento_inventario', tooltip: 'Movimientos de inventario' }] },
@@ -57,7 +58,10 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   tipoArticuloClass = new TipoArticuloC();
   reporteClass = new ReporteC();
 
-  constructor(private tServ: TablasService, public loadServ: LoaderService) {
+  constructor(
+    private tServ: TablasService,
+    public loadServ: LoaderService
+  ) {
     super();
   }
 
@@ -65,7 +69,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this._init_mixin({ component: 'inventario', is_routing: true });
     this.necesarioParaEmpezar();
 
-    this.tipoArticuloClass.getAll().then((res) => (this.tipo_articulos = res.data));
+    this.tipoArticuloClass.getAll().then(res => (this.tipo_articulos = res.data));
   }
 
   iniciarCambioMenu(arg, callback) {
@@ -99,18 +103,13 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this.articuloClass.getAll(extra).then((result: any) => (this.cant_inventario = result['data'].stock));
   }
 
-
   async getArticulos(params?: { per_page?: number; page?: number; search?: string }) {
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
 
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     this.palabra_buscar = palabra_a_buscar;
 
-    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro }).then((res) => {
-      res.data.map((arti) => {
-        arti.customStyles = { codigo: { width: '5.5rem', 'text-align': 'left' }, nombre: { width: '35rem', 'text-align': 'left', 'padding-left': '2rem' } };
-      });
-
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro }).then(res => {
       this.listaArticulos = fun.deepCloning(res.data);
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
@@ -119,8 +118,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   filtrarArticulos() {
     const actualPagination = this.tServ.getPaginationById('lista_inventario');
     actualPagination['search'] = this.palabra_buscar;
-
-
 
     if (this.filtro != 'todos') {
       if (fun.isEmpty(actualPagination['ant_page'])) {
@@ -141,7 +138,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   movimientoInventario(arg) {
-    const tipoArticuloSelected = this.tipo_articulos.find((val) => val.id == _.parseInt(arg.data.tipo_articulo_id));
+    const tipoArticuloSelected = this.tipo_articulos.find(val => val.id == _.parseInt(arg.data.tipo_articulo_id));
 
     if (tipoArticuloSelected.tipo != 'servicio') {
       this.openNewModal({

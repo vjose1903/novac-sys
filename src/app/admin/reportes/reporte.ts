@@ -94,7 +94,7 @@ export class ReporteC extends CrudG<any> {
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false },
             { clase: 'btn btn-verde', function: instance => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false },
           ],
         },
@@ -129,7 +129,7 @@ export class ReporteC extends CrudG<any> {
           Ss.loadServ.isLoading.next(false);
 
           fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-          if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
+          if (modalInstance) modalInstance.closeModal(modalInstance.id);
         })
         .catch(err => {
           Ss.loadServ.isLoading.next(false);
@@ -145,7 +145,7 @@ export class ReporteC extends CrudG<any> {
       .download(this._configCsv, data)
       .then(() => {
         fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-        if (modalInstance) modalInstance.closeModal(modalInstance.id, 'cancel');
+        if (modalInstance) modalInstance.closeModal(modalInstance.id);
       })
       .catch(err => {
         console.error(err);

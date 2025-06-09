@@ -21,7 +21,7 @@ jobs:
         run: npm i
 
       - name: Ejecutar script de configuración
-        run: node ./scripts/start.js -p -c $$CLIENTE$$
+        run: node ./scripts/start.js -p -c $$CUSTOMER_NAME$$
         
       - name: Build Novac App
         id: build-novac-app

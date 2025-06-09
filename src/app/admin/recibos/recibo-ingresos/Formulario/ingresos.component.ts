@@ -99,7 +99,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   tipoFacturas;
   precioEnTurno: any;
-  ExisteMontoMayor: boolean;
+  ExisteMontoMayor: boolean = false;
   detalleYtotal: any;
   devuelta: any;
   forma_pago: any;
@@ -413,7 +413,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       texto: '¿Seguro de que desea cancelar la operacion?.',
       siFunction: instance => {
         this.cancelarIgreso();
-        instance.closeModal(instance.id, 'cancelar');
+        instance.closeModal(instance.id);
       },
     };
     this.confirmationModal(obj);
@@ -471,7 +471,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
             texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
             siFunction: instance => {
               this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
-              instance.closeModal(instance.id, 'cancelar');
+              instance.closeModal(instance.id);
             },
           };
           this.confirmationModal(obj);
@@ -485,7 +485,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         this.facturaClass.parseDataToPdf(params.data).then(dataFactura => {
           let botonesDinamicos = [
             { clase: 'btn btn-gris', function: instance => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false as any },
+            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false as any },
           ];
           const toPDFData = { data: dataFactura, type: 'facturacion' };
 
@@ -626,9 +626,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         return;
       }
 
-      const total_plus_mora = Big(total).plus(mora).toNumber();
+      const total_plus_mora = fun.desformatearStNumber(fun.roundNumberToDecimal(Big(total).plus(mora).toNumber()));
 
-      if (monto > total_plus_mora) {
+      if (monto > total_plus_mora + 0.4) {
         this.ExisteMontoMayor = true;
 
         fun.toastWarning('Monto no puede ser mayor al total de la factura', 'AVISO');

@@ -1,5 +1,10 @@
+import { FacturasI } from "@admin/facturacion/factura";
+
 export interface inputViewerOptions {
   viewerOptions: viewerOptions;
+  show_estado?: boolean;
+  estado_documento?: string;
+  factura?: FacturasI;
   [key: string]: any;
 }
 

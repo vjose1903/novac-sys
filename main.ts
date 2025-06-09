@@ -2,7 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ConfigI } from './src/app/core/interface/config-interface';
- 
+
 const { exec } = require('child_process');
 
 import Functions from './electron/functions';
@@ -37,13 +37,16 @@ import LogProcessor from './electron/write-logs';
 import MachineId from './electron/machine-id';
 import OpenBrowser from './electron/open-web-browser';
 import { sharedState } from './electron/shared-state';
+import PdfPrinter from './electron/pdf-printer';
 
 let win: BrowserWindow | null;
 let splash: BrowserWindow | null;
 let auto_updater: AppUpdate;
-let export_to_excel: ExportToExcel;
 let docker_handler: DockerHandler;
 let replace_in_file: ReplaceInFile;
+let pdf_printer: PdfPrinter;
+let export_to_excel: ExportToExcel;
+
 const Console: LogProcessor = LogProcessor.getInstance();
 const openBrowser: OpenBrowser = OpenBrowser.getInstance();
 const machineId: MachineId = MachineId.getInstance();
@@ -108,7 +111,8 @@ function createWindow() {
       });
 
       if (serve) {
-        win.loadURL('http://localhost:5220').catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
+        const port = 5220;
+        win.loadURL(`http://localhost:${port}`).catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
 
         setTimeout(() => {
           win?.webContents.openDevTools();
@@ -263,6 +267,7 @@ function continuarCargandoArchivos(resolve) {
   // -------------- remplazar en archivos ----------------
   replace_in_file = new ReplaceInFile();
   export_to_excel = new ExportToExcel(app);
+  pdf_printer = PdfPrinter.getInstance(win);
 
   writeLogs(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
 
@@ -306,18 +311,17 @@ async function handleEvent(event: any, obj: string) {
       //
       case ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE:
         writeLogs('Verificando actualizaciones');
-        auto_updater.verifyUpdateAvailable().then(res => {
-          task.response = res;
-          console.log('task', task);
-          console.log('res', res);
-
-          event.reply(ELECTRON_RESPONSE, task);
-
-        }).catch(err => {
-          task.error = true;
-          task.response = err;
-          event.reply(ELECTRON_RESPONSE, task);
-        });
+        auto_updater
+          .verificateUpdateAvailable()
+          .then(res => {
+            task.response = res;
+            event.reply(ELECTRON_RESPONSE, task);
+          })
+          .catch(err => {
+            task.error = true;
+            task.response = err;
+            event.reply(ELECTRON_RESPONSE, task);
+          });
         break;
       //
       case ELECTRON_RELOAD:
@@ -357,15 +361,12 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case ELECTRON_PRINT_BASE64:
-        writeLogs('INICIANDOO PROCESO DE IMPRESION');
+        writeLogs('INICIANDO PROCESO DE IMPRESION');
 
-        const base64 = parameters.base64;
-        const fileName = parameters.file;
-        const printer = parameters.printer;
-        const type = parameters['type'] ? parameters['type'] : 'reporte';
-        const pageOrientation = parameters['pageOrientation'] ? parameters['pageOrientation'] : 'portrait';
+        const { base64, file: fileName, printer, type = 'reporte', pageOrientation = 'portrait' } = parameters;
 
-        generatePdfFileFormBase64({ fileName, base64, type, pageOrientation, printer })
+        pdf_printer
+          .generatePdfFileFromBase64({ fileName, base64, type, pageOrientation, printer })
           .then(res => {
             task.response = res;
             event.reply(ELECTRON_RESPONSE, task);
@@ -461,16 +462,6 @@ function getActualGitUser() {
   });
 }
 
-async function getPrinters() {
-  const printerPromise = await win?.webContents.getPrintersAsync();
-  if (printerPromise) {
-    const printers_list = printerPromise.map(item => item.name);
-    return printers_list;
-  } else {
-    return [];
-  }
-}
-
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER EL ARCHIVO APP.CONFIG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -481,7 +472,7 @@ function parseAppConfig() {
       const pjson = require('./package.json');
       const config: ConfigI = await Functions.getConfigFile();
 
-      const printer_list = await getPrinters();
+      const printer_list = await pdf_printer.getPrinters();
       config['operative_system'] = isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows;
       config['is_development'] = serve_;
       config['gitUser'] = await getActualGitUser();
@@ -522,70 +513,6 @@ export async function writeLogs(msg, titulo?) {
   if (win || splash) {
     Console.log(msg, titulo);
   }
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// FUNCION QUE SE ENCARGA DE ESCRIBIR EN EL ARCHIVO LOG
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function escribirLogs(file, titulo, texto) {
-  if (!fs.existsSync(file)) {
-    const stream = fs.createWriteStream(file);
-
-    await stream.once('open', () => {
-      stream.write(titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`);
-      stream.end();
-    });
-  } else {
-    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, () => {});
-  }
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// GENERAR EL PDF
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; pageOrientation: string; printer: string }) {
-  return new Promise(async (resolve, reject) => {
-    const pdfFileName = await pathAdd(`/${params.fileName}`);
-
-    try {
-      fs.writeFile(pdfFileName, params.base64, { encoding: 'base64' }, () => {
-        imprimir({ fileName: params.fileName, tipo: params.type, pageOrientation: params.pageOrientation, printer: params.printer })
-          .then(res => resolve(res))
-          .catch(err => reject(err));
-      });
-    } catch (err) {
-      reject({ msg: 'Error generando reporte!!', status: false, error: err });
-    }
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// IMPRIMIR EL PDF
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function imprimir(params: { fileName: string; tipo: string; pageOrientation: string; printer: string }) {
-  return new Promise(async (resolve, reject) => {
-    const file_path = await pathAdd(`/${params.fileName}`);
-
-    writeLogs(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
-    let comando = '';
-
-    if (isMacOs()) {
-      // let pageSize = `${params.width}x${params.height}in`;
-      // options.push(`-o PageSize=${pageSize}`);
-      comando = `lp -o ${params.pageOrientation} -o ColorModel=RGB -o fit-to-page -d "${params.printer}" "${file_path}"`;
-    } else {
-      const gsprint_path = await pathAdd(`/print/gsprint.exe`);
-      const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
-
-      comando = `${gsprint_path} -${params.pageOrientation} -colour -ghostscript "${ghostscript_path}" -dPDFFitPage -printer "${params.printer}" "${file_path}"`;
-    }
-
-    runTerminalCommand(comando)
-      .then(res => {
-        resolve({ msg: 'PDF impreso correctamente!!', STDOUT: res });
-      })
-      .catch(err => reject({ msg: 'Error imprimiento PDF!!', err }));
-  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

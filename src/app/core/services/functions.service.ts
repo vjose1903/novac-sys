@@ -7,7 +7,7 @@ import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
 import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
-
+import { RetryOptions } from '../interface/retry-until';
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun {
   constructor() {}
@@ -155,7 +155,7 @@ export class fun {
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
-  static redondearNum(numero, decimales) {
+  static redondearNum(numero, decimales = 2) {
     const factor = Math.pow(10, decimales);
     const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor;
     return numberRounded.toFixed(decimales);
@@ -471,7 +471,7 @@ export class fun {
     }
   }
 
-// __________________________________________________________________________________________________
+  // __________________________________________________________________________________________________
   /**
    * Nombre: isEmpty
    * Descripción: Esta función valida si una variable está vacía.
@@ -488,7 +488,7 @@ export class fun {
     if (Array.isArray(value)) return value.length === 0;
 
     if (value instanceof Date) return isNaN(value.getTime());
-    
+
     if (typeof value === 'object') return Object.keys(value).length === 0;
 
     return false;
@@ -551,7 +551,7 @@ export class fun {
   // __________________________________________________________________________________________________
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
-  // __________________________________________________________________________________________________
+  // _________________________________________________________________________________________________
   static enfocarInput(arg, element?) {
     element ??= document.getElementById(arg) as HTMLElement;
     if (element) element.focus();
@@ -560,7 +560,7 @@ export class fun {
   // __________________________________________________________________________________________________
   // Nombre: desEnfocarInput
   // Descripcion : Esta funcion desenfoca un elemento html
-  // __________________________________________________________________________________________________
+  // _________________________________________________________________________________________________
   static desEnfocarInput(inputId?: string) {
     const element = document.getElementById('input_fantasma');
     if (element) element.click();
@@ -626,6 +626,48 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: retryUntil
+  // Descripcion : Esta funcion recibe una tarea y la repite hasta que las condiciones establecidas se cumplan
+  // _________________________________________________________________________________________________
+
+  static async retryUntil<T>(params: { task: () => Promise<T>; retryWhen: (response: T) => boolean; actionAfterRetry: (response: T) => void; actionIfNoSuccess: () => void; options?: RetryOptions }): Promise<void> {
+    const { task, retryWhen, actionAfterRetry, actionIfNoSuccess, options = {} } = params;
+    const { delayBetweenRetries = 500, retryMax = 20, logError = false } = options;
+
+    let retryCount = 0;
+
+    const executeTask = async (): Promise<void> => {
+      try {
+        const response = await task();
+        const shouldRetry = retryWhen(response);
+        const hasRetries = retryCount < retryMax;
+
+        if (shouldRetry && hasRetries) {
+          retryCount++;
+          await new Promise(resolve => setTimeout(resolve, delayBetweenRetries));
+          return executeTask();
+        }
+
+        if (shouldRetry && !hasRetries) {
+          if (logError) {
+            console.error(`Max number of retries (${retryMax}) reached`);
+          }
+          Ss.zone.run(() => actionIfNoSuccess());
+        } else {
+          Ss.zone.run(() => actionAfterRetry(response));
+        }
+      } catch (error) {
+        if (logError) {
+          console.error('Task execution failed:', error);
+        }
+        Ss.zone.run(() => actionIfNoSuccess());
+      }
+    };
+
+    Ss.zone.runOutsideAngular(() => executeTask());
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: compare
   // Descripcion : Esta funcion se utiliza para ordenar un arreglo
   // __________________________________________________________________________________________________
@@ -679,14 +721,19 @@ export class fun {
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
 
+        // Resetear el estado del guard y limpiar cache
+        const authGuard = fun.getAuthGuardInstance();
+        const currentUserService = fun.getCurrentUserServiceInstance();
+
+        if (authGuard) authGuard.resetValidation();
+        if (currentUserService) currentUserService.clearValidationCache();
+
         Ss.layServ.nextLogOut(undefined);
         resolve(true);
       } catch (error) {
         resolve(false);
       }
     });
-
-    // this.router.navigateByUrl('/auth/login');
   }
 
   static decryptConfigPassword(str) {
@@ -973,5 +1020,25 @@ export class fun {
       }
     }
     return false;
+  }
+
+  // Métodos helper para obtener instancias de servicios
+  private static authGuardInstance: any = null;
+  private static currentUserServiceInstance: any = null;
+
+  static setAuthGuardInstance(instance: any) {
+    fun.authGuardInstance = instance;
+  }
+
+  static getAuthGuardInstance() {
+    return fun.authGuardInstance;
+  }
+
+  static setCurrentUserServiceInstance(instance: any) {
+    fun.currentUserServiceInstance = instance;
+  }
+
+  static getCurrentUserServiceInstance() {
+    return fun.currentUserServiceInstance;
   }
 }

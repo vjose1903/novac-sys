@@ -2,7 +2,7 @@ export const config_inventario = {
   margin_general: [0, 0, 0, 0],
   isBreak: false,
   only_titulo: false,
-  widths: [24, 35, '*', 'auto', 'auto'],
+  widths: [22, 30, 'auto', 'auto', 'auto', 'auto'],
   info: [
     {
       text: '#',
@@ -25,7 +25,7 @@ export const config_inventario = {
     {
       text: 'Articulo',
       alignment_titulo: 'left',
-      noWrap: true,
+      noWrap: false,
       style: 'letra10',
       style_body: 'letra10',
       key: 'nombre',
@@ -48,6 +48,16 @@ export const config_inventario = {
       style: 'letra10',
       style_body: 'letra10',
       key: 'precio_principal',
+      alignment_body: 'right',
+      formato_numero: true,
+    },
+    {
+      text: 'Costo',
+      alignment_titulo: 'right',
+      noWrap: true,
+      style: 'letra10',
+      style_body: 'letra10',
+      key: 'costo_principal',
       alignment_body: 'right',
       formato_numero: true,
       margin_titulo: [0, 0, 10, 0],

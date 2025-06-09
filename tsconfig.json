@@ -22,7 +22,8 @@
       "@core/*": ["app/core/*"],
       "@components/*": ["app/core/components/*"],
       "@registros/*": ["app/admin/registros/*"],
-      "@admin/*": ["app/admin/*"]
+      "@admin/*": ["app/admin/*"],
+      "@environments/*": ["environments/*"]
     }
   },
   "files": [

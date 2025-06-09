@@ -2,7 +2,7 @@ import { PrimengModule } from './modules/primeng.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NewModalModule } from './core/components/modal/modal.module';
 import { FormulariosEnModalesModule } from './core/components/formularios en modales/formularios-en-modales.module';
-import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener, inject, OnDestroy } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from '@core/services/ipc.service';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
@@ -27,7 +27,7 @@ import {
   ELECTRON_EVENT_DOWNLOAD_UPDATE,
 } from '../../electron/shared-electron-angular';
 
-import { Subscription } from 'rxjs';
+import { Subscription, takeUntil, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from '@core/services/shared.service';
@@ -46,138 +46,178 @@ import { ModalClass } from './core/components/modal/modal-class';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit {
+export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit, OnDestroy {
+  // Servicios inyectados usando inject()
+  public _ipc = inject(IpcService);
+  public loaderServ = inject(LoaderService);
+  public cdRef = inject(ChangeDetectorRef);
+  public zone = inject(NgZone);
+  public http = inject(HttpClient);
+  public factServ = inject(FacturacionService);
+  public layServ = inject(LayoutService);
+  public configServ = inject(ConfigurationService);
+  public themeService = inject(ThemeService);
+  public toastr = inject(ToastrService);
+  public sharedServ = inject(SharedService);
+  public permissionsService = inject(NgxPermissionsService);
+
+  // Subject para manejar la destrucción del componente
+  private readonly destroy$ = new Subject<void>();
+
+  // Propiedades del componente
+  loading = false;
+  objProgress: any;
+  visible = false;
+  imgLogo: string;
+  tiempo_restante: string;
+  objPercent: any;
+  counter = 0;
+
+  // Mapa de eventos de Electron para mejor organización
+  private readonly electronEventHandlers = {
+    [ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE]: (data: any) => {
+      fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
+    },
+    [ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE]: (data: any) => {
+      fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, data);
+      this.mostrar_modal_actualizacion(data);
+    },
+    [ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS]: (data: any) => {
+      this.visible = true;
+      fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
+      this.downloadProgression(data.body);
+    },
+    [ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED]: () => {
+      this.visible = false;
+    },
+    [ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE]: (data: any) => {
+      fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
+    },
+    [ELECTRON_EVENT_UPDATE_ERROR]: (data: any) => {
+      fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
+      fun.toastError(data.msg, 'ERRROR');
+      this.visible = false;
+    },
+    [ELECTRON_SHOW_CLOSE_CONFIRMATION]: () => {
+      const token = fun.getAuthToken();
+      if (fun.hasValue(token)) {
+        this.cerrar_app();
+      } else {
+        this.sendCloseConfirmation();
+      }
+    },
+    test: () => {
+      // Evento de prueba
+    },
+  };
+
   @HostListener('window:keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent) {
-    if ((event.metaKey || event.ctrlKey) && event.key == 'r') {
+  onKeyDown(event: KeyboardEvent): void {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'r') {
       event.preventDefault();
       fun.reloadElectron();
     }
   }
 
-  loading = false;
-  objProgress;
-  visible = false;
-  imgLogo;
-  tiempo_restante;
-  objPercent;
-  configReady = false;
-  counter = 0;
-  sub: Subscription;
-  subModified: Subscription;
-
-  constructor(
-    public _ipc: IpcService,
-    public loaderServ: LoaderService,
-    private cdRef: ChangeDetectorRef,
-
-    public zone: NgZone,
-    public http: HttpClient,
-
-    public factServ: FacturacionService,
-    public layServ: LayoutService,
-    public configServ: ConfigurationService,
-    public themeService: ThemeService,
-    public toastr: ToastrService,
-    public sharedServ: SharedService,
-    public permissionsService: NgxPermissionsService
-  ) {
-    super();
+  @HostListener('window:resize', ['$event'])
+  onResize(): void {
+    fun.setWindowSize(window);
   }
 
-  ngOnInit(): void {
-    Ss.http = this.http;
-    Ss.zone = this.zone;
-    Ss.configServ = this.configServ;
-    Ss._ipc = this._ipc;
-    Ss.factServ = this.factServ;
+  constructor() {
+    super();
+    this.initializeSingletonServices();
+  }
 
-    Ss.permissionsService = this.permissionsService;
-    Ss.loadServ = this.loaderServ;
-    Ss.layServ = this.layServ;
-    Ss.toastr = this.toastr;
-    Ss.sharedServ = this.sharedServ;
-    Ss.cdRef = this.cdRef;
+  async ngOnInit(): Promise<void> {
+    // Cargar configuración al inicio
+    await this.loadAppConfig();
 
-    this.loaderServ.isLoading.subscribe(v => (this.loading = v));
-
-    this.subModified = MODIFIED_CONFIG_FILE.subscribe(res => {
-      if (fun.hasValue(res)) this.getAppConfig();
-    });
-
-    this._ipc.electronEvents$.subscribe(res => {
-      Ss.zone.run(() => {
-        if (fun.hasValue(res)) {
-          const data = res.data;
-          switch (res.eventName) {
-            case ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE:
-              fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
-              break;
-            //
-            case ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE:
-              fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, data);
-              this.mostrar_modal_actualizacion(data);
-              break;
-            //
-            case ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS:
-              this.visible = true;
-              fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
-              this.downloadProgression(data.body);
-              break;
-            //
-            case ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED:
-              this.visible = false;
-              break;
-            //
-            case ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE:
-              fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
-              break;
-            //
-            //
-            case ELECTRON_EVENT_UPDATE_ERROR:
-              fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
-              fun.toastError(data.msg, 'ERRROR');
-              this.visible = false;
-              break;
-            //
-            case ELECTRON_SHOW_CLOSE_CONFIRMATION:
-              const token = fun.getAuthToken();
-
-              if (fun.hasValue(token)) {
-                this.cerrar_app();
-              } else {
-                this.sendCloseConfirmation();
-              }
-              break;
-            //
-            case 'test':
-              break;
-            //
-            default:
-              break;
-          }
-        }
-      });
-    });
-
-    window.onresize = e => this.resize.bind(this)(e);
+    this.setupSubscriptions();
   }
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
-
-    this.getAppConfig().then(config => {
-      setTimeout(() => {
-        this.configReady = true;
-      }, 250);
-    });
   }
 
-  ngAfterContentChecked() {
+  ngAfterContentChecked(): void {
     this.cdRef.detectChanges();
   }
 
-  async test() {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Inicializar servicios singleton
+   */
+  private initializeSingletonServices(): void {
+    Object.assign(Ss, {
+      http: this.http,
+      zone: this.zone,
+      configServ: this.configServ,
+      _ipc: this._ipc,
+      factServ: this.factServ,
+      permissionsService: this.permissionsService,
+      loadServ: this.loaderServ,
+      layServ: this.layServ,
+      toastr: this.toastr,
+      sharedServ: this.sharedServ,
+      cdRef: this.cdRef,
+    });
+  }
+
+  /**
+   * Configurar todas las suscripciones del componente
+   */
+  private setupSubscriptions(): void {
+    // Suscripción al loader
+    this.loaderServ.isLoading.pipe(takeUntil(this.destroy$)).subscribe(loading => (this.loading = loading));
+
+    // Solo escuchar cambios en la configuración para recargarla
+    MODIFIED_CONFIG_FILE.pipe(takeUntil(this.destroy$)).subscribe(res => {
+      if (fun.hasValue(res)) this.loadAppConfig();
+    });
+
+    // Eventos de Electron
+    this._ipc.electronEvents$.pipe(takeUntil(this.destroy$)).subscribe(res => {
+      if (fun.hasValue(res)) {
+        this.handleElectronEvent(res);
+      }
+    });
+  }
+
+  /**
+   * Maneja los eventos de Electron de forma organizada
+   */
+  private handleElectronEvent(event: any): void {
+    this.zone.run(() => {
+      const handler = this.electronEventHandlers[event.eventName];
+      if (handler) {
+        handler(event.data);
+      }
+    });
+  }
+
+  /**
+   * Cargar configuración de la aplicación
+   */
+  async loadAppConfig(): Promise<void> {
+    try {
+      const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
+      const config = (await this._ipc.sendTask(task)) as any;
+
+      this.configServ.setConfig = config;
+      this.themeService.setTheme(config.color_app);
+      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+    } catch (error) {
+      console.error('Error cargando configuración:', error);
+      // Manejar error de configuración
+    }
+  }
+
+  async test(): Promise<void> {
     // const obj = { nombre: 'victor', edad: 35, direccion: { calle: 'las maras-higuero', apto: 'amarillo' }, estudios: ['colegio inmaculada', 'ucateci'] };
     // console.log(`obj ANTES => `, obj);
     // const obj2 = fun.deepCloning(obj);
@@ -191,15 +231,14 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     //   .catch((err) => console.error(err));
   }
 
-  getActualPath() {
-    const location = window.location.href;
-    const initSlice = location.indexOf('/admin') == -1 ? location.indexOf('/auth') : location.indexOf('/admin');
-    const actualPath = location.slice(initSlice, location.length);
-    return actualPath;
+  enfocarApp(): void {
+    this.zone.run(() => {
+      this._ipc.focusWindow();
+    });
   }
 
-  cerrar_app() {
-    Ss.zone.run(() => {
+  cerrar_app(): void {
+    this.zone.run(() => {
       this.openNewModal({
         html: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
         id: 'cerrar_app',
@@ -208,12 +247,17 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cancelar', disable: false },
+            {
+              clase: 'btn btn-blanco',
+              function: instance => instance.closeModal(instance.id),
+              label: 'Cancelar',
+              disable: false,
+            },
             {
               clase: 'btn btn-danger',
               function: instance => {
                 this.sendCloseConfirmation();
-                instance.closeModal(instance.id, 'cancel');
+                instance.closeModal(instance.id);
               },
               label: 'Cerrar',
               disable: false,
@@ -224,23 +268,13 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
-  sendCloseConfirmation() {
+  sendCloseConfirmation(): void {
     const task = new MessageTask(ELECTRON_CLOSE_CONFIRMATION);
     this._ipc.sendTask(task);
   }
 
-  enfocarApp() {
-    Ss.zone.run(() => {
-      this._ipc.focusWindow();
-    });
-  }
-
-  resize() {
-    fun.setWindowSize(window);
-  }
-
-  mostrar_modal_actualizacion(info) {
-    Ss.zone.run(() => {
+  mostrar_modal_actualizacion(info: any): void {
+    this.zone.run(() => {
       this.openNewModal({
         html: `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`,
         id: 'actualizar_app',
@@ -249,12 +283,17 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cancelar', disable: false },
+            {
+              clase: 'btn btn-blanco',
+              function: instance => instance.closeModal(instance.id),
+              label: 'Cancelar',
+              disable: false,
+            },
             {
               clase: 'btn btn-verde',
               function: instance => {
                 this.iniciar_descarga_actualizacion();
-                instance.closeModal(instance.id, 'cancel');
+                instance.closeModal(instance.id);
               },
               label: 'Actualizar',
               disable: false,
@@ -265,7 +304,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
-  iniciar_descarga_actualizacion() {
+  iniciar_descarga_actualizacion(): void {
     const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
     this._ipc.sendTask(task).then(res => {
       console.log('res ---> ', res);
@@ -273,9 +312,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
-  downloadProgression(object) {
-    Ss.zone.run(() => {
-      if (this.counter == 1) this.visible = true;
+  downloadProgression(object: any): void {
+    this.zone.run(() => {
+      if (this.counter === 1) this.visible = true;
 
       this.counter++;
       this.tiempo_restante = this.timeConvert(object.total / object.bytesPerSecond);
@@ -289,26 +328,23 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
-  async getAppConfig() {
-    return new Promise<any>((resolve, reject) => {
+  async getAppConfig(): Promise<any> {
+    try {
       const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
+      const config = (await this._ipc.sendTask(task)) as any;
 
-      this._ipc
-        .sendTask(task)
-        .then((config: any) => {
-          this.themeService.setTheme(config.color_app);
-          this.configServ.setConfig = config;
-          this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+      this.themeService.setTheme(config.color_app);
+      this.configServ.setConfig = config;
+      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
 
-          resolve(config);
-        })
-        .catch(err => {
-          console.error(err);
-        });
-    });
+      return config;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   }
 
-  timeConvert(d) {
+  timeConvert(d: number): string {
     d = Number(d);
     const h = Math.floor(d / 3600);
     const m = Math.floor((d % 3600) / 60);
@@ -317,6 +353,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     const hDisplay = h > 0 ? h + (h === 1 ? ' hora, ' : ' horas, ') : '';
     const mDisplay = m > 0 ? m + (m === 1 ? ' minuto, ' : ' minutos, ') : '';
     const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
+
     return hDisplay + mDisplay + sDisplay;
   }
 }

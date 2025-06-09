@@ -360,7 +360,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   closeModal(modalInstance) {
-    modalInstance.closeModal(modalInstance.id, 'cancelar');
+    modalInstance.closeModal(modalInstance.id);
   }
 
   formarIngredientes(ingredientes) {

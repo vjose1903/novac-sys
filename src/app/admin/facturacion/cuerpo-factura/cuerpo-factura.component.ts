@@ -697,9 +697,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   enviarTotalesGenerales() {
-    const tempTotal = _.reduce(this.factServ.filasDetalle, (acumulado, item) => acumulado + fun.desformatearStNumber(item.value.total), 0);
-    const tempDesc = _.reduce(this.listaDeDescuentos, (acumulado, item) => acumulado + item.valor, 0);
-    const tempItbis = _.reduce(this.factServ.filasDetalle, (acumulado, item) => acumulado + fun.desformatearStNumber(item.value.itbis) * item.value.cantidad, 0);
+    const tempTotal = this.factServ.filasDetalle.reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.value.total), 0);
+    const tempDesc = this.listaDeDescuentos.reduce((acumulado, item) => acumulado + item.valor, 0);
+    const tempItbis = this.factServ.filasDetalle.reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.value.itbis) * item.value.cantidad, 0);
 
     const obj = { total: fun.roundNumberToDecimal(tempTotal), itbis: fun.roundNumberToDecimal(tempItbis), descuento: fun.roundNumberToDecimal(tempDesc) };
 
@@ -741,7 +741,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       detalle[campoToSolve] = actual_price_value;
       formGroup.patchValue(detalle);
 
-      this.calcularMontosRow(index).then(result => instance.closeModal(instance.id, 'get_actual_price'));
+      this.calcularMontosRow(index).then(result => instance.closeModal(instance.id));
     };
 
     const label = this.factServ.isCompra ? 'costo' : 'precio';

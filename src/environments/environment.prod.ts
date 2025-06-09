@@ -1,5 +1,5 @@
 export const AppConfig = {
   production: true,
   environment: 'PROD',
-  url_server: 'http://admservidor.ddns.net:9092',
+  DGII_CERTIFICATION_DATE: '2025-05-15',
 };

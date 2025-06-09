@@ -916,7 +916,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
+    const config = {
       data: regisData,
       texto: `¿Está seguro que desea eliminar el artículo <b> ${regisData.nombre}</b>?`,
       siFunction: () => {
@@ -928,7 +928,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       },
     };
 
-    this.eliminarRegistro(objToSend);
+    this.eliminarRegistro(config);
   }
 
   // =============================================

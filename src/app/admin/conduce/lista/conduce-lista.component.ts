@@ -191,12 +191,12 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
           botones: {
             ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
             dinamico: [
-              { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
+              { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false },
               {
                 clase: 'btn btn-verde',
                 function: instance => {
                   this.imprimir_base64(fileName, base64, pageOrientation);
-                  instance.closeModal(instance.id, 'cancel');
+                  instance.closeModal(instance.id);
                 },
                 label: 'Imprimir',
                 disable: false,
@@ -220,7 +220,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco w-9', function: instance => instance.closeModal(instance.id, obj.id), label: 'No', disable: false },
+          { clase: 'btn btn-blanco w-9', function: instance => instance.closeModal(instance.id), label: 'No', disable: false },
           {
             clase: 'btn btn-verde w-9',
             function: instance => obj.siFunction(instance),

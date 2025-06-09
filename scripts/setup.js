@@ -11,38 +11,42 @@ const setup_ = {
     TITLE_APP: 'Novac System - DEMO',
     PORT_APP: '5223',
     DB_PORT: '9093',
-    CLIENTE: 'demo',
+    CUSTOMER_NAME: 'demo',
     DOCKER_NAME: 'demo',
     NAME_UPDATE_REPO: 'novac-system-demo',
-    CUSTOM_ACCESS
+    CUSTOM_ACCESS: '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',
+    DGII_DATE: '',
   },
   agrodemi: {
     TITLE_APP: 'Novac System - AGRODEMI',
     PORT_APP: '5220',
     DB_PORT: '9090',
-    CLIENTE: 'agrodemi',
+    CUSTOMER_NAME: 'agrodemi',
     DOCKER_NAME: 'agrodemi',
     NAME_UPDATE_REPO: 'novac-system-agrodemi',
-    CUSTOM_ACCESS
+    CUSTOM_ACCESS: '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',
+    DGII_DATE: '2025-05-15',
   },
   brendy: {
     TITLE_APP: 'Novac System - Panaderia Brendy',
     PORT_APP: '5221',
     DB_PORT: '9091',
-    CLIENTE: 'brendy',
+    CUSTOMER_NAME: 'brendy',
     DOCKER_NAME: 'brendy',
     NAME_UPDATE_REPO: 'novac-system-brendy',
-    CUSTOM_ACCESS
+    CUSTOM_ACCESS: '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',
+    DGII_DATE: '',
   },
   vasquez: {
     TITLE_APP: 'Novac System - D` Vásquez Services',
     PORT_APP: '5222',
     DB_PORT: '9092',
-    CLIENTE: 'vasquez',
+    CUSTOMER_NAME: 'vasquez',
     DOCKER_NAME: 'vasquez',
     NAME_UPDATE_REPO: 'novac-system-vasquez',
-    CUSTOM_ACCESS
-  }
+    CUSTOM_ACCESS: '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',
+    DGII_DATE: '',
+  },
 };
 
 const files = [
@@ -53,6 +57,7 @@ const files = [
   { tipo: 'reemplazo', file_name: 'update-config.json', path: 'electron/update-config.json' },
   { tipo: 'reemplazo', file_name: 'environment.ts', path: 'src/environments/environment.ts' },
   { tipo: 'reemplazo', file_name: 'environment.web.ts', path: 'src/environments/environment.web.ts' },
+  { tipo: 'reemplazo', file_name: 'environment.prod.ts', path: 'src/environments/environment.prod.ts' },
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
   { tipo: 'reemplazo', file_name: 'package.json', path: 'package.json' },
   { tipo: 'reemplazo', file_name: 'main.ts', path: 'main.ts' },
