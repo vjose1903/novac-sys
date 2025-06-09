@@ -312,7 +312,7 @@ async function handleEvent(event: any, obj: string) {
       case ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE:
         writeLogs('Verificando actualizaciones');
         auto_updater
-          .verificateUpdateAvailable()
+          .verifyUpdateAvailable()
           .then(res => {
             task.response = res;
             event.reply(ELECTRON_RESPONSE, task);
