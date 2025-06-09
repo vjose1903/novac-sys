@@ -267,7 +267,6 @@ function continuarCargandoArchivos(resolve) {
   // -------------- remplazar en archivos ----------------
   replace_in_file = new ReplaceInFile();
   export_to_excel = new ExportToExcel(app);
-  pdf_printer = PdfPrinter.getInstance(win);
 
   writeLogs(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
 
@@ -284,6 +283,8 @@ async function beforeCreateWindow(win) {
   auto_updater = new AppUpdate(win, serve_);
   auto_updater.init();
   // ---------------------------------------
+
+  pdf_printer = PdfPrinter.getInstance(win);
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -473,6 +474,7 @@ function parseAppConfig() {
       const config: ConfigI = await Functions.getConfigFile();
 
       const printer_list = await pdf_printer.getPrinters();
+      
       config['operative_system'] = isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows;
       config['is_development'] = serve_;
       config['gitUser'] = await getActualGitUser();
