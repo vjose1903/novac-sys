@@ -46,8 +46,6 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     defaultStyle,
   };
 
-  console.log('footer ', JSON.stringify(pieFacturaVenta(data)));
-
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };
 
   return obj;
@@ -198,10 +196,6 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 function pieFacturaVenta(data) {
   return getQRCode(data);
 }
-
-
-
-
 
 // ==========================================================================================================================================================
 // CONTENIDO
