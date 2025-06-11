@@ -30,8 +30,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   actualRuta;
   nextModule;
 
-  menuItems = MENU_CONFIG;
-
   showLoading;
 
   usuario;
@@ -52,7 +50,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
-  tipoFacturaClass = new TiposFacturaC();
 
   chequiando_cuadre: boolean;
   hasPermisosValidated: boolean;
@@ -99,9 +96,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.initVariables();
     this._init_mixin({ component: 'layout', is_routing: false });
 
-    // Inicializar actualPath inmediatamente
-    this.checkRouteActiva();
-
     this.layServ.CHECKCUADRETODAY.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
         this.checkCuadre();
@@ -124,20 +118,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         else this.imgUser = 'assets/img/userM.png';
       }
     });
-
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
-    this.versionApp = this.configApp.app_version;
-
-    fun.logYellow('config ', this.configApp);
   }
 
   ngAfterViewInit() {
-    this.parseMenu();
     this.checkFacturasArchivadas();
-    this.ready = true;
     this.cdRef.detectChanges();
-
-    this.getTiposFacturas();
   }
 
   ngAfterContentChecked() {
@@ -157,23 +142,33 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.activeIndex = 0;
     this.currentYear = new Date().getFullYear();
     this.cuadre_hoy = false;
+    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.checkRouteActiva();
+
+    this.verifyIsReady();
   }
 
-  getTiposFacturas() {
-    return new Promise(async (resolve, reject) => {
-      await this.tipoFacturaClass
-        .getAll()
-        .then((tiposFacturas: any) => {
-          tiposFacturas = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
-          Ss.factServ.lista_tipos_facturas = tiposFacturas;
+  async verifyIsReady() {
+    const validations = async () => {
+      return new Promise<boolean>(resolve => {
+        if (fun.isEmpty(this.configApp)) return resolve(false);
+        if (fun.isEmpty(this.actualPath) || fun.isEmpty(this.actualRuta)) return resolve(false);
+        if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
 
-          resolve(Ss.factServ.lista_tipos_facturas);
-        })
-        .catch(error => {
-          fun.logBlue('error: ', error);
-          if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
-          reject(error);
-        });
+        resolve(true);
+      });
+    };
+
+    const noSuccess = () => {
+      this.ready = false;
+      fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+    };
+
+    fun.retryUntil({
+      task: () => validations(),
+      retryWhen: res => !res,
+      actionAfterRetry: () => (this.ready = true),
+      actionIfNoSuccess: () => noSuccess(),
     });
   }
 
@@ -231,35 +226,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
   }
 
-  parseMenu() {
-    for (const keyFather in this.menuPermissionsObj) {
-      // Buscar el menuItem que tenga el id igual al keyFather
-      const fatherMenuItem = this.menuItems.find(item => item.id === keyFather);
-
-      if (fatherMenuItem) {
-        for (const keyChild in this.menuPermissionsObj[keyFather]) {
-          const subMenuProp = this.menuPermissionsObj[keyFather][keyChild];
-
-          if (keyChild === 'flatt') {
-            // Asignar el flatt al father
-            fatherMenuItem.permission = [...(fatherMenuItem.permission || []), ...(subMenuProp || [])];
-          } else {
-            // Buscar el subItem que tenga el id igual al keyChild
-            const childMenuItem = fatherMenuItem.subItems?.find(subItem => subItem.id === keyChild);
-
-            if (childMenuItem) {
-              // Asignar los permisos al child
-              childMenuItem.permission = subMenuProp;
-            }
-
-            // Agregar al flatt del father
-            this.menuPermissionsObj[keyFather].flatt = [...new Set([...(this.menuPermissionsObj[keyFather].flatt || []), ...(subMenuProp || [])])];
-          }
-        }
-      }
-    }
-  }
-
   // =================================================================================
   // Refrescar el programa
   // =================================================================================
@@ -289,7 +255,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
     this.nextModule = undefined;
     this.actualRuta = pathSplit.join('/').replace('/admin/', '');
-    this.ready = true;
   }
 
   // =================================================================================

@@ -69,6 +69,7 @@ export class NotaC extends CrudG<any> {
 
           if (configApp.plantillas_impresion.nota == 'Detallada') data_parsed.contenido_reporte.push(...this.parseContentDetalladoNota(factura_aplicada));
         } else if (data_parsed.serie == serie.electronica) {
+          let descuento = 0;
           data_parsed.contenido_reporte = factura_aplicada.detalles_facturas_notas.map(detalle => {
             detalle['cantidad_mostrar'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${unidadAbrev[fun.normalizarTexto(detalle.unidad)]}.`;
             
@@ -77,11 +78,15 @@ export class NotaC extends CrudG<any> {
             const descuento_equivalente = descuento_big.div(detalle.cantidad_origin).toNumber();
             const descuento_proporcional = descuento_equivalente * (isPriceChange ? detalle.cantidad_origin : detalle.cantidad);
 
-            detalle['descuento_valor'] = fun.roundNumberToDecimal(descuento_proporcional);
+            detalle['descuento_valor'] = fun.desformatearStNumber(fun.roundNumberToDecimal(descuento_proporcional));
+
+            descuento += detalle['descuento_valor']
 
 
             return detalle;
           });
+
+          data_parsed.descuento = descuento;
         }
       });
 

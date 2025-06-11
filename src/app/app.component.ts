@@ -39,6 +39,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { log } from 'console';
 import { ModalClass } from './core/components/modal/modal-class';
+import { TipoFacturaI, TiposFacturaC } from '@admin/facturacion/factura';
 
 @Component({
   selector: 'app-root',
@@ -72,6 +73,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   tiempo_restante: string;
   objPercent: any;
   counter = 0;
+  isReady = false;
+
+  tipoFacturaClass = new TiposFacturaC();
 
   // Mapa de eventos de Electron para mejor organización
   private readonly electronEventHandlers = {
@@ -134,6 +138,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     await this.loadAppConfig();
 
     this.setupSubscriptions();
+    this.getTiposFacturas();
+    Ss.layServ.parseMenu();
+    this.verifyIsReady();
   }
 
   ngAfterViewInit(): void {
@@ -215,6 +222,46 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       console.error('Error cargando configuración:', error);
       // Manejar error de configuración
     }
+  }
+
+  getTiposFacturas() {
+    return new Promise(async (resolve, reject) => {
+      await this.tipoFacturaClass
+        .getAll()
+        .then((tiposFacturas: any) => {
+          tiposFacturas = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
+          Ss.factServ.lista_tipos_facturas = tiposFacturas;
+
+          resolve(Ss.factServ.lista_tipos_facturas);
+        })
+        .catch(error => {
+          fun.logRed('error: ', error);
+          reject(error);
+        });
+    });
+  }
+
+  async verifyIsReady() {
+    const validations = async () => {
+      return new Promise<boolean>(resolve => {
+        if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
+        if (!Ss.layServ.menuParsed) return resolve(false);
+
+        resolve(true);
+      });
+    };
+
+    const noSuccess = () => {
+      this.isReady = false;
+      fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+    };
+
+    fun.retryUntil({
+      task: () => validations(),
+      retryWhen: res => !res,
+      actionAfterRetry: () => (this.isReady = true),
+      actionIfNoSuccess: () => noSuccess(),
+    });
   }
 
   async test(): Promise<void> {

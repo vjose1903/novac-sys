@@ -112,8 +112,6 @@ export class ReciboC extends CrudG<ReciboI> {
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
       let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
-      console.log('objPdfView ', objPdfView);
-
       ReporteC.visualizarReporte(objPdfView);
     });
 
@@ -121,8 +119,6 @@ export class ReciboC extends CrudG<ReciboI> {
       const data = requestResponse;
 
       if (requestParameters['search_by'] == SearchBy.por_cliente && reporteParams.data.tipo == ReportGroupTypeE.detallado) data.tipo_reporte = 'recibos_cliente';
-
-      console.log('requestResponse ', requestResponse);
 
       return data;
     }
