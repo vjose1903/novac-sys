@@ -11,6 +11,13 @@ import { csvConfig as csvConfigCxcAnt } from '@core/services/reports/excel/confi
 import { csvConfig as csvConfigVentasCliente } from '@core/services/reports/excel/configs/report/ventas_cliente';
 import { MoraCalculator } from '../../recibos/recibo-ingresos/utils/mora-calculator';
 
+export enum CxC {
+  por_cliente = 1,
+  detallado = 2,
+  agrupado = 3,
+}
+
+
 export class ClienteC extends CrudG<any> {
   constructor() {
     super('clientes');
@@ -31,6 +38,8 @@ export class ClienteC extends CrudG<any> {
     disabledFunction: () => false,
     validators: Validators.required,
   };
+
+
 
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
     return new Promise<any>((resolve, reject) => {
@@ -129,7 +138,6 @@ export class ClienteC extends CrudG<any> {
         let mora = 0;
         let total_general = 0;
 
-
         requestResponse.contenido_reporte.map(factura => {
           factura.balance = factura.total_pendiente;
           const mora_calculator = new MoraCalculator(factura);
@@ -153,10 +161,4 @@ export class ClienteC extends CrudG<any> {
       return requestResponse;
     }
   }
-}
-
-export enum CxC {
-  por_cliente = 1,
-  detallado = 2,
-  agrupado = 3,
 }

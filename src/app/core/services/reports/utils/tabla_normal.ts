@@ -98,7 +98,8 @@ function getTotalizacion(configuration, data) {
       { bool: configuration?.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.roundNumberToDecimal(data?.bruto) },
       { bool: configuration?.mostrar_descuento, title: 'DESCUENTO RD$ ', value: fun_.roundNumberToDecimal(data?.descuento) },
       { bool: configuration?.mostrar_itbis, title: 'ITBIS RD$ ', value: fun_.roundNumberToDecimal(data?.itbis) },
-      { bool: configuration?.mostrar_bruto, title: 'DEVUELTO RD$ ', value: fun_.roundNumberToDecimal(data?.devuelto) },
+      { bool: configuration?.mostrar_devuelto, title: 'DEVUELTO RD$ ', value: fun_.roundNumberToDecimal(data?.devuelto) },
+      { bool: configuration?.mostrar_mora, title: 'MORA RD$ ', value: fun_.roundNumberToDecimal(data?.mora) },
       { bool: configuration?.mostrar_total, title: 'TOTAL RD$ ', value: fun_.roundNumberToDecimal(data?.total) },
     ];
 
