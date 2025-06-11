@@ -79,6 +79,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
       this.form.addControl(element.formControl, this.fb.control(null));
 
+      if (element.initialValue) this.form.controls[element.formControl].setValue(element.initialValue);
+
       if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
     }
     setTimeout(() => (this.dinamycSelectionReady = true), 10);
@@ -245,8 +247,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
   reportTypeHasfield(reportType: string) {
     const reportTypeMap = {
-      [reportField.dynamicSelection]: ['movimientos_vehiculo'],
-      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos', 'cuentas_cobrar_cliente'],
+      [reportField.dynamicSelection]: ['movimientos_vehiculo', 'recibos'],
+      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos', 'cuentas_cobrar_cliente', 'recibos'],
       [reportField.serieField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
       [reportField.conditionField]: ['ventas_cliente', 'ventas_rango', 'ventas_diarias'],
       [reportField.typeField]: ['ventas_rango', 'recibos', 'ventas_productos', 'cuentas_cobrar_ant_saldo', 'notas', 'pago_facturas', 'cuentas_pagar_ant_saldo'],
@@ -322,6 +324,16 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
       hasta: [null],
       serie: [null],
     });
+
+    this.form.valueChanges.subscribe(value => {});
+  }
+
+  verifyConditionalRender(field: reportField): boolean {
+    if (fun.isEmpty(this.inputs?.conditionalRender) || fun.isEmpty(this.inputs?.conditionalRender[field])) return true;
+
+    const formValue = this.form.getRawValue();
+
+    return this.inputs.conditionalRender[field](formValue);
   }
 
   btn_aceptar() {

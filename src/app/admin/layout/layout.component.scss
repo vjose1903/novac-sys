@@ -149,6 +149,11 @@
 
         max-height: calc(100vh - 4rem);
         position: relative;
+
+        // Media query para pantallas pequeñas
+        @media (max-width: 768px) {
+          padding: 0.8rem 0.5rem;
+        }
       }
 
       .footer {

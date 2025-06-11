@@ -5,6 +5,8 @@ export const config_ventas_cliente = {
   widths: [24, 60, 73, 53, '*', 'auto'],
   mostrar_total: true,
   mostrar_bruto: true,
+  mostrar_descuento: true,
+  mostrar_devuelto: true,
   mensaje_contenido_vacio: 'El cliente buscado no ha realizado facturas en el rango de fechas introducido.',
   info: [
     {

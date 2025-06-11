@@ -46,6 +46,8 @@ const configuraciones = {
   recibos: config_recibos.detallado,
   recibos_agrupado: config_recibos.agrupado,
 
+  recibos_cliente: config_recibos.detallado_cliente,
+
   ventas_productos: config_ventas_prod,
   cuentas_con_pagos: config_cuentas_pagos,
   suplidor_prod: config_suplidor_prod,

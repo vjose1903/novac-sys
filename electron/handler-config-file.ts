@@ -1,6 +1,6 @@
-import { ConfigI } from '../src/app/core/interface/config-interface';
+import { ConfigI } from '../src/app/core/interface/config-interface.js';
 import * as fs from 'fs';
-import { pathAdd, writeLogs } from '../main';
+import { pathAdd, writeLogs } from '../main.js';
 import Functions from './functions.js';
 import { BrowserWindow } from 'electron';
 import { serie } from '../src/app/core/typescript/constantes.js';

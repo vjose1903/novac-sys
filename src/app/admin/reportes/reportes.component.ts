@@ -14,6 +14,12 @@ import { SuplidorC } from '@registros/registro-suplidores/suplidores';
 import { CuadreC } from './../cuadres/cuadres';
 import { NotaC } from '../manipular facturas/notas-cred-deb/notas';
 
+
+
+export enum SearchBy {
+  general = 1,
+  por_cliente = 2,
+}
 @Component({
   selector: 'app-reportes',
   templateUrl: './reportes.component.html',
