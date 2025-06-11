@@ -21,57 +21,7 @@ export class LayoutClass extends TablaClass {
   private static lastComponentInitLayout;
   private static layoutComponent;
 
-  menuPermissionsObj = {
-    facturacion: {
-      venta: Object.values(Permisos.factura_venta),
-      compra: Object.values(Permisos.factura_compra),
-      pre_venta: Object.values(Permisos.pre_venta),
-      cotizacion: Object.values(Permisos.cotizacion),
-      flatt: [],
-    },
-    manipularFacturas: {
-      nota_credito: Object.values(Permisos.nota_credito),
-      nota_debito: Object.values(Permisos.nota_debito),
-      vizualizar: [Permisos.factura_compra.get_facturas_by_params, Permisos.factura_venta.get_facturas_by_params],
-      flatt: [],
-    },
-    facturacionElectonica: {
-      ecf_received: Object.values(Permisos.ecf_reception),
-      commertial_approval: Object.values(Permisos.commertial_approval_reception),
-      flatt: [],
-    },
-    ingresos: {
-      recibos_ingresos: Object.values(Permisos.recibo_ingreso),
-      viajes: [Permisos.factura_venta.get_viajes_sin_completar],
-      flatt: [],
-    },
-    conduce: {
-      conduce: Object.values(Permisos.conduce),
-      flatt: [],
-    },
-    registro: {
-      empleados: Object.values(Permisos.user),
-      clientes: Object.values(Permisos.cliente),
-      suplidores: Object.values(Permisos.suplidor),
-      articulos: Object.values(Permisos.articulo),
-      camiones: Object.values(Permisos.vehiculo),
-      roles: Object.values(Permisos.role),
-      ncf: Object.values(Permisos.secuencia_comprobante),
-      flatt: [],
-    },
-    produccion: {
-      produccion: Object.values(Permisos.produccion),
-      flatt: [],
-    },
-    inventario: {
-      inventario: Object.values(Permisos.movimiento_inventario),
-      flatt: [],
-    },
-    reportes: {
-      reportes: Object.values(Permisos.reporte),
-      flatt: [],
-    },
-  };
+
 
   _init_layout(arg) {
     this.layServ = Ss.layServ;

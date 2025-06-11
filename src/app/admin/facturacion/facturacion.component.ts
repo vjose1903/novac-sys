@@ -1804,25 +1804,33 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async enviarABaseDatos() {
-    const cabecera_fact = this.formarData();
+    try {
+      const cabecera_fact = this.formarData();
 
-    let res;
+      let res;
 
-    let documento = this.getDocumentoDescripcion();
-    if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
-    else res = await this.facturaClass.createOne(cabecera_fact);
+      let documento = this.getDocumentoDescripcion();
+      if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
+      else res = await this.facturaClass.createOne(cabecera_fact);
+      console.log('%c res', 'color: yellow', res);
 
-    if (this.factura_guardada) this.revisarLocalStorage();
+      if (this.factura_guardada) this.revisarLocalStorage();
 
-    this.facturaClass.parseDataToPdf(res['data']).then(async factura_parsed => {
-      const obj = { data: factura_parsed, type: documento.tipo };
+      console.log('%c res', 'color: lime', res['data']);
+      this.facturaClass.parseDataToPdf(res['data']).then(async factura_parsed => {
+        console.log('%c factura_parsed', 'color: magenta', factura_parsed);
+        const obj = { data: factura_parsed, type: documento.tipo };
+        console.log('%c obj', 'color: cyan', obj);
 
-      PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(`Error imprimiendo la ${documento.descripcion}.`, 'ERROR'));
+        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(`Error imprimiendo la ${documento.descripcion}.`, 'ERROR'));
 
-      this.layServ.nextCheckCuadreToday(true);
+        this.layServ.nextCheckCuadreToday(true);
 
-      if (this.factServ.action == actionFacturacion.update) this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
-      else await this.resetVariables();
-    });
+        if (this.factServ.action == actionFacturacion.update) this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
+        else await this.resetVariables();
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
