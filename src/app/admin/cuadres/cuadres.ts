@@ -22,7 +22,8 @@ export class CuadreC {
   }
 
   static requestReporte(reporteParams, pdfParams) {
-    const requestParams = { parameters: { fecha: fun.my_dateFormater(reporteParams.data.fecha, false) } };
+    const formReporte = reporteParams.data;
+    const requestParams = { parameters: { fecha: fun.my_dateFormater(formReporte.fecha, false) } };
 
     new CuadreCajaC().createOne({}, requestParams).then((res) => {
       this.parseDataToPdf(res['data']).then(async (cuadre_parsed) => {
