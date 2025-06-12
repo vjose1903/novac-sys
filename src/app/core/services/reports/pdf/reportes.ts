@@ -33,6 +33,7 @@ const configuraciones = {
   ventas_rango_agrupado_itbis: config_ventas.agrupado_itbis,
 
   cxc: config_cxc.sin_mora,
+  cxc_historico: config_cxc.historico,
   cxc_mora: config_cxc.con_mora,
   cxc_preventa: config_cxc_preventa,
   ventas_cliente: config_ventas_cliente,

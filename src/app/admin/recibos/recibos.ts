@@ -96,19 +96,19 @@ export class ReciboC extends CrudG<ReciboI> {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   static requestReporte(reporteParams, pdfParams) {
     let requestParameters;
-
+    const formReporte = reporteParams.data;
     requestParameters = {};
 
-    requestParameters['desde'] = fun.my_dateFormater(reporteParams.data.desde, false);
-    requestParameters['hasta'] = fun.my_dateFormater(reporteParams.data.hasta, false);
+    requestParameters['desde'] = fun.my_dateFormater(formReporte.desde, false);
+    requestParameters['hasta'] = fun.my_dateFormater(formReporte.hasta, false);
     requestParameters['order'] = 'ASC';
-    requestParameters['tipo'] = reporteParams.data.tipo;
-    requestParameters['search_by'] = reporteParams.data.search_by || SearchBy.general;
-    requestParameters['cliente_id'] = reporteParams.data.cliente_id || null;
+    requestParameters['tipo'] = formReporte.tipo;
+    requestParameters['search_by'] = formReporte.search_by || SearchBy.general;
+    requestParameters['cliente_id'] = formReporte.cliente_id || null;
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
-    ReporteC.configCsv = csvConfigReciboIngreso[reporteParams.data.tipo == ReportGroupTypeE.detallado ? 'detallado' : 'agrupado'];
+    ReporteC.configCsv = csvConfigReciboIngreso[formReporte.tipo == ReportGroupTypeE.detallado ? 'detallado' : 'agrupado'];
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
       let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
@@ -118,7 +118,7 @@ export class ReciboC extends CrudG<ReciboI> {
     function transformRequestResponse(requestResponse) {
       const data = requestResponse;
 
-      if (requestParameters['search_by'] == SearchBy.por_cliente && reporteParams.data.tipo == ReportGroupTypeE.detallado) data.tipo_reporte = 'recibos_cliente';
+      if (requestParameters['search_by'] == SearchBy.por_cliente && formReporte.tipo == ReportGroupTypeE.detallado) data.tipo_reporte = 'recibos_cliente';
 
       return data;
     }

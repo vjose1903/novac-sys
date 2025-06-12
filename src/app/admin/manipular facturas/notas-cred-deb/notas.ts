@@ -136,8 +136,9 @@ export class NotaC extends CrudG<any> {
 
   static requestReporte(reporteParams, pdfParams) {
     let requestParameters;
+    const formReporte = reporteParams.data;
 
-    requestParameters = { desde: fun.my_dateFormater(reporteParams.data.desde, false), hasta: fun.my_dateFormater(reporteParams.data.hasta, false), tipo_factura_id: reporteParams.data.tipo };
+    requestParameters = { desde: fun.my_dateFormater(formReporte.desde, false), hasta: fun.my_dateFormater(formReporte.hasta, false), tipo_factura_id: formReporte.tipo };
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
     ReporteC.configCsv = csvConfig;

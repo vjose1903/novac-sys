@@ -141,7 +141,7 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
     const value = fun.getProperty(detalle, info.key);
 
     if (info.key === 'index') {
-      text_ = offset +j + 1;
+      text_ = offset + j + 1;
     } else {
       if (info.formato_fecha) {
         text_ = fun_.my_dateFormater(value);
