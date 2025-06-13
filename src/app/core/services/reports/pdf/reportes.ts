@@ -64,7 +64,7 @@ export function makeReporte(data) {
   const configuration = configuraciones[data.tipo_reporte];
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.config;
 
   const margin_top = data.mostrar_sub_titulo ? 125 : 111.5;
   const dd = {

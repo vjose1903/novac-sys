@@ -1,7 +1,7 @@
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { serie, seriesDGII, seriesDgiiI } from '@core/typescript/constantes';
 // import { CxP } from '@registros/registro-suplidores/suplidores';
 import { fun } from '@core/services/functions.service';
@@ -54,7 +54,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     super();
   }
 
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
   reportField = reportField;
 
@@ -337,8 +337,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   btn_aceptar() {
-    const modal = this.modal.instance.modalsConfig.find(config => config.id == this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.returnDataFromModal({ data: { ...this.form.value, switchGroup: { ...this.inputs.switchGroup } }, modal_id: this.modal.component_id });
+    const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id == this.modalWrapper.component_id);
+    modal.closeModal(this.modalWrapper.component_id);
+    modal.returnDataFromModal({ data: { ...this.form.value, switchGroup: { ...this.inputs.switchGroup } }, modal_id: this.modalWrapper.component_id });
   }
 }

@@ -120,7 +120,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.config;
 
     this.fecha = moment().format('DD/MM/YYYY');
     this.serieSelected.set(this.serie);

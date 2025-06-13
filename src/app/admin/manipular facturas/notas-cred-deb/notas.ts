@@ -46,7 +46,7 @@ export class NotaC extends CrudG<any> {
 
   parseDataToPdf(data) {
     return new Promise<any>(resolve => {
-      const configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+      const configApp = Ss.configServ.config;
 
       const pick_nota1 = ['cliente', 'estado', 'fecha_equivalente', 'fecha_valida', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'bruto', 'itbis', 'usuario', 'facturas_aplicadas', 'tipo_factura_id'];
       const pick_nota2 = ['tipo_factura_id', 'razon', 'serie', 'qr_url_dgii', 'fecha_hora_firma', 'security_code', 'document_reference', 'is_ncf_modificado'];

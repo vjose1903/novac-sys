@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
 import { IpcService } from '@core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
-import * as _ from 'lodash';
+import { Environment } from '@environments/environment';
 
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
@@ -56,13 +56,12 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   ngAfterViewInit(): void {
-    this.configServ.getConfig().then((config: ConfigI) => {
-      this.configApp = config;
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-      this.versionApp = config.app_version;
+    this.configApp = Ss.configServ.config
+    this.imgLogo = `data:image/png;base64,${this.configApp.logo_empresa}`;
+    this.versionApp = this.configApp.app_version;
 
-      this.form = this.fb.group({ usuario: config.is_development ? 'novac' : null, password: config.is_development ? '1234567' : null });
-    });
+    this.form = this.fb.group({ usuario: !Environment.production ? 'novac' : null, password: !Environment.production ? '1234567' : null });
+
     setTimeout(() => fun.enfocarInput('Iusuario'), 5);
     // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
   }
@@ -97,7 +96,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   login() {
     const formulario = this.form.getRawValue();
 
-    if (formulario.usuario == '1973' && formulario.password == '3791') {
+    if (formulario.usuario == Environment.config_user && formulario.password == Environment.config_password) {
       if (this.configApp.is_development) this.router.navigateByUrl('/auth/config');
       else this.openConfigsModal();
     } else {
@@ -123,7 +122,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     fun.enfocarInput('Iusuario');
 
     this.openNewModal({
-      inputs: {},
+      inputs: { from: 'login' },
       component: ModalPasswordConfigComponent,
       id: 'passwordConfigForm',
       width: '30rem',
@@ -132,6 +131,8 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   getDataFromModal(arg, search?) {
+    console.log('%c ANDO AQUIII', 'color: red');
+
     this.router.navigateByUrl('/auth/config');
   }
 
@@ -192,7 +193,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     //   PdfService.generatePdf({ oPdf: obj, imprimir: false })
     //     .then(async res => {
     //       const objBase = { base64: res.base64, filename: res.file, type: this.tipo_prueba };
-    //       const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+    //       const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
     //       console.log("obj ", obj);
     //       // this.abrirModalReporte(obj);
     //     })

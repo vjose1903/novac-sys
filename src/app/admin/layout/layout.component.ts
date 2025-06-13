@@ -19,6 +19,7 @@ import { ELECTRON_CHANGE_CONFIG_FILE, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE
 import { IpcService } from '@core/services/ipc.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 import { MENU_CONFIG } from './utils/menu-items';
+import { ModalPasswordConfigComponent } from 'app/login/extra/modal-password-config/modal-password-config.component';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
@@ -35,7 +36,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   usuario;
 
   imgUser;
-  versionApp: any;
   configApp: ConfigI;
   noServer;
 
@@ -142,7 +142,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.activeIndex = 0;
     this.currentYear = new Date().getFullYear();
     this.cuadre_hoy = false;
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.config;
     this.checkRouteActiva();
 
     this.verifyIsReady();
@@ -224,6 +224,27 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.copyToClipboardServ.copyText(this.configApp.machineId).then(() => {
       fun.toastInfo('ID de la máquina copiado al portapapeles', 'COPIADO');
     });
+  }
+
+  openConfigurationModal() {
+    // if (this.configApp.is_development) {
+    //   this.router.navigateByUrl('/auth/config');
+    //   return;
+    // }
+
+    this.openNewModal({
+      inputs: { from: 'layout' },
+      component: ModalPasswordConfigComponent,
+      id: 'passwordConfigForm',
+      width: '30rem',
+      header: 'Configuraciones',
+    });
+  }
+
+  async getDataFromModal(arg, search?) {
+    console.log('%c ANDO AQUIII', 'color: lime');
+
+    // this.router.navigateByUrl('/auth/config');
   }
 
   // =================================================================================

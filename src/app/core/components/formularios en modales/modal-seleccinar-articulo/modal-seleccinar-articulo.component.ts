@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
 
 @Component({
-    selector: 'app-modal-seleccinar-articulo',
-    templateUrl: './modal-seleccinar-articulo.component.html',
-    styleUrls: ['./modal-seleccinar-articulo.component.scss'],
-    standalone: false
+  selector: 'app-modal-seleccinar-articulo',
+  templateUrl: './modal-seleccinar-articulo.component.html',
+  styleUrls: ['./modal-seleccinar-articulo.component.scss'],
+  standalone: false,
 })
 export class ModalSeleccinarArticuloComponent extends MixinClass implements OnInit, ModalI {
   table_config: table_config = {
@@ -32,17 +32,17 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
     super();
   }
 
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
 
   btn_aceptar() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.returnDataFromModal({ data: this.articulos_selected, modal_id: this.modal.component_id });
+    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
+    modal.closeModal(this.modalWrapper.component_id);
+    modal.returnDataFromModal({ data: this.articulos_selected, modal_id: this.modalWrapper.component_id });
   }
 
   ngOnInit() {
-    this.inputs.map(async (arti) => {
+    this.inputs.map(async arti => {
       arti.articulo_is_active = arti.articulo_estado ? '' : 'fas fa-times';
       arti.articulo_is_active_tooltip = arti.articulo_estado ? '' : 'Articulo Inactivo';
       arti.is_active_color = 'red';
@@ -67,7 +67,7 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
   parseCantidades() {}
 
   tableInputChange(event) {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
     if (event.key == 'select') this.articulos_selected = _.filter(this.inputs, { select: true, disable: false });
 
     setTimeout(() => (modal.botones.dinamico[1].disable = this.articulos_selected.length == 0), 50);

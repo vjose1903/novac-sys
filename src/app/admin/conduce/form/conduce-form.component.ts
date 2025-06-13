@@ -106,7 +106,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   ngOnInit() {
     this._init_mixin({ component: 'conduce', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.config
 
     this.necesarioStar();
   }

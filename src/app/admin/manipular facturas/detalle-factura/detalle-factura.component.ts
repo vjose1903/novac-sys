@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { ModalI } from '@components/modal/modal-class';
 import { fun } from '@core/services/functions.service';
 import { serie, TrackStatusEnum } from '@core/typescript/constantes';
@@ -15,7 +15,7 @@ import { DateUtils } from '@vjose1903/dateutils';
   standalone: false,
 })
 export class DetalleFacturaComponent implements OnInit, ModalI {
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: { data: any; documento: string };
 
   TrackStatusEnum = TrackStatusEnum;

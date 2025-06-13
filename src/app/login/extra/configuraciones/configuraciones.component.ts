@@ -20,7 +20,8 @@ import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 })
 export class ConfiguracionesComponent implements OnInit {
   configServ = Ss.configServ;
-  config;
+  configApp
+  configCopy;
   form;
 
   logo_empresa;
@@ -70,7 +71,6 @@ export class ConfiguracionesComponent implements OnInit {
     { printerFormControlName: 'printer_reporte', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_reporte', label: 'Reportes', key: 'reporte' },
   ];
 
-  configCopy;
 
   htmlServ = inject(HtmlElementsService);
 
@@ -82,13 +82,13 @@ export class ConfiguracionesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.configServ.getConfig().then((config: ConfigI) => {
-      this.config = config;
-      this.configCopy = fun.deepCloning(config);
-      this.parseDocumentosAImprimir(config).then(() => this.createForm(config));
+    
+      this.configApp = Ss.configServ.config
+      this.configCopy = fun.deepCloning(this.configApp);
+      this.parseDocumentosAImprimir(this.configApp).then(() => this.createForm(this.configApp));
 
-      fun.logGreen('this.config', this.config);
-    });
+      fun.logGreen('this.configApp', this.configApp);
+    
   }
 
   createForm(data) {
@@ -355,8 +355,8 @@ export class ConfiguracionesComponent implements OnInit {
 
   submit() {
     const formulario = this.getFormularioToSend();
-    fun.logGreen('this.config', this.config);
-    formulario['cliente'] = this.getValue(this.config, 'cliente');
+    fun.logGreen('this.config', this.configApp);
+    formulario['cliente'] = this.getValue(this.configApp, 'cliente');
 
     const configReplacement = {};
     const logos_changes = {};

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener, inject, Input } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { fun } from '@core/services/functions.service';
@@ -40,7 +40,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     super();
   }
 
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
 
   htmlServ = inject(HtmlElementsService);
@@ -55,7 +55,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+      this.configApp = Ss.configServ.config;
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
       this.handleDefaultSwitch();
 
@@ -122,12 +122,12 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const efectivo = fun.desformatearStNumber(this.efectivo);
     const obj = { dinero: efectivo, devuelta: this.devuelta ? devuelta_ : 0, forma_pago: this.formaPago, decision_cambio: this.cambiar_articulos === 'si' ? true : false };
 
-    const modal = this.modal.instance.modalsConfig.find(config => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
+    const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id === this.modalWrapper.component_id);
+    modal.closeModal(this.modalWrapper.component_id);
 
     if (this.factura_de == 'compra') {
       if (this.cambiar_articulos != undefined) {
-        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
+        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modalWrapper.component_id });
       } else {
         fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
       }
@@ -135,7 +135,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       if (this.validarForm()) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
       } else {
-        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
+        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modalWrapper.component_id });
       }
     }
   }
@@ -159,7 +159,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modal.instance.modalsConfig.find(modal => modal.id == this.modal.component_id);
+    const modal = this.modalWrapper.instance.modalsConfig.find(modal => modal.id == this.modalWrapper.component_id);
     const btn = modal.botones.dinamico.find(boton => boton.btn_id == 'btnConfirmar');
 
     btn.disable = validate;

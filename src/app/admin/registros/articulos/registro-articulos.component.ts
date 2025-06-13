@@ -112,7 +112,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   ngOnInit() {
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.createForm();
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.config;
     this.medida_config = this.configApp.medida_producto_terminado;
 
     this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then(result => {

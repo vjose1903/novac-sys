@@ -21,7 +21,7 @@ import { ModalClass } from '@components/modal/modal-class';
 import { BuscarFacturaC, shearchDocumentTableId } from './buscar-factura';
 import { TitleCasePipe } from '@angular/common';
 import { seriesDGII } from '@core/typescript/constantes';
-import { AppConfig } from '@environments/environment';
+import { Environment } from '@environments/environment';
 
 import * as _ from 'lodash';
 import { ConfigI } from '@core/interface/config-interface';
@@ -115,7 +115,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
   htmlServ = inject(HtmlElementsService);
-  certificacionDate = AppConfig.DGII_CERTIFICATION_DATE;
+  certificacionDate = Environment.DGII_CERTIFICATION_DATE;
 
   constructor(
     private router: Router,
@@ -130,7 +130,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   ngOnInit(): void {
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.config
     this.makeNotaSerieSelected.set(this.configApp.serie_default);
   }
 

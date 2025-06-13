@@ -21,6 +21,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
 import { MenuItemComponent } from './components/menu-item/menu-item.component';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 @NgModule({
   declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
   imports: [
@@ -37,6 +38,7 @@ import { MenuItemComponent } from './components/menu-item/menu-item.component';
     BtnIconModule,
     NgxExtendedPdfViewerModule,
     MenuItemComponent,
+    FormErrorMsgComponent
   ],
 })
 export class LayoutModule {}

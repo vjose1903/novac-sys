@@ -1,6 +1,6 @@
 <div class="widget config-widget">
   <div class="widget-header d-flex align-items-center">
-    <h4 class="negrita ml-3 mb-0">Configuraciones del sistema para: {{ config?.nombre_empresa }}</h4>
+    <h4 class="negrita ml-3 mb-0">Configuraciones del sistema para: {{ configApp?.nombre_empresa }}</h4>
   </div>
 
   <div class="widget-content overflow-hidden">
@@ -12,7 +12,7 @@
       <!-- ============================ INFORMACIONES GENERALES ============================ -->
       <p-tabpanels>
         <p-tabpanel header="Informaciones generales" [value]="0">
-          @if (config) {
+          @if (configApp) {
           <form [formGroup]="form">
             <div class="row my-3">
               <div class="col-12 mb-2">
@@ -236,7 +236,7 @@
 
         <!-- ============================ PLANTILLAS DE IMPRESION ============================ -->
         <p-tabpanel header="Impresiones" [value]="1">
-          @if (config) {
+          @if (configApp) {
           <form [formGroup]="form">
             <div class="row my-3">
               <div class="col-12 mb-3">
@@ -272,7 +272,7 @@
                         </div>
                         <div [appMsgError]="item.printerFormControlName" [form]="form" class="mb-2">
                           <div class="mb-0">Impresora:</div>
-                          <p-select appendTo="body" [options]="config.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-select>
+                          <p-select appendTo="body" [options]="configApp.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-select>
                           <span [id]="'msgContainer_' + item.printerFormControlName"></span>
                         </div>
                         @if (item.plantillaFormControlName) {
@@ -307,7 +307,7 @@
         <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="Guardar" id="btn-verde" />
       </div>
 
-      <div class="footer pr-2 d-flex justify-content-end align-items-center" style="color: white">Novac System {{ config?.app_version }} - &#64;2020 Desarrollador: Victor J. Vasquez</div>
+      <div class="footer pr-2 d-flex justify-content-end align-items-center" style="color: white">Novac System {{ configApp?.app_version }} - &#64;2020 Desarrollador: Victor J. Vasquez</div>
     </div>
   </div>
 </div>

@@ -3,21 +3,21 @@ import { MixinClass } from '@core/typescript/MixinClass';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { fun } from '@core/services/functions.service';
 import { ModalI } from '@components/modal/modal-class';
-import { Component, DoCheck, OnInit, inject } from '@angular/core';
+import { Component, DoCheck, Input, OnInit, inject } from '@angular/core';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 
 @Component({
-    selector: 'app-retornar-devuelto',
-    templateUrl: './retornar-devuelto.component.html',
-    styleUrls: ['./retornar-devuelto.component.scss'],
-    standalone: false
+  selector: 'app-retornar-devuelto',
+  templateUrl: './retornar-devuelto.component.html',
+  styleUrls: ['./retornar-devuelto.component.scss'],
+  standalone: false,
 })
 export class RetornarDevueltoComponent extends MixinClass implements OnInit, ModalI, DoCheck {
   constructor(private fb: UntypedFormBuilder) {
     super();
   }
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
 
   form;
@@ -39,7 +39,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
 
   tablaComponent;
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
   ngOnInit() {
     this.createForm();
@@ -108,12 +108,12 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   }
 
   btnAceptarIsDisabled() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
     const aceptar_btn = modal.botones.aceptar;
     const formulario = this.form.getRawValue();
     const valores = [formulario.solo_devuelto, formulario.defectuoso, formulario.devuelto];
 
-    aceptar_btn.disable = _.every(valores, (valor) => fun.isEmpty(valor) || valor == 0);
+    aceptar_btn.disable = _.every(valores, valor => fun.isEmpty(valor) || valor == 0);
     return aceptar_btn.disable;
   }
 
@@ -150,9 +150,9 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
       return;
     }
 
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    const obj = { key: this.inputs.data.key, modal_id: this.modal.component_id };
+    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
+    modal.closeModal(this.modalWrapper.component_id);
+    const obj = { key: this.inputs.data.key, modal_id: this.modalWrapper.component_id };
     const informacion_retornar = this.form.getRawValue();
 
     obj['data'] = {

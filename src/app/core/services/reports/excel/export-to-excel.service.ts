@@ -15,7 +15,7 @@ export class ExportToExcelService {
   configApp: ConfigI;
 
   constructor() {
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.config
   }
 
   download(config: exportExcelConfigI, exportData: any) {

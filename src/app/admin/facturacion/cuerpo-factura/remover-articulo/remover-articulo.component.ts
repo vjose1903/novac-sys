@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { ModalI } from '@components/modal/modal-class';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
@@ -7,14 +7,14 @@ import { fun } from '@core/services/functions.service';
 import { timeStamp } from 'console';
 
 @Component({
-    selector: 'app-remover-articulo',
-    templateUrl: './remover-articulo.component.html',
-    styleUrls: ['./remover-articulo.component.scss'],
-    standalone: false
+  selector: 'app-remover-articulo',
+  templateUrl: './remover-articulo.component.html',
+  styleUrls: ['./remover-articulo.component.scss'],
+  standalone: false,
 })
 export class RemoverArticuloComponent implements OnInit, ModalI {
   constructor(private fb: UntypedFormBuilder) {}
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
   form;
 
@@ -63,9 +63,9 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
 
   btn_aceptar() {
     if (this.form.valid || this.inputs.data_detalle.is_defectuoso || !this.inputs.is_prefactura_selected) {
-      const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-      modal.closeModal(this.modal.component_id);
-      const obj = { key: this.inputs.key, modal_id: this.modal.component_id, data: this.inputs.data_detalle };
+      const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
+      modal.closeModal(this.modalWrapper.component_id);
+      const obj = { key: this.inputs.key, modal_id: this.modalWrapper.component_id, data: this.inputs.data_detalle };
 
       if (this.inputs.is_prefactura_selected) obj['data'] = this.form.getRawValue();
 

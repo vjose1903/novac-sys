@@ -1,4 +1,4 @@
-import { Component, effect, OnInit, signal } from '@angular/core';
+import { Component, effect, Input, OnInit, signal } from '@angular/core';
 import * as _ from 'lodash';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
@@ -58,7 +58,7 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
       }
     });
   }
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
 
   ngOnInit() {

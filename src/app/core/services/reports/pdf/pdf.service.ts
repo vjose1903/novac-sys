@@ -27,7 +27,7 @@ export class PdfService {
       const data = fun.deepCloning(params.oPdf.data);
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
-      const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+      const config: ConfigI = Ss.configServ.config;
 
       let options;
       let printer_selected = config.printer_selected[type_oPdf];

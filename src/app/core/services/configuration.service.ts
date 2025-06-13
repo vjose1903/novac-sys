@@ -9,26 +9,20 @@ export class ConfigurationService {
 
   constructor() {}
 
-  private config: ConfigI;
+  private _config: ConfigI;
   private configLoadedSubject = new BehaviorSubject<boolean>(false);
   
   // Observable público para suscribirse al estado de carga
   public configLoaded$: Observable<boolean> = this.configLoadedSubject.asObservable();
 
   set setConfig(configuration) {
-    this.config = configuration;
+    this._config = configuration;
     // Notificar que la configuración ya está cargada
     this.configLoadedSubject.next(true);
   }
 
-  getConfig(params: { isPromise: boolean } = { isPromise: true }): any {
-    if (params.isPromise) {
-      return new Promise((resolve) => {
-        resolve(this.config as ConfigI);
-      });
-    } else {
-      return this.config as ConfigI;
-    }
+  get config() {
+    return this._config;
   }
 
   // Método para verificar si la configuración está cargada

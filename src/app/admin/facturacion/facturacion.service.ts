@@ -27,7 +27,7 @@ export class FacturacionService {
 
   public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
     if (fun.hasValue(Ss.configServ)) {
-      const configApp = Ss.configServ.getConfig({ isPromise: false });
+      const configApp = Ss.configServ.config;
 
       return { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
     } else {

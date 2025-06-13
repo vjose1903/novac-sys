@@ -9,9 +9,10 @@ import { TablasModule } from '@components/new_tablas/tablas.module';
 import { DirectivesModule } from '@core/directive/directives.module';
 import { PipesModule } from '@core/pipe/pipes.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 
 @NgModule({
   declarations: [RegistroEmpleadosComponent],
-  imports: [CommonModule, RegistroEmpleadosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, DirectivesModule, PipesModule,  NgxPermissionsModule.forChild()],
+  imports: [CommonModule, RegistroEmpleadosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, TablasModule, DirectivesModule, PipesModule, NgxPermissionsModule.forChild(), FormErrorMsgComponent],
 })
 export class RegistroEmpleadosModule {}

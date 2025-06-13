@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, Output, EventEmitter, AfterViewInit, inject } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, AfterViewInit, inject, Input } from '@angular/core';
 import * as _ from 'lodash';
 import { fun } from '@core/services/functions.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -7,10 +7,10 @@ import { ModalI } from '../../modal/modal-class';
 import { MovimientosC } from './movimiento-model';
 
 @Component({
-    selector: 'app-movimientos-form',
-    templateUrl: './movimientos-form.component.html',
-    styleUrls: ['./movimientos-form.component.scss'],
-    standalone: false
+  selector: 'app-movimientos-form',
+  templateUrl: './movimientos-form.component.html',
+  styleUrls: ['./movimientos-form.component.scss'],
+  standalone: false,
 })
 export class MovimientosFormComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
   form;
@@ -26,7 +26,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
 
   movimientosC = new MovimientosC();
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
 
   htmlServ = inject(HtmlElementsService);
@@ -102,15 +102,15 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   btn_aceptar() {
     const obj = { articulo_id: this.inputs.id, cantidad: this.cantidad, cantidad_en_unidades: this.inputs.contenido[this.medida] * this.cantidad, accion: this.tipo_movimiento, motivo: this.motivo, medida: this.medida, tipo_salida: this.tipo_salida };
 
-    this.movimientosC.createOne(obj).then((res) => {
+    this.movimientosC.createOne(obj).then(res => {
       fun.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
       this.resetForm();
 
       const obj = { bool: true, body: res.articulo };
 
-      const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
+      const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
       modal.closeModal('inventario');
-      modal.returnDataFromModal({ data: obj, modal_id: this.modal.component_id });
+      modal.returnDataFromModal({ data: obj, modal_id: this.modalWrapper.component_id });
     });
   }
 

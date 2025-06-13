@@ -118,24 +118,24 @@ export class ReporteC extends CrudG<any> {
 
   static imprimirPDF(objPdf, modalInstance?) {
     Ss.loadServ.isLoading.next(true);
-    Ss.configServ.getConfig({ isPromise: true }).then((configApp: ConfigI) => {
-      objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
+    const printerSelected = Ss.configServ.config.printer_selected;
 
-      const entidad = objPdf['type'] == 'reporte' ? 'reporte' : 'cuadre_caja';
-      objPdf['printer'] = configApp.printer_selected[entidad];
+    objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
 
-      PdfService.imprimirBase64(objPdf)
-        .then(res => {
-          Ss.loadServ.isLoading.next(false);
+    const entidad = objPdf['type'] == 'reporte' ? 'reporte' : 'cuadre_caja';
+    objPdf['printer'] = printerSelected[entidad];
 
-          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-          if (modalInstance) modalInstance.closeModal(modalInstance.id);
-        })
-        .catch(err => {
-          Ss.loadServ.isLoading.next(false);
-          fun.toastError(err.msg, 'ERROR');
-        });
-    });
+    PdfService.imprimirBase64(objPdf)
+      .then(res => {
+        Ss.loadServ.isLoading.next(false);
+
+        fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
+        if (modalInstance) modalInstance.closeModal(modalInstance.id);
+      })
+      .catch(err => {
+        Ss.loadServ.isLoading.next(false);
+        fun.toastError(err.msg, 'ERROR');
+      });
   }
 
   static exportCsv(data: ReporteBackendResponseI, modalInstance?) {

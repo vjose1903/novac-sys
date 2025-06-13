@@ -58,7 +58,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   ngOnInit() {
     this._init_mixin({ component: 'produccion', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.config;
     this.optionsMedidas[0] = this.configApp.medida_producto_terminado;
 
     this.getProductosTerminados();

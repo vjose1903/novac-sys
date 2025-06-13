@@ -28,9 +28,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   ngOnInit() {
     this._init_mixin({ component: 'home', is_routing: true });
 
-    this.configServ.getConfig().then((config: ConfigI) => {
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-    });
+    this.imgLogo = `data:image/png;base64,${this.configServ.config.logo_empresa}`;
     this.prueba();
   }
 

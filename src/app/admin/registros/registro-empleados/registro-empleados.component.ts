@@ -77,8 +77,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     this.form = this.fb.group({
       id: [null],
-      nombre: [{ value: null, disabled: true }, Validators.required],
-      apellido: [{ value: null, disabled: true }, Validators.required],
+      nombre: [{ value: null, disabled: true }, Validators.compose([Validators.required, Validators.minLength(3)])],
+      apellido: [{ value: null, disabled: true }, Validators.compose([Validators.required, Validators.minLength(3)])],
       usuario: [{ value: null, disabled: true }, Validators.compose([Validators.required])],
       sexo: [{ value: null, disabled: true }, Validators.required],
       cedula: [{ value: null, disabled: false }, Validators.compose([myValidators.cedulaValidator(), Validators.required])],

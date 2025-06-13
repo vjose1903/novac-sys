@@ -70,12 +70,16 @@
         <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
       </div>
 
-      <div class="footer w-100">
+      <div class="footer w-100 c-default">
         <span class="machine-id" (click)="copyMachineId()">
           {{ configApp.machineId }}
         </span>
 
-        <span> Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
+        <div class="d-flex align-items-center gap-1 no-selectable">
+          <span> Novac System </span>
+          <span [multiClick]="7" (multiClickEvent)="openConfigurationModal()"> {{ configApp.app_version }} </span>
+          <span class="d-none d-md-block"> - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
+        </div>
       </div>
 
       @if (cuadre_hoy) {

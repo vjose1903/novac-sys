@@ -206,7 +206,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ngOnInit() {
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.config;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

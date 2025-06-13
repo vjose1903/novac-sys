@@ -33,7 +33,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_marcas',
-    padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
+    padre_functions: { data_request: params => this.pedirNuevaData(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.marca.update }, borrar: { show: true, permiso: this.permissions.marca.destroy } },
@@ -48,7 +48,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_modelos',
-    padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
+    padre_functions: { data_request: params => this.pedirNuevaData(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.modelo.update }, borrar: { show: true, permiso: this.permissions.modelo.destroy } },
@@ -83,7 +83,11 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    private tServ: TablasService,
+    private permissionsService: NgxPermissionsService
+  ) {
     super();
 
     effect(() => {
@@ -106,7 +110,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     });
   }
 
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
   btn_aceptar() {}
 
@@ -141,18 +145,18 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.checkPermissions();
   }
   checkPermissions() {
-    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then((result) => (this.hasPermissionsMarca = result));
-    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then((result) => (this.hasPermissionsModelo = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then(result => (this.hasPermissionsMarca = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then(result => (this.hasPermissionsModelo = result));
 
-    this.permissionsService.hasPermission([this.permissions.marca.create, this.permissions.marca.update]).then((result) => (this.hasPermissionsMarcaCreate = result));
-    this.permissionsService.hasPermission([this.permissions.modelo.create, this.permissions.modelo.update]).then((result) => (this.hasPermissionsModeloCreate = result));
+    this.permissionsService.hasPermission([this.permissions.marca.create, this.permissions.marca.update]).then(result => (this.hasPermissionsMarcaCreate = result));
+    this.permissionsService.hasPermission([this.permissions.modelo.create, this.permissions.modelo.update]).then(result => (this.hasPermissionsModeloCreate = result));
   }
 
   getMarcas(params) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: params.paginado, page: params.page, per_page: params.per_page } };
     this.listadoMarcas.length = 0;
-    this.marcasClass.getAll(extra).then((res) => {
+    this.marcasClass.getAll(extra).then(res => {
       if (!params.paginado) this.listaMarcas = fun.deepCloning(res);
       if (params.paginado) {
         this.listadoMarcas = res.data;
@@ -166,8 +170,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: true, page: params.page, per_page: params.per_page } };
 
     this.listadoModelos.length = 0;
-    this.modeloClass.getAll(extra).then((res) => {
-      res.data.map((obj) => {
+    this.modeloClass.getAll(extra).then(res => {
+      res.data.map(obj => {
         obj.marca_nombre = obj.marca.descripcion;
         return obj;
       });
@@ -203,8 +207,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   closeThis() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
+    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
+    modal.closeModal(this.modalWrapper.component_id);
 
     return modal;
   }
@@ -271,7 +275,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       texto: `¿Está seguro que desea eliminar ${this.isShowMarcas() ? 'la marca' : 'el modelo'}: <b> ${regisData.descripcion} </b>?`,
       siFunction: () => {
         const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
-        clase.deleteOne(regisData.id).then((res) => {
+        clase.deleteOne(regisData.id).then(res => {
           const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex()]);
           this.pedirNuevaData(actual_pagination);
         });

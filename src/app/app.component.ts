@@ -6,7 +6,6 @@ import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, Afte
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from '@core/services/ipc.service';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
-import * as _ from 'lodash';
 import { Ss } from '@core/services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from '@admin/layout/layout.service';
@@ -27,7 +26,7 @@ import {
   ELECTRON_EVENT_DOWNLOAD_UPDATE,
 } from '../../electron/shared-electron-angular';
 
-import { Subscription, takeUntil, Subject } from 'rxjs';
+import { takeUntil, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { SharedService } from '@core/services/shared.service';
@@ -37,7 +36,6 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { log } from 'console';
 import { ModalClass } from './core/components/modal/modal-class';
 import { TipoFacturaI, TiposFacturaC } from '@admin/facturacion/factura';
 

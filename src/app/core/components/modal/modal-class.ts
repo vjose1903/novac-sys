@@ -4,8 +4,8 @@ import { LayoutClass } from '@admin/layout/layout';
 import { MODALCONFIG } from './modal.service';
 
 export interface ModalI {
-  modal: any;
-  inputs: any;
+  modalWrapper: any;
+  inputs?: any;
   btn_aceptar(): any;
 }
 

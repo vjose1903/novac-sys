@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
 import { ModalI } from '../../modal/modal-class';
@@ -7,12 +7,11 @@ import { teclasCode } from '@core/typescript/constantes';
 import * as _ from 'lodash';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
 
-
 @Component({
-    selector: 'app-confirmacion-imprimir',
-    templateUrl: './confirmacion-imprimir.component.html',
-    styleUrls: ['./confirmacion-imprimir.component.scss'],
-    standalone: false
+  selector: 'app-confirmacion-imprimir',
+  templateUrl: './confirmacion-imprimir.component.html',
+  styleUrls: ['./confirmacion-imprimir.component.scss'],
+  standalone: false,
 })
 export class ConfirmacionImprimirComponent implements OnInit, ModalI {
   @HostListener('window:keyup', ['$event'])
@@ -25,9 +24,12 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
     if (key == teclasCode._enter) this.btn_aceptar();
   }
 
-  constructor(private shServ: SharedService, public factServ: FacturacionService) {}
+  constructor(
+    private shServ: SharedService,
+    public factServ: FacturacionService
+  ) {}
 
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
   configApp: ConfigI;
   documentos_a_imprimir = [];
@@ -36,7 +38,7 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
   is_print: boolean;
 
   ngOnInit(): void {
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.config;
     this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
     this.documento = this.factServ.getDocumentoDescripcion(this.inputs, true);
 
@@ -53,8 +55,8 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
   }
 
   btn_aceptar() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    modal.returnDataFromModal({ is_print: this.is_print, modal_id: this.modal.component_id });
+    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
+    modal.closeModal(this.modalWrapper.component_id);
+    modal.returnDataFromModal({ is_print: this.is_print, modal_id: this.modalWrapper.component_id });
   }
 }

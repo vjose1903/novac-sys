@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ArticuloC } from '@registros/articulos/articulo';
 import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
@@ -7,10 +7,10 @@ import { MixinClass } from '@core/typescript/MixinClass';
 import { default_per_page, table_config } from '../../new_tablas/tabla-class';
 
 @Component({
-    selector: 'app-buscar-articulo',
-    templateUrl: './buscar-articulo.component.html',
-    styleUrls: ['./buscar-articulo.component.scss'],
-    standalone: false
+  selector: 'app-buscar-articulo',
+  templateUrl: './buscar-articulo.component.html',
+  styleUrls: ['./buscar-articulo.component.scss'],
+  standalone: false,
 })
 export class BuscarArticuloComponent extends MixinClass implements OnInit, ModalI {
   articuloClass = new ArticuloC();
@@ -19,7 +19,7 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
   }
 
   dataFiltro;
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
 
   table_config: table_config = {
@@ -29,7 +29,7 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
     ],
     focusRow: true,
     id_tabla: 'buscar_articulo',
-    padre_functions: { data_request: (params) => this.buscarArticulos(params) },
+    padre_functions: { data_request: params => this.buscarArticulos(params) },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
   };
 
@@ -55,8 +55,8 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
           fecha: this.inputs.fecha_articulo,
           is_compra: is_compra,
         })
-        .catch((error) => {
-          this.closeThis({ tipo: 'data_no_found', modal_id: this.modal.component_id, index: this.inputs.index });
+        .catch(error => {
+          this.closeThis({ tipo: 'data_no_found', modal_id: this.modalWrapper.component_id, index: this.inputs.index });
         });
 
       this.dataFiltro = res?.data;
@@ -66,13 +66,13 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
 
   tableClickRow(event) {
     const modal = this.closeThis();
-    modal.returnDataFromModal({ data: event.data, modal_id: this.modal.component_id, index: this.inputs.index });
+    modal.returnDataFromModal({ data: event.data, modal_id: this.modalWrapper.component_id, index: this.inputs.index });
   }
 
   closeThis(arg?) {
-    const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
+    const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id == this.modalWrapper.component_id);
 
-    modal.closeModal(this.modal.component_id);
+    modal.closeModal(this.modalWrapper.component_id);
     if (arg) modal.returnDataFromModal(arg);
 
     return modal;

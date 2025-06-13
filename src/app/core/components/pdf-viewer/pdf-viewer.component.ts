@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { ModalI } from '../modal/modal-class';
 import { inputViewerOptions } from './pdf-viewer';
@@ -11,7 +11,7 @@ import { fun } from '@core/services/functions.service';
 })
 export class PdfViewerComponent implements OnInit, ModalI {
   constructor() {}
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: inputViewerOptions;
 
   fun = fun;

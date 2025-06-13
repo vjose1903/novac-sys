@@ -5,8 +5,9 @@ import { PaswordConfirmDirective } from './pasword-confirm-directive.directive';
 import { OnScrollDirective } from './on-scroll.directive';
 import { DataFilterDirective } from './data-filter.directive';
 import { SizeCatcherDirective } from './size-catcher.directive';
+import { MultiClickDirective } from './multi-click.directive';
 
-const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, SizeCatcherDirective];
+const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, SizeCatcherDirective, MultiClickDirective];
 
 @NgModule({
   declarations: directives,

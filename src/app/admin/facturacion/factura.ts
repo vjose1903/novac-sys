@@ -176,7 +176,7 @@ export class FacturaC extends CrudG<FacturasI> {
     if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switchGroup.array, item => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
-      const configApp = Ss.configServ.getConfig({ isPromise: false });
+      const configApp = Ss.configServ.config;
 
       const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
       let formas_pago = '';
@@ -230,7 +230,7 @@ export class FacturaC extends CrudG<FacturasI> {
     }
 
     function transformRequestResponse(requestResponse) {
-      const configApp = Ss.configServ.getConfig({ isPromise: false });
+      const configApp = Ss.configServ.config;
 
       requestResponse.contenido_reporte = requestResponse.contenido_reporte.map(item => {
         const largo_nombre = configApp.calcular_itbis && params.pdf.tipo != 'movimientos_vehiculo' ? 58 : 48;

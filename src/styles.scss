@@ -280,6 +280,14 @@ body {
 .c-pointer {
   cursor: pointer !important;
 }
+
+.c-default {
+  cursor: default !important;
+}
+
+.no-selectable {
+  user-select: none;
+}
 // ========================================================
 // TEXT_COLOR
 // ========================================================

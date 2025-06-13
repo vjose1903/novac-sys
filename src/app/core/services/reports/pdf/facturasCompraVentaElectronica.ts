@@ -30,7 +30,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const is_venta = data.tipo === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
 
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.config;
 
   const dd = {
     pageSize: is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 },

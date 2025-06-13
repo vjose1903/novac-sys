@@ -1,6 +1,6 @@
 import { tipoDocFacturacion } from '@admin/facturacion/factura';
 import { Ss } from '@core/services/singleton.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ClienteC } from '@registros/registro-clientes/cliente';
 import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
@@ -23,7 +23,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   dataFiltro;
-  modal: any = {};
+  @Input() modalWrapper: any = {};
   inputs: any;
   paraFiltroClientes;
 
@@ -62,7 +62,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     this.table_config.info = this.isSuplidor ? this.compraInfo : this.ventaInfo;
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
 
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.config;
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
@@ -100,7 +100,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
           this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
         })
         .catch(error => {
-          if (where === 'init') this.closeThis({ tipo: 'data_no_found', modal_id: this.modal.component_id });
+          if (where === 'init') this.closeThis({ tipo: 'data_no_found', modal_id: this.modalWrapper.component_id });
         });
     } catch (error) {}
   }
@@ -108,13 +108,13 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   tableClickRow(event) {
     const modal = this.closeThis();
 
-    if (this.inputs?.after_select) event.data.after_select = this.inputs.after_select
-    modal.returnDataFromModal({ data: event.data, modal_id: this.modal.component_id });
+    if (this.inputs?.after_select) event.data.after_select = this.inputs.after_select;
+    modal.returnDataFromModal({ data: event.data, modal_id: this.modalWrapper.component_id });
   }
 
   closeThis(arg?) {
-    const modal = this.modal.instance.modalsConfig.find(config => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
+    const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id === this.modalWrapper.component_id);
+    modal.closeModal(this.modalWrapper.component_id);
     if (arg) modal.returnDataFromModal(arg);
     return modal;
   }

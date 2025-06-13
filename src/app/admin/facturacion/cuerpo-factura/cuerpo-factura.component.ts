@@ -68,7 +68,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   ngOnInit() {
     this._init_mixin({ component: 'cuerpo_factura', is_routing: false });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.config
     this.rellenarVariables();
   }
 
