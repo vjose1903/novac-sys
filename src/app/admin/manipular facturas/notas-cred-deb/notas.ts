@@ -65,9 +65,7 @@ export class NotaC extends CrudG<any> {
 
       data_parsed.facturas_aplicadas.forEach(factura_aplicada => {
         if (data_parsed.serie == serie.normal) {
-          if (configApp.plantillas_impresion.nota == 'Agrupada') data_parsed.contenido_reporte.push(this.parseContentAgrupadoNota(factura_aplicada));
-
-          if (configApp.plantillas_impresion.nota == 'Detallada') data_parsed.contenido_reporte.push(...this.parseContentDetalladoNota(factura_aplicada));
+          data_parsed.contenido_reporte.push(this.parseContentAgrupadoNota(factura_aplicada));
         } else if (data_parsed.serie == serie.electronica) {
           let descuento = 0;
           data_parsed.contenido_reporte = factura_aplicada.detalles_facturas_notas.map(detalle => {
@@ -103,22 +101,6 @@ export class NotaC extends CrudG<any> {
     return factura_aplicada;
   }
 
-  parseContentDetalladoNota(factura_aplicada) {
-    const detalles = [];
-
-    factura_aplicada.detalles_facturas_notas.forEach(detalle_nota => {
-      const obj_detalle = {};
-
-      obj_detalle['fecha'] = moment(`${factura_aplicada.cabecera_factura.fecha_equivalente}`).format('DD/MM/YYYY');
-      obj_detalle['numero_comprobante'] = factura_aplicada.cabecera_factura.numero_comprobante;
-      obj_detalle['total'] = fun.roundNumberToDecimal(Math.abs(detalle_nota.total));
-      obj_detalle['articulo'] = detalle_nota.articulo.nombre;
-
-      detalles.push(obj_detalle);
-    });
-
-    return detalles;
-  }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {

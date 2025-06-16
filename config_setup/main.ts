@@ -476,8 +476,6 @@ function parseAppConfig() {
       const printer_list = await pdf_printer.getPrinters();
       
       config['operative_system'] = isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows;
-      config['is_development'] = serve_;
-      config['gitUser'] = await getActualGitUser();
       config['machineId'] = machineId.value;
       config['printersList'] = ['Ninguna', ...printer_list];
       config['app_version'] = pjson.version;

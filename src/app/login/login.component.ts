@@ -20,6 +20,8 @@ import { fun } from '@core/services/functions.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { FacturaC } from '@admin/facturacion/factura';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { ICallbackModal, modalCloseType, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-login',
@@ -56,7 +58,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   ngAfterViewInit(): void {
-    this.configApp = Ss.configServ.config
+    this.configApp = Ss.configServ.config;
     this.imgLogo = `data:image/png;base64,${this.configApp.logo_empresa}`;
     this.versionApp = this.configApp.app_version;
 
@@ -97,8 +99,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     const formulario = this.form.getRawValue();
 
     if (formulario.usuario == Environment.config_user && formulario.password == Environment.config_password) {
-      if (this.configApp.is_development) this.router.navigateByUrl('/auth/config');
-      else this.openConfigsModal();
+      this.openConfigsModal();
     } else {
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
@@ -121,16 +122,34 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     if (fun.hasValue(this.form)) this.form.reset();
     fun.enfocarInput('Iusuario');
 
-    this.openNewModal({
-      inputs: { from: 'login' },
-      component: ModalPasswordConfigComponent,
-      id: 'passwordConfigForm',
-      width: '30rem',
-      header: 'Configuraciones',
-    });
+    const passwordConfirmCallbal = (args: ICallbackModal) => {
+      if (args.type === modalCloseType.returnData && args.data && !args.data.error) this.navigateToConfig();
+    };
+
+    if (!Environment.production) {
+      passwordConfirmCallbal({ data: { error: false }, type: modalCloseType.returnData });
+      return;
+    }
+
+    const passwordConfigModal = new DynamicModalClass();
+
+    passwordConfigModal.id = 'passwordConfigForm';
+    passwordConfigModal.inputs = { from: 'layout' };
+    passwordConfigModal.header = 'Configuraciones';
+    passwordConfigModal.width = '30rem';
+    passwordConfigModal.component = ModalPasswordConfigComponent;
+    passwordConfigModal.comfirmToClose = false;
+
+    passwordConfigModal.botones = [
+      { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },
+      { id: 'aceptarBtn', label: 'Aceptar', clase: 'btn-success' },
+    ];
+
+    passwordConfigModal.setCallback(passwordConfirmCallbal);
+    passwordConfigModal.show();
   }
 
-  getDataFromModal(arg, search?) {
+  navigateToConfig() {
     console.log('%c ANDO AQUIII', 'color: red');
 
     this.router.navigateByUrl('/auth/config');

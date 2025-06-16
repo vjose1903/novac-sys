@@ -58,11 +58,7 @@ export default class HandlerConfigFile {
       cuadre_caja: '8.5x5.5',
       reporte: '8.5x11',
     },
-
-    plantillas_impresion: {
-      nota: 'Agrupada',
-    },
-
+    
     documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota,cotizacion',
   };
 

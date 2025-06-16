@@ -8,6 +8,7 @@ import { IpcService } from './ipc.service';
 import { SharedService } from './shared.service';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
+import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +26,7 @@ export class Ss {
   public static sharedServ: SharedService;
   public static cdRef: ChangeDetectorRef;
   public static permissionsService: NgxPermissionsService;
+  public static dynamicModalService: DynamicModalService;
 
   constructor() {}
 }

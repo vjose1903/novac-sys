@@ -737,12 +737,9 @@ export class fun {
   }
 
   static decryptConfigPassword(str) {
-    console.log('%c str ', 'color: yellow', str);
     const str_remplace = btoa(str);
-    console.log('%c str_remplace ', 'color: red', str_remplace);
     
     const config: ConfigI = Ss.configServ.config;
-    console.log('%c config.config_password ', 'color: red', config.config_password);
     return str_remplace == config.config_password.replace('VMj$pt30r=', '=');
   }
   // ----------------------------------------------------------------------------------------------------------

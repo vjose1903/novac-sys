@@ -4,13 +4,13 @@ import { NewModalModule } from './core/components/modal/modal.module';
 import { FormulariosEnModalesModule } from './core/components/formularios en modales/formularios-en-modales.module';
 import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener, inject, OnDestroy } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
-import { IpcService } from '@core/services/ipc.service';
+import { IpcService } from '@services/ipc.service';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
-import { Ss } from '@core/services/singleton.service';
+import { Ss } from '@services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from '@admin/layout/layout.service';
-import { ConfigurationService } from '@core/services/configuration.service';
-import { ThemeService } from '@core/services/theme.service';
+import { ConfigurationService } from '@services/configuration.service';
+import { ThemeService } from '@services/theme.service';
 import { MessageTask } from '@core/models/message-task';
 
 import {
@@ -29,8 +29,8 @@ import {
 import { takeUntil, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { SharedService } from '@core/services/shared.service';
-import { fun } from '@core/services/functions.service';
+import { SharedService } from '@services/shared.service';
+import { fun } from '@services/functions.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
@@ -38,10 +38,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ModalClass } from './core/components/modal/modal-class';
 import { TipoFacturaI, TiposFacturaC } from '@admin/facturacion/factura';
+import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
+import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, PrimengModule, FormsModule, ReactiveFormsModule, NewModalModule, FormulariosEnModalesModule, RouterModule],
+  imports: [CommonModule, PrimengModule, FormsModule, ReactiveFormsModule, NewModalModule, FormulariosEnModalesModule, RouterModule, DynamicModalComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -59,6 +61,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   public toastr = inject(ToastrService);
   public sharedServ = inject(SharedService);
   public permissionsService = inject(NgxPermissionsService);
+  public dynamicModalService = inject(DynamicModalService);
 
   // Subject para manejar la destrucción del componente
   private readonly destroy$ = new Subject<void>();
@@ -170,6 +173,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       toastr: this.toastr,
       sharedServ: this.sharedServ,
       cdRef: this.cdRef,
+      dynamicModalService: this.dynamicModalService,
     });
   }
 
@@ -213,6 +217,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
       const config = (await this._ipc.sendTask(task)) as any;
 
+      console.log('%c config ---> ', 'color: yellow; font-weight: bold;', config);
+      
       this.configServ.setConfig = config;
       this.themeService.setTheme(config.color_app);
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;

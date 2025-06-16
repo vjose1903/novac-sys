@@ -106,7 +106,7 @@ export class CrudG<T> {
   private getUrlInUse() {
     const configApp: ConfigI = Ss.configServ.config;
 
-    const url = configApp.is_development ? Environment[configApp.machineId] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
+    const url = !Environment.production ? Environment[configApp.machineId] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     // const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;
   }

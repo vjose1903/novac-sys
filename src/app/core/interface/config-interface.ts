@@ -10,7 +10,6 @@ export interface ConfigI {
   logo_impresion:              string;
   color_app:                   colors;
   mode_app:                    modes;
-  gitUser?:                    string;
   machineId?:                  string;
   operative_system?:           operativeSystemE;
   url_servidor:                string;
@@ -23,8 +22,6 @@ export interface ConfigI {
   calcular_itbis:              boolean;
   pages_sizes:                 Documentos;
   printer_selected:            Documentos;
-  plantillas_impresion:        PlantiallasImpresion;
-  is_development?:             boolean;
   printersList?:               Printer[] | string [];
   app_version?:                string;
   is_db_local:                 boolean;

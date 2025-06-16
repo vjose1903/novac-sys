@@ -84,11 +84,11 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   searchInArray(array, source, target) {
-    return _.find(array, config => config[source] === target);
+    return array.find(config => config[source] === target);
   }
 
   changeConfig(array, id_modal) {
-    const modal = _.find(this.modalsConfig, config => config.id === id_modal);
+    const modal = this.modalsConfig.find(config => config.id === id_modal);
 
     array.forEach(element => {
       const key = _.keys(element)[0];
@@ -185,7 +185,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const modal = _.find(this.modalsConfig, config => config.id === id_);
+    const modal = this.modalsConfig.find(config => config.id === id_);
 
     if (modal['instance']) {
       modal['instance'].btn_aceptar();
@@ -196,7 +196,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   dynamicFunction(configuration, btn) {
-    const modal = _.find(this.modalsConfig, config => config.id === configuration.id);
+    const modal = this.modalsConfig.find(config => config.id === configuration.id);
 
     if (fun.objHas(btn, 'function_in_other_component')) modal['instance'][btn['function_in_other_component']]();
     else btn['function'](modal);
@@ -207,7 +207,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
   }
 
   hasAnyBtn(configuration) {
-    const modal = _.find(this.modalsConfig, config => config.id === configuration.id);
+    const modal = this.modalsConfig.find(config => config.id === configuration.id);
     const botones_show = modal?.botones?.aceptar?.show || modal?.botones?.cancelar?.show || modal?.botones?.dinamico;
     return botones_show;
   }

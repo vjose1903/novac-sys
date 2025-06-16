@@ -101,19 +101,13 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
     if (!this.fieldElement) return null;
 
     // ElementRef
-    if (this.fieldElement instanceof ElementRef) {
-      return this.fieldElement.nativeElement;
-    }
+    if (this.fieldElement instanceof ElementRef) return this.fieldElement.nativeElement;
 
     // HTMLElement nativo
-    if (this.fieldElement instanceof HTMLElement) {
-      return this.fieldElement;
-    }
+    if (this.fieldElement instanceof HTMLElement) return this.fieldElement;
 
     // Componente PrimeNG
-    if (this.isPrimeNGComponent(this.fieldElement)) {
-      return this.getPrimeNGElement(this.fieldElement);
-    }
+    if (this.isPrimeNGComponent(this.fieldElement)) return this.getPrimeNGElement(this.fieldElement);
 
     return null;
   }
@@ -138,27 +132,15 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
   }
 
   private getComponentConfig(component: PrimeNGComponent): { selectors: string[] } {
-    if (component instanceof InputMask) {
-      return { selectors: ['input'] };
-    }
+    if (component instanceof InputMask) return { selectors: ['input'] };
 
-    if (component instanceof InputNumber) {
-      return { selectors: ['input'] };
-    }
+    if (component instanceof InputNumber) return { selectors: ['input'] };
 
-    if (component instanceof Select) {
-      return { selectors: ['.p-select-label'] };
-    }
+    if (component instanceof Select) return { selectors: ['.p-select-label'] };
 
-    if (component instanceof MultiSelect) {
-      return { selectors: ['input', '[role="combobox"]'] };
-    }
+    if (component instanceof MultiSelect) return { selectors: ['input', '[role="combobox"]'] };
 
-    if (component instanceof DatePicker) {
-      return {
-        selectors: ['input[data-pc-section="input"]', 'input.p-inputtext', 'input[type="text"]', 'input'],
-      };
-    }
+    if (component instanceof DatePicker) return { selectors: ['input.p-inputtext', 'input'] };
 
     return { selectors: [] };
   }
@@ -230,10 +212,7 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.mutationObserver.observe(element, {
-      attributes: true,
-      attributeFilter: ['aria-expanded'],
-    });
+    this.mutationObserver.observe(element, { attributes: true, attributeFilter: ['aria-expanded'] });
   }
 
   private waitForElement(parentElement: HTMLElement, selectors: string[], maxAttempts: number = 5, delay: number = 20): Promise<HTMLElement | null> {

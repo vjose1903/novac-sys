@@ -52,7 +52,7 @@ export class PdfService {
           case 'nota':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
-            let tipo_pdf = `_${config.plantillas_impresion['nota'].toLowerCase()}`;
+            let tipo_pdf = ``;
 
             if (data.serie == serie.electronica) tipo_pdf = '_electronica';
 

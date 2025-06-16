@@ -20,6 +20,10 @@ import { IpcService } from '@core/services/ipc.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 import { MENU_CONFIG } from './utils/menu-items';
 import { ModalPasswordConfigComponent } from 'app/login/extra/modal-password-config/modal-password-config.component';
+import { ConfiguracionesComponent } from 'app/login/extra/configuraciones/configuraciones.component';
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { Environment } from '@environments/environment';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
@@ -121,6 +125,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
+    this.openConfigurationModal();
+
     this.checkFacturasArchivadas();
     this.cdRef.detectChanges();
   }
@@ -227,24 +233,50 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   openConfigurationModal() {
-    // if (this.configApp.is_development) {
-    //   this.router.navigateByUrl('/auth/config');
-    //   return;
-    // }
+    const passwordConfirmCallback = (args: ICallbackModal) => {
+      if (args.type === modalCloseType.returnData && args.data && !args.data.error) this.openConfiguracionesModal();
+    };
 
-    this.openNewModal({
-      inputs: { from: 'layout' },
-      component: ModalPasswordConfigComponent,
-      id: 'passwordConfigForm',
-      width: '30rem',
-      header: 'Configuraciones',
-    });
+    if (!Environment.production) {
+      passwordConfirmCallback({ data: { error: false }, type: modalCloseType.returnData });
+      return;
+    }
+
+    const passwordConfigModal = new DynamicModalClass();
+
+    passwordConfigModal.id = 'passwordConfigForm';
+    passwordConfigModal.inputs = { from: 'layout' };
+    passwordConfigModal.header = 'Configuraciones';
+    passwordConfigModal.width = '30rem';
+    passwordConfigModal.component = ModalPasswordConfigComponent;
+    passwordConfigModal.comfirmToClose = false;
+
+    passwordConfigModal.botones = [
+      { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },
+      { id: 'aceptarBtn', label: 'Aceptar', clase: 'btn-success' },
+    ];
+
+    passwordConfigModal.setCallback(passwordConfirmCallback);
+    passwordConfigModal.show();
   }
 
-  async getDataFromModal(arg, search?) {
-    console.log('%c ANDO AQUIII', 'color: lime');
+  openConfiguracionesModal() {
+    const passwordConfirmCallback = (args: ICallbackModal) => {
+      console.log('args ', args);
+    };
 
-    // this.router.navigateByUrl('/auth/config');
+    const passwordConfigModal = new DynamicModalClass();
+    passwordConfigModal.id = 'configuracionesForm';
+    passwordConfigModal.width = '90vw';
+    passwordConfigModal.header = `Configuraciones del sistema para: ${this.configApp?.nombre_empresa}`;
+    passwordConfigModal.height = '90vh';
+    passwordConfigModal.padding = '0rem';
+    passwordConfigModal.component = ConfiguracionesComponent;
+    passwordConfigModal.inputs = { is_on_modal: true };
+    passwordConfigModal.comfirmToClose = false;
+
+    passwordConfigModal.setCallback(passwordConfirmCallback);
+    passwordConfigModal.show();
   }
 
   // =================================================================================

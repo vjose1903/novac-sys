@@ -1,7 +1,11 @@
-.widget.config-widget {
+.config-widget {
   .widget-header {
     height: 4rem;
     background-color: var(--primary02);
+
+    &.is-on-modal {
+      display: none !important;
+    }
   }
 
   .widget-content {
@@ -9,7 +13,6 @@
   }
 
   .widget-footer {
-    
     .buttons-section {
       display: flex;
       justify-content: flex-end;
@@ -19,6 +22,10 @@
 
     .footer {
       background-color: var(--secondary04);
+      
+      &.is-on-modal {
+        display: none !important;
+      }
     }
   }
 }

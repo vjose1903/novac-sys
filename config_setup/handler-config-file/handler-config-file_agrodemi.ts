@@ -59,10 +59,6 @@ export default class HandlerConfigFile {
       reporte: '8.5x11',
     },
 
-    plantillas_impresion: {
-      nota: 'Agrupada',
-    },
-
     documentos_a_imprimir: 'recibo_ingreso,conduce,pre_venta,venta_credito,venta_contado,nota,cotizacion',
   };
 

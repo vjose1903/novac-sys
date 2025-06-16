@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { Ss } from '@core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
@@ -19,8 +19,10 @@ import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
   standalone: false,
 })
 export class ConfiguracionesComponent implements OnInit {
+  @Input() is_on_modal: boolean = false;
+  @Input() modalConfig: any;
   configServ = Ss.configServ;
-  configApp
+  configApp;
   configCopy;
   form;
 
@@ -34,11 +36,6 @@ export class ConfiguracionesComponent implements OnInit {
   ];
 
   medidas_articulos = [{ value: 'Quintal' }, { value: 'Producto' }];
-
-  plantillas_impresion = [
-    { key: 'nota', value: 'Agrupada' },
-    { key: 'nota', value: 'Detallada' },
-  ];
 
   paper_sizes = [
     { label: '8.5 x 11', descripcion: '8.5x11' },
@@ -59,18 +56,17 @@ export class ConfiguracionesComponent implements OnInit {
   ];
 
   impresiones = [
-    { printerFormControlName: 'printer_venta_contado', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_venta_contado', label: 'Venta Contado', key: 'venta_contado' },
-    { printerFormControlName: 'printer_venta_credito', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_venta_credito', label: 'Venta Credito', key: 'venta_credito' },
-    { printerFormControlName: 'printer_pre_venta', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_pre_venta', label: 'Pre venta', key: 'pre_venta' },
-    { printerFormControlName: 'printer_cotizacion', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_cotizacion', label: 'Cotización', key: 'cotizacion' },
-    { printerFormControlName: 'printer_compra', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_compra', label: 'Factura compras', key: 'compra' },
-    { printerFormControlName: 'printer_recibo_ingreso', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_recibo_ingreso', label: 'Recibos de ingreso', key: 'ingreso' },
-    { printerFormControlName: 'printer_conduce', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_conduce', label: 'Conduce', key: 'conduce' },
-    { printerFormControlName: 'printer_nota', plantillaFormControlName: 'plantilla_impresion_nota', pageSizeFormControlName: 'page_size_nota', label: 'Notas', key: 'nota' },
-    { printerFormControlName: 'printer_cuadre_caja', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_cuadre_caja', label: 'Cuadre de caja', key: 'cuadre' },
-    { printerFormControlName: 'printer_reporte', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_reporte', label: 'Reportes', key: 'reporte' },
+    { printerFormControlName: 'printer_venta_contado', pageSizeFormControlName: 'page_size_venta_contado', label: 'Venta Contado', key: 'venta_contado' },
+    { printerFormControlName: 'printer_venta_credito', pageSizeFormControlName: 'page_size_venta_credito', label: 'Venta Credito', key: 'venta_credito' },
+    { printerFormControlName: 'printer_pre_venta', pageSizeFormControlName: 'page_size_pre_venta', label: 'Pre venta', key: 'pre_venta' },
+    { printerFormControlName: 'printer_cotizacion', pageSizeFormControlName: 'page_size_cotizacion', label: 'Cotización', key: 'cotizacion' },
+    { printerFormControlName: 'printer_compra', pageSizeFormControlName: 'page_size_compra', label: 'Factura compras', key: 'compra' },
+    { printerFormControlName: 'printer_recibo_ingreso', pageSizeFormControlName: 'page_size_recibo_ingreso', label: 'Recibos de ingreso', key: 'ingreso' },
+    { printerFormControlName: 'printer_conduce', pageSizeFormControlName: 'page_size_conduce', label: 'Conduce', key: 'conduce' },
+    { printerFormControlName: 'printer_nota', pageSizeFormControlName: 'page_size_nota', label: 'Notas', key: 'nota' },
+    { printerFormControlName: 'printer_cuadre_caja', pageSizeFormControlName: 'page_size_cuadre_caja', label: 'Cuadre de caja', key: 'cuadre' },
+    { printerFormControlName: 'printer_reporte', pageSizeFormControlName: 'page_size_reporte', label: 'Reportes', key: 'reporte' },
   ];
-
 
   htmlServ = inject(HtmlElementsService);
 
@@ -82,17 +78,15 @@ export class ConfiguracionesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    
-      this.configApp = Ss.configServ.config
-      this.configCopy = fun.deepCloning(this.configApp);
-      this.parseDocumentosAImprimir(this.configApp).then(() => this.createForm(this.configApp));
+    this.configApp = Ss.configServ.config;
+    this.configCopy = fun.deepCloning(this.configApp);
+    this.parseDocumentosAImprimir(this.configApp).then(() => this.createForm(this.configApp));
 
-      fun.logGreen('this.configApp', this.configApp);
-    
+    fun.logGreen('this.configApp', this.configApp);
   }
 
   createForm(data) {
-    const color_format = _.find(this.colores, item => item.descripcion == data.color_app);
+    const color_format = this.colores.find(item => item.descripcion == data.color_app);
 
     this.form = this.fb.group({
       nombre_empresa: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
@@ -139,8 +133,6 @@ export class ConfiguracionesComponent implements OnInit {
       printer_nota: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
       printer_cuadre_caja: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
       printer_reporte: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
-
-      plantilla_impresion_nota: [{ value: this.getValue(data, 'plantillas_impresion.nota'), disabled: false }, Validators.required],
     });
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
@@ -157,12 +149,6 @@ export class ConfiguracionesComponent implements OnInit {
     const docs = _.filter(data.documentos_a_imprimir, { selected: true });
 
     return docs;
-  }
-
-  get_plantillas(key) {
-    const plantillas = _.filter(this.plantillas_impresion, { key });
-
-    return plantillas;
   }
 
   getValue(data, key) {
@@ -239,10 +225,6 @@ export class ConfiguracionesComponent implements OnInit {
       reporte: formulario.printer_reporte,
     };
 
-    const plantillas_impresion = {
-      nota: formulario.plantilla_impresion_nota,
-    };
-
     const keys_to_omit = [
       'plantilla_impresion_nota',
 
@@ -271,7 +253,6 @@ export class ConfiguracionesComponent implements OnInit {
 
     formulario['pages_sizes'] = pages_sizes;
     formulario['printer_selected'] = printer_selected;
-    formulario['plantillas_impresion'] = plantillas_impresion;
     return formulario;
   }
 
@@ -319,21 +300,6 @@ export class ConfiguracionesComponent implements OnInit {
               const value_target = tipoDato == 'string' ? `${key}: '${obj[key]}'` : `${key}: ${obj[key]}`;
 
               configReplacement[key] = { source: value_source, target: value_target };
-              // switch (key_padre) {
-              //   case 'pages_sizes':
-              //   case 'plantillas_impresion':
-              //     fun.logOrange('ANDO AQUI 1');
-              //     this.object_changed(configReplacement, key, obj, copyObjLevel);
-              //     break;
-
-              //   default:
-              //     fun.logGreen('ANDO AQUI 2');
-              //     const value_source = tipoDato == 'string' ? `'${copyObjLevel[key]}'` : `${copyObjLevel[key]}`;
-              //     const value_target = tipoDato == 'string' ? `'${obj[key]}'` : `${obj[key]}`;
-
-              //     configReplacement[key] = { source: value_source, target: value_target };
-              //     break;
-              // }
               // TODO: poner aqui una funcion para el remplazo exclusivo de los pages_sizes con el key_padre
             }
           }
@@ -387,4 +353,3 @@ export class ConfiguracionesComponent implements OnInit {
       });
   }
 }
-
