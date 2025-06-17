@@ -1,7 +1,7 @@
-import { TiposFacturaC, actionFacturacion, TipoFacturaI } from './../facturacion/factura';
+import { actionFacturacion } from './../facturacion/factura';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, inject } from '@angular/core';
 
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { CuadreCajaC } from '@core/typescript/cuadre_caja';
@@ -18,9 +18,8 @@ import { MessageTask } from '@core/models/message-task';
 import { ELECTRON_CHANGE_CONFIG_FILE, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
-import { MENU_CONFIG } from './utils/menu-items';
-import { ModalPasswordConfigComponent } from 'app/login/extra/modal-password-config/modal-password-config.component';
-import { ConfiguracionesComponent } from 'app/login/extra/configuraciones/configuraciones.component';
+import { ModalPasswordConfigComponent } from '../../login/extra/modal-password-config/modal-password-config.component';
+import { ConfiguracionesComponent } from '../../login/extra/configuraciones/configuraciones.component';
 import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { Environment } from '@environments/environment';
@@ -125,7 +124,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
-    this.openConfigurationModal();
+    // this.openConfigurationModal();
 
     this.checkFacturasArchivadas();
     this.cdRef.detectChanges();
@@ -269,7 +268,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     passwordConfigModal.id = 'configuracionesForm';
     passwordConfigModal.width = '90vw';
     passwordConfigModal.header = `Configuraciones del sistema para: ${this.configApp?.nombre_empresa}`;
-    passwordConfigModal.height = '90vh';
+    passwordConfigModal.height = 'calc(100vh - 10rem)';
     passwordConfigModal.padding = '0rem';
     passwordConfigModal.component = ConfiguracionesComponent;
     passwordConfigModal.inputs = { is_on_modal: true };

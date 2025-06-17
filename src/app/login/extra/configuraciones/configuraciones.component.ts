@@ -3,15 +3,14 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { Ss } from '@core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
-import * as _ from 'lodash';
 import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
-import { ConfigI } from '@core/interface/config-interface';
+import { ELECTRON_CHANGE_CONFIG_FILE } from '@electron/shared-electron-angular';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
 import { Router } from '@angular/router';
 import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
+import { configuracionesFieldsId, configuracionesFormAttr } from './configuraciones.model';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -26,6 +25,8 @@ export class ConfiguracionesComponent implements OnInit {
   configCopy;
   form;
 
+  configuracionesFormAttr = configuracionesFormAttr;
+  configuracionesFieldsId = configuracionesFieldsId;
   logo_empresa;
   logo_impresion;
 
@@ -56,16 +57,16 @@ export class ConfiguracionesComponent implements OnInit {
   ];
 
   impresiones = [
-    { printerFormControlName: 'printer_venta_contado', pageSizeFormControlName: 'page_size_venta_contado', label: 'Venta Contado', key: 'venta_contado' },
-    { printerFormControlName: 'printer_venta_credito', pageSizeFormControlName: 'page_size_venta_credito', label: 'Venta Credito', key: 'venta_credito' },
-    { printerFormControlName: 'printer_pre_venta', pageSizeFormControlName: 'page_size_pre_venta', label: 'Pre venta', key: 'pre_venta' },
-    { printerFormControlName: 'printer_cotizacion', pageSizeFormControlName: 'page_size_cotizacion', label: 'Cotización', key: 'cotizacion' },
-    { printerFormControlName: 'printer_compra', pageSizeFormControlName: 'page_size_compra', label: 'Factura compras', key: 'compra' },
-    { printerFormControlName: 'printer_recibo_ingreso', pageSizeFormControlName: 'page_size_recibo_ingreso', label: 'Recibos de ingreso', key: 'ingreso' },
-    { printerFormControlName: 'printer_conduce', pageSizeFormControlName: 'page_size_conduce', label: 'Conduce', key: 'conduce' },
-    { printerFormControlName: 'printer_nota', pageSizeFormControlName: 'page_size_nota', label: 'Notas', key: 'nota' },
-    { printerFormControlName: 'printer_cuadre_caja', pageSizeFormControlName: 'page_size_cuadre_caja', label: 'Cuadre de caja', key: 'cuadre' },
-    { printerFormControlName: 'printer_reporte', pageSizeFormControlName: 'page_size_reporte', label: 'Reportes', key: 'reporte' },
+    { printerFormControlName: configuracionesFormAttr.printer_venta_contado, pageSizeFormControlName: configuracionesFormAttr.page_size_venta_contado, label: 'Venta Contado', key: 'venta_contado' },
+    { printerFormControlName: configuracionesFormAttr.printer_venta_credito, pageSizeFormControlName: configuracionesFormAttr.page_size_venta_credito, label: 'Venta Credito', key: 'venta_credito' },
+    { printerFormControlName: configuracionesFormAttr.printer_pre_venta, pageSizeFormControlName: configuracionesFormAttr.page_size_pre_venta, label: 'Pre venta', key: 'pre_venta' },
+    { printerFormControlName: configuracionesFormAttr.printer_cotizacion, pageSizeFormControlName: configuracionesFormAttr.page_size_cotizacion, label: 'Cotización', key: 'cotizacion' },
+    { printerFormControlName: configuracionesFormAttr.printer_compra, pageSizeFormControlName: configuracionesFormAttr.page_size_compra, label: 'Factura compras', key: 'compra' },
+    { printerFormControlName: configuracionesFormAttr.printer_recibo_ingreso, pageSizeFormControlName: configuracionesFormAttr.page_size_recibo_ingreso, label: 'Recibos de ingreso', key: 'ingreso' },
+    { printerFormControlName: configuracionesFormAttr.printer_conduce, pageSizeFormControlName: configuracionesFormAttr.page_size_conduce, label: 'Conduce', key: 'conduce' },
+    { printerFormControlName: configuracionesFormAttr.printer_nota, pageSizeFormControlName: configuracionesFormAttr.page_size_nota, label: 'Notas', key: 'nota' },
+    { printerFormControlName: configuracionesFormAttr.printer_cuadre_caja, pageSizeFormControlName: configuracionesFormAttr.page_size_cuadre_caja, label: 'Cuadre de caja', key: 'cuadre' },
+    { printerFormControlName: configuracionesFormAttr.printer_reporte, pageSizeFormControlName: configuracionesFormAttr.page_size_reporte, label: 'Reportes', key: 'reporte' },
   ];
 
   htmlServ = inject(HtmlElementsService);
@@ -80,7 +81,10 @@ export class ConfiguracionesComponent implements OnInit {
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;
     this.configCopy = fun.deepCloning(this.configApp);
-    this.parseDocumentosAImprimir(this.configApp).then(() => this.createForm(this.configApp));
+    this.parseDocumentosAImprimir(this.configApp).then(() => {
+      this.createForm(this.configApp);
+      this.formIsInvalid();
+    });
 
     fun.logGreen('this.configApp', this.configApp);
   }
@@ -89,50 +93,49 @@ export class ConfiguracionesComponent implements OnInit {
     const color_format = this.colores.find(item => item.descripcion == data.color_app);
 
     this.form = this.fb.group({
-      nombre_empresa: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
-      rnc_empresa: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
-      direccion_empresa: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
-      telefono_empresa: [{ value: this.getValue(data, 'telefono_empresa'), disabled: false }, Validators.required],
-      logo_empresa: [{ value: this.getValue(data, 'logo_empresa'), disabled: false }, Validators.required],
-      logo_impresion: [{ value: this.getValue(data, 'logo_impresion'), disabled: false }, Validators.required],
-      color_app: [{ value: color_format, disabled: false }, Validators.required],
-      url_servidor: [{ value: this.getValue(data, 'url_servidor'), disabled: false }, Validators.required],
-      url_servidor_respaldo: [{ value: this.getValue(data, 'url_servidor_respaldo'), disabled: false }, Validators.required],
-      url_servidor_descargas: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
-      config_password: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
-      usa_url_principal: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
-      serie_default: [{ value: this.getValue(data, 'serie_default'), disabled: false }],
-      // printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
-      // printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
-      is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
-      calcular_itbis: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
-      is_produccion: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
-      facturacion_editar_precio: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
-      vende_sin_inventario: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
-      medida_producto_terminado: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
-      documentos_a_imprimir: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
+      [configuracionesFormAttr.nombre_empresa]: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.rnc_empresa]: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.direccion_empresa]: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.telefono_empresa]: [{ value: this.getValue(data, 'telefono_empresa'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.logo_empresa]: [{ value: this.getValue(data, 'logo_empresa'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.logo_impresion]: [{ value: this.getValue(data, 'logo_impresion'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.color_app]: [{ value: color_format, disabled: false }, Validators.required],
+      [configuracionesFormAttr.url_servidor]: [{ value: this.getValue(data, 'url_servidor'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.url_servidor_respaldo]: [{ value: this.getValue(data, 'url_servidor_respaldo'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.url_servidor_descargas]: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.config_password]: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.usa_url_principal]: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.serie_default]: [{ value: this.getValue(data, 'serie_default'), disabled: false }],
 
-      page_size_venta_contado: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_contado'), disabled: false }, Validators.required],
-      page_size_venta_credito: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_credito'), disabled: false }, Validators.required],
-      page_size_pre_venta: [{ value: this.getValuePageSize(data, 'pages_sizes.pre_venta'), disabled: false }, Validators.required],
-      page_size_cotizacion: [{ value: this.getValuePageSize(data, 'pages_sizes.cotizacion'), disabled: false }, Validators.required],
-      page_size_compra: [{ value: this.getValuePageSize(data, 'pages_sizes.compra'), disabled: false }, Validators.required],
-      page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
-      page_size_conduce: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
-      page_size_nota: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
-      page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
-      page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.is_db_local]: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.calcular_itbis]: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.is_produccion]: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.facturacion_editar_precio]: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.vende_sin_inventario]: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.medida_producto_terminado]: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.documentos_a_imprimir]: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
 
-      printer_venta_contado: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
-      printer_venta_credito: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
-      printer_pre_venta: [{ value: this.getValue(data, 'printer_selected.pre_venta'), disabled: false }, Validators.required],
-      printer_cotizacion: [{ value: this.getValue(data, 'printer_selected.cotizacion'), disabled: false }, Validators.required],
-      printer_compra: [{ value: this.getValue(data, 'printer_selected.compra'), disabled: false }, Validators.required],
-      printer_recibo_ingreso: [{ value: this.getValue(data, 'printer_selected.recibo_ingreso'), disabled: false }, Validators.required],
-      printer_conduce: [{ value: this.getValue(data, 'printer_selected.conduce'), disabled: false }, Validators.required],
-      printer_nota: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
-      printer_cuadre_caja: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
-      printer_reporte: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_venta_contado]: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_contado'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_venta_credito]: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_credito'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_pre_venta]: [{ value: this.getValuePageSize(data, 'pages_sizes.pre_venta'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_cotizacion]: [{ value: this.getValuePageSize(data, 'pages_sizes.cotizacion'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_compra]: [{ value: this.getValuePageSize(data, 'pages_sizes.compra'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_recibo_ingreso]: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_conduce]: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_nota]: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_cuadre_caja]: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.page_size_reporte]: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
+
+      [configuracionesFormAttr.printer_venta_contado]: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_venta_credito]: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_pre_venta]: [{ value: this.getValue(data, 'printer_selected.pre_venta'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_cotizacion]: [{ value: this.getValue(data, 'printer_selected.cotizacion'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_compra]: [{ value: this.getValue(data, 'printer_selected.compra'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_recibo_ingreso]: [{ value: this.getValue(data, 'printer_selected.recibo_ingreso'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_conduce]: [{ value: this.getValue(data, 'printer_selected.conduce'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_nota]: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_cuadre_caja]: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
+      [configuracionesFormAttr.printer_reporte]: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
     });
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
@@ -140,19 +143,18 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   getValuePageSize(data, key) {
-    const size = _.get(data, key);
-    const page_size = _.find(this.paper_sizes, item => item.descripcion == size);
+    const size = fun.getProperty(data, key);
+    const page_size = this.paper_sizes.find(item => item.descripcion == size);
     return page_size;
   }
 
   getDocumentosAImprimir(data) {
-    const docs = _.filter(data.documentos_a_imprimir, { selected: true });
-
+    const docs = data.documentos_a_imprimir.filter(doc => doc.selected);
     return docs;
   }
 
   getValue(data, key) {
-    return _.get(data, key);
+    return fun.getProperty(data, key);
   }
 
   capitalice(control, arg) {
@@ -160,18 +162,35 @@ export class ConfiguracionesComponent implements OnInit {
     campo.setValue(fun.Capitalice(arg));
   }
 
-  saltar(input) {}
+  saltar(sali_de) {
+    console.log('sali_de', sali_de);
+
+    let next_control = null;
+
+    switch (sali_de) {
+      case configuracionesFieldsId.nombre_empresa:
+        next_control = configuracionesFieldsId.rnc_empresa;
+        break;
+      case configuracionesFieldsId.rnc_empresa:
+        next_control = configuracionesFieldsId.telefono_empresa;
+        break;
+      case configuracionesFieldsId.telefono_empresa:
+        next_control = configuracionesFieldsId.direccion_empresa;
+    }
+
+    if (next_control) fun.enfocarInput(next_control);
+  }
 
   parseDocumentosAImprimir(config) {
     return new Promise<any>(resolve => {
       const documentos_config = config.documentos_a_imprimir.split(',');
-      documentos_config.forEach(item => this.documentos_a_imprimir_selected.push(_.find(this.documentos_a_imprimir, { key: item })));
+      documentos_config.forEach(item => this.documentos_a_imprimir_selected.push(this.documentos_a_imprimir.find(doc => doc.key == item)));
       resolve(true);
     });
   }
 
   changeDocumentosAImprimir() {
-    const documentos_selected = _.join(_.map(this.documentos_a_imprimir_selected, 'key'), ',');
+    const documentos_selected = this.documentos_a_imprimir_selected.map(doc => doc.key).join(',');
 
     this.form.controls.documentos_a_imprimir.setValue(fun.hasValue(documentos_selected) ? documentos_selected : null);
   }
@@ -192,7 +211,11 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   salir() {
-    this.router.navigateByUrl('auth/login');
+    if (this.is_on_modal) {
+      this.modalConfig.close();
+    } else {
+      this.router.navigateByUrl('auth/login');
+    }
   }
 
   getFormularioToSend() {
@@ -249,7 +272,7 @@ export class ConfiguracionesComponent implements OnInit {
       'printer_reporte',
     ];
 
-    keys_to_omit.forEach(element => (formulario = _.omit(formulario, [element])));
+    keys_to_omit.forEach(element => delete formulario[element]);
 
     formulario['pages_sizes'] = pages_sizes;
     formulario['printer_selected'] = printer_selected;

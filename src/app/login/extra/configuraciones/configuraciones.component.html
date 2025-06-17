@@ -13,22 +13,22 @@
       <p-tabpanels>
         <p-tabpanel header="Informaciones generales" [value]="0">
           @if (configApp && form) {
-            <form [formGroup]="form">
+            <form [formGroup]="form" (submit)="$event.stopPropagation(); $event.preventDefault()">
               <div class="row my-3">
                 <div class="col-12 mb-2">
                   <div class="form-group">
                     <label class="control-label">Nombre de la empresa: </label>
                     <input
-                      id="campoNombre"
-                      (keyup)="capitalice('nombre_empresa', htmlServ.getValue($event))"
-                      (keydown.enter)="saltar('campoApellido')"
+                      [id]="configuracionesFieldsId.nombre_empresa"
+                      (keyup)="capitalice(configuracionesFormAttr.nombre_empresa, htmlServ.getValue($event))"
+                      (keydown.enter)="saltar(configuracionesFieldsId.nombre_empresa)"
                       type="text"
-                      formControlName="nombre_empresa"
+                      [formControlName]="configuracionesFormAttr.nombre_empresa"
                       placeholder="Introduzca nombre de la empresa"
                       class="form-control"
                       autocomplete="off"
                       autofocus />
-                    <form-error-msg [control]="form.controls['nombre_empresa']"></form-error-msg>
+                    <form-error-msg [control]="form.controls[configuracionesFormAttr.nombre_empresa]"></form-error-msg>
                   </div>
                 </div>
                 <div class="col-6">
@@ -42,15 +42,15 @@
                 <div class="col-6 mb-2">
                   <div class="form-group">
                     <label class="control-label">Rnc: </label>
-                    <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
-                    <form-error-msg [control]="form.controls['rnc_empresa']"></form-error-msg>
+                    <p-inputMask [inputId]="configuracionesFieldsId.rnc_empresa" (keydown.enter)="saltar(configuracionesFieldsId.rnc_empresa)" [formControlName]="configuracionesFormAttr.rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
+                    <form-error-msg [control]="form.controls[configuracionesFormAttr.rnc_empresa]"></form-error-msg>
                   </div>
                 </div>
                 <div class="col-6 mb-2">
                   <div class="form-group">
                     <label class="control-label">Telefono: </label>
-                    <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>
-                    <form-error-msg [control]="form.controls['telefono_empresa']"></form-error-msg>
+                    <p-inputMask [inputId]="configuracionesFieldsId.telefono_empresa" (keydown.enter)="saltar(configuracionesFieldsId.telefono_empresa)" [formControlName]="configuracionesFormAttr.telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>
+                    <form-error-msg [control]="form.controls[configuracionesFormAttr.telefono_empresa]"></form-error-msg>
                   </div>
                 </div>
                 <div class="col-8 mb-2">
@@ -240,7 +240,7 @@
         <!-- ============================ PLANTILLAS DE IMPRESION ============================ -->
         <p-tabpanel header="Impresiones" [value]="1">
           @if (configApp && form) {
-            <form [formGroup]="form">
+            <form [formGroup]="form" (submit)="$event.stopPropagation(); $event.preventDefault()">
               <div class="row my-3">
                 <div class="col-12 mb-3">
                   <div class="row bg-dark-1 br-10 p-2">
@@ -297,8 +297,8 @@
       <div class="buttons-section">
         <!-- <a class="btn mr-2" id="btn-gris" (click)="test()">Test</a> -->
 
-        <a class="btn mr-2" id="btn-blanco" (click)="salir()">Salir</a>
-        <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="Guardar" id="btn-verde" />
+        <button class="btn btn-sm" id="btn-blanco" (click)="salir()">Salir</button>
+        <button type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn btn-sm" id="btn-verde">Guardar</button>
       </div>
 
       <div class="footer pr-2 d-flex justify-content-end align-items-center" [ngClass]="{ 'is-on-modal': is_on_modal }" style="color: white">Novac System {{ configApp?.app_version }} - &#64;2020 Desarrollador: Victor J. Vasquez</div>

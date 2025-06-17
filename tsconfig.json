@@ -24,7 +24,8 @@
       "@components/*": ["app/core/components/*"],
       "@registros/*": ["app/admin/registros/*"],
       "@admin/*": ["app/admin/*"],
-      "@environments/*": ["environments/*"]
+      "@environments/*": ["environments/*"],
+      "@electron/*": ["../electron/*"]
     }
   },
   "files": [

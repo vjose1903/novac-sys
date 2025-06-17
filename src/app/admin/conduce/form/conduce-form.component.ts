@@ -20,12 +20,12 @@ import { ModalClass } from '@components/modal/modal-class';
 import { Router } from '@angular/router';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
-  
+
 @Component({
-    selector: 'app-conduce-form',
-    templateUrl: './conduce-form.component.html',
-    styleUrls: ['./conduce-form.component.scss'],
-    standalone: false
+  selector: 'app-conduce-form',
+  templateUrl: './conduce-form.component.html',
+  styleUrls: ['./conduce-form.component.scss'],
+  standalone: false,
 })
 export class ConduceFormComponent extends MixinClass implements OnInit, OnDestroy {
   secuenciaKeys = [];
@@ -100,13 +100,17 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   configApp: ConfigI;
 
   htmlServ = inject(HtmlElementsService);
-  constructor(private fb: UntypedFormBuilder, public mServ: ModalService, private router: Router) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    public mServ: ModalService,
+    private router: Router
+  ) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'conduce', is_routing: true });
-    this.configApp = Ss.configServ.config
+    this.configApp = Ss.configServ.config;
 
     this.necesarioStar();
   }
@@ -158,24 +162,24 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async reajustarExcedentes(conteo = 0) {
-    const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
+    const filas_ocupadas = _.filter(this.filasDetalle, item => fun.hasValue(item.value.articulo));
 
-    this.checkCantidadExede(conteo, 'proceso_quitar_articulo', (excede) => {
+    this.checkCantidadExede(conteo, 'proceso_quitar_articulo', excede => {
       if (excede) this.rowsExcede.push(conteo);
       else if (_.includes(this.rowsExcede, conteo) && !excede) _.pull(this.rowsExcede, conteo);
 
       conteo++;
       if (conteo < filas_ocupadas.length) this.reajustarExcedentes(conteo);
       else {
-        const excedientes_mayores = _.filter(this.rowsExcede, (item) => item >= conteo);
-        excedientes_mayores.forEach((element) => _.pull(this.rowsExcede, element));
+        const excedientes_mayores = _.filter(this.rowsExcede, item => item >= conteo);
+        excedientes_mayores.forEach(element => _.pull(this.rowsExcede, element));
       }
     });
   }
 
   ajustarSecuencia() {
-    return new Promise((resolve) => {
-      const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
+    return new Promise(resolve => {
+      const filas_ocupadas = _.filter(this.filasDetalle, item => fun.hasValue(item.value.articulo));
       this.secuencia = filas_ocupadas.length;
 
       this.inputSecuencia = 'cod-' + this.secuencia;
@@ -206,7 +210,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
     if (arg.modal_id === 'seleccionar_articulos_adelantados') {
       this.ajustarSecuencia();
-      this.llenarConduce(arg.data).then((res) => {
+      this.llenarConduce(arg.data).then(res => {
         this.checkFacturasAdelantadasSelection();
       });
     }
@@ -314,7 +318,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       if (articulo.vendido_en == 'Saco' && articulo.calcular_saco) this.entrarSacosAUnidades(unidadesArticulo, precioPrincipal, costoPrincipal);
 
       if (articulo.is_detallable) {
-        articulo.contenido_articulos.forEach((element) => {
+        articulo.contenido_articulos.forEach(element => {
           unidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
         });
       }
@@ -326,7 +330,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   entrarSacosAUnidades(unidadesArticulo, precioQuintal, costoQuintal) {
-    this.sacos.forEach((saco) => {
+    this.sacos.forEach(saco => {
       const valor = 'Saco de ' + saco + ' libras';
       unidadesArticulo.push({
         value: valor,
@@ -389,7 +393,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   // =============================================
-  async checkCantidadExede(index, lugar, callback = (arg) => {}) {
+  async checkCantidadExede(index, lugar, callback = arg => {}) {
     let cantidad = 0;
     this.calcularCantidadEnUnidades({ index });
     const fila_actual = this.filasDetalle[index].getRawValue();
@@ -397,8 +401,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
     if (fun.hasValue(articulo)) {
       const rowsIgual = _.map(
-        _.filter(this.filasDetalle, (item) => item.controls.articulo?.value?.id == articulo.id),
-        'value',
+        _.filter(this.filasDetalle, item => item.controls.articulo?.value?.id == articulo.id),
+        'value'
       );
 
       cantidad = _.reduce(rowsIgual, (acumulado, item) => acumulado + item.cantidad_en_unidades, 0);
@@ -468,7 +472,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   async selectMedida(index) {
     if (this.dropdownMedidaOpen) {
-      this.checkCantidadExede(index, 'change', (excede) => {
+      this.checkCantidadExede(index, 'change', excede => {
         if (!excede)
           this.ajustarSecuencia().then(() => {
             fun.enfocarInput(this.inputSecuencia);
@@ -485,7 +489,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     let cantidadMinima = 1;
 
     if (unidad && unidades.length > 0) {
-      const unidad_find = unidades.find((_uni) => _uni.value.toLowerCase() == unidad.toLowerCase());
+      const unidad_find = unidades.find(_uni => _uni.value.toLowerCase() == unidad.toLowerCase());
       if (unidad_find) cantidadMinima = unidad_find.cantidad;
     }
 
@@ -545,7 +549,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       id: 'removerArticulo',
       header: 'Confirmar',
       texto: `Seguro que desea remover el articulo <b class="negrita">${name ?? codigo ?? ''}</b>`,
-      siFunction: (instance) => {
+      siFunction: instance => {
         this.procesoQuitarArticulo();
         instance.closeModal(instance.id, 'removerArticulo');
       },
@@ -557,7 +561,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   selectedRow(i, bool) {
     const lista = [`cod-${i}`, `can-${i}`, `uni-${i}`, `des-${i}`];
 
-    lista.forEach((row) => {
+    lista.forEach(row => {
       if (this.checkIfRowContainArticulo(i)) fun.ModificarClass(row, 'inputOscuro', bool ? 'add' : 'remove');
     });
   }
@@ -565,9 +569,9 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   async buscarFacturasAdelantadas(id) {
     try {
       this.facturaClass.getFacturasByParams({ campo: request_factura_campo.cliente_id, valor: id, tipo_factura_id: 0, adelantada: true, page: 1, per_page: 1, paginado: false, tipo: 'venta' }).then(
-        (res) => {
+        res => {
           this.facturas_adelantadas = res['data'];
-          this.facturas_adelantadas.map((factura) => {
+          this.facturas_adelantadas.map(factura => {
             factura.secuencia = _.padStart(factura.numero_factura, 8, '0');
             factura.customStyles = {
               some_is_selected: [
@@ -584,24 +588,24 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
           });
           this.checkFacturasAdelantadasSelection();
         },
-        (error) => {},
+        error => {}
       );
     } catch (error) {}
   }
 
   checkFacturasAdelantadasSelection() {
-    this.facturas_adelantadas.map((item) => {
-      item.detalle_facturas.map((detalle) => {
+    this.facturas_adelantadas.map(item => {
+      item.detalle_facturas.map(detalle => {
         const formArray = this.form.get('rowFactura') as UntypedFormArray;
-        const existe = formArray.value.find((d) => d.detalle_factura_id == detalle.id);
+        const existe = formArray.value.find(d => d.detalle_factura_id == detalle.id);
 
         detalle.select = fun.hasValue(existe);
 
         return detalle;
       });
 
-      const almenos_uno = item.detalle_facturas.some((detalle) => detalle.select);
-      const todos = _.every(item.detalle_facturas, (detalle) => detalle.select);
+      const almenos_uno = item.detalle_facturas.some(detalle => detalle.select);
+      const todos = _.every(item.detalle_facturas, detalle => detalle.select);
 
       item.detalles_selected = todos ? 'fas fa-check' : almenos_uno ? 'far fa-check-square' : 'far fa-square';
       return item;
@@ -617,7 +621,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       this.checkFacturasAdelantadasSelection();
       let conteo = 0;
 
-      factura.detalle_facturas.map(async (detalle) => {
+      factura.detalle_facturas.map(async detalle => {
         const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Bolsa: 'Bol.' };
 
         const contenidos_format = this.formatContenidos(detalle.contenidos);
@@ -630,7 +634,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         for (let j = 0; j < arrayMostrar.length; j++) {
           const element = arrayMostrar[j];
 
-          const contenidoSelected = _.find(contenidos_format, (cont) => element.num >= cont[1]);
+          const contenidoSelected = _.find(contenidos_format, cont => element.num >= cont[1]);
 
           const cantidad = contenidoSelected ? element.num / contenidoSelected[1] : null;
           element.medida = contenidoSelected ? `${cantidad} ${abreviaturas[contenidoSelected[0]]}` : null;
@@ -654,7 +658,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               botones: {
                 ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
                 dinamico: [
-                  { clase: 'btn btn-blanco w-9', function: (instance) => instance.closeModal(instance.id), label: 'No', disable: false },
+                  { clase: 'btn btn-blanco w-9', function: instance => instance.closeModal(instance.id), label: 'No', disable: false },
                   { btn_id: 'btnConfirmar', clase: 'btn btn-verde w-9', function_in_other_component: 'btn_aceptar', label: 'Si', disable: true },
                 ],
               },
@@ -686,10 +690,10 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   llenarConduce(detalles, conteo = 0, firstResolve = null) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       firstResolve ??= resolve;
 
-      this.llenarFila(detalles[conteo], this.secuencia).then((res) => {
+      this.llenarFila(detalles[conteo], this.secuencia).then(res => {
         conteo++;
         if (conteo < detalles.length) this.llenarConduce(detalles, conteo, firstResolve);
         else firstResolve(true);
@@ -711,7 +715,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async llenarFila(element, i) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       // const validator = (rowArticulo) => rowArticulo.detalle_factura_id == element.id;
 
       // const result = this.ARRAY_ROWARTICULOS.getRawValue().some(validator);
@@ -720,7 +724,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
       const multiplo = element.cantidad_en_unidades / element.cantidad;
       const cant_actual = cant_en_unidades_actual / multiplo;
-      this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.fechaConduce }).then((result) => {
+      this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.fechaConduce }).then(result => {
         const articulo = _.first(result['data']);
         // const cant_en_unidades_actual = cant_en_unidades_actual * multiplo;
 
@@ -749,7 +753,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         (this.filasDetalle[i] as any).controls['uni'].disable();
 
         setTimeout(async () => {
-          this.checkCantidadExede(i, 'llenarFila', (res) => {
+          this.checkCantidadExede(i, 'llenarFila', res => {
             if (res) this.rowsExcede.push(i);
           });
 
@@ -787,7 +791,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async imprimirConduce() {
-    const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
+    const filas_ocupadas = _.filter(this.filasDetalle, item => fun.hasValue(item.value.articulo));
 
     if (this.rowsExcede.length) {
       fun.toastWarning('No puede hacer el conduce, existiendo artículos que exceden su cantidad en el inventario', 'Aviso');
@@ -809,7 +813,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
           dinamico: [
-            { clase: 'btn btn-blanco', function: (instance) => this.closeModal(instance), label: 'Cancelar', disable: false },
+            { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
             { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
           ],
         },
@@ -818,7 +822,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   parseCuerpoConduce() {
-    const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
+    const filas_ocupadas = _.filter(this.filasDetalle, item => fun.hasValue(item.value.articulo));
 
     this.CuerpoConduce = [];
     for (let i = 0; i < filas_ocupadas.length; i++) {
@@ -842,7 +846,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   getCantidadArticulos() {
-    const filas_ocupadas = _.filter(this.filasDetalle, (item) => fun.hasValue(item.value.articulo));
+    const filas_ocupadas = _.filter(this.filasDetalle, item => fun.hasValue(item.value.articulo));
     return filas_ocupadas.length;
   }
 
@@ -852,13 +856,13 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     cabecera_conduce['numero_conduce'] = '';
     cabecera_conduce['detalle_conduces'] = this.CuerpoConduce;
 
-    this.conduceClass.createUpdateOne(cabecera_conduce).then((res) => {
-      this.conduceClass.parseDataToPdf(res['data']).then((conduce_parsed) => {
+    this.conduceClass.createUpdateOne(cabecera_conduce).then(res => {
+      this.conduceClass.parseDataToPdf(res['data']).then(conduce_parsed => {
         const obj = { data: conduce_parsed, type: 'conduce' };
 
         this.cancelarConduce();
         this.goBack();
-        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch((err) => fun.toastError(err['msg'], 'ERROR'));
+        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(err['msg'], 'ERROR'));
       });
     });
   }
@@ -900,7 +904,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       id: 'cancelar_conduce',
       texto: 'Conduce no terminado, <b class="negrita">¿Desea cancelarlo?</b>',
       header: 'Confirmación',
-      siFunction: async (instance) => {
+      siFunction: async instance => {
         this.cancelarConduce();
         instance.closeModal('cancelar_conduce', 'cancelar');
       },

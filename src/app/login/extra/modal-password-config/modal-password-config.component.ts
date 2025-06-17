@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { ModalI } from '@components/modal/modal-class';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 import { fun } from '@core/services/functions.service';
@@ -59,8 +58,8 @@ export class ModalPasswordConfigComponent implements OnInit, IDynamicModal {
     const is_correct = fun.decryptConfigPassword(data.password);
 
     if (is_correct) {
-      console.log("BTN-ACEPTAR");
-      
+      console.log('BTN-ACEPTAR');
+
       this.modalConfig.close({ error: false });
 
       setTimeout(() => {
