@@ -14,32 +14,34 @@ export function agruparArticulosPorPagina(articulos: any[], itemsPorPagina: numb
 }
 
 export function parseTotalizacion(detalles: DetalleFactura[]): { total_excento: number; total_gravado: number; itbis: number; total_pagina: number } {
+  console.log('detalles', detalles);
+  
   let total_excento = 0;
   let total_gravado = 0;
   let itbis = 0;
   let total_pagina = 0;
+  let total_descuento = 0;
 
   const articulos_grabados = detalles.filter(detalle => detalle.calcular_itbis);
   const articulos_excentos = detalles.filter(detalle => !detalle.calcular_itbis);
 
   articulos_grabados.forEach(articulo => {
-    const descuento = articulo.descuento_valor ?? articulo.descuento  ?? 0;
-    const itbis_ = articulo.itbis ?? 0;
-
-    total_gravado += articulo.total + descuento - itbis_;
-    itbis += itbis_;
-    total_pagina = total_gravado - descuento + itbis;
-  });
-
-  articulos_excentos.forEach(articulo => {
     const descuento = articulo.descuento_valor ?? articulo.descuento ?? 0;
     const itbis_ = articulo.itbis ?? 0;
 
-    total_excento += articulo.total + descuento - itbis_;
-    total_pagina = total_excento - descuento + itbis;
+    total_descuento += descuento;
+    total_gravado += articulo.total + descuento;
+    itbis += itbis_;
   });
 
+  total_pagina = total_gravado - total_descuento + itbis;
 
+  articulos_excentos.forEach(articulo => {
+    const descuento = articulo.descuento_valor ?? articulo.descuento ?? 0;
+    total_descuento += descuento;
+    total_excento += articulo.total + descuento;
+  });
 
+  total_pagina += total_excento - total_descuento + itbis;
   return { total_excento, total_gravado, itbis, total_pagina };
 }
