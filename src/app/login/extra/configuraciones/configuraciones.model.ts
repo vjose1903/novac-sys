@@ -1,4 +1,4 @@
-export enum configuracionesFormAttr {
+export enum formFieldName {
   nombre_empresa = 'nombre_empresa',
   rnc_empresa = 'rnc_empresa',
   direccion_empresa = 'direccion_empresa',
@@ -43,7 +43,7 @@ export enum configuracionesFormAttr {
   printer_reporte = 'printer_reporte',
 }
 
-export enum configuracionesFieldsId {
+export enum formFieldId {
   nombre_empresa = 'field_nombre_empresa',
   rnc_empresa = 'field_rnc_empresa',
   direccion_empresa = 'field_direccion_empresa',

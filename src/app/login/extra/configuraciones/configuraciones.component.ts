@@ -10,7 +10,7 @@ import { SharedService } from '@core/services/shared.service';
 import { Router } from '@angular/router';
 import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
-import { configuracionesFieldsId, configuracionesFormAttr } from './configuraciones.model';
+import { formFieldId, formFieldName } from './configuraciones.model';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -25,8 +25,8 @@ export class ConfiguracionesComponent implements OnInit {
   configCopy;
   form;
 
-  configuracionesFormAttr = configuracionesFormAttr;
-  configuracionesFieldsId = configuracionesFieldsId;
+  formFieldName = formFieldName;
+  formFieldId = formFieldId;
   logo_empresa;
   logo_impresion;
 
@@ -48,25 +48,26 @@ export class ConfiguracionesComponent implements OnInit {
 
   documentos_a_imprimir = [
     { name: 'Venta Contado', key: 'venta_contado' },
-    { name: 'Venta Credito', key: 'venta_credito' },
+    { name: 'Venta Crédito', key: 'venta_credito' },
     { name: 'Pre_Venta', key: 'pre_venta' },
     { name: 'Compra', key: 'compra' },
     { name: 'Recibo Ingreso', key: 'recibo_ingreso' },
     { name: 'Nota', key: 'nota' },
     { name: 'Conduce', key: 'conduce' },
+    { name: 'Cotización', key: 'cotizacion' },
   ];
 
   impresiones = [
-    { printerFormControlName: configuracionesFormAttr.printer_venta_contado, pageSizeFormControlName: configuracionesFormAttr.page_size_venta_contado, label: 'Venta Contado', key: 'venta_contado' },
-    { printerFormControlName: configuracionesFormAttr.printer_venta_credito, pageSizeFormControlName: configuracionesFormAttr.page_size_venta_credito, label: 'Venta Credito', key: 'venta_credito' },
-    { printerFormControlName: configuracionesFormAttr.printer_pre_venta, pageSizeFormControlName: configuracionesFormAttr.page_size_pre_venta, label: 'Pre venta', key: 'pre_venta' },
-    { printerFormControlName: configuracionesFormAttr.printer_cotizacion, pageSizeFormControlName: configuracionesFormAttr.page_size_cotizacion, label: 'Cotización', key: 'cotizacion' },
-    { printerFormControlName: configuracionesFormAttr.printer_compra, pageSizeFormControlName: configuracionesFormAttr.page_size_compra, label: 'Factura compras', key: 'compra' },
-    { printerFormControlName: configuracionesFormAttr.printer_recibo_ingreso, pageSizeFormControlName: configuracionesFormAttr.page_size_recibo_ingreso, label: 'Recibos de ingreso', key: 'ingreso' },
-    { printerFormControlName: configuracionesFormAttr.printer_conduce, pageSizeFormControlName: configuracionesFormAttr.page_size_conduce, label: 'Conduce', key: 'conduce' },
-    { printerFormControlName: configuracionesFormAttr.printer_nota, pageSizeFormControlName: configuracionesFormAttr.page_size_nota, label: 'Notas', key: 'nota' },
-    { printerFormControlName: configuracionesFormAttr.printer_cuadre_caja, pageSizeFormControlName: configuracionesFormAttr.page_size_cuadre_caja, label: 'Cuadre de caja', key: 'cuadre' },
-    { printerFormControlName: configuracionesFormAttr.printer_reporte, pageSizeFormControlName: configuracionesFormAttr.page_size_reporte, label: 'Reportes', key: 'reporte' },
+    { printerFormControlName: formFieldName.printer_venta_contado, pageSizeFormControlName: formFieldName.page_size_venta_contado, label: 'Venta Contado', key: 'venta_contado' },
+    { printerFormControlName: formFieldName.printer_venta_credito, pageSizeFormControlName: formFieldName.page_size_venta_credito, label: 'Venta Credito', key: 'venta_credito' },
+    { printerFormControlName: formFieldName.printer_pre_venta, pageSizeFormControlName: formFieldName.page_size_pre_venta, label: 'Pre venta', key: 'pre_venta' },
+    { printerFormControlName: formFieldName.printer_cotizacion, pageSizeFormControlName: formFieldName.page_size_cotizacion, label: 'Cotización', key: 'cotizacion' },
+    { printerFormControlName: formFieldName.printer_compra, pageSizeFormControlName: formFieldName.page_size_compra, label: 'Factura compras', key: 'compra' },
+    { printerFormControlName: formFieldName.printer_recibo_ingreso, pageSizeFormControlName: formFieldName.page_size_recibo_ingreso, label: 'Recibos de ingreso', key: 'ingreso' },
+    { printerFormControlName: formFieldName.printer_conduce, pageSizeFormControlName: formFieldName.page_size_conduce, label: 'Conduce', key: 'conduce' },
+    { printerFormControlName: formFieldName.printer_nota, pageSizeFormControlName: formFieldName.page_size_nota, label: 'Notas', key: 'nota' },
+    { printerFormControlName: formFieldName.printer_cuadre_caja, pageSizeFormControlName: formFieldName.page_size_cuadre_caja, label: 'Cuadre de caja', key: 'cuadre' },
+    { printerFormControlName: formFieldName.printer_reporte, pageSizeFormControlName: formFieldName.page_size_reporte, label: 'Reportes', key: 'reporte' },
   ];
 
   htmlServ = inject(HtmlElementsService);
@@ -93,49 +94,49 @@ export class ConfiguracionesComponent implements OnInit {
     const color_format = this.colores.find(item => item.descripcion == data.color_app);
 
     this.form = this.fb.group({
-      [configuracionesFormAttr.nombre_empresa]: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.rnc_empresa]: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.direccion_empresa]: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.telefono_empresa]: [{ value: this.getValue(data, 'telefono_empresa'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.logo_empresa]: [{ value: this.getValue(data, 'logo_empresa'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.logo_impresion]: [{ value: this.getValue(data, 'logo_impresion'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.color_app]: [{ value: color_format, disabled: false }, Validators.required],
-      [configuracionesFormAttr.url_servidor]: [{ value: this.getValue(data, 'url_servidor'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.url_servidor_respaldo]: [{ value: this.getValue(data, 'url_servidor_respaldo'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.url_servidor_descargas]: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.config_password]: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.usa_url_principal]: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.serie_default]: [{ value: this.getValue(data, 'serie_default'), disabled: false }],
+      [formFieldName.nombre_empresa]: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
+      [formFieldName.rnc_empresa]: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
+      [formFieldName.direccion_empresa]: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
+      [formFieldName.telefono_empresa]: [{ value: this.getValue(data, 'telefono_empresa'), disabled: false }, Validators.required],
+      [formFieldName.logo_empresa]: [{ value: this.getValue(data, 'logo_empresa'), disabled: false }, Validators.required],
+      [formFieldName.logo_impresion]: [{ value: this.getValue(data, 'logo_impresion'), disabled: false }, Validators.required],
+      [formFieldName.color_app]: [{ value: color_format, disabled: false }, Validators.required],
+      [formFieldName.url_servidor]: [{ value: this.getValue(data, 'url_servidor'), disabled: false }, Validators.required],
+      [formFieldName.url_servidor_respaldo]: [{ value: this.getValue(data, 'url_servidor_respaldo'), disabled: false }, Validators.required],
+      [formFieldName.url_servidor_descargas]: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
+      [formFieldName.config_password]: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
+      [formFieldName.usa_url_principal]: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
+      [formFieldName.serie_default]: [{ value: this.getValue(data, 'serie_default'), disabled: false }],
 
-      [configuracionesFormAttr.is_db_local]: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.calcular_itbis]: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.is_produccion]: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.facturacion_editar_precio]: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.vende_sin_inventario]: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.medida_producto_terminado]: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.documentos_a_imprimir]: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
+      [formFieldName.is_db_local]: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
+      [formFieldName.calcular_itbis]: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
+      [formFieldName.is_produccion]: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
+      [formFieldName.facturacion_editar_precio]: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
+      [formFieldName.vende_sin_inventario]: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
+      [formFieldName.medida_producto_terminado]: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
+      [formFieldName.documentos_a_imprimir]: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
 
-      [configuracionesFormAttr.page_size_venta_contado]: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_contado'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_venta_credito]: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_credito'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_pre_venta]: [{ value: this.getValuePageSize(data, 'pages_sizes.pre_venta'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_cotizacion]: [{ value: this.getValuePageSize(data, 'pages_sizes.cotizacion'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_compra]: [{ value: this.getValuePageSize(data, 'pages_sizes.compra'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_recibo_ingreso]: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_conduce]: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_nota]: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_cuadre_caja]: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.page_size_reporte]: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
+      [formFieldName.page_size_venta_contado]: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_contado'), disabled: false }, Validators.required],
+      [formFieldName.page_size_venta_credito]: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_credito'), disabled: false }, Validators.required],
+      [formFieldName.page_size_pre_venta]: [{ value: this.getValuePageSize(data, 'pages_sizes.pre_venta'), disabled: false }, Validators.required],
+      [formFieldName.page_size_cotizacion]: [{ value: this.getValuePageSize(data, 'pages_sizes.cotizacion'), disabled: false }, Validators.required],
+      [formFieldName.page_size_compra]: [{ value: this.getValuePageSize(data, 'pages_sizes.compra'), disabled: false }, Validators.required],
+      [formFieldName.page_size_recibo_ingreso]: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
+      [formFieldName.page_size_conduce]: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
+      [formFieldName.page_size_nota]: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
+      [formFieldName.page_size_cuadre_caja]: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
+      [formFieldName.page_size_reporte]: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
 
-      [configuracionesFormAttr.printer_venta_contado]: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_venta_credito]: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_pre_venta]: [{ value: this.getValue(data, 'printer_selected.pre_venta'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_cotizacion]: [{ value: this.getValue(data, 'printer_selected.cotizacion'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_compra]: [{ value: this.getValue(data, 'printer_selected.compra'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_recibo_ingreso]: [{ value: this.getValue(data, 'printer_selected.recibo_ingreso'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_conduce]: [{ value: this.getValue(data, 'printer_selected.conduce'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_nota]: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_cuadre_caja]: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
-      [configuracionesFormAttr.printer_reporte]: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
+      [formFieldName.printer_venta_contado]: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
+      [formFieldName.printer_venta_credito]: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
+      [formFieldName.printer_pre_venta]: [{ value: this.getValue(data, 'printer_selected.pre_venta'), disabled: false }, Validators.required],
+      [formFieldName.printer_cotizacion]: [{ value: this.getValue(data, 'printer_selected.cotizacion'), disabled: false }, Validators.required],
+      [formFieldName.printer_compra]: [{ value: this.getValue(data, 'printer_selected.compra'), disabled: false }, Validators.required],
+      [formFieldName.printer_recibo_ingreso]: [{ value: this.getValue(data, 'printer_selected.recibo_ingreso'), disabled: false }, Validators.required],
+      [formFieldName.printer_conduce]: [{ value: this.getValue(data, 'printer_selected.conduce'), disabled: false }, Validators.required],
+      [formFieldName.printer_nota]: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
+      [formFieldName.printer_cuadre_caja]: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
+      [formFieldName.printer_reporte]: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
     });
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
@@ -167,23 +168,30 @@ export class ConfiguracionesComponent implements OnInit {
 
     let next_control = null;
 
-    switch (sali_de) {
-      case configuracionesFieldsId.nombre_empresa:
-        next_control = configuracionesFieldsId.rnc_empresa;
-        break;
-      case configuracionesFieldsId.rnc_empresa:
-        next_control = configuracionesFieldsId.telefono_empresa;
-        break;
-      case configuracionesFieldsId.telefono_empresa:
-        next_control = configuracionesFieldsId.direccion_empresa;
-    }
+    const next_control_map = {
+      [formFieldId.nombre_empresa]: formFieldId.rnc_empresa,
+      [formFieldId.rnc_empresa]: formFieldId.telefono_empresa,
+      [formFieldId.telefono_empresa]: formFieldId.direccion_empresa,
+      [formFieldId.direccion_empresa]: formFieldId.color_app,
+      [formFieldId.color_app]: formFieldId.url_servidor,
+      [formFieldId.url_servidor]: formFieldId.url_servidor_respaldo,
+      [formFieldId.url_servidor_respaldo]: formFieldId.url_servidor_descargas,
+      [formFieldId.url_servidor_descargas]: formFieldId.documentos_a_imprimir,
+      [formFieldId.documentos_a_imprimir]: formFieldId.medida_producto_terminado,
+      [formFieldId.medida_producto_terminado]: formFieldId.telefono_empresa,
+    };
 
-    if (next_control) fun.enfocarInput(next_control);
+    if (fun.hasValue(next_control_map[sali_de])) next_control = next_control_map[sali_de];
+
+    setTimeout(() => {
+      if (next_control) fun.enfocarInput(next_control);
+    }, 0);
   }
 
   parseDocumentosAImprimir(config) {
     return new Promise<any>(resolve => {
       const documentos_config = config.documentos_a_imprimir.split(',');
+
       documentos_config.forEach(item => this.documentos_a_imprimir_selected.push(this.documentos_a_imprimir.find(doc => doc.key == item)));
       resolve(true);
     });

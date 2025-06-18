@@ -1,10 +1,10 @@
-[type="file"] {
+[type='file'] {
   height: 0;
   overflow: hidden;
   width: 0;
 }
 
-[type="file"] + label {
+[type='file'] + label {
   background: #f15d22;
   border: none;
   border-radius: 5px;
@@ -29,26 +29,21 @@
     background-color: var(--primary03);
     border-radius: 22px;
     overflow: hidden;
+    display: flex;
+    align-items: center;
 
-    &::before {
-      font-family: "Font Awesome 5 Free";
-      color: #fff;
-      content: "\f093" !important;
-      font-size: 1.5rem;
-      height: 25%;
-      right: 130%;
-      line-height: 1.6;
+    .icon-file {
       position: absolute;
-      top: 0px;
       transition: all 0.3s;
+      right: 110%;
+      opacity: 0;
     }
-
+    
     &:hover {
-      filter: brightness(0.6);
-
-      &::before {
-        top: 0;
-        right: 5%;
+      filter: brightness(0.8);
+      .icon-file {
+        right: 0.5rem;
+        opacity: 1;
       }
     }
   }

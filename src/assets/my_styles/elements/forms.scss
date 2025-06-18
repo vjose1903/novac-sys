@@ -5,7 +5,11 @@
   box-shadow: 1px 1px 4px 0px #1d253b3d !important;
   border: 1px solid #ced4da !important;
   border-radius: 0.25rem !important;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
 
   &:focus {
     @include formFieldFocus;
@@ -96,6 +100,12 @@ textarea {
 .form-group {
   > label {
     color: #1d253b;
+  }
+
+  &.horizontal-layout {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
   // > input:not(.apple-switch) {

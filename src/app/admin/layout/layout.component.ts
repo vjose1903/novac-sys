@@ -60,6 +60,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   currentYear: number;
 
   my_capitalize = fun.Capitalice;
+  
 
   copyToClipboardServ = inject(CopyToClipboardService);
   private destroy$ = new Subject<void>();
@@ -124,7 +125,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
-    // this.openConfigurationModal();
+    this.openConfigurationModal();
 
     this.checkFacturasArchivadas();
     this.cdRef.detectChanges();
@@ -267,7 +268,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     const passwordConfigModal = new DynamicModalClass();
     passwordConfigModal.id = 'configuracionesForm';
     passwordConfigModal.width = '90vw';
-    passwordConfigModal.header = `Configuraciones del sistema para: ${this.configApp?.nombre_empresa}`;
+    passwordConfigModal.header = 'Configuraciones del sistema';
     passwordConfigModal.height = 'calc(100vh - 10rem)';
     passwordConfigModal.padding = '0rem';
     passwordConfigModal.component = ConfiguracionesComponent;

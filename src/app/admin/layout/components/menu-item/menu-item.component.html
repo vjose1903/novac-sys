@@ -1,7 +1,7 @@
 <div *ngxPermissionsOnly="menuItem.permission" class="menuList" [id]="menuItemId">
-  <h5 class="tituloMenu" [ngClass]="getTitleClasses()" [innerText]="menuItem.title"></h5>
+  <h5 class="tituloMenu c-default" [ngClass]="getTitleClasses()" [innerText]="menuItem.title"></h5>
 
-  <img class="iconosMenu" [ngClass]="{ iconosMenuA: isActive }" [src]="menuItem.icon" [alt]="menuItem.title" (click)="onMenuClick($event)" />
+  <img class="iconosMenu c-pointer" [ngClass]="{ iconosMenuA: isActive }" [src]="menuItem.icon" [alt]="menuItem.title" (click)="onMenuClick($event)" />
 
   <!-- Submenu para elementos dropdown -->
   <div *ngIf="menuItem.type === 'dropdown' && menuItem.subItems" class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isSubMenuActive }">

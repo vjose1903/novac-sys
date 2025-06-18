@@ -23,6 +23,7 @@ export enum EFontAwesomeIcon {
   chartColumn = 'fa-solid fa-chart-column',
   chartPie = 'fa-solid fa-chart-pie',
   tableList = 'fa-solid fa-table-list',
+  fileArrowUp = 'fa-solid fa-file-arrow-up',
 
   // regular
   fileZipper = 'fa-regular fa-file-zipper',
@@ -53,6 +54,7 @@ const faSolidIcons = {
   chartColumn: EFontAwesomeIcon.chartColumn,
   chartPie: EFontAwesomeIcon.chartPie,
   tableList: EFontAwesomeIcon.tableList,
+  fileArrowUp: EFontAwesomeIcon.fileArrowUp,
 };
 
 const faRegularIcons = {

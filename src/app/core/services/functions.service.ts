@@ -738,7 +738,7 @@ export class fun {
 
   static decryptConfigPassword(str) {
     const str_remplace = btoa(str);
-    
+
     const config: ConfigI = Ss.configServ.config;
     return str_remplace == config.config_password.replace('VMj$pt30r=', '=');
   }

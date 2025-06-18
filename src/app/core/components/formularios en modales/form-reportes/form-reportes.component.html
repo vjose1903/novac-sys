@@ -4,7 +4,7 @@
     @if (verifyConditionalRender(reportField.simpleSwitchField) && dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) {
       @for (dinamyc_switch of inputs.dinamyc_switches; track dinamyc_switch.id) {
         <div class="col-12 p-0">
-          <div class="form-group switchDiv">
+          <div class="form-group horizontal-layout">
             <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
             <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
           </div>
@@ -190,7 +190,7 @@
       }
       <div>
         @for (switch of inputs.switchGroup.array; track switch) {
-          <div class="form-group mb-2 switchDiv">
+          <div class="form-group mb-2 horizontal-layout">
             <input [(ngModel)]="switch.value" class="apple-switch" type="checkbox" />
             <span class="ml-2">{{ switch.label }}</span>
           </div>
