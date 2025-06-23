@@ -111,7 +111,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
   async getEmpleados(params?: { per_page?: number; page?: number; search?: string }) {
     try {

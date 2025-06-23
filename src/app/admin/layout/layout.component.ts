@@ -59,7 +59,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   actionFacturacion = actionFacturacion;
   currentYear: number;
 
-  my_capitalize = fun.Capitalice;
+  my_capitalize = fun.capitalice;
   
 
   copyToClipboardServ = inject(CopyToClipboardService);
@@ -125,7 +125,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
-    this.openConfigurationModal();
+    // this.openConfigurationModal();
 
     this.checkFacturasArchivadas();
     this.cdRef.detectChanges();

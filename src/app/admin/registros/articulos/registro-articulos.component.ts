@@ -289,7 +289,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   createForm() {

@@ -83,8 +83,8 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
             if (this.inputs?.include_contado && !this.isSuplidor && busqueda_include_contado) res.data.unshift(cliente_contado);
 
             res.data.map(async entidad => {
-              entidad.nombre = entidad.nombre ? fun.Capitalice(entidad.nombre) : '----------';
-              entidad.apellido = entidad.apellido ? fun.Capitalice(entidad.apellido) : '----------';
+              entidad.nombre = entidad.nombre ? fun.capitalice(entidad.nombre) : '----------';
+              entidad.apellido = entidad.apellido ? fun.capitalice(entidad.apellido) : '----------';
               entidad.telefono = entidad.telefono ?? '----------';
 
               const doc = entidad?.documentos_de_identidad?.find(documento => documento.principal);

@@ -1,17 +1,15 @@
 import { Component, OnInit, OnDestroy, inject, resource, computed, WritableSignal, signal } from '@angular/core';
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { customValidators } from '@core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
-import { ProvinciaC, ProvinciaI } from '../../../core/typescript/classes/provincia.model';
+import { ProvinciaC } from '../../../core/typescript/classes/provincia.model';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -119,11 +117,12 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         provincia_id: [{ value: null, disabled: true }],
         municipio_id: [{ value: null, disabled: true }, Validators.required],
       });
-      this.form.valueChanges.subscribe(val => {
-        console.log(' ');
-        console.log('val ', val);
-        console.log('this.form ', this.form);
-      });
+
+      // this.form.valueChanges.subscribe(val => {
+      //   console.log(' ');
+      //   console.log('val ', val);
+      //   console.log('this.form ', this.form);
+      // });
 
       resolve();
     });
@@ -160,7 +159,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   marcarCheck(arg) {
@@ -184,9 +183,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
     this.listaClientes.length = 0;
+
     this.clienteClass.getAll(extra).then(res => {
       res['data'].map(cliente => {
-        const doc = _.find(cliente.documentos_de_identidad, { principal: true });
+        const doc = cliente.documentos_de_identidad.find(doc => doc.principal);
         cliente.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         return cliente;
       });
@@ -241,9 +241,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         else this.form.controls.cedula.setValue(doc.documento);
       });
 
-      const doc_principal = _.find(documentos, doc => doc.principal);
+      const doc_principal = documentos.find(doc => doc.principal);
 
-      setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
+      setTimeout(() => this.marcarCheck(doc_principal.descripcion), 1);
     }
   }
 
@@ -273,18 +273,18 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
         await fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: tipo })
-          .then(res => {
+          .then(async (res: any) => {
             if (res['data'].length) {
-              const is_cliente = _.find(res['data'], item => item.persona_is === 'Cliente');
+              const is_cliente = res.data.find(item => item.persona_is.toLowerCase() == 'cliente');
               const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_cliente) && is_cliente?.persona?.estado) {
-                fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
+                fun.toastError(`${fun.capitalice(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
                 return;
               }
 
-              const persona = fun.hasValue(is_cliente) ? is_cliente?.persona : _.head(res['data']).persona;
+              const persona = fun.hasValue(is_cliente) ? is_cliente?.persona : res['data'][0].persona;
               persona.id = id_anterior;
 
               const documento_persona = persona.documentos_de_identidad.find(item => item.principal);
@@ -312,7 +312,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
             console.error('err ', err);
           });
       } else {
-        if (!this.editando && _.endsWith(documento, '_')) {
+        if (!this.editando && documento.endsWith('_')) {
           this.documentos_de_identidad = undefined;
           // this.camposDisabled = true;
           this.changeStateCampos(false);
@@ -326,8 +326,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     if (campo != 'send') {
       if (campo == 'campoNombre') {
-        if (!_.endsWith(formulario[this.doc_principal], '_')) {
-          const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
+        if (!formulario[this.doc_principal].endsWith('_')) {
+          const docSinGuiones = formulario[this.doc_principal].split('-').join('');
           if (this.doc_principal == 'cedula') {
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
@@ -368,24 +368,22 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     ];
 
     documentos_identidad.map(element => {
-      const doc_backend = _.find(this.documentos_de_identidad, doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+      const doc_backend = this.documentos_de_identidad.find(doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
 
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;
       return element;
     });
 
-    formulario.documentos_de_identidad = _.filter(documentos_identidad, doc => fun.hasValue(doc.documento));
+    formulario.documentos_de_identidad = documentos_identidad.filter(doc => fun.hasValue(doc.documento));
 
     if (!this.form.controls[this.doc_principal].value) {
       fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
-
-      // paso todas las validaciones
     } else {
+      // paso todas las validaciones
       formulario.documentos_de_identidad = documentos_identidad;
 
       if (this.PhotoData !== undefined) {
-        formulario.imagen_attributes = null;
         formulario.imagen_attributes = this.PhotoData;
       }
 

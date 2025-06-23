@@ -243,7 +243,7 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
   entidades.forEach((entidad, index) => {
     if (firmas[tipo_pdf].includes(entidad)) {
       mainTable.table.widths.push(100);
-      mainTable.table.body[0].push({ text: fun.Capitalice(entidad.split('_').join(' ')), alignment: 'center', style: 'letra10', border: [false, true, false, false] });
+      mainTable.table.body[0].push({ text: fun.capitalice(entidad.split('_').join(' ')), alignment: 'center', style: 'letra10', border: [false, true, false, false] });
 
       if (index < firmas[tipo_pdf].length - 1) {
         mainTable.table.widths.push(20);
@@ -356,7 +356,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   const evaluar_nombre = propietario.nombre_completo.length > max_length ? `${propietario.nombre_completo.substring(0, max_length)}...` : propietario.nombre_completo;
 
   const propietarioConfig = {
-    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.Capitalice(evaluar_nombre) || '' },
+    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.capitalice(evaluar_nombre) || '' },
     doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario.rnc || '' },
     direccion: { label: 'Dirección: ', valor: propietario.direccion || '' },
     recibido: { label: 'Recibido: ', valorArray: [fun_.roundNumberToDecimal(data?.total), ` - ${fun_.my_capitalize(numero_letra)}`] },

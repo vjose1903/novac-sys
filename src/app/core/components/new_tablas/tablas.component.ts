@@ -169,7 +169,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   getValueForm(column: table_info, data) {
     const value = fun.getProperty(data, column.key);
 
-    const evaluar_value = item => (fun.hasValue(column.capitalice) ? fun.Capitalice(item) : item);
+    const evaluar_value = item => (fun.hasValue(column.capitalice) ? fun.capitalice(item) : item);
     switch (column.tipo) {
       case 'textList':
         return value.reduce((acumulado, item) => {

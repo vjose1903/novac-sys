@@ -374,7 +374,7 @@ export class fun {
   // Nombre: Capitalice
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
-  static Capitalice(str) {
+  static capitalice(str) {
     if (!fun.hasValue(str)) return str;
 
     const upperCaseText = str

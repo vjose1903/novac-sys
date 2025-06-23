@@ -354,7 +354,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     detalle['cantidad_en_unidades'] = 0;
     detalle['key_initial'] = fun.hasValue(data?.key_initial) ? data.key_initial : null;
     detalle['key'] = fun.hasValue(data?.key) ? data.key : fun.generateKey();
-    detalle['descripcion'] = `${_.capitalize(articulo.nombre)} ${data.is_defectuoso ? ' (defectuoso)' : ''}`;
+    detalle['descripcion'] = `${fun.capitalice(articulo.nombre)} ${data.is_defectuoso ? ' (defectuoso)' : ''}`;
     detalle['calcular_saco'] = data.calcular_saco;
     detalle['is_defectuoso'] = data.is_defectuoso;
     detalle['is_devuelto'] = data.is_devuelto || false;

@@ -8,7 +8,7 @@
           <th class="column-unidad text-center">Unidad</th>
           <th class="column-descripcion" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripcion</th>
           <th class="column-descuento">Descuento</th>
-          <th class="column-precio">{{ fun.Capitalice(precioCostoKey) }}</th>
+          <th class="column-precio">{{ precioCostoKey | uppercase }}</th>
           @if (configApp.calcular_itbis) {
             <th class="column-itbis">ITBIS</th>
           }

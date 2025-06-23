@@ -102,7 +102,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   async getSuplidores(params?: { per_page?: number; page?: number; search?: string }) {
