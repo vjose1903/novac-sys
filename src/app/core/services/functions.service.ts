@@ -623,6 +623,19 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: setInterval
+  // Descripcion : Esta funcion ejecuta una funcion en un intervalo de tiempo
+  // __________________________________________________________________________________________________
+  static setInterval(callback: () => void, time: number) {
+    const interval = setInterval(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return interval;
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: keyboardEvent
   // Descripcion : Esta funcion simula un evento de teclado
   // __________________________________________________________________________________________________

@@ -202,7 +202,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
 
-    this.timeInterval = setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
+    this.timeInterval = fun.setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
   }
 
   ngOnInit() {

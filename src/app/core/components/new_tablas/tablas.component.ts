@@ -45,7 +45,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   @Input() print_log = false;
   @Input() seleccionado: any;
-  @Input() data = [];
+  @Input() data: any;
   @Input() post_id: any = '';
   @Input() config: table_config = { padre_functions: null };
 
@@ -68,7 +68,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     public cdRef: ChangeDetectorRef
   ) {
     cdRef.detach();
-    this.tablaInterval = setInterval(() => this.cdRef.detectChanges(), 500);
+    this.tablaInterval = fun.setInterval(() => this.cdRef.detectChanges(), 500);
   }
 
   formatoNumero(num) {
@@ -106,7 +106,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.tServ.deletePaginationById(this.realIdTabla);
     this.tServ.resetRowEditing();
-    clearInterval(this.tablaInterval);
+    if (this.tablaInterval) clearInterval(this.tablaInterval);
   }
 
   handleConfig() {
@@ -503,6 +503,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngOnChanges(change) {
+    console.log('%cchange --> ', 'color: red', change);
+
     if (change.data && change.data.currentValue) {
       this.updateDataCopy(this.data);
 

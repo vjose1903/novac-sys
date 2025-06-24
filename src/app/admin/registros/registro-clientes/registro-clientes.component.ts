@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, resource, computed, WritableSignal, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, resource, computed, signal } from '@angular/core';
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { TablasService } from '@components/new_tablas/tablas.service';
@@ -10,7 +10,6 @@ import { ProvinciaC } from '../../../core/typescript/classes/provincia.model';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
-import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -22,7 +21,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   boton = '';
   form: UntypedFormGroup;
 
-  listaClientes = [];
+  listaClientes: any;
   FORM: any;
   isCreando: boolean = false;
   doc_is_cedula = true;
@@ -183,7 +182,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
-    this.listaClientes.length = 0;
 
     this.clienteClass.getAll(extra).then(res => {
       res['data'].map(cliente => {
