@@ -42,8 +42,6 @@ export class DynamicModalClass {
   }
 
   constructor(params?: IModalConfiguration) {
-    console.log('%c params ', 'color: red', params);
-
     this.id = params?.id;
     this.component = params && fun.objHas(params, 'component') ? params.component : undefined;
     this.width = params && fun.objHas(params, 'width') ? params.width : '50vw';
@@ -69,15 +67,11 @@ export class DynamicModalClass {
   }
 
   show() {
-    console.log('this.padding ------------> ', this.padding);
-
     this.visible = true;
     Ss.dynamicModalService.updateModalConfig(this);
   }
 
   close(dataToReturn?: ICallbackModal) {
-    console.log('%c CLOSE', 'color: red');
-
     this.modalWrapper.handleCloseModal(this.id, dataToReturn);
   }
 

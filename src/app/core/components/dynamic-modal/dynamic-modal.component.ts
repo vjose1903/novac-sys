@@ -126,13 +126,9 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
           const componente = viewContainerRef.createComponent(currentConfig.component);
 
           // Configurar modalConfig si existe la propiedad
-          console.log('componente.instance ', componente.instance);
-
           if (componente.setInput) {
-            console.log('1');
             componente.setInput('modalConfig', currentConfig);
           } else {
-            console.log('2');
             componente.instance.modalConfig = currentConfig;
           }
 

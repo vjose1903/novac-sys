@@ -1,5 +1,5 @@
 import { routes } from './app.routing';
-import { ApplicationConfig } from "@angular/core";
+import { ApplicationConfig } from '@angular/core';
 import { importProvidersFrom } from '@angular/core';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
@@ -10,7 +10,11 @@ import { primeNGLocales } from '@core/typescript/primeNG.locales';
 import Nora from '@primeng/themes/nora';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-import { provideRouter, withRouterConfig, withComponentInputBinding } from "@angular/router";
+import { provideRouter, withRouterConfig, withComponentInputBinding } from '@angular/router';
+
+// import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+// import { getDatabase, provideDatabase } from '@angular/fire/database';
+// import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,7 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withRouterConfig({
-        onSameUrlNavigation: 'reload'
+        onSameUrlNavigation: 'reload',
       }),
       withComponentInputBinding()
     ),
@@ -39,5 +43,10 @@ export const appConfig: ApplicationConfig = {
       },
       translation: primeNGLocales,
     }),
+
+    // FIREBASE
+    // provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    // provideDatabase(() => getDatabase()),
+    // provideFirestore(() => getFirestore()),
   ],
-}
+};

@@ -19,7 +19,9 @@
                   <div class="form-group">
                     <label class="control-label">Nombre de la empresa: </label>
                     <input
+                      onElementReady
                       [id]="formFieldId.nombre_empresa"
+                      (elementReady)="htmlServ.focusInput($event)"
                       (keyup)="capitalice(formFieldName.nombre_empresa, htmlServ.getValue($event))"
                       (keydown.enter)="saltar(formFieldId.nombre_empresa)"
                       type="text"

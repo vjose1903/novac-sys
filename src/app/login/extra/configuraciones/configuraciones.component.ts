@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { Ss } from '@core/services/singleton.service';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
@@ -17,7 +17,7 @@ import { formFieldId, formFieldName } from './configuraciones.model';
   styleUrls: ['./configuraciones.component.scss'],
   standalone: false,
 })
-export class ConfiguracionesComponent implements OnInit {
+export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   @Input() is_on_modal: boolean = false;
   @Input() modalConfig: any;
   configServ = Ss.configServ;
@@ -78,7 +78,7 @@ export class ConfiguracionesComponent implements OnInit {
     private router: Router,
     public _ipc: IpcService
   ) {}
-
+  
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;
     this.configCopy = fun.deepCloning(this.configApp);
@@ -86,8 +86,12 @@ export class ConfiguracionesComponent implements OnInit {
       this.createForm(this.configApp);
       this.formIsInvalid();
     });
-
+    
     fun.logGreen('this.configApp', this.configApp);
+  }
+
+  ngAfterViewInit(): void {
+    fun.enfocarInput(formFieldId.nombre_empresa);
   }
 
   createForm(data) {
