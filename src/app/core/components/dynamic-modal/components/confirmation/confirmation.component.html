@@ -1,14 +1,20 @@
-<div class="row" *ngIf="inputs.iconName; else confirmationContent">
-  <div class="col-1 p-0 d-flex justify-content-center align-items-center">
-    <i class="{{ inputs.iconName }}" [ngStyle]="{ 'font-size': inputs.iconSize, color: inputs.iconColor }"></i>
+@if (inputs.iconName) {
+  <div class="row">
+    <div class="col-1 p-0 d-flex justify-content-center align-items-center">
+      <i class="{{ inputs.iconName }}" [ngStyle]="{ 'font-size': inputs.iconSize, color: inputs.iconColor }"></i>
+    </div>
+    <div class="col-11 d-flex justify-content-start align-items-center">
+      <ng-container *ngTemplateOutlet="confirmationContent"></ng-container>
+    </div>
+    @if (inputs.showReasonInput) {
+      <div class="col-12 mt-3">
+        <textarea class="form-control" style="min-height: 8rem" placeholder="Ingresar motivo..." id="floatingTextarea" [(ngModel)]="reason" (ngModelChange)="validateDeleteBtnState()"></textarea>
+      </div>
+    }
   </div>
-  <div class="col-11 d-flex justify-content-start align-items-center">
-    <ng-container *ngTemplateOutlet="confirmationContent"></ng-container>
-  </div>
-  <div class="col-12 mt-3" *ngIf="inputs.showReasonInput">
-    <textarea class="form-control" style="min-height: 8rem" placeholder="Ingresar motivo..." id="floatingTextarea" [(ngModel)]="reason" (ngModelChange)="validateDeleteBtnState()"></textarea>
-  </div>
-</div>
+} @else {
+  <p [innerHTML]="inputs.html"></p>
+}
 
 <ng-template #confirmationContent>
   <p [innerHTML]="inputs.html"></p>

@@ -54,7 +54,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.configApp = Ss.configServ.config;
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
       this.handleDefaultSwitch();

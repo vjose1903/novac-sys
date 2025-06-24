@@ -115,7 +115,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
       // const currentConfig = this.searchInArray(this.modalsConfig, 'id', config.id);
 
       if (currentConfig.component) {
-        setTimeout(() => {
+        fun.setTimeout(() => {
           const currentReceptor = this.modalReceptor['_results'].find((receptor: any) => receptor.modalReceptorId == config.id);
           let viewContainerRef = currentReceptor.viewContainerRef;
 
@@ -151,7 +151,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
           componente.changeDetectorRef.detectChanges();
 
           // Segundo ciclo de detección para componentes hijos
-          setTimeout(() => {
+          fun.setTimeout(() => {
             componente.changeDetectorRef.detectChanges();
           }, 100);
 

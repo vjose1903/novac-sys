@@ -4,6 +4,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { MenuClickEvent, MenuItemI, SubMenuItemI } from '../../utils/menu-items';
 import { fun } from '@core/services/functions.service';
 import { Subject } from 'rxjs';
+import { Ss } from '@core/services/singleton.service';
 @Component({
   selector: 'app-menu-item',
   imports: [CommonModule, NgxPermissionsModule],
@@ -51,7 +52,9 @@ export class MenuItemComponent implements AfterViewInit {
 
   private scrollToActiveIfNeeded(): void {
     if (this.isActive) {
-      setTimeout(() => fun.scrollTo({ id: this.menuItemId, behavior: 'smooth', block: 'center', inline: 'center' }), 300);
+      fun.setTimeout(() => {
+        fun.scrollTo({ id: this.menuItemId, behavior: 'smooth', block: 'center', inline: 'center' });
+      }, 300);
     }
   }
 

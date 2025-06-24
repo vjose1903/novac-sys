@@ -13,10 +13,10 @@ import { Ss } from '@core/services/singleton.service';
 import { ModalClass } from '@components/modal/modal-class';
 const $ = require('jquery');
 @Component({
-    selector: 'app-produccion',
-    templateUrl: './produccion.component.html',
-    styleUrls: ['./produccion.component.scss'],
-    standalone: false
+  selector: 'app-produccion',
+  templateUrl: './produccion.component.html',
+  styleUrls: ['./produccion.component.scss'],
+  standalone: false,
 })
 export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
   producto_terminado_en_turno;
@@ -50,7 +50,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   articuloClass = new ArticuloC();
   produccionClass = new ProduccionC();
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
   constructor(private tServ: TablasService) {
     super();
@@ -88,8 +88,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   async getProductosTerminados() {
     const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
     this.listaProductos.length = 0;
-    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.producto_terminado }).then((res) => {
-      res['data'].map((producto_terminado) => {
+    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.producto_terminado }).then(res => {
+      res['data'].map(producto_terminado => {
         producto_terminado.optionDisabled = false;
         this.listaProductos.push(producto_terminado);
       });
@@ -131,7 +131,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   ingredientesScroll(arg) {
     const divs = ['inventario_scroll', 'produccion_scroll'];
-    let div_opuesto_id = divs.find((item) => item != arg.element_id);
+    let div_opuesto_id = divs.find(item => item != arg.element_id);
     const div_opuesto = document.getElementById(div_opuesto_id);
 
     if (fun.hasValue(div_opuesto)) div_opuesto.scrollTop = arg.element.scrollTop;
@@ -180,18 +180,21 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     } else {
       if (this.producto_terminado_en_turno) {
         const is_invalid = this.formIsInvalid();
-        if (!is_invalid) setTimeout(() => this.agregarAlista(), 250);
+        if (!is_invalid)
+          fun.setTimeout(() => {
+            this.agregarAlista();
+          }, 250);
       }
     }
   }
 
   disableOption(id, boolean) {
-    let optionSelected = this.listaProductos.find((item) => item.id == id);
+    let optionSelected = this.listaProductos.find(item => item.id == id);
     optionSelected.optionDisabled = boolean;
   }
 
   activateAllOptions() {
-    const deactivated = this.listaProductos.filter((item) => (item.optionDisabled = true));
+    const deactivated = this.listaProductos.filter(item => (item.optionDisabled = true));
     for (const iterator of deactivated) this.disableOption(iterator.id, false);
   }
 
@@ -210,7 +213,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   calcularCantidadAProduccir() {
     this.ingredientesParaProduccion = [];
     if (this.cantidad_producir && this.medida_producir) {
-      this.ingredientes.forEach(async (ingrediente) => {
+      this.ingredientes.forEach(async ingrediente => {
         let cantidad_formula = ingrediente.cantidad;
         let contenidos_ingrediente = ingrediente.contenido;
         const contenido_a_producir = {};
@@ -226,19 +229,19 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
         if (this.lista_produccion.length > 0) {
           const all_ingredientes = _.flattenDeep(
-            _.map(this.lista_produccion, (producto) => {
+            _.map(this.lista_produccion, producto => {
               const producto_distinto_en_lista = producto.articulo_id != ingrediente.articulo_id ? fun.getProperty(producto, 'ingredientes') : [];
               return producto_distinto_en_lista;
-            }),
+            })
           );
-          const ingredientesIguales = all_ingredientes.filter((item) => item.articulo_combo == ingrediente.articulo_combo);
+          const ingredientesIguales = all_ingredientes.filter(item => item.articulo_combo == ingrediente.articulo_combo);
 
           if (ingredientesIguales.length) cantidad_calculada = _.reduce(ingredientesIguales, (acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
         }
 
         const extra = { afterPath: `check_excede/${ingrediente.articulo_combo}`, parameters: { cantidad: cantidad_calculada } };
 
-        await this.articuloClass.getAll(extra).then((res) => {
+        await this.articuloClass.getAll(extra).then(res => {
           const excede = res['data'];
           if (excede) {
             this.cantidad_producir = null;
@@ -270,7 +273,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   agregarAlista() {
-    const prod_en_lista = this.lista_produccion.find((product) => product.id == this.producto_terminado_en_turno.id);
+    const prod_en_lista = this.lista_produccion.find(product => product.id == this.producto_terminado_en_turno.id);
     if (prod_en_lista) {
       prod_en_lista.cantidad = this.cantidad_producir;
       prod_en_lista.cantidad_en_unidades = this.cantidad_producir * this.producto_terminado_en_turno.contenido[this.medida_producir];
@@ -289,7 +292,9 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       };
 
       this.lista_produccion.push(obj);
-      setTimeout(() => this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion.length }]), 100);
+      fun.setTimeout(() => {
+        this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion.length }]);
+      }, 100);
     }
 
     this.disableOption(this.producto_terminado_en_turno.id, true);
@@ -307,14 +312,14 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
     this.articuloEditando = data;
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.cantidad_producir = data.cantidad;
       this.medida_producir = data.medida;
     }, 10);
 
-    this.producto_terminado_en_turno = this.listaProductos.find((product) => product.id == data.id);
+    this.producto_terminado_en_turno = this.listaProductos.find(product => product.id == data.id);
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.getIngredients();
       this.ingredientesParaProduccion = data.ingredientes;
     }, 5);
@@ -352,8 +357,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco w-9', function: (instance) => this.closeModal(instance), label: 'No', disable: false },
-          { clase: 'btn btn-verde w-9', function: (instance) => functions[tipo](instance, data), label: 'Si', disable: false },
+          { clase: 'btn btn-blanco w-9', function: instance => this.closeModal(instance), label: 'No', disable: false },
+          { clase: 'btn btn-verde w-9', function: instance => functions[tipo](instance, data), label: 'Si', disable: false },
         ],
       },
     });
@@ -398,7 +403,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     produccion_send['fecha_equivalente'] = null;
     produccion_send['detalles_produccion'] = detalle;
 
-    this.produccionClass.createUpdateOne(produccion_send).then((res) => {
+    this.produccionClass.createUpdateOne(produccion_send).then(res => {
       this.getProductosTerminados();
       this.borrarForm();
       this.lista_produccion.length = 0;

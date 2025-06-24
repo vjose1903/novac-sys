@@ -15,12 +15,13 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { Permisos } from '@core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ModalClass } from '@components/modal/modal-class';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
-    selector: 'app-registro-vehiculo',
-    templateUrl: './registro-vehiculo.component.html',
-    styleUrls: ['./registro-vehiculo.component.scss'],
-    standalone: false
+  selector: 'app-registro-vehiculo',
+  templateUrl: './registro-vehiculo.component.html',
+  styleUrls: ['./registro-vehiculo.component.scss'],
+  standalone: false,
 })
 export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
@@ -55,7 +56,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_vehiculos',
-    padre_functions: { data_request: (params) => this.getVehiculos(params) },
+    padre_functions: { data_request: params => this.getVehiculos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.vehiculo.update }, borrar: { show: true, permiso: this.permissions.vehiculo.destroy } },
@@ -67,7 +68,13 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   htmlServ = inject(HtmlElementsService);
   fun = fun;
-  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor(
+    private cdRef: ChangeDetectorRef,
+    private fb: UntypedFormBuilder,
+    private router: Router,
+    private tServ: TablasService,
+    private permissionsService: NgxPermissionsService
+  ) {
     super();
   }
 
@@ -102,17 +109,17 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   checkPermisos() {
-    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then((result) => (this.hasPermissionsMarca = result));
-    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then((result) => (this.hasPermissionsModelo = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then(result => (this.hasPermissionsMarca = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then(result => (this.hasPermissionsModelo = result));
   }
 
   async getPropietarios() {
     this.empleadosClass.getAll({ parameters: { id: true } }).then(
-      (res) => {
+      res => {
         res['data'].unshift({ id: -1, nombre_completo: 'No empleado' });
         this.listaPropietarios = res['data'];
       },
-      (err: any) => {},
+      (err: any) => {}
     );
   }
 
@@ -123,7 +130,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.listaVehiculos.length = 0;
     const res = await this.vehiculosClass.getAll(extra);
 
-    res.data.map((val) => {
+    res.data.map(val => {
       // val.nombre_completo = `${val.propietario.nombre} ${val.propietario.apellido}`;
       return val;
     });
@@ -135,7 +142,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   async getMarcas() {
     try {
-      const res = await this.marcasClass.getAll() as any;
+      const res = (await this.marcasClass.getAll()) as any;
 
       this.listaMarcas = res;
     } catch (error) {
@@ -172,9 +179,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     } else {
       if (this.form.valid) {
         fun.enfocarInput('user_id');
-        setTimeout(() => {
-          this.submit(this.form);
-        }, 250);
+        fun.setTimeout(() => this.submit(this.form), 250);
       }
     }
   }
@@ -243,7 +248,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       data: regisData,
       texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n Propietario: <b> ${regisData.nombre_completo} </b>?`,
       siFunction: () => {
-        this.vehiculosClass.deleteOne(regisData.id).then((res) => {
+        this.vehiculosClass.deleteOne(regisData.id).then(res => {
           this.listaVehiculos = null;
           fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombre_completo}` + ' borrado.', 'CORRECTO');
           const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
@@ -268,11 +273,11 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
     if (!this.vehiculoSelected.user_id) this.form.controls.user_id.setValue(-1);
 
-    const marca_id = this.listaMarcas.find((marca) => marca.descripcion === this.vehiculoSelected.marca).id;
+    const marca_id = this.listaMarcas.find(marca => marca.descripcion === this.vehiculoSelected.marca).id;
 
     this.form.controls.marca.setValue(marca_id);
     this.selectMarca().then(() => {
-      const modelo_id = this.listaModelos.find((modelo) => modelo.descripcion == this.vehiculoSelected.modelo).id;
+      const modelo_id = this.listaModelos.find(modelo => modelo.descripcion == this.vehiculoSelected.modelo).id;
       this.form.controls.modelo.setValue(modelo_id);
     });
 
@@ -314,8 +319,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const obj = {
       user_id: formulario.user_id !== -1 ? formulario.user_id : null,
 
-      marca: this.listaMarcas.find((marca) => marca.id === formulario.marca).descripcion,
-      modelo: this.listaModelos.find((modelo) => modelo.id === formulario.modelo).descripcion,
+      marca: this.listaMarcas.find(marca => marca.id === formulario.marca).descripcion,
+      modelo: this.listaModelos.find(modelo => modelo.id === formulario.modelo).descripcion,
       anio: formulario.anio,
       estado: formulario.estado,
 

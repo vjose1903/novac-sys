@@ -3,6 +3,8 @@ import * as _ from 'lodash';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
+import { Ss } from '@core/services/singleton.service';
+import { fun } from '@core/services/functions.service';
 
 @Component({
   selector: 'app-modal-seleccinar-articulo',
@@ -70,6 +72,8 @@ export class ModalSeleccinarArticuloComponent extends MixinClass implements OnIn
     const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
     if (event.key == 'select') this.articulos_selected = _.filter(this.inputs, { select: true, disable: false });
 
-    setTimeout(() => (modal.botones.dinamico[1].disable = this.articulos_selected.length == 0), 50);
+    fun.setTimeout(() => {
+      modal.botones.dinamico[1].disable = this.articulos_selected.length == 0;
+    }, 50);
   }
 }

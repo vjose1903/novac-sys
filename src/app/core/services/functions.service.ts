@@ -456,7 +456,7 @@ export class fun {
 
       if (event?.key === 'Enter' || event?.keyCode === 13) return resolve();
 
-      fun.timeout = setTimeout(resolve, waitingTime);
+      fun.timeout = fun.setTimeout(resolve, waitingTime);
     });
   }
 
@@ -604,7 +604,22 @@ export class fun {
   // __________________________________________________________________________________________________
   static enfocarAndSelectInput(arg) {
     fun.enfocarInput(arg);
-    setTimeout(() => this.selectContenido(arg), 10);
+    fun.setTimeout(() => {
+      this.selectContenido(arg);
+    }, 10);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setTimeOut
+  // Descripcion : Esta funcion ejecuta una funcion despues de un tiempo
+  // __________________________________________________________________________________________________
+  static setTimeout(callback: () => void, time: number) {
+    const timeout = setTimeout(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return timeout;
   }
 
   // __________________________________________________________________________________________________
@@ -644,7 +659,9 @@ export class fun {
 
         if (shouldRetry && hasRetries) {
           retryCount++;
-          await new Promise(resolve => setTimeout(resolve, delayBetweenRetries));
+          await new Promise<void>(resolve => {
+            fun.setTimeout(resolve, delayBetweenRetries);
+          });
           return executeTask();
         }
 

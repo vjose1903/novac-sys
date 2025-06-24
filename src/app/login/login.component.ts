@@ -64,8 +64,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
     this.form = this.fb.group({ usuario: !Environment.production ? 'novac' : null, password: !Environment.production ? '1234567' : null });
 
-    setTimeout(() => fun.enfocarInput('Iusuario'), 5);
-    // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
+    fun.setTimeout(() => fun.enfocarInput('Iusuario'), 5);
   }
 
   ngOnDestroy() {}
@@ -104,13 +103,11 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then(res => {
-          setTimeout(
-            () =>
-              this.currentUserServ.setUser(res.data).then(() => {
-                this.router.navigateByUrl('/admin/dashboard');
-              }),
-            250
-          );
+          fun.setTimeout(() => {
+            this.currentUserServ.setUser(res.data).then(() => {
+              this.router.navigateByUrl('/admin/dashboard');
+            });
+          }, 250);
         })
         .catch(error => {
           if (error.status === 0) fun.toastError('El servidor está <strong>caido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR SERVIDOR');

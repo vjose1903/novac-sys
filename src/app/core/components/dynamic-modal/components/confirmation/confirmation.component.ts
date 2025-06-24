@@ -10,7 +10,7 @@ import { fun } from '@core/services/functions.service';
   selector: 'app-confirmation',
   templateUrl: './confirmation.component.html',
   imports: [CommonModule, FormsModule],
-  styleUrls: ['./confirmation.component.css'],
+  styleUrls: ['./confirmation.component.scss'],
 })
 export class ConfirmationComponent implements OnInit, IDynamicModal {
   inputs!: {

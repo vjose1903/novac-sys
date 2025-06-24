@@ -199,11 +199,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
     if (arg.modal_id == 'buscarCliente') {
       if (arg?.tipo == 'data_no_found') {
-        setTimeout(() => fun.enfocarInput('clienteI'), 10);
+        fun.setTimeout(() => fun.enfocarInput('clienteI'), 10);
       } else {
         this.cliente = arg.data;
         (document.getElementById('clienteI') as any).value = arg.data.nombre;
-        setTimeout(() => fun.enfocarInput('cod-0'), 10);
+        fun.setTimeout(() => fun.enfocarInput('cod-0'), 10);
         this.buscarFacturasAdelantadas(arg.data.id);
       }
     }
@@ -222,7 +222,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async saltar(input, index) {
-    setTimeout(() => {
+    fun.setTimeout(() => {
       const fila_actual = this.filasDetalle[index].getRawValue();
       const fila_siguiente = this.filasDetalle[index + 1].getRawValue();
 
@@ -272,7 +272,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       if (this.configApp.vende_sin_inventario) {
         this.continuarLlenarRow({ articulo: articulo, index: index });
       } else {
-        setTimeout(() => fun.enfocarAndSelectInput('cod-' + index), 10);
+        fun.setTimeout(() => fun.enfocarAndSelectInput('cod-' + index), 10);
       }
     } else {
       this.continuarLlenarRow({ articulo: articulo, index: index });
@@ -300,7 +300,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     (this.filasDetalle[params.index] as any).controls['uni'].setValue(null);
     (this.filasDetalle[params.index] as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
 
-    setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
+    fun.setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
   }
 
   llenarArrayUnidades(articulo) {
@@ -351,7 +351,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   hideDropdownMedida() {
-    setTimeout(() => this.setInputDrop(undefined), 100);
+    fun.setTimeout(() => this.setInputDrop(undefined), 100);
   }
 
   showDropdownMedida(event, dropdown) {
@@ -422,7 +422,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
             if (this.configApp.vende_sin_inventario) {
               callback(false);
             } else {
-              setTimeout(() => {
+              fun.setTimeout(() => {
                 fun.enfocarAndSelectInput('can-' + index);
                 this.calcularCantidadEnUnidades({ index: index, clean: true });
                 (this.filasDetalle[index] as any).controls['uni'].setValue(null);
@@ -513,7 +513,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       this.changeStateDropDownMedida(false);
     }
 
-    if (this.inputDrop) setTimeout(() => fun.enfocarInput(this.inputDrop), 10);
+    if (this.inputDrop) fun.setTimeout(() => fun.enfocarInput(this.inputDrop), 10);
   }
 
   createItem(i): UntypedFormGroup {
@@ -647,7 +647,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
         conteo++;
         if (conteo >= factura.detalle_facturas.length)
-          setTimeout(() => {
+          fun.setTimeout(() => {
             this.openNewModal({
               component: ModalSeleccinarArticuloComponent,
               inputs: factura.detalle_facturas,
@@ -752,7 +752,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
         (this.filasDetalle[i] as any).controls['uni'].disable();
 
-        setTimeout(async () => {
+        fun.setTimeout(async () => {
           this.checkCantidadExede(i, 'llenarFila', res => {
             if (res) this.rowsExcede.push(i);
           });
@@ -917,7 +917,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   cancelarConduce() {
     this.borrar();
     (document.getElementById('clienteI') as any).value = '';
-    setTimeout(() => fun.enfocarInput('clienteI'), 10);
+    fun.setTimeout(() => fun.enfocarInput('clienteI'), 10);
   }
 
   goBack() {

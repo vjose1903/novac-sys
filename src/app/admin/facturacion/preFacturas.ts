@@ -7,6 +7,7 @@ import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component'
 import { FacturaC } from './factura';
 import { ModalClass } from '@components/modal/modal-class';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { Ss } from '@core/services/singleton.service';
 
 export class PreFacturaClass extends MixinClass {
   facturaClass = new FacturaC();
@@ -15,12 +16,11 @@ export class PreFacturaClass extends MixinClass {
   }
 
   parseFactura(factura, fact_de, buscarPara) {
-    return new Promise<any>((resolve) => {
-      setTimeout(() => {
+    return new Promise<any>(resolve => {
+      fun.setTimeout(() => {
         factura['FACTURA_DE'] = fact_de;
         resolve(factura);
       }, 5);
     });
   }
-
 }

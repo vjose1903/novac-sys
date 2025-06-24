@@ -9,6 +9,7 @@ import { fun } from '@core/services/functions.service';
 import { Component, OnInit, inject, ViewChild, ElementRef, Input } from '@angular/core';
 import { ModalI } from '@components/modal/modal-class';
 import * as _ from 'lodash';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-menu-opciones-extra',
@@ -92,12 +93,12 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     if (this.filter_key == this.filter_options.todos) {
       this.showAllDocuments();
     } else {
-      setTimeout(() => fun.enfocarInput('valorI'), 100);
+      fun.setTimeout(() => fun.enfocarInput('valorI'), 100);
     }
   }
 
   dropdownClienteAction(action: 'show' | 'hide') {
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.tServ.blockRowMovement = action === 'show';
       if (action === 'hide') fun.desEnfocarInput('valorI');
     }, 100);
@@ -123,7 +124,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   }
 
   async checkNumeroPreFactura(evento) {
-    setTimeout(() => {
+    fun.setTimeout(() => {
       if (this.filter_value.length < 8 || this.filter_value.includes('_')) fun.toastWarning('Numero de Pre-venta incompleto', 'Aviso');
       else this.buscarDocumentos(this.tServ.obj_paginate.default);
       evento.stopPropagation();
@@ -192,7 +193,9 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
       this.documentos = _.orderBy(this.documentos, ['fecha_equivalente'], ['desc']);
 
       if (this.documentos.length > 0) {
-        setTimeout(() => this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]), 100);
+        fun.setTimeout(() => {
+          this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+        }, 100);
       } else {
         if (this.filter_key == this.filter_options.cliente) {
           fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');

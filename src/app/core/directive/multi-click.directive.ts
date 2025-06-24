@@ -1,8 +1,10 @@
 import { Directive, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { fun } from '@core/services/functions.service';
+import { Ss } from '@core/services/singleton.service';
 
 @Directive({
   selector: '[multiClick]',
-  standalone: false
+  standalone: false,
 })
 export class MultiClickDirective {
   @Input('multiClick') requiredClicks: number = 1;
@@ -29,9 +31,7 @@ export class MultiClickDirective {
     }
 
     // Configurar timer para resetear el contador
-    this.resetTimer = setTimeout(() => {
-      this.resetClickCount();
-    }, this.resetTime);
+    this.resetTimer = fun.setTimeout(() => this.resetClickCount(), this.resetTime);
   }
 
   private resetClickCount(): void {
@@ -47,4 +47,4 @@ export class MultiClickDirective {
       clearTimeout(this.resetTimer);
     }
   }
-} 
+}

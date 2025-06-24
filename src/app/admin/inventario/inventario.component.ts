@@ -131,10 +131,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       }
     }
 
-    setTimeout(() => {
-      this.getArticulos(actualPagination);
-      Ss.cdRef.detectChanges();
-    }, 500);
+    fun.setTimeout(() => this.getArticulos(actualPagination), 500);
   }
 
   movimientoInventario(arg) {

@@ -3,6 +3,7 @@ import { UntypedFormGroup, AbstractControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
 import { fun } from '../services/functions.service';
+import { Ss } from '@core/services/singleton.service';
 
 interface ErrorResponse {
   render: boolean;
@@ -35,7 +36,9 @@ export class MsgErrorDirective implements OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     // Delay más largo para modales dinámicos
-    setTimeout(() => this.initSubscription(), 300);
+    fun.setTimeout(() => {
+      this.initSubscription();
+    }, 300);
   }
 
   @HostListener('focusin', ['$event'])
@@ -45,7 +48,7 @@ export class MsgErrorDirective implements OnDestroy, AfterViewInit {
 
   @HostListener('focusout', ['$event'])
   onFocusOut(event: Event): void {
-    setTimeout(() => this.checkErrors(), 50);
+    fun.setTimeout(() => this.checkErrors(), 50);
   }
 
   @HostListener('input', ['$event'])
@@ -65,7 +68,7 @@ export class MsgErrorDirective implements OnDestroy, AfterViewInit {
 
   @HostListener('blur', ['$event'])
   onBlur(event: Event): void {
-    setTimeout(() => this.checkErrors(), 50);
+    fun.setTimeout(() => this.checkErrors(), 50);
   }
 
   ngOnDestroy(): void {
@@ -79,7 +82,7 @@ export class MsgErrorDirective implements OnDestroy, AfterViewInit {
     const control = this.getFormControl();
     if (!control) {
       // Retry después de un tiempo para modales dinámicos
-      setTimeout(() => this.initSubscription(), 200);
+      fun.setTimeout(() => this.initSubscription(), 200);
       return;
     }
 

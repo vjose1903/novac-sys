@@ -83,7 +83,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
       if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
     }
-    setTimeout(() => (this.dinamycSelectionReady = true), 10);
+
+    fun.setTimeout(() => {
+      this.dinamycSelectionReady = true;
+    }, 10);
 
     for (let index = 0; index < this.inputs?.dinamyc_switches?.length; index++) {
       const element = this.inputs.dinamyc_switches[index];
@@ -92,7 +95,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
 
       if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
     }
-    setTimeout(() => (this.dinamycSwitchReady = true), 10);
+
+    fun.setTimeout(() => {
+      this.dinamycSwitchReady = true;
+    }, 10);
   }
 
   async getArticulos(name) {

@@ -9,6 +9,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { FacturasI } from '@admin/facturacion/factura';
 import { MoraSelectorService, MoraSelectorKeyI } from './mora-selector.service';
 import { skip, Subject, takeUntil } from 'rxjs';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-mora-selector',
@@ -79,7 +80,7 @@ export class MoraSelectorComponent implements OnInit, OnDestroy {
     this.customMora = this.rowData?.mora ?? 0;
 
     if (op) {
-      setTimeout(() => {
+      fun.setTimeout(() => {
         op.align();
       }, 700);
     }

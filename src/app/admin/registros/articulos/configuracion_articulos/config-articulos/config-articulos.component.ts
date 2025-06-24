@@ -4,6 +4,7 @@ import { ModalI } from '@components/modal/modal-class';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { ConfigArticuloC } from '../articulos_configuracion';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-config-articulos',
@@ -36,7 +37,7 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
         porciento_ganancia: [{ value: data.porciento_ganancia, disabled: false }, Validators.compose([Validators.required, Validators.min(1), Validators.max(100)])],
       });
 
-      setTimeout(() => resolve(true), 10);
+      fun.setTimeout(() => resolve(true), 10);
     });
   }
 

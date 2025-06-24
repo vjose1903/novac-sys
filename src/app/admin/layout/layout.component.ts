@@ -60,7 +60,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   currentYear: number;
 
   my_capitalize = fun.capitalice;
-  
 
   copyToClipboardServ = inject(CopyToClipboardService);
   private destroy$ = new Subject<void>();
@@ -83,9 +82,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.showLoading = false;
 
         if (this.initNavigate) {
-          setTimeout(() => this.checkRouteActiva(), 250);
+          fun.setTimeout(() => {
+            this.checkRouteActiva();
+          }, 250);
 
-          setTimeout(() => {
+          fun.setTimeout(() => {
             const token = fun.getAuthToken();
             if (token) this.checkCuadre();
           }, 500);

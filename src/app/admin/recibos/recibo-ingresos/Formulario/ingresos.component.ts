@@ -18,6 +18,7 @@ import { Location } from '@angular/common';
 import Big from 'big.js';
 import { MoraSelectorKeyI, MoraSelectorService } from '../components/mora-selector/mora-selector.service';
 import { MoraCalculator } from '../utils/mora-calculator';
+import { Ss } from '@core/services/singleton.service';
 const moment = require('../../../../core/javascript/moment');
 
 @Component({
@@ -273,7 +274,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
     this.totalPagadoPorciento = parseFloat(fun.roundNumberToDecimal(this.totalPagadoPorciento));
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       if (res.data.page != params.page) {
         this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
         this.tablaComponent.reloadPagination();
@@ -402,7 +403,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.resetVariables();
 
-    setTimeout(() => fun.enfocarInput('clienteI'), 250);
+    fun.setTimeout(() => fun.enfocarInput('clienteI'), 250);
     this.router.navigateByUrl('/admin/recibos/ingresos/0/0');
   }
 

@@ -2,19 +2,21 @@ import { Component, Input, OnDestroy, OnInit, ElementRef, ChangeDetectionStrateg
 import { AbstractControl } from '@angular/forms';
 import { Subject, fromEvent, merge } from 'rxjs';
 import { takeUntil, debounceTime } from 'rxjs/operators';
-import { CommonModule } from '@angular/common';
+
 import { InputMask } from 'primeng/inputmask';
 import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
 import { MultiSelect } from 'primeng/multiselect';
+import { Ss } from '@core/services/singleton.service';
+import { fun } from '@core/services/functions.service';
 
 type PrimeNGComponent = InputMask | InputNumber | Select | DatePicker | MultiSelect;
 type FieldElement = ElementRef<HTMLInputElement> | HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | PrimeNGComponent;
 
 @Component({
   selector: 'form-error-msg',
-  imports: [CommonModule],
+  imports: [],
   template: `
     @if (showError) {
       <div class="error-message">{{ errorMessage }}</div>
@@ -206,7 +208,7 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
 
           if (!isExpanded) {
             this.control!.markAsTouched();
-            setTimeout(() => this.checkErrors(), 10);
+            fun.setTimeout(() => this.checkErrors(), 10);
           }
         }
       });
@@ -235,7 +237,7 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
           return;
         }
 
-        setTimeout(checkForElement, delay);
+        fun.setTimeout(() => checkForElement(), delay);
       };
 
       checkForElement();

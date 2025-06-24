@@ -14,11 +14,12 @@ import { RolesC } from '../roles/roles';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 
 import { Permisos } from '@core/typescript/permisos';
+import { Ss } from '@core/services/singleton.service';
 @Component({
-    selector: 'app-registro-empleados',
-    templateUrl: './registro-empleados.component.html',
-    styleUrls: ['./registro-empleados.component.scss'],
-    standalone: false
+  selector: 'app-registro-empleados',
+  templateUrl: './registro-empleados.component.html',
+  styleUrls: ['./registro-empleados.component.scss'],
+  standalone: false,
 })
 export class RegistroEmpleadosComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;
@@ -49,7 +50,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_empleados',
-    padre_functions: { data_request: (params) => this.getEmpleados(params) },
+    padre_functions: { data_request: params => this.getEmpleados(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.user.update }, borrar: { show: true, permiso: this.permissions.user.destroy } },
@@ -58,9 +59,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   formPermissions = [Permisos.user.create, Permisos.user.update];
   maxDateBirth = new Date();
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    private tServ: TablasService
+  ) {
     super();
   }
 
@@ -120,8 +124,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
       this.listaEmpleados.length = 0;
-      this.empleadosClass.getAll(extra).then((res) => {
-        res['data'].map((empleado) => {
+      this.empleadosClass.getAll(extra).then(res => {
+        res['data'].map(empleado => {
           const doc = _.find(empleado.documentos_de_identidad, { principal: true });
           empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
 
@@ -138,12 +142,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   async getRoles() {
     await this.rolesClass.getAll().then(
-      (res) => {
+      res => {
         this.listRoles = res.data;
       },
-      (error) => {
+      error => {
         console.error('Error obteniendo roles: ', error);
-      },
+      }
     );
   }
 
@@ -154,16 +158,16 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-        if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === cedula)) {
+        if (this.editando && this.documentos_de_identidad.some(doc => doc.documento === cedula)) {
           enable_campos = true;
           return;
         }
 
         fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
-          .then((res) => {
+          .then(res => {
             if (res['data'].length) {
-              const is_user = _.find(res['data'], (item) => item.persona_is === 'User');
+              const is_user = _.find(res['data'], item => item.persona_is === 'User');
               const id_anterior = this.form.getRawValue().id;
               if (fun.hasValue(is_user) && is_user?.persona?.estado) {
                 fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
@@ -172,7 +176,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
               }
 
               const persona = fun.hasValue(is_user) ? is_user.persona : _.head(res['data']).persona;
-              const documento_persona = _.find(persona.documentos_de_identidad, (item) => item.principal);
+              const documento_persona = _.find(persona.documentos_de_identidad, item => item.principal);
 
               if (fun.hasValue(documento_persona)) this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
 
@@ -188,7 +192,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
             if (enable_campos) this.changeStateCampos(true);
           })
-          .catch((err) => {
+          .catch(err => {
             console.error('err ', err);
           });
       } else {
@@ -211,7 +215,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         }
       } else fun.enfocarInput(campo);
     } else {
-      if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
+      if (!this.formIsInvalid()) {
+        fun.setTimeout(() => this.submit(), 250);
+      }
     }
   }
 
@@ -228,7 +234,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   changeStateCampos(enable = false) {
-    ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles'].forEach((campo) => {
+    ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles'].forEach(campo => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
@@ -283,7 +289,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       texto: `¿Está seguro que desea eliminar el empleado <b>${regisData.nombre_completo}</b>?`,
       siFunction: () => {
         const actualPagination = this.tServ.getPaginationById('lista_empleados');
-        this.empleadosClass.deleteOne(regisData.id).then((res) => this.getEmpleados(actualPagination));
+        this.empleadosClass.deleteOne(regisData.id).then(res => this.getEmpleados(actualPagination));
       },
     };
 
@@ -295,11 +301,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.documentos_de_identidad = data.documentos_de_identidad;
 
     if (this.documentos_de_identidad.length) {
-      const doc = data.documentos_de_identidad.filter((doc) => doc.principal === true);
+      const doc = data.documentos_de_identidad.filter(doc => doc.principal === true);
       if (data.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
     }
 
-    const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map((rol) => rol.id) });
+    const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map(rol => rol.id) });
     this.form.patchValue(objPerson);
 
     this.empleadoSelected = data;
@@ -317,9 +323,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     const documentos_identidad = [{ documento: formulario.cedula, descripcion: 'cedula' }];
 
-    documentos_identidad.map((element) => {
+    documentos_identidad.map(element => {
       // haciendo la estructura para mandar los documentos a la base de datos
-      const doc_backend = _.find(this.documentos_de_identidad, (doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+      const doc_backend = _.find(this.documentos_de_identidad, doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = true;
       return element;
@@ -333,7 +339,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     if (!this.editando && fun.isEmpty(objSend.password)) {
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
-      this.empleadosClass.createUpdateOne(objSend).then((res) => {
+      this.empleadosClass.createUpdateOne(objSend).then(res => {
         const actualPagination = this.tServ.getPaginationById('lista_empleados');
         this.getEmpleados(actualPagination);
         this.borrar();

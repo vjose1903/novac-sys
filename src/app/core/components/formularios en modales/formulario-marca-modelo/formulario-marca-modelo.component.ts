@@ -11,6 +11,7 @@ import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '../../new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
@@ -100,12 +101,14 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
           this.pedirNuevaData(actual_pagination);
         } else {
           fun.toastError('No tiene permisos para realizar esta accion', 'No Autorizado');
-          setTimeout(() => {
+          fun.setTimeout(() => {
             this.tabIndex.set(this.tabIndex() == 0 ? 1 : 0);
           }, 1);
         }
 
-        setTimeout(() => (this.processingTabChange = false), 250);
+        fun.setTimeout(() => {
+          this.processingTabChange = false;
+        }, 250);
       }
     });
   }
@@ -136,7 +139,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
     this.pedirNuevaData(this.tServ.obj_paginate.default);
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.processingTabChange = false;
       if (this.tipo_formulario === 'modelos') fun.enfocarInput('marca_modal');
       else fun.enfocarInput('descripcion');

@@ -4,6 +4,7 @@ import { MODALCONFIG, ModalService } from './modal.service';
 import { ModalDirective } from './modal.directive';
 import * as _ from 'lodash';
 import { fun } from '@core/services/functions.service';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-new-modal',
@@ -52,7 +53,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
     MODALCONFIG.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res && res.show) {
         this.renderizarComponente(res).then(() =>
-          setTimeout(() => {
+          fun.setTimeout(() => {
             fun.enfocarInput(`focusElement-${res.id}`);
           }, 0)
         );
@@ -105,7 +106,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
       const currentConfig = this.searchInArray(this.modalsConfig, 'id', config.id);
 
       if (currentConfig.component) {
-        setTimeout(() => {
+        fun.setTimeout(() => {
           const currentReceptor = this.searchInArray(this.modal_receptor['_results'], 'modal_id', config.id);
           let viewContainerRef = currentReceptor.viewContainerRef;
 
@@ -143,7 +144,7 @@ export class NewModalComponent implements OnInit, OnDestroy {
           componente.changeDetectorRef.detectChanges();
 
           // Segundo ciclo de detección para componentes hijos
-          setTimeout(() => {
+          fun.setTimeout(() => {
             componente.changeDetectorRef.detectChanges();
           }, 100);
 

@@ -78,7 +78,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     private router: Router,
     public _ipc: IpcService
   ) {}
-  
+
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;
     this.configCopy = fun.deepCloning(this.configApp);
@@ -86,7 +86,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       this.createForm(this.configApp);
       this.formIsInvalid();
     });
-    
+
     fun.logGreen('this.configApp', this.configApp);
   }
 
@@ -187,7 +187,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
     if (fun.hasValue(next_control_map[sali_de])) next_control = next_control_map[sali_de];
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       if (next_control) fun.enfocarInput(next_control);
     }, 0);
   }
@@ -375,7 +375,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       .then(res => {
         this.sharedServ.nextCanToast(true);
         fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
-        setTimeout(() => {
+        fun.setTimeout(() => {
           MODIFIED_CONFIG_FILE.next(res);
           this.sharedServ.nextCanToast(false);
           this.salir();

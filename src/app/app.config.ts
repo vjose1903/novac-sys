@@ -1,5 +1,5 @@
 import { routes } from './app.routing';
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { importProvidersFrom } from '@angular/core';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
@@ -18,6 +18,7 @@ import { provideRouter, withRouterConfig, withComponentInputBinding } from '@ang
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZonelessChangeDetection(),
     importProvidersFrom(NgxPermissionsModule.forRoot()),
     importProvidersFrom(NgxExtendedPdfViewerModule),
     importProvidersFrom(NgxExtendedPdfViewerService),

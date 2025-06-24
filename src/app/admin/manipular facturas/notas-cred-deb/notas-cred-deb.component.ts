@@ -316,7 +316,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     if (key === 'select') {
       if (!value) {
-        setTimeout(() => {
+        fun.setTimeout(() => {
           // Actualizar también en el objeto factura.detalle_facturas
           if (detalle_factura) {
             detalle_factura.total_nota = '0.00';
@@ -326,7 +326,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           // data.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? data.precio_real * 0.18 : 0);
 
           this.detalleNota.update(detalles => detalles.filter(detalle => detalle.id !== data.id));
-          Ss.cdRef.detectChanges();
         }, 500);
       } else {
         this.detalleNota.update(detalles => [...detalles, data]);

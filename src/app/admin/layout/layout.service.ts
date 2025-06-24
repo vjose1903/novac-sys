@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MENU_CONFIG, menuPermissionsObj } from './utils/menu-items';
+import { fun } from '@core/services/functions.service';
 
 @Injectable({
   providedIn: 'root',
@@ -49,7 +50,7 @@ export class LayoutService {
         fatherPerms.flatt = Array.from(flattSet);
       });
 
-      setTimeout(() => {
+      fun.setTimeout(() => {
         this.menuParsed = true;
       }, 0);
     } catch (error) {

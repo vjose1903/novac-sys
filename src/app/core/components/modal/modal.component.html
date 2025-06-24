@@ -41,7 +41,9 @@
                     class="btn btn-sm {{ dynamic_boton.clase }} flex-shrink-0 d-flex align-items-center justify-content-center"
                     (click)="dynamicFunction(modalConfig, dynamic_boton)">
                     <span class="d-flex gap-2 align-items-center">
-                      <i *ngIf="fun.hasValue(dynamic_boton.icon)" [class]="dynamic_boton.icon" [ngStyle]="{ 'font-size': dynamic_boton.iconSize ?? '1rem', color: dynamic_boton.iconColor ?? 'black' }"></i>
+                      @if (fun.hasValue(dynamic_boton.icon)) {
+                        <i [class]="dynamic_boton.icon" [ngStyle]="{ 'font-size': dynamic_boton.iconSize ?? '1rem', color: dynamic_boton.iconColor ?? 'black' }"></i>
+                      }
                       {{ dynamic_boton.label }}
                     </span>
                   </button>

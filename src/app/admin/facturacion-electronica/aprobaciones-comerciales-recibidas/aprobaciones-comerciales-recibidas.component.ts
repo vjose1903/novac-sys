@@ -6,7 +6,7 @@ import { CommertialApprovalC, CommertialApprovalI } from './aprobaciones-comerci
 import { AprobacionesComercialesRecibidasService } from './aprobaciones-comerciales-recibidas.service';
 import { default_per_page, table_config } from '@core/components/new_tablas/tabla-class';
 import { fun } from '@core/services/functions.service';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BtnIconModule } from '@core/components/btn-icon-circular/btn-icon-circular.module';
 import { TablasModule } from '@core/components/new_tablas/tablas.module';
@@ -20,7 +20,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
   templateUrl: './aprobaciones-comerciales-recibidas.component.html',
   styleUrl: './aprobaciones-comerciales-recibidas.component.scss',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
+  imports: [FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
 })
 export class AprobacionesComercialesRecibidasComponent extends MixinClass implements OnInit {
   tServ = inject(TablasService);

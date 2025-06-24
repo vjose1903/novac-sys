@@ -130,7 +130,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   ngOnInit(): void {
-    this.configApp = Ss.configServ.config
+    this.configApp = Ss.configServ.config;
     this.makeNotaSerieSelected.set(this.configApp.serie_default);
   }
 
@@ -309,7 +309,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
         this.showSide = true;
 
-        setTimeout(() => this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]), 10);
+        fun.setTimeout(() => {
+          this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]);
+        }, 10);
       } catch (err) {
         console.error(err);
         const error = err.error;
@@ -425,7 +427,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
               this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota, documento: 'factura' });
             });
           } else {
-            setTimeout(() => {
+            fun.setTimeout(() => {
               this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
             }, 100);
           }
@@ -535,7 +537,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
     if (tipo == 'tipo_documento') {
       this.buscar_por = null;
-      setTimeout(() => {
+      fun.setTimeout(() => {
         this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       }, 100);
     }
@@ -681,7 +683,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   pasarCotizacionAfacturar(cotizacion) {
-    setTimeout(() => this.router.navigateByUrl(`/admin/factura/venta/bill_from_cotizacion/${cotizacion.id}`), 10);
+    fun.setTimeout(() => {
+      this.router.navigateByUrl(`/admin/factura/venta/bill_from_cotizacion/${cotizacion.id}`);
+    }, 10);
   }
 
   async saltar(salioDe, valor) {
@@ -748,7 +752,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   goToFacturacionPage(tipo: string, action: string, id: any) {
-    setTimeout(() => this.router.navigateByUrl(`/admin/factura/${tipo}/${action}/${id}`), 10);
+    fun.setTimeout(() => {
+      this.router.navigateByUrl(`/admin/factura/${tipo}/${action}/${id}`);
+    }, 10);
   }
 
   async AnularFactura() {

@@ -1,16 +1,16 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-modal-password-config',
   templateUrl: './modal-password-config.component.html',
   styleUrls: ['./modal-password-config.component.scss'],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormErrorMsgComponent],
+  imports: [FormsModule, ReactiveFormsModule, FormErrorMsgComponent],
 })
 export class ModalPasswordConfigComponent implements OnInit, IDynamicModal {
   @Input() modalConfig: IModalConfiguration;
@@ -37,7 +37,9 @@ export class ModalPasswordConfigComponent implements OnInit, IDynamicModal {
         password: [null, Validators.compose([Validators.required, Validators.minLength(6)])],
       });
 
-      setTimeout(() => resolve(), 10);
+      fun.setTimeout(() => {
+        resolve();
+      }, 10);
     });
   }
 
@@ -62,12 +64,13 @@ export class ModalPasswordConfigComponent implements OnInit, IDynamicModal {
 
       this.modalConfig.close({ error: false });
 
-      setTimeout(() => {
+      fun.setTimeout(() => {
         if (this.from === 'login') this.sharedServ.nextCanToast(false);
       }, 2000);
     } else {
       fun.toastError('Contraseña Incorrecta', 'ERROR');
-      setTimeout(() => {
+
+      fun.setTimeout(() => {
         if (this.from === 'login') this.sharedServ.nextCanToast(false);
       }, 2000);
     }

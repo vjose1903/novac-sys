@@ -7,6 +7,7 @@ import { TablasService } from './tablas.service';
 import { fun } from '@core/services/functions.service';
 import { btnTableI, medidas, table_config, table_info } from './tabla-class';
 import { teclasCode } from '@core/typescript/constantes';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'dinamic-table',
@@ -89,7 +90,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.TablasComponentChange.emit(this.TablasComponent);
 
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
-    setTimeout(() => (this.ready = true), 250);
+    fun.setTimeout(() => {
+      this.ready = true;
+    }, 250);
   }
 
   ngAfterViewInit() {
@@ -127,7 +130,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
 
     if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
-      setTimeout(() => {
+      fun.setTimeout(() => {
         fun.enfocarInput(`search-${this.realIdTabla}`);
       }, 100);
     }
@@ -218,7 +221,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   filter(event) {
     if ([teclasCode._abajo, teclasCode._arriba, teclasCode._izquierda, teclasCode._derecha, teclasCode._enter].includes(event.keyCode)) return;
 
-    const search = event.target.value;    
+    const search = event.target.value;
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
@@ -267,7 +270,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   paginatorChange(event, id) {
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.zone.run(() => {
         const page = event.page + 1;
         const per_page = event.rows;
@@ -292,8 +295,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }
 
         this.handle_table_events('paginatorChange', { page, per_page, data: this.data });
-
-        this.cdRef.detectChanges();
       });
     }, 150);
   }
@@ -374,16 +375,17 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     const actualPage = this.getPaginatorPageByNumber(actualPagination?.page);
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.zone.run(() => {
         if (actualPage) {
           actualPage.setAttribute('clickeado_por', 'maquina');
           actualPage.click();
-          setTimeout(() => actualPage.removeAttribute('clickeado_por'), 2000);
+          fun.setTimeout(() => {
+            actualPage.removeAttribute('clickeado_por');
+          }, 2000);
         }
 
         this.cantPagesView = actual;
-        this.cdRef.detectChanges();
       });
     }, 100);
   }
@@ -507,7 +509,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       // ================================================
       // CUSTOM STYLES
       // ================================================
-      setTimeout(() => this.changeStylesTitles(), 10);
+      fun.setTimeout(() => {
+        this.changeStylesTitles();
+      }, 10);
       // ================================================
 
       this.TablasComponent = this;
@@ -669,6 +673,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ENTER(arg) {
     const element = document.getElementById(arg) as any;
-    if (element) setTimeout(() => element.click(), 10);
+    if (element) fun.setTimeout(() => element.click(), 10);
   }
 }

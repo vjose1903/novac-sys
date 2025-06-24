@@ -232,7 +232,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           });
           //
         } else {
-          setTimeout(() => {
+          fun.setTimeout(() => {
             if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario();
             else fun.enfocarInput('tipoFact');
           }, 5);
@@ -446,7 +446,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         const action_route = fun.hasValue(factura.action) ? factura?.action : 'new';
 
         this.router.navigateByUrl(`/admin/factura/${factura.tipo}/${action_route}/${this.id_documento ?? 0}`).then(result => {
-          setTimeout(() => {
+          fun.setTimeout(() => {
             this.rellenarVariables().then(() => resolve());
           }, 250);
         });
@@ -462,7 +462,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.checkPath(factura).then(res => {
           this.rellenarCabezaFactura(factura).then(factura_rellenada => {
             this.cuerpo.rellenarCuerpoFactura(factura_rellenada['detalle_facturas'], fun.objHas(factura_rellenada, 'archivo_id')).then(res => {
-              setTimeout(() => {
+              fun.setTimeout(() => {
                 this._sideBarOpened = false;
 
                 this.cuerpo.seleccionarCampoEnTurno();
@@ -771,7 +771,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let buscar = false;
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       const voy_a = document.activeElement.id;
       const dont_have_propietario = fun.isEmpty(this.factServ?.propietario_factura) || fun.isEmpty(this.factServ?.propietario_factura?.id);
 
@@ -803,7 +803,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   calcularBruto() {
-    setTimeout(() => {
+    fun.setTimeout(() => {
       const suma = Big(fun.desformatearStNumber(this.TOTAL)).plus(fun.desformatearStNumber(this.DESCUENTO)).minus(fun.desformatearStNumber(this.ITBIS));
       this.BRUTO = fun.roundNumberToDecimal(suma.toNumber());
     }, 5);
@@ -876,7 +876,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   async changeSerie() {
     this.factServ.setTipos(this.factServ.tipoDocumento, this.factServ.serieType(), true).then(result => {
       this.errorComprobante = false;
-      setTimeout(() => this.checkTipoFactura('changeSerie'), 0);
+      fun.setTimeout(() => this.checkTipoFactura('changeSerie'), 0);
     });
   }
 
@@ -989,7 +989,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     if (is_enforcar) {
-      setTimeout(() => fun.enfocarInput(siguiente_input), 10);
+      fun.setTimeout(() => fun.enfocarInput(siguiente_input), 10);
     } else fun.desEnfocarInput(salioDe);
 
     if (is_buscar_cliente) this.abrirModalPropietario();
@@ -1000,7 +1000,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (this.condicion_fact !== 'Crédito') {
       this.factServ.propietario_factura = this.form.value;
 
-      setTimeout(() => this.cuerpo.seleccionarCampoEnTurno(), 10);
+      fun.setTimeout(() => {
+        this.cuerpo.seleccionarCampoEnTurno();
+      }, 10);
     } else {
       fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
     }
@@ -1040,7 +1042,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     this.popover['item'].toggle(event);
 
-    if (tipo == 'movimiento') setTimeout(() => fun.enfocarInput('searchCamion'), 5);
+    if (tipo == 'movimiento') fun.setTimeout(() => fun.enfocarInput('searchCamion'), 5);
     if (event) event.stopPropagation();
   }
 
@@ -1087,7 +1089,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   moverFocoMovimientoViaje(voy_a) {
     this.entidad_en_turno = voy_a;
     const entidades = { camion: 'searchCamion', chofer: 'searchChofer' };
-    setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
+    fun.setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
   }
 
   checkCamionIsSelected(camion?) {
@@ -1123,7 +1125,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const containMovimientoViaje = document.getElementById('overlayMovimientoViaje');
     const entidades = { camion: 'searchCamion', chofer: 'searchChofer' };
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       const voy_a = document.activeElement;
 
       if (!containMovimientoViaje.contains(voy_a)) {
@@ -1131,10 +1133,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.saliendoDeCamionOverlay();
         } else {
           fun.toastWarning('Debe de seleccionar almenos un camión y un chofer para el viaje.', 'Aviso');
-          setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
+          fun.setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
         }
       } else {
-        setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
+        fun.setTimeout(() => fun.enfocarInput(entidades[this.entidad_en_turno]), 5);
       }
     }, 250);
   }
@@ -1174,7 +1176,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   saliendoDeCamionOverlay(where?) {
-    setTimeout(() => {
+    fun.setTimeout(() => {
       if (this.movimientosSelected.length && !this.movimientosSelected.some(mov => fun.isEmpty(mov.user_id))) {
         if (fun.isEmpty(where) || where != 'teclado') {
           if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura?.id)) this.abrirModalPropietario();
@@ -1517,7 +1519,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   resetVariables() {
     this.rellenarVariables().then(() => {
-      setTimeout(() => {
+      fun.setTimeout(() => {
         if (this.factServ.isPreVenta || this.factServ.isCotizacion) this.abrirModalPropietario();
         else fun.enfocarInput('tipoFact');
       }, 5);

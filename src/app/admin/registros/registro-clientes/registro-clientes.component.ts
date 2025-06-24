@@ -10,6 +10,7 @@ import { ProvinciaC } from '../../../core/typescript/classes/provincia.model';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-registro-clientes',
@@ -243,7 +244,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
       const doc_principal = documentos.find(doc => doc.principal);
 
-      setTimeout(() => this.marcarCheck(doc_principal.descripcion), 1);
+      fun.setTimeout(() => {
+        this.marcarCheck(doc_principal.descripcion);
+      }, 1);
     }
   }
 
@@ -334,7 +337,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         }
       } else fun.enfocarInput(campo);
     } else {
-      if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
+      if (!this.formIsInvalid()) {
+        fun.setTimeout(() => this.submit(), 250);
+      }
     }
   }
 
@@ -404,7 +409,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   nuevoRegistro() {
     this.isCreando = true;
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.marcarCheck('cedula');
       fun.enfocarInput('cedula');
     }, 200);
@@ -429,7 +434,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.form.patchValue(default_values);
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       fun.enfocarInput('cedula');
       this.marcarCheck('cedula');
     }, 2);

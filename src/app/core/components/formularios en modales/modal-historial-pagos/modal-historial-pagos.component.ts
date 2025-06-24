@@ -4,6 +4,7 @@ import { MixinClass } from '@core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
 import { fun } from '@core/services/functions.service';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-modal-historial-pagos',
@@ -53,8 +54,13 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
 
         if (cantidad <= 0) this.activeIndex.set(opositeIndex);
 
-        setTimeout(() => (this.show = true), 10);
-        setTimeout(() => (this.processingTabChange = false), 250);
+        fun.setTimeout(() => {
+          this.show = true;
+        }, 10);
+
+        fun.setTimeout(() => {
+          this.processingTabChange = false;
+        }, 250);
       }
     });
   }
