@@ -21,13 +21,13 @@
 <p-dialog [closable]="false" [closeOnEscape]="false" header="Porcentaje de descarga" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
   <div class="d-flex justify-content-between mb-2 position-relative">
     <span class="negrita">Descargando actualizacion...</span>
-    <div class="mr-2">
+    <div class="me-2">
       <span class="negrita">{{ objPercent?.transferred }} Mb / </span>
       <span class="negrita gris">{{ objPercent?.total }} Mb</span>
     </div>
   </div>
   <p-progressBar [value]="objPercent?.percent"></p-progressBar>
-  <div class="mr-2">
+  <div class="me-2">
     <span> </span>
   </div>
 </p-dialog>

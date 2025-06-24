@@ -23,29 +23,29 @@
                     } }
                   </select>
                   @if (aletarTipoArticulo) {
-                  <div class="alerta text-danger ml-1" style="font-size: 12px">Debe de seleccionar tipo de comprobante</div>
+                  <div class="alerta text-danger ms-1" style="font-size: 12px">Debe de seleccionar tipo de comprobante</div>
                   }
                 </div>
               </div>
-              <div class="col-6 p-0 pr-2">
+              <div class="col-6 p-0 pe-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Desde: <span style="color: red">*</span></label>
                   <input id="campoDesde" (keydown.enter)="saltar('campoHasta')" type="number" class="form-control input_cantidad" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
                   @if (desdeAlert) {
-                  <div class="alerta text-danger ml-1" style="font-size: 12px">Campo obligatorio.</div>
+                  <div class="alerta text-danger ms-1" style="font-size: 12px">Campo obligatorio.</div>
                   }
                 </div>
               </div>
-              <div class="col-6 p-0 pl-2">
+              <div class="col-6 p-0 ps-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Hasta: <span style="color: red">*</span></label>
                   <input id="campoHasta" (keydown.enter)="saltar('campoFechaCompra')" type="number" class="form-control input_cantidad" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
                   @if (hastaAlert) {
-                  <div class="alerta text-danger ml-1" style="font-size: 12px">Campo obligatorio.</div>
+                  <div class="alerta text-danger ms-1" style="font-size: 12px">Campo obligatorio.</div>
                   }
                 </div>
               </div>
-              <div class="col-6 p-0 pr-2">
+              <div class="col-6 p-0 pe-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Fecha compra: <span style="color: red">*</span></label>
                   <p-datepicker
@@ -59,7 +59,7 @@
                   ></p-datepicker>
                 </div>
               </div>
-              <div class="col-6 p-0 pl-2">
+              <div class="col-6 p-0 ps-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Fecha validez: </label>
                   <p-datepicker inputId="campoFechaValida" [(ngModel)]="fechaValidez" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('send')"></p-datepicker>
@@ -71,13 +71,13 @@
                   <div class="col-6">
                     <div class="d-flex">
                       <h5>Usado:</h5>
-                      <i class="ml-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"></i>
+                      <i class="ms-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"></i>
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="d-flex">
                       <h5>Activo:</h5>
-                      <i class="ml-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"></i>
+                      <i class="ms-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"></i>
                     </div>
                   </div>
                 </div>
@@ -85,11 +85,11 @@
               }
               <div class="col-12 p-0 mt-3" style="display: flex; justify-content: space-between">
                 <div>
-                  <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-                  <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+                  <a class="btn me-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                  <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn ms-2" value="{{ boton }}" id="btn-verde" />
                 </div>
                 <div>
-                  <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
+                  <input class="btn ms-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
                 </div>
               </div>
             </div>

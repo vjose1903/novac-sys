@@ -14,11 +14,11 @@
           <div class="card cardFormClass">
             <form [formGroup]="form">
               <div class="row">
-                <div class="col-6 p-0 pr-2">
+                <div class="col-6 p-0 pe-2">
                   <div>
-                    <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
+                    <label class="me-2"> <input type="radio" value="1" class="me-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
                     <label>
-                      <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc
+                      <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="me-1" (click)="changeIdent(false)" />Rnc
                       <span style="color: red">*</span>
                     </label>
                   </div>
@@ -64,7 +64,7 @@
                   </div>
                   }
                 </div>
-                <div class="col-6 p-0 pl-2">
+                <div class="col-6 p-0 ps-2">
                   <div class="form-group mb-2" [appMsgError]="'telefono'" [form]="form">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
                     <p-inputMask (keydown.enter)="saltar('campoNombre')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
@@ -105,11 +105,11 @@
                 <div class="col-12 p-0 mt-3">
                   <div class="col-12 form-group" style="display: flex; justify-content: space-between">
                     <div>
-                      <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-                      <input [disabled]="formIsInvalid()" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" style="max-width: 6rem" />
+                      <a class="btn me-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                      <input [disabled]="formIsInvalid()" (click)="submit()" class="btn ms-2" value="{{ boton }}" id="btn-verde" style="max-width: 6rem" />
                     </div>
                     <div>
-                      <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
+                      <input class="btn ms-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
                     </div>
                   </div>
                 </div>

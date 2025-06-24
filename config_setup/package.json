@@ -28,7 +28,7 @@
     "windows:prod": "npm run build:prod && npm run electron:builder-windows -- -p always",
     "macos": "npm run build:prod && electron-builder build --mac",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
-    "bundle-report": "webpack-bundle-analyzer dist/stats.json"
+    "bundle-report": "npx esbuild-visualizer --metadata=dist/stats.json --open"
   },
   "repository": {
     "type": "git",

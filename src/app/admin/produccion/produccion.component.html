@@ -45,7 +45,7 @@
                       (blur)="calcularCantidadAProduccir()" />
                   </div>
 
-                  <div class="col-8 pr-0">
+                  <div class="col-8 pe-0">
                     <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
                       <option [value]="null" disabled></option>
                       @for (item of optionsMedidas; track $index) {
@@ -58,13 +58,13 @@
             </div>
 
             <div class="col-12 p-0 mt-2">
-              <a class="btn mr-2 btn-blanco" (click)="borrarForm()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
+              <a class="btn me-2 btn-blanco" (click)="borrarForm()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
               <input [disabled]="formIsInvalid()" (click)="agregarAlista()" type="submit" class="btn btn-verde" value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}" />
             </div>
           </div>
         </div>
       </div>
-      <div class="col-8 pl-0">
+      <div class="col-8 ps-0">
         <div class="card card-padding-1 sombra cardIngredientes" [ngStyle]="{ 'max-height': cardFormulario.offsetHeight + 'px' }">
           <h4 class="titulo">Ingredientes</h4>
 

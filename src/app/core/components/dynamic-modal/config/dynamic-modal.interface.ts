@@ -114,31 +114,31 @@ export interface IConfirmationButtonProps {
 
 export const confirmBtnConfig: IConfirmBtnConfig = {
   [confirmationButtons.cancelarContinuar]: {
-    noBtn: { label: 'Cancelar', icon: fontAwesome.faSolid.x, clase: 'btn btn-danger mr-2', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'Cancelar', icon: fontAwesome.faSolid.x, clase: 'btn btn-danger me-2', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Continuar', icon: fontAwesome.faSolid.check, clase: 'btn btn-primary', showProcess: false, id: 'btnCancelar' },
   },
   [confirmationButtons.cancelarEliminar]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-primary mr-2', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-primary me-2', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Eliminar', icon: fontAwesome.faSolid.trashCan, clase: 'btn btn-danger', showProcess: true, id: 'btnEliminar' },
   },
   [confirmationButtons.cancelarRemover]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-primary mr-2', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-primary me-2', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Remover', icon: fontAwesome.faSolid.trashCan, clase: 'btn btn-danger', showProcess: true, id: 'btnRemover' },
   },
   [confirmationButtons.cancelarDesactivar]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-primary mr-2', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-primary me-2', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Desactivar', icon: fontAwesome.faSolid.ban, clase: 'btn btn-danger', showProcess: false, id: 'btnDesactivar' },
   },
   [confirmationButtons.cancelarActivar]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-danger mr-2', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-danger me-2', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Reactivar', icon: fontAwesome.faSolid.check, clase: 'btn btn-primary', showProcess: false, id: 'btnReactivar' },
   },
   [confirmationButtons.copiarSalir]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-danger mr-2', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-danger me-2', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Copiar', icon: fontAwesome.faSolid.copy, clase: 'btn btn-primary', showProcess: false, id: 'btnCopiar' },
   },
   [confirmationButtons.continuarOSalir]: {
-    noBtn: { label: 'Continuar Editando', icon: null, clase: 'btn btn-grey mr-2', showProcess: false, id: 'btnContinuarEditando' },
+    noBtn: { label: 'Continuar Editando', icon: null, clase: 'btn btn-grey me-2', showProcess: false, id: 'btnContinuarEditando' },
     siBtn: { label: 'Salir sin guardar', icon: null, clase: 'btn btn-danger', showProcess: false, id: 'btnConfirmSalidSinGuardar' },
   },
   [confirmationButtons.ok]: {

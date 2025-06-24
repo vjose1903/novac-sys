@@ -34,7 +34,7 @@
                   </div>
                 </div>
                 @if (form.controls['user_id'].value === -1) {
-                <div class="col-6 p-0 pr-2">
+                <div class="col-6 p-0 pe-2">
                   <div class="form-group">
                     <label class="control-label">Nombre: <span style="color: red">*</span></label>
                     <input
@@ -48,12 +48,12 @@
                       id="nombre"
                     />
                     @if (!form.controls['nombre_no_empleado'].valid && (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)) {
-                    <div class="alerta text-danger ml-1" style="font-size: 12px">Introduzca el nombre</div>
+                    <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el nombre</div>
                     }
                   </div>
                 </div>
                 } @if (form.controls['user_id'].value === -1) {
-                <div class="col-6 p-0 pl-2">
+                <div class="col-6 p-0 ps-2">
                   <div class="form-group">
                     <label class="control-label">Apellido: <span style="color: red">*</span></label>
                     <input
@@ -67,17 +67,17 @@
                       id="apellido"
                     />
                     @if (!form.controls['apellido_no_empleado'].valid && (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)) {
-                    <div class="alerta text-danger ml-1" style="font-size: 12px">Introduzca el apellido</div>
+                    <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el apellido</div>
                     }
                   </div>
                 </div>
                 } @if (form.controls['user_id'].value === -1) {
-                <div class="col-6 p-0 pr-2">
+                <div class="col-6 p-0 pe-2">
                   <div class="form-group">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
                     <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_no_empleado" [autoClear]="false"></p-inputMask>
                     @if (!form.controls['telefono_no_empleado'].valid && (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)) {
-                    <div class="alerta text-danger ml-1" style="font-size: 12px">Introduzca el numero de telefono</div>
+                    <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el numero de telefono</div>
                     }
                   </div>
                 </div>
@@ -85,7 +85,7 @@
                 <div class="col-12 p-0">
                   <hr class="rayaTop mt-2" />
                 </div>
-                <div class="col-6 p-0 pr-2">
+                <div class="col-6 p-0 pe-2">
                   <div class="form-group">
                     <label class="control-label">Marca: <span style="color: red">*</span></label>
 
@@ -104,7 +104,7 @@
                     />
                   </div>
                 </div>
-                <div class="col-6 p-0 pl-2">
+                <div class="col-6 p-0 ps-2">
                   <div class="form-group">
                     <label class="control-label">Modelo: <span style="color: red">*</span></label>
 
@@ -122,12 +122,12 @@
                     />
                   </div>
                 </div>
-                <div class="col-6 p-0 pr-2">
+                <div class="col-6 p-0 pe-2">
                   <div class="form-group">
                     <label class="control-label">Año: <span style="color: red">*</span></label>
                     <input (focus)="htmlServ.selectValue($event)" type="text" formControlName="anio" placeholder="Introduzca año" class="form-control" autocomplete="off" id="anio" maxlength="4" />
                     @if (!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)) {
-                    <div class="alerta text-danger ml-1" style="font-size: 12px">
+                    <div class="alerta text-danger ms-1" style="font-size: 12px">
                       @if (form.controls['anio'].errors.minlength) {
                       <span>Año incompleto</span>
                       } @if (form.controls['anio'].errors.required) {
@@ -139,11 +139,11 @@
                 </div>
                 <div class="col-12 p-0 mt-3" style="display: flex; justify-content: space-between">
                   <div>
-                    <a class="btn mr-2" id="btn-blanco" (click)="borrar(true)">Borrar</a>
-                    <input [disabled]="!form.valid" (click)="submit(form)" style="max-width: 6rem" class="btn ml-2" id="btn-verde" value="{{ boton }}" />
+                    <a class="btn me-2" id="btn-blanco" (click)="borrar(true)">Borrar</a>
+                    <input [disabled]="!form.valid" (click)="submit(form)" style="max-width: 6rem" class="btn ms-2" id="btn-verde" value="{{ boton }}" />
                   </div>
                   <div>
-                    <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(true); isCreando = false" style="max-width: 6rem" />
+                    <input class="btn ms-2" value="Cerrar" id="btn-blanco" (click)="borrar(true); isCreando = false" style="max-width: 6rem" />
                   </div>
                 </div>
               </div>
@@ -158,9 +158,9 @@
           <h4 classs="mb-0">Listado camiones</h4>
           <div class="" style="height: min-content">
             @if (hasPermissionsMarca) {
-            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
+            <a class="btn me-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
             } @if (hasPermissionsModelo) {
-            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
+            <a class="btn me-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
             }
             <button *ngxPermissionsOnly="permissions.vehiculo.create" [disabled]="vehiculoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
           </div>

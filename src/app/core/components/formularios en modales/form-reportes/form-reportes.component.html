@@ -27,7 +27,7 @@
           <label class="control-label mb-0">Fecha: <span style="color: red">*</span> </label>
           <p-datepicker inputId="fecha" formControlName="fecha" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
           @if (!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)) {
-            <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+            <div class="alerta text-danger ms-1" style="font-size: 12px">Este campo es obligatorio</div>
           }
         </div>
       </div>
@@ -36,12 +36,12 @@
     <!-- ----- DESDE -----  -->
 
     @if (verifyConditionalRender(reportField.fromField) && (reportTypeHasfield(reportField.fromField) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.range))) {
-      <div class="col-6 pl-0">
+      <div class="col-6 ps-0">
         <div class="form-group">
           <label class="control-label mb-0">Desde: <span style="color: red">*</span> </label>
           <p-datepicker inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
           @if (!form.controls['desde'].valid && (form.controls['desde'].dirty || form.controls['desde'].touched)) {
-            <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+            <div class="alerta text-danger ms-1" style="font-size: 12px">Este campo es obligatorio</div>
           }
         </div>
       </div>
@@ -49,12 +49,12 @@
 
     <!-- ----- HASTA -----  -->
     @if (verifyConditionalRender(reportField.toDateField) && (reportTypeHasfield(reportField.toDateField) || (inputs.tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.range))) {
-      <div class="col-6 pr-0">
+      <div class="col-6 pe-0">
         <div class="form-group">
           <label class="control-label mb-0">Hasta: <span style="color: red">*</span> </label>
           <p-datepicker inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
           @if (!form.controls['hasta'].valid && (form.controls['hasta'].dirty || form.controls['hasta'].touched)) {
-            <div class="alerta text-danger ml-1" style="font-size: 12px">Este campo es obligatorio</div>
+            <div class="alerta text-danger ms-1" style="font-size: 12px">Este campo es obligatorio</div>
           }
         </div>
       </div>
@@ -192,7 +192,7 @@
         @for (switch of inputs.switchGroup.array; track switch) {
           <div class="form-group mb-2 horizontal-layout">
             <input [(ngModel)]="switch.value" class="apple-switch" type="checkbox" />
-            <span class="ml-2">{{ switch.label }}</span>
+            <span class="ms-2">{{ switch.label }}</span>
           </div>
         }
       </div>

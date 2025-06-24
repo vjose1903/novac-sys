@@ -1,6 +1,6 @@
 <div class="widget config-widget">
   <div class="widget-header d-flex align-items-center" [ngClass]="{ 'is-on-modal': is_on_modal }">
-    <h4 class="negrita ml-3 mb-0">Configuraciones del sistema para: {{ configApp?.nombre_empresa }}</h4>
+    <h4 class="negrita ms-3 mb-0">Configuraciones del sistema para: {{ configApp?.nombre_empresa }}</h4>
   </div>
 
   <div class="widget-content overflow-hidden">
@@ -82,14 +82,14 @@
                       <ng-template pTemplate="selectedItem">
                         @if (form.controls['color_app'].value) {
                           <div class="d-flex align-items-center">
-                            <div class="colorsito mr-2" [style.background-color]="form.controls['color_app'].value.color"></div>
+                            <div class="colorsito me-2" [style.background-color]="form.controls['color_app'].value.color"></div>
                             <div>{{ form.controls['color_app'].value.label }}</div>
                           </div>
                         }
                       </ng-template>
                       <ng-template let-colorItem pTemplate="item">
                         <div class="colorItem-item d-flex align-items-center">
-                          <div class="colorsito mr-2" [style.background-color]="colorItem.color"></div>
+                          <div class="colorsito me-2" [style.background-color]="colorItem.color"></div>
                           <div>{{ colorItem.label }}</div>
                         </div>
                       </ng-template>
@@ -222,40 +222,40 @@
                 <div class="col-12 mt-3">
                   <div class="row">
                     <div class="col-6 p-0">
-                      <div class="form-group horizontal-layout">
-                        <input formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
-                        <span class="mb-0">Usa url principal</span>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.usa_url_principal" formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.usa_url_principal" class="mb-0 c-pointer">Usa url principal</label>
                         <form-error-msg [control]="form.get(formFieldName.usa_url_principal)"></form-error-msg>
                       </div>
 
-                      <div class="form-group horizontal-layout">
-                        <input formControlName="is_db_local" class="apple-switch" type="checkbox" />
-                        <span class="mb-0">Usa base de datos local</span>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.is_db_local" formControlName="is_db_local" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.is_db_local" class="mb-0 c-pointer">Usa base de datos local</label>
                         <form-error-msg [control]="form.get(formFieldName.is_db_local)"></form-error-msg>
                       </div>
 
-                      <div class="form-group horizontal-layout">
-                        <input formControlName="is_produccion" class="apple-switch" type="checkbox" />
-                        <span class="mb-0">Tienen Modulo Producción</span>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.is_produccion" formControlName="is_produccion" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.is_produccion" class="mb-0 c-pointer">Tienen Modulo Producción</label>
                         <form-error-msg [control]="form.get(formFieldName.is_produccion)"></form-error-msg>
                       </div>
                     </div>
                     <div class="col-6 p-0">
-                      <div class="form-group horizontal-layout">
-                        <input formControlName="facturacion_editar_precio" class="apple-switch" type="checkbox" />
-                        <span class="mb-0">Editar precio en facturación</span>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.facturacion_editar_precio" formControlName="facturacion_editar_precio" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.facturacion_editar_precio" class="mb-0 c-pointer">Editar precio en facturación</label>
                         <form-error-msg [control]="form.get(formFieldName.facturacion_editar_precio)"></form-error-msg>
                       </div>
 
-                      <div class="form-group horizontal-layout">
-                        <input formControlName="vende_sin_inventario" class="apple-switch" type="checkbox" />
-                        <span class="mb-0">Vender sin inventario</span>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.vende_sin_inventario" formControlName="vende_sin_inventario" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.vende_sin_inventario" class="mb-0 c-pointer">Vender sin inventario</label>
                         <form-error-msg [control]="form.get(formFieldName.vende_sin_inventario)"></form-error-msg>
                       </div>
 
-                      <div class="form-group horizontal-layout">
-                        <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
-                        <span class="mb-0">Usa Itbis</span>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.calcular_itbis" formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.calcular_itbis" class="mb-0 c-pointer">Usa Itbis</label>
                         <form-error-msg [control]="form.get(formFieldName.calcular_itbis)"></form-error-msg>
                       </div>
                     </div>
@@ -324,13 +324,13 @@
   <div class="widget-footer">
     <div class="d-flex flex-column">
       <div class="buttons-section">
-        <!-- <a class="btn mr-2" id="btn-gris" (click)="test()">Test</a> -->
+        <!-- <a class="btn me-2" id="btn-gris" (click)="test()">Test</a> -->
 
         <button class="btn btn-sm" id="btn-blanco" (click)="salir()">Salir</button>
         <button type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn btn-sm" id="btn-verde">Guardar</button>
       </div>
 
-      <div class="footer pr-2 d-flex justify-content-end align-items-center" [ngClass]="{ 'is-on-modal': is_on_modal }" style="color: white">Novac System {{ configApp?.app_version }} - &#64;2020 Desarrollador: Victor J. Vasquez</div>
+      <div class="footer pe-2 d-flex justify-content-end align-items-center" [ngClass]="{ 'is-on-modal': is_on_modal }" style="color: white">Novac System {{ configApp?.app_version }} - &#64;2020 Desarrollador: Victor J. Vasquez</div>
     </div>
   </div>
 </div>

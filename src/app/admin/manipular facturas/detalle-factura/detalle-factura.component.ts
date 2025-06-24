@@ -23,7 +23,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   fun = fun;
   detalles: ModalDetalleFacturaI[] = [
     { label: 'Forma de pago', key: 'forma_pago', tipo: 'string', div_clase: 'col-12 col-md-6 p-0 ' },
-    { label: 'Fecha', key: 'fecha_equivalente', tipo: 'date', div_clase: 'col-12 col-md-6 p-0 pl-md-3' },
+    { label: 'Fecha', key: 'fecha_equivalente', tipo: 'date', div_clase: 'col-12 col-md-6 p-0 ps-md-3' },
     { label: 'Comprobante', key: 'numero_comprobante', tipo: 'tag', div_clase: 'col-12 p-0', clase_string: 'text-black mb-0', bg_tag: '#bfbfbf' },
   ];
   _ipc = inject(IpcService);
@@ -45,7 +45,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
         .filter(d => d.key != 'forma_pago')
         .map(item => {
           if (item.key == 'fecha_equivalente') return { ...item, div_clase: 'col-12 col-md-6 p-0' };
-          if (item.key == 'numero_comprobante') return { ...item, div_clase: 'col-12 col-md-6 p-0 pl-md-3' };
+          if (item.key == 'numero_comprobante') return { ...item, div_clase: 'col-12 col-md-6 p-0 ps-md-3' };
 
           return { ...item, label: item.label.replace('Forma de pago', 'Tipo de nota') };
         });
@@ -60,7 +60,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
         label: 'Estado Ecf',
         key: 'is_aceptada',
         tipo: 'tag',
-        div_clase: 'col-12 pl-0',
+        div_clase: 'col-12 ps-0',
         clase_string: is_aceptada == TrackStatusEnum.ACCEPTED ? 'text-success' : is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED ? 'text-warning' : is_aceptada == TrackStatusEnum.REJECTED ? 'text-danger' : 'text-secondary',
         bg_tag: is_aceptada == TrackStatusEnum.ACCEPTED ? '#98ff98' : is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED ? '#ffff98' : is_aceptada == TrackStatusEnum.REJECTED ? '#fb9898' : '#bfbfbf',
       });

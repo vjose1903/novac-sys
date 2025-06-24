@@ -53,16 +53,16 @@
         <div class="card-body p-2">
           <div class="d-flex px-2 info-viaje-selected align-items-center justify-content-between">
             <div class="d-flex">
-              <span class="d-flex align-items-center mr-3">
-                <h6 class="negrita p-0 mr-2">Cliente:</h6>
+              <span class="d-flex align-items-center me-3">
+                <h6 class="negrita p-0 me-2">Cliente:</h6>
 
                 <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
                   <p class="text-black mb-0">{{ viaje_selected?.cliente.nombre }}</p>
                 </p-tag>
               </span>
 
-              <span class="d-flex align-items-center mr-3">
-                <h6 class="negrita p-0 mr-2">Total facturado:</h6>
+              <span class="d-flex align-items-center me-3">
+                <h6 class="negrita p-0 me-2">Total facturado:</h6>
 
                 <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
                   <p class="text-black mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
@@ -70,8 +70,8 @@
               </span>
 
               @if (monto_pendiente > 0) {
-              <span class="d-flex align-items-center mr-3">
-                <h6 class="negrita p-0 mr-2 text-red">Monto pendiente:</h6>
+              <span class="d-flex align-items-center me-3">
+                <h6 class="negrita p-0 me-2 text-red">Monto pendiente:</h6>
                 <p-tag [rounded]="true" [style]="{ background: '#e9c1c1', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
                   <p class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
                 </p-tag>

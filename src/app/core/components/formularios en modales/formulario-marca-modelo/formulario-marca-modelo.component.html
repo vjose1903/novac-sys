@@ -16,7 +16,7 @@
                     <label class="control-label">{{ campo1 }}: <span style="color: red">*</span></label>
                     <input (keyup)="capitalice('descripcion', htmlServ.getValue($event), formMarca)" (focus)="htmlServ.selectValue($event)" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
                     @if (!formMarca.controls['descripcion'].valid && (formMarca.controls['descripcion'].dirty || formMarca.controls['descripcion'].touched)) {
-                    <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
+                    <div class="alerta position-absolute text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                     }
                   </div>
                 </div>
@@ -24,9 +24,9 @@
                 <div class="row">
                   <div class="col-12 mt-3 p-0">
                     <div class="form-group">
-                      <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
+                      <a class="btn me-2" id="btn-gris" (click)="closeThis()">Salir</a>
                       @if (marcaSelected) {
-                      <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
+                      <a class="btn me-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
                       }
                       <input [disabled]="!formMarca.valid" (click)="submit(formMarca)" type="submit" class="btn" value="{{ marcaSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
                     </div>
@@ -76,16 +76,16 @@
                     <label class="control-label">Modelo: <span style="color: red">*</span></label>
                     <input (keyup)="capitalice('descripcion', htmlServ.getValue($event), formModelo)" (focus)="htmlServ.selectValue($event)" type="text" id="descripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
                     @if (!formModelo.controls['descripcion'].valid && (formModelo.controls['descripcion'].dirty || formModelo.controls['descripcion'].touched)) {
-                    <div class="alerta position-absolute text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
+                    <div class="alerta position-absolute text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                     }
                   </div>
                 </div>
 
                 <div class="col-12 mt-3 p-0">
                   <div class="form-group">
-                    <a class="btn mr-2" id="btn-gris" (click)="closeThis()">Salir</a>
+                    <a class="btn me-2" id="btn-gris" (click)="closeThis()">Salir</a>
                     @if (modeloSelected) {
-                    <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
+                    <a class="btn me-2" id="btn-blanco" (click)="borrar()">Cancelar</a>
                     }
                     <input [disabled]="!formModelo.valid" (click)="submit(formModelo)" type="submit" class="btn" value="{{ modeloSelected ? 'Editar' : 'Guardar' }}" id="btn-verde" />
                   </div>
