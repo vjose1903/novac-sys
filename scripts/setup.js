@@ -55,9 +55,10 @@ const files = [
 
   { tipo: 'reemplazo', file_name: 'docker-handler.ts', path: 'electron/docker-handler.ts' },
   { tipo: 'reemplazo', file_name: 'update-config.json', path: 'electron/update-config.json' },
-  { tipo: 'reemplazo', file_name: 'environment.ts', path: 'src/environments/environment.ts' },
-  { tipo: 'reemplazo', file_name: 'environment.web.ts', path: 'src/environments/environment.web.ts' },
-  { tipo: 'reemplazo', file_name: 'environment.prod.ts', path: 'src/environments/environment.prod.ts' },
+  { tipo: 'reemplazo', file_name: 'environment/environment.ts', path: 'src/environments/environment.ts' },
+  { tipo: 'reemplazo', file_name: 'environment/environment.dev.ts', path: 'src/environments/environment.dev.ts' },
+  { tipo: 'reemplazo', file_name: 'environment/environment.web.ts', path: 'src/environments/environment.web.ts' },
+  { tipo: 'reemplazo', file_name: 'environment/environment.prod.ts', path: 'src/environments/environment.prod.ts' },
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
   { tipo: 'reemplazo', file_name: 'package.json', path: 'package.json' },
   { tipo: 'reemplazo', file_name: 'main.ts', path: 'main.ts' },

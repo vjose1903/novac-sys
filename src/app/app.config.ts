@@ -12,9 +12,10 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { provideRouter, withRouterConfig, withComponentInputBinding } from '@angular/router';
 
-// import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-// import { getDatabase, provideDatabase } from '@angular/fire/database';
-// import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getDatabase, provideDatabase } from '@angular/fire/database';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { Environment } from '@environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -46,8 +47,8 @@ export const appConfig: ApplicationConfig = {
     }),
 
     // FIREBASE
-    // provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-    // provideDatabase(() => getDatabase()),
-    // provideFirestore(() => getFirestore()),
+    provideFirebaseApp(() => initializeApp(Environment.firebaseConfig)),
+    provideDatabase(() => getDatabase()),
+    provideFirestore(() => getFirestore()),
   ],
 };

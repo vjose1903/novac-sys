@@ -9,6 +9,7 @@ import { SharedService } from './shared.service';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
 import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
+import { Firestore } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class Ss {
   public static configServ: ConfigurationService;
   public static loadServ: LoaderService;
   public static factServ: FacturacionService;
+  public static firestore: Firestore;
 
   public static layServ: LayoutService;
   public static toastr: ToastrService;

@@ -1,5 +1,11 @@
 import { operativeSystemE, serie } from "../typescript/constantes";
 
+export interface EmpresaI {
+  id: string;
+  key: string;
+  nombre: string;
+}
+
 export interface ConfigI {
   cliente:                     string;
   nombre_empresa:              string;

@@ -10,6 +10,7 @@ import { Ss } from '@services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from '@admin/layout/layout.service';
 import { ConfigurationService } from '@services/configuration.service';
+import { EmpresaService } from '@core/services/empresa.service';
 import { ThemeService } from '@services/theme.service';
 import { MessageTask } from '@core/models/message-task';
 
@@ -40,6 +41,7 @@ import { ModalClass } from './core/components/modal/modal-class';
 import { TipoFacturaI, TiposFacturaC } from '@admin/facturacion/factura';
 import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
 import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
+import { Firestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-root',
@@ -57,11 +59,13 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   public factServ = inject(FacturacionService);
   public layServ = inject(LayoutService);
   public configServ = inject(ConfigurationService);
+  public empresaServ = inject(EmpresaService);
   public themeService = inject(ThemeService);
   public toastr = inject(ToastrService);
   public sharedServ = inject(SharedService);
   public permissionsService = inject(NgxPermissionsService);
   public dynamicModalService = inject(DynamicModalService);
+  public firestore = inject(Firestore);
 
   // Subject para manejar la destrucción del componente
   private readonly destroy$ = new Subject<void>();
@@ -174,6 +178,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       sharedServ: this.sharedServ,
       cdRef: this.cdRef,
       dynamicModalService: this.dynamicModalService,
+      firestore: this.firestore,
     });
   }
 
@@ -218,7 +223,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       const config = (await this._ipc.sendTask(task)) as any;
 
       console.log('%c config ---> ', 'color: yellow; font-weight: bold;', config);
-      
+
       this.configServ.setConfig = config;
       this.themeService.setTheme(config.color_app);
       this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
