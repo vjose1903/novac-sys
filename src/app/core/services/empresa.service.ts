@@ -7,10 +7,12 @@ import { Environment } from '@environments/environment';
   providedIn: 'root',
 })
 export class EmpresaService extends FirebaseRequest<EmpresaI> {
+  private _collectionName = 'Empresas';
+
   constructor() {
     super();
-    this.firebaseCollectionName = 'Empresas';
-    // this.getEmpresa(Environment.empresa_key);
+    this.firebaseCollectionName = this._collectionName;
+    this.getEmpresa(Environment.empresa_key);
   }
 
   private _empresa: EmpresaI;
@@ -22,6 +24,10 @@ export class EmpresaService extends FirebaseRequest<EmpresaI> {
 
   get empresa() {
     return this._empresa;
+  }
+
+  get collectionName() {
+    return this._collectionName;
   }
 
 

@@ -231,7 +231,7 @@ function beforeCreateSplash(splash) {
     // ----------- inicializando docker handler --------------
     docker_handler = new DockerHandler();
 
-    HandlerConfigFile.checkConfigFile(splash)
+    HandlerConfigFile.checkConfigFile()
       .then(async is_config_ready => {
         if (is_config_ready) {
           Functions.getConfigFile()

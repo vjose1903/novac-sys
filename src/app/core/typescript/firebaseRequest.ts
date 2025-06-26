@@ -278,13 +278,13 @@ export interface SubCollectionParams {
 
 export interface CreateInParentParams {
   parentCollection: string;
-  parentId: string;
+  parentId: string | number;
   data: any;
 }
 
 export interface UpdateInParentParams {
   parentCollection: string;
-  parentId: string;
-  documentId: string;
+  parentId: string | number;
+  documentId: string | number;
   data: any;
 }

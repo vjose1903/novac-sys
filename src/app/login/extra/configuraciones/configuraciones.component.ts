@@ -98,6 +98,8 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     const color_format = this.colores.find(item => item.descripcion == data.color_app);
 
     this.form = this.fb.group({
+      [formFieldName.id]: [{ value: this.getValue(data, 'id'), disabled: false }],
+      [formFieldName.machineId]: [{ value: this.getValue(data, 'machineId'), disabled: false }],
       [formFieldName.nombre_empresa]: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
       [formFieldName.rnc_empresa]: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
       [formFieldName.direccion_empresa]: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
@@ -107,7 +109,6 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.color_app]: [{ value: color_format, disabled: false }, Validators.required],
       [formFieldName.url_servidor]: [{ value: this.getValue(data, 'url_servidor'), disabled: false }, Validators.required],
       [formFieldName.url_servidor_respaldo]: [{ value: this.getValue(data, 'url_servidor_respaldo'), disabled: false }, Validators.required],
-      [formFieldName.url_servidor_descargas]: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
       [formFieldName.config_password]: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
       [formFieldName.usa_url_principal]: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
       [formFieldName.serie_default]: [{ value: this.getValue(data, 'serie_default'), disabled: false }],
@@ -179,8 +180,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldId.direccion_empresa]: formFieldId.color_app,
       [formFieldId.color_app]: formFieldId.url_servidor,
       [formFieldId.url_servidor]: formFieldId.url_servidor_respaldo,
-      [formFieldId.url_servidor_respaldo]: formFieldId.url_servidor_descargas,
-      [formFieldId.url_servidor_descargas]: formFieldId.documentos_a_imprimir,
+      [formFieldId.url_servidor_respaldo]: formFieldId.documentos_a_imprimir,
       [formFieldId.documentos_a_imprimir]: formFieldId.medida_producto_terminado,
       [formFieldId.medida_producto_terminado]: formFieldId.telefono_empresa,
     };
@@ -261,8 +261,6 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     };
 
     const keys_to_omit = [
-      'plantilla_impresion_nota',
-
       'page_size_venta_contado',
       'page_size_venta_credito',
       'page_size_pre_venta',
@@ -272,6 +270,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       'page_size_nota',
       'page_size_cuadre_caja',
       'page_size_reporte',
+      'page_size_cotizacion',
 
       'printer_venta_contado',
       'printer_venta_credito',
@@ -282,6 +281,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       'printer_nota',
       'printer_cuadre_caja',
       'printer_reporte',
+      'printer_cotizacion',
     ];
 
     keys_to_omit.forEach(element => delete formulario[element]);
@@ -356,35 +356,37 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
   submit() {
     const formulario = this.getFormularioToSend();
-    fun.logGreen('this.config', this.configApp);
     formulario['cliente'] = this.getValue(this.configApp, 'cliente');
+    fun.logGreen('formulario', formulario);
 
-    const configReplacement = {};
-    const logos_changes = {};
+    // this.configServ.createConfig(formulario);
 
-    this.changesParser(configReplacement, logos_changes, formulario, this.configCopy, 'obj_principal');
+    // const configReplacement = {};
+    // const logos_changes = {};
 
-    const objChange = { new_config: formulario, configReplacement: configReplacement };
+    // this.changesParser(configReplacement, logos_changes, formulario, this.configCopy, 'obj_principal');
 
-    if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
+    // const objChange = { new_config: formulario, configReplacement: configReplacement };
 
-    const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE, objChange);
+    // if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
 
-    this._ipc
-      .sendTask(task)
-      .then(res => {
-        this.sharedServ.nextCanToast(true);
-        fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
-        fun.setTimeout(() => {
-          MODIFIED_CONFIG_FILE.next(res);
-          this.sharedServ.nextCanToast(false);
-          this.salir();
-        }, 250);
-      })
-      .catch(err => {
-        if (err.msg) fun.toastError(err.msg, 'ERROR');
-        else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
-        console.error(err);
-      });
+    // const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE, objChange);
+
+    // this._ipc
+    //   .sendTask(task)
+    //   .then(res => {
+    //     this.sharedServ.nextCanToast(true);
+    //     fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
+    //     fun.setTimeout(() => {
+    //       MODIFIED_CONFIG_FILE.next(res);
+    //       this.sharedServ.nextCanToast(false);
+    //       this.salir();
+    //     }, 250);
+    //   })
+    //   .catch(err => {
+    //     if (err.msg) fun.toastError(err.msg, 'ERROR');
+    //     else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
+    //     console.error(err);
+    //   });
   }
 }

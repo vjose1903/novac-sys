@@ -7,6 +7,7 @@ export interface EmpresaI {
 }
 
 export interface ConfigI {
+  id?:                         string | number;
   cliente:                     string;
   nombre_empresa:              string;
   rnc_empresa:                 string;
@@ -20,7 +21,6 @@ export interface ConfigI {
   operative_system?:           operativeSystemE;
   url_servidor:                string;
   url_servidor_respaldo:       string;
-  url_servidor_descargas:      string;
   config_password:             string;
   usa_url_principal:           boolean;
   is_produccion:               boolean;

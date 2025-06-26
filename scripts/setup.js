@@ -50,7 +50,7 @@ const setup_ = {
 };
 
 const files = [
-  { tipo: 'move', file_name: 'handler-config-file/handler-config-file', extension: 'ts', path: 'electron/handler-config-file.ts' },
+  { tipo: 'move', file_name: 'default_config/default_config', extension: 'json', path: 'electron/default_config.json' },
   { tipo: 'move', file_name: 'logos/logos', extension: 'json', path: 'logos.json' },
 
   { tipo: 'reemplazo', file_name: 'docker-handler.ts', path: 'electron/docker-handler.ts' },

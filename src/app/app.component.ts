@@ -217,8 +217,15 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   /**
    * Cargar configuración de la aplicación
    */
+  async verifiyLocalConfigFile(): Promise<void> {
+    // TODO: flujo es verificar si existe el archivo de configuracion local y si no existe, retornar el archivo de configuracion por defecto
+    // TODO: con el archivo por defecto guardarlo en firebase y luego guardarlo en el archivo de configuracion local
+  }
+
   async loadAppConfig(): Promise<void> {
     try {
+      console.log('----- ELECTRON_GET_APP_CONFIG -----');
+
       const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
       const config = (await this._ipc.sendTask(task)) as any;
 

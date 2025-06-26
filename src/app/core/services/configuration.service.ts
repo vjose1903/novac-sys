@@ -37,9 +37,16 @@ export class ConfigurationService extends FirebaseRequest<ConfigI> {
     return this.configLoadedSubject.value;
   }
 
-  saveConfig(key: string) {
+  createConfig(newConfig: ConfigI) {
     if (fun.isEmpty(this.empresaServ.empresa)) throw new Error('Empresa is not defined');
 
-    this._createOne({  data: { key: key } });
+    this.createOneInParentCollection({ parentCollection: this.empresaServ.collectionName, parentId: this.empresaServ.empresa.id, data: newConfig });
+  }
+
+  updateConfig(newConfig: ConfigI) {
+    if (fun.isEmpty(this.empresaServ.empresa)) throw new Error('Empresa is not defined');
+    if (fun.isEmpty(newConfig.id)) throw new Error('Config id is not defined');
+
+    this.updateOneInParentCollection({ parentCollection: this.empresaServ.collectionName, parentId: this.empresaServ.empresa.id, documentId: newConfig.id, data: newConfig });
   }
 }

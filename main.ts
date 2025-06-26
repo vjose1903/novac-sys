@@ -50,6 +50,7 @@ let export_to_excel: ExportToExcel;
 const Console: LogProcessor = LogProcessor.getInstance();
 const openBrowser: OpenBrowser = OpenBrowser.getInstance();
 const machineId: MachineId = MachineId.getInstance();
+const handlerConfigFile: HandlerConfigFile = HandlerConfigFile.getInstance();
 
 const args = process.argv.slice(1);
 const serve = args.some(val => val === '--serve');
@@ -186,8 +187,9 @@ export function sendCloseConfirmation() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Close the app AND SPLASH ERROR
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-export function closeAppAndSplashError(error: string) {
-  createSplash(`splash_error_desconocido`);
+export function closeAppAndSplashError(error: string, type: string = 'splash_error_desconocido') {
+  writeLogs(error, 'closeAppAndSplashError');
+  createSplash(type);
   closeApp();
 }
 
@@ -229,34 +231,33 @@ function beforeCreateSplash(splash) {
     writeLogs(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
     // ----------- inicializando docker handler --------------
-    docker_handler = new DockerHandler();
 
-    HandlerConfigFile.checkConfigFile(splash)
-      .then(async is_config_ready => {
-        if (is_config_ready) {
-          Functions.getConfigFile()
-            .then(async config => {
-              // ----------- correr base de datos local --------------
-              writeLogs(config.is_db_local, 'config.is_db_local ');
+    try {
+      const config_exists = await handlerConfigFile.configFileExists({ create_if_not_exists: true });
 
-              if (config.is_db_local) {
-                docker_handler
-                  .checkAllInDocker()
-                  .then(res_db => continuarCargandoArchivos(resolve))
-                  .catch(error_type => createSplash(`splash_${error_type}_error`));
-                //
-              } else {
-                continuarCargandoArchivos(resolve);
-              }
+      if (config_exists) {
+        const config = await Functions.getConfigFile();
+        // ----------- correr base de datos local --------------
+        writeLogs(config.is_db_local, 'config.is_db_local ');
+
+        if (config.is_db_local) {
+          docker_handler = DockerHandler.getInstance();
+
+          docker_handler
+            .checkAllInDocker()
+            .then(res_db => {
+              continuarCargandoArchivos(resolve);
             })
-            .catch(err => {
-              createSplash('splash_config_error');
-            });
+            .catch(error_type => createSplash(`splash_${error_type}_error`));
+          //
+        } else {
+          continuarCargandoArchivos(resolve);
         }
-      })
-      .catch(err => {
-        createSplash('splash_config_error');
-      });
+      }
+    } catch (error) {
+      writeLogs(error, 'ERROR AL OBTENER EL ARCHIVO DE CONFIGURACION');
+      createSplash('splash_config_error');
+    }
   });
 }
 
@@ -398,7 +399,7 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case ELECTRON_GET_APP_CONFIG:
-        parseAppConfig()
+        getAppConfig()
           .then(config => {
             task.response = config;
             event.reply(ELECTRON_RESPONSE, task);
@@ -441,51 +442,84 @@ async function handleEvent(event: any, obj: string) {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// OBTENER EL ACTUAL USUARIO DE GIT
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function getActualGitUser() {
-  return new Promise<string>(async (resolve, reject) => {
-    const serve_ = await getServer_();
-
-    if (serve_) {
-      runTerminalCommand(`git config --get user.name`)
-        .then(res => {
-          const username = res.STDOUT.trim() != '' ? res.STDOUT.trim() : 'vjose1903';
-          resolve(username);
-        })
-        .catch(error => {
-          console.error('getActualGitUser', error);
-          reject(error);
-        });
-    } else {
-      resolve('vjose1903');
-    }
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // OBTENER EL ARCHIVO APP.CONFIG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function parseAppConfig() {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const serve_ = await getServer_();
-      const pjson = require('./package.json');
-      const config: ConfigI = await Functions.getConfigFile();
+async function getAppConfig(): Promise<ConfigI> {
+  try {
+    writeLogs('Iniciando carga de configuración de la aplicación', 'getAppConfig');
 
-      const printer_list = await pdf_printer.getPrinters();
-      
-      config['operative_system'] = isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows;
-      config['machineId'] = machineId.value;
-      config['printersList'] = ['Ninguna', ...printer_list];
-      config['app_version'] = pjson.version;
+    // 1. Verificar/crear archivo de configuración
+    await handlerConfigFile.configFileExists({ create_if_not_exists: true });
+    writeLogs('Archivo de configuración verificado', 'getAppConfig');
 
-      resolve(config);
-    } catch (error) {
-      console.error('parseAppConfig', error);
-      reject({ err: error, msg: 'Error buscando el archivo de configuracion' });
+    // 2. Obtener configuración base
+    const config: ConfigI = await Functions.getConfigFile();
+    writeLogs('Configuración base obtenida', 'getAppConfig');
+
+    // 3. Verificar base de datos local si está configurada
+    if (config.is_db_local && !docker_handler?.is_db_local_running) {
+      writeLogs('Verificando estado de base de datos local', 'getAppConfig');
+      await docker_handler.checkAllInDocker();
+      writeLogs('Base de datos local verificada y ejecutándose', 'getAppConfig');
     }
-  });
+
+    // 4. Obtener información del sistema en paralelo
+    const [printer_list, pjson] = await Promise.all([
+      pdf_printer.getPrinters(),
+      Promise.resolve(require('./package.json')), // Para mantener consistencia async
+    ]);
+
+    // 5. Enriquecer configuración con datos del sistema
+    const enrichedConfig = {
+      ...config,
+      operative_system: isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows,
+      printersList: ['Ninguna', ...printer_list],
+      app_version: pjson.version,
+    };
+
+    writeLogs('Configuración de aplicación cargada exitosamente', 'getAppConfig');
+    return enrichedConfig;
+  } catch (error) {
+    // Determinar tipo de error para mostrar splash específico
+    const errorContext = determineErrorContext(error);
+
+    writeLogs(error, `getAppConfig ERROR - ${errorContext.type}`);
+    closeAppAndSplashError(errorContext.message, errorContext.splashType);
+
+    throw {
+      err: error,
+      msg: errorContext.message,
+      type: errorContext.type,
+    };
+  }
+}
+
+// Función auxiliar para determinar el contexto del error
+function determineErrorContext(error: any) {
+  // Si el error viene del docker handler
+  if (typeof error === 'string' && error.includes('db')) {
+    return {
+      type: 'database',
+      message: 'Error al iniciar la base de datos local',
+      splashType: `splash_${error}_error`,
+    };
+  }
+
+  // Si el error viene del archivo de configuración
+  if (error.message && error.message.includes('config')) {
+    return {
+      type: 'config',
+      message: 'Error buscando el archivo de configuración',
+      splashType: 'splash_config_error',
+    };
+  }
+
+  // Error genérico
+  return {
+    type: 'general',
+    message: 'Error general al cargar la configuración',
+    splashType: 'splash_error_desconocido',
+  };
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

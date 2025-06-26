@@ -1,4 +1,6 @@
 export enum formFieldName {
+  id = 'id',
+  machineId = 'machineId',
   nombre_empresa = 'nombre_empresa',
   rnc_empresa = 'rnc_empresa',
   direccion_empresa = 'direccion_empresa',
@@ -8,7 +10,6 @@ export enum formFieldName {
   color_app = 'color_app',
   url_servidor = 'url_servidor',
   url_servidor_respaldo = 'url_servidor_respaldo',
-  url_servidor_descargas = 'url_servidor_descargas',
   config_password = 'config_password',
   usa_url_principal = 'usa_url_principal',
   serie_default = 'serie_default',
@@ -53,7 +54,6 @@ export enum formFieldId {
   color_app = 'field_color_app',
   url_servidor = 'field_url_servidor',
   url_servidor_respaldo = 'field_url_servidor_respaldo',
-  url_servidor_descargas = 'field_url_servidor_descargas',
   config_password = 'field_config_password',
   usa_url_principal = 'field_usa_url_principal',
   serie_default = 'field_serie_default',

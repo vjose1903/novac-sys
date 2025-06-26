@@ -22,7 +22,6 @@
                       onElementReady
                       [id]="formFieldId.nombre_empresa"
                       (elementReady)="htmlServ.focusInput($event)"
-                      (keyup)="capitalice(formFieldName.nombre_empresa, htmlServ.getValue($event))"
                       (keydown.enter)="saltar(formFieldId.nombre_empresa)"
                       type="text"
                       [formControlName]="formFieldName.nombre_empresa"
@@ -135,7 +134,7 @@
                       </div>
                     </div> -->
 
-                <div class="col-4 mb-3">
+                <div class="col-6 mb-3">
                   <div class="form-group">
                     <label class="control-label">Url Servidor: </label>
                     <input
@@ -150,7 +149,7 @@
                   </div>
                 </div>
 
-                <div class="col-4 mb-3">
+                <div class="col-6 mb-3">
                   <div class="form-group">
                     <label class="control-label">Url Servidor Respaldo: </label>
                     <input
@@ -162,21 +161,6 @@
                       class="form-control"
                       autocomplete="off" />
                     <form-error-msg [control]="form.get(formFieldName.url_servidor_respaldo)"></form-error-msg>
-                  </div>
-                </div>
-
-                <div class="col-4 mb-3">
-                  <div class="form-group">
-                    <label class="control-label">Url Servidor Descargas: </label>
-                    <input
-                      [id]="formFieldId.url_servidor_descargas"
-                      (keydown.enter)="saltar(formFieldId.url_servidor_descargas)"
-                      type="text"
-                      [formControlName]="formFieldName.url_servidor_descargas"
-                      placeholder="Introduzca url servidor de descargas"
-                      class="form-control"
-                      autocomplete="off" />
-                    <form-error-msg [control]="form.get(formFieldName.url_servidor_descargas)"></form-error-msg>
                   </div>
                 </div>
 
