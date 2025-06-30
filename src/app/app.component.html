@@ -1,4 +1,4 @@
-@if (!configServ.isConfigLoaded() || !isReady) {
+@if (!isReady()) {
   <div class="h-100 w-100 splash-container">
     <h2 class="msg">Cargando archivo de configuración</h2>
     <img class="logo" src="assets/img/logo_splash.png" />
@@ -7,14 +7,14 @@
   </div>
 }
 
-@if (loading && configServ.isConfigLoaded()) {
-  <div id="fondoC" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
-    <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
-    <span class="text"> CARGANDO ... </span>
-  </div>
-}
+@if (isReady()) {
+  @if (loading) {
+    <div id="fondoC" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
+      <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
+      <span class="text"> CARGANDO ... </span>
+    </div>
+  }
 
-@if (configServ.isConfigLoaded() && isReady) {
   <router-outlet></router-outlet>
 }
 

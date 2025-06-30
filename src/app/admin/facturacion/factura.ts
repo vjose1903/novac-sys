@@ -269,7 +269,7 @@ export class FacturaC extends CrudG<FacturasI> {
     movimientos_viaje?: boolean;
     extra_params?: any;
   }) {
-    const valor_enc = btoa(args.valor.toString());
+    const valor_enc = fun.encriptar(args.valor.toString());
     const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
     args.pagada ??= '0';
     args.extra_params ??= {};

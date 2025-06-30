@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 import { ipcRenderer, webFrame } from 'electron';
 import * as childProcess from 'child_process';
 import { BehaviorSubject, filter, lastValueFrom, skip, take } from 'rxjs';
@@ -29,6 +29,8 @@ export class IpcService {
   // Añadir nuevo Subject para eventos
   private electronEvents = new BehaviorSubject<MessageTaskInterface>(null);
   public electronEvents$ = this.electronEvents.asObservable();
+
+  private ngZone = inject(NgZone);
 
   get isElectron(): boolean {
     return !!(window && window.process && window.process.type);
@@ -66,16 +68,19 @@ export class IpcService {
 
   listenEvents() {
     this._ipc.on(ELECTRON_RESPONSE, (event, obj) => {
-      const arg = obj ? (typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface)) : {} as MessageTaskInterface;
-      const tareas = this.colaDeMensajes.value;
+      // Ejecutar dentro de la zona de Angular para detectar cambios
+      this.ngZone.run(() => {
+        const arg = obj ? (typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface)) : {} as MessageTaskInterface;
+        const tareas = this.colaDeMensajes.value;
 
-      if (tareas.hasOwnProperty(arg.id)) {
-        (tareas[arg.id] as MessageTask).fn.next(arg);
-        tareas[arg.id] = undefined;
-        this.updateColaMensaje(tareas);
-      } else {
-        this.electronEvents.next(obj);
-      }
+        if (tareas.hasOwnProperty(arg.id)) {
+          (tareas[arg.id] as MessageTask).fn.next(arg);
+          tareas[arg.id] = undefined;
+          this.updateColaMensaje(tareas);
+        } else {
+          this.electronEvents.next(obj);
+        }
+      });
     });
   }
 
@@ -87,13 +92,17 @@ export class IpcService {
 
         try {
           const taskResult = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
-          if (taskResult.error == false || !('error' in taskResult) || fun.isEmpty(taskResult?.error)) {
-            resolve(taskResult.response);
-          } else {
-            reject(taskResult.response);
-          }
+          
+          // Ejecutar resolución dentro de la zona de Angular
+          this.ngZone.run(() => {
+            if (taskResult.error == false || !('error' in taskResult) || fun.isEmpty(taskResult?.error)) {
+              resolve(taskResult.response);
+            } else {
+              reject(taskResult.response);
+            }
+          });
         } catch (error) {
-          reject(error);
+          this.ngZone.run(() => reject(error));
         }
       } else {
         reject({ error: true });

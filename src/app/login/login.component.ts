@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { AfterViewInit, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
@@ -22,6 +22,7 @@ import { FacturaC } from '@admin/facturacion/factura';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { ICallbackModal, modalCloseType, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -35,7 +36,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   errorU = '';
   versionApp = '';
   tipo_prueba = 'otro';
-  imgLogo;
+  imgLogo = signal<string>('');
 
   requestClass = new RequestC();
   configServ = Ss.configServ;
@@ -48,21 +49,21 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     private fb: UntypedFormBuilder,
     private router: Router,
     public _ipc: IpcService,
-    public currentUserServ: CurrentUserService
+    public currentUserServ: CurrentUserService,
+    private sanitizer: DomSanitizer
   ) {
     super();
   }
 
   ngOnInit() {
     fun.logout();
+    this.form = this.fb.group({ usuario: !Environment.production ? 'novac' : null, password: !Environment.production ? '1234567' : null });
   }
 
   ngAfterViewInit(): void {
     this.configApp = Ss.configServ.config;
-    this.imgLogo = `data:image/png;base64,${this.configApp.logo_empresa}`;
+    this.imgLogo.set(`data:image/png;base64,${this.configApp.logo_empresa}`);
     this.versionApp = this.configApp.app_version;
-
-    this.form = this.fb.group({ usuario: !Environment.production ? 'novac' : null, password: !Environment.production ? '1234567' : null });
 
     fun.setTimeout(() => fun.enfocarInput('Iusuario'), 5);
   }
@@ -100,6 +101,8 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     if (formulario.usuario == Environment.config_user && formulario.password == Environment.config_password) {
       this.openConfigsModal();
     } else {
+      Ss.sharedServ.nextCanToast(true);
+
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then(res => {

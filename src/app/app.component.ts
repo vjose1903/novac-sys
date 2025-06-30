@@ -2,7 +2,7 @@ import { PrimengModule } from './modules/primeng.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NewModalModule } from './core/components/modal/modal.module';
 import { FormulariosEnModalesModule } from './core/components/formularios en modales/formularios-en-modales.module';
-import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener, inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, AfterViewInit, HostListener, inject, OnDestroy, signal } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from '@services/ipc.service';
 import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
@@ -49,7 +49,7 @@ import { Firestore } from '@angular/fire/firestore';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit, OnDestroy {
+export class AppComponent extends MixinClass implements OnInit, AfterViewInit, OnDestroy {
   // Servicios inyectados usando inject()
   public _ipc = inject(IpcService);
   public loaderServ = inject(LoaderService);
@@ -78,7 +78,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   tiempo_restante: string;
   objPercent: any;
   counter = 0;
-  isReady = false;
+  isReady = signal<boolean>(false);
 
   tipoFacturaClass = new TiposFacturaC();
 
@@ -143,17 +143,12 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     await this.loadAppConfig();
 
     this.setupSubscriptions();
-    this.getTiposFacturas();
     Ss.layServ.parseMenu();
     this.verifyIsReady();
   }
 
   ngAfterViewInit(): void {
     fun.setWindowSize(window);
-  }
-
-  ngAfterContentChecked(): void {
-    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -240,42 +235,55 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     }
   }
 
-  getTiposFacturas() {
-    return new Promise(async (resolve, reject) => {
-      await this.tipoFacturaClass
-        .getAll()
-        .then((tiposFacturas: any) => {
-          tiposFacturas = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
-          Ss.factServ.lista_tipos_facturas = tiposFacturas;
+  async getTiposFacturas(): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const tiposFacturas = (await this.tipoFacturaClass.getAll()) as unknown as TipoFacturaI[];
 
-          resolve(Ss.factServ.lista_tipos_facturas);
-        })
-        .catch(error => {
-          fun.logRed('error: ', error);
-          reject(error);
-        });
+        console.log('tiposFacturas ', tiposFacturas);
+
+        const tiposFacturasOrdenados = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
+
+        Ss.factServ.lista_tipos_facturas = tiposFacturasOrdenados;
+        resolve();
+      } catch (error) {
+        fun.logRed('error: ', error);
+        reject(error);
+      }
     });
   }
 
   async verifyIsReady() {
     const validations = async () => {
       return new Promise<boolean>(resolve => {
-        if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
+        // if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
         if (!Ss.layServ.menuParsed) return resolve(false);
+        if (!Ss.configServ.isConfigLoaded()) return resolve(false);
 
         resolve(true);
       });
     };
 
     const noSuccess = () => {
-      this.isReady = false;
-      fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+      this.zone.run(() => {
+        this.isReady.set(false);
+        fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+      });
+    };
+
+    const actionAfterRetry = () => {
+      // this.zone.run(() => {
+      this.getTiposFacturas().finally(() => {
+        console.log('isReady ');
+        this.isReady.set(true);
+      });
+      // });
     };
 
     fun.retryUntil({
       task: () => validations(),
       retryWhen: res => !res,
-      actionAfterRetry: () => (this.isReady = true),
+      actionAfterRetry: actionAfterRetry,
       actionIfNoSuccess: () => noSuccess(),
     });
   }

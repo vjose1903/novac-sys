@@ -68,16 +68,27 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
+        // console.log('response', response);
+        const errorDesconocido = () => fun.toastError('Error <strong>desconocido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR');
+
         if (fun.isEmpty(response.error)) {
-          fun.toastError('Error <strong>desconocido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR');
+          errorDesconocido();
         } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
           fun.toastError(response.error.msg, 'ERROR');
           this.sharedServ.nextCanToast(false);
           Ss.layServ.nextLogOut({ bool: true, quien: 'close_session' });
         } else {
-          if (fun.objHas(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
+          if (fun.objHas(response, 'status') && response.status == 404 && fun.hasValue(response?.error?.msg)) {
+            // console.log('1');
 
-          if (fun.objHas(response, 'error.msg')) this.handler_msg(response.error.msg, 'error');
+            this.handler_msg(response.error.msg, 'warning');
+          } else if (fun.objHas(response, 'error.msg')) {
+            // console.log('2');
+            this.handler_msg(response.error.msg, 'error');
+          } else {
+            // console.log('3');
+            errorDesconocido();
+          }
         }
 
         return throwError(response);

@@ -12,7 +12,7 @@ export class EmpresaService extends FirebaseRequest<EmpresaI> {
   constructor() {
     super();
     this.firebaseCollectionName = this._collectionName;
-    this.getEmpresa(Environment.empresa_key);
+    // this.getEmpresa(Environment.empresa_key);
   }
 
   private _empresa: EmpresaI;

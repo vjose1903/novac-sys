@@ -9,30 +9,43 @@ const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
   private static instance: HandlerConfigFile;
-  private default_config: ConfigI;
-  private machineId: MachineId = MachineId.getInstance();
+  private static initPromise: Promise<HandlerConfigFile>;
+  private _default_config: ConfigI;
 
-  private constructor() {
-    this.getDefaultConfig()
-      .then(config => {
-        this.default_config = config;
-        
-        this.default_config.logo_empresa = logos.logo_empresa;
-        this.default_config.logo_impresion = logos.logo_impresion;
-
-        this.default_config.machineId = this.machineId.value;
-
-      })
-      .catch(error => {
-        writeLogs('ERROR al leer archivo de configuración por defecto:', error);
-      });
+  get default_config() {
+    return this._default_config;
   }
 
-  static getInstance(): HandlerConfigFile {
+  private constructor() {}
+
+  static getInstance(machineId: MachineId): Promise<HandlerConfigFile> {
+    if (!HandlerConfigFile.initPromise) {
+      HandlerConfigFile.initPromise = HandlerConfigFile.createInstance(machineId);
+    }
+    return HandlerConfigFile.initPromise;
+  }
+
+  private static async createInstance(machineId: MachineId): Promise<HandlerConfigFile> {
     if (!HandlerConfigFile.instance) {
       HandlerConfigFile.instance = new HandlerConfigFile();
+      await HandlerConfigFile.instance.initialize(machineId);
     }
     return HandlerConfigFile.instance;
+  }
+
+  private async initialize(machineId: MachineId): Promise<void> {
+    try {
+      const config = await this.getDefaultConfig();
+
+      this._default_config = config;
+      this._default_config.logo_empresa = logos.logo_empresa;
+      this._default_config.logo_impresion = logos.logo_impresion;
+
+      this._default_config.machineId = machineId.value;
+    } catch (error) {
+      writeLogs('ERROR al leer archivo de configuración por defecto:', error);
+      throw error;
+    }
   }
 
   getDefaultConfig() {
@@ -62,7 +75,7 @@ export default class HandlerConfigFile {
 
       if (args?.create_if_not_exists && !file_exists) {
         try {
-          await Functions.setConfigFile(JSON.stringify(this.default_config))  
+          await Functions.setConfigFile(JSON.stringify(this._default_config));
           resolve(true);
         } catch (error) {
           reject(false);
@@ -82,9 +95,6 @@ export default class HandlerConfigFile {
   //     if (!existe_archivo_config) {
   //       Functions.setConfigFile(JSON.stringify(this.default_config))
   //         .then(() => {
-  //           console.log(' ');
-  //           console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
-  //           console.log(' ');
   //           writeLogs('------ ARCHIVO DE CONFIGURACION CREADO ------');
 
   //           setTimeout(() => resolve(true), 500);

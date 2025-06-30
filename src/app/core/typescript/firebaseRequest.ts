@@ -1,16 +1,22 @@
-import { addDoc, collection, doc, getDoc, getDocs, updateDoc, query, where, limit } from '@angular/fire/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, updateDoc, query, where, limit, DocumentReference } from '@angular/fire/firestore';
 import { Ss } from '../services/singleton.service';
 import { fun } from '@core/services/functions.service';
+import { runInInjectionContext, Injector, inject } from '@angular/core';
 
 export class FirebaseRequest<T> {
   private _firebaseCollectionName!: string;
+  private injector = inject(Injector);
+  private resolvedRefs = new Map<string, any>(); // Cache para referencias ya resueltas
 
   set firebaseCollectionName(value: string) {
     this._firebaseCollectionName = value;
   }
 
   // ========== MÉTODOS DE VALIDACIÓN ==========
-  private async validateParams(params: referenceParams | CreateInParentParams | UpdateInParentParams, type: 'getAll' | 'getOne' | 'create' | 'update' | 'createInParent' | 'updateInParent'): Promise<referenceParams | CreateInParentParams | UpdateInParentParams> {
+  private async validateParams(
+    params: referenceParams | CreateInParentParams | UpdateInParentParams,
+    type: 'getAll' | 'getOne' | 'create' | 'update' | 'createInParent' | 'updateInParent'
+  ): Promise<referenceParams | CreateInParentParams | UpdateInParentParams> {
     if (fun.isEmpty(params)) params = {};
 
     // Validación específica para createInParent
@@ -45,12 +51,79 @@ export class FirebaseRequest<T> {
   }
 
   // ========== MÉTODOS HELPER ==========
-  private mapDocumentToObject(docSnapshot: any): T {
-    return { ...((docSnapshot.data() as object) || {}), id: docSnapshot.id } as T;
+  private async mapDocumentToObject(docSnapshot: any): Promise<T> {
+    const data = { ...((docSnapshot.data() as object) || {}), id: docSnapshot.id };
+    return (await this.resolveDocumentReferences(data)) as T;
   }
 
-  private mapDocumentsToArray(docs: any[]): T[] {
-    return docs.map(doc => this.mapDocumentToObject(doc));
+  private async mapDocumentsToArray(docs: any[]): Promise<T[]> {
+    return Promise.all(docs.map(doc => this.mapDocumentToObject(doc)));
+  }
+
+  private async resolveDocumentReferences(data: any): Promise<any> {
+    if (!data || typeof data !== 'object') return data;
+
+    // Si es un array, procesar cada elemento
+    if (Array.isArray(data)) {
+      return Promise.all(data.map(item => this.resolveDocumentReferences(item)));
+    }
+
+    const resolvedData = { ...data };
+
+    // Procesar todas las propiedades en paralelo
+    const promises = Object.entries(data).map(async ([key, value]) => {
+      if (this.isDocumentReference(value)) {
+        try {
+          const resolvedValue = await this.resolveDocumentReference(value as DocumentReference);
+          return [key, resolvedValue];
+        } catch (error) {
+          console.warn(`Error resolving document reference for key ${key}:`, error);
+          return [key, value]; // Mantener la referencia original
+        }
+      } else if (typeof value === 'object' && value !== null) {
+        const resolvedValue = await this.resolveDocumentReferences(value);
+        return [key, resolvedValue];
+      }
+      return [key, value];
+    });
+
+    const results = await Promise.all(promises);
+    results.forEach(([key, value]) => {
+      resolvedData[key] = value;
+    });
+
+    return resolvedData;
+  }
+
+  private isDocumentReference(value: any): boolean {
+    return value && typeof value === 'object' && 'path' in value && 'id' in value && 'parent' in value && typeof value.path === 'string' && value.path.includes('/');
+  }
+
+  private async resolveDocumentReference(docRef: DocumentReference): Promise<any> {
+    const refKey = docRef.path;
+
+    // Verificar cache primero
+    if (this.resolvedRefs.has(refKey)) {
+      return this.resolvedRefs.get(refKey);
+    }
+
+    return runInInjectionContext(this.injector, async () => {
+      try {
+        const docSnapshot = await getDoc(docRef);
+        if (docSnapshot.exists()) {
+          const data = { ...((docSnapshot.data() as object) || {}), id: docSnapshot.id };
+          const resolvedData = await this.resolveDocumentReferences(data);
+
+          // Guardar en cache
+          this.resolvedRefs.set(refKey, resolvedData);
+          return resolvedData;
+        }
+        return null;
+      } catch (error) {
+        console.warn(`Error resolving document reference ${refKey}:`, error);
+        return null;
+      }
+    });
   }
 
   private makeEntityRefString(params: Partial<referenceParams> = {}): string {
@@ -63,7 +136,7 @@ export class FirebaseRequest<T> {
     return refString;
   }
 
-  private createQuery(collectionRef: any, findBy: string, findValue: any, limitCount?: number) {
+  private firebaseQuery(collectionRef: any, findBy: string, findValue: any, limitCount?: number) {
     let q = query(collectionRef, where(findBy, '==', findValue));
     if (limitCount) {
       q = query(q, limit(limitCount));
@@ -72,42 +145,48 @@ export class FirebaseRequest<T> {
   }
 
   // ========== MÉTODOS PARA OBTENER POR ID ==========
-  private async getDocumentById(refString: string): Promise<T> {
-    const entityRef = doc(Ss.firestore, refString);
-    const entitySnapshot = await getDoc(entityRef);
+  private async getDocumentById(refString: string): Promise<T | null> {
+    return runInInjectionContext(this.injector, async () => {
+      const entityRef = doc(Ss.firestore, refString);
+      const entitySnapshot = await getDoc(entityRef);
 
-    if (!entitySnapshot.exists()) {
-      throw new Error('Document does not exist');
-    }
+      if (!entitySnapshot.exists()) {
+        return null;
+      }
 
-    return this.mapDocumentToObject(entitySnapshot);
+      return await this.mapDocumentToObject(entitySnapshot);
+    });
   }
 
   // ========== MÉTODOS PARA OBTENER POR CAMPO ==========
-  private async getDocumentByField(collectionPath: string, fieldName: string, fieldValue: any): Promise<T> {
-    const entityRef = collection(Ss.firestore, collectionPath);
-    const q = this.createQuery(entityRef, fieldName, fieldValue, 1);
-    const entitySnapshot = await getDocs(q);
+  private async getDocumentByField(collectionPath: string, fieldName: string, fieldValue: any): Promise<T | null> {
+    return runInInjectionContext(this.injector, async () => {
+      const entityRef = collection(Ss.firestore, collectionPath);
+      const q = this.firebaseQuery(entityRef, fieldName, fieldValue, 1);
+      const entitySnapshot = await getDocs(q);
 
-    if (entitySnapshot.empty) {
-      throw new Error(`Document with ${fieldName} = ${fieldValue} does not exist`);
-    }
+      if (entitySnapshot.empty) {
+        return null;
+      }
 
-    return this.mapDocumentToObject(entitySnapshot.docs[0]);
+      return await this.mapDocumentToObject(entitySnapshot.docs[0]);
+    });
   }
 
   private async getDocumentsByField(collectionPath: string, fieldName?: string, fieldValue?: any): Promise<T[]> {
-    const entityRef = collection(Ss.firestore, collectionPath);
+    return runInInjectionContext(this.injector, async () => {
+      const entityRef = collection(Ss.firestore, collectionPath);
 
-    let q;
-    if (fieldName && fieldValue !== undefined) {
-      q = this.createQuery(entityRef, fieldName, fieldValue);
-    } else {
-      q = entityRef;
-    }
+      let q;
+      if (fieldName && fieldValue !== undefined) {
+        q = this.firebaseQuery(entityRef, fieldName, fieldValue);
+      } else {
+        q = entityRef;
+      }
 
-    const entitySnapshot = await getDocs(q);
-    return this.mapDocumentsToArray(entitySnapshot.docs);
+      const entitySnapshot = await getDocs(q);
+      return await this.mapDocumentsToArray(entitySnapshot.docs);
+    });
   }
 
   // ========== MÉTODOS PÚBLICOS PRINCIPALES ==========
@@ -117,11 +196,11 @@ export class FirebaseRequest<T> {
       const refString = this.makeEntityRefString(params);
       return await this.getDocumentsByField(refString);
     } catch (error) {
-      throw error;
+      return [];
     }
   }
 
-  async _getOne(params: referenceParams): Promise<T> {
+  async _getOne(params: referenceParams): Promise<T | null> {
     try {
       params = await this.validateParams(params, 'getOne');
 
@@ -138,46 +217,57 @@ export class FirebaseRequest<T> {
       });
       return await this.getDocumentByField(refString, params.find_by, params.find_value);
     } catch (error) {
-      throw error;
+      return null;
     }
   }
 
-  async _createOne(params: referenceParams): Promise<void> {
+  async _createOne(params: referenceParams): Promise<T> {
     try {
       params = await this.validateParams(params, 'create');
       const refString = this.makeEntityRefString(params);
       const entityRef = collection(Ss.firestore, refString);
-      await addDoc(entityRef, params.data);
+      
+      const docRef = await addDoc(entityRef, params.data);
+      const docSnapshot = await getDoc(docRef);
+      
+      return await this.mapDocumentToObject(docSnapshot);
     } catch (error) {
       throw error;
     }
   }
 
-  async createOneInParentCollection(params: CreateInParentParams): Promise<void> {
+  async createOneInParentCollection(params: CreateInParentParams): Promise<T> {
     try {
       params = (await this.validateParams(params, 'createInParent')) as CreateInParentParams;
 
       const refString = `${params.parentCollection}/${params.parentId}/${this._firebaseCollectionName}`;
       const entityRef = collection(Ss.firestore, refString);
 
-      await addDoc(entityRef, params.data);
+      const docRef = await addDoc(entityRef, params.data);
+      const docSnapshot = await getDoc(docRef);
+      
+      return await this.mapDocumentToObject(docSnapshot);
     } catch (error) {
       throw error;
     }
   }
 
-  async _updateOne(params: referenceParams): Promise<void> {
+  async _updateOne(params: referenceParams): Promise<T> {
     try {
       params = await this.validateParams(params, 'update');
       const refString = this.makeEntityRefString(params);
       const entityRef = doc(Ss.firestore, refString);
+      
       await updateDoc(entityRef, params.data);
+      const docSnapshot = await getDoc(entityRef);
+      
+      return await this.mapDocumentToObject(docSnapshot);
     } catch (error) {
       throw error;
     }
   }
 
-  async updateOneInParentCollection(params: UpdateInParentParams): Promise<void> {
+  async updateOneInParentCollection(params: UpdateInParentParams): Promise<T> {
     try {
       params = (await this.validateParams(params, 'updateInParent')) as UpdateInParentParams;
 
@@ -185,6 +275,9 @@ export class FirebaseRequest<T> {
       const entityRef = doc(Ss.firestore, refString);
 
       await updateDoc(entityRef, params.data);
+      const docSnapshot = await getDoc(entityRef);
+      
+      return await this.mapDocumentToObject(docSnapshot);
     } catch (error) {
       throw error;
     }
@@ -199,11 +292,11 @@ export class FirebaseRequest<T> {
       });
       return await this.getDocumentsByField(refString);
     } catch (error) {
-      throw error;
+      return [];
     }
   }
 
-  async getOneSubCollection(params: SubCollectionParams): Promise<T> {
+  async getOneSubCollection(params: SubCollectionParams): Promise<T | null> {
     try {
       // Buscar por ID del documento
       if (!params.find_by || params.find_by === 'id') {
@@ -222,7 +315,7 @@ export class FirebaseRequest<T> {
       });
       return await this.getDocumentByField(refString, params.find_by, params.find_value);
     } catch (error) {
-      throw error;
+      return null;
     }
   }
 
@@ -234,19 +327,27 @@ export class FirebaseRequest<T> {
       });
       return await this.getDocumentsByField(refString, params.find_by, params.find_value);
     } catch (error) {
-      throw error;
+      return [];
     }
   }
 
   // ========== MÉTODOS ADICIONALES DE CONVENIENCIA ==========
-  async _getByField(fieldName: string, fieldValue: any, params: Partial<referenceParams> = {}): Promise<T> {
-    const refString = this.makeEntityRefString(params);
-    return await this.getDocumentByField(refString, fieldName, fieldValue);
+  async _getByField(fieldName: string, fieldValue: any, params: Partial<referenceParams> = {}): Promise<T | null> {
+    try {
+      const refString = this.makeEntityRefString(params);
+      return await this.getDocumentByField(refString, fieldName, fieldValue);
+    } catch (error) {
+      return null;
+    }
   }
 
   async _getAllByField(fieldName: string, fieldValue: any, params: Partial<referenceParams> = {}): Promise<T[]> {
-    const refString = this.makeEntityRefString(params);
-    return await this.getDocumentsByField(refString, fieldName, fieldValue);
+    try {
+      const refString = this.makeEntityRefString(params);
+      return await this.getDocumentsByField(refString, fieldName, fieldValue);
+    } catch (error) {
+      return [];
+    }
   }
 
   async _exists(params: referenceParams): Promise<boolean> {
@@ -256,6 +357,15 @@ export class FirebaseRequest<T> {
     } catch {
       return false;
     }
+  }
+
+  // ========== MÉTODOS DE LIMPIEZA ==========
+  clearCache(): void {
+    this.resolvedRefs.clear();
+  }
+
+  clearCacheForPath(path: string): void {
+    this.resolvedRefs.delete(path);
   }
 }
 

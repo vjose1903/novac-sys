@@ -32,7 +32,7 @@ export class CrudG<T> {
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend'): Promise<responseModel<T>> {
     let url = this.makeUrl(tipo, arg);
 
-    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise());
+    return await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise();
   }
 
   async getOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
@@ -105,8 +105,8 @@ export class CrudG<T> {
 
   private getUrlInUse() {
     const configApp: ConfigI = Ss.configServ.config;
-
     const url = !Environment.production ? Environment[configApp.machineId] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
+
     // const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;
   }

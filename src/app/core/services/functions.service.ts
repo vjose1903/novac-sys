@@ -737,6 +737,32 @@ export class fun {
     return base;
   }
 
+  /**
+   * Nombre: encriptar
+   * Descripcion : Esta funcion encripta un string
+   * @param arg El string a encriptar
+   * @returns El string encriptado
+   */
+  static encriptar(arg: string): string {
+    return btoa(unescape(encodeURIComponent(arg)))
+  }
+
+  /**
+   * Nombre: desEncriptar
+   * Descripcion : Esta funcion desencripta un string
+   * @param arg El string a desencriptar
+   * @returns El string desencriptado
+   */
+  static desEncriptar(arg: string): { object: string; error?: boolean } {
+    try {
+      const decodedString = decodeURIComponent(escape(atob(arg)));
+      return { object: decodedString, error: false };
+    } catch (error) {
+      console.error('Error al desencriptar:', error);
+      return { object: '', error: true };
+    }
+  }
+
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
@@ -767,7 +793,7 @@ export class fun {
   }
 
   static decryptConfigPassword(str) {
-    const str_remplace = btoa(str);
+    const str_remplace = fun.encriptar(str);
 
     const config: ConfigI = Ss.configServ.config;
     return str_remplace == config.config_password.replace('VMj$pt30r=', '=');
@@ -846,19 +872,35 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

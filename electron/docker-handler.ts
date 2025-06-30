@@ -26,10 +26,7 @@ export default class DockerHandler {
       if (this.count_docker <= 20 && this.count_db <= 20) {
         runTerminalCommand('docker ps --filter "name=agrodemi-dev" --format "{{.Status}}"')
           .then(res => {
-            if (this.count_db == 1) writeLogs('Docker esta corriendo perfectamente.');
-
             if (res.STDOUT.toLowerCase().includes('up')) {
-              writeLogs('Base de datos esta corriendo perfectamente.');
               setTimeout(() => {
                 this.is_db_local_running = true;
                 first_resolve('Todo Listo en docker');

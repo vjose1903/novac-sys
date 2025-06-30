@@ -33,11 +33,11 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets",
-              "src/splash_config_error.html",
-              "src/splash_db_error.html",
-              "src/splash_docker_error.html",
-              "src/splash_error_desconocido.html",
-              "src/splash.html",
+              {
+                "glob": "**/*",
+                "input": "src/splash",
+                "output": "splash"
+              },
               "src/favicon.ico",
               "src/favicon.icns",
               "src/favicon.256x256.png",

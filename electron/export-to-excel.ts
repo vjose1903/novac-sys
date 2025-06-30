@@ -38,7 +38,6 @@ export default class ExportToExcel {
         const documentsPath = this.app.getPath('documents');
         const targetFolder = path.join(documentsPath, 'NovacSystem');
         const filePath = parsePath(path.join(targetFolder, fileName));
-        writeLogs(filePath, 'filePath');
 
         await this.ensureDirectoryExists(targetFolder);
 
@@ -46,7 +45,6 @@ export default class ExportToExcel {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Datos');
         excelData.forEach(row => sheet.addRow(row));
-
 
         this.autoFitColumns(sheet);
 
