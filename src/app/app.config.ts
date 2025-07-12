@@ -7,11 +7,10 @@ import { InterceptorService } from './loader/interceptor.service';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { NgxExtendedPdfViewerModule, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { primeNGLocales } from '@core/typescript/primeNG.locales';
-import Nora from '@primeng/themes/nora';
+import Nora from '@primeuix/themes/nora';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { provideRouter, withRouterConfig, withComponentInputBinding } from '@angular/router';
-
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
