@@ -1,10 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ArticuloC } from '@registros/articulos/articulo';
+import { AfterViewInit, Component, Input, OnInit, signal } from '@angular/core';
+import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';
 import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 
 import { MixinClass } from '@core/typescript/MixinClass';
 import { default_per_page, table_config } from '../../new_tablas/tabla-class';
+import { tipoDocFacturacion } from '@admin/facturacion/factura';
 
 @Component({
   selector: 'app-buscar-articulo',
@@ -12,15 +13,20 @@ import { default_per_page, table_config } from '../../new_tablas/tabla-class';
   styleUrls: ['./buscar-articulo.component.scss'],
   standalone: false,
 })
-export class BuscarArticuloComponent extends MixinClass implements OnInit, ModalI {
+export class BuscarArticuloComponent extends MixinClass implements ModalI, AfterViewInit {
   articuloClass = new ArticuloC();
   constructor(private tServ: TablasService) {
     super();
   }
 
-  dataFiltro;
+  @Input() modalConfig: any;
   @Input() modalWrapper: any = {};
-  inputs: any;
+  @Input() metodo: tipoDocFacturacion | null = null;
+  @Input() palabra_a_buscar: string = ' ';
+  @Input() fecha_articulo: string = null;
+  @Input() index: number = null;
+
+  dataFiltro = signal<ArticuloI[]>([]);
 
   table_config: table_config = {
     info: [
@@ -36,14 +42,15 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
   tablaComponent;
 
   btn_aceptar() {}
-  ngOnInit(): void {
+
+  ngAfterViewInit(): void {
     this.buscarArticulos(this.tServ.obj_paginate.default, 'init');
   }
 
   async buscarArticulos(params?: { per_page: number; page: number; search: string }, where?) {
-    let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
+    let palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
 
-    const is_compra = this.inputs.metodo === 'compra';
+    const is_compra = this.metodo === 'compra';
 
     try {
       const res = await this.articuloClass
@@ -52,29 +59,26 @@ export class BuscarArticuloComponent extends MixinClass implements OnInit, Modal
           page: params.page,
           per_page: params.per_page,
           paginado: true,
-          fecha: this.inputs.fecha_articulo,
+          fecha: this.fecha_articulo,
           is_compra: is_compra,
         })
         .catch(error => {
-          this.closeThis({ tipo: 'data_no_found', modal_id: this.modalWrapper.component_id, index: this.inputs.index });
+          this.closeModal({ tipo: 'data_no_found', modal_id: this.modalWrapper.component_id, index: this.index });
         });
 
-      this.dataFiltro = res?.data;
-      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      this.dataFiltro.set(res?.data);
+
+      if (this.tablaComponent?.changeTableConfig) {
+        this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      }
     } catch (error) {}
   }
 
   tableClickRow(event) {
-    const modal = this.closeThis();
-    modal.returnDataFromModal({ data: event.data, modal_id: this.modalWrapper.component_id, index: this.inputs.index });
+    this.closeModal({ articulo: event.data, modal_id: this.modalWrapper.component_id, index: this.index });
   }
 
-  closeThis(arg?) {
-    const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id == this.modalWrapper.component_id);
-
-    modal.closeModal(this.modalWrapper.component_id);
-    if (arg) modal.returnDataFromModal(arg);
-
-    return modal;
+  closeModal(arg?) {
+    if (this.modalConfig) this.modalConfig.close(arg);
   }
 }
