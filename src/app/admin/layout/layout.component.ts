@@ -15,7 +15,7 @@ import { fun } from '@core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 import { serie } from '@core/typescript/constantes';
 import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_CHANGE_CONFIG_FILE, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
+import { ELECTRON_SET_APP_CONFIG, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 import { ModalPasswordConfigComponent } from '../../login/extra/modal-password-config/modal-password-config.component';
@@ -180,27 +180,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   changeSerieDefault() {
-    fun.logYellow('changeSerieDefault');
-
-    const logos_changes = {};
-    const prev_serie_default = this.configApp.serie_default;
     const new_config = { ...this.configApp, serie_default: this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica };
 
-    const replacement = {
-      serie_default: { source: prev_serie_default, target: new_config.serie_default },
-    };
-
-    const objChange = { new_config, configReplacement: replacement };
-
-    if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
-
-    const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE, objChange);
+    const task = new MessageTask(ELECTRON_SET_APP_CONFIG, new_config);
 
     this._ipc
       .sendTask(task)
-      .then(res => {
-        this.refreshPage();
-      })
+      .then(res => this.refreshPage())
       .catch(err => {
         console.error(err);
         if (err.msg) fun.toastError(err.msg, 'ERROR');
@@ -262,10 +248,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   openConfiguracionesModal() {
-    const passwordConfirmCallback = (args: ICallbackModal) => {
-      console.log('args ', args);
-    };
-
     const passwordConfigModal = new DynamicModalClass();
     passwordConfigModal.id = 'configuracionesForm';
     passwordConfigModal.width = '90vw';
@@ -276,7 +258,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     passwordConfigModal.inputs = { is_on_modal: true };
     passwordConfigModal.comfirmToClose = false;
 
-    passwordConfigModal.setCallback(passwordConfirmCallback);
     passwordConfigModal.show();
   }
 

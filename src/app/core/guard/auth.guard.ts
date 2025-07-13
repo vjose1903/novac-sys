@@ -58,7 +58,7 @@ export class AuthGuard {
   private async ensureConfigLoaded(): Promise<void> {
     if (this.configurationService.isConfigLoaded()) return;
 
-    await firstValueFrom(this.configurationService.configLoaded$.pipe(filter(loaded => loaded)));
+    await firstValueFrom(this.configurationService.config$.pipe(filter(config => config !== null)));
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { EmpresaI } from '@core/interface/config-interface';
-import { FirebaseRequest } from '@core/typescript/firebaseRequest';
+import { FirebaseRequest } from '@core/typescript/firebase/firebaseRequest';
 import { Environment } from '@environments/environment';
 
 @Injectable({
@@ -16,9 +16,8 @@ export class EmpresaService extends FirebaseRequest<EmpresaI> {
   }
 
   private _empresa: EmpresaI;
-  
 
-  set setEmpresa(empresa) {
+  set empresa(empresa) {
     this._empresa = empresa;
   }
 
@@ -30,10 +29,13 @@ export class EmpresaService extends FirebaseRequest<EmpresaI> {
     return this._collectionName;
   }
 
+  setEmpresa() {
+    this.getEmpresa(Environment.empresa_key);
+  }
 
   getEmpresa(key: string) {
-    this._getOne({ find_by: 'key', find_value: key }).then((empresa) => {
-      this.setEmpresa = empresa;
+    this._getOne({ find_by: 'key', find_value: key }).then(empresa => {
+      this.empresa = empresa;
     });
   }
 }

@@ -2,7 +2,6 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { AfterViewInit, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
 import { IpcService } from '@core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
 import { Environment } from '@environments/environment';
@@ -13,7 +12,6 @@ import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { RequestC } from '@core/typescript/requests';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Ss } from '@core/services/singleton.service';
-import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '@core/models/message-task';
 import { ConfigI } from '@core/interface/config-interface';
 import { fun } from '@core/services/functions.service';
@@ -150,8 +148,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   navigateToConfig() {
-    console.log('%c ANDO AQUIII', 'color: red');
-
     this.router.navigateByUrl('/auth/config');
   }
 

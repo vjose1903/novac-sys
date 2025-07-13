@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Injectable, NgZone } from '@angular/core';
+import { ChangeDetectorRef, Injectable, Injector, NgZone } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { LoaderService } from '../../loader/loader.service';
 import { LayoutService } from '@admin/layout/layout.service';
@@ -22,6 +22,7 @@ export class Ss {
   public static loadServ: LoaderService;
   public static factServ: FacturacionService;
   public static firestore: Firestore;
+  public static injector: Injector;
 
   public static layServ: LayoutService;
   public static toastr: ToastrService;

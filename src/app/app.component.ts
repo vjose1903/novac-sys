@@ -2,10 +2,10 @@ import { PrimengModule } from './modules/primeng.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NewModalModule } from './core/components/modal/modal.module';
 import { FormulariosEnModalesModule } from './core/components/formularios en modales/formularios-en-modales.module';
-import { Component, OnInit, ChangeDetectorRef, NgZone, AfterViewInit, HostListener, inject, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, AfterViewInit, HostListener, inject, OnDestroy, signal, Injector } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from '@services/ipc.service';
-import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
+
 import { Ss } from '@services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from '@admin/layout/layout.service';
@@ -66,6 +66,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   public permissionsService = inject(NgxPermissionsService);
   public dynamicModalService = inject(DynamicModalService);
   public firestore = inject(Firestore);
+  public injector = inject(Injector);
 
   // Subject para manejar la destrucción del componente
   private readonly destroy$ = new Subject<void>();
@@ -174,6 +175,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       cdRef: this.cdRef,
       dynamicModalService: this.dynamicModalService,
       firestore: this.firestore,
+      injector: this.injector,
     });
   }
 
@@ -185,8 +187,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     this.loaderServ.isLoading.pipe(takeUntil(this.destroy$)).subscribe(loading => (this.loading = loading));
 
     // Solo escuchar cambios en la configuración para recargarla
-    MODIFIED_CONFIG_FILE.pipe(takeUntil(this.destroy$)).subscribe(res => {
-      if (fun.hasValue(res)) this.loadAppConfig();
+    this.configServ.config$.pipe(takeUntil(this.destroy$)).subscribe(config => {
+      this.themeService.setTheme(config.color_app);
+      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
     });
 
     // Eventos de Electron
@@ -209,26 +212,12 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     });
   }
 
-  /**
-   * Cargar configuración de la aplicación
-   */
-  async verifiyLocalConfigFile(): Promise<void> {
-    // TODO: flujo es verificar si existe el archivo de configuracion local y si no existe, retornar el archivo de configuracion por defecto
-    // TODO: con el archivo por defecto guardarlo en firebase y luego guardarlo en el archivo de configuracion local
-  }
-
   async loadAppConfig(): Promise<void> {
     try {
-      console.log('----- ELECTRON_GET_APP_CONFIG -----');
-
       const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
       const config = (await this._ipc.sendTask(task)) as any;
 
-      console.log('%c config ---> ', 'color: yellow; font-weight: bold;', config);
-
-      this.configServ.setConfig = config;
-      this.themeService.setTheme(config.color_app);
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+      this.configServ.config = config;
     } catch (error) {
       console.error('Error cargando configuración:', error);
       // Manejar error de configuración
@@ -239,8 +228,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     return new Promise<void>(async (resolve, reject) => {
       try {
         const tiposFacturas = (await this.tipoFacturaClass.getAll()) as unknown as TipoFacturaI[];
-
-        console.log('tiposFacturas ', tiposFacturas);
 
         const tiposFacturasOrdenados = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
 
@@ -274,7 +261,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     const actionAfterRetry = () => {
       // this.zone.run(() => {
       this.getTiposFacturas().finally(() => {
-        console.log('isReady ');
         this.isReady.set(true);
       });
       // });
@@ -378,7 +364,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   iniciar_descarga_actualizacion(): void {
     const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
     this._ipc.sendTask(task).then(res => {
-      console.log('res ---> ', res);
       this.visible = true;
     });
   }
@@ -397,22 +382,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       this.objPercent = object;
       this.cdRef.detectChanges();
     });
-  }
-
-  async getAppConfig(): Promise<any> {
-    try {
-      const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
-      const config = (await this._ipc.sendTask(task)) as any;
-
-      this.themeService.setTheme(config.color_app);
-      this.configServ.setConfig = config;
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-
-      return config;
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
   }
 
   timeConvert(d: number): string {

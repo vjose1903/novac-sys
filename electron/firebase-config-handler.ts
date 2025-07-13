@@ -72,8 +72,6 @@ export default class FirebaseConfigHandler {
   private async getActualClient(): Promise<string> {
     const pathFile = (await pathAdd('/actual_cliente.json')) as string;
 
-    console.log('pathFile ', pathFile);
-
     if (!fs.existsSync(pathFile)) {
       throw new Error('Archivo de cliente actual no encontrado');
     }
@@ -141,6 +139,8 @@ export default class FirebaseConfigHandler {
 
     if (entitySnapshot.empty) {
       throw new Error('Empresa no encontrada en Firebase');
+    } else {
+      writeLogs('----- Empresa encontrada en Firebase -----');
     }
 
     const doc = entitySnapshot.docs[0];
@@ -161,8 +161,8 @@ export default class FirebaseConfigHandler {
    * Obtiene el snapshot de configuración actual
    */
   private async getCurrentConfigSnapShot() {
-    const collectionRef = this.getCurrentConfigCollection();
-    const q = this.createQuery(collectionRef, 'machineId', this.machineId, 1);
+    const configCollectionRef = this.getCurrentConfigCollection();
+    const q = this.createQuery(configCollectionRef, 'machineId', this.machineId, 1);
     return await getDocs(q);
   }
 
@@ -175,11 +175,11 @@ export default class FirebaseConfigHandler {
     }
 
     try {
-      const entitySnapshot = await this.getCurrentConfigSnapShot();
+      const configSnapshot = await this.getCurrentConfigSnapShot();
 
-      if (!entitySnapshot.empty) {
+      if (!configSnapshot.empty) {
         writeLogs('----- Configuración encontrada en Firebase -----');
-        const doc = entitySnapshot.docs[0];
+        const doc = configSnapshot.docs[0];
         const data = this.mapDocumentToObject<ConfigI>(doc);
 
         return data;
@@ -206,17 +206,17 @@ export default class FirebaseConfigHandler {
     }
 
     try {
-      const entitySnapshot = await this.getCurrentConfigSnapShot();
+      const configSnapshot = await this.getCurrentConfigSnapShot();
 
       let docRef;
-      if (!entitySnapshot.empty) {
+      if (!configSnapshot.empty) {
         // Actualizar documento existente
-        docRef = entitySnapshot.docs[0].ref;
+        docRef = configSnapshot.docs[0].ref;
         await setDoc(docRef, config, { merge: true });
       } else {
         // Crear nuevo documento
-        const collectionRef = this.getCurrentConfigCollection();
-        docRef = await addDoc(collectionRef, config);
+        const configCollectionRef = this.getCurrentConfigCollection();
+        docRef = await addDoc(configCollectionRef, config);
       }
 
       // Obtener el documento actualizado/creado

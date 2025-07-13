@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ConfigI, EmpresaI } from '@core/interface/config-interface';
-import { FirebaseRequest } from '@core/typescript/firebaseRequest';
+import { ConfigI } from '@core/interface/config-interface';
+import { FirebaseRequest } from '@core/typescript/firebase/firebaseRequest';
 import { EmpresaService } from './empresa.service';
 import { fun } from './functions.service';
 
@@ -16,37 +16,37 @@ export class ConfigurationService extends FirebaseRequest<ConfigI> {
     this.firebaseCollectionName = 'configuration';
   }
 
-  private _config: ConfigI;
-  private configLoadedSubject = new BehaviorSubject<boolean>(false);
-
   // Observable público para suscribirse al estado de carga
-  public configLoaded$: Observable<boolean> = this.configLoadedSubject.asObservable();
+  private _config: BehaviorSubject<ConfigI> = new BehaviorSubject<ConfigI | null>(null);
 
-  set setConfig(configuration) {
-    this._config = configuration;
-    // Notificar que la configuración ya está cargada
-    this.configLoadedSubject.next(true);
+  // Observables públicos
+  get config$(): Observable<ConfigI> {
+    return this._config.asObservable();
   }
 
-  get config() {
-    return this._config;
+  get config(): ConfigI {
+    return this._config.value;
+  }
+
+  set config(value: ConfigI) {
+    this._config.next(value);
   }
 
   // Método para verificar si la configuración está cargada
   isConfigLoaded(): boolean {
-    return this.configLoadedSubject.value;
+    return this._config.value !== null;
   }
 
-  createConfig(newConfig: ConfigI) {
+  async createConfig(newConfig: ConfigI): Promise<ConfigI> {
     if (fun.isEmpty(this.empresaServ.empresa)) throw new Error('Empresa is not defined');
 
-    this.createOneInParentCollection({ parentCollection: this.empresaServ.collectionName, parentId: this.empresaServ.empresa.id, data: newConfig });
+    return await this.createOneInParentCollection({ parentCollection: this.empresaServ.collectionName, parentId: this.empresaServ.empresa.id, data: newConfig });
   }
 
-  updateConfig(newConfig: ConfigI) {
+  async updateConfig(newConfig: ConfigI): Promise<ConfigI> {
     if (fun.isEmpty(this.empresaServ.empresa)) throw new Error('Empresa is not defined');
     if (fun.isEmpty(newConfig.id)) throw new Error('Config id is not defined');
 
-    this.updateOneInParentCollection({ parentCollection: this.empresaServ.collectionName, parentId: this.empresaServ.empresa.id, documentId: newConfig.id, data: newConfig });
+    return await this.updateOneInParentCollection({ parentCollection: this.empresaServ.collectionName, parentId: this.empresaServ.empresa.id, documentId: newConfig.id, data: newConfig });
   }
 }

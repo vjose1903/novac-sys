@@ -10,7 +10,6 @@ import FirebaseConfigHandler from './electron/firebase-config-handler';
 import SplashHandler, { ErrorType, TypedError } from './electron/splash-handler';
 
 import SharedElectronAngular, {
-  ELECTRON_CHANGE_CONFIG_FILE,
   ELECTRON_EVENT_DECRYPT,
   ELECTRON_EVENT_ENCRYPT,
   ELECTRON_GET_APP_CONFIG,
@@ -30,8 +29,7 @@ import SharedElectronAngular, {
   ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE,
 } from './electron/shared-electron-angular';
 
-import AppUpdate from './electron/auto-update';
-import ReplaceInFile from './electron/replace-in-file';
+import AppUpdate from './electron/auto-update'
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
 import ExportToExcel from './electron/export-to-excel';
@@ -44,7 +42,6 @@ import PdfPrinter from './electron/pdf-printer';
 let win: BrowserWindow | null;
 let auto_updater: AppUpdate;
 let docker_handler: DockerHandler;
-let replace_in_file: ReplaceInFile;
 let pdf_printer: PdfPrinter;
 let export_to_excel: ExportToExcel;
 
@@ -309,7 +306,6 @@ async function handleNewConfig(): Promise<void> {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function continuarCargandoArchivos() {
   // -------------- remplazar en archivos ----------------
-  replace_in_file = new ReplaceInFile();
   export_to_excel = new ExportToExcel(app);
 
   writeLogs(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
@@ -384,20 +380,6 @@ async function handleEvent(event: any, obj: string) {
       //
       case ELECTRON_OPEN_WEB_BROWSER:
         openBrowser.open(parameters.url);
-        break;
-      case ELECTRON_CHANGE_CONFIG_FILE:
-        replace_in_file
-          .replaceFunction(parameters)
-          .then(res => {
-            task.response = res;
-            event.reply(ELECTRON_RESPONSE, task);
-          })
-          .catch(err => {
-            task.error = true;
-            task.response = err;
-            event.reply(ELECTRON_RESPONSE, task);
-          });
-
         break;
       //
       case ELECTRON_EVENT_DECRYPT:

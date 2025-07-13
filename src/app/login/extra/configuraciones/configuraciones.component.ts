@@ -2,15 +2,15 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { AfterViewInit, Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { Ss } from '@core/services/singleton.service';
-import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
 import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_CHANGE_CONFIG_FILE } from '@electron/shared-electron-angular';
+import { ELECTRON_SET_APP_CONFIG } from '@electron/shared-electron-angular';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
 import { Router } from '@angular/router';
 import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 import { formFieldId, formFieldName } from './configuraciones.model';
+import { EmpresaService } from '@core/services/empresa.service';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -71,6 +71,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   ];
 
   htmlServ = inject(HtmlElementsService);
+  empresaServ = inject(EmpresaService);
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -81,13 +82,14 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;
+
     this.configCopy = fun.deepCloning(this.configApp);
     this.parseDocumentosAImprimir(this.configApp).then(() => {
       this.createForm(this.configApp);
       this.formIsInvalid();
     });
 
-    fun.logGreen('this.configApp', this.configApp);
+    this.empresaServ.setEmpresa();
   }
 
   ngAfterViewInit(): void {
@@ -169,8 +171,6 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   }
 
   saltar(sali_de) {
-    // console.log('sali_de', sali_de);
-
     let next_control = null;
 
     const next_control_map = {
@@ -231,162 +231,119 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   }
 
   getFormularioToSend() {
-    let formulario = this.form.getRawValue();
+    const formulario = this.form.getRawValue();
+
+    // Extraer descripción del color
     formulario.color_app = formulario.color_app.descripcion;
 
-    const pages_sizes = {
-      venta_contado: formulario.page_size_venta_contado.descripcion,
-      venta_credito: formulario.page_size_venta_credito.descripcion,
-      pre_venta: formulario.page_size_pre_venta.descripcion,
-      cotizacion: formulario.page_size_cotizacion.descripcion,
-      compra: formulario.page_size_compra.descripcion,
-      recibo_ingreso: formulario.page_size_recibo_ingreso.descripcion,
-      conduce: formulario.page_size_conduce.descripcion,
-      nota: formulario.page_size_nota.descripcion,
-      cuadre_caja: formulario.page_size_cuadre_caja.descripcion,
-      reporte: formulario.page_size_reporte.descripcion,
-    };
+    // Mapear tamaños de página
+    const pageSizeKeys = ['venta_contado', 'venta_credito', 'pre_venta', 'cotizacion', 'compra', 'recibo_ingreso', 'conduce', 'nota', 'cuadre_caja', 'reporte'];
 
-    const printer_selected = {
-      venta_contado: formulario.printer_venta_contado,
-      venta_credito: formulario.printer_venta_credito,
-      pre_venta: formulario.printer_pre_venta,
-      cotizacion: formulario.printer_cotizacion,
-      compra: formulario.printer_compra,
-      recibo_ingreso: formulario.printer_recibo_ingreso,
-      conduce: formulario.printer_conduce,
-      nota: formulario.printer_nota,
-      cuadre_caja: formulario.printer_cuadre_caja,
-      reporte: formulario.printer_reporte,
-    };
+    const pages_sizes = pageSizeKeys.reduce((acc, key) => {
+      acc[key] = formulario[`page_size_${key}`].descripcion;
+      return acc;
+    }, {});
 
-    const keys_to_omit = [
-      'page_size_venta_contado',
-      'page_size_venta_credito',
-      'page_size_pre_venta',
-      'page_size_compra',
-      'page_size_recibo_ingreso',
-      'page_size_conduce',
-      'page_size_nota',
-      'page_size_cuadre_caja',
-      'page_size_reporte',
-      'page_size_cotizacion',
+    // Mapear impresoras seleccionadas
+    const printer_selected = pageSizeKeys.reduce((acc, key) => {
+      acc[key] = formulario[`printer_${key}`];
+      return acc;
+    }, {});
 
-      'printer_venta_contado',
-      'printer_venta_credito',
-      'printer_pre_venta',
-      'printer_compra',
-      'printer_recibo_ingreso',
-      'printer_conduce',
-      'printer_nota',
-      'printer_cuadre_caja',
-      'printer_reporte',
-      'printer_cotizacion',
-    ];
+    // Eliminar campos individuales del formulario
+    const keysToOmit = [...pageSizeKeys.map(key => `page_size_${key}`), ...pageSizeKeys.map(key => `printer_${key}`)];
 
-    keys_to_omit.forEach(element => delete formulario[element]);
+    keysToOmit.forEach(key => delete formulario[key]);
 
-    formulario['pages_sizes'] = pages_sizes;
-    formulario['printer_selected'] = printer_selected;
+    // Agregar objetos estructurados
+    formulario.pages_sizes = pages_sizes;
+    formulario.printer_selected = printer_selected;
+
     return formulario;
   }
 
-  formIsInvalid() {
-    let res = true;
+  formIsInvalid(): boolean {
+    if (!this.form) return true;
+    if (!this.form.valid) return true;
 
-    if (this.form) {
-      if (this.form.valid) {
-        let formulario = this.getFormularioToSend();
-
-        let keysConfig = Object.keys(formulario);
-        const cambios = [];
-
-        keysConfig.forEach(keyC => {
-          if (typeof this.configCopy[keyC] == 'string') {
-            if (this.configCopy[keyC] != formulario[keyC]) cambios.push(keyC);
-          } else {
-            if (!fun.isEqual(this.configCopy[keyC], formulario[keyC])) cambios.push(keyC);
-          }
-        });
-
-        res = cambios.length > 0 ? false : true;
-      } else res = true;
-    }
-
-    return res;
-  }
-
-  changesParser(configReplacement, logos_changes, obj, copyObjLevel, key_padre) {
-    let keysConfig = Object.keys(obj);
-    const logosKeys = ['logo_empresa', 'logo_impresion'];
-
-    for (let i = 0; i < keysConfig.length; i++) {
-      const key = keysConfig[i];
-
-      if (fun.hasValue(copyObjLevel[key])) {
-        const tipoDato = typeof obj[key];
-
-        if (tipoDato == 'string' || tipoDato == 'boolean') {
-          if (copyObjLevel[key] != obj[key]) {
-            if (logosKeys.includes(key)) {
-              logos_changes[key] = obj[key];
-            } else {
-              const value_source = tipoDato == 'string' ? `${key}: '${copyObjLevel[key]}'` : `${key}: ${copyObjLevel[key]}`;
-              const value_target = tipoDato == 'string' ? `${key}: '${obj[key]}'` : `${key}: ${obj[key]}`;
-
-              configReplacement[key] = { source: value_source, target: value_target };
-              // TODO: poner aqui una funcion para el remplazo exclusivo de los pages_sizes con el key_padre
-            }
-          }
-        } else {
-          this.changesParser(configReplacement, logos_changes, obj[key], copyObjLevel[key], key);
-        }
-      }
-    }
-  }
-
-  object_changed(configReplacement, key, obj, copyObjLevel) {
-    const tipoDato = typeof obj[key];
-
-    const value_source = tipoDato == 'string' ? `${key}: '${copyObjLevel[key]}'` : `${key}: ${copyObjLevel[key]}`;
-    const value_target = tipoDato == 'string' ? `${key}: '${obj[key]}'` : `${key}: ${obj[key]}`;
-
-    configReplacement[key] = { source: value_source, target: value_target };
-  }
-
-  submit() {
     const formulario = this.getFormularioToSend();
-    formulario['cliente'] = this.getValue(this.configApp, 'cliente');
-    fun.logGreen('formulario', formulario);
+    const keysConfig = Object.keys(formulario);
 
-    // this.configServ.createConfig(formulario);
+    const hasChanges = keysConfig.some(key => {
+      const originalValue = this.configCopy[key];
+      const newValue = formulario[key];
 
-    // const configReplacement = {};
-    // const logos_changes = {};
+      // Comparar según el tipo de dato
+      if (typeof originalValue === 'string') {
+        return originalValue !== newValue;
+      } else {
+        return !fun.isEqual(originalValue, newValue);
+      }
+    });
 
-    // this.changesParser(configReplacement, logos_changes, formulario, this.configCopy, 'obj_principal');
+    return !hasChanges;
+  }
 
-    // const objChange = { new_config: formulario, configReplacement: configReplacement };
+  async submit(): Promise<void> {
+    try {
+      // Preparar formulario con cliente
+      const formulario = {
+        ...this.getFormularioToSend(),
+        cliente: this.getValue(this.configApp, 'cliente'),
+      };
 
-    // if (fun.hasValue(logos_changes)) objChange['logos_changes'] = logos_changes;
+      const config_id = formulario[formFieldName.id];
+      const isNewConfig = fun.isEmpty(config_id) || config_id === 'default';
 
-    // const task = new MessageTask(ELECTRON_CHANGE_CONFIG_FILE, objChange);
+      // Crear o actualizar configuración
+      const config_response = isNewConfig ? await this.configServ.createConfig(formulario) : await this.configServ.updateConfig(formulario);
 
-    // this._ipc
-    //   .sendTask(task)
-    //   .then(res => {
-    //     this.sharedServ.nextCanToast(true);
-    //     fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
-    //     fun.setTimeout(() => {
-    //       MODIFIED_CONFIG_FILE.next(res);
-    //       this.sharedServ.nextCanToast(false);
-    //       this.salir();
-    //     }, 250);
-    //   })
-    //   .catch(err => {
-    //     if (err.msg) fun.toastError(err.msg, 'ERROR');
-    //     else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
-    //     console.error(err);
-    //   });
+      // Enviar tarea a Electron
+      const task = new MessageTask(ELECTRON_SET_APP_CONFIG, config_response);
+
+      await this._ipc.sendTask(task);
+
+      // Manejar éxito
+      this.handleSubmitSuccess(config_response);
+    } catch (error) {
+      this.handleSubmitError(error);
+    }
+  }
+
+  private handleSubmitSuccess(config_response: any): void {
+    // Mostrar toast solo si no está en modal
+    if (!this.is_on_modal) {
+      this.sharedServ.nextCanToast(true);
+    }
+
+    fun.toastSuccess('Configuración de la aplicación cambiada correctamente.', 'CORRECTO');
+
+    // Actualizar configuración y salir después de un delay
+    fun.setTimeout(() => {
+      // Preservar propiedades que no son manejadas por el formulario
+      const propiedadesFormulario = Object.keys(config_response);
+      const configCompleta = { ...config_response };
+
+      // Agregar propiedades faltantes desde configCopy
+      Object.keys(this.configCopy).forEach(key => {
+        if (!propiedadesFormulario.includes(key)) {
+          configCompleta[key] = this.configCopy[key];
+        }
+      });
+
+      this.configServ.config = configCompleta;
+
+      if (!this.is_on_modal) {
+        this.sharedServ.nextCanToast(false);
+      }
+
+      this.salir();
+    }, 250);
+  }
+
+  private handleSubmitError(error: any): void {
+    const errorMessage = error?.msg || 'Error al cambiar la configuración de la aplicación';
+    fun.toastError(errorMessage, 'ERROR');
+    console.error('Error en submit:', error);
   }
 }
