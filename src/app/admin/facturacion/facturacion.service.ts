@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { fun } from '@core/services/functions.service';
 import { comprobante, comprobanteElectronico, comprobanteNormal, tipoDocFacturacion, TipoFacturaI, tFacturaKey } from './factura';
 import { Ss } from '@core/services/singleton.service';
@@ -9,7 +9,7 @@ import { serie } from '@core/typescript/constantes';
 })
 export class FacturacionService {
   action;
-  tipoDocumento: tipoDocFacturacion;
+  tipoDocumento = signal<tipoDocFacturacion | null>(null);
   tipoFacturaReferenciaSelected: string;
   tipoFactura: TipoFacturaI;
   htmlTiposFacturas: string;
@@ -25,6 +25,11 @@ export class FacturacionService {
   filasDetalle;
   serieType = signal(serie.electronica);
 
+  isCompra = computed(() => this.tipoDocumento() == tipoDocFacturacion.compra);
+  isVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.venta);
+  isCotizacion = computed(() => this.tipoDocumento() == tipoDocFacturacion.cotizacion);
+  isPreVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.pre_venta);
+
   public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
     if (fun.hasValue(Ss.configServ)) {
       const configApp = Ss.configServ.config;
@@ -33,22 +38,6 @@ export class FacturacionService {
     } else {
       return {};
     }
-  }
-
-  public get isCompra(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.compra;
-  }
-
-  public get isVenta(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.venta;
-  }
-
-  public get isCotizacion(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.cotizacion;
-  }
-
-  public get isPreVenta(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.pre_venta;
   }
 
   public get isComprobanteElectronico(): boolean {

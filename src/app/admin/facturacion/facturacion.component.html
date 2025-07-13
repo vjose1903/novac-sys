@@ -1,4 +1,4 @@
-<span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', factServ.tipoDocumento)">
+<span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', factServ.tipoDocumento())">
   <i id="triangualo" class="fas fa-caret-left text-white"></i>
 </span>
 
@@ -7,7 +7,7 @@
     <div class="d-flex align-items-center">
       <h4 class="negrita mb-0">{{ titulo | titlecase }}</h4>
 
-      @if (optionesExtra.length > 0 && factServ.isVenta) {
+      @if (optionesExtra.length > 0 && factServ.isVenta()) {
         <div class="ms-3">
           <btn-icon-circular id="btnExtra" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
@@ -32,7 +32,7 @@
     </div>
 
     <div class="d-flex">
-      @if (!factServ.isCotizacion && !factServ.isPreVenta) {
+      @if (!factServ.isCotizacion() && !factServ.isPreVenta()) {
         <p-selectButton
           [options]="facturasSerieOptions"
           [ngModel]="factServ.serieType()"
@@ -50,7 +50,7 @@
     <div class="cardPrincipal cardFacturacion">
       <div class="cabezaFactura">
         <div class="row">
-          @if (factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion) {
+          @if (factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion) {
             <div class="col-3 divRight ps-0">
               <div class="row">
                 <div class="col-3 ps-0">
@@ -76,7 +76,7 @@
                   </p-popover>
                 </div>
 
-                <div class="{{ factServ.isCompra ? 'col-6' : 'col-9' }} p-0">
+                <div class="{{ factServ.isCompra() ? 'col-6' : 'col-9' }} p-0">
                   <!-- ================== CONDICION ================== -->
                   <span class="titulos"><strong>Condición:</strong></span>
                   <select
@@ -94,7 +94,7 @@
                   </select>
                 </div>
 
-                @if (factServ.isCompra) {
+                @if (factServ.isCompra()) {
                   <div class="col-3 pe-0">
                     <!-- ================== GASTO ================== -->
                     <span class="titulos"><strong>Gasto:</strong></span>
@@ -120,7 +120,7 @@
                 }
               </div>
 
-              @if (factServ.isVenta) {
+              @if (factServ.isVenta()) {
                 <div>
                   <!-- ================== VENTA ================== -->
                   <span class="me-2 mt-3 titulos"><strong>Venta: </strong></span>
@@ -252,7 +252,7 @@
                   </p-popover>
                 </div>
               }
-              @if (factServ.isCompra) {
+              @if (factServ.isCompra()) {
                 <div>
                   <!-- ================== COMPROBANTE ================== -->
                   <span class="mt-2"><strong>Número comprobante:</strong></span>
@@ -288,12 +288,12 @@
           }
           <!-- ======================================================================================================================================================================== -->
           <!-- ======================================================================================================================================================================== -->
-          <div class="{{ factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
+          <div class="{{ factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
             <form [formGroup]="form">
               <div class="d-flex" style="height: 1.7rem">
                 <!-- ================== PROPIETARIO ================== -->
                 <h5>
-                  <strong>{{ factServ.isCompra ? 'Suplidor' : 'Cliente' }}:</strong>
+                  <strong>{{ factServ.isCompra() ? 'Suplidor' : 'Cliente' }}:</strong>
                 </h5>
                 <span class="ms-3">
                   <btn-icon-circular
@@ -301,7 +301,7 @@
                     [icon]="'fas fa-search'"
                     [size]="'size-md'"
                     [icon_size]="'1rem'"
-                    [tooltip]="factServ.isCompra ? 'Buscar suplidor' : 'Buscar cliente'"
+                    [tooltip]="factServ.isCompra() ? 'Buscar suplidor' : 'Buscar cliente'"
                     [tooltipPosition]="'right'"
                     (clickFunction)="abrirModalPropietario()">
                   </btn-icon-circular>
@@ -413,7 +413,7 @@
 
           <div class="col-7">
             <div class="h-100 d-flex justify-content-around align-items-center ms-4">
-              <div *ngxPermissionsOnly="factServ.isVenta ? permissions.factura_venta.create : permissions.factura_compra.create">
+              <div *ngxPermissionsOnly="factServ.isVenta() ? permissions.factura_venta.create : permissions.factura_compra.create">
                 <app-btncircular [alto]="'100px'" [accion]="'Terminar ' + getDocumentoDescripcion().descripcion_short" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
               </div>
               <div>
@@ -430,7 +430,7 @@
                   [nombreImg]="'guardarFactura'"
                 (pulsar)="archivarFactura()"></app-btncircular>
               </div>
-              @if (factServ.isVenta) {
+              @if (factServ.isVenta()) {
                 <div>
                   @if (fun.isEmpty(factura_a_rellenar)) {
                     <app-btncircular [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
@@ -489,8 +489,8 @@
   [dismissible]="true"
   [closeOnEscape]="true"
   [blockScroll]="true"
-  (visibleChange)="_toggleSidebar('visibleChange', factServ.tipoDocumento)">
-  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', factServ.tipoDocumento)">
+  (visibleChange)="_toggleSidebar('visibleChange', factServ.tipoDocumento())">
+  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', factServ.tipoDocumento())">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
 

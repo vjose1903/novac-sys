@@ -1,4 +1,4 @@
-@if (isInitialized && form && ARRAY_ROWFACTURAS?.controls?.length > 0) {
+@if (isInitialized && form && factServ.filasDetalle?.length > 0) {
   <div class="cuerpo-fact">
     <table class="table m-auto titulos-fact">
       <thead>
@@ -10,7 +10,7 @@
           <th class="column-descuento">Descuento</th>
           <th class="column-precio">{{ precioCostoKey | titlecase }}</th>
           @if (configApp.calcular_itbis) {
-            <th class="column-itbis">ITBIS</th>
+            <th class="column-itbis">Itbis</th>
           }
           <th class="column-total">Total</th>
         </tr>
@@ -32,7 +32,7 @@
     </table>
     <div class="contenido-fact" #cuadro>
       <form [formGroup]="form" action="">
-        @for (item_cuerpo of ARRAY_ROWFACTURAS?.controls; track item_cuerpo; let index_cuerpo = $index) {
+        @for (item_cuerpo of factServ.filasDetalle; track item_cuerpo; let index_cuerpo = $index) {
           <div formArrayName="rowFactura">
             <ng-container [formGroupName]="index_cuerpo">
               <p-popover #dropRowMenu appendTo="body">
@@ -41,7 +41,7 @@
                     <li role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
                       <a class="" id="dropdown-item">
                         <i class="fa-solid fa-triangle-exclamation text-gris-oscuro me-1"></i>
-                        Obtener {{ factServ.isCompra ? 'costo' : 'precio' }} actual
+                        Obtener {{ factServ.isCompra() ? 'costo' : 'precio' }} actual
                       </a>
                     </li>
                   }
@@ -183,7 +183,7 @@
                             type="text"
                             (blur)="handleInputEvent('blur', precioCostoKey, index_cuerpo); calcularMontosRow(index_cuerpo)"
                             (focus)="verificarSecuencia(index_cuerpo)"
-                            class="form-control entrada campoNumeros {{ factServ.isVenta ? 'inPRE' : '' }}"
+                            class="form-control entrada campoNumeros {{ factServ.isVenta() ? 'inPRE' : '' }}"
                             (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
                             id="{{ precioCostoKey }}-{{ index_cuerpo }}"
                             [formControlName]="precioCostoKey"
