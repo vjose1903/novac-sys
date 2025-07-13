@@ -23,8 +23,14 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   dataFiltro;
+
   @Input() modalWrapper: any = {};
-  inputs: any;
+
+  @Input() metodo: tipoDocFacturacion | null = null;
+  @Input() include_contado: boolean = false;
+  @Input() palabra_a_buscar: string = ' ';
+  @Input() after_select: any = null;
+
   paraFiltroClientes;
 
   table_config: table_config = {
@@ -57,7 +63,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   btn_aceptar() {}
 
   ngOnInit(): void {
-    this.isSuplidor = this.inputs.metodo == tipoDocFacturacion.compra;
+    this.isSuplidor = this.metodo == tipoDocFacturacion.compra;
 
     this.table_config.info = this.isSuplidor ? this.compraInfo : this.ventaInfo;
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
@@ -68,7 +74,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
     const copyData = fun.deepCloning(this.dataFiltro);
 
-    let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
+    let palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
 
     const classDinamic = this.isSuplidor ? 'suplidorClass' : 'clienteClass';
     try {
@@ -80,7 +86,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
             const cliente_contado = { id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null };
             const busqueda_include_contado = contado_name.includes(palabra_a_buscar);
 
-            if (this.inputs?.include_contado && !this.isSuplidor && busqueda_include_contado) res.data.unshift(cliente_contado);
+            if (this.include_contado && !this.isSuplidor && busqueda_include_contado) res.data.unshift(cliente_contado);
 
             res.data.map(async entidad => {
               entidad.nombre = entidad.nombre ? fun.capitalice(entidad.nombre) : '----------';
@@ -108,7 +114,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   tableClickRow(event) {
     const modal = this.closeThis();
 
-    if (this.inputs?.after_select) event.data.after_select = this.inputs.after_select;
+    if (this.after_select) event.data.after_select = this.after_select;
     modal.returnDataFromModal({ data: event.data, modal_id: this.modalWrapper.component_id });
   }
 

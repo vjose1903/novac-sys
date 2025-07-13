@@ -503,8 +503,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngOnChanges(change) {
-    console.log('%cchange --> ', 'color: red', change);
-
     if (change.data && change.data.currentValue) {
       this.updateDataCopy(this.data);
 
