@@ -126,8 +126,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngAfterViewInit() {
-    this.openConfigurationModal();
-
     this.checkFacturasArchivadas();
     this.cdRef.detectChanges();
   }

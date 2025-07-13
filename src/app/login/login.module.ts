@@ -1,3 +1,4 @@
+import { SvgBackgroundComponent } from './extra/svg-background/svg-background.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -8,6 +9,6 @@ import { DirectivesModule } from '@core/directive/directives.module';
 import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 @NgModule({
   declarations: [LoginComponent],
-  imports: [CommonModule, LoginRoutingModule, FormsModule, ReactiveFormsModule, DirectivesModule, FormErrorMsgComponent],
+  imports: [CommonModule, LoginRoutingModule, FormsModule, ReactiveFormsModule, DirectivesModule, FormErrorMsgComponent, SvgBackgroundComponent],
 })
 export class LoginModule {}

@@ -1,16 +1,18 @@
-<div class="home" style="background-color: var(--primary02)">
-  <div class="col-4 d-flex justify-content-center">
-    <div class="card card-padding sombra">
-      <div class="view view-cascade waves-light d-flex justify-content-center mb-4">
-        <img [src]="imgLogo()" class="img-fluid" style="max-width: 20rem" />
+<div class="home">
+  <svg-background class="svg-background" style="position: absolute"></svg-background>
+  <div class="col-3 d-flex justify-content-center">
+    <div class="card card-padding sombra w-100 card-login">
+      <div class="view view-cascade waves-light d-flex justify-content-center">
+        <img [src]="imgLogo()" class="img-fluid" style="max-width: 25rem" draggable="false" />
       </div>
       @if (form) {
-        <form [formGroup]="form" class="" method="post">
+        <form [formGroup]="form" class="" (keydown.enter)="$event.stopPropagation()">
           <div class="form-group" id="usuario-group">
             <label for="" class="formulario__label d-block">Usuario:</label>
             <input (focus)="htmlServ.selectValue($event)" type="text" class="form-control" formControlName="usuario" id="Iusuario" (keyup.enter)="saltar('Ipassword')" />
             <span class="error text-danger mt-0">{{ errorU }}</span>
           </div>
+
           <div class="form-group" id="password-group">
             <label for="" class="formulario__label d-block">Contraseña:</label>
             <input (focus)="htmlServ.selectValue($event)" type="password" class="form-control" formControlName="password" id="Ipassword" (keyup.enter)="saltar('send')" />
@@ -22,9 +24,11 @@
       <div class="d-flex justify-content-center">
         <button [disabled]="formularioIsInvalid()" class="waves-light" (click)="login()" mdbWavesEffect id="boton" class="btn btn-success text-center"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
       </div>
+
       <div class="text-center mt-1" style="width: 100%">
         <span class="version"> Novac System v{{ versionApp }} </span>
       </div>
+
       @if (false) {
         <div class="d-flex justify-content-center my-2">
           <button class="waves-light" mdbWavesEffect (click)="test()" class="btn btn-warning text-center">Test</button>
@@ -37,7 +41,12 @@
       }
     </div>
   </div>
+
   <div class="machine-id" (click)="copyMachineId()">
     {{ configApp?.machineId }}
+  </div>
+  <div class="power-by-div">
+    <span class="label"> POWER BY: </span>
+    <img class="inspot" src="assets/img/inspot_splash.png" draggable="false" />
   </div>
 </div>
