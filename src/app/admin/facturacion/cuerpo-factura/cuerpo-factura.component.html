@@ -1,4 +1,4 @@
-@if (isInitialized) {
+@if (isInitialized && form && ARRAY_ROWFACTURAS?.controls?.length > 0) {
   <div class="cuerpo-fact">
     <table class="table m-auto titulos-fact">
       <thead>
@@ -6,9 +6,9 @@
           <th class="column-codigo">Código</th>
           <th class="column-cantidad">Cantidad</th>
           <th class="column-unidad text-center">Unidad</th>
-          <th class="column-descripcion" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripcion</th>
+          <th class="column-descripcion" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripción</th>
           <th class="column-descuento">Descuento</th>
-          <th class="column-precio">{{ precioCostoKey | uppercase }}</th>
+          <th class="column-precio">{{ precioCostoKey | titlecase }}</th>
           @if (configApp.calcular_itbis) {
             <th class="column-itbis">ITBIS</th>
           }

@@ -118,33 +118,26 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         this.sacos = [25, 50, 100];
 
-        this.createForm().then(() => {
-          this.lastCuerpoChange = fun.deepCloning(this.factServ.getDetallesLlenos());
-          this.escucharCambiosEnForm();
-        });
+        // Inicializar el formulario de forma síncrona
+        this.form = this.fb.group({ rowFactura: this.fb.array([]) });
 
-        this.ARRAY_ROWFACTURAS = this.form['rowFactura'] as UntypedFormArray;
+        this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as UntypedFormArray;
 
-        for (let index = 1; index <= 25; index++) await this.addItem();
+        // Agregar elementos al FormArray
+        for (let index = 0; index < 26; index++) {
+          this.ARRAY_ROWFACTURAS.push(this.createItem());
+        }
 
-        this.factServ.filasDetalle = (this.form.controls['rowFactura'] as UntypedFormArray).controls;
-
+        this.factServ.filasDetalle = this.ARRAY_ROWFACTURAS.controls;
         this.precioCostoKey = this.factServ.isCompra ? 'costo' : 'precio';
+
+        this.lastCuerpoChange = fun.deepCloning(this.factServ.getDetallesLlenos());
+        this.escucharCambiosEnForm();
 
         resolve(true);
       } catch (error) {
         reject(error);
       }
-    });
-  }
-
-  createForm() {
-    return new Promise<void>(resolve => {
-      this.form = this.fb.group({
-        rowFactura: this.fb.array([this.createItem()]),
-      });
-
-      resolve();
     });
   }
 
@@ -212,11 +205,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   hasArticulosDevueltos(index) {
+    if (!this.factServ.filasDetalle || !this.factServ.filasDetalle[index]) return false;
+
     const current_detalle = this.factServ.filasDetalle[index].getRawValue();
 
     const detalles = this.factServ.getDetallesLlenos();
 
-    return detalles.some(detalle => detalle.key_initial == current_detalle.key && fun.hasValue(current_detalle.key)) || this.factServ.productos_devueltos.some(detalle => detalle.key_initial == current_detalle.key);
+    return (
+      detalles.some(detalle => detalle.key_initial == current_detalle.key && fun.hasValue(current_detalle.key)) || (this.factServ.productos_devueltos && this.factServ.productos_devueltos.some(detalle => detalle.key_initial == current_detalle.key))
+    );
   }
 
   // =============================================
@@ -267,7 +264,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   addItem(): void {
-    this.ARRAY_ROWFACTURAS = this.form.get('rowFactura') as FormArray;
+    if (!this.form || !this.ARRAY_ROWFACTURAS) return;
     this.ARRAY_ROWFACTURAS.push(this.createItem());
   }
 
@@ -795,7 +792,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const detalles = this.factServ.getDetallesLlenos();
 
     const articulo_defectuoso = _.find(detalles, detalle => detalle.key_initial == current_detalle.key);
-    const articulo_solo_devuelto = _.find(this.factServ.productos_devueltos, detalle => detalle.key_initial == current_detalle.key);
+    const articulo_solo_devuelto = this.factServ.productos_devueltos ? this.factServ.productos_devueltos.find(detalle => detalle.key_initial == current_detalle.key) : null;
 
     const name = current_detalle.descripcion;
     const unidad = current_detalle.unidad;
@@ -940,7 +937,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   retornarDevuelto(arg) {
     const infoRetorno = [
       { tipo: 'defectuoso', data: arg.data?.defectuoso, contenedor_retorno: this.factServ.filasDetalle },
-      { tipo: 'solo_devuelto', data: arg.data?.solo_devuelto, contenedor_retorno: this.factServ.productos_devueltos },
+      { tipo: 'solo_devuelto', data: arg.data?.solo_devuelto, contenedor_retorno: this.factServ.productos_devueltos || [] },
     ];
 
     infoRetorno.forEach(itemRetorno => {
@@ -1053,7 +1050,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
             }
           }, 10);
         } else if (data_remover.razon == razon_remover.no_venta) {
-          const articulo_ya_retirado = _.find(this.factServ.productos_devueltos, detalle => detalle.key_initial == current_detalle.value.key);
+          const articulo_ya_retirado = this.factServ.productos_devueltos ? this.factServ.productos_devueltos.find(detalle => detalle.key_initial == current_detalle.value.key) : null;
 
           const producto_devuelto = this.parsearProductoDevueltos(origin_current_detalle, data_remover, false);
 
@@ -1075,6 +1072,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     producto['articulo_id'] = producto.articulo.id;
 
     if (tipo == 'add') {
+      if (!this.factServ.productos_devueltos) this.factServ.productos_devueltos = [];
       this.factServ.productos_devueltos.push(producto);
     }
 
