@@ -1262,7 +1262,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         botones['dinamico'] = [{ clase: 'btn btn-gris', function: instance => this.router.navigateByUrl('/admin/dashboard') && this.closeModal(instance), label: label, disable: false }];
       }
 
-      const include_contado = this.factServ.isVenta() || this.factServ.isCotizacion;
+      const include_contado = this.factServ.isVenta() || this.factServ.isCotizacion();
 
       let after_select = { send_factura: args?.send_factura };
       if (Object.values(after_select).every(value => fun.isEmpty(value))) after_select = null;
