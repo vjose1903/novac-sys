@@ -112,56 +112,63 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
       this.handleConfig(config);
 
       const currentConfig: DynamicModalClass = Ss.dynamicModalService.findModalConfigById(config.id);
-      // const currentConfig = this.searchInArray(this.modalsConfig, 'id', config.id);
 
-      if (currentConfig.component) {
-        fun.setTimeout(() => {
-          const currentReceptor = this.modalReceptor['_results'].find((receptor: any) => receptor.modalReceptorId == config.id);
-          let viewContainerRef = currentReceptor.viewContainerRef;
-
-          viewContainerRef.clear();
-          viewContainerRef.remove();
-
-          // Crear componente usando la nueva API
-          const componente = viewContainerRef.createComponent(currentConfig.component);
-
-          // Configurar modalConfig si existe la propiedad
-          if (componente.setInput) {
-            componente.setInput('modalConfig', currentConfig);
-          } else {
-            componente.instance.modalConfig = currentConfig;
-          }
-
-          // Pasar inputs usando ambos métodos para máxima compatibilidad
-          if (config.inputs) {
-            // Método 1: Asignar directamente a la instancia
-            componente.instance.inputs = config.inputs;
-
-            // Método 2: Usar setInput para @Input() individuales
-            Object.keys(config.inputs).forEach(key => {
-              if (componente.setInput) {
-                componente.setInput(key, config.inputs[key]);
-              } else {
-                componente.instance[key] = config.inputs[key];
-              }
-            });
-          }
-
-          // Forzar inicialización completa del componente y sus hijos
-          componente.changeDetectorRef.detectChanges();
-
-          // Segundo ciclo de detección para componentes hijos
-          fun.setTimeout(() => {
-            componente.changeDetectorRef.detectChanges();
-          }, 100);
-
-          currentConfig.componentInstance = componente.instance;
-          currentConfig.modalWrapper = this;
-
-          resolve();
-        }, 1);
+      if (!currentConfig.component) {
+        resolve();
+        return;
       }
+
+      fun.setTimeout(() => {
+        const currentReceptor = this.modalReceptor['_results'].find((receptor: any) => receptor.modalReceptorId == config.id);
+        if (!currentReceptor) {
+          resolve();
+          return;
+        }
+
+        const viewContainerRef = currentReceptor.viewContainerRef;
+        viewContainerRef.clear();
+        viewContainerRef.remove();
+
+        // Crear componente usando la nueva API
+        const componente = viewContainerRef.createComponent(currentConfig.component);
+
+        // Configurar modalConfig
+        this.setComponentInput(componente, 'modalConfig', currentConfig);
+
+        // Pasar inputs si existen
+        if (config.inputs) {
+          componente.instance.inputs = config.inputs;
+          Object.keys(config.inputs).forEach(key => {
+            this.setComponentInput(componente, key, config.inputs[key]);
+          });
+        }
+
+        // Forzar inicialización completa del componente y sus hijos
+        this.initializeComponent(componente);
+
+        currentConfig.componentInstance = componente.instance;
+        currentConfig.modalWrapper = this;
+
+        resolve();
+      }, 1);
     });
+  }
+
+  private setComponentInput(componente: any, key: string, value: any): void {
+    if (componente.setInput) {
+      componente.setInput(key, value);
+    } else {
+      componente.instance[key] = value;
+    }
+  }
+
+  private initializeComponent(componente: any): void {
+    componente.changeDetectorRef.detectChanges();
+
+    // Segundo ciclo de detección para componentes hijos
+    fun.setTimeout(() => {
+      componente.changeDetectorRef.detectChanges();
+    }, 100);
   }
 
   changeStateButton(params: { modalId: string; btnId: string; disable: boolean }) {

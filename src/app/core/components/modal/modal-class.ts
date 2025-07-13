@@ -5,7 +5,6 @@ import { MODALCONFIG } from './modal.service';
 
 export interface ModalI {
   modalWrapper: any;
-  inputs?: any;
   btn_aceptar(): any;
 }
 
