@@ -32,8 +32,8 @@
             <p-popover [dismissable]="true" #dropdownCuenta styleClass="no-carret" appendTo="body">
               <ul class="popover-cuenta">
                 <li class="popover-header">
-                  <h4 class="mb-1">{{ usuario?.nombre }}</h4>
-                  <p class="mb-0">{{ usuario?.email }}</p>
+                  <h4 class="mb-0">{{ usuario?.nombre }}</h4>
+                  <p class="mb-0 text-s-16">{{ usuario?.email }}</p>
                 </li>
                 <li>
                   <a class="popover-item" id="popover-item" (click)="refreshPage(); dropdownCuenta.hide()">
