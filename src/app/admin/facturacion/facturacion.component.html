@@ -158,7 +158,7 @@
                         placeholder="dd/mm/aaaa"
                         [minDate]="datesAvailable.viaje.minDate"
                         (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
-                      [disabled]="errorComprobante"></p-datepicker>
+                        [disabled]="errorComprobante"></p-datepicker>
                     </div>
                     <div class="ms-3 position-relative">
                       <btn-icon-circular
@@ -261,12 +261,12 @@
                     (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
                     [ngModel]="NCFcompra()"
                     (ngModelChange)="NCFcompra.set($event)"
-                    [mask]="factServ.isComprobanteNormal ? 'B9999999999' : 'E999999999999'"
+                    [mask]="factServ.isComprobanteNormal() ? 'B9999999999' : 'E999999999999'"
                     tabindex="-1"
                     styleClass="form-control inputE UPPERCASE"
-                    [placeholder]="factServ.isComprobanteNormal ? 'B__________' : 'E____________'"
+                    [placeholder]="factServ.isComprobanteNormal() ? 'B__________' : 'E____________'"
                     [autoClear]="false"
-                  [disabled]="errorComprobante"></p-inputMask>
+                    [disabled]="errorComprobante"></p-inputMask>
                   @if (condicion_fact === 'Crédito') {
                     <div>
                       <!-- ================== FECHA VENCIMIENTO ================== -->
@@ -279,7 +279,7 @@
                         placeholder="dd/mm/aaaa"
                         [minDate]="datesAvailable.viaje.minDate"
                         (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_vencimiento', value: fecha_vencimiento })"
-                      [disabled]="errorComprobante"></p-datepicker>
+                        [disabled]="errorComprobante"></p-datepicker>
                     </div>
                   }
                 </div>
@@ -400,7 +400,7 @@
             [fechaFactura]="fechaFactura?.front"
             (getCuerpoFactura)="getCuerpoFactura($event)"
             (getCalculosDinero)="getCalculosDinero($event)"
-          [isInitialized]="isInitialized"></app-cuerpo-factura>
+            [isInitialized]="isInitialized"></app-cuerpo-factura>
         </div>
       </div>
       <div class="pieFactura">
@@ -421,14 +421,14 @@
                   [alto]="'100px'"
                   [accion]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar) ? 'Cancelar Edición' : 'Cancelar ' + getDocumentoDescripcion().descripcion_short"
                   [nombreImg]="'cancelar'"
-                (pulsar)="cancelarFactura()"></app-btncircular>
+                  (pulsar)="cancelarFactura()"></app-btncircular>
               </div>
               <div>
                 <app-btncircular
                   [alto]="'100px'"
                   [accion]="fun.hasValue(factura_guardada) ? getDocumentoDescripcion().descripcion_short + ' ya está archivada' : 'Archivar ' + getDocumentoDescripcion().descripcion_short"
                   [nombreImg]="'guardarFactura'"
-                (pulsar)="archivarFactura()"></app-btncircular>
+                  (pulsar)="archivarFactura()"></app-btncircular>
               </div>
               @if (factServ.isVenta()) {
                 <div>
@@ -446,28 +446,29 @@
                 (click)="prueba()"
               ></app-btncircular>
             </div> -->
+            </div>
           </div>
-        </div>
-        <div class="col-5 d-flex justify-content-end">
-          <div class="mostrarNumeros w-100">
-            <div class="row">
-              <div class="col-12 cuadroResumenTotal mb-2">
-                <span class="label text-poppins position-absolute left-0 top-0">BRUTO:</span>
-                <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(BRUTO) }}</h5>
-              </div>
-              @if (configApp.calcular_itbis) {
+          <div class="col-5 d-flex justify-content-end">
+            <div class="mostrarNumeros w-100">
+              <div class="row">
                 <div class="col-12 cuadroResumenTotal mb-2">
-                  <span class="label text-poppins position-absolute left-0 top-0">ITBIS:</span>
-                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(ITBIS) }}</h5>
+                  <span class="label text-poppins position-absolute left-0 top-0">BRUTO:</span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(BRUTO) }}</h5>
                 </div>
-              }
-              <div class="col-12 cuadroResumenTotal mb-2">
-                <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
-                <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(DESCUENTO) }}</h5>
-              </div>
-              <div class="col-12 cuadroResumenTotal mb-2">
-                <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
-                <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
+                @if (configApp.calcular_itbis) {
+                  <div class="col-12 cuadroResumenTotal mb-2">
+                    <span class="label text-poppins position-absolute left-0 top-0">ITBIS:</span>
+                    <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(ITBIS) }}</h5>
+                  </div>
+                }
+                <div class="col-12 cuadroResumenTotal mb-2">
+                  <span class="label text-poppins position-absolute left-0 top-0">DESCUENTO:</span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(DESCUENTO) }}</h5>
+                </div>
+                <div class="col-12 cuadroResumenTotal mb-2">
+                  <span class="label text-poppins position-absolute left-0 top-0"> <strong>TOTAL:</strong> </span>
+                  <h5 class="w-100 text-end mb-0 mt-2">{{ formatoNumero(TOTAL) }}</h5>
+                </div>
               </div>
             </div>
           </div>
@@ -475,7 +476,6 @@
       </div>
     </div>
   </div>
-</div>
 </div>
 
 <p-drawer

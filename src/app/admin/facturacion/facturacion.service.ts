@@ -30,6 +30,9 @@ export class FacturacionService {
   isCotizacion = computed(() => this.tipoDocumento() == tipoDocFacturacion.cotizacion);
   isPreVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.pre_venta);
 
+  isComprobanteElectronico = computed(() => this.serieType() == serie.electronica);
+  isComprobanteNormal = computed(() => this.serieType() == serie.normal);
+
   public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
     if (fun.hasValue(Ss.configServ)) {
       const configApp = Ss.configServ.config;
@@ -38,14 +41,6 @@ export class FacturacionService {
     } else {
       return {};
     }
-  }
-
-  public get isComprobanteElectronico(): boolean {
-    return this.serieType() == serie.electronica;
-  }
-
-  public get isComprobanteNormal(): boolean {
-    return this.serieType() == serie.normal;
   }
 
   constructor() {}

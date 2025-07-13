@@ -885,7 +885,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       .setTipoFacturaSelected({ value: this.factServ.tipoFacturaReferenciaSelected, by: 'referencia' })
       .then(result => {
         if (this.factServ.isCompra()) {
-          const ncf_prefix = `${this.factServ.isComprobanteNormal ? 'B' : 'E'}${this.factServ.tipoFacturaReferenciaSelected}`;
+          const ncf_prefix = `${this.factServ.isComprobanteNormal() ? 'B' : 'E'}${this.factServ.tipoFacturaReferenciaSelected}`;
 
           if (!this.NCFcompra().startsWith(ncf_prefix)) {
             this.NCFcompra.set(ncf_prefix);
