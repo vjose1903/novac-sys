@@ -449,6 +449,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         buscarArticuloModalConf.padding = '1rem';
         buscarArticuloModalConf.component = BuscarArticuloComponent;
         buscarArticuloModalConf.comfirmToClose = false;
+        buscarArticuloModalConf.closableEsc = true;
 
         buscarArticuloModalConf.setCallback(this.llenarRowDespuesDeFiltro.bind(this));
         buscarArticuloModalConf.show();

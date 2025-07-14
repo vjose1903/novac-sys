@@ -5,8 +5,9 @@ import * as _ from 'lodash';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '@core/services/functions.service';
-import { btnTableI, medidas, table_config, table_info } from './tabla-class';
+import { btnTableI, medidas, table_config, table_info, tableCellType } from './tabla-class';
 import { teclasCode } from '@core/typescript/constantes';
+
 import { Ss } from '@core/services/singleton.service';
 
 @Component({
@@ -36,6 +37,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   seleccionado_id: any;
   altoTabla;
   altoTbody;
+  tableCellType = tableCellType;
 
   @Input() TablasComponent;
   @Input() emptyMessage;
@@ -60,6 +62,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   tablaInterval;
   realIdTabla;
+
+  dynamicTooltipEntities = {
+    cantidades: { key: 'cantidades', sub_key: null, pluralize: true, order: 'cantidad-medida' },
+    precio: { key: 'costos', sub_key: 'precio', pluralize: false, order: 'medida-cantidad' },
+    costo: { key: 'costos', sub_key: 'costo', pluralize: false, order: 'medida-cantidad' },
+  };
 
   htmlServ = inject(HtmlElementsService);
   constructor(
@@ -520,40 +528,56 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.cdRef.detectChanges();
   }
 
-  cantidadesTooltip(dato, column) {
-    if (dato.tipo_articulo.tipo == 'servicio') return null;
+  formatQuantityString(valor: number, medida: string, order: string): string {
+    const cantidad = fun.roundNumberToDecimal(valor);
 
-    const objeto = dato[column.key];
-    const keys = _.keys(objeto);
-    const values = _.values(objeto);
-
-    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
-    const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
-    const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
-
-    const padre = fun.roundNumberToDecimal(values[1]) + '  ' + fin1;
-    const hijo = fun.roundNumberToDecimal(values[2]) + '  ' + fin2;
-
-    let cantiTootip = '';
-
-    cantiTootip = `${padre}`;
-
-    if (keys.length > 1) {
-      keys.length == 2 ? (cantiTootip = `${padre}`) : (cantiTootip = `${padre} - ${hijo}`);
+    if (order === 'cantidad-medida') {
+      return `${cantidad} ${medida}`;
+    } else if (order === 'medida-cantidad') {
+      return `${medida} ${cantidad}`;
     }
 
-    return cantiTootip;
+    // Por defecto retorna cantidad-medida
+    return `${cantidad} ${medida}`;
   }
 
-  cantidadesLabel(dato, column) {
-    if (dato.tipo_articulo.tipo == 'servicio') return 'N/A';
+  quantityTooltip(dato, column) {
+    if (dato.tipo_articulo.tipo === 'servicio') return null;
 
-    const objeto = dato[column.key];
-    const keys = _.keys(objeto);
-    const values = _.values(objeto);
-    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
+    const { key, pluralize, order, sub_key } = this.dynamicTooltipEntities[column.key];
+    const objeto = dato[key];
+    const keys = Object.keys(objeto);
 
-    return fun.roundNumberToDecimal(values[0]) + '  ' + fin;
+    if (keys.length <= 1) return '';
+
+    const processKey = (keyIndex: number) => {
+      const key = keys[keyIndex];
+      const valor = fun.hasValue(sub_key) ? objeto[key][sub_key] : objeto[key];
+      const medida = valor > 1 && pluralize ? fun.to_plural(key) : key;
+      return this.formatQuantityString(valor, medida, order);
+    };
+
+    const items = [];
+    if (keys.length >= 2) items.push(processKey(1)); // padre
+    if (keys.length >= 3) items.push(processKey(2)); // hijo
+
+    return items.length > 0 ? `<ul class="m-0 ps-3">${items.map(item => `<li>${item}</li>`).join('')}</ul>` : '';
+  }
+
+  quantityLabel(dato, column) {
+    if (dato.tipo_articulo.tipo === 'servicio') return 'N/A';
+
+    const { key, pluralize, order, sub_key } = this.dynamicTooltipEntities[column.key];
+    const objeto = dato[key];
+    const keys = Object.keys(objeto);
+
+    if (keys.length === 0) return 'N/A';
+
+    const firstKey = keys[0];
+    const valor = fun.hasValue(sub_key) ? objeto[firstKey][sub_key] : objeto[firstKey];
+    const medida = valor > 1 && pluralize ? fun.to_plural(firstKey) : firstKey;
+
+    return this.formatQuantityString(valor, medida, order);
   }
 
   disableInput(dato, column) {

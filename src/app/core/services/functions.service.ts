@@ -1,3 +1,4 @@
+import { SpanishInflector } from './../typescript/spanish-inflector';
 const moment = require('../javascript/moment');
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
@@ -8,6 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
 import { RetryOptions } from '../interface/retry-until';
+
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun {
   constructor() {}
@@ -57,6 +59,26 @@ export class fun {
       count++;
       console.log(count);
     };
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: to_plural
+  // Descripcion : Esta funcion convierte una palabra a plural
+  // _________________________________________________________________________________________________
+  static to_plural(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.pluralize(normalWord);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: to_singular
+  // Descripcion : Esta funcion convierte una palabra a singular
+  // _________________________________________________________________________________________________
+  static to_singular(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.singularize(normalWord);
   }
 
   // __________________________________________________________________________________________________
@@ -744,7 +766,7 @@ export class fun {
    * @returns El string encriptado
    */
   static encriptar(arg: string): string {
-    return btoa(unescape(encodeURIComponent(arg)))
+    return btoa(unescape(encodeURIComponent(arg)));
   }
 
   /**

@@ -8,7 +8,7 @@ import { ReporteC } from '../reportes/reporte';
 import { MovimientosFormComponent } from '@components/formularios en modales/movimientos-form/movimientos-form.component';
 import { fun } from '@core/services/functions.service';
 import { Ss } from '@core/services/singleton.service';
-import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { default_per_page, table_config, tableCellType } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { InventarioC } from './inventario';
 
@@ -26,11 +26,11 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   permissions = Permisos;
   table_roles_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', style: { width: '5.5rem', 'text-align': 'left' } },
-      { titulo: 'Articulo', tipo: 'text', key: 'nombre', style: { width: '30rem', 'text-align': 'left' } },
-      { titulo: 'Cantidad', tipo: 'cantidades', key: 'cantidades' },
-      { titulo: 'Precio', tipo: 'formatoNumero', key: 'precio_principal' },
-      { titulo: 'Costo', tipo: 'formatoNumero', key: 'costo_principal' },
+      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', style: { width: '5.5rem', 'text-align': 'left' } },
+      { titulo: 'Articulo', tipo: tableCellType.text, key: 'nombre', style: { width: '30rem', 'text-align': 'left' } },
+      { titulo: 'Cantidad', tipo: tableCellType.quantityTooltip, key: 'cantidades' },
+      { titulo: 'Precio', tipo: tableCellType.formatoNumero, key: 'precio_principal' },
+      { titulo: 'Costo', tipo: tableCellType.formatoNumero, key: 'costo_principal' },
     ],
     padding: '0.5rem',
     id_tabla: 'lista_inventario',

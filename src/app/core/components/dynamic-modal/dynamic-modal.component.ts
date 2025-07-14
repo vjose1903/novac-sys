@@ -181,14 +181,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
 
   private setModalFocus(): void {
     // Enfocar el input oculto para evitar que el foco vaya al botón de cerrar
-    const focusInput = document.getElementById('modal_focus') as HTMLInputElement;
-    if (focusInput) {
-      focusInput.focus();
-      // Opcional: desenfocar inmediatamente para que el foco no quede en un elemento invisible
-      fun.setTimeout(() => {
-        focusInput.blur();
-      }, 10);
-    }
+    fun.enfocarInput('modal_focus');
   }
 
   changeStateButton(params: { modalId: string; btnId: string; disable: boolean }) {

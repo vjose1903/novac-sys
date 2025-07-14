@@ -4,7 +4,7 @@ import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 
 import { MixinClass } from '@core/typescript/MixinClass';
-import { default_per_page, table_config } from '../../new_tablas/tabla-class';
+import { default_per_page, table_config, tableCellType } from '../../new_tablas/tabla-class';
 import { tipoDocFacturacion } from '@admin/facturacion/factura';
 
 @Component({
@@ -30,8 +30,8 @@ export class BuscarArticuloComponent extends MixinClass implements ModalI, After
 
   table_config: table_config = {
     info: [
-      { titulo: 'Descripción', tipo: 'text', key: 'nombre' },
-      { titulo: 'Existencia', tipo: 'cantidades', key: 'cantidades' },
+      { titulo: 'Descripción', tipo: tableCellType.text, key: 'nombre' },
+      { titulo: 'Existencia', tipo: tableCellType.quantityTooltip, key: 'cantidades' },
     ],
     focusRow: true,
     id_tabla: 'buscar_articulo',
@@ -44,6 +44,8 @@ export class BuscarArticuloComponent extends MixinClass implements ModalI, After
   btn_aceptar() {}
 
   ngAfterViewInit(): void {
+    if (this.metodo === tipoDocFacturacion.compra) this.table_config.info.push({ titulo: 'Costo', tipo: tableCellType.quantityTooltip, key: 'costo' });
+    else this.table_config.info.push({ titulo: 'Precio', tipo: tableCellType.quantityTooltip, key: 'precio' });
     this.buscarArticulos(this.tServ.obj_paginate.default, 'init');
   }
 
@@ -67,6 +69,8 @@ export class BuscarArticuloComponent extends MixinClass implements ModalI, After
         });
 
       this.dataFiltro.set(res?.data);
+
+      console.log(this.dataFiltro());
 
       if (this.tablaComponent?.changeTableConfig) {
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
