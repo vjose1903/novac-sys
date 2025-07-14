@@ -19,6 +19,7 @@
         [closeOnEscape]="modalConfig.closableEsc!"
         [closable]="modalConfig.closable! && !modalConfig.comfirmToClose"
         [transitionOptions]="modalConfig.transitionOptions!"
+        (onShow)="handleModalShow(modalConfig.id!)"
         (onHide)="handleCloseModal(modalConfig.id!)"
         [contentStyle]="{ padding: modalConfig.padding, overflow: modalConfig.overflow, height: modalConfig.height, width: modalConfig.width }"
         [style]="{}">
@@ -35,6 +36,7 @@
           </div>
         </ng-template>
         <div style="transition: all 0.5s" class="h-100 w-100">
+          <input type="text" id="modal_focus" style="position: absolute; left: -9999rem; opacity: 0;" tabindex="-1" />
           @if (modalConfig.html) {
             <div [innerHtml]="sanitizeHtml(modalConfig.html)" appFocus></div>
           } @else {

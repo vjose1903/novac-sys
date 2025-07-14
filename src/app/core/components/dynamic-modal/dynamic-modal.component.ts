@@ -52,6 +52,13 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  handleModalShow(modalId: string) {
+    // Cuando el modal se muestra, establecer el foco en el input oculto
+    fun.setTimeout(() => {
+      this.setModalFocus();
+    }, 50);
+  }
+
   sanitizeHtml(html: string) {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
@@ -168,7 +175,20 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
     // Segundo ciclo de detección para componentes hijos
     fun.setTimeout(() => {
       componente.changeDetectorRef.detectChanges();
+      this.setModalFocus();
     }, 100);
+  }
+
+  private setModalFocus(): void {
+    // Enfocar el input oculto para evitar que el foco vaya al botón de cerrar
+    const focusInput = document.getElementById('modal_focus') as HTMLInputElement;
+    if (focusInput) {
+      focusInput.focus();
+      // Opcional: desenfocar inmediatamente para que el foco no quede en un elemento invisible
+      fun.setTimeout(() => {
+        focusInput.blur();
+      }, 10);
+    }
   }
 
   changeStateButton(params: { modalId: string; btnId: string; disable: boolean }) {
