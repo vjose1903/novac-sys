@@ -742,7 +742,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       detalle[campoToSolve] = actual_price_value;
       formGroup.patchValue(detalle);
 
-      this.calcularMontosRow(index).then(result => instance.closeModal(instance.id));
+      this.calcularMontosRow(index).then(result => instance.close());
     };
 
     const label = this.factServ.isCompra() ? 'costo' : 'precio';
@@ -832,8 +832,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   llenarRowDespuesDeFiltro(args: ICallbackModal) {
     if (args.type == modalCloseType.onHide) return;
 
+    console.log(' args ', args);
+
     const data = args.data;
-    const { articulo, index } = data;
+    const { articulo, index, tipo } = data;
+
+    if (fun.hasValue(tipo) && tipo == 'data_no_found') {
+      fun.enfocarAndSelectInput(`codigo-${index}`);
+      return;
+    }
 
     if ((this.factServ.isVenta() || this.factServ.isPreVenta()) && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
       let msg = 'Producto agotado, debe de comprar mas!!!';
@@ -930,8 +937,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg?.tipo == 'data_no_found') fun.enfocarAndSelectInput(`codigo-${arg.index}`);
-
     if (arg.modal_id == 'retornarDevuelto') this.retornarDevuelto(arg);
 
     if (arg.modal_id == 'removerArticulo') this.procesoQuitarArticulo(arg.key, arg.data);

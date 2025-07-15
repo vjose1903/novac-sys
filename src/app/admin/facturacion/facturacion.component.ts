@@ -656,19 +656,19 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.agregarFacturaALocalStorage();
         this.info_cambio['bool'] = true;
         this.runFinalizarCambioMenu(this.info_cambio);
-        this.closeModal(instance);
+        instance.close();
       };
 
       let noGuardar = instance => {
         this.info_cambio['bool'] = true;
         this.runFinalizarCambioMenu(this.info_cambio);
-        this.closeModal(instance);
+        instance.close();
       };
 
       let cancelarFunction = instance => {
         this.info_cambio['bool'] = false;
         this.runFinalizarCambioMenu(this.info_cambio);
-        this.closeModal(instance);
+        instance.close();
       };
 
       const confirmationObj = {
@@ -708,11 +708,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               let noFunction = instance => {
                 this.procesoRelleno(factura).then(() => {
                   this.actualizarLayServFactGuardada(factura);
-                  this.closeModal(instance);
+                  instance.close();
                 });
               };
 
-              const cancelarRelleno = instance => this.closeModal(instance);
+              const cancelarRelleno = instance => instance.close();
 
               const confirmationObj = {
                 id: 'archivar_factura',
@@ -1298,7 +1298,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (this.factServ.action !== actionFacturacion.update) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento()}/${actionFacturacion.new}/0`).then(res_router => this.resetVariables());
       else if (this.factServ.action == actionFacturacion.update || this.factServ.action == actionFacturacion.bill_from_cotizacion) this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
 
-      this.closeModal(instance);
+      instance.close();
     };
 
     let documento = this.getDocumentoDescripcion();
@@ -1456,8 +1456,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   procesoArchivarFactura(modalInstance, reset = false) {
     this.agregarFacturaALocalStorage();
-    // this.getFacturasGuardadas();
-    this.closeModal(modalInstance);
+    modalInstance.close();
 
     if (reset) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento()}/${actionFacturacion.new}/0`).then(res_router => this.resetVariables());
   }

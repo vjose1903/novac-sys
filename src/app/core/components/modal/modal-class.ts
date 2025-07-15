@@ -2,6 +2,7 @@ import { fun } from '@core/services/functions.service';
 import * as _ from 'lodash';
 import { LayoutClass } from '@admin/layout/layout';
 import { MODALCONFIG } from './modal.service';
+import { DynamicModalClass } from '../dynamic-modal/config/dynamic-modal.class';
 
 export interface ModalI {
   modalWrapper: any;
@@ -25,7 +26,6 @@ export interface ConfigureModalI {
   contentStyleClass?: string;
   returnDataFromModal?: Function;
 }
-
 
 export interface btnDisabled {
   function?: Function;
@@ -71,20 +71,20 @@ export class ModalClass extends LayoutClass {
     modal_configuration['closableEsc'] = fun.objHas(params, 'closableEsc') ? params.closableEsc : false;
     modal_configuration['transitionOptions'] = fun.objHas(params, 'transitionOptions') ? params.transitionOptions : '0ms';
     modal_configuration['contentStyleClass'] = fun.objHas(params, 'contentStyleClass') ? params.contentStyleClass : '';
-    modal_configuration['returnDataFromModal'] = fun.objHas(params, 'returnDataFromModal') ? (arg) => params.returnDataFromModal(arg) : (arg) => this.getDataFromModal(arg, ' ');
+    modal_configuration['returnDataFromModal'] = fun.objHas(params, 'returnDataFromModal') ? arg => params.returnDataFromModal(arg) : arg => this.getDataFromModal(arg, ' ');
 
-    modal_configuration['onHide'] = (arg) => {
+    modal_configuration['onHide'] = arg => {
       if (fun.hasValue(this) && fun.objHas(this, 'onHideModal')) this.onHideModal(arg);
     };
 
     modal_configuration['html'] = fun.objHas(params, 'html') ? params.html : null;
     modal_configuration['id'] = params.id ?? fun.generateKey();
-    this.verificateBottons(modal_configuration);
+    this.verifyButtons(modal_configuration);
 
     MODALCONFIG.next(modal_configuration);
   }
 
-  verificateBottons(config: ConfigureModalI) {
+  verifyButtons(config: ConfigureModalI) {
     const verificateId = (boton: ButtonI) => (boton.btn_id ??= fun.generateKey());
 
     if (config.botones) {
@@ -92,7 +92,7 @@ export class ModalClass extends LayoutClass {
         const btnObj = config.botones[key];
 
         if (Array.isArray(btnObj)) {
-          btnObj.forEach((btn) => verificateId(btn));
+          btnObj.forEach(btn => verificateId(btn));
         } else {
           verificateId(btnObj);
         }
@@ -104,25 +104,24 @@ export class ModalClass extends LayoutClass {
   onHideModal(arg) {}
 
   confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string; noFunction?: Function; cancelarFunction?: Function }) {
-    const config = {
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco w-9', function: (instance) => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : this.closeModal(instance)), label: 'No', disable: false },
-          { clase: 'btn btn-verde w-9', function: (instance) => obj.siFunction(instance), label: 'Si', disable: false },
-        ],
-      },
-    };
+    const confirmationModalConf = new DynamicModalClass();
+
+    confirmationModalConf.id = obj.id;
+    confirmationModalConf.header = obj.header;
+    confirmationModalConf.width = obj.width || '30rem';
+    confirmationModalConf.html = `<p> ${obj.texto} </p>`;
+    confirmationModalConf.botones = [
+      { clase: 'btn btn-blanco w-9', function: instance => (fun.objHas(obj, 'noFunction') ? obj?.noFunction(instance) : confirmationModalConf.close()), label: 'No', disable: false },
+      { clase: 'btn btn-verde w-9', function: instance => obj.siFunction(instance), label: 'Si', disable: false },
+    ];
 
     if (fun.objHas(obj, 'cancelarFunction') && fun.hasValue(obj.cancelarFunction)) {
-      fun.pushAt(config.botones.dinamico, 0, { clase: 'btn btn-blanco', function: (instance) => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
+      fun.pushAt(confirmationModalConf.botones, 0, { clase: 'btn btn-blanco', function: instance => obj.cancelarFunction(instance), label: 'Cancelar', disable: false });
     }
 
-    this.openNewModal(config);
+    confirmationModalConf.show();
+
+    return confirmationModalConf;
   }
 
   closeModal(modalInstance) {

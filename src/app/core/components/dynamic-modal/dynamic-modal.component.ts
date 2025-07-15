@@ -119,6 +119,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
       this.handleConfig(config);
 
       const currentConfig: DynamicModalClass = Ss.dynamicModalService.findModalConfigById(config.id);
+      currentConfig.modalWrapper = this;
 
       if (!currentConfig.component) {
         resolve();
@@ -154,7 +155,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
         this.initializeComponent(componente);
 
         currentConfig.componentInstance = componente.instance;
-        currentConfig.modalWrapper = this;
+        console.log('currentConfig ', currentConfig);
 
         resolve();
       }, 1);

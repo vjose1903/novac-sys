@@ -414,7 +414,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       texto: '¿Seguro de que desea cancelar la operacion?.',
       siFunction: instance => {
         this.cancelarIgreso();
-        instance.closeModal(instance.id);
+        instance.close();
       },
     };
     this.confirmationModal(obj);
@@ -472,7 +472,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
             texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
             siFunction: instance => {
               this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
-              instance.closeModal(instance.id);
+              instance.close();
             },
           };
           this.confirmationModal(obj);

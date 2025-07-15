@@ -299,7 +299,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       this.openNewModal({
         html: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
         id: 'cerrar_app',
-        header: 'CONFIRMACION DE CIERRE',
+        header: 'CONFIRMACIÓN DE CIERRE',
         width: '40rem',
         botones: {
           ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),

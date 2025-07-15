@@ -374,7 +374,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         texto: text,
         siFunction: instance => {
           this.deleteMovimientoViaje(params);
-          instance.closeModal(instance.id);
+          instance.close();
         },
       };
 
@@ -410,7 +410,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para realizar el recibo de este pedido.',
       siFunction: instance => {
         this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}/${factura.id}`);
-        instance.closeModal(instance.id);
+        instance.close();
       },
     };
 

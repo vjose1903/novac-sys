@@ -140,7 +140,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
           const texto_modal = `Seguro de que desea anular el recibo <b class="negrita"> #${recibo_selected.numero_recibo} </b>`;
           const siFunction = instance => {
             this.anularRecibo(recibo_selected.id);
-            instance.closeModal(instance.id);
+            instance.close();
           };
 
           this.confirmationModal({ id: 'anular_recibo', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });

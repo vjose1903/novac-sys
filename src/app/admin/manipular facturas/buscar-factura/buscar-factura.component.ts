@@ -636,7 +636,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
           const si = instance => {
             this.goToFacturacionPage(params.data.tipo, action, params.data.id);
-            this.closeModal(instance);
+            instance.close();
           };
 
           let obj = { id: actions[params.iconKey].modalId, header: 'Confirmación', texto: `Seguro que desea <strong>${label}</strong> la ${tipoDocumento} No.: <strong>${params.data.secuencia} </strong>`, siFunction: si };

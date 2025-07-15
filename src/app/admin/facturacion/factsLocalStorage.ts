@@ -144,7 +144,7 @@ export class FactsLocalStorage extends PreFacturaClass {
   quitarFacturaGuardada(archivo_id) {
     let index;
     const allFacturas = FactsLocalStorage.getList();
-    
+
     if (archivo_id) {
       index = allFacturas.findIndex((item: any) => item.archivo_id === archivo_id);
 
@@ -179,7 +179,7 @@ export class FactsLocalStorage extends PreFacturaClass {
       header: 'Confirmación',
       siFunction: instance => {
         this.quitarFacturaGuardada(fact.archivo_id);
-        instance.closeModal(instance.id);
+        instance.close();
       },
       width: '30rem',
     };

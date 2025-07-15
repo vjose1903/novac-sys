@@ -55,18 +55,14 @@ export class BuscarArticuloComponent extends MixinClass implements ModalI, After
     const is_compra = this.metodo === 'compra';
 
     try {
-      const res = await this.articuloClass
-        .getArticulosFiltrado({
-          buscar: palabra_a_buscar,
-          page: params.page,
-          per_page: params.per_page,
-          paginado: true,
-          fecha: this.fecha_articulo,
-          is_compra: is_compra,
-        })
-        .catch(error => {
-          this.closeModal({ tipo: 'data_no_found', modal_id: this.modalWrapper.component_id, index: this.index });
-        });
+      const res = await this.articuloClass.getArticulosFiltrado({
+        buscar: palabra_a_buscar,
+        page: params.page,
+        per_page: params.per_page,
+        paginado: true,
+        fecha: this.fecha_articulo,
+        is_compra: is_compra,
+      });
 
       this.dataFiltro.set(res?.data);
 
@@ -75,14 +71,12 @@ export class BuscarArticuloComponent extends MixinClass implements ModalI, After
       if (this.tablaComponent?.changeTableConfig) {
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       }
-    } catch (error) {}
+    } catch (error) {
+      this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalWrapper.component_id, index: this.index });
+    }
   }
 
   tableClickRow(event) {
-    this.closeModal({ articulo: event.data, modal_id: this.modalWrapper.component_id, index: this.index });
-  }
-
-  closeModal(arg?) {
-    if (this.modalConfig) this.modalConfig.close(arg);
+    this.modalConfig.close({ articulo: event.data, modal_id: this.modalWrapper.component_id, index: this.index });
   }
 }

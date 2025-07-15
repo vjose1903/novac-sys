@@ -438,7 +438,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       },
       width: '30rem',
     };
-    this.confirmationModal(confirmationObj);
+    this.confirmationCancelModal(confirmationObj);
   }
 
   async getDataFromModal(arg, search?) {
@@ -474,7 +474,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     }
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+  confirmationCancelModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
     this.openNewModal({
       id: obj.id,
       header: obj.header,

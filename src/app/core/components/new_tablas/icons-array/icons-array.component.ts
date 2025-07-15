@@ -125,7 +125,7 @@ export class IconsArrayComponent implements OnInit {
       const siFunction = instance => {
         data.is_editing = false;
         this.tServ.modifyRowsEditing(editing_row, 'remove').then(() => this.handle_table_events('clickIcon', obj_click));
-        new ModalClass().closeModal(instance);
+        instance.close();
       };
 
       new ModalClass().confirmationModal({ id: 'cancel_row_editing', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });

@@ -15,6 +15,15 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { Environment } from '@environments/environment';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+
+// Registrar el locale español
+registerLocaleData(localeEs);
+
+// Configuración para ng-bootstrap
+import { NgbConfig } from '@ng-bootstrap/ng-bootstrap';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,6 +42,14 @@ export const appConfig: ApplicationConfig = {
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimationsAsync(),
+    provideAnimations(),
+    {
+      provide: NgbConfig,
+      useValue: {
+        animation: true,
+        placement: 'auto',
+      },
+    },
     providePrimeNG({
       theme: {
         preset: Nora,

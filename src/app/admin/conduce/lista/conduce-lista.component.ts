@@ -158,7 +158,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
             instance.closeModal(instance.id, 'anular_conduce');
           };
 
-          this.confirmationModal({ id: 'anular_conduce', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
+          this.confirmationAnularModal({ id: 'anular_conduce', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
           break;
 
         default:
@@ -211,7 +211,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       });
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
+  confirmationAnularModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
     this.openNewModal({
       id: obj.id,
       header: obj.header,

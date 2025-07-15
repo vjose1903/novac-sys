@@ -3,6 +3,7 @@ import { appConfig } from './app/app.config';
 import { enableProdMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { Environment } from './environments/environment';
+import '@angular/localize/init';
 
 if (Environment.production) {
   enableProdMode();
