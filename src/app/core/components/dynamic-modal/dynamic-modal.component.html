@@ -21,8 +21,7 @@
         [transitionOptions]="modalConfig.transitionOptions!"
         (onShow)="handleModalShow(modalConfig.id!)"
         (onHide)="handleCloseModal(modalConfig.id!)"
-        [contentStyle]="{ padding: modalConfig.padding, overflow: modalConfig.overflow, height: modalConfig.height, width: modalConfig.width }"
-        [style]="{}">
+        [contentStyle]="{ padding: modalConfig.padding, overflow: modalConfig.overflow, height: modalConfig.height, width: modalConfig.width }">
         <ng-template pTemplate="header">
           <div class="d-flex justify-content-between align-items-center w-100 h-100">
             <h4 class="mb-0">{{ modalConfig.header }}</h4>
@@ -36,7 +35,7 @@
           </div>
         </ng-template>
         <div style="transition: all 0.5s" class="h-100 w-100">
-          <input type="text" id="modal_focus" style="position: absolute; left: -9999rem; opacity: 0;" tabindex="-1" />
+          <input type="text" id="modal_focus" style="position: absolute; left: -9999rem; opacity: 0" tabindex="-1" />
           @if (modalConfig.html) {
             <div [innerHtml]="sanitizeHtml(modalConfig.html)" appFocus></div>
           } @else {

@@ -447,7 +447,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const { index, codigo } = args;
     const metodo = this.factServ.isPreVenta() ? tipoDocFacturacion.venta : this.factServ.tipoDocumento();
 
-    if (isNaN(Number(codigo))) {
+    if (isNaN(Number(codigo)) || codigo.length < 5) {
       const obj = { palabra_a_buscar: codigo, index, metodo: metodo, fecha_articulo: this.fechaFactura };
 
       const buscarArticuloModalConf = new DynamicModalClass();

@@ -16,10 +16,12 @@
         [blockScroll]="false"
         [resizable]="false"
         [closeOnEscape]="modalConfig.closableEsc"
+        [contentStyle]="{ padding: modalConfig.padding, overflow: modalConfig.overflow, height: modalConfig.height, width: modalConfig.width }"
         [closable]="modalConfig.closable"
         [transitionOptions]="modalConfig.transitionOptions"
         (onHide)="onHideModal(modalConfig.id)">
-        <div [ngStyle]="{ height: modalConfig.height, width: modalConfig.width, 'min-height': modalConfig.minHeight }" style="transition: all 0.5s">
+
+        <div [ngStyle]="{ 'min-height': modalConfig.minHeight }" style="transition: all 0.5s">
           @if (modalConfig.html) {
             <div [innerHtml]="modalConfig.html"></div>
           } @else {
@@ -51,12 +53,12 @@
               }
               @if (modalConfig?.botones?.cancelar?.show) {
                 <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.cancelar)" tooltipPosition="top">
-                  <button type="button" class="btn btn-blanco" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="disabledButton(modalConfig?.botones?.cancelar || false)">Cancelar</button>
+                  <button type="button" class="btn btn-sm btn-blanco" (click)="cancelarAndAceptar(false, modalConfig.id)" [disabled]="disabledButton(modalConfig?.botones?.cancelar || false)">Cancelar</button>
                 </span>
               }
               @if (modalConfig?.botones?.aceptar?.show) {
                 <span [pTooltip]="getButtonTooltip(modalConfig?.botones?.aceptar)" tooltipPosition="top">
-                  <button type="button" class="btn btn-verde" (click)="cancelarAndAceptar(true, modalConfig.id)" [disabled]="disabledButton(modalConfig?.botones?.aceptar || false)">Aceptar</button>
+                  <button type="button" class="btn btn-sm btn-verde" (click)="cancelarAndAceptar(true, modalConfig.id)" [disabled]="disabledButton(modalConfig?.botones?.aceptar || false)">Aceptar</button>
                 </span>
               }
             </div>

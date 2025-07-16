@@ -16,6 +16,8 @@ export interface ConfigureModalI {
   component?: any;
   width?: string;
   height?: string;
+  padding?: string;
+  overflow?: 'hidden' | 'auto' | undefined;
   minHeight?: string;
   botones?: ButtonsObjI;
   closable?: boolean;
@@ -65,6 +67,8 @@ export class ModalClass extends LayoutClass {
     modal_configuration['height'] = fun.objHas(params, 'height') ? params.height : undefined;
     modal_configuration['inputs'] = fun.objHas(params, 'inputs') ? params.inputs : undefined;
     modal_configuration['header'] = fun.objHas(params, 'header') ? params.header : undefined;
+    modal_configuration['padding'] = fun.objHas(params, 'padding') ? params.padding : '1rem';
+    modal_configuration['overflow'] = fun.objHas(params, 'overflow') ? params.overflow : 'hidden';
     modal_configuration['position'] = fun.objHas(params, 'position') ? params.position : 'center';
     modal_configuration['botones'] = fun.objHas(params, 'botones') ? params.botones : { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } };
     modal_configuration['closable'] = fun.objHas(params, 'closable') ? params.closable : true;

@@ -15,7 +15,14 @@ import { timeStamp } from 'console';
 export class RemoverArticuloComponent implements OnInit, ModalI {
   constructor(private fb: UntypedFormBuilder) {}
   @Input() modalWrapper: any = {};
-  inputs: any;
+
+  @Input() index: number;
+  @Input() key: string;
+  @Input() cantidad: number;
+  @Input() is_prefactura_selected: boolean;
+  @Input() data_detalle: any;
+  @Input() nombre: string;
+
   form;
 
   htmlServ = inject(HtmlElementsService);
@@ -41,7 +48,7 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
   }
 
   changeValorCheck() {
-    this.form.controls.cantidad.setValue(this.inputs.cantidad);
+    this.form.controls.cantidad.setValue(this.cantidad);
     fun.enfocarInput('razon');
   }
 
@@ -53,21 +60,21 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
       this.form.controls.cantidad.setValue(0);
     }
 
-    if (formulario.cantidad > this.inputs.cantidad) {
+    if (formulario.cantidad > this.cantidad) {
       fun.toastWarning('La cantidad no puede ser mayor a la cantidad pre-facturada.');
-      this.form.controls.cantidad.setValue(this.inputs.cantidad);
+      this.form.controls.cantidad.setValue(this.cantidad);
     }
 
-    this.form.controls.all.setValue(formulario.cantidad == this.inputs.cantidad);
+    this.form.controls.all.setValue(formulario.cantidad == this.cantidad);
   }
 
   btn_aceptar() {
-    if (this.form.valid || this.inputs.data_detalle.is_defectuoso || !this.inputs.is_prefactura_selected) {
+    if (this.form.valid || this.data_detalle.is_defectuoso || !this.is_prefactura_selected) {
       const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
       modal.closeModal(this.modalWrapper.component_id);
-      const obj = { key: this.inputs.key, modal_id: this.modalWrapper.component_id, data: this.inputs.data_detalle };
+      const obj = { key: this.key, modal_id: this.modalWrapper.component_id, data: this.data_detalle };
 
-      if (this.inputs.is_prefactura_selected) obj['data'] = this.form.getRawValue();
+      if (this.is_prefactura_selected) obj['data'] = this.form.getRawValue();
 
       modal.returnDataFromModal(obj);
     } else {
