@@ -60,16 +60,17 @@ export class ArticuloC extends CrudG<ArticuloI> {
 
   getArticulosFiltrado(arg: { buscar: any; fecha: any; parameters?: any; tipo?: any; page?: number; per_page?: number; paginado?: boolean; is_compra?: boolean }) {
     return new Promise<any>((resolve, reject) => {
-      let extra = { afterPath: `filtro/${arg.buscar}`, parameters: {} };
+      const { buscar, fecha, parameters, tipo = 'todos', page = 1, per_page = 20, paginado = true, is_compra = false } = arg;
+      let extra = { afterPath: `filtro/${buscar}`, parameters: {} };
 
       extra['parameters'] = {
-        page: arg.page || 1,
-        per_page: arg.per_page || 20,
-        paginado: fun.objHas(arg, 'paginado') ? arg.paginado : true,
-        is_compra: fun.objHas(arg, 'is_compra') ? arg.is_compra : false,
-        tipo: arg.tipo || 'todos',
-        fecha: arg.fecha,
-        ...arg.parameters,
+        page: page,
+        per_page: per_page,
+        paginado: paginado,
+        is_compra: is_compra,
+        tipo: tipo,
+        fecha: fecha,
+        ...parameters,
       };
 
       this.getAll(extra)

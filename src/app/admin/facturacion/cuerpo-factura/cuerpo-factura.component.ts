@@ -417,49 +417,65 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     }
   }
 
-  async saltar(input, index) {
-    if (index >= 10 && input === 'cantidad-') this.addItem();
+  async saltar(next_input, index) {
+    if (index >= 10 && next_input === 'cantidad-') this.addItem();
 
-    if (input == 'precioOCompra-') input = this.factServ.isCompra() ? 'costo-' : 'precio-';
+    if (next_input == 'precioOCompra-') next_input = this.factServ.isCompra() ? 'costo-' : 'precio-';
 
     const { articulo, codigo, cantidad, unidad } = this.factServ.filasDetalle[index].getRawValue();
 
-    if (input == 'unidad-' && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(codigo)) {
+    if (next_input == 'unidad-' && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(codigo)) {
       this.saliDeCantidad(index).then(excede => {
         if (!excede) fun.enfocarInput('unidad-' + index);
       });
     }
 
-    if ((input === 'precio-' || input === 'costo-') && fun.hasValue(codigo) && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(unidad)) {
-      fun.enfocarInput(`${input}${index}`);
+    if ((next_input === 'precio-' || next_input === 'costo-') && fun.hasValue(codigo) && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(unidad)) {
+      fun.enfocarInput(`${next_input}${index}`);
     }
 
-    if (input === 'cantidad-' && fun.hasValue(codigo)) {
+    if (next_input === 'cantidad-' && fun.hasValue(codigo)) {
       if (fun.isEmpty(articulo) || codigo !== articulo.codigo) {
-        const metodo = this.factServ.isPreVenta() ? tipoDocFacturacion.venta : this.factServ.tipoDocumento();
-        const obj = { palabra_a_buscar: codigo, index, metodo: metodo, fecha_articulo: this.fechaFactura };
-
-        const buscarArticuloModalConf = new DynamicModalClass();
-
-        buscarArticuloModalConf.id = 'buscarArticulo';
-        buscarArticuloModalConf.inputs = obj;
-        buscarArticuloModalConf.header = 'BUSCAR ARTICULO';
-        buscarArticuloModalConf.width = '56.25rem';
-        buscarArticuloModalConf.height = '31.25rem';
-        buscarArticuloModalConf.padding = '1rem';
-        buscarArticuloModalConf.component = BuscarArticuloComponent;
-        buscarArticuloModalConf.comfirmToClose = false;
-        buscarArticuloModalConf.closableEsc = true;
-
-        buscarArticuloModalConf.setCallback(this.llenarRowDespuesDeFiltro.bind(this));
-        buscarArticuloModalConf.show();
-
-        setTimeout(() => {
-          fun.enfocarInput('input_fantasma');
-        }, 10);
+        this.searchArticulo({ index, codigo });
       } else {
         fun.enfocarAndSelectInput(`cantidad-${index}`);
       }
+    }
+  }
+
+  async searchArticulo(args: { index: number; codigo: string }) {
+    const { index, codigo } = args;
+    const metodo = this.factServ.isPreVenta() ? tipoDocFacturacion.venta : this.factServ.tipoDocumento();
+
+    if (isNaN(Number(codigo))) {
+      const obj = { palabra_a_buscar: codigo, index, metodo: metodo, fecha_articulo: this.fechaFactura };
+
+      const buscarArticuloModalConf = new DynamicModalClass();
+
+      buscarArticuloModalConf.id = 'buscarArticulo';
+      buscarArticuloModalConf.inputs = obj;
+      buscarArticuloModalConf.header = 'BUSCAR ARTICULO';
+      buscarArticuloModalConf.width = '56.25rem';
+      buscarArticuloModalConf.height = '31.25rem';
+      buscarArticuloModalConf.padding = '1rem';
+      buscarArticuloModalConf.component = BuscarArticuloComponent;
+      buscarArticuloModalConf.comfirmToClose = false;
+      buscarArticuloModalConf.closableEsc = true;
+
+      buscarArticuloModalConf.setCallback((args: ICallbackModal) => this.llenarRowDespuesDeFiltro(args));
+      buscarArticuloModalConf.show();
+
+      setTimeout(() => fun.enfocarInput('input_fantasma'), 10);
+    } else {
+      try {
+        const res = await this.articuloClass.getArticulosFiltrado({
+          buscar: codigo,
+          fecha: this.fechaFactura,
+          is_compra: this.factServ.isCompra(),
+        });
+
+        this.llenarRowDespuesDeFiltro({ data: { articulo: res.data[0], index } }, false);
+      } catch (error) {}
     }
   }
 
@@ -829,32 +845,32 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.inputDrop) fun.setTimeout(() => fun.enfocarInput(this.inputDrop), 10);
   }
 
-  llenarRowDespuesDeFiltro(args: ICallbackModal) {
-    if (args.type == modalCloseType.onHide) return;
+  llenarRowDespuesDeFiltro(args: ICallbackModal | { data: any }, fromModal: boolean = true) {
+    if (fromModal && (args as ICallbackModal).type == modalCloseType.onHide) return;
 
-    console.log(' args ', args);
-
-    const data = args.data;
-    const { articulo, index, tipo } = data;
+    const { articulo, index, tipo } = args.data;
 
     if (fun.hasValue(tipo) && tipo == 'data_no_found') {
       fun.enfocarAndSelectInput(`codigo-${index}`);
       return;
     }
 
-    if ((this.factServ.isVenta() || this.factServ.isPreVenta()) && articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio') {
-      let msg = 'Producto agotado, debe de comprar mas!!!';
+    const isVentaOrPreVenta = this.factServ.isVenta() || this.factServ.isPreVenta();
+    const isProductoAgotado = articulo.existencia == 0 && articulo.tipo_articulo.tipo != 'servicio';
 
-      if (articulo.descripcion.toLowerCase() == 'producto terminado') msg = 'Producto agotado, debe de producir mas!!!';
-      fun.toastError(msg, 'ERROR');
+    if (isVentaOrPreVenta && isProductoAgotado) {
+      const isProductoTerminado = articulo.descripcion.toLowerCase() == 'producto terminado';
+      const mensaje = isProductoTerminado ? 'Producto agotado, debe de producir mas!!!' : 'Producto agotado, debe de comprar mas!!!';
+
+      fun.toastError(mensaje, 'ERROR');
 
       if (this.configApp.vende_sin_inventario) {
-        this.continuarLlenarRow({ articulo: articulo, index: index });
+        this.continuarLlenarRow({ articulo, index });
       } else {
-        fun.setTimeout(() => fun.enfocarAndSelectInput('codigo-' + index), 10);
+        fun.setTimeout(() => fun.enfocarAndSelectInput(`codigo-${index}`), 10);
       }
     } else {
-      this.continuarLlenarRow({ articulo: articulo, index: index });
+      this.continuarLlenarRow({ articulo, index });
     }
   }
 
