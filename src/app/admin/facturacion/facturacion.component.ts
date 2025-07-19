@@ -31,6 +31,8 @@ import { ConfigArticuloC, ConfigArticuloI } from '@registros/articulos/configura
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { DateUtils } from '@vjose1903/dateutils';
 import Big from 'big.js';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-facturacion',
@@ -392,7 +394,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       else if (this.factServ.isPreVenta()) this.titulo = 'Pre factura';
       else if (this.factServ.isCotizacion()) this.titulo = 'Cotización';
 
-      const useNormalSerie = [this.factServ.isCotizacion, this.factServ.isPreVenta].some(condition => condition);
+      const useNormalSerie = [this.factServ.isCotizacion(), this.factServ.isPreVenta()].some(condition => condition);
 
       const serieSelected = useNormalSerie ? serie.normal : this.configApp.serie_default;
 
@@ -403,6 +405,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row, this.chofer_row] = Array(6).fill(0);
         [this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.popover] = Array(7).fill(undefined);
         this.NCFcompra.set('');
+        this.CostoYgasto.set('');
 
         this.entidad_en_turno = 'camion';
         this.cuerpoFactura.length = 0;
@@ -411,7 +414,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         this.info_cambio = {};
         this.fechaFactura = {};
-        this.CostoYgasto.set('');
 
         this.fechaFactura['front'] = this.formarFechaFactura(new Date())['FechaFactura'];
         this.fechaFactura['back'] = this.fechaFactura['front'];
@@ -1386,31 +1388,52 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     const obj = {
-      modo_factura: this.modo_factura,
-      condicion_fact: this.condicion_fact,
       metodo: this.factServ.tipoDocumento(),
-      total_factura: this.TOTAL,
       efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
-      tipo_modal: 'devuelta',
+      total_factura: this.TOTAL,
       formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
-      factura_de: this.factServ.tipoDocumento(),
       cambios_articulos: articulos_a_cambiar,
+      condicion_fact: this.condicion_fact,
     };
 
-    this.openNewModal({
-      component: FormCantidadEfectivoComponent,
-      inputs: obj,
-      id: 'cambioEfectivo',
-      header: 'Cantidad de efectivo',
-      width: '34.375rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-          { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
-        ],
-      },
-    });
+    const cantidadEfectivoModalConfig = new DynamicModalClass();
+
+    cantidadEfectivoModalConfig.id = 'cambioEfectivo';
+    cantidadEfectivoModalConfig.inputs = obj;
+    cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
+    cantidadEfectivoModalConfig.width = '35rem';
+    cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
+    cantidadEfectivoModalConfig.comfirmToClose = false;
+    cantidadEfectivoModalConfig.closableEsc = true;
+    cantidadEfectivoModalConfig.botones = [
+      { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+      { id: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
+    ];
+
+    cantidadEfectivoModalConfig.setCallback(this.recibirCambiosEfectivo.bind(this));
+    cantidadEfectivoModalConfig.show();
+  }
+
+  async recibirCambiosEfectivo(args: ICallbackModal) {
+    if (args.type !== modalCloseType.returnData) return;
+
+    const {
+      data: { is_print, obj },
+    } = args;
+
+    // Actualizar propiedades del componente
+    this.is_print = is_print;
+    this.Devuelta = obj.devuelta;
+    this.forma_pago = obj.forma_pago;
+
+    // Procesar cambios específicos para compras
+    if (this.factServ.isCompra()) {
+      if (obj.decision_cambio) await this.cambiarCostos();
+      this.cuerpoFactura = this.newCuerpo;
+    }
+
+    // Enviar a base de datos
+    this.enviarABaseDatos();
   }
 
   getDocumentoDescripcion() {
@@ -1646,19 +1669,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.is_print = arg.is_print;
       this.enviarABaseDatos();
       //
-    } else if (arg.modal_id == 'cambioEfectivo') {
-      this.is_print = arg.is_print;
-      this.Devuelta = arg.obj.devuelta;
-      this.forma_pago = arg.obj.forma_pago;
-
-      if (this.factServ.isCompra()) {
-        if (arg.obj.decision_cambio) await this.cambiarCostos();
-
-        this.cuerpoFactura = this.newCuerpo;
-        this.enviarABaseDatos();
-      } else {
-        this.enviarABaseDatos();
-      }
     } else if (arg.modal_id == 'retornarDevuelto') {
       this.cuerpo.getDataFromModal(arg, search);
     } else if (arg.modal_id == 'buscarCliente') {
@@ -1813,22 +1823,23 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       let documento = this.getDocumentoDescripcion();
       if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
       else res = await this.facturaClass.createOne(cabecera_fact);
-      console.log('%c res', 'color: yellow', res);
 
       if (this.factura_guardada) this.revisarLocalStorage();
 
-      console.log('%c res', 'color: lime', res['data']);
       this.facturaClass.parseDataToPdf(res['data']).then(async factura_parsed => {
-        console.log('%c factura_parsed', 'color: magenta', factura_parsed);
         const obj = { data: factura_parsed, type: documento.tipo };
-        console.log('%c obj', 'color: cyan', obj);
 
         PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(`Error imprimiendo la ${documento.descripcion}.`, 'ERROR'));
 
         this.layServ.nextCheckCuadreToday(true);
 
         if (this.factServ.action == actionFacturacion.update) this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
-        else await this.resetVariables();
+        else {
+          // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
+          fun.setTimeout(() => {
+            this.resetVariables();
+          }, 0);
+        }
       });
     } catch (error) {
       console.error(error);

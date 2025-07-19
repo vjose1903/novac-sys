@@ -6,6 +6,8 @@ import { TablasService } from '../../new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { default_per_page, table_config, tableCellType } from '../../new_tablas/tabla-class';
 import { tipoDocFacturacion } from '@admin/facturacion/factura';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-buscar-articulo',
@@ -13,14 +15,14 @@ import { tipoDocFacturacion } from '@admin/facturacion/factura';
   styleUrls: ['./buscar-articulo.component.scss'],
   standalone: false,
 })
-export class BuscarArticuloComponent extends MixinClass implements ModalI, AfterViewInit {
+export class BuscarArticuloComponent extends MixinClass implements IDynamicModal, AfterViewInit {
   articuloClass = new ArticuloC();
   constructor(private tServ: TablasService) {
     super();
   }
 
-  @Input() modalConfig: any;
-  @Input() modalWrapper: any = {};
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
   @Input() metodo: tipoDocFacturacion | null = null;
   @Input() palabra_a_buscar: string = ' ';
   @Input() fecha_articulo: string = null;
@@ -66,17 +68,15 @@ export class BuscarArticuloComponent extends MixinClass implements ModalI, After
 
       this.dataFiltro.set(res?.data);
 
-      console.log(this.dataFiltro());
-
       if (this.tablaComponent?.changeTableConfig) {
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       }
     } catch (error) {
-      this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalWrapper.component_id, index: this.index });
+      this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id, index: this.index });
     }
   }
 
   tableClickRow(event) {
-    this.modalConfig.close({ articulo: event.data, modal_id: this.modalWrapper.component_id, index: this.index });
+    this.modalConfig.close({ articulo: event.data, modal_id: this.modalConfig.id, index: this.index });
   }
 }

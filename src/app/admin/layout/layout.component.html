@@ -63,7 +63,7 @@
         </div>
       </div>
       <div class="contenido">
-        @if (ready) {
+        @if (ready()) {
           <router-outlet></router-outlet>
         }
 
@@ -82,7 +82,7 @@
         </div>
       </div>
 
-      @if (cuadre_hoy) {
+      @if (cuadre_hoy()) {
         <div class="cuadre_hoy">
           <div class="msg">Hoy ya existe un cuadre</div>
         </div>

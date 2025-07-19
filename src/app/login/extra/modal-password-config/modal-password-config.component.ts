@@ -5,6 +5,7 @@ import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-erro
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
 import { Ss } from '@core/services/singleton.service';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-modal-password-config',
@@ -13,7 +14,8 @@ import { Ss } from '@core/services/singleton.service';
   imports: [FormsModule, ReactiveFormsModule, FormErrorMsgComponent],
 })
 export class ModalPasswordConfigComponent implements OnInit, IDynamicModal {
-  @Input() modalConfig: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
   @Input() from: 'login' | 'layout' = 'login';
 
   formGroup: UntypedFormGroup;

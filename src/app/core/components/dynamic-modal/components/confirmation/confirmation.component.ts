@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { IDynamicModal, ICallbackModal, IModalComponent, IModalConfiguration } from '../../config/dynamic-modal.interface';
 import { EFontAwesomeIcon } from '@core/typescript/fontawesome';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { fun } from '@core/services/functions.service';
+import { DynamicModalComponent } from '../../dynamic-modal.component';
 
 @Component({
   selector: 'app-confirmation',
@@ -21,7 +22,9 @@ export class ConfirmationComponent implements OnInit, IDynamicModal {
     showReasonInput: boolean;
     callback: (data: ICallbackModal) => void;
   };
-  modalConfig!: IModalConfiguration;
+
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
   reason!: string;
 
   ngOnInit() {

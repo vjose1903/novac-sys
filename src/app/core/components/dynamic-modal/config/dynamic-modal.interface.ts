@@ -1,5 +1,6 @@
 import { EFontAwesomeIcon, fontAwesome } from '@core/typescript/fontawesome';
 import { DynamicModalClass } from './dynamic-modal.class';
+import { DynamicModalComponent } from '../dynamic-modal.component';
 
 export interface IModalComponent {
   id?: any;
@@ -12,8 +13,8 @@ export interface IModalComponent {
 }
 
 export interface IDynamicModal {
-  inputs: any;
   modalConfig: IModalConfiguration;
+  modalWrapper: DynamicModalComponent;
   submit?: (arg?: any) => any;
   showConfirmAlert?: () => boolean;
 }

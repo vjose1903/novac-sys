@@ -14,8 +14,6 @@ export function agruparArticulosPorPagina(articulos: any[], itemsPorPagina: numb
 }
 
 export function parseTotalizacion(detalles: DetalleFactura[]): { total_excento: number; total_gravado: number; itbis: number; total_pagina: number } {
-  console.log('detalles', detalles);
-  
   let total_excento = 0;
   let total_gravado = 0;
   let itbis = 0;

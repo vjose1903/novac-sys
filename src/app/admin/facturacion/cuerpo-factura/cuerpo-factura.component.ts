@@ -457,7 +457,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       buscarArticuloModalConf.header = 'BUSCAR ARTICULO';
       buscarArticuloModalConf.width = '56.25rem';
       buscarArticuloModalConf.height = '31.25rem';
-      buscarArticuloModalConf.padding = '1rem';
       buscarArticuloModalConf.component = BuscarArticuloComponent;
       buscarArticuloModalConf.comfirmToClose = false;
       buscarArticuloModalConf.closableEsc = true;

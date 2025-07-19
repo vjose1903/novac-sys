@@ -155,7 +155,6 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
         this.initializeComponent(componente);
 
         currentConfig.componentInstance = componente.instance;
-        console.log('currentConfig ', currentConfig);
 
         resolve();
       }, 1);

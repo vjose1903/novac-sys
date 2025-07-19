@@ -1,5 +1,5 @@
 import { DynamicModalClass } from '../config/dynamic-modal.class';
-import { ICallbackModal } from '../config/dynamic-modal.interface';
+import { ICallbackModal, modalActionsE } from '../config/dynamic-modal.interface';
 import { SampleComponentModalComponent } from './sample-component-modal/sample-component-modal.component';
 
 // MODAL CON UN HTML EN EL CONTENIDO ---------------------------------------------
@@ -35,7 +35,7 @@ function openModalComponent() {
   testModal.comfirmToClose = true;
 
   testModal.botones = [
-    { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', function: () => testModal.close() },
+    { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },
     { id: 'aceptarBtn', label: 'Aceptar', clase: 'btn-success' }, // Si no se le especifica function o functionInOtherComponent se pone por defecto functionInOtherComponent = 'submit'
   ];
 

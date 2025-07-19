@@ -1,5 +1,5 @@
 import { actionFacturacion } from './../facturacion/factura';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, inject, signal } from '@angular/core';
 
 import { Subject, takeUntil } from 'rxjs';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
@@ -42,19 +42,19 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   configApp: ConfigI;
   noServer;
 
-  ready;
+  ready = signal<boolean>(false);
   // facturas_localStorage: any;
   activeIndex;
   initNavigate = true;
-  cuadre_hoy;
   ant_event_change_visibility;
-
+  
   configServ = Ss.configServ;
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
-
-  chequiando_cuadre: boolean;
+  
+  chequiando_cuadre = signal<boolean>(false);
+  cuadre_hoy = signal<boolean>(false);
   hasPermisosValidated: boolean;
   actionFacturacion = actionFacturacion;
   currentYear: number;
@@ -146,7 +146,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.noServer = false;
     this.activeIndex = 0;
     this.currentYear = new Date().getFullYear();
-    this.cuadre_hoy = false;
+    this.cuadre_hoy.set(false);
     this.configApp = Ss.configServ.config;
     this.checkRouteActiva();
 
@@ -165,14 +165,22 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     };
 
     const noSuccess = () => {
-      this.ready = false;
-      fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+      // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
+      fun.setTimeout(() => {
+        this.ready.set(false);
+        fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+      }, 0);
     };
 
     fun.retryUntil({
       task: () => validations(),
       retryWhen: res => !res,
-      actionAfterRetry: () => (this.ready = true),
+      actionAfterRetry: () => {
+        // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
+        fun.setTimeout(() => {
+          this.ready.set(true);
+        }, 0);
+      },
       actionIfNoSuccess: () => noSuccess(),
     });
   }
@@ -201,12 +209,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   checkCuadre() {
-    if (!this.chequiando_cuadre) {
+    if (!this.chequiando_cuadre()) {
       let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [{ key: 'spinner', value: 'no_show' }] };
-      this.chequiando_cuadre = true;
+      this.chequiando_cuadre.set(true);
       new CuadreCajaC().getAll(extra).then(res => {
-        this.cuadre_hoy = res['data'].existe_cuadre_hoy;
-        this.chequiando_cuadre = false;
+        const existe_cuadre_hoy = res['data'].existe_cuadre_hoy;
+        this.cuadre_hoy.set(existe_cuadre_hoy);
+        this.chequiando_cuadre.set(false);
       });
     }
   }
