@@ -21,6 +21,7 @@ import { Router } from '@angular/router';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
 
+
 @Component({
   selector: 'app-conduce-form',
   templateUrl: './conduce-form.component.html',
@@ -139,12 +140,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     });
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

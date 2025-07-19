@@ -14,7 +14,7 @@
       <div class="sideBar">
         <div class="menuContent">
           @for (menuItem of layServ.menuItems; track menuItem; let first = $first; let last = $last) {
-            <app-menu-item [menuItem]="menuItem" [actualPath]="actualPath" [nextModule]="nextModule" (menuClick)="cambiarMenu($event)" (subMenuClick)="cambiarMenu($event)"> </app-menu-item>
+            <app-menu-item [menuItem]="menuItem" [actualPath]="actualPath()" [nextModule]="nextModule()" (menuClick)="cambiarMenu($event)" (subMenuClick)="cambiarMenu($event)"> </app-menu-item>
           }
         </div>
       </div>

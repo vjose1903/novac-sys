@@ -13,6 +13,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 
+
 @Component({
   selector: 'app-registro-suplidores',
   templateUrl: './registro-suplidores.component.html',
@@ -88,12 +89,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.nesesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy(): void {
     this._destroy_mixin();

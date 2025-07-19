@@ -1,8 +1,8 @@
 import { fun } from '@core/services/functions.service';
 import * as _ from 'lodash';
-import { LayoutClass } from '@admin/layout/layout';
 import { MODALCONFIG } from './modal.service';
 import { DynamicModalClass } from '../dynamic-modal/config/dynamic-modal.class';
+import { TablaClass } from '../new_tablas/tabla-class';
 
 export interface ModalI {
   modalWrapper: any;
@@ -51,12 +51,10 @@ export interface ButtonI {
   tooltip?: string;
 }
 
-export class ModalClass extends LayoutClass {
+export class ModalClass extends TablaClass {
   static noShowAceptarCancelarButtons = { aceptar: { show: false }, cancelar: { show: false } };
 
-  constructor() {
-    super();
-  }
+
 
   openNewModal(params: ConfigureModalI) {
     const modal_configuration = {};

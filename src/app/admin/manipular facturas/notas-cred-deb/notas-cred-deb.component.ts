@@ -20,6 +20,7 @@ import Big from 'big.js';
 import { serie, seriesDGII, seriesDgiiI } from '@core/typescript/constantes';
 import { DateUtils } from '@vjose1903/dateutils';
 
+
 @Component({
   selector: 'app-notas-cred-deb',
   templateUrl: './notas-cred-deb.component.html',
@@ -137,12 +138,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy(): void {
     this._destroy_mixin();

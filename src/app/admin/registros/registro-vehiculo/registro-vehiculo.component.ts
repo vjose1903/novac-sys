@@ -17,6 +17,7 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { ModalClass } from '@components/modal/modal-class';
 import { Ss } from '@core/services/singleton.service';
 
+
 @Component({
   selector: 'app-registro-vehiculo',
   templateUrl: './registro-vehiculo.component.html',
@@ -89,12 +90,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.necesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

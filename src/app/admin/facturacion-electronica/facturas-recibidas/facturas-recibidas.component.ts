@@ -56,12 +56,7 @@ export class FacturasRecibidasComponent extends MixinClass implements OnInit {
     this.necesarioParaEmpezar();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   necesarioParaEmpezar() {
     this.getFacturasRecibidas(this.tServ.obj_paginate.default);

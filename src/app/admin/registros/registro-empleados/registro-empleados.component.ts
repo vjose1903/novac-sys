@@ -15,6 +15,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
+
 @Component({
   selector: 'app-registro-empleados',
   templateUrl: './registro-empleados.component.html',
@@ -95,12 +96,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     });
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy(): void {
     this._destroy_mixin();

@@ -10,7 +10,6 @@ import { ProvinciaC } from '../../../core/typescript/classes/provincia.model';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
-
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
@@ -141,12 +140,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     });
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

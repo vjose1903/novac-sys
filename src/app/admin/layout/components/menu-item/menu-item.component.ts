@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, AfterViewInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, AfterViewInit, input } from '@angular/core';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { MenuClickEvent, MenuItemI, SubMenuItemI } from '../../utils/menu-items';
 import { fun } from '@core/services/functions.service';
@@ -13,8 +13,8 @@ import { Ss } from '@core/services/singleton.service';
 })
 export class MenuItemComponent implements AfterViewInit {
   @Input() menuItem!: MenuItemI;
-  @Input() actualPath: string = '';
-  @Input() nextModule!: string;
+  actualPath = input<string>('');
+  nextModule = input<string>('');
 
   @Output() menuClick = new EventEmitter<MenuClickEvent>();
   @Output() subMenuClick = new EventEmitter<MenuClickEvent>();
@@ -31,7 +31,7 @@ export class MenuItemComponent implements AfterViewInit {
     // Para elementos dropdown con subItems
     if (type === 'dropdown' && subItems?.length) {
       // Se activa si algún subItem está activo O si nextModule coincide con el module
-      return subItems.some(subItem => this.isSubItemActive(subItem)) || (this.nextModule && this.nextModule.includes(module));
+      return subItems.some(subItem => this.isSubItemActive(subItem)) || (this.nextModule() && this.nextModule().includes(module));
     }
 
     // Para elementos single, usar sus activeRoutes específicas
@@ -59,13 +59,13 @@ export class MenuItemComponent implements AfterViewInit {
   }
 
   private isRouteActive(module: string, paths?: string[]): boolean {
-    if (fun.isEmpty(this.actualPath)) return false;
+    if (fun.isEmpty(this.actualPath())) return false;
 
     if (fun.hasValue(paths) && paths!.length > 0) {
-      return paths!.some(path => this.actualPath.includes(`/${module}/${path}`));
+      return paths!.some(path => this.actualPath().includes(`/${module}/${path}`));
     }
 
-    return this.actualPath.includes(`/${module}`) || (this.nextModule && this.nextModule.includes(module));
+    return this.actualPath().includes(`/${module}`) || (this.nextModule() && this.nextModule().includes(module));
   }
 
   onMenuClick(event: Event): void {

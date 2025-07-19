@@ -13,6 +13,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Router } from '@angular/router';
 import { ConduceC } from '../coduce';
+
 import * as _ from 'lodash';
 
 @Component({
@@ -75,12 +76,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     await this.getConduces(this.tServ.obj_paginate.default);
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

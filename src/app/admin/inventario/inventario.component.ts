@@ -12,6 +12,7 @@ import { default_per_page, table_config, tableCellType } from '@components/new_t
 import { Permisos } from '@core/typescript/permisos';
 import { InventarioC } from './inventario';
 
+
 @Component({
   selector: 'app-inventario',
   templateUrl: './inventario.component.html',
@@ -72,12 +73,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this.tipoArticuloClass.getAll().then(res => (this.tipo_articulos = res.data));
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

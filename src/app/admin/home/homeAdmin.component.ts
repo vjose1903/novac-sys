@@ -6,6 +6,7 @@ import { MixinClass } from '@core/typescript/MixinClass';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
 
+
 @Component({
     selector: 'app-homeAdmin',
     templateUrl: './homeAdmin.component.html',
@@ -21,7 +22,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
   configServ = Ss.configServ;
 
   initCambioMenu(arg) {
-    if (arg.bool) this.runFinalizarCambioMenu(arg);
+
   }
 
   cedula = null;
@@ -53,12 +54,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, OnDestroy 
     // });
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

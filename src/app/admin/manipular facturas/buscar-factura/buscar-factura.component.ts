@@ -23,6 +23,7 @@ import { TitleCasePipe } from '@angular/common';
 import { seriesDGII } from '@core/typescript/constantes';
 import { Environment } from '@environments/environment';
 
+
 import * as _ from 'lodash';
 import { ConfigI } from '@core/interface/config-interface';
 import { DateUtils } from '@vjose1903/dateutils';
@@ -186,12 +187,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     if (fun.hasValue(res)) fun.enfocarInput('valorI');
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   async loadFacturasChangingSerie() {
     const actualPagination = await this.getActualPagination();

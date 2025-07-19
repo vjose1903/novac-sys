@@ -14,7 +14,6 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Ss } from '@core/services/singleton.service';
-
 @Component({
   selector: 'app-recibo-viajes',
   templateUrl: './recibo-viajes.component.html',
@@ -128,12 +127,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

@@ -21,6 +21,7 @@ import { MoraCalculator } from '../utils/mora-calculator';
 import { Ss } from '@core/services/singleton.service';
 const moment = require('../../../../core/javascript/moment');
 
+
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
@@ -161,12 +162,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this._destroy_mixin();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   goBack() {
     this.location.back();

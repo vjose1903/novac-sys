@@ -18,6 +18,7 @@ import { MessageTask } from '@core/models/message-task';
 import { ELECTRON_SET_APP_CONFIG, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
+import { NavigationService } from '@core/services/navigation.service';
 import { ModalPasswordConfigComponent } from '../../login/extra/modal-password-config/modal-password-config.component';
 import { ConfiguracionesComponent } from '../../login/extra/configuraciones/configuraciones.component';
 import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
@@ -30,9 +31,9 @@ import { Environment } from '@environments/environment';
   standalone: false,
 })
 export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
-  actualPath;
-  actualRuta;
-  nextModule;
+  actualPath = signal<string>('');
+  actualRuta = signal<string>('');
+  nextModule = signal<string>('');
 
   showLoading;
 
@@ -47,12 +48,12 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   activeIndex;
   initNavigate = true;
   ant_event_change_visibility;
-  
+
   configServ = Ss.configServ;
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
-  
+
   chequiando_cuadre = signal<boolean>(false);
   cuadre_hoy = signal<boolean>(false);
   hasPermisosValidated: boolean;
@@ -68,6 +69,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     private router: Router,
     private cdRef: ChangeDetectorRef,
     private currentUserServ: CurrentUserService,
+    private navigationService: NavigationService,
     public _ipc: IpcService
   ) {
     super();
@@ -157,7 +159,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     const validations = async () => {
       return new Promise<boolean>(resolve => {
         if (fun.isEmpty(this.configApp)) return resolve(false);
-        if (fun.isEmpty(this.actualPath) || fun.isEmpty(this.actualRuta)) return resolve(false);
+        if (fun.isEmpty(this.actualPath()) || fun.isEmpty(this.actualRuta())) return resolve(false);
         if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
 
         resolve(true);
@@ -280,7 +282,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
   logOut() {
     fun.logout().then(() => {
-      this._destroy_layout(true);
       this.noServer = false;
       this.router.navigateByUrl('/');
     });
@@ -291,12 +292,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
-    this.actualPath = fun.getActualPath();
+    this.actualPath.set(fun.getActualPath());
 
-    const pathSplit = this.actualPath.split('/').filter(item => fun.hasValue(item.trim()));
+    const pathSplit = this.actualPath()
+      .split('/')
+      .filter(item => fun.hasValue(item.trim()));
 
-    this.nextModule = undefined;
-    this.actualRuta = pathSplit.join('/').replace('/admin/', '');
+    this.nextModule.set(undefined);
+    this.actualRuta.set(pathSplit.join('/').replace('/admin/', ''));
   }
 
   // =================================================================================
@@ -311,30 +314,20 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // NAVEGAR
   // =================================================================================
 
-  cambiarMenu(args: { url: string; navigate: boolean; event: any }) {
+  async cambiarMenu(args: { url: string; navigate: boolean; event: any }) {
     if (!args.navigate) {
-      this.nextModule = args.url;
-
+      this.nextModule.set(args.url);
       return;
     }
 
     const nextCambioMenu = `/admin/${args.url}`;
 
-    if (this.actualPath === nextCambioMenu) {
-      fun.toastWarning('Ya se encuentra en este módulo.', 'AVISO');
-      return;
-    }
+    // Usar el nuevo servicio de navegación
+    const success = await this.navigationService.navigateTo(nextCambioMenu);
 
-    this.runRouterNavigate({ bool: true, ruta: nextCambioMenu });
-    fun.enfocarInput(null, args.event.target);
-  }
-
-  finalizarCambioMenu(arg) {
-    if (arg.bool) {
-      this.nextModule = undefined;
-      this.router.navigateByUrl(arg.ruta);
-    } else {
-      this.checkRouteActiva();
+    if (success) {
+      this.nextModule.set(undefined);
+      fun.enfocarInput(null, args.event.target);
     }
   }
 

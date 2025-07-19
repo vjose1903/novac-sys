@@ -19,6 +19,7 @@ import { ModalClass } from '@components/modal/modal-class';
 const moment = require('../../../core/javascript/moment');
 const $ = require('jquery');
 
+
 @Component({
   selector: 'app-registro-articulos',
   templateUrl: './registro-articulos.component.html',
@@ -125,12 +126,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.necesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

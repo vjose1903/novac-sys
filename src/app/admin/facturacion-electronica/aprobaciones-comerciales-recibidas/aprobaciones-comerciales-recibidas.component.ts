@@ -59,12 +59,7 @@ export class AprobacionesComercialesRecibidasComponent extends MixinClass implem
     this.necesarioParaEmpezar();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   necesarioParaEmpezar() {
     this.getFacturasRecibidas(this.tServ.obj_paginate.default);

@@ -9,6 +9,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { Permisos } from '@core/typescript/permisos';
 import { ModalClass } from '@components/modal/modal-class';
 
+
 @Component({
     selector: 'app-roles',
     templateUrl: './roles.component.html',
@@ -159,12 +160,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     });
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   createForm() {
     this.form = this.fb.group({

@@ -33,6 +33,7 @@ import { DateUtils } from '@vjose1903/dateutils';
 import Big from 'big.js';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { CanComponentDeactivate, CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 
 @Component({
   selector: 'app-facturacion',
@@ -40,7 +41,7 @@ import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/
   styleUrls: ['./facturacion.component.scss'],
   standalone: false,
 })
-export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnChanges, OnDestroy, AfterViewInit, CanDeactivateGuard {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
   @Input() tipo_documento: any;
   @Input() id_documento: any;
@@ -657,19 +658,16 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       let salirFunction = instance => {
         this.agregarFacturaALocalStorage();
         this.info_cambio['bool'] = true;
-        this.runFinalizarCambioMenu(this.info_cambio);
         instance.close();
       };
 
       let noGuardar = instance => {
         this.info_cambio['bool'] = true;
-        this.runFinalizarCambioMenu(this.info_cambio);
         instance.close();
       };
 
       let cancelarFunction = instance => {
         this.info_cambio['bool'] = false;
-        this.runFinalizarCambioMenu(this.info_cambio);
         instance.close();
       };
 
@@ -686,7 +684,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.confirmationModal(confirmationObj);
     } else {
       this.info_cambio['bool'] = true;
-      this.runFinalizarCambioMenu(this.info_cambio);
 
       callback({ bool: true });
     }
@@ -746,18 +743,75 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.factura_guardada = fun.deepCloning(factura);
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.info_cambio = arg;
-      this.checkSituaciones().then(result => {
-        if (result.factura_en_proceso) {
-          this.procesoCambio(result.abrirModal, result.texto_modal, callback);
-        } else {
-          this.runFinalizarCambioMenu(this.info_cambio);
-          callback({ bool: true });
-        }
-      });
+  canDeactivate(): boolean | Promise<boolean> {
+    // Verificar si hay una factura en proceso
+    if (this.checkIfFacturacionEnProceso()) {
+      return this.handleFacturaEnProceso();
     }
+    
+    // Si no hay factura en proceso, permitir la navegación
+    return true;
+  }
+
+  getDeactivateMessage(): string {
+    const documento = this.getDocumentoDescripcion();
+    return `Estas a punto de salir del modulo de facturación, ¿desea guardar la ${documento.descripcion} para continuarla luego?`;
+  }
+
+  getDeactivateOptions() {
+    return {
+      showCancelButton: true,
+      showNoButton: true,
+      cancelText: 'Cancelar',
+      noText: 'No',
+      yesText: 'Si',
+      header: 'Confirmación',
+      width: '30rem'
+    };
+  }
+  
+  private async handleFacturaEnProceso(): Promise<boolean> {
+    const result = await this.checkSituaciones();
+    
+    if (result.factura_en_proceso) {
+      if (result.abrirModal) {
+        // Replicar exactamente la lógica del método procesoCambio original
+        return new Promise<boolean>((resolve) => {
+          const salirFunction = async (instance: any) => {
+            await this.agregarFacturaALocalStorage();
+            instance.close();
+            resolve(true);
+          };
+
+          const noGuardar = (instance: any) => {
+            instance.close();
+            resolve(true);
+          };
+
+          const cancelarFunction = (instance: any) => {
+            instance.close();
+            resolve(false);
+          };
+
+          const confirmationObj = {
+            id: 'salir_layout',
+            texto: result.texto_modal,
+            header: 'Confirmación',
+            siFunction: (instance: any) => salirFunction(instance),
+            noFunction: (instance: any) => noGuardar(instance),
+            cancelarFunction: (instance: any) => cancelarFunction(instance),
+            width: '30rem',
+          };
+
+          this.confirmationModal(confirmationObj);
+        });
+      } else {
+        // La factura ya está archivada, permitir navegación
+        return true;
+      }
+    }
+    
+    return true;
   }
 
   checkIfFacturacionEnProceso() {

@@ -13,9 +13,6 @@ import { ReciboC } from '../recibos/recibos';
 import { SuplidorC } from '@registros/registro-suplidores/suplidores';
 import { CuadreC } from './../cuadres/cuadres';
 import { NotaC } from '../manipular facturas/notas-cred-deb/notas';
-
-
-
 export enum SearchBy {
   general = 1,
   por_cliente = 2,
@@ -57,12 +54,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then(result => (this.hasPermisoCamiones = result));
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

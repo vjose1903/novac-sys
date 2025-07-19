@@ -69,12 +69,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     this.tablaComponent.changeTableConfig([{ total_count: 0 }]);
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();

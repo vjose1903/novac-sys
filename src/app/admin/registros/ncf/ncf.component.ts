@@ -13,6 +13,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { Permisos } from '@core/typescript/permisos';
 import { DateUtils } from '@vjose1903/dateutils';
 
+
 @Component({
   selector: 'app-ncf',
   templateUrl: './ncf.component.html',
@@ -87,12 +88,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.setDateInputs(new Date());
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy(): void {
     this._destroy_mixin();

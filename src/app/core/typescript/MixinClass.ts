@@ -23,12 +23,10 @@ export class MixinClass extends ModalClass {
 
   _init_mixin(arg?: mixinInit) {
     this.arg_mixin = arg;
-
-    this._init_layout(arg);
   }
 
   _destroy_mixin(algo?) {
-    this._destroy_layout();
+    // Método vacío para compatibilidad
   }
 
   // =========================================================================================================

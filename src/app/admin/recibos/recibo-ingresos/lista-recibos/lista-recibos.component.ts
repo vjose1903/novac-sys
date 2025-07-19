@@ -13,6 +13,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { ModalClass } from '@components/modal/modal-class';
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
+
 @Component({
   selector: 'app-lista-recibos',
   templateUrl: './lista-recibos.component.html',
@@ -67,12 +68,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   ngOnDestroy() {
     this._destroy_mixin();
