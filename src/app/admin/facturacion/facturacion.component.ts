@@ -108,7 +108,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   FechaFacturaMostrar: any;
 
   factura_a_rellenar: FacturasI;
-  form: UntypedFormGroup;
+  formPropietario: UntypedFormGroup;
   fecha;
   modo_factura;
   is_adelantada;
@@ -181,7 +181,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   filterCamionesTargets;
   filterChoferesTargets;
-  ƒ;
+
   permissions = Permisos;
   configApp: ConfigI;
   timeInterval;
@@ -203,7 +203,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ) {
     super();
 
-    this.form = this.fb.group({ id: [], nombre: [], direccion: [], telefono: [] });
+    this.formPropietario = this.fb.group({ id: null, direccion: null, telefono: null, nombre_completo: null });
 
     this.timeInterval = fun.setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
   }
@@ -479,9 +479,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.filterChoferesTargets = ['nombre', 'apellido', 'nombre_completo'];
 
         if (this.factServ.isVenta()) {
-          this.form.patchValue(this.factServ.clienteContado);
+          this.formPropietario.patchValue(this.factServ.clienteContado);
         } else {
-          if (fun.hasValue(this.form)) this.form.reset();
+          if (fun.hasValue(this.formPropietario)) this.formPropietario.reset();
         }
         this.cuerpo.RESETCUERPO();
         this.isInitialized = true;
@@ -646,17 +646,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     if (arg.tipo == tipoDocFacturacion.compra) {
       const suplidor_response = await this.suplidorClass.getOne(arg.suplidor_id);
       this.factServ.propietario_factura = suplidor_response.data;
-      this.factServ.propietario_factura.nombre = this.factServ.propietario_factura.nombre_completo;
+      this.factServ.propietario_factura.nombre_completo = this.factServ.propietario_factura.nombre_completo;
     } else {
       if (fun.hasValue(arg.cliente_id)) {
         const cliente_response = await this.clienteClass.getOne(arg.cliente_id);
         this.factServ.propietario_factura = cliente_response.data;
-        this.factServ.propietario_factura.nombre = this.factServ.propietario_factura.nombre_completo;
+        this.factServ.propietario_factura.nombre_completo = this.factServ.propietario_factura.nombre_completo;
       } else {
-        this.factServ.propietario_factura = { id: null, direccion: arg['NoCliente_direccion'], nombre: arg['NoCliente_nombre'], telefono: '' };
+        this.factServ.propietario_factura = { id: null, direccion: arg['NoCliente_direccion'], nombre_completo: arg['NoCliente_nombre'], telefono: '' };
       }
     }
-    this.form.patchValue(this.factServ.propietario_factura);
+    this.formPropietario.patchValue(this.factServ.propietario_factura);
   }
 
   checkSituaciones(): Promise<{ factura_en_proceso: boolean; abrirModal?: boolean; texto_modal?: string; archivo_id?: any }> {
@@ -992,7 +992,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         } else if (this.modo_factura == 'viaje') {
           siguiente_input = 'fecha_viaje';
         } else if (this.modo_factura == 'adelantada') {
-          if (fun.isEmpty(this.factServ.propietario_factura) || this.factServ.propietario_factura.nombre == this.factServ.clienteContado.nombre) is_enforcar = false;
+          if (fun.isEmpty(this.factServ.propietario_factura) || this.factServ.propietario_factura.nombre_completo == this.factServ.clienteContado.nombre_completo) is_enforcar = false;
           else is_enforcar_cuerpo = true;
         } else {
           is_enforcar = false;
@@ -1027,7 +1027,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   iniciarFactura() {
     if (this.condicion_fact !== 'Crédito') {
-      this.factServ.propietario_factura = this.form.value;
+      this.factServ.propietario_factura = this.formPropietario.value;
 
       fun.setTimeout(() => {
         this.cuerpo.seleccionarCampoEnTurno();
@@ -1296,25 +1296,57 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       let after_select = { send_factura: args?.send_factura };
       if (Object.values(after_select).every(value => fun.isEmpty(value))) after_select = null;
 
-      this.openNewModal({
-        component: BuscarClienteSuplidorComponent,
-        inputs: { metodo: this.factServ.tipoDocumento(), include_contado, palabra_a_buscar: ' ', after_select },
-        id: 'buscarCliente',
-        header: this.factServ.isCompra() ? 'BUSCAR SUPLIDOR' : 'BUSCAR CLIENTE',
-        width: '56.25rem',
-        height: '31.25rem',
-        botones: botones,
-      });
+      const propietarioModalConf = new DynamicModalClass();
+
+      propietarioModalConf.id = 'buscarCliente';
+      propietarioModalConf.inputs = { metodo: this.factServ.tipoDocumento(), include_contado, palabra_a_buscar: ' ', after_select };
+      propietarioModalConf.header = this.factServ.isCompra() ? 'BUSCAR SUPLIDOR' : 'BUSCAR CLIENTE';
+      propietarioModalConf.width = '56.25rem';
+      propietarioModalConf.height = '31.25rem';
+      propietarioModalConf.component = BuscarClienteSuplidorComponent;
+      propietarioModalConf.comfirmToClose = false;
+      propietarioModalConf.closableEsc = true;
+      propietarioModalConf.botones = botones;
+      propietarioModalConf.setCallback(this.processPropietarioModal.bind(this));
+      propietarioModalConf.show();
     }
   }
 
-  onHideModal(arg) {
-    if (arg.modal.id == 'buscarCliente') {
+  processPropietarioModal(args: ICallbackModal) {
+    if (args.type == modalCloseType.onHide) {
       let documento = this.getDocumentoDescripcion();
       const actualPath = fun.getActualPath();
 
       if (fun.hasValue(documento) && !documento.has_Propietario && actualPath.includes('factura')) {
         fun.toastWarning(`Para realizar una ${documento.descripcion}, debe de seleccionar el cliente.`, 'AVISO');
+      }
+    }
+
+    if (args.type == modalCloseType.returnData) {
+      const { data } = args;
+
+      this.factServ.propietario_factura = data;
+
+      console.log('this.factServ.propietario_factura ', this.factServ.propietario_factura);
+
+      this.formPropietario.patchValue(this.factServ.propietario_factura);
+      const balance = Number(this.factServ.propietario_factura.balance);
+      const maxCred = Number(this.factServ.propietario_factura.maximo_credito);
+
+      if (this.factServ.tipoDocumento() != tipoDocFacturacion.cotizacion && this.condicion_fact != 'Contado') {
+        if (balance > maxCred - 1000 && balance < maxCred) {
+          fun.toastWarning(`Crédito actual RD$${this.formatoNumero(balance)} limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CRÉDITO');
+        } else if (balance > maxCred) {
+          fun.toastError(`Crédito actual RD$${this.formatoNumero(balance)} limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CRÉDITO');
+        }
+      }
+
+      if (data?.after_select?.send_factura) {
+        this.imprimirFactura();
+      } else if (this.factServ.action == actionFacturacion.duplicate) {
+        fun.enfocarAndSelectInput('tipoFact');
+      } else {
+        this.cuerpo.seleccionarCampoEnTurno();
       }
     }
   }
@@ -1389,20 +1421,31 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       modo_factura: this.modo_factura,
     };
 
-    this.openNewModal({
-      component: ConfirmacionImprimirComponent,
-      inputs: obj,
-      id: 'confirmacionImprimir',
-      header: 'Confirmación',
-      width: '30rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-          { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
-        ],
-      },
-    });
+    const confirmationImprimirModalConf = new DynamicModalClass();
+
+    confirmationImprimirModalConf.id = 'confirmacionImprimir';
+    confirmationImprimirModalConf.inputs = obj;
+    confirmationImprimirModalConf.header = 'Confirmación';
+    confirmationImprimirModalConf.width = '30rem';
+    confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
+    confirmationImprimirModalConf.comfirmToClose = false;
+    confirmationImprimirModalConf.closableEsc = false;
+    confirmationImprimirModalConf.botones = [
+      { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+      { id: 'btnConfirmar', clase: 'btn btn-verde', label: 'Confirmar', disable: false },
+    ];
+
+    confirmationImprimirModalConf.setCallback(this.processImprimir.bind(this));
+    confirmationImprimirModalConf.show();
+  }
+
+  processImprimir(args: ICallbackModal) {
+    if (args.type == modalCloseType.returnData) {
+      const { is_print } = args.data;
+
+      this.is_print = is_print;
+      this.enviarABaseDatos();
+    }
   }
 
   private async abrirModalCantidadEfectivo() {
@@ -1476,7 +1519,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   agregarFacturaALocalStorage() {
-    if (!this.factServ.propietario_factura) this.factServ.propietario_factura = this.form.value;
+    if (!this.factServ.propietario_factura) this.factServ.propietario_factura = this.formPropietario.value;
 
     let facturas_localStorage = (FactsLocalStorage.getList() || []).sort((a, b) => fun.compare(a, b, ['archivo_id'], 'asc'));
 
@@ -1692,34 +1735,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factura_pendiente = true;
 
       //
-    } else if (arg.modal_id == 'confirmacionImprimir') {
-      this.is_print = arg.is_print;
-      this.enviarABaseDatos();
-      //
     } else if (arg.modal_id == 'retornarDevuelto') {
       this.cuerpo.getDataFromModal(arg, search);
-    } else if (arg.modal_id == 'buscarCliente') {
-      this.factServ.propietario_factura = arg.data;
-
-      this.form.patchValue(this.factServ.propietario_factura);
-      const balance = _.parseInt(this.factServ.propietario_factura.balance);
-      const maxCred = _.parseInt(this.factServ.propietario_factura.maximo_credito);
-
-      if (this.factServ.tipoDocumento() != tipoDocFacturacion.cotizacion && this.condicion_fact != 'Contado') {
-        if (balance > maxCred - 1000 && balance < maxCred) {
-          fun.toastWarning(`Credito actual RD$${this.formatoNumero(balance)} limite: RD$${this.formatoNumero(maxCred)}`, 'PROXIMO A LIMITE DE CREDITO');
-        } else if (balance > maxCred) {
-          fun.toastError(`Credito actual RD$${this.formatoNumero(balance)} limite: RD$${this.formatoNumero(maxCred)}`, 'SOBRE VALOR DE CREDITO');
-        }
-      }
-
-      if (arg?.data?.after_select?.send_factura) {
-        this.imprimirFactura();
-      } else if (this.factServ.action == actionFacturacion.duplicate) {
-        fun.enfocarAndSelectInput('tipoFact');
-      } else {
-        this.cuerpo.seleccionarCampoEnTurno();
-      }
     }
   }
 
@@ -1813,8 +1830,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     } else {
       if (fun.isEmpty(this.factServ.propietario_factura) || fun.isEmpty(this.factServ.propietario_factura.id)) {
         cabecera_fact['cliente_id'] = null;
-        cabecera_fact['NoCliente_nombre'] = this.form.controls.nombre.value;
-        cabecera_fact['NoCliente_direccion'] = this.form.controls.direccion.value;
+        cabecera_fact['NoCliente_nombre'] = this.formPropietario.controls.nombre_completo.value;
+        cabecera_fact['NoCliente_direccion'] = this.formPropietario.controls.direccion.value;
       } else {
         cabecera_fact['cliente_id'] = this.factServ.propietario_factura.id;
       }

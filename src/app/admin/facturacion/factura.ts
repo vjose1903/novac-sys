@@ -338,8 +338,14 @@ export class FacturaC extends CrudG<FacturasI> {
       data_parsed.total = data_parsed.total_factura;
       data_parsed.contenido_reporte = [];
 
-      if (fun.hasValue(data_parsed.cliente) && data_parsed.cliente.nombre.length > 80) data_parsed.cliente.nombre = `${data_parsed.cliente.nombre.substring(0, 80)}...`;
-      if (fun.hasValue(data_parsed.suplidor) && data_parsed.suplidor.nombre.length > 80) data_parsed.suplidor.nombre = `${data_parsed.suplidor.nombre.substring(0, 80)}...`;
+      const truncarNombre = entidad => {
+        if (fun.hasValue(entidad) && entidad.nombre_completo.length > 80) {
+          entidad.nombre_completo = `${entidad.nombre_completo.substring(0, 80)}...`;
+        }
+      };
+
+      truncarNombre(data_parsed.cliente);
+      truncarNombre(data_parsed.suplidor);
 
       data_parsed.detalle_facturas.forEach(detalle => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {

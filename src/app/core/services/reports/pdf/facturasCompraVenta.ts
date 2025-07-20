@@ -84,7 +84,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           margin: [0, 10, 0, 0],
           text: [
             {
-              text: [is_venta ? { text: 'Cliente : ', style: 'letra10' } : { text: 'Suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' }],
+              text: [is_venta ? { text: 'Cliente : ', style: 'letra10' } : { text: 'Suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.nombre_completo, style: 'letra10' } : { text: data.suplidor.nombre_completo, style: 'letra10' }],
             },
           ],
         },

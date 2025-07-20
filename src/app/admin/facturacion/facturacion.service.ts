@@ -33,11 +33,11 @@ export class FacturacionService {
   isComprobanteElectronico = computed(() => this.serieType() == serie.electronica);
   isComprobanteNormal = computed(() => this.serieType() == serie.normal);
 
-  public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
+  public get clienteContado(): { id?: any; direccion?: string; telefono?: any; nombre_completo?: string } {
     if (fun.hasValue(Ss.configServ)) {
       const configApp = Ss.configServ.config;
 
-      return { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
+      return { id: null, nombre_completo: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
     } else {
       return {};
     }
@@ -112,7 +112,7 @@ export class FacturacionService {
     return this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == key && tipo_factura.serie == serieTarget).id;
   }
 
-  getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }, print?) {
+  getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }) {
     const res = { descripcion: undefined, descripcion_short: undefined, has_Propietario: fun.hasValue(this.propietario_factura), tipo: 'facturacion' };
     const actualPath = fun.getActualPath();
 

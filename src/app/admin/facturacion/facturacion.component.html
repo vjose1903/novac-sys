@@ -289,7 +289,7 @@
           <!-- ======================================================================================================================================================================== -->
           <!-- ======================================================================================================================================================================== -->
           <div class="{{ factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
-            <form [formGroup]="form">
+            <form [formGroup]="formPropietario">
               <div class="d-flex" style="height: 1.7rem">
                 <!-- ================== PROPIETARIO ================== -->
                 <h5>
@@ -316,7 +316,7 @@
                     id="nom"
                     (keydown.enter)="saltar(htmlServ.getId($event), nombreInput.value)"
                     type="text"
-                    formControlName="nombre"
+                    formControlName="nombre_completo"
                     class="form-control inputE"
                     (focus)="htmlServ.selectValue($event)"
                     autocomplete="off"
@@ -324,7 +324,7 @@
                     tabindex="-1"
                     [ngClass]="{ disabled: activarNombreDireccion() }" />
                   <input id="id" type="hidden" formControlName="id" />
-                  @if (!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)) {
+                  @if (!formPropietario.controls['nombre_completo'].valid && (formPropietario.controls['nombre_completo'].dirty || formPropietario.controls['nombre_completo'].touched)) {
                     <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                   }
                 </div>
@@ -334,7 +334,7 @@
                     <!-- ================== TELEFONO ================== -->
                     <span class="control-label titulos">Telefono:</span>
                     <input type="text" class="form-control inputE disabled" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" [readOnly]="true" tabindex="-1" />
-                    @if (!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)) {
+                    @if (!formPropietario.controls['telefono'].valid && (formPropietario.controls['telefono'].dirty || formPropietario.controls['telefono'].touched)) {
                       <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el numero de telefono</div>
                     }
                   </div>
@@ -356,7 +356,7 @@
                       [readOnly]=""
                       [ngClass]="{ disabled: activarNombreDireccion() }"
                       tabindex="-1" />
-                    @if (!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)) {
+                    @if (!formPropietario.controls['direccion'].valid && (formPropietario.controls['direccion'].dirty || formPropietario.controls['direccion'].touched)) {
                       <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                     }
                   </div>

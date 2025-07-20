@@ -1,11 +1,11 @@
 import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
-import { ModalI } from '../../modal/modal-class';
 import { SharedService } from '@core/services/shared.service';
 import { teclasCode } from '@core/typescript/constantes';
-import * as _ from 'lodash';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-confirmacion-imprimir',
@@ -13,7 +13,7 @@ import { FacturacionService } from '@admin/facturacion/facturacion.service';
   styleUrls: ['./confirmacion-imprimir.component.scss'],
   standalone: false,
 })
-export class ConfirmacionImprimirComponent implements OnInit, ModalI {
+export class ConfirmacionImprimirComponent implements OnInit, IDynamicModal {
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
     event.stopPropagation();
@@ -21,7 +21,7 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
 
     if (key == teclasCode._p || key == teclasCode._P) this.is_print = !this.is_print;
 
-    if (key == teclasCode._enter) this.btn_aceptar();
+    if (key == teclasCode._enter) this.submit();
   }
 
   constructor(
@@ -29,34 +29,42 @@ export class ConfirmacionImprimirComponent implements OnInit, ModalI {
     public factServ: FacturacionService
   ) {}
 
-  @Input() modalWrapper: any = {};
-  inputs: any;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
+  @Input() metodo: string;
+  @Input() condicion_fact: string;
+  @Input() modo_factura: string;
+  @Input() is_viaje: boolean;
+
   configApp: ConfigI;
   documentos_a_imprimir = [];
   documento;
 
   is_print: boolean;
 
+  get documentoParams() {
+    return { metodo: this.metodo, condicion_fact: this.condicion_fact, modo_factura: this.modo_factura, is_viaje: this.is_viaje };
+  }
+
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;
     this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
-    this.documento = this.factServ.getDocumentoDescripcion(this.inputs, true);
+    this.documento = this.factServ.getDocumentoDescripcion(this.documentoParams);
 
     this.handleDefaultSwitch();
   }
 
   handleDefaultSwitch() {
-    if (this.inputs.metodo == 'venta') {
-      const comparation = this.inputs.condicion_fact == 'Crédito' ? 'venta_credito' : 'venta_contado';
+    if (this.metodo == 'venta') {
+      const comparation = this.condicion_fact == 'Crédito' ? 'venta_credito' : 'venta_contado';
       this.is_print = this.documentos_a_imprimir.includes(comparation);
     } else {
-      this.is_print = this.documentos_a_imprimir.includes(this.inputs.metodo);
+      this.is_print = this.documentos_a_imprimir.includes(this.metodo);
     }
   }
 
-  btn_aceptar() {
-    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
-    modal.closeModal(this.modalWrapper.component_id);
-    modal.returnDataFromModal({ is_print: this.is_print, modal_id: this.modalWrapper.component_id });
+  submit() {
+    this.modalConfig.close({ is_print: this.is_print });
   }
 }

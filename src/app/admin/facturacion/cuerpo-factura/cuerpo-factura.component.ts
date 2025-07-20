@@ -418,6 +418,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async saltar(next_input, index) {
+    console.log('next_input ', next_input);
+    
     if (index >= 10 && next_input === 'cantidad-') this.addItem();
 
     if (next_input == 'precioOCompra-') next_input = this.factServ.isCompra() ? 'costo-' : 'precio-';

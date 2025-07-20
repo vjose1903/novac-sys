@@ -1,30 +1,32 @@
 import { tipoDocFacturacion } from '@admin/facturacion/factura';
 import { Ss } from '@core/services/singleton.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { ClienteC } from '@registros/registro-clientes/cliente';
-import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 import { SuplidorC } from '@registros/registro-suplidores/suplidores';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ConfigI } from '@core/interface/config-interface';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 @Component({
   selector: 'app-buscar-cliente-suplidor',
   templateUrl: './buscar-cliente-suplidor.component.html',
   styleUrls: ['./buscar-cliente-suplidor.component.scss'],
   standalone: false,
 })
-export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit, ModalI {
+export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit, IDynamicModal {
   constructor(private tServ: TablasService) {
     super();
   }
 
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
-  dataFiltro;
+  dataFiltro = signal<any[]>([]);
 
-  @Input() modalWrapper: any = {};
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
 
   @Input() metodo: tipoDocFacturacion | null = null;
   @Input() include_contado: boolean = false;
@@ -47,14 +49,14 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   ventaInfo: table_info[] = [
     { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
     { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
 
   compraInfo: table_info[] = [
     { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
@@ -72,7 +74,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
-    const copyData = fun.deepCloning(this.dataFiltro);
+    const copyData = fun.deepCloning(this.dataFiltro());
 
     let palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
 
@@ -98,30 +100,21 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
               return entidad;
             });
 
-            this.dataFiltro = res.data;
+            this.dataFiltro.set(res.data);
           } else {
-            this.dataFiltro = copyData;
+            this.dataFiltro.set(copyData);
           }
 
           this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
         })
         .catch(error => {
-          if (where === 'init') this.closeThis({ tipo: 'data_no_found', modal_id: this.modalWrapper.component_id });
+          if (where === 'init') this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id });
         });
     } catch (error) {}
   }
 
   tableClickRow(event) {
-    const modal = this.closeThis();
-
     if (this.after_select) event.data.after_select = this.after_select;
-    modal.returnDataFromModal({ data: event.data, modal_id: this.modalWrapper.component_id });
-  }
-
-  closeThis(arg?) {
-    const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id === this.modalWrapper.component_id);
-    modal.closeModal(this.modalWrapper.component_id);
-    if (arg) modal.returnDataFromModal(arg);
-    return modal;
+    this.modalConfig.close(event.data);
   }
 }

@@ -19,7 +19,8 @@ import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import Big from 'big.js';
 import { serie, seriesDGII, seriesDgiiI } from '@core/typescript/constantes';
 import { DateUtils } from '@vjose1903/dateutils';
-
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -137,8 +138,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     this.necesarioStart();
   }
-
-
 
   ngOnDestroy(): void {
     this._destroy_mixin();
@@ -437,13 +436,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.confirmationCancelModal(confirmationObj);
   }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modal_id === 'confirmacionImprimir') {
-      this.is_print = arg.is_print;
-      this.formarNota();
-    }
-  }
-
   // =============================================
   //  MODAL IMPRIMIR
   // =============================================
@@ -453,20 +445,31 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     } else {
       const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: `nota_${this.tipoNota}`, is_viaje: false };
 
-      this.openNewModal({
-        component: ConfirmacionImprimirComponent,
-        inputs: obj,
-        id: 'confirmacionImprimir',
-        header: 'Confirmación',
-        width: '30rem',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
-          ],
-        },
-      });
+      const confirmationImprimirModalConf = new DynamicModalClass();
+
+      confirmationImprimirModalConf.id = 'confirmacionImprimir';
+      confirmationImprimirModalConf.inputs = obj;
+      confirmationImprimirModalConf.header = 'Confirmación';
+      confirmationImprimirModalConf.width = '30rem';
+      confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
+      confirmationImprimirModalConf.comfirmToClose = false;
+      confirmationImprimirModalConf.closableEsc = false;
+      confirmationImprimirModalConf.botones = [
+        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { id: 'btnConfirmar', clase: 'btn btn-verde', label: 'Confirmar', disable: false },
+      ];
+
+      confirmationImprimirModalConf.setCallback(this.processImprimir.bind(this));
+      confirmationImprimirModalConf.show();
+    }
+  }
+
+  processImprimir(args: ICallbackModal) {
+    if (args.type == modalCloseType.returnData) {
+      const { is_print } = args.data;
+
+      this.is_print = is_print;
+      this.send_nota();
     }
   }
 
@@ -490,7 +493,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     modalInstance.closeModal(modalInstance.id);
   }
 
-  async formarNota() {
+  async send_nota() {
     let fecha_valida = null;
 
     if (fun.hasValue(this.paqueteComprobante?.fecha_valida) && DateUtils.isValid(new Date(this.paqueteComprobante?.fecha_valida))) {

@@ -20,7 +20,8 @@ import { ModalClass } from '@components/modal/modal-class';
 import { Router } from '@angular/router';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
-
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-conduce-form',
@@ -140,8 +141,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     });
   }
 
-
-
   ngOnDestroy() {
     this._destroy_mixin();
   }
@@ -209,11 +208,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       this.llenarConduce(arg.data).then(res => {
         this.checkFacturasAdelantadasSelection();
       });
-    }
-
-    if (arg.modal_id === 'confirmacionImprimir') {
-      this.is_print = arg.is_print;
-      this.sendData();
     }
   }
 
@@ -798,22 +792,33 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       fun.enfocarInput('cod-1');
     } else {
       this.parseCuerpoConduce();
-      const obj = { modo_factura: 'conduce', condicion_fact: 'conduce', metodo: 'conduce' };
+      const obj = { modo_factura: 'conduce', condicion_fact: 'conduce', metodo: 'conduce', is_viaje: false };
 
-      this.openNewModal({
-        component: ConfirmacionImprimirComponent,
-        inputs: obj,
-        id: 'confirmacionImprimir',
-        header: 'Confirmación',
-        width: '30rem',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
-          ],
-        },
-      });
+      const confirmationImprimirModalConf = new DynamicModalClass();
+
+      confirmationImprimirModalConf.id = 'confirmacionImprimir';
+      confirmationImprimirModalConf.inputs = obj;
+      confirmationImprimirModalConf.header = 'Confirmación';
+      confirmationImprimirModalConf.width = '30rem';
+      confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
+      confirmationImprimirModalConf.comfirmToClose = false;
+      confirmationImprimirModalConf.closableEsc = false;
+      confirmationImprimirModalConf.botones = [
+        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { id: 'btnConfirmar', clase: 'btn btn-verde', label: 'Confirmar', disable: false },
+      ];
+
+      confirmationImprimirModalConf.setCallback(this.processImprimir.bind(this));
+      confirmationImprimirModalConf.show();
+    }
+  }
+
+  processImprimir(args: ICallbackModal) {
+    if (args.type == modalCloseType.returnData) {
+      const { is_print } = args.data;
+
+      this.is_print = is_print;
+      this.sendData();
     }
   }
 

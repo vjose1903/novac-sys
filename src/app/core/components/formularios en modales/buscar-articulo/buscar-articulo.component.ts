@@ -16,7 +16,7 @@ import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-mo
   standalone: false,
 })
 export class BuscarArticuloComponent extends MixinClass implements IDynamicModal, AfterViewInit {
-  articuloClass = new ArticuloC();
+  articuloClass = new ArticuloC(); 
   constructor(private tServ: TablasService) {
     super();
   }

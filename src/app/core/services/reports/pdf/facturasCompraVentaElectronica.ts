@@ -94,7 +94,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
             {
               text: [
                 is_venta ? { text: 'Razón Social Cliente : ', style: 'letra10' } : { text: ' Razón Social Suplidor : ', style: 'letra10' },
-                is_venta ? { text: data.cliente.nombre, style: 'letra10' } : { text: data.suplidor.nombre, style: 'letra10' },
+                is_venta ? { text: data.cliente.nombre_completo, style: 'letra10' } : { text: data.suplidor.nombre_completo, style: 'letra10' },
               ],
             },
           ],
