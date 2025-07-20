@@ -43,17 +43,7 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
   }
 
   /**
-   * Muestra un modal de confirmación usando las opciones del componente
-   */
-  static showComponentConfirmationModal(component: CanComponentDeactivate, message?: string): Promise<boolean> {
-    const options = component.getDeactivateOptions?.() || {};
-    const finalMessage = message || component.getDeactivateMessage?.() || '¿Está seguro que desea continuar?';
-
-    return this.showConfirmationModal(finalMessage, options);
-  }
-
-  /**
-   * Muestra un modal de confirmación dinámico - igual que el original
+   * Muestra un modal de confirmación dinámico con funciones personalizadas
    */
   static showConfirmationModal(
     message: string,
@@ -65,6 +55,9 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
       yesText?: string;
       header?: string;
       width?: string;
+      onCancel?: () => void | Promise<void>;
+      onNo?: () => void | Promise<void>;
+      onYes?: () => void | Promise<void>;
     }
   ): Promise<boolean> {
     return new Promise(resolve => {
@@ -83,7 +76,10 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
           id: 'cancelBtn',
           label: options?.cancelText || 'Cancelar',
           clase: 'btn btn-blanco',
-          function: () => {
+          function: async () => {
+            if (options?.onCancel) {
+              await options.onCancel();
+            }
             modal.close();
             resolve(false);
           },
@@ -96,9 +92,12 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
           id: 'noBtn',
           label: options?.noText || 'No',
           clase: 'btn btn-blanco w-9',
-          function: () => {
+          function: async () => {
+            if (options?.onNo) {
+              await options.onNo();
+            }
             modal.close();
-            resolve(false);
+            resolve(true);
           },
         });
       }
@@ -108,10 +107,13 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
         id: 'yesBtn',
         label: options?.yesText || 'Si',
         clase: 'btn btn-verde w-9',
-        function: () => {
+        function: async () => {
+          if (options?.onYes) {
+            await options.onYes();
+          }
           modal.close();
           resolve(true);
-        },
+          },
       });
 
       modal.botones = botones;
