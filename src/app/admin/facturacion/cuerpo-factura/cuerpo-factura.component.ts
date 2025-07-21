@@ -15,7 +15,7 @@ import { Ss } from '@core/services/singleton.service';
 import { ModalClass } from '@components/modal/modal-class';
 import { Subject, takeUntil } from 'rxjs';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
-import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -419,7 +419,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async saltar(next_input, index) {
     console.log('next_input ', next_input);
-    
+
     if (index >= 10 && next_input === 'cantidad-') this.addItem();
 
     if (next_input == 'precioOCompra-') next_input = this.factServ.isCompra() ? 'costo-' : 'precio-';
@@ -460,7 +460,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       buscarArticuloModalConf.width = '56.25rem';
       buscarArticuloModalConf.height = '31.25rem';
       buscarArticuloModalConf.component = BuscarArticuloComponent;
-      buscarArticuloModalConf.comfirmToClose = false;
+      buscarArticuloModalConf.confirmToClose = false;
       buscarArticuloModalConf.closableEsc = true;
 
       buscarArticuloModalConf.setCallback((args: ICallbackModal) => this.llenarRowDespuesDeFiltro(args));
@@ -812,7 +812,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const current_detalle = tipo == 'defectuoso' ? this.factServ.filasDetalle[index].getRawValue() : null;
     const detalles = this.factServ.getDetallesLlenos();
 
-    const articulo_defectuoso = _.find(detalles, detalle => detalle.key_initial == current_detalle.key);
+    const articulo_defectuoso = detalles.find(detalle => detalle.key_initial == current_detalle.key);
     const articulo_solo_devuelto = this.factServ.productos_devueltos ? this.factServ.productos_devueltos.find(detalle => detalle.key_initial == current_detalle.key) : null;
 
     const name = current_detalle.descripcion;
@@ -821,14 +821,21 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const inputs = { data: current_detalle, articulo_defectuoso: articulo_defectuoso, articulo_solo_devuelto: articulo_solo_devuelto, tipo: tipo, is_articulo_selected: true };
     inputs['nombre'] = unidad ? `${name} (${unidad})` : name;
 
-    this.openNewModal({
-      component: RetornarDevueltoComponent,
-      inputs: inputs,
-      id: 'retornarDevuelto',
-      header: 'Retornar Articulos Devueltos',
-      width: '40rem',
-      botones: { aceptar: { show: true, disable: true }, cancelar: { show: true, disable: false } },
-    });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.width = '57rem';
+    modalConfig.height = '32rem';
+    modalConfig.component = RetornarDevueltoComponent;
+    modalConfig.inputs = inputs;
+    modalConfig.id = 'retornarDevuelto';
+    modalConfig.header = 'Retornar Articulos Devueltos';
+
+    modalConfig.botones = [
+      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+    ];
+
+    modalConfig.setCallback((arg: ICallbackModal) => this.retornarDevuelto(arg.data));
+    modalConfig.show();
 
     if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();
@@ -954,20 +961,18 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'retornarDevuelto') this.retornarDevuelto(arg);
-
     if (arg.modal_id == 'removerArticulo') this.procesoQuitarArticulo(arg.key, arg.data);
   }
 
-  retornarDevuelto(arg) {
+  retornarDevuelto(arg: { key: string; retorno: { solo_devuelto: any; defectuoso: any } }) {
     const infoRetorno = [
-      { tipo: 'defectuoso', data: arg.data?.defectuoso, contenedor_retorno: this.factServ.filasDetalle },
-      { tipo: 'solo_devuelto', data: arg.data?.solo_devuelto, contenedor_retorno: this.factServ.productos_devueltos || [] },
+      { tipo: 'defectuoso', data: arg.retorno?.defectuoso, contenedor_retorno: this.factServ.filasDetalle },
+      { tipo: 'solo_devuelto', data: arg.retorno?.solo_devuelto, contenedor_retorno: this.factServ.productos_devueltos || [] },
     ];
 
     infoRetorno.forEach(itemRetorno => {
       if (fun.hasValue(itemRetorno?.data?.key) && itemRetorno?.data?.cantidad > 0) {
-        let articulo_devuelto = _.find(itemRetorno.contenedor_retorno, item => {
+        let articulo_devuelto = itemRetorno.contenedor_retorno.find(item => {
           const entidad = itemRetorno.tipo == 'defectuoso' ? item.value : item;
           return entidad.key == itemRetorno?.data?.key;
         });

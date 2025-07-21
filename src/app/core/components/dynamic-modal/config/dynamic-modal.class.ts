@@ -24,7 +24,7 @@ export class DynamicModalClass {
   closable: boolean | undefined;
   closableEsc: boolean | undefined;
   closableClickOutside: boolean | undefined;
-  comfirmToClose: boolean | undefined;
+  confirmToClose: boolean | undefined;
 
   returnData!: Function;
   hideModal!: Function;
@@ -59,7 +59,7 @@ export class DynamicModalClass {
     this.closableEsc = params && fun.objHas(params, 'closableEsc') ? params.closableEsc : false;
     this.maximizable = params && fun.objHas(params, 'maximizable') ? params.maximizable : false;
     this.closableClickOutside = params && fun.objHas(params, 'closableClickOutside') ? params.closableClickOutside : false;
-    this.comfirmToClose = params && fun.objHas(params, 'comfirmToClose') ? params.comfirmToClose : false;
+    this.confirmToClose = params && fun.objHas(params, 'confirmToClose') ? params.confirmToClose : false;
     this.html = params && fun.objHas(params, 'html') ? params.html : undefined;
 
     this.returnData = (arg: ICallbackModal) => this.runCallback(arg);

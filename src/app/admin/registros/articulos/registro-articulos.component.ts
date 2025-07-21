@@ -548,7 +548,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (costo > 0 && fun.hasValue(costo)) {
       // const precio = costo / 0.9;
 
-      const precio = costo / this.configArticuloClass.getWinPercerntCalc(this.cofig_articulos);
+      const precio = costo / this.configArticuloClass.getWinPercentCalc(this.cofig_articulos);
       const precio_rounded = fun.roundToNearestMultipleOf5(precio);
       const precioLibra = fun.roundToNearestMultipleOf5(precio_rounded / 100);
 

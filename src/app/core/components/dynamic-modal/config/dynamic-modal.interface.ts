@@ -66,7 +66,7 @@ export interface IModalConfiguration {
   closable?: boolean;
   closableEsc?: boolean;
   closableClickOutside?: boolean;
-  comfirmToClose?: boolean;
+  confirmToClose?: boolean;
 
   close?: (dataToReturn?: any) => void;
   show?: () => void;

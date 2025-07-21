@@ -3,13 +3,15 @@ import { Router } from '@angular/router';
 import { ClienteC } from '@registros/registro-clientes/cliente';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
-import { FacturaC, request_factura_campo, tipoDocFacturacion } from './../factura';
+import { FacturaC, FacturasI, request_factura_campo, tipoDocFacturacion } from './../factura';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
-import { Component, OnInit, inject, ViewChild, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef, Input, signal } from '@angular/core';
 import { ModalI } from '@components/modal/modal-class';
 import * as _ from 'lodash';
 import { Ss } from '@core/services/singleton.service';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-menu-opciones-extra',
@@ -17,8 +19,9 @@ import { Ss } from '@core/services/singleton.service';
   styleUrls: ['./menu-opciones-extra.component.scss'],
   standalone: false,
 })
-export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ModalI {
+export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, IDynamicModal {
   @ViewChild('dropdownCliente') dropdownCliente: ElementRef;
+
   constructor(
     private tServ: TablasService,
     private router: Router
@@ -26,12 +29,13 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     super();
   }
 
-  @Input() modalWrapper: any = {};
-  inputs: any;
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() code!: tipoDocFacturacion;
 
   filter_key;
   filter_value = '';
-  documentos = [];
+  documentos = signal<FacturasI[]>([]);
   listaClientes = [];
   clienteSelected;
 
@@ -55,15 +59,15 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
   table_notas_config: table_config = {
     info: [
-      { titulo: 'No. Doc.', tooltip: 'Número de documento', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
-      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre', estilos: [{ 'text-align': 'start' }, { 'padding-left': '1rem' }, { width: '45%' }] },
-      { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '6rem' }] },
+      { titulo: 'No. Doc.', tooltip: 'Número de documento', tipo: 'text', key: 'secuencia', style: { width: '7rem' } },
+      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre_completo', style: { 'text-align': 'start', 'padding-left': '1rem', width: '45%' } },
+      { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente', style: { width: '6rem' } },
       { titulo: 'Total', tipo: 'formatoNumero', key: 'total_factura' },
       {
         titulo: 'Acciones',
         tipo: 'icon',
         key: 'actions',
-        estilos: [{ width: '9%' }],
+        style: { width: '9%' },
         iconsArray: [
           { key: 'view', tooltip: 'Ver Documento', text_color: 'viewColor' },
           { key: 'rellenar_factura', tooltip: 'Crear Factura desde Cotización', disable: [{ kind: 'has_value', target: 'fecha_completada' }] },
@@ -162,12 +166,12 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
   async buscarDocumentos(params?: { per_page: number; page: number; search: string }) {
     try {
-      this.documentos.length = 0;
+      this.documentos.set([]);
 
-      const args = { campo: this.filter_key, valor: this.filter_value, tipo_factura_id: 0, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, tipo: this.inputs.code, pagada: false, estado: true };
+      const args = { campo: this.filter_key, valor: this.filter_value, tipo_factura_id: 0, adelantada: false, page: params.page, per_page: params.per_page, paginado: true, tipo: this.code, pagada: false, estado: true };
       const res = await this.facturaClass.getFacturasByParams(args);
 
-      res['data'].forEach(fact => {
+      const documentos = res['data'].map(fact => {
         fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
 
         fact.viewColor = 'gris-claro';
@@ -176,10 +180,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
         fact.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
 
         fact.customStyles = {
-          secuencia: { width: '7rem' },
-          'cliente.nombre': { 'text-align': 'start', 'padding-left': '1rem', width: '45%' },
-          fecha_equivalente: { width: '6rem' },
-
           actions: [
             { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
             { key: 'view', estilos: 'font-size: 1.1rem !important;' },
@@ -187,12 +187,12 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
           ],
         };
 
-        this.documentos.push(fact);
+        return fact;
       });
 
-      this.documentos = _.orderBy(this.documentos, ['fecha_equivalente'], ['desc']);
+      this.documentos.set(_.orderBy(documentos, ['fecha_equivalente'], ['desc']));
 
-      if (this.documentos.length > 0) {
+      if (this.documentos().length > 0) {
         fun.setTimeout(() => {
           this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
         }, 100);
@@ -212,7 +212,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'view') {
         this.facturaClass.parseDataToPdf(params.data).then(factura_parsed => {
-          this.mostrarFactura(factura_parsed, this.inputs.code == tipoDocFacturacion.cotizacion ? 'cotizacion' : 'facturacion');
+          this.mostrarFactura(factura_parsed, this.code == tipoDocFacturacion.cotizacion ? 'cotizacion' : 'facturacion');
         });
       }
 
@@ -231,7 +231,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
 
     let botonesDinamicos = [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false as any }];
 
-    if (this.inputs.code == tipoDocFacturacion.cotizacion) {
+    if (this.code == tipoDocFacturacion.cotizacion) {
       botonesDinamicos.push({
         clase: 'btn btn-gris',
         function: instance => {
@@ -249,11 +249,10 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, Mo
   }
 
   pasar_a_facturacion(documento_selected) {
-    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
-    modal.closeModal(this.modalWrapper.component_id);
+    this.modalConfig.close();
 
     this.router.navigateByUrl('/').then(res => {
-      this.router.navigateByUrl(`/admin/factura/venta/bill_from_${this.inputs.code}/${documento_selected.id}`);
+      this.router.navigateByUrl(`/admin/factura/venta/bill_from_${this.code}/${documento_selected.id}`);
     });
   }
 

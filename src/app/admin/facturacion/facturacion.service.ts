@@ -95,6 +95,8 @@ export class FacturacionService {
     return new Promise<any>((resolve, reject) => {
       const originalTipoFactura = this.lista_tipos_facturas.find(tipo_factura => (by == 'id' ? tipo_factura[by] == value : tipo_factura[by] == value));
 
+      console.log('originalTipoFactura ', originalTipoFactura);
+
       if (equivalentSerie) {
         this.tipoFactura = this.lista_tipos_facturas.find(item => item.key == originalTipoFactura.key && item.serie == this.serieType());
       } else {

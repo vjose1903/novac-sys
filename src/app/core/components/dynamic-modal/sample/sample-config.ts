@@ -32,7 +32,7 @@ function openModalComponent() {
   testModal.inputs = { propiedad: 'Esta es una propiedad pasada por parametros' };
   testModal.header = 'Modal de prueba Componente';
   testModal.component = SampleComponentModalComponent;
-  testModal.comfirmToClose = true;
+  testModal.confirmToClose = true;
 
   testModal.botones = [
     { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },

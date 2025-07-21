@@ -72,7 +72,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
       showConfirmAlert = modal['componentInstance']['showConfirmAlert']();
     }
 
-    if (showConfirmAlert && modal.comfirmToClose && modal.id) {
+    if (showConfirmAlert && modal.confirmToClose && modal.id) {
       const confirmationConfig = {
         id: `closeConfirm-${modal.id}`,
         callback: (data: ICallbackModal) => this.handleCloseModal(modal.id || '', dataToReturn),

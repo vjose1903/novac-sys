@@ -160,6 +160,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       return new Promise<boolean>(resolve => {
         if (fun.isEmpty(this.configApp)) return resolve(false);
         if (fun.isEmpty(this.actualPath()) || fun.isEmpty(this.actualRuta())) return resolve(false);
+        console.log('Ss.factServ.lista_tipos_facturas ', Ss.factServ.lista_tipos_facturas);
+
         if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
 
         resolve(true);
@@ -245,7 +247,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     passwordConfigModal.header = 'Configuraciones';
     passwordConfigModal.width = '30rem';
     passwordConfigModal.component = ModalPasswordConfigComponent;
-    passwordConfigModal.comfirmToClose = false;
+    passwordConfigModal.confirmToClose = false;
 
     passwordConfigModal.botones = [
       { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },
@@ -265,7 +267,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     passwordConfigModal.padding = '0rem';
     passwordConfigModal.component = ConfiguracionesComponent;
     passwordConfigModal.inputs = { is_on_modal: true };
-    passwordConfigModal.comfirmToClose = false;
+    passwordConfigModal.confirmToClose = false;
 
     passwordConfigModal.show();
   }
