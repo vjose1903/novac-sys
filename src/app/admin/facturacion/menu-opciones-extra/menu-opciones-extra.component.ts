@@ -53,11 +53,9 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
     { key: this.filter_options.numero_documento, label: 'No. de Cotización' },
   ];
 
-  table_config;
-
   tablaComponent;
 
-  table_notas_config: table_config = {
+  table_config: table_config = {
     info: [
       { titulo: 'No. Doc.', tooltip: 'Número de documento', tipo: 'text', key: 'secuencia', style: { width: '7rem' } },
       { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre_completo', style: { 'text-align': 'start', 'padding-left': '1rem', width: '45%' } },
@@ -251,9 +249,13 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
   pasar_a_facturacion(documento_selected) {
     this.modalConfig.close();
 
-    this.router.navigateByUrl('/').then(res => {
+    console.log(this.code);
+    
+    // this.router.navigateByUrl(`/admin/factura/venta/bill_from_cotizacion/${cotizacion.id}`);
+
+    
       this.router.navigateByUrl(`/admin/factura/venta/bill_from_${this.code}/${documento_selected.id}`);
-    });
+    
   }
 
   btn_aceptar() {}

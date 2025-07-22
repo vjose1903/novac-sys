@@ -46,16 +46,18 @@ export class FacturacionService {
   constructor() {}
 
   setTipos(metodo: tipoDocFacturacion, serie: serie, sameTipo: boolean = false) {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<any>(async (resolve, reject) => {
       this.serieType.set(serie);
 
       if (metodo == tipoDocFacturacion.compra || metodo == tipoDocFacturacion.venta) {
         const defaultKey = metodo == tipoDocFacturacion.compra ? tFacturaKey.factura_de_credito_fiscal : tFacturaKey.factura_de_consumo;
 
+        console.log('%c this.tipoFactura', 'color: yellow', this.tipoFactura);
         const keyTarget = sameTipo && fun.hasValue(this.tipoFactura) ? this.tipoFactura.key : defaultKey;
 
         this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == keyTarget && tipo_factura.serie == this.serieType());
-
+        console.log('%c this.tipoFactura', 'color: salmon', this.tipoFactura);
+        
         this.htmlTiposFacturas = `<div style=" max-width: 21rem;" > \
           <span>${comprobante[this.serieType()].factura_de_credito_fiscal} Factura de credito fiscal</span><br>\
           <span>${comprobante[this.serieType()].factura_de_consumo} Factura de consumo</span><br>\
@@ -84,7 +86,7 @@ export class FacturacionService {
         this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == tFacturaKey.pre_venta && tipo_factura.serie == this.serieType());
       }
 
-      this.setTipoFacturaSelected({ value: this.tipoFactura.id, by: 'id' });
+      await this.setTipoFacturaSelected({ value: this.tipoFactura.id, by: 'id', equivalentSerie: false });
       resolve(true);
     });
   }

@@ -67,10 +67,10 @@
     </div>
   </div>
   <div class="options_table">
-    <div #cardTablaDcumentos id="cardTablaDcumentos" class="divContainerTabla">
+    <div #cardTablaDocumentos id="cardTablaDocumentos" class="divContainerTabla">
       <div class="innerTablas">
         @if (documentos().length) {
-          <dinamic-table [cardTabla]="cardTablaDcumentos" [data]="documentos()" (dataChange)="documentos.set($event)" [(TablasComponent)]="tablaComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          <dinamic-table [cardTabla]="cardTablaDocumentos" [data]="documentos()" (dataChange)="documentos.set($event)" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
         }
       </div>
     </div>

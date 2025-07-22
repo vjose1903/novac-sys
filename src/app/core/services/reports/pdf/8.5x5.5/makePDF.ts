@@ -345,10 +345,6 @@ function parseInfoFactura(data, tipo_pdf, is_electronica) {
 }
 
 function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
-  console.log('data ', data);
-  console.log('tipo_pdf ', tipo_pdf);
-  console.log('is_suplidor ', is_suplidor);
-
   if (!infoPropietarioPartes[tipo_pdf].length) return [{ text: '' }];
 
   const numero_letra = numLetra.NumeroALetras(data?.total);

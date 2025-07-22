@@ -160,8 +160,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       return new Promise<boolean>(resolve => {
         if (fun.isEmpty(this.configApp)) return resolve(false);
         if (fun.isEmpty(this.actualPath()) || fun.isEmpty(this.actualRuta())) return resolve(false);
-        console.log('Ss.factServ.lista_tipos_facturas ', Ss.factServ.lista_tipos_facturas);
-
         if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
 
         resolve(true);
