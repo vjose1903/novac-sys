@@ -7,14 +7,14 @@
     <div class="d-flex align-items-center">
       <h4 class="negrita mb-0">{{ titulo | titlecase }}</h4>
 
-      @if (optionesExtra.length > 0 && factServ.isVenta()) {
+      @if (opcionesExtra().length > 0 && factServ.isVenta()) {
         <div class="ms-3">
           <btn-icon-circular id="btnExtra" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
           <p-popover #overlayExtra [dismissable]="false" styleClass="padding-sm" (onHide)="cerrarOverlay()">
             <div id="overlayExtra">
               <ul class="overlayExtra" role="menu">
-                @for (option of optionesExtra; track option.key; let index_option = $index) {
+                @for (option of opcionesExtra(); track option.key; let index_option = $index) {
                   @if (option.condition()) {
                     <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer br-4" (click)="selectOptionExtra(option, 'click')">
                       <div class="d-flex align-items-center">

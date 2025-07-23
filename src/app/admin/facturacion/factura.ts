@@ -270,7 +270,7 @@ export class FacturaC extends CrudG<FacturasI> {
     extra_params?: any;
   }) {
     const valor_enc = fun.encriptar(args.valor.toString());
-    const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
+    const VALOR_ENC = valor_enc.replace('\\', '&^IC');
     args.pagada ??= '0';
     args.extra_params ??= {};
 

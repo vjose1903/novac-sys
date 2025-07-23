@@ -48,6 +48,7 @@ export class BuscarArticuloComponent extends MixinClass implements IDynamicModal
   ngAfterViewInit(): void {
     if (this.metodo === tipoDocFacturacion.compra) this.table_config.info.push({ titulo: 'Costo', tipo: tableCellType.quantityTooltip, key: 'costo' });
     else this.table_config.info.push({ titulo: 'Precio', tipo: tableCellType.quantityTooltip, key: 'precio' });
+    
     this.buscarArticulos(this.tServ.obj_paginate.default, 'init');
   }
 

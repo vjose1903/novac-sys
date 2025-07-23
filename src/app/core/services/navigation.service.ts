@@ -22,12 +22,29 @@ export class NavigationService {
 
   constructor() {
     this.initializeNavigationState();
+    this.subscribeToRouterEvents();
   }
 
   private initializeNavigationState() {
     this.navigationState$.next({
       isNavigating: false,
       currentRoute: this.router.url,
+    });
+  }
+
+  private subscribeToRouterEvents() {
+    this.router.events.subscribe(event => {
+      if (event.type === 1) {
+        // NavigationEnd
+        const currentState = this.navigationState$.value;
+
+        this.navigationState$.next({
+          ...currentState,
+          currentRoute: this.router.url,
+          isNavigating: false,
+          pendingRoute: undefined,
+        });
+      }
     });
   }
 

@@ -25,7 +25,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
   subModalConfig!: Subscription;
 
   get modalsConfig(): DynamicModalClass[] {
-    return Ss.dynamicModalService.modalsConfigurations;
+    return Ss.dynamicModalService.modalsConfigurations ?? [];
   }
 
   ngOnInit(): void {

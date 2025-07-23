@@ -2,7 +2,7 @@ import { PrimengModule } from './modules/primeng.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NewModalModule } from './core/components/modal/modal.module';
 import { FormulariosEnModalesModule } from './core/components/formularios en modales/formularios-en-modales.module';
-import { Component, OnInit, ChangeDetectorRef, NgZone, AfterViewInit, HostListener, inject, OnDestroy, signal, Injector } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, AfterViewInit, HostListener, inject, OnDestroy, signal, Injector, effect } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from '@services/ipc.service';
 
@@ -72,13 +72,12 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   private readonly destroy$ = new Subject<void>();
 
   // Propiedades del componente
-  loading = false;
+  loading = signal<boolean>(false);
   objProgress: any;
-  visible = false;
-  imgLogo: string;
-  tiempo_restante: string;
-  objPercent: any;
-  counter = 0;
+  visible = signal<boolean>(false);
+  imgLogo = signal<string>('');
+  objPercent = signal<any>(null);
+  counter = signal<number>(0);
   isReady = signal<boolean>(false);
 
   tipoFacturaClass = new TiposFacturaC();
@@ -93,12 +92,12 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       this.mostrar_modal_actualizacion(data);
     },
     [ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS]: (data: any) => {
-      this.visible = true;
+      this.visible.set(true);
       fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
       this.downloadProgression(data.body);
     },
     [ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED]: () => {
-      this.visible = false;
+      this.visible.set(false);
     },
     [ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE]: (data: any) => {
       fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
@@ -106,7 +105,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     [ELECTRON_EVENT_UPDATE_ERROR]: (data: any) => {
       fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
       fun.toastError(data.msg, 'ERRROR');
-      this.visible = false;
+      this.visible.set(false);
     },
     [ELECTRON_SHOW_CLOSE_CONFIRMATION]: () => {
       const token = fun.getAuthToken();
@@ -149,7 +148,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   }
 
   ngAfterViewInit(): void {
-    fun.setWindowSize(window);
+    fun.setTimeout(() => {
+      fun.setWindowSize(window);
+    }, 0);
   }
 
   ngOnDestroy(): void {
@@ -184,12 +185,16 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
    */
   private setupSubscriptions(): void {
     // Suscripción al loader
-    this.loaderServ.isLoading.pipe(takeUntil(this.destroy$)).subscribe(loading => (this.loading = loading));
+    this.loaderServ.isLoading.pipe(takeUntil(this.destroy$)).subscribe(loading => {
+      this.zone.runOutsideAngular(() => {
+        this.loading.set(loading);
+      });
+    });
 
     // Solo escuchar cambios en la configuración para recargarla
     this.configServ.config$.pipe(takeUntil(this.destroy$)).subscribe(config => {
       this.themeService.setTheme(config.color_app);
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+      this.imgLogo.set(`data:image/png;base64,${config.logo_empresa}`);
     });
 
     // Eventos de Electron
@@ -364,36 +369,22 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   iniciar_descarga_actualizacion(): void {
     const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
     this._ipc.sendTask(task).then(res => {
-      this.visible = true;
+      this.visible.set(true);
     });
   }
 
   downloadProgression(object: any): void {
     this.zone.run(() => {
-      if (this.counter === 1) this.visible = true;
+      if (this.counter() === 1) this.visible.set(true);
 
-      this.counter++;
-      this.tiempo_restante = this.timeConvert(object.total / object.bytesPerSecond);
+      this.counter.update(prev => prev + 1);
 
       object.transferred = parseFloat(fun.roundNumberToDecimal(object.transferred / 1000000));
       object.total = parseFloat(fun.roundNumberToDecimal(object.total / 1000000));
       object.percent = parseFloat(fun.roundNumberToDecimal(object.percent));
 
-      this.objPercent = object;
+      this.objPercent.set(object);
       this.cdRef.detectChanges();
     });
-  }
-
-  timeConvert(d: number): string {
-    d = Number(d);
-    const h = Math.floor(d / 3600);
-    const m = Math.floor((d % 3600) / 60);
-    const s = Math.floor((d % 3600) % 60);
-
-    const hDisplay = h > 0 ? h + (h === 1 ? ' hora, ' : ' horas, ') : '';
-    const mDisplay = m > 0 ? m + (m === 1 ? ' minuto, ' : ' minutos, ') : '';
-    const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
-
-    return hDisplay + mDisplay + sDisplay;
   }
 }

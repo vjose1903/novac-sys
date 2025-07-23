@@ -39,7 +39,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   altoTbody;
   tableCellType = tableCellType;
 
-  @Input() TablasComponent;
+  @Input() TablasComponent: any = undefined;
   @Input() emptyMessage;
   @Output() TablasComponentChange = new EventEmitter<any>();
 
@@ -94,10 +94,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       }
     });
 
-    this.TablasComponent = this;
-    this.TablasComponentChange.emit(this.TablasComponent);
+    this.updateTablasComponent();
 
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
+
     fun.setTimeout(() => {
       this.ready = true;
     }, 250);
@@ -517,15 +517,22 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       // ================================================
       // CUSTOM STYLES
       // ================================================
-      fun.setTimeout(() => {
+      requestAnimationFrame(() => {
         this.changeStylesTitles();
-      }, 10);
+      });
       // ================================================
 
-      this.TablasComponent = this;
-      this.TablasComponentChange.emit(this.TablasComponent);
+      this.updateTablasComponent();
     }
     this.cdRef.detectChanges();
+  }
+
+  updateTablasComponent() {
+    requestAnimationFrame(() => {
+      this.TablasComponent = this;
+      this.TablasComponentChange.emit(this.TablasComponent);
+      this.cdRef.detectChanges();
+    });
   }
 
   formatQuantityString(valor: number, medida: string, order: string): string {
@@ -697,6 +704,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ENTER(arg) {
     const element = document.getElementById(arg) as any;
-    if (element) fun.setTimeout(() => element.click(), 10);
+    if (element) requestAnimationFrame(() => element.click());
   }
 }

@@ -52,12 +52,10 @@ export class FacturacionService {
       if (metodo == tipoDocFacturacion.compra || metodo == tipoDocFacturacion.venta) {
         const defaultKey = metodo == tipoDocFacturacion.compra ? tFacturaKey.factura_de_credito_fiscal : tFacturaKey.factura_de_consumo;
 
-        console.log('%c this.tipoFactura', 'color: yellow', this.tipoFactura);
         const keyTarget = sameTipo && fun.hasValue(this.tipoFactura) ? this.tipoFactura.key : defaultKey;
 
         this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == keyTarget && tipo_factura.serie == this.serieType());
-        console.log('%c this.tipoFactura', 'color: salmon', this.tipoFactura);
-        
+
         this.htmlTiposFacturas = `<div style=" max-width: 21rem;" > \
           <span>${comprobante[this.serieType()].factura_de_credito_fiscal} Factura de credito fiscal</span><br>\
           <span>${comprobante[this.serieType()].factura_de_consumo} Factura de consumo</span><br>\
@@ -94,18 +92,24 @@ export class FacturacionService {
   setTipoFacturaSelected(args: { value: any; by: string; equivalentSerie?: boolean }) {
     const { value, by, equivalentSerie = false } = args;
 
-    return new Promise<any>((resolve, reject) => {
-      const originalTipoFactura = this.lista_tipos_facturas.find(tipo_factura => (by == 'id' ? tipo_factura[by] == value : tipo_factura[by] == value));
+    return new Promise<any>(resolve => {
+      // Buscar el tipo de factura original
+      const originalTipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura[by] === value);
 
-      console.log('originalTipoFactura ', originalTipoFactura);
-
-      if (equivalentSerie) {
-        this.tipoFactura = this.lista_tipos_facturas.find(item => item.key == originalTipoFactura.key && item.serie == this.serieType());
-      } else {
-        this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => (by == 'id' ? tipo_factura[by] == value : tipo_factura[by] == value && tipo_factura.serie == this.serieType()));
+      if (!originalTipoFactura) {
+        resolve(value);
+        return;
       }
 
-      this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
+      // Determinar el tipo de factura final según equivalentSerie
+      if (equivalentSerie) {
+        this.tipoFactura = this.lista_tipos_facturas.find(item => item.key === originalTipoFactura.key && item.serie === this.serieType());
+      } else {
+        this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura[by] === value && tipo_factura.serie === this.serieType());
+      }
+
+      // Actualizar referencia seleccionada si se encontró el tipo de factura
+      if (this.tipoFactura) this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
 
       resolve(value);
     });
@@ -117,49 +121,66 @@ export class FacturacionService {
   }
 
   getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }) {
-    const res = { descripcion: undefined, descripcion_short: undefined, has_Propietario: fun.hasValue(this.propietario_factura), tipo: 'facturacion' };
+    const res = {
+      descripcion: undefined,
+      descripcion_short: undefined,
+      has_Propietario: fun.hasValue(this.propietario_factura),
+      tipo: 'facturacion',
+    };
+
     const actualPath = fun.getActualPath();
+    const { metodo, condicion_fact, modo_factura, is_viaje } = params;
 
-    if ((params.metodo == tipoDocFacturacion.cotizacion || params.metodo == tipoDocFacturacion.pre_venta) && (actualPath.includes('cotizacion') || actualPath.includes('pre_venta'))) {
-      res.descripcion = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre-venta';
-      res.tipo = params.metodo == tipoDocFacturacion.cotizacion ? tipoDocFacturacion.cotizacion : tipoDocFacturacion.pre_venta;
-      //
-    } else if (params.condicion_fact == 'Crédito') {
+    // Determinar descripción según el tipo de documento
+    if (this.isCotizacionOrPreVenta(metodo, actualPath)) {
+      res.descripcion = metodo === tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre-venta';
+      res.tipo = metodo;
+    } else if (condicion_fact === 'Crédito') {
       res.descripcion = 'Factura a Crédito';
-      //
-    } else if (params.metodo == tipoDocFacturacion.nota_credito || params.metodo == tipoDocFacturacion.nota_debito) {
-      res.descripcion = tipoDocFacturacion.nota_credito ? 'Nota de Crédito' : 'Nota de Dédito';
-
-      //
-    } else if (fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia == '01') {
+    } else if (this.isNotaCreditoOrDebito(metodo)) {
+      res.descripcion = metodo === tipoDocFacturacion.nota_credito ? 'Nota de Crédito' : 'Nota de Débito';
+    } else if (this.isFacturaConValorFiscal()) {
       res.descripcion = 'Factura con valor fiscal';
-      //
-    } else if (params.modo_factura == 'adelantada') {
+    } else if (modo_factura === 'adelantada') {
       res.descripcion = 'Factura adelantada';
-      //
-    } else if (params.is_viaje) {
+    } else if (is_viaje) {
       res.descripcion = 'Factura de viaje';
-      //
     } else {
-      if (params.metodo == tipoDocFacturacion.venta) {
-        res.descripcion = 'Factura de venta';
-        if (params.condicion_fact != 'Crédito') res.has_Propietario = true;
-      }
-      if (params.metodo == tipoDocFacturacion.compra) res.descripcion = 'Factura de compra';
+      this.setDescripcionPorMetodo(res, metodo, condicion_fact);
     }
 
-    if (fun.hasValue(res?.descripcion)) res.descripcion_short = res.descripcion.split(' ')[0];
+    // Generar descripción corta si existe descripción
+    if (fun.hasValue(res.descripcion)) {
+      res.descripcion_short = res.descripcion.split(' ')[0];
+    }
 
     return res;
   }
 
-  getDetallesLlenos() {
-    if (fun.hasValue(this.filasDetalle)) {
-      const filasMap = this.filasDetalle.map(inner_detalle => inner_detalle.value);
+  private isCotizacionOrPreVenta(metodo: string, actualPath: string): boolean {
+    return (metodo === tipoDocFacturacion.cotizacion || metodo === tipoDocFacturacion.pre_venta) && (actualPath.includes('cotizacion') || actualPath.includes('pre_venta'));
+  }
 
-      return filasMap.filter(filter_detalle => fun.hasValue(filter_detalle?.key));
-    } else {
-      return [];
+  private isNotaCreditoOrDebito(metodo: string): boolean {
+    return metodo === tipoDocFacturacion.nota_credito || metodo === tipoDocFacturacion.nota_debito;
+  }
+
+  private isFacturaConValorFiscal(): boolean {
+    return fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia === '01';
+  }
+
+  private setDescripcionPorMetodo(res: any, metodo: string, condicion_fact: string): void {
+    if (metodo === tipoDocFacturacion.venta) {
+      res.descripcion = 'Factura de venta';
+      if (condicion_fact !== 'Crédito') res.has_Propietario = true;
+    } else if (metodo === tipoDocFacturacion.compra) {
+      res.descripcion = 'Factura de compra';
     }
+  }
+
+  getDetallesLlenos() {
+    if (!fun.hasValue(this.filasDetalle)) return [];
+
+    return this.filasDetalle.map(inner_detalle => inner_detalle.value).filter(detalle => fun.hasValue(detalle?.key));
   }
 }

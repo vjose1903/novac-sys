@@ -8,9 +8,9 @@
 }
 
 @if (isReady()) {
-  @if (loading) {
-    <div id="fondoC" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
-      <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
+  @if (loading()) {
+    <div id="fondoC" [ngClass]="{ fadeIn: loading(), fadeOut: !loading() }" class="h-100 w-100 position-absolute backnegro">
+      <img class="img-fluid logoLoading rubberBand" [src]="imgLogo()" alt="" />
       <span class="text"> CARGANDO ... </span>
     </div>
   }
@@ -22,11 +22,11 @@
   <div class="d-flex justify-content-between mb-2 position-relative">
     <span class="negrita">Descargando actualizacion...</span>
     <div class="me-2">
-      <span class="negrita">{{ objPercent?.transferred }} Mb / </span>
-      <span class="negrita gris">{{ objPercent?.total }} Mb</span>
+      <span class="negrita">{{ objPercent()?.transferred }} Mb / </span>
+      <span class="negrita gris">{{ objPercent()?.total }} Mb</span>
     </div>
   </div>
-  <p-progressBar [value]="objPercent?.percent"></p-progressBar>
+  <p-progressBar [value]="objPercent()?.percent"></p-progressBar>
   <div class="me-2">
     <span> </span>
   </div>

@@ -6,10 +6,8 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { FacturaC, FacturasI, request_factura_campo, tipoDocFacturacion } from './../factura';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
-import { Component, OnInit, inject, ViewChild, ElementRef, Input, signal } from '@angular/core';
-import { ModalI } from '@components/modal/modal-class';
+import { Component, inject, ViewChild, ElementRef, Input, signal, AfterViewInit, OnInit } from '@angular/core';
 import * as _ from 'lodash';
-import { Ss } from '@core/services/singleton.service';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
@@ -33,7 +31,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
   @Input() modalConfig!: IModalConfiguration;
   @Input() code!: tipoDocFacturacion;
 
-  filter_key;
   filter_value = '';
   documentos = signal<FacturasI[]>([]);
   listaClientes = [];
@@ -45,15 +42,16 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
     numero_documento: request_factura_campo.numero_factura,
   };
 
-  tipo_documento_selected;
+  filter_key = this.filter_options.todos;
 
+  tipo_documento_selected;
   tipos_filtro = [
     { key: this.filter_options.todos, label: 'Todos' },
     { key: this.filter_options.cliente, label: 'Cliente' },
     { key: this.filter_options.numero_documento, label: 'No. de Cotización' },
   ];
 
-  tablaComponent;
+  tablaComponent: any = undefined;
 
   table_config: table_config = {
     info: [
@@ -85,7 +83,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
   htmlServ = inject(HtmlElementsService);
 
   ngOnInit(): void {
-    this.filter_key = this.filter_options.todos;
     this.buscarDocumentos(this.tServ.obj_paginate.default);
   }
 
@@ -100,10 +97,10 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
   }
 
   dropdownClienteAction(action: 'show' | 'hide') {
-    fun.setTimeout(() => {
+    requestAnimationFrame(() => {
       this.tServ.blockRowMovement = action === 'show';
       if (action === 'hide') fun.desEnfocarInput('valorI');
-    }, 100);
+    });
   }
 
   clearFilterValues() {
@@ -126,12 +123,12 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
   }
 
   async checkNumeroPreFactura(evento) {
-    fun.setTimeout(() => {
+    requestAnimationFrame(() => {
       if (this.filter_value.length < 8 || this.filter_value.includes('_')) fun.toastWarning('Numero de Pre-venta incompleto', 'Aviso');
       else this.buscarDocumentos(this.tServ.obj_paginate.default);
       evento.stopPropagation();
       evento.preventDefault();
-    }, 0);
+    });
   }
 
   async getClientes(arg) {
@@ -170,7 +167,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
       const res = await this.facturaClass.getFacturasByParams(args);
 
       const documentos = res['data'].map(fact => {
-        fact.secuencia = _.padStart(fact.numero_factura, 8, '0');
+        fact.secuencia = fact.numero_factura.toString().padStart(8, '0');
 
         fact.viewColor = 'gris-claro';
         fact.view = 'far fa-eye-slash';
@@ -188,11 +185,11 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
         return fact;
       });
 
-      this.documentos.set(_.orderBy(documentos, ['fecha_equivalente'], ['desc']));
+      this.documentos.set(documentos.sort((a, b) => fun.compare(a, b, 'id', 'desc')));
 
       if (this.documentos().length > 0) {
         fun.setTimeout(() => {
-          this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+          if (this.tablaComponent) this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
         }, 100);
       } else {
         if (this.filter_key == this.filter_options.cliente) {
@@ -250,12 +247,10 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
     this.modalConfig.close();
 
     console.log(this.code);
-    
+
     // this.router.navigateByUrl(`/admin/factura/venta/bill_from_cotizacion/${cotizacion.id}`);
 
-    
-      this.router.navigateByUrl(`/admin/factura/venta/bill_from_${this.code}/${documento_selected.id}`);
-    
+    this.router.navigateByUrl(`/admin/factura/venta/bill_from_${this.code}/${documento_selected.id}`);
   }
 
   btn_aceptar() {}

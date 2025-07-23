@@ -23,7 +23,6 @@ import { TitleCasePipe } from '@angular/common';
 import { seriesDGII } from '@core/typescript/constantes';
 import { Environment } from '@environments/environment';
 
-
 import * as _ from 'lodash';
 import { ConfigI } from '@core/interface/config-interface';
 import { DateUtils } from '@vjose1903/dateutils';
@@ -186,8 +185,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   pressEscResponse(res) {
     if (fun.hasValue(res)) fun.enfocarInput('valorI');
   }
-
-
 
   async loadFacturasChangingSerie() {
     const actualPagination = await this.getActualPagination();
@@ -678,12 +675,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     });
   }
 
-  pasarCotizacionAfacturar(cotizacion) {
-    fun.setTimeout(() => {
-      this.router.navigateByUrl(`/admin/factura/venta/bill_from_cotizacion/${cotizacion.id}`);
-    }, 10);
-  }
-
   async saltar(salioDe, valor) {
     this.resetFacturas();
     let actualPagination = await this.getActualPagination();
@@ -748,6 +739,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   goToFacturacionPage(tipo: string, action: string, id: any) {
+    console.log('%c tipo', 'color: red', tipo);
+    console.log('%c action', 'color: blue', action);
+    console.log('%c id', 'color: green', id);
+
     fun.setTimeout(() => {
       this.router.navigateByUrl(`/admin/factura/${tipo}/${action}/${id}`);
     }, 10);

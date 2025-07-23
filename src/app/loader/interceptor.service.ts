@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 
@@ -13,7 +13,8 @@ import { SharedService } from '@core/services/shared.service';
 export class InterceptorService implements HttpInterceptor {
   constructor(
     public loadServ: LoaderService,
-    public sharedServ: SharedService
+    public sharedServ: SharedService,
+    private zone: NgZone
   ) {}
   requestCount: number = 0;
 
@@ -29,7 +30,7 @@ export class InterceptorService implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    this.sharedServ.nextCanToast(false);
+    this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(false));
     const token = fun.getAuthToken();
 
     let spinner = request.params.get('spinner');
@@ -57,17 +58,28 @@ export class InterceptorService implements HttpInterceptor {
         if (event instanceof HttpResponse) {
           if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
 
-          ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach(header => {
-            const headerValue = event.headers.get(header);
-            if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue);
+          this.zone.runOutsideAngular(() => {
+            ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach(header => {
+              const headerValue = event.headers.get(header);
+              if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue);
+            });
           });
         }
 
-        this.sharedServ.nextCanToast(true);
+        this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(true));
         return event;
       }),
 
       catchError((response: HttpErrorResponse) => {
+        console.log('%c response ', 'color: orange', response);
+
+        if (response.status == 401) {
+          const token = fun.getAuthToken();
+          if (token) {
+            fun.toastError('Su sesión ha expirado, por favor inicie sesión nuevamente', 'SESIÓN EXPIRADA');
+            return;
+          }
+        }
         // console.log('response', response);
         const errorDesconocido = () => fun.toastError('Error <strong>desconocido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR');
 
@@ -75,18 +87,19 @@ export class InterceptorService implements HttpInterceptor {
           errorDesconocido();
         } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
           fun.toastError(response.error.msg, 'ERROR');
-          this.sharedServ.nextCanToast(false);
+          this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(false));
+
           Ss.layServ.nextLogOut({ bool: true, quien: 'close_session' });
         } else {
           if (fun.objHas(response, 'status') && response.status == 404 && fun.hasValue(response?.error?.msg)) {
-            // console.log('1');
+            console.log('1');
 
             this.handler_msg(response.error.msg, 'warning');
           } else if (fun.objHas(response, 'error.msg')) {
-            // console.log('2');
+            console.log('2');
             this.handler_msg(response.error.msg, 'error');
           } else {
-            // console.log('3');
+            console.log('3');
             errorDesconocido();
           }
         }
