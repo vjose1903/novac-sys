@@ -517,9 +517,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       // ================================================
       // CUSTOM STYLES
       // ================================================
-      requestAnimationFrame(() => {
+      fun.setTimeout(() => {
         this.changeStylesTitles();
-      });
+      }, 0);
+
       // ================================================
 
       this.updateTablasComponent();
