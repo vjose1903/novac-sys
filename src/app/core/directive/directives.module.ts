@@ -7,12 +7,14 @@ import { DataFilterDirective } from './data-filter.directive';
 import { SizeCatcherDirective } from './size-catcher.directive';
 import { MultiClickDirective } from './multi-click.directive';
 import { OnElementReadyDirective } from './on-element-ready.directive';
+import { ElementResizedDirective } from './element-resized.directive';
 
-const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, SizeCatcherDirective, MultiClickDirective, OnElementReadyDirective];
+const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, SizeCatcherDirective, MultiClickDirective, OnElementReadyDirective, ElementResizedDirective];
 
 @NgModule({
   declarations: directives,
   imports: [CommonModule],
+  
   exports: directives,
 })
 export class DirectivesModule {}

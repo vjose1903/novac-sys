@@ -263,14 +263,14 @@
           <!-- TFOOT -->
           <tfoot class="tfoot w-100">
             @if (config?.obj_paginate && config?.obj_paginate.show != false) {
-              <div id="paginationDiv-{{ realIdTabla }}" class="pieTabla d-flex align-items-center justify-content-between w-100">
+              <div id="paginationDiv-{{ realIdTabla }}" class="pieTabla">
                 @if (config?.obj_paginate.showTotal) {
-                  <div>
-                    <h6 class="d-none d-md-block m-0" style="white-space: nowrap">Total de registros: {{ config.total_count }}</h6>
+                  <div class="pagination-total">
+                    <h6 class="d-none d-md-block m-0">Total de registros: {{ config.total_count }}</h6>
                   </div>
                 }
 
-                <div id="divPaginator" class="w-100 d-flex justify-content-end align-items-center">
+                <div id="divPaginator" class="pagination-controls" elementResized (resized)="divPaginatorChangeWidth($event)">
                   <p-paginator
                     id="paginator-{{ realIdTabla }}"
                     [first]="tServ.getPaginationById(realIdTabla)?.page_front"

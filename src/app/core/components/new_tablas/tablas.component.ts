@@ -1,14 +1,12 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
 
-import * as _ from 'lodash';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '@core/services/functions.service';
-import { btnTableI, medidas, table_config, table_info, tableCellType } from './tabla-class';
+import { btnTableI, table_config, table_info, tableCellType } from './tabla-class';
 import { teclasCode } from '@core/typescript/constantes';
-
-import { Ss } from '@core/services/singleton.service';
+import { ResizeEvent } from '@core/directive/element-resized.directive';
 
 @Component({
   selector: 'dinamic-table',
@@ -60,7 +58,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   fun = fun;
 
-  tablaInterval;
   realIdTabla;
 
   dynamicTooltipEntities = {
@@ -70,14 +67,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   };
 
   htmlServ = inject(HtmlElementsService);
-  constructor(
-    public tServ: TablasService,
-    private zone: NgZone,
-    public cdRef: ChangeDetectorRef
-  ) {
-    cdRef.detach();
-    this.tablaInterval = fun.setInterval(() => this.cdRef.detectChanges(), 500);
-  }
+  tServ = inject(TablasService);
+  zone = inject(NgZone);
+  cdRef = inject(ChangeDetectorRef);
+
+  constructor() {}
 
   formatoNumero(num) {
     let numformat = '0.00';
@@ -90,7 +84,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     new fun().getWindowSize.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
-        this.setCantPagView(res.innerWidth, 'width_page');
+        requestAnimationFrame(() => {
+          this.setCantPagView(res.innerWidth, 'width_page');
+        });
       }
     });
 
@@ -114,7 +110,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.tServ.deletePaginationById(this.realIdTabla);
     this.tServ.resetRowEditing();
-    if (this.tablaInterval) clearInterval(this.tablaInterval);
   }
 
   handleConfig() {
@@ -123,7 +118,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
     if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
     if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
-    if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, info => _.values(_.pick(info, ['key']))[0]);
+    if (!this.config.filterTargets) this.config.filterTargets = this.config.info.map(info => Object.values(fun.pick(info, ['key']))[0]);
 
     if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
       if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
@@ -272,7 +267,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     if (paginator) {
       const paginator_pages = document.getElementsByClassName('p-paginator-pages');
-      paginatorPage = _.find(_.head(paginator_pages).children, { outerText: `${number || 1}` });
+      const children = Array.from(paginator_pages[0]?.children || []);
+      paginatorPage = children.find(child => (child as HTMLElement).outerText === `${number || 1}`);
     }
     return paginatorPage;
   }
@@ -362,8 +358,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
-  divPaginatorChangeWidth(event) {
-    this.setCantPagView(event.newRect.width, 'width_paginator');
+  divPaginatorChangeWidth(event: ResizeEvent) {
+    requestAnimationFrame(() => {
+      this.setCantPagView(event.width, 'width_paginator');
+    });
   }
 
   setCantPagView(width, tipo) {
@@ -375,11 +373,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (divPaginator) width = divPaginator.offsetWidth;
     }
 
-    if (width > 385) actual = 5;
-    else if (width <= 385 && width > 350) actual = 4;
-    else if (width <= 350 && width > 320) actual = 3;
-    else if (width <= 320 && width > 285) actual = 2;
-    else if (width <= 285) actual = 1;
+    if (width > 600) actual = 5;
+    else if (width <= 600 && width > 500) actual = 4;
+    else if (width <= 500 && width > 400) actual = 3;
+    else if (width <= 400 && width > 300) actual = 2;
+    else if (width <= 300) actual = 1;
 
     const actualPage = this.getPaginatorPageByNumber(actualPagination?.page);
 
@@ -501,13 +499,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   updateDataCopy(data) {
+    if (!data) return;
+
     this.copyData = fun.deepCloning(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.changeTableConfig([{ total_count: data.length }]);
       this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
     }
-    this.cdRef.detectChanges();
   }
 
   ngOnChanges(change) {
@@ -525,7 +524,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
       this.updateTablasComponent();
     }
-    this.cdRef.detectChanges();
   }
 
   updateTablasComponent() {
@@ -697,7 +695,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       else this.actualRowIndex = this.actualRowIndex + 1;
     }
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
-    this.cdRef.detectChanges();
 
     fun.scrollTo({ id: this.row_id, behavior: 'smooth', block: 'center', inline: 'center' });
     fun.enfocarInput(this.row_id);
