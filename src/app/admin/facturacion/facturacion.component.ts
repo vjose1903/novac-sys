@@ -388,7 +388,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       modalConfig.inputs = { code: option.code };
       modalConfig.component = MenuOpcionesExtraComponent;
-      modalConfig.confirmToClose = false;
       modalConfig.closableEsc = true;
 
       modalConfig.botones = [{ clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false }];
@@ -1344,7 +1343,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       propietarioModalConf.width = '56.25rem';
       propietarioModalConf.height = '31.25rem';
       propietarioModalConf.component = BuscarClienteSuplidorComponent;
-      propietarioModalConf.confirmToClose = false;
       propietarioModalConf.closableEsc = true;
       propietarioModalConf.botones = botones;
       propietarioModalConf.setCallback(this.processPropietarioModal.bind(this));
@@ -1469,8 +1467,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     confirmationImprimirModalConf.header = 'Confirmación';
     confirmationImprimirModalConf.width = '30rem';
     confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
-    confirmationImprimirModalConf.confirmToClose = false;
-    confirmationImprimirModalConf.closableEsc = false;
     confirmationImprimirModalConf.botones = [
       { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
       { id: 'btnConfirmar', clase: 'btn btn-verde', label: 'Confirmar', disable: false },
@@ -1514,7 +1510,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
     cantidadEfectivoModalConfig.width = '35rem';
     cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
-    cantidadEfectivoModalConfig.confirmToClose = false;
     cantidadEfectivoModalConfig.closableEsc = true;
     cantidadEfectivoModalConfig.botones = [
       { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },

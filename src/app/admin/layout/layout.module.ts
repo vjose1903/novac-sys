@@ -15,7 +15,6 @@ import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
 import { TabsModule } from 'primeng/tabs';
 import { ReportesComponent } from '../reportes/reportes.component';
-import { PdfViewerModule } from '@components/pdf-viewer/pdf-viewer.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -32,13 +31,12 @@ import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-erro
     TabsModule,
     FormsModule,
     DirectivesModule,
-    PdfViewerModule,
     ReactiveFormsModule,
     NgxPermissionsModule.forChild(),
     BtnIconModule,
     NgxExtendedPdfViewerModule,
     MenuItemComponent,
-    FormErrorMsgComponent
+    FormErrorMsgComponent,
   ],
 })
 export class LayoutModule {}

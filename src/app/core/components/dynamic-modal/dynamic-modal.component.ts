@@ -128,6 +128,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
 
       fun.setTimeout(() => {
         const currentReceptor = this.modalReceptor['_results'].find((receptor: any) => receptor.modalReceptorId == config.id);
+        
         if (!currentReceptor) {
           resolve();
           return;

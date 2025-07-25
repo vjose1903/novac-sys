@@ -113,47 +113,49 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   handleConfig() {
-    if (!this.config.padding) this.config.padding = '0rem';
-    if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
-    if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
-    if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
-    if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
-    if (!this.config.filterTargets) this.config.filterTargets = this.config.info.map(info => Object.values(fun.pick(info, ['key']))[0]);
+    fun.setTimeout(() => {
+      if (!this.config.padding) this.config.padding = '0rem';
+      if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
+      if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
+      if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
+      if (!this.config.filterTargets) this.config.filterTargets = this.config.info.map(info => Object.values(fun.pick(info, ['key']))[0]);
 
-    if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
-    }
+      if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
+      }
 
-    this.verificateBottons(this.config);
+      this.verifyButtons(this.config);
 
-    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
+      this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
 
-    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
-      fun.setTimeout(() => {
-        fun.enfocarInput(`search-${this.realIdTabla}`);
-      }, 100);
-    }
+      if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
+        fun.setTimeout(() => {
+          fun.enfocarInput(`search-${this.realIdTabla}`);
+        }, 100);
+      }
 
-    this.config.info.map(item => {
-      if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
-    });
+      this.config.info.map(item => {
+        if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
+      });
+    }, 0);
   }
 
-  verificateBottons(config: table_config) {
-    const verificateId = (boton: btnTableI) => (boton.btn_id ??= `${fun.generateKey()}-${boton.icon}`);
+  verifyButtons(config: table_config) {
+    const verifyId = (btn: btnTableI) => (btn.btn_id ??= `${fun.generateKey()}-${btn.icon}`);
 
     if (config.botones) {
       for (const key in config.botones) {
         const btnObj = config.botones[key];
 
         if (Array.isArray(btnObj)) {
-          btnObj.forEach(btn => verificateId(btn));
+          btnObj.forEach(btn => verifyId(btn));
         } else {
-          verificateId(btnObj);
+          verifyId(btnObj);
         }
       }
     }

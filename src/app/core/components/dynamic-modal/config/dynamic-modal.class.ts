@@ -67,8 +67,10 @@ export class DynamicModalClass {
   }
 
   show() {
-    this.visible = true;
-    Ss.dynamicModalService.updateModalConfig(this);
+    fun.setTimeout(() => {
+      this.visible = true;
+      Ss.dynamicModalService.updateModalConfig(this);
+    }, 0);
   }
 
   close(dataToReturn?: ICallbackModal) {

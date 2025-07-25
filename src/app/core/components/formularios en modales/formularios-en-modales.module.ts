@@ -18,6 +18,8 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
+import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -30,12 +32,13 @@ const components = [
   ModalSeleccinarArticuloComponent,
   BuscarClienteSuplidorComponent,
   BuscarArticuloComponent,
-  ConfirmacionImprimirComponent
+  ConfirmacionImprimirComponent,
+  PdfViewerComponent,
 ];
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabsModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule],
+  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabsModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule, NgxExtendedPdfViewerModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}

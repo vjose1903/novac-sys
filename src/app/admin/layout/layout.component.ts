@@ -245,7 +245,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     passwordConfigModal.header = 'Configuraciones';
     passwordConfigModal.width = '30rem';
     passwordConfigModal.component = ModalPasswordConfigComponent;
-    passwordConfigModal.confirmToClose = false;
 
     passwordConfigModal.botones = [
       { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },
@@ -265,7 +264,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     passwordConfigModal.padding = '0rem';
     passwordConfigModal.component = ConfiguracionesComponent;
     passwordConfigModal.inputs = { is_on_modal: true };
-    passwordConfigModal.confirmToClose = false;
 
     passwordConfigModal.show();
   }

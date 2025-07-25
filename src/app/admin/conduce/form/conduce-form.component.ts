@@ -801,8 +801,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       confirmationImprimirModalConf.header = 'Confirmación';
       confirmationImprimirModalConf.width = '30rem';
       confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
-      confirmationImprimirModalConf.confirmToClose = false;
-      confirmationImprimirModalConf.closableEsc = false;
       confirmationImprimirModalConf.botones = [
         { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
         { id: 'btnConfirmar', clase: 'btn btn-verde', label: 'Confirmar', disable: false },
