@@ -18,7 +18,7 @@ jobs:
           node-version: 22.13.1
 
       - name: Install dependencies
-        run: npm i
+        run: npm i --force
 
       - name: Ejecutar script de configuración
         run: node ./scripts/start.js -p -c agrodemi
