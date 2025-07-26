@@ -242,25 +242,25 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   }
 
   async verifyIsReady() {
-    const validations = async () => {
-      return new Promise<boolean>(resolve => {
-        if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
-        if (!Ss.layServ.menuParsed) return resolve(false);
+    const validateAppReadiness = (): boolean => {
+      const hasTiposFacturas = Ss.factServ.lista_tipos_facturas?.length > 0;
+      const isMenuParsed = Ss.layServ.menuParsed;
 
-        resolve(true);
-      });
+      return hasTiposFacturas && isMenuParsed;
     };
 
-    const noSuccess = () => {
+    const handleFailure = () => {
       this.isReady = false;
       fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
     };
 
     fun.retryUntil({
-      task: () => validations(),
-      retryWhen: res => !res,
-      actionAfterRetry: () => (this.isReady = true),
-      actionIfNoSuccess: () => noSuccess(),
+      task: () => Promise.resolve(validateAppReadiness()),
+      retryWhen: (isReady: boolean) => !isReady,
+      actionAfterRetry: () => {
+        setTimeout(() => (this.isReady = true), 250);
+      },
+      actionIfNoSuccess: handleFailure,
     });
   }
 
