@@ -26,8 +26,9 @@ import { Environment } from '@environments/environment';
 import * as _ from 'lodash';
 import { ConfigI } from '@core/interface/config-interface';
 import { DateUtils } from '@vjose1903/dateutils';
-import { IButtonDynamic, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, IButtonDynamic, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 const moment = require('../../../core/javascript/moment');
 
 @Component({
@@ -117,6 +118,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   hasPermisoPreVenta: boolean = false;
   hasPermisoCotizacion: boolean = false;
   htmlServ = inject(HtmlElementsService);
+  dynamicModalServ = inject(DynamicModalService);
   certificacionDate = Environment.DGII_CERTIFICATION_DATE;
 
   constructor(
@@ -617,7 +619,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
         if (params.iconKey == 'delete') {
           const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion || this.tipo_documento_selected() == tipoDocFacturacion.compra ? deleteDocumentosTypes.delete : deleteDocumentosTypes.anular;
-          this.deleteRequest({ ids: params.data.id, tipo: tipo });
+          this.confirmAnularDocumento({ ids: params.data.id, tipo: tipo, secuencia: params.data.secuencia });
         }
 
         const toGoFacturacionTypes = ['duplicate', 'make_bill'];
@@ -641,6 +643,19 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     }
   }
 
+  confirmAnularDocumento(params: { ids: string; tipo: string; secuencia: string }) {
+    const documento_descripcion = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'Cotización' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
+
+    this.dynamicModalServ.confirmationModal({
+      id: 'confirmAnularDocumento',
+      texto: `Seguro que desea anular la ${documento_descripcion} No.: <strong>${params.secuencia} </strong>`,
+      header: 'Confirmación',
+      showCancelarBtn: true,
+      btnKind: confirmationButtons.cancelarAnular,
+      onYes: () => this.deleteRequest(params),
+    });
+  }
+
   deleteRequest(params: { ids: string; tipo: string }) {
     const extra = { afterPath: `custom/delete`, parameters: params };
 
@@ -659,16 +674,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
         let msg = '';
         if (res.data.error.length == 1) {
-          msg = `La ${current_info.label.singular} con el ${current_info.key_label.singular}: <<${indicadores}>> no pudo ser borrada.`;
+          msg = `La ${current_info.label.singular} con el ${current_info.key_label.singular}: <<${indicadores}>> no pudo ser anulada.`;
         } else {
-          msg = `Las ${current_info.label.plural} con los ${current_info.key_label.plural}: <<${indicadores}>> no pudieron ser borradas.`;
+          msg = `Las ${current_info.label.plural} con los ${current_info.key_label.plural}: <<${indicadores}>> no pudieron ser anuladas.`;
         }
 
         fun.toastError(msg, 'ERROR');
       }
 
       if (res.data.success.length > 0) {
-        const msg = res.data.error.length == 1 ? `La ${current_info.label.singular} fue borrada correctamente.` : `Las ${current_info.label.plural} fueron borradas correctamente.`;
+        const msg = res.data.error.length == 1 ? `La ${current_info.label.singular} fue anulada correctamente.` : `Las ${current_info.label.plural} fueron anuladas correctamente.`;
         fun.toastSuccess(msg, 'CORRECTO');
       }
 
@@ -962,9 +977,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   verDetalles(data, documento) {
-    const configModal = this.facturaClass.modalVerDetalles(data, documento);
-
-    this.openNewModal(configModal);
+    this.facturaClass.modalVerDetalles(data, documento);
   }
 
   async getActualPagination() {

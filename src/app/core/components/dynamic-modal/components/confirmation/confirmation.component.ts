@@ -14,30 +14,30 @@ import { DynamicModalComponent } from '../../dynamic-modal.component';
   styleUrls: ['./confirmation.component.scss'],
 })
 export class ConfirmationComponent implements OnInit, IDynamicModal {
-  inputs!: {
-    html: string;
-    iconName: EFontAwesomeIcon | null;
-    iconSize: string;
-    iconColor: string;
-    showReasonInput: boolean;
-    callback: (data: ICallbackModal) => void;
-  };
-
   @Input() modalWrapper!: DynamicModalComponent;
   @Input() modalConfig!: IModalConfiguration;
+  
+  @Input() html: string;
+  @Input() iconName: EFontAwesomeIcon | null;
+  @Input() iconSize: string;
+  @Input() iconColor: string;
+  @Input() showReasonInput: boolean;
+  @Input() onYes?: () => void | Promise<void>;
+
   reason!: string;
 
   ngOnInit() {
-    if (this.inputs.iconName) {
-      if (fun.isEmpty(this.inputs.iconSize)) this.inputs.iconSize = '40px';
-      if (fun.isEmpty(this.inputs.iconColor)) this.inputs.iconColor = 'black';
+    if (this.iconName) {
+      if (fun.isEmpty(this.iconSize)) this.iconSize = '40px';
+      if (fun.isEmpty(this.iconColor)) this.iconColor = 'black';
     }
-    if (this.inputs.showReasonInput) this.validateDeleteBtnState();
+    if (this.showReasonInput) this.validateDeleteBtnState();
   }
 
   validateDeleteBtnState() {
     const buttonIsDisable = fun.isEmpty(this.reason);
     const modalWrapper = this.modalConfig.modalWrapper;
+
     if (modalWrapper && modalWrapper.changeStateButton) {
       modalWrapper.changeStateButton({
         modalId: this.modalConfig.id,
@@ -48,7 +48,7 @@ export class ConfirmationComponent implements OnInit, IDynamicModal {
   }
 
   submit(arg?: any) {
-    this.inputs.callback({ data: { reason: this.reason } });
+    if (this.onYes) this.onYes();
     this.modalConfig.close();
   }
 }

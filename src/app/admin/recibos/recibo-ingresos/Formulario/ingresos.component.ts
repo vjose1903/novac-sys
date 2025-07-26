@@ -495,8 +495,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   verDetalles(data) {
-    const configModal = this.reciboClass.modalVerDetalles(data);
-    this.openNewModal(configModal);
+    this.facturaClass.modalVerDetalles(data, 'recibo');
   }
 
   selectAll() {

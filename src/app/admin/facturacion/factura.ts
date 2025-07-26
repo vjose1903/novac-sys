@@ -17,6 +17,8 @@ import { csvConfig as csvConfigMovimientosVehiculo } from '@core/services/report
 import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { ArticuloI } from '@registros/articulos/articulo';
 import { DateUtils } from '@vjose1903/dateutils';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 export enum comprobanteNormal {
   factura_de_credito_fiscal = '01',
@@ -359,18 +361,19 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   modalVerDetalles(data, documento = 'Factura') {
-    return {
-      component: DetalleFacturaComponent,
-      inputs: { data, documento: documento.toLowerCase() },
-      id: `detalle_factura`,
-      header: `Detalles ${documento}`,
-      width: '35rem',
-      minHeight: '10rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false }],
-      },
-    };
+    const detalleDocModalConf = new DynamicModalClass();
+
+    detalleDocModalConf.id = 'detalle_factura';
+    detalleDocModalConf.inputs = { data, documento: documento.toLowerCase() };
+    detalleDocModalConf.header = `Detalles ${documento}`;
+    detalleDocModalConf.width = '35rem';
+    // detalleDocModalConf.height = '31.25rem';
+    detalleDocModalConf.component = DetalleFacturaComponent;
+    detalleDocModalConf.confirmToClose = false;
+    detalleDocModalConf.closableEsc = true;
+    detalleDocModalConf.botones = [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+
+    detalleDocModalConf.show();
   }
 
   handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?) {

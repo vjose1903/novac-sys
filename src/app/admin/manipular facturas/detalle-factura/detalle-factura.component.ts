@@ -7,6 +7,8 @@ import { MessageTask } from '@core/models/message-task';
 import { ELECTRON_OPEN_WEB_BROWSER } from '../../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
 import { DateUtils } from '@vjose1903/dateutils';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-detalle-factura',
@@ -14,9 +16,12 @@ import { DateUtils } from '@vjose1903/dateutils';
   styleUrls: ['./detalle-factura.component.scss'],
   standalone: false,
 })
-export class DetalleFacturaComponent implements OnInit, ModalI {
-  @Input() modalWrapper: any = {};
-  inputs: { data: any; documento: string };
+export class DetalleFacturaComponent implements OnInit, IDynamicModal {
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() data!: any;
+  @Input() documento!: string;
+
 
   TrackStatusEnum = TrackStatusEnum;
   serie = serie;
@@ -36,11 +41,11 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   }
 
   validateDetails() {
-    if (this.inputs.documento == 'recibo') {
+    if (this.documento == 'recibo') {
       this.detalles = this.detalles.filter(d => d.key != 'numero_comprobante');
     }
 
-    if (this.inputs.documento == 'nota') {
+    if (this.documento == 'nota') {
       this.detalles = this.detalles
         .filter(d => d.key != 'forma_pago')
         .map(item => {
@@ -53,8 +58,8 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   }
 
   validateElectronicInfoceDetails() {
-    if (this.inputs.data?.serie == serie.electronica) {
-      const is_aceptada = this.inputs.data.is_aceptada;
+    if (this.data?.serie == serie.electronica) {
+      const is_aceptada = this.data.is_aceptada;
 
       this.detalles.push({
         label: 'Estado Ecf',
@@ -68,7 +73,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   }
 
   openBrowser() {
-    const task = new MessageTask(ELECTRON_OPEN_WEB_BROWSER, { url: this.inputs.data.qr_url_dgii });
+    const task = new MessageTask(ELECTRON_OPEN_WEB_BROWSER, { url: this.data.qr_url_dgii });
 
     this._ipc.sendTask(task).catch(err => {
       if (err.msg) fun.toastError(err.msg, 'ERROR');
@@ -78,7 +83,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
   }
 
   getValue(config) {
-    let value = fun.getProperty(this.inputs.data, config.key);
+    let value = fun.getProperty(this.data, config.key);
 
     if (config.tipo == 'number') value = fun.roundNumberToDecimal(value);
     if (config.tipo == 'date') value = DateUtils.format({ date: value, dateFormat: 'dd/MM/yyyy', include_hour: true, hourFormat: 'hh:mm a', separator: ' ' });
@@ -87,7 +92,7 @@ export class DetalleFacturaComponent implements OnInit, ModalI {
     return value;
   }
 
-  btn_aceptar() {
+  submit() {
     throw new Error('Method not implemented.');
   }
 }

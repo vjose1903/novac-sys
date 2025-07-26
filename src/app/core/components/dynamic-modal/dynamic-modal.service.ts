@@ -43,66 +43,71 @@ export class DynamicModalService {
     iconName?: string | null;
     iconSize?: string;
     iconColor?: string;
-    callback?: CallbackFunction;
     closableClickOutside?: boolean;
     showCancelarBtn?: boolean;
     showReasonInput?: boolean;
+    onNo?: () => void | Promise<void>;
+    onYes?: () => void | Promise<void>;
   }) {
-    params.btnKind = params.btnKind ? params.btnKind : confirmationButtons.cancelarContinuar;
-    params.showReasonInput = params.showReasonInput ? params.showReasonInput : false;
+    const { id, texto, header, btnKind = confirmationButtons.cancelarContinuar, width = '40vw', iconName, iconSize, iconColor, closableClickOutside, showCancelarBtn, showReasonInput = false, onNo, onYes } = params;
 
-    const inputs = { html: params.texto, iconName: params.iconName, iconSize: params.iconSize, iconColor: params.iconColor, showReasonInput: params.showReasonInput, callback: params.callback };
+    const inputs = { html: texto, iconName, iconSize, iconColor, showReasonInput, onYes };
 
-    const config: IModalConfiguration = {
-      id: params.id,
-      inputs: inputs,
-      header: params.header,
-      width: params.width || '40vw',
-      component: ConfirmationComponent,
-      closableClickOutside: params.closableClickOutside,
-      botones: [],
-    };
+    const confirmationModal = new DynamicModalClass();
+    confirmationModal.id = id;
+    confirmationModal.inputs = inputs;
+    confirmationModal.header = header;
+    confirmationModal.width = width;
+    confirmationModal.component = ConfirmationComponent;
+    confirmationModal.closableClickOutside = closableClickOutside;
+    confirmationModal.botones = [];
 
-    const currentBtnConfig = confirmBtnConfig[params.btnKind];
+    const currentBtnConfig = confirmBtnConfig[btnKind];
 
-    ////console.log("currentBtnConfig ", currentBtnConfig);
-
-    if (config.botones) {
-      if (params.showCancelarBtn && currentBtnConfig.noBtn)
-        config.botones.push({
-          id: currentBtnConfig.noBtn.id,
-          clase: currentBtnConfig.noBtn.clase,
-          action: modalActionsE.close,
-          label: currentBtnConfig.noBtn.label,
-          disable: false,
-          iconName: currentBtnConfig.noBtn.icon,
-          iconSize: '20px',
-          iconColor: 'white',
-          showProcess: currentBtnConfig.noBtn.showProcess,
-        });
-      if (params.callback || currentBtnConfig.siBtn)
-        config.botones.push({
-          id: currentBtnConfig.siBtn.id,
-          clase: currentBtnConfig.siBtn.clase,
-          functionInOtherComponent: 'submit',
-          label: currentBtnConfig.siBtn.label,
-          disable: false,
-          iconName: currentBtnConfig.siBtn.icon,
-          iconSize: '20px',
-          iconColor: 'white',
-          showProcess: currentBtnConfig.siBtn.showProcess,
-        });
+    // Configurar botón de cancelar si es necesario
+    if (showCancelarBtn && currentBtnConfig.noBtn) {
+      const { noBtn } = currentBtnConfig;
+      confirmationModal.botones.push({
+        id: noBtn.id,
+        clase: noBtn.clase,
+        function: async () => {
+          if (onNo) await onNo();
+          confirmationModal.close();
+        },
+        label: noBtn.label,
+        disable: false,
+        iconName: noBtn.icon,
+        iconSize: '20px',
+        iconColor: 'white',
+        showProcess: noBtn.showProcess,
+      });
     }
 
-    const confirmationModal = new DynamicModalClass(config);
+    // Configurar botón de confirmar
+    if (currentBtnConfig.siBtn) {
+      const { siBtn } = currentBtnConfig;
+      confirmationModal.botones.push({
+        id: siBtn.id,
+        clase: siBtn.clase,
+        functionInOtherComponent: 'submit',
+        label: siBtn.label,
+        disable: false,
+        iconName: siBtn.icon,
+        iconSize: '20px',
+        iconColor: 'white',
+        showProcess: siBtn.showProcess,
+      });
+    }
+
     confirmationModal.show();
   }
 
-  closeConfirmModal(params: { id: string; callback?: CallbackFunction; width?: string }) {
+  closeConfirmModal(params: { id: string;  width?: string , onYes?: () => void | Promise<void>, onNo?: () => void | Promise<void>}) {
     const config = {
       id: params.id,
       width: params.width,
-      callback: params.callback,
+      onYes: params.onYes,
+      onNo: params.onNo,
       texto: 'Se observa que ha registrado información pero no la ha guardado. Es necesario que guarde la información para que pueda ser almacenada. <strong> ¿Desea Continuar? </strong>',
       header: 'Alerta',
       iconName: 'fa-solid fa-triangle-exclamation',
@@ -111,6 +116,7 @@ export class DynamicModalService {
       showCancelarBtn: true,
       btnKind: confirmationButtons.continuarOSalir,
     };
+    
     this.confirmationModal(config);
   }
 }

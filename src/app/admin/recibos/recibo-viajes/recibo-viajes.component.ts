@@ -127,8 +127,6 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.necesarioStart();
   }
 
-
-
   ngOnDestroy() {
     this._destroy_mixin();
   }
@@ -412,8 +410,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   verDetalles(data) {
-    const configModal = this.facturaClass.modalVerDetalles(data);
-    this.openNewModal(configModal);
+    this.facturaClass.modalVerDetalles(data);
   }
 
   abrir_historial() {

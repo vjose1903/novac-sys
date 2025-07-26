@@ -13,6 +13,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { ModalClass } from '@components/modal/modal-class';
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
+import { FacturaC } from '@admin/facturacion/factura';
 
 @Component({
   selector: 'app-lista-recibos',
@@ -51,6 +52,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   lista_recibos;
   rowSelected: any;
   reciboClass = new ReciboC();
+  facturaClass = new FacturaC();
 
   permissions = Permisos;
   configApp: ConfigI;
@@ -202,8 +204,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   verDetalles(data) {
-    const configModal = this.reciboClass.modalVerDetalles(data);
-    this.openNewModal(configModal);
+    this.facturaClass.modalVerDetalles(data, 'recibo');
   }
 
   imprimir_base64(fileName, base64, pageOrientation) {
