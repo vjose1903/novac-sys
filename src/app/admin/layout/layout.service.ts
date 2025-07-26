@@ -51,7 +51,7 @@ export class LayoutService {
 
       setTimeout(() => {
         this.menuParsed = true;
-      }, 0);
+      }, 10);
     } catch (error) {
       console.error('Error al parsear el menú:', error);
     }
