@@ -1064,7 +1064,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   iniciarFactura() {
     if (this.condicion_fact !== 'Crédito') {
-      this.factServ.propietario_factura = this.form.value;
+      this.factServ.propietario_factura = this.formPropietario.getRawValue();
+
       this.calcularPorcientoComprobante().then(continuar => {
         if (continuar) setTimeout(() => this.cuerpo.seleccionarCampoEnTurno(), 10);
         else this.errorComprobante = true;

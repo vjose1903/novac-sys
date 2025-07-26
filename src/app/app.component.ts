@@ -143,7 +143,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     await this.loadAppConfig();
 
     this.setupSubscriptions();
-    this.getTiposFacturas();
     Ss.layServ.parseMenu();
     this.verifyIsReady();
   }
@@ -248,15 +247,10 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
 
   async verifyIsReady() {
     const validateAppReadiness = (): boolean => {
-      const hasTiposFacturas = Ss.factServ.lista_tipos_facturas?.length > 0;
       const isMenuParsed = Ss.layServ.menuParsed;
       const isConfigLoaded = Ss.configServ.isConfigLoaded();
 
-      console.log('hasTiposFacturas ---> ', hasTiposFacturas);
-      console.log('isMenuParsed ---> ', isMenuParsed);
-      console.log('isConfigLoaded ---> ', isConfigLoaded);
-
-      return hasTiposFacturas && isMenuParsed;
+      return isMenuParsed && isConfigLoaded;
     };
 
     const handleFailure = () => {
@@ -268,7 +262,11 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       task: () => Promise.resolve(validateAppReadiness()),
       retryWhen: (isReady: boolean) => !isReady,
       actionAfterRetry: () => {
-        setTimeout(() => this.isReady.set(true), 250);
+        this.getTiposFacturas().then(() => {
+          fun.setTimeout(() => {
+            this.isReady.set(true);
+          }, 250);
+        });
       },
       actionIfNoSuccess: handleFailure,
     });
