@@ -156,34 +156,24 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   async verifyIsReady() {
-    const validations = async () => {
-      return new Promise<boolean>(resolve => {
-        if (fun.isEmpty(this.configApp)) return resolve(false);
-        if (fun.isEmpty(this.actualPath()) || fun.isEmpty(this.actualRuta())) return resolve(false);
-        if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
-
-        resolve(true);
-      });
+    const validateAppReady = (): boolean => {
+      return fun.hasValue(this.configApp) && fun.hasValue(this.actualPath()) && fun.hasValue(this.actualRuta()) && Ss.factServ.lista_tipos_facturas?.length > 0;
     };
 
-    const noSuccess = () => {
-      // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
+    const setReadyState = (isReady: boolean) => {
       fun.setTimeout(() => {
-        this.ready.set(false);
-        fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+        this.ready.set(isReady);
+        if (!isReady) {
+          fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+        }
       }, 0);
     };
 
     fun.retryUntil({
-      task: () => validations(),
-      retryWhen: res => !res,
-      actionAfterRetry: () => {
-        // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
-        fun.setTimeout(() => {
-          this.ready.set(true);
-        }, 0);
-      },
-      actionIfNoSuccess: () => noSuccess(),
+      task: () => Promise.resolve(validateAppReady()),
+      retryWhen: isReady => !isReady,
+      actionAfterRetry: () => setReadyState(true),
+      actionIfNoSuccess: () => setReadyState(false),
     });
   }
 
