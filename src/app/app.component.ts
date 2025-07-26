@@ -143,6 +143,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     await this.loadAppConfig();
 
     this.setupSubscriptions();
+    this.getTiposFacturas();
     Ss.layServ.parseMenu();
     this.verifyIsReady();
   }
@@ -246,36 +247,30 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   }
 
   async verifyIsReady() {
-    const validations = async () => {
-      return new Promise<boolean>(resolve => {
-        // if (Ss.factServ.lista_tipos_facturas?.length == 0) return resolve(false);
-        if (!Ss.layServ.menuParsed) return resolve(false);
-        if (!Ss.configServ.isConfigLoaded()) return resolve(false);
+    const validateAppReadiness = (): boolean => {
+      const hasTiposFacturas = Ss.factServ.lista_tipos_facturas?.length > 0;
+      const isMenuParsed = Ss.layServ.menuParsed;
+      const isConfigLoaded = Ss.configServ.isConfigLoaded();
 
-        resolve(true);
-      });
+      console.log('hasTiposFacturas ---> ', hasTiposFacturas);
+      console.log('isMenuParsed ---> ', isMenuParsed);
+      console.log('isConfigLoaded ---> ', isConfigLoaded);
+
+      return hasTiposFacturas && isMenuParsed;
     };
 
-    const noSuccess = () => {
-      this.zone.run(() => {
-        this.isReady.set(false);
-        fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
-      });
-    };
-
-    const actionAfterRetry = () => {
-      // this.zone.run(() => {
-      this.getTiposFacturas().finally(() => {
-        this.isReady.set(true);
-      });
-      // });
+    const handleFailure = () => {
+      this.isReady.set(false);
+      fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
     };
 
     fun.retryUntil({
-      task: () => validations(),
-      retryWhen: res => !res,
-      actionAfterRetry: actionAfterRetry,
-      actionIfNoSuccess: () => noSuccess(),
+      task: () => Promise.resolve(validateAppReadiness()),
+      retryWhen: (isReady: boolean) => !isReady,
+      actionAfterRetry: () => {
+        setTimeout(() => this.isReady.set(true), 250);
+      },
+      actionIfNoSuccess: handleFailure,
     });
   }
 

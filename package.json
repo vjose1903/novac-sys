@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "6.2.1",
+  "version": "6.3.0",
   "description": "Sistema facturación e inventario NOVAC.",
   "author": {
     "name": "Victor Jose Vásquez Santos",
@@ -63,7 +63,7 @@
     "node-machine-id": "1.1.12",
     "pdfmake": "0.2.18",
     "primeicons": "7.0.0",
-    "primeng": "20.0.0-rc.1",
+    "primeng": "20.0.0",
     "qrcode": "1.5.4"
   },
   "devDependencies": {
