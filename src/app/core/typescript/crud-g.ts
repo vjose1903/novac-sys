@@ -32,7 +32,7 @@ export class CrudG<T> {
   async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend'): Promise<responseModel<T>> {
     let url = this.makeUrl(tipo, arg);
 
-    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise());
+    return await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise();
   }
 
   async getOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {

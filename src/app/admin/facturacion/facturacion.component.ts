@@ -819,68 +819,66 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
-  async calcularPorcientoComprobante() {
-    return new Promise(async resolve => {
-      if (this.factServ.isVenta) {
-        if (this.factServ.tipoFactura.referencia != '00' && this.factServ.tipoFactura.referencia != comprobanteNormal.factura_de_consumo && this.factServ.tipoFactura.referencia != comprobanteElectronico.factura_de_consumo) {
-          try {
-            const paquete = await this.ncfClass.getAll({ afterPath: `custom/${this.factServ.tipoFactura.id}/true` });
+  async calcularPorcientoComprobante(): Promise<boolean> {
+    // Solo procesar si es venta y tiene tipo de factura válido
+    if (!this.factServ.isVenta || this.factServ.tipoFactura.referencia === '00' || this.factServ.tipoFactura.referencia === comprobanteNormal.factura_de_consumo) {
+      this.paqueteComprobante = undefined;
+      this.errorComprobante = false;
+      return true;
+    }
 
-            this.paqueteComprobante = paquete.data;
+    try {
+      // Obtener paquete de comprobantes
+      const paquete = await this.ncfClass.getAll({ afterPath: `custom/${this.factServ.tipoFactura.id}/true` });
+      this.paqueteComprobante = paquete.data;
 
-            if (fun.hasValue(this.paqueteComprobante.fecha_valida)) {
-              const desde = this.paqueteComprobante.desde;
-              const hasta = this.paqueteComprobante.hasta;
-              const secuencia = this.paqueteComprobante.secuencia;
-
-              const cant = hasta - desde;
-              const cantidad = cant + 1;
-              let porciento = 0;
-
-              if (cantidad > 0 && cantidad <= 40) {
-                porciento = cantidad * 0.5;
-              } else if (cantidad > 40 && cantidad <= 100) {
-                porciento = cantidad * 0.25;
-              } else if (cantidad > 100 && cantidad <= cantidad * 500) {
-                porciento = cantidad * 0.1;
-              } else if (cantidad > 500) {
-                porciento = cantidad * 0.04;
-              }
-              const limite = hasta - porciento;
-              const restante = hasta - secuencia + 1;
-
-              const descripcion = this.factServ.tipoFactura.descripcion;
-
-              const msg = this.paqueteComprobante.msg == 'Ultimo comprobante de este paquete' ? `Ultimo comprobante para ${descripcion}.` : `Los comprobantes para ${descripcion} se estan agotando, solo quedan ${restante}`;
-
-              if (secuencia >= limite) fun.toastWarning(msg, 'AVISO');
-            }
-            resolve(true);
-          } catch (error) {
-            if (fun.isEmpty(error.error.msg)) fun.toastError('Error calculando la secuencia de comprobantes.', 'AVISO');
-
-            this.errorComprobante = true;
-            resolve(false);
-          }
-        } else {
-          this.paqueteComprobante = undefined;
-          this.errorComprobante = false;
-          resolve(true);
-        }
-      } else {
-        resolve(true);
+      // Verificar si hay fecha válida para procesar
+      if (!fun.hasValue(this.paqueteComprobante?.fecha_valida)) {
+        return true;
       }
-    });
+
+      const { desde, hasta, secuencia } = this.paqueteComprobante;
+      const cantidad = hasta - desde + 1;
+
+      // Calcular porcentaje según rangos
+      const porcentaje = this.calcularPorcentajePorRango(cantidad);
+      const limite = hasta - porcentaje;
+      const restante = hasta - secuencia + 1;
+
+      // Mostrar advertencia si es necesario
+      if (secuencia >= limite) {
+        const descripcion = this.factServ.tipoFactura.descripcion;
+        const mensaje = this.paqueteComprobante.msg === 'Ultimo comprobante de este paquete' ? `Ultimo comprobante para ${descripcion}.` : `Los comprobantes para ${descripcion} se estan agotando, solo quedan ${restante}`;
+
+        fun.toastWarning(mensaje, 'AVISO');
+      }
+
+      return true;
+    } catch (error) {
+      if (fun.isEmpty(error.error?.msg)) {
+        fun.toastError('Error calculando la secuencia de comprobantes.', 'AVISO');
+      }
+      this.errorComprobante = true;
+      return false;
+    }
+  }
+
+  private calcularPorcentajePorRango(cantidad: number): number {
+    if (cantidad > 0 && cantidad <= 40) return cantidad * 0.5;
+    if (cantidad > 40 && cantidad <= 100) return cantidad * 0.25;
+    if (cantidad > 100 && cantidad <= 500) return cantidad * 0.1;
+    if (cantidad > 500) return cantidad * 0.04;
+    return 0;
   }
 
   async changeSerie() {
     this.factServ.setTipos(this.factServ.tipoDocumento, this.factServ.serieType(), true).then(result => {
       this.errorComprobante = false;
-      setTimeout(() => this.checkTipoFactura('changeSerie'), 0);
+      setTimeout(() => this.checkTipoFactura(), 0);
     });
   }
 
-  async checkTipoFactura(where) {
+  async checkTipoFactura() {
     this.factServ
       .setTipoFacturaSelected({ value: this.factServ.tipoFacturaReferenciaSelected, by: 'referencia' })
       .then(result => {
@@ -999,8 +997,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   iniciarFactura() {
     if (this.condicion_fact !== 'Crédito') {
       this.factServ.propietario_factura = this.form.value;
-
-      setTimeout(() => this.cuerpo.seleccionarCampoEnTurno(), 10);
+      this.calcularPorcientoComprobante().then(continuar => {
+        if (continuar) setTimeout(() => this.cuerpo.seleccionarCampoEnTurno(), 10);
+        else this.errorComprobante = true;
+      });
     } else {
       fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
     }
