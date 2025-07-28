@@ -85,6 +85,8 @@ export enum modalCloseType {
 }
 
 export enum confirmationButtons {
+  siNo = 'si-no',
+  siNoCancelar = 'si-no-cancelar',
   cancelarContinuar = 'cancelar-continuar',
   cancelarEliminar = 'cancelar-eliminar',
   copiarSalir = 'copiar-salir',
@@ -102,52 +104,62 @@ export interface IConfirmBtnConfig {
 
 export interface IConfirmationButtonOption {
   noBtn?: IConfirmationButtonProps;
-
+  cancelarBtn?: IConfirmationButtonProps;
   siBtn: IConfirmationButtonProps;
 }
 
 export interface IConfirmationButtonProps {
   label: string;
   icon: EFontAwesomeIcon | null;
+  iconColor?: string;
   clase: string;
   showProcess: boolean;
   id: string;
 }
 
 export const confirmBtnConfig: IConfirmBtnConfig = {
+  [confirmationButtons.siNo]: {
+    noBtn: { label: 'No', icon: fontAwesome.faSolid.x, iconColor: 'black', clase: 'btn-light-grey', showProcess: false, id: 'btnNo' },
+    siBtn: { label: 'Si', icon: fontAwesome.faSolid.check, iconColor: 'white', clase: 'btn-green', showProcess: false, id: 'btnSi' },
+  },
+  [confirmationButtons.siNoCancelar]: {
+    cancelarBtn: { label: 'Cancelar', icon: null, clase: 'btn-grey', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'No', icon: fontAwesome.faSolid.x, iconColor: 'black', clase: 'btn-light-grey', showProcess: false, id: 'btnNo' },
+    siBtn: { label: 'Si', icon: fontAwesome.faSolid.check, iconColor: 'white', clase: 'btn-green', showProcess: false, id: 'btnSi' },
+  },
   [confirmationButtons.cancelarContinuar]: {
-    noBtn: { label: 'Cancelar', icon: fontAwesome.faSolid.x, clase: 'btn btn-light-grey me-2', showProcess: false, id: 'btnCancelar' },
-    siBtn: { label: 'Continuar', icon: fontAwesome.faSolid.check, clase: 'btn btn-primary', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'Cancelar', icon: fontAwesome.faSolid.x, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Continuar', icon: fontAwesome.faSolid.check, clase: 'btn-green', showProcess: false, id: 'btnCancelar' },
   },
   [confirmationButtons.cancelarEliminar]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-light-grey me-2', showProcess: false, id: 'btnCancelar' },
-    siBtn: { label: 'Eliminar', icon: fontAwesome.faSolid.trashCan, clase: 'btn btn-danger', showProcess: true, id: 'btnEliminar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Eliminar', icon: fontAwesome.faSolid.trashCan, clase: 'btn-danger', showProcess: true, id: 'btnEliminar' },
   },
   [confirmationButtons.cancelarRemover]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-light-grey me-2', showProcess: false, id: 'btnCancelar' },
-    siBtn: { label: 'Remover', icon: fontAwesome.faSolid.trashCan, clase: 'btn btn-danger', showProcess: true, id: 'btnRemover' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Remover', icon: fontAwesome.faSolid.trashCan, clase: 'btn-danger', showProcess: true, id: 'btnRemover' },
   },
   [confirmationButtons.cancelarDesactivar]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-light-grey me-2', showProcess: false, id: 'btnCancelar' },
-    siBtn: { label: 'Desactivar', icon: fontAwesome.faSolid.ban, clase: 'btn btn-danger', showProcess: false, id: 'btnDesactivar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Desactivar', icon: fontAwesome.faSolid.ban, clase: 'btn-danger', showProcess: false, id: 'btnDesactivar' },
   },
   [confirmationButtons.cancelarActivar]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-light-grey me-2', showProcess: false, id: 'btnCancelar' },
-    siBtn: { label: 'Reactivar', icon: fontAwesome.faSolid.check, clase: 'btn btn-primary', showProcess: false, id: 'btnReactivar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Reactivar', icon: fontAwesome.faSolid.check, clase: 'btn-green', showProcess: false, id: 'btnReactivar' },
   },
   [confirmationButtons.cancelarAnular]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-light-grey me-2', showProcess: false, id: 'btnCancelar' },
-    siBtn: { label: 'Anular', icon: fontAwesome.faSolid.ban, clase: 'btn btn-danger', showProcess: false, id: 'btnAnular' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Anular', icon: fontAwesome.faSolid.ban, clase: 'btn-danger', showProcess: false, id: 'btnAnular' },
   },
   [confirmationButtons.copiarSalir]: {
-    noBtn: { label: 'Cancelar', icon: null, clase: 'btn btn-light-grey me-2', showProcess: false, id: 'btnCancelar' },
-    siBtn: { label: 'Copiar', icon: fontAwesome.faSolid.copy, clase: 'btn btn-primary', showProcess: false, id: 'btnCopiar' },
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Copiar', icon: fontAwesome.faSolid.copy, clase: 'btn-green', showProcess: false, id: 'btnCopiar' },
   },
   [confirmationButtons.continuarOSalir]: {
-    noBtn: { label: 'Continuar Editando', icon: null, clase: 'btn btn-light-grey me-2', showProcess: false, id: 'btnContinuarEditando' },
-    siBtn: { label: 'Salir sin guardar', icon: null, clase: 'btn btn-danger', showProcess: false, id: 'btnConfirmSalidSinGuardar' },
+    noBtn: { label: 'Continuar Editando', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnContinuarEditando' },
+    siBtn: { label: 'Salir sin guardar', icon: null, clase: 'btn-danger', showProcess: false, id: 'btnConfirmSalidSinGuardar' },
   },
   [confirmationButtons.ok]: {
-    siBtn: { label: 'Ok', icon: fontAwesome.faSolid.check, clase: 'btn btn-primary', showProcess: false, id: 'btnConfirmOk' },
+    siBtn: { label: 'Ok', icon: fontAwesome.faSolid.check, clase: 'btn-green', showProcess: false, id: 'btnConfirmOk' },
   },
 };

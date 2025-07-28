@@ -32,8 +32,9 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { DateUtils } from '@vjose1903/dateutils';
 import Big from 'big.js';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
-import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { CanComponentDeactivate, CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-facturacion',
@@ -55,6 +56,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   titulo: string;
 
   datesAvailable = { viaje: { minDate: new Date() } };
+
+  showDeactivationModal = signal<boolean>(true);
 
   @HostListener('window:keydown', ['$event'])
   @HostListener('window:keyup', ['$event'])
@@ -193,14 +196,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   facturasSerieOptions = seriesDGII();
   htmlServ = inject(HtmlElementsService);
   factServ = inject(FacturacionService);
+  dynamicModalServ = inject(DynamicModalService);
+  fb = inject(UntypedFormBuilder);
+  router = inject(Router);
 
   local_index_fact_archivada = this.index_fact_archivada();
 
-  constructor(
-    private fb: UntypedFormBuilder,
-
-    private router: Router
-  ) {
+  constructor() {
     super();
 
     this.formPropietario = this.fb.group({ id: null, direccion: null, telefono: null, nombre_completo: null });
@@ -256,6 +258,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ngAfterViewInit() {}
 
   canDeactivate(): boolean | Promise<boolean> {
+    if (!this.showDeactivationModal()) return true;
+
     // Verificar si hay una factura en proceso
     if (this.checkIfFacturacionEnProceso()) {
       return this.handleFacturaEnProceso();
@@ -266,7 +270,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   private async handleFacturaEnProceso(): Promise<boolean> {
-    const result = await this.checkSituaciones();
+    const result = await this.checkSituaciones({ goOut: true });
 
     if (result.factura_en_proceso) {
       if (result.abrirModal) {
@@ -474,6 +478,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando, this.errorComprobante] = Array(5).fill(false);
         [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row, this.chofer_row] = Array(6).fill(0);
         [this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.popover] = Array(7).fill(undefined);
+        this.showDeactivationModal.set(true);
         this.NCFcompra.set('');
         this.CostoYgasto.set('');
 
@@ -698,7 +703,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.formPropietario.patchValue(this.factServ.propietario_factura);
   }
 
-  checkSituaciones(): Promise<{ factura_en_proceso: boolean; abrirModal?: boolean; texto_modal?: string; archivo_id?: any }> {
+  checkSituaciones(args: { goOut: boolean }): Promise<{ factura_en_proceso: boolean; abrirModal?: boolean; texto_modal?: string; archivo_id?: any }> {
+    const { goOut } = args;
+
     return new Promise(resolve => {
       let documento = this.getDocumentoDescripcion();
       this.verificateArchivo().then(() => {
@@ -729,7 +736,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               texto_modal = `La <strong>${documento.descripcion}</strong> que esta en proceso ya se encuentra archivada <strong>¿desea sobreescribirla?</strong>`;
             }
           } else {
-            texto_modal = `Estas a punto de salir del modulo de facturación, <strong> ¿desea guardar la ${documento.descripcion} para continuarla luego?</strong>`;
+            if (goOut) {
+              texto_modal = `Estas a punto de salir del modulo de facturación, <strong> ¿desea guardar la ${documento.descripcion} que esta en proceso, para continuarla luego?</strong>`;
+            } else {
+              texto_modal = `¿Desea guardar la <strong> ${documento.descripcion}</strong> que esta en proceso, para continuarla luego?`;
+            }
           }
 
           resolve({ factura_en_proceso: true, abrirModal, texto_modal });
@@ -740,77 +751,35 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     });
   }
 
-  procesoCambio(abrirModal, texto_modal, callback) {
-    if (abrirModal) {
-      let salirFunction = instance => {
-        this.agregarFacturaALocalStorage();
-        this.info_cambio['bool'] = true;
-        instance.close();
-      };
-
-      let noGuardar = instance => {
-        this.info_cambio['bool'] = true;
-        instance.close();
-      };
-
-      let cancelarFunction = instance => {
-        this.info_cambio['bool'] = false;
-        instance.close();
-      };
-
-      const confirmationObj = {
-        id: 'salir_layout',
-        texto: texto_modal,
-        header: 'Confirmación',
-        siFunction: instance => salirFunction(instance),
-        noFunction: instance => noGuardar(instance),
-        cancelarFunction: instance => cancelarFunction(instance),
-        width: '30rem',
-      };
-
-      this.confirmationModal(confirmationObj);
-    } else {
-      this.info_cambio['bool'] = true;
-
-      callback({ bool: true });
-    }
-  }
-
   rellenarFacturaArchivada(factura) {
     if (fun.hasValue(factura)) {
       if (this.factura_guardada && this.factura_guardada?.archivo_id == factura.archivo_id) {
         fun.toastWarning(`Ya esta ${this.getSideBarTabByKey(this.factura_guardada.tipo)['singleTitle']} esta seleccionada.`, 'AVISO');
       } else {
-        this.checkSituaciones().then(result => {
+        this.checkSituaciones({ goOut: false }).then(result => {
           if (result.factura_en_proceso) {
             if (result.abrirModal) {
-              let siFunction = instance => {
-                this.procesoArchivarFactura(instance);
+              let siFunction = () => {
+                this.procesoArchivarFactura();
                 this.procesoRelleno(factura).then(() => {
                   this.actualizarLayServFactGuardada(factura);
                 });
               };
 
-              let noFunction = instance => {
+              let noFunction = () => {
                 this.procesoRelleno(factura).then(() => {
                   this.actualizarLayServFactGuardada(factura);
-                  instance.close();
                 });
               };
 
-              const cancelarRelleno = instance => instance.close();
-
-              const confirmationObj = {
+              this.dynamicModalServ.confirmationModal({
                 id: 'archivar_factura',
                 texto: result.texto_modal,
                 header: 'Confirmación',
-                siFunction: instance => siFunction.bind(this)(instance),
-                noFunction: instance => noFunction.bind(this)(instance),
-                cancelarFunction: instance => cancelarRelleno(instance),
-                width: '30rem',
-              };
-
-              this.confirmationModal(confirmationObj);
+                btnKind: confirmationButtons.siNoCancelar,
+                onYes: siFunction.bind(this),
+                onNo: noFunction.bind(this),
+              });
             } else {
               this.procesoRelleno(factura).then(() => {
                 this.actualizarLayServFactGuardada(factura);
@@ -1390,21 +1359,27 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    let siFunct = instance => {
-      if (this.factServ.action !== actionFacturacion.update) {
-        this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento()}/${actionFacturacion.new}/0`).then(res_router => this.resetVariables());
-      } else if (this.factServ.action == actionFacturacion.update || this.factServ.action == actionFacturacion.bill_from_cotizacion) {
-        this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
-      }
+    let siFunct = () => {
+      this.showDeactivationModal.set(false);
 
-      instance.close();
+      const actionToGoFinder = [actionFacturacion.update, actionFacturacion.duplicate];
+
+      if (actionToGoFinder.includes(this.factServ.action)) {
+        this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
+      } else {
+        this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento()}/${actionFacturacion.new}/0`).then(res_router => this.resetVariables());
+      }
     };
 
     let documento = this.getDocumentoDescripcion();
 
-    let obj = { id: 'cancelar_factura', header: 'Confirmación', texto: `Seguro que desea cancelar la ${documento.descripcion}`, siFunction: siFunct };
-
-    this.confirmationModal(obj);
+    this.dynamicModalServ.confirmationModal({
+      id: 'confirmCancelarFactura',
+      texto: `Seguro que desea cancelar la <strong>${documento.descripcion}</strong>.`,
+      header: 'Confirmación',
+      btnKind: confirmationButtons.siNo,
+      onYes: () => siFunct(),
+    });
   }
 
   // =============================================
@@ -1580,9 +1555,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.reloadIndexFactArchivada();
   }
 
-  procesoArchivarFactura(modalInstance, reset = false) {
+  procesoArchivarFactura(reset: boolean = false) {
     this.agregarFacturaALocalStorage();
-    modalInstance.close();
 
     if (reset) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento()}/${actionFacturacion.new}/0`).then(res_router => this.resetVariables());
   }
@@ -1596,11 +1570,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         if (this.factura_guardada && this.factura_guardada?.archivo_id) is_guardada = FactsLocalStorage.getList().find((fact: any) => fact.archivo_id == this.factura_guardada?.archivo_id);
 
-        const texto_modal = is_guardada ? `Esta ${documento.descripcion} ya esta archivada ¿desea sobreescribirla?` : `¿Seguro que desea archivar esta ${documento.descripcion} para continuarla luego?`;
+        const texto_modal = is_guardada ? `Esta <strong>${documento.descripcion}</strong> ya esta archivada ¿desea sobreescribirla?` : `¿Seguro que desea archivar esta <strong>${documento.descripcion}</strong> para continuarla luego?`;
 
-        const confirmationObj = { id: 'archivar_factura', texto: texto_modal, header: 'Confirmación', siFunction: instance => this.procesoArchivarFactura(instance, true), width: '30rem' };
-
-        this.confirmationModal(confirmationObj);
+        this.dynamicModalServ.confirmationModal({
+          id: 'archivar_factura',
+          texto: texto_modal,
+          header: 'Confirmación',
+          btnKind: confirmationButtons.siNo,
+          onYes: () => this.procesoArchivarFactura(true),
+        });
       });
     } else {
       fun.toastWarning(`Debe de iniciar una ${documento.descripcion} para archivarla.`, 'AVISO');

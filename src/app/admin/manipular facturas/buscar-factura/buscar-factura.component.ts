@@ -623,6 +623,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         }
 
         const toGoFacturacionTypes = ['duplicate', 'make_bill'];
+
         if (toGoFacturacionTypes.includes(params.iconKey)) {
           const actions = { duplicate: { url: actionFacturacion.duplicate, modalLabel: 'duplicar', modalId: 'duplicate_bill' }, make_bill: { url: actionFacturacion.bill_from_cotizacion, modalLabel: 'facturar', modalId: 'make_bill' } };
 
@@ -631,13 +632,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           const action = actions[params.iconKey].url;
           const label = actions[params.iconKey].modalLabel;
 
-          const si = instance => {
-            this.goToFacturacionPage(params.data.tipo, action, params.data.id);
-            instance.close();
-          };
-
-          let obj = { id: actions[params.iconKey].modalId, header: 'Confirmación', texto: `Seguro que desea <strong>${label}</strong> la ${tipoDocumento} No.: <strong>${params.data.secuencia} </strong>`, siFunction: si };
-          this.confirmationModal(obj);
+          this.dynamicModalServ.confirmationModal({
+            id: actions[params.iconKey].modalId,
+            texto: `Seguro que desea <strong>${label}</strong> la ${tipoDocumento} No.: <strong>${params.data.secuencia} </strong>`,
+            header: 'Confirmación',
+            btnKind: confirmationButtons.siNo,
+            onYes: () => this.goToFacturacionPage(params.data.tipo, action, params.data.id),
+          });
         }
       }
     }
@@ -650,7 +651,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
       id: 'confirmAnularDocumento',
       texto: `Seguro que desea anular la ${documento_descripcion} No.: <strong>${params.secuencia} </strong>`,
       header: 'Confirmación',
-      showCancelarBtn: true,
       btnKind: confirmationButtons.cancelarAnular,
       onYes: () => this.deleteRequest(params),
     });
@@ -773,10 +773,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   goToFacturacionPage(tipo: string, action: string, id: any) {
-    console.log('%c tipo', 'color: red', tipo);
-    console.log('%c action', 'color: blue', action);
-    console.log('%c id', 'color: green', id);
-
     fun.setTimeout(() => {
       this.router.navigateByUrl(`/admin/factura/${tipo}/${action}/${id}`);
     }, 10);
@@ -803,8 +799,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   mostrarFactura(args: { factura: FacturasI; type: string; dataDB?: any; crear_nota?: boolean; documento?: string }) {
     const { factura, type, dataDB, crear_nota, documento } = args;
-    console.log('crear_nota ', crear_nota);
-    console.log('type ', type);
 
     const toPDFData = { data: factura, type: type };
     let botonesDinamicos: IButtonDynamic[] = [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
@@ -931,21 +925,18 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   confirmarReemplazarENCF(factura, modalPdfInstance) {
-    const obj = {
+    this.dynamicModalServ.confirmationModal({
       id: 'reemplazarENCF',
-      header: 'Confirmación',
       texto: `Seguro que desea reemplazar a eNCF la factura <strong>${factura.numero_comprobante}</strong>?`,
-      siFunction: instance => {
-        this.reemplazarENCF(factura, [modalPdfInstance, instance]);
-      },
-    };
-
-    this.confirmationModal(obj);
+      header: 'Confirmación',
+      btnKind: confirmationButtons.siNo,
+      onYes: () => this.reemplazarENCF(factura, [modalPdfInstance]),
+    });
   }
 
   reemplazarENCF(factura, modalInstances) {
     this.facturaClass.updateOne({ id: factura.id }, { afterPath: `dgii/eNCF/replace` }).then(res => {
-      modalInstances.forEach(instance => instance.closeModal(instance.id));
+      modalInstances.forEach(instance => instance.close());
 
       this.beforeReemplazarENCF();
     });
@@ -966,7 +957,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         this.loadServ.isLoading.next(false);
 
         fun.toastSuccess(res.msg, 'CORRECTO');
-        modalInstance.closeModal(modalInstance.id);
+        modalInstance.close();
       })
       .catch(err => {
         console.error('err ', err);

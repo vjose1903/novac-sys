@@ -44,12 +44,12 @@ export class DynamicModalService {
     iconSize?: string;
     iconColor?: string;
     closableClickOutside?: boolean;
-    showCancelarBtn?: boolean;
     showReasonInput?: boolean;
+    onCancelar?: () => void | Promise<void>;
     onNo?: () => void | Promise<void>;
     onYes?: () => void | Promise<void>;
   }) {
-    const { id, texto, header, btnKind = confirmationButtons.cancelarContinuar, width = '40vw', iconName, iconSize, iconColor, closableClickOutside, showCancelarBtn, showReasonInput = false, onNo, onYes } = params;
+    const { id, texto, header, btnKind = confirmationButtons.cancelarContinuar, width = '40vw', iconName, iconSize, iconColor, closableClickOutside, showReasonInput = false, onNo, onYes, onCancelar } = params;
 
     const inputs = { html: texto, iconName, iconSize, iconColor, showReasonInput, onYes };
 
@@ -63,9 +63,29 @@ export class DynamicModalService {
     confirmationModal.botones = [];
 
     const currentBtnConfig = confirmBtnConfig[btnKind];
-
+    
     // Configurar botón de cancelar si es necesario
-    if (showCancelarBtn && currentBtnConfig.noBtn) {
+    if (currentBtnConfig.cancelarBtn) {
+      const { cancelarBtn } = currentBtnConfig;
+
+      confirmationModal.botones.push({
+        id: cancelarBtn.id,
+        clase: cancelarBtn.clase,
+        function: async () => {
+          if (onCancelar) await onCancelar();
+          confirmationModal.close();
+        },
+        label: cancelarBtn.label,
+        disable: false,
+        iconName: cancelarBtn.icon,
+        iconSize: '16px',
+        iconColor: cancelarBtn.iconColor ?? 'black',
+        showProcess: cancelarBtn.showProcess,
+      });
+    }
+
+    // Configurar botón de No si es necesario
+    if (currentBtnConfig.noBtn) {
       const { noBtn } = currentBtnConfig;
       confirmationModal.botones.push({
         id: noBtn.id,
@@ -77,11 +97,12 @@ export class DynamicModalService {
         label: noBtn.label,
         disable: false,
         iconName: noBtn.icon,
-        iconSize: '20px',
-        iconColor: 'white',
+        iconSize: '16px',
+        iconColor: noBtn.iconColor ?? 'black',
         showProcess: noBtn.showProcess,
       });
     }
+
 
     // Configurar botón de confirmar
     if (currentBtnConfig.siBtn) {
@@ -93,8 +114,8 @@ export class DynamicModalService {
         label: siBtn.label,
         disable: false,
         iconName: siBtn.icon,
-        iconSize: '20px',
-        iconColor: 'white',
+        iconSize: '16px',
+        iconColor: siBtn.iconColor ?? 'white',
         showProcess: siBtn.showProcess,
       });
     }
@@ -102,7 +123,7 @@ export class DynamicModalService {
     confirmationModal.show();
   }
 
-  closeConfirmModal(params: { id: string;  width?: string , onYes?: () => void | Promise<void>, onNo?: () => void | Promise<void>}) {
+  closeConfirmModal(params: { id: string; width?: string; onYes?: () => void | Promise<void>; onNo?: () => void | Promise<void> }) {
     const config = {
       id: params.id,
       width: params.width,
@@ -116,7 +137,7 @@ export class DynamicModalService {
       showCancelarBtn: true,
       btnKind: confirmationButtons.continuarOSalir,
     };
-    
+
     this.confirmationModal(config);
   }
 }

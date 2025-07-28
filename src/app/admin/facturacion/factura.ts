@@ -366,7 +366,7 @@ export class FacturaC extends CrudG<FacturasI> {
     detalleDocModalConf.id = 'detalle_factura';
     detalleDocModalConf.inputs = { data, documento: documento.toLowerCase() };
     detalleDocModalConf.header = `Detalles ${documento}`;
-    detalleDocModalConf.width = '35rem';
+    detalleDocModalConf.width = '36rem';
     // detalleDocModalConf.height = '31.25rem';
     detalleDocModalConf.component = DetalleFacturaComponent;
     detalleDocModalConf.confirmToClose = false;
