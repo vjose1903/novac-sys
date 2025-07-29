@@ -18,7 +18,7 @@ import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { ArticuloI } from '@registros/articulos/articulo';
 import { DateUtils } from '@vjose1903/dateutils';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
-import { modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { IButtonDynamic, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 export enum comprobanteNormal {
   factura_de_credito_fiscal = '01',
@@ -367,7 +367,6 @@ export class FacturaC extends CrudG<FacturasI> {
     detalleDocModalConf.inputs = { data, documento: documento.toLowerCase() };
     detalleDocModalConf.header = `Detalles ${documento}`;
     detalleDocModalConf.width = '36rem';
-    // detalleDocModalConf.height = '31.25rem';
     detalleDocModalConf.component = DetalleFacturaComponent;
     detalleDocModalConf.confirmToClose = false;
     detalleDocModalConf.closableEsc = true;
@@ -376,28 +375,27 @@ export class FacturaC extends CrudG<FacturasI> {
     detalleDocModalConf.show();
   }
 
-  handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?) {
-    return new Promise<any>((resolve, reject) => {
+  handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?: IButtonDynamic[]) {
+    return new Promise<void>((resolve, reject) => {
       PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
         .then(async res => {
-          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+          const { data: factura } = toPDFData;
+          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')), show_estado: dataModal.show_estado, estado_documento: factura.estado, documento: toPDFData.documento, factura: factura };
 
-          const obj_modal = {
-            component: PdfViewerComponent,
-            inputs: inputs,
-            id: dataModal.id,
-            header: dataModal.header,
-            width: '900px',
-            height: '70vh',
-            botones: {
-              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false }],
-            },
-          };
+          const viewPdfModalConf = new DynamicModalClass();
 
-          if (fun.hasValue(botones_dinamicos)) obj_modal.botones.dinamico = botones_dinamicos;
+          viewPdfModalConf.id = 'pdfViewer-modal';
+          viewPdfModalConf.inputs = inputs;
+          viewPdfModalConf.header = dataModal.header;
+          viewPdfModalConf.width = '56.25rem';
+          viewPdfModalConf.height = '70vh';
+          viewPdfModalConf.component = PdfViewerComponent;
+          viewPdfModalConf.closableEsc = true;
+          viewPdfModalConf.botones = botones_dinamicos ? botones_dinamicos : [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
 
-          resolve(obj_modal);
+          viewPdfModalConf.show();
+
+          resolve();
         })
         .catch(err => {
           fun.toastError(err.msg, 'ERROR');

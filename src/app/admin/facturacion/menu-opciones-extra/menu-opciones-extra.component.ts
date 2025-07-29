@@ -8,7 +8,7 @@ import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
 import { Component, inject, ViewChild, ElementRef, Input, signal, AfterViewInit, OnInit } from '@angular/core';
 import * as _ from 'lodash';
-import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { IButtonDynamic, IDynamicModal, IModalConfiguration, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
@@ -224,23 +224,23 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
   mostrarFactura(dataFactura, type) {
     const toPDFData = { data: dataFactura, type: type };
 
-    let botonesDinamicos = [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false as any }];
+    let botonesDinamicos: IButtonDynamic[] = [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false as any }];
 
     if (this.code == tipoDocFacturacion.cotizacion) {
       botonesDinamicos.push({
         clase: 'btn btn-gris',
         function: instance => {
-          instance.closeModal(instance.id);
           this.tableClickIcon({ id_tabla: 'mostrar_documento', columnKey: 'actions', iconKey: 'rellenar_factura', data: dataFactura });
+          instance.close();
         },
         label: 'Facturar',
         disable: { function: () => fun.hasValue(dataFactura.fecha_completada) },
       });
     }
 
-    const dataModal = { id: 'mostrarDocumento', header: 'MOSTRAR DOCUMENTO' };
+    const dataModal = { id: 'mostrarDocumento', header: 'MOSTRAR DOCUMENTO', show_estado: false };
 
-    this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then(obj_modal => this.openNewModal(obj_modal));
+    this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos);
   }
 
   pasar_a_facturacion(documento_selected) {

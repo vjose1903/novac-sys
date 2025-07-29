@@ -14,6 +14,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Ss } from '@core/services/singleton.service';
+import { modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 @Component({
   selector: 'app-recibo-viajes',
   templateUrl: './recibo-viajes.component.html',
@@ -276,13 +277,13 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           this.facturaClass.parseDataToPdf(params.data).then(dataFactura => {
             let botonesDinamicos = [
               { clase: 'btn btn-gris', function: instance => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-              { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false as any },
+              { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false as any },
             ];
 
             const toPDFData = { data: dataFactura, type: 'facturacion' };
-            const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA' };
+            const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA', show_estado: false };
 
-            this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then(obj_modal => this.openNewModal(obj_modal));
+            this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos);
           });
         }
         if (params.iconKey == 'make_recipt') this.redirectToIngresos(params.data);

@@ -800,36 +800,41 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   mostrarFactura(args: { factura: FacturasI; type: string; dataDB?: any; crear_nota?: boolean; documento?: string }) {
     const { factura, type, dataDB, crear_nota, documento } = args;
 
-    const toPDFData = { data: factura, type: type };
     let botonesDinamicos: IButtonDynamic[] = [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+    this.agregarBotones(botonesDinamicos, factura, type, crear_nota, dataDB, documento);
+    const toPDFData = { data: factura, type: type };
 
-    PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
-      .then(async res => {
-        const viewPdfModalConf = new DynamicModalClass();
+    const dataModal = { id: 'pdfViewer-modal', header: documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA', show_estado: true };
 
-        viewPdfModalConf.id = 'pdfViewer-modal';
-        viewPdfModalConf.inputs = {
-          show_estado: true,
-          estado_documento: factura.estado,
-          base64: res.base64,
-          documento: documento,
-          reimprimir: res.reimprimir,
-          fileName: res.file.split('.')[0],
-          factura: factura,
-        };
-        viewPdfModalConf.header = documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
-        viewPdfModalConf.width = '56.25rem';
-        viewPdfModalConf.height = '70vh';
-        viewPdfModalConf.component = PdfViewerComponent;
-        viewPdfModalConf.closableEsc = true;
+    this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos);
 
-        this.agregarBotones(botonesDinamicos, factura, type, crear_nota, dataDB, documento);
+    // PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
+    //   .then(async res => {
+    //     const viewPdfModalConf = new DynamicModalClass();
 
-        viewPdfModalConf.botones = botonesDinamicos;
+    //     viewPdfModalConf.id = 'pdfViewer-modal';
+    //     viewPdfModalConf.inputs = {
+    //       show_estado: true,
+    //       estado_documento: factura.estado,
+    //       base64: res.base64,
+    //       documento: documento,
+    //       reimprimir: res.reimprimir,
+    //       fileName: res.file.split('.')[0],
+    //       factura: factura,
+    //     };
+    //     viewPdfModalConf.header = documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
+    //     viewPdfModalConf.width = '56.25rem';
+    //     viewPdfModalConf.height = '70vh';
+    //     viewPdfModalConf.component = PdfViewerComponent;
+    //     viewPdfModalConf.closableEsc = true;
 
-        viewPdfModalConf.show();
-      })
-      .catch(err => fun.toastError(err.msg, 'ERROR'));
+    //     this.agregarBotones(botonesDinamicos, factura, type, crear_nota, dataDB, documento);
+
+    //     viewPdfModalConf.botones = botonesDinamicos;
+
+    //     viewPdfModalConf.show();
+    //   })
+    //   .catch(err => fun.toastError(err.msg, 'ERROR'));
   }
 
   private agregarBotones(botonesDinamicos: IButtonDynamic[], factura: FacturasI, type: string, crear_nota: boolean, dataDB?: any, documento?: string): void {

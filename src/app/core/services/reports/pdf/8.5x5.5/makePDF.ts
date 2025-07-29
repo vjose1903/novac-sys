@@ -19,8 +19,7 @@ import { agruparArticulosPorPagina, parseTotalizacion } from '../../utils/factur
 import { pageBreak } from '../../utils/funciones';
 
 const configuraciones = {
-  notas_detallada: config_notas.detallada,
-  notas_agrupada: config_notas.agrupada,
+  notas: config_notas.normal,
   notas_electronica: config_notas.electronica,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
@@ -35,7 +34,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 
   const is_suplidor = is_compra;
   const is_electronica = data?.serie == serie.electronica;
-
+  
   const configApp: ConfigI = Ss.configServ.config;
   const configuration = configuraciones[tipo_pdf];
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
