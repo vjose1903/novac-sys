@@ -775,7 +775,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
               this.dynamicModalServ.confirmationModal({
                 id: 'archivar_factura',
                 texto: result.texto_modal,
-                header: 'Confirmación',
                 btnKind: confirmationButtons.siNoCancelar,
                 onYes: siFunction.bind(this),
                 onNo: noFunction.bind(this),
@@ -1376,7 +1375,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.dynamicModalServ.confirmationModal({
       id: 'confirmCancelarFactura',
       texto: `Seguro que desea cancelar la <strong>${documento.descripcion}</strong>.`,
-      header: 'Confirmación',
       btnKind: confirmationButtons.siNo,
       onYes: () => siFunct(),
     });
@@ -1575,7 +1573,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.dynamicModalServ.confirmationModal({
           id: 'archivar_factura',
           texto: texto_modal,
-          header: 'Confirmación',
           btnKind: confirmationButtons.siNo,
           onYes: () => this.procesoArchivarFactura(true),
         });

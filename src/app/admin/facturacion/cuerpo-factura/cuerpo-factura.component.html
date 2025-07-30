@@ -32,7 +32,7 @@
     </table>
     <div class="contenido-fact" #cuadro>
       <form [formGroup]="form" action="">
-        @for (item_cuerpo of factServ.filasDetalle; track item_cuerpo; let index_cuerpo = $index) {
+        @for (item_cuerpo of factServ.filasDetalle.controls; track item_cuerpo; let index_cuerpo = $index) {
           <div formArrayName="rowFactura">
             <ng-container [formGroupName]="index_cuerpo">
               <p-popover #dropRowMenu appendTo="body">
@@ -123,7 +123,7 @@
                             id="unidad-{{ index_cuerpo }}"
                             (focus)="setInputDrop(index_cuerpo); verificarSecuencia(index_cuerpo)"
                             (blur)="calcularMontosRow(index_cuerpo)"
-                            [pTooltip]="factServ.filasDetalle[index_cuerpo].value.unidad ?? ''"
+                            [pTooltip]="factServ.filasDetalle.at(index_cuerpo).value.unidad ?? ''"
                             tooltipPosition="top"
                             formControlName="unidad"
                             tabindex="-1" />
@@ -137,7 +137,7 @@
                             appendTo="body"
                             optionLabel="value"
                             optionValue="value"
-                            [options]="factServ.filasDetalle[index_cuerpo].value.unidades"
+                            [options]="factServ.filasDetalle.at(index_cuerpo).value.unidades"
                             placeholder="medida"
                             [filter]="false"
                             [virtualScroll]="true"

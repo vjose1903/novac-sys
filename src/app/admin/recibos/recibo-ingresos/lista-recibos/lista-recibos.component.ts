@@ -147,7 +147,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
           this.dynamicModalServ.confirmationModal({
             id: 'confirmAnularDocumento',
             texto: `Seguro de que desea anular el recibo <b class="negrita"> #${recibo_selected.numero_recibo} </b>`,
-            header: 'Confirmación',
             btnKind: confirmationButtons.cancelarAnular,
             onYes: () => this.anularRecibo(recibo_selected.id),
           });
@@ -177,11 +176,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         this.loadServ.isLoading.next(false);
 
         const { file: fileName, base64, pageOrientation } = res;
-        const obj_pdf = {
-          base64,
-          reimprimir: true,
-          fileName: fileName.split('.')[0],
-        };
+        const obj_pdf = { base64, reimprimir: true, fileName: fileName.split('.')[0], };
 
         const reciboModalConf = new DynamicModalClass();
         reciboModalConf.id = 'revision_recibo';
@@ -227,10 +222,11 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       pageOrientation,
     };
 
+    console.log(obj);
+
     PdfService.imprimirBase64(obj)
       .then(res => {
-        if (res.status === 'si') fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
-        else fun.toastError(res.msg, 'ERROR');
+        fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
       })
       .catch(err => {
         console.error(err);

@@ -14,7 +14,8 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Ss } from '@core/services/singleton.service';
-import { modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 @Component({
   selector: 'app-recibo-viajes',
   templateUrl: './recibo-viajes.component.html',
@@ -31,19 +32,19 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         tipo: 'icon',
         key: 'estado',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }],
+        style: { width: '3%', color: 'var(--transparente00)', padding: '0.6rem 0rem' },
         iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
       },
-      { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', estilos: [{ width: '13%' }] },
-      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre', estilos: [{ width: '40%' }] },
-      { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '15%' }] },
-      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', estilos: [{ width: '20%' }] },
+      { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', style: { width: '13%' } },
+      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre_completo', style: { width: '40%' } },
+      { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', style: { width: '15%' } },
+      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', style: { width: '20%' } },
       {
         titulo: 'Acciones',
         tipo: 'icon',
         key: 'actions',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '7%' }],
+        style: { width: '7%' },
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
           { key: 'make_recipt', rowTooltip: 'make_recipt_tooltip', disable: [{ kind: 'has_value', target: 'fecha_completada' }] },
@@ -67,8 +68,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         tipo: 'icon',
         key: 'actions',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '7%' }],
-
+        style: { width: '7%' },
         iconsArray: [
           { key: 'editar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Editar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
           { key: 'borrar_btn', tooltip: 'Borrar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
@@ -112,14 +112,14 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   facturaClass = new FacturaC();
 
   htmlServ = inject(HtmlElementsService);
+  dynamicModalServ = inject(DynamicModalService);
+  tServ = inject(TablasService);
+  fb = inject(UntypedFormBuilder);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
 
   fun = fun;
-  constructor(
-    private tServ: TablasService,
-    private fb: UntypedFormBuilder,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     super();
   }
 
@@ -209,16 +209,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         viaje.make_recipt_tooltip = fun.hasValue(viaje.fecha_completada) ? 'Pedido completado' : 'Realizar recibo de ingreso';
 
         viaje.customStyles = {
-          estado: [
-            { key: 'estado', isTd: true, estilos: 'width: 3% !important; padding: 0.6rem 0rem !important' },
-            { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
-          ],
-          fecha_equivalente: { width: '13%' },
-          'cliente.nombre': { width: '40%' },
-          numero_comprobante: { width: '15%' },
-          total_factura: { width: '20%' },
+          estado: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
+
           actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 7% !important' },
             { key: 'ver', estilos: 'font-size: 1rem !important' },
             { key: 'make_recipt', estilos: 'font-size: 1rem !important' },
           ],
@@ -361,17 +354,12 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       if (fun.isEmpty(data.user_id)) text = `Seguro que desea eliminar el movimiento realizado con el camión: <strong>${data.vehiculo.info_vehiculo}</strong>.`;
       if (fun.isEmpty(data.vehiculo_id)) text = `Seguro que desea eliminar el movimiento realizado por: <strong>${params.data.chofer.nombre_completo}</strong>.`;
 
-      const obj = {
+      this.dynamicModalServ.confirmationModal({
         id: 'delete_movimiento_viaje',
-        header: 'Confirmación',
         texto: text,
-        siFunction: instance => {
-          this.deleteMovimientoViaje(params);
-          instance.close();
-        },
-      };
-
-      this.confirmationModal(obj);
+        btnKind: confirmationButtons.siNo,
+        onYes: () => this.deleteMovimientoViaje(params),
+      });
     }
   }
 
@@ -397,17 +385,16 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   redirectToIngresos(factura) {
-    const obj = {
-      id: 'move_to_ingresos',
-      header: 'Confirmación',
-      texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para realizar el recibo de este pedido.',
-      siFunction: instance => {
-        this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}/${factura.id}`);
-        instance.close();
-      },
+    const onYes = () => {
+      this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}/${factura.id}`);
     };
 
-    this.confirmationModal(obj);
+    this.dynamicModalServ.confirmationModal({
+      id: 'move_to_ingresos',
+      texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para <strong>realizar el recibo de este pedido</strong>.',
+      btnKind: confirmationButtons.siNo,
+      onYes: () => onYes(),
+    }); 
   }
 
   verDetalles(data) {

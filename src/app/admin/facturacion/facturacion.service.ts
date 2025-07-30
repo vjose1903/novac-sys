@@ -181,6 +181,6 @@ export class FacturacionService {
   getDetallesLlenos() {
     if (!fun.hasValue(this.filasDetalle)) return [];
 
-    return this.filasDetalle.map(inner_detalle => inner_detalle.value).filter(detalle => fun.hasValue(detalle?.key));
+    return this.filasDetalle.controls.map(inner_detalle => inner_detalle.value).filter(detalle => fun.hasValue(detalle?.key));
   }
 }

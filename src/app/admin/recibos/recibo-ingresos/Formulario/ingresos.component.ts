@@ -421,7 +421,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.dynamicModalServ.confirmationModal({
       id: 'cancelar_ingreso',
       texto: tipo == 'cancelar' ? `¿Seguro de que desea cancelar el <strong>Recibo de ingresos</strong>?` : `¿Seguro de que desea iniciar una nueva búsqueda para el <strong>Recibo de ingresos</strong>?`,
-      header: 'Confirmación',
       btnKind: confirmationButtons.siNo,
       onYes: () => this.cancelarIngreso(),
     });
@@ -456,7 +455,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           this.dynamicModalServ.confirmationModal({
             id: 'move_to_viajes',
             texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
-            header: 'Confirmación',
             btnKind: confirmationButtons.siNo,
             onYes: () => {
               this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
@@ -704,24 +702,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   processPropietarioModal(args: ICallbackModal) {
-    console.log('args ', args);
     const { data, type, factura_a_buscar = undefined } = args as any;
 
-    // if (arg?.tipo == 'data_no_found') {
-    //   fun.enfocarAndSelectInput('clienteI');
-    // } else {
-    //   this.clienteAdepositar = arg.data;
-    //   (document.getElementById('clienteI') as any).value = arg.data.nombre_completo;
-    //   const parameters = { ...this.table_config.obj_paginate, factura_a_buscar: arg?.factura_a_buscar };
-    //   this.pedirFacturasPorCliente(arg.data.id, parameters);
-    // }
-
-    if (type == modalCloseType.onHide) {
-      // let documento = this.getDocumentoDescripcion();
-      // const actualPath = fun.getActualPath();
-      // if (fun.hasValue(documento) && !documento.has_Propietario && actualPath.includes('factura')) {
-      //   fun.toastWarning(`Para realizar una ${documento.descripcion}, debe de seleccionar el cliente.`, 'AVISO');
-      // }
+    if (type == modalCloseType.onHide && fun.isEmpty(this.clienteAdepositar)) {
+      fun.enfocarInput('clienteI');
     }
 
     if (type == modalCloseType.returnData) {

@@ -635,7 +635,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           this.dynamicModalServ.confirmationModal({
             id: actions[params.iconKey].modalId,
             texto: `Seguro que desea <strong>${label}</strong> la ${tipoDocumento} No.: <strong>${params.data.secuencia} </strong>`,
-            header: 'Confirmación',
             btnKind: confirmationButtons.siNo,
             onYes: () => this.goToFacturacionPage(params.data.tipo, action, params.data.id),
           });
@@ -650,7 +649,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     this.dynamicModalServ.confirmationModal({
       id: 'confirmAnularDocumento',
       texto: `Seguro que desea anular la ${documento_descripcion} No.: <strong>${params.secuencia} </strong>`,
-      header: 'Confirmación',
       btnKind: confirmationButtons.cancelarAnular,
       onYes: () => this.deleteRequest(params),
     });
@@ -933,7 +931,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     this.dynamicModalServ.confirmationModal({
       id: 'reemplazarENCF',
       texto: `Seguro que desea reemplazar a eNCF la factura <strong>${factura.numero_comprobante}</strong>?`,
-      header: 'Confirmación',
       btnKind: confirmationButtons.siNo,
       onYes: () => this.reemplazarENCF(factura, [modalPdfInstance]),
     });

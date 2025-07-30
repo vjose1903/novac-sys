@@ -130,7 +130,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       formItems.forEach(item => formArray.push(item));
 
       // Configurar variables del servicio
-      this.factServ.filasDetalle = formArray.controls;
+      this.factServ.filasDetalle = formArray;
       this.precioCostoKey = this.factServ.isCompra() ? 'costo' : 'precio';
 
       // Configurar listeners y estado inicial
@@ -181,7 +181,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   checkCodigo(index) {
-    const formulario = this.factServ.filasDetalle[index].getRawValue();
+    const formulario = this.factServ.filasDetalle.at(index).getRawValue();
 
     if (fun.hasValue(formulario.codigo) && fun.is_number(formulario.codigo)) this.minCodigo = 5;
     else this.minCodigo = undefined;
@@ -200,16 +200,16 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   checkIfRowContainArticulo(index) {
     let res = false;
     if (this.factServ.filasDetalle) {
-      const element = this.factServ.filasDetalle[index] as FormGroup;
+      const element = this.factServ.filasDetalle.at(index) as FormGroup;
       res = element.controls['descripcion'].value || element.controls['codigo'].value;
     }
     return res;
   }
 
   hasArticulosDevueltos(index) {
-    if (!this.factServ.filasDetalle || !this.factServ.filasDetalle[index]) return false;
+    if (!this.factServ.filasDetalle || !this.factServ.filasDetalle.at(index)) return false;
 
-    const current_detalle = this.factServ.filasDetalle[index].getRawValue();
+    const current_detalle = this.factServ.filasDetalle.at(index).getRawValue();
 
     const detalles = this.factServ.getDetallesLlenos();
 
@@ -272,7 +272,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   removeItem(key: string) {
-    const index = this.factServ.filasDetalle.findIndex(detalle => detalle.value.key == key);
+    const index = this.factServ.filasDetalle.controls.findIndex(detalle => detalle.value.key == key);
     (this.form.get('rowFactura') as FormArray).removeAt(index);
   }
 
@@ -359,7 +359,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   llenarDetalles(data, articulo, index) {
-    const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+    const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
     const detalle = {};
     detalle['detalle_id'] = fun.hasValue(data?.id) ? data?.id : null;
     detalle['articulo'] = articulo;
@@ -398,7 +398,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   test(arg) {
-    const current_detalle = this.factServ.filasDetalle[arg].getRawValue();
+    const current_detalle = this.factServ.filasDetalle.at(arg).getRawValue();
   }
 
   getBadPrice(data) {
@@ -441,7 +441,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     if (next_input == 'precioOCompra-') next_input = this.factServ.isCompra() ? 'costo-' : 'precio-';
 
-    const { articulo, codigo, cantidad, unidad } = this.factServ.filasDetalle[index].getRawValue();
+    const { articulo, codigo, cantidad, unidad } = this.factServ.filasDetalle.at(index).getRawValue();
 
     if (next_input == 'unidad-' && fun.hasValue(cantidad) && cantidad != 0 && fun.hasValue(codigo)) {
       this.saliDeCantidad(index).then(excede => {
@@ -498,7 +498,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   ajustarSecuencia(where?: string) {
     return new Promise(resolve => {
-      const filas_ocupadas = this.factServ.filasDetalle.filter(item => fun.hasValue(item.value.articulo));
+      const filas_ocupadas = this.factServ.filasDetalle.controls.filter(item => fun.hasValue(item.value.articulo));
 
       this.secuencia = filas_ocupadas.length;
 
@@ -510,7 +510,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   saliDeCantidad(index) {
     return new Promise<boolean>(resolve => {
-      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
       const detale = {};
       const { unidad, cantidad, cantidad_ant } = formGroup.getRawValue();
 
@@ -544,11 +544,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         return;
       }
 
-      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
       const { articulo, from_pre_factura } = formGroup.value;
 
       const rowsIgual = _.map(
-        this.factServ.filasDetalle.filter(item => item.value?.articulo?.id == articulo.id),
+        this.factServ.filasDetalle.controls.filter(item => item.value?.articulo?.id == articulo.id),
         'value'
       );
 
@@ -602,7 +602,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async selectMedida(index) {
     if (this.dropdownMedidaOpen) {
-      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
       const detalle = {};
 
       let { unidad: unidadaSelected, unidades } = formGroup.getRawValue();
@@ -645,7 +645,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    const formGroup = this.factServ.filasDetalle[params.index] as FormGroup;
+    const formGroup = this.factServ.filasDetalle.at(params.index) as FormGroup;
     const { unidad, cantidad, cantidad_initial, unidades } = formGroup.value;
     const detalles = {};
 
@@ -672,7 +672,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   calcularMontosRow(index: number) {
     return new Promise<any>((resolve, reject) => {
-      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
       const detalle = {};
       let { cantidad, articulo, codigo, key, precio, costo, descuento_valor } = formGroup.value;
 
@@ -731,9 +731,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   enviarTotalesGenerales() {
-    const tempTotal = this.factServ.filasDetalle.reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.value.total), 0);
+    const tempTotal = this.factServ.filasDetalle.controls.reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.value.total), 0);
     const tempDesc = this.listaDeDescuentos.reduce((acumulado, item) => acumulado + item.valor, 0);
-    const tempItbis = this.factServ.filasDetalle.reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.value.itbis) * item.value.cantidad, 0);
+    const tempItbis = this.factServ.filasDetalle.controls.reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.value.itbis) * item.value.cantidad, 0);
 
     const obj = { total: fun.roundNumberToDecimal(tempTotal), itbis: fun.roundNumberToDecimal(tempItbis), descuento: fun.roundNumberToDecimal(tempDesc) };
 
@@ -741,7 +741,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   revisarPrecio(formControlName, index) {
-    let input = (this.factServ.filasDetalle[index] as FormGroup).controls[formControlName];
+    let input = (this.factServ.filasDetalle.at(index) as FormGroup).controls[formControlName];
 
     fun.revisarNumber(input, `${formControlName}-${index}`).then(res => {
       if (!res.error) {
@@ -754,7 +754,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   handleInputEvent(type, formControlName, index) {
-    let input = (this.factServ.filasDetalle[index] as FormGroup).controls[formControlName];
+    let input = (this.factServ.filasDetalle.at(index) as FormGroup).controls[formControlName];
 
     if (type == 'focus' && fun.hasValue(input.value)) input.setValue(fun.desformatearStNumber(input.value));
     if (type == 'blur') {
@@ -764,10 +764,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   getActualPrice(index, event?) {
-    const actual_price_value = (this.factServ.filasDetalle[index] as FormGroup).controls['actual_price_value'].value;
+    const actual_price_value = (this.factServ.filasDetalle.at(index) as FormGroup).controls['actual_price_value'].value;
 
     const siFunction = instance => {
-      const formGroup = this.factServ.filasDetalle[index] as FormGroup;
+      const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
       const detalle = {};
       const campoToSolve = this.factServ.isCompra() ? 'costo' : 'precio';
 
@@ -788,7 +788,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   getInfoBadPrice(index) {
     let res = { icon: undefined, tooltip: undefined };
 
-    const formulario_data = this.factServ.filasDetalle[index].getRawValue();
+    const formulario_data = this.factServ.filasDetalle.at(index).getRawValue();
 
     const actual_price_value = fun.desformatearStNumber(formulario_data.actual_price_value);
     const tipo = this.factServ.isCompra() ? 'Costo' : 'Precio';
@@ -804,7 +804,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   modalRemover(index, event?) {
-    const data = this.factServ.filasDetalle[index].getRawValue();
+    const data = this.factServ.filasDetalle.at(index).getRawValue();
 
     const { descripcion, cantidad, unidad, key } = data;
 
@@ -825,7 +825,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   retornarArticulosDevueltos(index, tipo, event) {
-    const current_detalle = tipo == 'defectuoso' ? this.factServ.filasDetalle[index].getRawValue() : null;
+          const current_detalle = tipo == 'defectuoso' ? this.factServ.filasDetalle.at(index).getRawValue() : null;
     const detalles = this.factServ.getDetallesLlenos();
 
     const articulo_defectuoso = detalles.find(detalle => detalle.key_initial == current_detalle.key);
@@ -859,7 +859,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   setInputDrop(index) {
     if (fun.hasValue(index) && fun.hasValue(this.factServ.filasDetalle)) {
-      const { articulo } = this.factServ.filasDetalle[index].getRawValue();
+      const { articulo } = this.factServ.filasDetalle.at(index).getRawValue();
       if (fun.hasValue(articulo)) this.inputDrop = `unidad-${index}`;
     } else {
       this.inputDrop = undefined;
@@ -910,7 +910,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       fun.toastWarning(msg, 'AVISO');
     }
 
-    const formGroup = this.factServ.filasDetalle[params.index] as FormGroup;
+    const formGroup = this.factServ.filasDetalle.at(params.index) as FormGroup;
     const detalle = {};
     detalle['articulo'] = params.articulo;
     detalle['unidades'] = this.llenarArrayUnidades(params.articulo);
@@ -982,7 +982,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   retornarDevuelto(arg: { key: string; retorno: { solo_devuelto: any; defectuoso: any } }) {
     const infoRetorno = [
-      { tipo: 'defectuoso', data: arg.retorno?.defectuoso, contenedor_retorno: this.factServ.filasDetalle },
+              { tipo: 'defectuoso', data: arg.retorno?.defectuoso, contenedor_retorno: this.factServ.filasDetalle.controls },
       { tipo: 'solo_devuelto', data: arg.retorno?.solo_devuelto, contenedor_retorno: this.factServ.productos_devueltos || [] },
     ];
 
@@ -1024,9 +1024,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         }
 
         // ----- CAMBIO DEL ARTICULO ORIGEN -----
-        const articulo_origin = _.find(this.factServ.filasDetalle, detalle => detalle.value.key == articulo_devuelto.key_initial);
+        const articulo_origin = _.find(this.factServ.filasDetalle.controls, detalle => detalle.value.key == articulo_devuelto.key_initial);
         if (fun.hasValue(articulo_origin)) {
-          const articulo_origin_index = _.findIndex(this.factServ.filasDetalle, articulo_origin);
+          const articulo_origin_index = _.findIndex(this.factServ.filasDetalle.controls, articulo_origin);
 
           const FormGroup_origin = articulo_origin as FormGroup;
           const detalle_origin = {};
@@ -1057,8 +1057,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   retirarArticuloPreFactura(key, data_remover) {
-    const current_detalle = _.find(this.factServ.filasDetalle, detalle => detalle.value.key == key);
-    const index_current_detalle = _.findIndex(this.factServ.filasDetalle, detalle => detalle.value.key == key);
+          const current_detalle = _.find(this.factServ.filasDetalle.controls, detalle => detalle.value.key == key);
+      const index_current_detalle = _.findIndex(this.factServ.filasDetalle.controls, detalle => detalle.value.key == key);
 
     const origin_current_detalle = fun.deepCloning(current_detalle.value);
 
@@ -1084,7 +1084,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (data_remover.cantidad <= origin_current_detalle.cantidad) {
         if (data_remover.razon == razon_remover.producto_defectuoso) {
           const articulo_ya_retirado = _.find(detalles_llenos, detalle => detalle.key_initial == current_detalle.value.key);
-          const articulo_retirado_index = fun.hasValue(articulo_ya_retirado) ? _.findIndex(this.factServ.filasDetalle, detalle => detalle.value.key == articulo_ya_retirado.key) : null;
+          const articulo_retirado_index = fun.hasValue(articulo_ya_retirado) ? _.findIndex(this.factServ.filasDetalle.controls, detalle => detalle.value.key == articulo_ya_retirado.key) : null;
 
           const producto_defectuoso = this.parsearProductoDevueltos(origin_current_detalle, data_remover, true);
 
@@ -1170,7 +1170,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   private modificarProductoDefectuoso(producto: any, articulo_ya_retirado: any): void {
-    const formGroup = this.factServ.filasDetalle[articulo_ya_retirado.index] as FormGroup;
+    const formGroup = this.factServ.filasDetalle.at(articulo_ya_retirado.index) as FormGroup;
 
     const detalle = {
       cantidad: producto.cantidad + articulo_ya_retirado.data.cantidad,
