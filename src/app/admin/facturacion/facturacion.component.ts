@@ -1583,36 +1583,47 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   selectModoFactura(arg) {
-    this.is_viaje = false;
-    this.is_adelantada = false;
+    // Resetear estados de modo de factura
+    this.is_viaje = arg === 'viaje';
+    this.is_adelantada = arg === 'adelantada';
     this.movimientosSelected = [];
 
-    if (arg === 'viaje') this.is_viaje = true;
-    else if (arg === 'adelantada') this.is_adelantada = true;
+    // Actualizar valores de retirado según el modo de factura
+    const isAdelantada = this.modo_factura === 'adelantada';
+    const valorRetirado = isAdelantada ? 0 : undefined;
+
+    this.cuerpoFactura.forEach(detalle => {
+      detalle.retirado = valorRetirado ?? detalle.cantidad_en_unidades;
+      detalle.retirado_en_venta = valorRetirado ?? detalle.cantidad_en_unidades;
+    });
   }
 
   getCantidadArticulos() {
-    const articulos_a_vender = _.filter(this.cuerpoFactura, factura => fun.hasValue(factura.cantidad));
-    return articulos_a_vender.length;
+    return this.cuerpoFactura.filter(factura => fun.hasValue(factura.cantidad))?.length ?? 0;
   }
 
   // =============================================
   //  OBTENER LA DATA DEL CUERPO
   // =============================================
   getCuerpoFactura(arg) {
-    if (arg.tipo == 'cuerpo') {
-      this.cuerpoFactura = arg.data;
+    if (arg.tipo !== 'cuerpo') return;
 
-      if (this.factServ.tipoDocumento() != tipoDocFacturacion.compra) {
-        this.cuerpoFactura.map(detalle => {
-          detalle.itbis = this.configApp.calcular_itbis ? fun.desformatearStNumber(detalle.itbis) : 0;
-          detalle.retirado = this.modo_factura === 'adelantada' ? 0 : detalle.cantidad_en_unidades;
-          detalle.retirado_en_venta = this.modo_factura === 'adelantada' ? 0 : detalle.cantidad_en_unidades;
+    this.cuerpoFactura = arg.data;
 
-          return detalle;
-        });
-      }
-    }
+    // Solo procesar si no es compra
+    if (this.factServ.tipoDocumento() === tipoDocFacturacion.compra) return;
+
+    const isAdelantada = this.modo_factura === 'adelantada';
+    const valorRetirado = isAdelantada ? 0 : undefined;
+
+    this.cuerpoFactura.forEach(detalle => {
+      // Calcular ITBIS
+      detalle.itbis = this.configApp.calcular_itbis ? fun.desformatearStNumber(detalle.itbis) : 0;
+
+      // Configurar valores de retirado
+      detalle.retirado = valorRetirado ?? detalle.cantidad_en_unidades;
+      detalle.retirado_en_venta = valorRetirado ?? detalle.cantidad_en_unidades;
+    });
   }
 
   prueba(arg?) {}
@@ -1862,6 +1873,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       let res;
 
       let documento = this.getDocumentoDescripcion();
+
       if (this.factServ.action == actionFacturacion.update) res = await this.facturaClass.updateOne(cabecera_fact, { afterPath: `custom/update/${this.id_documento}` });
       else res = await this.facturaClass.createOne(cabecera_fact);
 
