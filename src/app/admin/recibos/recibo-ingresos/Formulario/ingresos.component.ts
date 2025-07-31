@@ -690,8 +690,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       propietarioModalConf.id = 'buscarCliente';
       propietarioModalConf.inputs = { metodo: 'venta', palabra_a_buscar: nombre };
       propietarioModalConf.header = 'BUSCAR CLIENTE';
-      propietarioModalConf.width = '56.25rem';
-      propietarioModalConf.height = '31.25rem';
+      propietarioModalConf.width = '57rem';
+      propietarioModalConf.height = '32rem';
       propietarioModalConf.component = BuscarClienteSuplidorComponent;
       propietarioModalConf.closableEsc = true;
       propietarioModalConf.setCallback(this.processPropietarioModal.bind(this));

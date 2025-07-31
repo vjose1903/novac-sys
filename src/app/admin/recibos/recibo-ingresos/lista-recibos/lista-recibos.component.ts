@@ -182,7 +182,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         reciboModalConf.id = 'revision_recibo';
         reciboModalConf.inputs = obj_pdf;
         reciboModalConf.header = 'Revisión de recibo de ingreso';
-        reciboModalConf.width = '56.25rem';
+        reciboModalConf.width = '57rem';
         reciboModalConf.height = '40rem';
         reciboModalConf.component = PdfViewerComponent;
         reciboModalConf.closableEsc = true;

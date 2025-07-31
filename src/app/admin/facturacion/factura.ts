@@ -387,7 +387,7 @@ export class FacturaC extends CrudG<FacturasI> {
           viewPdfModalConf.id = 'pdfViewer-modal';
           viewPdfModalConf.inputs = inputs;
           viewPdfModalConf.header = dataModal.header;
-          viewPdfModalConf.width = '56.25rem';
+          viewPdfModalConf.width = '57rem';
           viewPdfModalConf.height = '70vh';
           viewPdfModalConf.component = PdfViewerComponent;
           viewPdfModalConf.closableEsc = true;

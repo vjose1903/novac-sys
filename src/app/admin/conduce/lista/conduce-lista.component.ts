@@ -176,7 +176,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         reciboModalConf.id = 'revision_conduce';
         reciboModalConf.inputs = obj_pdf;
         reciboModalConf.header = 'Revisión de conduce de mercancías';
-        reciboModalConf.width = '56.25rem';
+        reciboModalConf.width = '57rem';
         reciboModalConf.height = '40rem';
         reciboModalConf.component = PdfViewerComponent;
         reciboModalConf.closableEsc = true;

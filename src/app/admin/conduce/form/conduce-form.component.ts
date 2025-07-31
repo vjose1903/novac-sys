@@ -9,7 +9,7 @@ import { FacturaC, request_factura_campo } from '../../facturacion/factura';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { BuscarArticuloComponent } from '@components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
-import { ModalSeleccinarArticuloComponent } from '@components/formularios en modales/modal-seleccinar-articulo/modal-seleccinar-articulo.component';
+import { ModalSeleccionarArticuloComponent } from '@components/formularios en modales/modal-seleccionar-articulo/modal-seleccionar-articulo.component';
 import { fun } from '@core/services/functions.service';
 import { ModalService } from '@components/modal/modal.service';
 import { Permisos } from '@core/typescript/permisos';
@@ -156,12 +156,12 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     await this.checkFacturasAdelantadasSelection();
   }
 
-    async reajustarExcedentes(conteo = 0) {
+  async reajustarExcedentes(conteo = 0) {
     const filas_ocupadas = this.filasDetalle.controls.filter(item => fun.hasValue(item.value.articulo));
 
     this.checkCantidadExede(conteo, 'proceso_quitar_articulo', excede => {
       if (excede) this.rowsExcede.push(conteo);
-              else if (this.rowsExcede.includes(conteo) && !excede) fun.pull(this.rowsExcede, conteo);
+      else if (this.rowsExcede.includes(conteo) && !excede) fun.pull(this.rowsExcede, conteo);
 
       conteo++;
       if (conteo < filas_ocupadas.length) this.reajustarExcedentes(conteo);
@@ -183,53 +183,51 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     });
   }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'buscar_articulo') {
-      if (arg?.tipo == 'data_no_found') {
-        fun.enfocarAndSelectInput(`cod-${arg.index}`);
-      } else {
-        this.llenarRowDespuesDeFiltro(arg);
-      }
-    }
-
-    if (arg.modal_id === 'seleccionar_articulos_adelantados') {
-      this.ajustarSecuencia();
-      this.llenarConduce(arg.data).then(res => {
-        this.checkFacturasAdelantadasSelection();
-      });
-    }
-  }
-
-  async saltar(input, index) {
+  async saltar(next_input, index) {
     fun.setTimeout(() => {
       const fila_actual = this.filasDetalle.at(index).getRawValue();
       const fila_siguiente = this.filasDetalle.at(index + 1).getRawValue();
 
       const { articulo, cod, can, uni, detalle_factura_id } = fila_actual;
 
-      if (index >= 10 && input == 'can-') this.addItem(index);
+      if (index >= 10 && next_input == 'can-') this.addItem(index);
 
       let campo_siguiente = fun.hasValue(fila_siguiente['detalle_factura_id']) ? `can-${index + 1}` : this.inputSecuencia;
 
-      if (input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) {
+      if (next_input == 'uni-' && fun.hasValue(can) && can != 0 && fun.hasValue(cod)) {
         const campo = fun.hasValue(detalle_factura_id) ? campo_siguiente : `uni-${index}`;
         fun.enfocarInput(campo);
       }
 
-      if (input == 'can-' && fun.hasValue(cod)) {
+      if (next_input == 'can-' && fun.hasValue(cod)) {
         if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
           const obj = { palabra_a_buscar: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
 
-          this.openNewModal({
-            component: BuscarArticuloComponent,
-            inputs: obj,
-            id: 'buscar_articulo',
-            header: 'BUSCAR ARTICULO',
-            width: '56.25rem',
-            height: '31.25rem',
-            botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          });
-          fun.enfocarInput('input_fantasma');
+          const buscarArticuloModalConf = new DynamicModalClass();
+
+          buscarArticuloModalConf.id = 'buscarArticulo';
+          buscarArticuloModalConf.inputs = obj;
+          buscarArticuloModalConf.header = 'BUSCAR ARTICULO';
+          buscarArticuloModalConf.width = '57rem';
+          buscarArticuloModalConf.height = '32rem';
+          buscarArticuloModalConf.component = BuscarArticuloComponent;
+          buscarArticuloModalConf.closableEsc = true;
+
+          buscarArticuloModalConf.setCallback((args: ICallbackModal) => this.llenarRowDespuesDeFiltro(args));
+          buscarArticuloModalConf.show();
+
+          setTimeout(() => fun.enfocarInput('input_fantasma'), 10);
+
+          // this.openNewModal({
+          //   component: BuscarArticuloComponent,
+          //   inputs: obj,
+          //   id: 'buscar_articulo',
+          //   header: 'BUSCAR ARTICULO',
+          //   width: '57rem',
+          //   height: '32rem',
+          //   botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+          // });
+          // fun.enfocarInput('input_fantasma');
         } else {
           fun.enfocarInput(`can-${index}`);
         }
@@ -237,10 +235,19 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     }, 250);
   }
 
-  llenarRowDespuesDeFiltro(obj) {
-    const articulo = obj.data;
+  llenarRowDespuesDeFiltro(args: ICallbackModal | { data: any }, fromModal: boolean = true) {
+    if (fromModal && (args as ICallbackModal).type == modalCloseType.onHide) return;
 
-    const index = obj.index;
+    const { articulo, index, tipo } = args.data;
+
+    console.log('  ');
+    console.log('args ', args);
+    console.log('tipo ', tipo);
+
+    if (fun.hasValue(tipo) && tipo == 'data_no_found') {
+      fun.enfocarAndSelectInput(`cod-${index}`);
+      return;
+    }
 
     if (articulo.existencia == 0) {
       let msg = 'Producto agotado, debe de comprar mas!!!';
@@ -270,14 +277,14 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       fun.toastWarning(msg, 'AVISO');
     }
 
-          (this.filasDetalle.at(params.index) as any).controls['articulo'].setValue(params.articulo);
-      (this.filasDetalle.at(params.index) as any).controls['unidades'].setValue(this.llenarArrayUnidades(params.articulo));
-      (this.filasDetalle.at(params.index) as any).controls['cod'].setValue(params.articulo.codigo);
-      (this.filasDetalle.at(params.index) as any).controls['des'].setValue(params.articulo.nombre);
-      (this.filasDetalle.at(params.index) as any).controls['can'].setValue(null);
-      (this.filasDetalle.at(params.index) as any).controls['can_ant'].setValue(null);
-      (this.filasDetalle.at(params.index) as any).controls['uni'].setValue(null);
-      (this.filasDetalle.at(params.index) as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
+    (this.filasDetalle.at(params.index) as any).controls['articulo'].setValue(params.articulo);
+    (this.filasDetalle.at(params.index) as any).controls['unidades'].setValue(this.llenarArrayUnidades(params.articulo));
+    (this.filasDetalle.at(params.index) as any).controls['cod'].setValue(params.articulo.codigo);
+    (this.filasDetalle.at(params.index) as any).controls['des'].setValue(params.articulo.nombre);
+    (this.filasDetalle.at(params.index) as any).controls['can'].setValue(null);
+    (this.filasDetalle.at(params.index) as any).controls['can_ant'].setValue(null);
+    (this.filasDetalle.at(params.index) as any).controls['uni'].setValue(null);
+    (this.filasDetalle.at(params.index) as any).controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
 
     fun.setTimeout(() => fun.enfocarInput('can-' + params.index), 0);
   }
@@ -302,9 +309,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         });
       }
 
-      unidadesArticulo = unidadesArticulo.filter((item, index, self) => 
-        index === self.findIndex(t => fun.isEqual(t, item))
-      );
+      unidadesArticulo = unidadesArticulo.filter((item, index, self) => index === self.findIndex(t => fun.isEqual(t, item)));
     }
 
     return unidadesArticulo;
@@ -345,7 +350,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   checkCodigo(index) {
-          const formulario = this.filasDetalle.at(index).getRawValue();
+    const formulario = this.filasDetalle.at(index).getRawValue();
 
     if (fun.hasValue(formulario.cod) && fun.is_number(formulario.cod)) this.minCodigo = 5;
     else this.minCodigo = undefined;
@@ -362,8 +367,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       propietarioModalConf.id = 'buscarCliente';
       propietarioModalConf.inputs = { metodo: 'venta', palabra_a_buscar: nombre };
       propietarioModalConf.header = 'BUSCAR CLIENTE';
-      propietarioModalConf.width = '56.25rem';
-      propietarioModalConf.height = '31.25rem';
+      propietarioModalConf.width = '57rem';
+      propietarioModalConf.height = '32rem';
       propietarioModalConf.component = BuscarClienteSuplidorComponent;
       propietarioModalConf.closableEsc = true;
       propietarioModalConf.setCallback(this.processPropietarioModal.bind(this));
@@ -398,13 +403,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   async checkCantidadExede(index, lugar, callback = arg => {}) {
     let cantidad = 0;
     this.calcularCantidadEnUnidades({ index });
-          const fila_actual = this.filasDetalle.at(index).getRawValue();
+    const fila_actual = this.filasDetalle.at(index).getRawValue();
     const articulo = fila_actual['articulo'];
 
     if (fun.hasValue(articulo)) {
-      const rowsIgual = this.filasDetalle
-        .filter(item => item.controls.articulo?.value?.id == articulo.id)
-        .map(item => item.value);
+      const rowsIgual = this.filasDetalle.controls.filter(item => item.controls.articulo?.value?.id == articulo.id).map(item => item.value);
 
       cantidad = rowsIgual.reduce((acumulado, item) => acumulado + item.cantidad_en_unidades, 0);
 
@@ -426,8 +429,8 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
               fun.setTimeout(() => {
                 fun.enfocarAndSelectInput('can-' + index);
                 this.calcularCantidadEnUnidades({ index: index, clean: true });
-                        (this.filasDetalle.at(index) as any).controls['uni'].setValue(null);
-        (this.filasDetalle.at(index) as any).controls['can_ant'].setValue(null);
+                (this.filasDetalle.at(index) as any).controls['uni'].setValue(null);
+                (this.filasDetalle.at(index) as any).controls['can_ant'].setValue(null);
               }, 250);
               callback(true);
             }
@@ -605,7 +608,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       });
 
       const almenos_uno = item.detalle_facturas.some(detalle => detalle.select);
-              const todos = item.detalle_facturas.every(detalle => detalle.select);
+      const todos = item.detalle_facturas.every(detalle => detalle.select);
 
       item.detalles_selected = todos ? 'fas fa-check' : almenos_uno ? 'far fa-check-square' : 'far fa-square';
       return item;
@@ -613,71 +616,90 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   tableClickRow(event) {
-    this.seleccionarFactruaAdelantada(event.data);
+    this.seleccionarFacturaAdelantada(event.data);
   }
 
-  async seleccionarFactruaAdelantada(factura) {
-    if (factura) {
+  async seleccionarFacturaAdelantada(factura) {
+    if (!factura) return;
+
+    this.checkFacturasAdelantadasSelection();
+
+    const abreviaturas = {
+      Caja: 'Caj.',
+      Unidad: 'Uni.',
+      Paquetes: 'Paq.',
+      Libra: 'Lbs.',
+      Quintal: 'Qtl.',
+      Saco: 'Saco',
+      Galon: 'Gal.',
+      Onza: 'Oz.',
+      Producto: 'Prod.',
+      Bolsa: 'Bol.',
+    };
+
+    const procesarDetalle = detalle => {
+      const contenidos_format = this.formatContenidos(detalle.contenidos);
+      const retirado = detalle.retirado;
+      const restante = detalle.cantidad_en_unidades - retirado;
+
+      console.log('contenidos_format ', contenidos_format);
+
+      const calcularMedida = cantidad => {
+        const contenidoSelected = contenidos_format.find(cont => cantidad >= Number(cont[1]));
+        if (!contenidoSelected) return null;
+
+        const cantidadCalculada = cantidad / Number(contenidoSelected[1]);
+        return `${cantidadCalculada} ${abreviaturas[contenidoSelected[0]]}`;
+      };
+
+      detalle.retirado_mostrar = calcularMedida(retirado);
+      detalle.restante_mostrar = calcularMedida(restante);
+      detalle.disable = detalle.articulo_estado ? fun.isEmpty(detalle.restante_mostrar) : true;
+    };
+
+    // Procesar todos los detalles
+    factura.detalle_facturas.forEach(procesarDetalle);
+
+    // Mostrar modal después de procesar todos los detalles
+    fun.setTimeout(() => {
+      const facturaAdelantadaModalConf = new DynamicModalClass();
+
+      facturaAdelantadaModalConf.id = 'buscarCliente';
+      facturaAdelantadaModalConf.inputs = { data: factura.detalle_facturas };
+      facturaAdelantadaModalConf.header = 'Seleccionar articulos desde factura adelantada';
+      facturaAdelantadaModalConf.width = '57rem';
+      facturaAdelantadaModalConf.height = '32rem';
+      facturaAdelantadaModalConf.component = ModalSeleccionarArticuloComponent;
+      facturaAdelantadaModalConf.closableEsc = true;
+      facturaAdelantadaModalConf.botones = [
+        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { id: 'btnConfirmar', clase: 'btn btn-verde', label: 'Confirmar', disable: true },
+      ];
+      facturaAdelantadaModalConf.setCallback(this.processFacturaAdelantadaModal.bind(this));
+      facturaAdelantadaModalConf.show();
+    }, 250);
+  }
+
+  processFacturaAdelantadaModal(args: ICallbackModal) {
+    const { data, type } = args as any;
+
+    if (type == modalCloseType.onHide) return;
+
+    const articulos_seleccionados = data.articulos_selected;
+
+    console.log('data ', data);
+    console.log('type ', type);
+
+    this.ajustarSecuencia();
+    this.llenarConduce(articulos_seleccionados).then(res => {
       this.checkFacturasAdelantadasSelection();
-      let conteo = 0;
-
-      factura.detalle_facturas.map(async detalle => {
-        const abreviaturas = { Caja: 'Caj.', Unidad: 'Uni.', Paquetes: 'Paq.', Libra: 'Lbs.', Quintal: 'Qtl.', Saco: 'Saco', Galon: 'Gal.', Onza: 'Oz.', Producto: 'Prod.', Bolsa: 'Bol.' };
-
-        const contenidos_format = this.formatContenidos(detalle.contenidos);
-
-        const arrayMostrar = [
-          { num: detalle.retirado, medida: '' },
-          { num: detalle.cantidad_en_unidades - detalle.retirado, medida: '' },
-        ];
-
-        for (let j = 0; j < arrayMostrar.length; j++) {
-          const element = arrayMostrar[j];
-
-          const contenidoSelected = contenidos_format.find(cont => element.num >= cont[1]);
-
-          const cantidad = contenidoSelected ? element.num / contenidoSelected[1] : null;
-          element.medida = contenidoSelected ? `${cantidad} ${abreviaturas[contenidoSelected[0]]}` : null;
-        }
-
-        detalle.retirado_mostrar = arrayMostrar[0].medida;
-        detalle.restante_mostrar = arrayMostrar[1].medida;
-
-        detalle.disable = detalle.articulo_estado ? fun.isEmpty(detalle.restante_mostrar) : true;
-
-        conteo++;
-        if (conteo >= factura.detalle_facturas.length)
-          fun.setTimeout(() => {
-            this.openNewModal({
-              component: ModalSeleccinarArticuloComponent,
-              inputs: factura.detalle_facturas,
-              id: 'seleccionar_articulos_adelantados',
-              header: 'Confirmar',
-              width: '900px',
-              height: '400px',
-              botones: {
-                ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-                dinamico: [
-                  { clase: 'btn btn-blanco w-9', function: instance => instance.closeModal(instance.id), label: 'No', disable: false },
-                  { btn_id: 'btnConfirmar', clase: 'btn btn-verde w-9', function_in_other_component: 'btn_aceptar', label: 'Si', disable: true },
-                ],
-              },
-            });
-          }, 250);
-
-        return detalle;
-      });
-    }
+    });
   }
 
   formatContenidos(contenidos) {
-    const contenido = [];
-
-    for (var cont in contenidos) {
-              if (!cont.includes('Saco')) contenido.push([cont, contenidos[cont]]);
-    }
-
-    return contenido.sort((a, b) => a[1] + b[1]);
+    return Object.entries(contenidos)
+      .filter(([key]) => !key.includes('Saco'))
+      .sort(([, a], [, b]) => Number(b) - Number(a));
   }
 
   checkIfRowContainArticulo(i) {
@@ -880,21 +902,21 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   resetForm() {
-    for (let i = 0; i < this.filasDetalle.length; i++) {
+    for (let i = 0; i < this.filasDetalle.controls.length; i++) {
       const control = this.filasDetalle.at(i).value;
 
       if (control.des || control.cod) {
-                  (this.filasDetalle.at(i) as any).controls['detalle_factura_id'].setValue(null);
-          (this.filasDetalle.at(i) as any).controls['articulo'].setValue(null);
-          (this.filasDetalle.at(i) as any).controls['cod'].setValue(null);
+        (this.filasDetalle.at(i) as any).controls['detalle_factura_id'].setValue(null);
+        (this.filasDetalle.at(i) as any).controls['articulo'].setValue(null);
+        (this.filasDetalle.at(i) as any).controls['cod'].setValue(null);
 
-          (this.filasDetalle.at(i) as any).controls['des'].setValue(null);
-          (this.filasDetalle.at(i) as any).controls['can'].setValue(null);
-          (this.filasDetalle.at(i) as any).controls['max_can'].setValue(9007199254740991);
-          (this.filasDetalle.at(i) as any).controls['can_original'].setValue(0);
-          (this.filasDetalle.at(i) as any).controls['cantidad_en_unidades'].setValue(null);
-          (this.filasDetalle.at(i) as any).controls['uni'].setValue(null);
-          (this.filasDetalle.at(i) as any).controls['uni'].enable();
+        (this.filasDetalle.at(i) as any).controls['des'].setValue(null);
+        (this.filasDetalle.at(i) as any).controls['can'].setValue(null);
+        (this.filasDetalle.at(i) as any).controls['max_can'].setValue(9007199254740991);
+        (this.filasDetalle.at(i) as any).controls['can_original'].setValue(0);
+        (this.filasDetalle.at(i) as any).controls['cantidad_en_unidades'].setValue(null);
+        (this.filasDetalle.at(i) as any).controls['uni'].setValue(null);
+        (this.filasDetalle.at(i) as any).controls['uni'].enable();
       }
     }
   }

@@ -8,7 +8,7 @@ import { FormCantidadEfectivoComponent } from './form-cantidad-efectivo/form-can
 import { FormReportesComponent } from './form-reportes/form-reportes.component';
 import { FormularioMarcaModeloComponent } from './formulario-marca-modelo/formulario-marca-modelo.component';
 import { ModalHistorialPagosComponent } from './modal-historial-pagos/modal-historial-pagos.component';
-import { ModalSeleccinarArticuloComponent } from './modal-seleccinar-articulo/modal-seleccinar-articulo.component';
+import { ModalSeleccionarArticuloComponent } from './modal-seleccionar-articulo/modal-seleccionar-articulo.component';
 import { MovimientosFormComponent } from './movimientos-form/movimientos-form.component';
 import { PendienteFormComponent } from './pendiente-form/pendiente-form.component';
 import { BuscarClienteSuplidorComponent } from './buscar-cliente-suplidor/buscar-cliente-suplidor.component';
@@ -29,7 +29,7 @@ const components = [
   FormReportesComponent,
   MovimientosFormComponent,
   PendienteFormComponent,
-  ModalSeleccinarArticuloComponent,
+  ModalSeleccionarArticuloComponent,
   BuscarClienteSuplidorComponent,
   BuscarArticuloComponent,
   ConfirmacionImprimirComponent,

@@ -735,8 +735,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     propietarioModalConf.id = 'buscarCliente';
     propietarioModalConf.inputs = { metodo: this.tipo_documento_selected(), include_contado: false, palabra_a_buscar: nombre };
     propietarioModalConf.header = this.tipo_documento_selected() == 'compra' ? 'Buscar Suplidor' : 'Buscar Cliente';
-    propietarioModalConf.width = '56.25rem';
-    propietarioModalConf.height = '31.25rem';
+    propietarioModalConf.width = '57rem';
+    propietarioModalConf.height = '32rem';
     propietarioModalConf.component = BuscarClienteSuplidorComponent;
     propietarioModalConf.closableEsc = true;
     propietarioModalConf.setCallback(this.processPropietarioModal.bind(this));
@@ -821,7 +821,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     //       factura: factura,
     //     };
     //     viewPdfModalConf.header = documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
-    //     viewPdfModalConf.width = '56.25rem';
+    //     viewPdfModalConf.width = '57rem';
     //     viewPdfModalConf.height = '70vh';
     //     viewPdfModalConf.component = PdfViewerComponent;
     //     viewPdfModalConf.closableEsc = true;
