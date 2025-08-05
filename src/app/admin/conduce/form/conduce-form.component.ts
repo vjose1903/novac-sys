@@ -201,7 +201,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
       if (next_input == 'can-' && fun.hasValue(cod)) {
         if (fun.isEmpty(articulo) || cod !== articulo.codigo) {
-          const obj = { palabra_a_buscar: cod, index, metodo: 'venta', data: [], fecha_articulo: this.fechaConduce };
+          const obj = { palabra_a_buscar: cod, index, metodo: 'venta', fecha_articulo: this.fechaConduce };
 
           const buscarArticuloModalConf = new DynamicModalClass();
 
@@ -485,26 +485,30 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    const formGroup = this.filasDetalle.at(params.index) as FormGroup;
-    const { uni: unidad, can: cantidad, unidades } = formGroup.value;
-    const detalles = {};
+    return new Promise<void>(resolve => {
+      const formGroup = this.filasDetalle.at(params.index) as FormGroup;
+      const { uni: unidad, can: cantidad, unidades } = formGroup.value;
 
-    let cantidadMinima = 1;
+      // Calcular cantidad mínima basada en la unidad seleccionada
+      const cantidadMinima = unidad && unidades?.length > 0 ? unidades.find(uni => uni.value.toLowerCase() === unidad.toLowerCase())?.cantidad || 1 : 1;
 
-    if (unidad && unidades.length > 0) {
-      const unidad_find = unidades.find(_uni => _uni.value.toLowerCase() == unidad.toLowerCase());
-      if (unidad_find) cantidadMinima = unidad_find.cantidad;
-    }
+      // Calcular cantidades en unidades
+      const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
 
-    const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
-    detalles['cantidad_en_unidades'] = cant_unidades;
+      // Preparar objeto de detalles a actualizar
+      const detalles = {
+        cantidad_en_unidades: cant_unidades,
+      };
 
-    if (cant_unidades == 0) {
-      detalles['precio'] = null;
-      detalles['total'] = null;
-    }
+      // Limpiar precio y total si no hay unidades
+      if (cant_unidades === 0) {
+        detalles['precio'] = null;
+        detalles['total'] = null;
+      }
 
-    formGroup.patchValue(detalles);
+      formGroup.patchValue(detalles);
+      resolve();
+    });
   }
 
   setInputDrop(index) {
@@ -652,13 +656,15 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
         return `${cantidadCalculada} ${abreviaturas[contenidoSelected[0]]}`;
       };
 
-      detalle.retirado_mostrar = calcularMedida(retirado);
-      detalle.restante_mostrar = calcularMedida(restante);
+      detalle.retirado_mostrar = calcularMedida(retirado) ?? '-';
+      detalle.restante_mostrar = calcularMedida(restante) ?? '-';
       detalle.disable = detalle.articulo_estado ? fun.isEmpty(detalle.restante_mostrar) : true;
     };
 
     // Procesar todos los detalles
     factura.detalle_facturas.forEach(procesarDetalle);
+
+    console.log('factura.detalle_facturas ', factura.detalle_facturas);
 
     // Mostrar modal después de procesar todos los detalles
     fun.setTimeout(() => {
@@ -711,16 +717,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     return res;
   }
 
-  llenarConduce(detalles, conteo = 0, firstResolve = null) {
-    return new Promise(resolve => {
-      firstResolve ??= resolve;
+  async llenarConduce(detalles, conteo = 0) {
+    if (conteo >= detalles.length) return true;
 
-      this.llenarFila(detalles[conteo], this.secuencia).then(res => {
-        conteo++;
-        if (conteo < detalles.length) this.llenarConduce(detalles, conteo, firstResolve);
-        else firstResolve(true);
-      });
-    });
+    await this.llenarFila(detalles[conteo], this.secuencia);
+    return this.llenarConduce(detalles, conteo + 1);
   }
 
   verSiExcede(i) {
@@ -737,56 +738,50 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async llenarFila(element, i) {
-    return new Promise(resolve => {
-      // Calcular cantidades
-      const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
-      const multiplo = element.cantidad_en_unidades / element.cantidad;
-      const cant_actual = cant_en_unidades_actual / multiplo;
+    console.log('element ', element);
 
-      // Obtener artículo filtrado
-      this.articuloClass
-        .getArticulosFiltrado({
-          buscar: element.codigo,
-          fecha: this.fechaConduce,
-        })
-        .then(result => {
-          const articulo = result['data'][0];
+    // Calcular cantidades
+    const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
+    const multiplo = element.cantidad_en_unidades / element.cantidad;
+    const cant_actual = cant_en_unidades_actual / multiplo;
 
-          // Obtener referencia al control de la fila
-          const filaControl = this.filasDetalle.at(i) as any;
+    // Obtener artículo filtrado
+    const result = await this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.fechaConduce });
 
-          // Configurar valores básicos
-          filaControl.controls['detalle_factura_id'].setValue(element.id);
-          filaControl.controls['cod'].setValue(element.codigo);
-          filaControl.controls['des'].setValue(articulo.nombre);
+    const articulo = result['data'][0];
+    const filaControl = this.filasDetalle.at(i) as any;
 
-          // Configurar cantidades
-          filaControl.controls['can'].setValue(cant_actual);
-          filaControl.controls['can_ant'].setValue(cant_actual);
-          filaControl.controls['max_can'].setValue(cant_actual);
-          filaControl.controls['can_original'].setValue(element.cantidad);
-          filaControl.controls['cantidad_en_unidades'].setValue(cant_en_unidades_actual);
+    // Configurar todos los valores de la fila
+    const valoresFila = {
+      detalle_factura_id: element.id,
+      cod: element.codigo,
+      des: articulo.nombre,
+      can: cant_actual,
+      can_ant: cant_actual,
+      max_can: cant_actual,
+      can_original: element.cantidad,
+      cantidad_en_unidades: cant_en_unidades_actual,
+      articulo: articulo,
+      unidades: this.llenarArrayUnidades(articulo),
+      vende_sin_inventario: this.configApp.vende_sin_inventario,
+      uni: element.peso_saco ? `Saco de ${element.peso_saco} libras` : element.unidad,
+    };
 
-          // Configurar artículo y unidades
-          filaControl.controls['articulo'].setValue(articulo);
-          filaControl.controls['unidades'].setValue(this.llenarArrayUnidades(articulo));
-          filaControl.controls['vende_sin_inventario'].setValue(this.configApp.vende_sin_inventario);
-
-          // Configurar unidad
-          const uni = element.peso_saco ? `Saco de ${element.peso_saco} libras` : element.unidad;
-          filaControl.controls['uni'].setValue(uni);
-          filaControl.controls['uni'].disable();
-
-          // Verificar excedentes y ajustar secuencia
-          fun.setTimeout(async () => {
-            this.checkCantidadExede(i, 'llenarFila', res => {
-              if (res) this.rowsExcede.push(i);
-            });
-            this.ajustarSecuencia();
-            resolve(true);
-          }, 100);
-        });
+    // Aplicar valores al control
+    Object.entries(valoresFila).forEach(([key, value]) => {
+      filaControl.controls[key].setValue(value);
     });
+
+    // Deshabilitar campo de unidad
+    filaControl.controls['uni'].disable();
+
+    // Verificar excedentes y ajustar secuencia con delay
+    await new Promise<void>(resolve => fun.setTimeout(() => resolve(), 100));
+
+    this.checkCantidadExede(i, 'llenarFila', res => {
+      if (res) this.rowsExcede.push(i);
+    });
+    this.ajustarSecuencia();
   }
 
   excedeMaxCan(i) {
@@ -796,6 +791,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     const max_can = fila_actual['max_can'];
     const can_original = fila_actual['can_original'];
     const can = fila_actual['can'];
+
     if (detalle_factura_id && can > max_can) {
       if (can_original > max_can) {
         fun.toastError('No puede introducir una cantidad mayor a la cantidad restante de la factura ', 'ERROR');
@@ -884,23 +880,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     return filas_ocupadas.length;
   }
 
-  async sendData() {
-    const cabecera_conduce = {};
-    cabecera_conduce['cliente_id'] = this.cliente.id;
-    cabecera_conduce['numero_conduce'] = '';
-    cabecera_conduce['detalle_conduces'] = this.CuerpoConduce;
-
-    this.conduceClass.createUpdateOne(cabecera_conduce).then(res => {
-      this.conduceClass.parseDataToPdf(res['data']).then(conduce_parsed => {
-        const obj = { data: conduce_parsed, type: 'conduce' };
-
-        this.cancelarConduce();
-        this.goBack();
-        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(err['msg'], 'ERROR'));
-      });
-    });
-  }
-
   resetForm() {
     for (let i = 0; i < this.filasDetalle.controls.length; i++) {
       const control = this.filasDetalle.at(i).value;
@@ -950,5 +929,24 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   goBack() {
     this.router.navigateByUrl('/admin/conduce/lista');
+  }
+
+  async sendData() {
+    const cabecera_conduce = {};
+    cabecera_conduce['cliente_id'] = this.cliente.id;
+    cabecera_conduce['numero_conduce'] = '';
+    cabecera_conduce['detalle_conduces'] = this.CuerpoConduce;
+
+    console.log("cabecera_conduce ", cabecera_conduce);
+    
+    // this.conduceClass.createUpdateOne(cabecera_conduce).then(res => {
+    //   this.conduceClass.parseDataToPdf(res['data']).then(conduce_parsed => {
+    //     const obj = { data: conduce_parsed, type: 'conduce' };
+
+    //     this.cancelarConduce();
+    //     this.goBack();
+    //     PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(err['msg'], 'ERROR'));
+    //   });
+    // });
   }
 }
