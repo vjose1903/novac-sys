@@ -144,7 +144,7 @@
                             [virtualScrollItemSize]="30"
                             (onChange)="selectMedidaChange($event, index_cuerpo)"
                             (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-                            (keyup.enter)="selectMedida(index_cuerpo)"
+                            (keyup.enter)="selectMedida(index_cuerpo); pDropdownMedida.hide()"
                             (onFocus)="showDropdownMedida($event, pDropdownMedida)"
                             (onBlur)="hideDropdownMedida()">
                           </p-select>

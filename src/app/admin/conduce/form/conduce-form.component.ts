@@ -2,10 +2,9 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, UntypedFormArray, FormGroup } from '@angular/forms';
-import * as _ from 'lodash';
 import { ArticuloC } from '@registros/articulos/articulo';
 import { ConduceC } from '../../conduce/coduce';
-import { FacturaC, request_factura_campo } from '../../facturacion/factura';
+import { FacturaC, request_factura_campo, tipoDocFacturacion } from '../../facturacion/factura';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { BuscarArticuloComponent } from '@components/formularios en modales/buscar-articulo/buscar-articulo.component';
 import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
@@ -16,7 +15,6 @@ import { Permisos } from '@core/typescript/permisos';
 import { table_config } from '@components/new_tablas/tabla-class';
 import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { teclasCode } from '@core/typescript/constantes';
-import { ModalClass } from '@components/modal/modal-class';
 import { Router } from '@angular/router';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
@@ -217,32 +215,17 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
           buscarArticuloModalConf.show();
 
           setTimeout(() => fun.enfocarInput('input_fantasma'), 10);
-
-          // this.openNewModal({
-          //   component: BuscarArticuloComponent,
-          //   inputs: obj,
-          //   id: 'buscar_articulo',
-          //   header: 'BUSCAR ARTICULO',
-          //   width: '57rem',
-          //   height: '32rem',
-          //   botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          // });
-          // fun.enfocarInput('input_fantasma');
         } else {
           fun.enfocarInput(`can-${index}`);
         }
       }
-    }, 250);
+    }, 0);
   }
 
   llenarRowDespuesDeFiltro(args: ICallbackModal | { data: any }, fromModal: boolean = true) {
     if (fromModal && (args as ICallbackModal).type == modalCloseType.onHide) return;
 
     const { articulo, index, tipo } = args.data;
-
-    console.log('  ');
-    console.log('args ', args);
-    console.log('tipo ', tipo);
 
     if (fun.hasValue(tipo) && tipo == 'data_no_found') {
       fun.enfocarAndSelectInput(`cod-${index}`);
@@ -337,7 +320,10 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   hideDropdownMedida() {
-    fun.setTimeout(() => this.setInputDrop(undefined), 100);
+    fun.setTimeout(() => {
+      this.setInputDrop(undefined);
+      this.changeStateDropDownMedida(false);
+    }, 100);
   }
 
   showDropdownMedida(event, dropdown) {
@@ -380,8 +366,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
   processPropietarioModal(args: ICallbackModal) {
     const { data, type } = args as any;
-
-    console.log('args ', args);
 
     if (type == modalCloseType.onHide && fun.isEmpty(this.cliente)) {
       fun.enfocarInput('clienteI');
@@ -474,6 +458,9 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async selectMedida(index) {
+    const unidad = (this.filasDetalle.at(index) as any).controls['uni'].getRawValue();
+    if (!unidad) return;
+
     if (this.dropdownMedidaOpen) {
       this.checkCantidadExede(index, 'change', excede => {
         if (!excede)
@@ -487,7 +474,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
     return new Promise<void>(resolve => {
       const formGroup = this.filasDetalle.at(params.index) as FormGroup;
-      const { uni: unidad, can: cantidad, unidades } = formGroup.value;
+      const { uni: unidad, can: cantidad, unidades } = formGroup.getRawValue();
 
       // Calcular cantidad mínima basada en la unidad seleccionada
       const cantidadMinima = unidad && unidades?.length > 0 ? unidades.find(uni => uni.value.toLowerCase() === unidad.toLowerCase())?.cantidad || 1 : 1;
@@ -552,14 +539,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
     this.indexRemove = i;
 
-    this.confirmationModal({
+    this.dynamicModalServ.confirmationModal({
       id: 'removerArticulo',
-      header: 'Confirmar',
-      texto: `Seguro que desea remover el articulo <b class="negrita">${name ?? codigo ?? ''}</b>`,
-      siFunction: instance => {
-        this.procesoQuitarArticulo();
-        instance.closeModal(instance.id, 'removerArticulo');
-      },
+      texto: `¿Seguro que desea remover el articulo <b class="negrita">${name ?? codigo ?? ''}</b>?`,
+      btnKind: confirmationButtons.siNo,
+      onYes: () => this.procesoQuitarArticulo(),
     });
 
     if (e) e.stopPropagation();
@@ -646,8 +630,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       const retirado = detalle.retirado;
       const restante = detalle.cantidad_en_unidades - retirado;
 
-      console.log('contenidos_format ', contenidos_format);
-
       const calcularMedida = cantidad => {
         const contenidoSelected = contenidos_format.find(cont => cantidad >= Number(cont[1]));
         if (!contenidoSelected) return null;
@@ -663,8 +645,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
     // Procesar todos los detalles
     factura.detalle_facturas.forEach(procesarDetalle);
-
-    console.log('factura.detalle_facturas ', factura.detalle_facturas);
 
     // Mostrar modal después de procesar todos los detalles
     fun.setTimeout(() => {
@@ -692,9 +672,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     if (type == modalCloseType.onHide) return;
 
     const articulos_seleccionados = data.articulos_selected;
-
-    console.log('data ', data);
-    console.log('type ', type);
 
     this.ajustarSecuencia();
     this.llenarConduce(articulos_seleccionados).then(res => {
@@ -738,8 +715,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   async llenarFila(element, i) {
-    console.log('element ', element);
-
     // Calcular cantidades
     const cant_en_unidades_actual = element.cantidad_en_unidades - element.retirado;
     const multiplo = element.cantidad_en_unidades / element.cantidad;
@@ -823,7 +798,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       fun.enfocarInput('cod-1');
     } else {
       this.parseCuerpoConduce();
-      const obj = { modo_factura: 'conduce', condicion_fact: 'conduce', metodo: 'conduce', is_viaje: false };
+      const obj = { modo_factura: tipoDocFacturacion.conduce, condicion_fact: tipoDocFacturacion.conduce, metodo: tipoDocFacturacion.conduce, is_viaje: false };
 
       const confirmationImprimirModalConf = new DynamicModalClass();
 
@@ -937,16 +912,14 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     cabecera_conduce['numero_conduce'] = '';
     cabecera_conduce['detalle_conduces'] = this.CuerpoConduce;
 
-    console.log("cabecera_conduce ", cabecera_conduce);
-    
-    // this.conduceClass.createUpdateOne(cabecera_conduce).then(res => {
-    //   this.conduceClass.parseDataToPdf(res['data']).then(conduce_parsed => {
-    //     const obj = { data: conduce_parsed, type: 'conduce' };
+    this.conduceClass.createUpdateOne(cabecera_conduce).then(res => {
+      this.conduceClass.parseDataToPdf(res['data']).then(conduce_parsed => {
+        const obj = { data: conduce_parsed, type: tipoDocFacturacion.conduce };
 
-    //     this.cancelarConduce();
-    //     this.goBack();
-    //     PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(err['msg'], 'ERROR'));
-    //   });
-    // });
+        this.cancelarConduce();
+        this.goBack();
+        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(err['msg'], 'ERROR'));
+      });
+    });
   }
 }

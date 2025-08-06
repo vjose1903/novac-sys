@@ -13,7 +13,6 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 
-
 @Component({
   selector: 'app-registro-suplidores',
   templateUrl: './registro-suplidores.component.html',
@@ -88,8 +87,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     this.nesesarioStart();
   }
-
-
 
   ngOnDestroy(): void {
     this._destroy_mixin();
@@ -310,9 +307,13 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         else this.form.controls.cedula.setValue(doc.documento);
       });
 
-      const doc_principal = _.find(documentos, doc => doc.principal);
+      const doc_principal = documentos.find(doc => doc.principal);
 
       fun.setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
+    } else {
+      ['rnc', 'cedula'].forEach(docType => {
+        this.form.controls[docType].setValue(null);
+      });
     }
   }
 

@@ -39,9 +39,13 @@
                                 inputId="cedula"
                                 placeholder="___-_______-_"
                                 formControlName="cedula"
-                                [autoClear]="false"></p-inputMask>
+                                [autoClear]="false">
+                              </p-inputMask>
+
                               <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                                <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                                <span class="input-group-text sufijo">
+                                  <i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i>
+                                </span>
                               </div>
                             </div>
                             <span id="msgContainer_cedula"></span>
@@ -59,9 +63,12 @@
                                 inputId="rnc"
                                 placeholder="___-_____-_"
                                 formControlName="rnc"
-                                [autoClear]="false"></p-inputMask>
+                                [autoClear]="false">
+                              </p-inputMask>
                               <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                                <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                                <span class="input-group-text sufijo">
+                                  <i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i>
+                                </span>
                               </div>
                             </div>
                             <span id="msgContainer_rnc"></span>
@@ -140,7 +147,7 @@
                   <div class="col-6 p-0 pe-2">
                     <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
                       <label class="control-label">Vendedor: <span style="color: red">*</span></label>
-                      <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
+                      <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('provincia_select')">
                         <option [value]="null" disabled>Seleccione</option>
                         @for (item of vendedores; track item.id) {
                           <option value="{{ item.id }}">{{ item.nombre_completo }}</option>
@@ -157,6 +164,7 @@
                           <label class="control-label">Provincia: <span style="color: red">*</span></label>
                           @if (provincias.value() !== undefined) {
                             <p-select
+                              #pSelectProvincia
                               inputId="provincia_select"
                               [options]="provincias.value()"
                               formControlName="provincia_id"
@@ -167,7 +175,10 @@
                               optionLabel="nombre"
                               optionValue="id"
                               emptyFilterMessage="Marca no encontrada"
-                              (onChange)="form.controls.municipio_id.setValue(null);"
+                              (onChange)="form.controls.municipio_id.setValue(null)"
+                              (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                              (keyup.enter)="saltar('municipio_select'); pSelectProvincia.hide()"
+                              (onFocus)="htmlServ.showPSelectPanel($event, pSelectProvincia)"
                               [resetFilterOnHide]="true" />
                           }
                         </div>
@@ -177,6 +188,7 @@
                           <label class="control-label">Municipio: <span style="color: red">*</span></label>
                           <div class="w-100" [pTooltip]="fun.hasValue(this.documento_identidad()) ? (fun.isEmpty(provincia_id()) ? 'Debe de seleccionar una provincia primero' : null) : null">
                             <p-select
+                              #pSelectMunicipio
                               inputId="municipio_select"
                               [options]="municipios()"
                               formControlName="municipio_id"
@@ -187,6 +199,9 @@
                               optionValue="id"
                               appendTo="body"
                               emptyFilterMessage="Municipio no encontrado"
+                              (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                              (keyup.enter)="saltar('campoDir'); pSelectMunicipio.hide()"
+                              (onFocus)="htmlServ.showPSelectPanel($event, pSelectMunicipio)"
                               [resetFilterOnHide]="true" />
                           </div>
                         </div>

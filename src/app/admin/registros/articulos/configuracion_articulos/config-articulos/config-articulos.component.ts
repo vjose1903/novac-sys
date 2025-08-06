@@ -3,8 +3,10 @@ import { fun } from '@core/services/functions.service';
 import { ModalI } from '@components/modal/modal-class';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { ConfigArticuloC } from '../articulos_configuracion';
+import { ConfigArticuloC, ConfigArticuloI } from '../articulos_configuracion';
 import { Ss } from '@core/services/singleton.service';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-config-articulos',
@@ -12,10 +14,13 @@ import { Ss } from '@core/services/singleton.service';
   styleUrls: ['./config-articulos.component.scss'],
   standalone: false,
 })
-export class ConfigArticulosComponent implements OnInit, ModalI {
+export class ConfigArticulosComponent implements OnInit, IDynamicModal {
   form: UntypedFormGroup;
-  @Input() modalWrapper: any = {};
-  inputs: any;
+  @Input() modalConfig: IModalConfiguration;
+  @Input() modalWrapper: DynamicModalComponent;
+
+  @Input() config_articulos: ConfigArticuloI;
+
   update_articulos = true;
   configArticuloClass = new ConfigArticuloC();
 
@@ -23,7 +28,7 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
   constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
-    this.createForm(this.inputs.cofig_articulos).then(() => {
+    this.createForm(this.config_articulos).then(() => {
       this.form.valueChanges.subscribe(res => {
         this.disableBtnConfirm(!this.form.valid);
       });
@@ -46,20 +51,16 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modalWrapper.instance.modalsConfig.find(modal => modal.id == this.modalWrapper.component_id);
-    const btn = modal.botones.dinamico.find(boton => boton.btn_id == 'btnConfirmar');
-
+    const btn = this.modalConfig.botones.find(boton => boton.id == 'btnConfirmar');
     btn.disable = validate;
   }
 
-  btn_aceptar() {
+  submit() {
     const formulario = this.form.getRawValue();
     this.configArticuloClass
       .updateOne(formulario, { parameters: { update_articulos: this.update_articulos } })
       .then(res => {
-        const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id == this.modalWrapper.component_id);
-        modal.closeModal(this.modalWrapper.component_id);
-        modal.returnDataFromModal({ data: { ...res.data }, modal_id: this.modalWrapper.component_id });
+        this.modalConfig.close({ ...res.data, update_articulos: this.update_articulos });
       })
       .catch(err => console.error(err));
   }

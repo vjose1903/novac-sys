@@ -91,6 +91,7 @@ export enum tipoDocFacturacion {
   cotizacion = 'cotizacion',
   nota_credito = 'nota_credito',
   nota_debito = 'nota_debito',
+  conduce = 'conduce',
 }
 
 export enum tipoDocFacturacionLabel {

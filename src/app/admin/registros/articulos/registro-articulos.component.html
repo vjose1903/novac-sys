@@ -92,7 +92,7 @@
                     <div class="col-6 pe-0">
                       <div class="form-group">
                         <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                        <select formControlName="vendido_en" (keydown.enter)="saltar('cantidad_formula', -1)" id="vendido" class="form-control" value="">
+                        <select formControlName="vendido_en" (keydown.enter)="saltar('articulo_id', -1)" id="vendido" class="form-control" value="">
                           <option [value]="null" disabled>Tipo</option>
                           @for (item of vendidoEn; track item) {
                             <option value="{{ item.backend }}">{{ item.front }}</option>
@@ -276,7 +276,7 @@
                                 <div class="col-5 p-0">
                                   <div class="form-group mb-0">
                                     <p-select
-                                      #dropdown
+                                      #dropdownArticuloCombo
                                       [placeholder]="'Seleccione ingrediente'"
                                       [options]="listaMateriasPrimas"
                                       formControlName="articulo_id"
@@ -285,15 +285,15 @@
                                       [filter]="true"
                                       optionDisabled="optionDisabled"
                                       filterBy="nombre"
-                                      (onHide)="saltar('ingrediente_producir', index_formula)"
-                                      (keydown.enter)="saltar('ingrediente_producir', index_formula)"
-                                      (onChange)="getCosto(index_formula, dropdown)"
                                       styleClass="form-control min"
                                       panelStyleClass="ingredienteDrop"
                                       [virtualScroll]="true"
                                       appendTo="body"
+                                      (onFocus)="htmlServ.showPSelectPanel($event, dropdownArticuloCombo)"
+                                      (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                                      (onChange)="saltar('cantidad_formula', index_formula); getCosto(index_formula, dropdownArticuloCombo); dropdownArticuloCombo.hide()"
                                       [virtualScrollItemSize]="30"
-                                      id="articulo_id-{{ index_formula }}"></p-select>
+                                      inputId="articulo_id-{{ index_formula }}"></p-select>
                                   </div>
                                 </div>
                                 <!-- cantidad -->
@@ -302,7 +302,7 @@
                                     <input
                                       (focus)="htmlServ.selectValue($event)"
                                       type="text"
-                                      (keydown.enter)="saltar('cantidad_formula', index_formula)"
+                                      (keydown.enter)="saltar('articulo_id', index_formula)"
                                       (blur)="calculateCostoPT()"
                                       [id]="'cantidad_formula-' + index_formula"
                                       formControlName="cantidad_formula"

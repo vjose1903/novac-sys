@@ -318,6 +318,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   saltar(campo) {
     const formulario = this.form.getRawValue();
+    console.log('campo ', campo);
 
     if (campo != 'send') {
       if (campo == 'campoNombre') {

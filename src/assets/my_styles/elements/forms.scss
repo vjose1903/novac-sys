@@ -97,9 +97,17 @@ textarea {
   }
 }
 
+.input-group-append {
+  .input-group-text {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    height: 100%;
+  }
+}
+
 .form-group {
   margin-bottom: 0.9rem;
-  
+
   > label {
     color: #1d253b;
   }

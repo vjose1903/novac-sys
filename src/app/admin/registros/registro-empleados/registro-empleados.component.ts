@@ -43,7 +43,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   table_config: table_config = {
     info: [
       { titulo: 'Nombre', tipo: 'text', key: 'nombre_completo' },
-      { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+      { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
       { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
       { titulo: 'Role', tipo: 'textList', key: 'roles', key_value: 'nombre' },
     ],
@@ -95,8 +95,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       ids_roles: [{ value: null, disabled: true }, Validators.required],
     });
   }
-
-
 
   ngOnDestroy(): void {
     this._destroy_mixin();
@@ -301,8 +299,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       if (data.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
     }
 
+    data.sexo = data.sexo ? data.sexo.toUpperCase() : '';
+
     const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map(rol => rol.id) });
     this.form.patchValue(objPerson);
+    console.log('objPerson ', objPerson);
 
     this.empleadoSelected = data;
     this.editando = true;

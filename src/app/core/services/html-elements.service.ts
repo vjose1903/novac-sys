@@ -26,4 +26,12 @@ export class HtmlElementsService {
 
     if (inputElement) inputElement.focus();
   }
+
+  showPSelectPanel(event, dropdown) {
+    if (event.type == 'focus' && !dropdown.overlayVisible) {
+      requestAnimationFrame(() => {
+        dropdown.show();
+      });
+    }
+  }
 }

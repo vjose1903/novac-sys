@@ -6,6 +6,7 @@ import { teclasCode } from '@core/typescript/constantes';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { tipoDocFacturacion } from '@admin/facturacion/factura';
 
 @Component({
   selector: 'app-confirmacion-imprimir',
@@ -32,7 +33,7 @@ export class ConfirmacionImprimirComponent implements OnInit, IDynamicModal {
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
 
-  @Input() metodo: string;
+  @Input() metodo: tipoDocFacturacion;
   @Input() condicion_fact: string;
   @Input() modo_factura: string;
   @Input() is_viaje: boolean;
@@ -46,6 +47,8 @@ export class ConfirmacionImprimirComponent implements OnInit, IDynamicModal {
   get documentoParams() {
     return { metodo: this.metodo, condicion_fact: this.condicion_fact, modo_factura: this.modo_factura, is_viaje: this.is_viaje };
   }
+
+  useEl = [tipoDocFacturacion.conduce];
 
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;

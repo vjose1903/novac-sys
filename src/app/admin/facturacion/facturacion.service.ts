@@ -137,6 +137,8 @@ export class FacturacionService {
       res.tipo = metodo;
     } else if (condicion_fact === 'Crédito') {
       res.descripcion = 'Factura a Crédito';
+    } else if (condicion_fact === 'conduce') {
+      res.descripcion = 'Conduce de mercancía';
     } else if (this.isNotaCreditoOrDebito(metodo)) {
       res.descripcion = metodo === tipoDocFacturacion.nota_credito ? 'Nota de Crédito' : 'Nota de Débito';
     } else if (this.isFacturaConValorFiscal()) {
