@@ -12,6 +12,8 @@ import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -58,13 +60,13 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   tablaComponent;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
-  htmlServ = inject(HtmlElementsService);
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  private route = inject(ActivatedRoute);
+  private tServ = inject(TablasService);
 
-  constructor(
-    private fb: UntypedFormBuilder,
-    private route: ActivatedRoute,
-    private tServ: TablasService
-  ) {
+  constructor() {
     super();
   }
 
@@ -273,18 +275,19 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el suplidor <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        this.suplidorClass.deleteOne(regisData.id).then(res => {
-          const actualPagination = this.tServ.getPaginationById('lista_suplidores');
-          this.getSuplidores(actualPagination);
-        });
-      },
+    const onYes = () => {
+      this.suplidorClass.deleteOne(regisData.id).then(res => {
+        const actualPagination = this.tServ.getPaginationById('lista_suplidores');
+        this.getSuplidores(actualPagination);
+      });
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el suplidor <b>${regisData.nombre_completo}</b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
   }
 
   editarItem(data) {

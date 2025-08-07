@@ -15,6 +15,8 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-registro-empleados',
@@ -60,12 +62,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   formPermissions = [Permisos.user.create, Permisos.user.update];
   maxDateBirth = new Date();
 
-  htmlServ = inject(HtmlElementsService);
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
 
-  constructor(
-    private fb: UntypedFormBuilder,
-    private tServ: TablasService
-  ) {
+  constructor() {
     super();
   }
 
@@ -278,16 +280,17 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el empleado <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('lista_empleados');
-        this.empleadosClass.deleteOne(regisData.id).then(res => this.getEmpleados(actualPagination));
-      },
+    const onYes = () => {
+      const actualPagination = this.tServ.getPaginationById('lista_empleados');
+      this.empleadosClass.deleteOne(regisData.id).then(res => this.getEmpleados(actualPagination));
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el empleado <b>${regisData.nombre_completo}</b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
   }
 
   editarItem(data) {

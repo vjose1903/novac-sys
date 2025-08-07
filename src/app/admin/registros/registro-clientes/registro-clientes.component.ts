@@ -10,6 +10,8 @@ import { ProvinciaC } from '../../../core/typescript/classes/provincia.model';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
@@ -59,8 +61,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   };
   tablaComponent;
 
-  htmlServ = inject(HtmlElementsService);
-
   provincia_id = signal<number | null>(null);
   documento_identidad = signal<string | null>(null);
 
@@ -80,10 +80,12 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     return municipios;
   });
 
-  constructor(
-    private fb: UntypedFormBuilder,
-    private tServ: TablasService
-  ) {
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+
+  constructor() {
     super();
   }
 
@@ -139,8 +141,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       this.documento_identidad.set(val.cedula || val.rnc);
     });
   }
-
-
 
   ngOnDestroy() {
     this._destroy_mixin();
@@ -215,16 +215,17 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('lista_clientes');
-        this.clienteClass.deleteOne(regisData.id).then(res => this.getClientes(actualPagination));
-      },
+    const onYes = () => {
+      const actualPagination = this.tServ.getPaginationById('lista_clientes');
+      this.clienteClass.deleteOne(regisData.id).then(res => this.getClientes(actualPagination));
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
   }
 
   patchDocumentos(documentos) {

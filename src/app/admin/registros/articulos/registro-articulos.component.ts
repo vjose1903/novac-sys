@@ -885,6 +885,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const array = this.ARRAY_FORMULA.value;
     const formulas = [];
     const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' };
+    
     array.forEach(element => {
       const obj = {
         id: fun.hasValue(element.id) ? Number(element.id) : null,
@@ -915,7 +916,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       onYes: onYes.bind(this),
     });
 
-    // this.eliminarRegistro(config);
   }
 
   // =============================================
