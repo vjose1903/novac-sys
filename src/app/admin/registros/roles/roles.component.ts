@@ -7,7 +7,6 @@ import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
-import { ModalClass } from '@components/modal/modal-class';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 

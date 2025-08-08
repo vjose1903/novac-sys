@@ -577,7 +577,9 @@ export class fun {
   static enfocarInput(arg, element?) {
     element ??= document.getElementById(arg) as HTMLElement;
 
-    if (element) element.focus();
+    if (element) {
+      requestAnimationFrame(() => element.focus());
+    }
   }
 
   // __________________________________________________________________________________________________

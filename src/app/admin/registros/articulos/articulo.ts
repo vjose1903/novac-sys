@@ -51,6 +51,7 @@ export interface ArticuloI {
   calcular_saco?: boolean;
   costos?: any;
   stock?: any;
+  [prop: string]: any;
 }
 
 export class ArticuloC extends CrudG<ArticuloI> {

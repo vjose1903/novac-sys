@@ -20,8 +20,8 @@
                     <label class="control-label">Nombre de la empresa: </label>
                     <input
                       onElementReady
-                      [id]="formFieldId.nombre_empresa"
                       (elementReady)="htmlServ.focusInput($event)"
+                      [id]="formFieldId.nombre_empresa"
                       (keydown.enter)="saltar(formFieldId.nombre_empresa)"
                       type="text"
                       [formControlName]="formFieldName.nombre_empresa"

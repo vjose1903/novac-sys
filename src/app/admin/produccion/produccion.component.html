@@ -10,8 +10,10 @@
                 <label class="control-label mt-1 mb-0">Nombre producto: <span style="color: red">*</span></label>
                 <div>
                   <p-select
+                    onElementReady
+                    (elementReady)="enfocarInput('articulo_id')"
                     [placeholder]="'Seleccione producto'"
-                    [options]="listaProductos"
+                    [options]="listaProductos()"
                     [(ngModel)]="producto_terminado_en_turno"
                     optionLabel="nombre"
                     [filter]="true"
@@ -20,10 +22,9 @@
                     (onHide)="saltar('cantidad_producir')"
                     (keydown.enter)="saltar('cantidad_producir')"
                     (onChange)="getIngredients()"
-                    styleClass="form-control min"
-                    [virtualScroll]="true"
-                    [virtualScrollItemSize]="30"
-                    id="articulo_id"></p-select>
+                    class="form-control min"
+                    inputId="articulo_id">
+                  </p-select>
                 </div>
               </div>
             </div>
@@ -75,7 +76,7 @@
               <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
                 @for (ingrediente of ingredientes; track ingrediente.id; let index = $index) {
                   <div class="ingredientesList d-flex">
-                    <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
+                    <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
                     <div style="width: 100%">
                       <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index != 0 ? 'top' : 'bottom'" [escape]="false">
                         {{ lookprincipal(ingrediente) }}
@@ -91,7 +92,7 @@
                 <div id="produccion_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
                   @for (ingrediente of ingredientesParaProduccion; track ingrediente.id; let index_ingrediente = $index) {
                     <div class="ingredientesList d-flex">
-                      <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
+                      <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
                       <div class="" style="width: 100%">
                         <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'" [escape]="false">
                           {{ lookprincipal(ingrediente) }}
@@ -112,7 +113,16 @@
     <div id="cardTabla" class="card card-padding-1 sombra h-100">
       <div #cardTablaProd class="divProducciones">
         <div class="divTabla">
-          <dinamic-table [cardTabla]="cardTablaProd" [seleccionado]="articuloEditando?.id" [(data)]="lista_produccion" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          <dinamic-table
+            onElementReady
+            (elementReady)="tableIsInitialized.set(true)"
+            [cardTabla]="cardTablaProd"
+            [seleccionado]="articuloEditando?.id"
+            [data]="lista_produccion()"
+            (dataChange)="lista_produccion.set($event)"
+            [(TablasComponent)]="tablaComponent"
+            [config]="table_config"
+            (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
       </div>
     </div>
