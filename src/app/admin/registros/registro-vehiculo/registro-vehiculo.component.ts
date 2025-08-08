@@ -242,8 +242,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   eliminarReg(regisData) {
-    console.log(regisData);
-
     const onYes = () => {
       this.vehiculosClass.deleteOne(regisData.id).then(res => {
         fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombre_completo_propietario}` + ' borrado.', 'CORRECTO');
