@@ -128,9 +128,9 @@
     </div>
   </div>
   <div class="col-12 abajo">
-    <div class="d-flex justify-content-end w-100">
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP', 'Seguro de que desea cancelar la produccion.', null)" type="submit" class="btn btn-blanco" value="Cancelar" />
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar', 'Seguro de que desea confirmar la produccion.', null)" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+    <div class="d-flex justify-content-end w-100 gap-3">
+      <button [disabled]="habilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP' )" type="submit" class="btn btn-gray">Cancelar</button>
+      <button [disabled]="habilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar' )" type="submit" class="btn btn-verde">Confirmar</button>
     </div>
   </div>
 </div>

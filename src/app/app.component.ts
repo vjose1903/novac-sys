@@ -42,6 +42,7 @@ import { TipoFacturaI, TiposFacturaC } from '@admin/facturacion/factura';
 import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
 import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
 import { Firestore } from '@angular/fire/firestore';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-root',
@@ -109,9 +110,14 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     },
     [ELECTRON_SHOW_CLOSE_CONFIRMATION]: () => {
       const token = fun.getAuthToken();
+      console.log('token', token);
+
       if (fun.hasValue(token)) {
+        console.log('1');
+
         this.cerrar_app();
       } else {
+        console.log('2');
         this.sendCloseConfirmation();
       }
     },
@@ -294,32 +300,40 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
 
   cerrar_app(): void {
     this.zone.run(() => {
-      this.openNewModal({
-        html: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
+      this.dynamicModalService.confirmationModal({
         id: 'cerrar_app',
         header: 'CONFIRMACIÓN DE CIERRE',
-        width: '40rem',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            {
-              clase: 'btn btn-blanco',
-              function: instance => instance.closeModal(instance.id),
-              label: 'Cancelar',
-              disable: false,
-            },
-            {
-              clase: 'btn btn-danger',
-              function: instance => {
-                this.sendCloseConfirmation();
-                instance.closeModal(instance.id);
-              },
-              label: 'Cerrar',
-              disable: false,
-            },
-          ],
-        },
+        texto: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
+        btnKind: confirmationButtons.cancelarCerrar,
+        onYes: this.sendCloseConfirmation.bind(this),
       });
+
+      // this.openNewModal({
+      //   html: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
+      //   id: 'cerrar_app',
+      //   header: 'CONFIRMACIÓN DE CIERRE',
+      //   width: '40rem',
+      //   botones: {
+      //     ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+      //     dinamico: [
+      //       {
+      //         clase: 'btn btn-blanco',
+      //         function: instance => instance.closeModal(instance.id),
+      //         label: 'Cancelar',
+      //         disable: false,
+      //       },
+      //       {
+      //         clase: 'btn btn-danger',
+      //         function: instance => {
+      //           this.sendCloseConfirmation();
+      //           instance.closeModal(instance.id);
+      //         },
+      //         label: 'Cerrar',
+      //         disable: false,
+      //       },
+      //     ],
+      //   },
+      // });
     });
   }
 

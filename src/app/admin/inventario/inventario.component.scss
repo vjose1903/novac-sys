@@ -5,9 +5,9 @@
 }
 
 .filtroArticulos {
-  height: calc(1em + 0.8rem + 2px);
+  height: 1.9rem;
   max-width: 13rem;
-  padding: 0rem !important;
+  padding: 0rem 0.5rem !important;
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 2;
@@ -42,7 +42,7 @@
         padding-left: 18rem;
 
         > .filtroArticulos {
-          margin-top: 0.6rem;
+          margin-top: 0.5rem;
         }
         > .btnReporte {
           margin: 0.15rem 0.5rem 0rem 0rem;

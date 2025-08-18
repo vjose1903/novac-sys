@@ -96,6 +96,7 @@ export enum confirmationButtons {
   cancelarAnular = 'cancelar-anular',
   cancelarActivar = 'cancelar-activar',
   cancelarAceptar = 'cancelar-aceptar',
+  cancelarCerrar = 'cancelar-cerrar',
   ok = 'ok',
 }
 
@@ -124,7 +125,7 @@ export const confirmBtnConfig: IConfirmBtnConfig = {
     siBtn: { label: 'Si', icon: fontAwesome.faSolid.check, iconColor: 'white', clase: 'btn-green', showProcess: false, id: 'btnSi' },
   },
   [confirmationButtons.siNoCancelar]: {
-    cancelarBtn: { label: 'Cancelar', icon: null, clase: 'btn-grey', showProcess: false, id: 'btnCancelar' },
+    cancelarBtn: { label: 'Cancelar', icon: null, clase: 'btn-gray', showProcess: false, id: 'btnCancelar' },
     noBtn: { label: 'No', icon: fontAwesome.faSolid.x, iconColor: 'black', clase: 'btn-light-grey', showProcess: false, id: 'btnNo' },
     siBtn: { label: 'Si', icon: fontAwesome.faSolid.check, iconColor: 'white', clase: 'btn-green', showProcess: false, id: 'btnSi' },
   },
@@ -151,6 +152,10 @@ export const confirmBtnConfig: IConfirmBtnConfig = {
   [confirmationButtons.cancelarAceptar]: {
     noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Aceptar', icon: fontAwesome.faSolid.check, clase: 'btn-green', showProcess: false, id: 'btnAceptar' },
+  },
+  [confirmationButtons.cancelarCerrar]: {
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Cerrar', icon: fontAwesome.faSolid.check, clase: 'btn-green', showProcess: false, id: 'btnCerrar' },
   },
   [confirmationButtons.cancelarAnular]: {
     noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },

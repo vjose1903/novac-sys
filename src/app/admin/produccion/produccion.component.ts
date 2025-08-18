@@ -191,7 +191,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     return res;
   }
 
-  abilitarBtnConfirmar() {
+  habilitarBtnConfirmar() {
     let res = true;
     if (this.lista_produccion() && this.lista_produccion().length > 0) res = false;
     return res;
@@ -297,7 +297,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   tableClick_action(params) {
     if (params.action == 'update') this.editarItem(params.data);
-    if (params.action == 'delete') this.abrirModalDinamicText('borrar', `Seguro de que desea remover el producto: <b>${params.data.nombre}</b>, de esta producción.`, params.data);
+    if (params.action == 'delete') this.abrirModalDinamicText('borrar', params.data);
   }
 
   editarItem(data) {
@@ -323,7 +323,13 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion().length }]);
   }
 
-  abrirModalDinamicText(tipo, texto_modal, data) {
+  abrirModalDinamicText(tipo, data = null) {
+    const msgConfig = {
+      confirmar: 'Seguro de que desea confirmar la produccion.',
+      borrar: `Seguro de que desea remover el producto: <b>${data?.nombre}</b>, de esta producción.`,
+      cancelarP: 'Seguro de que desea cancelar la produccion.',
+    };
+
     const config = {
       confirmar: {
         buttons: confirmationButtons.cancelarAceptar,
@@ -341,7 +347,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
     this.dynamicModalServ.confirmationModal({
       id: 'cancelar_ingreso',
-      texto: `<p> ${texto_modal} </p>`,
+      texto: `<p> ${msgConfig[tipo]} </p>`,
       btnKind: config[tipo].buttons,
       onYes: config[tipo].function.bind(this, data),
     });
