@@ -15,13 +15,12 @@ import { IModalConfiguration } from '@core/components/dynamic-modal/config/dynam
   standalone: false,
 })
 export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit, IDynamicModal {
-  // TODO: Cambiar a DynamicModalComponent
   form: UntypedFormGroup;
   element: HTMLElement;
   empleadoClass = new EmpleadoC();
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
-  inputs: any;
+  @Input() empleado!: any;
 
   constructor(private fb: UntypedFormBuilder) {
     super();
@@ -33,18 +32,19 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
       confirmPassword: [null, Validators.minLength(6)],
     });
   }
+
   ngAfterViewInit() {
     fun.setTimeout(() => fun.enfocarInput('pass'), 50);
   }
 
-  btn_aceptar() {
+  submit() {
     const objTemp = this.form.value;
 
-    if (objTemp.password === null) {
+    if (fun.isEmpty(objTemp.password)) {
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
-      const ids_roles = this.inputs.roles.map(rol => rol.id);
-      const obj = fun.omit(this.inputs, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documento_identidad', 'nombre_completo', 'roles']);
+      const ids_roles = this.empleado.roles.map(rol => rol.id);
+      const obj = fun.omit(this.empleado, ['', 'uid', 'sign_in_count', 'created_at', 'updated_at', 'documento_identidad', 'nombre_completo', 'roles']);
 
       obj['password'] = objTemp.password;
       obj['ids_roles'] = ids_roles;

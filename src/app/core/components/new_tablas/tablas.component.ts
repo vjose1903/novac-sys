@@ -190,8 +190,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         return this.formatoNumero(value);
 
       case 'date':
-        const fecha = fun.date_formater({ date: value, dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
-        return fecha;
+        return fun.date_formater({ date: value, dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
 
       default:
         return evaluar_value(value);
@@ -290,7 +289,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
           if (actualPagination.is_local) {
-            this.localPagination(page, per_page, 'paginatorChange');
+            this.localPagination(page, per_page);
           } else {
             if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
               this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
@@ -310,11 +309,17 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   reloadPagination() {
-    this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'reloadPagination');
+    this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page);
   }
 
-  localPagination(page, per_page, desde = '') {
+  localPagination(page, per_page) {
     const copyData = fun.deepCloning(this.copyData);
+
+    // Validar que page y per_page sean válidos
+    if (!page || page <= 0 || !per_page || per_page <= 0) {
+      page = this.tServ.obj_paginate.default.page;
+      per_page = this.tServ.obj_paginate.default.per_page;
+    }
 
     const inicio = (page - 1) * per_page;
     const final = inicio + per_page;
@@ -507,7 +512,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.changeTableConfig([{ total_count: data.length }]);
-      this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
+      this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page);
     }
   }
 

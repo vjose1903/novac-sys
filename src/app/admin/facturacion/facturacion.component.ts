@@ -1735,22 +1735,30 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   ingresarFecha() {
-    this.openNewModal({
-      component: PendienteFormComponent,
-      id: 'facturaPendiente',
-      header: 'Factura pendiente',
-      width: '34.375rem',
-    });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.width = '35rem';
+    modalConfig.component = PendienteFormComponent;
+    modalConfig.id = 'facturaPendiente';
+    modalConfig.header = 'Factura pendiente';
+
+    modalConfig.botones = [
+      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+    ];
+
+    modalConfig.setCallback(this.processPendienteForm.bind(this));
+    modalConfig.show();
   }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modal_id === 'facturaPendiente') {
-      this.fechaFactura['front'] = this.formarFechaFactura(arg.fecha)['FechaFactura'];
-      this.fechaFactura['back'] = this.fechaFactura['front'];
-      this.FechaFacturaMostrar = this.formarFechaFactura(arg.fecha)['FechaFacturaMostrar'];
-      this.factura_pendiente = true;
-      //
-    }
+  async processPendienteForm(arg: ICallbackModal) {
+    if (arg.type != modalCloseType.returnData) return;
+
+    const { fecha } = arg.data;
+
+    this.fechaFactura['front'] = this.formarFechaFactura(fecha)['FechaFactura'];
+    this.fechaFactura['back'] = this.fechaFactura['front'];
+    this.FechaFacturaMostrar = this.formarFechaFactura(fecha)['FechaFacturaMostrar'];
+    this.factura_pendiente = true;
   }
 
   async cambiarCostos() {

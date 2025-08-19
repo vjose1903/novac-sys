@@ -11,7 +11,6 @@ import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-mod
   standalone: false,
 })
 export class PendienteFormComponent implements OnInit, IDynamicModal {
-  // TODO: Cambiar a DynamicModalComponent
   time = { hour: 13, minute: 30 };
   hora;
   minutos;
@@ -24,14 +23,6 @@ export class PendienteFormComponent implements OnInit, IDynamicModal {
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
 
-  inputs: any;
-  btn_aceptar() {
-    const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
-    const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
-
-    this.modalConfig.close({ fecha });
-  }
-
   ngOnInit() {
     this.hora = moment().hour();
     this.minutos = moment().minutes();
@@ -43,5 +34,12 @@ export class PendienteFormComponent implements OnInit, IDynamicModal {
 
   toggleMeridian() {
     this.meridian = !this.meridian;
+  }
+
+  submit() {
+    const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
+    const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
+
+    this.modalConfig.close({ fecha });
   }
 }

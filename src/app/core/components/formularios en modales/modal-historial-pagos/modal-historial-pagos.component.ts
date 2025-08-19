@@ -1,7 +1,7 @@
 import { Component, effect, Input, OnInit, signal } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
-import { table_config } from '../../new_tablas/tabla-class';
+import { table_config, tableCellType } from '../../new_tablas/tabla-class';
 import { fun } from '@core/services/functions.service';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
@@ -13,13 +13,12 @@ import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-mo
   standalone: false,
 })
 export class ModalHistorialPagosComponent extends MixinClass implements OnInit, IDynamicModal {
-  // TODO: Cambiar a DynamicModalComponent
   activeIndex = signal(0);
   processingTabChange = true;
 
   table_pagos_config: table_config = {
     info: [
-      { titulo: 'Fecha abono', tipo: 'text', key: 'fecha_equivalente' },
+      { titulo: 'Fecha abono', tipo: tableCellType.date, key: 'fecha_equivalente' },
       { titulo: 'NO. recibo', tipo: 'text', key: 'numero_recibo' },
       { titulo: 'Abonado', tipo: 'formatoNumero', key: 'deposito' },
       { titulo: 'Mora', tipo: 'formatoNumero', key: 'mora' },
@@ -35,7 +34,7 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
       { titulo: 'NO. comprobante', tipo: 'text', key: 'numero_comprobante' },
       { titulo: 'Tipo', tipo: 'text', key: 'tipo_label' },
       { titulo: 'Monto', tipo: 'formatoNumero', key: 'total' },
-      { titulo: 'Fecha nota', tipo: 'text', key: 'fecha_equivalente' },
+      { titulo: 'Fecha nota', tipo: tableCellType.date, key: 'fecha_equivalente' },
     ],
     colores: true,
     id_tabla: 'listado_notas',
@@ -67,20 +66,22 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
   }
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
-  inputs: any;
+  @Input() abonos!: any;
+  @Input() notas!: any;
 
   ngOnInit() {
     this.activeIndex.set(this.arrayHasData('abonos').cant > 0 ? 0 : 1);
     this.processingTabChange = false;
 
-    this.inputs['abonos'] = this.inputs['abonos'].map(abono => {
+    this.abonos = this.abonos.map(abono => {
       abono.total = abono.deposito + abono.mora;
       return abono;
     });
   }
 
   arrayHasData(tipo) {
-    return { disable: this.inputs[tipo].length == 0, cant: this.inputs[tipo].length };
+    const data = tipo == 'abonos' ? this.abonos : this.notas;
+    return { disable: data.length == 0, cant: data.length };
   }
 
   btn_aceptar() {

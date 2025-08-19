@@ -32,7 +32,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   @Input() cliente_id: string;
   @Input() factura_id: string;
 
-  clienteAdepositar: any;
+  clienteAdepositar = signal<any>(null);
   all_facturas = signal<FacturasI[]>([]);
   facturas = [];
   tipo_recibo = 'Pago factura';
@@ -272,7 +272,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     fun.setTimeout(() => {
       if (res.data.page != params.page) {
-        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
+        // Validar que res.data.page sea válido antes de usarlo
+        const pageToSet = res.data.page && res.data.page > 0 ? res.data.page : 1;
+
+        this.tServ.modifyPaginationById('listado_recibos', [{ page: pageToSet }]);
+
         this.tablaComponent.reloadPagination();
       }
     }, 100);
@@ -402,7 +406,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.all_facturas.set([]);
 
     // Resetear variables de estado
-    this.clienteAdepositar = undefined;
+    this.clienteAdepositar.set(null);
     this.debiendo_sin_mora.set(0);
 
     // Limpiar input del cliente
@@ -431,10 +435,10 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
-    if (fun.hasValue(this.clienteAdepositar)) {
+    if (fun.hasValue(this.clienteAdepositar())) {
       const order_by = this.tServ.parseSort(this.table_config);
       params = { ...params, ...order_by };
-      this.pedirFacturasPorCliente(this.clienteAdepositar.id, params);
+      this.pedirFacturasPorCliente(this.clienteAdepositar().id, params);
     } else {
       fun.toastWarning('Debe de seleccionar un cliente para continuar.', 'AVISO');
     }
@@ -704,7 +708,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   processPropietarioModal(args: ICallbackModal) {
     const { data, type, factura_a_buscar = undefined } = args as any;
 
-    if (type == modalCloseType.onHide && fun.isEmpty(this.clienteAdepositar)) {
+    if (type == modalCloseType.onHide && fun.isEmpty(this.clienteAdepositar())) {
       fun.enfocarInput('clienteI');
     }
 
@@ -712,7 +716,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       if (data?.tipo == 'data_no_found') {
         fun.enfocarAndSelectInput('clienteI');
       } else {
-        this.clienteAdepositar = data;
+        this.clienteAdepositar.set(data);
         (document.getElementById('clienteI') as any).value = data.nombre_completo;
         const parameters = { ...this.table_config.obj_paginate, factura_a_buscar: factura_a_buscar };
         this.pedirFacturasPorCliente(data.id, parameters);
@@ -795,7 +799,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   async sendIngreso() {
     const obj = {
-      cliente_id: this.clienteAdepositar.id,
+      cliente_id: this.clienteAdepositar().id,
       bruto: this.detalleYtotal.bruto,
       mora: this.detalleYtotal.mora,
       total: this.detalleYtotal.total_recibo,
@@ -812,7 +816,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       const recibo = res['data'].recibo;
 
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
-      this.pedirFacturasPorCliente(this.clienteAdepositar.id, actualPagination);
+      this.pedirFacturasPorCliente(this.clienteAdepositar().id, actualPagination);
 
       this.resetVariables();
       this.reciboClass.parseDataToPdf(recibo).then(recibo_parsed => {

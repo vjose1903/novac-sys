@@ -836,14 +836,20 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     let obj = { index, key, cantidad, is_prefactura_selected: fun.hasValue(this.factServ.pre_venta_selected), data_detalle: data };
     obj['nombre'] = unidad ? `${descripcion} (${unidad})` : descripcion;
 
-    this.openNewModal({
-      component: RemoverArticuloComponent,
-      inputs: obj,
-      id: 'removerArticulo',
-      header: 'Confirmación',
-      width: obj.is_prefactura_selected ? '40rem' : '30rem',
-      botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
-    });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.width = obj.is_prefactura_selected ? '40rem' : '30rem';
+    modalConfig.component = RemoverArticuloComponent;
+    modalConfig.inputs = obj;
+    modalConfig.id = 'removerArticulo';
+    modalConfig.header = 'Confirmación';
+
+    modalConfig.botones = [
+      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+    ];
+
+    modalConfig.setCallback(this.procesoQuitarArticulo.bind(this));
+    modalConfig.show();
 
     if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();
@@ -1001,10 +1007,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return fun.roundNumberToDecimal(res);
   }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'removerArticulo') this.procesoQuitarArticulo(arg.key, arg.data);
-  }
-
   retornarDevuelto(arg: { key: string; retorno: { solo_devuelto: any; defectuoso: any } }) {
     const infoRetorno = [
       { tipo: 'defectuoso', data: arg.retorno?.defectuoso, contenedor_retorno: this.factServ.filasDetalle.controls },
@@ -1073,9 +1075,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  procesoQuitarArticulo(key, data_remover) {
-    if (this.factServ.pre_venta_selected && data_remover) {
-      this.retirarArticuloPreFactura(key, data_remover);
+  procesoQuitarArticulo(arg: ICallbackModal) {
+    if (arg.type != modalCloseType.returnData) return;
+
+    const { key, data } = arg.data;
+
+    if (this.factServ.pre_venta_selected && data) {
+      this.retirarArticuloPreFactura(key, data);
     } else {
       this.pasosQuitarArticulo(key);
     }

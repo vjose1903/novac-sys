@@ -16,7 +16,8 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
-import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 @Component({
   selector: 'app-registro-empleados',
@@ -306,7 +307,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map(rol => rol.id) });
     this.form.patchValue(objPerson);
-    console.log('objPerson ', objPerson);
 
     this.empleadoSelected = data;
     this.editando = true;
@@ -353,6 +353,18 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   showModal() {
-    this.openNewModal({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.width = '30rem';
+    modalConfig.component = ChangePasswordComponent;
+    modalConfig.inputs = { empleado: fun.deepCloning(this.empleadoSelected) };
+    modalConfig.id = 'changePassword';
+    modalConfig.header = 'Cambiar contraseña';
+
+    modalConfig.botones = [
+      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+    ];
+
+    modalConfig.show();
   }
 }

@@ -13,7 +13,6 @@ import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-mo
   standalone: false,
 })
 export class RemoverArticuloComponent implements OnInit, IDynamicModal {
-  // TODO: Cambiar a DynamicModalComponent
   constructor(private fb: UntypedFormBuilder) {}
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
@@ -45,7 +44,7 @@ export class RemoverArticuloComponent implements OnInit, IDynamicModal {
     if (campo != 'send') {
       fun.enfocarInput(campo);
     } else {
-      this.btn_aceptar();
+      this.submit();
     }
   }
 
@@ -70,7 +69,7 @@ export class RemoverArticuloComponent implements OnInit, IDynamicModal {
     this.form.controls.all.setValue(formulario.cantidad == this.cantidad);
   }
 
-  btn_aceptar() {
+  submit() {
     if (this.form.valid || this.data_detalle.is_defectuoso || !this.is_prefactura_selected) {
       const obj = { key: this.key, data: this.data_detalle };
 

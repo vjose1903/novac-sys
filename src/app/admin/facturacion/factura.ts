@@ -410,25 +410,24 @@ export class FacturaC extends CrudG<FacturasI> {
       for (let i = 0; i < pagos.length; i++) {
         const pago = pagos[i];
         pago.numero_recibo = pago.numero_recibo.toString().padStart(8, '0');
-        pago.fecha_equivalente = DateUtils.format({ date: pago.fecha_equivalente, dateFormat: 'DD/MM/YYYY' });
       }
 
       for (let i = 0; i < notas.length; i++) {
         const nota = notas[i];
         nota.total = Math.abs(nota.total);
-        nota.fecha_equivalente = DateUtils.format({ date: nota.fecha_equivalente, dateFormat: 'DD/MM/YYYY' });
       }
 
       const obj = { abonos: pagos, notas: notas };
-      openNewModal({
-        component: ModalHistorialPagosComponent,
-        inputs: obj,
-        id: 'historial_pago',
-        header: 'Historial de moviemientos a balance de factura',
-        width: '700px',
-        height: '400px',
-        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-      });
+
+      const modalConfig = new DynamicModalClass();
+      modalConfig.width = '45rem';
+      modalConfig.height = '30rem';
+      modalConfig.component = ModalHistorialPagosComponent;
+      modalConfig.inputs = obj;
+      modalConfig.id = 'historial_pago';
+      modalConfig.header = 'Historial de movimientos a balance de factura';
+
+      modalConfig.show();
     }
   }
 }

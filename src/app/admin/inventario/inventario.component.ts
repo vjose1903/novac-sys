@@ -136,7 +136,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       modalConfig.component = MovimientosFormComponent;
       modalConfig.inputs = { data: arg.data };
       modalConfig.id = 'inventarioModal';
-      modalConfig.header = 'Retornar Articulos Devueltos';
+      modalConfig.header = 'Movimientos de inventario';
 
       modalConfig.botones = [
         { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },

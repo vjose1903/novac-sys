@@ -20,6 +20,8 @@ import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
+import { DirectivesModule } from '@core/directive/directives.module';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -38,7 +40,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabsModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule, NgxExtendedPdfViewerModule],
+  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabsModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule, NgxExtendedPdfViewerModule, FormErrorMsgComponent, DirectivesModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}
