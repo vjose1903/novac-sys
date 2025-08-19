@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 const moment = require('../../../../core/javascript/moment');
 
-import { ModalI } from '../../modal/modal-class';
-import * as _ from 'lodash';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-pendiente-form',
@@ -10,7 +10,8 @@ import * as _ from 'lodash';
   styleUrls: ['./pendiente-form.component.scss'],
   standalone: false,
 })
-export class PendienteFormComponent implements OnInit, ModalI {
+export class PendienteFormComponent implements OnInit, IDynamicModal {
+  // TODO: Cambiar a DynamicModalComponent
   time = { hour: 13, minute: 30 };
   hora;
   minutos;
@@ -20,16 +21,15 @@ export class PendienteFormComponent implements OnInit, ModalI {
 
   constructor() {}
 
-  @Input() modalWrapper: any = {};
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
   inputs: any;
   btn_aceptar() {
     const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
-
     const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
 
-    const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
-    modal.closeModal(this.modalWrapper.component_id);
-    modal.returnDataFromModal({ fecha, modal_id: this.modalWrapper.component_id });
+    this.modalConfig.close({ fecha });
   }
 
   ngOnInit() {

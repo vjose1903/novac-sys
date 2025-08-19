@@ -36,8 +36,8 @@ export class ModalSeleccionarArticuloComponent extends MixinClass implements OnI
     super();
   }
 
-  @Input() modalConfig: IModalConfiguration;
-  @Input() modalWrapper: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
   @Input() data: any;
 
   ngOnInit() {

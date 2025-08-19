@@ -1,10 +1,10 @@
 import { Component, effect, Input, OnInit, signal } from '@angular/core';
-import * as _ from 'lodash';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
 import { fun } from '@core/services/functions.service';
-import { Ss } from '@core/services/singleton.service';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-modal-historial-pagos',
@@ -12,7 +12,8 @@ import { Ss } from '@core/services/singleton.service';
   styleUrls: ['./modal-historial-pagos.component.scss'],
   standalone: false,
 })
-export class ModalHistorialPagosComponent extends MixinClass implements OnInit, ModalI {
+export class ModalHistorialPagosComponent extends MixinClass implements OnInit, IDynamicModal {
+  // TODO: Cambiar a DynamicModalComponent
   activeIndex = signal(0);
   processingTabChange = true;
 
@@ -64,7 +65,8 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
       }
     });
   }
-  @Input() modalWrapper: any = {};
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
   inputs: any;
 
   ngOnInit() {

@@ -1,10 +1,11 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, Output, EventEmitter, AfterViewInit, inject, Input } from '@angular/core';
-import * as _ from 'lodash';
+import { Component, OnInit, AfterViewInit, inject, Input } from '@angular/core';
 import { fun } from '@core/services/functions.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ModalI } from '../../modal/modal-class';
 import { MovimientosC } from './movimiento-model';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { ArticuloI } from '@registros/articulos/articulo';
 
 @Component({
   selector: 'app-movimientos-form',
@@ -12,7 +13,7 @@ import { MovimientosC } from './movimiento-model';
   styleUrls: ['./movimientos-form.component.scss'],
   standalone: false,
 })
-export class MovimientosFormComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
+export class MovimientosFormComponent extends MixinClass implements OnInit, AfterViewInit, IDynamicModal {
   form;
   tipo_movimiento;
   tipo_salida;
@@ -20,14 +21,13 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   element: any;
   cantidad = 0;
   motivo;
-  // @Input() data;
-  @Output() cancel = new EventEmitter<any>();
   medidas;
 
   movimientosC = new MovimientosC();
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
-  @Input() modalWrapper: any = {};
-  inputs: any;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() data!: ArticuloI;
 
   htmlServ = inject(HtmlElementsService);
   constructor() {
@@ -35,7 +35,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   }
 
   ngOnInit() {
-    this.medidas = _.keys(this.inputs.cantidades);
+    this.medidas = Object.keys(this.data.cantidades);
   }
 
   ngAfterViewInit() {
@@ -56,7 +56,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
           return 'Disminuirá ' + this.cantidad + ' ' + med;
         }
       } else {
-        const existenciaPorMedida = this.inputs.cantidades[this.medida];
+        const existenciaPorMedida = this.data.cantidades[this.medida];
         let calculo = 0;
         if (this.tipo_movimiento === 'entrada') {
           calculo = existenciaPorMedida + this.cantidad;
@@ -72,7 +72,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
     if (campo !== 'send') {
       fun.enfocarInput(campo);
     } else {
-      this.btn_aceptar();
+      this.submit();
     }
   }
 
@@ -95,22 +95,21 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   }
 
   selectTipoMov() {
-    if (this.tipo_movimiento === 'entrada') {
-      this.tipo_salida = undefined;
-    }
+    if (this.tipo_movimiento === 'entrada') this.tipo_salida = undefined;
   }
-  btn_aceptar() {
-    const obj = { articulo_id: this.inputs.id, cantidad: this.cantidad, cantidad_en_unidades: this.inputs.contenido[this.medida] * this.cantidad, accion: this.tipo_movimiento, motivo: this.motivo, medida: this.medida, tipo_salida: this.tipo_salida };
+
+  submit() {
+    const obj = { articulo_id: this.data.id, cantidad: this.cantidad, cantidad_en_unidades: this.data.contenido[this.medida] * this.cantidad, accion: this.tipo_movimiento, motivo: this.motivo, medida: this.medida, tipo_salida: this.tipo_salida };
+
+    console.log('obj, ---> ', obj);
 
     this.movimientosC.createOne(obj).then(res => {
-      fun.toastSuccess(_.capitalize(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
+      fun.toastSuccess(`${fun.capitalice(this.tipo_movimiento)} de inventario exitosa.`, 'CORRECTO');
       this.resetForm();
 
       const obj = { bool: true, body: res.articulo };
 
-      const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
-      modal.closeModal('inventario');
-      modal.returnDataFromModal({ data: obj, modal_id: this.modalWrapper.component_id });
+      this.modalConfig.close({ data: obj });
     });
   }
 

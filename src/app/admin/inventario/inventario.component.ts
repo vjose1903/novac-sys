@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
-import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
@@ -7,11 +6,11 @@ import { ArticuloC, TipoArticuloC } from '@registros/articulos/articulo';
 import { ReporteC } from '../reportes/reporte';
 import { MovimientosFormComponent } from '@components/formularios en modales/movimientos-form/movimientos-form.component';
 import { fun } from '@core/services/functions.service';
-import { Ss } from '@core/services/singleton.service';
 import { default_per_page, table_config, tableCellType } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { InventarioC } from './inventario';
-
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-inventario',
@@ -73,8 +72,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     this.tipoArticuloClass.getAll().then(res => (this.tipo_articulos = res.data));
   }
 
-
-
   ngOnDestroy() {
     this._destroy_mixin();
   }
@@ -131,31 +128,33 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   movimientoInventario(arg) {
-    const tipoArticuloSelected = this.tipo_articulos.find(val => val.id == _.parseInt(arg.data.tipo_articulo_id));
+    const tipoArticuloSelected = this.tipo_articulos.find(val => val.id == Number(arg.data.tipo_articulo_id));
 
     if (tipoArticuloSelected.tipo != 'servicio') {
-      this.openNewModal({
-        component: MovimientosFormComponent,
-        inputs: arg.data,
-        id: 'inventario',
-        header: 'Movimientos de inventario',
-        width: '450px',
+      const modalConfig = new DynamicModalClass();
+      modalConfig.width = '30rem';
+      modalConfig.component = MovimientosFormComponent;
+      modalConfig.inputs = { data: arg.data };
+      modalConfig.id = 'inventarioModal';
+      modalConfig.header = 'Retornar Articulos Devueltos';
 
-        botones: {
-          aceptar: { show: true, disable: false },
-          cancelar: { show: true, disable: false },
-        },
-      });
+      modalConfig.botones = [
+        { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+        { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+      ];
+
+      modalConfig.setCallback((arg: ICallbackModal) => this.movimientoInventarioCallback(arg));
+      modalConfig.show();
     } else {
       fun.toastWarning('El articulo seleccionado no requiere movimientos de inventario', 'AVISO');
     }
   }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modal_id === 'inventario') {
-      const actualPagination = this.tServ.getPaginationById('lista_inventario');
-      actualPagination['search'] = this.palabra_buscar;
-      this.getArticulos(actualPagination);
-    }
+  movimientoInventarioCallback(arg: ICallbackModal) {
+    if (arg.type != modalCloseType.returnData) return;
+
+    const actualPagination = this.tServ.getPaginationById('lista_inventario');
+    actualPagination['search'] = this.palabra_buscar;
+    this.getArticulos(actualPagination);
   }
 }

@@ -1,10 +1,10 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { ModalI } from '@components/modal/modal-class';
 import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '@core/services/functions.service';
-import { timeStamp } from 'console';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-remover-articulo',
@@ -12,9 +12,11 @@ import { timeStamp } from 'console';
   styleUrls: ['./remover-articulo.component.scss'],
   standalone: false,
 })
-export class RemoverArticuloComponent implements OnInit, ModalI {
+export class RemoverArticuloComponent implements OnInit, IDynamicModal {
+  // TODO: Cambiar a DynamicModalComponent
   constructor(private fb: UntypedFormBuilder) {}
-  @Input() modalWrapper: any = {};
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
 
   @Input() index: number;
   @Input() key: string;
@@ -70,13 +72,10 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
 
   btn_aceptar() {
     if (this.form.valid || this.data_detalle.is_defectuoso || !this.is_prefactura_selected) {
-      const modal = _.find(this.modalWrapper.instance.modalsConfig, config => config.id === this.modalWrapper.component_id);
-      modal.closeModal(this.modalWrapper.component_id);
-      const obj = { key: this.key, modal_id: this.modalWrapper.component_id, data: this.data_detalle };
+      const obj = { key: this.key, data: this.data_detalle };
 
       if (this.is_prefactura_selected) obj['data'] = this.form.getRawValue();
-
-      modal.returnDataFromModal(obj);
+      this.modalConfig.close(obj);
     } else {
       fun.toastError('Complete los campos para retirar el articulo.', 'ERROR');
     }

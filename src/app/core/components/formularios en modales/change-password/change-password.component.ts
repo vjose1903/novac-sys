@@ -4,6 +4,9 @@ import { fun } from '@core/services/functions.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { EmpleadoC } from '@admin/registros/registro-empleados/empleado';
 import { ModalI } from '../../modal/modal-class';
+import { IDynamicModal } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-change-password',
@@ -11,11 +14,13 @@ import { ModalI } from '../../modal/modal-class';
   styleUrls: ['./change-password.component.scss'],
   standalone: false,
 })
-export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
+export class ChangePasswordComponent extends MixinClass implements OnInit, AfterViewInit, IDynamicModal {
+  // TODO: Cambiar a DynamicModalComponent
   form: UntypedFormGroup;
   element: HTMLElement;
   empleadoClass = new EmpleadoC();
-  @Input() modalWrapper: any = {};
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
   inputs: any;
 
   constructor(private fb: UntypedFormBuilder) {
@@ -45,9 +50,7 @@ export class ChangePasswordComponent extends MixinClass implements OnInit, After
       obj['ids_roles'] = ids_roles;
 
       this.empleadoClass.createUpdateOne(obj).then(() => {
-        const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id === this.modalWrapper.component_id);
-        modal.closeModal(this.modalWrapper.component_id);
-        modal.returnDataFromModal({ error: false });
+        this.modalConfig.close({ error: false });
       });
     }
   }

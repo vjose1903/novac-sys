@@ -15,6 +15,8 @@ import { ModalI } from '@components/modal/modal-class';
 import { reportField } from './form-reportes.component.model';
 import { ReportDateTypeE, ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { tFacturaKey } from '@admin/facturacion/factura';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-form-reportes',
@@ -22,7 +24,8 @@ import { tFacturaKey } from '@admin/facturacion/factura';
   styleUrls: ['./form-reportes.component.scss'],
   standalone: false,
 })
-export class FormReportesComponent extends MixinClass implements OnInit, ModalI {
+export class FormReportesComponent extends MixinClass implements OnInit, IDynamicModal {
+  // TODO: Cambiar a DynamicModalComponent
   fun = fun;
 
   form: UntypedFormGroup;
@@ -54,7 +57,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
     super();
   }
 
-  @Input() modalWrapper: any = {};
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
   inputs: any;
   reportField = reportField;
 
@@ -343,8 +347,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, ModalI 
   }
 
   btn_aceptar() {
-    const modal = this.modalWrapper.instance.modalsConfig.find(config => config.id == this.modalWrapper.component_id);
-    modal.closeModal(this.modalWrapper.component_id);
-    modal.returnDataFromModal({ data: { ...this.form.value, switchGroup: { ...this.inputs.switchGroup } }, modal_id: this.modalWrapper.component_id });
+    this.modalConfig.close({ data: { ...this.form.value, switchGroup: { ...this.inputs.switchGroup } } });
   }
 }

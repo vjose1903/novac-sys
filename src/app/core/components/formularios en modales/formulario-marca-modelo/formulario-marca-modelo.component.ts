@@ -19,8 +19,8 @@ import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-moda
   standalone: false,
 })
 export class FormularioMarcaModeloComponent extends MixinClass implements OnInit, IDynamicModal {
-  @Input() modalConfig: IModalConfiguration;
-  @Input() modalWrapper: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
 
   @Input() tipo_formulario;
 

@@ -14,7 +14,7 @@ import { FacturasI } from '@admin/facturacion/factura';
 })
 export class PdfViewerComponent implements IDynamicModal {
   @Input() modalWrapper!: DynamicModalComponent;
-  @Input() modalConfig: IModalConfiguration;
+  @Input() modalConfig!: IModalConfiguration;
 
   @Input() viewerOptions: viewerOptions = {};
   @Input() show_estado: boolean;

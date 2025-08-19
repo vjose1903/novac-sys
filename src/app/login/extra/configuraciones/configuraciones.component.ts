@@ -19,7 +19,7 @@ import { EmpresaService } from '@core/services/empresa.service';
 })
 export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   @Input() is_on_modal: boolean = false;
-  @Input() modalConfig: any;
+  @Input() modalConfig!: any;
   configServ = Ss.configServ;
   configApp;
   configCopy;

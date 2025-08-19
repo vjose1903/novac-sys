@@ -16,8 +16,8 @@ import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-mo
 })
 export class ConfigArticulosComponent implements OnInit, IDynamicModal {
   form: UntypedFormGroup;
-  @Input() modalConfig: IModalConfiguration;
-  @Input() modalWrapper: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
 
   @Input() config_articulos: ConfigArticuloI;
 
