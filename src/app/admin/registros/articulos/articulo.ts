@@ -4,6 +4,8 @@ import { ReporteC } from '../../reportes/reporte';
 import { fun } from '@core/services/functions.service';
 import { csvConfig as ventas_producto_csvConfig } from '@core/services/reports/excel/configs/report/ventas_producto';
 import { ReportDateTypeE } from '../../reportes/reporte.utils';
+import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 export enum tipos_articulos {
   veterinaria = 'veterinaria',
@@ -80,12 +82,15 @@ export class ArticuloC extends CrudG<ArticuloI> {
     });
   }
 
-  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
+  static openModalReporteForm(params: { tipo: any; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
+      const { tipo, titulo } = params;
+      const inputs = { tipo_reporte: tipo };
+
       let objModal;
       switch (params.tipo) {
         case 'ventas_productos':
-          ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+          ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
           objModal = ReporteC.objReporte;
 
           break;
@@ -94,12 +99,13 @@ export class ArticuloC extends CrudG<ArticuloI> {
           break;
       }
 
-      params.openNewModal(objModal);
-
-      function returnDataFromModal(arg) {
-        ArticuloC.requestReporte(arg, params);
-        resolve(arg);
+      function returnDataFromModal(arg: ICallbackModal) {
+        if (arg.type != modalCloseType.returnData) return;
+        ArticuloC.requestReporte(arg.data, params);
+        resolve(arg.data);
       }
+
+      new DynamicModalClass(ReporteC.objReporte).show();
     });
   }
 
@@ -123,7 +129,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
-      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+      let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')) };
 
       ReporteC.visualizarReporte(objPdfView);
     });

@@ -45,7 +45,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     notas: NotaC,
   };
 
-  constructor(public loadServ: LoaderService ) {
+  constructor(public loadServ: LoaderService) {
     super();
   }
 
@@ -54,15 +54,12 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then(result => (this.hasPermisoCamiones = result));
   }
 
-
-
   ngOnDestroy() {
     this._destroy_mixin();
   }
 
   openReporteForm(params: { tipo: string; titulo: string }) {
     ReporteC.configCsv = undefined;
-    const obj = { tipo: 'reportes', titulo: params.titulo, tipo_reporte: params.tipo };
-    this.instancesClases[params.tipo.toString()].openModalReporteForm({ tipo: params.tipo, inputs: obj, openNewModal: this.openNewModal.bind(this) });
+    this.instancesClases[params.tipo.toString()].openModalReporteForm({ tipo: params.tipo, titulo: params.titulo });
   }
 }

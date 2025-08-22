@@ -12,6 +12,8 @@ import { ExportToExcelService } from '@core/services/reports/excel/export-to-exc
 import { inject } from '@angular/core';
 import { exportExcelConfigI } from '@core/interface/export-to-excel.interface';
 import { Console } from 'console';
+import { IModalConfiguration, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 export class ReporteC extends CrudG<any> {
   private static _objReporte;
@@ -29,13 +31,16 @@ export class ReporteC extends CrudG<any> {
     return this._configCsv;
   }
 
-  static set objReporte(params: { width?: string; id?: string; header?: string; botones?: any; inputs?: any; height?: any; returnDataFromModal?: Function }) {
-    const obj = {
+  static set objReporte(params: { width?: string; id?: string; header?: string; botones?: any; inputs?: any; height?: any; callback?: Function }) {
+    const obj: IModalConfiguration = {
       component: FormReportesComponent,
-      width: '510px',
+      width: '38rem',
       id: params.id,
       header: params.header,
-      botones: { aceptar: { show: true, disable: false }, cancelar: { show: true, disable: false } },
+      botones: [
+        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { clase: 'btn btn-verde', label: 'Aceptar', disable: false },
+      ],
     };
 
     if (fun.hasValue(params.inputs)) obj['inputs'] = params.inputs;
@@ -45,7 +50,7 @@ export class ReporteC extends CrudG<any> {
     if (fun.hasValue(params.width)) obj['width'] = params.width;
     if (fun.hasValue(params.height)) obj['height'] = params.height;
 
-    if (fun.hasValue(params.returnDataFromModal)) obj['returnDataFromModal'] = params.returnDataFromModal;
+    if (fun.hasValue(params.callback)) obj['callback'] = params.callback;
 
     this._objReporte = obj;
   }
@@ -84,33 +89,32 @@ export class ReporteC extends CrudG<any> {
     if (objPdfView.status == 'no') {
       fun.toastError(objPdfView.msg, 'ERROR');
     } else {
-      const modalViewReporte = {
+      const { dd, file, msg, pageOrientation, requestResult, sBase64, sDd, status, titulo, ...inputs } = objPdfView;
+
+      const modalViewReporte: IModalConfiguration = {
         component: PdfViewerComponent,
-        inputs: objPdfView,
+        inputs: inputs,
         id: 'reporte_view',
         header: objPdfView.titulo,
         width: '57rem',
         height: '75vh',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false },
-            { clase: 'btn btn-verde', function: instance => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false },
-          ],
-        },
+        botones: [
+          { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false },
+          { clase: 'btn btn-verde', label: 'Imprimir', disable: false, function: instance => this.imprimirPDF(objPdfView, instance) },
+        ],
       };
 
       if (fun.hasValue(this._configCsv))
-        fun.pushAt(modalViewReporte.botones.dinamico, 1, {
+        fun.pushAt(modalViewReporte.botones, 1, {
           clase: 'btn btn-gris',
-          function: instance => this.exportCsv(objPdfView.requestResult, instance),
+          function: instance => this.exportCsv(objPdfView.requestResult),
           label: 'Exportar CSV',
           disable: false,
-          icon: 'fa-solid fa-file-excel',
+          iconName: 'fa-solid fa-file-excel',
           iconColor: '#5fcf5f',
         });
 
-      objPdfView.openNewModal(modalViewReporte);
+      new DynamicModalClass(modalViewReporte).show();
     }
 
     Ss.loadServ.isLoading.next(false);
@@ -130,7 +134,7 @@ export class ReporteC extends CrudG<any> {
         Ss.loadServ.isLoading.next(false);
 
         fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-        if (modalInstance) modalInstance.closeModal(modalInstance.id);
+        if (modalInstance) modalInstance.close();
       })
       .catch(err => {
         Ss.loadServ.isLoading.next(false);
@@ -138,14 +142,13 @@ export class ReporteC extends CrudG<any> {
       });
   }
 
-  static exportCsv(data: ReporteBackendResponseI, modalInstance?) {
+  static exportCsv(data: ReporteBackendResponseI) {
     const exportToExcelServ = new ExportToExcelService();
 
     exportToExcelServ
       .download(this._configCsv, data)
       .then(() => {
         fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-        if (modalInstance) modalInstance.closeModal(modalInstance.id);
       })
       .catch(err => {
         console.error(err);

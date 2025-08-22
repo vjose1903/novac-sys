@@ -59,6 +59,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   hasPermisosValidated: boolean;
   actionFacturacion = actionFacturacion;
   currentYear: number;
+  fun = fun;
 
   my_capitalize = fun.capitalice;
 
@@ -111,9 +112,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.layServ.LOGOUT.pipe(takeUntil(this.destroy$)).subscribe(res => {
-      if (res && res.bool) this.logOut();
-      else {
-        if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
+      console.log('%c ANDO POR AQUIII', 'color: yellow', res);
+
+      if (res && res.bool) {
+        this.logOut();
+        this.layServ.nextLogOut(undefined);
       }
     });
 
@@ -269,10 +272,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
-    fun.logout().then(() => {
-      this.noServer = false;
-      this.router.navigateByUrl('/');
-    });
+    this.noServer = false;
+    this.router.navigateByUrl('/');
   }
 
   // =================================================================================

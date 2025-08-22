@@ -467,7 +467,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
         }
       }
       if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
-        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal.bind(this));
+        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas);
       }
 
       if (params.iconKey == 'ver') {

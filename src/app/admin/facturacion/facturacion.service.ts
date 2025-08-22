@@ -1,6 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { fun } from '@core/services/functions.service';
-import { comprobante, comprobanteElectronico, comprobanteNormal, tipoDocFacturacion, TipoFacturaI, tFacturaKey } from './factura';
+import { comprobante, comprobanteElectronico, comprobanteNormal, tipoDocFacturacion, TipoFacturaI, tFacturaKey, TiposFacturaC } from './factura';
 import { Ss } from '@core/services/singleton.service';
 import { serie } from '@core/typescript/constantes';
 
@@ -23,7 +23,10 @@ export class FacturacionService {
   cotizacion_selected;
   productos_devueltos = [];
   filasDetalle;
+  
+  tipoFacturaClass = new TiposFacturaC();
   serieType = signal(serie.electronica);
+
 
   isCompra = computed(() => this.tipoDocumento() == tipoDocFacturacion.compra);
   isVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.venta);
@@ -178,6 +181,22 @@ export class FacturacionService {
     } else if (metodo === tipoDocFacturacion.compra) {
       res.descripcion = 'Factura de compra';
     }
+  }
+
+  async getTiposFacturas(): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const tiposFacturas = (await this.tipoFacturaClass.getAll()) as unknown as TipoFacturaI[];
+
+        const tiposFacturasOrdenados = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
+
+        this.lista_tipos_facturas = tiposFacturasOrdenados;
+        resolve();
+      } catch (error) {
+        fun.logRed('error: ', error);
+        reject(error);
+      }
+    });
   }
 
   getDetallesLlenos() {

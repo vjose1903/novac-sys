@@ -394,7 +394,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para <strong>realizar el recibo de este pedido</strong>.',
       btnKind: confirmationButtons.siNo,
       onYes: () => onYes(),
-    }); 
+    });
   }
 
   verDetalles(data) {
@@ -405,7 +405,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     const pagos = this.viaje_selected.pagos;
     const notas = this.viaje_selected.notas;
 
-    if (pagos.length || notas.length) this.facturaClass.abrirModalHistorial(pagos, notas, this.openNewModal);
+    if (pagos.length || notas.length) this.facturaClass.abrirModalHistorial(pagos, notas);
   }
 
   addMovimiento() {

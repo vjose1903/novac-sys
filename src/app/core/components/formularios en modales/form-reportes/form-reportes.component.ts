@@ -57,10 +57,15 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     super();
   }
 
+  reportField = reportField;
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
-  inputs: any;
-  reportField = reportField;
+
+  @Input() tipo_reporte!: any;
+  @Input() dinamyc_selections!: any;
+  @Input() dinamyc_switches!: any;
+  @Input() conditionalRender!: any;
+  @Input() switchGroup!: any;
 
   ngOnInit() {
     this.necesarioStart();
@@ -71,38 +76,42 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     await this.checkDinamycFields();
     await this.agregateValidators();
 
-    if (this.formarFecha.includes(this.inputs.tipo_reporte)) {
+    if (this.formarFecha.includes(this.tipo_reporte)) {
       this.Fecha = this.formarFechaFactura(new Date())['FechaFactura'];
     }
   }
 
   checkDinamycFields() {
-    for (let index = 0; index < this.inputs?.dinamyc_selections?.length; index++) {
-      const element = this.inputs.dinamyc_selections[index];
-      element.id = fun.generateKey();
+    if (fun.hasValue(this.dinamyc_selections)) {
+      for (let index = 0; index < this.dinamyc_selections?.length; index++) {
+        const element = this.dinamyc_selections[index];
+        element.id = fun.generateKey();
 
-      this.form.addControl(element.formControl, this.fb.control(null));
+        this.form.addControl(element.formControl, this.fb.control(null));
 
-      if (element.initialValue) this.form.controls[element.formControl].setValue(element.initialValue);
+        if (element.initialValue) this.form.controls[element.formControl].setValue(element.initialValue);
 
-      if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
+        if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
+      }
+
+      fun.setTimeout(() => {
+        this.dinamycSelectionReady = true;
+      }, 10);
     }
 
-    fun.setTimeout(() => {
-      this.dinamycSelectionReady = true;
-    }, 10);
+    if (fun.hasValue(this.dinamyc_switches)) {
+      for (let index = 0; index < this.dinamyc_switches?.length; index++) {
+        const element = this.dinamyc_switches[index];
+        element.id = fun.generateKey();
+        this.form.addControl(element.formControl, this.fb.control(element.defaultValue ?? false));
 
-    for (let index = 0; index < this.inputs?.dinamyc_switches?.length; index++) {
-      const element = this.inputs.dinamyc_switches[index];
-      element.id = fun.generateKey();
-      this.form.addControl(element.formControl, this.fb.control(element.defaultValue ?? false));
+        if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
+      }
 
-      if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
+      fun.setTimeout(() => {
+        this.dinamycSwitchReady = true;
+      }, 10);
     }
-
-    fun.setTimeout(() => {
-      this.dinamycSwitchReady = true;
-    }, 10);
   }
 
   async getArticulos(name) {
@@ -149,16 +158,16 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     const desde_year_hasta_includes = ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo', 'cuentas_cobrar_cliente'];
     const tipo_factura_includes = ['ventas_diarias', 'ventas_rango', 'ventas_cliente', 'movimientos_vehiculo'];
 
-    if (this.inputs.tipo_reporte == 'cuadre') {
+    if (this.tipo_reporte == 'cuadre') {
       this.form.controls.fecha.setValue(new Date());
       //
-    } else if (this.inputs.tipo_reporte == 'ventas_diarias') {
+    } else if (this.tipo_reporte == 'ventas_diarias') {
       serie_selected = serie.all;
       tipo_selected = 'ventas_diarias';
       condicion_selected = 'todos';
 
       //
-    } else if (this.inputs.tipo_reporte == 'recibos') {
+    } else if (this.tipo_reporte == 'recibos') {
       this.tipos = [
         { id: ReportGroupTypeE.detallado, label: 'Detallado' },
         { id: ReportGroupTypeE.agrupado, label: 'Agrupado' },
@@ -166,14 +175,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
 
       tipo_selected = ReportGroupTypeE.detallado;
       //
-    } else if (this.inputs.tipo_reporte == 'pago_facturas') {
+    } else if (this.tipo_reporte == 'pago_facturas') {
       this.tipos = [
         // { id: TipoPagoReporte.detallado, label: 'Detallado' },
         // { id: TipoPagoReporte.agrupado, label: 'Agrupado' },
       ];
 
       tipo_selected = ReportGroupTypeE.detallado;
-    } else if (this.inputs.tipo_reporte == 'ventas_rango') {
+    } else if (this.tipo_reporte == 'ventas_rango') {
       this.tipos = [
         { id: ReportGroupTypeE.detallado, label: 'Detallado' },
         { id: ReportGroupTypeE.agrupado, label: 'Agrupado' },
@@ -184,35 +193,37 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
       condicion_selected = 'todos';
 
       //
-    } else if (this.inputs.tipo_reporte == 'cuentas_cobrar_ant_saldo') {
+    } else if (this.tipo_reporte == 'cuentas_cobrar_cliente') {
+      tipo_selected = CxC.por_cliente;
+    } else if (this.tipo_reporte == 'cuentas_cobrar_ant_saldo') {
       this.tipos = [
         { id: CxC.detallado, label: 'Detallado' },
         { id: CxC.agrupado, label: 'Agrupado' },
       ];
       //
-    } else if (this.inputs.tipo_reporte == 'cuentas_pagar_ant_saldo') {
+    } else if (this.tipo_reporte == 'cuentas_pagar_ant_saldo') {
       this.tipos = [
         // { id: CxP.detallado, label: 'Detallado' },
         // { id: CxP.agrupado, label: 'Agrupado' },
       ];
       //
-    } else if (this.inputs.tipo_reporte == 'notas') {
+    } else if (this.tipo_reporte == 'notas') {
       this.tipos = [
         { label: 'Crédito', id: Ss.factServ.tipoFacturaId(tFacturaKey.nota_de_credito) },
         { label: 'Dédito', id: Ss.factServ.tipoFacturaId(tFacturaKey.nota_de_debito) },
         { label: 'Todas', id: 0 },
       ];
       //
-    } else if (this.inputs.tipo_reporte == 'cuentas_con_pagos' || this.inputs.tipo_reporte == 'ventas_cliente') {
+    } else if (this.tipo_reporte == 'cuentas_con_pagos' || this.tipo_reporte == 'ventas_cliente') {
       this.setValidator('cliente_id');
       serie_selected = serie.all;
 
-      if (this.inputs.tipo_reporte == 'ventas_cliente') {
+      if (this.tipo_reporte == 'ventas_cliente') {
         this.setValidator('tipo');
         condicion_selected = 'todos';
         this.form.controls.tipo.setValue('todos');
       }
-    } else if (this.inputs.tipo_reporte == 'ventas_productos') {
+    } else if (this.tipo_reporte == 'ventas_productos') {
       this.tipos = [
         { id: ReportDateTypeE.one_day, label: 'Dia único' },
         { id: ReportDateTypeE.range, label: 'Rango fechas' },
@@ -235,10 +246,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
       this.setValidator('serie');
     }
 
-    if (tipo_factura_includes.includes(this.inputs.tipo_reporte)) this.parseTipoFacturas();
+    if (tipo_factura_includes.includes(this.tipo_reporte)) this.parseTipoFacturas();
 
-    if (desde_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls();
-    if (desde_year_hasta_includes.includes(this.inputs.tipo_reporte)) this.setDesdeHastaControls({ begin_of_year: true });
+    if (desde_hasta_includes.includes(this.tipo_reporte)) this.setDesdeHastaControls();
+    if (desde_year_hasta_includes.includes(this.tipo_reporte)) this.setDesdeHastaControls({ begin_of_year: true });
   }
 
   setDesdeHastaControls(params?: { begin_of_year?: boolean }) {
@@ -270,7 +281,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
       [reportField.simpleSwitchField]: ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo', 'cuentas_cobrar_cliente'],
     };
 
-    return reportTypeMap[reportType].includes(this.inputs.tipo_reporte);
+    return reportTypeMap[reportType].includes(this.tipo_reporte);
   }
 
   parseTipoFacturas() {
@@ -300,7 +311,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   changeTipo() {
     const control = this.form.controls;
 
-    if (this.inputs.tipo_reporte == 'ventas_productos') {
+    if (this.tipo_reporte == 'ventas_productos') {
       ['fecha', 'desde', 'hasta'].forEach(control => this.removeValidator(control));
 
       if (control.tipo.value == ReportDateTypeE.one_day) {
@@ -339,14 +350,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   }
 
   verifyConditionalRender(field: reportField): boolean {
-    if (fun.isEmpty(this.inputs?.conditionalRender) || fun.isEmpty(this.inputs?.conditionalRender[field])) return true;
+    if (fun.isEmpty(this.conditionalRender) || fun.isEmpty(this.conditionalRender[field])) return true;
 
     const formValue = this.form.getRawValue();
 
-    return this.inputs.conditionalRender[field](formValue);
+    return this.conditionalRender[field](formValue);
   }
 
-  btn_aceptar() {
-    this.modalConfig.close({ data: { ...this.form.value, switchGroup: { ...this.inputs.switchGroup } } });
+  submit() {
+    this.modalConfig.close({ data: { ...this.form.value, switchGroup: { ...this.switchGroup } } });
   }
 }

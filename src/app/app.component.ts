@@ -81,8 +81,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   counter = signal<number>(0);
   isReady = signal<boolean>(false);
 
-  tipoFacturaClass = new TiposFacturaC();
-
   // Mapa de eventos de Electron para mejor organización
   private readonly electronEventHandlers = {
     [ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE]: (data: any) => {
@@ -235,22 +233,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     }
   }
 
-  async getTiposFacturas(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        const tiposFacturas = (await this.tipoFacturaClass.getAll()) as unknown as TipoFacturaI[];
-
-        const tiposFacturasOrdenados = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
-
-        Ss.factServ.lista_tipos_facturas = tiposFacturasOrdenados;
-        resolve();
-      } catch (error) {
-        fun.logRed('error: ', error);
-        reject(error);
-      }
-    });
-  }
-
   async verifyIsReady() {
     const validateAppReadiness = (): boolean => {
       const isMenuParsed = Ss.layServ.menuParsed;
@@ -268,11 +250,17 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       task: () => Promise.resolve(validateAppReadiness()),
       retryWhen: (isReady: boolean) => !isReady,
       actionAfterRetry: () => {
-        this.getTiposFacturas().then(() => {
-          fun.setTimeout(() => {
-            this.isReady.set(true);
-          }, 250);
-        });
+        const token = fun.getAuthToken();
+
+        if (token) {
+          Ss.factServ.getTiposFacturas().then(() => {
+            fun.setTimeout(() => {
+              this.isReady.set(true);
+            }, 250);
+          });
+        } else {
+          this.isReady.set(true);
+        }
       },
       actionIfNoSuccess: handleFailure,
     });

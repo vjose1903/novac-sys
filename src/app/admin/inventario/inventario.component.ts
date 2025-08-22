@@ -86,9 +86,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async makeReporte() {
-    const obj = { tipo: 'reporte', titulo: 'Reporte de inventario', tipo_reporte: 'reporte' };
-
-    InventarioC.openModalReporteForm({ tipo: 'inventario', inputs: obj, openNewModal: this.openNewModal.bind(this) });
+    InventarioC.openModalReporteForm({ tipo: 'inventario', titulo: 'Reporte de inventario' });
   }
 
   async getStock() {

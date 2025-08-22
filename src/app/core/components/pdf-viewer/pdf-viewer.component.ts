@@ -33,5 +33,5 @@ export class PdfViewerComponent implements IDynamicModal {
 
   constructor() {}
 
-  btn_aceptar() {}
+  submit() {}
 }

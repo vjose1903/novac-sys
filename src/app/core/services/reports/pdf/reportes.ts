@@ -61,7 +61,12 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
+  console.log('%c data ', 'color: red', data);
+  console.log('%c tipo_reporte ', 'color: orange', data.tipo_reporte);
+  console.log('%c configuraciones ', 'color: lime', configuraciones);
+  
   const configuration = configuraciones[data.tipo_reporte];
+  console.log('%c configuration ', 'color: magenta', configuration);
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = Ss.configServ.config;

@@ -99,10 +99,10 @@ export class MixinClass extends ModalClass {
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco w-9', function: (instance) => noFunction(instance), label: 'No', disable: false },
+          { clase: 'btn btn-blanco w-9', function: instance => noFunction(instance), label: 'No', disable: false },
           {
             clase: 'btn btn-verde w-9',
-            function: (instance) => {
+            function: instance => {
               obj.siFunction();
               instance.closeModal('borrar');
             },

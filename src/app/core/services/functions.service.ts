@@ -805,11 +805,14 @@ export class fun {
         // Resetear el estado del guard y limpiar cache
         const authGuard = fun.getAuthGuardInstance();
         const currentUserService = fun.getCurrentUserServiceInstance();
+        console.log('1');
 
         if (authGuard) authGuard.resetValidation();
         if (currentUserService) currentUserService.clearValidationCache();
 
-        Ss.layServ.nextLogOut(undefined);
+        console.log('2');
+
+        Ss.layServ.nextLogOut({ bool: true });
         resolve(true);
       } catch (error) {
         resolve(false);

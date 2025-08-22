@@ -18,7 +18,7 @@ import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { ArticuloI } from '@registros/articulos/articulo';
 import { DateUtils } from '@vjose1903/dateutils';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
-import { IButtonDynamic, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { IButtonDynamic, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 export enum comprobanteNormal {
   factura_de_credito_fiscal = '01',
@@ -132,10 +132,13 @@ export class FacturaC extends CrudG<FacturasI> {
     },
   ];
 
-  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
+  static openModalReporteForm(params: { tipo: any; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
-      if (params.tipo != 'movimientos_vehiculo') {
-        params.inputs['switchGroup'] = {
+      const { tipo, titulo } = params;
+      const inputs = { tipo_reporte: tipo };
+
+      if (tipo != 'movimientos_vehiculo') {
+        inputs['switchGroup'] = {
           title: 'Seleccione los metodos de pago deseados',
           array: [
             { label: 'Efectivo', value: true },
@@ -145,16 +148,17 @@ export class FacturaC extends CrudG<FacturasI> {
           ],
         };
       } else {
-        params.inputs['dinamyc_selections'] = FacturaC.inputsMovimientosViaje;
+        inputs['dinamyc_selections'] = FacturaC.inputsMovimientosViaje;
       }
 
-      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+      ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 
-      params.openNewModal(ReporteC.objReporte);
-
-      function returnDataFromModal(arg) {
-        FacturaC.requestReporte({ reporte: arg, pdf: params });
+      function returnDataFromModal(arg: ICallbackModal) {
+        if (arg.type != modalCloseType.returnData) return;
+        FacturaC.requestReporte({ reporte: arg.data, pdf: params });
       }
+
+      new DynamicModalClass(ReporteC.objReporte).show();
     });
   }
 
@@ -226,7 +230,7 @@ export class FacturaC extends CrudG<FacturasI> {
       if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
-        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
+        let objPdfView = { ...response, titulo: params.pdf.titulo, fileName: _.first(response.file.split('.')) };
 
         ReporteC.visualizarReporte(objPdfView);
       });
@@ -405,7 +409,7 @@ export class FacturaC extends CrudG<FacturasI> {
     });
   }
 
-  abrirModalHistorial(pagos, notas, openNewModal) {
+  abrirModalHistorial(pagos, notas) {
     if (pagos.length > 0 || notas.length > 0) {
       for (let i = 0; i < pagos.length; i++) {
         const pago = pagos[i];

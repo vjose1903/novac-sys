@@ -8,6 +8,8 @@ import { csvConfig as csvConfigReciboIngreso } from '@core/services/reports/exce
 import { ReportGroupTypeE } from '../reportes/reporte.utils';
 import { Validators } from '@angular/forms';
 import { reportField } from '@core/components/formularios en modales/form-reportes/form-reportes.component.model';
+import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 export interface ReciboI {
   id?: number;
   user_id?: number;
@@ -63,18 +65,22 @@ export class ReciboC extends CrudG<ReciboI> {
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
+  static openModalReporteForm(params: { tipo: any; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
-      params.inputs['dinamyc_selections'] = ReciboC.inputsBuscarPor;
-      params.inputs['conditionalRender'] = { ...ReciboC.clienteConditionalRender };
-      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+      const { tipo, titulo } = params;
+      const inputs = { tipo_reporte: tipo };
 
-      params.openNewModal(ReporteC.objReporte);
+      inputs['dinamyc_selections'] = ReciboC.inputsBuscarPor;
+      inputs['conditionalRender'] = { ...ReciboC.clienteConditionalRender };
+      ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 
-      function returnDataFromModal(arg) {
-        ReciboC.requestReporte(arg, params);
-        resolve(arg);
+      function returnDataFromModal(arg: ICallbackModal) {
+        if (arg.type != modalCloseType.returnData) return;
+        ReciboC.requestReporte(arg.data, params);
+        resolve(arg.data);
       }
+
+      new DynamicModalClass(ReporteC.objReporte).show();
     });
   }
 
@@ -96,7 +102,7 @@ export class ReciboC extends CrudG<ReciboI> {
     ReporteC.configCsv = csvConfigReciboIngreso[formReporte.tipo == ReportGroupTypeE.detallado ? 'detallado' : 'agrupado'];
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
-      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+      let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')) };
       ReporteC.visualizarReporte(objPdfView);
     });
 

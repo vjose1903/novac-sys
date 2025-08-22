@@ -61,9 +61,12 @@ export class DynamicModalClass {
     this.closableClickOutside = params && fun.objHas(params, 'closableClickOutside') ? params.closableClickOutside : false;
     this.confirmToClose = params && fun.objHas(params, 'confirmToClose') ? params.confirmToClose : false;
     this.html = params && fun.objHas(params, 'html') ? params.html : undefined;
+    this.callback = params && fun.objHas(params, 'callback') ? params.callback : undefined;
 
     this.returnData = (arg: ICallbackModal) => this.runCallback(arg);
     this.hideModal = (arg: ICallbackModal) => this.runCallback(arg);
+
+
   }
 
   show() {

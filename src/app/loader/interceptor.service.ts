@@ -75,6 +75,11 @@ export class InterceptorService implements HttpInterceptor {
 
         if (response.status == 401) {
           const token = fun.getAuthToken();
+          console.log('ENREEEE 2');
+          console.log('token ', token);
+
+          fun.logout();
+
           if (token) {
             fun.toastError('Su sesión ha expirado, por favor inicie sesión nuevamente', 'SESIÓN EXPIRADA');
             return;
@@ -86,10 +91,12 @@ export class InterceptorService implements HttpInterceptor {
         if (fun.isEmpty(response.error)) {
           errorDesconocido();
         } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
+
+          console.log("@@@@@@@@@@@@@@@@@@@@@@@@@");
+          
           fun.toastError(response.error.msg, 'ERROR');
           this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(false));
-
-          Ss.layServ.nextLogOut({ bool: true, quien: 'close_session' });
+          fun.logout();
         } else {
           if (fun.objHas(response, 'status') && response.status == 404 && fun.hasValue(response?.error?.msg)) {
             console.log('1');

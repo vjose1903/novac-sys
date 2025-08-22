@@ -54,7 +54,6 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   ngOnInit() {
-    fun.logout();
     this.form = this.fb.group({ usuario: !Environment.production ? 'novac' : null, password: !Environment.production ? '1234567' : null });
   }
 
@@ -106,6 +105,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
         .then(res => {
           fun.setTimeout(() => {
             this.currentUserServ.setUser(res.data).then(() => {
+              Ss.factServ.getTiposFacturas();
               this.router.navigateByUrl('/admin/dashboard');
             });
           }, 250);
