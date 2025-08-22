@@ -1,10 +1,8 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { fun } from '@core/services/functions.service';
-import { ModalI } from '@components/modal/modal-class';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { ConfigArticuloC, ConfigArticuloI } from '../articulos_configuracion';
-import { Ss } from '@core/services/singleton.service';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 

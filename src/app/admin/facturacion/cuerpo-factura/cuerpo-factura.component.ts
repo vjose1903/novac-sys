@@ -1,7 +1,7 @@
 import { RetornarDevueltoComponent } from './retornar-devuelto/retornar-devuelto.component';
 import { FacturacionService } from './../facturacion.service';
 import { tipoDocFacturacion } from './../factura';
-import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormArray, FormGroup, FormArray } from '@angular/forms';
 import * as _ from 'lodash';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -12,10 +12,10 @@ import { RemoverArticuloComponent } from './remover-articulo/remover-articulo.co
 import { razon_remover } from './remover-articulo/contantes';
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
-import { ModalClass } from '@components/modal/modal-class';
 import { Subject, takeUntil } from 'rxjs';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
-import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -58,10 +58,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private fb: UntypedFormBuilder,
-    public factServ: FacturacionService
-  ) {
+  dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  public factServ = inject(FacturacionService);
+
+  constructor() {
     super();
     // this.rowFactura = new FormArray([new FormControl()]);
   }
@@ -791,7 +792,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   getActualPrice(index, event?) {
     const actual_price_value = (this.factServ.filasDetalle.at(index) as FormGroup).controls['actual_price_value'].value;
 
-    const siFunction = instance => {
+    const siFunction = () => {
       const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
       const detalle = {};
       const campoToSolve = this.factServ.isCompra() ? 'costo' : 'precio';
@@ -800,11 +801,17 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       detalle[campoToSolve] = actual_price_value;
       formGroup.patchValue(detalle);
 
-      this.calcularMontosRow(index).then(result => instance.close());
+      this.calcularMontosRow(index);
     };
 
     const label = this.factServ.isCompra() ? 'costo' : 'precio';
-    this.confirmationModal({ id: 'get_actual_price', header: 'Confirmar', texto: `Seguro que desea obtener el ${label} actual`, siFunction: siFunction });
+
+    this.dynamicModalServ.confirmationModal({
+      id: 'get_actual_price',
+      texto: `Seguro que desea obtener el ${label} actual`,
+      btnKind: confirmationButtons.siNo,
+      onYes: siFunction.bind(this),
+    });
 
     if (this.dropRowMenu) this.dropRowMenu.hide();
     if (event) event.stopPropagation();

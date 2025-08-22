@@ -1,11 +1,9 @@
-import { ModalClass } from '@components/modal/modal-class';
 import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { LoaderService } from './../../../loader/loader.service';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
 import { Ss } from '@core/services/singleton.service';
-import { ModalService } from '@components/modal/modal.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { ConfigI } from '@core/interface/config-interface';
 import { Permisos } from '@core/typescript/permisos';

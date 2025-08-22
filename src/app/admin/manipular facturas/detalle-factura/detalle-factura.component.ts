@@ -1,5 +1,4 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { ModalI } from '@components/modal/modal-class';
 import { fun } from '@core/services/functions.service';
 import { serie, TrackStatusEnum } from '@core/typescript/constantes';
 import { ModalDetalleFacturaI } from './detalle-factura.model';

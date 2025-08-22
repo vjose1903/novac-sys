@@ -1,8 +1,9 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { ModalClass } from '../../modal/modal-class';
 import { TablasService } from '../tablas.service';
 import { fun } from '@core/services/functions.service';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'icons-array',
@@ -24,6 +25,7 @@ export class IconsArrayComponent {
 
   htmlServ = inject(HtmlElementsService);
   tServ = inject(TablasService);
+  dynamicModalServ = inject(DynamicModalService);
 
   get visibleIcons() {
     if (!this.column?.iconsArray) return [];
@@ -111,7 +113,12 @@ export class IconsArrayComponent {
         instance.close();
       };
 
-      new ModalClass().confirmationModal({ id: 'cancel_row_editing', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
+      this.dynamicModalServ.confirmationModal({
+        id: 'cancel_row_editing',
+        texto: texto_modal,
+        btnKind: confirmationButtons.siNo,
+        onYes: siFunction.bind(this),
+      });
     }
   }
 

@@ -9,7 +9,6 @@ import { MixinClass } from '@core/typescript/MixinClass';
 import { DateUtils } from '@vjose1903/dateutils';
 import { ArticuloC } from '@registros/articulos/articulo';
 import { ClienteC, CxC } from '@registros/registro-clientes/cliente';
-import { ModalI } from '@components/modal/modal-class';
 // import { TipoPagoReporte } from '../../../pagos/class/pagos/pagos';
 // import { TipoReciboReporte } from '../../../pagos/class/ingresos/recibos';
 import { reportField } from './form-reportes.component.model';

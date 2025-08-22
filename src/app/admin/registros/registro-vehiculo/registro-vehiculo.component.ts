@@ -3,7 +3,6 @@ import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject, signal } from 
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { GLOBAL } from '@core/typescript/GLOBAL';
 import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -14,8 +13,6 @@ import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { ModalClass } from '@components/modal/modal-class';
-import { Ss } from '@core/services/singleton.service';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';

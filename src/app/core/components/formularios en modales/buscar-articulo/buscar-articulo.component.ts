@@ -1,8 +1,6 @@
-import { AfterViewInit, Component, Input, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, Input, signal } from '@angular/core';
 import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';
-import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
-
 import { MixinClass } from '@core/typescript/MixinClass';
 import { default_per_page, table_config, tableCellType } from '../../new_tablas/tabla-class';
 import { tipoDocFacturacion } from '@admin/facturacion/factura';

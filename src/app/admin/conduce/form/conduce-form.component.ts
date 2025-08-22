@@ -10,7 +10,6 @@ import { BuscarArticuloComponent } from '@components/formularios en modales/busc
 import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { ModalSeleccionarArticuloComponent } from '@components/formularios en modales/modal-seleccionar-articulo/modal-seleccionar-articulo.component';
 import { fun } from '@core/services/functions.service';
-import { ModalService } from '@components/modal/modal.service';
 import { Permisos } from '@core/typescript/permisos';
 import { table_config } from '@components/new_tablas/tabla-class';
 import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
@@ -102,7 +101,6 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   htmlServ = inject(HtmlElementsService);
   dynamicModalServ = inject(DynamicModalService);
   private fb = inject(UntypedFormBuilder);
-  public mServ = inject(ModalService);
   private router = inject(Router);
 
   constructor() {

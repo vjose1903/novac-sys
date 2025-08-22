@@ -1,7 +1,6 @@
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
-import { Component, OnInit, OnDestroy, Input, signal, computed, effect } from '@angular/core';
-import * as _ from 'lodash';
+import { Component, OnInit, OnDestroy, Input, signal, computed, effect, inject } from '@angular/core';
 const moment = require('../../../core/javascript/moment');
 import { Router } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -9,18 +8,18 @@ import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';
 import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC, DetalleFactura, request_factura_campo, tipoDocFacturacion, TipoFacturaI } from '../../facturacion/factura';
 import { NcfC } from '@registros/ncf/ncf';
 import { ClienteC } from '@registros/registro-clientes/cliente';
-import { comprobanteElectronico, comprobanteNormal, NotaC } from './notas';
+import { NotaC } from './notas';
 import { fun } from '@core/services/functions.service';
 import { Permisos } from '@core/typescript/permisos';
 import { table_config, transformType } from '@components/new_tablas/tabla-class';
 import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
-import { ModalClass } from '@components/modal/modal-class';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import Big from 'big.js';
 import { serie, seriesDGII, seriesDgiiI } from '@core/typescript/constantes';
 import { DateUtils } from '@vjose1903/dateutils';
-import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -107,7 +106,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return this.tipoNota === 'credito';
   }
 
-  constructor(private router: Router) {
+  dynamicModalServ = inject(DynamicModalService);
+  private router = inject(Router);
+
+  constructor() {
     super();
 
     effect(async () => {
@@ -423,17 +425,16 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    const confirmationObj = {
-      id: 'archivar_factura',
-      texto: 'Seguro que desea cancelar la operación',
-      header: 'Confirmación',
-      siFunction: instance => {
-        this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
-        this.closeModal(instance);
-      },
-      width: '30rem',
+    const siFunction = () => {
+      this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
     };
-    this.confirmationCancelModal(confirmationObj);
+
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_nota',
+      texto: 'Seguro que desea cancelar la operación',
+      btnKind: confirmationButtons.siNo,
+      onYes: siFunction.bind(this),
+    });
   }
 
   // =============================================
@@ -469,22 +470,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       this.is_print = is_print;
       this.send_nota();
     }
-  }
-
-  confirmationCancelModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco w-9', function: instance => this.closeModal(instance), label: 'No', disable: false },
-          { clase: 'btn btn-verde w-9', function: instance => obj.siFunction(instance), label: 'Si', disable: false },
-        ],
-      },
-    });
   }
 
   closeModal(modalInstance) {

@@ -1,9 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import * as _ from 'lodash';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ModalI } from '../../modal/modal-class';
 import { table_config } from '../../new_tablas/tabla-class';
-import { Ss } from '@core/services/singleton.service';
 import { fun } from '@core/services/functions.service';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';

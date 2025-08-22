@@ -1,6 +1,5 @@
 import { Component, effect, Input, OnInit, signal } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ModalI } from '../../modal/modal-class';
 import { table_config, tableCellType } from '../../new_tablas/tabla-class';
 import { fun } from '@core/services/functions.service';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';

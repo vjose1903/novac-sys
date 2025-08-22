@@ -8,7 +8,6 @@ import { fun } from '@core/services/functions.service';
 const moment = require('../../core/javascript/moment');
 import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
-import { ModalClass } from '@components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { serie, unidadAbrev } from '@core/typescript/constantes';
@@ -16,7 +15,6 @@ import { csvConfig as csvConfigVentas } from '@core/services/reports/excel/confi
 import { csvConfig as csvConfigMovimientosVehiculo } from '@core/services/reports/excel/configs/report/movimientos_vehiculo';
 import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { ArticuloI } from '@registros/articulos/articulo';
-import { DateUtils } from '@vjose1903/dateutils';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { IButtonDynamic, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 

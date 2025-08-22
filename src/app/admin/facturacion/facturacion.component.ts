@@ -2,9 +2,9 @@ import { EmpleadoC } from '@registros/registro-empleados/empleado';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-extra.component';
 
-import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, inject, effect, OnChanges, SimpleChanges, Input, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, inject, OnChanges, SimpleChanges, Input, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 const moment = require('../../core/javascript/moment');
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
@@ -25,7 +25,6 @@ import { Permisos } from '@core/typescript/permisos';
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
 import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
-import { ModalClass } from '@components/modal/modal-class';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { ConfigArticuloC, ConfigArticuloI } from '@registros/articulos/configuracion_articulos/articulos_configuracion';
 import { HtmlElementsService } from '@core/services/html-elements.service';
@@ -1290,11 +1289,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     } else {
       fun.desEnfocarInput(document?.activeElement?.id);
 
-      let botones = fun.deepCloning(ModalClass.noShowAceptarCancelarButtons);
+      let botones = [];
 
       if (this.factServ.isCotizacion() || this.factServ.isPreVenta()) {
         const label = `Salir de ${this.factServ.isCotizacion() ? 'Cotización' : 'Pre venta'}`;
-        botones['dinamico'] = [{ clase: 'btn btn-gris', function: instance => this.router.navigateByUrl('/admin/dashboard') && this.closeModal(instance), label: label, disable: false }];
+        botones.push({ clase: 'btn btn-gris', function: instance => this.router.navigateByUrl('/admin/dashboard') && instance.close(), label: label, disable: false });
       }
 
       const include_contado = this.factServ.isVenta() || this.factServ.isCotizacion();

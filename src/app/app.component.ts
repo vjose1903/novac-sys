@@ -1,8 +1,7 @@
 import { PrimengModule } from './modules/primeng.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NewModalModule } from './core/components/modal/modal.module';
 import { FormulariosEnModalesModule } from './core/components/formularios en modales/formularios-en-modales.module';
-import { Component, OnInit, ChangeDetectorRef, NgZone, AfterViewInit, HostListener, inject, OnDestroy, signal, Injector, effect } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, AfterViewInit, HostListener, inject, OnDestroy, signal, Injector } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
 import { IpcService } from '@services/ipc.service';
 
@@ -37,16 +36,15 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ModalClass } from './core/components/modal/modal-class';
-import { TipoFacturaI, TiposFacturaC } from '@admin/facturacion/factura';
 import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
 import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
 import { Firestore } from '@angular/fire/firestore';
-import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, PrimengModule, FormsModule, ReactiveFormsModule, NewModalModule, FormulariosEnModalesModule, RouterModule, DynamicModalComponent],
+  imports: [CommonModule, PrimengModule, FormsModule, ReactiveFormsModule, FormulariosEnModalesModule, RouterModule, DynamicModalComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -295,33 +293,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
         btnKind: confirmationButtons.cancelarCerrar,
         onYes: this.sendCloseConfirmation.bind(this),
       });
-
-      // this.openNewModal({
-      //   html: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
-      //   id: 'cerrar_app',
-      //   header: 'CONFIRMACIÓN DE CIERRE',
-      //   width: '40rem',
-      //   botones: {
-      //     ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-      //     dinamico: [
-      //       {
-      //         clase: 'btn btn-blanco',
-      //         function: instance => instance.closeModal(instance.id),
-      //         label: 'Cancelar',
-      //         disable: false,
-      //       },
-      //       {
-      //         clase: 'btn btn-danger',
-      //         function: instance => {
-      //           this.sendCloseConfirmation();
-      //           instance.closeModal(instance.id);
-      //         },
-      //         label: 'Cerrar',
-      //         disable: false,
-      //       },
-      //     ],
-      //   },
-      // });
     });
   }
 
@@ -332,39 +303,27 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
 
   mostrar_modal_actualizacion(info: any): void {
     this.zone.run(() => {
-      this.openNewModal({
-        html: `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`,
-        id: 'actualizar_app',
-        header: 'ACTUALIZACIÓN DISPONIBLE',
-        width: '40rem',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            {
-              clase: 'btn btn-blanco',
-              function: instance => instance.closeModal(instance.id),
-              label: 'Cancelar',
-              disable: false,
-            },
-            {
-              clase: 'btn btn-verde',
-              function: instance => {
-                this.iniciar_descarga_actualizacion();
-                instance.closeModal(instance.id);
-              },
-              label: 'Actualizar',
-              disable: false,
-            },
-          ],
-        },
-      });
+      const propietarioModalConf = new DynamicModalClass();
+
+      propietarioModalConf.id = 'actualizar_app';
+      propietarioModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
+      propietarioModalConf.width = '40rem';
+      propietarioModalConf.html = `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`;
+      propietarioModalConf.closableEsc = true;
+      propietarioModalConf.botones = [
+        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance) },
+      ];
+
+      propietarioModalConf.show();
     });
   }
 
-  iniciar_descarga_actualizacion(): void {
+  iniciar_descarga_actualizacion(modalInstance?: DynamicModalClass): void {
     const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
     this._ipc.sendTask(task).then(res => {
       this.visible.set(true);
+      if (modalInstance) modalInstance.close();
     });
   }
 
