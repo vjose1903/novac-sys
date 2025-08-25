@@ -2,7 +2,7 @@
   <div class="row">
     <!-- ----- SIMPLE_SWITCH -----  -->
     @if (verifyConditionalRender(reportField.simpleSwitchField) && dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) {
-      @for (dinamyc_switch of dinamyc_switches; track dinamyc_switch.id) {
+      @for (dinamyc_switch of dynamic_switches; track dinamyc_switch.id) {
         <div class="col-12 p-0">
           <div class="form-group horizontal-layout">
             <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
@@ -21,7 +21,7 @@
     }
 
     <!-- ----- FECHA -----  -->
-    @if (verifyConditionalRender(reportField.dateField) && ((tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.one_day) || reportTypeHasfield(reportField.dateField))) {
+    @if (verifyConditionalRender(reportField.dateField) && reportTypeHasfield(reportField.dateField)) {
       <div class="col-12 p-0">
         <div class="form-group">
           <label class="control-label mb-0">Fecha: <span style="color: red">*</span> </label>
@@ -35,7 +35,7 @@
 
     <!-- ----- DESDE -----  -->
 
-    @if (verifyConditionalRender(reportField.fromField) && (reportTypeHasfield(reportField.fromField) || (tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.range))) {
+    @if (verifyConditionalRender(reportField.fromField) && reportTypeHasfield(reportField.fromField)) {
       <div class="col-6 ps-0">
         <div class="form-group">
           <label class="control-label mb-0">Desde: <span style="color: red">*</span> </label>
@@ -48,7 +48,7 @@
     }
 
     <!-- ----- HASTA -----  -->
-    @if (verifyConditionalRender(reportField.toDateField) && (reportTypeHasfield(reportField.toDateField) || (tipo_reporte == 'ventas_productos' && form.controls.tipo.value == ReportDateTypeE.range))) {
+    @if (verifyConditionalRender(reportField.toDateField) && reportTypeHasfield(reportField.toDateField)) {
       <div class="col-6 pe-0">
         <div class="form-group">
           <label class="control-label mb-0">Hasta: <span style="color: red">*</span> </label>
@@ -63,7 +63,7 @@
     <!-- ----- DINAMYC SELECTION -----  -->
 
     @if (verifyConditionalRender(reportField.dynamicSelection) && dinamycSelectionReady && reportTypeHasfield(reportField.dynamicSelection)) {
-      @for (dinamyc_selection of dinamyc_selections; track dinamyc_selection.id) {
+      @for (dinamyc_selection of dynamic_selections; track dinamyc_selection.id) {
         <div class="col-12 p-0">
           <div class="form-group">
             <label class="control-label mb-0">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>

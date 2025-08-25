@@ -57,14 +57,14 @@ export class ClienteC extends CrudG<any> {
 
       const reportIncludedInSwitches = ['cuentas_cobrar_ant_saldo', 'cuentas_cobrar_cliente'];
 
-      inputs['dinamyc_switches'] = [];
+      inputs['dynamic_switches'] = [];
       if (reportIncludedInSwitches.includes(tipo)) {
-        inputs['dinamyc_switches'].push(ClienteC.inputsIncludeSaldadas);
+        inputs['dynamic_switches'].push(ClienteC.inputsIncludeSaldadas);
       }
 
       if (tipo == 'cuentas_cobrar_cliente') {
-        inputs['dinamyc_switches'].unshift(ClienteC.inputMostrarPendienteAnterior);
-        inputs['dinamyc_switches'].push(ClienteC.inputsIncludeMora);
+        inputs['dynamic_switches'].unshift(ClienteC.inputMostrarPendienteAnterior);
+        inputs['dynamic_switches'].push(ClienteC.inputsIncludeMora);
       }
 
       ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };

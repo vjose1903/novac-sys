@@ -146,7 +146,7 @@ export class FacturaC extends CrudG<FacturasI> {
           ],
         };
       } else {
-        inputs['dinamyc_selections'] = FacturaC.inputsMovimientosViaje;
+        inputs['dynamic_selections'] = FacturaC.inputsMovimientosViaje;
       }
 
       ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };

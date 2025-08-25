@@ -22,8 +22,8 @@ export interface CanComponentDeactivate {
 })
 export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate> {
   canDeactivate(component: CanComponentDeactivate): Observable<boolean> | Promise<boolean> | boolean {
-    // Si el componente no implementa la interfaz, permitir la navegación
-    if (!component.canDeactivate) return true;
+    // Si el componente es null o no implementa la interfaz, permitir la navegación
+    if (!component || !component.canDeactivate) return true;
 
     const result = component.canDeactivate();
 

@@ -68,7 +68,7 @@ export class ReciboC extends CrudG<ReciboI> {
       const { tipo, titulo } = params;
       const inputs = { tipo_reporte: tipo };
 
-      inputs['dinamyc_selections'] = ReciboC.inputsBuscarPor;
+      inputs['dynamic_selections'] = ReciboC.inputsBuscarPor;
       inputs['conditionalRender'] = { ...ReciboC.clienteConditionalRender };
       ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 

@@ -34,7 +34,7 @@ export class ReporteC extends CrudG<any> {
       header: params.header,
       botones: [
         { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
-        { clase: 'btn btn-verde', label: 'Aceptar', disable: false },
+        { clase: 'btn btn-verde', label: 'Aceptar', disable: true, id: 'accept' },
       ],
     };
 
