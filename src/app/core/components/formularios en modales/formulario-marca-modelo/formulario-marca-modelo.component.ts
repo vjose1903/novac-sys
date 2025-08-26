@@ -1,16 +1,16 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, Input, Output, EventEmitter, inject, signal, effect } from '@angular/core';
+import { Component, OnInit, Input, inject, signal, effect } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { GLOBAL } from '@core/typescript/GLOBAL';
-import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
-import { ModalI } from '../../modal/modal-class';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '../../new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { confirmationButtons, IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-formulario-marca-modelo',
@@ -18,22 +18,26 @@ import { NgxPermissionsService } from 'ngx-permissions';
   styleUrls: ['./formulario-marca-modelo.component.scss'],
   standalone: false,
 })
-export class FormularioMarcaModeloComponent extends MixinClass implements OnInit, ModalI {
+export class FormularioMarcaModeloComponent extends MixinClass implements OnInit, IDynamicModal {
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
   @Input() tipo_formulario;
+
   tabIndex = signal(0);
   processingTabChange = true;
 
   tituloTabla;
-  @Output() accion_ = new EventEmitter<any>();
   formMarca: UntypedFormGroup;
   formModelo: UntypedFormGroup;
+
   permissions = Permisos;
   table_marca_config: table_config = {
     info: [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_marcas',
-    padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
+    padre_functions: { data_request: params => this.pedirNuevaData(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.marca.update }, borrar: { show: true, permiso: this.permissions.marca.destroy } },
@@ -48,29 +52,27 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_modelos',
-    padre_functions: { data_request: (params) => this.pedirNuevaData(params) },
+    padre_functions: { data_request: params => this.pedirNuevaData(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.modelo.update }, borrar: { show: true, permiso: this.permissions.modelo.destroy } },
   };
+
   tablaModeloComponent: any;
 
   info = [{ titulo: 'Descripcion', key: 'descripcion', tipo: 'text' }];
 
-  botones = { titulo: true, borrar: true, editar: true };
   componente = { 0: 'listado_marcas', 1: 'listado_modelos' };
 
-  listadoMarcas = [];
-  marcaSelected;
+  listadoMarcas = signal<any[]>([]);
+  marcaSelected = signal<any>(null);
 
-  listadoModelos = [];
-  modeloSelected;
+  listadoModelos = signal<any[]>([]);
+  modeloSelected = signal<any>(null);
 
-  campo1;
-  campo2;
   editando = false;
 
-  listaMarcas: any;
+  listaMarcas = signal<any[]>([]);
   listaTipoArticulos: any;
 
   marcasClass = new MarcaC();
@@ -81,47 +83,56 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   hasPermissionsMarcaCreate: boolean;
   hasPermissionsModeloCreate: boolean;
 
-  htmlServ = inject(HtmlElementsService);
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+  private permissionsService = inject(NgxPermissionsService);
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+  constructor() {
     super();
 
     effect(() => {
-      if (fun.hasValue(this.tabIndex()) && !this.processingTabChange) {
+      const tabIndex = this.tabIndex();
+
+      if (fun.hasValue(tabIndex) && !this.processingTabChange) {
         const has_permisos = { 0: this.hasPermissionsMarca, 1: this.hasPermissionsModelo };
         this.processingTabChange = true;
 
-        if (has_permisos[this.tabIndex()]) {
-          const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex()]);
+        if (has_permisos[tabIndex]) {
+          const actual_pagination = this.tServ.getPaginationById(this.componente[tabIndex]);
           this.pedirNuevaData(actual_pagination);
+          requestAnimationFrame(() => {
+            fun.enfocarInput('descripcion-input');
+            console.log('ANDO AQUIII');
+          });
         } else {
-          fun.toastError('No tiene permisos para realizar esta accion', 'No Autorizado');
-          setTimeout(() => {
-            this.tabIndex.set(this.tabIndex() == 0 ? 1 : 0);
+          fun.toastError('No tiene permisos para realizar esta acción', 'No Autorizado');
+
+          fun.setTimeout(() => {
+            const prevIndex = tabIndex == 0 ? 1 : 0;
+            this.tabIndex.set(prevIndex);
           }, 1);
         }
 
-        setTimeout(() => (this.processingTabChange = false), 250);
+        fun.setTimeout(() => {
+          this.processingTabChange = false;
+        }, 250);
       }
     });
   }
 
-  modal: any = {};
-  inputs: any;
   btn_aceptar() {}
 
   ngOnInit() {
     this.createForm();
-    this.tipo_formulario = this.inputs.tipo;
 
     if (this.tipo_formulario === 'marcas') {
       this.tabIndex.set(0);
       this.tituloTabla = 'Marcas';
-      this.campo1 = 'Marca';
     } else if (this.tipo_formulario === 'modelos') {
       this.tabIndex.set(1);
       this.tituloTabla = 'Modelos';
-      this.campo1 = 'Marca';
     }
 
     this.formMarca.controls.descripcion.setValidators([Validators.required]);
@@ -132,30 +143,32 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
     this.pedirNuevaData(this.tServ.obj_paginate.default);
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.processingTabChange = false;
-      if (this.tipo_formulario === 'modelos') fun.enfocarInput('marca_modal');
-      else fun.enfocarInput('descripcion');
+      fun.enfocarInput('descripcion-input');
     }, 200);
 
     this.checkPermissions();
   }
   checkPermissions() {
-    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then((result) => (this.hasPermissionsMarca = result));
-    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then((result) => (this.hasPermissionsModelo = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then(result => (this.hasPermissionsMarca = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then(result => (this.hasPermissionsModelo = result));
 
-    this.permissionsService.hasPermission([this.permissions.marca.create, this.permissions.marca.update]).then((result) => (this.hasPermissionsMarcaCreate = result));
-    this.permissionsService.hasPermission([this.permissions.modelo.create, this.permissions.modelo.update]).then((result) => (this.hasPermissionsModeloCreate = result));
+    this.permissionsService.hasPermission([this.permissions.marca.create, this.permissions.marca.update]).then(result => (this.hasPermissionsMarcaCreate = result));
+    this.permissionsService.hasPermission([this.permissions.modelo.create, this.permissions.modelo.update]).then(result => (this.hasPermissionsModeloCreate = result));
   }
 
   getMarcas(params) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: params.paginado, page: params.page, per_page: params.per_page } };
-    this.listadoMarcas.length = 0;
-    this.marcasClass.getAll(extra).then((res) => {
-      if (!params.paginado) this.listaMarcas = fun.deepCloning(res);
+
+    this.listadoMarcas.set([]);
+
+    this.marcasClass.getAll(extra).then(res => {
+      if (!params.paginado) this.listaMarcas.set(fun.deepCloning(res));
+
       if (params.paginado) {
-        this.listadoMarcas = res.data;
+        this.listadoMarcas.set(res.data);
         this.tablaMarcaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       }
     });
@@ -165,21 +178,21 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: true, page: params.page, per_page: params.per_page } };
 
-    this.listadoModelos.length = 0;
-    this.modeloClass.getAll(extra).then((res) => {
-      res.data.map((obj) => {
+    this.listadoModelos.set([]);
+    this.modeloClass.getAll(extra).then(res => {
+      res.data.map(obj => {
         obj.marca_nombre = obj.marca.descripcion;
         return obj;
       });
 
-      this.listadoModelos = res.data;
+      this.listadoModelos.set(res.data);
       this.tablaModeloComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
   capitalice(control, arg, form) {
     const campo = form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   createForm() {
@@ -198,37 +211,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     }
   }
 
-  accion(arg) {
-    this.accion_.emit(arg);
-  }
-
   closeThis() {
-    const modal = _.find(this.modal.instance.modalsConfig, (config) => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-
-    return modal;
-  }
-
-  async submit(formToSubmit) {
-    const obj = fun.deepCloning(formToSubmit.getRawValue());
-    const metodo = fun.hasValue(obj?.id) ? 'actualizado' : 'creado';
-
-    if (this.isShowMarcas() && fun.objHas(obj, 'marca_id')) delete obj['marca_id'];
-
-    const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
-
-    await clase.createUpdateOne(obj).then(() => this.onSuccess(metodo));
-  }
-
-  onSuccess(metodo) {
-    fun.toastSuccess(`Item ${metodo} correctamente.`, 'CORRECTO');
-
-    this.pedirNuevaData(this.tServ.obj_paginate.default);
-
-    this.borrar();
-
-    if (this.isShowMarcas()) fun.enfocarInput('descripcion');
-    else fun.enfocarInput('marca_modal');
+    this.modalConfig.close();
   }
 
   isShowMarcas() {
@@ -243,10 +227,10 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   borrar() {
     if (this.isShowMarcas()) {
       this.formMarca.reset();
-      this.marcaSelected = undefined;
+      this.marcaSelected.set(null);
     } else {
       this.formModelo.reset();
-      this.modeloSelected = undefined;
+      this.modeloSelected.set(null);
     }
 
     this.editando = false;
@@ -255,8 +239,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   editarItem(data) {
     const form = this.isShowMarcas() ? this.formMarca : this.formModelo;
 
-    if (this.isShowMarcas()) this.marcaSelected = data;
-    else this.modeloSelected = data;
+    if (this.isShowMarcas()) this.marcaSelected.set(data);
+    else this.modeloSelected.set(data);
 
     this.editando = true;
 
@@ -266,18 +250,48 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar ${this.isShowMarcas() ? 'la marca' : 'el modelo'}: <b> ${regisData.descripcion} </b>?`,
-      siFunction: () => {
-        const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
-        clase.deleteOne(regisData.id).then((res) => {
-          const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex()]);
-          this.pedirNuevaData(actual_pagination);
-        });
-      },
+    const onYes = () => {
+      const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
+      clase.deleteOne(regisData.id).then(res => {
+        const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex()]);
+        this.pedirNuevaData(actual_pagination);
+      });
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'eliminar_reg',
+      texto: `¿Está seguro que desea eliminar ${this.isShowMarcas() ? 'la marca' : 'el modelo'}: <b> ${regisData.descripcion} </b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
+  }
+
+  async submit(formToSubmit) {
+    const formData = formToSubmit.getRawValue();
+    const isUpdate = fun.hasValue(formData?.id);
+    const metodo = isUpdate ? 'actualizado' : 'creado';
+
+    // Limpiar marca_id si es formulario de marcas
+    if (this.isShowMarcas() && fun.objHas(formData, 'marca_id')) {
+      delete formData.marca_id;
+    }
+
+    const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
+    await clase.createUpdateOne(formData);
+
+    this.onSuccess(metodo);
+  }
+
+  onSuccess(metodo) {
+    fun.toastSuccess(`Item ${metodo} correctamente.`, 'CORRECTO');
+
+    // Actualizar datos y limpiar formulario
+    const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex()]);
+    this.pedirNuevaData(actual_pagination);
+    this.borrar();
+
+    // Enfocar el input correspondiente
+    const inputToFocus = this.isShowMarcas() ? 'descripcion' : 'marca_modal';
+    fun.enfocarInput(inputToFocus);
   }
 }

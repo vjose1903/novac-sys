@@ -19,11 +19,11 @@
                   </div>
                   <div class="col-6 p-0 mb-3">
                     <div class="row">
-                      <div class="pr-0 col-12">
+                      <div class="pe-0 col-12">
                         <div>
-                          <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
+                          <label class="me-2"> <input type="radio" value="1" class="me-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
                           <label>
-                            <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc
+                            <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="me-1" (click)="changeIdent(false)" />Rnc
                             <span style="color: red">*</span>
                           </label>
                         </div>
@@ -39,9 +39,13 @@
                                 inputId="cedula"
                                 placeholder="___-_______-_"
                                 formControlName="cedula"
-                                [autoClear]="false"></p-inputMask>
+                                [autoClear]="false">
+                              </p-inputMask>
+
                               <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                                <span class="input-group-text"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                                <span class="input-group-text sufijo">
+                                  <i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i>
+                                </span>
                               </div>
                             </div>
                             <span id="msgContainer_cedula"></span>
@@ -59,16 +63,19 @@
                                 inputId="rnc"
                                 placeholder="___-_____-_"
                                 formControlName="rnc"
-                                [autoClear]="false"></p-inputMask>
+                                [autoClear]="false">
+                              </p-inputMask>
                               <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
-                                <span class="input-group-text"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
+                                <span class="input-group-text sufijo">
+                                  <i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i>
+                                </span>
                               </div>
                             </div>
                             <span id="msgContainer_rnc"></span>
                           </div>
                         }
                       </div>
-                      <div class="pr-0 col-12">
+                      <div class="pe-0 col-12">
                         <div class="form-group" [appMsgError]="'nombre'" [form]="form">
                           <label class="control-label">Nombre: <span style="color: red">*</span></label>
                           <input
@@ -84,7 +91,7 @@
                           <span id="msgContainer_nombre"></span>
                         </div>
                       </div>
-                      <div class="pr-0 col-12 mb-3">
+                      <div class="pe-0 col-12 mb-3">
                         <div class="form-group" [appMsgError]="'apellido'" [form]="form">
                           <label class="control-label">Apellido: <span style="color: red">*</span></label>
                           <input
@@ -101,14 +108,14 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-6 p-0 pr-2">
+                  <div class="col-6 p-0 pe-2">
                     <div class="form-group" [appMsgError]="'telefono'" [form]="form">
                       <label class="control-label">Telefono: <span style="color: red">*</span></label>
                       <p-inputMask (keydown.enter)="saltar('campoSexo')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
                       <span id="msgContainer_telefono"></span>
                     </div>
                   </div>
-                  <div class="col-6 p-0 pl-2">
+                  <div class="col-6 p-0 ps-2">
                     <div class="form-group" [appMsgError]="'sexo'" [form]="form">
                       <label class="control-label">Sexo: <span style="color: red">*</span></label>
                       <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
@@ -119,7 +126,7 @@
                       <span id="msgContainer_sexo"></span>
                     </div>
                   </div>
-                  <div class="col-6 p-0 pr-2">
+                  <div class="col-6 p-0 pe-2">
                     <div class="form-group" [appMsgError]="'limite_credito'" [form]="form">
                       <label class="control-label">Dias credito: <span style="color: red">*</span></label>
                       <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
@@ -130,17 +137,17 @@
                       <span id="msgContainer_limite_credito"></span>
                     </div>
                   </div>
-                  <div class="col-6 p-0 pl-2">
+                  <div class="col-6 p-0 ps-2">
                     <div class="form-group" [appMsgError]="'maximo_credito'" [form]="form">
                       <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
                       <input type="text" class="form-control" (blur)="revisarPrecio('maximo_credito')" formControlName="maximo_credito" id="maximo_credito" (keydown.enter)="saltar('campoVendedor')" placeholder="cantidad maxima" autocomplete="off" />
                       <span id="msgContainer_maximo_credito"> </span>
                     </div>
                   </div>
-                  <div class="col-6 p-0 pr-2">
+                  <div class="col-6 p-0 pe-2">
                     <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
                       <label class="control-label">Vendedor: <span style="color: red">*</span></label>
-                      <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('campoDir')">
+                      <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('provincia_select')">
                         <option [value]="null" disabled>Seleccione</option>
                         @for (item of vendedores; track item.id) {
                           <option value="{{ item.id }}">{{ item.nombre_completo }}</option>
@@ -152,11 +159,12 @@
 
                   <div class="col-12 p-0">
                     <div class="row">
-                      <div class="col-12 col-md-6 pl-0">
+                      <div class="col-12 col-md-6 ps-0">
                         <div class="form-group">
                           <label class="control-label">Provincia: <span style="color: red">*</span></label>
                           @if (provincias.value() !== undefined) {
                             <p-select
+                              #pSelectProvincia
                               inputId="provincia_select"
                               [options]="provincias.value()"
                               formControlName="provincia_id"
@@ -167,16 +175,20 @@
                               optionLabel="nombre"
                               optionValue="id"
                               emptyFilterMessage="Marca no encontrada"
-                              (onChange)="form.controls.municipio_id.setValue(null);"
+                              (onChange)="form.controls.municipio_id.setValue(null)"
+                              (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                              (keyup.enter)="saltar('municipio_select'); pSelectProvincia.hide()"
+                              (onFocus)="htmlServ.showPSelectPanel($event, pSelectProvincia)"
                               [resetFilterOnHide]="true" />
                           }
                         </div>
                       </div>
-                      <div class="col-12 col-md-6 pr-0">
+                      <div class="col-12 col-md-6 pe-0">
                         <div class="form-group">
                           <label class="control-label">Municipio: <span style="color: red">*</span></label>
                           <div class="w-100" [pTooltip]="fun.hasValue(this.documento_identidad()) ? (fun.isEmpty(provincia_id()) ? 'Debe de seleccionar una provincia primero' : null) : null">
                             <p-select
+                              #pSelectMunicipio
                               inputId="municipio_select"
                               [options]="municipios()"
                               formControlName="municipio_id"
@@ -187,6 +199,9 @@
                               optionValue="id"
                               appendTo="body"
                               emptyFilterMessage="Municipio no encontrado"
+                              (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+                              (keyup.enter)="saltar('campoDir'); pSelectMunicipio.hide()"
+                              (onFocus)="htmlServ.showPSelectPanel($event, pSelectMunicipio)"
                               [resetFilterOnHide]="true" />
                           </div>
                         </div>
@@ -204,11 +219,11 @@
 
                   <div class="col-12 form-group p-0" style="display: flex; justify-content: space-between">
                     <div>
-                      <a class="btn mr-2" id="btn-blanco" (click)="borrar()">Borrar</a>
-                      <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="{{ boton }}" id="btn-verde" />
+                      <a class="btn me-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                      <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ms-2" value="{{ boton }}" id="btn-verde" />
                     </div>
                     <div>
-                      <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
+                      <input class="btn ms-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
                     </div>
                   </div>
                 </div>

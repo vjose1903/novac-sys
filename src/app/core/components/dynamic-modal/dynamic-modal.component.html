@@ -1,0 +1,65 @@
+@for (modalConfig of modalsConfig; track modalConfig) {
+  <span>
+    @if (modalConfig) {
+      <p-dialog
+        #myModal
+        [id]="modalConfig.id"
+        [(visible)]="modalConfig.visible!"
+        [breakpoints]="{ '767px': '90vw' }"
+        [position]="modalConfig.position!"
+        [contentStyleClass]="modalConfig.contentStyleClass!"
+        [baseZIndex]="10000"
+        [draggable]="false"
+        [maximizable]="modalConfig.maximizable!"
+        [modal]="true"
+        [showHeader]="!!modalConfig.header"
+        [blockScroll]="false"
+        [resizable]="modalConfig.resizable!"
+        [dismissableMask]="modalConfig.closableClickOutside!"
+        [closeOnEscape]="modalConfig.closableEsc!"
+        [closable]="modalConfig.closable! && !modalConfig.confirmToClose"
+        [transitionOptions]="modalConfig.transitionOptions!"
+        (onShow)="handleModalShow(modalConfig.id!)"
+        (onHide)="handleCloseModal(modalConfig.id!)"
+        [contentStyle]="{ padding: modalConfig.padding, overflow: modalConfig.overflow, height: modalConfig.height, width: modalConfig.width }">
+        <ng-template pTemplate="header">
+          <div class="d-flex justify-content-between align-items-center w-100 h-100">
+            <h4 class="mb-0">{{ modalConfig.header }}</h4>
+            <div class="p-dialog-header-icons">
+              @if (modalConfig.confirmToClose) {
+                <button id="confirm-close-button" (click)="confirmToClose(modalConfig.id!)" type="button" pripple="" class="p-ripple p-element p-dialog-header-icon p-dialog-header-close p-link" tabindex="-1">
+                  <span class="p-dialog-header-close-icon pi pi-times" ng-reflect-ng-class="pi pi-times"></span>
+                </button>
+              }
+            </div>
+          </div>
+        </ng-template>
+        <div style="transition: all 0.5s" class="h-100 w-100">
+          <input type="text" id="modal_focus" style="position: absolute; left: -9999rem; opacity: 0" tabindex="-1" />
+          @if (modalConfig.html) {
+            <div [innerHtml]="sanitizeHtml(modalConfig.html)" appFocus></div>
+          } @else {
+            <ng-container [modalReceptorId]="modalConfig.id!"></ng-container>
+          }
+        </div>
+        
+        @if (hasAnyBtn(modalConfig)) {
+          <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center mt-2 gap-3">
+              @for (dynamic_boton of modalConfig?.botones; track dynamic_boton) {
+                <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
+                  <button [disabled]="getButtonState(dynamic_boton)" class="btn btn-sm {{ dynamic_boton.clase }} d-flex align-items-center justify-content-center gap-2" (click)="dynamicFunction(modalConfig, dynamic_boton)">
+                    @if (dynamic_boton.iconName) {
+                      <i class="{{ dynamic_boton.iconName }}" [ngStyle]="{ 'font-size': dynamic_boton.iconSize ?? '20px', color: dynamic_boton.iconColor ?? 'white' }"></i>
+                    }
+                    {{ dynamic_boton.label }}
+                  </button>
+                </span>
+              }
+            </div>
+          </ng-template>
+        }
+      </p-dialog>
+    }
+  </span>
+}

@@ -6,6 +6,7 @@ import { ProduccionComponent } from '../produccion/produccion.component';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { LayoutComponent } from './layout.component';
 import { PermissionsGuardService } from '@core/guard/permissions.guard';
+import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 import { Permisos } from '@core/typescript/permisos';
 const routes: Routes = [
   {
@@ -20,6 +21,7 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: HomeAdminComponent,
+        canDeactivate: [CanDeactivateGuard],
       },
       {
         path: 'factura',
@@ -32,6 +34,7 @@ const routes: Routes = [
       {
         path: 'produccion',
         component: ProduccionComponent,
+        canDeactivate: [CanDeactivateGuard],
       },
       {
         path: 'registros',
@@ -48,6 +51,7 @@ const routes: Routes = [
       {
         path: 'inventario',
         component: InventarioComponent,
+        canDeactivate: [CanDeactivateGuard],
       },
       {
         path: 'conduce',
@@ -57,6 +61,7 @@ const routes: Routes = [
         path: 'reportes',
         component: ReportesComponent,
         canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.reporte), 'admin/dashboard')],
+        canDeactivate: [CanDeactivateGuard],
       },
     ],
   },

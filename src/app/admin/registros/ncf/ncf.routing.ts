@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NcfComponent } from './ncf.component';
+import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 import { Permisos } from '@core/typescript/permisos';
 import { PermissionsGuardService } from '@core/guard/permissions.guard';
 
@@ -9,6 +10,7 @@ const routes: Routes = [
     path: '',
     component: NcfComponent,
     canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.secuencia_comprobante), 'admin/dashboard')],
+    canDeactivate: [CanDeactivateGuard],
   },
 ];
 

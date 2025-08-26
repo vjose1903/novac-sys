@@ -1,3 +1,4 @@
+import { FormulariosEnModalesModule } from '@components/formularios en modales/formularios-en-modales.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -15,6 +16,19 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [NotasCredDebComponent, BuscarFacturaComponent],
-  imports: [CommonModule, ManipularFacturasRoutingModule, TablasModule, BtncircularModule, PrimengModule, FormsModule, ReactiveFormsModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtnIconModule, SelectButtonModule],
+  imports: [
+    CommonModule,
+    ManipularFacturasRoutingModule,
+    TablasModule,
+    BtncircularModule,
+    PrimengModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxPermissionsModule.forChild(),
+    DetalleFacturaModule,
+    BtnIconModule,
+    SelectButtonModule,
+    FormulariosEnModalesModule,
+  ],
 })
 export class ManipularFacturasModule {}

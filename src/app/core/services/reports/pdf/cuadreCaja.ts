@@ -9,7 +9,8 @@ import { ConfigI } from '../../../interface/config-interface';
 // ==========================================================================================================================================================
 
 export function makePDF(data) {
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.config;
+
   try {
     const dd = {
       pageSize: { width: 600, height: 398 },

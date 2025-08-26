@@ -15,7 +15,7 @@ export class ExportToExcelService {
   configApp: ConfigI;
 
   constructor() {
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.config
   }
 
   download(config: exportExcelConfigI, exportData: any) {
@@ -70,7 +70,7 @@ export class ExportToExcelService {
 
       if (col.nullIfCero && fun.hasValue(value) && Number(value) == 0) return null;
 
-      if (col.uppercase) value = fun.Capitalice(value);
+      if (col.uppercase) value = fun.capitalice(value);
 
       return value;
     };

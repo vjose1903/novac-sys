@@ -5,7 +5,11 @@
   box-shadow: 1px 1px 4px 0px #1d253b3d !important;
   border: 1px solid #ced4da !important;
   border-radius: 0.25rem !important;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
 
   &:focus {
     @include formFieldFocus;
@@ -93,9 +97,25 @@ textarea {
   }
 }
 
+.input-group-append {
+  .input-group-text {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    height: 100%;
+  }
+}
+
 .form-group {
+  margin-bottom: 0.9rem;
+
   > label {
     color: #1d253b;
+  }
+
+  &.horizontal-layout {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
   // > input:not(.apple-switch) {

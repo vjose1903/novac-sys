@@ -1,9 +1,9 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { ModalClass } from '../../modal/modal-class';
 import { TablasService } from '../tablas.service';
 import { fun } from '@core/services/functions.service';
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
-import * as _ from 'lodash';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'icons-array',
@@ -11,7 +11,7 @@ import * as _ from 'lodash';
   styleUrls: ['./icons-array.component.scss'],
   standalone: false,
 })
-export class IconsArrayComponent implements OnInit {
+export class IconsArrayComponent {
   @Input() seleccionado;
   @Input() column;
   @Input() indexBody;
@@ -24,37 +24,22 @@ export class IconsArrayComponent implements OnInit {
   @Output() icon_click = new EventEmitter<any>();
 
   htmlServ = inject(HtmlElementsService);
+  tServ = inject(TablasService);
+  dynamicModalServ = inject(DynamicModalService);
 
-  constructor(public tServ: TablasService) {}
-
-  ngOnInit(): void {}
-
-  verificateIconId(objIcon) {
-    if (objIcon.id) return objIcon.id;
-
-    return `${fun.generateKey()}-${objIcon.key}`;
+  get visibleIcons() {
+    if (!this.column?.iconsArray) return [];
+    return this.column.iconsArray.filter(objIcon => this.showIcon(objIcon, this.rowData));
   }
 
   getIconKey(objIcon) {
-    let res = '';
-    if (typeof objIcon.key == 'string') res = objIcon.key;
-
-    if (typeof objIcon.key == 'object') res = objIcon.key.key;
-
-    return res;
+    if (typeof objIcon.key == 'string') return objIcon.key;
+    if (typeof objIcon.key == 'object') return objIcon.key.key;
   }
 
   getIconClass(objIcon, dato) {
-    let res = '';
-    if (typeof objIcon.key == 'string') res = dato[objIcon.key];
-
-    if (typeof objIcon.key == 'object') {
-      const source = objIcon.key.source;
-      const clase_in_turn = objIcon.key.clases.find(item => item.value == dato[source]);
-
-      res = clase_in_turn?.clase;
-    }
-    return res;
+    if (typeof objIcon.key == 'string') return dato[objIcon.key];
+    if (typeof objIcon.key == 'object') return objIcon.key.clases.find(item => item.value == dato[objIcon.key.source])?.clase;
   }
 
   showIcon(objIcon, data) {
@@ -125,10 +110,15 @@ export class IconsArrayComponent implements OnInit {
       const siFunction = instance => {
         data.is_editing = false;
         this.tServ.modifyRowsEditing(editing_row, 'remove').then(() => this.handle_table_events('clickIcon', obj_click));
-        new ModalClass().closeModal(instance);
+        instance.close();
       };
 
-      new ModalClass().confirmationModal({ id: 'cancel_row_editing', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
+      this.dynamicModalServ.confirmationModal({
+        id: 'cancel_row_editing',
+        texto: texto_modal,
+        btnKind: confirmationButtons.siNo,
+        onYes: siFunction.bind(this),
+      });
     }
   }
 

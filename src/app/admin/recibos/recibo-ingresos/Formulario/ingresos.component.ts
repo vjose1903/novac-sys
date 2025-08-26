@@ -1,6 +1,6 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { ClienteC } from '@registros/registro-clientes/cliente';
-import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, Input } from '@angular/core';
 import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -11,13 +11,15 @@ import { FormCantidadEfectivoComponent } from '@components/formularios en modale
 import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
-import { ModalClass } from '@components/modal/modal-class';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { MoraSelectorComponent } from '../components/mora-selector/mora-selector.component';
 import { Location } from '@angular/common';
 import Big from 'big.js';
 import { MoraSelectorKeyI, MoraSelectorService } from '../components/mora-selector/mora-selector.service';
 import { MoraCalculator } from '../utils/mora-calculator';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 const moment = require('../../../../core/javascript/moment');
 
 @Component({
@@ -27,7 +29,10 @@ const moment = require('../../../../core/javascript/moment');
   standalone: false,
 })
 export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
-  clienteAdepositar: any;
+  @Input() cliente_id: string;
+  @Input() factura_id: string;
+
+  clienteAdepositar = signal<any>(null);
   all_facturas = signal<FacturasI[]>([]);
   facturas = [];
   tipo_recibo = 'Pago factura';
@@ -142,12 +147,11 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   htmlServ = inject(HtmlElementsService);
   location = inject(Location);
   moraSelectorService = inject(MoraSelectorService);
+  dynamicModalServ = inject(DynamicModalService);
+  tServ = inject(TablasService);
+  router = inject(Router);
 
-  constructor(
-    private tServ: TablasService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
+  constructor() {
     super();
   }
 
@@ -158,13 +162,6 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._destroy_mixin();
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   goBack() {
@@ -273,9 +270,13 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.totalPagadoPorciento = ((this.totalPagado + this.totalNotasCredito) / this.totalFacturado) * 100;
     this.totalPagadoPorciento = parseFloat(fun.roundNumberToDecimal(this.totalPagadoPorciento));
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       if (res.data.page != params.page) {
-        this.tServ.modifyPaginationById('listado_recibos', [{ page: res.data.page }]);
+        // Validar que res.data.page sea válido antes de usarlo
+        const pageToSet = res.data.page && res.data.page > 0 ? res.data.page : 1;
+
+        this.tServ.modifyPaginationById('listado_recibos', [{ page: pageToSet }]);
+
         this.tablaComponent.reloadPagination();
       }
     }, 100);
@@ -373,12 +374,18 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async checkRoute() {
-    const cliente_id = this.route.snapshot.params['cliente_id'];
-    const factura_id = this.route.snapshot.params['factura_id'];
+    const cliente_id = Number(this.cliente_id);
+    const factura_id = Number(this.factura_id);
 
-    if (cliente_id != '0' && factura_id != '0') {
+    if (cliente_id && factura_id) {
       const cliente_response = await this.clienteClass.getOne(cliente_id);
-      this.getDataFromModal({ data: cliente_response.data, modal_id: 'buscarCliente', factura_a_buscar: factura_id });
+
+      this.processPropietarioModal({
+        data: cliente_response.data,
+        modalId: 'buscarCliente',
+        factura_a_buscar: factura_id,
+        type: modalCloseType.returnData,
+      } as any);
     } else {
       fun.enfocarInput('clienteI');
     }
@@ -392,63 +399,46 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     return valid;
   }
 
-  cancelarIgreso() {
-    this.facturas.length = 0;
+  cancelarIngreso() {
+    // Limpiar arrays y signals
+    this.facturas = [];
     this.facturasSelected.set([]);
-    this.clienteAdepositar = undefined;
-    this.debiendo_sin_mora.set(0);
     this.all_facturas.set([]);
-    (document.getElementById('clienteI') as any).value = null;
 
+    // Resetear variables de estado
+    this.clienteAdepositar.set(null);
+    this.debiendo_sin_mora.set(0);
+
+    // Limpiar input del cliente
+    const clienteInput = document.getElementById('clienteI') as HTMLInputElement;
+    if (clienteInput) clienteInput.value = '';
+
+    // Resetear variables adicionales
     this.resetVariables();
 
-    setTimeout(() => fun.enfocarInput('clienteI'), 250);
+    // Navegar y enfocar input después de un breve delay
     this.router.navigateByUrl('/admin/recibos/ingresos/0/0');
+    fun.setTimeout(() => fun.enfocarInput('clienteI'), 250);
   }
 
-  abrirModalDinamicText(tipo) {
-    const obj = {
+  abrirModalDinamicText(tipo: 'cancelar' | 'nuevo') {
+    this.dynamicModalServ.confirmationModal({
       id: 'cancelar_ingreso',
-      header: 'Confirmación',
-      texto: '¿Seguro de que desea cancelar la operacion?.',
-      siFunction: instance => {
-        this.cancelarIgreso();
-        instance.closeModal(instance.id);
-      },
-    };
-    this.confirmationModal(obj);
+      texto: tipo == 'cancelar' ? `¿Seguro de que desea cancelar el <strong>Recibo de ingresos</strong>?` : `¿Seguro de que desea iniciar una nueva búsqueda para el <strong>Recibo de ingresos</strong>?`,
+      btnKind: confirmationButtons.siNo,
+      onYes: () => this.cancelarIngreso(),
+    });
   }
 
   getCantidadArticulos() {
     return this.facturasSelected().length;
   }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'cambioEfectivo_IngresosComponent') {
-      this.devuelta = arg.obj.devuelta;
-      this.forma_pago = arg.obj.forma_pago;
-      this.is_print = arg.is_print;
-
-      this.sendIngreso();
-    }
-
-    if (arg.modal_id == 'buscarCliente') {
-      if (arg?.tipo == 'data_no_found') {
-        fun.enfocarAndSelectInput('clienteI');
-      } else {
-        this.clienteAdepositar = arg.data;
-        (document.getElementById('clienteI') as any).value = arg.data.nombre_completo;
-        const parameters = { ...this.table_config.obj_paginate, factura_a_buscar: arg?.factura_a_buscar };
-        this.pedirFacturasPorCliente(arg.data.id, parameters);
-      }
-    }
-  }
-
   pedirNuevaData(params?: { per_page: number; page: number; search: string }) {
-    if (fun.hasValue(this.clienteAdepositar)) {
+    if (fun.hasValue(this.clienteAdepositar())) {
       const order_by = this.tServ.parseSort(this.table_config);
       params = { ...params, ...order_by };
-      this.pedirFacturasPorCliente(this.clienteAdepositar.id, params);
+      this.pedirFacturasPorCliente(this.clienteAdepositar().id, params);
     } else {
       fun.toastWarning('Debe de seleccionar un cliente para continuar.', 'AVISO');
     }
@@ -459,47 +449,46 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
     this.devuelta = null;
     this.detalleYtotal = undefined;
     this.facturasSelected.set([]);
+    this.porcentajeSelected = 2;
   }
 
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'pedido') {
         if (params.data.is_viaje) {
-          const obj = {
+          this.dynamicModalServ.confirmationModal({
             id: 'move_to_viajes',
-            header: 'Confirmación',
             texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
-            siFunction: instance => {
+            btnKind: confirmationButtons.siNo,
+            onYes: () => {
               this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
-              instance.closeModal(instance.id);
             },
-          };
-          this.confirmationModal(obj);
+          });
         }
       }
       if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length)) {
-        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas, this.openNewModal.bind(this));
+        this.facturaClass.abrirModalHistorial(params.data.pagos, params.data.notas);
       }
 
       if (params.iconKey == 'ver') {
         this.facturaClass.parseDataToPdf(params.data).then(dataFactura => {
           let botonesDinamicos = [
             { clase: 'btn btn-gris', function: instance => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
-            { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id), label: 'Cerrar', disable: false as any },
+            { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false as any },
           ];
+
           const toPDFData = { data: dataFactura, type: 'facturacion' };
 
-          const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA' };
+          const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA', show_estado: false };
 
-          this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then(obj_modal => this.openNewModal(obj_modal));
+          this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos);
         });
       }
     }
   }
 
   verDetalles(data) {
-    const configModal = this.reciboClass.modalVerDetalles(data);
-    this.openNewModal(configModal);
+    this.facturaClass.modalVerDetalles(data, 'recibo');
   }
 
   selectAll() {
@@ -700,22 +689,38 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   async abrirModalFiltro(nombre) {
     if (fun.hasValue(nombre)) {
-      const obj = {
-        data: [],
-        palabra_a_buscar: nombre,
-        metodo: 'venta',
-      };
+      const propietarioModalConf = new DynamicModalClass();
 
-      this.openNewModal({
-        component: BuscarClienteSuplidorComponent,
-        inputs: obj,
-        id: 'buscarCliente',
-        header: 'Buscar cliente',
-        width: '900px',
-        height: '500px',
-        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-      });
+      propietarioModalConf.id = 'buscarCliente';
+      propietarioModalConf.inputs = { metodo: 'venta', palabra_a_buscar: nombre };
+      propietarioModalConf.header = 'BUSCAR CLIENTE';
+      propietarioModalConf.width = '57rem';
+      propietarioModalConf.height = '32rem';
+      propietarioModalConf.component = BuscarClienteSuplidorComponent;
+      propietarioModalConf.closableEsc = true;
+      propietarioModalConf.setCallback(this.processPropietarioModal.bind(this));
+      propietarioModalConf.show();
+
       fun.desEnfocarInput('clienteI');
+    }
+  }
+
+  processPropietarioModal(args: ICallbackModal) {
+    const { data, type, factura_a_buscar = undefined } = args as any;
+
+    if (type == modalCloseType.onHide && fun.isEmpty(this.clienteAdepositar())) {
+      fun.enfocarInput('clienteI');
+    }
+
+    if (type == modalCloseType.returnData) {
+      if (data?.tipo == 'data_no_found') {
+        fun.enfocarAndSelectInput('clienteI');
+      } else {
+        this.clienteAdepositar.set(data);
+        (document.getElementById('clienteI') as any).value = data.nombre_completo;
+        const parameters = { ...this.table_config.obj_paginate, factura_a_buscar: factura_a_buscar };
+        this.pedirFacturasPorCliente(data.id, parameters);
+      }
     }
   }
 
@@ -760,26 +765,41 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       this.detalleYtotal = await this.formarDetalleRecibos();
       const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
 
-      this.openNewModal({
-        component: FormCantidadEfectivoComponent,
-        inputs: obj,
-        id: 'cambioEfectivo_IngresosComponent',
-        header: 'Cantidad de efectivo',
-        width: '34.375rem',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
-          ],
-        },
-      });
+      const cantidadEfectivoModalConfig = new DynamicModalClass();
+
+      cantidadEfectivoModalConfig.id = 'cambioEfectivo';
+      cantidadEfectivoModalConfig.inputs = obj;
+      cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
+      cantidadEfectivoModalConfig.width = '35rem';
+      cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
+      cantidadEfectivoModalConfig.closableEsc = true;
+      cantidadEfectivoModalConfig.botones = [
+        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { id: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
+      ];
+
+      cantidadEfectivoModalConfig.setCallback(this.recibirCambiosEfectivo.bind(this));
+      cantidadEfectivoModalConfig.show();
     }
+  }
+
+  async recibirCambiosEfectivo(args: ICallbackModal) {
+    if (args.type !== modalCloseType.returnData) return;
+
+    const { is_print, obj } = args.data;
+
+    // Actualizar propiedades del componente
+    this.devuelta = obj.devuelta;
+    this.forma_pago = obj.forma_pago;
+    this.is_print = is_print;
+
+    // Enviar a base de datos
+    this.sendIngreso();
   }
 
   async sendIngreso() {
     const obj = {
-      cliente_id: this.clienteAdepositar.id,
+      cliente_id: this.clienteAdepositar().id,
       bruto: this.detalleYtotal.bruto,
       mora: this.detalleYtotal.mora,
       total: this.detalleYtotal.total_recibo,
@@ -796,7 +816,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       const recibo = res['data'].recibo;
 
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
-      this.pedirFacturasPorCliente(this.clienteAdepositar.id, actualPagination);
+      this.pedirFacturasPorCliente(this.clienteAdepositar().id, actualPagination);
 
       this.resetVariables();
       this.reciboClass.parseDataToPdf(recibo).then(recibo_parsed => {

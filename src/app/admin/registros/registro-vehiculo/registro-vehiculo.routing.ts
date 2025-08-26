@@ -4,11 +4,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { RegistroVehiculoComponent } from './registro-vehiculo.component';
 import { Permisos } from '@core/typescript/permisos';
 import { PermissionsGuardService } from '@core/guard/permissions.guard';
+import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 const routes: Routes = [
   {
     path: '',
     component: RegistroVehiculoComponent,
     canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.vehiculo), 'admin/dashboard')],
+    canDeactivate: [CanDeactivateGuard],
   },
 ];
 

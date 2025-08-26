@@ -12,3 +12,20 @@ export enum reportField {
   switchGroupField = 'switchGroupField',
   simpleSwitchField = 'simpleSwitchField',
 }
+
+export interface switchGroup {
+  title: string;
+  array: { label: string; value: any }[];
+}
+
+export const formControlMap = {
+  [reportField.articuloField]: 'articulo_id',
+  [reportField.customerField]: 'cliente_id',
+  [reportField.conditionField]: 'condicion',
+  [reportField.fromField]: 'desde',
+  [reportField.dateField]: 'fecha',
+  [reportField.toDateField]: 'hasta',
+  [reportField.serieField]: 'serie',
+  [reportField.typeField]: 'tipo',
+  [reportField.billTypeField]: 'tipo_factura_id',
+};

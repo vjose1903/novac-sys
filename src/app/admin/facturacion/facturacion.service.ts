@@ -1,6 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { fun } from '@core/services/functions.service';
-import { comprobante, comprobanteElectronico, comprobanteNormal, tipoDocFacturacion, TipoFacturaI, tFacturaKey } from './factura';
+import { comprobante, comprobanteElectronico, comprobanteNormal, tipoDocFacturacion, TipoFacturaI, tFacturaKey, TiposFacturaC } from './factura';
 import { Ss } from '@core/services/singleton.service';
 import { serie } from '@core/typescript/constantes';
 
@@ -9,7 +9,7 @@ import { serie } from '@core/typescript/constantes';
 })
 export class FacturacionService {
   action;
-  tipoDocumento: tipoDocFacturacion;
+  tipoDocumento = signal<tipoDocFacturacion | null>(null);
   tipoFacturaReferenciaSelected: string;
   tipoFactura: TipoFacturaI;
   htmlTiposFacturas: string;
@@ -23,46 +23,33 @@ export class FacturacionService {
   cotizacion_selected;
   productos_devueltos = [];
   filasDetalle;
+  
+  tipoFacturaClass = new TiposFacturaC();
   serieType = signal(serie.electronica);
 
-  public get clienteContado(): { id?: any; nombre?: string; direccion?: string; telefono?: any } {
-    if (fun.hasValue(Ss.configServ)) {
-      const configApp = Ss.configServ.getConfig({ isPromise: false });
 
-      return { id: null, nombre: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
+  isCompra = computed(() => this.tipoDocumento() == tipoDocFacturacion.compra);
+  isVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.venta);
+  isCotizacion = computed(() => this.tipoDocumento() == tipoDocFacturacion.cotizacion);
+  isPreVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.pre_venta);
+
+  isComprobanteElectronico = computed(() => this.serieType() == serie.electronica);
+  isComprobanteNormal = computed(() => this.serieType() == serie.normal);
+
+  public get clienteContado(): { id?: any; direccion?: string; telefono?: any; nombre_completo?: string } {
+    if (fun.hasValue(Ss.configServ)) {
+      const configApp = Ss.configServ.config;
+
+      return { id: null, nombre_completo: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
     } else {
       return {};
     }
   }
 
-  public get isCompra(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.compra;
-  }
-
-  public get isVenta(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.venta;
-  }
-
-  public get isCotizacion(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.cotizacion;
-  }
-
-  public get isPreVenta(): boolean {
-    return this.tipoDocumento == tipoDocFacturacion.pre_venta;
-  }
-
-  public get isComprobanteElectronico(): boolean {
-    return this.serieType() == serie.electronica;
-  }
-
-  public get isComprobanteNormal(): boolean {
-    return this.serieType() == serie.normal;
-  }
-
   constructor() {}
 
   setTipos(metodo: tipoDocFacturacion, serie: serie, sameTipo: boolean = false) {
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<any>(async (resolve, reject) => {
       this.serieType.set(serie);
 
       if (metodo == tipoDocFacturacion.compra || metodo == tipoDocFacturacion.venta) {
@@ -100,7 +87,7 @@ export class FacturacionService {
         this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == tFacturaKey.pre_venta && tipo_factura.serie == this.serieType());
       }
 
-      this.setTipoFacturaSelected({ value: this.tipoFactura.id, by: 'id' });
+      await this.setTipoFacturaSelected({ value: this.tipoFactura.id, by: 'id', equivalentSerie: false });
       resolve(true);
     });
   }
@@ -108,16 +95,24 @@ export class FacturacionService {
   setTipoFacturaSelected(args: { value: any; by: string; equivalentSerie?: boolean }) {
     const { value, by, equivalentSerie = false } = args;
 
-    return new Promise<any>((resolve, reject) => {
-      const originalTipoFactura = this.lista_tipos_facturas.find(tipo_factura => (by == 'id' ? tipo_factura[by] == value : tipo_factura[by] == value));
+    return new Promise<any>(resolve => {
+      // Buscar el tipo de factura original
+      const originalTipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura[by] === value);
 
-      if (equivalentSerie) {
-        this.tipoFactura = this.lista_tipos_facturas.find(item => item.key == originalTipoFactura.key && item.serie == this.serieType());
-      } else {
-        this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => (by == 'id' ? tipo_factura[by] == value : tipo_factura[by] == value && tipo_factura.serie == this.serieType()));
+      if (!originalTipoFactura) {
+        resolve(value);
+        return;
       }
 
-      this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
+      // Determinar el tipo de factura final según equivalentSerie
+      if (equivalentSerie) {
+        this.tipoFactura = this.lista_tipos_facturas.find(item => item.key === originalTipoFactura.key && item.serie === this.serieType());
+      } else {
+        this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura[by] === value && tipo_factura.serie === this.serieType());
+      }
+
+      // Actualizar referencia seleccionada si se encontró el tipo de factura
+      if (this.tipoFactura) this.tipoFacturaReferenciaSelected = this.tipoFactura.referencia;
 
       resolve(value);
     });
@@ -128,50 +123,85 @@ export class FacturacionService {
     return this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == key && tipo_factura.serie == serieTarget).id;
   }
 
-  getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }, print?) {
-    const res = { descripcion: undefined, descripcion_short: undefined, has_Propietario: fun.hasValue(this.propietario_factura), tipo: 'facturacion' };
+  getDocumentoDescripcion(params: { metodo: string; condicion_fact: string; modo_factura: string; is_viaje: boolean }) {
+    const res = {
+      descripcion: undefined,
+      descripcion_short: undefined,
+      has_Propietario: fun.hasValue(this.propietario_factura),
+      tipo: 'facturacion',
+    };
+
     const actualPath = fun.getActualPath();
+    const { metodo, condicion_fact, modo_factura, is_viaje } = params;
 
-    if ((params.metodo == tipoDocFacturacion.cotizacion || params.metodo == tipoDocFacturacion.pre_venta) && (actualPath.includes('cotizacion') || actualPath.includes('pre_venta'))) {
-      res.descripcion = params.metodo == tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre-venta';
-      res.tipo = params.metodo == tipoDocFacturacion.cotizacion ? tipoDocFacturacion.cotizacion : tipoDocFacturacion.pre_venta;
-      //
-    } else if (params.condicion_fact == 'Crédito') {
+    // Determinar descripción según el tipo de documento
+    if (this.isCotizacionOrPreVenta(metodo, actualPath)) {
+      res.descripcion = metodo === tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre-venta';
+      res.tipo = metodo;
+    } else if (condicion_fact === 'Crédito') {
       res.descripcion = 'Factura a Crédito';
-      //
-    } else if (params.metodo == tipoDocFacturacion.nota_credito || params.metodo == tipoDocFacturacion.nota_debito) {
-      res.descripcion = tipoDocFacturacion.nota_credito ? 'Nota de Crédito' : 'Nota de Dédito';
-
-      //
-    } else if (fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia == '01') {
+    } else if (condicion_fact === 'conduce') {
+      res.descripcion = 'Conduce de mercancía';
+    } else if (this.isNotaCreditoOrDebito(metodo)) {
+      res.descripcion = metodo === tipoDocFacturacion.nota_credito ? 'Nota de Crédito' : 'Nota de Débito';
+    } else if (this.isFacturaConValorFiscal()) {
       res.descripcion = 'Factura con valor fiscal';
-      //
-    } else if (params.modo_factura == 'adelantada') {
+    } else if (modo_factura === 'adelantada') {
       res.descripcion = 'Factura adelantada';
-      //
-    } else if (params.is_viaje) {
+    } else if (is_viaje) {
       res.descripcion = 'Factura de viaje';
-      //
     } else {
-      if (params.metodo == tipoDocFacturacion.venta) {
-        res.descripcion = 'Factura de venta';
-        if (params.condicion_fact != 'Crédito') res.has_Propietario = true;
-      }
-      if (params.metodo == tipoDocFacturacion.compra) res.descripcion = 'Factura de compra';
+      this.setDescripcionPorMetodo(res, metodo, condicion_fact);
     }
 
-    if (fun.hasValue(res?.descripcion)) res.descripcion_short = res.descripcion.split(' ')[0];
+    // Generar descripción corta si existe descripción
+    if (fun.hasValue(res.descripcion)) {
+      res.descripcion_short = res.descripcion.split(' ')[0];
+    }
 
     return res;
   }
 
-  getDetallesLlenos() {
-    if (fun.hasValue(this.filasDetalle)) {
-      const filasMap = this.filasDetalle.map(inner_detalle => inner_detalle.value);
+  private isCotizacionOrPreVenta(metodo: string, actualPath: string): boolean {
+    return (metodo === tipoDocFacturacion.cotizacion || metodo === tipoDocFacturacion.pre_venta) && (actualPath.includes('cotizacion') || actualPath.includes('pre_venta'));
+  }
 
-      return filasMap.filter(filter_detalle => fun.hasValue(filter_detalle?.key));
-    } else {
-      return [];
+  private isNotaCreditoOrDebito(metodo: string): boolean {
+    return metodo === tipoDocFacturacion.nota_credito || metodo === tipoDocFacturacion.nota_debito;
+  }
+
+  private isFacturaConValorFiscal(): boolean {
+    return fun.hasValue(this.tipoFactura) && this.tipoFactura?.referencia === '01';
+  }
+
+  private setDescripcionPorMetodo(res: any, metodo: string, condicion_fact: string): void {
+    if (metodo === tipoDocFacturacion.venta) {
+      res.descripcion = 'Factura de venta';
+      if (condicion_fact !== 'Crédito') res.has_Propietario = true;
+    } else if (metodo === tipoDocFacturacion.compra) {
+      res.descripcion = 'Factura de compra';
     }
+  }
+
+  async getTiposFacturas(): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const tiposFacturas = (await this.tipoFacturaClass.getAll()) as unknown as TipoFacturaI[];
+
+        const tiposFacturasOrdenados = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
+
+        this.lista_tipos_facturas = tiposFacturasOrdenados;
+        resolve();
+      } catch (error) {
+        fun.logRed('error: ', error);
+        reject(error);
+      }
+    });
+  }
+
+  getDetallesLlenos() {
+    if (!fun.hasValue(this.filasDetalle)) return [];
+
+    return this.filasDetalle.controls.map(inner_detalle => inner_detalle.value).filter(detalle => fun.hasValue(detalle?.key));
   }
 }

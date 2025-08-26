@@ -18,12 +18,12 @@ export class FacturasRecibidasC extends CrudG<FacturasRecibidasI> {
     super('ecf_receptions');
   }
 
-  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
+  static openModalReporteForm(params: { tipo: any; titulo?: any }) {
     // return new Promise<any>((resolve, reject) => {
     //   let objModal;
     //   switch (params.tipo) {
     //     case 'ventas_productos':
-    //       ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+    //       ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.titulo, returnDataFromModal: returnDataFromModal };
     //       objModal = ReporteC.objReporte;
     //       break;
     //     default:
@@ -50,7 +50,7 @@ export class FacturasRecibidasC extends CrudG<FacturasRecibidasI> {
     // }
     // const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
     // ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
-    //   let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+    //   let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
     //   ReporteC.visualizarReporte(objPdfView);
     // });
   }

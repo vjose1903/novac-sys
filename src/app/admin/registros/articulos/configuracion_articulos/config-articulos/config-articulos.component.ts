@@ -1,29 +1,33 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { fun } from '@core/services/functions.service';
-import { ModalI } from '@components/modal/modal-class';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Component, OnInit, inject } from '@angular/core';
-import { ConfigArticuloC } from '../articulos_configuracion';
+import { Component, Input, OnInit, inject } from '@angular/core';
+import { ConfigArticuloC, ConfigArticuloI } from '../articulos_configuracion';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
-    selector: 'app-config-articulos',
-    templateUrl: './config-articulos.component.html',
-    styleUrls: ['./config-articulos.component.scss'],
-    standalone: false
+  selector: 'app-config-articulos',
+  templateUrl: './config-articulos.component.html',
+  styleUrls: ['./config-articulos.component.scss'],
+  standalone: false,
 })
-export class ConfigArticulosComponent implements OnInit, ModalI {
+export class ConfigArticulosComponent implements OnInit, IDynamicModal {
   form: UntypedFormGroup;
-  modal: any = {};
-  inputs: any;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
+  @Input() config_articulos: ConfigArticuloI;
+
   update_articulos = true;
   configArticuloClass = new ConfigArticuloC();
 
-  htmlServ = inject(HtmlElementsService)
+  htmlServ = inject(HtmlElementsService);
   constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
-    this.createForm(this.inputs.cofig_articulos).then(() => {
-      this.form.valueChanges.subscribe((res) => {
+    this.createForm(this.config_articulos).then(() => {
+      this.form.valueChanges.subscribe(res => {
         this.disableBtnConfirm(!this.form.valid);
       });
     });
@@ -36,7 +40,7 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
         porciento_ganancia: [{ value: data.porciento_ganancia, disabled: false }, Validators.compose([Validators.required, Validators.min(1), Validators.max(100)])],
       });
 
-      setTimeout(() => resolve(true), 10);
+      fun.setTimeout(() => resolve(true), 10);
     });
   }
 
@@ -45,21 +49,17 @@ export class ConfigArticulosComponent implements OnInit, ModalI {
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modal.instance.modalsConfig.find((modal) => modal.id == this.modal.component_id);
-    const btn = modal.botones.dinamico.find((boton) => boton.btn_id == 'btnConfirmar');
-
+    const btn = this.modalConfig.botones.find(boton => boton.id == 'btnConfirmar');
     btn.disable = validate;
   }
 
-  btn_aceptar() {
+  submit() {
     const formulario = this.form.getRawValue();
     this.configArticuloClass
       .updateOne(formulario, { parameters: { update_articulos: this.update_articulos } })
-      .then((res) => {
-        const modal = this.modal.instance.modalsConfig.find((config) => config.id == this.modal.component_id);
-        modal.closeModal(this.modal.component_id);
-        modal.returnDataFromModal({ data: { ...res.data }, modal_id: this.modal.component_id });
+      .then(res => {
+        this.modalConfig.close({ ...res.data, update_articulos: this.update_articulos });
       })
-      .catch((err) => console.error(err));
+      .catch(err => console.error(err));
   }
 }

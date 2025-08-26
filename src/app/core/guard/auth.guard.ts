@@ -58,7 +58,7 @@ export class AuthGuard {
   private async ensureConfigLoaded(): Promise<void> {
     if (this.configurationService.isConfigLoaded()) return;
 
-    await firstValueFrom(this.configurationService.configLoaded$.pipe(filter(loaded => loaded)));
+    await firstValueFrom(this.configurationService.config$.pipe(filter(config => config !== null)));
   }
 
   /**
@@ -88,6 +88,7 @@ export class AuthGuard {
    */
   private handleValidationError(error: any): boolean {
     const shouldRedirectToLogin = error.razon === 'sesion_expired' || error.razon === 'no_token';
+    console.log('%c error ', 'color: magenta', error);
 
     if (shouldRedirectToLogin) {
       fun.logout().then(() => this.router.navigateByUrl('/auth/login'));

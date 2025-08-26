@@ -1,9 +1,8 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { GLOBAL } from '@core/typescript/GLOBAL';
 import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -14,19 +13,21 @@ import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { ModalClass } from '@components/modal/modal-class';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
-    selector: 'app-registro-vehiculo',
-    templateUrl: './registro-vehiculo.component.html',
-    styleUrls: ['./registro-vehiculo.component.scss'],
-    standalone: false
+  selector: 'app-registro-vehiculo',
+  templateUrl: './registro-vehiculo.component.html',
+  styleUrls: ['./registro-vehiculo.component.scss'],
+  standalone: false,
 })
 export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
   form: UntypedFormGroup;
   phoneMask = ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  listaVehiculos = [];
+  listaVehiculos = signal<any[]>([]);
   FORM: any;
 
   listaMarcas = [];
@@ -55,7 +56,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_vehiculos',
-    padre_functions: { data_request: (params) => this.getVehiculos(params) },
+    padre_functions: { data_request: params => this.getVehiculos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.vehiculo.update }, borrar: { show: true, permiso: this.permissions.vehiculo.destroy } },
@@ -65,9 +66,17 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   hasPermissionsMarca: boolean;
   hasPermissionsModelo: boolean;
 
-  htmlServ = inject(HtmlElementsService);
   fun = fun;
-  constructor(private cdRef: ChangeDetectorRef, private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
+
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private cdRef = inject(ChangeDetectorRef);
+  private fb = inject(UntypedFormBuilder);
+  private router = inject(Router);
+  private tServ = inject(TablasService);
+  private permissionsService = inject(NgxPermissionsService);
+
+  constructor() {
     super();
   }
 
@@ -80,13 +89,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
     fun.enfocarInput('user_id');
     this.necesarioStart();
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   ngOnDestroy() {
@@ -102,17 +104,17 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   checkPermisos() {
-    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then((result) => (this.hasPermissionsMarca = result));
-    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then((result) => (this.hasPermissionsModelo = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.marca)).then(result => (this.hasPermissionsMarca = result));
+    this.permissionsService.hasPermission(Object.values(this.permissions.modelo)).then(result => (this.hasPermissionsModelo = result));
   }
 
   async getPropietarios() {
     this.empleadosClass.getAll({ parameters: { id: true } }).then(
-      (res) => {
+      res => {
         res['data'].unshift({ id: -1, nombre_completo: 'No empleado' });
         this.listaPropietarios = res['data'];
       },
-      (err: any) => {},
+      (err: any) => {}
     );
   }
 
@@ -120,22 +122,23 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, nombre_completo_propietario: true } };
-    this.listaVehiculos.length = 0;
+    this.listaVehiculos.set([]);
     const res = await this.vehiculosClass.getAll(extra);
 
-    res.data.map((val) => {
+    res.data.map(val => {
       // val.nombre_completo = `${val.propietario.nombre} ${val.propietario.apellido}`;
       return val;
     });
 
-    this.listaVehiculos = _.orderBy(res.data, ['id'], ['asc']);
+    const vehiculos = _.orderBy(res.data, ['id'], ['asc']);
+    this.listaVehiculos.set(vehiculos);
 
     this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
   }
 
   async getMarcas() {
     try {
-      const res = await this.marcasClass.getAll() as any;
+      const res = (await this.marcasClass.getAll()) as any;
 
       this.listaMarcas = res;
     } catch (error) {
@@ -157,7 +160,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       nombre_no_empleado: [{ value: null, disabled: true }, Validators.required],
       apellido_no_empleado: [{ value: null, disabled: true }, Validators.required],
       telefono_no_empleado: [{ value: null, disabled: true }, Validators.required],
-      estado: [true],
     });
     this.verificateMarcaIsSelected();
   }
@@ -172,9 +174,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     } else {
       if (this.form.valid) {
         fun.enfocarInput('user_id');
-        setTimeout(() => {
-          this.submit(this.form);
-        }, 250);
+        fun.setTimeout(() => this.submit(this.form), 250);
       }
     }
   }
@@ -239,21 +239,21 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n Propietario: <b> ${regisData.nombre_completo} </b>?`,
-      siFunction: () => {
-        this.vehiculosClass.deleteOne(regisData.id).then((res) => {
-          this.listaVehiculos = null;
-          fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombre_completo}` + ' borrado.', 'CORRECTO');
-          const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
-          this.getVehiculos(actualPagination);
-          this.borrar();
-        });
-      },
+    const onYes = () => {
+      this.vehiculosClass.deleteOne(regisData.id).then(res => {
+        fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombre_completo_propietario}` + ' borrado.', 'CORRECTO');
+        const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
+        this.getVehiculos(actualPagination);
+        this.borrar();
+      });
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el vehículo <b> ${regisData.marca} - ${regisData.modelo}. </b> \n Propietario: <b> ${regisData.nombre_completo_propietario} </b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
   }
 
   async editarItem(data) {
@@ -268,11 +268,11 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
     if (!this.vehiculoSelected.user_id) this.form.controls.user_id.setValue(-1);
 
-    const marca_id = this.listaMarcas.find((marca) => marca.descripcion === this.vehiculoSelected.marca).id;
+    const marca_id = this.listaMarcas.find(marca => marca.descripcion === this.vehiculoSelected.marca).id;
 
     this.form.controls.marca.setValue(marca_id);
     this.selectMarca().then(() => {
-      const modelo_id = this.listaModelos.find((modelo) => modelo.descripcion == this.vehiculoSelected.modelo).id;
+      const modelo_id = this.listaModelos.find(modelo => modelo.descripcion == this.vehiculoSelected.modelo).id;
       this.form.controls.modelo.setValue(modelo_id);
     });
 
@@ -286,23 +286,26 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   abrirModalMarcasYModelos(tipo) {
-    this.openNewModal({
-      component: FormularioMarcaModeloComponent,
-      inputs: { tipo },
-      id: 'crud_marca_modelo',
-      header: 'Mantenimiento marca & modelo',
-      width: '1000px',
-      height: '650px',
-      botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-    });
+    const registroMarcaYModeloConfig = new DynamicModalClass();
+    registroMarcaYModeloConfig.width = '64rem';
+    registroMarcaYModeloConfig.height = '40rem';
+    registroMarcaYModeloConfig.component = FormularioMarcaModeloComponent;
+    registroMarcaYModeloConfig.inputs = { tipo_formulario: tipo };
+    registroMarcaYModeloConfig.id = 'retornarDevuelto';
+    registroMarcaYModeloConfig.header = 'Retornar Articulos Devueltos';
+
+    registroMarcaYModeloConfig.botones = [{ clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+
+    registroMarcaYModeloConfig.setCallback((arg: ICallbackModal) => this.closeModalMarcaModelo(arg));
+    registroMarcaYModeloConfig.show();
   }
 
-  onHideModal(arg) {
-    if (arg.modal.id == 'crud_marca_modelo') this.getMarcas();
+  closeModalMarcaModelo(arg: ICallbackModal) {
+    if (arg.type == modalCloseType.onHide) this.getMarcas();
   }
   // =============================================
   //  Crear vehiculo
@@ -314,10 +317,9 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const obj = {
       user_id: formulario.user_id !== -1 ? formulario.user_id : null,
 
-      marca: this.listaMarcas.find((marca) => marca.id === formulario.marca).descripcion,
-      modelo: this.listaModelos.find((modelo) => modelo.id === formulario.modelo).descripcion,
+      marca: this.listaMarcas.find(marca => marca.id === formulario.marca).descripcion,
+      modelo: this.listaModelos.find(modelo => modelo.id === formulario.modelo).descripcion,
       anio: formulario.anio,
-      estado: formulario.estado,
 
       nombre_no_empleado: formulario.nombre_no_empleado,
       apellido_no_empleado: formulario.apellido_no_empleado,

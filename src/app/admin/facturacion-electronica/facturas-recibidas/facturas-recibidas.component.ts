@@ -3,7 +3,7 @@ import { TablasService } from '@core/components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { LoaderService } from 'app/loader/loader.service';
 import { FacturasRecibidasC, FacturasRecibidasI } from './facturas-recibidas.model';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BtnIconModule } from '@core/components/btn-icon-circular/btn-icon-circular.module';
 import { TablasModule } from '@core/components/new_tablas/tablas.module';
@@ -19,7 +19,7 @@ import { fun } from '@core/services/functions.service';
   templateUrl: './facturas-recibidas.component.html',
   styleUrl: './facturas-recibidas.component.scss',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
+  imports: [FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule, BtnIconModule],
 })
 export class FacturasRecibidasComponent extends MixinClass implements OnInit {
   tServ = inject(TablasService);
@@ -56,12 +56,7 @@ export class FacturasRecibidasComponent extends MixinClass implements OnInit {
     this.necesarioParaEmpezar();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
+
 
   necesarioParaEmpezar() {
     this.getFacturasRecibidas(this.tServ.obj_paginate.default);

@@ -27,7 +27,7 @@ export class PdfService {
       const data = fun.deepCloning(params.oPdf.data);
       const type_oPdf = params.oPdf.type;
       const reimprimir = params.oPdf.data.reimprimir ? true : false;
-      const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+      const config: ConfigI = Ss.configServ.config;
 
       let options;
       let printer_selected = config.printer_selected[type_oPdf];
@@ -52,7 +52,7 @@ export class PdfService {
           case 'nota':
             options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
 
-            let tipo_pdf = `_${config.plantillas_impresion['nota'].toLowerCase()}`;
+            let tipo_pdf = ``;
 
             if (data.serie == serie.electronica) tipo_pdf = '_electronica';
 
@@ -122,14 +122,14 @@ export class PdfService {
     });
   }
 
-  static createPdfFromBase64(docDefinition, file_, reimprimir_) {
+  static createPdfFromBase64(docDefinition: any, file_: string, reimprimir_: boolean): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       try {
         pdfMake.vfs = vfs;
         pdfMake.fonts = fonts;
 
         const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-        pdfDocGenerator.getBase64(data => {
+        pdfDocGenerator.getBase64((data: string) => {
           const respuesta = this.makeStatusObj({
             msg: 'Pdf Base64 correcto',
             file: file_,
@@ -142,28 +142,23 @@ export class PdfService {
           resolve(respuesta);
         });
       } catch (error) {
-        console.error('>>>>.', error);
+        console.error('Error en createPdfFromBase64:', error);
         const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no', body: error });
         reject(respuesta);
       }
     });
   }
 
-  static imprimirBase64(oBase: { base64: string; file: string; type: string; printer: string; pageOrientation: string }) {
+  static async imprimirBase64(oBase: { base64: string; file: string; type: string; printer: string; pageOrientation: string }): Promise<any> {
     try {
-      return new Promise<any>((resolve, reject) => {
-        const task = new MessageTask(ELECTRON_PRINT_BASE64, oBase);
+      const task = new MessageTask(ELECTRON_PRINT_BASE64, oBase);
+      const res = await Ss._ipc.sendTask(task);
 
-        Ss._ipc
-          .sendTask(task)
-          .then(res => {
-            res['pageOrientation'] = oBase.pageOrientation;
-            resolve(res);
-          })
-          .catch(err => reject(err));
-      });
+      res['pageOrientation'] = oBase.pageOrientation;
+      return res;
     } catch (error) {
-      console.error(error);
+      console.error('Error en imprimirBase64:', error);
+      throw error;
     }
   }
 

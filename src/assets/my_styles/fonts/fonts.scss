@@ -1,3 +1,5 @@
+@use "sass:list";
+
 // Definir una variable para la ruta de la fuente
 $font-path: '../../fonts';
 
@@ -19,13 +21,13 @@ $font-variations: (
 );
 
 // Definir el @font-face utilizando un @for
-@for $i from 1 through length($font-variations) {
-  $font-variation: nth($font-variations, $i);
-  $font-name: nth($font-variation, 1);
-  $font-weight: nth($font-variation, 2);
-  $font-style: nth($font-variation, 3);
-  $font-family-name: nth($font-variation, 4);
-  $font-directory: nth($font-variation, 5);
+@for $i from 1 through list.length($font-variations) {
+  $font-variation: list.nth($font-variations, $i);
+  $font-name: list.nth($font-variation, 1);
+  $font-weight: list.nth($font-variation, 2);
+  $font-style: list.nth($font-variation, 3);
+  $font-family-name: list.nth($font-variation, 4);
+  $font-directory: list.nth($font-variation, 5);
 
   @font-face {
     font-family: '#{$font-family-name}';

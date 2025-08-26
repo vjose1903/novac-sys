@@ -154,7 +154,7 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
         text_ = value;
       }
 
-      if (info.uppercase) text_ = fun.Capitalice(text_);
+      if (info.uppercase) text_ = fun.capitalice(text_);
 
       if ('maxLength' in info && info.maxLength) {
         const raw_descripcion = text_.trim();

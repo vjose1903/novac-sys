@@ -15,9 +15,10 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigArticuloC, ConfigArticuloI } from './configuracion_articulos/articulos_configuracion';
-import { ModalClass } from '@components/modal/modal-class';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 const moment = require('../../../core/javascript/moment');
-const $ = require('jquery');
 
 @Component({
   selector: 'app-registro-articulos',
@@ -95,24 +96,24 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     botones: { editar: { show: true, permiso: this.permissions.articulo.update }, borrar: { show: true, permiso: this.permissions.articulo.destroy } },
   };
   tablaComponent;
-  cofig_articulos: ConfigArticuloI;
+  config_articulos: ConfigArticuloI;
 
-  htmlServ = inject(HtmlElementsService);
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private cdRef = inject(ChangeDetectorRef);
+  private fb = inject(UntypedFormBuilder);
+  private router = inject(Router);
+  private tServ = inject(TablasService);
+  private permissionsService = inject(NgxPermissionsService);
 
-  constructor(
-    private cdRef: ChangeDetectorRef,
-    private fb: UntypedFormBuilder,
-    private router: Router,
-    private tServ: TablasService,
-    private permissionsService: NgxPermissionsService
-  ) {
+  constructor() {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.createForm();
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.config;
     this.medida_config = this.configApp.medida_producto_terminado;
 
     this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then(result => {
@@ -123,13 +124,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     this.boton = 'Registrar';
     this.necesarioStart();
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   ngOnDestroy() {
@@ -150,8 +144,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   getConfiguracionArticulo() {
-    this.configArticuloClass.getOne(1).then(cofig_articulos => {
-      this.cofig_articulos = cofig_articulos.data;
+    this.configArticuloClass.getOne(1).then(config_articulos => {
+      this.config_articulos = config_articulos.data;
     });
   }
 
@@ -180,26 +174,30 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   openModalConfig() {
-    this.openNewModal({
-      component: ConfigArticulosComponent,
-      inputs: { cofig_articulos: this.cofig_articulos },
-      id: 'cofig_articulos',
-      header: 'Configuraciones de articulos',
-      width: '50rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-          { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: true },
-        ],
-      },
-    });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.id = 'config_articulos';
+    modalConfig.width = '40rem';
+    modalConfig.component = ConfigArticulosComponent;
+    modalConfig.inputs = { config_articulos: this.config_articulos };
+    modalConfig.header = 'Configuraciones de articulos';
+
+    modalConfig.botones = [
+      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { id: 'btnConfirmar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+    ];
+
+    modalConfig.setCallback((arg: ICallbackModal) => this.processConfigArticulos(arg));
+    modalConfig.show();
   }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modal_id == 'cofig_articulos') {
-      this.cofig_articulos = arg.data;
+  async processConfigArticulos(arg: ICallbackModal) {
+    if (arg.type == modalCloseType.onHide) return;
 
+    const { update_articulos, ...data } = arg.data;
+
+    this.config_articulos = data;
+
+    if (update_articulos) {
       const actualPagination = this.tServ.getPaginationById('lista_articulos');
       this.getArticulos(actualPagination);
     }
@@ -289,7 +287,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   createForm() {
@@ -332,15 +330,16 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.ARRAY_FORMULA = this.form.get('rowFormula') as FormArray;
   }
 
-  saltar(campo, i?) {
+  saltar(next_campo, i?) {
     let is_invalid = true;
-    if (campo != 'send' && campo != 'cantidad_formula' && campo != 'ingrediente_producir' && campo != 'in_medida_alerta') {
-      fun.enfocarInput(campo);
+    const especial_fields = ['send', 'cantidad_formula', 'ingrediente_producir', 'in_medida_alerta', 'articulo_id'];
+    if (!especial_fields.includes(next_campo)) {
+      fun.enfocarInput(next_campo);
       //
-    } else if (campo == 'ingrediente_producir') {
-      fun.enfocarInput(`cantidad_formula-${i}`);
+    } else if (next_campo == 'cantidad_formula') {
+      fun.setTimeout(() => fun.enfocarInput(`cantidad_formula-${i}`), 100);
       //
-    } else if (campo == 'in_medida_alerta') {
+    } else if (next_campo == 'in_medida_alerta') {
       if (this.showContenido(this.form.getRawValue().medida)) {
         fun.enfocarInput('contenidoPadre');
         //
@@ -359,15 +358,13 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         if (campo == 'send') is_invalid = this.formIsInvalid();
         else fun.enfocarInput(campo);
       }
-    } else if (campo == 'cantidad_formula') {
-      const actual_campo = i >= 0 ? `#cantidad_formula-${i}` : '#vendido';
-      var field = $(actual_campo)[0];
+    } else if (next_campo == 'articulo_id') {
+      const next_campo = `articulo_id-${i + 1}`;
 
-      var fields = $(actual_campo).parents('form:eq(0),body').find(':input').not('[tabindex]');
+      const articulo_combo = document.getElementById(next_campo);
 
-      var index = _.findIndex(fields, field);
-
-      if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
+      if (articulo_combo) fun.enfocarInput(next_campo);
+      else fun.enfocarInput('otros_costos');
     } else {
       is_invalid = this.formIsInvalid();
     }
@@ -552,7 +549,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (costo > 0 && fun.hasValue(costo)) {
       // const precio = costo / 0.9;
 
-      const precio = costo / this.configArticuloClass.getWinPercerntCalc(this.cofig_articulos);
+      const precio = costo / this.configArticuloClass.getWinPercentCalc(this.config_articulos);
       const precio_rounded = fun.roundToNearestMultipleOf5(precio);
       const precioLibra = fun.roundToNearestMultipleOf5(precio_rounded / 100);
 
@@ -877,19 +874,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     return contenido;
   }
 
-  prue() {
-    // var keypressEvent = $.Event('keydown', { which: 9, keyCode: 9 });
-    // $(`#nombre`).siblings();
-
-    ($(`#articulo_id-0`)[0].firstChild as any).focus();
-    // var fields = $(`#cantidad_formula-0`).parents('form:eq(0),body').find(':input').not('[tabindex]');
-    // var index = fields.index($(`#cantidad_formula-0`));
-    // if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
-    // if (index > -1 && index + 1 < fields.length) fields.eq(index + 1).focus();
-
-    // $(`#nombre`).trigger(keypressEvent);
-  }
-
   checkLongDecimales(event) {
     let check_obj = fun.checkLongDecimales(event.target.value, 4);
     event.target.value = check_obj.value;
@@ -901,6 +885,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const array = this.ARRAY_FORMULA.value;
     const formulas = [];
     const unidades = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' };
+    
     array.forEach(element => {
       const obj = {
         id: fun.hasValue(element.id) ? Number(element.id) : null,
@@ -916,19 +901,21 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   eliminarReg(regisData) {
-    const config = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el artículo <b> ${regisData.nombre}</b>?`,
-      siFunction: () => {
-        this.articuloClass.deleteOne(regisData.id).then(res => {
-          const actualPagination = this.tServ.getPaginationById('lista_articulos');
-          this.getArticulos(actualPagination);
-          this.borrar();
-        });
-      },
+    const onYes = () => {
+      this.articuloClass.deleteOne(regisData.id).then(res => {
+        const actualPagination = this.tServ.getPaginationById('lista_articulos');
+        this.getArticulos(actualPagination);
+        this.borrar();
+      });
     };
 
-    this.eliminarRegistro(config);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el artículo <b> ${regisData.nombre}</b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
+
   }
 
   // =============================================

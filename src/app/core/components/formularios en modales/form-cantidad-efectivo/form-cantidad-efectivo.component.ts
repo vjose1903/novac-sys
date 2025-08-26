@@ -1,12 +1,14 @@
-import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener, inject, Input } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ModalI } from '../../modal/modal-class';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
 import { teclasCode } from '@core/typescript/constantes';
 import { HtmlElementsService } from '@core/services/html-elements.service';
+import { tipoDocFacturacion } from '@admin/facturacion/factura';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
@@ -14,7 +16,7 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
   styleUrls: ['./form-cantidad-efectivo.component.scss'],
   standalone: false,
 })
-export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, ModalI {
+export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, IDynamicModal {
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
     event.stopPropagation();
@@ -25,54 +27,57 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   element: any;
   devuelta = '0.00';
-  efectivo: string;
-  formaPago = 'Efectivo';
   @Output() getDevuelta = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
-  factura_de: any;
 
   cambiar_articulos = undefined;
   is_print: boolean;
   documentos_a_imprimir = [];
   configApp: ConfigI;
 
+  tipoDocFacturacion = tipoDocFacturacion;
+
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
+
+  @Input() metodo!: tipoDocFacturacion;
+  @Input() efectivo: string;
+  @Input() total_factura: string;
+  @Input() formaPago: string = 'Efectivo';
+  @Input() cambios_articulos: string;
+  @Input() condicion_fact: string;
+
+  htmlServ = inject(HtmlElementsService);
+
   constructor(private shServ: SharedService) {
     super();
   }
 
-  modal: any = {};
-  inputs: any;
-
-  htmlServ = inject(HtmlElementsService);
-
   ngOnInit() {
-    this.efectivo = fun.hasValue(this.inputs.efectivo) ? this.formatoNumero(this.inputs.efectivo) : '0.00';
-    this.factura_de = this.inputs.factura_de;
-    this.formaPago = this.inputs.formaPago;
-
-    if (!this.inputs.cambios_articulos) this.cambiar_articulos = 'no';
+    this.efectivo = fun.hasValue(this.efectivo) ? this.formatoNumero(this.efectivo) : '0.00';
+    if (!this.cambios_articulos) this.cambiar_articulos = 'no';
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    fun.setTimeout(() => {
+      this.configApp = Ss.configServ.config;
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
       this.handleDefaultSwitch();
 
-      if (this.factura_de != 'compra') fun.enfocarInput('inputEfectivo');
+      if (this.metodo != tipoDocFacturacion.compra) fun.enfocarInput('inputEfectivo');
 
-      if (this.factura_de == 'compra' && !this.inputs.cambios_articulos) this.disableBtnConfirm(false);
+      if (this.metodo == tipoDocFacturacion.compra && !this.cambios_articulos) this.disableBtnConfirm(false);
       this.validarForm('init');
       this.calcularDevueta();
     }, 250);
   }
 
   handleDefaultSwitch() {
-    if (this.factura_de == 'venta') {
-      const comparation = this.inputs.condicion_fact == 'Crédito' ? 'venta_credito' : 'venta_contado';
+    if (this.metodo == tipoDocFacturacion.venta) {
+      const comparation = this.condicion_fact == 'Crédito' ? 'venta_credito' : 'venta_contado';
       this.is_print = this.documentos_a_imprimir.includes(comparation);
     } else {
-      this.is_print = this.documentos_a_imprimir.includes(this.factura_de);
+      this.is_print = this.documentos_a_imprimir.includes(this.metodo);
     }
   }
 
@@ -81,7 +86,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       fun.enfocarInput(campo);
     }
     if (campo === 'send') {
-      if (this.inputs.tipo_modal != 'no_devuelta' && parseFloat(fun.desformatearStNumber(this.efectivo)) < fun.desformatearStNumber(this.inputs.total_factura)) {
+      if (parseFloat(fun.desformatearStNumber(this.efectivo)) < fun.desformatearStNumber(this.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         fun.enfocarInput('inputEfectivo');
       } else {
@@ -104,7 +109,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     if (fun.isEmpty(this.efectivo)) {
       this.devuelta = '0.00';
     } else {
-      const total = fun.desformatearStNumber(this.inputs.total_factura);
+      const total = fun.desformatearStNumber(this.total_factura);
       const efectivo = fun.desformatearStNumber(this.efectivo);
 
       const dev = efectivo - total;
@@ -122,12 +127,9 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     const efectivo = fun.desformatearStNumber(this.efectivo);
     const obj = { dinero: efectivo, devuelta: this.devuelta ? devuelta_ : 0, forma_pago: this.formaPago, decision_cambio: this.cambiar_articulos === 'si' ? true : false };
 
-    const modal = this.modal.instance.modalsConfig.find(config => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-
-    if (this.factura_de == 'compra') {
+    if (this.metodo == tipoDocFacturacion.compra) {
       if (this.cambiar_articulos != undefined) {
-        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
+        this.modalConfig.close({ obj, is_print: this.is_print, modal_id: this.modalConfig.id });
       } else {
         fun.toastWarning('Debe de marcar una opcion en el cambio de costos de los articulos', 'AVISO');
       }
@@ -135,7 +137,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       if (this.validarForm()) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
       } else {
-        modal.returnDataFromModal({ obj, is_print: this.is_print, modal_id: this.modal.component_id });
+        this.modalConfig.close({ obj, is_print: this.is_print, modal_id: this.modalConfig.id });
       }
     }
   }
@@ -146,12 +148,12 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   validarForm(from?): boolean {
-    const total = fun.desformatearStNumber(this.inputs.total_factura);
+    const total = fun.desformatearStNumber(this.total_factura);
     const efectivo = fun.desformatearStNumber(this.efectivo);
 
-    let isInvalid = isNaN(efectivo) ? true : this.inputs.tipo_modal != 'no_devuelta' && total > efectivo;
+    let isInvalid = isNaN(efectivo) ? true : total > efectivo;
 
-    if (this.factura_de == 'compra') isInvalid = false;
+    if (this.metodo == tipoDocFacturacion.compra) isInvalid = false;
 
     if (from == 'input' || from == 'init') this.disableBtnConfirm(isInvalid);
 
@@ -159,9 +161,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modal.instance.modalsConfig.find(modal => modal.id == this.modal.component_id);
-    const btn = modal.botones.dinamico.find(boton => boton.btn_id == 'btnConfirmar');
-
-    btn.disable = validate;
+    this.modalConfig.botones.find(btn => btn.id == 'btnConfirmar').disable = validate;
   }
 }

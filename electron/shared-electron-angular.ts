@@ -11,7 +11,6 @@ export const ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
 export const ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
 export const ELECTRON_PRINT_BASE64 = 'electron-print-base64';
 export const ELECTRON_EXPORT_CSV = 'electron-export-csv';
-export const ELECTRON_CHANGE_CONFIG_FILE = 'electron-change-config-file';
 export const ELECTRON_OPEN_WEB_BROWSER = 'electron-open-web-browser';
 export const ELECTRON_RELOAD = 'electron-reload';
 export const ELECTRON_EVENT_CHECK_UPDATE = 'check-update';

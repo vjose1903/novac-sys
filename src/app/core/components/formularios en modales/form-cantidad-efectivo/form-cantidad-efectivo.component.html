@@ -1,74 +1,71 @@
-@if ((factura_de != 'compra' || factura_de == 'recibo_ingreso') && (inputs.tipo_modal == 'devuelta' || inputs.tipo_modal == 'no_devuelta')) {
-<div class="row">
-  <div class="col-12">
-    <div class="d-flex">
-      <h3 class="label w-100">TOTAL: RD$</h3>
-      <span class="negrita w-100 total text-end">
-        {{ formatoNumero(inputs.total_factura) }}
-      </span>
+@if (metodo != tipoDocFacturacion.compra) {
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex">
+        <h3 class="label w-100">TOTAL: RD$</h3>
+        <span class="negrita w-100 total text-end">
+          {{ formatoNumero(total_factura) }}
+        </span>
+      </div>
+      <h3 class="label w-100 mt-3">EFECTIVO: RD$</h3>
+      <input
+        type="text"
+        class="form-control inputEfectivo"
+        (focus)="htmlServ.selectValue($event)"
+        (keyup)="calcularDevueta()"
+        (keydown.enter)="saltar('formaPago')"
+        [(ngModel)]="efectivo"
+        (ngModelChange)="validarForm('input')"
+        (blur)="revisarPrecio($event.target)"
+        id="inputEfectivo" />
+      <h3 class="label w-100 mt-3">FORMA DE PAGO</h3>
+      <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control inputEfectivo">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Tarjeta">Tarjeta</option>
+        <option value="Transferencia">Transferencia Bancaria</option>
+        <option value="Cheque">Cheque</option>
+      </select>
+
+      <div class="d-flex mt-3">
+        <h3 class="label w-100">DEVUELTA: RD$</h3>
+        @if (devuelta) {
+          <span class="negrita w-100 total text-end"> {{ devuelta }} </span>
+        }
+      </div>
     </div>
-    <h3 class="label w-100 mt-3">EFECTIVO: RD$</h3>
-    <input
-      type="text"
-      class="form-control inputEfectivo"
-      (focus)="htmlServ.selectValue($event)"
-      (keyup)="calcularDevueta()"
-      (keydown.enter)="saltar('formaPago')"
-      [(ngModel)]="efectivo"
-      (ngModelChange)="validarForm('input')"
-      (blur)="revisarPrecio($event.target)"
-      id="inputEfectivo"
-    />
-    <h3 class="label w-100 mt-3">FORMA DE PAGO</h3>
-    <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control inputEfectivo">
-      <option value="Efectivo">Efectivo</option>
-      <option value="Tarjeta">Tarjeta</option>
-      <option value="Transferencia">Transferencia Bancaria</option>
-      <option value="Cheque">Cheque</option>
-    </select>
-    @if (inputs.tipo_modal == 'devuelta') {
-    <div class="d-flex mt-3">
-      <h3 class="label w-100">DEVUELTA: RD$</h3>
-      @if (devuelta) {
-      <span class="negrita w-100 total text-end"> {{ devuelta }} </span>
+  </div>
+} @else {
+  <!-- ======================================================= -->
+
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex si-wrap">
+        <h3 class="label w-100 no-wrap me-2">TOTAL DE COMPRA: RD$</h3>
+        <span class="negrita w-100 total">
+          {{ formatoNumero(total_factura) }}
+        </span>
+      </div>
+      @if (cambios_articulos) {
+        <div class="cambioDePrecios mb-3">
+          <span class="spanTituloCambio"> <span> ALGUNOS ARTICULOS CAMBIARON SU COSTO </span> &nbsp; <i class="fas fa-exclamation-circle"></i> </span>
+          <span class="deseaCambio_"> ¿Desea actualizar los costos de los articulos automaticamente? </span>
+          <span class="decisionesCambio">
+            <span class="si_ c-pointer" (click)="cambiosEnArticulos('si')">
+              SI
+              <i class=" btnDecision {{ cambiar_articulos == 'si' ? 'far fa-check-square' : 'far fa-square' }}"></i>
+            </span>
+            <span class="no_ c-pointer" (click)="cambiosEnArticulos('no')">
+              NO
+              <i class=" btnDecision {{ cambiar_articulos == 'no' ? 'far fa-check-square' : 'far fa-square' }}"></i>
+            </span>
+          </span>
+        </div>
       }
     </div>
-    }
   </div>
-</div>
-}
-
-<!-- ======================================================= -->
-@if (factura_de == 'compra') {
-<div class="row">
-  <div class="col-12">
-    <div class="d-flex si-wrap">
-      <h3 class="label w-100 no-wrap mr-2">TOTAL DE COMPRA: RD$</h3>
-      <span class="negrita w-100 total">
-        {{ formatoNumero(inputs.total_factura) }}
-      </span>
-    </div>
-    @if (inputs.cambios_articulos) {
-    <div class="cambioDePrecios mb-3">
-      <span class="spanTituloCambio"> <span> ALGUNOS ARTICULOS CAMBIARON SU COSTO </span> &nbsp; <i class="fas fa-exclamation-circle"></i> </span>
-      <span class="deseaCambio_"> ¿Desea actualizar los costos de los articulos automaticamente? </span>
-      <span class="decisionesCambio">
-        <span class="si_ c-pointer" (click)="cambiosEnArticulos('si')">
-          SI
-          <i class=" btnDecision {{ cambiar_articulos == 'si' ? 'far fa-check-square' : 'far fa-square' }}"></i>
-        </span>
-        <span class="no_ c-pointer" (click)="cambiosEnArticulos('no')">
-          NO
-          <i class=" btnDecision {{ cambiar_articulos == 'no' ? 'far fa-check-square' : 'far fa-square' }}"></i>
-        </span>
-      </span>
-    </div>
-    }
-  </div>
-</div>
 }
 
 <div class="d-flex align-items-center h-100 mt-2">
-  <label class="control-label mr-2 mb-0">Imprimir documento: </label>
+  <label class="control-label me-2 mb-0">Imprimir documento: </label>
   <input class="apple-switch" type="checkbox" [(ngModel)]="is_print" />
 </div>
