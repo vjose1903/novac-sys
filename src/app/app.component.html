@@ -1,4 +1,4 @@
-@if (!configServ.isConfigLoaded() || !isReady) {
+@if (!isReady()) {
   <div class="h-100 w-100 splash-container">
     <h2 class="msg">Cargando archivo de configuración</h2>
     <img class="logo" src="assets/img/logo_splash.png" />
@@ -7,31 +7,31 @@
   </div>
 }
 
-@if (loading && configServ.isConfigLoaded()) {
-  <div id="fondoC" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
-    <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
-    <span class="text"> CARGANDO ... </span>
-  </div>
-}
+@if (isReady()) {
+  @if (loading()) {
+    <div id="fondoC" [ngClass]="{ fadeIn: loading(), fadeOut: !loading() }" class="h-100 w-100 position-absolute backnegro">
+      <img class="img-fluid logoLoading rubberBand" [src]="imgLogo()" alt="" />
+      <span class="text"> CARGANDO ... </span>
+    </div>
+  }
 
-@if (configServ.isConfigLoaded() && isReady) {
   <router-outlet></router-outlet>
 }
 
 <p-dialog [closable]="false" [closeOnEscape]="false" header="Porcentaje de descarga" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
   <div class="d-flex justify-content-between mb-2 position-relative">
     <span class="negrita">Descargando actualizacion...</span>
-    <div class="mr-2">
-      <span class="negrita">{{ objPercent?.transferred }} Mb / </span>
-      <span class="negrita gris">{{ objPercent?.total }} Mb</span>
+    <div class="me-2">
+      <span class="negrita">{{ objPercent()?.transferred }} Mb / </span>
+      <span class="negrita gris">{{ objPercent()?.total }} Mb</span>
     </div>
   </div>
-  <p-progressBar [value]="objPercent?.percent"></p-progressBar>
-  <div class="mr-2">
+  <p-progressBar [value]="objPercent()?.percent"></p-progressBar>
+  <div class="me-2">
     <span> </span>
   </div>
 </p-dialog>
 
-<app-new-modal></app-new-modal>
+<dynamic-modal></dynamic-modal>
 
 <button class="d-none position-absolute" (click)="enfocarApp()"></button>

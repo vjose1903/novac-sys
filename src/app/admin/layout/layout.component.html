@@ -13,9 +13,9 @@
 
       <div class="sideBar">
         <div class="menuContent">
-          <ng-container *ngFor="let menuItem of layServ.menuItems; let first = first; let last = last">
-            <app-menu-item [menuItem]="menuItem" [actualPath]="actualPath" [nextModule]="nextModule" (menuClick)="cambiarMenu($event)" (subMenuClick)="cambiarMenu($event)"> </app-menu-item>
-          </ng-container>
+          @for (menuItem of layServ.menuItems; track menuItem; let first = $first; let last = $last) {
+            <app-menu-item [menuItem]="menuItem" [actualPath]="actualPath()" [nextModule]="nextModule()" (menuClick)="cambiarMenu($event)" (subMenuClick)="cambiarMenu($event)"> </app-menu-item>
+          }
         </div>
       </div>
     </div>
@@ -32,8 +32,8 @@
             <p-popover [dismissable]="true" #dropdownCuenta styleClass="no-carret" appendTo="body">
               <ul class="popover-cuenta">
                 <li class="popover-header">
-                  <h4 class="mb-1">{{ usuario?.nombre }}</h4>
-                  <p class="mb-0">{{ usuario?.email }}</p>
+                  <h4 class="mb-0">{{ usuario?.nombre }}</h4>
+                  <p class="mb-0 text-s-16">{{ usuario?.email }}</p>
                 </li>
                 <li>
                   <a class="popover-item" id="popover-item" (click)="refreshPage(); dropdownCuenta.hide()">
@@ -55,7 +55,7 @@
                 </li>
                 <li class="divider popover-divider"></li>
                 <li>
-                  <a class="popover-item danger" id="popover-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
+                  <a class="popover-item danger" id="popover-item" (click)="fun.logout(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
                 </li>
               </ul>
             </p-popover>
@@ -63,22 +63,26 @@
         </div>
       </div>
       <div class="contenido">
-        @if (ready) {
+        @if (ready()) {
           <router-outlet></router-outlet>
         }
 
         <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
       </div>
 
-      <div class="footer w-100">
+      <div class="footer w-100 c-default">
         <span class="machine-id" (click)="copyMachineId()">
           {{ configApp.machineId }}
         </span>
 
-        <span> Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
+        <div class="d-flex align-items-center gap-1 no-selectable">
+          <span> Novac System </span>
+          <span [multiClick]="7" (multiClickEvent)="openConfigurationModal()"> {{ configApp.app_version }} </span>
+          <span class="d-none d-lg-block"> - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
+        </div>
       </div>
 
-      @if (cuadre_hoy) {
+      @if (cuadre_hoy()) {
         <div class="cuadre_hoy">
           <div class="msg">Hoy ya existe un cuadre</div>
         </div>

@@ -1,5 +1,5 @@
 import { routes } from './app.routing';
-import { ApplicationConfig } from "@angular/core";
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { importProvidersFrom } from '@angular/core';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
@@ -7,13 +7,27 @@ import { InterceptorService } from './loader/interceptor.service';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { NgxExtendedPdfViewerModule, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { primeNGLocales } from '@core/typescript/primeNG.locales';
-import Nora from '@primeng/themes/nora';
+import Nora from '@primeuix/themes/nora';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-import { provideRouter, withRouterConfig, withComponentInputBinding } from "@angular/router";
+import { provideRouter, withRouterConfig, withComponentInputBinding } from '@angular/router';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getDatabase, provideDatabase } from '@angular/fire/database';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { Environment } from '@environments/environment';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+
+// Registrar el locale español
+registerLocaleData(localeEs);
+
+// Configuración para ng-bootstrap
+import { NgbConfig } from '@ng-bootstrap/ng-bootstrap';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZonelessChangeDetection(),
     importProvidersFrom(NgxPermissionsModule.forRoot()),
     importProvidersFrom(NgxExtendedPdfViewerModule),
     importProvidersFrom(NgxExtendedPdfViewerService),
@@ -21,13 +35,21 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withRouterConfig({
-        onSameUrlNavigation: 'reload'
+        onSameUrlNavigation: 'reload',
       }),
       withComponentInputBinding()
     ),
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorService, multi: true },
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimationsAsync(),
+    provideAnimations(),
+    {
+      provide: NgbConfig,
+      useValue: {
+        animation: true,
+        placement: 'auto',
+      },
+    },
     providePrimeNG({
       theme: {
         preset: Nora,
@@ -39,5 +61,10 @@ export const appConfig: ApplicationConfig = {
       },
       translation: primeNGLocales,
     }),
+
+    // FIREBASE
+    provideFirebaseApp(() => initializeApp(Environment.firebaseConfig)),
+    provideDatabase(() => getDatabase()),
+    provideFirestore(() => getFirestore()),
   ],
-}
+};

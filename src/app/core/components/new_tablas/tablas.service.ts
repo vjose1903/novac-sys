@@ -56,11 +56,17 @@ export class TablasService {
   modifyPaginationById(id, params: Array<paginateI>) {
     params.forEach(param => {
       const key = Object.keys(param)[0];
+      const value = param[key];
 
-      this.obj_paginate[id][key] = param[key];
+      // Validar que el valor no sea null o inválido
+      if (value === null || value === undefined) {
+        return; // Saltar este parámetro
+      }
+
+      this.obj_paginate[id][key] = value;
 
       if (key == 'page') {
-        const pageFromCero = param[key] > 0 ? param[key] - 1 : param[key];
+        const pageFromCero = value > 0 ? value - 1 : value;
         this.obj_paginate[id].page_front = pageFromCero * this.obj_paginate[id].per_page;
       }
     });

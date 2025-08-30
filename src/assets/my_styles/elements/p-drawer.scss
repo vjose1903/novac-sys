@@ -1,0 +1,77 @@
+@use './forms.scss' as *;
+
+.p-drawer {
+  &.my_sidebar {
+    z-index: 999 !important;
+    opacity: 1 !important;
+    box-shadow: -13px 0px 20px 0 #00000029 !important;
+    flex-direction: inherit !important;
+    display: block !important;
+    border: 0 solid transparent !important;
+
+    &.large {
+      width: 30rem !important;
+    }
+    &.x-large {
+      width: 40rem !important;
+    }
+    .p-drawer-content {
+      overflow: visible;
+      padding: 0 !important;
+
+      .contendioSidebar {
+        overflow: hidden;
+        display: grid;
+
+        grid-template-areas:
+          'head'
+          'cuerpoContenidoSidar';
+        grid-template-rows: min-content auto;
+
+        > .head {
+          grid-area: head;
+          width: 100%;
+          border-bottom: 1px solid var(--transparente05) !important;
+          padding: 1rem 0.5rem;
+
+          > .tituloSidebar {
+            font-size: 1.4rem;
+            color: var(--primary10);
+            padding: 0;
+            font-weight: 500;
+          }
+        }
+
+        > .cuerpoContenidoSidar {
+          grid-area: cuerpoContenidoSidar;
+
+          overflow: hidden;
+          > .no_fact {
+            font-weight: 400;
+          }
+        }
+      }
+    }
+
+    .p-drawer-header {
+      display: none;
+    }
+
+    &.side_open {
+      .p-drawer-content {
+        > .btn_side_bar_facturas {
+          transform: translate(-1rem, 49vh);
+          > #triangualo {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+}
+
+.p-drawer-mask {
+  &.p-overlay-mask {
+    z-index: 997 !important;
+  }
+}

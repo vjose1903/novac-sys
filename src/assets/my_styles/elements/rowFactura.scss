@@ -1,13 +1,11 @@
 @use './forms.scss' as *;
 
-
 @mixin entrada-focus {
   border: 2px solid var(--primary08) !important;
   box-shadow: none !important;
   outline: none !important;
   background-color: var(--primary01) !important;
 }
-
 
 .entrada {
   border-radius: 0 !important;
@@ -38,7 +36,7 @@
 }
 
 .panel-dropdown-unidad {
-  min-width: 11rem;
+  min-width: 11rem !important;
 }
 
 [tabindex='-1']:focus:not(:focus-visible):not(.entrada) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { ElementRef, Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
@@ -19,5 +19,19 @@ export class HtmlElementsService {
   getValue(event: any): any {
     const inputElement = event.target as HTMLInputElement;
     return inputElement ? inputElement.value : null;
+  }
+
+  focusInput(event: any | ElementRef): any {
+    const inputElement = event instanceof ElementRef ? event.nativeElement : (event.target as HTMLInputElement);
+
+    if (inputElement) inputElement.focus();
+  }
+
+  showPSelectPanel(event, dropdown) {
+    if (event.type == 'focus' && !dropdown.overlayVisible) {
+      requestAnimationFrame(() => {
+        dropdown.show();
+      });
+    }
   }
 }

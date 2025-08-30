@@ -159,6 +159,7 @@
       .footer {
         grid-area: footer;
         height: 2rem;
+        gap: 1rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -172,9 +173,11 @@
           font-size: 9px;
           opacity: 0.5;
           transition: all 0.2s ease;
+          border-radius: 0.5rem;
 
           cursor: copy;
           &:hover {
+            background-color: #f5f5f51f;
             opacity: 1;
           }
         }
@@ -195,6 +198,7 @@
   list-style: none;
 
   .popover-header {
+    padding: 0.5rem;
     background-color: var(--primary01);
 
     h3 {
@@ -206,7 +210,7 @@
   .popover-item {
     display: block;
     color: #333;
-    padding: 15px 25px;
+    padding: 15px 20px;
     font-size: 14px;
     cursor: pointer;
 

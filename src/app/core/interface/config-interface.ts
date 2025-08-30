@@ -1,6 +1,13 @@
 import { operativeSystemE, serie } from "../typescript/constantes";
 
+export interface EmpresaI {
+  id: string;
+  key: string;
+  nombre: string;
+}
+
 export interface ConfigI {
+  id?:                         string | number;
   cliente:                     string;
   nombre_empresa:              string;
   rnc_empresa:                 string;
@@ -10,12 +17,10 @@ export interface ConfigI {
   logo_impresion:              string;
   color_app:                   colors;
   mode_app:                    modes;
-  gitUser?:                    string;
   machineId?:                  string;
   operative_system?:           operativeSystemE;
   url_servidor:                string;
   url_servidor_respaldo:       string;
-  url_servidor_descargas:      string;
   config_password:             string;
   usa_url_principal:           boolean;
   is_produccion:               boolean;
@@ -23,8 +28,6 @@ export interface ConfigI {
   calcular_itbis:              boolean;
   pages_sizes:                 Documentos;
   printer_selected:            Documentos;
-  plantillas_impresion:        PlantiallasImpresion;
-  is_development?:             boolean;
   printersList?:               Printer[] | string [];
   app_version?:                string;
   is_db_local:                 boolean;

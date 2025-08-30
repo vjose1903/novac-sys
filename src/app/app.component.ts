@@ -1,17 +1,16 @@
 import { PrimengModule } from './modules/primeng.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NewModalModule } from './core/components/modal/modal.module';
 import { FormulariosEnModalesModule } from './core/components/formularios en modales/formularios-en-modales.module';
-import { Component, OnInit, ChangeDetectorRef, AfterContentChecked, NgZone, AfterViewInit, HostListener, inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, AfterViewInit, HostListener, inject, OnDestroy, signal, Injector } from '@angular/core';
 import { LoaderService } from './loader/loader.service';
-import { IpcService } from '@core/services/ipc.service';
-import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
-import * as _ from 'lodash';
-import { Ss } from '@core/services/singleton.service';
+import { IpcService } from '@services/ipc.service';
+
+import { Ss } from '@services/singleton.service';
 import { HttpClient } from '@angular/common/http';
 import { LayoutService } from '@admin/layout/layout.service';
-import { ConfigurationService } from '@core/services/configuration.service';
-import { ThemeService } from '@core/services/theme.service';
+import { ConfigurationService } from '@services/configuration.service';
+import { EmpresaService } from '@core/services/empresa.service';
+import { ThemeService } from '@services/theme.service';
 import { MessageTask } from '@core/models/message-task';
 
 import {
@@ -27,27 +26,29 @@ import {
   ELECTRON_EVENT_DOWNLOAD_UPDATE,
 } from '../../electron/shared-electron-angular';
 
-import { Subscription, takeUntil, Subject } from 'rxjs';
+import { takeUntil, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { SharedService } from '@core/services/shared.service';
-import { fun } from '@core/services/functions.service';
+import { SharedService } from '@services/shared.service';
+import { fun } from '@services/functions.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { log } from 'console';
-import { ModalClass } from './core/components/modal/modal-class';
-import { TipoFacturaI, TiposFacturaC } from '@admin/facturacion/factura';
+import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
+import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
+import { Firestore } from '@angular/fire/firestore';
+import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, PrimengModule, FormsModule, ReactiveFormsModule, NewModalModule, FormulariosEnModalesModule, RouterModule],
+  imports: [CommonModule, PrimengModule, FormsModule, ReactiveFormsModule, FormulariosEnModalesModule, RouterModule, DynamicModalComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent extends MixinClass implements OnInit, AfterContentChecked, AfterViewInit, OnDestroy {
+export class AppComponent extends MixinClass implements OnInit, AfterViewInit, OnDestroy {
   // Servicios inyectados usando inject()
   public _ipc = inject(IpcService);
   public loaderServ = inject(LoaderService);
@@ -57,25 +58,26 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
   public factServ = inject(FacturacionService);
   public layServ = inject(LayoutService);
   public configServ = inject(ConfigurationService);
+  public empresaServ = inject(EmpresaService);
   public themeService = inject(ThemeService);
   public toastr = inject(ToastrService);
   public sharedServ = inject(SharedService);
   public permissionsService = inject(NgxPermissionsService);
+  public dynamicModalService = inject(DynamicModalService);
+  public firestore = inject(Firestore);
+  public injector = inject(Injector);
 
   // Subject para manejar la destrucción del componente
   private readonly destroy$ = new Subject<void>();
 
   // Propiedades del componente
-  loading = false;
+  loading = signal<boolean>(false);
   objProgress: any;
-  visible = false;
-  imgLogo: string;
-  tiempo_restante: string;
-  objPercent: any;
-  counter = 0;
-  isReady = false;
-
-  tipoFacturaClass = new TiposFacturaC();
+  visible = signal<boolean>(false);
+  imgLogo = signal<string>('');
+  objPercent = signal<any>(null);
+  counter = signal<number>(0);
+  isReady = signal<boolean>(false);
 
   // Mapa de eventos de Electron para mejor organización
   private readonly electronEventHandlers = {
@@ -87,12 +89,12 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       this.mostrar_modal_actualizacion(data);
     },
     [ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS]: (data: any) => {
-      this.visible = true;
+      this.visible.set(true);
       fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
       this.downloadProgression(data.body);
     },
     [ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED]: () => {
-      this.visible = false;
+      this.visible.set(false);
     },
     [ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE]: (data: any) => {
       fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
@@ -100,13 +102,18 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     [ELECTRON_EVENT_UPDATE_ERROR]: (data: any) => {
       fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
       fun.toastError(data.msg, 'ERRROR');
-      this.visible = false;
+      this.visible.set(false);
     },
     [ELECTRON_SHOW_CLOSE_CONFIRMATION]: () => {
       const token = fun.getAuthToken();
+      console.log('token', token);
+
       if (fun.hasValue(token)) {
+        console.log('1');
+
         this.cerrar_app();
       } else {
+        console.log('2');
         this.sendCloseConfirmation();
       }
     },
@@ -138,17 +145,14 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     await this.loadAppConfig();
 
     this.setupSubscriptions();
-    this.getTiposFacturas();
     Ss.layServ.parseMenu();
     this.verifyIsReady();
   }
 
   ngAfterViewInit(): void {
-    fun.setWindowSize(window);
-  }
-
-  ngAfterContentChecked(): void {
-    this.cdRef.detectChanges();
+    fun.setTimeout(() => {
+      fun.setWindowSize(window);
+    }, 0);
   }
 
   ngOnDestroy(): void {
@@ -172,6 +176,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       toastr: this.toastr,
       sharedServ: this.sharedServ,
       cdRef: this.cdRef,
+      dynamicModalService: this.dynamicModalService,
+      firestore: this.firestore,
+      injector: this.injector,
     });
   }
 
@@ -180,11 +187,16 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
    */
   private setupSubscriptions(): void {
     // Suscripción al loader
-    this.loaderServ.isLoading.pipe(takeUntil(this.destroy$)).subscribe(loading => (this.loading = loading));
+    this.loaderServ.isLoading.pipe(takeUntil(this.destroy$)).subscribe(loading => {
+      this.zone.runOutsideAngular(() => {
+        this.loading.set(loading);
+      });
+    });
 
     // Solo escuchar cambios en la configuración para recargarla
-    MODIFIED_CONFIG_FILE.pipe(takeUntil(this.destroy$)).subscribe(res => {
-      if (fun.hasValue(res)) this.loadAppConfig();
+    this.configServ.config$.pipe(takeUntil(this.destroy$)).subscribe(config => {
+      this.themeService.setTheme(config.color_app);
+      this.imgLogo.set(`data:image/png;base64,${config.logo_empresa}`);
     });
 
     // Eventos de Electron
@@ -207,50 +219,28 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
     });
   }
 
-  /**
-   * Cargar configuración de la aplicación
-   */
   async loadAppConfig(): Promise<void> {
     try {
       const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
       const config = (await this._ipc.sendTask(task)) as any;
 
-      this.configServ.setConfig = config;
-      this.themeService.setTheme(config.color_app);
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
+      this.configServ.config = config;
     } catch (error) {
       console.error('Error cargando configuración:', error);
       // Manejar error de configuración
     }
   }
 
-  getTiposFacturas() {
-    return new Promise(async (resolve, reject) => {
-      await this.tipoFacturaClass
-        .getAll()
-        .then((tiposFacturas: any) => {
-          tiposFacturas = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
-          Ss.factServ.lista_tipos_facturas = tiposFacturas;
-
-          resolve(Ss.factServ.lista_tipos_facturas);
-        })
-        .catch(error => {
-          fun.logRed('error: ', error);
-          reject(error);
-        });
-    });
-  }
-
   async verifyIsReady() {
     const validateAppReadiness = (): boolean => {
-      const hasTiposFacturas = Ss.factServ.lista_tipos_facturas?.length > 0;
       const isMenuParsed = Ss.layServ.menuParsed;
+      const isConfigLoaded = Ss.configServ.isConfigLoaded();
 
-      return hasTiposFacturas && isMenuParsed;
+      return isMenuParsed && isConfigLoaded;
     };
 
     const handleFailure = () => {
-      this.isReady = false;
+      this.isReady.set(false);
       fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
     };
 
@@ -258,7 +248,17 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
       task: () => Promise.resolve(validateAppReadiness()),
       retryWhen: (isReady: boolean) => !isReady,
       actionAfterRetry: () => {
-        setTimeout(() => (this.isReady = true), 250);
+        const token = fun.getAuthToken();
+
+        if (token) {
+          Ss.factServ.getTiposFacturas().then(() => {
+            fun.setTimeout(() => {
+              this.isReady.set(true);
+            }, 250);
+          });
+        } else {
+          this.isReady.set(true);
+        }
       },
       actionIfNoSuccess: handleFailure,
     });
@@ -286,31 +286,12 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   cerrar_app(): void {
     this.zone.run(() => {
-      this.openNewModal({
-        html: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
+      this.dynamicModalService.confirmationModal({
         id: 'cerrar_app',
-        header: 'CONFIRMACION DE CIERRE',
-        width: '40rem',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            {
-              clase: 'btn btn-blanco',
-              function: instance => instance.closeModal(instance.id),
-              label: 'Cancelar',
-              disable: false,
-            },
-            {
-              clase: 'btn btn-danger',
-              function: instance => {
-                this.sendCloseConfirmation();
-                instance.closeModal(instance.id);
-              },
-              label: 'Cerrar',
-              disable: false,
-            },
-          ],
-        },
+        header: 'CONFIRMACIÓN DE CIERRE',
+        texto: `<p> ESTAS A PUNTO DE <strong>CERRAR EL PROGRAMA NOVAC SYSTEM</strong>, ¿Desea continuar? </p>`,
+        btnKind: confirmationButtons.cancelarCerrar,
+        onYes: this.sendCloseConfirmation.bind(this),
       });
     });
   }
@@ -322,85 +303,42 @@ export class AppComponent extends MixinClass implements OnInit, AfterContentChec
 
   mostrar_modal_actualizacion(info: any): void {
     this.zone.run(() => {
-      this.openNewModal({
-        html: `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`,
-        id: 'actualizar_app',
-        header: 'ACTUALIZACIÓN DISPONIBLE',
-        width: '40rem',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            {
-              clase: 'btn btn-blanco',
-              function: instance => instance.closeModal(instance.id),
-              label: 'Cancelar',
-              disable: false,
-            },
-            {
-              clase: 'btn btn-verde',
-              function: instance => {
-                this.iniciar_descarga_actualizacion();
-                instance.closeModal(instance.id);
-              },
-              label: 'Actualizar',
-              disable: false,
-            },
-          ],
-        },
-      });
+      const propietarioModalConf = new DynamicModalClass();
+
+      propietarioModalConf.id = 'actualizar_app';
+      propietarioModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
+      propietarioModalConf.width = '40rem';
+      propietarioModalConf.html = `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`;
+      propietarioModalConf.closableEsc = true;
+      propietarioModalConf.botones = [
+        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance) },
+      ];
+
+      propietarioModalConf.show();
     });
   }
 
-  iniciar_descarga_actualizacion(): void {
+  iniciar_descarga_actualizacion(modalInstance?: DynamicModalClass): void {
     const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
     this._ipc.sendTask(task).then(res => {
-      console.log('res ---> ', res);
-      this.visible = true;
+      this.visible.set(true);
+      if (modalInstance) modalInstance.close();
     });
   }
 
   downloadProgression(object: any): void {
     this.zone.run(() => {
-      if (this.counter === 1) this.visible = true;
+      if (this.counter() === 1) this.visible.set(true);
 
-      this.counter++;
-      this.tiempo_restante = this.timeConvert(object.total / object.bytesPerSecond);
+      this.counter.update(prev => prev + 1);
 
       object.transferred = parseFloat(fun.roundNumberToDecimal(object.transferred / 1000000));
       object.total = parseFloat(fun.roundNumberToDecimal(object.total / 1000000));
       object.percent = parseFloat(fun.roundNumberToDecimal(object.percent));
 
-      this.objPercent = object;
+      this.objPercent.set(object);
       this.cdRef.detectChanges();
     });
-  }
-
-  async getAppConfig(): Promise<any> {
-    try {
-      const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
-      const config = (await this._ipc.sendTask(task)) as any;
-
-      this.themeService.setTheme(config.color_app);
-      this.configServ.setConfig = config;
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-
-      return config;
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  }
-
-  timeConvert(d: number): string {
-    d = Number(d);
-    const h = Math.floor(d / 3600);
-    const m = Math.floor((d % 3600) / 60);
-    const s = Math.floor((d % 3600) % 60);
-
-    const hDisplay = h > 0 ? h + (h === 1 ? ' hora, ' : ' horas, ') : '';
-    const mDisplay = m > 0 ? m + (m === 1 ? ' minuto, ' : ' minutos, ') : '';
-    const sDisplay = s > 0 ? s + (s === 1 ? ' segundo' : ' segundos') : '';
-
-    return hDisplay + mDisplay + sDisplay;
   }
 }

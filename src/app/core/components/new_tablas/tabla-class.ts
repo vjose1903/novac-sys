@@ -1,4 +1,22 @@
-export type tableRowType = 'inputSwitch' | 'index' | 'cantidades' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date' | 'none';
+export enum tableCellType {
+  inputSwitch = 'inputSwitch',
+  index = 'index',
+  quantityTooltip = 'quantityTooltip',
+  img = 'img',
+  icon = 'icon',
+  tag = 'tag',
+  color = 'color',
+  switch = 'switch',
+  dropDown = 'dropDown',
+  input = 'input',
+  text = 'text',
+  formatoNumero = 'formatoNumero',
+  textList = 'textList',
+  date = 'date',
+  none = 'none',
+}
+
+export type tableRowType = 'inputSwitch' | 'index' | 'quantityTooltip' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date' | 'none';
 
 export interface table_info {
   id?: string;
@@ -6,7 +24,7 @@ export interface table_info {
   titulo_sm?: string;
   key?: string;
   dropdown_key?: string;
-  tipo?: tableRowType;
+  tipo?: tableRowType | tableCellType;
   tag_severity?: string;
   remplace?: any;
   data?: any;

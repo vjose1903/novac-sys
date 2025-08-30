@@ -8,6 +8,8 @@ import { ReporteC } from '../../reportes/reporte';
 import { csvConfig } from '@core/services/reports/excel/configs/report/notas';
 import { serie, unidadAbrev } from '@core/typescript/constantes';
 import Big from 'big.js';
+import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 export enum comprobanteNormal {
   debito = '03',
@@ -46,7 +48,7 @@ export class NotaC extends CrudG<any> {
 
   parseDataToPdf(data) {
     return new Promise<any>(resolve => {
-      const configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+      const configApp = Ss.configServ.config;
 
       const pick_nota1 = ['cliente', 'estado', 'fecha_equivalente', 'fecha_valida', 'id', 'identificador', 'numero_comprobante', 'numero_documento', 'tipo_factura', 'total', 'bruto', 'itbis', 'usuario', 'facturas_aplicadas', 'tipo_factura_id'];
       const pick_nota2 = ['tipo_factura_id', 'razon', 'serie', 'qr_url_dgii', 'fecha_hora_firma', 'security_code', 'document_reference', 'is_ncf_modificado'];
@@ -65,14 +67,12 @@ export class NotaC extends CrudG<any> {
 
       data_parsed.facturas_aplicadas.forEach(factura_aplicada => {
         if (data_parsed.serie == serie.normal) {
-          if (configApp.plantillas_impresion.nota == 'Agrupada') data_parsed.contenido_reporte.push(this.parseContentAgrupadoNota(factura_aplicada));
-
-          if (configApp.plantillas_impresion.nota == 'Detallada') data_parsed.contenido_reporte.push(...this.parseContentDetalladoNota(factura_aplicada));
+          data_parsed.contenido_reporte.push(this.parseContentAgrupadoNota(factura_aplicada));
         } else if (data_parsed.serie == serie.electronica) {
           let descuento = 0;
           data_parsed.contenido_reporte = factura_aplicada.detalles_facturas_notas.map(detalle => {
             detalle['cantidad_mostrar'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${unidadAbrev[fun.normalizarTexto(detalle.unidad)]}.`;
-            
+
             const isPriceChange = detalle.cantidad == 0;
             const descuento_big = Big(detalle.descuento);
             const descuento_equivalente = descuento_big.div(detalle.cantidad_origin).toNumber();
@@ -80,8 +80,7 @@ export class NotaC extends CrudG<any> {
 
             detalle['descuento_valor'] = fun.desformatearStNumber(fun.roundNumberToDecimal(descuento_proporcional));
 
-            descuento += detalle['descuento_valor']
-
+            descuento += detalle['descuento_valor'];
 
             return detalle;
           });
@@ -103,34 +102,21 @@ export class NotaC extends CrudG<any> {
     return factura_aplicada;
   }
 
-  parseContentDetalladoNota(factura_aplicada) {
-    const detalles = [];
-
-    factura_aplicada.detalles_facturas_notas.forEach(detalle_nota => {
-      const obj_detalle = {};
-
-      obj_detalle['fecha'] = moment(`${factura_aplicada.cabecera_factura.fecha_equivalente}`).format('DD/MM/YYYY');
-      obj_detalle['numero_comprobante'] = factura_aplicada.cabecera_factura.numero_comprobante;
-      obj_detalle['total'] = fun.roundNumberToDecimal(Math.abs(detalle_nota.total));
-      obj_detalle['articulo'] = detalle_nota.articulo.nombre;
-
-      detalles.push(obj_detalle);
-    });
-
-    return detalles;
-  }
-
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
+  static openModalReporteForm(params: { tipo: any; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
-      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+      const { tipo, titulo } = params;
+      const inputs = { tipo_reporte: tipo };
 
-      params.openNewModal(ReporteC.objReporte);
+      ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 
-      function returnDataFromModal(arg) {
-        NotaC.requestReporte(arg, params);
-        resolve(arg);
+      function returnDataFromModal(arg: ICallbackModal) {
+        if (arg.type != modalCloseType.returnData) return;
+        NotaC.requestReporte(arg.data, params);
+        resolve(arg.data);
       }
+
+      new DynamicModalClass(ReporteC.objReporte).show();
     });
   }
 
@@ -143,7 +129,7 @@ export class NotaC extends CrudG<any> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
     ReporteC.configCsv = csvConfig;
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
-      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+      let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')) };
 
       ReporteC.visualizarReporte(objPdfView);
     });

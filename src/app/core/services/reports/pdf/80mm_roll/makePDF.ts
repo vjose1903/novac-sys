@@ -30,7 +30,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const is_suplidor = is_compra;
   const is_electronica = data?.serie == serie.electronica;
 
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.config;
 
   const dd = {
     pageSize: { width: 200, height: 'auto' },

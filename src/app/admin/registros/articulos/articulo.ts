@@ -4,6 +4,8 @@ import { ReporteC } from '../../reportes/reporte';
 import { fun } from '@core/services/functions.service';
 import { csvConfig as ventas_producto_csvConfig } from '@core/services/reports/excel/configs/report/ventas_producto';
 import { ReportDateTypeE } from '../../reportes/reporte.utils';
+import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 export enum tipos_articulos {
   veterinaria = 'veterinaria',
@@ -51,6 +53,7 @@ export interface ArticuloI {
   calcular_saco?: boolean;
   costos?: any;
   stock?: any;
+  [prop: string]: any;
 }
 
 export class ArticuloC extends CrudG<ArticuloI> {
@@ -60,16 +63,17 @@ export class ArticuloC extends CrudG<ArticuloI> {
 
   getArticulosFiltrado(arg: { buscar: any; fecha: any; parameters?: any; tipo?: any; page?: number; per_page?: number; paginado?: boolean; is_compra?: boolean }) {
     return new Promise<any>((resolve, reject) => {
-      let extra = { afterPath: `filtro/${arg.buscar}`, parameters: {} };
+      const { buscar, fecha, parameters, tipo = 'todos', page = 1, per_page = 20, paginado = true, is_compra = false } = arg;
+      let extra = { afterPath: `filtro/${buscar}`, parameters: {} };
 
       extra['parameters'] = {
-        page: arg.page || 1,
-        per_page: arg.per_page || 20,
-        paginado: fun.objHas(arg, 'paginado') ? arg.paginado : true,
-        is_compra: fun.objHas(arg, 'is_compra') ? arg.is_compra : false,
-        tipo: arg.tipo || 'todos',
-        fecha: arg.fecha,
-        ...arg.parameters,
+        page: page,
+        per_page: per_page,
+        paginado: paginado,
+        is_compra: is_compra,
+        tipo: tipo,
+        fecha: fecha,
+        ...parameters,
       };
 
       this.getAll(extra)
@@ -78,12 +82,15 @@ export class ArticuloC extends CrudG<ArticuloI> {
     });
   }
 
-  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal }) {
+  static openModalReporteForm(params: { tipo: any; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
+      const { tipo, titulo } = params;
+      const inputs = { tipo_reporte: tipo };
+
       let objModal;
       switch (params.tipo) {
         case 'ventas_productos':
-          ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+          ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
           objModal = ReporteC.objReporte;
 
           break;
@@ -92,12 +99,13 @@ export class ArticuloC extends CrudG<ArticuloI> {
           break;
       }
 
-      params.openNewModal(objModal);
-
-      function returnDataFromModal(arg) {
-        ArticuloC.requestReporte(arg, params);
-        resolve(arg);
+      function returnDataFromModal(arg: ICallbackModal) {
+        if (arg.type != modalCloseType.returnData) return;
+        ArticuloC.requestReporte(arg.data, params);
+        resolve(arg.data);
       }
+
+      new DynamicModalClass(ReporteC.objReporte).show();
     });
   }
 
@@ -121,7 +129,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
-      let objPdfView = { ...response, titulo: pdfParams.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: pdfParams.openNewModal };
+      let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')) };
 
       ReporteC.visualizarReporte(objPdfView);
     });

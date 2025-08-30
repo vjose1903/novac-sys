@@ -9,6 +9,7 @@ export function my_barcode(code) {
 }
 
 export function my_qrcode(code, size = 200) {
+  if (isEmpty(code)) return '';
   // Necesitamos instalar la biblioteca qrcode: npm install qrcode
   const QRCode = require('qrcode');
 

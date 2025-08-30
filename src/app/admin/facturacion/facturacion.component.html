@@ -1,4 +1,4 @@
-<span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', factServ.tipoDocumento)">
+<span id="btn_side_facturas" class="btn_side_bar_facturas out-side d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn afuera', factServ.tipoDocumento())">
   <i id="triangualo" class="fas fa-caret-left text-white"></i>
 </span>
 
@@ -7,19 +7,19 @@
     <div class="d-flex align-items-center">
       <h4 class="negrita mb-0">{{ titulo | titlecase }}</h4>
 
-      @if (optionesExtra.length > 0 && factServ.isVenta) {
-        <div class="ml-3">
+      @if (opcionesExtra().length > 0 && factServ.isVenta()) {
+        <div class="ms-3">
           <btn-icon-circular id="btnExtra" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
           <p-popover #overlayExtra [dismissable]="false" styleClass="padding-sm" (onHide)="cerrarOverlay()">
             <div id="overlayExtra">
               <ul class="overlayExtra" role="menu">
-                @for (option of optionesExtra; track option.key; let index_option = $index) {
+                @for (option of opcionesExtra(); track option.key; let index_option = $index) {
                   @if (option.condition()) {
                     <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer br-4" (click)="selectOptionExtra(option, 'click')">
                       <div class="d-flex align-items-center">
                         <strong> {{ option.key }} - </strong> &nbsp;
-                        <p id="dropdown-item" class="mr-3 mb-0">{{ option.label }}</p>
+                        <p id="dropdown-item" class="me-3 mb-0">{{ option.label }}</p>
                       </div>
                     </li>
                   }
@@ -32,7 +32,7 @@
     </div>
 
     <div class="d-flex">
-      @if (!factServ.isCotizacion && !factServ.isPreVenta) {
+      @if (!factServ.isCotizacion() && !factServ.isPreVenta()) {
         <p-selectButton
           [options]="facturasSerieOptions"
           [ngModel]="factServ.serieType()"
@@ -50,10 +50,10 @@
     <div class="cardPrincipal cardFacturacion">
       <div class="cabezaFactura">
         <div class="row">
-          @if (factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion) {
-            <div class="col-3 divRight pl-0">
+          @if (factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion) {
+            <div class="col-3 divRight ps-0">
               <div class="row">
-                <div class="col-3 pl-0">
+                <div class="col-3 ps-0">
                   <!-- ================== TIPO ================== -->
                   <span class="titulos"><strong>Tipo:</strong></span>
                   <input
@@ -76,7 +76,7 @@
                   </p-popover>
                 </div>
 
-                <div class="{{ factServ.isCompra ? 'col-6' : 'col-9' }} p-0">
+                <div class="{{ factServ.isCompra() ? 'col-6' : 'col-9' }} p-0">
                   <!-- ================== CONDICION ================== -->
                   <span class="titulos"><strong>Condición:</strong></span>
                   <select
@@ -94,8 +94,8 @@
                   </select>
                 </div>
 
-                @if (factServ.isCompra) {
-                  <div class="col-3 pr-0">
+                @if (factServ.isCompra()) {
+                  <div class="col-3 pe-0">
                     <!-- ================== GASTO ================== -->
                     <span class="titulos"><strong>Gasto:</strong></span>
                     <input
@@ -120,10 +120,10 @@
                 }
               </div>
 
-              @if (factServ.isVenta) {
+              @if (factServ.isVenta()) {
                 <div>
                   <!-- ================== VENTA ================== -->
-                  <span class="mr-2 mt-3 titulos"><strong>Venta: </strong></span>
+                  <span class="me-2 mt-3 titulos"><strong>Venta: </strong></span>
                   <select
                     #ventaInput
                     id="venta"
@@ -160,7 +160,7 @@
                         (onClose)="checkCambiosModoyCondicionFactura({ id: 'fecha_viaje', value: fecha_viaje })"
                         [disabled]="errorComprobante"></p-datepicker>
                     </div>
-                    <div class="ml-3 position-relative">
+                    <div class="ms-3 position-relative">
                       <btn-icon-circular
                         [id]="'btnCamion'"
                         [icon_size]="'1.2rem'"
@@ -178,7 +178,7 @@
 
                   <p-popover [dismissable]="false" [dismissable]="getIndicadorMovimientoViaje('close_icon')" styleClass="padding-sm" #overlayMovimientoViaje (onHide)="cerrarOverlay()">
                     <div id="overlayMovimientoViaje" class="containMovimientoViaje">
-                      <div class="camionSelector pr-2">
+                      <div class="camionSelector pe-2">
                         <span class="mb-2 titulos"><strong>Camion: </strong></span>
                         <div class="filterOverlay">
                           <input
@@ -200,7 +200,7 @@
                               class="hoverlable"
                               [ngClass]="{ indicador: camion_row == index_camion && entidad_en_turno == 'camion', selected: camion_row == index_camion && entidad_en_turno == 'chofer' }">
                               <div class="d-flex justify-content-between align-items-center">
-                                <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' mr-1 c-help'"></i>
+                                <i pTooltip="{{ getCamionInfo(camion, 'tooltip') }}" tooltipPosition="top" [class]="getCamionInfo(camion, 'icon') + ' me-1 c-help'"></i>
                                 <span id="dropdown-item" class="mb-0"> {{ getCamionInfo(camion, 'label') }} </span>
                                 <input class="apple-switch" [ngClass]="{ disabled: factServ.action == 'update' || errorComprobante }" type="checkbox" (change)="seleccionarCamion(camion, index_camion)" [checked]="checkCamionIsSelected(camion)" />
                               </div>
@@ -213,7 +213,7 @@
                           }
                         </ul>
                       </div>
-                      <div class="choferSelector rayaLeft pl-2">
+                      <div class="choferSelector rayaLeft ps-2">
                         <div class="overlayChofer {{ checkCamionIsSelected(null) ? 'd-none' : 'show' }}">
                           <span class="label"> Seleccione primero el camión </span>
                         </div>
@@ -252,7 +252,7 @@
                   </p-popover>
                 </div>
               }
-              @if (factServ.isCompra) {
+              @if (factServ.isCompra()) {
                 <div>
                   <!-- ================== COMPROBANTE ================== -->
                   <span class="mt-2"><strong>Número comprobante:</strong></span>
@@ -261,10 +261,10 @@
                     (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
                     [ngModel]="NCFcompra()"
                     (ngModelChange)="NCFcompra.set($event)"
-                    [mask]="factServ.isComprobanteNormal ? 'B9999999999' : 'E999999999999'"
+                    [mask]="factServ.isComprobanteNormal() ? 'B9999999999' : 'E999999999999'"
                     tabindex="-1"
                     styleClass="form-control inputE UPPERCASE"
-                    [placeholder]="factServ.isComprobanteNormal ? 'B__________' : 'E____________'"
+                    [placeholder]="factServ.isComprobanteNormal() ? 'B__________' : 'E____________'"
                     [autoClear]="false"
                     [disabled]="errorComprobante"></p-inputMask>
                   @if (condicion_fact === 'Crédito') {
@@ -288,35 +288,35 @@
           }
           <!-- ======================================================================================================================================================================== -->
           <!-- ======================================================================================================================================================================== -->
-          <div class="{{ factServ.tipoDocumento != tipoDocFacturacion.pre_venta && factServ.tipoDocumento != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
-            <form [formGroup]="form">
+          <div class="{{ factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
+            <form [formGroup]="formPropietario">
               <div class="d-flex" style="height: 1.7rem">
                 <!-- ================== PROPIETARIO ================== -->
                 <h5>
-                  <strong>{{ factServ.isCompra ? 'Suplidor' : 'Cliente' }}:</strong>
+                  <strong>{{ factServ.isCompra() ? 'Suplidor' : 'Cliente' }}:</strong>
                 </h5>
-                <span class="ml-3">
+                <span class="ms-3">
                   <btn-icon-circular
                     [id]="'btnBuscarClienteSuplidor'"
                     [icon]="'fas fa-search'"
                     [size]="'size-md'"
                     [icon_size]="'1rem'"
-                    [tooltip]="factServ.isCompra ? 'Buscar suplidor' : 'Buscar cliente'"
+                    [tooltip]="factServ.isCompra() ? 'Buscar suplidor' : 'Buscar cliente'"
                     [tooltipPosition]="'right'"
                     (clickFunction)="abrirModalPropietario()">
                   </btn-icon-circular>
                 </span>
               </div>
               <div class="row">
-                <div class="col-7 pl-0">
+                <div class="col-7 ps-0">
                   <!-- ================== NOMBRE ================== -->
-                  <span class="control-label titulos mr-2">Nombre:</span>
+                  <span class="control-label titulos me-2">Nombre:</span>
                   <input
                     #nombreInput
                     id="nom"
                     (keydown.enter)="saltar(htmlServ.getId($event), nombreInput.value)"
                     type="text"
-                    formControlName="nombre"
+                    formControlName="nombre_completo"
                     class="form-control inputE"
                     (focus)="htmlServ.selectValue($event)"
                     autocomplete="off"
@@ -324,18 +324,18 @@
                     tabindex="-1"
                     [ngClass]="{ disabled: activarNombreDireccion() }" />
                   <input id="id" type="hidden" formControlName="id" />
-                  @if (!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)) {
-                    <div class="alerta text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
+                  @if (!formPropietario.controls['nombre_completo'].valid && (formPropietario.controls['nombre_completo'].dirty || formPropietario.controls['nombre_completo'].touched)) {
+                    <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                   }
                 </div>
 
-                <div class="col-5 pr-0">
+                <div class="col-5 pe-0">
                   <div class="form-group">
                     <!-- ================== TELEFONO ================== -->
                     <span class="control-label titulos">Telefono:</span>
                     <input type="text" class="form-control inputE disabled" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" [readOnly]="true" tabindex="-1" />
-                    @if (!form.controls['telefono'].valid && (form.controls['telefono'].dirty || form.controls['telefono'].touched)) {
-                      <div class="alerta text-danger ml-1" style="font-size: 12px">Introduzca el numero de telefono</div>
+                    @if (!formPropietario.controls['telefono'].valid && (formPropietario.controls['telefono'].dirty || formPropietario.controls['telefono'].touched)) {
+                      <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el numero de telefono</div>
                     }
                   </div>
                 </div>
@@ -343,7 +343,7 @@
                 <div class="col-12 p-0">
                   <div class="form-group">
                     <!-- ================== DIRECCION ================== -->
-                    <span class="control-label titulos mr-2">Direccion:</span>
+                    <span class="control-label titulos me-2">Direccion:</span>
                     <input
                       #direccionInput
                       id="dir"
@@ -356,8 +356,8 @@
                       [readOnly]=""
                       [ngClass]="{ disabled: activarNombreDireccion() }"
                       tabindex="-1" />
-                    @if (!form.controls['direccion'].valid && (form.controls['direccion'].dirty || form.controls['direccion'].touched)) {
-                      <div class="alerta text-danger ml-1" style="font-size: 12px">Este Campo es obligatorio</div>
+                    @if (!formPropietario.controls['direccion'].valid && (formPropietario.controls['direccion'].dirty || formPropietario.controls['direccion'].touched)) {
+                      <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                     }
                   </div>
                 </div>
@@ -412,8 +412,8 @@
           </div>
 
           <div class="col-7">
-            <div class="h-100 d-flex justify-content-around align-items-center ml-4">
-              <div *ngxPermissionsOnly="factServ.isVenta ? permissions.factura_venta.create : permissions.factura_compra.create">
+            <div class="h-100 d-flex justify-content-around align-items-center ms-4">
+              <div *ngxPermissionsOnly="factServ.isVenta() ? permissions.factura_venta.create : permissions.factura_compra.create">
                 <app-btncircular [alto]="'100px'" [accion]="'Terminar ' + getDocumentoDescripcion().descripcion_short" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
               </div>
               <div>
@@ -430,7 +430,7 @@
                   [nombreImg]="'guardarFactura'"
                   (pulsar)="archivarFactura()"></app-btncircular>
               </div>
-              @if (factServ.isVenta) {
+              @if (factServ.isVenta()) {
                 <div>
                   @if (fun.isEmpty(factura_a_rellenar)) {
                     <app-btncircular [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
@@ -489,8 +489,8 @@
   [dismissible]="true"
   [closeOnEscape]="true"
   [blockScroll]="true"
-  (visibleChange)="_toggleSidebar('visibleChange', factServ.tipoDocumento)">
-  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', factServ.tipoDocumento)">
+  (visibleChange)="_toggleSidebar('visibleChange', factServ.tipoDocumento())">
+  <span id="btn_side_facturas" class="btn_side_bar_facturas d-flex justify-content-center align-items-center" (click)="_toggleSidebar('btn adentro', factServ.tipoDocumento())">
     <i id="triangualo" class="fas fa-caret-left text-white"></i>
   </span>
 
@@ -506,7 +506,9 @@
             <p-tab [value]="$index" [disabled]="countCantFactSaved(docTab.key).disable">
               <div class="d-flex align-items-center gap-2" pTooltip="No tiene {{ docTab.label }} guardadas" [tooltipDisabled]="!countCantFactSaved(docTab.key).disable">
                 {{ docTab.title }}
-                <span *ngIf="!countCantFactSaved(docTab.key).disable"> &nbsp;({{ countCantFactSaved(docTab.key).cant }})</span>
+                @if (!countCantFactSaved(docTab.key).disable) {
+                  <span> &nbsp;({{ countCantFactSaved(docTab.key).cant }})</span>
+                }
               </div>
             </p-tab>
           }

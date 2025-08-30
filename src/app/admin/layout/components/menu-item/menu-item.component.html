@@ -1,14 +1,16 @@
 <div *ngxPermissionsOnly="menuItem.permission" class="menuList" [id]="menuItemId">
-  <h5 class="tituloMenu" [ngClass]="getTitleClasses()" [innerText]="menuItem.title"></h5>
+  <h5 class="tituloMenu c-default" [ngClass]="getTitleClasses()" [innerText]="menuItem.title"></h5>
 
-  <img class="iconosMenu" [ngClass]="{ iconosMenuA: isActive }" [src]="menuItem.icon" [alt]="menuItem.title" (click)="onMenuClick($event)" />
+  <img class="iconosMenu c-pointer" [ngClass]="{ iconosMenuA: isActive }" [src]="menuItem.icon" [alt]="menuItem.title" (click)="onMenuClick($event)" />
 
   <!-- Submenu para elementos dropdown -->
-  <div *ngIf="menuItem.type === 'dropdown' && menuItem.subItems" class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isSubMenuActive }">
-    <ng-container *ngFor="let subItem of menuItem.subItems">
-      <h4 *ngxPermissionsOnly="subItem.permission" class="opcion" [ngClass]="getSubItemClasses(subItem)" (click)="onSubMenuClick($event, subItem)">
-        {{ subItem.title }}
-      </h4>
-    </ng-container>
-  </div>
+  @if (menuItem.type === 'dropdown' && menuItem.subItems) {
+    <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isSubMenuActive }">
+      @for (subItem of menuItem.subItems; track subItem) {
+        <h4 *ngxPermissionsOnly="subItem.permission" class="opcion" [ngClass]="getSubItemClasses(subItem)" (click)="onSubMenuClick($event, subItem)">
+          {{ subItem.title }}
+        </h4>
+      }
+    </div>
+  }
 </div>

@@ -1,7 +1,6 @@
-<p>Seguro que desea concluir la {{ documento.descripcion }}</p>
+<p>Seguro que desea concluir {{ useEl.includes(metodo) ? 'el' : 'la' }} {{ documento.descripcion }}</p>
 
 <div class="d-flex align-items-center h-100">
-  <label class="control-label mr-2 mb-0">Imprimir documento: </label>
+  <label class="control-label me-2 mb-0">Imprimir documento: </label>
   <input class="apple-switch" type="checkbox" [(ngModel)]="is_print" />
 </div>
-

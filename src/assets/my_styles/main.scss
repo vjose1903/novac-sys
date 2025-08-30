@@ -11,6 +11,7 @@
 @use './elements/modal.scss' as *;
 @use './elements/opacity.scss' as *;
 @use './elements/p-datepicker.scss' as *;
+@use './elements/p-drawer.scss' as *;
 @use './elements/p-inputMask.scss' as *;
 @use './elements/p-multiselect.scss' as *;
 @use './elements/p-paginator.scss' as *;
@@ -24,6 +25,7 @@
 @use './elements/size.scss' as *;
 @use './elements/tablas.scss' as *;
 @use './elements/text.scss' as *;
+@use './elements/toast.scss' as *;
 
 // Fonts
 @use './fonts/fonts.scss' as *;

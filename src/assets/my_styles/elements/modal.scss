@@ -1,5 +1,5 @@
 .p-dialog-mask.p-overlay-mask {
-  z-index: 999999 !important;
+  z-index: 9999 !important;
 }
 
 .p-dialog {
@@ -13,7 +13,10 @@
     padding: 0.5rem 1rem !important;
     z-index: 100001 !important;
     text-transform: uppercase;
-    font-size: 1rem;
+
+    h4 {
+      font-size: 1.2rem !important;
+    }
 
     .p-dialog-header-actions {
       .p-dialog-close-button {
@@ -25,9 +28,9 @@
   }
 
   .p-dialog-content {
-    padding: 1rem !important;
-    height: inherit !important;
-    overflow: hidden;
+    // padding: 1rem !important;
+    // height: inherit !important;
+    // overflow: hidden;
   }
 
   .p-dialog-footer {

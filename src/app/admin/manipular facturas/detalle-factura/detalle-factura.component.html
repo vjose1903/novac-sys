@@ -1,8 +1,8 @@
 <div class="mainContainer">
   <div class="d-flex align-items-center mb-2">
-    <b class="mr-2">Cliente: </b>
+    <b class="me-2">Cliente: </b>
     <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '100%', overflow: 'hidden', display: 'inline-block', flex: '1' }">
-      <p class="text-black mb-0">{{ inputs.data.cliente.nombre }}</p>
+      <p class="text-black mb-0">{{ data.cliente.nombre_completo }}</p>
     </p-tag>
   </div>
   
@@ -28,13 +28,13 @@
       </div>
     }
 
-    @if (inputs?.data?.serie == serie.electronica) {
-      @if (fun.hasValue(inputs?.data?.dgii_message)) {
+    @if (data?.serie == serie.electronica) {
+      @if (fun.hasValue(data?.dgii_message)) {
         <div class="col-12 p-0 mt-3">
           <div class="card br-8">
             <div class="card-body p-3">
-              <span [ngClass]="{ 'text-danger': inputs?.data?.is_aceptada == TrackStatusEnum.REJECTED, 'text-warning': inputs?.data?.is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED }">
-                {{ inputs?.data?.dgii_message }}
+              <span [ngClass]="{ 'text-danger': data?.is_aceptada == TrackStatusEnum.REJECTED, 'text-warning': data?.is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED }">
+                {{ data?.dgii_message }}
               </span>
             </div>
           </div>

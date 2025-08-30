@@ -12,7 +12,7 @@ const cyan = chalk.cyan;
 let PRODUCTION = 'no';
 
 function getActualClient() {
-  const cliente = fs.readFileSync(pathAdd('../config_setup/actual_cliente.txt'), 'utf8').trim();
+  const cliente = fs.readFileSync(pathAdd('../actual_cliente.json'), 'utf8').trim();
   console.log('\n');
   console.log(`${green(' ||-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=||')}`);
   console.log(`${green(' ||          ')}${white('CLIENTE ACTUAL')}${green('          ||')}`);

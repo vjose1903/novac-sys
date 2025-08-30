@@ -1,7 +1,6 @@
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
-import { Component, OnInit, OnDestroy, Input, signal, computed, effect } from '@angular/core';
-import * as _ from 'lodash';
+import { Component, OnInit, OnDestroy, Input, signal, computed, effect, inject } from '@angular/core';
 const moment = require('../../../core/javascript/moment');
 import { Router } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -9,16 +8,18 @@ import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';
 import { FacturaC, TiposFacturaC, FacturasI, FacturasAplicadasC, DetalleFactura, request_factura_campo, tipoDocFacturacion, TipoFacturaI } from '../../facturacion/factura';
 import { NcfC } from '@registros/ncf/ncf';
 import { ClienteC } from '@registros/registro-clientes/cliente';
-import { comprobanteElectronico, comprobanteNormal, NotaC } from './notas';
+import { NotaC } from './notas';
 import { fun } from '@core/services/functions.service';
 import { Permisos } from '@core/typescript/permisos';
 import { table_config, transformType } from '@components/new_tablas/tabla-class';
 import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
-import { ModalClass } from '@components/modal/modal-class';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import Big from 'big.js';
 import { serie, seriesDGII, seriesDgiiI } from '@core/typescript/constantes';
 import { DateUtils } from '@vjose1903/dateutils';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-notas-cred-deb',
@@ -105,7 +106,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return this.tipoNota === 'credito';
   }
 
-  constructor(private router: Router) {
+  dynamicModalServ = inject(DynamicModalService);
+  private router = inject(Router);
+
+  constructor() {
     super();
 
     effect(async () => {
@@ -120,7 +124,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.config;
 
     this.fecha = moment().format('DD/MM/YYYY');
     this.serieSelected.set(this.serie);
@@ -135,13 +139,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     if (this.configApp.calcular_itbis) this.agregarItbisEnTabla();
 
     this.necesarioStart();
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   ngOnDestroy(): void {
@@ -316,7 +313,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
     if (key === 'select') {
       if (!value) {
-        setTimeout(() => {
+        fun.setTimeout(() => {
           // Actualizar también en el objeto factura.detalle_facturas
           if (detalle_factura) {
             detalle_factura.total_nota = '0.00';
@@ -326,7 +323,6 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
           // data.itbis_real = fun.roundNumberToDecimal(this.configApp.calcular_itbis ? data.precio_real * 0.18 : 0);
 
           this.detalleNota.update(detalles => detalles.filter(detalle => detalle.id !== data.id));
-          Ss.cdRef.detectChanges();
         }, 500);
       } else {
         this.detalleNota.update(detalles => [...detalles, data]);
@@ -429,24 +425,16 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   //  MODAL CANCELAR
   // =============================================
   cancelarFactura() {
-    const confirmationObj = {
-      id: 'archivar_factura',
-      texto: 'Seguro que desea cancelar la operación',
-      header: 'Confirmación',
-      siFunction: instance => {
-        this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
-        this.closeModal(instance);
-      },
-      width: '30rem',
+    const siFunction = () => {
+      this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
     };
-    this.confirmationModal(confirmationObj);
-  }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modal_id === 'confirmacionImprimir') {
-      this.is_print = arg.is_print;
-      this.formarNota();
-    }
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_nota',
+      texto: 'Seguro que desea cancelar la operación',
+      btnKind: confirmationButtons.siNo,
+      onYes: siFunction.bind(this),
+    });
   }
 
   // =============================================
@@ -458,44 +446,37 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     } else {
       const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: `nota_${this.tipoNota}`, is_viaje: false };
 
-      this.openNewModal({
-        component: ConfirmacionImprimirComponent,
-        inputs: obj,
-        id: 'confirmacionImprimir',
-        header: 'Confirmación',
-        width: '30rem',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            { clase: 'btn btn-blanco', function: instance => this.closeModal(instance), label: 'Cancelar', disable: false },
-            { btn_id: 'btnConfirmar', clase: 'btn btn-verde', function_in_other_component: 'btn_aceptar', label: 'Confirmar', disable: false },
-          ],
-        },
-      });
+      const confirmationImprimirModalConf = new DynamicModalClass();
+
+      confirmationImprimirModalConf.id = 'confirmacionImprimir';
+      confirmationImprimirModalConf.inputs = obj;
+      confirmationImprimirModalConf.header = 'Confirmación';
+      confirmationImprimirModalConf.width = '30rem';
+      confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
+      confirmationImprimirModalConf.botones = [
+        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { id: 'btnConfirmar', clase: 'btn btn-verde', label: 'Confirmar', disable: false },
+      ];
+
+      confirmationImprimirModalConf.setCallback(this.processImprimir.bind(this));
+      confirmationImprimirModalConf.show();
     }
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco w-9', function: instance => this.closeModal(instance), label: 'No', disable: false },
-          { clase: 'btn btn-verde w-9', function: instance => obj.siFunction(instance), label: 'Si', disable: false },
-        ],
-      },
-    });
+  processImprimir(args: ICallbackModal) {
+    if (args.type == modalCloseType.returnData) {
+      const { is_print } = args.data;
+
+      this.is_print = is_print;
+      this.send_nota();
+    }
   }
 
   closeModal(modalInstance) {
     modalInstance.closeModal(modalInstance.id);
   }
 
-  async formarNota() {
+  async send_nota() {
     let fecha_valida = null;
 
     if (fun.hasValue(this.paqueteComprobante?.fecha_valida) && DateUtils.isValid(new Date(this.paqueteComprobante?.fecha_valida))) {

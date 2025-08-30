@@ -1,3 +1,4 @@
+import { SpanishInflector } from './../typescript/spanish-inflector';
 const moment = require('../javascript/moment');
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
@@ -8,6 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
 import { RetryOptions } from '../interface/retry-until';
+
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun {
   constructor() {}
@@ -57,6 +59,26 @@ export class fun {
       count++;
       console.log(count);
     };
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: to_plural
+  // Descripcion : Esta funcion convierte una palabra a plural
+  // _________________________________________________________________________________________________
+  static to_plural(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.pluralize(normalWord);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: to_singular
+  // Descripcion : Esta funcion convierte una palabra a singular
+  // _________________________________________________________________________________________________
+  static to_singular(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.singularize(normalWord);
   }
 
   // __________________________________________________________________________________________________
@@ -374,7 +396,7 @@ export class fun {
   // Nombre: Capitalice
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
-  static Capitalice(str) {
+  static capitalice(str) {
     if (!fun.hasValue(str)) return str;
 
     const upperCaseText = str
@@ -456,7 +478,7 @@ export class fun {
 
       if (event?.key === 'Enter' || event?.keyCode === 13) return resolve();
 
-      fun.timeout = setTimeout(resolve, waitingTime);
+      fun.timeout = fun.setTimeout(resolve, waitingTime);
     });
   }
 
@@ -554,7 +576,10 @@ export class fun {
   // _________________________________________________________________________________________________
   static enfocarInput(arg, element?) {
     element ??= document.getElementById(arg) as HTMLElement;
-    if (element) element.focus();
+
+    if (element) {
+      requestAnimationFrame(() => element.focus());
+    }
   }
 
   // __________________________________________________________________________________________________
@@ -604,7 +629,35 @@ export class fun {
   // __________________________________________________________________________________________________
   static enfocarAndSelectInput(arg) {
     fun.enfocarInput(arg);
-    setTimeout(() => this.selectContenido(arg), 10);
+    fun.setTimeout(() => {
+      this.selectContenido(arg);
+    }, 10);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setTimeOut
+  // Descripcion : Esta funcion ejecuta una funcion despues de un tiempo
+  // __________________________________________________________________________________________________
+  static setTimeout(callback: () => void, time: number) {
+    const timeout = setTimeout(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return timeout;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setInterval
+  // Descripcion : Esta funcion ejecuta una funcion en un intervalo de tiempo
+  // __________________________________________________________________________________________________
+  static setInterval(callback: () => void, time: number) {
+    const interval = setInterval(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return interval;
   }
 
   // __________________________________________________________________________________________________
@@ -644,7 +697,9 @@ export class fun {
 
         if (shouldRetry && hasRetries) {
           retryCount++;
-          await new Promise(resolve => setTimeout(resolve, delayBetweenRetries));
+          await new Promise<void>(resolve => {
+            fun.setTimeout(resolve, delayBetweenRetries);
+          });
           return executeTask();
         }
 
@@ -707,6 +762,32 @@ export class fun {
     return base;
   }
 
+  /**
+   * Nombre: encriptar
+   * Descripcion : Esta funcion encripta un string
+   * @param arg El string a encriptar
+   * @returns El string encriptado
+   */
+  static encriptar(arg: string): string {
+    return btoa(unescape(encodeURIComponent(arg)));
+  }
+
+  /**
+   * Nombre: desEncriptar
+   * Descripcion : Esta funcion desencripta un string
+   * @param arg El string a desencriptar
+   * @returns El string desencriptado
+   */
+  static desEncriptar(arg: string): { object: string; error?: boolean } {
+    try {
+      const decodedString = decodeURIComponent(escape(atob(arg)));
+      return { object: decodedString, error: false };
+    } catch (error) {
+      console.error('Error al desencriptar:', error);
+      return { object: '', error: true };
+    }
+  }
+
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
@@ -724,11 +805,14 @@ export class fun {
         // Resetear el estado del guard y limpiar cache
         const authGuard = fun.getAuthGuardInstance();
         const currentUserService = fun.getCurrentUserServiceInstance();
+        console.log('1');
 
         if (authGuard) authGuard.resetValidation();
         if (currentUserService) currentUserService.clearValidationCache();
 
-        Ss.layServ.nextLogOut(undefined);
+        console.log('2');
+
+        Ss.layServ.nextLogOut({ bool: true });
         resolve(true);
       } catch (error) {
         resolve(false);
@@ -737,9 +821,10 @@ export class fun {
   }
 
   static decryptConfigPassword(str) {
-    const str_remplace = btoa(str);
-    const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
-    return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
+    const str_remplace = fun.encriptar(str);
+
+    const config: ConfigI = Ss.configServ.config;
+    return str_remplace == config.config_password.replace('VMj$pt30r=', '=');
   }
   // ----------------------------------------------------------------------------------------------------------
 
@@ -815,19 +900,35 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

@@ -18,26 +18,27 @@
                 placeholder="Nombre Cliente"
                 class="form-control mb-4"
                 autocomplete="off"
-                [ngClass]="{ disabled: !!clienteAdepositar }" />
+                [ngClass]="{ disabled: !!clienteAdepositar() }" />
             </div>
             <div class="widget-footer">
               <div class="d-flex gap-3">
-                <button class="btn btn-blanco" (click)="goBack()">Atras</button>
-                <button [disabled]="!clienteAdepositar" class="btn btn-gris" (click)="cancelarIgreso()">Nueva Busqueda</button>
+                <button class="btn btn-blanco" (click)="goBack()">Atrás</button>
+                <button [disabled]="!clienteAdepositar()" class="btn btn-gris" (click)="abrirModalDinamicText('nuevo')">Nueva Búsqueda</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-8 pl-0">
-        @if (clienteAdepositar) {
+
+      <div class="col-8 ps-0">
+        @if (clienteAdepositar()) {
           <div class="clienteAdepositar">
             <div class="nombre_cliente">
-              <h3 class="negrita mb-0">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h3>
+              <h3 class="negrita mb-0">{{ clienteAdepositar().nombre + ' ' + clienteAdepositar().apellido }}</h3>
             </div>
             <div class="cuerpo">
               <div class="cajas">
-                <div class="izquierda pr-2">
+                <div class="izquierda pe-2">
                   <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
                     <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
                   </span>
@@ -56,7 +57,7 @@
                     </span>
                   }
                 </div>
-                <div class="derecha pl-2">
+                <div class="derecha ps-2">
                   <span class="w-100 detalleBalance badge text-shadow bg-orange text-white mb-2">
                     <span>Mora:</span> <span>RD$ {{ formatoNumero(mora_general()) }}</span>
                   </span>
@@ -74,7 +75,7 @@
               </div>
             </div>
             <div class="porcentaje">
-              @if (clienteAdepositar) {
+              @if (clienteAdepositar()) {
                 <div class="d-flex justify-content-between">
                   <span class="negrita">Porcentaje de pago</span>
                 </div>
@@ -92,7 +93,7 @@
         <div class="header">
           <div class="d-flex align-items-center gap-3">
             @if (this.all_facturas().length > this.tablaComponent?.config.obj_paginate.per_page) {
-              <div class="more-pages animated flash slower infinite"><strong class="mr-2">Atención: </strong> Existen múltiples páginas</div>
+              <div class="more-pages animated flash slower infinite"><strong class="me-2">Atención: </strong> Existen múltiples páginas</div>
             }
 
             <div class="d-flex align-items-center gap-2">
