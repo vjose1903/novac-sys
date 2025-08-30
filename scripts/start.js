@@ -11,6 +11,11 @@ const cyan = chalk.cyan;
 
 let PRODUCTION = 'no';
 
+function pathAdd(str_path) {
+  const path_resolved = path.join(__dirname, str_path);
+  return path_resolved;
+}
+
 function getActualClient() {
   const cliente = fs.readFileSync(pathAdd('../actual_cliente.json'), 'utf8').trim();
   console.log('\n');
@@ -83,11 +88,6 @@ function removeItemAtIndex(array, index) {
   } else {
     console.log(`${red('Índice fuera de rango.')}`);
   }
-}
-
-function pathAdd(str_path) {
-  const path_resolved = path.join(__dirname, str_path);
-  return path_resolved;
 }
 
 const args = process.argv.slice(2);

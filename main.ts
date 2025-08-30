@@ -567,24 +567,25 @@ export function parsePath(path_temp) {
   return isMacOs() ? path_temp : path_temp.split('/').join('\\');
 }
 
-export function pathAdd(addToPath = '', resource = true): Promise<string> {
+export function pathAdd(addToPath = '', inAsar = false): Promise<string> {
   return new Promise<string>(async resolve => {
-    let path_temp;
-    const pjson = require('./package.json');
     const serve_ = await getServer_();
 
+    let path_temp;
     if (serve_) {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(pjson.name.toLowerCase())) + pjson.name;
+      // En desarrollo, usar process.cwd()
+      path_temp = process.cwd();
     } else {
-      if (resource) {
-        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
+      if (inAsar) {
+        // En producción, usar app.getAppPath() que funciona correctamente con ASAR
+        path_temp = app.getAppPath();
       } else {
-        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+        // Para directorios fuera del ASAR, usar la ruta del ejecutable y agregar /resources
+        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.getName().toLowerCase())) + app.getName() + '/resources';
       }
     }
 
     path_temp = path_temp + addToPath;
-
     resolve(parsePath(path_temp));
   });
 }
