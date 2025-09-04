@@ -1,9 +1,9 @@
 <div class="mainRecibos">
   <div class="mb-2 titulo">
-    <h3 class="negrita">{{ this.pagosService.isReciboIngreso ? 'Recibos de ingreso' : 'Pagos de facturas' }}</h3>
+    <h3 class="negrita">{{ this.pagosService.isReciboIngreso() ? 'Recibos de ingreso' : 'Pagos de facturas' }}</h3>
   </div>
   <div *ngxPermissionsOnly="permissions.recibo_ingreso.create" class="mb-3 botonNuevo">
-    <button class="btn btn-verde" (click)="navegar()">{{ this.pagosService.isReciboIngreso ? 'Nuevo recibo' : 'Nuevo pago' }} <i class="fas fa-hand-holding-usd"></i></button>
+    <button class="btn btn-verde" (click)="navegar()">{{ this.pagosService.isReciboIngreso() ? 'Nuevo recibo' : 'Nuevo pago' }} <i class="fas fa-hand-holding-usd"></i></button>
   </div>
   <div class="divTabla">
     <div #cardTabla id="cardTabla" class="cardListados">

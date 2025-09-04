@@ -8,3 +8,4 @@ export interface ModalDetalleFacturaI {
   transform?: (value: any) => any;
 }
 
+export type documentoT = 'factura' | 'nota' | 'pago';

@@ -1,6 +1,6 @@
 <div class="row IngresosRow">
   <div class="col-12 titulo">
-    <h3 class="negrita mb-0">{{ pagosService.isReciboIngreso ? 'Realizar recibo de ingreso' : 'Realizar pago de factura' }}</h3>
+    <h3 class="negrita mb-0">{{ pagosService.isReciboIngreso() ? 'Realizar recibo de ingreso' : 'Realizar pago de factura' }}</h3>
   </div>
   <div class="col-12 p-0 arriba">
     <div class="row">
@@ -8,13 +8,13 @@
         <div class="card card-padding sombra h-100">
           <div class="widget">
             <div class="widget-content">
-              <label class="control-label">{{ pagosService.isReciboIngreso ? 'Cliente' : 'Suplidor' }}: </label>
+              <label class="control-label">{{ pagosService.isReciboIngreso()? 'Cliente' : 'Suplidor' }}: </label>
               <input
                 type="text"
                 id="entidadI"
                 (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
                 (focus)="htmlServ.selectValue($event)"
-                [placeholder]="pagosService.isReciboIngreso ? 'Nombre Cliente' : 'Nombre Suplidor'"
+                [placeholder]="pagosService.isReciboIngreso()? 'Nombre Cliente' : 'Nombre Suplidor'"
                 class="form-control mb-4"
                 autocomplete="off"
                 [ngClass]="{ disabled: !!entidadAdepositar() }" />

@@ -1,7 +1,7 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { fun } from '@core/services/functions.service';
 import { serie, TrackStatusEnum } from '@core/typescript/constantes';
-import { ModalDetalleFacturaI } from './detalle-factura.model';
+import { documentoT, ModalDetalleFacturaI } from './detalle-factura.model';
 import { MessageTask } from '@core/typescript/message-task';
 import { ELECTRON_OPEN_WEB_BROWSER } from '../../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
@@ -19,7 +19,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   @Input() modalWrapper!: DynamicModalComponent;
   @Input() modalConfig!: IModalConfiguration;
   @Input() data!: any;
-  @Input() documento!: string;
+  @Input() documento!: documentoT;
 
   entidad;
   entidadLabel;
@@ -45,7 +45,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   }
 
   validateDetails() {
-    if (this.documento == 'recibo') {
+    if (this.documento == 'pago') {
       this.detalles = this.detalles.filter(d => d.key != 'numero_comprobante');
     }
 

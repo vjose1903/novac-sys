@@ -17,6 +17,7 @@ import { ArticuloI } from '@registros/articulos/articulo';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { IButtonDynamic, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DateUtils } from '@vjose1903/dateutils';
+import { documentoT } from '@admin/manipular facturas/detalle-factura/detalle-factura.model';
 
 export enum comprobanteNormal {
   factura_de_credito_fiscal = '01',
@@ -366,7 +367,7 @@ export class FacturaC extends CrudG<FacturasI> {
     });
   }
 
-  modalVerDetalles(data, documento = 'Factura') {
+  modalVerDetalles(data, documento: documentoT = 'factura') {
     const detalleDocModalConf = new DynamicModalClass();
 
     detalleDocModalConf.id = 'detalle_factura';
