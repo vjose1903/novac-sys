@@ -1,69 +1,126 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import * as _ from 'lodash';
+import { Directive, ElementRef, HostListener, Input, OnDestroy, AfterViewInit } from '@angular/core';
+import { UntypedFormGroup, AbstractControl } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil, debounceTime } from 'rxjs/operators';
 import { fun } from '../services/functions.service';
-import { Ss } from '../services/singleton.service';
+import { Ss } from '@core/services/singleton.service';
+
+interface ErrorResponse {
+  render: boolean;
+  msg: string;
+}
 
 @Directive({
   selector: '[appMsgError]',
+  standalone: false,
 })
-export class MsgErrorDirective {
-  @Input('appMsgError') id;
+export class MsgErrorDirective implements OnDestroy, AfterViewInit {
+  @Input('appMsgError') formControlName: string;
   @Input() form: UntypedFormGroup;
 
-  id_content;
-  id_msg;
-  msgContainer;
-
-  isSubscription = false;
+  private readonly destroy$ = new Subject<void>();
+  private isSubscribed = false;
+  private readonly ERROR_MESSAGES = {
+    required: 'Este campo es requerido.',
+    minlength: (error: any) => `Cant. mínima de letras es: ${error.requiredLength}.`,
+    max: (error: any) => `Valor maximo requerido es: ${error.max} - actualmente tiene: ${error.actual}.`,
+    min: (error: any) => `Valor mínimo requerido es: ${error.min} - actualmente tiene: ${error.actual}.`,
+    ip: 'Intoduzca una ip valida.',
+    compares: 'Las contraseñas no coinciden.',
+    invalidCedula: 'Ingrese una cédula válida.',
+    email: 'Ingrese una email válido.',
+    sinRayas: () => `Complete el campo: ${this.formControlName}`,
+  };
 
   constructor(private el: ElementRef) {}
 
+  ngAfterViewInit(): void {
+    // Delay más largo para modales dinámicos
+    fun.setTimeout(() => {
+      this.initSubscription();
+    }, 300);
+  }
+
   @HostListener('focusin', ['$event'])
-  onFocus(event) {
-    setTimeout(() => this.initSubscription(), 250);
-  }
-
-  @HostListener('focusout', ['$event.target.value'])
-  onBlur(value) {
-    this.initSubscription(true);
-  }
-
-  @HostListener('input', ['$event.target.value'])
-  onInput(value) {
+  onFocusIn(event: Event): void {
     this.initSubscription();
   }
 
-  initSubscription(launch = false) {
-    if (!this.isSubscription) {
-      this.form.get(this.id).valueChanges.subscribe((formChange) => {
-        // this.form.get(this.id).value ::        este tiene el valor cambiado del campo
-        // this.form.value[this.id]     ::        este tiene el anterior del campo
-        if (this.form.get(this.id).value !== this.form.value[this.id]) this.checkErrors();
-      });
-      this.isSubscription = true;
+  @HostListener('focusout', ['$event'])
+  onFocusOut(event: Event): void {
+    fun.setTimeout(() => this.checkErrors(), 50);
+  }
+
+  @HostListener('input', ['$event'])
+  onInput(event: Event): void {
+    this.checkErrors();
+  }
+
+  @HostListener('change', ['$event'])
+  onChange(event: Event): void {
+    this.checkErrors();
+  }
+
+  @HostListener('keyup', ['$event'])
+  onKeyUp(event: Event): void {
+    this.checkErrors();
+  }
+
+  @HostListener('blur', ['$event'])
+  onBlur(event: Event): void {
+    fun.setTimeout(() => this.checkErrors(), 50);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initSubscription(): void {
+    if (this.isSubscribed) return;
+
+    const control = this.getFormControl();
+    if (!control) {
+      // Retry después de un tiempo para modales dinámicos
+      fun.setTimeout(() => this.initSubscription(), 200);
+      return;
     }
-    if (!this.isSubscription || launch) this.checkErrors();
+
+    control.valueChanges.pipe(debounceTime(50), takeUntil(this.destroy$)).subscribe(() => this.checkErrors());
+
+    control.statusChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.checkErrors());
+
+    this.isSubscribed = true;
+    this.checkErrors();
   }
 
-  setVariables(id_content = undefined, id_msg = undefined, msgContainer = undefined) {
-    this.id_content = id_content;
-    this.id_msg = id_msg;
-    this.msgContainer = msgContainer;
+  private getFormControl(): AbstractControl | null {
+    return this.form?.get(this.formControlName) || null;
   }
 
+<<<<<<< HEAD
   checkErrors(value?) {
     const childrens = this.el.nativeElement.childNodes;
     const id_content = `msgContainer`;
     const id_msg = `msg_text_${this.id}`;
+=======
+  private checkErrors(): void {
+    const control = this.getFormControl();
+    if (!control) {
+      console.warn(`Control '${this.formControlName}' no encontrado en checkErrors`);
+      return;
+    }
+>>>>>>> dev
 
-    const msgContainer = _.find(childrens, (child) => child.id === id_content);
-    this.setVariables(id_content, id_msg, msgContainer);
+    const containerId = `msgContainer_${this.formControlName}`;
+    const msgContainer = this.el.nativeElement.querySelector(`#${containerId}`) as HTMLElement;
 
-    this.handleMsgError().then((msgHandle) => {
-      if (msgHandle.render) {
-        var msg = document.createElement('div');
+    if (!msgContainer) {
+      console.warn(`msgContainer con ID '${containerId}' no encontrado para el campo '${this.formControlName}'`);
+      return;
+    }
 
+<<<<<<< HEAD
         if (msg) {
           msg.setAttribute('style', 'color: #ff4d4d; margin-left: 0.2rem; position: absolute; font-size: 12px;');
           msg.id = id_msg;
@@ -72,16 +129,40 @@ export class MsgErrorDirective {
           msgContainer.appendChild(msg);
           this.setVariables();
         }
-      }
-    });
+=======
+    this.clearPreviousMessages(msgContainer);
+
+    const errorResponse = this.getErrorMessage(control);
+
+    if (errorResponse.render) {
+      this.renderErrorMessage(msgContainer, errorResponse.msg);
+    }
   }
 
-  handleMsgError(): any {
-    return new Promise((resolve) => {
-      setTimeout(async () => {
-        this.borrarMsgAntiguos().then(() => {
-          let response = { render: false, msg: '' };
+  private getErrorMessage(control: AbstractControl): ErrorResponse {
+    const errors = control.errors;
 
+    if (!fun.hasValue(errors) || control.valid || (!control.dirty && !control.touched)) {
+      return { render: false, msg: '' };
+    }
+
+    for (const [errorType, errorValue] of Object.entries(errors)) {
+      const messageHandler = this.ERROR_MESSAGES[errorType];
+      if (messageHandler) {
+        const message = typeof messageHandler === 'function' ? messageHandler(errorValue) : messageHandler;
+        return { render: true, msg: message };
+>>>>>>> dev
+      }
+    }
+
+    return { render: false, msg: '' };
+  }
+
+  private renderErrorMessage(container: HTMLElement, message: string): void {
+    const msgElement = document.createElement('div');
+    const msgId = `msg_text_${this.formControlName}`;
+
+<<<<<<< HEAD
           const formName = this.id.replaceAll('_', ' ');
 
           const errors = this.form.controls[this.id].errors;
@@ -104,18 +185,18 @@ export class MsgErrorDirective {
         });
       }, 50);
     });
+=======
+    msgElement.id = msgId;
+    msgElement.innerHTML = message;
+    msgElement.style.cssText = 'color: #ff4d4d; margin-left: 0.2rem; position: absolute; font-size: 12px;';
+
+    container.appendChild(msgElement);
+>>>>>>> dev
   }
 
-  borrarMsgAntiguos(firstResolve?) {
-    return new Promise((resolve) => {
-      firstResolve ||= resolve;
-
-      if (this.msgContainer?.childNodes && this.msgContainer?.childNodes.length) {
-        this.msgContainer.removeChild(this.msgContainer.childNodes[0]);
-        this.borrarMsgAntiguos(firstResolve);
-      } else {
-        firstResolve(true);
-      }
-    });
+  private clearPreviousMessages(container: HTMLElement): void {
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
   }
 }

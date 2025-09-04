@@ -1,0 +1,27 @@
+<div class="row rowResgitro">
+  <div class="col-12 p-0 colTitulo">
+    <h4 class="negrita mb-0">Aprobaciones comerciales recibidas</h4>
+  </div>
+
+  <div class="col-12 p-0 colFormularioListado">
+    <div class="list onlyList">
+      <div class="tituloCardClass">
+        <h4 class="mb-0">Listado</h4>
+      </div>
+
+      <div #cardTabla id="cardTabla" class="card cardContentClass">
+        <div class="divTabla">
+          <dinamic-table
+            [cardTabla]="cardTabla"
+            [(data)]="commertialApprovalList"
+            [seleccionado]="commertialApprovalSelected?.id"
+            [(TablasComponent)]="tablaComponent"
+            [config]="table_config"
+            (table_events)="handle_table_events($event)"
+            [emptyMessage]="'No hay aprobaciones comerciales recibidas'">
+          </dinamic-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 
 @Directive({
   selector: '[appCapitalice]',
+  standalone: false,
 })
 export class CapitaliceDirective {
   @Input('appCapitalice') type: 'formGroup' | 'input';

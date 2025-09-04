@@ -1,195 +1,21 @@
 @if (noServer) {
-<div id="fondoC" class="h-100 w-100 position-absolute backnegro">
-  <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
-</div>
+  <div id="fondoC" class="h-100 w-100 position-absolute backnegro">
+    <span [ngClass]="{ errorServidor: true }">El servidor está caido no puede realizar ninguna accion.</span>
+  </div>
 }
 
 <div class="fantasma">
-  @if (hasPermisosValidated) {
   <div class="layout">
     <div class="menu">
       <div class="title">
-        <span class="titulo" (click)="cambiarMenu({ url: 'dashboard', navigate: true })">Menu</span>
+        <span class="titulo" (click)="cambiarMenu({ url: 'dashboard', navigate: true, event: $event })">Menu</span>
       </div>
+
       <div class="sideBar">
         <div class="menuContent">
-          <!-- FACTURACION -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.facturacion.flatt" class="menuList">
-            <h5 [id]="idsH5.factura" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('factura') }" [innerText]="'Facturación'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: getLayoutActiveRoute('factura') }" src="assets/img/factura.png" alt="Facturacion" (click)="cambiarMenu({ url: 'factura', navigate: false, id_h5: idsH5.factura })" draggable="false" />
-
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: getLayoutActiveRoute('factura') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.pre_venta" [ngClass]="{ activa: getLayoutActiveRoute('pre_venta', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/pre_venta/new/0', navigate: true })">
-                Pre-Venta
-              </h4>
-
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.facturacion.venta"
-                [ngClass]="{ activa: getLayoutActiveRoute('venta', [actionFacturacion.new, actionFacturacion.update, actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta]) }"
-                (click)="cambiarMenu({ url: 'factura/venta/new/0', navigate: true })"
-              >
-                Venta
-              </h4>
-
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.compra" [ngClass]="{ activa: getLayoutActiveRoute('compra', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/compra/new/0', navigate: true })">Compra</h4>
-
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.facturacion.cotizacion" [ngClass]="{ activa: getLayoutActiveRoute('cotizacion', ['new', 'update']) }" (click)="cambiarMenu({ url: 'factura/cotizacion/new/0', navigate: true })">
-                Cotización
-              </h4>
-            </div>
-          </div>
-
-          <!-- MANIPULAR DOCUMENTOS -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.flatt" class="menuList">
-            <h5 [id]="idsH5.manipular" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('manipular') }" [innerText]="'Manipular\ndocumentos'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: getLayoutActiveRoute('manipular') }" src="assets/img/notaM.png" alt="Notas" (click)="cambiarMenu({ url: 'manipular', navigate: false, id_h5: idsH5.manipular })" draggable="false" />
-
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: getLayoutActiveRoute('manipular') }">
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.notaCredito"
-                [ngClass]="{ activa: actualRuta == 'buscarFactura/nota_credito' }"
-                (click)="cambiarMenu({ url: 'manipular/buscarFactura/nota_credito', navigate: true })"
-              >
-                Nota de Crédito
-              </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.notaDebito"
-                [ngClass]="{ activa: actualRuta == 'buscarFactura/nota_debito' }"
-                (click)="cambiarMenu({ url: 'manipular/buscarFactura/nota_debito', navigate: true })"
-              >
-                Nota de Débito
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.manipularFacturas.vizualizar" [ngClass]="{ activa: actualRuta == 'buscarFactura/solo_ver' }" (click)="cambiarMenu({ url: 'manipular/buscarFactura/solo_ver', navigate: true })">
-                Visualizar
-              </h4>
-            </div>
-          </div>
-
-          <!-- PAGOS -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.pagos.flatt" class="menuList">
-            <h5 [id]="idsH5.pagos" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('pagos') }" [innerText]="'Pagos'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: getLayoutActiveRoute('pagos') }" src="assets/img/reciboIngreso.png" alt="Pagos" (click)="cambiarMenu({ url: 'pagos', navigate: false, id_h5: idsH5.pagos })" draggable="false" />
-
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: getLayoutActiveRoute('pagos') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.pagos.recibosIngresos" [ngClass]="{ activa: actualRuta == 'pagos/recibo_ingreso' }" (click)="cambiarMenu({ url: 'pagos/pagos/recibo_ingreso', navigate: true })">
-                Recibos de ingreso
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.pagos.cuentasPagar" [ngClass]="{ activa: actualRuta == 'pagos/pago_factura' }" (click)="cambiarMenu({ url: 'pagos/pagos/pago_factura', navigate: true })">Pago de facturas</h4>
-            </div>
-          </div>
-
-          <!-- PEDIDOS -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.recibos_viajes.viajes" class="menuList">
-            <h5 [id]="idsH5.viajes" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('viajes') }" [innerText]="'Pedidos'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: getLayoutActiveRoute('viajes') }" src="assets/img/viaje.png" alt="Viajes" (click)="cambiarMenu({ url: 'viajes/viajes/0', navigate: true, id_h5: 'pedidosLabel' })" draggable="false" />
-          </div>
-
-          <!-- CONDUCE -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.conduce.flatt" class="menuList">
-            <h5 [id]="idsH5.conduce" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('conduce') }" [innerText]="'Conduce'"></h5>
-            <img
-              class="iconosMenu"
-              [ngClass]="{ iconosMenuA: getLayoutActiveRoute('conduce') }"
-              src="assets/img/conduce.png"
-              alt="Facturacion"
-              (click)="cambiarMenu({ url: 'conduce/lista', navigate: true, id_h5: 'conduceLabel' })"
-              draggable="false"
-            />
-          </div>
-
-          <!-- REGISTROS -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.registro.flatt" class="menuList">
-            <h5 [id]="idsH5.registros" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('registros') }" [innerText]="'Registros'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: getLayoutActiveRoute('registros') }" src="assets/img/registro.png" alt="Registros" (click)="cambiarMenu({ url: 'registros', navigate: false, id_h5: idsH5.registros })" draggable="false" />
-
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: getLayoutActiveRoute('registros') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.user" [ngClass]="{ activa: actualRuta == 'empleados' }" (click)="cambiarMenu({ url: 'registros/empleados', navigate: true })">Empleados</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.clientes" [ngClass]="{ activa: actualRuta == 'clientes' }" (click)="cambiarMenu({ url: 'registros/clientes', navigate: true })">Clientes</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.suplidores" [ngClass]="{ activa: actualRuta == 'suplidores' }" (click)="cambiarMenu({ url: 'registros/suplidores', navigate: true })">Suplidores</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.articulos" [ngClass]="{ activa: actualRuta == 'articulos' }" (click)="cambiarMenu({ url: 'registros/articulos', navigate: true })">Articulos</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.camiones" [ngClass]="{ activa: actualRuta == 'camiones' }" (click)="cambiarMenu({ url: 'registros/camiones', navigate: true })">Camiones</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.roles" [ngClass]="{ activa: actualRuta == 'roles' }" (click)="cambiarMenu({ url: 'registros/roles', navigate: true })">Roles</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.ncf" [ngClass]="{ activa: actualRuta == 'ncf' }" (click)="cambiarMenu({ url: 'registros/ncf', navigate: true })">NCF</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.periodo_fiscal" [ngClass]="{ activa: actualRuta == 'periodo_fiscal' }" (click)="cambiarMenu({ url: 'registros/periodo_fiscal', navigate: true })">Periodos Fiscales</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.divisa" [ngClass]="{ activa: actualRuta == 'divisa' }" (click)="cambiarMenu({ url: 'registros/divisa', navigate: true })">Divisas</h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.registro.banco" [ngClass]="{ activa: actualRuta == 'banco' }" (click)="cambiarMenu({ url: 'registros/banco', navigate: true })">Bancos</h4>
-            </div>
-          </div>
-
-          <!-- PRODUCCION -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.produccion.flatt" class="menuList">
-            <h5 [id]="idsH5.produccion" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('produccion') }" [innerText]="'Producción'"></h5>
-            <img
-              class="iconosMenu"
-              [ngClass]="{ iconosMenuA: getLayoutActiveRoute('produccion') }"
-              src="assets/img/produccion.png"
-              alt="Producción"
-              (click)="cambiarMenu({ url: 'produccion', navigate: true, id_h5: 'produccionLabel' })"
-              draggable="false"
-            />
-          </div>
-
-          <!-- INVENTARIO -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.inventario.flatt" class="menuList">
-            <h5 [id]="idsH5.inventario" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('inventario') }" [innerText]="'Inventario'"></h5>
-            <img
-              class="iconosMenu"
-              [ngClass]="{ iconosMenuA: getLayoutActiveRoute('inventario') }"
-              src="assets/img/inventario.png"
-              alt="Inventario"
-              (click)="cambiarMenu({ url: 'inventario', navigate: true, id_h5: 'inventarioLabel' })"
-              draggable="false"
-            />
-          </div>
-
-          <!-- CONTABILIDAD -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.contabilidad.flatt" class="menuList">
-            <h5 [id]="idsH5.contabilidad" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('contabilidad') }" [innerText]="'Contabilidad'"></h5>
-            <img
-              class="iconosMenu"
-              [ngClass]="{ iconosMenuA: getLayoutActiveRoute('contabilidad') }"
-              src="assets/img/contabilidad.png"
-              alt="Contabilidad"
-              (click)="cambiarMenu({ url: 'contabilidad', navigate: false, id_h5: 'contabilidadLabel' })"
-              draggable="false"
-            />
-
-            <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: getLayoutActiveRoute('contabilidad') }">
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.catalogo_cuentas" [ngClass]="{ activa: actualRuta == 'catalogo_cuentas' }" (click)="cambiarMenu({ url: 'contabilidad/catalogo_cuentas', navigate: true })">
-                Catalogo de cuentas
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.asientos_contables" [ngClass]="{ activa: actualRuta == 'libro_diario' }" (click)="cambiarMenu({ url: 'contabilidad/libro_diario', navigate: true })">
-                Libro Diario
-              </h4>
-              <h4
-                class="opcion"
-                *ngxPermissionsOnly="menuPermissionsObj.contabilidad.configuracion_entidad_cuenta"
-                [ngClass]="{ activa: actualRuta == 'configuracion_entidad_cuenta' }"
-                (click)="cambiarMenu({ url: 'contabilidad/configuracion_entidad_cuenta', navigate: true })"
-                pTooltip="Configuración de cuentas contables"
-                tooltipPosition="right"
-              >
-                Config. de cuentas
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.deposito" [ngClass]="{ activa: actualRuta == 'deposito' }" (click)="cambiarMenu({ url: 'contabilidad/deposito', navigate: true })">Depositos</h4>
-              <h4 class="opcion sm" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.transferencia" [ngClass]="{ activa: actualRuta == 'transferencia' }" (click)="cambiarMenu({ url: 'contabilidad/transferencia', navigate: true })">
-                Transferencias
-              </h4>
-              <h4 class="opcion" *ngxPermissionsOnly="menuPermissionsObj.contabilidad.cheque" [ngClass]="{ activa: actualRuta == 'cheque' }" (click)="cambiarMenu({ url: 'contabilidad/cheque', navigate: true })">
-                Cheques
-              </h4>
-            </div>
-          </div>
-
-          <!-- REPORTES -->
-          <div *ngxPermissionsOnly="menuPermissionsObj.reportes.flatt" class="menuList">
-            <h5 [id]="idsH5.reportes" class="tituloMenu" [ngClass]="{ tituloMenuA: getLayoutActiveRoute('reportes') }" [innerText]="'Reportes'"></h5>
-            <img class="iconosMenu" [ngClass]="{ iconosMenuA: getLayoutActiveRoute('reportes') }" src="assets/img/reporte.png" alt="Reportes" (click)="cambiarMenu({ url: 'reportes', navigate: true, id_h5: 'reporteLabel' })" draggable="false" />
-          </div>
-          <div class="menuList"></div>
+          @for (menuItem of layServ.menuItems; track menuItem; let first = $first; let last = $last) {
+            <app-menu-item [menuItem]="menuItem" [actualPath]="actualPath()" [nextModule]="nextModule()" (menuClick)="cambiarMenu($event)" (subMenuClick)="cambiarMenu($event)"> </app-menu-item>
+          }
         </div>
       </div>
     </div>
@@ -198,46 +24,70 @@
       <div class="navBar">
         <div class="right">
           <div class="btn-group dropCuenta" id="dropCuenta">
-            <span class="dropdown-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
-              <img class="rounded-circle" [src]="imgUser" alt="Admin" draggable="false" />
-              Cuenta
-              <span class="caret"></span>
+            <span class="popover-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
+              <img class="rounded-circle" [src]="imgUser" alt="Admin" />
+              Cuenta <span class="caret"></span>
             </span>
-            <p-overlayPanel [dismissable]="true" [showCloseIcon]="false" #dropdownCuenta styleClass="overlayCuenta" appendTo="body">
-              <ul class="dropdown-cuenta">
-                <div class="dropdown-header">
-                  <h3>{{ usuario?.nombre }}</h3>
-                  <p>{{ usuario?.email }}</p>
-                </div>
-                <li role="menuitem">
-                  <a class="dropdown-item" id="dropdown-item" (click)="refreshPage(); dropdownCuenta.hide()"><i class="fas fa-undo-alt"></i>Recargar aplicación</a>
+
+            <p-popover [dismissable]="true" #dropdownCuenta styleClass="no-carret" appendTo="body">
+              <ul class="popover-cuenta">
+                <li class="popover-header">
+                  <h4 class="mb-0">{{ usuario?.nombre }}</h4>
+                  <p class="mb-0 text-s-16">{{ usuario?.email }}</p>
                 </li>
-                <li class="divider dropdown-divider"></li>
-                <li role="menuitem">
-                  <a class="dropdown-item" id="dropdown-item" (click)="logOut(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
+                <li>
+                  <a class="popover-item" id="popover-item" (click)="refreshPage(); dropdownCuenta.hide()">
+                    <i class="fas fa-undo-alt"></i>
+                    Recargar aplicación
+                  </a>
+                </li>
+                <li>
+                  <div class="popover-item" id="popover-item" (click)="changeSerieDefault(); dropdownCuenta.hide()">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <strong>Serie por defecto:</strong> {{ my_capitalize(configApp.serie_default) }}
+                  </div>
+                </li>
+                <li>
+                  <div class="popover-item" id="popover-item" (click)="verificarActualizaciones(); dropdownCuenta.hide()">
+                    <i class="fas fa-cloud-arrow-down"></i>
+                    Verificar actualizaciones
+                  </div>
+                </li>
+                <li class="divider popover-divider"></li>
+                <li>
+                  <a class="popover-item danger" id="popover-item" (click)="fun.logout(); dropdownCuenta.hide()"><i class="fas fa-power-off"></i>Cerrar sesión</a>
                 </li>
               </ul>
-            </p-overlayPanel>
+            </p-popover>
           </div>
         </div>
       </div>
 
       <div class="contenido">
-        @if (ready) {
-
-        <router-outlet></router-outlet>
+        @if (ready()) {
+          <router-outlet></router-outlet>
         }
+
         <input id="input_fantasma" class="input_fantasma" (click)="clickFantasma()" />
       </div>
 
-      <div class="footer">Novac System {{ versionApp }} - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez</div>
+      <div class="footer w-100 c-default">
+        <span class="machine-id" (click)="copyMachineId()">
+          {{ configApp.machineId }}
+        </span>
 
-      @if (cuadre_hoy) {
-      <div class="cuadre_hoy">
-        <div class="msg">Hoy ya existe un cuadre</div>
+        <div class="d-flex align-items-center gap-1 no-selectable">
+          <span> Novac System </span>
+          <span [multiClick]="7" (multiClickEvent)="openConfigurationModal()"> {{ configApp.app_version }} </span>
+          <span class="d-none d-lg-block"> - &#64;{{ currentYear }} Desarrollador: Victor J. Vasquez </span>
+        </div>
       </div>
+
+      @if (cuadre_hoy()) {
+        <div class="cuadre_hoy">
+          <div class="msg">Hoy ya existe un cuadre</div>
+        </div>
       }
     </div>
   </div>
-  }
 </div>

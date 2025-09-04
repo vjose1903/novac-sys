@@ -1,13 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NgxPermissionsGuard } from 'ngx-permissions';
 import { RegistroEmpleadosComponent } from './registro-empleados.component';
-import { Permisos } from '../../../core/typescript/permisos';
+import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
+import { Permisos } from '@core/typescript/permisos';
+import { PermissionsGuardService } from '@core/guard/permissions.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: RegistroEmpleadosComponent,
+<<<<<<< HEAD
     // canActivate: [NgxPermissionsGuard],
     // data: {
     //   permissions: {
@@ -19,6 +21,10 @@ const routes: Routes = [
     //   },
     // },
 
+=======
+    canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.user), 'admin/dashboard')],
+    canDeactivate: [CanDeactivateGuard],
+>>>>>>> dev
   },
 ];
 

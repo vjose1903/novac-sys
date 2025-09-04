@@ -5,7 +5,13 @@
 }
 
 .filtroArticulos {
-  min-width: 13rem;
+  height: 1.9rem;
+  max-width: 13rem;
+  padding: 0rem 0.5rem !important;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 2;
+  z-index: 99;
 }
 
 .mainInventario {
@@ -23,21 +29,24 @@
     grid-area: cuerpo;
 
     position: relative;
-
-    .divFiltro {
-      top: 0;
+    > .cardListados {
       position: absolute;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      height: 100%;
       width: 100%;
-      padding-left: 18rem;
 
-      > .filtroArticulos {
-        margin-top: 0.6rem;
-      }
-      > .btnReporte {
-        margin: 0.15rem 0.5rem 0rem 0rem;
+      > .divFiltro {
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding-left: 18rem;
+
+        > .filtroArticulos {
+          margin-top: 0.5rem;
+        }
+        > .btnReporte {
+          margin: 0.15rem 0.5rem 0rem 0rem;
+        }
       }
     }
   }

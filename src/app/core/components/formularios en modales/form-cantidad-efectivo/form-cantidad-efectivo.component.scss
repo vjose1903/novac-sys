@@ -1,0 +1,55 @@
+.total {
+  font-size: 3rem;
+}
+
+.inputEfectivo {
+  text-align: end;
+  font-size: 2.4rem;
+  padding: 0rem 3rem 0rem 0rem;
+}
+
+.cambioDePrecios {
+  background-color: var(--primary02);
+  border: 1.5px solid var(--primary03);
+  border-radius: 1rem;
+  padding: 0.5rem;
+}
+
+span.spanTituloCambio {
+  display: block;
+  text-align: center;
+  font-size: 1.15rem;
+  > span {
+    font-weight: 520;
+    color: var(--primary09);
+  }
+  > i.fas.fa-exclamation-circle {
+    color: var(--primary07);
+    font-size: 1.5rem;
+  }
+}
+
+span.deseaCambio_ {
+  display: block;
+  margin: 0.9rem 0rem;
+}
+
+.btnDecision {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+span.decisionesCambio {
+  display: block;
+  text-align: center;
+  > span.si_ {
+    font-size: 1.8rem;
+    font-weight: 500;
+  }
+  > span.no_ {
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin: 0rem 0rem 0rem 5rem;
+  }
+}

@@ -1,0 +1,46 @@
+<div style="height: 100%">
+  <p-tabs [(value)]="activeIndex" styleClass="my_tabView">
+    <p-tablist>
+      @if (showPagos) {
+        <p-tab [value]="getPagosIndex()" [disabled]="arrayHasData('pagos').disable"> Pagos {{ !arrayHasData('pagos').disable ? '(' + arrayHasData('pagos').cant + ')' : '' }} </p-tab>
+      }
+      @if (showNotas) {
+        <p-tab [value]="getNotasIndex()" [disabled]="arrayHasData('notas').disable"> Notas {{ !arrayHasData('notas').disable ? '(' + arrayHasData('notas').cant + ')' : '' }} </p-tab>
+      }
+      @if (showRecibos) {
+        <p-tab [value]="getRecibosIndex()" [disabled]="arrayHasData('recibos').disable"> Recibos {{ !arrayHasData('recibos').disable ? '(' + arrayHasData('recibos').cant + ')' : '' }} </p-tab>
+      }
+    </p-tablist>
+
+    @if (show) {
+      <p-tabpanels>
+        @if (showPagos) {
+          <p-tabpanel [value]="getPagosIndex()">
+            <div class="d-flex h-100 w-100" #cardTablaPagos id="cardTabla">
+              <dinamic-table [cardTabla]="cardTablaPagos" [(data)]="pagos" [(TablasComponent)]="tablaPagosComponent" [config]="table_pagos_config" ></dinamic-table>
+              <!-- <dinamic-table [cardTabla]="cardTablaPagos" [(data)]="pagos" [(TablasComponent)]="tablaPagosComponent" [config]="table_pagos_config" (table_events)="handle_table_events($event)"></dinamic-table> -->
+            </div>
+          </p-tabpanel>
+        }
+
+        @if (showNotas) {
+          <p-tabpanel [value]="getNotasIndex()">
+            <div class="d-flex h-100 w-100" #cardTablaNota id="cardTablaNota">
+              <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" ></dinamic-table>
+              <!-- <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table> -->
+            </div>
+          </p-tabpanel>
+        }
+
+        @if (showRecibos) {
+          <p-tabpanel [value]="getRecibosIndex()">
+            <div class="d-flex h-100 w-100" #cardTablaRecibo id="cardTablaRecibo">
+              <dinamic-table [cardTabla]="cardTablaRecibo" [(data)]="recibos" [(TablasComponent)]="tablaRecibosComponent" [config]="table_recibos_config" ></dinamic-table>
+              <!-- <dinamic-table [cardTabla]="cardTablaRecibo" [(data)]="recibos" [(TablasComponent)]="tablaRecibosComponent" [config]="table_recibos_config" (table_events)="handle_table_events($event)"></dinamic-table> -->
+            </div>
+          </p-tabpanel>
+        }
+      </p-tabpanels>
+    }
+  </p-tabs>
+</div>

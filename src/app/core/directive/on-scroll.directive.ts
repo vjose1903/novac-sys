@@ -1,7 +1,8 @@
 import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
 
 @Directive({
-  selector: '[appOnScroll]',
+    selector: '[appOnScroll]',
+    standalone: false
 })
 export class OnScrollDirective {
   @Output() scrolling = new EventEmitter<any>();

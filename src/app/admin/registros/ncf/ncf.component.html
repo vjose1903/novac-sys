@@ -23,32 +23,32 @@
                     } }
                   </select>
                   @if (aletarTipoArticulo) {
-                  <div class="alerta text-danger ml-1" style="font-size: 12px">Debe de seleccionar tipo de comprobante</div>
+                  <div class="alerta text-danger ms-1" style="font-size: 12px">Debe de seleccionar tipo de comprobante</div>
                   }
                 </div>
               </div>
-              <div class="col-6 p-0 pr-2">
+              <div class="col-6 p-0 pe-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Desde: <span style="color: red">*</span></label>
                   <input id="campoDesde" (keydown.enter)="saltar('campoHasta')" type="number" class="form-control input_cantidad" [(ngModel)]="Desde" (keyup)="checkInputs('desde')" (blur)="checkInputs('desde')" />
                   @if (desdeAlert) {
-                  <div class="alerta text-danger ml-1" style="font-size: 12px">Campo obligatorio.</div>
+                  <div class="alerta text-danger ms-1" style="font-size: 12px">Campo obligatorio.</div>
                   }
                 </div>
               </div>
-              <div class="col-6 p-0 pl-2">
+              <div class="col-6 p-0 ps-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Hasta: <span style="color: red">*</span></label>
                   <input id="campoHasta" (keydown.enter)="saltar('campoFechaCompra')" type="number" class="form-control input_cantidad" [(ngModel)]="Hasta" (keyup)="checkInputs('hasta')" (blur)="checkInputs('hasta')" />
                   @if (hastaAlert) {
-                  <div class="alerta text-danger ml-1" style="font-size: 12px">Campo obligatorio.</div>
+                  <div class="alerta text-danger ms-1" style="font-size: 12px">Campo obligatorio.</div>
                   }
                 </div>
               </div>
-              <div class="col-6 p-0 pr-2">
+              <div class="col-6 p-0 pe-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Fecha compra: <span style="color: red">*</span></label>
-                  <p-calendar
+                  <p-datepicker
                     inputId="campoFechaCompra"
                     [(ngModel)]="fechaCompra"
                     dateFormat="dd/mm/yy"
@@ -56,13 +56,13 @@
                     (onSelect)="setDateInputs(fechaCompra)"
                     (onClose)="setDateInputs(fechaCompra)"
                     (keydown.enter)="saltar('campoFechaValida')"
-                  ></p-calendar>
+                  ></p-datepicker>
                 </div>
               </div>
-              <div class="col-6 p-0 pl-2">
+              <div class="col-6 p-0 ps-2">
                 <div class="form-group mt-2">
                   <label class="control-label">Fecha validez: </label>
-                  <p-calendar inputId="campoFechaValida" [(ngModel)]="fechaValidez" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('send')"></p-calendar>
+                  <p-datepicker inputId="campoFechaValida" [(ngModel)]="fechaValidez" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('send')"></p-datepicker>
                 </div>
               </div>
               @if (is_editando) {
@@ -71,18 +71,19 @@
                   <div class="col-6">
                     <div class="d-flex">
                       <h5>Usado:</h5>
-                      <i class="ml-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"></i>
+                      <i class="ms-3 mt-1 {{ ncfSelected.usado ? 'fas fa-check' : 'fas fa-times' }} {{ ncfSelected.usado ? 'text-green' : 'text-red' }}"></i>
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="d-flex">
                       <h5>Activo:</h5>
-                      <i class="ml-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"></i>
+                      <i class="ms-3 mt-1 {{ ncfSelected.estado ? 'fas fa-check' : 'fas fa-times' }}  {{ ncfSelected.estado ? 'text-green' : 'text-red' }}"></i>
                     </div>
                   </div>
                 </div>
               </div>
               }
+<<<<<<< HEAD
               <div class="col-12 p-0 w-100 mt-5 d-flex justify-content-between">
                 <div class="d-flex column-gap-2">
                   <button (click)="borrar()" class="btn btn-blanco">Borrar</button>
@@ -90,6 +91,15 @@
                 </div>
                 <div>
                   <button class="btn btn-blanco" (click)="borrar(); isCreando = false">Cerrar</button>
+=======
+              <div class="col-12 p-0 mt-3" style="display: flex; justify-content: space-between">
+                <div>
+                  <a class="btn me-2" id="btn-blanco" (click)="borrar()">Borrar</a>
+                  <input [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn ms-2" value="{{ boton }}" id="btn-verde" />
+                </div>
+                <div>
+                  <input class="btn ms-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
+>>>>>>> dev
                 </div>
               </div>
             </div>
@@ -103,6 +113,7 @@
           <h4 class="mb-0">Listado de comprobantes</h4>
           <button *ngxPermissionsOnly="permissions.secuencia_comprobante.create" [disabled]="ncfSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
         </div>
+        
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">
             <dinamic-table [cardTabla]="cardTabla" [(data)]="listaNCF" [seleccionado]="ncfSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>

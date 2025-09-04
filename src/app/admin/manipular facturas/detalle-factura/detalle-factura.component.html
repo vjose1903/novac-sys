@@ -1,33 +1,52 @@
 <div class="mainContainer">
-  <div class="d-flex info flex-wrap column-gap-2">
-    <div class="d-flex">
-      <b class="mr-2">{{ entidadLabel }}: </b>
-      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-        <p class="text-black mb-0">{{ inputs.data.cliente.nombre }}</p>
-      </p-tag>
-    </div>
-
-    @if (inputs?.data?.numero_comprobante) {
-    <div class="d-flex">
-      <b class="mr-2">Comprobante: </b>
-      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-        <p class="text-black mb-0">{{ inputs.data.numero_comprobante }}</p></p-tag
-      >
-    </div>
-    }
+  <div class="d-flex align-items-center mb-2">
+    <b class="me-2">{{ entidadLabel }}: </b>
+    <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '100%', overflow: 'hidden', display: 'inline-block', flex: '1' }">
+      <p class="text-black mb-0">{{ data.cliente.nombre_completo }}</p>
+    </p-tag>
   </div>
 
   <hr class="rayaTop" />
-  
-  <div class="row">
+  <div class="row mt-3">
     @for (item of detalles; track item.key; let index = $index) {
-    <div class="col-6 pl-0">
-      <ng-container class="d-flex">
-        <p>
-          <strong>{{ item.label }}</strong>: {{ getValue(item) }}
-        </p>
-      </ng-container>
-    </div>
+      <div class="mb-2" [ngClass]="item.div_clase">
+        <ng-container>
+          <span class="d-flex align-items-center gap-2 white-space-nowrap">
+            <strong class="mb-0">{{ item.label }}:</strong>
+            @switch (item.tipo) {
+              @case ('tag') {
+                <p-tag [rounded]="true" [style]="{ background: item.bg_tag, 'white-space': 'nowrap', width: 'fit-content', overflow: 'hidden', display: 'inline-block' }">
+                  <p class="mb-0" [ngClass]="item.clase_string">{{ getValue(item) }}</p>
+                </p-tag>
+              }
+              @default {
+                {{ getValue(item) }}
+              }
+            }
+          </span>
+        </ng-container>
+      </div>
+    }
+
+    @if (data?.serie == serie.electronica) {
+      @if (fun.hasValue(data?.dgii_message)) {
+        <div class="col-12 p-0 mt-3">
+          <div class="card br-8">
+            <div class="card-body p-3">
+              <span [ngClass]="{ 'text-danger': data?.is_aceptada == TrackStatusEnum.REJECTED, 'text-warning': data?.is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED }">
+                {{ data?.dgii_message }}
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <button class="btn btn-verde p-1 px-2 mt-2" (click)="openBrowser()">
+        <div class="d-flex align-items-center gap-2">
+          <img src="assets/img/dgii_logo.png" alt="dgii logo" class="dgii-logo" />
+          Verificar Estado Ecf
+        </div>
+      </button>
     }
   </div>
 </div>

@@ -1,0 +1,25 @@
+@use './forms.scss' as *;
+
+.p-inputmask {
+  @include formField;
+  
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  &.min {
+    height: 2rem !important;
+    padding: 0.2rem !important;
+  }
+
+  &.disabled,
+  &:disabled {
+    @include formFieldDisabled;
+  }
+
+  &.with-right-btn {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+}

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { DivisaService } from './../divisa/divisa.service';
 import { entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
@@ -23,11 +24,30 @@ import { ConfigureModalI } from '../../components/modal/modal-class';
 import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
 import { ImagenService } from '../../../core/services/imagen.service';
 import { documentoIdentidad } from '../../../core/typescript/documentos_de_identidad.utils';
+=======
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import * as _ from 'lodash';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { customValidators } from '@core/typescript/custom-validators';
+import { pattern } from '@core/typescript/constantes';
+import { SuplidorC } from './suplidores';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
+import { Ss } from '@core/services/singleton.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+>>>>>>> dev
 
 @Component({
   selector: 'app-registro-suplidores',
   templateUrl: './registro-suplidores.component.html',
   styleUrls: ['./registro-suplidores.component.scss'],
+  standalone: false,
 })
 export class RegistroSuplidoresComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;
@@ -67,14 +87,20 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_suplidores',
-    padre_functions: { data_request: (params) => this.getSuplidores(params) },
+    padre_functions: { data_request: params => this.getSuplidores(params) },
     filtrar: { local: false },
+<<<<<<< HEAD
     obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy }, styles: { width: '5.5rem' } },
+=======
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
+    botones: { editar: { show: true, permiso: this.permissions.suplidor.update }, borrar: { show: true, permiso: this.permissions.suplidor.destroy } },
+>>>>>>> dev
   };
   tablaComponent;
   formPermissions = [Permisos.suplidor.create, Permisos.suplidor.update];
 
+<<<<<<< HEAD
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.suplidor;
   configApp: ConfigI = ConfigService.config;
   fun = fun;
@@ -91,6 +117,15 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     public imgServ: ImagenService,
     public divisaServ: DivisaService,
   ) {
+=======
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  private route = inject(ActivatedRoute);
+  private tServ = inject(TablasService);
+
+  constructor() {
+>>>>>>> dev
     super();
   }
 
@@ -101,13 +136,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.metodo = this.route.snapshot.params['metodo'];
 
     this.nesesarioStart();
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   ngOnDestroy(): void {
@@ -123,6 +151,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.marcarCheck('rnc');
   }
 
+<<<<<<< HEAD
   async createForm() {
     this.form = this.fb.group({
       id: [null],
@@ -135,6 +164,11 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       rnc: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
       cedula: [null],
     });
+=======
+  capitalice(control, arg) {
+    const campo = this.form.get(control);
+    campo.setValue(fun.capitalice(arg));
+>>>>>>> dev
   }
 
   async getSuplidores(params?: { per_page?: number; page?: number; search?: string }) {
@@ -143,9 +177,15 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
     this.listaSuplidores.length = 0;
+<<<<<<< HEAD
     this.suplidorClass.getAll(extra).then((res) => {
       res['data'].map((suplidor) => {
         const doc = suplidor.documentos_de_identidad.find((doc) => doc.principal == true);
+=======
+    this.suplidorClass.getAll(extra).then(res => {
+      res['data'].map(suplidor => {
+        const doc = _.find(suplidor.documentos_de_identidad, { principal: true });
+>>>>>>> dev
         suplidor.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         suplidor.img_divisa = suplidor?.divisa?.imagen?.file_name ? this.imgServ.getImgUrlServer(suplidor?.divisa?.imagen?.file_name) : 'assets/img/no-divisa.png';
         suplidor.img_divisa_tooltip = suplidor?.divisa?.nombre ? suplidor?.divisa?.nombre : 'Divisa no registrada';
@@ -195,9 +235,13 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.editando = false;
     this.changeStateCampos(false);
 
+<<<<<<< HEAD
     this.listaEntidadCuentasContables = [];
 
     setTimeout(() => {
+=======
+    fun.setTimeout(() => {
+>>>>>>> dev
       this.marcarCheck('rnc');
       fun.enfocarInput('rnc');
     }, 2);
@@ -219,7 +263,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         this.marcarCheck('cedula');
         fun.enfocarInput('cedula');
 
-        setTimeout(() => this.submit(), 250);
+        fun.setTimeout(() => this.submit(), 250);
       }
     }
   }
@@ -257,16 +301,20 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-        if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === documento)) {
+        if (this.editando && this.documentos_de_identidad.some(doc => doc.documento === documento)) {
           enable_campos = true;
           return;
         }
 
         fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
-          .then((res) => {
+          .then(res => {
             if (res['data'].length) {
+<<<<<<< HEAD
               const is_suplidor = res['data'].find((item) => item.persona_is === 'Suplidor');
+=======
+              const is_suplidor = _.find(res['data'], item => item.persona_is === 'Suplidor');
+>>>>>>> dev
               const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_suplidor) && is_suplidor?.persona?.estado) {
@@ -277,7 +325,11 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
               const persona = fun.hasValue(is_suplidor) ? is_suplidor?.persona : res['data'][0].persona;
               persona.id = id_anterior;
+<<<<<<< HEAD
               const documento_persona = persona.documentos_de_identidad.find((item) => item.principal == true);
+=======
+              const documento_persona = _.find(persona.documentos_de_identidad, item => item.principal);
+>>>>>>> dev
 
               if (fun.hasValue(documento_persona)) {
                 this.doc_is_cedula = documento_persona.descripcion == documentoIdentidad.cedula ? true : false;
@@ -297,7 +349,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
             if (enable_campos) this.changeStateCampos(true);
           })
-          .catch((err) => {
+          .catch(err => {
             console.error('err ', err);
           });
       } else {
@@ -312,7 +364,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   nuevoRegistro() {
     this.isCreando = true;
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.marcarCheck('rnc');
       fun.enfocarInput('rnc');
     }, 200);
@@ -322,6 +374,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.suplidor, id_modal: 'categorias_suplidores', inputs: { configsEntCuentas: this.listaConfigSuplidores }, openNewModal: this.openNewModal.bind(this) });
   }
 
+<<<<<<< HEAD
   onHideModal(modalConfig: ConfigureModalI) {
     if (modalConfig.id == 'categorias_suplidores') {
       this.categoriaEntidadServ.setCategoriaChange();
@@ -330,6 +383,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   changeStateCampos(enable = false) {
     ['nombre', 'telefono', 'direccion', 'email', 'divisa_id'].forEach((campo) => {
+=======
+    ['nombre', 'telefono', 'direccion', 'email'].forEach(campo => {
+>>>>>>> dev
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
@@ -347,18 +403,19 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el suplidor <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        this.suplidorClass.deleteOne(regisData.id).then((res) => {
-          const actualPagination = this.tServ.getPaginationById('lista_suplidores');
-          this.getSuplidores(actualPagination);
-        });
-      },
+    const onYes = () => {
+      this.suplidorClass.deleteOne(regisData.id).then(res => {
+        const actualPagination = this.tServ.getPaginationById('lista_suplidores');
+        this.getSuplidores(actualPagination);
+      });
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el suplidor <b>${regisData.nombre_completo}</b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
   }
 
   editarItem(data) {
@@ -378,20 +435,38 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.suplidorSelected = fun.deepCloning(data);
     this.changeDivisa();
 
+<<<<<<< HEAD
     setTimeout(() => fun.enfocarInput('rnc'), 1);
     this.changeStateCampos(true);
+=======
+    this.patchDocumentos(data.documentos_de_identidad);
+    fun.setTimeout(() => fun.enfocarInput('rnc'), 1);
+>>>>>>> dev
   }
 
   patchDocumentos(documentos) {
     if (documentos.length) {
+<<<<<<< HEAD
       documentos.forEach((doc) => {
         if (doc.descripcion === documentoIdentidad.rnc) this.form.controls.rnc.setValue(doc.documento);
         else this.form.controls.cedula.setValue(doc.documento);
       });
 
       const doc_principal = documentos.find((doc) => doc.principal == true);
+=======
+      documentos.forEach(doc => {
+        if (doc.descripcion === 'rnc') this.form.controls.rnc.setValue(doc.documento);
+        else this.form.controls.cedula.setValue(doc.documento);
+      });
 
-      setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
+      const doc_principal = documentos.find(doc => doc.principal);
+>>>>>>> dev
+
+      fun.setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
+    } else {
+      ['rnc', 'cedula'].forEach(docType => {
+        this.form.controls[docType].setValue(null);
+      });
     }
   }
 
@@ -473,14 +548,23 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       { documento: formulario.rnc, descripcion: documentoIdentidad.rnc },
     ];
 
+<<<<<<< HEAD
     documentos_identidad.map((element) => {
       const doc_backend = this.documentos_de_identidad?.find((doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+=======
+    documentos_identidad.map(element => {
+      const doc_backend = _.find(this.documentos_de_identidad, doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+>>>>>>> dev
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;
       return element;
     });
 
+<<<<<<< HEAD
     formulario.documentos_de_identidad = documentos_identidad.filter((doc) => fun.hasValue(doc.documento));
+=======
+    formulario.documentos_de_identidad = _.filter(documentos_identidad, doc => fun.hasValue(doc.documento));
+>>>>>>> dev
     formulario.estado = true;
 
     if (ConfigService.config.has_contabilidad) formulario['cuentas_contables'] = this.listaEntidadCuentasContables;
@@ -489,7 +573,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
       // paso todas las validaciones
     } else {
-      this.suplidorClass.createUpdateOne(formulario).then((res) => {
+      this.suplidorClass.createUpdateOne(formulario).then(res => {
         const actualPagination = this.tServ.getPaginationById('lista_suplidores');
         this.getSuplidores(actualPagination);
         this.borrar();

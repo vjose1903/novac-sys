@@ -1,0 +1,368 @@
+<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.scss
+=======
+.alert_msg {
+  color: #8080806b;
+  margin-right: 0.2rem;
+  cursor: help !important;
+}
+
+.index {
+  background: #80808021;
+}
+
+.show_color {
+  min-height: 1.5rem;
+  min-width: 1.5rem;
+  width: 1.5rem;
+  border-radius: 3px;
+  margin: auto;
+
+  &.sm {
+    min-height: 1rem !important;
+    min-width: 1rem !important;
+    width: 1rem !important;
+  }
+}
+
+.dinamicTable {
+  display: grid !important;
+  column-gap: 0rem;
+  grid-template-rows: [filter-start] min-content [filter-end fantasma-start] auto [fantasma-end];
+  grid-template-columns: [filter-start fantasma-start] auto [filter-end fantasma-end];
+
+  .searchDiv {
+    // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;
+    grid-area: filter-start / filter-start / filter-end / filter-end;
+  }
+
+  .divTableFantasma {
+    // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;
+    grid-area: fantasma-start / fantasma-start / fantasma-end / fantasma-end;
+
+    position: relative;
+
+    .divTable {
+      overflow: auto;
+      position: absolute;
+      box-shadow: 0px 1px 5px 1px #00000014;
+      &.redondo {
+        border-radius: 13px;
+        .myTable {
+          border-radius: 10px;
+        }
+        .thead {
+          border-radius: 10px 10px 0px 0px;
+        }
+      }
+
+      .myTable {
+        border-radius: 10px;
+
+        display: grid !important;
+        height: 100% !important;
+
+        grid-template-areas:
+          'thead'
+          'tbody'
+          'tfoot';
+
+        grid-template-rows: [head-start] min-content [body-start] auto [body-end] min-content [foot-end];
+
+        .thead {
+          grid-area: thead;
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+
+          &:not(&.colorTitulo) {
+            border-bottom: 1px solid #808080a8 !important;
+          }
+
+          &.colorTitulo {
+            background: var(--primary06);
+          }
+
+          &.noColorTitulo {
+            background: #c6c6c6a8;
+          }
+
+          .thHead {
+            &:first-child {
+              padding-left: 0.7rem;
+            }
+            &:last-child {
+              padding-right: 0.7rem;
+            }
+            padding: 0.6rem 0rem;
+            &.sm {
+              padding: 0.3rem 0rem;
+            }
+
+            .titulo {
+              cursor: default;
+              user-select: none;
+            }
+          }
+        }
+        .divBody {
+          grid-area: tbody;
+          grid-row: body-start / body-end;
+          overflow-y: auto;
+
+          .tbody {
+            overflow: auto;
+            height: 100%;
+            > tr {
+              display: table;
+              width: 100%;
+              table-layout: fixed;
+
+              &.bg-selected {
+                background: var(--transparente05) !important;
+              }
+
+              &.danger {
+                background-color: #ff7e7e8d !important;
+                &:hover {
+                  background-color: #ce4d4da1 !important;
+                }
+              }
+
+              &.greenTd {
+                background-color: #7eff988d !important;
+                &:hover {
+                  background-color: #4dce76a1 !important;
+                }
+              }
+
+              &.bg-light {
+                background-color: #dbd8d8 !important;
+              }
+
+              &.bg-more-light {
+                background-color: #e9e9e9 !important;
+              }
+
+              &:hover {
+                background-color: #e9e9e9 !important;
+              }
+
+              > td {
+                text-align: center;
+                border-top: 0px solid transparent !important;
+                border-bottom: 0.5px solid #e5e5e554;
+                vertical-align: middle !important;
+
+                padding: 0.6rem 0rem;
+                &:first-child {
+                  padding-left: 0.7rem;
+                }
+                &:last-child {
+                  padding-right: 0.7rem;
+                }
+
+                &.sm {
+                  padding: 0.2rem 0rem;
+                }
+
+                .table_input {
+                  position: relative;
+                  display: flex;
+                  align-items: center;
+                  .inputTabla {
+                    &.refresh {
+                      padding-right: 2rem;
+                    }
+                  }
+                  .icon {
+                    cursor: pointer;
+                    position: absolute;
+                    right: 0.5rem;
+                    &:hover {
+                      transform: scale(1.2);
+                    }
+                  }
+                }
+
+                &.btnAccion {
+                }
+              }
+            }
+          }
+        }
+
+        .tfoot {
+          grid-area: tfoot;
+          .pieTabla {
+            padding: 0.3rem 0rem 0.3rem 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            .pagination-total {
+              white-space: nowrap;
+            }
+
+            .pagination-controls {
+              flex: 1;
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin speeddial-icons {
+  height: 35px !important;
+  width: 35px !important;
+}
+
+::ng-deep {
+  .btn-table-cellphone {
+    > button {
+      background: var(--primary05) !important;
+      border-color: var(--primary05) !important;
+      box-shadow:
+        0 4px 6px rgba(50, 50, 93, 0.11),
+        0 1px 3px rgba(0, 0, 0, 0.08) !important;
+
+      @include speeddial-icons;
+      &:hover {
+        filter: brightness(0.6);
+      }
+    }
+    position: inherit !important;
+  }
+
+  .p-speeddial-item {
+    z-index: 999 !important;
+    box-shadow: 0px 0px 11px 3px #00000082;
+    border-radius: 50%;
+  }
+
+  .p-speeddial-action {
+    background: #495057eb !important;
+    @include speeddial-icons;
+    &:hover {
+      background: #1a1c1feb !important;
+    }
+  }
+}
+
+.sort-icon {
+  position: relative;
+  width: 15px;
+  display: inline-block;
+  transform: translate(3px, -4px);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(-4px);
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 8px solid #80808038; /* Flecha hacia arriba */
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(7px); /* Desplazar hacia abajo */
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 8px solid #80808038; /* Flecha hacia abajo */
+  }
+
+  /* ordenado ascendente */
+  &.order-asc {
+    &::after {
+      /* Flecha hacia arriba */
+      border-bottom-color: var(--primary09);
+    }
+  }
+
+  /* ordenado descendente */
+  &.order-desc {
+    &::before {
+      /* Flecha hacia abajo */
+      border-top-color: var(--primary09);
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+
+  .titulo_sm {
+    display: none;
+  }
+
+  .divTable thead,
+  .divTable tbody {
+    font-size: 0.8rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .titulo_sm {
+    display: none;
+  }
+
+  .divTable thead,
+  .divTable tbody {
+    font-size: 0.65rem !important;
+  }
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .titulosHeader {
+    display: none !important;
+  }
+
+  .titulo_sm {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem !important;
+    font-weight: 600;
+  }
+
+  .divTable thead,
+  .divTable tbody {
+    font-size: 0.9rem !important;
+  }
+
+  .tableTD {
+    display: flex !important;
+    justify-content: space-between;
+    width: 100% !important ;
+    float: right !important;
+    clear: left !important;
+  }
+
+  .tfoot {
+    padding-top: 0.2rem !important;
+  }
+}
+>>>>>>> dev:src/app/core/components/new_tablas/tablas.component.scss

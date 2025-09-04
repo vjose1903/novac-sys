@@ -6,6 +6,7 @@
     <div class="d-flex justify-content-between align-items-end rayaBottom mb-3 pb-2">
       <div class="colores w-70">
         @if (viajes?.length && viajes_pendientes_cant > 0) {
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.html
           <span class="badge text-shadow red text-white">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
         } 
 
@@ -19,6 +20,18 @@
         
         @if (viajes?.length > 0 && viajes_pendientes_cant == 0) {
           <span class="badge text-shadow green text-white">Todos los viajes fueron completados</span>
+=======
+          <span class="badge text-shadow bg-red text-white">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
+        }
+        @if (viajes?.length && viajes_pendientes_cant > 0 && viajes_completados_cant > 0) {
+          <span class="badge text-shadow bg-blue text-white">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
+        }
+        @if (viajes?.length == 0) {
+          <span class="badge text-shadow bg-green text-white">No tiene viajes pendientes</span>
+        }
+        @if (viajes?.length > 0 && viajes_pendientes_cant == 0) {
+          <span class="badge text-shadow bg-green text-white">Todos los viajes fueron completados</span>
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.html
         }
       </div>
 
@@ -48,7 +61,7 @@
     </div>
 
     <div class="formulario {{ fun.hasValue(viaje_selected) ? 'list-form' : 'solo-list' }}">
-      <div class="card sombra w-100 h-100 br-1 overflow-hidden">
+      <div class="card sombra w-100 h-100 br-10 overflow-hidden">
         <div class="card-header position-relative d-flex align-items-center">
           <h4 class="negrita mb-0">Viaje seleccionado</h4>
 
@@ -57,18 +70,18 @@
           </div>
         </div>
         <div class="card-body p-2">
-          <div class="d-flex px-2 info-viaje-selected align-items-center justify-content-between">
-            <div class="d-flex">
-              <span class="d-flex align-items-center mr-3">
-                <h6 class="negrita p-0 mr-2">Cliente:</h6>
+          <div class="d-flex px-2 info-viaje-selected align-items-center justify-content-between gap-4">
+            <div class="d-flex gap-3">
+              <span class="d-flex flex-column">
+                <small class="negrita p-0 me-2">Cliente:</small>
 
                 <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                  <p class="text-black mb-0">{{ viaje_selected?.cliente.nombre }}</p>
+                  <p class="text-black mb-0">{{ viaje_selected?.cliente.nombre_completo }}</p>
                 </p-tag>
               </span>
 
-              <span class="d-flex align-items-center mr-3">
-                <h6 class="negrita p-0 mr-2">Total facturado:</h6>
+              <span class="d-flex flex-column">
+                <small class="negrita p-0 me-2">Total facturado:</small>
 
                 <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
                   <p *ngIf="fun.hasValue(viaje_selected)" class="text-black mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
@@ -76,10 +89,17 @@
               </span>
 
               @if (monto_pendiente > 0) {
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.html
                 <span class="d-flex align-items-center mr-3">
                   <h6 class="negrita p-0 mr-2 text-red">Monto pendiente:</h6>
                   <p-tag [rounded]="true" [style]="{ background: '#e9c1c1', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
                     <p *ngIf="fun.hasValue(viaje_selected)" class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
+=======
+                <span class="d-flex flex-column">
+                  <small class="negrita p-0 me-2 text-red">Monto pendiente:</small>
+                  <p-tag [rounded]="true" [style]="{ background: '#e9c1c1', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                    <p class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.html
                   </p-tag>
                 </span>
               }
@@ -98,8 +118,12 @@
                   [(data)]="viaje_selected.movimientos_viaje"
                   [(TablasComponent)]="tablaMovimientosComponent"
                   [config]="config_viaje_selected"
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.html
                   (table_events)="handle_table_events($event)"
                 ></dinamic-table>
+=======
+                  (table_events)="handle_table_events($event)"></dinamic-table>
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.html
               }
             </div>
           </div>

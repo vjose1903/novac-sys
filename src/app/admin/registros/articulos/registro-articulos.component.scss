@@ -8,9 +8,14 @@
   border-radius: 12px;
 }
 
-.SCROLLFORMULA {
+.scroll-formula-titles {
+  padding: 0 0.9rem 0 0.3rem !important;
+}
+
+.scroll-formula-content {
   max-height: 14rem !important;
   overflow: hidden auto;
+  padding: 0.2rem;
 }
 
 .raya {

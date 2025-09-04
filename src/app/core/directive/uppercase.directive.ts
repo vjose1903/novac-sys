@@ -3,6 +3,7 @@ import { fun } from '../services/functions.service';
 
 @Directive({
   selector: '[appUppercase]',
+  standalone: false,
 })
 export class UppercaseDirective {
   @Input('appUppercase') type: 'condition' | 'always';

@@ -1,39 +1,102 @@
-import { Component, OnInit } from '@angular/core';
-import { ModalComponentI, ModalI } from '../../components/modal/modal-class';
-import * as _ from 'lodash';
-import { fun } from '../../../core/services/functions.service';
+import { Component, inject, Input, OnInit } from '@angular/core';
+import { fun } from '@core/services/functions.service';
+import { serie, TrackStatusEnum } from '@core/typescript/constantes';
+import { ModalDetalleFacturaI } from './detalle-factura.model';
+import { MessageTask } from '@core/typescript/message-task';
+import { ELECTRON_OPEN_WEB_BROWSER } from '../../../../../electron/shared-electron-angular';
+import { IpcService } from '@core/services/ipc.service';
+import { DateUtils } from '@vjose1903/dateutils';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-detalle-factura',
   templateUrl: './detalle-factura.component.html',
   styleUrls: ['./detalle-factura.component.scss'],
+  standalone: false,
 })
-export class DetalleFacturaComponent implements OnInit, ModalI {
-  constructor() {}
-  modalComponent: ModalComponentI = {};
-  inputs: any;
-
-  detalles = [{ label: 'Forma de pago', key: 'forma_pago', tipo: 'string' }];
+export class DetalleFacturaComponent implements OnInit, IDynamicModal {
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() data!: any;
+  @Input() documento!: string;
 
   entidad;
   entidadLabel;
+  TrackStatusEnum = TrackStatusEnum;
+  serie = serie;
+  fun = fun;
+  detalles: ModalDetalleFacturaI[] = [
+    { label: 'Forma de pago', key: 'forma_pago', tipo: 'string', div_clase: 'col-12 col-md-6 p-0 ' },
+    { label: 'Fecha', key: 'fecha_equivalente', tipo: 'date', div_clase: 'col-12 col-md-6 p-0 ps-md-3' },
+    { label: 'Comprobante', key: 'numero_comprobante', tipo: 'tag', div_clase: 'col-12 p-0', clase_string: 'text-black mb-0', bg_tag: '#bfbfbf' },
+  ];
+  _ipc = inject(IpcService);
+
+  constructor() {}
 
   ngOnInit(): void {
+    const hasCliente = fun.hasValue(this.data.cliente);
+    this.entidad = hasCliente ? this.data.cliente : this.data.suplidor;
 
-    const hasCliente = fun.hasValue(this.inputs.data.cliente);
-    this.entidad = hasCliente ? this.inputs.data.cliente : this.inputs.data.suplidor;
     this.entidadLabel = hasCliente ? 'Cliente' : 'Suplidor';
+    this.validateDetails();
+    this.validateElectronicInfoceDetails();
+  }
+
+  validateDetails() {
+    if (this.documento == 'recibo') {
+      this.detalles = this.detalles.filter(d => d.key != 'numero_comprobante');
+    }
+
+    if (this.documento == 'nota') {
+      this.detalles = this.detalles
+        .filter(d => d.key != 'forma_pago')
+        .map(item => {
+          if (item.key == 'fecha_equivalente') return { ...item, div_clase: 'col-12 col-md-6 p-0' };
+          if (item.key == 'numero_comprobante') return { ...item, div_clase: 'col-12 col-md-6 p-0 ps-md-3' };
+
+          return { ...item, label: item.label.replace('Forma de pago', 'Tipo de nota') };
+        });
+    }
+  }
+
+  validateElectronicInfoceDetails() {
+    if (this.data?.serie == serie.electronica) {
+      const is_aceptada = this.data.is_aceptada;
+
+      this.detalles.push({
+        label: 'Estado Ecf',
+        key: 'is_aceptada',
+        tipo: 'tag',
+        div_clase: 'col-12 ps-0',
+        clase_string: is_aceptada == TrackStatusEnum.ACCEPTED ? 'text-success' : is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED ? 'text-warning' : is_aceptada == TrackStatusEnum.REJECTED ? 'text-danger' : 'text-secondary',
+        bg_tag: is_aceptada == TrackStatusEnum.ACCEPTED ? '#98ff98' : is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED ? '#ffff98' : is_aceptada == TrackStatusEnum.REJECTED ? '#fb9898' : '#bfbfbf',
+      });
+    }
+  }
+
+  openBrowser() {
+    const task = new MessageTask(ELECTRON_OPEN_WEB_BROWSER, { url: this.data.qr_url_dgii });
+
+    this._ipc.sendTask(task).catch(err => {
+      if (err.msg) fun.toastError(err.msg, 'ERROR');
+      else fun.toastError('Error buscar el estado de la factura', 'ERROR');
+      console.error(err);
+    });
   }
 
   getValue(config) {
-    let value = fun.getProperty(this.inputs.data, config.key);
+    let value = fun.getProperty(this.data, config.key);
 
     if (config.tipo == 'number') value = fun.roundNumberToDecimal(value);
+    if (config.tipo == 'date') value = DateUtils.format({ date: value, dateFormat: 'dd/MM/yyyy', include_hour: true, hourFormat: 'hh:mm a', separator: ' ' });
 
+    if (config.transform) value = config.transform(value);
     return value;
   }
 
-  btn_aceptar() {
+  submit() {
     throw new Error('Method not implemented.');
   }
 }

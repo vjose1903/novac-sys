@@ -1,22 +1,34 @@
-import { ModalService } from './../../../components/modal/modal.service';
-import { Component, OnInit, inject } from '@angular/core';
-import { ModalI, ModalComponentI } from '../../../../admin/components/modal/modal-class';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Component, Input, OnInit, inject } from '@angular/core';
+import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { fun } from '../../../../core/services/functions.service';
-import { HtmlElementsService } from './../../../../core/services/html-elements.service';
+import { fun } from '@core/services/functions.service';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-remover-articulo',
   templateUrl: './remover-articulo.component.html',
   styleUrls: ['./remover-articulo.component.scss'],
+  standalone: false,
 })
-export class RemoverArticuloComponent implements OnInit, ModalI {
-  constructor(private fb: UntypedFormBuilder, public mServ: ModalService) {}
-  modalComponent: ModalComponentI = {};
-  inputs: any;
+export class RemoverArticuloComponent implements OnInit, IDynamicModal {
   form;
 
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
+  @Input() index: number;
+  @Input() key: string;
+  @Input() cantidad: number;
+  @Input() is_prefactura_selected: boolean;
+  @Input() data_detalle: any;
+  @Input() nombre: string;
+
   htmlServ = inject(HtmlElementsService);
+  private fb = inject(UntypedFormBuilder);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.createForm();
@@ -34,12 +46,12 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
     if (campo != 'send') {
       fun.enfocarInput(campo);
     } else {
-      this.btn_aceptar();
+      this.submit();
     }
   }
 
   changeValorCheck() {
-    this.form.controls.cantidad.setValue(this.inputs.cantidad);
+    this.form.controls.cantidad.setValue(this.cantidad);
     fun.enfocarInput('razon');
   }
 
@@ -51,20 +63,20 @@ export class RemoverArticuloComponent implements OnInit, ModalI {
       this.form.controls.cantidad.setValue(0);
     }
 
-    if (formulario.cantidad > this.inputs.cantidad) {
+    if (formulario.cantidad > this.cantidad) {
       fun.toastWarning('La cantidad no puede ser mayor a la cantidad pre-facturada.');
-      this.form.controls.cantidad.setValue(this.inputs.cantidad);
+      this.form.controls.cantidad.setValue(this.cantidad);
     }
 
-    this.form.controls.all.setValue(formulario.cantidad == this.inputs.cantidad);
+    this.form.controls.all.setValue(formulario.cantidad == this.cantidad);
   }
 
-  btn_aceptar() {
-    if (this.form.valid || this.inputs.data_detalle.is_defectuoso || !this.inputs.is_prefactura_selected) {
-      const modal = this.mServ.findModalConfigById(this.modalComponent.id);
+  submit() {
+    if (this.form.valid || this.data_detalle.is_defectuoso || !this.is_prefactura_selected) {
+      const obj = { key: this.key, data: this.data_detalle };
 
-      const data_to_return = { key: this.inputs.key, modalId: this.modalComponent.id, data: this.form.getRawValue() };
-      modal.dismissModal(this.modalComponent.id, data_to_return);
+      if (this.is_prefactura_selected) obj['data'] = this.form.getRawValue();
+      this.modalConfig.close(obj);
     } else {
       fun.toastError('Complete los campos para retirar el articulo.', 'ERROR');
     }

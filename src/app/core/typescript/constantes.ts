@@ -8,12 +8,44 @@ export enum serie {
   no = 0,
   normal = 'normal',
   electronica = 'electronica',
+  all = 'all',
 }
 
-export const seriesDGII = [
-  { label: 'Normal', value: serie.normal, disabled: false },
-  { label: 'Electronica', value: serie.electronica, disabled: false },
-];
+export enum TrackStatusEnum {
+  NOT_FOUND = 'No encontrado',
+  ACCEPTED = 'Aceptado',
+  REJECTED = 'Rechazado',
+  IN_PROCESS = 'En Proceso',
+  CONDITIONAL_ACCEPTED = 'Aceptado Condicional',
+}
+
+export interface seriesDgiiI {
+  label: string;
+  value: serie;
+  disabled?: boolean;
+}
+
+export const seriesDGII = (args?: { includeAll?: boolean; disableNormal?: boolean; disableElectronica?: boolean; disableAll?: boolean }): seriesDgiiI[] => {
+  args ??= {};
+  args.includeAll ??= false;
+  args.disableNormal ??= false;
+  args.disableElectronica ??= false;
+  args.disableAll ??= false;
+
+  const list: seriesDgiiI[] = [
+    { label: 'Normal', value: serie.normal, disabled: args.disableNormal },
+    { label: 'Electronica', value: serie.electronica, disabled: args.disableElectronica },
+  ];
+
+  if (args.includeAll) list.unshift({ label: 'Todas', value: serie.all, disabled: args.disableAll });
+
+  return list;
+};
+
+export enum operativeSystemE {
+  windows = 'windows',
+  macOs = 'macOs',
+}
 
 export const booleanYesNo = [
   { label: 'Si', value: true, disabled: false },
@@ -26,9 +58,23 @@ export enum TypeNavigation {
   back_forward = 2,
 }
 
-export enum dateRangeType{
-  dia_unico = '1',
-  rango_fecha = '2',
+export enum unidadAbrev {
+  barril = 'BARR',
+  bolsa = 'BOL',
+  botella = 'BOTELLA',
+  caja = 'CAJ',
+  docena = 'DOC',
+  fardo = 'FARD',
+  galon = 'GL',
+  kilogramo = 'KG',
+  libra = 'LB',
+  litro = 'LITRO',
+  tanque = 'TANQUE',
+  unidad = 'UND',
+  saco = 'SAC',
+  quintal = ' Q',
+  miligramo = 'MG',
+  onzas = 'OZ',
 }
 
 export enum teclasCode {
@@ -106,4 +152,8 @@ export enum teclasCode {
   _x = 120,
   _y = 121,
   _z = 122,
+}
+
+export interface ObjectVar<T> {
+  [key: string]: T;
 }

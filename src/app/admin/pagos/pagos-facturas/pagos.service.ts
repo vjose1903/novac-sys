@@ -1,18 +1,14 @@
-import { Injectable } from '@angular/core';
-import {  tipoPagoE } from './lista-pagos/pagos.config';
+import { computed, Injectable, signal } from '@angular/core';
+import { tipoPagoE } from './lista-pagos/pagos.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PagosService {
   constructor() {}
-  tipoPago;
 
-  public get isPagoFactura(): boolean {
-    return this.tipoPago == tipoPagoE.pagosFacturas;
-  }
+  tipoPago = signal<tipoPagoE>(tipoPagoE.recibosIngresos);
 
-  public get isReciboIngreso(): boolean {
-    return this.tipoPago == tipoPagoE.recibosIngresos;
-  }
+  isPagoFactura = computed(() => this.tipoPago() == tipoPagoE.pagosFacturas);
+  isReciboIngreso = computed(() => this.tipoPago() == tipoPagoE.recibosIngresos);
 }

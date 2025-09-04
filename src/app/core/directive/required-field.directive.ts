@@ -3,6 +3,7 @@ import { fun } from '../services/functions.service';
 
 @Directive({
   selector: '[requiredFieldLabel]',
+  standalone: false,
 })
 export class RequiredFieldDirective implements OnInit, OnChanges {
   @Input('requiredFieldLabel') show: boolean | string = true;

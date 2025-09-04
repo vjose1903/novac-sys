@@ -269,6 +269,7 @@ export const Permisos = {
     update: 'cotizacion_update',
     destroy: 'cotizacion_destroy',
   },
+<<<<<<< HEAD
   pagos_compras: {
     create: 'pagos_compras_create',
     read_all: 'pagos_compras_read_all',
@@ -391,5 +392,15 @@ export const Permisos = {
     update: 'cheque_update',
     anular_cheque: 'cheque_anular_cheque',
     get_filtrados: 'cheque_get_filtrados',
+=======
+  ecf_reception: {
+    read_all: 'ecf_reception_read_all',
+    read_one: 'ecf_reception_read_one',
+    response_receive: 'ecf_reception_response_receive',
+  },
+  commertial_approval_reception: {
+    read_all: 'commertial_approval_reception_read_all',
+    read_one: 'commertial_approval_reception_read_one',
+>>>>>>> dev
   },
 };

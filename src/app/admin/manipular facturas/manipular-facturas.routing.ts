@@ -2,15 +2,18 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { BuscarFacturaComponent } from './buscar-factura/buscar-factura.component';
 import { NotasCredDebComponent } from './notas-cred-deb/notas-cred-deb.component';
+import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 
 const routes: Routes = [
   {
-    path: 'buscarFactura/:para',
+    path: 'buscarFactura/:buscarPara',
     component: BuscarFacturaComponent,
+    canDeactivate: [CanDeactivateGuard],
   },
   {
-    path: 'nota/:tipo/:ids',
+    path: 'nota/:tipoNota/:id_factura/:serie',
     component: NotasCredDebComponent,
+    canDeactivate: [CanDeactivateGuard],
   },
 ];
 

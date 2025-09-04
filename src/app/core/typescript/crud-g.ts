@@ -2,6 +2,8 @@ import { MetodoHttp } from './../../../../electron/shared-electron-angular';
 import { Observable, lastValueFrom } from 'rxjs';
 import { Ss } from '../services/singleton.service';
 import * as _ from 'lodash';
+import { Environment } from '@environments/environment';
+import { ConfigI } from '../interface/config-interface';
 import { fun } from '../services/functions.service';
 import { getUrlInUse } from './url-server.utils';
 
@@ -29,15 +31,11 @@ export class CrudG<T> {
 
   async getAll(arg?: requestParameters, tipo: 'backend' | 'externo' = 'backend'): Promise<responseModel<T>> {
     return new Promise<responseModel<T>>(async (resolve, reject) => {
-      try {
-        const url = this.makeUrl(tipo, arg);
+      let url = this.makeUrl(tipo, arg);
 
-        const response = await lastValueFrom(this.request(url, 'get', null, tipo, arg?.requestParams));
+      const response = await lastValueFrom(this.request(url, 'get', null, tipo, arg?.requestParams));
 
-        resolve(response as responseModel<T>);
-      } catch (error) {
-        reject(error);
-      }
+      resolve(response as responseModel<T>);
     });
   }
 
@@ -57,13 +55,13 @@ export class CrudG<T> {
 
       if (fun.objHas(data, 'id') && data.id !== 0) {
         this.updateOne(data, arg, tipo).then(
-          (res) => resolve(res),
-          (err) => reject(err),
+          res => resolve(res),
+          err => reject(err)
         );
       } else {
         this.createOne(data, arg, tipo).then(
-          (res) => resolve(res),
-          (err) => reject(err),
+          res => resolve(res),
+          err => reject(err)
         );
       }
     });
@@ -81,34 +79,26 @@ export class CrudG<T> {
   }
 
   private parseParams(arg) {
-    let parameters = '';
+    if (!arg || Object.keys(arg).length === 0) return '';
+
+    const params = new URLSearchParams();
 
     for (const key in arg) {
       if (Object.prototype.hasOwnProperty.call(arg, key)) {
         const value = arg[key];
 
-        if (parameters.length == 0) parameters += '?';
-
         if (fun.hasValue(value)) {
-          if (typeof value == 'object') {
-            if (parameters != '?') parameters += '&';
-            parameters += `${key}={`;
-            let inner_object = '';
-            for (const inner_key in value) {
-              const inner_value = value[inner_key];
-
-              if (inner_object.length > 0) inner_object += ',';
-              parameters += `${inner_key}:${inner_value}`;
-            }
-            parameters += `}`;
+          if (typeof value === 'object') {
+            // Para objetos, los convertimos a JSON string
+            params.append(key, JSON.stringify(value));
           } else {
-            if (parameters != '?') parameters += '&';
-            parameters += `${key}=${value}`;
+            params.append(key, value.toString());
           }
         }
       }
     }
-    return parameters;
+
+    return `?${params.toString()}`;
   }
 
   private makeUrl(tipo, args?, id = null) {

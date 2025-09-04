@@ -1,0 +1,210 @@
+<<<<<<< HEAD:src/app/core/services/pdf/pdf.service.ts
+import { ConfigService } from './../configuration.service';
+import { Injectable } from '@angular/core';
+import * as _ from 'lodash';
+const pdfMake = require('pdfmake/build/pdfmake.js');
+const pdfFonts = require('pdfmake/build/vfs_fonts.js');
+
+=======
+>>>>>>> dev:src/app/core/services/reports/pdf/pdf.service.ts
+import * as _8_5x5_5 from './8.5x5.5/makePDF';
+import * as roll80mm from './80mm_roll/makePDF';
+import * as facturasCompraVenta from './facturasCompraVenta';
+import * as facturasCompraVentaElectronica from './facturasCompraVentaElectronica';
+import * as cuadreCaja from './cuadreCaja';
+import * as reportes from './reportes';
+<<<<<<< HEAD:src/app/core/services/pdf/pdf.service.ts
+import { Ss } from '../singleton.service';
+import { MessageTask } from '../../typescript/message-task';
+import { KEYWORD_ELECTRON_PRINT_BASE64 } from '../../../../../electron/shared-electron-angular';
+import { fun } from '../functions.service';
+=======
+import { Ss } from '../../singleton.service';
+import { MessageTask } from '../../../models/message-task';
+import { ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
+import { ConfigI } from '../../../interface/config-interface';
+import { fun } from '../../functions.service';
+import { Injectable } from '@angular/core';
+
+import { vfs } from '../utils/vfs_fonts';
+import { fonts } from '../utils/pdfFonts';
+import { serie } from '@core/typescript/constantes';
+const pdfMake = require('pdfmake/build/pdfmake');
+>>>>>>> dev:src/app/core/services/reports/pdf/pdf.service.ts
+
+@Injectable({ providedIn: 'root' })
+export class PdfService {
+  constructor() {}
+
+  static generatePdf(params: { oPdf: { data: any; type?: any }; imprimir: boolean; isMostrar?: boolean }): any {
+    return new Promise((resolve, reject) => {
+      let obj;
+      let todo_true = true;
+      const data = fun.deepCloning(params.oPdf.data);
+      const type_oPdf = params.oPdf.type;
+      const reimprimir = params.oPdf.data.reimprimir ? true : false;
+<<<<<<< HEAD:src/app/core/services/pdf/pdf.service.ts
+=======
+      const config: ConfigI = Ss.configServ.config;
+>>>>>>> dev:src/app/core/services/reports/pdf/pdf.service.ts
+
+      let options;
+      let printer_selected = ConfigService.config.printer_selected[type_oPdf];
+
+      data['reimprimir'] = reimprimir;
+
+      data.fecha = fun.hasValue(data.fecha_equivalente) ? data.fecha_equivalente : data.fecha;
+<<<<<<< HEAD:src/app/core/services/pdf/pdf.service.ts
+      options = { '80mm_roll': roll80mm, '8.5x5.5': _8_5x5_5, '8.5x11': _8_5x5_5 };
+=======
+>>>>>>> dev:src/app/core/services/reports/pdf/pdf.service.ts
+
+      try {
+        switch (type_oPdf) {
+          case 'recibo_ingreso':
+            obj = options[ConfigService.config.pages_sizes.recibo_ingreso].makePDF(data, 'reciboI.pdf', 'recibo_ingreso');
+            break;
+
+          case 'pago_factura':
+            obj = options[ConfigService.config.pages_sizes.pago_factura].makePDF(data, 'pagoFactura.pdf', 'pago_factura');
+            break;
+
+          case 'conduce':
+            obj = options[ConfigService.config.pages_sizes.conduce].makePDF(data, 'conduce.pdf', 'conduce');
+            break;
+
+          case 'nota':
+            const tipo_pdf = `_${ConfigService.config.plantillas_impresion['nota'].toLowerCase()}`;
+
+<<<<<<< HEAD:src/app/core/services/pdf/pdf.service.ts
+            obj = options[ConfigService.config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
+=======
+            let tipo_pdf = ``;
+
+            if (data.serie == serie.electronica) tipo_pdf = '_electronica';
+
+            obj = options[config.pages_sizes.nota].makePDF(data, 'nota.pdf', 'notas', tipo_pdf);
+>>>>>>> dev:src/app/core/services/reports/pdf/pdf.service.ts
+            break;
+
+          case 'facturacion':
+            const file_maker = data.serie == serie.electronica ? facturasCompraVentaElectronica : facturasCompraVenta;
+
+            options = { '80mm_roll': roll80mm, '8.5x5.5': file_maker, '8.5x11': file_maker };
+            const tipo_documento = this.getFacturacionType(data);
+            printer_selected = ConfigService.config.printer_selected[tipo_documento];
+
+            obj = options[ConfigService.config.pages_sizes[tipo_documento]].makePDF(data, 'factura.pdf', 'ventas', params.isMostrar);
+            break;
+
+          case 'cotizacion':
+            obj = options[ConfigService.config.pages_sizes.cotizacion].makePDF(data, 'cotizacion.pdf', 'cotizacion');
+            break;
+
+          case 'pre_venta':
+            obj = options[ConfigService.config.pages_sizes.pre_venta].makePDF(data, 'pre-venta.pdf', 'pre_venta');
+            break;
+
+          case 'cuadre_caja':
+            options = { '80mm_roll': roll80mm, '8.5x5.5': cuadreCaja, '8.5x11': cuadreCaja };
+
+            obj = options[ConfigService.config.pages_sizes.cuadre_caja].makePDF(data, 'cuadre.pdf', 'cuadre_caja');
+            break;
+
+          case 'reporte':
+            obj = reportes.makeReporte(data);
+            break;
+
+          default:
+            todo_true = false;
+            break;
+        }
+
+        if (todo_true) {
+          this.createPdfFromBase64(obj.doc, obj.file, reimprimir)
+            .then(res => {
+              res['pageOrientation'] = obj.pageOrientation;
+              if (params.imprimir) {
+                this.imprimirBase64({ base64: res.base64, file: res.file, type: type_oPdf, printer: printer_selected, pageOrientation: res['pageOrientation'] })
+                  .then(res_impresion => resolve(res_impresion))
+                  .catch(err_impresion => reject(err_impresion));
+              } else {
+                resolve(res);
+              }
+            })
+            .catch(err => reject(err));
+        } else {
+          const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
+          fun.toastError('Error generando el pdf.', 'ERROR');
+          resolve(respuesta);
+        }
+      } catch (error) {
+        console.error('error ', error);
+
+        const respuesta = this.makeStatusObj({ msg: 'ERROR en el switch de tipos de pdf.', status: 'no', body: error });
+
+        fun.toastError('ERROR en el switch de tipos de pdf.', 'ERROR');
+        reject(respuesta);
+      }
+    });
+  }
+
+  static createPdfFromBase64(docDefinition: any, file_: string, reimprimir_: boolean): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      try {
+        pdfMake.vfs = vfs;
+        pdfMake.fonts = fonts;
+
+        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+        pdfDocGenerator.getBase64((data: string) => {
+          const respuesta = this.makeStatusObj({
+            msg: 'Pdf Base64 correcto',
+            file: file_,
+            status: 'si',
+            reimprimir: reimprimir_,
+            base64: data,
+            dd: docDefinition,
+          });
+
+          resolve(respuesta);
+        });
+      } catch (error) {
+        console.error('Error en createPdfFromBase64:', error);
+        const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no', body: error });
+        reject(respuesta);
+      }
+    });
+  }
+
+  static async imprimirBase64(oBase: { base64: string; file: string; type: string; printer: string; pageOrientation: string }): Promise<any> {
+    try {
+      const task = new MessageTask(ELECTRON_PRINT_BASE64, oBase);
+      const res = await Ss._ipc.sendTask(task);
+
+      res['pageOrientation'] = oBase.pageOrientation;
+      return res;
+    } catch (error) {
+      console.error('Error en imprimirBase64:', error);
+      throw error;
+    }
+  }
+
+  static makeStatusObj(oStatus) {
+    const obj = {};
+
+    if (oStatus.msg) obj['msg'] = oStatus.msg;
+    if (oStatus.file) obj['file'] = oStatus.file;
+    if (oStatus.status) obj['status'] = oStatus.status;
+    if (oStatus.reimprimir) obj['reimprimir'] = oStatus.reimprimir;
+    if (oStatus.base64) obj['base64'] = oStatus.base64;
+    if (oStatus.base64) obj['sBase64'] = JSON.stringify(oStatus.base64);
+    if (oStatus.dd) obj['dd'] = oStatus.dd;
+    if (oStatus.dd) obj['sDd'] = JSON.stringify(oStatus.dd);
+
+    return obj;
+  }
+
+  static getFacturacionType(data) {
+    return data.tipo == 'venta' ? (data.condicion == 'Crédito' ? 'venta_credito' : 'venta_contado') : 'compra';
+  }
+}

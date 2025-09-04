@@ -1,0 +1,254 @@
+export enum tableCellType {
+  inputSwitch = 'inputSwitch',
+  index = 'index',
+  cantidades = 'cantidades',
+  img = 'img',
+  icon = 'icon',
+  quantityTooltip = 'quantityTooltip',
+  tag = 'tag',
+  color = 'color',
+  switch = 'switch',
+  dropDown = 'dropDown',
+  input = 'input',
+  text = 'text',
+  formatoNumero = 'formatoNumero',
+  textList = 'textList',
+  date = 'date',
+  none = 'none',
+}
+
+export type tableRowType = 'inputSwitch' | 'index' | 'quantityTooltip' | 'img' | 'icon' | 'tag' | 'color' | 'switch' | 'dropDown' | 'input' | 'text' | 'tag' | 'formatoNumero' | 'textList' | 'date' | 'none';
+
+export interface table_info {
+  id?: string;
+  titulo?: string;
+  titulo_sm?: string;
+  key?: string;
+  dropdown_key?: string;
+  tachado?: boolean;
+  acepta_negativos?: boolean;
+  puntosSuspensivos?: boolean;
+  tipo?: tableRowType | tableCellType;
+  tag_severity?: string;
+  remplace?: any;
+  data?: any;
+  placeholder?: string;
+  optionLabel?: any;
+  optionValue?: any;
+  estilos?: Array<any>;
+  style?: any;
+  select_all?: boolean;
+  alert_msg?: string;
+  lineClamp?: number;
+  checkNumber?: boolean;
+  can_reset?: boolean;
+  inputType?: string;
+  interactWithMouse?: boolean;
+  inputEvents?: string;
+  textAlign?: 'start' | 'center' | 'end';
+  tooltip?: string;
+  column_gap?: string;
+  rowTooltip?: string;
+  alerta?: boolean;
+  tag_color?: string;
+  row_tag_color?: string;
+  tag_apretada?: boolean;
+  include_hour?: boolean;
+  con_hora?: boolean;
+  capitalice?: boolean;
+  disable?: any;
+  color?: string;
+  text_color?: string;
+  dateFormat?: any;
+  rowTransform?: RowTransformI;
+  hours?: any;
+  imgStyle?: 'circular' | 'cuadrada';
+  rowImgStyle?: 'circular' | 'cuadrada';
+  src?: any;
+  alt?: any;
+  rowAlt?: any;
+  click?: Function;
+  iconsArray?: Array<iconsI>;
+  key_value?: string;
+  div_class?: string;
+  sort?: sortInfo;
+}
+
+export interface RowTransformI {
+  component: (rowData: any) => any;
+  inputs?: any;
+}
+
+export enum transformType {
+  text = 'text',
+  number = 'number',
+  date = 'date',
+  boolean = 'boolean',
+}
+
+interface sortInfo {
+  key: string;
+  order: 'asc' | 'desc' | null;
+}
+interface keySourceArray {
+  value: any;
+  clase: string;
+}
+
+interface keySource {
+  key: string;
+  source: string;
+  clases: Array<keySourceArray>;
+}
+
+interface iconsI {
+  id?: string | number;
+  key: string | keySource;
+  rowTooltip?: string;
+  tooltip?: string;
+  style?: any;
+  text_color?: string;
+  showCondition?: Array<any>;
+  editing_buttons?: boolean;
+  one_per_row?: boolean;
+  table_component_function?: Function;
+  disable?: Array<iconDisableItem>;
+}
+
+export interface iconDisableItem {
+  kind?: 'always' | 'selected' | 'has_value' | 'campo' | 'compare';
+  target?: string;
+  value?: Array<any>;
+  type?: 'equal' | 'notEqual';
+  transform?: transformType;
+  global?: boolean;
+}
+export interface paginateI {
+  show?: boolean;
+  showTotal?: boolean;
+  showDropDown?: boolean;
+  showPaginator?: boolean;
+  page?: number;
+  page_front?: number;
+  ant_page?: number;
+  per_page?: number;
+  per_page_options?: Array<number>;
+  search?: string;
+  key?: string;
+  is_local?: boolean;
+}
+
+export interface btnTableI {
+  btnId?: string;
+  show: boolean;
+  name?: string;
+  tooltip?: string;
+  tooltipKey?: string;
+  permiso?: string | string[];
+  icon?: string;
+}
+
+export interface botonesTableI {
+  dinamico?: Array<btnTableI>;
+  borrar?: btnTableI;
+  editar?: btnTableI;
+  mostrar?: btnTableI;
+  styles?: any;
+}
+
+interface padreFunctionsI {
+  handleBtnsDinamic?: Function;
+  data_request?: Function;
+}
+interface filtarI {
+  show?: boolean;
+  local?: boolean;
+}
+
+export interface table_config {
+  track_key?: string;
+  focusSearchInput?: boolean;
+  info?: Array<table_info>;
+  padding?: string;
+  padre_functions?: padreFunctionsI;
+  colores?: Boolean;
+  redondo?: Boolean;
+  colorTitulo?: Boolean;
+  read?: Boolean;
+  focusRow?: Boolean;
+  extraCalculo?: Number;
+  filtrar?: filtarI;
+  localFilter?: Boolean;
+  filterTargets?: any;
+  id?: String;
+  id_tabla?: String;
+  data_request?: any;
+  table_size?: 'sm' | 'md' | 'lg';
+  backgroundColor?: any;
+  total_count?: any;
+  obj_paginate?: paginateI;
+  botones?: botonesTableI;
+  noDataMessage?: string;
+}
+
+export const default_per_page = [10, 15, 20, 30, 50, 100];
+
+export enum medidas {
+  Libra = 'Libras',
+  Quintal = 'Quintales',
+  Caja = 'Cajas',
+  Paquete = 'Paquetes',
+  Unidad = 'Unidades',
+  Saco = 'Sacos',
+  Galon = 'Galones',
+  Onza = 'Onzas',
+  Producto = 'Productos',
+  Bolsa = 'Bolsas',
+}
+
+export const rowDataDividerKey = 'rowDivider';
+
+export class TablaClass {
+  handle_table_events(event) {
+    switch (event.type) {
+      case 'click_action':
+        this.tableClick_action(event.info);
+        break;
+
+      case 'clickRow':
+        this.tableClickRow(event.info);
+        break;
+
+      case 'clickIcon':
+        this.tableClickIcon(event.info);
+        break;
+
+      case 'inputChange':
+        this.tableInputChange(event.info);
+        break;
+
+      case 'inputBlur':
+        this.tableInputBlur(event.info);
+        break;
+
+      case 'inputFocus':
+        this.tableInputFocus(event.info);
+        break;
+
+      case 'paginatorChange':
+        this.tablePaginatorChange(event.info);
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  tableClick_action(arg) {}
+  tableClickRow(arg) {}
+  tableClickIcon(arg) {}
+  tableInputChange(arg) {}
+  tableInputBlur(arg) {}
+  tableInputFocus(arg) {}
+  tablePaginatorChange(arg) {}
+}

@@ -1,25 +1,31 @@
-import { ModalService } from './../../../components/modal/modal.service';
-import { HtmlElementsService } from './../../../../core/services/html-elements.service';
-import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { tableCellType, table_config } from './../../../components/new_tablas/tabla-class';
-import { fun } from './../../../../core/services/functions.service';
-import { ModalI, ModalComponentI } from './../../../components/modal/modal-class';
-import { Component, DoCheck, OnInit, inject } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { default_per_page, table_config, tableCellType } from '@components/new_tablas/tabla-class';
+import { fun } from '@core/services/functions.service';
+import { Component, DoCheck, Input, OnInit, inject } from '@angular/core';
 import * as _ from 'lodash';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
-
+import { UntypedFormBuilder } from '@angular/forms';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { DetalleFactura } from '@admin/facturacion/factura';
 
 @Component({
   selector: 'app-retornar-devuelto',
   templateUrl: './retornar-devuelto.component.html',
   styleUrls: ['./retornar-devuelto.component.scss'],
+  standalone: false,
 })
-export class RetornarDevueltoComponent extends MixinClass implements OnInit, ModalI, DoCheck {
-  constructor(private fb: UntypedFormBuilder, public mServ: ModalService) {
-    super();
-  }
-  modalComponent: ModalComponentI = {};
-  inputs: any;
+export class RetornarDevueltoComponent extends MixinClass implements OnInit, IDynamicModal, DoCheck {
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
+  @Input() data: DetalleFactura;
+  @Input() articulo_defectuoso: DetalleFactura;
+  @Input() articulo_solo_devuelto: DetalleFactura;
+  @Input() tipo: string;
+  @Input() is_articulo_selected: boolean;
+  @Input() nombre: string;
+  @Input() devueltos_list: DetalleFactura[];
 
   form;
   fun = fun;
@@ -33,7 +39,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     colores: true,
     id_tabla: 'retornar_articulo',
     filtrar: { show: false, local: true },
-    obj_paginate: { show: true, showTotal: false, showDropDown: false, per_page: 9999, is_local: true },
+    obj_paginate: { show: true, showTotal: false, showDropDown: false, page: 1, per_page: 9999, per_page_options: default_per_page, search: ' ', is_local: true },
   };
 
   articuloSelected;
@@ -41,6 +47,11 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   tablaComponent;
 
   htmlServ = inject(HtmlElementsService);
+  private fb = inject(UntypedFormBuilder);
+
+  constructor() {
+    super();
+  }
 
   ngOnInit() {
     this.createForm();
@@ -60,11 +71,13 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     this.form.controls[currentControl].enable();
 
     const currentKey = currentControl == 'defectuoso' ? 'articulo_defectuoso' : 'articulo_solo_devuelto';
-    this.inputs['articulo_solo_devuelto'] = null;
-    this.inputs['articulo_defectuoso'] = null;
+    this.articulo_solo_devuelto = null;
+    this.articulo_defectuoso = null;
 
-    this.inputs[currentKey] = fun.deepCloning(event.data);
-    this.inputs['data'] = fun.deepCloning(event.data.producto_origin);
+    if (currentKey == 'articulo_defectuoso') this.articulo_defectuoso = fun.deepCloning(event.data);
+    else if (currentKey == 'articulo_solo_devuelto') this.articulo_solo_devuelto = fun.deepCloning(event.data);
+
+    this.data = fun.deepCloning(event.data.producto_initial);
 
     this.enfocarInitInput();
   }
@@ -72,11 +85,11 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   enfocarInitInput() {
     let input_enfocar;
 
-    if (fun.hasValue(this.inputs?.data) || fun.hasValue(this.inputs?.articulo_solo_devuelto) || fun.hasValue(this.inputs?.articulo_defectuoso)) {
-      if (this.inputs?.data?.is_devuelto) {
+    if (fun.hasValue(this.data) || fun.hasValue(this.articulo_solo_devuelto) || fun.hasValue(this.articulo_defectuoso)) {
+      if (this.data?.is_devuelto) {
         input_enfocar = 'devuelto';
       } else {
-        if (fun.hasValue(this.inputs?.articulo_solo_devuelto?.cantidad)) {
+        if (fun.hasValue(this.articulo_solo_devuelto?.cantidad)) {
           input_enfocar = 'solo_devuelto';
         } else {
           input_enfocar = 'defectuoso';
@@ -90,16 +103,16 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   createForm() {
     this.form = this.fb.group({
       devuelto: [{ value: null, disabled: false }],
-      solo_devuelto: [{ value: null, disabled: fun.isEmpty(this.inputs?.articulo_solo_devuelto?.cantidad) }],
-      defectuoso: [{ value: null, disabled: fun.isEmpty(this.inputs?.articulo_defectuoso?.cantidad) }],
+      solo_devuelto: [{ value: null, disabled: fun.isEmpty(this.articulo_solo_devuelto?.cantidad) }],
+      defectuoso: [{ value: null, disabled: fun.isEmpty(this.articulo_defectuoso?.cantidad) }],
     });
   }
 
   saltar(sali_de) {
     if (this.checkCantidad(sali_de)) {
-      let nextFunction = this.btn_aceptar.bind(this);
+      let nextFunction = this.submit.bind(this);
 
-      if (sali_de == 'solo_devuelto' && fun.hasValue(this.inputs?.articulo_defectuoso?.cantidad)) {
+      if (sali_de == 'solo_devuelto' && fun.hasValue(this.articulo_defectuoso?.cantidad)) {
         fun.enfocarAndSelectInput('defectuoso');
         nextFunction = undefined;
       }
@@ -109,13 +122,12 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
   }
 
   btnAceptarIsDisabled() {
-    const modal = this.mServ.findModalConfigById(this.modalComponent.id);
+    const aceptar_btn = this.modalConfig.botones.find(btn => btn.id == 'btn_aceptar');
 
-    const aceptar_btn = modal.botones.aceptar;
     const formulario = this.form.getRawValue();
     const valores = [formulario.solo_devuelto, formulario.defectuoso, formulario.devuelto];
 
-    aceptar_btn.disable = _.every(valores, (valor) => fun.isEmpty(valor) || valor == 0);
+    aceptar_btn.disable = _.every(valores, valor => fun.isEmpty(valor) || valor == 0);
     return aceptar_btn.disable;
   }
 
@@ -135,7 +147,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
       todo_bien = false;
     }
 
-    const entidades = { solo_devuelto: this.inputs.articulo_solo_devuelto?.cantidad || 0, defectuoso: this.inputs.articulo_defectuoso?.cantidad || 0, devuelto: this.inputs?.data?.cantidad || 0 };
+    const entidades = { solo_devuelto: this.articulo_solo_devuelto?.cantidad || 0, defectuoso: this.articulo_defectuoso?.cantidad || 0, devuelto: this.data?.cantidad || 0 };
 
     if (formulario[tipo] > entidades[tipo]) {
       fun.toastWarning('La cantidad no puede ser mayor a la cantidad devuelta.');
@@ -146,24 +158,24 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, Mod
     return todo_bien;
   }
 
-  btn_aceptar() {
+  submit() {
     if (this.btnAceptarIsDisabled()) {
       fun.toastError('Complete los campos para retornar el articulo.', 'ERROR');
       return;
     }
 
-    const dataToReturn = { key: this.inputs.data.key, modalId: this.modalComponent.id };
+    const obj = { key: this.data.key };
     const informacion_retornar = this.form.getRawValue();
 
-    dataToReturn['data'] = {
-      solo_devuelto: { key: this.inputs.articulo_solo_devuelto?.key, cantidad: informacion_retornar.solo_devuelto, origin: this.inputs?.articulo_solo_devuelto?.producto_origin },
-      defectuoso: { key: this.inputs.articulo_defectuoso?.key, cantidad: informacion_retornar.defectuoso, origin: this.inputs?.articulo_defectuoso?.producto_origin },
+    obj['retorno'] = {
+      solo_devuelto: { key: this.articulo_solo_devuelto?.key, cantidad: informacion_retornar.solo_devuelto, origin: this.articulo_solo_devuelto?.producto_initial },
+      defectuoso: { key: this.articulo_defectuoso?.key, cantidad: informacion_retornar.defectuoso, origin: this.articulo_defectuoso?.producto_initial },
     };
 
-    if (this.inputs.data.is_devuelto) {
-      dataToReturn['data'][this.inputs.tipo] = { key: this.inputs.data?.key, cantidad: informacion_retornar.devuelto, origin: this.inputs?.data?.producto_origin };
+    if (this.data.is_devuelto) {
+      obj['retorno'][this.tipo] = { key: this.data?.key, cantidad: informacion_retornar.devuelto, origin: this.data?.producto_initial };
     }
 
-    this.modalComponent.closeModal(this.modalComponent.id, dataToReturn);
+    this.modalConfig.close(obj);
   }
 }

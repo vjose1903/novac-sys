@@ -1,4 +1,3 @@
-@import "../../assets/my_styles/global-font.scss";
 .home {
   background-color: var(--primary02);
   position: relative;
@@ -8,13 +7,32 @@
   justify-content: center;
   align-items: center;
 
+<<<<<<< HEAD
   .power-by-div {
+=======
+  .svg-background {
+    height: 100%;
+    width: 100%;
+  }
+
+  .card-login {
+    max-width: 25rem;
+    .version {
+      color: #b3b3b3;
+      font-size: 0.8rem;
+    }
+  }
+
+  .power-by-div {
+    cursor: default !important;
+    user-select: none;
+>>>>>>> dev
     position: absolute;
     bottom: 1rem;
     right: 1rem;
     display: flex;
-    justify-content: center;
     align-items: center;
+<<<<<<< HEAD
     column-gap: 0.3rem;
 
     .label {
@@ -40,4 +58,33 @@
 
 .formulario__label {
   font-family: $globalFont;
+=======
+
+    .label {
+      white-space: nowrap;
+    }
+
+    .inspot {
+      width: 7rem;
+      height: auto;
+    }
+  }
+
+  .machine-id {
+    position: absolute;
+    font-size: 0.7rem;
+    bottom: 1rem;
+    left: 1rem;
+    opacity: 0.5;
+    cursor: copy;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+
+    &:hover {
+      opacity: 1;
+      background-color: #0000002a;
+    }
+  }
+>>>>>>> dev
 }

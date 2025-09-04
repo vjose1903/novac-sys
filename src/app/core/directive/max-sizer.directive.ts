@@ -2,6 +2,7 @@ import { Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@ang
 
 @Directive({
   selector: '[maxSizer]',
+  standalone: false,
 })
 export class MaxSizerDirective implements OnInit, OnDestroy {
   @Input('maxSizer') type: maxSizeTypeE;

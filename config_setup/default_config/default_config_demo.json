@@ -1,0 +1,53 @@
+{
+  "id": "default",
+  "cliente": "demo",
+  "color_app": "blue",
+  "mode_app": "light",
+  "config_password": "SW4kcDB0Z3VAcmQVMj$pt30r=",
+  "direccion_empresa": "La Vega República Dominicana",
+  "logo_empresa": null,
+  "logo_impresion": null,
+  "nombre_empresa": "Inspot Technology",
+  "rnc_empresa": "000-00000-0",
+  "telefono_empresa": "(809) 879-0161",
+  "url_servidor": "https://8n3mw1zq-9093.use2.devtunnels.ms",
+  "url_servidor_respaldo": "https://8n3mw1zq-9093.use2.devtunnels.ms",
+  "usa_url_principal": true,
+  "has_contabilidad": true,
+  "is_db_local": false,
+  "calcular_itbis": true,
+  "is_produccion": false,
+  "facturacion_editar_precio": false,
+  "vende_sin_inventario": false,
+  "use_ecf": false,
+  "medida_producto_terminado": "Producto",
+  "serie_default": "normal",
+
+  "printer_selected": {
+    "venta_contado": "Ninguna",
+    "venta_credito": "Ninguna",
+    "pre_venta": "Ninguna",
+    "cotizacion": "Ninguna",
+    "compra": "Ninguna",
+    "recibo_ingreso": "Ninguna",
+    "conduce": "Ninguna",
+    "nota": "Ninguna",
+    "cuadre_caja": "Ninguna",
+    "reporte": "Ninguna"
+  },
+
+  "pages_sizes": {
+    "venta_contado": "8.5x5.5",
+    "venta_credito": "8.5x11",
+    "pre_venta": "8.5x5.5",
+    "cotizacion": "8.5x5.5",
+    "compra": "8.5x5.5",
+    "recibo_ingreso": "8.5x5.5",
+    "conduce": "8.5x5.5",
+    "nota": "8.5x5.5",
+    "cuadre_caja": "8.5x5.5",
+    "reporte": "8.5x11"
+  },
+
+  "documentos_a_imprimir": "conduce"
+}

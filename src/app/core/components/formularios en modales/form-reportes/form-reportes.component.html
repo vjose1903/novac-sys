@@ -1,0 +1,199 @@
+<form [formGroup]="form">
+  <div class="row">
+    <!-- ----- SIMPLE_SWITCH -----  -->
+    @if (verifyConditionalRender(reportField.simpleSwitchField) && dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) {
+      @for (dinamyc_switch of dynamic_switches; track dinamyc_switch.id) {
+        <div class="col-12 p-0">
+          <div class="form-group horizontal-layout">
+            <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
+            <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
+          </div>
+        </div>
+      }
+    }
+
+    <!-- ----- SERIE -----  -->
+    @if (verifyConditionalRender(reportField.serieField) && reportTypeHasfield(reportField.serieField)) {
+      <div class="col-12 p-0 mb-2">
+        <label class="control-label mb-0">Serie: <span style="color: red">*</span> </label>
+        <p-selectButton [options]="facturasSerieOptions" formControlName="serie" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+      </div>
+    }
+
+    <!-- ----- FECHA -----  -->
+    @if (verifyConditionalRender(reportField.dateField) && reportTypeHasfield(reportField.dateField)) {
+      <div class="col-12 p-0">
+        <div class="form-group">
+          <label class="control-label mb-0">Fecha: <span style="color: red">*</span> </label>
+          <p-datepicker inputId="fecha" formControlName="fecha" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+          @if (!form.controls['fecha'].valid && (form.controls['fecha'].dirty || form.controls['fecha'].touched)) {
+            <div class="alerta text-danger ms-1" style="font-size: 12px">Este campo es obligatorio</div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ----- DESDE -----  -->
+
+    @if (verifyConditionalRender(reportField.fromField) && reportTypeHasfield(reportField.fromField)) {
+      <div class="col-6 ps-0">
+        <div class="form-group">
+          <label class="control-label mb-0">Desde: <span style="color: red">*</span> </label>
+          <p-datepicker inputId="fecha_desde" formControlName="desde" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+          @if (!form.controls['desde'].valid && (form.controls['desde'].dirty || form.controls['desde'].touched)) {
+            <div class="alerta text-danger ms-1" style="font-size: 12px">Este campo es obligatorio</div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ----- HASTA -----  -->
+    @if (verifyConditionalRender(reportField.toDateField) && reportTypeHasfield(reportField.toDateField)) {
+      <div class="col-6 pe-0">
+        <div class="form-group">
+          <label class="control-label mb-0">Hasta: <span style="color: red">*</span> </label>
+          <p-datepicker inputId="fecha_hasta" formControlName="hasta" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+          @if (!form.controls['hasta'].valid && (form.controls['hasta'].dirty || form.controls['hasta'].touched)) {
+            <div class="alerta text-danger ms-1" style="font-size: 12px">Este campo es obligatorio</div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ----- DINAMYC SELECTION -----  -->
+
+    @if (verifyConditionalRender(reportField.dynamicSelection) && dinamycSelectionReady && reportTypeHasfield(reportField.dynamicSelection)) {
+      @for (dinamyc_selection of dynamic_selections; track dinamyc_selection.id) {
+        <div class="col-12 p-0">
+          <div class="form-group">
+            <label class="control-label mb-0">{{ dinamyc_selection.label }}: <span style="color: red">*</span> </label>
+            <p-select
+              [options]="dinamyc_selection.items"
+              [formControlName]="dinamyc_selection.formControl"
+              [placeholder]="dinamyc_selection.placeholder"
+              appendTo="body"
+              [filter]="true"
+              [optionLabel]="dinamyc_selection.optionLabel ?? null"
+              [optionValue]="dinamyc_selection.optionValue ?? null"
+              (onFilter)="dinamyc_selection.searchFunction($event.filter)"
+              [disabled]="dinamyc_selection.disabledFunction()"
+              [emptyFilterMessage]="dinamyc_selection.notFoundText"
+              [resetFilterOnHide]="true" />
+          </div>
+        </div>
+      }
+    }
+
+    <!-- ----- SELECCION DE CLIENTE -----  -->
+    @if (verifyConditionalRender(reportField.customerField) && reportTypeHasfield(reportField.customerField)) {
+      <div class="col-12 p-0">
+        <div class="form-group">
+          <label class="control-label mb-0">Seleccione cliente: <span style="color: red">*</span> </label>
+
+          <p-select
+            [options]="listaClientes"
+            formControlName="cliente_id"
+            placeholder="Ingrese el nombre del cliente"
+            [filter]="true"
+            appendTo="body"
+            optionLabel="nombre_completo"
+            optionValue="id"
+            (onFilter)="getClientes($event.filter)"
+            emptyFilterMessage="Cliente no encontrado"
+            [resetFilterOnHide]="true">
+            <ng-template let-cliente pTemplate="item">
+              <div class="">
+                <span class="d-flex gap-2 w-100" style="font-size: 1rem"> <strong>Nombre: </strong> {{ cliente.nombre_completo }} </span>
+                <span class="d-flex gap-2 w-100 no-wrap" style="font-size: 0.8rem; color: #00000054"> <strong>documento de identidad: </strong> {{ cliente.documento_identidad }} </span>
+              </div>
+            </ng-template>
+          </p-select>
+        </div>
+      </div>
+    }
+
+    <!-- ----- CONDICION -----  -->
+    @if (verifyConditionalRender(reportField.conditionField) && reportTypeHasfield(reportField.conditionField)) {
+      <div class="col-12 p-0">
+        <div class="form-group">
+          <label class="control-label mb-0">Condicion: <span style="color: red">*</span> </label>
+          <select formControlName="condicion" class="form-control">
+            <option disabled>Seleccione</option>
+            @for (condicion of condiciones; track condicion.id) {
+              <option [value]="condicion.id">{{ condicion.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
+
+    <!-- ----- TIPO -----  -->
+    @if (verifyConditionalRender(reportField.typeField) && reportTypeHasfield(reportField.typeField)) {
+      <div class="col-12 p-0">
+        <div class="form-group">
+          <label class="control-label mb-0">Tipo: <span style="color: red">*</span> </label>
+          <select formControlName="tipo" class="form-control" (change)="changeTipo()">
+            <option disabled>Seleccione</option>
+            @for (tipo of tipos; track tipo) {
+              <option [value]="tipo.id">{{ tipo.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
+
+    <!-- ----- TIPO FACTURAS -----  -->
+    @if (verifyConditionalRender(reportField.billTypeField) && reportTypeHasfield(reportField.billTypeField)) {
+      <div class="col-12 p-0">
+        <div class="form-group">
+          <label class="control-label mb-0">Tipo de factura: <span style="color: red">*</span> </label>
+          <select formControlName="tipo_factura_id" class="form-control">
+            <option disabled>Seleccione</option>
+            @for (tipo of tipos_facturas; track tipo) {
+              <option [value]="tipo.id">{{ tipo.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
+
+    <!-- ----- SELECCION DE ARTICULO -----  -->
+    @if (verifyConditionalRender(reportField.articuloField) && reportTypeHasfield(reportField.articuloField)) {
+      <div class="col-12 p-0">
+        <div class="form-group">
+          <label class="control-label mb-0">Seleccione articulo: <span style="color: red">*</span> </label>
+
+          <p-select
+            [options]="listaArticulos"
+            formControlName="articulo_id"
+            placeholder="Ingrese el nombre de un articulo"
+            [filter]="true"
+            optionLabel="nombre"
+            optionValue="id"
+            (onFilter)="getArticulos($event.filter)"
+            emptyFilterMessage="Articulo no encontrado"
+            [resetFilterOnHide]="true"
+            appendTo="body" />
+        </div>
+      </div>
+    }
+  </div>
+</form>
+
+@if (switchGroup) {
+  <div>
+    <div class="form-group">
+      @if (switchGroup && switchGroup?.title && fun.hasValue(switchGroup.title)) {
+        <label class="control-label">{{ switchGroup.title }} </label>
+      }
+      <div>
+        @for (switch of switchGroup.array; track switch) {
+          <div class="form-group mb-2 horizontal-layout">
+            <input [(ngModel)]="switch.value" class="apple-switch" type="checkbox" />
+            <span class="ms-2">{{ switch.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

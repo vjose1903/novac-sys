@@ -1,8 +1,16 @@
+<<<<<<< HEAD
+=======
+import { CommonModule } from '@angular/common';
+>>>>>>> dev
 import { Ss } from './../../../core/services/singleton.service';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'svg-background',
+<<<<<<< HEAD
+=======
+  imports: [CommonModule],
+>>>>>>> dev
   templateUrl: './svg-background.component.html',
   styleUrls: ['./svg-background.component.scss'],
 })

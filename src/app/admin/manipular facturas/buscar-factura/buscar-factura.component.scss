@@ -5,9 +5,8 @@
   grid-template-areas:
     "titulo"
     "arriba"
-    "abajo"
-    "footer";
-  grid-template-rows: min-content min-content auto min-content;
+    "abajo";
+  grid-template-rows: min-content min-content auto;
 
   .titulo {
     grid-area: titulo;
@@ -26,18 +25,12 @@
       }
     }
   }
-  .footer {
-    grid-area: footer;
-    width: min-content;
-    justify-self: end;
-    margin-right: 15px !important;
-  }
 }
 
 ::ng-deep .sideFact {
-  z-index: 99999 !important;
+  z-index: 999 !important;
 
-  .p-sidebar-content {
+  .p-drawer-content {
     height: 100%;
   }
 }

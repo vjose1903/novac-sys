@@ -1,3 +1,4 @@
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
 import { DateUtils } from './../../../core/typescript/date.utils';
 import { tipoPagoE } from './../../pagos/pagos-facturas/lista-pagos/pagos.config';
 import { tableCellType, table_info } from './../../components/new_tablas/tabla-class';
@@ -14,10 +15,31 @@ import { fun } from '../../../core/services/functions.service';
 import { table_config } from '../../components/new_tablas/tabla-class';
 import { FacturaC, FacturasI } from '../../facturacion/factura';
 
+=======
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { MovimientosC } from '@components/formularios en modales/movimientos-form/movimiento-model';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import * as _ from 'lodash';
+const moment = require('../../../core/javascript/moment');
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { EmpleadoC } from '@registros/registro-empleados/empleado';
+import { VehiculoC } from '@registros/registro-vehiculo/vehiculo';
+import { ReciboC } from '../recibos';
+import { FacturaC } from '../../facturacion/factura';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { UntypedFormBuilder } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Ss } from '@core/services/singleton.service';
+import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
 @Component({
   selector: 'app-recibo-viajes',
   templateUrl: './recibo-viajes.component.html',
   styleUrls: ['./recibo-viajes.component.scss'],
+  standalone: false,
 })
 export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestroy {
   @ViewChild('cardTabla') cardTabla: ElementRef;
@@ -29,31 +51,42 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         tipo: tableCellType.icon,
         key: 'estado',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '3%' }, { color: 'var(--transparente00)' }],
+        style: { width: '3%', color: 'var(--transparente00)', padding: '0.6rem 0rem' },
         iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
       },
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
       { titulo: 'Fecha Fact.', tipo: tableCellType.date, key: 'fecha_equivalente', estilos: [{ width: '13%' }] },
       { titulo: 'Cliente', tipo: tableCellType.text, key: 'cliente.nombre', estilos: [{ width: '40%' }] },
       { titulo: 'NCF', tipo: tableCellType.text, key: 'numero_comprobante', estilos: [{ width: '15%' }] },
       { titulo: 'Total facturado', tipo: tableCellType.formatoNumero, key: 'total_factura', estilos: [{ width: '20%' }] },
+=======
+      { titulo: 'Fecha Fact.', tipo: 'date', key: 'fecha_equivalente', style: { width: '13%' } },
+      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre_completo', style: { width: '40%' } },
+      { titulo: 'NCF', tipo: 'text', key: 'numero_comprobante', style: { width: '15%' } },
+      { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura', style: { width: '20%' } },
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
       {
         titulo: 'Acciones',
         tipo: tableCellType.icon,
         key: 'actions',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '7%' }],
+        style: { width: '7%' },
         iconsArray: [
           { key: 'ver', tooltip: 'Ver factura', text_color: 'colorNegro' },
           { key: 'make_recipt', rowTooltip: 'make_recipt_tooltip', disable: [{ kind: 'has_value', target: 'fecha_completada' }] },
         ],
       },
     ],
-    padre_functions: { data_request: (params) => this.getViajes(params) },
+    padre_functions: { data_request: params => this.getViajes(params) },
     padding: '0.5rem',
     filtrar: { local: false },
     colores: true,
     id_tabla: 'lista_viajes',
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
     obj_paginate: { show: true, showTotal: true, is_local: false },
+=======
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
   };
 
   config_viaje_selected: table_config = {
@@ -65,8 +98,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         tipo: tableCellType.icon,
         key: 'actions',
         div_class: 'd-flex justify-content-around',
-        estilos: [{ width: '7%' }],
-
+        style: { width: '7%' },
         iconsArray: [
           { key: 'editar_btn', one_per_row: true, editing_buttons: true, tooltip: 'Editar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
           { key: 'borrar_btn', tooltip: 'Borrar', showCondition: [{ kind: 'campo', target: 'is_editing', value: [false, null, undefined] }] },
@@ -110,22 +142,20 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   facturaClass = new FacturaC();
 
   htmlServ = inject(HtmlElementsService);
+  dynamicModalServ = inject(DynamicModalService);
+  tServ = inject(TablasService);
+  fb = inject(UntypedFormBuilder);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
 
   fun = fun;
-  constructor(private tServ: TablasService, private fb: UntypedFormBuilder, private route: ActivatedRoute, private router: Router) {
+  constructor() {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'recibos_viajes', is_routing: true });
     this.necesarioStart();
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   ngOnDestroy() {
@@ -145,11 +175,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   // }
 
   async checkRoute() {
-    this.getViajes(this.tServ.obj_paginate.default).then(async (result) => {
+    this.getViajes(this.tServ.obj_paginate.default).then(async result => {
       const id_documento = this.route.snapshot.params['id'];
 
       if (id_documento != '0') {
-        const factura = this.viajes.find((viaje) => viaje.id == id_documento);
+        const factura = this.viajes.find(viaje => viaje.id == id_documento);
 
         if (fun.isEmpty(factura)) {
           const inputSearch = document.getElementById('search-lista_viajes') as any;
@@ -167,6 +197,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   async getChoferes() {
     const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'chofer' } };
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
     this.userClass.getAll(extra).then((res) => {
       if (this.config_viaje_selected && this.config_viaje_selected.info) {
         const config: table_info | undefined = this.config_viaje_selected.info.find((config) => config.id == 'chofer');
@@ -175,12 +206,19 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           this.choferes = res['data'];
         }
       }
+=======
+    this.userClass.getAll(extra).then(res => {
+      const config = this.config_viaje_selected.info.find(config => config.id == 'chofer');
+      config.data = res['data'];
+      this.choferes = res['data'];
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
     });
-    setTimeout(() => {}, 500);
+    fun.setTimeout(() => {}, 500);
   }
 
   async getCamiones() {
     const extra = { afterPath: `filtro/ `, parameters: { paginado: false, info_vehiculo: true } };
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
     this.vehiculoClass.getAll(extra).then((res) => {
       if (this.config_viaje_selected && this.config_viaje_selected.info) {
         const config: table_info | undefined = this.config_viaje_selected.info.find((config) => config.id == 'camion');
@@ -189,8 +227,14 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           this.camiones = res['data'];
         }
       }
+=======
+    this.vehiculoClass.getAll(extra).then(res => {
+      const config = this.config_viaje_selected.info.find(config => config.id == 'camion');
+      config.data = res['data'];
+      this.camiones = res['data'];
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
     });
-    setTimeout(() => {}, 500);
+    fun.setTimeout(() => {}, 500);
   }
 
   async getViajes(params?: { per_page?: number; page?: number; search?: string }) {
@@ -205,8 +249,13 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         parameters: { page: params?.page, per_page: params?.per_page, paginado: true, movimientos_viaje: true, estado: true, palabra_a_buscar: palabra_a_buscar },
       });
 
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
       const fechaA = DateUtils.format({ dateFormat: 'YYYY-MM-DD' });
       res.data.forEach((viaje) => {
+=======
+      const fechaA = moment().format('YYYY-MM-DD');
+      res.data.forEach(viaje => {
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
         const pago_a_tiempo = viaje.condicion == 'Contado' ? true : viaje.fecha_vencimiento > fechaA ? true : false;
 
         viaje.is_active = viaje.fecha_completada ? 'fas fa-check' : viaje.recibos.length > 0 ? 'far fa-check-square' : 'far fa-square';
@@ -217,24 +266,23 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         viaje.make_recipt_tooltip = fun.hasValue(viaje.fecha_completada) ? 'Pedido completado' : 'Realizar recibo de ingreso';
 
         viaje.customStyles = {
-          estado: [
-            { key: 'estado', isTd: true, estilos: 'width: 3% !important; padding: 0.6rem 0rem !important' },
-            { key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' },
-          ],
-          fecha_equivalente: { width: '13%' },
-          'cliente.nombre': { width: '40%' },
-          numero_comprobante: { width: '15%' },
-          total_factura: { width: '20%' },
+          estado: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
+
           actions: [
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
             { key: 'actions', isTd: true, estilos: 'width: 7% !important' },
             { key: 'ver', estilos: 'font-size: 1.1rem !important' },
             { key: 'make_recipt', estilos: 'font-size: 1.1rem !important' },
+=======
+            { key: 'ver', estilos: 'font-size: 1rem !important' },
+            { key: 'make_recipt', estilos: 'font-size: 1rem !important' },
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
           ],
         };
 
         viaje['pago_a_tiempo'] = pago_a_tiempo;
 
-        viaje.movimientos_viaje.map((movimiento_viaje) => {
+        viaje.movimientos_viaje.map(movimiento_viaje => {
           this.parseMovimientosViaje(movimiento_viaje);
           return movimiento_viaje;
         });
@@ -244,10 +292,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
       this.viajes_cant = res.total_registros ? res.total_registros : 0;
 
-      this.viajes_completados_cant = this.viajes.filter((v) => fun.hasValue(v.fecha_completada)).length;
-      this.viajes_pendientes_cant = this.viajes.filter((v) => fun.isEmpty(v.fecha_completada)).length;
+      this.viajes_completados_cant = this.viajes.filter(v => fun.hasValue(v.fecha_completada)).length;
+      this.viajes_pendientes_cant = this.viajes.filter(v => fun.isEmpty(v.fecha_completada)).length;
 
-      setTimeout(() => {
+      fun.setTimeout(() => {
         this.viajes_cant_porciento = (this.viajes_completados_cant / this.viajes_cant) * 100;
         this.viajes_cant_porciento = fun.roundNumberToDecimal(this.viajes_cant_porciento);
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
@@ -282,16 +330,21 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     if (params.id_tabla == 'lista_viajes') {
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'ver') {
-          this.facturaClass.parseDataToPdf(params.data).then((dataFactura) => {
+          this.facturaClass.parseDataToPdf(params.data).then(dataFactura => {
             let botonesDinamicos = [
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
               { clase: 'btn btn-gris', function: (instance) => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
               { clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false as any },
+=======
+              { clase: 'btn btn-gris', function: instance => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+              { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false as any },
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
             ];
 
             const toPDFData = { data: dataFactura, type: 'facturacion' };
-            const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA' };
+            const dataModal = { id: 'mostrarFacturaIngreso', header: 'MOSTRAR FACTURA', show_estado: false };
 
-            this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos).then((obj_modal) => this.openNewModal(obj_modal));
+            this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos);
           });
         }
         if (params.iconKey == 'make_recipt') this.redirectToIngresos(params.data);
@@ -321,15 +374,15 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         if (fun.isEmpty(row_edited)) {
           is_completed = false;
         } else {
-          let index_row_en_turno = this.viaje_selected.movimientos_viaje.findIndex((movimiento) => movimiento.id == row_edited.id);
+          let index_row_en_turno = this.viaje_selected.movimientos_viaje.findIndex(movimiento => movimiento.id == row_edited.id);
 
           this.viaje_selected.movimientos_viaje[index_row_en_turno] = fun.deepCloning(row_edited);
 
-          const new_movimiento_viaje = this.viaje_selected.movimientos_viaje.map((movimiento) => {
+          const new_movimiento_viaje = this.viaje_selected.movimientos_viaje.map(movimiento => {
             return fun.pick(movimiento, ['vehiculo_id', 'user_id']);
           });
 
-          is_completed = new_movimiento_viaje.every((movimiento) => {
+          is_completed = new_movimiento_viaje.every(movimiento => {
             return fun.hasValue(movimiento?.user_id) && fun.hasValue(movimiento?.vehiculo_id);
           });
 
@@ -349,7 +402,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.removeMovimientoInfo(params.data);
     let data_update = fun.pick(this.viaje_selected, ['id', 'movimientos_viaje']);
 
-    data_update.movimientos_viaje = this.viaje_selected.movimientos_viaje.map((movimiento) => {
+    data_update.movimientos_viaje = this.viaje_selected.movimientos_viaje.map(movimiento => {
       return { vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id };
     });
 
@@ -369,10 +422,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       if (fun.isEmpty(data.user_id)) text = `Seguro que desea eliminar el movimiento realizado con el camión: <strong>${data.vehiculo.info_vehiculo}</strong>.`;
       if (fun.isEmpty(data.vehiculo_id)) text = `Seguro que desea eliminar el movimiento realizado por: <strong>${params.data.chofer.nombre_completo}</strong>.`;
 
-      const obj = {
+      this.dynamicModalServ.confirmationModal({
         id: 'delete_movimiento_viaje',
-        header: 'Confirmación',
         texto: text,
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
         siFunction: (instance) => {
           this.deleteMovimientoViaje(params);
           instance.dismissModal(instance.id);
@@ -380,17 +433,28 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
       };
 
       this.confirmationModal(obj);
+=======
+        btnKind: confirmationButtons.siNo,
+        onYes: () => this.deleteMovimientoViaje(params),
+      });
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
     }
   }
 
   sendUpdateMovimientos(data_update, row_edited?) {
     this.facturaClass
       .updateOne(data_update, { afterPath: `update/movimientos_viaje` })
-      .then((res_factura) => {
+      .then(res_factura => {
         if (fun.hasValue(row_edited)) {
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
           const viaje_modificado = this.viaje_selected.movimientos_viaje.find((movimiento) => movimiento.id == row_edited.id);
           const chofer = this.choferes.find((chofer) => chofer && chofer.id == row_edited.user_id);
           const vehiculo = this.camiones.find((camion) => camion.id == row_edited.vehiculo_id);
+=======
+          const viaje_modificado = this.viaje_selected.movimientos_viaje.find(movimiento => movimiento.id == row_edited.id);
+          const chofer = this.choferes.find(chofer => chofer.id == row_edited.user_id);
+          const vehiculo = this.camiones.find(camion => camion.id == row_edited.vehiculo_id);
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
 
           viaje_modificado.chofer = fun.deepCloning(chofer);
           viaje_modificado.user_id = chofer.id;
@@ -401,10 +465,11 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
           this.tServ.modifyRowsEditing(row_edited, 'remove');
         }
       })
-      .catch((error) => {});
+      .catch(error => {});
   }
 
   redirectToIngresos(factura) {
+<<<<<<< HEAD:src/app/admin/viajes/recibo-viajes/recibo-viajes.component.ts
     const obj = {
       id: 'move_to_ingresos',
       header: 'Confirmación',
@@ -413,14 +478,22 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         this.router.navigateByUrl(`/admin/pagos/${tipoPagoE.recibosIngresos}/${factura.cliente_id}/${factura.id}`);
         instance.dismissModal(instance.id);
       },
+=======
+    const onYes = () => {
+      this.router.navigateByUrl(`/admin/recibos/ingresos/${factura.cliente_id}/${factura.id}`);
+>>>>>>> dev:src/app/admin/recibos/recibo-viajes/recibo-viajes.component.ts
     };
 
-    this.confirmationModal(obj);
+    this.dynamicModalServ.confirmationModal({
+      id: 'move_to_ingresos',
+      texto: 'Seguro que desea dirigirse al modulo de recibos de ingreso para <strong>realizar el recibo de este pedido</strong>.',
+      btnKind: confirmationButtons.siNo,
+      onYes: () => onYes(),
+    });
   }
 
   verDetalles(data) {
-    const configModal = this.facturaClass.modalVerDetalles(data);
-    this.openNewModal(configModal);
+    this.facturaClass.modalVerDetalles(data);
   }
 
   abrir_historial() {
@@ -428,7 +501,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     const recibos = this.viaje_selected.recibos;
     const notas = this.viaje_selected.notas;
 
-    if (recibos.length || notas.length) this.facturaClass.abrirModalHistorial(pagos, notas, recibos, this.openNewModal, { showPagos: false });
+    if (recibos.length || notas.length) this.facturaClass.abrirModalHistorial({ pagos, notas, recibos, config: { showPagos: false } } );
   }
 
   addMovimiento() {
@@ -436,7 +509,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.parseMovimientosViaje(movimiento_viaje);
     this.viaje_selected.movimientos_viaje.push(movimiento_viaje);
 
-    setTimeout(() => this.tServ.modifyRowsEditing(movimiento_viaje, 'add'), 10);
+    fun.setTimeout(() => {
+      this.tServ.modifyRowsEditing(movimiento_viaje, 'add');
+    }, 10);
   }
 
   tableClickRow(event) {
@@ -451,9 +526,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
     this.ultimo_pago = fun.maxBy(this.viaje_selected.recibos, 'id');
 
-    const index_viaje = this.viajes.findIndex((viaje) => viaje.id == data.id);
+    const index_viaje = this.viajes.findIndex(viaje => viaje.id == data.id);
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       fun.scrollTo({ id: `row-lista_viajes-${this.tablaComponent.getIndex(index_viaje)}`, behavior: 'smooth', block: 'center', inline: 'center' });
     }, 500);
   }

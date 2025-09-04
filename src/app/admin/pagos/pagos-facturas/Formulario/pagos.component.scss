@@ -27,34 +27,48 @@
   .medio {
     grid-area: medio;
 
-    > .cardFacturas {
+    .cardFacturas {
       display: grid;
       grid-template-areas:
+<<<<<<< HEAD:src/app/admin/pagos/pagos-facturas/Formulario/pagos.component.scss
         'bonton_select_all'
+=======
+        'header'
+>>>>>>> dev:src/app/admin/recibos/recibo-ingresos/Formulario/ingresos.component.scss
         'divFantasma';
       grid-template-rows: min-content auto;
       height: 100%;
 
-      > .bonton_select_all {
-        grid-area: bonton_select_all;
+      .header {
+        grid-area: header;
         margin-top: 0.5rem;
         display: flex;
         justify-content: flex-end;
         align-items: center;
+        padding-right: 1rem;
 
-        > .btnSelect {
+        .more-pages {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #ffe500;
+          padding: 0.1rem 0.5rem;
+          border-radius: 8px;
+          cursor: copy;
+        }
+
+        .btnSelect {
           font-size: 1.5rem;
-          margin-right: 1rem;
           &:hover {
             cursor: pointer;
           }
         }
       }
-      > .divFantasma {
+      .divFantasma {
         grid-area: divFantasma;
         position: relative;
 
-        > .tablaIngresos {
+        .tablaIngresos {
           position: absolute;
           height: 100%;
           width: 100%;
@@ -71,7 +85,11 @@
   display: grid;
   height: 100%;
   grid-template-areas:
+<<<<<<< HEAD:src/app/admin/pagos/pagos-facturas/Formulario/pagos.component.scss
     'nombre_entidad'
+=======
+    'nombre_cliente'
+>>>>>>> dev:src/app/admin/recibos/recibo-ingresos/Formulario/ingresos.component.scss
     'cuerpo'
     'porcentaje';
   grid-template-rows: min-content auto min-content;

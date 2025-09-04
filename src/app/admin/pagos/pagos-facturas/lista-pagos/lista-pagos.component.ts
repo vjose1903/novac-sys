@@ -102,8 +102,8 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async necesarioStart() {
-    this.pagosService.tipoPago = this.route.snapshot.params['tipo'];
-    this.table_config.info = tableConfigPagos[this.pagosService.tipoPago];
+    this.pagosService.tipoPago.set(this.route.snapshot.params['tipo'] as tipoPagoE);
+    this.table_config.info = tableConfigPagos[this.pagosService.tipoPago()];
     await this.getPagos(this.tServ.obj_paginate.default);
   }
 
@@ -115,7 +115,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
 
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
-      classToQuery[this.pagosService.tipoPago].getAll(extra).then((res) => {
+      classToQuery[this.pagosService.tipoPago()].getAll(extra).then((res) => {
         res['data'] = this.mapeoPagos(res['data']);
         this.lista_pagos = fun.deepCloning(res['data']);
 
@@ -125,7 +125,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   navegar() {
-    this.router.navigateByUrl(`/admin/pagos/${this.pagosService.tipoPago}/0/0`);
+    this.router.navigateByUrl(`/admin/pagos/${this.pagosService.tipoPago()}/0/0`);
   }
 
   tableClickIcon(event) {
@@ -161,8 +161,8 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
 
     const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
-    classToQuery[this.pagosService.tipoPago].parseDataToPdf(pago_selected).then((pago_parsed) => {
-      const obj = { data: pago_parsed, type: this.pagosService.tipoPago, retunBase64: true };
+    classToQuery[this.pagosService.tipoPago()].parseDataToPdf(pago_selected).then((pago_parsed) => {
+      const obj = { data: pago_parsed, type: this.pagosService.tipoPago(), retunBase64: true };
       this.generarPdf(obj);
     });
   }
@@ -217,7 +217,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
   verDetalles(data) {
     const classToUse = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
-    const configModal = classToUse[this.pagosService.tipoPago].modalVerDetalles(data);
+    const configModal = classToUse[this.pagosService.tipoPago()].modalVerDetalles(data);
     this.openNewModal(configModal);
   }
 
@@ -245,7 +245,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
       const actualPagination = this.tServ.getPaginationById(ListaPagosComponent.tablePagosId);
       const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
-      classToQuery[this.pagosService.tipoPago].dynamic(extra).then((res) => this.getPagos(actualPagination));
+      classToQuery[this.pagosService.tipoPago()].dynamic(extra).then((res) => this.getPagos(actualPagination));
     } catch (error) {}
   }
 }

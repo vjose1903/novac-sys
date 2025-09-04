@@ -4,10 +4,11 @@ import { CommonModule } from '@angular/common';
 import { MsgErrorPipe } from './msg-error.pipe';
 import { FiltroParaNgforPipe } from './filtro-para-ngfor.pipe';
 
-const pipes = [FiltroParaNgforPipe, MsgErrorPipe, CapitalicePipe];
+const pipes = [FiltroParaNgforPipe, MsgErrorPipe];
+
 @NgModule({
   declarations: pipes,
-  imports: [CommonModule],
-  exports: pipes,
+  imports: [CommonModule, CapitalicePipe],
+  exports: [...pipes, CapitalicePipe],
 })
 export class PipesModule {}

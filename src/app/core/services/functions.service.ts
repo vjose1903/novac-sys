@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { ConfigService } from './configuration.service';
 import { CustomLodash } from './custom_lodash.service';
 import { DocumentosC } from '../typescript/documentos_de_identidad.utils';
@@ -6,6 +7,19 @@ import { BehaviorSubject } from 'rxjs';
 import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../typescript/message-task';
 const moment = require('../javascript/moment');
+=======
+import { SpanishInflector } from './../typescript/spanish-inflector';
+const moment = require('../javascript/moment');
+import { DocumentosC } from '../typescript/documentos_de_identidad';
+import * as _ from 'lodash';
+
+import { ConfigI } from '../interface/config-interface';
+import { Ss } from './singleton.service';
+import { BehaviorSubject } from 'rxjs';
+import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
+import { MessageTask } from '../models/message-task';
+import { RetryOptions } from '../interface/retry-until';
+>>>>>>> dev
 
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun extends CustomLodash {
@@ -26,12 +40,12 @@ export class fun extends CustomLodash {
   // Descripcion : Esta funcion recarga el electron
   // _________________________________________________________________________________________________
   static reloadElectron() {
-    const task = new MessageTask(KEYWORD_ELECTRON_RELOAD);
+    const task = new MessageTask(ELECTRON_RELOAD);
 
     Ss._ipc
       .sendTask(task)
-      .then((res) => {})
-      .catch((err) => console.error(err));
+      .then(res => {})
+      .catch(err => console.error(err));
   }
   // __________________________________________________________________________________________________
   // Nombre: removerDuplicados
@@ -61,6 +75,38 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
+<<<<<<< HEAD
+=======
+  // Nombre: to_plural
+  // Descripcion : Esta funcion convierte una palabra a plural
+  // _________________________________________________________________________________________________
+  static to_plural(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.pluralize(normalWord);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: to_singular
+  // Descripcion : Esta funcion convierte una palabra a singular
+  // _________________________________________________________________________________________________
+  static to_singular(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.singularize(normalWord);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: date_formater
+  // Descripcion : Esta funcion formatea una fecha con los parametros establecidos
+  // _________________________________________________________________________________________________
+  static date_formater(params: { date: any; dateFormat?: 'DD/MM/YYYY'; con_hora?: boolean }) {
+    let fecha = moment(params.date).format(params.dateFormat);
+    if (params.con_hora) fecha += ` - ${moment(params.date).format('LT')}`;
+    return fecha;
+  }
+  // __________________________________________________________________________________________________
+>>>>>>> dev
   // Nombre: deepCloning
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
@@ -100,13 +146,18 @@ export class fun extends CustomLodash {
       return array_string;
     }
 
-    const promise = new Promise((resolve) => {
-      fun.awaitTyping().then((res) => {
+    const promise = new Promise(resolve => {
+      fun.awaitTyping().then(res => {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (fun.isEmpty(searchText)) resolve(copyData);
 
+<<<<<<< HEAD
         const data_filtered = fun.deepCloning(copyData).filter((obj) => {
           const obj_picked = fun.pick(obj, targets);
+=======
+        const data_filtered = fun.deepCloning(copyData).filter(obj => {
+          const obj_picked = _.pick(obj, targets);
+>>>>>>> dev
           const array_picked = pick_object(obj_picked);
 
           const is_include = array_picked.some((value: any) => value.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
@@ -122,7 +173,7 @@ export class fun extends CustomLodash {
   }
 
   static revisarNumber(input, id): any {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const precioTEMPO = input.value;
 
       const res = { number: null, error: true };
@@ -133,11 +184,10 @@ export class fun extends CustomLodash {
         if (isNaN(Number(fun.desformatearStNumber(newNumber)))) {
           fun.toastError('Valor introducido es invalido', 'ERROR');
           if (document.getElementById(id)) document.getElementById(id).focus();
-          return;
+        } else {
+          res.number = newNumber;
+          res.error = false;
         }
-
-        res.number = newNumber;
-        res.error = false;
       }
 
       resolve(res);
@@ -148,19 +198,33 @@ export class fun extends CustomLodash {
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
+  static redondearNum(numero, decimales = 2) {
+    const factor = Math.pow(10, decimales);
+    const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor;
+    return numberRounded.toFixed(decimales);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: roundNumberToDecimal
+  // Descripcion : Esta funcion redondea a 2 decimales
+  // _________________________________________________________________________________________________
 
   static roundNumberToDecimal(number, cant = 2): string {
     if (fun.isEmpty(number)) return number;
 
     if (typeof number == 'string' || isNaN(number)) number = parseFloat(fun.desformatearStNumber(number));
 
-    const numerRounded = number.toFixed(cant);
+    const numerRounded = fun.redondearNum(number, cant);
 
     // Formateamos el número con comas para separar millares
     const partes = numerRounded.split('.');
     const enteros = partes[0];
     const decimales = partes[1];
+<<<<<<< HEAD
     const numeroFormateado = `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cant > 0 ? `.${decimales}` : ''}`;
+=======
+    const numeroFormateado = `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cant >= 1 ? `.${decimales}` : ''}`;
+>>>>>>> dev
 
     return numeroFormateado;
   }
@@ -224,7 +288,7 @@ export class fun extends CustomLodash {
   // _________________________________________________________________________________________________
   static identifyObject(object: any | Array<any>, key = 'id') {
     if (Array.isArray(object)) {
-      object.map((item) => (item[key] = fun.generateKey()));
+      object.map(item => (item[key] = fun.generateKey()));
     } else {
       object[key] = fun.generateKey();
     }
@@ -252,17 +316,30 @@ export class fun extends CustomLodash {
 
       new DocumentosC()
         .getAll(extra)
-        .then((res) => {
+        .then(res => {
           for (const persona of res.data) {
-            persona.persona.documentos_de_identidad.map((doc) => {
+            persona.persona.documentos_de_identidad.map(doc => {
               doc.id = null;
               return doc;
             });
           }
           resolve(res);
         })
-        .catch((err) => reject(err));
+        .catch(err => reject(err));
     });
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: normalizarTexto
+  // Descripcion : Esta funcion normaliza un texto para que no tenga acentos
+  // _________________________________________________________________________________________________
+
+  static normalizarTexto(texto: string): string {
+    const textoMinusculas = texto.toLowerCase();
+
+    const textoSinAcentos = textoMinusculas.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    return textoSinAcentos;
   }
 
   // __________________________________________________________________________________________________
@@ -345,8 +422,19 @@ export class fun extends CustomLodash {
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
   static capitalice(str) {
+<<<<<<< HEAD
     const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
     return fun.hasValue(str) ? str.substr(0, 1).toUpperCase() + str.substr(1, ultimosCaractes) : str;
+=======
+    if (!fun.hasValue(str)) return str;
+
+    const upperCaseText = str
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    return upperCaseText;
+>>>>>>> dev
   }
 
   // __________________________________________________________________________________________________
@@ -387,14 +475,14 @@ export class fun extends CustomLodash {
   // _________________________________________________________________________________________________
 
   static timeout;
-  static awaitTyping(event?, waitingTime = 700) {
-    const promise = new Promise((resolve) => {
-      clearTimeout(fun.timeout);
-      fun.timeout = setTimeout(() => {
-        if (!event || event.keyCode != 13) resolve(event);
-      }, waitingTime);
+  static awaitTyping(event?: KeyboardEvent, waitingTime = 700): Promise<void> {
+    return new Promise(resolve => {
+      if (fun.timeout) clearTimeout(fun.timeout);
+
+      if (event?.key === 'Enter' || event?.keyCode === 13) return resolve();
+
+      fun.timeout = fun.setTimeout(resolve, waitingTime);
     });
-    return promise;
   }
 
   // __________________________________________________________________________________________________
@@ -409,24 +497,26 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: isEmpty
-  // Descripcion : Esta funcion valida que si una variable esta vacia
-  // __________________________________________________________________________________________________
+  /**
+   * Nombre: isEmpty
+   * Descripción: Esta función valida si una variable está vacía.
+   * @param value La variable a evaluar.
+   * @returns true si la variable está vacía, false en caso contrario.
+   * @example fun.isEmpty(variable)
+   */
 
-  static isEmpty(value) {
-    return (
-      // es null o indefinido
-      value === null ||
-      value === undefined ||
-      // es una fecha invalida
-      (value instanceof Date && isNaN(value.getTime())) ||
-      // si tiene longitud 0
-      (value.hasOwnProperty('length') && value.length == 0) ||
-      // si es un string vacio o con lleno de espacios
-      (typeof value == 'string' && value.trim().length == 0) ||
-      // si es un objeto y no tiene propiedades
-      (value.constructor == Object && Object.keys(value).length == 0)
-    );
+  static isEmpty(value: any) {
+    if (value == null) return true;
+
+    if (typeof value === 'string') return value.trim().length === 0;
+
+    if (Array.isArray(value)) return value.length === 0;
+
+    if (value instanceof Date) return isNaN(value.getTime());
+
+    if (typeof value === 'object') return Object.keys(value).length === 0;
+
+    return false;
   }
 
   // __________________________________________________________________________________________________
@@ -498,6 +588,7 @@ export class fun extends CustomLodash {
   // __________________________________________________________________________________________________
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
+<<<<<<< HEAD
   // __________________________________________________________________________________________________
   static enfocarInput(arg, type = 'id') {
     let element;
@@ -508,12 +599,21 @@ export class fun extends CustomLodash {
     }
 
     if (element) element.focus();
+=======
+  // _________________________________________________________________________________________________
+  static enfocarInput(arg, element?) {
+    element ??= document.getElementById(arg) as HTMLElement;
+
+    if (element) {
+      requestAnimationFrame(() => element.focus());
+    }
+>>>>>>> dev
   }
 
   // __________________________________________________________________________________________________
   // Nombre: desEnfocarInput
   // Descripcion : Esta funcion desenfoca un elemento html
-  // __________________________________________________________________________________________________
+  // _________________________________________________________________________________________________
   static desEnfocarInput(inputId?: string) {
     const element = document.getElementById('input_fantasma');
     if (element) element.click();
@@ -558,7 +658,35 @@ export class fun extends CustomLodash {
   // __________________________________________________________________________________________________
   static enfocarAndSelectInput(arg) {
     fun.enfocarInput(arg);
-    setTimeout(() => this.selectContenido(arg), 10);
+    fun.setTimeout(() => {
+      this.selectContenido(arg);
+    }, 10);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setTimeOut
+  // Descripcion : Esta funcion ejecuta una funcion despues de un tiempo
+  // __________________________________________________________________________________________________
+  static setTimeout(callback: () => void, time: number) {
+    const timeout = setTimeout(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return timeout;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setInterval
+  // Descripcion : Esta funcion ejecuta una funcion en un intervalo de tiempo
+  // __________________________________________________________________________________________________
+  static setInterval(callback: () => void, time: number) {
+    const interval = setInterval(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return interval;
   }
 
   // __________________________________________________________________________________________________
@@ -566,7 +694,7 @@ export class fun extends CustomLodash {
   // Descripcion : Esta funcion simula un evento de teclado
   // __________________________________________________________________________________________________
   static keyboardEvent(element: any, event: 'keyup' | 'keydown', keysArray: Array<string>): any {
-    keysArray.forEach((key) => {
+    keysArray.forEach(key => {
       element.dispatchEvent(new KeyboardEvent(event, { key: key }));
     });
   }
@@ -576,7 +704,51 @@ export class fun extends CustomLodash {
   // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
   // __________________________________________________________________________________________________
   static getKeyByValue(object, value): any {
-    return Object.keys(object).find((key) => object[key] == value);
+    return Object.keys(object).find(key => object[key] == value);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: retryUntil
+  // Descripcion : Esta funcion recibe una tarea y la repite hasta que las condiciones establecidas se cumplan
+  // _________________________________________________________________________________________________
+
+  static async retryUntil<T>(params: { task: () => Promise<T>; retryWhen: (response: T) => boolean; actionAfterRetry: (response: T) => void; actionIfNoSuccess: () => void; options?: RetryOptions }): Promise<void> {
+    const { task, retryWhen, actionAfterRetry, actionIfNoSuccess, options = {} } = params;
+    const { delayBetweenRetries = 500, retryMax = 20, logError = false } = options;
+
+    let retryCount = 0;
+
+    const executeTask = async (): Promise<void> => {
+      try {
+        const response = await task();
+        const shouldRetry = retryWhen(response);
+        const hasRetries = retryCount < retryMax;
+
+        if (shouldRetry && hasRetries) {
+          retryCount++;
+          await new Promise<void>(resolve => {
+            fun.setTimeout(resolve, delayBetweenRetries);
+          });
+          return executeTask();
+        }
+
+        if (shouldRetry && !hasRetries) {
+          if (logError) {
+            console.error(`Max number of retries (${retryMax}) reached`);
+          }
+          Ss.zone.run(() => actionIfNoSuccess());
+        } else {
+          Ss.zone.run(() => actionAfterRetry(response));
+        }
+      } catch (error) {
+        if (logError) {
+          console.error('Task execution failed:', error);
+        }
+        Ss.zone.run(() => actionIfNoSuccess());
+      }
+    };
+
+    Ss.zone.runOutsideAngular(() => executeTask());
   }
 
   // __________________________________________________________________________________________________
@@ -654,12 +826,38 @@ export class fun extends CustomLodash {
     return base;
   }
 
+  /**
+   * Nombre: encriptar
+   * Descripcion : Esta funcion encripta un string
+   * @param arg El string a encriptar
+   * @returns El string encriptado
+   */
+  static encriptar(arg: string): string {
+    return btoa(unescape(encodeURIComponent(arg)));
+  }
+
+  /**
+   * Nombre: desEncriptar
+   * Descripcion : Esta funcion desencripta un string
+   * @param arg El string a desencriptar
+   * @returns El string desencriptado
+   */
+  static desEncriptar(arg: string): { object: string; error?: boolean } {
+    try {
+      const decodedString = decodeURIComponent(escape(atob(arg)));
+      return { object: decodedString, error: false };
+    } catch (error) {
+      console.error('Error al desencriptar:', error);
+      return { object: '', error: true };
+    }
+  }
+
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
 
   static async logout() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       try {
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
@@ -668,14 +866,22 @@ export class fun extends CustomLodash {
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
 
-        Ss.layServ.nextLogOut(undefined);
+        // Resetear el estado del guard y limpiar cache
+        const authGuard = fun.getAuthGuardInstance();
+        const currentUserService = fun.getCurrentUserServiceInstance();
+        console.log('1');
+
+        if (authGuard) authGuard.resetValidation();
+        if (currentUserService) currentUserService.clearValidationCache();
+
+        console.log('2');
+
+        Ss.layServ.nextLogOut({ bool: true });
         resolve(true);
       } catch (error) {
         resolve(false);
       }
     });
-
-    // this.router.navigateByUrl('/auth/login');
   }
 
   // __________________________________________________________________________________________________
@@ -703,8 +909,15 @@ export class fun extends CustomLodash {
   }
 
   static decryptConfigPassword(str) {
+<<<<<<< HEAD
     const str_remplace = btoa(str);
     return str_remplace == ConfigService.config.config_password.replace('VMj$pt30r=', '=');
+=======
+    const str_remplace = fun.encriptar(str);
+
+    const config: ConfigI = Ss.configServ.config;
+    return str_remplace == config.config_password.replace('VMj$pt30r=', '=');
+>>>>>>> dev
   }
   // ----------------------------------------------------------------------------------------------------------
 
@@ -767,4 +980,255 @@ export class fun extends CustomLodash {
     amount = parseInt(`${(255 * amount) / 100}`);
     return (color = `#${this.subtractLight(color.substring(0, 2), amount)}${this.subtractLight(color.substring(2, 4), amount)}${this.subtractLight(color.substring(4, 6), amount)}`);
   }
+<<<<<<< HEAD
+=======
+
+  // =====================================================================
+  // TOASTS
+  // =====================================================================
+
+  static toastInfo(msg?, titulo = 'INFORMACION') {
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
+  }
+
+  static toastSuccess(msg?, titulo = 'CORRECTO') {
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
+  }
+
+  static toastError(msg?, titulo = 'ERROR') {
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
+  }
+
+  static toastWarning(msg?, titulo = 'AVISO') {
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
+  }
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // LODASH
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+  // __________________________________________________________________________________________________
+  // Nombre: pushAt
+  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
+  // _________________________________________________________________________________________________
+  static pushAt(arr, index, newItem) {
+    const copyArr = fun.deepCloning(arr);
+    arr.length = 0;
+    const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
+    newArr.forEach(item => arr.push(item));
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: pull
+  // Descripcion : Esta funcion remueve un item  de un arreglo
+  // _________________________________________________________________________________________________
+  static pull(array, item_remove) {
+    const index = array.findIndex(item => fun.isEqual(item, item_remove));
+    array.splice(index, 1);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: pullAt
+  // Descripcion : Esta funcion remueve un item en un indice especificado de un arreglo
+  // _________________________________________________________________________________________________
+  static pullAt(array, index) {
+    array.splice(index, 1);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: objHas
+  // Descripcion : Esta funcion retorna un valor booleano si el objeto evaluado contiene todas las propiedades evaluadas
+  // _________________________________________________________________________________________________
+
+  static objHas(obj, props) {
+    let result = true;
+    const props_split = props.split('.');
+
+    for (let index = 0; index < props_split.length; index++) {
+      const current_prop = props_split[index];
+      const current_object = fun.getCurrentObjLevel(obj, props_split, index);
+
+      if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(current_prop);
+      else result = false;
+
+      if (result == false) break;
+    }
+
+    return result;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: getProperty
+  // Descripcion : Esta funcion retorna el valor de una propiedad de un objeto
+  // _________________________________________________________________________________________________
+  static getProperty(obj, prop) {
+    return prop.split('.').reduce((objeto, property) => objeto?.[property], obj);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setProperty
+  // Descripcion : Esta funcion setea una propiedad a un objeto
+  // _________________________________________________________________________________________________
+  static setProperty(obj, prop, valor) {
+    const props_split = prop.split('.');
+
+    fun.createNestedObject(obj, [...props_split], valor);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: pick
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
+  // _________________________________________________________________________________________________
+  static pick(obj: any, props: Array<string>): any {
+    const result = {};
+
+    for (let index = 0; index < props.length; index++) {
+      const prop = props[index];
+      const props_split = prop.split('.');
+
+      if (fun.hasValue(fun.getProperty(obj, prop))) {
+        fun.createNestedObject(result, [...props_split], fun.getProperty(obj, prop));
+      }
+    }
+    return result;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: omit
+  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades omitidas
+  // _________________________________________________________________________________________________
+  static omit(obj, props) {
+    for (let index = 0; index < props.length; index++) {
+      const prop = props[index];
+
+      if (fun.hasValue(fun.getProperty(obj, prop))) {
+        const props_split = prop.split('.');
+        let current_object = obj;
+
+        for (let innerIndex = 0; innerIndex < props_split.length; innerIndex++) {
+          const currentProp = props_split[innerIndex];
+
+          current_object = fun.getCurrentObjLevel(obj, props_split, innerIndex);
+
+          if (innerIndex == props_split.length - 1) delete current_object[currentProp];
+        }
+      }
+    }
+
+    return obj;
+  }
+
+  static getCurrentObjLevel(mainObj, props_split, actualIndex, deepLevel = 0) {
+    let obj_en_turno = mainObj;
+
+    if (fun.hasValue(mainObj) && actualIndex > 0 && deepLevel < actualIndex) {
+      const nextLevel = mainObj[props_split[deepLevel]];
+      deepLevel += 1;
+      obj_en_turno = fun.getCurrentObjLevel(nextLevel, props_split, actualIndex, deepLevel);
+    }
+
+    return obj_en_turno;
+  }
+
+  toString = Object.prototype.toString;
+
+  static createMap() {
+    return Object.create(null);
+  }
+  static isWindow(obj) {
+    return obj && obj.window === obj;
+  }
+  static isScope(obj) {
+    return obj && obj.$evalAsync && obj.$watch;
+  }
+  static isRegExp(value) {
+    return toString.call(value) === '[object RegExp]';
+  }
+  static simpleCompare(a, b) {
+    return a === b || (a !== a && b !== b);
+  }
+  static isDate(value) {
+    return toString.call(value) === '[object Date]';
+  }
+  static isArray(arr) {
+    return Array.isArray(arr) || arr instanceof Array;
+  }
+
+  static isEqual(obj1, obj2) {
+    if (obj1 === obj2) return true;
+    if (obj1 === null || obj2 === null) return false;
+    if (obj1 !== obj1 && obj2 !== obj2) return true; // NaN === NaN
+
+    let length, key, keySet;
+
+    if (typeof obj1 === typeof obj2 && typeof obj1 === 'object') {
+      if (fun.isArray(obj1)) {
+        if (!fun.isArray(obj2)) return false;
+
+        if ((length = obj1.length) === obj2.length) {
+          for (key = 0; key < length; key++) {
+            if (!fun.isEqual(obj1[key], obj2[key])) return false;
+          }
+
+          return true;
+        }
+      } else if (fun.isDate(obj1)) {
+        if (!fun.isDate(obj2)) return false;
+        return fun.simpleCompare(obj1.getTime(), obj2.getTime());
+      } else if (fun.isRegExp(obj1)) {
+        if (!fun.isRegExp(obj2)) return false;
+        return obj1.toString() === obj2.toString();
+      } else {
+        if (fun.isScope(obj1) || fun.isScope(obj2) || fun.isWindow(obj1) || fun.isWindow(obj2) || fun.isArray(obj2) || fun.isDate(obj2) || fun.isRegExp(obj2)) return false;
+        keySet = fun.createMap();
+        for (key in obj1) {
+          if (key.charAt(0) === '$' || fun.isFunction(obj1[key])) continue;
+          if (!fun.isEqual(obj1[key], obj2[key])) return false;
+          keySet[key] = true;
+        }
+        for (key in obj2) {
+          if (!(key in keySet) && key.charAt(0) !== '$' && fun.hasValue(obj2[key]) && !fun.isFunction(obj2[key])) return false;
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Métodos helper para obtener instancias de servicios
+  private static authGuardInstance: any = null;
+  private static currentUserServiceInstance: any = null;
+
+  static setAuthGuardInstance(instance: any) {
+    fun.authGuardInstance = instance;
+  }
+
+  static getAuthGuardInstance() {
+    return fun.authGuardInstance;
+  }
+
+  static setCurrentUserServiceInstance(instance: any) {
+    fun.currentUserServiceInstance = instance;
+  }
+
+  static getCurrentUserServiceInstance() {
+    return fun.currentUserServiceInstance;
+  }
+>>>>>>> dev
 }

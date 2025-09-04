@@ -7,31 +7,32 @@
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
         @if (isCreando || vehiculoSelected) {
-        <div class="contenedorRegistro" class="form {{ isCreando || vehiculoSelected ? 'showForm' : 'hideForm' }} " style="grid-template-rows: min-content min-content">
-          <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
-            <h4 class="mb-0">Formulario</h4>
-          </div>
-          <div class="card cardFormClass">
-            <form [formGroup]="form">
-              <div class="row">
-                <div class="col-12 p-0">
-                  <div class="form-group">
-                    <label class="control-label">Propietario: <span style="color: red">*</span></label>
+          <div class="contenedorRegistro" class="form {{ isCreando || vehiculoSelected ? 'showForm' : 'hideForm' }} " style="grid-template-rows: min-content min-content">
+            <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
+              <h4 class="mb-0">Formulario</h4>
+            </div>
+            <div class="card cardFormClass">
+              <form [formGroup]="form">
+                <div class="row">
+                  <div class="col-12 p-0">
+                    <div class="form-group">
+                      <label class="control-label">Propietario: <span style="color: red">*</span></label>
 
-                    <p-dropdown
-                      inputId="user_id"
-                      [options]="listaPropietarios"
-                      formControlName="user_id"
-                      placeholder="Seleccione un propietario"
-                      [filter]="true"
-                      filterBy="nombre_completo"
-                      optionLabel="nombre_completo"
-                      optionValue="id"
-                      emptyFilterMessage="Propietario no encontrado"
-                      [resetFilterOnHide]="true"
-                      (onChange)="selectPropietario()"
-                    />
+                      <p-select
+                        inputId="user_id"
+                        [options]="listaPropietarios"
+                        formControlName="user_id"
+                        placeholder="Seleccione un propietario"
+                        [filter]="true"
+                        filterBy="nombre_completo"
+                        optionLabel="nombre_completo"
+                        optionValue="id"
+                        emptyFilterMessage="Propietario no encontrado"
+                        [resetFilterOnHide]="true"
+                        (onChange)="selectPropietario()" />
+                    </div>
                   </div>
+<<<<<<< HEAD
                 </div>
                 @if (form.controls['user_id'].value === -1) {
                 <div class="col-6 p-0 pr-2">
@@ -136,8 +137,124 @@
                 </div>
               </div>
             </form>
+=======
+                  @if (form.controls['user_id'].value === -1) {
+                    <div class="col-6 p-0 pe-2">
+                      <div class="form-group">
+                        <label class="control-label">Nombre: <span style="color: red">*</span></label>
+                        <input
+                          (keyup)="capitalice('nombre_no_empleado', htmlServ.getValue($event))"
+                          (focus)="htmlServ.selectValue($event)"
+                          type="text"
+                          formControlName="nombre_no_empleado"
+                          placeholder="Introduzca nombre"
+                          class="form-control"
+                          autocomplete="off"
+                          id="nombre" />
+                        @if (!form.controls['nombre_no_empleado'].valid && (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)) {
+                          <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el nombre</div>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (form.controls['user_id'].value === -1) {
+                    <div class="col-6 p-0 ps-2">
+                      <div class="form-group">
+                        <label class="control-label">Apellido: <span style="color: red">*</span></label>
+                        <input
+                          (keyup)="capitalice('apellido_no_empleado', htmlServ.getValue($event))"
+                          (focus)="htmlServ.selectValue($event)"
+                          type="text"
+                          formControlName="apellido_no_empleado"
+                          placeholder="Introduzca apellido"
+                          class="form-control"
+                          autocomplete="off"
+                          id="apellido" />
+                        @if (!form.controls['apellido_no_empleado'].valid && (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)) {
+                          <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el apellido</div>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (form.controls['user_id'].value === -1) {
+                    <div class="col-6 p-0 pe-2">
+                      <div class="form-group">
+                        <label class="control-label">Telefono: <span style="color: red">*</span></label>
+                        <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_no_empleado" [autoClear]="false"></p-inputMask>
+                        @if (!form.controls['telefono_no_empleado'].valid && (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)) {
+                          <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el numero de telefono</div>
+                        }
+                      </div>
+                    </div>
+                  }
+                  <div class="col-12 p-0">
+                    <hr class="rayaTop mt-2" />
+                  </div>
+                  <div class="col-6 p-0 pe-2">
+                    <div class="form-group">
+                      <label class="control-label">Marca: <span style="color: red">*</span></label>
+
+                      <p-select
+                        inputId="marca"
+                        [options]="listaMarcas"
+                        formControlName="marca"
+                        placeholder="Seleccione una marca"
+                        [filter]="true"
+                        filterBy="descripcion"
+                        optionLabel="descripcion"
+                        optionValue="id"
+                        emptyFilterMessage="Marca no encontrada"
+                        [resetFilterOnHide]="true"
+                        (onChange)="selectMarca()" />
+                    </div>
+                  </div>
+                  <div class="col-6 p-0 ps-2">
+                    <div class="form-group">
+                      <label class="control-label">Modelo: <span style="color: red">*</span></label>
+
+                      <p-select
+                        inputId="modelo"
+                        [options]="listaModelos"
+                        formControlName="modelo"
+                        placeholder="Seleccione un modelo"
+                        [filter]="true"
+                        filterBy="descripcion"
+                        optionLabel="descripcion"
+                        optionValue="id"
+                        emptyFilterMessage="Modelo no encontrado"
+                        [resetFilterOnHide]="true" />
+                    </div>
+                  </div>
+                  <div class="col-6 p-0 pe-2">
+                    <div class="form-group">
+                      <label class="control-label">Año: <span style="color: red">*</span></label>
+                      <input (focus)="htmlServ.selectValue($event)" type="number" formControlName="anio" placeholder="Introduzca año" class="form-control" autocomplete="off" id="anio" maxlength="4" />
+                      @if (!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)) {
+                        <div class="alerta text-danger ms-1" style="font-size: 12px">
+                          @if (form.controls['anio'].errors.minlength) {
+                            <span>Año incompleto</span>
+                          }
+                          @if (form.controls['anio'].errors.required) {
+                            <span>Introduzca el año</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div class="col-12 p-0 mt-3" style="display: flex; justify-content: space-between">
+                    <div>
+                      <a class="btn me-2" id="btn-blanco" (click)="borrar(true)">Borrar</a>
+                      <input [disabled]="!form.valid" (click)="submit(form)" style="max-width: 6rem" class="btn ms-2" id="btn-verde" value="{{ boton }}" />
+                    </div>
+                    <div>
+                      <input class="btn ms-2" value="Cerrar" id="btn-blanco" (click)="borrar(true); isCreando = false" style="max-width: 6rem" />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+>>>>>>> dev
           </div>
-        </div>
         }
       </ng-container>
 
@@ -146,9 +263,10 @@
           <h4 classs="mb-0">Listado camiones</h4>
           <div class="" style="height: min-content">
             @if (hasPermissionsMarca) {
-            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
-            } @if (hasPermissionsModelo) {
-            <a class="btn mr-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
+              <a class="btn me-2" id="btn-gris" (click)="abrirModalMarcasYModelos('marcas')">Marcas</a>
+            }
+            @if (hasPermissionsModelo) {
+              <a class="btn me-2" id="btn-gris" (click)="abrirModalMarcasYModelos('modelos')">Modelos</a>
             }
             <button *ngxPermissionsOnly="permissions.vehiculo.create" [disabled]="vehiculoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
           </div>
@@ -156,7 +274,14 @@
 
         <div #cardTabla id="cardTabla" class="card cardContentClass">
           <div class="divTabla">
-            <dinamic-table [cardTabla]="cardTabla" [(data)]="listaVehiculos" [seleccionado]="vehiculoSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+            <dinamic-table
+              [cardTabla]="cardTabla"
+              [data]="listaVehiculos()"
+              (dataChange)="listaVehiculos.set($event)"
+              [seleccionado]="vehiculoSelected?.id"
+              [(TablasComponent)]="tablaComponent"
+              [config]="table_config"
+              (table_events)="handle_table_events($event)"></dinamic-table>
           </div>
         </div>
       </div>

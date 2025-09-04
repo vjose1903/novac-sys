@@ -1,57 +1,61 @@
-import { DivisaService } from './../registros/divisa/divisa.service';
-import { LoaderService } from './../../core/services/loader.service';
-import { ConfigService } from './../../core/services/configuration.service';
-import { TiposFacturaC, actionFacturacion } from './../facturacion/factura';
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-import * as _ from 'lodash';
-import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { CuadreCajaC } from '../../core/typescript/cuadre_caja.utils';
-import { CurrentUserService } from '../../core/services/current-user.service';
-import { ClienteC } from '../registros/registro-clientes/cliente';
-import { SuplidorC } from '../registros/registro-suplidores/suplidores';
-import { RequestC } from '../../core/typescript/requests';
-import { Ss } from '../../core/services/singleton.service';
-import { fun } from '../../core/services/functions.service';
-import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
+import { actionFacturacion } from './../facturacion/factura';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, inject, signal } from '@angular/core';
 
+import { Subject, takeUntil } from 'rxjs';
+import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { CuadreCajaC } from '@core/typescript/cuadre_caja.utils';
+import { CurrentUserService } from '@core/services/current-user.service';
+import { ClienteC } from '@registros/registro-clientes/cliente';
+import { SuplidorC } from '@registros/registro-suplidores/suplidores';
+import { RequestC } from '@core/typescript/requests';
+import { Ss } from '@core/services/singleton.service';
+import { ConfigI } from '@core/interface/config-interface';
+import { fun } from '@core/services/functions.service';
+import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
+import { serie } from '@core/typescript/constantes';
+import { MessageTask } from '@core/typescript/message-task';
+import { ELECTRON_SET_APP_CONFIG, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
+import { IpcService } from '@core/services/ipc.service';
+import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
+import { NavigationService } from '@core/services/navigation.service';
+import { ModalPasswordConfigComponent } from '../../login/extra/modal-password-config/modal-password-config.component';
+import { ConfiguracionesComponent } from '../../login/extra/configuraciones/configuraciones.component';
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { Environment } from '@environments/environment';
+import { DivisaService } from '@registros/divisa/divisa.service';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
+  standalone: false,
 })
 export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
-  actualPath;
-  actualRuta;
-  actualModule;
-  prevModule;
+  actualPath = signal<string>('');
+  actualRuta = signal<string>('');
+  nextModule = signal<string>('');
 
   showLoading;
 
   usuario;
 
   imgUser;
-  versionApp: any;
+  configApp: ConfigI;
   noServer;
-  subCheckCuadreToday: Subscription;
-  subLogOut: Subscription;
-  subRouter: Subscription;
-  subCurrentUser: Subscription;
 
-  ready;
+  ready = signal<boolean>(false);
   // facturas_localStorage: any;
   activeIndex;
   initNavigate = true;
-  cuadre_hoy;
   ant_event_change_visibility;
 
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
-  tipoFacturaClass = new TiposFacturaC();
 
-  chequiando_cuadre: boolean;
+  chequiando_cuadre = signal<boolean>(false);
+  cuadre_hoy = signal<boolean>(false);
   hasPermisosValidated: boolean;
 
   idsH5 = {
@@ -69,11 +73,22 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   actionFacturacion = actionFacturacion;
   currentYear: number;
+  fun = fun;
+  my_capitalize = fun.capitalice;
 
-  constructor(private router: Router, private currentUserServ: CurrentUserService, public divisaServ: DivisaService) {
+  copyToClipboardServ = inject(CopyToClipboardService);
+  public divisaServ = inject(DivisaService);
+  private router = inject(Router);
+  private cdRef = inject(ChangeDetectorRef);
+  private currentUserServ = inject(CurrentUserService);
+  private navigationService = inject(NavigationService);
+  public _ipc = inject(IpcService);
+
+  private destroy$ = new Subject<void>();
+  constructor() {
     super();
 
-    this.subRouter = this.router.events.subscribe((routerEvent: Event | RouterEvent) => {
+    this.router.events.pipe(takeUntil(this.destroy$)).subscribe((routerEvent: Event | RouterEvent) => {
       if (routerEvent instanceof NavigationStart) {
         this.showLoading = true;
         this.initNavigate = true;
@@ -83,9 +98,11 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.showLoading = false;
 
         if (this.initNavigate) {
-          setTimeout(() => this.checkRouteActiva(), 250);
+          fun.setTimeout(() => {
+            this.checkRouteActiva();
+          }, 250);
 
-          setTimeout(() => {
+          fun.setTimeout(() => {
             const token = fun.getAuthToken();
             if (token) {
               this.checkCuadre();
@@ -103,71 +120,45 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.initVariables();
     this._init_mixin({ component: 'layout', is_routing: false });
 
-    this.subCheckCuadreToday = this.layServ.CHECKCUADRETODAY.subscribe((res) => {
+    this.layServ.CHECKCUADRETODAY.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
         this.checkCuadre();
         this.layServ.nextCheckCuadreToday(false);
       }
     });
 
-    this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
-      if (res && res.bool) this.logOut();
-      else {
-        if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
+    this.layServ.LOGOUT.pipe(takeUntil(this.destroy$)).subscribe(res => {
+      console.log('%c ANDO POR AQUIII', 'color: yellow', res);
+
+      if (res && res.bool) {
+        this.logOut();
+        this.layServ.nextLogOut(undefined);
       }
     });
 
-    this.subCurrentUser = this.currentUserServ.CURENTUSER.subscribe((res) => {
-      if (res) this.setUser(res);
-    });
+    this.currentUserServ.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(usuario => {
+      if (usuario) {
+        this.usuario = usuario;
 
-    fun.logYellow('config ', ConfigService.config);
-    this.versionApp = ConfigService.config.app_version;
+        if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
+        else this.imgUser = 'assets/img/userM.png';
+      }
+    });
   }
 
   ngAfterViewInit() {
-    this.parseMenu();
-    this.checkRouteActiva();
     this.checkFacturasArchivadas();
-    Ss.cdRef.detectChanges();
-
-    this.validateUserAndLoadPermisos().then((result) => {
-      this.getTiposFacturas().then(() => {
-        this.divisaServ.getDivisas().then((res) => {
-          this.hasPermisosValidated = result;
-        });
-      });
-    });
+    this.cdRef.detectChanges();
   }
 
-  getTiposFacturas() {
-    return new Promise<void>(async (resolve, reject) => {
-      await this.tipoFacturaClass
-        .getAll()
-        .then((tiposFacturas: any) => {
-          tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
-          Ss.factServ.lista_tipos_facturas = tiposFacturas;
-          resolve();
-        })
-        .catch((error) => {
-          fun.logBlue('error: ', error);
-          if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
-          reject(error);
-        });
-    });
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
   }
 
-  validateUserAndLoadPermisos() {
-    return new Promise<any>(async (resolve, reject) => {
-      await this.currentUserServ
-        .validateUser()
-        .then((result) => resolve(true))
-        .catch((error) => {
-          fun.logBlue('error: ', error);
-          if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
-          reject(error);
-        });
-    });
+  ngOnDestroy() {
+    this._destroy_mixin();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   initVariables() {
@@ -176,42 +167,114 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.noServer = false;
     this.activeIndex = 0;
     this.currentYear = new Date().getFullYear();
-    this.cuadre_hoy = false;
+    this.cuadre_hoy.set(false);
+    this.configApp = Ss.configServ.config;
+    this.checkRouteActiva();
+
+    this.verifyIsReady();
   }
 
-  ngOnDestroy() {
-    this._destroy_mixin();
-    if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
-    if (this.subLogOut) this.subLogOut.unsubscribe();
-    if (this.subRouter) this.subRouter.unsubscribe();
-    if (this.subCurrentUser) this.subCurrentUser.unsubscribe();
+  async verifyIsReady() {
+    const validateAppReady = (): boolean => {
+      return fun.hasValue(this.configApp) && fun.hasValue(this.actualPath()) && fun.hasValue(this.actualRuta()) && Ss.factServ.lista_tipos_facturas?.length > 0;
+    };
+
+    const setReadyState = (isReady: boolean) => {
+      fun.setTimeout(() => {
+        this.ready.set(isReady);
+        if (!isReady) {
+          fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+        }
+      }, 0);
+    };
+
+    fun.retryUntil({
+      task: () => Promise.resolve(validateAppReady()),
+      retryWhen: isReady => !isReady,
+      actionAfterRetry: () => setReadyState(true),
+      actionIfNoSuccess: () => setReadyState(false),
+    });
+  }
+
+  changeSerieDefault() {
+    const new_config = { ...this.configApp, serie_default: this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica };
+
+    const task = new MessageTask(ELECTRON_SET_APP_CONFIG, new_config);
+
+    this._ipc
+      .sendTask(task)
+      .then(res => this.refreshPage())
+      .catch(err => {
+        console.error(err);
+        if (err.msg) fun.toastError(err.msg, 'ERROR');
+        else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
+      });
+  }
+
+  verificarActualizaciones() {
+    const task = new MessageTask(ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE);
+
+    this._ipc.sendTask(task).then(res => {
+      console.log('res ---> ', res);
+    });
   }
 
   checkCuadre() {
-    if (!this.chequiando_cuadre) {
-      let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [LoaderService.noShowSppiner] };
-      this.chequiando_cuadre = true;
-      new CuadreCajaC().getAll(extra).then((res) => {
-        this.cuadre_hoy = res['data'].existe_cuadre_hoy;
-        this.chequiando_cuadre = false;
+    if (!this.chequiando_cuadre()) {
+      let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [{ key: 'spinner', value: 'no_show' }] };
+      this.chequiando_cuadre.set(true);
+      new CuadreCajaC().getAll(extra).then(res => {
+        const existe_cuadre_hoy = res['data'].existe_cuadre_hoy;
+        this.cuadre_hoy.set(existe_cuadre_hoy);
+        this.chequiando_cuadre.set(false);
       });
     }
   }
 
-  setUser(usuario) {
-    this.usuario = usuario;
-
-    if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
-    else this.imgUser = 'assets/img/userM.png';
+  copyMachineId() {
+    this.copyToClipboardServ.copyText(this.configApp.machineId).then(() => {
+      fun.toastInfo('ID de la máquina copiado al portapapeles', 'COPIADO');
+    });
   }
 
-  parseMenu() {
-    for (const keyFather in this.menuPermissionsObj) {
-      for (const keyChild in this.menuPermissionsObj[keyFather]) {
-        const subMenuProp = this.menuPermissionsObj[keyFather][keyChild];
-        this.menuPermissionsObj[keyFather].flatt = _.union(this.menuPermissionsObj[keyFather].flatt, subMenuProp);
-      }
+  openConfigurationModal() {
+    const passwordConfirmCallback = (args: ICallbackModal) => {
+      if (args.type === modalCloseType.returnData && args.data && !args.data.error) this.openConfiguracionesModal();
+    };
+
+    if (!Environment.production) {
+      passwordConfirmCallback({ data: { error: false }, type: modalCloseType.returnData });
+      return;
     }
+
+    const passwordConfigModal = new DynamicModalClass();
+
+    passwordConfigModal.id = 'passwordConfigForm';
+    passwordConfigModal.inputs = { from: 'layout' };
+    passwordConfigModal.header = 'Configuraciones';
+    passwordConfigModal.width = '30rem';
+    passwordConfigModal.component = ModalPasswordConfigComponent;
+
+    passwordConfigModal.botones = [
+      { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },
+      { id: 'aceptarBtn', label: 'Aceptar', clase: 'btn-success' },
+    ];
+
+    passwordConfigModal.setCallback(passwordConfirmCallback);
+    passwordConfigModal.show();
+  }
+
+  openConfiguracionesModal() {
+    const passwordConfigModal = new DynamicModalClass();
+    passwordConfigModal.id = 'configuracionesForm';
+    passwordConfigModal.width = '90vw';
+    passwordConfigModal.header = 'Configuraciones del sistema';
+    passwordConfigModal.height = 'calc(100vh - 10rem)';
+    passwordConfigModal.padding = '0rem';
+    passwordConfigModal.component = ConfiguracionesComponent;
+    passwordConfigModal.inputs = { is_on_modal: true };
+
+    passwordConfigModal.show();
   }
 
   // =================================================================================
@@ -225,23 +288,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
-    fun.logout().then(() => {
-      this._destroy_layout(true);
-      this.noServer = false;
-      this.router.navigateByUrl('/');
-    });
-  }
-
-  // =================================================================================
-  // CHECK LAYOUT ACTIVE ROUTE
-  // =================================================================================
-
-  getLayoutActiveRoute(module, paths?) {
-    if (fun.hasValue(paths) || paths?.length > 0) {
-      return paths.some((path) => this.actualPath.includes(`/${module}/${path}`));
-    } else {
-      return this.actualPath?.includes(`/${module}`) || this.actualModule?.includes(module);
-    }
+    this.noServer = false;
+    this.router.navigateByUrl('/');
   }
 
   // =================================================================================
@@ -249,25 +297,14 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
-    this.actualPath = fun.getActualPath();
+    this.actualPath.set(fun.getActualPath());
 
-    let pathSplit = this.actualPath.split('/admin/')[1].split('/');
+    const pathSplit = this.actualPath()
+      .split('/')
+      .filter(item => fun.hasValue(item.trim()));
 
-    this.prevModule = this.actualModule;
-    this.actualModule = pathSplit[0];
-
-    this.actualRuta = _.join(pathSplit.slice(1), '/');
-
-    const keysIdsH5 = Object.keys(this.idsH5);
-    const currentRouteKey = keysIdsH5.find((key) => this.actualModule.includes(key));
-
-    if (fun.hasValue(currentRouteKey)) {
-      setTimeout(() => {
-        fun.scrollTo({ id: this.idsH5[currentRouteKey], behavior: 'smooth', block: 'start', inline: 'center' });
-      }, 500);
-    }
-
-    this.ready = true;
+    this.nextModule.set(undefined);
+    this.actualRuta.set(pathSplit.join('/').replace('/admin/', ''));
   }
 
   // =================================================================================
@@ -278,40 +315,24 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     FactsLocalStorage.verificateFacturasGuardadas();
   }
 
-  cambiarMenu(args: { url: string; navigate: boolean; id_h5?: string }) {
-    console.log('\n\n ---- cambiarMenu ---- ');
-    console.log('args:  ', args);
+  // =================================================================================
+  // NAVEGAR
+  // =================================================================================
 
-    let next_cambio_menu = '';
-
-    if (args.navigate) {
-      next_cambio_menu = `/admin/${args.url}`;
-
-      if (this.actualPath !== next_cambio_menu) {
-        this.runRouterNavigate({ bool: true, ruta: next_cambio_menu });
-      } else {
-        fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
-      }
-    } else {
-      this.prevModule = this.actualModule;
-      this.actualModule = args.url;
-
-      if (this.prevModule == this.actualModule) [this.actualModule, this.prevModule] = Array(2).fill(undefined);
+  async cambiarMenu(args: { url: string; navigate: boolean; event: any }) {
+    if (!args.navigate) {
+      this.nextModule.set(args.url);
+      return;
     }
-    setTimeout(() => {
-      if (fun.hasValue(args.id_h5)) fun.scrollTo({ id: args.id_h5, behavior: 'smooth', block: 'start', inline: 'center' });
-    }, 100);
-  }
 
-  finalizarCambioMenu(arg) {
-    if (arg.bool && arg.verificar) this.ready = false;
+    const nextCambioMenu = `/admin/${args.url}`;
 
-    if (arg.bool) {
-      this.prevModule = this.actualModule;
-      this.actualModule = undefined;
-      this.router.navigateByUrl(arg.ruta);
-    } else {
-      this.checkRouteActiva();
+    // Usar el nuevo servicio de navegación
+    const success = await this.navigationService.navigateTo(nextCambioMenu);
+
+    if (success) {
+      this.nextModule.set(undefined);
+      fun.enfocarInput(null, args.event.target);
     }
   }
 

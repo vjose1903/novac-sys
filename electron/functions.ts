@@ -1,27 +1,38 @@
 import * as fs from 'fs';
-import { pathAdd } from '../main';
+import { pathAdd, writeLogs } from '../main';
 import { BrowserWindow } from 'electron';
+import { ConfigI } from '../src/app/core/interface/config-interface';
 
 export default class Functions {
   static encriptar(arg: string): string {
     const base64String = btoa(unescape(encodeURIComponent(arg)));
     return base64String;
   }
-  static desEncriptar(arg: string): string {
-    const decodedString = decodeURIComponent(escape(atob(arg)));
-    return decodedString;
+  static desEncriptar(arg: string): { object: string; error?: boolean } {
+    try {
+      const decodedString = decodeURIComponent(escape(atob(arg)));
+      return { object: decodedString, error: false };
+    } catch (error) {
+      console.error('Error al desencriptar:', error);
+      return { object: '', error: true };
+    }
   }
 
-  static getConfigFile() {
+  static getConfigFile(): Promise<ConfigI> {
     return new Promise(async (resolve, reject) => {
       let pathConfig = (await pathAdd(`/app_config.config`)) as string;
 
       if (fs.existsSync(pathConfig)) {
         var res = fs.readFileSync(pathConfig, 'utf-8');
         var decript = this.desEncriptar(res);
-        resolve(decript);
+
+        if (decript.error) {
+          reject();
+        } else {
+          resolve(JSON.parse(decript.object));
+        }
       } else {
-        resolve('{}');
+        reject();
       }
     });
   }
@@ -85,7 +96,7 @@ export default class Functions {
   // __________________________________________________________________________________________________
   static async getDefaultPrinter(win: BrowserWindow) {
     const printers = await win.webContents.getPrintersAsync();
-    const defaultPrinter = printers.find((printer) => printer.isDefault);
+    const defaultPrinter = printers.find(printer => printer.isDefault);
     return defaultPrinter;
   }
 }

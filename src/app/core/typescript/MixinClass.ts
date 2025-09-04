@@ -1,7 +1,8 @@
-import { ModalClass } from '../../admin/components/modal/modal-class';
+const moment = require('../javascript/moment');
 import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
-import { DateUtils } from './date.utils';
+import { TablaClass } from '@core/components/new_tablas/tabla-class';
+import { DateUtils } from '@vjose1903/dateutils';
 
 interface mixinInit {
   component?: String;
@@ -13,7 +14,7 @@ interface fechaFactura {
   FechaFacturaMostrar?: string;
 }
 
-export class MixinClass extends ModalClass {
+export class MixinClass extends TablaClass {
   constructor() {
     super();
   }
@@ -23,12 +24,10 @@ export class MixinClass extends ModalClass {
 
   _init_mixin(arg?: mixinInit) {
     this.arg_mixin = arg;
-
-    this._init_layout(arg);
   }
 
   _destroy_mixin(algo?) {
-    this._destroy_layout();
+    // Método vacío para compatibilidad
   }
 
   // =========================================================================================================
@@ -80,32 +79,5 @@ export class MixinClass extends ModalClass {
 
   logGreen(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.deepCloning(body) : '');
-  }
-
-  eliminarRegistro(obj) {
-    const noFunction = (instance: any) => {
-      instance.dismissModal(instance.id);
-    };
-    this.openNewModal({
-      id: 'borrar',
-      header: 'Confirmar',
-      width: '510px',
-      html: `<p> ${obj?.texto} </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco', function: (instance) => noFunction(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => {
-              obj.siFunction();
-              instance.dismissModal(instance.id);
-            },
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
   }
 }

@@ -6,105 +6,123 @@
     <div class="row">
       <div class="col-4">
         <div class="card card-padding sombra h-100">
-          <div class="form-group mb-0 d-contents">
-            <label class="control-label">{{ pagosService.isReciboIngreso ? 'Cliente' : 'Suplidor' }}: </label>
-            <input
-              type="text"
-              id="entidadI"
-              (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
-              (focus)="htmlServ.selectValue($event)"
-              [placeholder]="pagosService.isReciboIngreso ? 'Nombre Cliente' : 'Nombre Suplidor'"
-              class="form-control mb-4"
-              autocomplete="off"
-              [ngClass]="{ disabled: !!entidadAdepositar }"
-            />
-            <div class="d-flex gap-2 mt-auto">
-              <button class="btn btn-gris" (click)="goBack()">Atras</button>
-              <button [disabled]="!entidadAdepositar" class="btn btn-gris" (click)="cancelarIgreso()">Nueva Busqueda</button>
+          <div class="widget">
+            <div class="widget-content">
+              <label class="control-label">{{ pagosService.isReciboIngreso ? 'Cliente' : 'Suplidor' }}: </label>
+              <input
+                type="text"
+                id="entidadI"
+                (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
+                (focus)="htmlServ.selectValue($event)"
+                [placeholder]="pagosService.isReciboIngreso ? 'Nombre Cliente' : 'Nombre Suplidor'"
+                class="form-control mb-4"
+                autocomplete="off"
+                [ngClass]="{ disabled: !!entidadAdepositar() }" />
+            </div>
+            <div class="widget-footer">
+              <div class="d-flex gap-3">
+                <button class="btn btn-blanco" (click)="goBack()">Atrás</button>
+                <button [disabled]="!entidadAdepositar()" class="btn btn-gris" (click)="abrirModalDinamicText('nuevo')">Nueva Búsqueda</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-8 pl-0">
-        @if (entidadAdepositar) {
-        <div class="entidadAdepositar">
-          <div class="nombre_entidad">
-            <h3 class="negrita mb-0">{{ entidadAdepositar.nombre_completo }}</h3>
-          </div>
+      <div class="col-8 ps-0">
+        @if (entidadAdepositar()) {
+          <div class="entidadAdepositar">
+            <div class="nombre_entidad">
+              <h3 class="negrita mb-0">{{ entidadAdepositar().nombre_completo }}</h3>
+            </div>
+            <div class="cuerpo">
+              <div class="cajas">
+                <div class="izquierda pe-2">
+                  <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
+                    <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
+                  </span>
 
-          <div class="cuerpo">
-            <div class="cajas">
-              <div class="centro">
-                <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white">
-                  <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
-                </span>
-              </div>
+                  <span class="w-100 detalleBalance badge bg-info mb-2">
+                    <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
+                  </span>
+                  @if (facturasSelected().length) {
+                    <span class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
+                      <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo()) }}</span>
+                    </span>
+                  }
+                  @if (facturasSelected().length) {
+                    <span class="w-100 detalleBalance badge bg-warning mb-2">
+                      <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando()) }}</span>
+                    </span>
+                  }
+                </div>
+                <div class="derecha ps-2">
+                  <span class="w-100 detalleBalance badge text-shadow bg-orange text-white mb-2">
+                    <span>Mora:</span> <span>RD$ {{ formatoNumero(mora_general()) }}</span>
+                  </span>
 
-              <div class="izquierda">
-                <span class="w-100 detalleBalance badge bg-info mb-2">
-                  <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
-                </span>
-                @if (facturasSelected.length) {
-                <span class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
-                  <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo) }}</span>
-                </span>
-                } @if (facturasSelected.length) {
-                <span class="w-100 detalleBalance badge bg-warning mb-2">
-                  <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando) }}</span>
-                </span>
-                }
-              </div>
-
-              <div class="derecha">
-                <span class="w-100 detalleBalance badge blue text-shadow text-white mb-2">
-                  <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
-                </span>
-                <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
-                  <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotasCredito) }}</span>
-                </span>
-                <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
-                  <span> Debiendo:</span> <span>RD$ {{ formatoNumero(totalFacturado + totalNotasDebito - totalPagado - totalNotasCredito) }}</span>
-                </span>
+                  <span class="w-100 detalleBalance badge bg-blue text-shadow text-white mb-2">
+                    <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
+                  </span>
+                  <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
+                    <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotasCredito) }}</span>
+                  </span>
+                  <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
+                    <span> Debiendo:</span> <span>RD$ {{ formatoNumero(debiendo_con_mora()) }} </span>
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div class="porcentaje">
-            <div class="d-flex justify-content-between">
-              <span class="negrita">Porcentaje de pago</span>
-            </div>
-            <div class="w-100" [pTooltip]="totalPagadoPorciento > 0 ? totalPagadoPorciento + '%' : ''">
+            <div class="porcentaje">
+              @if (entidadAdepositar()) {
+                <div class="d-flex justify-content-between">
+                  <span class="negrita">Porcentaje de pago</span>
+                </div>
+              }
               <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
             </div>
           </div>
-        </div>
         }
       </div>
     </div>
   </div>
   <div class="col-12 medio">
     @if (facturas && facturas?.length) {
-    <div class="card sombra cardFacturas br-1">
-      <div class="bonton_select_all">
-        <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
-      </div>
-      <div class="divFantasma">
-        <div #cardTabla id="cardTabla" class="tablaIngresos">
-          <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+      <div class="card sombra cardFacturas br-10">
+        <div class="header">
+          <div class="d-flex align-items-center gap-3">
+            @if (this.all_facturas().length > this.tablaComponent?.config.obj_paginate.per_page) {
+              <div class="more-pages animated flash slower infinite"><strong class="me-2">Atención: </strong> Existen múltiples páginas</div>
+            }
+
+            <div class="d-flex align-items-center gap-2">
+              Mora General
+              <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" [(porcentajeSelected)]="porcentajeSelected" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
+            </div>
+
+            @if (areAllSelected()) {
+              <input class="apple-switch" type="checkbox" (change)="selectAllPagoTotal()" [checked]="areAllSelectedPagoTotal()" pTooltip="{{ areAllSelectedPagoTotal() ? 'Deseleccionar pago total' : 'Marcar pago total' }}" tooltipPosition="left" />
+            }
+
+            <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+          </div>
         </div>
-        <span class="w-90 facturas-seleccionadas">
-          Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ totalRegistros }}</strong>
-        </span>
+        <div class="divFantasma">
+          <div #cardTabla id="cardTabla" class="tablaIngresos">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
+          <span class="w-90 facturas-seleccionadas">
+            Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ this.all_facturas().length }}</strong>
+          </span>
+        </div>
       </div>
-    </div>
     }
   </div>
   <div class="col-12 abajo">
     @if (facturas && facturas?.length) {
-    <div class="d-flex justify-content-end gap-2">
-      <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
-      <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarPago()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
-    </div>
+      <div class="d-flex justify-content-end gap-2">
+        <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
+        <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarPago()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      </div>
     }
   </div>
 </div>

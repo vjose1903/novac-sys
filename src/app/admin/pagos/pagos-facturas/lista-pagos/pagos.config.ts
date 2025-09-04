@@ -1,4 +1,4 @@
-import { tableCellType, table_info } from '../../../components/new_tablas/tabla-class';
+import { tableCellType, table_info } from '@components/new_tablas/tabla-class';
 
 export enum tipoPagoE {
   recibosIngresos = 'recibo_ingreso',

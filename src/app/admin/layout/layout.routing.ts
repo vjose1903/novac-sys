@@ -5,7 +5,9 @@ import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
 import { ReportesComponent } from '../reportes/reportes.component';
 import { LayoutComponent } from './layout.component';
-
+import { PermissionsGuardService } from '@core/guard/permissions.guard';
+import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
+import { Permisos } from '@core/typescript/permisos';
 const routes: Routes = [
   {
     path: '',
@@ -14,56 +16,59 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: HomeAdminComponent,
+        canDeactivate: [CanDeactivateGuard],
       },
       {
         path: 'factura',
-        loadChildren: () => import('../facturacion/facturacion.module').then((m) => m.FacturacionModule),
+        loadChildren: () => import('../facturacion/facturacion.module').then(m => m.FacturacionModule),
       },
-
+      {
+        path: 'ecf',
+        loadChildren: () => import('../facturacion-electronica/facturacion-electronica.module').then(m => m.FacturacionElectronicaModule),
+      },
       {
         path: 'produccion',
         component: ProduccionComponent,
+        canDeactivate: [CanDeactivateGuard],
       },
       {
         path: 'registros',
-        loadChildren: () => import('../registros/registros.module').then((m) => m.RegistrosModule),
+        loadChildren: () => import('../registros/registros.module').then(m => m.RegistrosModule),
       },
       {
         path: 'manipular',
-        loadChildren: () => import('../manipular facturas/manipular-facturas.module').then((m) => m.ManipularFacturasModule),
+        loadChildren: () => import('../manipular facturas/manipular-facturas.module').then(m => m.ManipularFacturasModule),
       },
       {
         path: 'pagos',
-        loadChildren: () => import('../pagos/pagos.module').then((m) => m.PagosModule),
+        loadChildren: () => import('../pagos/pagos.module').then(m => m.PagosModule),
       },
       {
         path: 'viajes',
-        loadChildren: () => import('../viajes/viajes.module').then((m) => m.ViajesModule),
+        loadChildren: () => import('../viajes/viajes.module').then(m => m.ViajesModule),
       },
       {
         path: 'contabilidad',
-        loadChildren: () => import('../contabilidad/contabilidad.module').then((m) => m.ContabilidadModule),
+        loadChildren: () => import('../contabilidad/contabilidad.module').then(m => m.ContabilidadModule),
       },
-
+      // {
+      //   path: 'recibos',
+      //   loadChildren: () => import('../recibos/recibos.module').then(m => m.RecibosModule),
+      // },
       {
         path: 'inventario',
         component: InventarioComponent,
+        canDeactivate: [CanDeactivateGuard],
       },
-
       {
         path: 'conduce',
-        loadChildren: () => import('../conduce/conduce.module').then((m) => m.ConduceModule),
+        loadChildren: () => import('../conduce/conduce.module').then(m => m.ConduceModule),
       },
-
       {
         path: 'reportes',
         component: ReportesComponent,
-        // canActivate: [NgxPermissionsGuard],
-        // data: {
-        //   permissions: {
-        //     only: Object.values(Permisos.reporte),
-        //   },
-        // },
+        canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.reporte), 'admin/dashboard')],
+        canDeactivate: [CanDeactivateGuard],
       },
     ],
   },

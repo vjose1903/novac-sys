@@ -1,15 +1,21 @@
-export const KEYWORD_ELECTRON_TEST = 'electron-test';
-export const KEYWORD_ELECTRON_SENDER = 'electron-envio';
-export const KEYWORD_ELECTRON_RESPONSE = 'electron-respuesta';
-export const KEYWORD_ELECTRON_QUIT_APP = 'electron-quit-app';
-export const KEYWORD_ELECTRON_EVENT_DECRYPT = 'electron-desencriptar';
-export const KEYWORD_ELECTRON_EVENT_ENCRYPT = 'electron-encriptar';
-export const KEYWORD_ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
-export const KEYWORD_ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
-export const KEYWORD_ELECTRON_PRINT_BASE64 = 'electron-print-base64';
-export const KEYWORD_ELECTRON_CHANGE_CONFIG_FILE = 'electron-change-config-file';
-export const KEYWORD_ELECTRON_RELOAD = 'electron-reload';
+export const ELECTRON_TEST = 'electron-test';
+export const ELECTRON_TO_ANGULAR = 'electron-to-angular';
+export const ELECTRON_SENDER = 'electron-envio';
+export const ELECTRON_RESPONSE = 'electron-respuesta';
+export const ELECTRON_FOCUS_WINDOW = 'electron-focus-window';
+export const ELECTRON_CLOSE_CONFIRMATION = 'electron-close-confirmation';
+export const ELECTRON_SHOW_CLOSE_CONFIRMATION = 'electron-show-close-confirmation';
+export const ELECTRON_EVENT_DECRYPT = 'electron-desencriptar';
+export const ELECTRON_EVENT_ENCRYPT = 'electron-encriptar';
+export const ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
+export const ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
+export const ELECTRON_PRINT_BASE64 = 'electron-print-base64';
+export const ELECTRON_EXPORT_CSV = 'electron-export-csv';
+export const ELECTRON_OPEN_WEB_BROWSER = 'electron-open-web-browser';
+export const ELECTRON_RELOAD = 'electron-reload';
 export const ELECTRON_EVENT_CHECK_UPDATE = 'check-update';
+export const ELECTRON_EVENT_DOWNLOAD_UPDATE = 'download-update';
+export const ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE = 'verificate-update-available';
 export const ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE = 'checking-for-update';
 export const ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE = 'update-available';
 export const ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS = 'download-progress';
@@ -35,10 +41,11 @@ export interface Printer {
 }
 
 export interface MessageTaskInterface {
-  id: string;
+  id?: string;
   eventName: string;
   data: any;
-  response: any;
+  response?: any;
+  error?: boolean;
 }
 export interface PrintJob {
   print_width: number;
@@ -49,7 +56,7 @@ export interface PrintJob {
 }
 
 export default class SharedElectronAngular {
-  static sendEventToAngular(win, params: { event_name: string; info: any }) {
-    if (win) win.webContents.send(KEYWORD_ELECTRON_RESPONSE, { event_name: params.event_name, info: params.info });
+  static sendEventToAngular(win, params: MessageTaskInterface) {
+    if (win) win.webContents.send(ELECTRON_RESPONSE, { eventName: params.eventName, data: params.data });
   }
 }
