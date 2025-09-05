@@ -133,16 +133,20 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
       this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
 
-      if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
-        fun.setTimeout(() => {
-          fun.enfocarInput(`search-${this.realIdTabla}`);
-        }, 100);
-      }
+
 
       this.config.info.map(item => {
         if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
       });
     }, 0);
+  }
+
+  focusSearchInput() {
+    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
+      fun.setTimeout(() => {
+        fun.enfocarInput(`search-${this.realIdTabla}`);
+      }, 100);
+    }
   }
 
   verifyButtons(config: table_config) {
