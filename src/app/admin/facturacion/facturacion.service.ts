@@ -23,10 +23,9 @@ export class FacturacionService {
   cotizacion_selected;
   productos_devueltos = [];
   filasDetalle;
-  
+
   tipoFacturaClass = new TiposFacturaC();
   serieType = signal(serie.electronica);
-
 
   isCompra = computed(() => this.tipoDocumento() == tipoDocFacturacion.compra);
   isVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.venta);
@@ -48,16 +47,18 @@ export class FacturacionService {
 
   constructor() {}
 
-  setTipos(metodo: tipoDocFacturacion, serie: serie, sameTipo: boolean = false) {
+  setTipos(args: { metodo: tipoDocFacturacion; serie: serie; equivalentSerie?: boolean; tipoFacturaId?: number }) {
     return new Promise<any>(async (resolve, reject) => {
+      const { metodo, serie, equivalentSerie, tipoFacturaId } = args;
+
       this.serieType.set(serie);
 
       if (metodo == tipoDocFacturacion.compra || metodo == tipoDocFacturacion.venta) {
         const defaultKey = metodo == tipoDocFacturacion.compra ? tFacturaKey.factura_de_credito_fiscal : tFacturaKey.factura_de_consumo;
 
-        const keyTarget = sameTipo && fun.hasValue(this.tipoFactura) ? this.tipoFactura.key : defaultKey;
+        const keyTarget = equivalentSerie && fun.hasValue(this.tipoFactura) ? this.tipoFactura.key : defaultKey;
 
-        this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == keyTarget && tipo_factura.serie == this.serieType());
+        this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => (tipoFacturaId ? tipo_factura.id == tipoFacturaId : tipo_factura.key == keyTarget && tipo_factura.serie == this.serieType()));
 
         this.htmlTiposFacturas = `<div style=" max-width: 21rem;" > \
           <span>${comprobante[this.serieType()].factura_de_credito_fiscal} Factura de credito fiscal</span><br>\

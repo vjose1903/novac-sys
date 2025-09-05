@@ -205,7 +205,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     super();
 
     this.formPropietario = this.fb.group({ id: null, direccion: null, telefono: null, nombre_completo: null });
-
     this.timeInterval = fun.setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
   }
 
@@ -471,7 +470,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       const serieSelected = useNormalSerie ? serie.normal : this.configApp.serie_default;
 
-      this.factServ.setTipos(this.factServ.tipoDocumento(), serieSelected).then(result => {
+      this.factServ.setTipos({ metodo: this.factServ.tipoDocumento(), serie: serieSelected }).then(result => {
         //
         [this.fecha_vencimiento, this.fecha_equivalente, this.fecha_viaje] = Array(3).fill(new Date());
         [this.is_adelantada, this.is_viaje, this.factura_pendiente, this.is_editando, this.errorComprobante] = Array(5).fill(false);
@@ -581,12 +580,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         }
       }
 
-      // const currentSerie = comprobante[this.configApp.serie_default].factura_de_consumo;
-
-      // const esDeCotizacionOPreVenta = original_factura.action == actionFacturacion.bill_from_pre_venta || original_factura.action == actionFacturacion.bill_from_cotizacion;
-      // const value_buscar = esDeCotizacionOPreVenta ? default_serie_key : factura.tipo_factura_id;
-      // const by_buscar = esDeCotizacionOPreVenta ? 'key' : 'id';
-
       if (original_factura.action !== actionFacturacion.duplicate) this.setPropietario(factura);
 
       // Determinar serie actual
@@ -602,7 +595,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
 
       this.factServ
-        .setTipos(this.factServ.tipoDocumento(), currentSerie, equivalentSerie)
+        .setTipos({ metodo: this.factServ.tipoDocumento(), serie: currentSerie, equivalentSerie, tipoFacturaId: factura.tipo_factura_id })
         .then(result => {
           // Configurar factura pendiente
           this.factura_pendiente = factura?.factura_pendiente || false;
@@ -907,7 +900,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   async changeSerie() {
-    this.factServ.setTipos(this.factServ.tipoDocumento(), this.factServ.serieType(), true).then(result => {
+    this.factServ.setTipos({ metodo: this.factServ.tipoDocumento(), serie: this.factServ.serieType(), equivalentSerie: true }).then(result => {
       this.errorComprobante = false;
       setTimeout(() => this.checkTipoFactura(), 0);
     });
