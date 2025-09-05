@@ -44,9 +44,10 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
 
   handleCloseModal(modalId: string, dataToReturn?: ICallbackModal) {
     const modal: DynamicModalClass = Ss.dynamicModalService.findModalConfigById(modalId);
+
     if (modal) {
       if (dataToReturn && modal.returnData) modal.returnData({ data: dataToReturn, modalId: modalId, type: modalCloseType.returnData });
-      if (modal.hideModal) modal.hideModal({ modalId, type: modalCloseType.onHide });
+      if (modal.hideModal) modal.hideModal({ modalId, type: modalCloseType.onHide, hasReturnData: !!dataToReturn });
 
       Ss.dynamicModalService.modalsConfigurations = this.modalsConfig.filter(modalConfig => modalConfig.id != modalId);
     }
@@ -128,7 +129,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
 
       fun.setTimeout(() => {
         const currentReceptor = this.modalReceptor['_results'].find((receptor: any) => receptor.modalReceptorId == config.id);
-        
+
         if (!currentReceptor) {
           resolve();
           return;

@@ -479,7 +479,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       buscarArticuloModalConf.component = BuscarArticuloComponent;
       buscarArticuloModalConf.closableEsc = true;
 
-      buscarArticuloModalConf.setCallback((args: ICallbackModal) => this.llenarRowDespuesDeFiltro(args));
+      buscarArticuloModalConf.setCallback((args: ICallbackModal) => this.llenarRowDespuesDeFiltro(args, index));
       buscarArticuloModalConf.show();
 
       setTimeout(() => fun.enfocarInput('input_fantasma'), 10);
@@ -491,7 +491,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           is_compra: this.factServ.isCompra(),
         });
 
-        this.llenarRowDespuesDeFiltro({ data: { articulo: res.data[0], index } }, false);
+        this.llenarRowDespuesDeFiltro({ data: { articulo: res.data[0], index } }, index, false);
       } catch (error) {}
     }
   }
@@ -907,11 +907,16 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.inputDrop) fun.setTimeout(() => fun.enfocarInput(this.inputDrop), 10);
   }
 
-  llenarRowDespuesDeFiltro(args: ICallbackModal | { data: any }, fromModal: boolean = true) {
-    if (fromModal && (args as ICallbackModal).type == modalCloseType.onHide) return;
+  llenarRowDespuesDeFiltro(args: ICallbackModal | { data: any }, index: number, fromModal: boolean = true) {
+    if (fromModal && (args as ICallbackModal).type == modalCloseType.onHide) {
+      if (!(args as ICallbackModal).hasReturnData) {
+        fun.enfocarAndSelectInput(`codigo-${index}`);
+      }
 
-    const { articulo, index, tipo } = args.data;
+      return;
+    }
 
+    const { articulo, tipo } = args.data;
     if (fun.hasValue(tipo) && tipo == 'data_no_found') {
       fun.enfocarAndSelectInput(`codigo-${index}`);
       return;

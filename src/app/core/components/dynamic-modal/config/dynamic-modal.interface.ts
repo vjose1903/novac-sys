@@ -24,6 +24,7 @@ export interface ICallbackModal {
   modalId?: any;
   extra?: any;
   type?: modalCloseType;
+  hasReturnData?: boolean;
 }
 
 export interface IBtnDisableFunction {
