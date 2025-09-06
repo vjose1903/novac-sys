@@ -9,17 +9,11 @@
               <div class="form-group">
                 <label class="control-label mt-1 mb-0">Nombre producto: <span style="color: red">*</span></label>
                 <div>
-<<<<<<< HEAD
-                  <p-dropdown
-                    placeholder="Seleccione producto"
-                    [options]="listaProductos"
-=======
                   <p-select
                     onElementReady
                     (elementReady)="enfocarInput('articulo_id')"
                     [placeholder]="'Seleccione producto'"
                     [options]="listaProductos()"
->>>>>>> dev
                     [(ngModel)]="producto_terminado_en_turno"
                     optionLabel="nombre"
                     [filter]="true"
@@ -28,21 +22,9 @@
                     (onHide)="saltar('cantidad_producir')"
                     (keydown.enter)="saltar('cantidad_producir')"
                     (onChange)="getIngredients()"
-<<<<<<< HEAD
-                    styleClass="form-control min"
-                    [virtualScroll]="true"
-                    [virtualScrollItemSize]="30"
-                    id="articulo_id"
-                  >
-                    <ng-template pTemplate="selectedItem">
-                      <div>{{ producto_terminado_en_turno.nombre }}</div>
-                    </ng-template>
-                  </p-dropdown>
-=======
                     class="form-control min"
                     inputId="articulo_id">
                   </p-select>
->>>>>>> dev
                 </div>
               </div>
             </div>
@@ -93,22 +75,13 @@
 
               <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
                 @for (ingrediente of ingredientes; track ingrediente.id; let index = $index) {
-<<<<<<< HEAD
-                <div class="ingredientesList">
-                  <div class="NombreIngre">{{ ingrediente.nombre + ': ' }}</div>
-                  <div class="cantIngre no-wrap">
-                    <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index != 0 ? 'top' : 'bottom'" [escape]="false">
-                      {{ lookprincipal(ingrediente) }}
-                    </span>
-=======
-                  <div class="ingredientesList d-flex">
-                    <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
-                    <div style="width: 100%">
+                  <div class="ingredientesList">
+                    <div class="NombreIngre">{{ ingrediente.nombre + ': ' }}</div>
+                    <div class="cantIngre no-wrap">
                       <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index != 0 ? 'top' : 'bottom'" [escape]="false">
                         {{ lookprincipal(ingrediente) }}
                       </span>
                     </div>
->>>>>>> dev
                   </div>
                 }
               </div>
@@ -116,29 +89,17 @@
             <div class="col-6 p-0 bordes fondoBlanco">
               <div class="text-center tituloIngre">Producción</div>
               @if (ingredientesParaProduccion.length > 0) {
-<<<<<<< HEAD
-              <div id="produccion_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                @for (ingrediente of ingredientesParaProduccion; track ingrediente.id; let index_ingrediente = $index) {
-                <div class="ingredientesList">
-                  <div class="NombreIngre">{{ ingrediente.nombre + ': ' }}</div>
-                  <div class="cantIngre no-wrap">
-                    <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'" [escape]="false">
-                      {{ lookprincipal(ingrediente) }}
-                    </span>
-                  </div>
-=======
                 <div id="produccion_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
                   @for (ingrediente of ingredientesParaProduccion; track ingrediente.id; let index_ingrediente = $index) {
-                    <div class="ingredientesList d-flex">
-                      <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
-                      <div class="" style="width: 100%">
+                    <div class="ingredientesList">
+                      <div class="NombreIngre">{{ ingrediente.nombre + ': ' }}</div>
+                      <div class="cantIngre no-wrap">
                         <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'" [escape]="false">
                           {{ lookprincipal(ingrediente) }}
                         </span>
                       </div>
                     </div>
                   }
->>>>>>> dev
                 </div>
               }
             </div>
@@ -146,36 +107,30 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="col-12 medio">
-    <div id="cardTabla" class="card card-padding-1 sombra h-100">
-      <div #cardTablaProd class="divProducciones">
-        <div class="divTabla">
-          <dinamic-table
-            onElementReady
-            (elementReady)="tableIsInitialized.set(true)"
-            [cardTabla]="cardTablaProd"
-            [seleccionado]="articuloEditando?.id"
-            [data]="lista_produccion()"
-            (dataChange)="lista_produccion.set($event)"
-            [(TablasComponent)]="tablaComponent"
-            [config]="table_config"
-            (table_events)="handle_table_events($event)"></dinamic-table>
+    <div class="col-12 medio">
+      <div id="cardTabla" class="card card-padding-1 sombra h-100">
+        <div #cardTablaProd class="divProducciones">
+          <div class="divTabla">
+            <dinamic-table
+              onElementReady
+              (elementReady)="tableIsInitialized.set(true)"
+              [cardTabla]="cardTablaProd"
+              [seleccionado]="articuloEditando?.id"
+              [data]="lista_produccion()"
+              (dataChange)="lista_produccion.set($event)"
+              [(TablasComponent)]="tablaComponent"
+              [config]="table_config"
+              (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-12 abajo">
-<<<<<<< HEAD
-    <div class="d-flex justify-content-end w-100 gap-2">
-      <button [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP', 'Seguro de que desea cancelar la produccion.', null)" type="submit" class="btn btn-blanco">Cancelar</button>
-      <button [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar', 'Seguro de que desea confirmar la produccion.', null)" type="submit" class="btn btn-verde">Confirmar</button>
-=======
-    <div class="d-flex justify-content-end w-100 gap-3">
-      <button [disabled]="habilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP' )" type="submit" class="btn btn-gray">Cancelar</button>
-      <button [disabled]="habilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar' )" type="submit" class="btn btn-verde">Confirmar</button>
->>>>>>> dev
+    <div class="col-12 abajo">
+      <div class="d-flex justify-content-end w-100 gap-3">
+        <button [disabled]="habilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP')" type="submit" class="btn btn-gray">Cancelar</button>
+        <button [disabled]="habilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar')" type="submit" class="btn btn-verde">Confirmar</button>
+      </div>
     </div>
   </div>
 </div>

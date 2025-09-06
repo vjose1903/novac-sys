@@ -30,11 +30,7 @@
     .cardFacturas {
       display: grid;
       grid-template-areas:
-<<<<<<< HEAD:src/app/admin/pagos/pagos-facturas/Formulario/pagos.component.scss
-        'bonton_select_all'
-=======
         'header'
->>>>>>> dev:src/app/admin/recibos/recibo-ingresos/Formulario/ingresos.component.scss
         'divFantasma';
       grid-template-rows: min-content auto;
       height: 100%;
@@ -85,11 +81,7 @@
   display: grid;
   height: 100%;
   grid-template-areas:
-<<<<<<< HEAD:src/app/admin/pagos/pagos-facturas/Formulario/pagos.component.scss
     'nombre_entidad'
-=======
-    'nombre_cliente'
->>>>>>> dev:src/app/admin/recibos/recibo-ingresos/Formulario/ingresos.component.scss
     'cuerpo'
     'porcentaje';
   grid-template-rows: min-content auto min-content;

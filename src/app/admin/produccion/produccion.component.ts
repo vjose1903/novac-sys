@@ -1,31 +1,14 @@
-<<<<<<< HEAD
-import { ConfigService } from './../../core/services/configuration.service';
-import { HtmlElementsService } from './../../core/services/html-elements.service';
-import { Component, OnInit, OnDestroy, AfterViewInit, inject } from '@angular/core';
-import * as _ from 'lodash';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { TablasService } from '../components/new_tablas/tablas.service';
-import { ArticuloC } from '../registros/articulos/articulo';
-import { tipos_articulos } from '../registros/articulos/tipo-articulo/tipo-articulo';
-import { ProduccionC } from './produccion';
-
-import { fun } from '../../core/services/functions.service';
-import { medidas, tableCellType, table_config } from '../components/new_tablas/tabla-class';
-import { ModalClass } from '../components/modal/modal-class';
-const $ = require('jquery');
-=======
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ArticuloC, ArticuloI, tipos_articulos } from '@registros/articulos/articulo';
 import { ProduccionC } from './produccion';
 import { fun } from '@core/services/functions.service';
-import { default_per_page, medidas, table_config } from '@components/new_tablas/tabla-class';
+import { default_per_page, medidas, table_config, tableCellType } from '@components/new_tablas/tabla-class';
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
->>>>>>> dev
 @Component({
   selector: 'app-produccion',
   templateUrl: './produccion.component.html',
@@ -52,32 +35,20 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     ],
     colores: true,
     id_tabla: 'lista_produccion',
-<<<<<<< HEAD
-    obj_paginate: { show: true, showTotal: true, is_local: true },
-=======
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: true },
->>>>>>> dev
     botones: { editar: { show: true, permiso: null }, borrar: { show: true, permiso: null } },
   };
   tablaComponent;
 
-<<<<<<< HEAD
-  listaProductos = [];
-=======
   configApp: ConfigI;
   listaProductos = signal<ArticuloI[]>([]);
->>>>>>> dev
   articuloEditando: any;
   articuloClass = new ArticuloC();
   produccionClass = new ProduccionC();
 
-<<<<<<< HEAD
   htmlServ = inject(HtmlElementsService);
-=======
   enfocarInput = fun.enfocarInput;
-  htmlServ = inject(HtmlElementsService);
   dynamicModalServ = inject(DynamicModalService);
->>>>>>> dev
 
   constructor() {
     super();
@@ -90,12 +61,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
   ngOnInit() {
     this._init_mixin({ component: 'produccion', is_routing: true });
-<<<<<<< HEAD
-    this.optionsMedidas[0] = ConfigService.config.medida_producto_terminado;
-=======
     this.configApp = Ss.configServ.config;
     this.optionsMedidas[0] = this.configApp.medida_producto_terminado;
->>>>>>> dev
 
     this.getProductosTerminados();
   }
@@ -116,11 +83,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async getIngredients() {
-<<<<<<< HEAD
-    this.ingredientes = this.producto_terminado_en_turno.formulas_productos_terminados.sort((a, b) => fun.compare(a, b, 'articulo_combo_id', 'asc'));
-=======
     this.ingredientes = [...this.producto_terminado_en_turno.formulas_productos_terminados].sort((a, b) => fun.compare(a, b, 'articulo_combo', 'asc'));
->>>>>>> dev
     this.ingredientesParaProduccion.length = 0;
     [this.cantidad_producir, this.medida_producir] = Array(2).fill(null);
   }
@@ -251,24 +214,12 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
           }
         }
 
-<<<<<<< HEAD
-        if (this.lista_produccion.length > 0) {
-          const all_ingredientes = _.flattenDeep(
-            this.lista_produccion.map((producto) => {
-              const producto_distinto_en_lista = producto.articulo_id != ingrediente.articulo_id ? fun.getProperty(producto, 'ingredientes') : [];
-              return producto_distinto_en_lista;
-            }),
-          );
-          const ingredientesIguales = all_ingredientes.filter((item) => item.articulo_combo_id == ingrediente.articulo_combo_id);
-
-=======
         if (this.lista_produccion().length > 0) {
           const lista_produccion = this.lista_produccion();
 
           const all_ingredientes = lista_produccion.map(producto => (producto.articulo_id != ingrediente.articulo_id ? fun.getProperty(producto, 'ingredientes') : [])).flat(Infinity);
           const ingredientesIguales = all_ingredientes.filter(item => item.articulo_combo == ingrediente.articulo_combo);
 
->>>>>>> dev
           if (ingredientesIguales.length) cantidad_calculada = ingredientesIguales.reduce((acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
         }
 
@@ -292,15 +243,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
               cantidad_en_unidades: contenido_a_producir[ingrediente.medida],
               medida: ingrediente.medida,
             });
-<<<<<<< HEAD
             this.ingredientesParaProduccion = this.ingredientesParaProduccion.sort((a, b) => fun.compare(a, b, 'articulo_combo_id', 'asc'));
-=======
-            this.ingredientesParaProduccion.sort((a, b) => {
-              if (a.articulo_combo < b.articulo_combo) return -1;
-              if (a.articulo_combo > b.articulo_combo) return 1;
-              return 0;
-            });
->>>>>>> dev
           }
         });
       });
@@ -376,43 +319,6 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion().length }]);
   }
 
-<<<<<<< HEAD
-  abrirModalDinamicText(tipo, texto_modal, data) {
-    const functions = {
-      confirmar: (instance, data?) => {
-        this.confirmarProduccion();
-        this.dismissModal(instance);
-      },
-      borrar: (instance, data) => {
-        this.eliminarReg(data);
-        this.dismissModal(instance);
-      },
-      cancelarP: (instance, data) => {
-        this.borrarForm();
-        this.activateAllOptions();
-        this.lista_produccion.length = 0;
-        this.dismissModal(instance);
-      },
-    };
-
-    this.openNewModal({
-      id: 'produccion_modal',
-      header: 'Confirmar',
-      width: '510px',
-      html: `<p> ${texto_modal} </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco', function: (instance) => this.dismissModal(instance), label: 'NO', disable: false },
-          { clase: 'btn btn-verde', function: (instance) => functions[tipo](instance, data), label: 'SI', disable: false },
-        ],
-      },
-    });
-  }
-
-  dismissModal(modalInstance) {
-    modalInstance.dismissModal(modalInstance.id);
-=======
   abrirModalDinamicText(tipo, data = null) {
     const msgConfig = {
       confirmar: 'Seguro de que desea confirmar la produccion.',
@@ -447,7 +353,6 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     this.borrarForm();
     this.activateAllOptions();
     this.lista_produccion.set([]);
->>>>>>> dev
   }
 
   formarIngredientes(ingredientes) {
