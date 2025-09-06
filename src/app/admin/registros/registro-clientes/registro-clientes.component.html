@@ -178,7 +178,6 @@
                               (onChange)="form.controls.municipio_id.setValue(null)"
                               (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
                               (keyup.enter)="saltar('municipio_select'); pSelectProvincia.hide()"
-                              (onFocus)="htmlServ.showPSelectPanel($event, pSelectProvincia)"
                               [resetFilterOnHide]="true" />
                           }
                         </div>
@@ -201,7 +200,6 @@
                               emptyFilterMessage="Municipio no encontrado"
                               (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
                               (keyup.enter)="saltar('campoDir'); pSelectMunicipio.hide()"
-                              (onFocus)="htmlServ.showPSelectPanel($event, pSelectMunicipio)"
                               [resetFilterOnHide]="true" />
                           </div>
                         </div>

@@ -120,7 +120,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       });
 
       // this.form.valueChanges.subscribe(val => {
-      //   console.log(' ');
+      //   p(' ');
       //   console.log('val ', val);
       //   console.log('this.form ', this.form);
       // });
@@ -168,6 +168,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'vendedor' } };
     this.empleadosClass.getAll(extra).then(res => {
       this.vendedores = res['data'];
+
       this.form.controls.vendedor_id.setValue(this.vendedores[0].id);
     });
   }
@@ -319,7 +320,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   saltar(campo) {
     const formulario = this.form.getRawValue();
-    console.log('campo ', campo);
 
     if (campo != 'send') {
       if (campo == 'campoNombre') {
@@ -329,7 +329,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
         }
+      } else if (campo == 'municipio_select') {
+        if (fun.hasValue(formulario.provincia_id)) fun.enfocarInput(campo);
       } else fun.enfocarInput(campo);
+    } else if (campo == 'campoDir') {
+      if (fun.hasValue(formulario.municipio_id)) fun.enfocarInput(campo);
     } else {
       if (!this.formIsInvalid()) {
         fun.setTimeout(() => this.submit(), 250);
