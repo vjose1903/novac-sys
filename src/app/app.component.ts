@@ -329,19 +329,26 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
 
     const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
     this._ipc.sendTask(task).then((res: any) => {
-      console.log('res ---> ', res);
-      if (res.available) {
-        if (res.downloadStarted) {
-          this.visible.set(true);
+      fun.setTimeout(() => {
+        console.log('res ---> ', res);
+        if (res.available) {
+          if (res.downloadStarted) {
+            // Cerrar el modal de actualización solo cuando la descarga realmente inicie
+            if (modalInstance) modalInstance.close();
+            this.visible.set(true);
+          } else {
+            fun.toastError(res.msg, 'ERROR');
+          }
         } else {
-          fun.toastError(res.msg, 'ERROR');
+          fun.toastInfo(res.msg, 'INFORMACIÓN');
         }
-      } else {
-        fun.toastInfo(res.msg, 'INFORMACIÓN');
-      }
 
-      if (modalInstance) modalInstance.close();
-      updateBtn.processing = false;
+        try {
+          if (updateBtn) updateBtn.processing = false;
+        } catch (error) {
+          console.error('Error al actualizar el botón de procesamiento:', error);
+        }
+      }, 0);
     });
   }
 
