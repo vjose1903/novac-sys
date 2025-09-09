@@ -130,6 +130,8 @@ function createWindow() {
           event.preventDefault();
           sendCloseConfirmation();
         } else {
+          // Cuando se está actualizando, permitir el cierre sin prevención
+          writeLogs('Cerrando aplicación para actualización...', 'close-event');
           closeApp();
         }
       });

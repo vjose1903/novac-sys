@@ -99,7 +99,8 @@ export default class AppUpdate {
       // Configurar la variable global para indicar que estamos cerrando para actualizar
       sharedState.isUpdaterClosing = true;
 
-      this.autoUpdater.quitAndInstall();
+      // Limpiar todos los listeners y procesos antes de instalar
+      this.prepareForUpdate();
     });
 
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
@@ -177,5 +178,60 @@ export default class AppUpdate {
         reject(error);
       }
     });
+  }
+
+  /**
+   * Prepara la aplicación para la actualización limpiando listeners y procesos
+   */
+  private prepareForUpdate() {
+    writeLogs('Preparando aplicación para actualización...', 'prepareForUpdate');
+
+    try {
+      // Cerrar splash handler si existe
+      const { SplashHandler } = require('./splash-handler');
+      if (SplashHandler && SplashHandler.getInstance) {
+        const splashHandler = SplashHandler.getInstance();
+        if (splashHandler && splashHandler.closeSplash) {
+          splashHandler.closeSplash();
+        }
+      }
+
+      // Remover todos los listeners de la ventana principal
+      if (this.win) {
+        this.win.removeAllListeners('close');
+        this.win.removeAllListeners('closed');
+        this.win.removeAllListeners('before-unload');
+      }
+
+      // Remover listeners de la aplicación
+      const { app } = require('electron');
+      app.removeAllListeners('window-all-closed');
+      app.removeAllListeners('before-quit');
+
+      // Cerrar todas las ventanas
+      const { BrowserWindow } = require('electron');
+      BrowserWindow.getAllWindows().forEach(win => {
+        if (!win.isDestroyed()) {
+          win.removeAllListeners();
+          win.close();
+        }
+      });
+
+      // Timeout de seguridad para forzar el cierre si quitAndInstall falla
+      setTimeout(() => {
+        writeLogs('Timeout de seguridad: forzando cierre de la aplicación', 'prepareForUpdate');
+        app.quit();
+      }, 5000);
+
+      // Ahora ejecutar quitAndInstall
+      writeLogs('Ejecutando quitAndInstall...', 'prepareForUpdate');
+      this.autoUpdater.quitAndInstall();
+
+    } catch (error) {
+      writeLogs(`Error preparando actualización: ${error}`, 'prepareForUpdate');
+      // Si hay error, intentar cerrar la aplicación de todas formas
+      const { app } = require('electron');
+      app.quit();
+    }
   }
 }
