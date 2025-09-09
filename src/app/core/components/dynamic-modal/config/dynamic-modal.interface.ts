@@ -42,6 +42,7 @@ export interface IButtonDynamic {
   iconSize?: string;
   iconColor?: string;
   showProcess?: boolean;
+  processing?: boolean;
   action?: modalActionsE;
   function?: (modalComponent: DynamicModalClass) => any;
   functionInOtherComponent?: string;
@@ -68,6 +69,7 @@ export interface IModalConfiguration {
   closableEsc?: boolean;
   closableClickOutside?: boolean;
   confirmToClose?: boolean;
+  disableAllButtonsIfAnyProcessing?: boolean;
 
   close?: (dataToReturn?: any) => void;
   show?: () => void;

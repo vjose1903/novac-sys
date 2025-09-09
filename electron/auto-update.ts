@@ -117,11 +117,41 @@ export default class AppUpdate {
   }
 
   async downloadUpdate() {
-    try {
-      this.autoUpdater.downloadUpdate();
-    } catch (error) {
-      writeLogs('ERROR al descargar actualización:', error);
-    }
+    return new Promise((resolve, reject) => {
+      try {
+        // Configurar un listener temporal para detectar cuando inicia la descarga
+        const onDownloadStart = () => {
+          writeLogs('Descarga iniciada exitosamente');
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
+          resolve({ success: true, msg: 'Descarga iniciada' });
+        };
+
+        const onError = (error) => {
+          writeLogs('ERROR al iniciar descarga:', error);
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_ERROR, onError);
+          reject(error);
+        };
+
+        // Escuchar cuando inicia la descarga (primer evento de progreso)
+        this.autoUpdater.once(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
+        this.autoUpdater.once(ELECTRON_EVENT_UPDATE_ERROR, onError);
+
+        // Iniciar la descarga
+        this.autoUpdater.downloadUpdate();
+
+        // Timeout de seguridad en caso de que no se dispare ningún evento
+        setTimeout(() => {
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_ERROR, onError);
+          reject(new Error('Timeout: No se pudo iniciar la descarga'));
+        }, 10000); // 10 segundos de timeout
+
+      } catch (error) {
+        writeLogs('ERROR al descargar actualización:', error);
+        reject(error);
+      }
+    });
   }
 
   async verifyUpdateAvailable() {

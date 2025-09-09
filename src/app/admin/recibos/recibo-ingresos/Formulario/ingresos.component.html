@@ -39,36 +39,36 @@
             <div class="cuerpo">
               <div class="cajas">
                 <div class="izquierda pe-2">
-                  <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
+                  <span class="w-100 detalleBalance badge bg-secondary text-shadow text-white mb-2">
                     <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
                   </span>
 
-                  <span class="w-100 detalleBalance badge bg-info mb-2">
+                  <span class="w-100 detalleBalance badge bg-info text-shadow mb-2">
                     <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
                   </span>
                   @if (facturasSelected().length) {
-                    <span class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
+                    <span class="w-100 detalleBalance badge bg-green text-shadow text-white mb-2">
                       <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo()) }}</span>
                     </span>
                   }
                   @if (facturasSelected().length) {
-                    <span class="w-100 detalleBalance badge bg-warning mb-2">
+                    <span class="w-100 detalleBalance badge bg-warning text-shadow mb-2">
                       <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando()) }}</span>
                     </span>
                   }
                 </div>
                 <div class="derecha ps-2">
-                  <span class="w-100 detalleBalance badge text-shadow bg-orange text-white mb-2">
+                  <span class="w-100 detalleBalance badge bg-orange text-shadow text-white mb-2">
                     <span>Mora:</span> <span>RD$ {{ formatoNumero(mora_general()) }}</span>
                   </span>
 
                   <span class="w-100 detalleBalance badge bg-blue text-shadow text-white mb-2">
                     <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
                   </span>
-                  <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
+                  <span class="w-100 detalleBalance badge bg-primary text-shadow text-white mb-2">
                     <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotasCredito) }}</span>
                   </span>
-                  <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
+                  <span class="w-100 detalleBalance badge bg-danger text-shadow text-white mb-2">
                     <span> Debiendo:</span> <span>RD$ {{ formatoNumero(debiendo_con_mora()) }} </span>
                   </span>
                 </div>

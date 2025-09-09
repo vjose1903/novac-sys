@@ -85,8 +85,10 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
     this.configCopy = fun.deepCloning(this.configApp);
     this.parseDocumentosAImprimir(this.configApp).then(() => {
-      this.createForm(this.configApp);
-      this.formIsInvalid();
+      fun.setTimeout(() => {
+        this.createForm(this.configApp);
+        this.formIsInvalid();
+      }, 0);
     });
 
     this.empresaServ.setEmpresa();

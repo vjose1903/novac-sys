@@ -17,7 +17,7 @@
         [resizable]="modalConfig.resizable!"
         [dismissableMask]="modalConfig.closableClickOutside!"
         [closeOnEscape]="modalConfig.closableEsc!"
-        [closable]="modalConfig.closable! && !modalConfig.confirmToClose"
+        [closable]="modalConfig.closable! && !modalConfig.confirmToClose && !someButtonIsProcessing(modalConfig.id!)"
         [transitionOptions]="modalConfig.transitionOptions!"
         (onShow)="handleModalShow(modalConfig.id!)"
         (onHide)="handleCloseModal(modalConfig.id!)"
@@ -48,11 +48,16 @@
             <div class="d-flex justify-content-end align-items-center mt-2 gap-3">
               @for (dynamic_boton of modalConfig?.botones; track dynamic_boton) {
                 <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
-                  <button [disabled]="getButtonState(dynamic_boton)" class="btn btn-sm {{ dynamic_boton.clase }} d-flex align-items-center justify-content-center gap-2" (click)="dynamicFunction(modalConfig, dynamic_boton)">
-                    @if (dynamic_boton.iconName) {
-                      <i class="{{ dynamic_boton.iconName }}" [ngStyle]="{ 'font-size': dynamic_boton.iconSize ?? '20px', color: dynamic_boton.iconColor ?? 'white' }"></i>
+                  <button [disabled]="getButtonState(dynamic_boton, modalConfig.id!)" class="btn btn-sm {{ dynamic_boton.clase }} d-flex align-items-center justify-content-center gap-2" (click)="dynamicFunction(modalConfig, dynamic_boton)">
+                    @if (dynamic_boton.showProcess && dynamic_boton.processing) {
+                      <i class="pi pi-spinner pi-spin"></i>
+                      Procesando...
+                    } @else {
+                      @if (dynamic_boton.iconName) {
+                        <i class="{{ dynamic_boton.iconName }}" [ngStyle]="{ 'font-size': dynamic_boton.iconSize ?? '20px', color: dynamic_boton.iconColor ?? 'white' }"></i>
+                      }
+                      {{ dynamic_boton.label }}
                     }
-                    {{ dynamic_boton.label }}
                   </button>
                 </span>
               }

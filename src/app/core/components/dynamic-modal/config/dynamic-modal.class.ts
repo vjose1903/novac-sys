@@ -25,6 +25,7 @@ export class DynamicModalClass {
   closableEsc: boolean | undefined;
   closableClickOutside: boolean | undefined;
   confirmToClose: boolean | undefined;
+  disableAllButtonsIfAnyProcessing: boolean | undefined;
 
   returnData!: Function;
   hideModal!: Function;
@@ -62,6 +63,7 @@ export class DynamicModalClass {
     this.confirmToClose = params && fun.objHas(params, 'confirmToClose') ? params.confirmToClose : false;
     this.html = params && fun.objHas(params, 'html') ? params.html : undefined;
     this.callback = params && fun.objHas(params, 'callback') ? params.callback : undefined;
+    this.disableAllButtonsIfAnyProcessing = params && fun.objHas(params, 'disableAllButtonsIfAnyProcessing') ? params.disableAllButtonsIfAnyProcessing : false;
 
     this.returnData = (arg: ICallbackModal) => this.runCallback(arg);
     this.hideModal = (arg: ICallbackModal) => this.runCallback(arg);

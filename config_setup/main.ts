@@ -29,7 +29,7 @@ import SharedElectronAngular, {
   ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE,
 } from './electron/shared-electron-angular';
 
-import AppUpdate from './electron/auto-update'
+import AppUpdate from './electron/auto-update';
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
 import ExportToExcel from './electron/export-to-excel';
@@ -353,8 +353,36 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case ELECTRON_EVENT_DOWNLOAD_UPDATE:
-        writeLogs('Descargando actualización');
-        auto_updater.downloadUpdate();
+        writeLogs('Verificando si hay actualización disponible antes de descargar');
+        auto_updater
+          .verifyUpdateAvailable()
+          .then(res => {
+            if (res) {
+              writeLogs('Descargando actualización');
+              auto_updater
+                .downloadUpdate()
+                .then(downloadResult => {
+                  task.response = { msg: 'Descarga iniciada exitosamente', available: true, downloadStarted: true };
+                  event.reply(ELECTRON_RESPONSE, task);
+                })
+                .catch(downloadError => {
+                  writeLogs('Error al iniciar descarga:', downloadError);
+                  task.error = true;
+                  task.response = { msg: 'Error al iniciar descarga', available: true, downloadStarted: false, error: downloadError };
+                  event.reply(ELECTRON_RESPONSE, task);
+                });
+            } else {
+              writeLogs('No hay actualización disponible para descargar');
+              task.response = { msg: 'No hay actualización disponible', available: false };
+              event.reply(ELECTRON_RESPONSE, task);
+            }
+          })
+          .catch(err => {
+            writeLogs('Error al verificar actualización:', err);
+            task.error = true;
+            task.response = { msg: 'Error al verificar actualización', error: err };
+            event.reply(ELECTRON_RESPONSE, task);
+          });
         break;
       //
       case ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE:
