@@ -127,7 +127,7 @@ export default class AppUpdate {
           resolve({ success: true, msg: 'Descarga iniciada' });
         };
 
-        const onError = (error) => {
+        const onError = error => {
           writeLogs('ERROR al iniciar descarga:', error);
           this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
           this.autoUpdater.off(ELECTRON_EVENT_UPDATE_ERROR, onError);
@@ -147,7 +147,6 @@ export default class AppUpdate {
           this.autoUpdater.off(ELECTRON_EVENT_UPDATE_ERROR, onError);
           reject(new Error('Timeout: No se pudo iniciar la descarga'));
         }, 10000); // 10 segundos de timeout
-
       } catch (error) {
         writeLogs('ERROR al descargar actualización:', error);
         reject(error);
@@ -155,13 +154,29 @@ export default class AppUpdate {
     });
   }
 
-  async verifyUpdateAvailable() {
+  async verifyUpdateAvailable(args?: { notify?: boolean }) {
     return new Promise<UpdateInfo | null>((resolve, reject) => {
+      const { notify = true } = args || {};
+      // Si notify es false, temporalmente deshabilitar el evento de actualización disponible
+      let originalHandler: any = null;
+      if (!notify) {
+        // Guardar el handler original
+        originalHandler = this.autoUpdater.listeners(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE)[0];
+        // Remover temporalmente el listener
+        this.autoUpdater.removeAllListeners(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE);
+      }
+
       try {
+
         this.autoUpdater
           .checkForUpdates()
           .then(res => {
             setTimeout(() => {
+              // Restaurar el handler original si se había removido
+              if (!notify && originalHandler) {
+                this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, originalHandler);
+              }
+
               if (res) {
                 resolve(res.updateInfo);
               } else {
@@ -170,10 +185,18 @@ export default class AppUpdate {
             }, 1000);
           })
           .catch(error => {
+            // Restaurar el handler original en caso de error
+            if (!notify && originalHandler) {
+              this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, originalHandler);
+            }
             writeLogs('Error al verificar actualizaciones:', error);
             reject(error);
           });
       } catch (error) {
+        // Restaurar el handler original en caso de error
+        if (!notify && originalHandler) {
+          this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, originalHandler);
+        }
         writeLogs('Error en verifyUpdateAvailable:', error);
         reject(error);
       }
@@ -226,7 +249,6 @@ export default class AppUpdate {
       // Ahora ejecutar quitAndInstall
       writeLogs('Ejecutando quitAndInstall...', 'prepareForUpdate');
       this.autoUpdater.quitAndInstall();
-
     } catch (error) {
       writeLogs(`Error preparando actualización: ${error}`, 'prepareForUpdate');
       // Si hay error, intentar cerrar la aplicación de todas formas

@@ -132,7 +132,7 @@ function createWindow() {
         } else {
           // Cuando se está actualizando, permitir el cierre sin prevención
           writeLogs('Cerrando aplicación para actualización...', 'close-event');
-          closeApp();
+          // No llamar closeApp() aquí para evitar conflictos con el proceso de actualización
         }
       });
 
@@ -357,7 +357,7 @@ async function handleEvent(event: any, obj: string) {
       case ELECTRON_EVENT_DOWNLOAD_UPDATE:
         writeLogs('Verificando si hay actualización disponible antes de descargar');
         auto_updater
-          .verifyUpdateAvailable()
+          .verifyUpdateAvailable({ notify: false })
           .then(res => {
             if (res) {
               writeLogs('Descargando actualización');
