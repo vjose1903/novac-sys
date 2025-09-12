@@ -17,14 +17,13 @@ jobs:
         with:
           node-version: '22.13.1'
 
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          path: |
+            ~/.npm
+            C:\Users\runneradmin\AppData\Local\npm-cache
+            C:\Users\runneradmin\AppData\Roaming\npm-cache
           key: ${{ runner.os }}-npm-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
@@ -32,12 +31,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Ejecutar script de configuración
-        run: node ./scripts/start.js -p -c agrodemi
+      # - name: Ejecutar script de configuración
+      #   run: node ./scripts/start.js -p -c agrodemi
 
-      - name: Build Novac App
-        id: build-novac-app
-        env:
-          GITHUB_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
-          GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
-        run: npm run windows:prod
+      # - name: Build Novac App
+      #   id: build-novac-app
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
+      #     GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
+      #   run: npm run windows:prod
