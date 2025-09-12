@@ -126,7 +126,9 @@ function createWindow() {
 
       // Evento cuando se intenta cerrar la ventana con el boton de cerrar
       win.on('close', (event: any) => {
+        writeLogs(`Evento close disparado. isUpdaterClosing: ${sharedState.isUpdaterClosing}`, 'close-event');
         if (!sharedState.isUpdaterClosing) {
+          writeLogs('Preparando confirmación de cierre...', 'close-event');
           event.preventDefault();
           sendCloseConfirmation();
         } else {
@@ -158,7 +160,9 @@ try {
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
+    writeLogs(`Evento window-all-closed disparado. isUpdaterClosing: ${sharedState.isUpdaterClosing}`, 'window-all-closed');
     if (!sharedState.isUpdaterClosing) {
+      writeLogs('Cerrando aplicación normalmente...', 'window-all-closed');
       closeApp();
     } else {
       writeLogs('Todas las ventanas cerradas durante actualización, permitiendo cierre automático...', 'window-all-closed');

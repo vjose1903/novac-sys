@@ -96,6 +96,10 @@ export default class AppUpdate {
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, (event: UpdateDownloadedEvent) => {
       SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, data: { msg: 'descarga finalizada...' } });
 
+      // Establecer la bandera ANTES de preparar la actualización
+      sharedState.isUpdaterClosing = true;
+      writeLogs(`sharedState.isUpdaterClosing establecido en: ${sharedState.isUpdaterClosing}`, 'update-downloaded');
+
       // Limpiar todos los listeners y procesos antes de instalar
       this.prepareForUpdate();
     });
@@ -229,15 +233,12 @@ export default class AppUpdate {
         }
       }
 
-      // Remover listeners que puedan interferir con el proceso de actualización
+      // Solo remover listeners específicos que puedan interferir, NO los de cierre
       if (this.win) {
-        this.win.removeAllListeners('closed');
         this.win.removeAllListeners('before-unload');
       }
 
-      // Remover listeners de la aplicación
       const { app } = require('electron');
-      app.removeAllListeners('window-all-closed');
       app.removeAllListeners('before-quit');
 
       // Timeout de seguridad para forzar el cierre si quitAndInstall falla
@@ -246,7 +247,7 @@ export default class AppUpdate {
         app.quit();
       }, 5000);
 
-      // Ejecutar quitAndInstall - el evento before-quit-for-update ya configuró la ventana
+      // Ejecutar quitAndInstall
       writeLogs('Ejecutando quitAndInstall...', 'prepareForUpdate');
       this.autoUpdater.quitAndInstall();
     } catch (error) {
