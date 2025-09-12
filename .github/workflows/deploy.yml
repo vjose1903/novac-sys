@@ -8,6 +8,7 @@ on:
 jobs:
   release:
     runs-on: windows-latest
+
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -17,31 +18,32 @@ jobs:
         with:
           node-version: '22.13.1'
 
-      # 🔑 Forzar npm a usar ~/.npm como cache
+      # 🔑 Configurar cache de npm en Windows
       - name: Configure npm cache dir
-        run: npm config set cache $HOME/.npm --global
+        run: npm config set cache "$env:USERPROFILE\AppData\Roaming\npm-cache" --global
         shell: pwsh
 
-      - name: Generate dependencies hash (ignoring version)
+      # 🔑 Generar hash de dependencias (package.json + package-lock.json)
+      - name: Generate dependencies hash
         id: deps-hash
         run: |
-          $packageJson = Get-Content -Raw -Path package.json | ConvertFrom-Json
-          $packageJson.PSObject.Properties.Remove('version')
-          $depsJson = $packageJson | ConvertTo-Json -Compress
-          $hash = [System.Security.Cryptography.HashAlgorithm]::Create('SHA256').ComputeHash([System.Text.Encoding]::UTF8.GetBytes($depsJson)) | ForEach-Object { $_.ToString('x2') } | Join-String
+          $files = Get-Content package.json, package-lock.json -Raw
+          $hash = [System.Security.Cryptography.HashAlgorithm]::Create('SHA256').ComputeHash([System.Text.Encoding]::UTF8.GetBytes($files)) | ForEach-Object { $_.ToString('x2') } | Join-String
           echo "hash=$hash" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
+      # 🔑 Cache de npm y node_modules
       - name: Cache npm dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ~/.npm
+            $env:USERPROFILE\AppData\Roaming\npm-cache
             node_modules
           key: ${{ runner.os }}-npm-${{ steps.deps-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-npm-
 
+      # 🔑 Instalar dependencias
       - name: Install dependencies
         run: npm ci
 
