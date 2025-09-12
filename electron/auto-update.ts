@@ -96,9 +96,6 @@ export default class AppUpdate {
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, (event: UpdateDownloadedEvent) => {
       SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, data: { msg: 'descarga finalizada...' } });
 
-      // Configurar la variable global para indicar que estamos cerrando para actualizar
-      sharedState.isUpdaterClosing = true;
-
       // Limpiar todos los listeners y procesos antes de instalar
       this.prepareForUpdate();
     });
@@ -114,6 +111,19 @@ export default class AppUpdate {
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, error => {
       writeLogs(error, 'ELECTRON_EVENT_UPDATE_ERROR');
       SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_ERROR, data: { msg: 'Error en la actualizacion...', body: { msg: 'Error descargando actualizacion...', body: error } } });
+    });
+
+    // Evento específico para antes de cerrar la aplicación para actualización
+    this.autoUpdater.on('before-quit-for-update' as any, () => {
+      writeLogs('Preparando para cerrar aplicación y actualizar...', 'before-quit-for-update');
+      // Configurar la variable global para indicar que estamos cerrando para actualizar
+      sharedState.isUpdaterClosing = true;
+
+      // Asegurar que la ventana principal sea cerrable
+      if (this.win && !this.win.isDestroyed()) {
+        this.win.setClosable(true);
+        writeLogs('Ventana principal configurada como cerrable antes de actualización', 'before-quit-for-update');
+      }
     });
   }
 
@@ -146,7 +156,7 @@ export default class AppUpdate {
           this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
           this.autoUpdater.off(ELECTRON_EVENT_UPDATE_ERROR, onError);
           reject(new Error('Timeout: No se pudo iniciar la descarga'));
-        }, 10000); // 10 segundos de timeout
+        }, 30000); // 10 segundos de timeout
       } catch (error) {
         writeLogs('ERROR al descargar actualización:', error);
         reject(error);
@@ -219,8 +229,7 @@ export default class AppUpdate {
         }
       }
 
-      // No remover el listener de 'close' para evitar conflictos
-      // Solo remover otros listeners que puedan interferir
+      // Remover listeners que puedan interferir con el proceso de actualización
       if (this.win) {
         this.win.removeAllListeners('closed');
         this.win.removeAllListeners('before-unload');
@@ -231,22 +240,13 @@ export default class AppUpdate {
       app.removeAllListeners('window-all-closed');
       app.removeAllListeners('before-quit');
 
-      // Cerrar todas las ventanas
-      const { BrowserWindow } = require('electron');
-      BrowserWindow.getAllWindows().forEach(win => {
-        if (!win.isDestroyed()) {
-          win.removeAllListeners();
-          win.close();
-        }
-      });
-
       // Timeout de seguridad para forzar el cierre si quitAndInstall falla
       setTimeout(() => {
         writeLogs('Timeout de seguridad: forzando cierre de la aplicación', 'prepareForUpdate');
         app.quit();
       }, 5000);
 
-      // Ahora ejecutar quitAndInstall
+      // Ejecutar quitAndInstall - el evento before-quit-for-update ya configuró la ventana
       writeLogs('Ejecutando quitAndInstall...', 'prepareForUpdate');
       this.autoUpdater.quitAndInstall();
     } catch (error) {
