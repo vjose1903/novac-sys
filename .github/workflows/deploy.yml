@@ -17,11 +17,14 @@ jobs:
         with:
           node-version: '22.13.1'
 
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            C:\Users\runneradmin\AppData\Local\npm-cache
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-npm-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
