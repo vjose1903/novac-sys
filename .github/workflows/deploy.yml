@@ -17,14 +17,7 @@ jobs:
         with:
           node-version: '22.13.1'
 
-      - name: Get npm cache path
-        id: npm-cache-path
-        run: |
-          $cachePath = npm config get cache
-          echo "cache-path=$cachePath" >> $env:GITHUB_OUTPUT
-        shell: pwsh
-
-      - name: Generate dependencies hash
+      - name: Generate dependencies hash (ignoring version)
         id: deps-hash
         run: |
           $packageJson = Get-Content -Raw -Path package.json | ConvertFrom-Json
@@ -37,7 +30,9 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ steps.npm-cache-path.outputs.cache-path }}
+          path: |
+            ~/.npm
+            node_modules
           key: ${{ runner.os }}-npm-${{ steps.deps-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-npm-
