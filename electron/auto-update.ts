@@ -219,9 +219,9 @@ export default class AppUpdate {
         }
       }
 
-      // Remover todos los listeners de la ventana principal
+      // No remover el listener de 'close' para evitar conflictos
+      // Solo remover otros listeners que puedan interferir
       if (this.win) {
-        this.win.removeAllListeners('close');
         this.win.removeAllListeners('closed');
         this.win.removeAllListeners('before-unload');
       }

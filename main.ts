@@ -132,7 +132,8 @@ function createWindow() {
         } else {
           // Cuando se está actualizando, permitir el cierre sin prevención
           writeLogs('Cerrando aplicación para actualización...', 'close-event');
-          // No llamar closeApp() aquí para evitar conflictos con el proceso de actualización
+          // No prevenir el evento para permitir que la ventana se cierre normalmente
+          // El proceso de actualización se encargará del resto
         }
       });
 
@@ -156,7 +157,13 @@ try {
   });
 
   // Quit when all windows are closed.
-  app.on('window-all-closed', () => closeApp());
+  app.on('window-all-closed', () => {
+    if (!sharedState.isUpdaterClosing) {
+      closeApp();
+    } else {
+      writeLogs('Todas las ventanas cerradas durante actualización, permitiendo cierre automático...', 'window-all-closed');
+    }
+  });
 } catch (e) {
   // Catch Error
   throw e;
