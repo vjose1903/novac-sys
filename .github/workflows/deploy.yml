@@ -16,7 +16,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.13.1'
-          cache: 'npm'
+
+      # 🔑 Forzar npm a usar ~/.npm como cache
+      - name: Configure npm cache dir
+        run: npm config set cache $HOME/.npm --global
+        shell: pwsh
 
       - name: Generate dependencies hash (ignoring version)
         id: deps-hash
