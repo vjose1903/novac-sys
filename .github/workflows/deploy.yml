@@ -16,6 +16,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.13.1'
+          cache: 'npm'
 
       - name: Generate dependencies hash (ignoring version)
         id: deps-hash
@@ -27,21 +28,12 @@ jobs:
           echo "hash=$hash" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
-      - name: Get npm cache path
-        id: npm-cache-path
-        run: |
-          $cachePath = npm config get cache
-          echo "cache-path=$cachePath" >> $env:GITHUB_OUTPUT
-        shell: pwsh
-
-      - name: Ensure cache path exists
-        run: New-Item -ItemType Directory -Force -Path "${{ steps.npm-cache-path.outputs.cache-path }}"
-        shell: pwsh
-
-      - name: Cache dependencies
+      - name: Cache npm dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ steps.npm-cache-path.outputs.cache-path }}
+          path: |
+            ~/.npm
+            node_modules
           key: ${{ runner.os }}-npm-${{ steps.deps-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-npm-
