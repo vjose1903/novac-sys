@@ -27,12 +27,21 @@ jobs:
           echo "hash=$hash" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
+      - name: Get npm cache path
+        id: npm-cache-path
+        run: |
+          $cachePath = npm config get cache
+          echo "cache-path=$cachePath" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Ensure cache path exists
+        run: New-Item -ItemType Directory -Force -Path "${{ steps.npm-cache-path.outputs.cache-path }}"
+        shell: pwsh
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ env.APPDATA }}\npm-cache
-            node_modules
+          path: ${{ steps.npm-cache-path.outputs.cache-path }}
           key: ${{ runner.os }}-npm-${{ steps.deps-hash.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-npm-
