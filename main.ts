@@ -331,7 +331,7 @@ function continuarCargandoArchivos() {
 async function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
   const serve_ = await getServer_();
-  auto_updater = new AppUpdate(win, serve_);
+  auto_updater = new AppUpdate(win, app, serve_);
   auto_updater.init();
   // ---------------------------------------
 

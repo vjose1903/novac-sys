@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import SharedElectronAngular, {
+  ELECTRON_EVENT_UPDATE_BEFORE_QUIT_FOR_UPDATE,
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
   ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
   ELECTRON_EVENT_UPDATE_ERROR,
@@ -21,9 +22,11 @@ export default class AppUpdate {
   serve_: boolean;
   autoUpdater: AppUpdater;
   updateConfig: PublishConfiguration;
+  app: Electron.App;
 
-  constructor(win, serve_) {
+  constructor(win, app, serve_) {
     this.win = win;
+    this.app = app;
     this.serve_ = serve_;
     this.autoUpdater = autoUpdater;
   }
@@ -118,7 +121,7 @@ export default class AppUpdate {
     });
 
     // Evento específico para antes de cerrar la aplicación para actualización
-    this.autoUpdater.on('before-quit-for-update' as any, () => {
+    this.autoUpdater.on(ELECTRON_EVENT_UPDATE_BEFORE_QUIT_FOR_UPDATE as any, () => {
       writeLogs('Preparando para cerrar aplicación y actualizar...', 'before-quit-for-update');
       // Configurar la variable global para indicar que estamos cerrando para actualizar
       sharedState.isUpdaterClosing = true;
@@ -160,7 +163,7 @@ export default class AppUpdate {
           this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
           this.autoUpdater.off(ELECTRON_EVENT_UPDATE_ERROR, onError);
           reject(new Error('Timeout: No se pudo iniciar la descarga'));
-        }, 30000); // 10 segundos de timeout
+        }, 30000); // 30 segundos de timeout
       } catch (error) {
         writeLogs('ERROR al descargar actualización:', error);
         reject(error);
@@ -224,37 +227,29 @@ export default class AppUpdate {
     writeLogs('Preparando aplicación para actualización...', 'prepareForUpdate');
 
     try {
-      // Cerrar splash handler si existe
-      const { SplashHandler } = require('./splash-handler');
-      if (SplashHandler && SplashHandler.getInstance) {
-        const splashHandler = SplashHandler.getInstance();
-        if (splashHandler && splashHandler.closeSplash) {
-          splashHandler.closeSplash();
-        }
-      }
-
       // Solo remover listeners específicos que puedan interferir, NO los de cierre
       if (this.win) {
         this.win.removeAllListeners('before-unload');
+        writeLogs('Listeners de before-unload removidos de la ventana', 'prepareForUpdate');
       }
 
-      const { app } = require('electron');
-      app.removeAllListeners('before-quit');
+      this.app.removeAllListeners('before-quit');
+      writeLogs('Listeners de before-quit removidos de la aplicación', 'prepareForUpdate');
+
+      // Ejecutar quitAndInstall primero
+      writeLogs('Ejecutando quitAndInstall...', 'prepareForUpdate');
+      this.autoUpdater.quitAndInstall();
+      writeLogs('quitAndInstall ejecutado exitosamente', 'prepareForUpdate');
 
       // Timeout de seguridad para forzar el cierre si quitAndInstall falla
       setTimeout(() => {
         writeLogs('Timeout de seguridad: forzando cierre de la aplicación', 'prepareForUpdate');
-        app.quit();
-      }, 5000);
-
-      // Ejecutar quitAndInstall
-      writeLogs('Ejecutando quitAndInstall...', 'prepareForUpdate');
-      this.autoUpdater.quitAndInstall();
+        this.app.quit();
+      }, 10000); // Aumentado a 10 segundos
     } catch (error) {
       writeLogs(`Error preparando actualización: ${error}`, 'prepareForUpdate');
       // Si hay error, intentar cerrar la aplicación de todas formas
-      const { app } = require('electron');
-      app.quit();
+      this.app.quit();
     }
   }
 }
