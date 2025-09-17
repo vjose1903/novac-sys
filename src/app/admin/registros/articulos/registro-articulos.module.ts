@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import { EntidadCuentaContableModule } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.module';
-import { BtnIconModule } from './../../components/btn-icon-circular/btn-icon-circular.module';
-=======
 import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
->>>>>>> dev
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 

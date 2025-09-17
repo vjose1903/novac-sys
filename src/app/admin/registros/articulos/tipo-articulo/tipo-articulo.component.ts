@@ -1,24 +1,27 @@
-import { HtmlElementsService } from './../../../../core/services/html-elements.service';
-import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { ModalClass, ModalComponentI, ModalI } from './../../../components/modal/modal-class';
-import { Permisos } from './../../../../core/typescript/permisos';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Permisos } from '@core/typescript/permisos';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Component, OnInit, inject } from '@angular/core';
-import { fun } from '../../../../core/services/functions.service';
+import { Component, Input, OnInit, inject } from '@angular/core';
+import { fun } from '@core/services/functions.service';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { TablasService } from '../../../components/new_tablas/tablas.service';
+import { TablasService } from '@components/new_tablas/tablas.service';
 import { TipoArticuloI, TipoArticuloC } from './tipo-articulo';
-import { tableCellType, table_config } from '../../../components/new_tablas/tabla-class';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { SubTipoArticuloComponent } from './sub-tipo-articulo/sub-tipo-articulo.component';
+import { ICallbackModal, IDynamicModal, IModalConfiguration, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 @Component({
   selector: 'app-tipo-articulo',
   templateUrl: './tipo-articulo.component.html',
   styleUrls: ['./tipo-articulo.component.scss'],
+  standalone: false,
 })
-export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI {
-  modalComponent: ModalComponentI = {};
-  inputs;
+export class TipoArticuloComponent extends MixinClass implements OnInit, IDynamicModal {
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
 
   listaTipoArticulos: TipoArticuloI[] = [];
 
@@ -39,7 +42,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_tipo_articulos',
-    padre_functions: { data_request: (params) => this.getTipoArticulos(params), handleBtnsDinamic: (params) => this.handleBtnsDinamic(params) },
+    padre_functions: { data_request: params => this.getTipoArticulos(params), handleBtnsDinamic: params => this.handleBtnsDinamic(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: {
@@ -51,7 +54,11 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
 
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private permissionsService: NgxPermissionsService, private fb: UntypedFormBuilder, private tServ: TablasService) {
+  constructor(
+    private permissionsService: NgxPermissionsService,
+    private fb: UntypedFormBuilder,
+    private tServ: TablasService
+  ) {
     super();
   }
 
@@ -70,9 +77,9 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     const extra = { parameters: { page: params.page, per_page: params.per_page, paginado: true, filter_target: palabra_a_buscar } };
 
     this.listaTipoArticulos.length = 0;
-    this.tipoArticuloClass.getAll(extra).then((res) => {
-      res.data.map((tipo_articulo) => {
-        tipo_articulo.tipo_ = this.tiposDeCategoria.find((tipo) => tipo.key == tipo_articulo.tipo).label;
+    this.tipoArticuloClass.getAll(extra).then(res => {
+      res.data.map(tipo_articulo => {
+        tipo_articulo.tipo_ = this.tiposDeCategoria.find(tipo => tipo.key == tipo_articulo.tipo).label;
         return tipo_articulo;
       });
 
@@ -83,7 +90,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
   }
 
   checkPermissions() {
-    this.permissionsService.hasPermission([this.permissions.tipo_articulo.create, this.permissions.tipo_articulo.update]).then((result) => (this.hasPermissionsCreateUpdate = result));
+    this.permissionsService.hasPermission([this.permissions.tipo_articulo.create, this.permissions.tipo_articulo.update]).then(result => (this.hasPermissionsCreateUpdate = result));
   }
 
   createForm() {
@@ -102,17 +109,34 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     const header = `Sub Categorias de tipo articulo: ${data.descripcion}`;
     const inputs = { tipo_articulo: data };
 
-    this.openNewModal({
-      component: SubTipoArticuloComponent,
-      inputs: inputs,
-      id: 'sub-categoria-articulos',
-      header: header,
-      width: '70rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
-      },
+    const modalConfig = new DynamicModalClass();
+    modalConfig.id = 'sub-categoria-articulos';
+    modalConfig.width = '70rem';
+    modalConfig.component = SubTipoArticuloComponent;
+    modalConfig.header = header;
+    modalConfig.inputs = inputs;
+
+    modalConfig.botones = [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+
+    modalConfig.setCallback((arg: ICallbackModal) => {
+      // this.config_articulos = arg.data;
+      // const actualPagination = this.tServ.getPaginationById('lista_articulos');
+      // this.getArticulos(actualPagination);
     });
+
+    modalConfig.show();
+
+    // this.openNewModal({
+    //   component: SubTipoArticuloComponent,
+    //   inputs: inputs,
+    //   id: 'sub-categoria-articulos',
+    //   header: header,
+    //   width: '70rem',
+    //   botones: {
+    //     ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
+    //     dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
+    //   },
+    // });
   }
 
   borrar() {
@@ -138,8 +162,8 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
 
     const originalValue = fun.pick(
-      this.listaTipoArticulos.find((categoria) => categoria.id == formValue.id),
-      pick_values,
+      this.listaTipoArticulos.find(categoria => categoria.id == formValue.id),
+      pick_values
     );
 
     return !fun.isEqual(formValue, originalValue);
@@ -158,7 +182,7 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
   requests() {
     const formulario = this.form.getRawValue();
 
-    this.tipoArticuloClass.createOne(formulario).then((res) => {
+    this.tipoArticuloClass.createOne(formulario).then(res => {
       this.borrar();
 
       const actualPagination = this.tServ.getPaginationById('listado_tipo_articulos');
@@ -166,5 +190,5 @@ export class TipoArticuloComponent extends MixinClass implements OnInit, ModalI 
     });
   }
 
-  btn_aceptar() {}
+  submit() {}
 }

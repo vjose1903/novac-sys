@@ -1,11 +1,7 @@
-<<<<<<< HEAD
-import { Injectable } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { fun } from './functions.service';
-import { Dropdown } from 'primeng/dropdown';
-=======
+import { Select } from 'primeng/select';
 import { ElementRef, Injectable } from '@angular/core';
->>>>>>> dev
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +24,6 @@ export class HtmlElementsService {
     return inputElement ? inputElement.value : null;
   }
 
-<<<<<<< HEAD
   selectAndConvertToNumber(event: any, control?: FormControl | AbstractControl<any, any>) {
     const inputElement = event.target as HTMLInputElement;
 
@@ -71,9 +66,6 @@ export class HtmlElementsService {
     else inputElement.value = valueTimmed;
   }
 
-  showPDropdown(event: any, dropdown: Dropdown) {
-    if (fun.hasValue(event.relatedTarget)) setTimeout(() => dropdown.show(), 100);
-=======
   focusInput(event: any | ElementRef): any {
     const inputElement = event instanceof ElementRef ? event.nativeElement : (event.target as HTMLInputElement);
 
@@ -86,6 +78,5 @@ export class HtmlElementsService {
         dropdown.show();
       });
     }
->>>>>>> dev
   }
 }

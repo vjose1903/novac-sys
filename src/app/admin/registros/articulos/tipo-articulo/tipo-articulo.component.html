@@ -1,44 +1,45 @@
 <div class="catArticuloContainer">
   <div class="row h-100 w-100">
-    <div *ngIf="hasPermissionsCreateUpdate" class="col-6 pl-0 pt-3">
-      <form [formGroup]="form" class="h-100" (keydown.enter)="$event.stopPropagation()">
-        <div class="card card-padding sombra-light">
-          <div class="form-group" appMsgError="descripcion" [form]="form">
-            <label class="control-label mb-0">Descripcion: <span style="color: red">*</span></label>
-            <input (focus)="htmlServ.selectValue($event)" type="text" id="campoDescripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
-            <span id="msgContainer"></span>
-          </div>
+    @if (hasPermissionsCreateUpdate) {
+      <div class="col-6 pl-0 pt-3">
+        <form [formGroup]="form" class="h-100" (keydown.enter)="$event.stopPropagation()">
+          <div class="card card-padding sombra-light">
+            <div class="form-group" appMsgError="descripcion" [form]="form">
+              <label class="control-label mb-0">Descripcion: <span style="color: red">*</span></label>
+              <input (focus)="htmlServ.selectValue($event)" type="text" id="campoDescripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
+              <span id="msgContainer"></span>
+            </div>
 
-          <div class="form-group" appMsgError="tipo" [form]="form">
-            <label class="control-label mb-0">Tipo: <span style="color: red">*</span></label>
-            <p-dropdown
-              [placeholder]="'Seleccione el tipo'"
-              [options]="tiposDeCategoria"
-              formControlName="tipo"
-              optionLabel="label"
-              optionValue="key"
-              [appendTo]="'body'"
-              styleClass="form-control"
-              [virtualScroll]="true"
-              [virtualScrollItemSize]="30"
-              id="campoTipo"
-            ></p-dropdown>
+            <div class="form-group" appMsgError="tipo" [form]="form">
+              <label class="control-label mb-0">Tipo: <span style="color: red">*</span></label>
+              <p-select
+                [placeholder]="'Seleccione el tipo'"
+                [options]="tiposDeCategoria"
+                formControlName="tipo"
+                optionLabel="label"
+                optionValue="key"
+                [appendTo]="'body'"
+                class="form-control"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="30"
+                id="campoTipo"></p-select>
 
-            <span id="msgContainer"></span>
-          </div>
+              <span id="msgContainer"></span>
+            </div>
 
-          <div class="mt-3">
-            <div class="form-group d-flex">
-              <button *ngIf="checkIfSomethingIsDiferrent()" (click)="borrar()" class="btn mr-2 btn-blanco">Cancelar</button>
+            <div class="mt-3">
+              <div class="form-group d-flex">
+                <button *ngIf="checkIfSomethingIsDiferrent()" (click)="borrar()" class="btn mr-2 btn-blanco">Cancelar</button>
 
-              <div [pTooltip]="fun.hasValue(categoriaSelected) ? (!checkIfSomethingIsDiferrent() ? 'Para editar debe de tener un valor distinto al original' : '') : ''" tooltipPosition="right">
-                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde">{{ categoriaSelected ? 'Editar' : 'Guardar' }}</button>
+                <div [pTooltip]="fun.hasValue(categoriaSelected) ? (!checkIfSomethingIsDiferrent() ? 'Para editar debe de tener un valor distinto al original' : '') : ''" tooltipPosition="right">
+                  <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde">{{ categoriaSelected ? 'Editar' : 'Guardar' }}</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    }
 
     <div class="{{ hasPermissionsCreateUpdate ? 'col-6' : 'col-12' }} p-0">
       <div #cardMarca class="h-100">

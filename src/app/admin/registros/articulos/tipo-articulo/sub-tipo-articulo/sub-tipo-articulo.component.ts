@@ -1,24 +1,27 @@
-import { HtmlElementsService } from './../../../../../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { TipoArticuloI } from './../tipo-articulo';
-import { TablasService } from './../../../../components/new_tablas/tablas.service';
-import { tableCellType, table_config } from './../../../../components/new_tablas/tabla-class';
-import { Permisos } from './../../../../../core/typescript/permisos';
-import { ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
-import { MixinClass } from './../../../../../core/typescript/MixinClass';
-import { Component, OnInit, inject } from '@angular/core';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { SubTipoArticuloC, SubTipoArticuloI } from './sub-tipo-articulo';
-import { fun } from './../../../../../core/services/functions.service';
+import { fun } from '@core/services/functions.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-sub-tipo-articulo',
   templateUrl: './sub-tipo-articulo.component.html',
   styleUrls: ['./sub-tipo-articulo.component.scss'],
+  standalone: false,
 })
-export class SubTipoArticuloComponent extends MixinClass implements OnInit, ModalI {
-  modalComponent: ModalComponentI = {};
-  inputs: { tipo_articulo: TipoArticuloI };
+export class SubTipoArticuloComponent extends MixinClass implements OnInit, IDynamicModal {
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() tipo_articulo: TipoArticuloI;
 
   listaSubTipoArticulos: SubTipoArticuloI[] = [];
 
@@ -35,7 +38,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_sub_tipo_articulos',
-    padre_functions: { data_request: (params) => this.getSubTipoArticulos(params) },
+    padre_functions: { data_request: params => this.getSubTipoArticulos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: {
@@ -46,7 +49,11 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
 
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private permissionsService: NgxPermissionsService, private fb: UntypedFormBuilder, private tServ: TablasService) {
+  constructor(
+    private permissionsService: NgxPermissionsService,
+    private fb: UntypedFormBuilder,
+    private tServ: TablasService
+  ) {
     super();
   }
 
@@ -61,17 +68,17 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
   }
 
   getSubTipoArticulos(params?: { per_page?: number; page?: number; search?: string }) {
-    const parameters = { ...params, paginado: true, tipo_articulo_id: this.inputs.tipo_articulo.id };
+    const parameters = { ...params, paginado: true, tipo_articulo_id: this.tipo_articulo.id };
     this.listaSubTipoArticulos.length = 0;
 
-    this.subTipoArticuloClass.getSubTipoArticulos(parameters).then((res) => {
+    this.subTipoArticuloClass.getSubTipoArticulos(parameters).then(res => {
       this.listaSubTipoArticulos = fun.deepCloning(res.data);
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
   checkPermissions() {
-    this.permissionsService.hasPermission([this.permissions.sub_tipo_articulo.create, this.permissions.sub_tipo_articulo.update]).then((result) => (this.hasPermissionsCreateUpdate = result));
+    this.permissionsService.hasPermission([this.permissions.sub_tipo_articulo.create, this.permissions.sub_tipo_articulo.update]).then(result => (this.hasPermissionsCreateUpdate = result));
   }
 
   createForm() {
@@ -79,7 +86,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
       this.form = this.fb.group({
         id: [{ value: null, disabled: false }],
         descripcion: [{ value: null, disabled: false }, Validators.required],
-        tipo_articulo_id: [{ value: this.inputs.tipo_articulo.id, disabled: false }, Validators.required],
+        tipo_articulo_id: [{ value: this.tipo_articulo.id, disabled: false }, Validators.required],
       });
 
       resolve(true);
@@ -88,7 +95,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
 
   borrar() {
     this.form.reset();
-    this.form.controls.tipo_articulo_id.setValue(this.inputs.tipo_articulo.id);
+    this.form.controls.tipo_articulo_id.setValue(this.tipo_articulo.id);
     this.subCategoriaSelected = undefined;
   }
 
@@ -106,8 +113,8 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
 
     const originalValue = fun.pick(
-      this.listaSubTipoArticulos.find((categoria) => categoria.id == formValue.id),
-      pick_values,
+      this.listaSubTipoArticulos.find(categoria => categoria.id == formValue.id),
+      pick_values
     );
 
     return !fun.isEqual(formValue, originalValue);
@@ -126,7 +133,7 @@ export class SubTipoArticuloComponent extends MixinClass implements OnInit, Moda
   requests() {
     const formulario = this.form.getRawValue();
 
-    this.subTipoArticuloClass.createOne(formulario).then((res) => {
+    this.subTipoArticuloClass.createOne(formulario).then(res => {
       this.borrar();
 
       const actualPagination = this.tServ.getPaginationById('listado_sub_tipo_articulos');

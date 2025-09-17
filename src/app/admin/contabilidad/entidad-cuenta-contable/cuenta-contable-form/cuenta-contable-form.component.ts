@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
   selector: 'cuenta-contable-form',
   templateUrl: './cuenta-contable-form.component.html',
   styleUrls: ['./cuenta-contable-form.component.scss'],
+  standalone: false,
 })
 export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input() inputs: { selectedConfig: ConfiguracionEntidadCuentaI; entidad: entidadesContables };

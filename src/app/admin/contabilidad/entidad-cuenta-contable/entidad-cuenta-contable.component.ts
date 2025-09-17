@@ -10,6 +10,7 @@ import { SubTipoArticuloI } from '../../registros/articulos/tipo-articulo/sub-ti
   selector: 'entidad-cuenta-contable',
   templateUrl: './entidad-cuenta-contable.component.html',
   styleUrls: ['./entidad-cuenta-contable.component.scss'],
+  standalone: false,
 })
 export class EntidadCuentaContableComponent implements OnInit, OnChanges {
   activeIndex = 0;
