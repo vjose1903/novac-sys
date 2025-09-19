@@ -1,35 +1,19 @@
-<<<<<<< HEAD
-import { DateUtils } from './../../../core/typescript/date.utils';
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
-import { NcfC } from './ncf';
-import { fun } from '../../../core/services/functions.service';
-import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
-=======
+import { DateUtils } from '@vjose1903/dateutils';
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Ss } from '@core/services/singleton.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import * as _ from 'lodash';
-
-const moment = require('../../../core/javascript/moment');
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
 import { fun } from '@core/services/functions.service';
-import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { default_per_page, tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
-import { DateUtils } from '@vjose1903/dateutils';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
->>>>>>> dev
 
-const moment = require('../../../core/javascript/moment');
+import * as _ from 'lodash';
+const moment = require('@core/javascript/moment');
 
 @Component({
   selector: 'app-ncf',
@@ -73,45 +57,28 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-<<<<<<< HEAD
-      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', estilos: [{ width: '5rem' }] },
-      { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipoC', estilos: [{ width: '3rem' }] },
+      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', style: { width: '3.5rem' } },
+      { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipoC', style: { width: '3rem' } },
       { titulo: 'Secuencia', tipo: tableCellType.text, key: 'secuencia_' },
       { titulo: 'Desde', tipo: tableCellType.text, key: 'desde' },
       { titulo: 'Hasta', tipo: tableCellType.text, key: 'hasta' },
-      { titulo: 'Usado', tipo: tableCellType.icon, key: 'usado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
-      { titulo: 'Activo', tipo: tableCellType.icon, key: 'estado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
-=======
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', style: { width: '3.5rem' } },
-      { titulo: 'Tipo', tipo: 'text', key: 'tipoC', style: { width: '3rem' } },
-      { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
-      { titulo: 'Desde', tipo: 'text', key: 'desde' },
-      { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
-      { titulo: 'Usado', tipo: 'icon', key: 'usado_', style: { width: '4rem' }, iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
-      { titulo: 'Activo', tipo: 'icon', key: 'estado_', style: { width: '4rem' }, iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
->>>>>>> dev
+      { titulo: 'Usado', tipo: tableCellType.icon, key: 'usado_', style: { width: '4rem' }, iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
+      { titulo: 'Activo', tipo: tableCellType.icon, key: 'estado_', style: { width: '4rem' }, iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
     ],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_ncf',
     padre_functions: { data_request: params => this.getPaquetesNCF(params) },
     filtrar: { local: false },
-<<<<<<< HEAD
-    obj_paginate: { show: true, showTotal: true, is_local: false },
-=======
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
->>>>>>> dev
     botones: { editar: { show: true, permiso: this.permissions.secuencia_comprobante.update }, borrar: { show: true, permiso: this.permissions.secuencia_comprobante.destroy } },
   };
   tablaComponent;
   formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
 
   htmlServ = inject(HtmlElementsService);
-<<<<<<< HEAD
-=======
   dynamicModalServ = inject(DynamicModalService);
   private tServ = inject(TablasService);
->>>>>>> dev
 
   constructor() {
     super();
@@ -128,17 +95,10 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this._destroy_mixin();
   }
 
-<<<<<<< HEAD
-  setDateInputs(actual) {
-    actual = DateUtils.format({ date: actual, dateFormat: 'MM/DD/YYYY' });
-
-    const anio = moment(new Date(actual)).add(1, 'year').format('YYYY');
-=======
   setDateInputs(buyDateSelected) {
     buyDateSelected = DateUtils.format({ date: buyDateSelected, dateFormat: 'MM/DD/YYYY' });
     const anio = DateUtils.add(1, 'years', buyDateSelected).getFullYear();
 
->>>>>>> dev
     const newFecha = DateUtils.format({ date: '12/31/' + anio, dateFormat: 'MM/DD/YYYY' });
 
     this.fechaCompra = new Date(buyDateSelected);
@@ -184,15 +144,10 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       res.data.forEach(ncf => {
         if (ncf.tipo_factura_id !== 1 && ncf.tipo_factura_id !== 3) {
           ncf.cantidad = ncf.hasta - ncf.desde + 1;
-<<<<<<< HEAD
-          ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].referencia;
-          ncf.tipoC_ = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
-          ncf.codigo = String(ncf.id).padStart(5, '0');
-=======
           ncf.tipoC = this.lista_tipos_facturas.filter(tipo => tipo.id === ncf.tipo_factura_id)[0].referencia;
           ncf.tipoC_ = this.lista_tipos_facturas.filter(tipo => tipo.id === ncf.tipo_factura_id)[0].descripcion;
-          ncf.codigo = _.padStart(ncf.id, 5, '0');
->>>>>>> dev
+          ncf.codigo = String(ncf.id).padStart(5, '0');
+          // TODO: colocar DateUtils
           ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
           ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
 
@@ -321,26 +276,11 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     const comprobanteData = data;
     comprobanteData.nombre = 'comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo;
 
-<<<<<<< HEAD
-    const objConfirmationModal = {
-      id: 'eliminar_comprobante',
-      header: 'Confirmar',
-      texto: `Desea eliminar comprobante para <b>${comprobanteData.tipoC_}</b> numero: <b>${comprobanteData.codigo}</b>`,
-      width: '510px',
-      siFunction: (instance) => {
-        this.ncfClass.deleteOne(comprobanteData.id).then((res) => {
-          const actualPagination = this.tServ.getPaginationById('lista_ncf');
-          this.getPaquetesNCF(actualPagination);
-          instance.dismissModal(instance.id);
-        });
-      },
-=======
     const siFunction = () => {
       this.ncfClass.deleteOne(comprobanteData.id).then(res => {
         const actualPagination = this.tServ.getPaginationById('lista_ncf');
         this.getPaquetesNCF(actualPagination);
       });
->>>>>>> dev
     };
 
     this.dynamicModalServ.confirmationModal({
