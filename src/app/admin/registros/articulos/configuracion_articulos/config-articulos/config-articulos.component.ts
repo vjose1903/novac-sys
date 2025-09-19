@@ -1,11 +1,5 @@
-<<<<<<< HEAD
-import { HtmlElementsService } from './../../../../../core/services/html-elements.service';
-import { fun } from './../../../../../core/services/functions.service';
-import { ConfigureModalI, ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
-=======
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { fun } from '@core/services/functions.service';
->>>>>>> dev
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { ConfigArticuloC, ConfigArticuloI } from '../articulos_configuracion';
@@ -20,16 +14,11 @@ import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-mo
 })
 export class ConfigArticulosComponent implements OnInit, IDynamicModal {
   form: UntypedFormGroup;
-<<<<<<< HEAD
-  modalComponent: ModalComponentI = {};
-  inputs: any;
-=======
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
 
   @Input() config_articulos: ConfigArticuloI;
 
->>>>>>> dev
   update_articulos = true;
   configArticuloClass = new ConfigArticuloC();
 
@@ -60,13 +49,7 @@ export class ConfigArticulosComponent implements OnInit, IDynamicModal {
   }
 
   disableBtnConfirm(validate) {
-<<<<<<< HEAD
-    const modal = this.modalComponent.modalsConfig.find((modal) => modal.id == this.modalComponent.id);
-    const btn = modal.botones.dinamico.find((boton) => boton.btnId == 'btnConfirmar');
-
-=======
     const btn = this.modalConfig.botones.find(boton => boton.id == 'btnConfirmar');
->>>>>>> dev
     btn.disable = validate;
   }
 
@@ -74,13 +57,8 @@ export class ConfigArticulosComponent implements OnInit, IDynamicModal {
     const formulario = this.form.getRawValue();
     this.configArticuloClass
       .updateOne(formulario, { parameters: { update_articulos: this.update_articulos } })
-<<<<<<< HEAD
-      .then((res) => {
-        this.modalComponent.closeModal(this.modalComponent.id, { data: { ...res.data } });
-=======
       .then(res => {
         this.modalConfig.close({ ...res.data, update_articulos: this.update_articulos });
->>>>>>> dev
       })
       .catch(err => console.error(err));
   }
