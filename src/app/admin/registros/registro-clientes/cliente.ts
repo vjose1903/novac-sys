@@ -2,16 +2,11 @@ import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 import { CrudG } from '@core/typescript/crud-g';
 import { ReporteC } from '../../reportes/reporte';
-<<<<<<< HEAD
-import { fun } from '../../../core/services/functions.service';
 import { ImagenI } from '../../../core/typescript/imagen.utils';
 import { EntidadCuentaContableI } from '../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
-import { DateUtils } from '../../../core/typescript/date.utils';
-=======
 import { fun } from '@core/services/functions.service';
 import { DateUtils } from '@vjose1903/dateutils';
->>>>>>> dev
 import { Validators } from '@angular/forms';
 import { ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
 import { csvConfig as csvConfigCxc } from '@core/services/reports/excel/configs/report/cxc';
@@ -99,11 +94,7 @@ export class ClienteC extends CrudG<any> {
     switch (pdfParams.tipo) {
       case 'cuentas_cobrar_cliente':
       case 'cuentas_cobrar_ant_saldo':
-<<<<<<< HEAD
-        requestParameters = { tipo: objTipo[reporteParams.modalId] };
-=======
         requestParameters = { tipo: reporteParams.data.tipo };
->>>>>>> dev
         tipo = requestParameters['tipo'];
 
         if (tipo == CxC.por_cliente) {
@@ -159,22 +150,13 @@ export class ClienteC extends CrudG<any> {
       let objPdfView: ReporteViewModalConfigI = {
         titulo: pdfParams.titulo,
         ...response,
-<<<<<<< HEAD
-        titulo: pdfParams.inputs.titulo,
-        fileName: _.first(response.file.split('.')),
-        openNewModal: pdfParams.openNewModal,
         viewerOptions: { width: tipo == CxC.por_cliente ? '57rem' : '64rem', height: tipo == CxC.por_cliente ? '76vh' : '47rem' },
-=======
->>>>>>> dev
       };
 
       ReporteC.visualizarReporte(objPdfView);
     });
 
     function transformRequestResponse(requestResponse) {
-<<<<<<< HEAD
-      if (hasPermisoPreVenta && objTipo['cuentas_cobrar_ant_saldo'] != CxC.agrupado && pdfParams.tipo != 'ventas_cliente') requestResponse['tipo_reporte'] += '_preventa';
-=======
       requestResponse['tipo_reporte'] = requestResponse['tipo_reporte'].replace('cuentas_cobrar', 'cxc');
 
       if (hasPermisoPreVenta && objTipo['cuentas_cobrar_ant_saldo'] != 3 && pdfParams.tipo != 'ventas_cliente') requestResponse['tipo_reporte'] += '_preventa';
@@ -203,7 +185,6 @@ export class ClienteC extends CrudG<any> {
         requestResponse.mora = mora;
         requestResponse.total_general = total_general;
       }
->>>>>>> dev
 
       return requestResponse;
     }
