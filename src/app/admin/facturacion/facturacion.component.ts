@@ -1349,27 +1349,33 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
   //  MODAL CANCELAR
   // =============================================
-  cancelarFactura() {
+  cancelarFactura(arg?: { showConfirmationModal?: boolean, goToFinder?: boolean }) {
+    const { showConfirmationModal = true, goToFinder = true } = arg || {};
+
     let siFunct = () => {
       this.showDeactivationModal.set(false);
 
       const actionToGoFinder = [actionFacturacion.update, actionFacturacion.duplicate];
 
-      if (actionToGoFinder.includes(this.factServ.action)) {
+      if (actionToGoFinder.includes(this.factServ.action) && goToFinder) {
         this.router.navigateByUrl(`/admin/manipular/buscarFactura/solo_ver`);
       } else {
         this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento()}/${actionFacturacion.new}/0`).then(res_router => this.resetVariables());
       }
     };
 
-    let documento = this.getDocumentoDescripcion();
+    if (showConfirmationModal) {
+      let documento = this.getDocumentoDescripcion();
 
-    this.dynamicModalServ.confirmationModal({
-      id: 'confirmCancelarFactura',
-      texto: `Seguro que desea cancelar la <strong>${documento.descripcion}</strong>.`,
-      btnKind: confirmationButtons.siNo,
-      onYes: () => siFunct(),
-    });
+      this.dynamicModalServ.confirmationModal({
+        id: 'confirmCancelarFactura',
+        texto: `Seguro que desea cancelar la <strong>${documento.descripcion}</strong>.`,
+        btnKind: confirmationButtons.siNo,
+        onYes: () => siFunct(),
+      });
+    } else {
+      siFunct();
+    }
   }
 
   // =============================================
@@ -1547,13 +1553,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   procesoArchivarFactura(reset: boolean = false) {
     this.agregarFacturaALocalStorage();
-
-    if (reset) this.router.navigateByUrl(`admin/factura/${this.factServ.tipoDocumento()}/${actionFacturacion.new}/0`).then(res_router => this.resetVariables());
+    this.cancelarFactura({ showConfirmationModal: false, goToFinder: false });
   }
 
   archivarFactura() {
     let documento = this.getDocumentoDescripcion();
-
+    // INICIO
     if (this.checkIfFacturacionEnProceso()) {
       this.verificateArchivo().then(() => {
         let is_guardada = false;
