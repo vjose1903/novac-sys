@@ -9,17 +9,8 @@ const routes: Routes = [
   {
     path: '',
     component: RegistroClientesComponent,
-<<<<<<< HEAD
-    // canActivate: [NgxPermissionsGuard],
-    // data: {
-    //   permissions: {
-    //     only: Object.values(Permisos.cliente),
-    //   },
-    // },
-=======
     canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.cliente), 'admin/dashboard')],
     canDeactivate: [CanDeactivateGuard],
->>>>>>> dev
   },
 ];
 

@@ -25,7 +25,8 @@
       "@registros/*": ["app/admin/registros/*"],
       "@admin/*": ["app/admin/*"],
       "@environments/*": ["environments/*"],
-      "@electron/*": ["../electron/*"]
+      "@electron/*": ["../electron/*"],
+      "@modules/*": ["app/modules/*"]
     }
   },
   "files": [
