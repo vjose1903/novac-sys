@@ -1,31 +1,35 @@
 import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { TablasService } from './../../components/new_tablas/tablas.service';
+import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from './../../../core/services/functions.service';
 import { MixinClass } from './../../../core/typescript/MixinClass';
-import { Component, OnInit, inject } from '@angular/core';
-import { ModalComponentI, ModalI } from '../../components/modal/modal-class';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { Permisos } from '../../../core/typescript/permisos';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { CategoriaEntidadContableC, CategoriaEntidadContableI, entidadesContables } from './categoria-entidad-contable.utils';
-import { paginateI, tableCellType, table_config } from '../../components/new_tablas/tabla-class';
+import { paginateI, tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import * as _ from 'lodash';
 import { CategoriaEntidadContableService } from './categoria-entidad-contable.service';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-categoria-entidad-contable',
   templateUrl: './categoria-entidad-contable.component.html',
   styleUrls: ['./categoria-entidad-contable.component.scss'],
+  standalone: false,
 })
-export class CategoriaEntidadContableComponent extends MixinClass implements OnInit, ModalI {
+export class CategoriaEntidadContableComponent extends MixinClass implements OnInit, IDynamicModal {
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() configsEntCuentas: Array<ConfiguracionEntidadCuentaI>;
+  @Input() entidad: entidadesContables;
+
   fun = fun;
   form: UntypedFormGroup;
   permissions = Permisos;
   hasPermissionsCreateUpdate;
-
-  modalComponent: ModalComponentI = {};
-  inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI>; entidad: entidadesContables };
 
   tabIndex = 0;
   configEntContableClass = new ConfiguracionEntidadCuentaC();
@@ -36,7 +40,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     colores: true,
     padding: '0.5rem',
     id_tabla: 'listado_categorias',
-    padre_functions: { data_request: (params) => this.fillArrayWithCategorias({ ...params }) },
+    padre_functions: { data_request: params => this.fillArrayWithCategorias({ ...params }) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.categoria_entidad_contable.update } },
@@ -50,7 +54,11 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
 
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private permissionsService: NgxPermissionsService, private fb: UntypedFormBuilder, private tServ: TablasService) {
+  constructor(
+    private permissionsService: NgxPermissionsService,
+    private fb: UntypedFormBuilder,
+    private tServ: TablasService
+  ) {
     super();
   }
 
@@ -74,7 +82,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
   }
 
   checkPermissions() {
-    this.permissionsService.hasPermission([this.permissions.categoria_entidad_contable.create, this.permissions.categoria_entidad_contable.update]).then((result) => (this.hasPermissionsCreateUpdate = result));
+    this.permissionsService.hasPermission([this.permissions.categoria_entidad_contable.create, this.permissions.categoria_entidad_contable.update]).then(result => (this.hasPermissionsCreateUpdate = result));
   }
 
   changeTabIndex(event) {
@@ -83,7 +91,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
   }
 
   selectCurrentConfig() {
-    this.selectedConfig = this.inputs.configsEntCuentas[this.tabIndex];
+    this.selectedConfig = this.configsEntCuentas[this.tabIndex];
   }
 
   borrar() {
@@ -106,8 +114,8 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
 
     const originalValue = fun.pick(
-      this.listadoCategorias.find((categoria) => categoria.id == formValue.id),
-      pick_values,
+      this.listadoCategorias.find(categoria => categoria.id == formValue.id),
+      pick_values
     );
 
     return !fun.isEqual(formValue, originalValue);
@@ -119,7 +127,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
 
   fillArrayWithCategorias(paginationOptions: paginateI) {
     this.listadoCategorias.length = 0;
-    CategoriaEntidadContableService.getCategoriasByEntidad({ ...paginationOptions, config_id: this.selectedConfig.id, entidad: this.inputs.entidad }).then((res) => {
+    CategoriaEntidadContableService.getCategoriasByEntidad({ ...paginationOptions, config_id: this.selectedConfig.id, entidad: this.entidad }).then(res => {
       this.listadoCategorias = res['data'];
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
@@ -137,7 +145,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
     const formValue = fun.pick(this.form.getRawValue(), ['id', 'descripcion']);
 
     if (same_in_all_config) {
-      this.inputs.configsEntCuentas.forEach((config: ConfiguracionEntidadCuentaI) => {
+      this.configsEntCuentas.forEach((config: ConfiguracionEntidadCuentaI) => {
         formValue['configuracion_entidad_cuenta_id'] = config.id;
         dataParsed.categorias.push(fun.deepCloning(formValue));
       });
@@ -152,7 +160,7 @@ export class CategoriaEntidadContableComponent extends MixinClass implements OnI
   requests() {
     const dataToSend = this.formarData();
 
-    this.categoriaEntContClass.createOne(dataToSend).then((res) => {
+    this.categoriaEntContClass.createOne(dataToSend).then(res => {
       this.borrar();
 
       const actualPagination = this.tServ.getPaginationById(`listado_categorias-${this.selectedConfig.id}`);

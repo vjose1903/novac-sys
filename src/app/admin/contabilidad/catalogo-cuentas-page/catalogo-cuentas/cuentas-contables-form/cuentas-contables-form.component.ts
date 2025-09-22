@@ -1,16 +1,22 @@
-import { fun } from './../../../../../core/services/functions.service';
+import { fun } from '@core/services/functions.service';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { ModalComponentI, ModalI } from './../../../../components/modal/modal-class';
-import { Component, OnInit } from '@angular/core';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { Component, Input, OnInit } from '@angular/core';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 
 @Component({
   selector: 'app-cuentas-contables-form',
   templateUrl: './cuentas-contables-form.component.html',
   styleUrls: ['./cuentas-contables-form.component.scss'],
+  standalone: false,
 })
-export class CuentasContablesFormComponent implements OnInit, ModalI {
-  modalComponent: ModalComponentI = {};
-  inputs: { data: any; dataOriginal: any; method: 'edit' | 'add'; cuenta_control: any };
+export class CuentasContablesFormComponent implements OnInit, IDynamicModal {
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+  @Input() data: any;
+  @Input() dataOriginal: any;
+  @Input() method: 'edit' | 'add';
+  @Input() cuenta_control: any;
 
   form: UntypedFormGroup;
   fun = fun;
@@ -28,14 +34,14 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
   constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit(): void {
-    this.createForm(this.inputs.data).then(() => this.escucharCambiosEnForm());
+    this.createForm(this.data).then(() => this.escucharCambiosEnForm());
     this.disableSelects();
   }
 
   escucharCambiosEnForm() {
     let form_is_invalid = !this.form.valid;
 
-    this.form.valueChanges.subscribe((res) => {
+    this.form.valueChanges.subscribe(res => {
       if (fun.hasValue(res)) {
         form_is_invalid = !this.form.valid;
 
@@ -52,7 +58,7 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
 
   checkIfSomethingIsDiferrent() {
     const formValue = this.parseData(this.form.getRawValue());
-    const originalValue = this.parseData(this.inputs.dataOriginal);
+    const originalValue = this.parseData(this.dataOriginal);
     originalValue['origen'] = this.getValueOrigenOrTipo(originalValue.origen);
     originalValue['tipo'] = this.getValueOrigenOrTipo(originalValue.tipo);
 
@@ -62,14 +68,14 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
   createForm(data?) {
     return new Promise<any>((resolve, reject) => {
       this.form = this.fb.group({
-        id: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.id : null) : null, disabled: false }],
+        id: [{ value: fun.hasValue(data) ? (this.method == 'edit' ? data.id : null) : null, disabled: false }],
         grupo_cuenta_id: [{ value: data.grupo_cuenta_id, disabled: false }],
         cuenta_control_id: [{ value: data.cuenta_control_id, disabled: false }],
 
-        cuenta_is_control: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.is_control : false) : false, disabled: false }, Validators.required],
-        cuenta_is_auxiliar: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? !data.is_control : true) : true, disabled: false }, Validators.required],
-        descripcion: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.descripcion : '') : '', disabled: false }, Validators.required],
-        codigo: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.codigo : '') : '', disabled: true }],
+        cuenta_is_control: [{ value: fun.hasValue(data) ? (this.method == 'edit' ? data.is_control : false) : false, disabled: false }, Validators.required],
+        cuenta_is_auxiliar: [{ value: fun.hasValue(data) ? (this.method == 'edit' ? !data.is_control : true) : true, disabled: false }, Validators.required],
+        descripcion: [{ value: fun.hasValue(data) ? (this.method == 'edit' ? data.descripcion : '') : '', disabled: false }, Validators.required],
+        codigo: [{ value: fun.hasValue(data) ? (this.method == 'edit' ? data.codigo : '') : '', disabled: true }],
         origen: [{ value: fun.hasValue(data) ? this.getValueOrigenOrTipo(data.origen) : '', disabled: false }, Validators.required],
         tipo: [{ value: fun.hasValue(data) ? this.getValueOrigenOrTipo(data.tipo) : '', disabled: false }, Validators.required],
       });
@@ -114,26 +120,24 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
       const formValue = this.form.getRawValue();
       const selects = ['origen', 'tipo'];
 
-      selects.forEach((select) => {
+      selects.forEach(select => {
         formValue.cuenta_is_control ? this.form.controls[select].enable() : this.form.controls[select].disable();
 
-        if (formValue.cuenta_is_auxiliar) this.form.controls[select].setValue(this.getValueOrigenOrTipo(this.inputs.dataOriginal[select]));
+        if (formValue.cuenta_is_auxiliar) this.form.controls[select].setValue(this.getValueOrigenOrTipo(this.dataOriginal[select]));
       });
     }, 1);
   }
 
   disableBtnConfirm(validate) {
-    const modal = this.modalComponent.modalsConfig.find((modal) => modal.id == this.modalComponent.id);
-    const btn = modal.botones.aceptar;
-
-    btn.disable = validate;
+    const btn = this.modalConfig.botones.find(boton => boton.id == 'btnAceptar');
+    if (btn) btn.disable = validate;
   }
 
   parseData(data) {
     data = fun.remplaceKeyFromJson(data, [{ old_key: 'cuenta_is_control', new_key: 'is_control' }]);
 
-    if (this.inputs.method == 'add') {
-      data.cuenta_control_id = this.inputs.dataOriginal.id;
+    if (this.method == 'add') {
+      data.cuenta_control_id = this.dataOriginal.id;
     }
 
     const keys_to_pick = ['descripcion', 'id', 'is_control', 'origen', 'tipo', 'grupo_cuenta_id', 'cuenta_control_id'];
@@ -142,9 +146,8 @@ export class CuentasContablesFormComponent implements OnInit, ModalI {
     return data;
   }
 
-  btn_aceptar() {
+  submit() {
     const dataToSend = this.parseData(this.form.getRawValue());
-
-    this.modalComponent.closeModal(this.modalComponent.id, { obj: dataToSend });
+    this.modalConfig.close(dataToSend);
   }
 }

@@ -49,7 +49,7 @@ export class DynamicModalService {
     onNo?: () => void | Promise<void>;
     onYes?: () => void | Promise<void>;
   }) {
-    const { id, texto, header = 'Confirmación', btnKind = confirmationButtons.cancelarContinuar, width = '40vw', iconName, iconSize, iconColor, closableClickOutside, showReasonInput = false, onNo, onYes, onCancelar } = params;
+    const { id, texto, header = 'Confirmación', btnKind = confirmationButtons.cancelarContinuar, width = '30rem', iconName, iconSize, iconColor, closableClickOutside, showReasonInput = false, onNo, onYes, onCancelar } = params;
 
     const inputs = { html: texto, iconName, iconSize, iconColor, showReasonInput, onYes };
 

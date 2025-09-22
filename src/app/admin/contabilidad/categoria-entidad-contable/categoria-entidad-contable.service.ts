@@ -6,8 +6,9 @@ import { CategoriaEntidadContableC, CategoriaEntidadContableI, entidadesContable
 import { Permisos } from './../../../core/typescript/permisos';
 import { Injectable } from '@angular/core';
 import { CategoriaEntidadContableComponent } from './categoria-entidad-contable.component';
-import { ModalClass } from '../../components/modal/modal-class';
 import { BehaviorSubject, filter, finalize, first, take } from 'rxjs';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -16,9 +17,7 @@ export class CategoriaEntidadContableService {
   private _categoriasChange = new BehaviorSubject<boolean>(false);
 
   get categoriasChange$() {
-    return this._categoriasChange.asObservable().pipe(
-      filter(value => value != false)
-    );
+    return this._categoriasChange.asObservable().pipe(filter(value => value != false));
   }
 
   permissions = Permisos;
@@ -40,33 +39,35 @@ export class CategoriaEntidadContableService {
     this._categoriasChange.next(false);
   }
 
-  openModalCategorias(params: { entidad: entidadesContables; openNewModal: Function; inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI> }; id_modal: string }) {
-    const header = `Categorias de ${CategoriaEntidadContableService.entidades.plural[params.entidad]}`;
-    params.inputs['entidad'] = params.entidad;
+  openModalCategorias(params: { entidad: entidadesContables; callback: Function; inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI> }; id_modal: string }) {
+    const { entidad, id_modal, inputs = {}, callback } = params ?? {};
 
-    params.openNewModal({
-      component: CategoriaEntidadContableComponent,
-      inputs: params.inputs,
-      id: params.id_modal,
-      header: header,
-      width: '70rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
-      },
-    });
+    const header = `Categorias de ${CategoriaEntidadContableService.entidades.plural[entidad]}`;
+    inputs['entidad'] = entidad;
+
+    const categoriasModalConf = new DynamicModalClass();
+
+    categoriasModalConf.id = params.id_modal;
+    categoriasModalConf.inputs = inputs;
+    categoriasModalConf.header = header;
+    categoriasModalConf.width = '70rem';
+    categoriasModalConf.component = CategoriaEntidadContableComponent;
+    categoriasModalConf.closableEsc = true;
+    categoriasModalConf.setCallback(callback);
+    categoriasModalConf.botones = [{ clase: 'btn btn-blanco mr-2', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+    categoriasModalConf.show();
   }
 
   static getCategoriasByEntidad(params: { entidad: entidadesContables; config_id: number; tipo_articulo_id?: number; search?: string; per_page?: number; page?: number; paginado?: boolean; showMsgs?: boolean }) {
     return new Promise<any>((resolve, reject) => {
-      if ((params.entidad == CategoriaEntidadContableC.entidad.articulo)) {
+      if (params.entidad == CategoriaEntidadContableC.entidad.articulo) {
         this.getSubTipoArticulo(params)
-          .then((result) => resolve(result))
-          .catch((err) => reject(err));
+          .then(result => resolve(result))
+          .catch(err => reject(err));
       } else {
         this.getCategoriasContables(params)
-          .then((result) => resolve(result))
-          .catch((err) => reject(err));
+          .then(result => resolve(result))
+          .catch(err => reject(err));
       }
     });
   }
@@ -78,10 +79,10 @@ export class CategoriaEntidadContableService {
 
       this.subTipoArticuloClass
         .getAll(extra)
-        .then((res) => {
+        .then(res => {
           resolve(res);
         })
-        .catch((err) => {
+        .catch(err => {
           reject(err);
         });
     });
@@ -98,14 +99,14 @@ export class CategoriaEntidadContableService {
 
       this.categoriaEntContClass
         .getAll(extra)
-        .then((res) => {
+        .then(res => {
           res['data'].map((categoria: CategoriaEntidadContableI) => {
             categoria.customStyles = { descripcion: { 'text-align': 'start', width: '80%' } };
             return categoria;
           });
           resolve(res);
         })
-        .catch((err) => {
+        .catch(err => {
           reject(err);
         });
     });

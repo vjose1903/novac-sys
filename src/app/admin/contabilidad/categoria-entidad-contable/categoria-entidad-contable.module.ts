@@ -1,6 +1,6 @@
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TablasModule } from './../../components/new_tablas/tablas.module';
+import { TablasModule } from '@components/new_tablas/tablas.module';
 import { PrimengModule } from './../../../modules/primeng.module';
 import { PipesModule } from './../../../core/pipe/pipes.module';
 import { NgModule } from '@angular/core';

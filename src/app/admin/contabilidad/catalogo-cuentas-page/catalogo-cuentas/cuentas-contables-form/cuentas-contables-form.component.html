@@ -1,10 +1,10 @@
 <div class="row">
   <div class="col-12 p-0">
-    <h5 class="mb-5" *ngIf="fun.hasValue(inputs.data) && inputs.method == 'edit'">
-      Cuenta Contable: <strong> {{ inputs.data.descripcion }}</strong>
+    <h5 class="mb-5" *ngIf="fun.hasValue(data) && method == 'edit'">
+      Cuenta Contable: <strong> {{ data.descripcion }}</strong>
     </h5>
-    <h5 class="mb-5" *ngIf="inputs.method == 'add'">
-      Añadir Cuenta Contable en: <strong> {{ inputs.data.descripcion }}</strong>
+    <h5 class="mb-5" *ngIf="method == 'add'">
+      Añadir Cuenta Contable en: <strong> {{ data.descripcion }}</strong>
     </h5>
   </div>
   <div class="col-12 p-0">
@@ -31,7 +31,7 @@
               [rounded]="true"
               [style]="{ background: '#d3eaf5', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block', 'font-size': '0.9rem', 'box-shadow': '1px 1px 3px #00000047', 'padding-left': '1rem' }"
             >
-              <p class="text-black mb-0">{{ getCuentaControlLabel(inputs.cuenta_control) }}</p>
+              <p class="text-black mb-0">{{ getCuentaControlLabel(cuenta_control) }}</p>
             </p-tag>
           </div>
         </div>
@@ -54,7 +54,7 @@
           </div>
         </div>
 
-        <div class="p-0 col-12" *ngIf="inputs.method == 'edit'">
+        <div class="p-0 col-12" *ngIf="method == 'edit'">
           <div class="form-group" appMsgError="descripcion" [form]="form">
             <label class="control-label">Cuenta Contable: </label>
             <input [appCapitalice]="'formGroup'" id="campoCodigo" type="text" formControlName="codigo" class="form-control" autocomplete="off" />
@@ -65,7 +65,7 @@
         <div class="p-0 col-12">
           <div class="form-group" appMsgError="origen" [form]="form">
             <label class="control-label">Origen: <span style="color: red">*</span></label>
-            <p-dropdown
+            <p-select
               [placeholder]="'Seleccione el origen de la cuenta'"
               [options]="origenList"
               formControlName="origen"
@@ -78,7 +78,7 @@
               [virtualScroll]="true"
               [virtualScrollItemSize]="30"
               id="campoOrigen"
-            ></p-dropdown>
+            ></p-select>
             <span id="msgContainer"></span>
           </div>
         </div>
@@ -86,7 +86,7 @@
         <div class="p-0 col-12">
           <div class="form-group" appMsgError="tipo" [form]="form">
             <label class="control-label">Tipo: <span style="color: red">*</span></label>
-            <p-dropdown
+            <p-select
               [placeholder]="'Seleccione el tipo de cuenta'"
               [options]="tipoList"
               formControlName="tipo"
@@ -99,7 +99,7 @@
               [virtualScroll]="true"
               [virtualScrollItemSize]="30"
               id="campoTipo"
-            ></p-dropdown>
+            ></p-select>
             <span id="msgContainer"></span>
           </div>
         </div>

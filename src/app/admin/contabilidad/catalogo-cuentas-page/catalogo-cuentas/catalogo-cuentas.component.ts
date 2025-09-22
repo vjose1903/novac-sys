@@ -1,19 +1,23 @@
-import { DateUtils } from './../../../../core/typescript/date.utils';
-import { TablasService } from './../../../components/new_tablas/tablas.service';
-import { tableCellType, table_config, table_info } from './../../../components/new_tablas/tabla-class';
+import { DateUtils } from '@vjose1903/dateutils';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { tableCellType, table_config, table_info } from '@components/new_tablas/tabla-class';
 import { CuentasContablesService } from './utils/cuentas-contables.service';
 import { TreeNode } from 'primeng/api';
-import { fun } from './../../../../core/services/functions.service';
-import { MixinClass } from './../../../../core/typescript/MixinClass';
+import { fun } from '@core/services/functions.service';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { CuentaContableC, CuentaContableI } from './cuentas-contables-form/cuentas_contables.utils';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { CuentasContablesFormComponent } from './cuentas-contables-form/cuentas-contables-form.component';
 import * as _ from 'lodash';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'catalogo-cuentas',
   templateUrl: './catalogo-cuentas.component.html',
   styleUrls: ['./catalogo-cuentas.component.scss'],
+  standalone: false,
 })
 export class CatalogoCuentasComponent extends MixinClass implements OnInit {
   @ViewChild('catalogoCuentasBody', { static: false }) catalogoCuentasBody: ElementRef;
@@ -56,7 +60,11 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     id_tabla: 'lista_cuentas_contables',
   };
 
-  constructor(private cuentasContablesServ: CuentasContablesService, public tServ: TablasService) {
+  private dynamicModalServ: DynamicModalService = inject(DynamicModalService);
+  private cuentasContablesServ: CuentasContablesService = inject(CuentasContablesService);
+  public tServ: TablasService = inject(TablasService);
+
+  constructor() {
     super();
   }
 
@@ -121,13 +129,6 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     return cuentaParsed;
   }
 
-  // deactivate_or_reactivate
-  async getDataFromModal(arg, search?) {
-    if (arg.modalId == 'form_cuenta_contable') {
-      this.requests(arg.obj);
-    }
-  }
-
   getValueForm(column: table_info, data) {
     switch (column.tipo) {
       case 'textList':
@@ -151,9 +152,9 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     this.treeTableScrollHeight = `${calculo}px`;
   }
 
-  filter(event) {
+  filter(event: any) {
     this.filter_target = event.target.value;
-    fun.awaitTyping({ evento: event }).then(() => this.getCuentasContables(this.filter_target));
+    fun.awaitTyping(event).then(() => this.getCuentasContables(this.filter_target));
   }
 
   iconsClick(event) {
@@ -173,40 +174,55 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
       }
 
       if (params.iconKey == 'add_account' || params.iconKey == 'edit_account') {
-        this.openNewModal({
-          component: CuentasContablesFormComponent,
-          inputs: inputs,
-          id: 'form_cuenta_contable',
-          header: header,
-          width: '35rem',
-          botones: { aceptar: { show: true, disable: true }, cancelar: { show: true, disable: false } },
-        });
+        const cuentasContablesModalConf = new DynamicModalClass();
+
+        cuentasContablesModalConf.id = 'form_cuenta_contable';
+        cuentasContablesModalConf.inputs = inputs;
+        cuentasContablesModalConf.header = header;
+        cuentasContablesModalConf.width = '35rem';
+        cuentasContablesModalConf.component = CuentasContablesFormComponent;
+        cuentasContablesModalConf.closableEsc = false;
+        cuentasContablesModalConf.setCallback(this.processCuentaContableModal.bind(this));
+        cuentasContablesModalConf.botones = [
+          { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+          { id: 'btnAceptar', clase: 'btn btn-verde', label: 'Aceptar', disable: true },
+        ];
+        cuentasContablesModalConf.show();
       }
 
       if (params.iconKey == 'deactivate_reactivate_account') {
-        this.confirmationModal({
+        const texto = params.data.estado
+          ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la cuenta <b class="negrita">${params.data.descripcion}</b>`
+          : `Seguro que desea <b class="negrita"> REACTIVAR </b> la cuenta <b class="negrita">${params.data.descripcion}</b>`;
+
+        const onYes = () => {
+          this.deactivateOrReactivateAccount(params.data);
+        };
+
+        this.dynamicModalServ.confirmationModal({
           id: 'deactivate_or_reactivate_account',
-          header: 'Confirmar',
-          texto: params.data.estado
-            ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la cuenta <b class="negrita">${params.data.descripcion}</b>`
-            : `Seguro que desea <b class="negrita"> REACTIVAR </b> la cuenta <b class="negrita">${params.data.descripcion}</b>`,
-          siFunction: (instance) => {
-            this.deactivateOrReactivateAccount(params.data);
-            instance.dismissModal(instance.id);
-          },
+          texto: texto,
+          btnKind: params.data.estado ? confirmationButtons.cancelarDesactivar : confirmationButtons.cancelarActivar,
+          onYes: onYes.bind(this),
         });
       }
     }
   }
 
+  processCuentaContableModal(arg: ICallbackModal) {
+    if (arg.type == modalCloseType.onHide) return;
+
+    this.requests(arg.data);
+  }
+
   deactivateOrReactivateAccount(data) {
-    this.cuentaContableClass.updateOne({ id: data.id }, { afterPath: 'deactivate_or_reactivate', parameters: { status: !data.estado } }).then((res) => {
+    this.cuentaContableClass.updateOne({ id: data.id }, { afterPath: 'deactivate_or_reactivate', parameters: { status: !data.estado } }).then(res => {
       this.getCuentasContables(this.filter_target);
     });
   }
 
   requests(data) {
-    this.cuentaContableClass.createUpdateOne(data).then((res) => {
+    this.cuentaContableClass.createUpdateOne(data).then(res => {
       this.getCuentasContables(this.filter_target);
     });
   }

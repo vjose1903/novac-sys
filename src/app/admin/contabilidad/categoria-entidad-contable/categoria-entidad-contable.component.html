@@ -1,13 +1,18 @@
 <div class="catEntContContainer">
-  <p-tabView [scrollable]="true" [(activeIndex)]="tabIndex" styleClass="my_tabView p-0" (onChange)="changeTabIndex($event)">
-    <p-tabPanel
+  <p-tabs [(value)]="tabIndex" [scrollable]="true" styleClass="my_tabView p-0" (onChange)="changeTabIndex($event)">
+    <!-- <p-tablist>
+      <p-tab [value]="0">Marcas</p-tab>
+      <p-tab [value]="1">Modelos</p-tab>
+    </p-tablist> -->
+    <!-- <p-tabView [scrollable]="true" [(activeIndex)]="tabIndex" styleClass="my_tabView p-0" (onChange)="changeTabIndex($event)"> -->
+    <!-- <p-tabPanel
       id="p-tabView-{{ config.key }}-{{ config.id }}"
       #tabPanel
       [closable]="false"
       *ngFor="let config of inputs.configsEntCuentas"
       headerStyleClass="p-tabView-{{ config.key }}-{{ config.id }}"
-      header="{{ configEntContableClass.getConfigLabel(config) }}"
-    >
+      header="{{ configEntContableClass.getConfigLabel(config) }}">
+
       <div class="row h-100 w-100">
         <div *ngIf="hasPermissionsCreateUpdate" class="col-6 pl-0 pt-3">
           <form [formGroup]="form" class="h-100" (keydown.enter)="$event.stopPropagation()">
@@ -49,11 +54,10 @@
               [(TablasComponent)]="tablaComponent"
               [config]="table_config"
               [post_id]="'-' + config.id"
-              (table_events)="handle_table_events($event)"
-            ></dinamic-table>
+              (table_events)="handle_table_events($event)"></dinamic-table>
           </div>
         </div>
       </div>
-    </p-tabPanel>
-  </p-tabView>
+    </p-tabPanel> -->
+  </p-tabs>
 </div>
