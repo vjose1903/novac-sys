@@ -1,49 +1,29 @@
-<<<<<<< HEAD
-import { ConfigService } from './../../../core/services/configuration.service';
-import { ConfigI } from '../../../core/typescript/config-interface';
+import { ConfigI } from '@core/interface/config-interface';
 import { FormEntidadCuentaContableI } from './../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
 import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 import { CategoriaEntidadContableC, entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { customValidators } from '../../../core/typescript/custom-validators';
-import { pattern } from '../../../core/typescript/constantes';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { EmpleadoC, EmpleadoI } from './empleado.utils';
-import { ChangePasswordComponent } from '../../components/formularios en modales/change-password/change-password.component';
-import { fun } from '../../../core/services/functions.service';
-import { RolesC } from '../roles/roles';
-import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
-import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
-import { DocumentoDeIdentidadI } from '../../../core/typescript/documentos_de_identidad.utils';
-import { ConfigureModalI } from '../../components/modal/modal-class';
-import { maxSizeTypeE } from '../../../core/directive/max-sizer.directive';
-=======
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import * as _ from 'lodash';
-const moment = require('../../../core/javascript/moment');
 import { MixinClass } from '@core/typescript/MixinClass';
 import { customValidators } from '@core/typescript/custom-validators';
 import { pattern } from '@core/typescript/constantes';
 import { TablasService } from '@components/new_tablas/tablas.service';
-import { EmpleadoC } from './empleado';
+import { EmpleadoC, EmpleadoI } from './empleado.utils';
 import { ChangePasswordComponent } from '@components/formularios en modales/change-password/change-password.component';
 import { fun } from '@core/services/functions.service';
 import { RolesC } from '../roles/roles';
-import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
-
+import { default_per_page, tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
+import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
+import { DocumentoDeIdentidadI } from '@core/typescript/documentos_de_identidad.utils';
+import { maxSizeTypeE } from '@core/directive/max-sizer.directive';
+import * as _ from 'lodash';
 import { Ss } from '@core/services/singleton.service';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
-import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
->>>>>>> dev
 
 @Component({
   selector: 'app-registro-empleados',
@@ -64,7 +44,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   editando = false;
   empleadoSelected: EmpleadoI;
   indexBorrar: any;
-  documentos_de_identidad: DocumentoDeIdentidadI[];
+  documentos_de_identidad: DocumentoDeIdentidadI[] = [];
 
   camposDisabled = true;
   empleadosClass = new EmpleadoC();
@@ -75,17 +55,10 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-<<<<<<< HEAD
       { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre_completo' },
       { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
       { titulo: 'Cedula', tipo: tableCellType.text, key: 'documento_identidad' },
       { titulo: 'Role', tipo: tableCellType.textList, key: 'roles', key_value: 'nombre' },
-=======
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre_completo' },
-      { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
-      { titulo: 'Cedula', tipo: 'text', key: 'documento_identidad' },
-      { titulo: 'Role', tipo: 'textList', key: 'roles', key_value: 'nombre' },
->>>>>>> dev
     ],
 
     colores: true,
@@ -93,33 +66,26 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     id_tabla: 'lista_empleados',
     padre_functions: { data_request: params => this.getEmpleados(params) },
     filtrar: { local: false },
-<<<<<<< HEAD
-    obj_paginate: { show: true, showTotal: true, is_local: false },
-=======
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
->>>>>>> dev
     botones: { editar: { show: true, permiso: this.permissions.user.update }, borrar: { show: true, permiso: this.permissions.user.destroy } },
   };
   tablaComponent;
   formPermissions = [Permisos.user.create, Permisos.user.update];
   maxDateBirth = new Date();
 
-<<<<<<< HEAD
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.user;
-  htmlServ = inject(HtmlElementsService);
 
-  configApp: ConfigI = ConfigService.config;
+  configApp!: ConfigI;
   maxSizeTypeE = maxSizeTypeE;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public categoriaEntidadServ: CategoriaEntidadContableService, public entCuentaContServ: EntidadCuentaContableService) {
-=======
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
+  public categoriaEntidadServ = inject(CategoriaEntidadContableService);
+  public entCuentaContServ = inject(EntidadCuentaContableService);
 
   constructor() {
->>>>>>> dev
     super();
   }
 
@@ -150,19 +116,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     });
   }
 
-<<<<<<< HEAD
-  iniciarCambioMenu(arg, callback) {
-    console.log("\n\n --- iniciarCambioMenu --- empleados");
-    console.log('arg:  ', arg)
-    
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
-
-=======
->>>>>>> dev
   ngOnDestroy(): void {
     this._destroy_mixin();
   }
@@ -175,13 +128,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     fun.enfocarInput('cedula');
   }
 
-<<<<<<< HEAD
-=======
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.capitalice(arg));
-  }
->>>>>>> dev
   async getEmpleados(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
@@ -189,15 +135,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
       this.listaEmpleados.length = 0;
-<<<<<<< HEAD
-      this.empleadosClass.getAll(extra).then((res) => {
-        res['data'].map((empleado) => {
-          const doc = empleado.documentos_de_identidad.find((doc) => doc.principal == true);
-=======
       this.empleadosClass.getAll(extra).then(res => {
         res['data'].map(empleado => {
-          const doc = _.find(empleado.documentos_de_identidad, { principal: true });
->>>>>>> dev
+          const doc = empleado.documentos_de_identidad.find(doc => doc.principal == true);
           empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
 
           return empleado;
@@ -213,7 +153,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   getConfigEntidadCliente() {
     const extra = { parameters: { filter_target: this.entidadContable } };
-    this.configEntContableClass.getAll(extra).then((res) => (this.listaConfigEmpleados = res['data']));
+    this.configEntContableClass.getAll(extra).then(res => (this.listaConfigEmpleados = res['data']));
   }
 
   async getRoles() {
@@ -243,11 +183,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
           .then(res => {
             if (res['data'].length) {
-<<<<<<< HEAD
-              const is_user = res['data'].find((item) => item.persona_is === 'User');
-=======
-              const is_user = _.find(res['data'], item => item.persona_is === 'User');
->>>>>>> dev
+              const is_user = res['data'].find(item => item.persona_is === 'User');
               const id_anterior = this.form.getRawValue().id;
               if (fun.hasValue(is_user) && is_user?.persona?.estado) {
                 fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
@@ -255,13 +191,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
                 return;
               }
 
-<<<<<<< HEAD
               const persona = fun.hasValue(is_user) ? is_user.persona : res['data'][0].persona;
-              const documento_persona = persona.documentos_de_identidad.find((item) => item.principal == true);
-=======
-              const persona = fun.hasValue(is_user) ? is_user.persona : _.head(res['data']).persona;
-              const documento_persona = _.find(persona.documentos_de_identidad, item => item.principal);
->>>>>>> dev
+              const documento_persona = persona.documentos_de_identidad.find(item => item.principal == true);
 
               if (fun.hasValue(documento_persona)) this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
 
@@ -270,7 +201,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
               if (this.camposDisabled) enable_campos = true;
 
-              this.documentos_de_identidad = persona.documentos_de_identidad;
+              this.documentos_de_identidad = persona.documentos_de_identidad ?? [];
             } else {
               enable_campos = true;
             }
@@ -282,7 +213,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
           });
       } else {
         if (!cedula.endsWith('_')) {
-          this.documentos_de_identidad = undefined;
+          this.documentos_de_identidad = [];
           // this.camposDisabled = true;
           this.changeStateCampos(false);
         }
@@ -331,19 +262,17 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     formValue['maximo_credito'] = fun.desformatearStNumber(formValue['maximo_credito']);
     formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
-    const originalEmpleado = this.listaEmpleados.find((empleado) => empleado.id == formValue.id);
+    const originalEmpleado = this.listaEmpleados.find(empleado => empleado.id == formValue.id);
     const originalValue = fun.pick(originalEmpleado, pick_values);
 
-    originalValue['cedula'] = originalEmpleado?.documentos_de_identidad.find((doc) => doc.descripcion == 'cedula')?.documento;
-    originalValue['ids_roles'] = originalEmpleado?.roles?.map((rol) => rol.id);
+    originalValue['cedula'] = originalEmpleado?.documentos_de_identidad.find(doc => doc.descripcion == 'cedula')?.documento;
+    originalValue['ids_roles'] = originalEmpleado?.roles?.map(rol => rol.id);
     originalValue['cuentas_contables'] = fun.deepCloning(this.entCuentaContServ.parseCuentasFromBackend(originalEmpleado?.cuentas_contables));
 
     return !fun.isEqual(formValue, originalValue);
   }
 
-  test() {
-    
-  }
+  test() {}
 
   changeStateCampos(enable = false) {
     ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles'].forEach(campo => {
@@ -370,8 +299,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.boton = 'Registrar';
     this.editando = false;
     this.isCreando = true;
-    [this.documentos_de_identidad, this.empleadoSelected] = Array(2).fill(undefined);
+    this.empleadoSelected = undefined;
 
+    this.documentos_de_identidad = [];
     this.listaEntidadCuentasContables = [];
 
     this.changeStateCampos(false);
@@ -379,7 +309,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.form.controls.password.setValidators(Validators.compose([Validators.minLength(6), Validators.required]));
     this.form.controls.confirm_password.setValidators(Validators.required);
 
-    ['password', 'confirm_password'].forEach((formControl) => this.form.controls[formControl].updateValueAndValidity());
+    ['password', 'confirm_password'].forEach(formControl => this.form.controls[formControl].updateValueAndValidity());
   }
 
   tableClick_action(params) {
@@ -388,17 +318,29 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   openModalCategorias() {
-    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.user, id_modal: 'categorias_empleados', inputs: { configsEntCuentas: this.listaConfigEmpleados }, openNewModal: this.openNewModal.bind(this) });
-  }
+    const callback = (arg: ICallbackModal) => {
+      if (arg.type != modalCloseType.onHide) return;
 
-  onHideModal(modalConfig: ConfigureModalI) {
-    if (modalConfig.id == 'categorias_empleados') {
       this.categoriaEntidadServ.setCategoriaChange();
-    }
+    };
+
+    this.categoriaEntidadServ.openModalCategorias({ entidad: CategoriaEntidadContableC.entidad.user, id_modal: 'categorias_clientes', inputs: { configsEntCuentas: this.listaConfigEmpleados }, callback });
   }
 
   showModal() {
-    this.openNewModal({ component: ChangePasswordComponent, id: 'changePassword', inputs: this.empleadoSelected, header: 'Cambiar contraseña', width: '30rem' });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.width = '30rem';
+    modalConfig.component = ChangePasswordComponent;
+    modalConfig.inputs = { empleado: fun.deepCloning(this.empleadoSelected) };
+    modalConfig.id = 'changePassword';
+    modalConfig.header = 'Cambiar contraseña';
+
+    modalConfig.botones = [
+      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+    ];
+
+    modalConfig.show();
   }
 
   eliminarReg(regisData) {
@@ -418,26 +360,20 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   editarItem(data) {
     this.borrar();
     if (fun.hasValue(this.form)) this.form.reset();
-    this.documentos_de_identidad = data.documentos_de_identidad;
+    this.documentos_de_identidad = data.documentos_de_identidad ?? [];
 
     if (this.documentos_de_identidad.length) {
       const doc = data.documentos_de_identidad.filter(doc => doc.principal === true);
       if (data.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
     }
 
-<<<<<<< HEAD
-    const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map((rol) => rol.id) });
+    data.sexo = data.sexo ? data.sexo.toUpperCase() : '';
+    const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map(rol => rol.id) });
     this.form.patchValue(fun.deepCloning(objPerson));
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
     this.empleadoSelected = fun.deepCloning(data);
-=======
-    data.sexo = data.sexo ? data.sexo.toUpperCase() : '';
-
-    const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map(rol => rol.id) });
-    this.form.patchValue(objPerson);
->>>>>>> dev
 
     this.editando = true;
     this.boton = 'Editar';
@@ -453,23 +389,17 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   async submit() {
-    if (ConfigService.config.has_contabilidad) {
+    if (this.configApp.has_contabilidad) {
       const entidades_validation = this.validate_cuentas();
 
       if (!entidades_validation.error) {
         if (!this.editando) {
-          const confirmationObj = {
+          this.dynamicModalServ.confirmationModal({
             id: 'aviso_cuentas',
             texto: 'Confirme las <b class="negrita">CUENTAS CONTABLES</b>, una vez registrado el empleado, no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
-            header: 'Confirmación',
-            siFunction: async (instance) => {
-              this.sendData();
-              instance.dismissModal(instance.id);
-            },
-            width: '30rem',
-          };
-
-          this.confirmationModal(confirmationObj);
+            btnKind: confirmationButtons.cancelarContinuar,
+            onYes: this.sendData.bind(this),
+          });
         } else {
           this.sendData();
         }
@@ -486,14 +416,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     const documentos_identidad = [{ documento: formulario.cedula, descripcion: 'cedula' }];
 
-<<<<<<< HEAD
-    documentos_identidad.map((element) => {
-      const doc_backend = this.documentos_de_identidad?.find((doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
-=======
     documentos_identidad.map(element => {
-      // haciendo la estructura para mandar los documentos a la base de datos
-      const doc_backend = _.find(this.documentos_de_identidad, doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
->>>>>>> dev
+      const doc_backend = this.documentos_de_identidad?.find(doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = true;
       return element;
@@ -504,7 +428,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
     const objSend = fun.omit(formulario, ['cedula']);
 
-    if (ConfigService.config.has_contabilidad) objSend['cuentas_contables'] = this.listaEntidadCuentasContables;
+    if (this.configApp.has_contabilidad) objSend['cuentas_contables'] = this.listaEntidadCuentasContables;
 
     if (!this.editando && fun.isEmpty(objSend.password)) {
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
@@ -521,23 +445,4 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   nuevoRegistro() {
     this.isCreando = true;
   }
-<<<<<<< HEAD
-=======
-
-  showModal() {
-    const modalConfig = new DynamicModalClass();
-    modalConfig.width = '30rem';
-    modalConfig.component = ChangePasswordComponent;
-    modalConfig.inputs = { empleado: fun.deepCloning(this.empleadoSelected) };
-    modalConfig.id = 'changePassword';
-    modalConfig.header = 'Cambiar contraseña';
-
-    modalConfig.botones = [
-      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
-      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
-    ];
-
-    modalConfig.show();
-  }
->>>>>>> dev
 }
