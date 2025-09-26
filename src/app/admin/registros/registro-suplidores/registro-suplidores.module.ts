@@ -10,7 +10,7 @@ import { DirectivesModule } from '@core/directive/directives.module';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { CategoriaEntidadContableModule } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.module';
-import { ImgModule } from '../../components/img-component/img.module';
+import { ImgModule } from '@components/img-component/img.module';
 import { FormDivisaInputModule } from '../../../core/components/form-fields/form-divisa-input/form-divisa-input.module';
 
 @NgModule({

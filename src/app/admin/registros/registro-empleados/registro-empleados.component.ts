@@ -91,6 +91,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   ngOnInit() {
     this.boton = 'Registrar';
+    this.configApp = Ss.configServ.config;
 
     this._init_mixin({ component: 'reg_empleados', is_routing: true });
 

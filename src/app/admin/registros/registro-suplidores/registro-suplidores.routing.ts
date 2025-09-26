@@ -9,17 +9,8 @@ const routes: Routes = [
   {
     path: '',
     component: RegistroSuplidoresComponent,
-<<<<<<< HEAD
-    // canActivate: [NgxPermissionsGuard],
-    // data: {
-    //   permissions: {
-    //     only: Object.values(Permisos.suplidor),
-    //   },
-    // },
-=======
     canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.suplidor), 'admin/dashboard')],
     canDeactivate: [CanDeactivateGuard],
->>>>>>> dev
   },
 ];
 
