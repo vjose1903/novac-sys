@@ -1,9 +1,8 @@
 <div class="w-100 position-relative">
   <div class="form-group" [id]="'section-' + fieldName()" [appMsgError]="fieldName()" [form]="formGroup()">
     <label class="control-label" requiredFieldLabel>Divisa: </label>
-    <p-dropdown
+    <p-select
       #divisaDropdown
-      [autoDisplayFirst]="false"
       [inputId]="inputId()"
       [disabled]="disabled()"
       [options]="divisaServ.listaDivisas"
@@ -16,8 +15,7 @@
       styleClass="form-control min-padding"
       class="{{ getControlClass() }}"
       (keydown.enter)="emitKeydown($event)"
-      (onFocus)="htmlServ.showPDropdown($event, divisaDropdown)"
-    >
+      (onFocus)="htmlServ.showPSelectPanel($event, divisaDropdown)">
       <ng-template pTemplate="selectedItem">
         <div class="d-flex align-items-center gap-1" *ngIf="fun.hasValue(valueSignal())">
           <div class="d-flex align-items-center" style="width: 2rem">
@@ -32,7 +30,7 @@
           <div>{{ divisa.nombre }}</div>
         </div>
       </ng-template>
-    </p-dropdown>
+    </p-select>
     <span id="msgContainer"></span>
   </div>
 </div>

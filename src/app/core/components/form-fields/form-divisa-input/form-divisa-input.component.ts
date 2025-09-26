@@ -10,6 +10,7 @@ import { ImagenService } from '../../../../core/services/imagen.service';
   selector: 'form-divisa-input',
   templateUrl: './form-divisa-input.component.html',
   styleUrl: './form-divisa-input.component.scss',
+  standalone: false,
 })
 export class FormDivisaInputComponent extends customFormsElements implements OnInit {
   inputId = input<string>('');
