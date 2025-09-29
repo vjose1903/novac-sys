@@ -351,7 +351,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
       if (fun.isEmpty(articulo) || fun.isEmpty(row.articulo.id)) {
         const res = await this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura });
-        articulo = _.first(res['data']);
+        articulo = res['data'][0];
       }
 
       resolve(articulo);
@@ -365,8 +365,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     detalle['articulo'] = articulo;
     detalle['unidades'] = this.llenarArrayUnidades(articulo);
     detalle['codigo'] = articulo.codigo;
-    detalle['precio'] = fun.roundNumberToDecimal(data.precio);
-    detalle['costo'] = fun.roundNumberToDecimal(data.costo);
+    detalle['precio'] = fun.roundNumberToDecimal(articulo.precio_principal);
+    detalle['costo'] = fun.roundNumberToDecimal(articulo.costo_principal);
     detalle['descuento_valor'] = fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : fun.roundNumberToDecimal(data.descuento_valor);
     detalle['cantidad'] = data.cantidad;
     detalle['cantidad_initial'] = fun.hasValue(data.cantidad) ? data.cantidad : 0;
@@ -381,9 +381,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     detalle['from_pre_factura'] = data.from_pre_factura || false;
     detalle['vende_sin_inventario'] = this.configApp.vende_sin_inventario;
 
-    detalle['is_bad_price'] = this.getBadPrice(data).bool;
+    detalle['is_bad_price'] = this.getBadPrice(data, articulo).bool;
     detalle['actual_price'] = data?.actual_price;
-    detalle['actual_price_value'] = this.getBadPrice(data).monto;
+    detalle['actual_price_value'] = this.getBadPrice(data, articulo).monto;
     detalle['producto_initial'] = fun.hasValue(data?.producto_initial) ? data.producto_initial : null;
 
     let unidad = fun.hasValue(data.peso_saco) ? `Saco de ${data.peso_saco} libras` : data.unidad;
@@ -401,12 +401,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const current_detalle = this.factServ.filasDetalle.at(arg).getRawValue();
   }
 
-  getBadPrice(data) {
+  getBadPrice(data, articulo) {
     const response = { bool: false, monto: '' };
 
     const medida = data.peso_saco || data.unidad.includes('Saco de') ? `Saco_${data.peso_saco}` : data.unidad;
 
-    let current_monto = this.factServ.isCompra() ? data.costo : data.precio;
+    let current_monto = this.factServ.isCompra() ? articulo.costo_principal : articulo.precio_principal;
 
     const tipo = this.factServ.isCompra() ? 'costo' : 'precio';
     let actual_price_monto = fun.hasValue(data.actual_price) ? data.actual_price[medida][tipo] : current_monto;
@@ -912,7 +912,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       if (!(args as ICallbackModal).hasReturnData) {
         fun.enfocarAndSelectInput(`codigo-${index}`);
       }
-
       return;
     }
 

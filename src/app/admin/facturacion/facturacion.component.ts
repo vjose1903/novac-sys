@@ -601,11 +601,19 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.factura_pendiente = factura?.factura_pendiente || false;
 
           // Configurar fechas
-          const fecha_facturacion = factura?.fecha_equivalente || fun.deepCloning(this.fechaFactura['back']);
-          const fechaFormateada = this.formarFechaFactura(fecha_facturacion);
-          this.fechaFactura['front'] = fechaFormateada['FechaFactura'];
-          this.fechaFactura['back'] = this.fechaFactura['front'];
-          this.FechaFacturaMostrar = fechaFormateada['FechaFacturaMostrar'];
+          const useInvoiceDate = (): boolean => {
+            const actionsToUseInvoiceDate = [actionFacturacion.update, actionFacturacion.bill_from_pre_venta];
+            if (actionsToUseInvoiceDate.includes(original_factura.action)) return true;
+            return false;
+          };
+
+          if (useInvoiceDate()) {
+            const fecha_facturacion = factura?.fecha_equivalente || fun.deepCloning(this.fechaFactura['back']);
+            const fechaFormateada = this.formarFechaFactura(fecha_facturacion);
+            this.fechaFactura['front'] = fechaFormateada['FechaFactura'];
+            this.fechaFactura['back'] = this.fechaFactura['front'];
+            this.FechaFacturaMostrar = fechaFormateada['FechaFacturaMostrar'];
+          }
 
           // Configurar NCF si es necesario
           const tipoFacturaValido = fun.hasValue(this.factServ.tipoFactura) && this.factServ.tipoFactura.referencia !== '00' && this.factServ.tipoFactura.referencia !== '02' && this.factServ.isVenta();
@@ -1349,7 +1357,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   // =============================================
   //  MODAL CANCELAR
   // =============================================
-  cancelarFactura(arg?: { showConfirmationModal?: boolean, goToFinder?: boolean }) {
+  cancelarFactura(arg?: { showConfirmationModal?: boolean; goToFinder?: boolean }) {
     const { showConfirmationModal = true, goToFinder = true } = arg || {};
 
     let siFunct = () => {
