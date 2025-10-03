@@ -32,166 +32,47 @@
                         (onChange)="selectPropietario()" />
                     </div>
                   </div>
-<<<<<<< HEAD
-                </div>
-                @if (form.controls['user_id'].value === -1) {
-                <div class="col-6 p-0 pr-2">
-                  <div class="form-group" appMsgError="nombre_no_empleado" [form]="form">
-                    <label class="control-label">Nombre: <span style="color: red">*</span></label>
 
-                    <input appCapitalice="formGroup" (focus)="htmlServ.selectValue($event)" type="text" formControlName="nombre_no_empleado" placeholder="Introduzca nombre" class="form-control" autocomplete="off" id="nombre" />
-
-                    <span id="msgContainer"></span>
-                  </div>
-                </div>
-                } @if (form.controls['user_id'].value === -1) {
-                <div class="col-6 p-0 pl-2">
-                  <div class="form-group" appMsgError="apellido_no_empleado" [form]="form">
-                    <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                    <input appCapitalice="formGroup" (focus)="htmlServ.selectValue($event)" type="text" formControlName="apellido_no_empleado" placeholder="Introduzca apellido" class="form-control" autocomplete="off" id="apellido" />
-
-                    <span id="msgContainer"></span>
-                  </div>
-                </div>
-                } @if (form.controls['user_id'].value === -1) {
-                <div class="col-6 p-0 pr-2">
-                  <div class="form-group" appMsgError="telefono_no_empleado" [form]="form">
-                    <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                    <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_no_empleado" [autoClear]="false"></p-inputMask>
-
-                    <span id="msgContainer"></span>
-                  </div>
-                </div>
-                }
-
-                <div class="col-12 p-0">
-                  <hr class="rayaTop mt-2" />
-                </div>
-
-                <div class="col-6 p-0 pr-2">
-                  <div class="form-group" appMsgError="marca" [form]="form">
-                    <label class="control-label">Marca: <span style="color: red">*</span></label>
-
-                    <p-dropdown
-                      inputId="marca"
-                      [options]="listaMarcas"
-                      formControlName="marca"
-                      placeholder="Seleccione una marca"
-                      [filter]="true"
-                      filterBy="descripcion"
-                      optionLabel="descripcion"
-                      optionValue="id"
-                      emptyFilterMessage="Marca no encontrada"
-                      [resetFilterOnHide]="true"
-                      (onChange)="selectMarca()"
-                    />
-                    <span id="msgContainer"></span>
-                  </div>
-                </div>
-
-                <div class="col-6 p-0 pl-2">
-                  <div class="form-group" appMsgError="modelo" [form]="form">
-                    <label class="control-label">Modelo: <span style="color: red">*</span></label>
-
-                    <p-dropdown
-                      inputId="modelo"
-                      [options]="listaModelos"
-                      formControlName="modelo"
-                      placeholder="Seleccione un modelo"
-                      [filter]="true"
-                      filterBy="descripcion"
-                      optionLabel="descripcion"
-                      optionValue="id"
-                      emptyFilterMessage="Modelo no encontrado"
-                      [resetFilterOnHide]="true"
-                    />
-                    <span id="msgContainer"></span>
-                  </div>
-                </div>
-
-                <div class="col-6 p-0 pr-2">
-                  <div class="form-group" appMsgError="anio" [form]="form">
-                    <label class="control-label">Año: <span style="color: red">*</span></label>
-                    <input (focus)="htmlServ.selectValue($event)" type="text" formControlName="anio" placeholder="Introduzca año" class="form-control" autocomplete="off" id="anio" maxlength="4" />
-                    @if (!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)) {
-                    <div class="alerta text-danger ml-1" style="font-size: 12px">
-                      @if (form.controls['anio'].errors.minlength) {
-                      <span>Año incompleto</span>
-                      } @if (form.controls['anio'].errors.required) {
-                      <span>Introduzca el año</span>
-                      }
-                    </div>
-                    }
-                    <span id="msgContainer"></span>
-                  </div>
-                </div>
-
-                <div class="col-12 p-0 w-100 mt-5 d-flex justify-content-between">
-                  <div class="d-flex column-gap-2">
-                    <button (click)="borrar(true)" class="btn btn-blanco">Borrar</button>
-                    <button [disabled]="!form.valid" type="submit" (click)="submit(form)" class="btn btn-verde">{{ boton }}</button>
-                  </div>
-                  <div>
-                    <button class="btn btn-blanco" (click)="borrar(true); isCreando = false">Cerrar</button>
-                  </div>
-                </div>
-              </div>
-            </form>
-=======
                   @if (form.controls['user_id'].value === -1) {
                     <div class="col-6 p-0 pe-2">
-                      <div class="form-group">
+                      <div class="form-group" appMsgError="nombre_no_empleado" [form]="form">
                         <label class="control-label">Nombre: <span style="color: red">*</span></label>
-                        <input
-                          (keyup)="capitalice('nombre_no_empleado', htmlServ.getValue($event))"
-                          (focus)="htmlServ.selectValue($event)"
-                          type="text"
-                          formControlName="nombre_no_empleado"
-                          placeholder="Introduzca nombre"
-                          class="form-control"
-                          autocomplete="off"
-                          id="nombre" />
-                        @if (!form.controls['nombre_no_empleado'].valid && (form.controls['nombre_no_empleado'].dirty || form.controls['nombre_no_empleado'].touched)) {
-                          <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el nombre</div>
-                        }
+
+                        <input appCapitalice="formGroup" (focus)="htmlServ.selectValue($event)" type="text" formControlName="nombre_no_empleado" placeholder="Introduzca nombre" class="form-control" autocomplete="off" id="nombre" />
+
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
                   }
+
                   @if (form.controls['user_id'].value === -1) {
                     <div class="col-6 p-0 ps-2">
-                      <div class="form-group">
+                      <div class="form-group" appMsgError="apellido_no_empleado" [form]="form">
                         <label class="control-label">Apellido: <span style="color: red">*</span></label>
-                        <input
-                          (keyup)="capitalice('apellido_no_empleado', htmlServ.getValue($event))"
-                          (focus)="htmlServ.selectValue($event)"
-                          type="text"
-                          formControlName="apellido_no_empleado"
-                          placeholder="Introduzca apellido"
-                          class="form-control"
-                          autocomplete="off"
-                          id="apellido" />
-                        @if (!form.controls['apellido_no_empleado'].valid && (form.controls['apellido_no_empleado'].dirty || form.controls['apellido_no_empleado'].touched)) {
-                          <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el apellido</div>
-                        }
+                        <input appCapitalice="formGroup" (focus)="htmlServ.selectValue($event)" type="text" formControlName="apellido_no_empleado" placeholder="Introduzca apellido" class="form-control" autocomplete="off" id="apellido" />
+
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
                   }
+
                   @if (form.controls['user_id'].value === -1) {
                     <div class="col-6 p-0 pe-2">
-                      <div class="form-group">
+                      <div class="form-group" appMsgError="telefono_no_empleado" [form]="form">
                         <label class="control-label">Telefono: <span style="color: red">*</span></label>
                         <p-inputMask mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono_no_empleado" [autoClear]="false"></p-inputMask>
-                        @if (!form.controls['telefono_no_empleado'].valid && (form.controls['telefono_no_empleado'].dirty || form.controls['telefono_no_empleado'].touched)) {
-                          <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el numero de telefono</div>
-                        }
+
+                        <span id="msgContainer"></span>
                       </div>
                     </div>
                   }
+
                   <div class="col-12 p-0">
                     <hr class="rayaTop mt-2" />
                   </div>
+
                   <div class="col-6 p-0 pe-2">
-                    <div class="form-group">
+                    <div class="form-group" appMsgError="marca" [form]="form">
                       <label class="control-label">Marca: <span style="color: red">*</span></label>
 
                       <p-select
@@ -206,10 +87,12 @@
                         emptyFilterMessage="Marca no encontrada"
                         [resetFilterOnHide]="true"
                         (onChange)="selectMarca()" />
+                      <span id="msgContainer"></span>
                     </div>
                   </div>
+
                   <div class="col-6 p-0 ps-2">
-                    <div class="form-group">
+                    <div class="form-group" appMsgError="modelo" [form]="form">
                       <label class="control-label">Modelo: <span style="color: red">*</span></label>
 
                       <p-select
@@ -223,10 +106,12 @@
                         optionValue="id"
                         emptyFilterMessage="Modelo no encontrado"
                         [resetFilterOnHide]="true" />
+                      <span id="msgContainer"></span>
                     </div>
                   </div>
+
                   <div class="col-6 p-0 pe-2">
-                    <div class="form-group">
+                    <div class="form-group" appMsgError="anio" [form]="form">
                       <label class="control-label">Año: <span style="color: red">*</span></label>
                       <input (focus)="htmlServ.selectValue($event)" type="number" formControlName="anio" placeholder="Introduzca año" class="form-control" autocomplete="off" id="anio" maxlength="4" />
                       @if (!form.controls['anio'].valid && (form.controls['anio'].dirty || form.controls['anio'].touched)) {
@@ -239,21 +124,24 @@
                           }
                         </div>
                       }
+                      <span id="msgContainer"></span>
                     </div>
                   </div>
-                  <div class="col-12 p-0 mt-3" style="display: flex; justify-content: space-between">
-                    <div>
-                      <a class="btn me-2" id="btn-blanco" (click)="borrar(true)">Borrar</a>
-                      <input [disabled]="!form.valid" (click)="submit(form)" style="max-width: 6rem" class="btn ms-2" id="btn-verde" value="{{ boton }}" />
-                    </div>
-                    <div>
-                      <input class="btn ms-2" value="Cerrar" id="btn-blanco" (click)="borrar(true); isCreando = false" style="max-width: 6rem" />
+
+                  <div class="col-12 p-0 mt-5">
+                    <div class="w-100 d-flex justify-content-between">
+                      <div class="d-flex column-gap-2">
+                        <button (click)="borrar(true)" class="btn btn-blanco">Borrar</button>
+                        <button [disabled]="!form.valid" type="submit" (click)="submit(form)" class="btn btn-verde">{{ boton }}</button>
+                      </div>
+                      <div>
+                        <button class="btn btn-blanco" (click)="borrar(true); isCreando = false">Cerrar</button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </form>
             </div>
->>>>>>> dev
           </div>
         }
       </ng-container>
@@ -281,7 +169,8 @@
               [seleccionado]="vehiculoSelected?.id"
               [(TablasComponent)]="tablaComponent"
               [config]="table_config"
-              (table_events)="handle_table_events($event)"></dinamic-table>
+              (table_events)="handle_table_events($event)">
+            </dinamic-table>
           </div>
         </div>
       </div>

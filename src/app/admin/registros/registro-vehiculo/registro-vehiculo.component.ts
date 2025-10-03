@@ -1,35 +1,18 @@
-<<<<<<< HEAD
-import { Ss } from './../../../core/services/singleton.service';
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import * as _ from 'lodash';
-import { MarcaC, ModeloC } from '../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { EmpleadoC } from '../registro-empleados/empleado.utils';
-import { VehiculoC } from './vehiculo';
-import { FormularioMarcaModeloComponent } from '../../components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
-import { fun } from '../../../core/services/functions.service';
-import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
-=======
+import { Ss } from '@core/services/singleton.service';
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { EmpleadoC } from '../registro-empleados/empleado';
+import { EmpleadoC } from '../registro-empleados/empleado.utils';
 import { VehiculoC } from './vehiculo';
 import { FormularioMarcaModeloComponent } from '@components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { fun } from '@core/services/functions.service';
-import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { default_per_page, tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
->>>>>>> dev
 import { NgxPermissionsService } from 'ngx-permissions';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
@@ -76,11 +59,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     id_tabla: 'lista_vehiculos',
     padre_functions: { data_request: params => this.getVehiculos(params) },
     filtrar: { local: false },
-<<<<<<< HEAD
-    obj_paginate: { show: true, showTotal: true, is_local: false },
-=======
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
->>>>>>> dev
     botones: { editar: { show: true, permiso: this.permissions.vehiculo.update }, borrar: { show: true, permiso: this.permissions.vehiculo.destroy } },
   };
   tablaComponent;
@@ -89,9 +68,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   hasPermissionsModelo: boolean;
 
   fun = fun;
-<<<<<<< HEAD
-  constructor(private fb: UntypedFormBuilder, private router: Router, private tServ: TablasService, private permissionsService: NgxPermissionsService) {
-=======
 
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
@@ -102,7 +78,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   private permissionsService = inject(NgxPermissionsService);
 
   constructor() {
->>>>>>> dev
     super();
   }
 
@@ -164,15 +139,9 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   async getMarcas() {
     try {
-<<<<<<< HEAD
-      this.marcasClass.getAll().then((marcas: any) => {
-        this.listaMarcas = marcas;
-      });
-=======
       const res = (await this.marcasClass.getAll()) as any;
 
       this.listaMarcas = res;
->>>>>>> dev
     } catch (error) {
       fun.toastError('Error buscando marcas', 'ERROR');
     }
@@ -316,14 +285,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     this.verificateMarcaIsSelected();
   }
 
-<<<<<<< HEAD
-=======
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.capitalice(arg));
-  }
-
->>>>>>> dev
   abrirModalMarcasYModelos(tipo) {
     const registroMarcaYModeloConfig = new DynamicModalClass();
     registroMarcaYModeloConfig.width = '64rem';
@@ -339,13 +300,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     registroMarcaYModeloConfig.show();
   }
 
-<<<<<<< HEAD
-  onHideModal(arg) {
-    if (arg.id == 'crud_marca_modelo') this.getMarcas();
-=======
   closeModalMarcaModelo(arg: ICallbackModal) {
     if (arg.type == modalCloseType.onHide) this.getMarcas();
->>>>>>> dev
   }
   // =============================================
   //  Crear vehiculo
