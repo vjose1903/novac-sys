@@ -1,23 +1,13 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, Input, inject, signal, effect } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
 import * as _ from 'lodash';
-import { TablasService } from '../../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { MarcaC, ModeloC } from '../../../components/formularios en modales/formulario-marca-modelo/marca-modelo';
-import { ModalComponentI, ModalI } from '../../modal/modal-class';
-import { fun } from '../../../../core/services/functions.service';
-import { tableCellType, table_config } from '../../new_tablas/tabla-class';
-import { Permisos } from '../../../../core/typescript/permisos';
-=======
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { fun } from '@core/services/functions.service';
-import { default_per_page, table_config } from '../../new_tablas/tabla-class';
+import { default_per_page, tableCellType, table_config } from '../../new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
->>>>>>> dev:src/app/core/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
 import { NgxPermissionsService } from 'ngx-permissions';
 import { confirmationButtons, IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
@@ -50,11 +40,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     id_tabla: 'listado_marcas',
     padre_functions: { data_request: params => this.pedirNuevaData(params) },
     filtrar: { local: false },
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
-    obj_paginate: { show: true, showTotal: true, is_local: false },
-=======
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
->>>>>>> dev:src/app/core/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
     botones: { editar: { show: true, permiso: this.permissions.marca.update }, borrar: { show: true, permiso: this.permissions.marca.destroy } },
   };
   tablaMarcaComponent: any;
@@ -69,11 +55,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     id_tabla: 'listado_modelos',
     padre_functions: { data_request: params => this.pedirNuevaData(params) },
     filtrar: { local: false },
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
-    obj_paginate: { show: true, showTotal: true, is_local: false },
-=======
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
->>>>>>> dev:src/app/core/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
     botones: { editar: { show: true, permiso: this.permissions.modelo.update }, borrar: { show: true, permiso: this.permissions.modelo.destroy } },
   };
 
@@ -141,11 +123,6 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     });
   }
 
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
-  modalComponent: ModalComponentI = {};
-  inputs: any;
-=======
->>>>>>> dev:src/app/core/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
   btn_aceptar() {}
 
   ngOnInit() {
@@ -214,14 +191,6 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     });
   }
 
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
-=======
-  capitalice(control, arg, form) {
-    const campo = form.get(control);
-    campo.setValue(fun.capitalice(arg));
-  }
-
->>>>>>> dev:src/app/core/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
   createForm() {
     this.formMarca = this.fb.group({ descripcion: [null], marca_id: [null], id: [null] });
 
@@ -238,40 +207,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     }
   }
 
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
-  accion(arg) {
-    this.accion_.emit(arg);
-  }
-
-  dismissModal() {
-    // this.modalComponent.
-    this.modalComponent.closeModal(this.modalComponent.id);
-  }
-
-  async submit(formToSubmit) {
-    const obj = fun.deepCloning(formToSubmit.getRawValue());
-    const metodo = fun.hasValue(obj?.id) ? 'actualizado' : 'creado';
-
-    if (this.isShowMarcas() && fun.objHas(obj, 'marca_id')) delete obj['marca_id'];
-
-    const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
-
-    await clase.createUpdateOne(obj).then(() => this.onSuccess(metodo));
-  }
-
-  onSuccess(metodo) {
-    fun.toastSuccess(`Item ${metodo} correctamente.`, 'CORRECTO');
-
-    this.pedirNuevaData(this.tServ.obj_paginate.default);
-
-    this.borrar();
-
-    if (this.isShowMarcas()) fun.enfocarInput('descripcion');
-    else fun.enfocarInput('marca_modal');
-=======
   closeThis() {
     this.modalConfig.close();
->>>>>>> dev:src/app/core/components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component.ts
   }
 
   isShowMarcas() {
