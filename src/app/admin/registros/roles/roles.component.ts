@@ -3,20 +3,12 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms
 import { MixinClass } from '@core/typescript/MixinClass';
 import { AccionesC, PermisosC, RolesC } from './roles';
 import * as _ from 'lodash';
-<<<<<<< HEAD
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { fun } from '../../../core/services/functions.service';
-import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
-import { ModalClass } from '../../components/modal/modal-class';
-=======
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
-import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { default_per_page, tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
->>>>>>> dev
 
 @Component({
   selector: 'app-roles',
@@ -44,11 +36,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     id_tabla: 'lista_roles',
     padre_functions: { data_request: params => this.getRoles(params) },
     filtrar: { local: false },
-<<<<<<< HEAD
-    obj_paginate: { show: true, showTotal: true, is_local: false },
-=======
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
->>>>>>> dev
     botones: { editar: { show: true, permiso: this.permissions.role.update }, borrar: { show: true, permiso: this.permissions.role.destroy } },
   };
   tablaRolesComponent;
@@ -136,23 +124,13 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   parsePermisos(params: { clean: boolean }) {
     if (params.clean) {
       const all_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
-<<<<<<< HEAD
-      const all_acciones_selected = all_acciones.filter((item) => item.selected == true);
-      all_acciones_selected.map((accion) => (accion.selected = false));
-    } else {
-      this.roleSelected.permisos_acciones.forEach((permiso_accion) => {
-        const permiso_en_turno = this.listaPermisos.find((item) => item.id == permiso_accion.permiso.id);
-
-        const accion_en_turno = permiso_en_turno.acciones.find((item) => item.id == permiso_accion.accion.id);
-=======
-      const all_acciones_selected = _.filter(all_acciones, { selected: true });
+      const all_acciones_selected = all_acciones.filter(item => item.selected == true);
       all_acciones_selected.map(accion => (accion.selected = false));
     } else {
       this.roleSelected.permisos_acciones.forEach(permiso_accion => {
-        const permiso_en_turno = _.find(this.listaPermisos, item => item.id == permiso_accion.permiso.id);
+        const permiso_en_turno = this.listaPermisos.find(item => item.id == permiso_accion.permiso.id);
 
-        const accion_en_turno = _.find(permiso_en_turno.acciones, item => item.id == permiso_accion.accion.id);
->>>>>>> dev
+        const accion_en_turno = permiso_en_turno.acciones.find(item => item.id == permiso_accion.accion.id);
         accion_en_turno.selected = true;
       });
     }
@@ -243,8 +221,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     if (this.form.valid) {
       const all_permiso_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
       const permiso_acciones_selected = _.map(
-        all_permiso_acciones.filter((item) => item.selected),
-        'id',
+        all_permiso_acciones.filter(item => item.selected),
+        'id'
       );
 
       res = permiso_acciones_selected.length == 0;
@@ -279,22 +257,9 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.dynamicModalServ.confirmationModal({
       id: 'delete_role',
-<<<<<<< HEAD
-      header: 'CONFIRMACION',
-      width: '30rem',
-      html: `<p> Seguro que desea eliminar el rol: <strong>${data.nombre}</strong> </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'NO', disable: false },
-          { clase: 'btn btn-verde', function: (instance) => this.eliminarRole(instance, data), label: 'SI', disable: false },
-        ],
-      },
-=======
       texto: `<p> Seguro que desea eliminar el rol: <strong>${data.nombre}</strong> </p>`,
       btnKind: confirmationButtons.cancelarEliminar,
       onYes: onYes.bind(this),
->>>>>>> dev
     });
   }
 
@@ -303,10 +268,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
       const actualPagination = this.tServ.getPaginationById('lista_roles');
       actualPagination['searchText'] = this.palabra_buscar;
       this.getRoles(actualPagination);
-<<<<<<< HEAD
-      modalInstance.dismissModal(modalInstance.id);
-=======
->>>>>>> dev
     });
   }
 
@@ -315,8 +276,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
     const all_permiso_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
     const permiso_acciones_selected = _.map(
-      all_permiso_acciones.filter((item) => item.selected),
-      'permiso_accion_id',
+      all_permiso_acciones.filter(item => item.selected),
+      'permiso_accion_id'
     );
 
     formulario['permisos_acciones'] = permiso_acciones_selected;
