@@ -1,15 +1,7 @@
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/movimientos-form/movimientos-form.component.ts
-import { HtmlElementsService } from './../../../../core/services/html-elements.service';
-import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
-import { fun } from '../../../../core/services/functions.service';
-import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { ModalComponentI, ModalI } from '../../modal/modal-class';
-=======
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, AfterViewInit, inject, Input } from '@angular/core';
 import { fun } from '@core/services/functions.service';
 import { MixinClass } from '@core/typescript/MixinClass';
->>>>>>> dev:src/app/core/components/formularios en modales/movimientos-form/movimientos-form.component.ts
 import { MovimientosC } from './movimiento-model';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
@@ -33,15 +25,11 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
 
   movimientosC = new MovimientosC();
   plural = { Quintal: 'Quintales', Libra: 'Libras', Caja: 'Cajas', Paquete: 'Paquetes', Unidad: 'Unidades', Saco: 'Sacos' };
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/movimientos-form/movimientos-form.component.ts
-=======
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
   @Input() data!: ArticuloI;
->>>>>>> dev:src/app/core/components/formularios en modales/movimientos-form/movimientos-form.component.ts
 
   htmlServ = inject(HtmlElementsService);
-  modalComponent: ModalComponentI = {};
   inputs: any;
 
   constructor() {
@@ -49,11 +37,7 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   }
 
   ngOnInit() {
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/movimientos-form/movimientos-form.component.ts
-    this.medidas = Object.keys(this.inputs.cantidades);
-=======
     this.medidas = Object.keys(this.data.cantidades);
->>>>>>> dev:src/app/core/components/formularios en modales/movimientos-form/movimientos-form.component.ts
   }
 
   ngAfterViewInit() {
@@ -115,32 +99,19 @@ export class MovimientosFormComponent extends MixinClass implements OnInit, Afte
   selectTipoMov() {
     if (this.tipo_movimiento === 'entrada') this.tipo_salida = undefined;
   }
-<<<<<<< HEAD:src/app/admin/components/formularios en modales/movimientos-form/movimientos-form.component.ts
-
-  btn_aceptar() {
-    const obj = { articulo_id: this.inputs.id, cantidad: this.cantidad, cantidad_en_unidades: this.inputs.contenido[this.medida] * this.cantidad, accion: this.tipo_movimiento, motivo: this.motivo, medida: this.medida, tipo_salida: this.tipo_salida };
-
-    this.movimientosC.createOne(obj).then((res: any) => {
-      fun.toastSuccess(fun.capitalice(this.tipo_movimiento) + ' de inventario exitosa.', 'CORRECTO');
-      this.resetForm();
-
-      const obj = { bool: true, body: res.articulo };
-      this.modalComponent.closeModal(this.modalComponent.id, { data: obj });
-=======
 
   submit() {
     const obj = { articulo_id: this.data.id, cantidad: this.cantidad, cantidad_en_unidades: this.data.contenido[this.medida] * this.cantidad, accion: this.tipo_movimiento, motivo: this.motivo, medida: this.medida, tipo_salida: this.tipo_salida };
 
     console.log('obj, ---> ', obj);
 
-    this.movimientosC.createOne(obj).then(res => {
+    this.movimientosC.createOne(obj).then((res: any) => {
       fun.toastSuccess(`${fun.capitalice(this.tipo_movimiento)} de inventario exitosa.`, 'CORRECTO');
       this.resetForm();
 
       const obj = { bool: true, body: res.articulo };
 
       this.modalConfig.close({ data: obj });
->>>>>>> dev:src/app/core/components/formularios en modales/movimientos-form/movimientos-form.component.ts
     });
   }
 
