@@ -1,27 +1,16 @@
-<<<<<<< HEAD
-import { ConfigService } from './../../core/services/configuration.service';
-import { viewerOptions } from './../components/pdf-viewer/pdf-viewer';
-import { PdfService } from '../../core/services/pdf/pdf.service';
-import { Ss } from '../../core/services/singleton.service';
-import { fun } from '../../core/services/functions.service';
-import { CrudG } from '../../core/typescript/crud-g';
-import { FormReportesComponent } from '../components/formularios en modales/form-reportes/form-reportes.component';
-import { ModalClass } from '../components/modal/modal-class';
-import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
-import * as _ from 'lodash';
-=======
-import { ReporteBackendResponseI, ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
+import { viewerOptions } from '@components/pdf-viewer/pdf-viewer';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { Ss } from '@core/services/singleton.service';
 import { fun } from '@core/services/functions.service';
 import { CrudG } from '@core/typescript/crud-g';
 import { FormReportesComponent } from '@components/formularios en modales/form-reportes/form-reportes.component';
 import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
+import * as _ from 'lodash';
+import { ReporteBackendResponseI, ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
 import { ExportToExcelService } from '@core/services/reports/excel/export-to-excel.service';
 import { exportExcelConfigI } from '@core/interface/export-to-excel.interface';
 import { IModalConfiguration, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
->>>>>>> dev
 
 export class ReporteC extends CrudG<any> {
   private static _objReporte;
@@ -104,18 +93,6 @@ export class ReporteC extends CrudG<any> {
         inputs: inputs,
         id: 'reporte_view',
         header: objPdfView.titulo,
-<<<<<<< HEAD
-        width: objPdfView?.viewerOptions?.width ?? '57rem',
-        height: objPdfView?.viewerOptions?.height ?? '76vh',
-        botones: {
-          ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-          dinamico: [
-            { clase: 'btn btn-blanco', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
-            { clase: 'btn btn-verde', function: (instance) => this.imprimirPDF(objPdfView, instance), label: 'Imprimir', disable: false },
-          ],
-        },
-      });
-=======
         width: '57rem',
         height: '75vh',
         botones: [
@@ -135,7 +112,6 @@ export class ReporteC extends CrudG<any> {
         });
 
       new DynamicModalClass(modalViewReporte).show();
->>>>>>> dev
     }
 
     Ss.loadServ.isLoading.next(false);
@@ -143,31 +119,11 @@ export class ReporteC extends CrudG<any> {
 
   static imprimirPDF(objPdf, modalInstance?) {
     Ss.loadServ.isLoading.next(true);
-<<<<<<< HEAD
-=======
     const printerSelected = Ss.configServ.config.printer_selected;
->>>>>>> dev
 
     objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
 
     const entidad = objPdf['type'] == 'reporte' ? 'reporte' : 'cuadre_caja';
-<<<<<<< HEAD
-    objPdf['printer'] = ConfigService.config.printer_selected[entidad];
-
-    PdfService.imprimirBase64(objPdf)
-      .then((res) => {
-        Ss.loadServ.isLoading.next(false);
-
-        if (res.status === 'si') {
-          fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
-          if (modalInstance) modalInstance.dismissModal(modalInstance.id);
-        } else fun.toastError(res.msg, 'ERROR');
-      })
-      .catch((err) => {
-        Ss.loadServ.isLoading.next(false);
-        fun.toastError(err.msg, 'ERROR');
-      });
-=======
     objPdf['printer'] = printerSelected[entidad];
 
     PdfService.imprimirBase64(objPdf)
@@ -200,6 +156,5 @@ export class ReporteC extends CrudG<any> {
           fun.toastError('Error al exportar el reporte', 'ERROR');
         }
       });
->>>>>>> dev
   }
 }
