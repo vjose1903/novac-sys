@@ -1,25 +1,13 @@
-<<<<<<< HEAD
-import { ConfigService } from './configuration.service';
 import { CustomLodash } from './custom_lodash.service';
 import { DocumentosC } from '../typescript/documentos_de_identidad.utils';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
-import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../typescript/message-task';
 const moment = require('../javascript/moment');
-=======
 import { SpanishInflector } from './../typescript/spanish-inflector';
-const moment = require('../javascript/moment');
-import { DocumentosC } from '../typescript/documentos_de_identidad';
-import * as _ from 'lodash';
-
 import { ConfigI } from '../interface/config-interface';
-import { Ss } from './singleton.service';
-import { BehaviorSubject } from 'rxjs';
 import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
-import { MessageTask } from '../models/message-task';
 import { RetryOptions } from '../interface/retry-until';
->>>>>>> dev
 
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun extends CustomLodash {
@@ -75,8 +63,6 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
-<<<<<<< HEAD
-=======
   // Nombre: to_plural
   // Descripcion : Esta funcion convierte una palabra a plural
   // _________________________________________________________________________________________________
@@ -106,7 +92,6 @@ export class fun extends CustomLodash {
     return fecha;
   }
   // __________________________________________________________________________________________________
->>>>>>> dev
   // Nombre: deepCloning
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
@@ -151,13 +136,8 @@ export class fun extends CustomLodash {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (fun.isEmpty(searchText)) resolve(copyData);
 
-<<<<<<< HEAD
         const data_filtered = fun.deepCloning(copyData).filter((obj) => {
           const obj_picked = fun.pick(obj, targets);
-=======
-        const data_filtered = fun.deepCloning(copyData).filter(obj => {
-          const obj_picked = _.pick(obj, targets);
->>>>>>> dev
           const array_picked = pick_object(obj_picked);
 
           const is_include = array_picked.some((value: any) => value.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()));
@@ -220,11 +200,7 @@ export class fun extends CustomLodash {
     const partes = numerRounded.split('.');
     const enteros = partes[0];
     const decimales = partes[1];
-<<<<<<< HEAD
-    const numeroFormateado = `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cant > 0 ? `.${decimales}` : ''}`;
-=======
     const numeroFormateado = `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cant >= 1 ? `.${decimales}` : ''}`;
->>>>>>> dev
 
     return numeroFormateado;
   }
@@ -422,10 +398,6 @@ export class fun extends CustomLodash {
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
   static capitalice(str) {
-<<<<<<< HEAD
-    const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
-    return fun.hasValue(str) ? str.substr(0, 1).toUpperCase() + str.substr(1, ultimosCaractes) : str;
-=======
     if (!fun.hasValue(str)) return str;
 
     const upperCaseText = str
@@ -434,7 +406,6 @@ export class fun extends CustomLodash {
       .join(' ');
 
     return upperCaseText;
->>>>>>> dev
   }
 
   // __________________________________________________________________________________________________
@@ -588,18 +559,6 @@ export class fun extends CustomLodash {
   // __________________________________________________________________________________________________
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
-<<<<<<< HEAD
-  // __________________________________________________________________________________________________
-  static enfocarInput(arg, type = 'id') {
-    let element;
-    if (type == 'id') {
-      element = document.getElementById(arg) as HTMLElement;
-    } else if (type == 'class') {
-      element = document.getElementsByClassName(arg)[0] as HTMLElement;
-    }
-
-    if (element) element.focus();
-=======
   // _________________________________________________________________________________________________
   static enfocarInput(arg, element?) {
     element ??= document.getElementById(arg) as HTMLElement;
@@ -607,7 +566,6 @@ export class fun extends CustomLodash {
     if (element) {
       requestAnimationFrame(() => element.focus());
     }
->>>>>>> dev
   }
 
   // __________________________________________________________________________________________________
@@ -793,27 +751,6 @@ export class fun extends CustomLodash {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: retryUntil
-  // Descripcion : Esta funcion recibe una tarea y la repite hasta que las condiciones establecidas se cumplan
-  // _________________________________________________________________________________________________
-  static retryUntil(task: any, retryWhen: any, actionAfterRetry: any, actionIfNoSuccess: any, delayBetweenRetries = 250, retryMax = 20, retryCount = 0) {
-    task().then((response: any) => {
-      const hasRetries = retryCount < retryMax;
-
-      if (hasRetries && retryWhen(response)) {
-        setTimeout(() => {
-          fun.retryUntil(task, retryWhen, actionAfterRetry, actionIfNoSuccess, delayBetweenRetries, retryMax, ++retryCount);
-        }, delayBetweenRetries);
-      } else if (!hasRetries) {
-        console.error('Max numbers of retries -');
-        actionIfNoSuccess();
-      } else {
-        actionAfterRetry(response);
-      }
-    });
-  }
-
-  // __________________________________________________________________________________________________
   // Nombre: createNestedObject
   // Descripcion : Esta funcion le crea al objeto pasado un valor anidado
   // __________________________________________________________________________________________________
@@ -909,15 +846,10 @@ export class fun extends CustomLodash {
   }
 
   static decryptConfigPassword(str) {
-<<<<<<< HEAD
-    const str_remplace = btoa(str);
-    return str_remplace == ConfigService.config.config_password.replace('VMj$pt30r=', '=');
-=======
     const str_remplace = fun.encriptar(str);
 
     const config: ConfigI = Ss.configServ.config;
     return str_remplace == config.config_password.replace('VMj$pt30r=', '=');
->>>>>>> dev
   }
   // ----------------------------------------------------------------------------------------------------------
 
@@ -980,236 +912,10 @@ export class fun extends CustomLodash {
     amount = parseInt(`${(255 * amount) / 100}`);
     return (color = `#${this.subtractLight(color.substring(0, 2), amount)}${this.subtractLight(color.substring(2, 4), amount)}${this.subtractLight(color.substring(4, 6), amount)}`);
   }
-<<<<<<< HEAD
-=======
 
-  // =====================================================================
-  // TOASTS
-  // =====================================================================
 
-  static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) {
-      fun.setTimeout(() => {
-        Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
-      }, 0);
-    }
-  }
 
-  static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) {
-      fun.setTimeout(() => {
-        Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
-      }, 0);
-    }
-  }
-
-  static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) {
-      fun.setTimeout(() => {
-        Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
-      }, 0);
-    }
-  }
-
-  static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) {
-      fun.setTimeout(() => {
-        Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
-      }, 0);
-    }
-  }
-
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  // LODASH
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-  // __________________________________________________________________________________________________
-  // Nombre: pushAt
-  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
-  // _________________________________________________________________________________________________
-  static pushAt(arr, index, newItem) {
-    const copyArr = fun.deepCloning(arr);
-    arr.length = 0;
-    const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
-    newArr.forEach(item => arr.push(item));
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: pull
-  // Descripcion : Esta funcion remueve un item  de un arreglo
-  // _________________________________________________________________________________________________
-  static pull(array, item_remove) {
-    const index = array.findIndex(item => fun.isEqual(item, item_remove));
-    array.splice(index, 1);
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: pullAt
-  // Descripcion : Esta funcion remueve un item en un indice especificado de un arreglo
-  // _________________________________________________________________________________________________
-  static pullAt(array, index) {
-    array.splice(index, 1);
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: objHas
-  // Descripcion : Esta funcion retorna un valor booleano si el objeto evaluado contiene todas las propiedades evaluadas
-  // _________________________________________________________________________________________________
-
-  static objHas(obj, props) {
-    let result = true;
-    const props_split = props.split('.');
-
-    for (let index = 0; index < props_split.length; index++) {
-      const current_prop = props_split[index];
-      const current_object = fun.getCurrentObjLevel(obj, props_split, index);
-
-      if (fun.hasValue(current_object)) result = current_object.hasOwnProperty(current_prop);
-      else result = false;
-
-      if (result == false) break;
-    }
-
-    return result;
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: getProperty
-  // Descripcion : Esta funcion retorna el valor de una propiedad de un objeto
-  // _________________________________________________________________________________________________
-  static getProperty(obj, prop) {
-    return prop.split('.').reduce((objeto, property) => objeto?.[property], obj);
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: setProperty
-  // Descripcion : Esta funcion setea una propiedad a un objeto
-  // _________________________________________________________________________________________________
-  static setProperty(obj, prop, valor) {
-    const props_split = prop.split('.');
-
-    fun.createNestedObject(obj, [...props_split], valor);
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: pick
-  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
-  // _________________________________________________________________________________________________
-  static pick(obj: any, props: Array<string>): any {
-    const result = {};
-
-    for (let index = 0; index < props.length; index++) {
-      const prop = props[index];
-      const props_split = prop.split('.');
-
-      if (fun.hasValue(fun.getProperty(obj, prop))) {
-        fun.createNestedObject(result, [...props_split], fun.getProperty(obj, prop));
-      }
-    }
-    return result;
-  }
-
-  // __________________________________________________________________________________________________
-  // Nombre: omit
-  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades omitidas
-  // _________________________________________________________________________________________________
-  static omit(obj, props) {
-    for (let index = 0; index < props.length; index++) {
-      const prop = props[index];
-
-      if (fun.hasValue(fun.getProperty(obj, prop))) {
-        const props_split = prop.split('.');
-        let current_object = obj;
-
-        for (let innerIndex = 0; innerIndex < props_split.length; innerIndex++) {
-          const currentProp = props_split[innerIndex];
-
-          current_object = fun.getCurrentObjLevel(obj, props_split, innerIndex);
-
-          if (innerIndex == props_split.length - 1) delete current_object[currentProp];
-        }
-      }
-    }
-
-    return obj;
-  }
-
-  static getCurrentObjLevel(mainObj, props_split, actualIndex, deepLevel = 0) {
-    let obj_en_turno = mainObj;
-
-    if (fun.hasValue(mainObj) && actualIndex > 0 && deepLevel < actualIndex) {
-      const nextLevel = mainObj[props_split[deepLevel]];
-      deepLevel += 1;
-      obj_en_turno = fun.getCurrentObjLevel(nextLevel, props_split, actualIndex, deepLevel);
-    }
-
-    return obj_en_turno;
-  }
-
-  toString = Object.prototype.toString;
-
-  static createMap() {
-    return Object.create(null);
-  }
-  static isWindow(obj) {
-    return obj && obj.window === obj;
-  }
-  static isScope(obj) {
-    return obj && obj.$evalAsync && obj.$watch;
-  }
-  static isRegExp(value) {
-    return toString.call(value) === '[object RegExp]';
-  }
-  static simpleCompare(a, b) {
-    return a === b || (a !== a && b !== b);
-  }
-  static isDate(value) {
-    return toString.call(value) === '[object Date]';
-  }
-  static isArray(arr) {
-    return Array.isArray(arr) || arr instanceof Array;
-  }
-
-  static isEqual(obj1, obj2) {
-    if (obj1 === obj2) return true;
-    if (obj1 === null || obj2 === null) return false;
-    if (obj1 !== obj1 && obj2 !== obj2) return true; // NaN === NaN
-
-    let length, key, keySet;
-
-    if (typeof obj1 === typeof obj2 && typeof obj1 === 'object') {
-      if (fun.isArray(obj1)) {
-        if (!fun.isArray(obj2)) return false;
-
-        if ((length = obj1.length) === obj2.length) {
-          for (key = 0; key < length; key++) {
-            if (!fun.isEqual(obj1[key], obj2[key])) return false;
-          }
-
-          return true;
-        }
-      } else if (fun.isDate(obj1)) {
-        if (!fun.isDate(obj2)) return false;
-        return fun.simpleCompare(obj1.getTime(), obj2.getTime());
-      } else if (fun.isRegExp(obj1)) {
-        if (!fun.isRegExp(obj2)) return false;
-        return obj1.toString() === obj2.toString();
-      } else {
-        if (fun.isScope(obj1) || fun.isScope(obj2) || fun.isWindow(obj1) || fun.isWindow(obj2) || fun.isArray(obj2) || fun.isDate(obj2) || fun.isRegExp(obj2)) return false;
-        keySet = fun.createMap();
-        for (key in obj1) {
-          if (key.charAt(0) === '$' || fun.isFunction(obj1[key])) continue;
-          if (!fun.isEqual(obj1[key], obj2[key])) return false;
-          keySet[key] = true;
-        }
-        for (key in obj2) {
-          if (!(key in keySet) && key.charAt(0) !== '$' && fun.hasValue(obj2[key]) && !fun.isFunction(obj2[key])) return false;
-        }
-        return true;
-      }
-    }
-    return false;
-  }
+  
 
   // Métodos helper para obtener instancias de servicios
   private static authGuardInstance: any = null;
@@ -1230,5 +936,4 @@ export class fun extends CustomLodash {
   static getCurrentUserServiceInstance() {
     return fun.currentUserServiceInstance;
   }
->>>>>>> dev
 }

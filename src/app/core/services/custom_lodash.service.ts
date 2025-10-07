@@ -5,6 +5,11 @@ export class CustomLodash extends ToastService {
   constructor() {
     super();
   }
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // LODASH
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   // __________________________________________________________________________________________________
   // Nombre: pushAt
   // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
@@ -13,7 +18,7 @@ export class CustomLodash extends ToastService {
     const copyArr = fun.deepCloning(arr);
     arr.length = 0;
     const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
-    newArr.forEach((item) => arr.push(item));
+    newArr.forEach(item => arr.push(item));
   }
 
   // __________________________________________________________________________________________________
@@ -21,7 +26,7 @@ export class CustomLodash extends ToastService {
   // Descripcion : Esta funcion remueve un item  de un arreglo
   // _________________________________________________________________________________________________
   static pull(array, item_remove) {
-    const index = array.findIndex((item) => fun.isEqual(item, item_remove));
+    const index = array.findIndex(item => fun.isEqual(item, item_remove));
     array.splice(index, 1);
   }
 
@@ -65,6 +70,16 @@ export class CustomLodash extends ToastService {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: setProperty
+  // Descripcion : Esta funcion setea una propiedad a un objeto
+  // _________________________________________________________________________________________________
+  static setProperty(obj, prop, valor) {
+    const props_split = prop.split('.');
+
+    fun.createNestedObject(obj, [...props_split], valor);
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: maxBy
   // Descripcion : esta funcion retorna el elemento mas alto dependiendo de una propiedad
   // _________________________________________________________________________________________________
@@ -88,16 +103,6 @@ export class CustomLodash extends ToastService {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: setProperty
-  // Descripcion : Esta funcion setea una propiedad a un objeto
-  // _________________________________________________________________________________________________
-  static setProperty(obj, prop, valor) {
-    const props_split = prop.split('.');
-
-    fun.createNestedObject(obj, [...props_split], valor);
-  }
-
-  // __________________________________________________________________________________________________
   // Nombre: pick
   // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
   // _________________________________________________________________________________________________
@@ -108,7 +113,9 @@ export class CustomLodash extends ToastService {
       const prop = props[index];
       const props_split = prop.split('.');
 
-      fun.createNestedObject(result, [...props_split], fun.getProperty(obj, prop));
+      if (fun.hasValue(fun.getProperty(obj, prop))) {
+        fun.createNestedObject(result, [...props_split], fun.getProperty(obj, prop));
+      }
     }
     return result;
   }
