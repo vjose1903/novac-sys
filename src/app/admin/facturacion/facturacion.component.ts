@@ -1477,6 +1477,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
       cambios_articulos: articulos_a_cambiar,
       condicion_fact: this.condicion_fact,
+      tipo_modal: TipoCantidadEfectivo.devuelta,
     };
 
     const cantidadEfectivoModalConfig = new DynamicModalClass();
