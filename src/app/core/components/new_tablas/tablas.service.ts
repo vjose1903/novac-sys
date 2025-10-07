@@ -269,4 +269,18 @@ export class TablasService {
 
     return styles;
   }
+
+  getPaginatorPageByNumber(number, paginatorId) {
+    let paginatorPage = undefined;
+    const paginator = document.getElementById(paginatorId);
+
+    if (paginator) {
+      const paginator_pages = document.getElementsByClassName('p-paginator-pages');
+
+      const firstPage = paginator_pages[0];
+      // TODO: revisar
+      paginatorPage = firstPage ? (Array.from(firstPage.children).find((item: any) => item.outerText == `${number || 1}`) as any) : undefined;
+    }
+    return paginatorPage;
+  }
 }

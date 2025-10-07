@@ -1,26 +1,15 @@
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-import { Ss } from './../../../core/services/singleton.service';
-import { DateUtils } from '../../../core/typescript/date.utils';
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
-import { TablasService } from './tablas.service';
-import { fun } from '../../../core/services/functions.service';
-import { rowDataDividerKey, medidas, table_config, table_info, btnTableI } from './tabla-class';
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { teclasCode } from '../../../core/typescript/constantes';
-import { tableCellType } from './tabla-class';
-import * as _ from 'lodash';
-=======
-import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Ss } from '@core/services/singleton.service';
+import { DateUtils } from '@vjose1903/dateutils';
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
-
 import { Subject, takeUntil } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '@core/services/functions.service';
-import { btnTableI, table_config, table_info, tableCellType } from './tabla-class';
+import { tableCellType, rowDataDividerKey, medidas, table_config, table_info, btnTableI } from './tabla-class';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { teclasCode } from '@core/typescript/constantes';
+import * as _ from 'lodash';
+
 import { ResizeEvent } from '@core/directive/element-resized.directive';
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
 
 @Component({
   selector: 'dinamic-table',
@@ -49,7 +38,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   seleccionado_id: any;
   altoTabla;
   altoTbody;
-  tableCellType = tableCellType;
 
   @Input() TablasComponent: any = undefined;
   @Input() emptyMessage;
@@ -81,15 +69,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   };
 
   htmlServ = inject(HtmlElementsService);
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-  constructor(public tServ: TablasService, private zone: NgZone) {}
-=======
   tServ = inject(TablasService);
   zone = inject(NgZone);
   cdRef = inject(ChangeDetectorRef);
 
   constructor() {}
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
 
   formatoNumero(num) {
     let numformat = '0.00';
@@ -118,46 +102,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   ngAfterViewInit() {
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-    if (this.data && this.data.length > 0) this.updateDataCopy(this.data);
-    this.handleConfig();
-  }
-
-  ngOnChanges(change) {
-    if (change.data && change.data.currentValue) {
-      this.data.map((item) => {
-        item.key_table = fun.generateKey();
-        return item;
-      });
-      this.updateDataCopy(this.data);
-
-      this.TablasComponent = this;
-      this.TablasComponentChange.emit(this.TablasComponent);
-    }
-    Ss.cdRef.detectChanges();
-  }
-
-  verificateConfig() {
-    if (!fun.objHas(this.config, 'noDataMessage') || fun.isEmpty(this.config.noDataMessage)) this.config.noDataMessage = 'No existen registros.';
-
-    if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
-    }
-    this.verificateBottons(this.config);
-
-    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
-  }
-
-=======
     this.changeStylesTitles();
     this.handleConfig();
   }
 
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
   ngOnDestroy() {
     if (this.destroy$) this.destroy$.next();
     if (this.destroy$) this.destroy$.complete();
@@ -166,10 +114,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.resetRowEditing();
   }
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-  verificateBottons(config: table_config) {
-    const verificateId = (boton: btnTableI) => (boton.btnId ??= fun.generateKey());
-=======
   handleConfig() {
     fun.setTimeout(() => {
       if (!this.config.padding) this.config.padding = '0rem';
@@ -204,8 +148,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   verifyButtons(config: table_config) {
-    const verifyId = (btn: btnTableI) => (btn.btn_id ??= `${fun.generateKey()}-${btn.icon}`);
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
+    const verifyId = (btn: btnTableI) => (btn.btnId ??= `${fun.generateKey()}-${btn.icon}`);
 
     if (config.botones) {
       for (const key in config.botones) {
@@ -219,33 +162,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       }
     }
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-    config.info.forEach((info) => {
-      if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach((icon) => (icon.id ??= fun.generateKey()));
-    });
-  }
-
-  handleConfig() {
-    if (!this.config.padding) this.config.padding = '0rem';
-    if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
-    if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
-    if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
-    if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showPaginator')) this.config.obj_paginate.showPaginator = true;
-    if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
-    if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, (info) => _.values(_.pick(info, ['key']))[0]);
-
-    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
-      setTimeout(() => {
-        fun.enfocarInput(`search-${this.realIdTabla}`);
-      }, 100);
-    }
-
-    this.config.info.map((item) => {
-      if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
-=======
     config.info.forEach(info => {
       if (fun.hasValue(info?.iconsArray)) info.iconsArray.forEach(icon => (icon.id ??= `${fun.generateKey()}-${icon.key}`));
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
     });
   }
 
@@ -262,13 +180,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const value = fun.getProperty(data, column.key);
 
     const evaluar_value = item => (fun.hasValue(column.capitalice) ? fun.capitalice(item) : item);
+
     switch (column.tipo) {
       case 'textList':
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-        return _.reduce(fun.getProperty(data, column.key), (acumulado, item) => acumulado + `${acumulado.length ? ',' : ''}  ${fun.getProperty(item, column.key_value)}`, '');
+        return value.reduce((acumulado, item) => {
+          const value = fun.getProperty(item, column.key_value);
+
+          return acumulado + `${acumulado.length ? ',' : ''}  ${evaluar_value(value)}`;
+        }, '');
 
       case 'formatoNumero':
-        const value = fun.getProperty(data, column.key);
         if ('tachado' in column && column.tachado) {
           const can_take_negativos = column.acepta_negativos ? true : value > 0;
           return fun.hasValue(value) && can_take_negativos ? this.formatoNumero(value) : '-';
@@ -281,23 +202,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         return fecha;
 
       default:
-        return fun.getProperty(data, column.key);
-=======
-        return value.reduce((acumulado, item) => {
-          const value = fun.getProperty(item, column.key_value);
-
-          return acumulado + `${acumulado.length ? ',' : ''}  ${evaluar_value(value)}`;
-        }, '');
-
-      case 'formatoNumero':
-        return this.formatoNumero(value);
-
-      case 'date':
-        return fun.date_formater({ date: value, dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
-
-      default:
         return evaluar_value(value);
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
     }
   }
 
@@ -354,8 +259,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.tServ.modifyPaginationById(this.realIdTabla, [{ search: search }]);
   }
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-=======
   sort(row) {
     if (fun.hasValue(row?.sort)) {
       const { key, order } = row.sort;
@@ -380,7 +283,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return paginatorPage;
   }
 
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
   paginatorChange(event, id) {
     fun.setTimeout(() => {
       this.zone.run(() => {
@@ -406,11 +308,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           }
         }
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
         Ss.cdRef.detectChanges();
-=======
         this.handle_table_events('paginatorChange', { page, per_page, data: this.data });
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
       });
     }, 150);
   }
@@ -476,15 +375,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-=======
   divPaginatorChangeWidth(event: ResizeEvent) {
     requestAnimationFrame(() => {
       this.setCantPagView(event.width, 'width_paginator');
     });
   }
 
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
   setCantPagView(width, tipo) {
     let actual = 1;
     const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
@@ -513,10 +409,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }
 
         this.cantPagesView = actual;
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-        Ss.cdRef.detectChanges();
-=======
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
       });
     }, 100);
   }
@@ -547,14 +439,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return res;
   }
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
   verificateColspan(data) {
     let colSpan = null;
-=======
-  changeStylesTitles() {
-    for (let i = 0; i < this.config.info.length; i++) {
-      const info: table_info = this.config.info[i];
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
 
     if (rowDataDividerKey in data && data[rowDataDividerKey]) {
       colSpan = this.config.info.length;
@@ -568,32 +454,25 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return rowDataDividerKey in data && data[rowDataDividerKey];
   }
 
-  getTitleStyles(key) {
-    const columnConfig = this.config.info.find((config) => config.key == key);
-    if (columnConfig) {
-      let estilos = {};
+  changeStylesTitles() {
+    for (let i = 0; i < this.config.info.length; i++) {
+      const info: table_info = this.config.info[i];
 
-      if (columnConfig.estilos && columnConfig.estilos.length > 0) {
-        for (let j = 0; j < columnConfig.estilos.length; j++) {
-          const currentStyle = columnConfig.estilos[j];
-          estilos = { ...estilos, ...currentStyle };
+      let list_estilos_titulos = '';
+      if (info.estilos && info.estilos.length > 0) {
+        for (let j = 0; j < info.estilos.length; j++) {
+          const estilos = info.estilos[j];
+          const key = Object.keys(estilos)[0];
+          const value = Object.values(estilos)[0];
+
+          list_estilos_titulos += `${key}: ${value} !important; `;
         }
       }
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-      if (fun.hasValue(columnConfig.style)) {
-        estilos = { ...estilos, ...columnConfig.style };
-      }
-
-      return estilos;
-    } else {
-      return null;
-=======
       if (fun.hasValue(list_estilos_titulos)) {
         const columna = document.getElementById(`titulo_${this.realIdTabla}_${info.key}`) as any;
         if (columna) columna.setAttribute('style', list_estilos_titulos);
       }
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
     }
   }
 
@@ -660,9 +539,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       this.changeTableConfig([{ total_count: data.length }]);
       this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page);
     }
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-    Ss.cdRef.detectChanges();
-=======
   }
 
   ngOnChanges(change) {
@@ -688,31 +564,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       this.TablasComponentChange.emit(this.TablasComponent);
       this.cdRef.detectChanges();
     });
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
   }
 
   formatQuantityString(valor: number, medida: string, order: string): string {
     const cantidad = fun.roundNumberToDecimal(valor);
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-    const objeto = dato[column.key];
-    let [medidaPrincipal, medidaPaquete, medidaUnidad]: Array<string> = Object.keys(objeto);
-    const [cantidadPrincipal, cantidadPaquete, cantidadUnidad]: Array<number> = Object.values(objeto);
-
-    medidaPaquete = cantidadPaquete > 1 ? medidas[medidaPaquete] : medidaPaquete;
-    medidaUnidad = cantidadUnidad > 1 ? medidas[medidaUnidad] : medidaUnidad;
-
-    const paquete = fun.hasValue(medidaPaquete) ? `${fun.roundNumberToDecimal(cantidadPaquete)} ${medidaPaquete}` : null;
-    const unidad = fun.hasValue(medidaUnidad) ? `${fun.roundNumberToDecimal(cantidadUnidad)} ${medidaUnidad}` : null;
-
-    const cantiTootip = fun.hasValue(medidaUnidad) ? `${paquete} - ${unidad}` : fun.hasValue(medidaPaquete) ? `${paquete}` : null;
-=======
     if (order === 'cantidad-medida') {
       return `${cantidad} ${medida}`;
     } else if (order === 'medida-cantidad') {
       return `${medida} ${cantidad}`;
     }
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
 
     // Por defecto retorna cantidad-medida
     return `${cantidad} ${medida}`;
@@ -721,15 +582,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   quantityTooltip(dato, column) {
     if (dato.tipo_articulo.tipo === 'servicio') return null;
 
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-    const objeto = dato[column.key];
-    let [medidaPrincipal, medidaPaquete, medidaUnidad]: Array<string> = Object.keys(objeto);
-    const [cantidadPrincipal, cantidadPaquete, cantidadUnidad]: Array<number> = Object.values(objeto);
-
-    medidaPrincipal = cantidadPrincipal > 1 ? medidas[medidaPrincipal] : medidaPrincipal;
-
-    return `${fun.roundNumberToDecimal(cantidadPrincipal)} ${medidaPrincipal}`;
-=======
     const { key, pluralize, order, sub_key } = this.dynamicTooltipEntities[column.key];
     const objeto = dato[key];
     const keys = Object.keys(objeto);
@@ -764,7 +616,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const medida = valor > 1 && pluralize ? fun.to_plural(firstKey) : firstKey;
 
     return this.formatQuantityString(valor, medida, order);
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
   }
 
   disableInput(dato, column) {
@@ -876,10 +727,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       else this.actualRowIndex = this.actualRowIndex + 1;
     }
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
-<<<<<<< HEAD:src/app/admin/components/new_tablas/tablas.component.ts
-    Ss.cdRef.detectChanges();
-=======
->>>>>>> dev:src/app/core/components/new_tablas/tablas.component.ts
 
     fun.scrollTo({ id: this.row_id, behavior: 'smooth', block: 'center', inline: 'center' });
     fun.enfocarInput(this.row_id);
