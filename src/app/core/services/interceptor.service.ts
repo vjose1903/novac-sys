@@ -1,26 +1,13 @@
-<<<<<<< HEAD:src/app/core/services/interceptor.service.ts
-import { ConfigService } from './configuration.service';
-import { Injectable } from '@angular/core';
-=======
 import { Injectable, NgZone } from '@angular/core';
->>>>>>> dev:src/app/loader/interceptor.service.ts
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 
 import { catchError, map, finalize } from 'rxjs/operators';
+import { LoaderService } from './loader.service';
 import * as _ from 'lodash';
-<<<<<<< HEAD:src/app/core/services/interceptor.service.ts
 import { Ss } from './singleton.service';
 import { fun } from './functions.service';
 import { SharedService } from './shared.service';
-
-@Injectable()
-export class InterceptorService implements HttpInterceptor {
-  constructor(public sharedServ: SharedService) {}
-=======
-import { Ss } from '@core/services/singleton.service';
-import { fun } from '@core/services/functions.service';
-import { SharedService } from '@core/services/shared.service';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
@@ -29,18 +16,17 @@ export class InterceptorService implements HttpInterceptor {
     public sharedServ: SharedService,
     private zone: NgZone
   ) {}
->>>>>>> dev:src/app/loader/interceptor.service.ts
   requestCount: number = 0;
 
   private startRequest(args?): void {
-    if (this.requestCount <= 0 && args != 'no_show') Ss.loadServ.isLoading.next(true);
+    if (this.requestCount <= 0 && args != 'no_show') this.loadServ.isLoading.next(true);
     this.requestCount++;
   }
 
   private endRequest(args?): void {
     if (this.requestCount > 0 && args != 'no_show') this.requestCount--;
 
-    if (this.requestCount == 0 && args != 'no_hide') Ss.loadServ.isLoading.next(false);
+    if (this.requestCount == 0 && args != 'no_hide') this.loadServ.isLoading.next(false);
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -48,10 +34,8 @@ export class InterceptorService implements HttpInterceptor {
     const token = fun.getAuthToken();
 
     let spinner = request.params.get('spinner');
-    let msgs = request.params.get('msgs');
-    let show_msgs = fun.hasValue(msgs) ? (msgs == 'no_show' ? false : true) : true;
 
-    let sendParams = request.params.delete('msgs', msgs);
+    let sendParams;
     if (spinner) sendParams = request.params.delete('spinner', spinner); // creando la nueva instancia de HttpParams sin el parametro spinner
 
     if (!spinner || spinner == 'no_hide') this.startRequest(spinner); // Activa el spinner
@@ -64,7 +48,6 @@ export class InterceptorService implements HttpInterceptor {
           expiry: `${localStorage.getItem('expiry')}`,
           uid: `${localStorage.getItem('uid')}`,
           'token-type': `${localStorage.getItem('token-type')}`,
-          'has-contabilidad': `${ConfigService.config.has_contabilidad}`,
         },
         params: sendParams,
       });
@@ -73,12 +56,12 @@ export class InterceptorService implements HttpInterceptor {
     return next.handle(request).pipe(
       map(event => {
         if (event instanceof HttpResponse) {
-          if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, show_msgs, 'success');
+          if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
 
           this.zone.runOutsideAngular(() => {
             ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach(header => {
               const headerValue = event.headers.get(header);
-              if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue);
+              if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue || '');
             });
           });
         }
@@ -88,21 +71,6 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
-<<<<<<< HEAD:src/app/core/services/interceptor.service.ts
-        // console.log(' ');
-        // console.log('response ', response);
-        // console.log(' ');
-        if (fun.isEmpty(response.error)) {
-          fun.toastError('Error desconocido por favor comunicarse con el soporte de Novac System.', 'ERROR');
-        } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
-          fun.toastError(response.error.msg, 'ERROR');
-          this.sharedServ.nextCanToast(false);
-          Ss.layServ.nextLogOut({ bool: true, quien: 'close_session' });
-        } else {
-          if (fun.objHas(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, show_msgs, 'warning');
-
-          if (fun.objHas(response, 'error.msg')) this.handler_msg(response.error.msg, show_msgs, 'error');
-=======
         console.log('%c response ', 'color: orange', response);
 
         if (response.status == 401) {
@@ -114,7 +82,7 @@ export class InterceptorService implements HttpInterceptor {
 
           if (token) {
             fun.toastError('Su sesión ha expirado, por favor inicie sesión nuevamente', 'SESIÓN EXPIRADA');
-            return;
+            return throwError(response);
           }
         }
         // console.log('response', response);
@@ -123,9 +91,8 @@ export class InterceptorService implements HttpInterceptor {
         if (fun.isEmpty(response.error)) {
           errorDesconocido();
         } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
+          console.log('@@@@@@@@@@@@@@@@@@@@@@@@@');
 
-          console.log("@@@@@@@@@@@@@@@@@@@@@@@@@");
-          
           fun.toastError(response.error.msg, 'ERROR');
           this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(false));
           fun.logout();
@@ -141,7 +108,6 @@ export class InterceptorService implements HttpInterceptor {
             console.log('3');
             errorDesconocido();
           }
->>>>>>> dev:src/app/loader/interceptor.service.ts
         }
 
         return throwError(response);
@@ -152,17 +118,17 @@ export class InterceptorService implements HttpInterceptor {
     );
   }
 
-  handler_msg(menssages, show_msgs, tipo) {
+  handler_msg(menssages, tipo_) {
     // console.warn('MENSAJE DESDE EL INTERCEPTOR');
     // console.warn('menssages ', menssages);
 
-    if (show_msgs && menssages && Array.isArray(menssages)) {
+    if (menssages && Array.isArray(menssages)) {
       for (let i = 0; i < menssages.length; i++) {
         const menssage = menssages[i];
 
-        if (tipo === 'success') fun.toastSuccess(menssage, 'CORRECTO');
-        if (tipo === 'warning') fun.toastWarning(menssage, 'AVISO');
-        if (tipo === 'error') fun.toastError(menssage, 'ERROR');
+        if (tipo_ === 'success') fun.toastSuccess(menssage, 'CORRECTO');
+        if (tipo_ === 'warning') fun.toastWarning(menssage, 'AVISO');
+        if (tipo_ === 'error') fun.toastError(menssage, 'ERROR');
       }
     }
   }
