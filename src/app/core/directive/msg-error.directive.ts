@@ -98,19 +98,12 @@ export class MsgErrorDirective implements OnDestroy, AfterViewInit {
     return this.form?.get(this.formControlName) || null;
   }
 
-<<<<<<< HEAD
-  checkErrors(value?) {
-    const childrens = this.el.nativeElement.childNodes;
-    const id_content = `msgContainer`;
-    const id_msg = `msg_text_${this.id}`;
-=======
   private checkErrors(): void {
     const control = this.getFormControl();
     if (!control) {
       console.warn(`Control '${this.formControlName}' no encontrado en checkErrors`);
       return;
     }
->>>>>>> dev
 
     const containerId = `msgContainer_${this.formControlName}`;
     const msgContainer = this.el.nativeElement.querySelector(`#${containerId}`) as HTMLElement;
@@ -120,16 +113,6 @@ export class MsgErrorDirective implements OnDestroy, AfterViewInit {
       return;
     }
 
-<<<<<<< HEAD
-        if (msg) {
-          msg.setAttribute('style', 'color: #ff4d4d; margin-left: 0.2rem; position: absolute; font-size: 12px;');
-          msg.id = id_msg;
-          msg.innerHTML = msgHandle.msg;
-
-          msgContainer.appendChild(msg);
-          this.setVariables();
-        }
-=======
     this.clearPreviousMessages(msgContainer);
 
     const errorResponse = this.getErrorMessage(control);
@@ -151,7 +134,6 @@ export class MsgErrorDirective implements OnDestroy, AfterViewInit {
       if (messageHandler) {
         const message = typeof messageHandler === 'function' ? messageHandler(errorValue) : messageHandler;
         return { render: true, msg: message };
->>>>>>> dev
       }
     }
 
@@ -162,36 +144,11 @@ export class MsgErrorDirective implements OnDestroy, AfterViewInit {
     const msgElement = document.createElement('div');
     const msgId = `msg_text_${this.formControlName}`;
 
-<<<<<<< HEAD
-          const formName = this.id.replaceAll('_', ' ');
-
-          const errors = this.form.controls[this.id].errors;
-
-          if (fun.hasValue(errors) && !this.form.controls[this.id].valid && (this.form.controls[this.id].dirty || this.form.controls[this.id].touched)) {
-            response.render = true;
-
-            if (errors.required) response.msg = 'Este campo es requerido.';
-            else if (errors.minlength) response.msg = `Cant. mínima de letras es: ${errors.minlength.requiredLength}.`;
-            else if (errors.max) response.msg = `Valor maximo requerido es: ${errors.max.max} - actualmente tiene: ${errors.max.actual}.`;
-            else if (errors.min) response.msg = `Valor mínimo requerido es: ${errors.min.min} - actualmente tiene: ${errors.min.actual}.`;
-            else if (errors.ip) response.msg = `Intoduzca una ip valida.`;
-            else if (errors.compares) response.msg = `Las contraseñas no coinciden.`;
-            else if (errors.invalidCedula) response.msg = `Ingrese una cédula válida.`;
-            else if (errors.email) response.msg = `Ingrese una email válido.`;
-            else if (errors.sinRayas) response.msg = `Complete el campo: ${formName}`;
-          }
-
-          resolve(response);
-        });
-      }, 50);
-    });
-=======
     msgElement.id = msgId;
     msgElement.innerHTML = message;
     msgElement.style.cssText = 'color: #ff4d4d; margin-left: 0.2rem; position: absolute; font-size: 12px;';
 
     container.appendChild(msgElement);
->>>>>>> dev
   }
 
   private clearPreviousMessages(container: HTMLElement): void {
