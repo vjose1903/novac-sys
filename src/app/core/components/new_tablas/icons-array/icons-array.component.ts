@@ -2,11 +2,8 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { TablasService } from '../tablas.service';
 import { fun } from '@core/services/functions.service';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-<<<<<<< HEAD:src/app/admin/components/new_tablas/icons-array/icons-array.component.ts
-=======
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
->>>>>>> dev:src/app/core/components/new_tablas/icons-array/icons-array.component.ts
 
 @Component({
   selector: 'icons-array',
@@ -113,11 +110,7 @@ export class IconsArrayComponent {
       const siFunction = instance => {
         data.is_editing = false;
         this.tServ.modifyRowsEditing(editing_row, 'remove').then(() => this.handle_table_events('clickIcon', obj_click));
-<<<<<<< HEAD:src/app/admin/components/new_tablas/icons-array/icons-array.component.ts
-        new ModalClass().dismissModal(instance);
-=======
         instance.close();
->>>>>>> dev:src/app/core/components/new_tablas/icons-array/icons-array.component.ts
       };
 
       this.dynamicModalServ.confirmationModal({
