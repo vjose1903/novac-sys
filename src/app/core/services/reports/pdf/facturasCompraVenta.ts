@@ -1,17 +1,8 @@
-import { ConfigService } from './../configuration.service';
-/* eslint-disable @typescript-eslint/indent */
-<<<<<<< HEAD:src/app/core/services/pdf/facturasCompraVenta.ts
-import * as fun_ from './utils/funciones';
-import { styles_ } from './utils/files';
-import * as numLetra from './utils/numero_letras';
-import { ConfigI } from '../../typescript/config-interface';
-=======
 import * as fun_ from '../utils/funciones';
 import { defaultStyle, styles_ } from '../utils/files';
 import * as numLetra from '../utils/numero_letras';
 import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../interface/config-interface';
->>>>>>> dev:src/app/core/services/reports/pdf/facturasCompraVenta.ts
 import { infoPagare } from './8.5x5.5/infoPdfs';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
@@ -32,21 +23,18 @@ export function makePDF(data, file_name, tipo_pdf?, isMostrar = true) {
   const is_venta = data.tipo === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
 
-<<<<<<< HEAD:src/app/core/services/pdf/facturasCompraVenta.ts
-=======
   const configApp: ConfigI = Ss.configServ.config;
 
->>>>>>> dev:src/app/core/services/reports/pdf/facturasCompraVenta.ts
   const dd = {
     pageSize: is_venta ? (is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 }) : { width: 600, height: 398 },
     pageMargins: getPageMargin(is_contado, is_venta),
-    header: (currentPage, pageCount, pageSize) => cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, ConfigService.config),
-    content: contenidoFacturaVenta(data, is_contado, is_venta, ConfigService.config, isMostrar),
+    header: (currentPage, pageCount, pageSize) => cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp),
+    content: contenidoFacturaVenta(data, is_contado, is_venta, configApp, isMostrar),
     images: {
-      logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
+      logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
-    defaultStyle
+    defaultStyle,
   };
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };
@@ -104,14 +92,10 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           margin: [0, 10, 0, 0],
           text: [
             {
-<<<<<<< HEAD:src/app/core/services/pdf/facturasCompraVenta.ts
               text: [
                 { text: is_venta ? 'Cliente : ' : 'Suplidor : ', style: 'letra10' },
-                { text: entidad.nombre, style: 'letra10' },
+                { text: entidad.nombre_completo, style: 'letra10' },
               ],
-=======
-              text: [is_venta ? { text: 'Cliente : ', style: 'letra10' } : { text: 'Suplidor : ', style: 'letra10' }, is_venta ? { text: data.cliente.nombre_completo, style: 'letra10' } : { text: data.suplidor.nombre_completo, style: 'letra10' }],
->>>>>>> dev:src/app/core/services/reports/pdf/facturasCompraVenta.ts
             },
           ],
         },
@@ -226,7 +210,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI, i
 
     row.push(
       { text: i + 1, style: 'letra11', alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
-      { text: descripcion, style: 'monospace10', margin: [0, -1, 0, 0],  pageBreak: br_ ? 'before' : 'none' },
+      { text: descripcion, style: 'monospace10', margin: [0, -1, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.cantidad, style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
         text: fun_.roundNumberToDecimal(is_venta ? detalle.precio : detalle.costo),
@@ -236,7 +220,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI, i
         pageBreak: br_ ? 'before' : 'none',
       },
       { text: fun_.roundNumberToDecimal(detalle.itbis) || '0.00', style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
-      { text: fun_.roundNumberToDecimal(detalle.total), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.roundNumberToDecimal(detalle.total), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' }
     );
     tempBody.push(row);
   });
@@ -422,7 +406,7 @@ function formatMovimientosViajes(data) {
 
   const movimientosRows = [];
 
-  data.movimientos_viaje.forEach((movimiento) => {
+  data.movimientos_viaje.forEach(movimiento => {
     movimientosRows.push([
       {
         // camión
