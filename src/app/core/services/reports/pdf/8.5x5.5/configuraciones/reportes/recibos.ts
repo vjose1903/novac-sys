@@ -159,7 +159,7 @@ export const config_recibos = {
   },
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  // DETALLADO
+  // DETALLADO POR CLIENTE
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   detallado_cliente: {
     margin_general: [0, 0, 0, 0],

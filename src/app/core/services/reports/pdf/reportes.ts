@@ -1,20 +1,11 @@
-<<<<<<< HEAD:src/app/core/services/pdf/reportes.ts
-import { ConfigService } from './../configuration.service';
-import { fun } from './../functions.service';
-/* eslint-disable @typescript-eslint/indent */
-import { styles_ } from './utils/files';
-import { getContentWithTablaNormal } from './utils/tabla_normal';
-import { getContentWithTablaAgrupada } from './utils/tabla_agrupada';
-import { ConfigI } from '../../typescript/config-interface';
-=======
-import { fun } from './../../functions.service';
 /* eslint-disable @typescript-eslint/indent */
 import { defaultStyle, styles_ } from '../utils/files';
 import { getContentWithTablaNormal } from '../utils/tabla_normal';
 import { getContentWithTablaAgrupada } from '../utils/tabla_agrupada';
+import { ConfigI } from '@core/interface/config-interface';
+import { fun } from '@services/functions.service';
 import { Ss } from '../../singleton.service';
-import { ConfigI } from '../../../interface/config-interface';
->>>>>>> dev:src/app/core/services/reports/pdf/reportes.ts
+
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
 import { config_cxc } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc';
 import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc_ant_preventa';
@@ -59,8 +50,8 @@ const configuraciones = {
 
   recibos: config_recibos.detallado,
   recibos_agrupado: config_recibos.agrupado,
+  recibos_cliente: config_recibos.detallado_cliente,
 
-<<<<<<< HEAD:src/app/core/services/pdf/reportes.ts
   pago_facturas: config_pago_facturas.detallado,
   pago_facturas_agrupado: config_pago_facturas.agrupado,
 
@@ -68,9 +59,6 @@ const configuraciones = {
   cxp: config_cxp,
   cxp_ant_detallado: config_cxp_ant.detallado,
   cxp_ant_agrupado: config_cxp_ant.agrupado,
-=======
-  recibos_cliente: config_recibos.detallado_cliente,
->>>>>>> dev:src/app/core/services/reports/pdf/reportes.ts
 
   ventas_productos: config_ventas_prod,
   cuentas_con_pagos: config_cuentas_pagos,
@@ -86,15 +74,12 @@ export function makeReporte(data) {
   console.log('%c data ', 'color: red', data);
   console.log('%c tipo_reporte ', 'color: orange', data.tipo_reporte);
   console.log('%c configuraciones ', 'color: lime', configuraciones);
-  
+
   const configuration = configuraciones[data.tipo_reporte];
   console.log('%c configuration ', 'color: magenta', configuration);
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
-<<<<<<< HEAD:src/app/core/services/pdf/reportes.ts
-=======
   const configApp: ConfigI = Ss.configServ.config;
->>>>>>> dev:src/app/core/services/reports/pdf/reportes.ts
 
   const margin_top = data.mostrar_sub_titulo ? 125 : 111.5;
   const dd = {
@@ -102,13 +87,13 @@ export function makeReporte(data) {
     pageMargins: [10, margin_top, 15, 40],
 
     pageOrientation: pageO,
-    header: cabeceraReporte(data, configuration, ConfigService.config),
+    header: cabeceraReporte(data, configuration, configApp),
     content: contenidoReporte(data, configuration),
     footer: (currentPage, pageCount) => {
       return [{ text: ' ', alignment: 'right', style: 'letra10', margin: [0, 0, 20, 0] }];
     },
     images: {
-      logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
+      logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
     defaultStyle,
@@ -210,10 +195,6 @@ function contenidoReporte(data, configuration) {
   } else {
     content = getContentWithTablaNormal({ configuration, data });
   }
-  // fun.pushAt(content, 0, '123456789 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52');
-  // fun.pushAt(content, 0, '111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111');
-  // fun.pushAt(content, 0, '..........................................................................................................................................');
-  // fun.pushAt(content, 0, '__________________________________________________________________________________________________________________________________________');
 
   return content;
 }
