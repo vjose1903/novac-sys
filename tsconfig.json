@@ -20,9 +20,12 @@
     "useDefineForClassFields": false,
     "paths": {
       "@core/*": ["app/core/*"],
+      "@services/*": ["app/core/services/*"],
       "@components/*": ["app/core/components/*"],
       "@registros/*": ["app/admin/registros/*"],
-      "@admin/*": ["app/admin/*"]
+      "@admin/*": ["app/admin/*"],
+      "@environments/*": ["environments/*"],
+      "@electron/*": ["../electron/*"]
     }
   },
   "files": [

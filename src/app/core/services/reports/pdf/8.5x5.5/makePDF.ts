@@ -19,8 +19,7 @@ import { agruparArticulosPorPagina, parseTotalizacion } from '../../utils/factur
 import { pageBreak } from '../../utils/funciones';
 
 const configuraciones = {
-  notas_detallada: config_notas.detallada,
-  notas_agrupada: config_notas.agrupada,
+  notas: config_notas.normal,
   notas_electronica: config_notas.electronica,
   ventas: config_ventas,
   recibo_ingreso: config_recibo_ingreso,
@@ -35,8 +34,8 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 
   const is_suplidor = is_compra;
   const is_electronica = data?.serie == serie.electronica;
-
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+  
+  const configApp: ConfigI = Ss.configServ.config;
   const configuration = configuraciones[tipo_pdf];
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
 
@@ -243,7 +242,7 @@ function parseFirmasPdf(args: { tipo_pdf: any }) {
   entidades.forEach((entidad, index) => {
     if (firmas[tipo_pdf].includes(entidad)) {
       mainTable.table.widths.push(100);
-      mainTable.table.body[0].push({ text: fun.Capitalice(entidad.split('_').join(' ')), alignment: 'center', style: 'letra10', border: [false, true, false, false] });
+      mainTable.table.body[0].push({ text: fun.capitalice(entidad.split('_').join(' ')), alignment: 'center', style: 'letra10', border: [false, true, false, false] });
 
       if (index < firmas[tipo_pdf].length - 1) {
         mainTable.table.widths.push(20);
@@ -286,15 +285,15 @@ function parseResumen(args: { data: any; tipo_pdf: any; is_electronica: boolean;
   if (!infoResumenPartes[tipo_pdf].length) return [{ text: '' }];
 
   const componentesResumen = {
-    total_excento: { label: 'Total Excento', valor: resumen_data?.total_excento || 0 },
-    total_gravado: { label: 'Total Gravado', valor: resumen_data?.total_gravado || 0 },
-    bruto: { label: 'Total Excento', valor: data?.Bruto || data?.bruto || 0 },
-    itbis: { label: 'Itbis', valor: resumen_data?.itbis || data?.itbis || 0 },
-    descuento: { label: 'Descuento', valor: resumen_data?.descuento || data?.descuento || 0 },
-    mora: { label: 'Mora', valor: data?.mora || 0 },
-    total: { label: 'Total', valor: resumen_data?.total_pagina || data?.total || 0 },
-    efectivo: { label: 'Efectivo', valor: data?.total + data?.devuelta || 0 },
-    cambio: { label: 'Cambio', valor: data?.devuelta || 0 },
+    total_excento: { label: 'Total Excento:', valor: resumen_data?.total_excento || 0 },
+    total_gravado: { label: 'Total Gravado:', valor: resumen_data?.total_gravado || 0 },
+    bruto: { label: 'Bruto:', valor: data?.Bruto || data?.bruto || 0 },
+    itbis: { label: 'Itbis:', valor: resumen_data?.itbis || data?.itbis || 0 },
+    descuento: { label: 'Descuento:', valor: resumen_data?.descuento || data?.descuento || 0 },
+    mora: { label: 'Mora:', valor: data?.mora || 0 },
+    total: { label: 'Total:', valor: resumen_data?.total_pagina || data?.total || 0 },
+    efectivo: { label: 'Efectivo:', valor: data?.total + data?.devuelta || 0 },
+    cambio: { label: 'Cambio:', valor: data?.devuelta || 0 },
   };
 
   const baseProps = {
@@ -356,7 +355,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   const evaluar_nombre = propietario.nombre_completo.length > max_length ? `${propietario.nombre_completo.substring(0, max_length)}...` : propietario.nombre_completo;
 
   const propietarioConfig = {
-    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.Capitalice(evaluar_nombre) || '' },
+    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.capitalice(evaluar_nombre) || '' },
     doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario.rnc || '' },
     direccion: { label: 'Dirección: ', valor: propietario.direccion || '' },
     recibido: { label: 'Recibido: ', valorArray: [fun_.roundNumberToDecimal(data?.total), ` - ${fun_.my_capitalize(numero_letra)}`] },

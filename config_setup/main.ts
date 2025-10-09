@@ -1,15 +1,15 @@
-import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, screen, ipcMain } from 'electron';
 import * as path from 'path';
-import * as fs from 'fs';
 import { ConfigI } from './src/app/core/interface/config-interface';
 
 const { exec } = require('child_process');
 
 import Functions from './electron/functions';
 import HandlerConfigFile from './electron/handler-config-file';
+import FirebaseConfigHandler from './electron/firebase-config-handler';
+import SplashHandler, { ErrorType, TypedError } from './electron/splash-handler';
 
 import SharedElectronAngular, {
-  ELECTRON_CHANGE_CONFIG_FILE,
   ELECTRON_EVENT_DECRYPT,
   ELECTRON_EVENT_ENCRYPT,
   ELECTRON_GET_APP_CONFIG,
@@ -25,25 +25,34 @@ import SharedElectronAngular, {
   ELECTRON_EXPORT_CSV,
   ELECTRON_FOCUS_WINDOW,
   ELECTRON_OPEN_WEB_BROWSER,
+  ELECTRON_EVENT_DOWNLOAD_UPDATE,
+  ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE,
 } from './electron/shared-electron-angular';
+
 import AppUpdate from './electron/auto-update';
-import ReplaceInFile from './electron/replace-in-file';
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
 import ExportToExcel from './electron/export-to-excel';
 import LogProcessor from './electron/write-logs';
 import MachineId from './electron/machine-id';
 import OpenBrowser from './electron/open-web-browser';
+import { sharedState } from './electron/shared-state';
+import PdfPrinter from './electron/pdf-printer';
 
 let win: BrowserWindow | null;
-let splash: BrowserWindow | null;
 let auto_updater: AppUpdate;
-let export_to_excel: ExportToExcel;
 let docker_handler: DockerHandler;
-let replace_in_file: ReplaceInFile;
+let pdf_printer: PdfPrinter;
+let export_to_excel: ExportToExcel;
+
 const Console: LogProcessor = LogProcessor.getInstance();
 const openBrowser: OpenBrowser = OpenBrowser.getInstance();
-const machineId: MachineId = MachineId.getInstance();
+
+// Variables para las instancias inicializadas
+let machineId: MachineId;
+let handlerConfigFile: HandlerConfigFile;
+let firebaseConfigHandler: FirebaseConfigHandler;
+let splash_handler: SplashHandler;
 
 const args = process.argv.slice(1);
 const serve = args.some(val => val === '--serve');
@@ -51,33 +60,27 @@ const serve = args.some(val => val === '--serve');
 const appFilePath = `file://${path.join(app.getAppPath(), 'dist', 'browser', 'index.html')}`;
 const iconPath = path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', 'assets', 'icons', isMacOs() ? 'mac/icon.icns' : 'win/icon.ico');
 
-function createSplash(type = 'splash') {
-  if (splash) {
-    splash.close();
-    splash = null;
-  }
+function createInitialSplash() {
+  // Iniciar splash de carga y manejar el flujo
+  splash_handler
+    .createSplash('splash')
+    .then(async () => {
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-  splash = new BrowserWindow({ width: 650, minWidth: 650, height: 500, minHeight: 500, transparent: true, frame: false, alwaysOnTop: true, icon: iconPath });
+      try {
+        await beforeCreateSplash();
 
-  const splashUrl = `file://${path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', `${type}.html`)}`;
-
-  writeLogs(' ----- CREATE SPLASH ------');
-
-  splash.loadURL(splashUrl);
-  splash.center();
-
-  if (type == 'splash') {
-    beforeCreateSplash(splash).then(res => {
-      splash?.close();
-      createWindow().then(win => beforeCreateWindow(win));
+        splash_handler.closeSplash();
+        const win = await createWindow();
+        beforeCreateWindow(win);
+      } catch (error) {
+        writeLogs(error, 'ERROR en beforeCreateSplash');
+        splash_handler.createErrorSplash(error);
+      }
+    })
+    .catch(error => {
+      splash_handler.createErrorSplash(error);
     });
-  } else {
-    shell.beep();
-    setTimeout(() => {
-      splash?.close();
-      app.quit();
-    }, 6000);
-  }
 }
 
 function createWindow() {
@@ -105,7 +108,8 @@ function createWindow() {
       });
 
       if (serve) {
-        win.loadURL('http://localhost:$$PORT_APP$$').catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
+        const port = $$PORT_APP$$;
+        win.loadURL(`http://localhost:${port}`).catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
 
         setTimeout(() => {
           win?.webContents.openDevTools();
@@ -122,8 +126,17 @@ function createWindow() {
 
       // Evento cuando se intenta cerrar la ventana con el boton de cerrar
       win.on('close', (event: any) => {
-        event.preventDefault();
-        sendCloseConfirmation();
+        writeLogs(`Evento close disparado. isUpdaterClosing: ${sharedState.isUpdaterClosing}`, 'close-event');
+        if (!sharedState.isUpdaterClosing) {
+          writeLogs('Preparando confirmación de cierre...', 'close-event');
+          event.preventDefault();
+          sendCloseConfirmation();
+        } else {
+          // Cuando se está actualizando, permitir el cierre sin prevención
+          writeLogs('Cerrando aplicación para actualización...', 'close-event');
+          // No prevenir el evento para permitir que la ventana se cierre normalmente
+          // El proceso de actualización se encargará del resto
+        }
       });
 
       resolve(win);
@@ -139,12 +152,22 @@ try {
   app.on('ready', () => {
     // -------- borrar el archivo de logs --------
     Console.clean().then(async () => {
-      createSplash();
+      // Inicializar SplashHandler
+      splash_handler = SplashHandler.getInstance(serve, iconPath);
+      createInitialSplash();
     });
   });
 
   // Quit when all windows are closed.
-  app.on('window-all-closed', () => closeApp());
+  app.on('window-all-closed', () => {
+    writeLogs(`Evento window-all-closed disparado. isUpdaterClosing: ${sharedState.isUpdaterClosing}`, 'window-all-closed');
+    if (!sharedState.isUpdaterClosing) {
+      writeLogs('Cerrando aplicación normalmente...', 'window-all-closed');
+      closeApp();
+    } else {
+      writeLogs('Todas las ventanas cerradas durante actualización, permitiendo cierre automático...', 'window-all-closed');
+    }
+  });
 } catch (e) {
   // Catch Error
   throw e;
@@ -175,8 +198,10 @@ export function sendCloseConfirmation() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Close the app AND SPLASH ERROR
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-export function closeAppAndSplashError(error: string) {
-  createSplash(`splash_error_desconocido`);
+export function closeAppAndSplashError(error: string, type: string = 'splash_error_desconocido') {
+  writeLogs(error, 'closeAppAndSplashError');
+  if (splash_handler) splash_handler.createSplash(type);
+
   closeApp();
 }
 
@@ -213,53 +238,90 @@ async function getServer_(): Promise<boolean> {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // CONFIGURACIONES DESPUES DE QUE SE CREA EL SPLASH SCREEN
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function beforeCreateSplash(splash) {
-  return new Promise<any>(async (resolve, reject) => {
-    writeLogs(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
+async function beforeCreateSplash(): Promise<void> {
+  writeLogs(' -------- INICIANDO CARGA DE ARCHIVOS NECESARIOS --------');
 
-    // ----------- inicializando docker handler --------------
-    docker_handler = new DockerHandler();
+  try {
+    // Inicializar componentes base
+    await initializeBaseComponents();
 
-    HandlerConfigFile.checkConfigFile(splash)
-      .then(async is_config_ready => {
-        if (is_config_ready) {
-          Functions.getConfigFile()
-            .then(async config => {
-              // ----------- correr base de datos local --------------
-              writeLogs(config.is_db_local, 'config.is_db_local ');
+    // Verificar y manejar configuración
+    const configExists = await handlerConfigFile.configFileExists();
 
-              if (config.is_db_local) {
-                docker_handler
-                  .checkAllInDocker()
-                  .then(res_db => continuarCargandoArchivos(resolve))
-                  .catch(error_type => createSplash(`splash_${error_type}_error`));
-                //
-              } else {
-                continuarCargandoArchivos(resolve);
-              }
-            })
-            .catch(err => {
-              createSplash('splash_config_error');
-            });
-        }
-      })
-      .catch(err => {
-        createSplash('splash_config_error');
-      });
-  });
+    if (configExists) {
+      await handleExistingConfig();
+    } else {
+      await handleNewConfig();
+    }
+
+    // Solo continuar con la carga de archivos si todo salió bien
+    continuarCargandoArchivos();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  } catch (error) {
+    // Usar splash_handler para manejar el error
+    splash_handler.createErrorSplash(error);
+
+    throw error; // Re-lanzar la excepción para que sea capturada por el SplashHandler
+  }
+}
+
+// Función auxiliar para inicializar componentes base
+async function initializeBaseComponents(): Promise<void> {
+  machineId = await MachineId.getInstance();
+  handlerConfigFile = await HandlerConfigFile.getInstance(machineId);
+}
+
+// Función auxiliar para manejar configuración existente
+async function handleExistingConfig(): Promise<void> {
+  const config = await Functions.getConfigFile();
+  writeLogs(config.is_db_local, 'config.is_db_local');
+
+  if (config.is_db_local) {
+    const dbResult = await handleLocalDatabase();
+    if (!dbResult) throw splash_handler.createTypedError('Error en configuración existente', ErrorType.CONFIG_FILE);
+  }
+}
+
+// Función auxiliar para manejar base de datos local
+async function handleLocalDatabase(): Promise<boolean> {
+  docker_handler = DockerHandler.getInstance();
+
+  try {
+    await docker_handler.checkAllInDocker();
+    return true;
+  } catch (error_type) {
+    writeLogs(error_type, 'ERROR al verificar la base de datos local');
+    throw splash_handler.createTypedError(`Error al verificar la base de datos local: ${error_type}`, ErrorType.DATABASE_LOCAL, error_type);
+  }
+}
+
+// Función auxiliar para manejar nueva configuración
+async function handleNewConfig(): Promise<void> {
+  try {
+    firebaseConfigHandler = await FirebaseConfigHandler.getInstance(machineId);
+
+    try {
+      const firebaseConfig = await firebaseConfigHandler.getAppConfig();
+
+      await Functions.setConfigFile(JSON.stringify(firebaseConfig));
+      writeLogs('Guardando configuración en el archivo local');
+    } catch (firebaseError) {
+      writeLogs(firebaseError, 'ERROR al obtener configuración desde Firebase, usando configuración local');
+      throw splash_handler.createTypedError('Error al obtener configuración desde Firebase', ErrorType.FIREBASE_CONFIG, firebaseError);
+    }
+  } catch (error) {
+    throw error;
+  }
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // continuar la carga de archivos necesarios
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function continuarCargandoArchivos(resolve) {
+function continuarCargandoArchivos() {
   // -------------- remplazar en archivos ----------------
-  replace_in_file = new ReplaceInFile();
   export_to_excel = new ExportToExcel(app);
 
   writeLogs(' -------- CARGA DE ARCHIVOS NECESARIOS FINALIZADA --------');
-
-  setTimeout(() => resolve(true), 2000);
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -269,9 +331,20 @@ function continuarCargandoArchivos(resolve) {
 async function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
   const serve_ = await getServer_();
-  auto_updater = new AppUpdate(win, serve_);
+  auto_updater = new AppUpdate(win, app, serve_);
   auto_updater.init();
   // ---------------------------------------
+
+  pdf_printer = PdfPrinter.getInstance(win);
+
+  // Desmontar Firebase Config Handler ya que Angular está listo
+  if (firebaseConfigHandler && firebaseConfigHandler.isReady()) {
+    try {
+      await firebaseConfigHandler.dispose();
+    } catch (error) {
+      writeLogs(error, 'ERROR al desmontar Firebase Config Handler');
+    }
+  }
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -292,18 +365,43 @@ async function handleEvent(event: any, obj: string) {
         // test function
         break;
       //
-      case ELECTRON_RELOAD:
-        writeLogs('RECARGANDO ELECTRON');
-        win?.reload();
-        if (!serve) win?.loadURL(appFilePath);
+      case ELECTRON_EVENT_DOWNLOAD_UPDATE:
+        writeLogs('Verificando si hay actualización disponible antes de descargar');
+        auto_updater
+          .verifyUpdateAvailable({ notify: false })
+          .then(res => {
+            if (res) {
+              writeLogs('Descargando actualización');
+              auto_updater
+                .downloadUpdate()
+                .then(downloadResult => {
+                  task.response = { msg: 'Descarga iniciada exitosamente', available: true, downloadStarted: true };
+                  event.reply(ELECTRON_RESPONSE, task);
+                })
+                .catch(downloadError => {
+                  writeLogs('Error al iniciar descarga:', downloadError);
+                  task.error = true;
+                  task.response = { msg: 'Error al iniciar descarga', available: true, downloadStarted: false, error: downloadError };
+                  event.reply(ELECTRON_RESPONSE, task);
+                });
+            } else {
+              writeLogs('No hay actualización disponible para descargar');
+              task.response = { msg: 'No hay actualización disponible', available: false };
+              event.reply(ELECTRON_RESPONSE, task);
+            }
+          })
+          .catch(err => {
+            writeLogs('Error al verificar actualización:', err);
+            task.error = true;
+            task.response = { msg: 'Error al verificar actualización', error: err };
+            event.reply(ELECTRON_RESPONSE, task);
+          });
         break;
       //
-      case ELECTRON_OPEN_WEB_BROWSER:
-        openBrowser.open(parameters.url);
-        break
-      case ELECTRON_CHANGE_CONFIG_FILE:
-        replace_in_file
-          .replaceFunction(parameters)
+      case ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE:
+        writeLogs('Verificando actualizaciones');
+        auto_updater
+          .verifyUpdateAvailable()
           .then(res => {
             task.response = res;
             event.reply(ELECTRON_RESPONSE, task);
@@ -313,7 +411,16 @@ async function handleEvent(event: any, obj: string) {
             task.response = err;
             event.reply(ELECTRON_RESPONSE, task);
           });
-
+        break;
+      //
+      case ELECTRON_RELOAD:
+        writeLogs('RECARGANDO ELECTRON');
+        win?.reload();
+        if (!serve) win?.loadURL(appFilePath);
+        break;
+      //
+      case ELECTRON_OPEN_WEB_BROWSER:
+        openBrowser.open(parameters.url);
         break;
       //
       case ELECTRON_EVENT_DECRYPT:
@@ -329,15 +436,12 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case ELECTRON_PRINT_BASE64:
-        writeLogs('INICIANDOO PROCESO DE IMPRESION');
+        writeLogs('INICIANDO PROCESO DE IMPRESION');
 
-        const base64 = parameters.base64;
-        const fileName = parameters.file;
-        const printer = parameters.printer;
-        const type = parameters['type'] ? parameters['type'] : 'reporte';
-        const pageOrientation = parameters['pageOrientation'] ? parameters['pageOrientation'] : 'portrait';
+        const { base64, file: fileName, printer, type = 'reporte', pageOrientation = 'portrait' } = parameters;
 
-        generatePdfFileFormBase64({ fileName, base64, type, pageOrientation, printer })
+        pdf_printer
+          .generatePdfFileFromBase64({ fileName, base64, type, pageOrientation, printer })
           .then(res => {
             task.response = res;
             event.reply(ELECTRON_RESPONSE, task);
@@ -368,7 +472,7 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case ELECTRON_GET_APP_CONFIG:
-        parseAppConfig()
+        getAppConfig()
           .then(config => {
             task.response = config;
             event.reply(ELECTRON_RESPONSE, task);
@@ -411,62 +515,63 @@ async function handleEvent(event: any, obj: string) {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// OBTENER EL ACTUAL USUARIO DE GIT
+// OBTENER EL ARCHIVO APP.CONFIG
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function getActualGitUser() {
-  return new Promise<string>(async (resolve, reject) => {
-    const serve_ = await getServer_();
+async function getAppConfig(): Promise<ConfigI> {
+  try {
+    const config: ConfigI = await Functions.getConfigFile();
 
-    if (serve_) {
-      runTerminalCommand(`git config --get user.name`)
-        .then(res => {
-          const username = res.STDOUT.trim() != '' ? res.STDOUT.trim() : 'vjose1903';
-          resolve(username);
-        })
-        .catch(error => {
-          console.error('getActualGitUser', error);
-          reject(error);
-        });
-    } else {
-      resolve('vjose1903');
-    }
-  });
-}
+    const [printer_list, pjson] = await Promise.all([pdf_printer.getPrinters(), Promise.resolve(require('./package.json'))]);
 
-async function getPrinters() {
-  const printerPromise = await win?.webContents.getPrintersAsync();
-  if (printerPromise) {
-    const printers_list = printerPromise.map(item => item.name);
-    return printers_list;
-  } else {
-    return [];
+    const enrichedConfig = {
+      ...config,
+      operative_system: isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows,
+      printersList: ['Ninguna', ...printer_list],
+      app_version: pjson.version,
+    };
+
+    return enrichedConfig;
+  } catch (error) {
+    // Determinar tipo de error para mostrar splash específico
+    const errorContext = determineErrorContext(error);
+
+    writeLogs(error, `getAppConfig ERROR - ${errorContext.type}`);
+    closeAppAndSplashError(errorContext.message, errorContext.splashType);
+
+    throw {
+      err: error,
+      msg: errorContext.message,
+      type: errorContext.type,
+    };
   }
 }
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// OBTENER EL ARCHIVO APP.CONFIG
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function parseAppConfig() {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const serve_ = await getServer_();
-      const pjson = require('./package.json');
-      const config: ConfigI = await Functions.getConfigFile();
+// Función auxiliar para determinar el contexto del error
+function determineErrorContext(error: any) {
+  // Si el error viene del docker handler
+  if (typeof error === 'string' && error.includes('db')) {
+    return {
+      type: 'database',
+      message: 'Error al iniciar la base de datos local',
+      splashType: `splash_${error}_error`,
+    };
+  }
 
-      const printer_list = await getPrinters();
-      config['operative_system'] = isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows;
-      config['is_development'] = serve_;
-      config['gitUser'] = await getActualGitUser();
-      config['machineId'] = machineId.value;
-      config['printersList'] = ['Ninguna', ...printer_list];
-      config['app_version'] = pjson.version;
+  // Si el error viene del archivo de configuración
+  if (error.message && error.message.includes('config')) {
+    return {
+      type: 'config',
+      message: 'Error buscando el archivo de configuración',
+      splashType: 'splash_config_error',
+    };
+  }
 
-      resolve(config);
-    } catch (error) {
-      console.error('parseAppConfig', error);
-      reject({ err: error, msg: 'Error buscando el archivo de configuracion' });
-    }
-  });
+  // Error genérico
+  return {
+    type: 'general',
+    message: 'Error general al cargar la configuración',
+    splashType: 'splash_error_desconocido',
+  };
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -491,73 +596,8 @@ export function runTerminalCommand(command) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 export async function writeLogs(msg, titulo?) {
-  if (win || splash) {
-    Console.log(msg, titulo);
-  }
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// FUNCION QUE SE ENCARGA DE ESCRIBIR EN EL ARCHIVO LOG
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-async function escribirLogs(file, titulo, texto) {
-  if (!fs.existsSync(file)) {
-    const stream = fs.createWriteStream(file);
-
-    await stream.once('open', () => {
-      stream.write(titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`);
-      stream.end();
-    });
-  } else {
-    await fs.appendFile(file, titulo ? `\n ${titulo}  ==╗ \n      ${texto} \n` : `\n${texto} \n`, () => {});
-  }
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// GENERAR EL PDF
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function generatePdfFileFormBase64(params: { fileName: string; base64: string; type: string; pageOrientation: string; printer: string }) {
-  return new Promise(async (resolve, reject) => {
-    const pdfFileName = await pathAdd(`/${params.fileName}`);
-
-    try {
-      fs.writeFile(pdfFileName, params.base64, { encoding: 'base64' }, () => {
-        imprimir({ fileName: params.fileName, tipo: params.type, pageOrientation: params.pageOrientation, printer: params.printer })
-          .then(res => resolve(res))
-          .catch(err => reject(err));
-      });
-    } catch (err) {
-      reject({ msg: 'Error generando reporte!!', status: false, error: err });
-    }
-  });
-}
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// IMPRIMIR EL PDF
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function imprimir(params: { fileName: string; tipo: string; pageOrientation: string; printer: string }) {
-  return new Promise(async (resolve, reject) => {
-    const file_path = await pathAdd(`/${params.fileName}`);
-
-    writeLogs(`VOY A IMPRIMIR EL ARCHIVO ---> ${file_path}`);
-    let comando = '';
-
-    if (isMacOs()) {
-      // let pageSize = `${params.width}x${params.height}in`;
-      // options.push(`-o PageSize=${pageSize}`);
-      comando = `lp -o ${params.pageOrientation} -o ColorModel=RGB -o fit-to-page -d "${params.printer}" "${file_path}"`;
-    } else {
-      const gsprint_path = await pathAdd(`/print/gsprint.exe`);
-      const ghostscript_path = await pathAdd(`/print/gswin64c.exe`);
-
-      comando = `${gsprint_path} -${params.pageOrientation} -colour -ghostscript "${ghostscript_path}" -dPDFFitPage -printer "${params.printer}" "${file_path}"`;
-    }
-
-    runTerminalCommand(comando)
-      .then(res => {
-        resolve({ msg: 'PDF impreso correctamente!!', STDOUT: res });
-      })
-      .catch(err => reject({ msg: 'Error imprimiento PDF!!', err }));
-  });
+  // Siempre escribir logs, no solo cuando win o splash existan
+  Console.log(msg, titulo);
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -568,24 +608,25 @@ export function parsePath(path_temp) {
   return isMacOs() ? path_temp : path_temp.split('/').join('\\');
 }
 
-export function pathAdd(addToPath = '', resource = true): Promise<string> {
+export function pathAdd(addToPath = '', inAsar = false): Promise<string> {
   return new Promise<string>(async resolve => {
-    let path_temp;
-    const pjson = require('./package.json');
     const serve_ = await getServer_();
 
+    let path_temp;
     if (serve_) {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(pjson.name.toLowerCase())) + pjson.name;
+      // En desarrollo, usar process.cwd()
+      path_temp = process.cwd();
     } else {
-      if (resource) {
-        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
+      if (inAsar) {
+        // En producción, usar app.getAppPath() que funciona correctamente con ASAR
+        path_temp = app.getAppPath();
       } else {
-        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+        // Para directorios fuera del ASAR, usar la ruta del ejecutable y agregar /resources
+        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.getName().toLowerCase())) + app.getName() + '/resources';
       }
     }
 
     path_temp = path_temp + addToPath;
-
     resolve(parsePath(path_temp));
   });
 }

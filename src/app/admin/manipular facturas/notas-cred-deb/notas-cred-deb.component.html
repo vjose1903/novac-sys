@@ -1,10 +1,12 @@
 @if (factura) {
   <div class="widget gap-2">
     <div class="widget-header">
-      <div class="titulo">
+      <div class="titulo-div">
         <h3 class="mb-0">
           {{ tituloPag }}<b>{{ factura.numero_comprobante }}</b>
         </h3>
+
+        <p-selectButton [options]="serieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
       </div>
     </div>
     <div class="widget-content">
@@ -33,7 +35,7 @@
                       <span class="d-block">
                         <b class="negrita">Direccion :</b>&nbsp; <span>{{ factura.cliente?.direccion }}</span>
                       </span>
-                      <span class="d-block negrita"> Total facturado : &nbsp; {{ formatoNumero(factura?.total_factura) }} </span>
+                      <span class="d-block negrita"> Total facturado: &nbsp; {{ formatoNumero(factura?.total_factura) }} </span>
                     </div>
                   </div>
                 </div>
@@ -72,7 +74,7 @@
                       Fecha : <strong> {{ fecha }}</strong>
                     </span>
                   </div>
-                  <div class="cuadroTotal">RD$ {{ formatoNumero(convertObj[tipoNota] * totalGlobal()) }}</div>
+                  <div class="cuadroTotal">RD$ {{ formatoNumero(convertObj[tipoNota] * totalGeneral()) }}</div>
                 </div>
               </div>
             </div>
@@ -112,7 +114,7 @@
               <div class="mostrarNumeros">
                 <div class="cuadroResumenTotal" style="max-height: 3rem">
                   <span class="label text-poppins position-absolute left-0"> <strong>TOTAL GENERAL:</strong> </span>
-                  <h5 class="w-100 text-end mb-0">{{ formatoNumero(convertObj[tipoNota] * totalGlobal()) }}</h5>
+                  <h5 class="w-100 text-end mb-0">{{ formatoNumero(convertObj[tipoNota] * totalGeneral()) }}</h5>
                 </div>
               </div>
             </div>

@@ -11,10 +11,11 @@ export const ELECTRON_GET_APP_CONFIG = 'electron-get-app-config';
 export const ELECTRON_SET_APP_CONFIG = 'electron-set-app-config';
 export const ELECTRON_PRINT_BASE64 = 'electron-print-base64';
 export const ELECTRON_EXPORT_CSV = 'electron-export-csv';
-export const ELECTRON_CHANGE_CONFIG_FILE = 'electron-change-config-file';
 export const ELECTRON_OPEN_WEB_BROWSER = 'electron-open-web-browser';
 export const ELECTRON_RELOAD = 'electron-reload';
 export const ELECTRON_EVENT_CHECK_UPDATE = 'check-update';
+export const ELECTRON_EVENT_DOWNLOAD_UPDATE = 'download-update';
+export const ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE = 'verificate-update-available';
 export const ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE = 'checking-for-update';
 export const ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE = 'update-available';
 export const ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS = 'download-progress';
@@ -22,6 +23,7 @@ export const ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED = 'update-downloaded';
 export const ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE = 'update-not-available';
 export const ELECTRON_EVENT_CONFIG_FILE_MODIFIED = 'config-file-modified';
 export const ELECTRON_EVENT_UPDATE_ERROR = 'error';
+export const ELECTRON_EVENT_UPDATE_BEFORE_QUIT_FOR_UPDATE = 'before-quit-for-update';
 
 export type MetodoHttp = 'get' | 'post' | 'put' | 'delete';
 export interface PeticionElectron {

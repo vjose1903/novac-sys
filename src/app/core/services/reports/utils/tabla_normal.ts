@@ -98,7 +98,8 @@ function getTotalizacion(configuration, data) {
       { bool: configuration?.mostrar_bruto, title: 'BRUTO RD$ ', value: fun_.roundNumberToDecimal(data?.bruto) },
       { bool: configuration?.mostrar_descuento, title: 'DESCUENTO RD$ ', value: fun_.roundNumberToDecimal(data?.descuento) },
       { bool: configuration?.mostrar_itbis, title: 'ITBIS RD$ ', value: fun_.roundNumberToDecimal(data?.itbis) },
-      { bool: configuration?.mostrar_bruto, title: 'DEVUELTO RD$ ', value: fun_.roundNumberToDecimal(data?.devuelto) },
+      { bool: configuration?.mostrar_devuelto, title: 'DEVUELTO RD$ ', value: fun_.roundNumberToDecimal(data?.devuelto) },
+      { bool: configuration?.mostrar_mora, title: 'MORA RD$ ', value: fun_.roundNumberToDecimal(data?.mora) },
       { bool: configuration?.mostrar_total, title: 'TOTAL RD$ ', value: fun_.roundNumberToDecimal(data?.total) },
     ];
 
@@ -140,7 +141,7 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
     const value = fun.getProperty(detalle, info.key);
 
     if (info.key === 'index') {
-      text_ = offset +j + 1;
+      text_ = offset + j + 1;
     } else {
       if (info.formato_fecha) {
         text_ = fun_.my_dateFormater(value);
@@ -153,7 +154,7 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
         text_ = value;
       }
 
-      if (info.uppercase) text_ = fun.Capitalice(text_);
+      if (info.uppercase) text_ = fun.capitalice(text_);
 
       if ('maxLength' in info && info.maxLength) {
         const raw_descripcion = text_.trim();

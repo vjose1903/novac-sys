@@ -1,30 +1,38 @@
 import { tipoDocFacturacion } from '@admin/facturacion/factura';
 import { Ss } from '@core/services/singleton.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { ClienteC } from '@registros/registro-clientes/cliente';
-import { ModalI } from '../../modal/modal-class';
 import { TablasService } from '../../new_tablas/tablas.service';
 import { SuplidorC } from '@registros/registro-suplidores/suplidores';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config, table_info } from '../../new_tablas/tabla-class';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ConfigI } from '@core/interface/config-interface';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 @Component({
   selector: 'app-buscar-cliente-suplidor',
   templateUrl: './buscar-cliente-suplidor.component.html',
   styleUrls: ['./buscar-cliente-suplidor.component.scss'],
   standalone: false,
 })
-export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit, ModalI {
+export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit, IDynamicModal {
   constructor(private tServ: TablasService) {
     super();
   }
 
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
-  dataFiltro;
-  modal: any = {};
-  inputs: any;
+  dataFiltro = signal<any[]>([]);
+
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
+  @Input() metodo: tipoDocFacturacion | null = null;
+  @Input() include_contado: boolean = false;
+  @Input() palabra_a_buscar: string = ' ';
+  @Input() after_select: any = null;
+
   paraFiltroClientes;
 
   table_config: table_config = {
@@ -41,14 +49,14 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   ventaInfo: table_info[] = [
     { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
     { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
 
   compraInfo: table_info[] = [
     { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
@@ -57,18 +65,18 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   btn_aceptar() {}
 
   ngOnInit(): void {
-    this.isSuplidor = this.inputs.metodo == tipoDocFacturacion.compra;
+    this.isSuplidor = this.metodo == tipoDocFacturacion.compra;
 
     this.table_config.info = this.isSuplidor ? this.compraInfo : this.ventaInfo;
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
 
-    this.configApp = Ss.configServ.getConfig({ isPromise: false });
+    this.configApp = Ss.configServ.config;
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
-    const copyData = fun.deepCloning(this.dataFiltro);
+    const copyData = fun.deepCloning(this.dataFiltro());
 
-    let palabra_a_buscar = where == 'init' ? this.inputs.palabra_a_buscar : params.search || ' ';
+    let palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
 
     const classDinamic = this.isSuplidor ? 'suplidorClass' : 'clienteClass';
     try {
@@ -76,12 +84,15 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
         .getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } })
         .then(res => {
           if (res.data && res.data.length > 0) {
-            const cliente_contado = { id: null, nombre: 'Cliente contado', direccion: this.configApp.direccion_empresa, telefono: null };
-            if (fun.objHas(this.inputs, 'include_contado') && this.inputs.include_contado && !this.isSuplidor) res.data.unshift(cliente_contado);
+            const contado_name = 'Cliente contado';
+            const cliente_contado = { id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null };
+            const busqueda_include_contado = contado_name.includes(palabra_a_buscar);
+
+            if (this.include_contado && !this.isSuplidor && busqueda_include_contado) res.data.unshift(cliente_contado);
 
             res.data.map(async entidad => {
-              entidad.nombre = entidad.nombre ? fun.Capitalice(entidad.nombre) : '----------';
-              entidad.apellido = entidad.apellido ? fun.Capitalice(entidad.apellido) : '----------';
+              entidad.nombre = entidad.nombre ? fun.capitalice(entidad.nombre) : '----------';
+              entidad.apellido = entidad.apellido ? fun.capitalice(entidad.apellido) : '----------';
               entidad.telefono = entidad.telefono ?? '----------';
 
               const doc = entidad?.documentos_de_identidad?.find(documento => documento.principal);
@@ -89,28 +100,21 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
               return entidad;
             });
 
-            this.dataFiltro = res.data;
+            this.dataFiltro.set(res.data);
           } else {
-            this.dataFiltro = copyData;
+            this.dataFiltro.set(copyData);
           }
 
           this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
         })
         .catch(error => {
-          if (where === 'init') this.closeThis({ tipo: 'data_no_found', modal_id: this.modal.component_id });
+          if (where === 'init') this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id });
         });
     } catch (error) {}
   }
 
   tableClickRow(event) {
-    const modal = this.closeThis();
-    modal.returnDataFromModal({ data: event.data, modal_id: this.modal.component_id });
-  }
-
-  closeThis(arg?) {
-    const modal = this.modal.instance.modalsConfig.find(config => config.id === this.modal.component_id);
-    modal.closeModal(this.modal.component_id);
-    if (arg) modal.returnDataFromModal(arg);
-    return modal;
+    if (this.after_select) event.data.after_select = this.after_select;
+    this.modalConfig.close(event.data);
   }
 }

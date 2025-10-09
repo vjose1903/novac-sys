@@ -1,3 +1,4 @@
+import { SpanishInflector } from './../typescript/spanish-inflector';
 const moment = require('../javascript/moment');
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
@@ -7,6 +8,7 @@ import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
 import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
+import { RetryOptions } from '../interface/retry-until';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun {
@@ -57,6 +59,26 @@ export class fun {
       count++;
       console.log(count);
     };
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: to_plural
+  // Descripcion : Esta funcion convierte una palabra a plural
+  // _________________________________________________________________________________________________
+  static to_plural(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.pluralize(normalWord);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: to_singular
+  // Descripcion : Esta funcion convierte una palabra a singular
+  // _________________________________________________________________________________________________
+  static to_singular(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.singularize(normalWord);
   }
 
   // __________________________________________________________________________________________________
@@ -155,7 +177,7 @@ export class fun {
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
-  static redondearNum(numero, decimales) {
+  static redondearNum(numero, decimales = 2) {
     const factor = Math.pow(10, decimales);
     const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor;
     return numberRounded.toFixed(decimales);
@@ -374,7 +396,7 @@ export class fun {
   // Nombre: Capitalice
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
-  static Capitalice(str) {
+  static capitalice(str) {
     if (!fun.hasValue(str)) return str;
 
     const upperCaseText = str
@@ -456,7 +478,7 @@ export class fun {
 
       if (event?.key === 'Enter' || event?.keyCode === 13) return resolve();
 
-      fun.timeout = setTimeout(resolve, waitingTime);
+      fun.timeout = fun.setTimeout(resolve, waitingTime);
     });
   }
 
@@ -471,7 +493,7 @@ export class fun {
     }
   }
 
-// __________________________________________________________________________________________________
+  // __________________________________________________________________________________________________
   /**
    * Nombre: isEmpty
    * Descripción: Esta función valida si una variable está vacía.
@@ -488,7 +510,7 @@ export class fun {
     if (Array.isArray(value)) return value.length === 0;
 
     if (value instanceof Date) return isNaN(value.getTime());
-    
+
     if (typeof value === 'object') return Object.keys(value).length === 0;
 
     return false;
@@ -551,16 +573,19 @@ export class fun {
   // __________________________________________________________________________________________________
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
-  // __________________________________________________________________________________________________
+  // _________________________________________________________________________________________________
   static enfocarInput(arg, element?) {
     element ??= document.getElementById(arg) as HTMLElement;
-    if (element) element.focus();
+
+    if (element) {
+      requestAnimationFrame(() => element.focus());
+    }
   }
 
   // __________________________________________________________________________________________________
   // Nombre: desEnfocarInput
   // Descripcion : Esta funcion desenfoca un elemento html
-  // __________________________________________________________________________________________________
+  // _________________________________________________________________________________________________
   static desEnfocarInput(inputId?: string) {
     const element = document.getElementById('input_fantasma');
     if (element) element.click();
@@ -604,7 +629,35 @@ export class fun {
   // __________________________________________________________________________________________________
   static enfocarAndSelectInput(arg) {
     fun.enfocarInput(arg);
-    setTimeout(() => this.selectContenido(arg), 10);
+    fun.setTimeout(() => {
+      this.selectContenido(arg);
+    }, 10);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setTimeOut
+  // Descripcion : Esta funcion ejecuta una funcion despues de un tiempo
+  // __________________________________________________________________________________________________
+  static setTimeout(callback: () => void, time: number) {
+    const timeout = setTimeout(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return timeout;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setInterval
+  // Descripcion : Esta funcion ejecuta una funcion en un intervalo de tiempo
+  // __________________________________________________________________________________________________
+  static setInterval(callback: () => void, time: number) {
+    const interval = setInterval(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return interval;
   }
 
   // __________________________________________________________________________________________________
@@ -623,6 +676,50 @@ export class fun {
   // __________________________________________________________________________________________________
   static getKeyByValue(object, value): any {
     return Object.keys(object).find(key => object[key] == value);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: retryUntil
+  // Descripcion : Esta funcion recibe una tarea y la repite hasta que las condiciones establecidas se cumplan
+  // _________________________________________________________________________________________________
+
+  static async retryUntil<T>(params: { task: () => Promise<T>; retryWhen: (response: T) => boolean; actionAfterRetry: (response: T) => void; actionIfNoSuccess: () => void; options?: RetryOptions }): Promise<void> {
+    const { task, retryWhen, actionAfterRetry, actionIfNoSuccess, options = {} } = params;
+    const { delayBetweenRetries = 500, retryMax = 20, logError = false } = options;
+
+    let retryCount = 0;
+
+    const executeTask = async (): Promise<void> => {
+      try {
+        const response = await task();
+        const shouldRetry = retryWhen(response);
+        const hasRetries = retryCount < retryMax;
+
+        if (shouldRetry && hasRetries) {
+          retryCount++;
+          await new Promise<void>(resolve => {
+            fun.setTimeout(resolve, delayBetweenRetries);
+          });
+          return executeTask();
+        }
+
+        if (shouldRetry && !hasRetries) {
+          if (logError) {
+            console.error(`Max number of retries (${retryMax}) reached`);
+          }
+          Ss.zone.run(() => actionIfNoSuccess());
+        } else {
+          Ss.zone.run(() => actionAfterRetry(response));
+        }
+      } catch (error) {
+        if (logError) {
+          console.error('Task execution failed:', error);
+        }
+        Ss.zone.run(() => actionIfNoSuccess());
+      }
+    };
+
+    Ss.zone.runOutsideAngular(() => executeTask());
   }
 
   // __________________________________________________________________________________________________
@@ -665,6 +762,32 @@ export class fun {
     return base;
   }
 
+  /**
+   * Nombre: encriptar
+   * Descripcion : Esta funcion encripta un string
+   * @param arg El string a encriptar
+   * @returns El string encriptado
+   */
+  static encriptar(arg: string): string {
+    return btoa(unescape(encodeURIComponent(arg)));
+  }
+
+  /**
+   * Nombre: desEncriptar
+   * Descripcion : Esta funcion desencripta un string
+   * @param arg El string a desencriptar
+   * @returns El string desencriptado
+   */
+  static desEncriptar(arg: string): { object: string; error?: boolean } {
+    try {
+      const decodedString = decodeURIComponent(escape(atob(arg)));
+      return { object: decodedString, error: false };
+    } catch (error) {
+      console.error('Error al desencriptar:', error);
+      return { object: '', error: true };
+    }
+  }
+
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
@@ -679,20 +802,29 @@ export class fun {
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
 
-        Ss.layServ.nextLogOut(undefined);
+        // Resetear el estado del guard y limpiar cache
+        const authGuard = fun.getAuthGuardInstance();
+        const currentUserService = fun.getCurrentUserServiceInstance();
+        console.log('1');
+
+        if (authGuard) authGuard.resetValidation();
+        if (currentUserService) currentUserService.clearValidationCache();
+
+        console.log('2');
+
+        Ss.layServ.nextLogOut({ bool: true });
         resolve(true);
       } catch (error) {
         resolve(false);
       }
     });
-
-    // this.router.navigateByUrl('/auth/login');
   }
 
   static decryptConfigPassword(str) {
-    const str_remplace = btoa(str);
-    const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
-    return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
+    const str_remplace = fun.encriptar(str);
+
+    const config: ConfigI = Ss.configServ.config;
+    return str_remplace == config.config_password.replace('VMj$pt30r=', '=');
   }
   // ----------------------------------------------------------------------------------------------------------
 
@@ -768,19 +900,35 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -973,5 +1121,25 @@ export class fun {
       }
     }
     return false;
+  }
+
+  // Métodos helper para obtener instancias de servicios
+  private static authGuardInstance: any = null;
+  private static currentUserServiceInstance: any = null;
+
+  static setAuthGuardInstance(instance: any) {
+    fun.authGuardInstance = instance;
+  }
+
+  static getAuthGuardInstance() {
+    return fun.authGuardInstance;
+  }
+
+  static setCurrentUserServiceInstance(instance: any) {
+    fun.currentUserServiceInstance = instance;
+  }
+
+  static getCurrentUserServiceInstance() {
+    return fun.currentUserServiceInstance;
   }
 }

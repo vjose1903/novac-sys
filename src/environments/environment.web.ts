@@ -1,4 +1,4 @@
-export const AppConfig = {
+export const Environment = {
   production: false,
   environment: 'WEB',
   ac5dcc09005786dc8b0ee3476b24d5c74967b5965f9e9a7f9ac4c2f8fea5ecc4: 'http://localhost:9093',

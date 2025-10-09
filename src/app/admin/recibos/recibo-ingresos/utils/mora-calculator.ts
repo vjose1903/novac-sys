@@ -75,7 +75,6 @@ export class MoraCalculator {
     const fechaActual = new Date();
 
     const diasRetraso = DateUtils.diffDays(fechaActual, fechaVencimiento);
-
     return diasRetraso;
   }
 

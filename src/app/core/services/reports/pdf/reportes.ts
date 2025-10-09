@@ -33,6 +33,7 @@ const configuraciones = {
   ventas_rango_agrupado_itbis: config_ventas.agrupado_itbis,
 
   cxc: config_cxc.sin_mora,
+  cxc_historico: config_cxc.historico,
   cxc_mora: config_cxc.con_mora,
   cxc_preventa: config_cxc_preventa,
   ventas_cliente: config_ventas_cliente,
@@ -46,6 +47,8 @@ const configuraciones = {
   recibos: config_recibos.detallado,
   recibos_agrupado: config_recibos.agrupado,
 
+  recibos_cliente: config_recibos.detallado_cliente,
+
   ventas_productos: config_ventas_prod,
   cuentas_con_pagos: config_cuentas_pagos,
   suplidor_prod: config_suplidor_prod,
@@ -58,10 +61,15 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
+  console.log('%c data ', 'color: red', data);
+  console.log('%c tipo_reporte ', 'color: orange', data.tipo_reporte);
+  console.log('%c configuraciones ', 'color: lime', configuraciones);
+  
   const configuration = configuraciones[data.tipo_reporte];
+  console.log('%c configuration ', 'color: magenta', configuration);
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
-  const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+  const configApp: ConfigI = Ss.configServ.config;
 
   const margin_top = data.mostrar_sub_titulo ? 125 : 111.5;
   const dd = {

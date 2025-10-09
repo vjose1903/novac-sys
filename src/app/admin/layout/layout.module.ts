@@ -15,12 +15,12 @@ import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
 import { TabsModule } from 'primeng/tabs';
 import { ReportesComponent } from '../reportes/reportes.component';
-import { PdfViewerModule } from '@components/pdf-viewer/pdf-viewer.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
-
+import { MenuItemComponent } from './components/menu-item/menu-item.component';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 @NgModule({
   declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
   imports: [
@@ -31,11 +31,12 @@ import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.m
     TabsModule,
     FormsModule,
     DirectivesModule,
-    PdfViewerModule,
     ReactiveFormsModule,
     NgxPermissionsModule.forChild(),
     BtnIconModule,
     NgxExtendedPdfViewerModule,
+    MenuItemComponent,
+    FormErrorMsgComponent,
   ],
 })
 export class LayoutModule {}

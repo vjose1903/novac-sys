@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { AccionesC, PermisosC, RolesC } from './roles';
@@ -7,13 +7,14 @@ import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
-import { ModalClass } from '@components/modal/modal-class';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
-    selector: 'app-roles',
-    templateUrl: './roles.component.html',
-    styleUrls: ['./roles.component.scss'],
-    standalone: false
+  selector: 'app-roles',
+  templateUrl: './roles.component.html',
+  styleUrls: ['./roles.component.scss'],
+  standalone: false,
 })
 export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   titulo;
@@ -33,7 +34,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_roles',
-    padre_functions: { data_request: (params) => this.getRoles(params) },
+    padre_functions: { data_request: params => this.getRoles(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.role.update }, borrar: { show: true, permiso: this.permissions.role.destroy } },
@@ -66,7 +67,11 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   TablasComponent;
   palabra_buscar: any;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+
+  constructor() {
     super();
   }
 
@@ -96,8 +101,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     this.listaRoles.length = 0;
     this.rolesClass
       .getAll(extra)
-      .then((res) => {
-        res['data'].map((role) => {
+      .then(res => {
+        res['data'].map(role => {
           role.estado_ = role.estado ? 'SI' : 'NO';
           role.estado_tag = role.estado ? 'success' : 'danger';
 
@@ -108,7 +113,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
         this.listaRoles = res['data'];
         this.tablaRolesComponent.changeTableConfig([{ total_count: res.total_registros }]);
       })
-      .catch((err) => {
+      .catch(err => {
         if (err.error.total_registros == 0) {
           this.listaRoles = [];
           this.tablaRolesComponent.changeTableConfig([{ total_count: 0 }]);
@@ -120,12 +125,12 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     if (params.clean) {
       const all_acciones = _.flattenDeep(_.map(this.listaPermisos, 'acciones'));
       const all_acciones_selected = _.filter(all_acciones, { selected: true });
-      all_acciones_selected.map((accion) => (accion.selected = false));
+      all_acciones_selected.map(accion => (accion.selected = false));
     } else {
-      this.roleSelected.permisos_acciones.forEach((permiso_accion) => {
-        const permiso_en_turno = _.find(this.listaPermisos, (item) => item.id == permiso_accion.permiso.id);
+      this.roleSelected.permisos_acciones.forEach(permiso_accion => {
+        const permiso_en_turno = _.find(this.listaPermisos, item => item.id == permiso_accion.permiso.id);
 
-        const accion_en_turno = _.find(permiso_en_turno.acciones, (item) => item.id == permiso_accion.accion.id);
+        const accion_en_turno = _.find(permiso_en_turno.acciones, item => item.id == permiso_accion.accion.id);
         accion_en_turno.selected = true;
       });
     }
@@ -137,9 +142,9 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   getPermisos() {
     this.listaPermisos.length = 0;
 
-    this.permisosClass.getAll({ parameters: { permisos_acciones: true } }).then((res) => {
-      this.listaPermisos = res.data.map((permiso) => {
-        permiso.acciones = permiso.permisos_acciones.map((permiso_accion) => {
+    this.permisosClass.getAll({ parameters: { permisos_acciones: true } }).then(res => {
+      this.listaPermisos = res.data.map(permiso => {
+        permiso.acciones = permiso.permisos_acciones.map(permiso_accion => {
           const accion = {
             nombre: this.my_capitalize(permiso_accion.accion.nombre),
             selected: false,
@@ -157,13 +162,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
         return permiso;
       });
     });
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   createForm() {
@@ -187,8 +185,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   iconCantSelected(permiso) {
-    const almenos_uno = permiso.acciones.some((item) => item.selected);
-    const todos = permiso.acciones.every((item) => item.selected);
+    const almenos_uno = permiso.acciones.some(item => item.selected);
+    const todos = permiso.acciones.every(item => item.selected);
 
     let res = almenos_uno ? { tooltip: 'Algunos seleccionados', icon: 'far fa-check-square' } : { tooltip: 'Ninguno seleccionado', icon: 'far fa-square' };
 
@@ -210,10 +208,10 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   selectOrDeselectAll(permiso) {
-    const some_true = permiso.acciones.some((accion) => accion.selected);
-    const all_true = permiso.acciones.every((accion) => accion.selected);
+    const some_true = permiso.acciones.some(accion => accion.selected);
+    const all_true = permiso.acciones.every(accion => accion.selected);
 
-    permiso.acciones.map((accion) => (accion.selected = some_true ? false : !all_true));
+    permiso.acciones.map(accion => (accion.selected = some_true ? false : !all_true));
   }
 
   saltar(input) {}
@@ -250,27 +248,23 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   eliminarReg(data) {
-    this.openNewModal({
+    const onYes = () => {
+      this.eliminarRole(data);
+    };
+
+    this.dynamicModalServ.confirmationModal({
       id: 'delete_role',
-      header: 'CONFIRMACION',
-      width: '30rem',
-      html: `<p> Seguro que desea eliminar el rol: <strong>${data.nombre}</strong> </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco w-9', function: (instance) => instance.closeModal(instance.id, 'aceptar'), label: 'No', disable: false },
-          { clase: 'btn btn-verde w-9', function: (instance) => this.eliminarRole(instance, data), label: 'Si', disable: false, },
-        ],
-      },
+      texto: `<p> Seguro que desea eliminar el rol: <strong>${data.nombre}</strong> </p>`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
     });
   }
 
-  eliminarRole(modalInstance, roleSelected) {
+  eliminarRole(roleSelected) {
     this.rolesClass.deleteOne(roleSelected.id).then(() => {
       const actualPagination = this.tServ.getPaginationById('lista_roles');
       actualPagination['searchText'] = this.palabra_buscar;
       this.getRoles(actualPagination);
-      modalInstance.closeModal(modalInstance.id, 'borrar');
     });
   }
 
@@ -282,7 +276,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
     formulario['permisos_acciones'] = permiso_acciones_selected;
 
-    this.rolesClass.createUpdateOne(formulario).then((res) => {
+    this.rolesClass.createUpdateOne(formulario).then(res => {
       this.isCreando = false;
       this.roleSelected = undefined;
       this.borrar();

@@ -1,7 +1,7 @@
 const moment = require('../javascript/moment');
-import { ModalClass } from '@components/modal/modal-class';
 import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
+import { TablaClass } from '@core/components/new_tablas/tabla-class';
 
 interface mixinInit {
   component?: String;
@@ -13,7 +13,7 @@ interface fechaFactura {
   FechaFacturaMostrar?: string;
 }
 
-export class MixinClass extends ModalClass {
+export class MixinClass extends TablaClass {
   constructor() {
     super();
   }
@@ -23,12 +23,10 @@ export class MixinClass extends ModalClass {
 
   _init_mixin(arg?: mixinInit) {
     this.arg_mixin = arg;
-
-    this._init_layout(arg);
   }
 
   _destroy_mixin(algo?) {
-    this._destroy_layout();
+    // Método vacío para compatibilidad
   }
 
   // =========================================================================================================
@@ -87,32 +85,5 @@ export class MixinClass extends ModalClass {
 
   logGreen(text: any, body?) {
     console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.deepCloning(body) : '');
-  }
-
-  eliminarRegistro(obj) {
-    const noFunction = (instance: any) => {
-      instance.closeModal('borrar', 'cancelar');
-    };
-    this.openNewModal({
-      id: 'borrar',
-      header: 'Confirmar',
-      width: '510px',
-      html: `<p> ${obj?.texto} </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco w-9', function: (instance) => noFunction(instance), label: 'No', disable: false },
-          {
-            clase: 'btn btn-verde w-9',
-            function: (instance) => {
-              obj.siFunction();
-              instance.closeModal('borrar', 'cancelar');
-            },
-            label: 'Si',
-            disable: false,
-          },
-        ],
-      },
-    });
   }
 }

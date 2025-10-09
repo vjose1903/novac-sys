@@ -115,11 +115,6 @@ body {
   position: absolute;
 }
 
-.switchDiv {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
 
 .scroll-container {
   display: flex;
@@ -280,6 +275,14 @@ body {
 .c-pointer {
   cursor: pointer !important;
 }
+
+.c-default {
+  cursor: default !important;
+}
+
+.no-selectable {
+  user-select: none;
+}
 // ========================================================
 // TEXT_COLOR
 // ========================================================
@@ -348,44 +351,6 @@ body {
   height: 2rem;
   box-shadow: none !important;
   width: 100% !important;
-}
-
-/* ====================================================== */
-/* BADGE */
-/* ====================================================== */
-.badge {
-  cursor: default !important;
-  font-size: 1rem;
-  padding: 0.5rem;
-  box-shadow: 1px 1px 1px black;
-  letter-spacing: 1px;
-
-  &.text-shadow {
-    text-shadow: 1px 1px 1px #000000cf;
-  }
-  &.bg-red {
-    background-color: #eb3a3a;
-  }
-
-  &.bgreen {
-    background-color: #1ade48;
-  }
-
-  &.bg-blue {
-    background-color: #1a44de;
-  }
-
-  &.bg-yellow {
-    background-color: #e9e61e;
-  }
-
-  &.bg-orange {
-    background-color: #ffa711;
-  }
-
-  &.disable {
-    filter: brightness(1.6) contrast(0.5);
-  }
 }
 
 .bg-secondary {

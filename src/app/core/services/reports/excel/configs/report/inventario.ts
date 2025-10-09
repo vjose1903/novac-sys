@@ -11,5 +11,6 @@ export const csvConfig: exportExcelConfigI = {
     { title: 'Articulo', key: 'nombre', uppercase: true },
     { title: 'Cantidad', key: 'cantidad_principal' },
     { title: 'Precio', key: 'precio_principal', bodyFormat: '#,##0.00' },
+    { title: 'Costo', key: 'costo_principal', bodyFormat: '#,##0.00' },
   ],
 };

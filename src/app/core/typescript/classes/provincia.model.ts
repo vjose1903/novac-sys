@@ -24,8 +24,8 @@ export class ProvinciaC extends CrudG<ProvinciaI> {
 
     return data.map(prov => ({
       ...prov,
-      nombre: fun.Capitalice(prov.nombre),
-      municipios: prov.municipios.map((muni)=> ({...muni, nombre: fun.Capitalice(muni.nombre)}))
+      nombre: fun.capitalice(prov.nombre),
+      municipios: prov.municipios.map((muni)=> ({...muni, nombre: fun.capitalice(muni.nombre)}))
     }));
   }
 }

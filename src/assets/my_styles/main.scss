@@ -1,6 +1,7 @@
 // Elements
 @use './elements/apple-switch.scss' as *;
 @use './elements/backgrounds.scss' as *;
+@use './elements/badge.scss' as *;
 @use './elements/border-radius.scss' as *;
 @use './elements/btns.scss' as *;
 @use './elements/flex.scss' as *;
@@ -9,7 +10,9 @@
 @use './elements/inputs.scss' as *;
 @use './elements/layout.scss' as *;
 @use './elements/modal.scss' as *;
+@use './elements/opacity.scss' as *;
 @use './elements/p-datepicker.scss' as *;
+@use './elements/p-drawer.scss' as *;
 @use './elements/p-inputMask.scss' as *;
 @use './elements/p-multiselect.scss' as *;
 @use './elements/p-paginator.scss' as *;
@@ -23,6 +26,7 @@
 @use './elements/size.scss' as *;
 @use './elements/tablas.scss' as *;
 @use './elements/text.scss' as *;
+@use './elements/toast.scss' as *;
 
 // Fonts
 @use './fonts/fonts.scss' as *;

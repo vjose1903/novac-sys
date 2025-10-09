@@ -1,6 +1,6 @@
 <form [formGroup]="form">
   <div class="form-group d-flex align-items-center mb-5">
-    <label class="control-label mb-0 mr-3">Modificar los articulos actuales: </label>
+    <label class="control-label mb-0 me-3">Modificar los articulos actuales: </label>
     <input class="apple-switch" type="checkbox" (change)="changeUpdateArticulos()" [checked]="update_articulos" />
   </div>
 
@@ -9,7 +9,9 @@
 
     <div class="input-group">
       <input type="number" id="porciento_ganancia" class="form-control input_cantidad" formControlName="porciento_ganancia" placeholder="Introduzca el monto" (focus)="htmlServ.selectValue($event)" autocomplete="off" aria-describedby="sufijo" />
-      <span class="input-group-text sufijo" id="sufijo">%</span>
+      <div class="input-group-append">
+        <span class="input-group-text sufijo" id="sufijo">%</span>
+      </div>
     </div>
 
     <span id="msgContainer_porciento_ganancia"></span>

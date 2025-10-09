@@ -193,6 +193,22 @@
           grid-area: tfoot;
           .pieTabla {
             padding: 0.3rem 0rem 0.3rem 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            .pagination-total {
+              white-space: nowrap;
+            }
+
+            .pagination-controls {
+              flex: 1;
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+            }
           }
         }
       }

@@ -1,18 +1,17 @@
-import { Component, OnInit, OnDestroy, inject, resource, computed, WritableSignal, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, resource, computed, signal } from '@angular/core';
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { customValidators } from '@core/typescript/custom-validators';
 import { ClienteC } from './cliente';
 import { EmpleadoC } from '../registro-empleados/empleado';
-import { ProvinciaC, ProvinciaI } from '../../../core/typescript/classes/provincia.model';
+import { ProvinciaC } from '../../../core/typescript/classes/provincia.model';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
-import { toSignal } from '@angular/core/rxjs-interop';
-
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
@@ -23,7 +22,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   boton = '';
   form: UntypedFormGroup;
 
-  listaClientes = [];
+  listaClientes: any;
   FORM: any;
   isCreando: boolean = false;
   doc_is_cedula = true;
@@ -62,8 +61,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   };
   tablaComponent;
 
-  htmlServ = inject(HtmlElementsService);
-
   provincia_id = signal<number | null>(null);
   documento_identidad = signal<string | null>(null);
 
@@ -83,10 +80,12 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     return municipios;
   });
 
-  constructor(
-    private fb: UntypedFormBuilder,
-    private tServ: TablasService
-  ) {
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+
+  constructor() {
     super();
   }
 
@@ -119,11 +118,12 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         provincia_id: [{ value: null, disabled: true }],
         municipio_id: [{ value: null, disabled: true }, Validators.required],
       });
-      this.form.valueChanges.subscribe(val => {
-        console.log(' ');
-        console.log('val ', val);
-        console.log('this.form ', this.form);
-      });
+
+      // this.form.valueChanges.subscribe(val => {
+      //   p(' ');
+      //   console.log('val ', val);
+      //   console.log('this.form ', this.form);
+      // });
 
       resolve();
     });
@@ -142,13 +142,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     });
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
-
   ngOnDestroy() {
     this._destroy_mixin();
   }
@@ -160,7 +153,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   marcarCheck(arg) {
@@ -175,6 +168,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'vendedor' } };
     this.empleadosClass.getAll(extra).then(res => {
       this.vendedores = res['data'];
+
       this.form.controls.vendedor_id.setValue(this.vendedores[0].id);
     });
   }
@@ -183,10 +177,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
-    this.listaClientes.length = 0;
+
     this.clienteClass.getAll(extra).then(res => {
       res['data'].map(cliente => {
-        const doc = _.find(cliente.documentos_de_identidad, { principal: true });
+        const doc = cliente.documentos_de_identidad.find(doc => doc.principal);
         cliente.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         return cliente;
       });
@@ -207,7 +201,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   editarItem(data) {
-    this.documentos_de_identidad = data.documentos_de_identidad;
+    this.documentos_de_identidad = data.documentos_de_identidad ?? [];
 
     this.form.patchValue(data);
 
@@ -222,16 +216,17 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('lista_clientes');
-        this.clienteClass.deleteOne(regisData.id).then(res => this.getClientes(actualPagination));
-      },
+    const onYes = () => {
+      const actualPagination = this.tServ.getPaginationById('lista_clientes');
+      this.clienteClass.deleteOne(regisData.id).then(res => this.getClientes(actualPagination));
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
   }
 
   patchDocumentos(documentos) {
@@ -241,9 +236,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         else this.form.controls.cedula.setValue(doc.documento);
       });
 
-      const doc_principal = _.find(documentos, doc => doc.principal);
+      const doc_principal = documentos.find(doc => doc.principal);
 
-      setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
+      fun.setTimeout(() => {
+        this.marcarCheck(doc_principal.descripcion);
+      }, 1);
     }
   }
 
@@ -273,18 +270,18 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
         await fun
           .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: tipo })
-          .then(res => {
+          .then(async (res: any) => {
             if (res['data'].length) {
-              const is_cliente = _.find(res['data'], item => item.persona_is === 'Cliente');
+              const is_cliente = res.data.find(item => item.persona_is.toLowerCase() == 'cliente');
               const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_cliente) && is_cliente?.persona?.estado) {
-                fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
+                fun.toastError(`${fun.capitalice(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
                 return;
               }
 
-              const persona = fun.hasValue(is_cliente) ? is_cliente?.persona : _.head(res['data']).persona;
+              const persona = fun.hasValue(is_cliente) ? is_cliente?.persona : res['data'][0].persona;
               persona.id = id_anterior;
 
               const documento_persona = persona.documentos_de_identidad.find(item => item.principal);
@@ -301,7 +298,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
               if (this.camposDisabled) enable_campos = true;
 
-              this.documentos_de_identidad = persona.documentos_de_identidad;
+              this.documentos_de_identidad = persona.documentos_de_identidad ?? [];
             } else {
               enable_campos = true;
             }
@@ -312,8 +309,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
             console.error('err ', err);
           });
       } else {
-        if (!this.editando && _.endsWith(documento, '_')) {
-          this.documentos_de_identidad = undefined;
+        if (!this.editando && documento.endsWith('_')) {
+          this.documentos_de_identidad = [];
           // this.camposDisabled = true;
           this.changeStateCampos(false);
         }
@@ -326,15 +323,21 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     if (campo != 'send') {
       if (campo == 'campoNombre') {
-        if (!_.endsWith(formulario[this.doc_principal], '_')) {
-          const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
+        if (!formulario[this.doc_principal].endsWith('_')) {
+          const docSinGuiones = formulario[this.doc_principal].split('-').join('');
           if (this.doc_principal == 'cedula') {
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
         }
+      } else if (campo == 'municipio_select') {
+        if (fun.hasValue(formulario.provincia_id)) fun.enfocarInput(campo);
       } else fun.enfocarInput(campo);
+    } else if (campo == 'campoDir') {
+      if (fun.hasValue(formulario.municipio_id)) fun.enfocarInput(campo);
     } else {
-      if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
+      if (!this.formIsInvalid()) {
+        fun.setTimeout(() => this.submit(), 250);
+      }
     }
   }
 
@@ -367,25 +370,24 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       { documento: formulario.rnc, descripcion: 'rnc' },
     ];
 
+    const documentos_registrados = this.documentos_de_identidad ?? [];
     documentos_identidad.map(element => {
-      const doc_backend = _.find(this.documentos_de_identidad, doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+      const doc_backend = documentos_registrados.find(doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
 
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;
       return element;
     });
 
-    formulario.documentos_de_identidad = _.filter(documentos_identidad, doc => fun.hasValue(doc.documento));
+    formulario.documentos_de_identidad = documentos_identidad.filter(doc => fun.hasValue(doc.documento));
 
     if (!this.form.controls[this.doc_principal].value) {
       fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
-
-      // paso todas las validaciones
     } else {
+      // paso todas las validaciones
       formulario.documentos_de_identidad = documentos_identidad;
 
       if (this.PhotoData !== undefined) {
-        formulario.imagen_attributes = null;
         formulario.imagen_attributes = this.PhotoData;
       }
 
@@ -406,7 +408,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   nuevoRegistro() {
     this.isCreando = true;
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.marcarCheck('cedula');
       fun.enfocarInput('cedula');
     }, 200);
@@ -419,7 +421,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
     this.doc_is_cedula = true;
-    this.documentos_de_identidad = undefined;
+    this.documentos_de_identidad = [];
     this.boton = 'Guardar';
     this.editando = false;
     this.changeStateCampos(false);
@@ -431,7 +433,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     this.form.patchValue(default_values);
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       fun.enfocarInput('cedula');
       this.marcarCheck('cedula');
     }, 2);

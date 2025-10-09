@@ -48,7 +48,23 @@ export default class LogProcessor {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   private formatMessage(msg: string | object | number): string {
     if (typeof msg === 'object') {
-      return JSON.stringify(msg, null, '\t');
+      // Manejar objetos Error específicamente
+      if (msg instanceof Error) {
+        return JSON.stringify({ name: msg?.name, message: msg?.message, stack: msg?.stack }, null, '\t');
+      }
+
+      // Para otros objetos, intentar JSON.stringify primero
+      try {
+        const jsonString = JSON.stringify(msg, null, '\t');
+        // Si JSON.stringify devuelve '{}' o '[]' vacío, usar toString()
+        if (jsonString === '{}' || jsonString === '[]') {
+          return msg.toString();
+        }
+        return jsonString;
+      } catch (stringifyError) {
+        // Si JSON.stringify falla, usar toString()
+        return msg.toString();
+      }
     }
     return msg.toString();
   }

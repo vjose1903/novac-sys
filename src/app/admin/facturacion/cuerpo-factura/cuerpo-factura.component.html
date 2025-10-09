@@ -1,4 +1,4 @@
-@if (isInitialized) {
+@if (isInitialized && form && factServ.filasDetalle?.length > 0) {
   <div class="cuerpo-fact">
     <table class="table m-auto titulos-fact">
       <thead>
@@ -6,11 +6,11 @@
           <th class="column-codigo">Código</th>
           <th class="column-cantidad">Cantidad</th>
           <th class="column-unidad text-center">Unidad</th>
-          <th class="column-descripcion" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripcion</th>
+          <th class="column-descripcion" [ngStyle]="{ width: configApp.calcular_itbis ? '30%' : '40%' }">Descripción</th>
           <th class="column-descuento">Descuento</th>
-          <th class="column-precio">{{ fun.Capitalice(precioCostoKey) }}</th>
+          <th class="column-precio">{{ precioCostoKey | titlecase }}</th>
           @if (configApp.calcular_itbis) {
-            <th class="column-itbis">ITBIS</th>
+            <th class="column-itbis">Itbis</th>
           }
           <th class="column-total">Total</th>
         </tr>
@@ -32,7 +32,7 @@
     </table>
     <div class="contenido-fact" #cuadro>
       <form [formGroup]="form" action="">
-        @for (item_cuerpo of ARRAY_ROWFACTURAS?.controls; track item_cuerpo; let index_cuerpo = $index) {
+        @for (item_cuerpo of factServ.filasDetalle.controls; track item_cuerpo; let index_cuerpo = $index) {
           <div formArrayName="rowFactura">
             <ng-container [formGroupName]="index_cuerpo">
               <p-popover #dropRowMenu appendTo="body">
@@ -40,15 +40,15 @@
                   @if (item_cuerpo.controls.is_bad_price.value) {
                     <li role="menuitem" (click)="getActualPrice(index_cuerpo, $event)" class="hoverlable">
                       <a class="" id="dropdown-item">
-                        <i class="fa-solid fa-triangle-exclamation text-gris-oscuro mr-1"></i>
-                        Obtener {{ factServ.isCompra ? 'costo' : 'precio' }} actual
+                        <i class="fa-solid fa-triangle-exclamation text-gris-oscuro me-1"></i>
+                        Obtener {{ factServ.isCompra() ? 'costo' : 'precio' }} actual
                       </a>
                     </li>
                   }
                   @if (hasArticulosDevueltos(index_cuerpo) || item_cuerpo.controls.is_devuelto.value) {
                     <li role="menuitem" (click)="retornarArticulosDevueltos(index_cuerpo, 'defectuoso', $event)" class="hoverlable">
                       <a class="" id="dropdown-item">
-                        <i class="fa-solid fa-repeat text-gris-oscuro mr-1"></i>
+                        <i class="fa-solid fa-repeat text-gris-oscuro me-1"></i>
                         Retornar articulos devueltos
                       </a>
                     </li>
@@ -56,7 +56,7 @@
                   @if (!item_cuerpo.controls.is_devuelto.value) {
                     <li role="menuitem" (click)="modalRemover(index_cuerpo, $event)" class="hoverlable danger">
                       <a class="" id="dropdown-item">
-                        <i class="far fa-trash-alt mr-1"></i>
+                        <i class="far fa-trash-alt me-1"></i>
                         Quitar Producto
                       </a>
                     </li>
@@ -123,7 +123,7 @@
                             id="unidad-{{ index_cuerpo }}"
                             (focus)="setInputDrop(index_cuerpo); verificarSecuencia(index_cuerpo)"
                             (blur)="calcularMontosRow(index_cuerpo)"
-                            [pTooltip]="factServ.filasDetalle[index_cuerpo].value.unidad ?? ''"
+                            [pTooltip]="factServ.filasDetalle.at(index_cuerpo).value.unidad ?? ''"
                             tooltipPosition="top"
                             formControlName="unidad"
                             tabindex="-1" />
@@ -137,15 +137,14 @@
                             appendTo="body"
                             optionLabel="value"
                             optionValue="value"
-                            [options]="factServ.filasDetalle[index_cuerpo].value.unidades"
+                            [options]="factServ.filasDetalle.at(index_cuerpo).value.unidades"
                             placeholder="medida"
                             [filter]="false"
                             [virtualScroll]="true"
                             [virtualScrollItemSize]="30"
-                            [autoDisplayFirst]="false"
                             (onChange)="selectMedidaChange($event, index_cuerpo)"
                             (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-                            (keyup.enter)="selectMedida(index_cuerpo)"
+                            (keyup.enter)="selectMedida(index_cuerpo); pDropdownMedida.hide()"
                             (onFocus)="showDropdownMedida($event, pDropdownMedida)"
                             (onBlur)="hideDropdownMedida()">
                           </p-select>
@@ -184,7 +183,7 @@
                             type="text"
                             (blur)="handleInputEvent('blur', precioCostoKey, index_cuerpo); calcularMontosRow(index_cuerpo)"
                             (focus)="verificarSecuencia(index_cuerpo)"
-                            class="form-control entrada campoNumeros {{ factServ.isVenta ? 'inPRE' : '' }}"
+                            class="form-control entrada campoNumeros {{ factServ.isVenta() ? 'inPRE' : '' }}"
                             (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
                             id="{{ precioCostoKey }}-{{ index_cuerpo }}"
                             [formControlName]="precioCostoKey"

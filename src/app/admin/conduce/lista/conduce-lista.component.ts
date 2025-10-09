@@ -1,19 +1,21 @@
-import { ModalClass } from '@components/modal/modal-class';
 import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { LoaderService } from './../../../loader/loader.service';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
 import { Ss } from '@core/services/singleton.service';
-import { ModalService } from '@components/modal/modal.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { ConfigI } from '@core/interface/config-interface';
 import { Permisos } from '@core/typescript/permisos';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Router } from '@angular/router';
 import { ConduceC } from '../coduce';
+
 import * as _ from 'lodash';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-conduce-lista',
@@ -56,30 +58,23 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   conduceClass = new ConduceC();
 
-  constructor(
-    public mServ: ModalService,
-    private router: Router,
-    private tServ: TablasService,
-    public loadServ: LoaderService
-  ) {
+  private dynamicModalServ = inject(DynamicModalService);
+  private router = inject(Router);
+  private tServ = inject(TablasService);
+  public loadServ = inject(LoaderService);
+
+  constructor() {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'lista_conduce', is_routing: true });
-    this.configApp = Ss.configServ.getConfig({ isPromise: false }) as ConfigI;
+    this.configApp = Ss.configServ.config;
     this.necesarioStart();
   }
 
   async necesarioStart() {
     await this.getConduces(this.tServ.obj_paginate.default);
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   ngOnDestroy() {
@@ -152,13 +147,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
           break;
 
         case 'anular':
-          const texto_modal = `Seguro de que desea anular el conduce <b class="negrita"> #${conduce_selected.numero_conduce} </b>`;
-          const siFunction = instance => {
-            this.anularRecibo(conduce_selected.id);
-            instance.closeModal(instance.id, 'anular_conduce');
-          };
-
-          this.confirmationModal({ id: 'anular_conduce', header: 'Confirmar', texto: texto_modal, siFunction: siFunction });
+          this.confirmationAnularModal(conduce_selected);
           break;
 
         default:
@@ -173,62 +162,50 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
     PdfService.generatePdf({ oPdf: obj, imprimir: false })
       .then(async res => {
+        this.loadServ.isLoading.next(false);
+
         const fileName = res.file;
         const base64 = res.base64;
         const pageOrientation = res.pageOrientation;
 
-        const obj_pdf = { base64: res.base64, titulo: 'Revisión de conduce de mercancías', reimprimir: true, fileName: _.first(res.file.split('.')) };
+        const obj_pdf = { base64: res.base64, reimprimir: true, fileName: fileName.split('.')[0] };
 
-        this.loadServ.isLoading.next(false);
+        const reciboModalConf = new DynamicModalClass();
+        reciboModalConf.id = 'revision_conduce';
+        reciboModalConf.inputs = obj_pdf;
+        reciboModalConf.header = 'Revisión de conduce de mercancías';
+        reciboModalConf.width = '57rem';
+        reciboModalConf.height = '40rem';
+        reciboModalConf.component = PdfViewerComponent;
+        reciboModalConf.closableEsc = true;
 
-        this.openNewModal({
-          component: PdfViewerComponent,
-          inputs: obj_pdf,
-          id: 'revision_conduce',
-          header: obj_pdf.titulo,
-          width: '900px',
-          height: '40rem',
-          botones: {
-            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [
-              { clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancel'), label: 'Cerrar', disable: false },
-              {
-                clase: 'btn btn-verde',
-                function: instance => {
-                  this.imprimir_base64(fileName, base64, pageOrientation);
-                  instance.closeModal(instance.id, 'cancel');
-                },
-                label: 'Imprimir',
-                disable: false,
-              },
-            ],
+        reciboModalConf.botones = [
+          { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false },
+          {
+            clase: 'btn btn-verde',
+            function: instance => {
+              this.imprimir_base64(fileName, base64, pageOrientation);
+              instance.close();
+            },
+            label: 'Imprimir',
+            disable: false,
           },
-        });
+        ];
+
+        reciboModalConf.show();
       })
-      .catch((err) => {
+      .catch(err => {
         fun.toastError(err.msg, 'ERROR');
         this.loadServ.isLoading.next(false);
       });
   }
 
-  confirmationModal(obj: { id: string; texto: string; header: string; siFunction: Function; width?: string }) {
-    this.openNewModal({
-      id: obj.id,
-      header: obj.header,
-      width: obj.width || '30rem',
-      html: `<p> ${obj.texto} </p>`,
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco w-9', function: instance => instance.closeModal(instance.id, obj.id), label: 'No', disable: false },
-          {
-            clase: 'btn btn-verde w-9',
-            function: instance => obj.siFunction(instance),
-            label: 'Si',
-            disable: false,
-          },
-        ],
-      },
+  confirmationAnularModal(conduce: any) {
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `Seguro de que desea anular el conduce <strong> #${conduce.numero_conduce} </strong>`,
+      btnKind: confirmationButtons.siNo,
+      onYes: () => this.anularRecibo(conduce.id),
     });
   }
 
@@ -237,8 +214,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
     try {
       PdfService.imprimirBase64(obj)
         .then(async res => {
-          if (res['status'] === 'si') fun.toastSuccess('Conduce de mercancía reimpreso !!', 'CORRECTO');
-          else fun.toastError(res['msg'], 'ERROR');
+          fun.toastSuccess('Conduce de mercancía reimpreso !!', 'CORRECTO');
         })
         .catch(err => {
           console.error(err);

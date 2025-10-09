@@ -1,12 +1,12 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, Input, Output, EventEmitter, OnChanges, OnDestroy, NgZone, HostListener, inject } from '@angular/core';
 
-import * as _ from 'lodash';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { TablasService } from './tablas.service';
 import { fun } from '@core/services/functions.service';
-import { btnTableI, medidas, table_config, table_info } from './tabla-class';
+import { btnTableI, table_config, table_info, tableCellType } from './tabla-class';
 import { teclasCode } from '@core/typescript/constantes';
+import { ResizeEvent } from '@core/directive/element-resized.directive';
 
 @Component({
   selector: 'dinamic-table',
@@ -35,8 +35,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   seleccionado_id: any;
   altoTabla;
   altoTbody;
+  tableCellType = tableCellType;
 
-  @Input() TablasComponent;
+  @Input() TablasComponent: any = undefined;
   @Input() emptyMessage;
   @Output() TablasComponentChange = new EventEmitter<any>();
 
@@ -44,7 +45,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   @Input() print_log = false;
   @Input() seleccionado: any;
-  @Input() data = [];
+  @Input() data: any;
   @Input() post_id: any = '';
   @Input() config: table_config = { padre_functions: null };
 
@@ -57,18 +58,20 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   fun = fun;
 
-  tablaInterval;
   realIdTabla;
 
+  dynamicTooltipEntities = {
+    cantidades: { key: 'cantidades', sub_key: null, pluralize: true, order: 'cantidad-medida' },
+    precio: { key: 'costos', sub_key: 'precio', pluralize: false, order: 'medida-cantidad' },
+    costo: { key: 'costos', sub_key: 'costo', pluralize: false, order: 'medida-cantidad' },
+  };
+
   htmlServ = inject(HtmlElementsService);
-  constructor(
-    public tServ: TablasService,
-    private zone: NgZone,
-    public cdRef: ChangeDetectorRef
-  ) {
-    cdRef.detach();
-    this.tablaInterval = setInterval(() => this.cdRef.detectChanges(), 500);
-  }
+  tServ = inject(TablasService);
+  zone = inject(NgZone);
+  cdRef = inject(ChangeDetectorRef);
+
+  constructor() {}
 
   formatoNumero(num) {
     let numformat = '0.00';
@@ -81,15 +84,19 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     new fun().getWindowSize.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
-        this.setCantPagView(res.innerWidth, 'width_page');
+        requestAnimationFrame(() => {
+          this.setCantPagView(res.innerWidth, 'width_page');
+        });
       }
     });
 
-    this.TablasComponent = this;
-    this.TablasComponentChange.emit(this.TablasComponent);
+    this.updateTablasComponent();
 
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
-    setTimeout(() => (this.ready = true), 250);
+
+    fun.setTimeout(() => {
+      this.ready = true;
+    }, 250);
   }
 
   ngAfterViewInit() {
@@ -103,51 +110,54 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.tServ.deletePaginationById(this.realIdTabla);
     this.tServ.resetRowEditing();
-    clearInterval(this.tablaInterval);
   }
 
   handleConfig() {
-    if (!this.config.padding) this.config.padding = '0rem';
-    if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
-    if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
-    if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
-    if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
-    if (!this.config.filterTargets) this.config.filterTargets = _.map(this.config.info, info => _.values(_.pick(info, ['key']))[0]);
+    fun.setTimeout(() => {
+      if (!this.config.padding) this.config.padding = '0rem';
+      if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
+      if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
+      if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
+      if (!this.config.filterTargets) this.config.filterTargets = this.config.info.map(info => Object.values(fun.pick(info, ['key']))[0]);
 
-    if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
-    }
+      if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
+        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
+      }
 
-    this.verificateBottons(this.config);
+      this.verifyButtons(this.config);
 
-    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
+      this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
 
+      this.config.info.map(item => {
+        if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
+      });
+    }, 0);
+  }
+
+  focusSearchInput() {
     if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
-      setTimeout(() => {
+      fun.setTimeout(() => {
         fun.enfocarInput(`search-${this.realIdTabla}`);
       }, 100);
     }
-
-    this.config.info.map(item => {
-      if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
-    });
   }
 
-  verificateBottons(config: table_config) {
-    const verificateId = (boton: btnTableI) => (boton.btn_id ??= `${fun.generateKey()}-${boton.icon}`);
+  verifyButtons(config: table_config) {
+    const verifyId = (btn: btnTableI) => (btn.btn_id ??= `${fun.generateKey()}-${btn.icon}`);
 
     if (config.botones) {
       for (const key in config.botones) {
         const btnObj = config.botones[key];
 
         if (Array.isArray(btnObj)) {
-          btnObj.forEach(btn => verificateId(btn));
+          btnObj.forEach(btn => verifyId(btn));
         } else {
-          verificateId(btnObj);
+          verifyId(btnObj);
         }
       }
     }
@@ -169,7 +179,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   getValueForm(column: table_info, data) {
     const value = fun.getProperty(data, column.key);
 
-    const evaluar_value = item => (fun.hasValue(column.capitalice) ? fun.Capitalice(item) : item);
+    const evaluar_value = item => (fun.hasValue(column.capitalice) ? fun.capitalice(item) : item);
     switch (column.tipo) {
       case 'textList':
         return value.reduce((acumulado, item) => {
@@ -182,8 +192,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         return this.formatoNumero(value);
 
       case 'date':
-        const fecha = fun.date_formater({ date: value, dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
-        return fecha;
+        return fun.date_formater({ date: value, dateFormat: fun.hasValue(column.dateFormat) ? column.dateFormat : 'DD/MM/YYYY', con_hora: column.con_hora });
 
       default:
         return evaluar_value(value);
@@ -218,7 +227,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   filter(event) {
     if ([teclasCode._abajo, teclasCode._arriba, teclasCode._izquierda, teclasCode._derecha, teclasCode._enter].includes(event.keyCode)) return;
 
-    const search = event.target.value;    
+    const search = event.target.value;
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
@@ -261,13 +270,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     if (paginator) {
       const paginator_pages = document.getElementsByClassName('p-paginator-pages');
-      paginatorPage = _.find(_.head(paginator_pages).children, { outerText: `${number || 1}` });
+      const children = Array.from(paginator_pages[0]?.children || []);
+      paginatorPage = children.find(child => (child as HTMLElement).outerText === `${number || 1}`);
     }
     return paginatorPage;
   }
 
   paginatorChange(event, id) {
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.zone.run(() => {
         const page = event.page + 1;
         const per_page = event.rows;
@@ -281,7 +291,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
           this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
           if (actualPagination.is_local) {
-            this.localPagination(page, per_page, 'paginatorChange');
+            this.localPagination(page, per_page);
           } else {
             if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
               this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
@@ -292,8 +302,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }
 
         this.handle_table_events('paginatorChange', { page, per_page, data: this.data });
-
-        this.cdRef.detectChanges();
       });
     }, 150);
   }
@@ -303,11 +311,17 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   reloadPagination() {
-    this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'reloadPagination');
+    this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page);
   }
 
-  localPagination(page, per_page, desde = '') {
+  localPagination(page, per_page) {
     const copyData = fun.deepCloning(this.copyData);
+
+    // Validar que page y per_page sean válidos
+    if (!page || page <= 0 || !per_page || per_page <= 0) {
+      page = this.tServ.obj_paginate.default.page;
+      per_page = this.tServ.obj_paginate.default.per_page;
+    }
 
     const inicio = (page - 1) * per_page;
     const final = inicio + per_page;
@@ -353,8 +367,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
-  divPaginatorChangeWidth(event) {
-    this.setCantPagView(event.newRect.width, 'width_paginator');
+  divPaginatorChangeWidth(event: ResizeEvent) {
+    requestAnimationFrame(() => {
+      this.setCantPagView(event.width, 'width_paginator');
+    });
   }
 
   setCantPagView(width, tipo) {
@@ -366,26 +382,25 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (divPaginator) width = divPaginator.offsetWidth;
     }
 
-    if (width > 385) actual = 5;
-    else if (width <= 385 && width > 350) actual = 4;
-    else if (width <= 350 && width > 320) actual = 3;
-    else if (width <= 320 && width > 285) actual = 2;
-    else if (width <= 285) actual = 1;
+    if (width > 600) actual = 5;
+    else if (width <= 600 && width > 500) actual = 4;
+    else if (width <= 500 && width > 400) actual = 3;
+    else if (width <= 400 && width > 300) actual = 2;
+    else if (width <= 300) actual = 1;
 
     const actualPage = this.getPaginatorPageByNumber(actualPagination?.page);
 
-    setTimeout(() => {
-      this.zone.run(() => {
-        if (actualPage) {
-          actualPage.setAttribute('clickeado_por', 'maquina');
-          actualPage.click();
-          setTimeout(() => actualPage.removeAttribute('clickeado_por'), 2000);
-        }
+    requestAnimationFrame(() => {
+      if (actualPage) {
+        actualPage.setAttribute('clickeado_por', 'maquina');
+        actualPage.click();
+        fun.setTimeout(() => {
+          actualPage.removeAttribute('clickeado_por');
+        }, 2000);
+      }
 
-        this.cantPagesView = actual;
-        this.cdRef.detectChanges();
-      });
-    }, 100);
+      this.cantPagesView = actual;
+    });
   }
 
   getColor(myColor) {
@@ -472,7 +487,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
 
     const obj = { column, data, index: index_body, id_tabla: this.realIdTabla };
-    this.handle_table_events('inputBlur', obj);
+    this.handle_table_events(type == 'blur' ? 'inputBlur' : 'inputFocus', obj);
   }
 
   changeValorInput(event, column, key, index, value, data) {
@@ -491,13 +506,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   updateDataCopy(data) {
+    if (!data) return;
+
     this.copyData = fun.deepCloning(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.changeTableConfig([{ total_count: data.length }]);
-      this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page, 'updateDataCopy');
+      this.localPagination(this.config.obj_paginate.page, this.config.obj_paginate.per_page);
     }
-    this.cdRef.detectChanges();
   }
 
   ngOnChanges(change) {
@@ -507,49 +523,74 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       // ================================================
       // CUSTOM STYLES
       // ================================================
-      setTimeout(() => this.changeStylesTitles(), 10);
+      fun.setTimeout(() => {
+        this.changeStylesTitles();
+      }, 0);
+
       // ================================================
 
+      this.updateTablasComponent();
+    }
+  }
+
+  updateTablasComponent() {
+    requestAnimationFrame(() => {
       this.TablasComponent = this;
       this.TablasComponentChange.emit(this.TablasComponent);
-    }
-    this.cdRef.detectChanges();
+      this.cdRef.detectChanges();
+    });
   }
 
-  cantidadesTooltip(dato, column) {
-    if (dato.tipo_articulo.tipo == 'servicio') return null;
+  formatQuantityString(valor: number, medida: string, order: string): string {
+    const cantidad = fun.roundNumberToDecimal(valor);
 
-    const objeto = dato[column.key];
-    const keys = _.keys(objeto);
-    const values = _.values(objeto);
-
-    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
-    const fin1 = values[1] > 1 ? medidas[keys[1]] : keys[1];
-    const fin2 = values[2] > 1 ? medidas[keys[2]] : keys[2];
-
-    const padre = fun.roundNumberToDecimal(values[1]) + '  ' + fin1;
-    const hijo = fun.roundNumberToDecimal(values[2]) + '  ' + fin2;
-
-    let cantiTootip = '';
-
-    cantiTootip = `${padre}`;
-
-    if (keys.length > 1) {
-      keys.length == 2 ? (cantiTootip = `${padre}`) : (cantiTootip = `${padre} - ${hijo}`);
+    if (order === 'cantidad-medida') {
+      return `${cantidad} ${medida}`;
+    } else if (order === 'medida-cantidad') {
+      return `${medida} ${cantidad}`;
     }
 
-    return cantiTootip;
+    // Por defecto retorna cantidad-medida
+    return `${cantidad} ${medida}`;
   }
 
-  cantidadesLabel(dato, column) {
-    if (dato.tipo_articulo.tipo == 'servicio') return 'N/A';
+  quantityTooltip(dato, column) {
+    if (dato.tipo_articulo.tipo === 'servicio') return null;
 
-    const objeto = dato[column.key];
-    const keys = _.keys(objeto);
-    const values = _.values(objeto);
-    const fin = values[0] > 1 ? medidas[keys[0]] : keys[0];
+    const { key, pluralize, order, sub_key } = this.dynamicTooltipEntities[column.key];
+    const objeto = dato[key];
+    const keys = Object.keys(objeto);
 
-    return fun.roundNumberToDecimal(values[0]) + '  ' + fin;
+    if (keys.length <= 1) return '';
+
+    const processKey = (keyIndex: number) => {
+      const key = keys[keyIndex];
+      const valor = fun.hasValue(sub_key) ? objeto[key][sub_key] : objeto[key];
+      const medida = valor > 1 && pluralize ? fun.to_plural(key) : key;
+      return this.formatQuantityString(valor, medida, order);
+    };
+
+    const items = [];
+    if (keys.length >= 2) items.push(processKey(1)); // padre
+    if (keys.length >= 3) items.push(processKey(2)); // hijo
+
+    return items.length > 0 ? `<ul class="m-0 ps-3">${items.map(item => `<li>${item}</li>`).join('')}</ul>` : '';
+  }
+
+  quantityLabel(dato, column) {
+    if (dato.tipo_articulo.tipo === 'servicio') return 'N/A';
+
+    const { key, pluralize, order, sub_key } = this.dynamicTooltipEntities[column.key];
+    const objeto = dato[key];
+    const keys = Object.keys(objeto);
+
+    if (keys.length === 0) return 'N/A';
+
+    const firstKey = keys[0];
+    const valor = fun.hasValue(sub_key) ? objeto[firstKey][sub_key] : objeto[firstKey];
+    const medida = valor > 1 && pluralize ? fun.to_plural(firstKey) : firstKey;
+
+    return this.formatQuantityString(valor, medida, order);
   }
 
   disableInput(dato, column) {
@@ -661,7 +702,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       else this.actualRowIndex = this.actualRowIndex + 1;
     }
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
-    this.cdRef.detectChanges();
 
     fun.scrollTo({ id: this.row_id, behavior: 'smooth', block: 'center', inline: 'center' });
     fun.enfocarInput(this.row_id);
@@ -669,6 +709,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ENTER(arg) {
     const element = document.getElementById(arg) as any;
-    if (element) setTimeout(() => element.click(), 10);
+    if (element) requestAnimationFrame(() => element.click());
   }
 }

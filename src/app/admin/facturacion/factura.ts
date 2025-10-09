@@ -8,7 +8,6 @@ import { fun } from '@core/services/functions.service';
 const moment = require('../../core/javascript/moment');
 import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
-import { ModalClass } from '@components/modal/modal-class';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { serie, unidadAbrev } from '@core/typescript/constantes';
@@ -16,6 +15,8 @@ import { csvConfig as csvConfigVentas } from '@core/services/reports/excel/confi
 import { csvConfig as csvConfigMovimientosVehiculo } from '@core/services/reports/excel/configs/report/movimientos_vehiculo';
 import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { ArticuloI } from '@registros/articulos/articulo';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { IButtonDynamic, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 export enum comprobanteNormal {
   factura_de_credito_fiscal = '01',
@@ -88,6 +89,8 @@ export enum tipoDocFacturacion {
   cotizacion = 'cotizacion',
   nota_credito = 'nota_credito',
   nota_debito = 'nota_debito',
+  conduce = 'conduce',
+  recibo_ingreso = 'recibo_ingreso',
 }
 
 export enum tipoDocFacturacionLabel {
@@ -128,10 +131,13 @@ export class FacturaC extends CrudG<FacturasI> {
     },
   ];
 
-  static openModalReporteForm(params: { tipo: any; inputs: any; openNewModal; titulo?: any }) {
+  static openModalReporteForm(params: { tipo: any; titulo?: any }) {
     return new Promise<any>((resolve, reject) => {
-      if (params.tipo != 'movimientos_vehiculo') {
-        params.inputs['switchGroup'] = {
+      const { tipo, titulo } = params;
+      const inputs = { tipo_reporte: tipo };
+
+      if (tipo != 'movimientos_vehiculo') {
+        inputs['switchGroup'] = {
           title: 'Seleccione los metodos de pago deseados',
           array: [
             { label: 'Efectivo', value: true },
@@ -141,16 +147,17 @@ export class FacturaC extends CrudG<FacturasI> {
           ],
         };
       } else {
-        params.inputs['dinamyc_selections'] = FacturaC.inputsMovimientosViaje;
+        inputs['dynamic_selections'] = FacturaC.inputsMovimientosViaje;
       }
 
-      ReporteC.objReporte = { inputs: params.inputs, id: params.tipo, header: params.inputs.titulo, returnDataFromModal: returnDataFromModal };
+      ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 
-      params.openNewModal(ReporteC.objReporte);
-
-      function returnDataFromModal(arg) {
-        FacturaC.requestReporte({ reporte: arg, pdf: params });
+      function returnDataFromModal(arg: ICallbackModal) {
+        if (arg.type != modalCloseType.returnData) return;
+        FacturaC.requestReporte({ reporte: arg.data, pdf: params });
       }
+
+      new DynamicModalClass(ReporteC.objReporte).show();
     });
   }
 
@@ -175,7 +182,7 @@ export class FacturaC extends CrudG<FacturasI> {
     if (params.pdf.tipo != 'movimientos_vehiculo' && _.every(params.reporte.data.switchGroup.array, item => item.value == false)) {
       fun.toastError('Debe seleccionar almenos un metodo de pago.', 'ERROR');
     } else {
-      const configApp = Ss.configServ.getConfig({ isPromise: false });
+      const configApp = Ss.configServ.config;
 
       const requestParams = { afterPath: `custom/${params.pdf.tipo}`, parameters: {} };
       let formas_pago = '';
@@ -222,14 +229,14 @@ export class FacturaC extends CrudG<FacturasI> {
       if (params.pdf.tipo != 'movimientos_vehiculo') requestParams.parameters['formas_pago'] = formas_pago;
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
-        let objPdfView = { ...response, titulo: params.pdf.inputs.titulo, fileName: _.first(response.file.split('.')), openNewModal: params.pdf.openNewModal };
+        let objPdfView = { ...response, titulo: params.pdf.titulo, fileName: _.first(response.file.split('.')) };
 
         ReporteC.visualizarReporte(objPdfView);
       });
     }
 
     function transformRequestResponse(requestResponse) {
-      const configApp = Ss.configServ.getConfig({ isPromise: false });
+      const configApp = Ss.configServ.config;
 
       requestResponse.contenido_reporte = requestResponse.contenido_reporte.map(item => {
         const largo_nombre = configApp.calcular_itbis && params.pdf.tipo != 'movimientos_vehiculo' ? 58 : 48;
@@ -268,8 +275,8 @@ export class FacturaC extends CrudG<FacturasI> {
     movimientos_viaje?: boolean;
     extra_params?: any;
   }) {
-    const valor_enc = btoa(args.valor.toString());
-    const VALOR_ENC = _.replace(valor_enc, '\\', '&^IC');
+    const valor_enc = fun.encriptar(args.valor.toString());
+    const VALOR_ENC = valor_enc.replace('\\', '&^IC');
     args.pagada ??= '0';
     args.extra_params ??= {};
 
@@ -295,7 +302,7 @@ export class FacturaC extends CrudG<FacturasI> {
   }
 
   parseDataToPdf(data) {
-    return new Promise(resolve => {
+    return new Promise<FacturasI>(resolve => {
       const pick_factura1 = ['Bruto', 'cliente', 'balance', 'condicion', 'descuento', 'identificador', 'detalle_facturas', 'numero_factura', 'devuelta', 'estado', 'fecha_completada', 'fecha_equivalente', 'fecha_valida', 'fecha_vencimiento'];
       const pick_factura2 = [
         'fecha_viaje',
@@ -319,6 +326,8 @@ export class FacturaC extends CrudG<FacturasI> {
         'is_aceptada',
         'dgii_message',
         'security_code',
+        'is_ncf_modificado',
+        'document_reference',
       ];
       const pick_factura = [...pick_factura1, ...pick_factura2];
 
@@ -329,14 +338,20 @@ export class FacturaC extends CrudG<FacturasI> {
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
 
-      data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format();
+      // data_parsed.fecha_equivalente = moment(data_parsed.fecha_equivalente).format();
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
       if (data_parsed.tipo_pdf == 'COTIZACION') data_parsed.tipo_pdf = 'COTIZACIÓN';
       data_parsed.total = data_parsed.total_factura;
       data_parsed.contenido_reporte = [];
 
-      if (fun.hasValue(data_parsed.cliente) && data_parsed.cliente.nombre.length > 80) data_parsed.cliente.nombre = `${data_parsed.cliente.nombre.substring(0, 80)}...`;
-      if (fun.hasValue(data_parsed.suplidor) && data_parsed.suplidor.nombre.length > 80) data_parsed.suplidor.nombre = `${data_parsed.suplidor.nombre.substring(0, 80)}...`;
+      const truncarNombre = entidad => {
+        if (fun.hasValue(entidad) && entidad.nombre_completo.length > 80) {
+          entidad.nombre_completo = `${entidad.nombre_completo.substring(0, 80)}...`;
+        }
+      };
+
+      truncarNombre(data_parsed.cliente);
+      truncarNombre(data_parsed.suplidor);
 
       data_parsed.detalle_facturas.forEach(detalle => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {
@@ -349,43 +364,42 @@ export class FacturaC extends CrudG<FacturasI> {
     });
   }
 
-  modalVerDetalles(data) {
-    return {
-      component: DetalleFacturaComponent,
-      inputs: { data: data },
-      id: `detalle_factura`,
-      header: 'Detalles Factura',
-      width: '35rem',
-      minHeight: '10rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
-      },
-    };
+  modalVerDetalles(data, documento = 'Factura') {
+    const detalleDocModalConf = new DynamicModalClass();
+
+    detalleDocModalConf.id = 'detalle_factura';
+    detalleDocModalConf.inputs = { data, documento: documento.toLowerCase() };
+    detalleDocModalConf.header = `Detalles ${documento}`;
+    detalleDocModalConf.width = '36rem';
+    detalleDocModalConf.component = DetalleFacturaComponent;
+    detalleDocModalConf.confirmToClose = false;
+    detalleDocModalConf.closableEsc = true;
+    detalleDocModalConf.botones = [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+
+    detalleDocModalConf.show();
   }
 
-  handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?) {
-    return new Promise<any>((resolve, reject) => {
+  handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?: IButtonDynamic[]) {
+    return new Promise<void>((resolve, reject) => {
       PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
         .then(async res => {
-          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+          const { data: factura } = toPDFData;
+          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')), show_estado: dataModal.show_estado, estado_documento: factura.estado, documento: toPDFData.documento, factura: factura };
 
-          const obj_modal = {
-            component: PdfViewerComponent,
-            inputs: inputs,
-            id: dataModal.id,
-            header: dataModal.header,
-            width: '900px',
-            height: '70vh',
-            botones: {
-              ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-              dinamico: [{ clase: 'btn btn-blanco', function: instance => instance.closeModal(instance.id, 'cancelar'), label: 'Cerrar', disable: false }],
-            },
-          };
+          const viewPdfModalConf = new DynamicModalClass();
 
-          if (fun.hasValue(botones_dinamicos)) obj_modal.botones.dinamico = botones_dinamicos;
+          viewPdfModalConf.id = 'pdfViewer-modal';
+          viewPdfModalConf.inputs = inputs;
+          viewPdfModalConf.header = dataModal.header;
+          viewPdfModalConf.width = '57rem';
+          viewPdfModalConf.height = '70vh';
+          viewPdfModalConf.component = PdfViewerComponent;
+          viewPdfModalConf.closableEsc = true;
+          viewPdfModalConf.botones = botones_dinamicos ? botones_dinamicos : [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
 
-          resolve(obj_modal);
+          viewPdfModalConf.show();
+
+          resolve();
         })
         .catch(err => {
           fun.toastError(err.msg, 'ERROR');
@@ -394,30 +408,29 @@ export class FacturaC extends CrudG<FacturasI> {
     });
   }
 
-  abrirModalHistorial(pagos, notas, openNewModal) {
+  abrirModalHistorial(pagos, notas) {
     if (pagos.length > 0 || notas.length > 0) {
       for (let i = 0; i < pagos.length; i++) {
         const pago = pagos[i];
-        pago.numero_recibo = _.padStart(pago.numero_recibo, 8, '0');
-        pago.fecha_equivalente = moment(pago.fecha_equivalente).format('DD/MM/YYYY');
+        pago.numero_recibo = pago.numero_recibo.toString().padStart(8, '0');
       }
 
       for (let i = 0; i < notas.length; i++) {
         const nota = notas[i];
         nota.total = Math.abs(nota.total);
-        nota.fecha_equivalente = moment(nota.fecha_equivalente).format('DD/MM/YYYY');
       }
 
       const obj = { abonos: pagos, notas: notas };
-      openNewModal({
-        component: ModalHistorialPagosComponent,
-        inputs: obj,
-        id: 'historial_pago',
-        header: 'Historial de moviemientos a balance de factura',
-        width: '700px',
-        height: '400px',
-        botones: fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-      });
+
+      const modalConfig = new DynamicModalClass();
+      modalConfig.width = '45rem';
+      modalConfig.height = '30rem';
+      modalConfig.component = ModalHistorialPagosComponent;
+      modalConfig.inputs = obj;
+      modalConfig.id = 'historial_pago';
+      modalConfig.header = 'Historial de movimientos a balance de factura';
+
+      modalConfig.show();
     }
   }
 }
@@ -507,6 +520,8 @@ export interface FacturasI {
   vendedor: string;
   notas: any;
   pagos: Pago[];
+  is_ncf_modificado?: boolean;
+  document_reference?: DocumentoReferenced;
   [propName: string]: any;
 }
 
@@ -515,6 +530,14 @@ export interface Cliente {
   telefono: string;
   direccion: string;
   rnc: string;
+}
+
+export interface DocumentoReferenced {
+  id: number;
+  document_referenced: FacturasI;
+  document_origin: FacturasI;
+  referenced_at: Date;
+  referenced_by: any;
 }
 
 export interface DetalleFactura {

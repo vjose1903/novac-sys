@@ -1,11 +1,10 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { AfterViewInit, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MODIFIED_CONFIG_FILE } from '@core/typescript/GLOBAL';
 import { IpcService } from '@core/services/ipc.service';
 import { ModalPasswordConfigComponent } from './extra/modal-password-config/modal-password-config.component';
-import * as _ from 'lodash';
+import { Environment } from '@environments/environment';
 
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
 
@@ -13,12 +12,15 @@ import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { RequestC } from '@core/typescript/requests';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Ss } from '@core/services/singleton.service';
-import { ELECTRON_CHANGE_CONFIG_FILE } from '../../../electron/shared-electron-angular';
 import { MessageTask } from '@core/models/message-task';
 import { ConfigI } from '@core/interface/config-interface';
 import { fun } from '@core/services/functions.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { FacturaC } from '@admin/facturacion/factura';
+import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { ICallbackModal, modalCloseType, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -32,37 +34,35 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   errorU = '';
   versionApp = '';
   tipo_prueba = 'otro';
-  imgLogo;
+  imgLogo = signal<string>('');
 
   requestClass = new RequestC();
   configServ = Ss.configServ;
   configApp: ConfigI;
 
   htmlServ = inject(HtmlElementsService);
+  copyToClipboardServ = inject(CopyToClipboardService);
 
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
     public _ipc: IpcService,
-    public currentUserServ: CurrentUserService
+    public currentUserServ: CurrentUserService,
+    private sanitizer: DomSanitizer
   ) {
     super();
   }
 
   ngOnInit() {
-    fun.logout();
+    this.form = this.fb.group({ usuario: !Environment.production ? 'novac' : null, password: !Environment.production ? '1234567' : null });
   }
 
   ngAfterViewInit(): void {
-    this.configServ.getConfig().then((config: ConfigI) => {
-      this.configApp = config;
-      this.imgLogo = `data:image/png;base64,${config.logo_empresa}`;
-      this.versionApp = config.app_version;
+    this.configApp = Ss.configServ.config;
+    this.imgLogo.set(`data:image/png;base64,${this.configApp.logo_empresa}`);
+    this.versionApp = this.configApp.app_version;
 
-      this.form = this.fb.group({ usuario: config.is_development ? 'novac' : null, password: config.is_development ? '1234567' : null });
-    });
-    setTimeout(() => fun.enfocarInput('Iusuario'), 5);
-    // setTimeout(() => this.router.navigateByUrl('/auth/config'), 100);
+    fun.setTimeout(() => fun.enfocarInput('Iusuario'), 5);
   }
 
   ngOnDestroy() {}
@@ -95,20 +95,20 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   login() {
     const formulario = this.form.getRawValue();
 
-    if (formulario.usuario == '1973' && formulario.password == '3791') {
-      if (this.configApp.is_development) this.router.navigateByUrl('/auth/config');
-      else this.openConfigsModal();
+    if (formulario.usuario == Environment.config_user && formulario.password == Environment.config_password) {
+      this.openConfigsModal();
     } else {
+      Ss.sharedServ.nextCanToast(true);
+
       this.requestClass
         .createOne(formulario, { afterPath: 'auth/sign_in' })
         .then(res => {
-          setTimeout(
-            () =>
-              this.currentUserServ.setUser(res.data).then(() => {
-                this.router.navigateByUrl('/admin/dashboard');
-              }),
-            250
-          );
+          fun.setTimeout(() => {
+            this.currentUserServ.setUser(res.data).then(() => {
+              Ss.factServ.getTiposFacturas();
+              this.router.navigateByUrl('/admin/dashboard');
+            });
+          }, 250);
         })
         .catch(error => {
           if (error.status === 0) fun.toastError('El servidor está <strong>caido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR SERVIDOR');
@@ -120,17 +120,42 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     if (fun.hasValue(this.form)) this.form.reset();
     fun.enfocarInput('Iusuario');
 
-    this.openNewModal({
-      inputs: {},
-      component: ModalPasswordConfigComponent,
-      id: 'passwordConfigForm',
-      width: '30rem',
-      header: 'Configuraciones',
-    });
+    const passwordConfirmCallbal = (args: ICallbackModal) => {
+      if (args.type === modalCloseType.returnData && args.data && !args.data.error) this.navigateToConfig();
+    };
+
+    if (!Environment.production) {
+      passwordConfirmCallbal({ data: { error: false }, type: modalCloseType.returnData });
+      return;
+    }
+
+    const passwordConfigModal = new DynamicModalClass();
+
+    passwordConfigModal.id = 'passwordConfigForm';
+    passwordConfigModal.inputs = { from: 'layout' };
+    passwordConfigModal.header = 'Configuraciones';
+    passwordConfigModal.width = '30rem';
+    passwordConfigModal.component = ModalPasswordConfigComponent;
+
+    passwordConfigModal.botones = [
+      { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },
+      { id: 'aceptarBtn', label: 'Aceptar', clase: 'btn-success' },
+    ];
+
+    passwordConfigModal.setCallback(passwordConfirmCallbal);
+    passwordConfigModal.show();
   }
 
-  getDataFromModal(arg, search?) {
+  navigateToConfig() {
     this.router.navigateByUrl('/auth/config');
+  }
+
+  copyMachineId() {
+    this.copyToClipboardServ.copyText(this.configApp.machineId).then(() => {
+      Ss.sharedServ.canToast = true;
+      fun.toastInfo('ID de la máquina copiado al portapapeles', 'COPIADO');
+      Ss.sharedServ.canToast = false;
+    });
   }
 
   onHideModal(arg) {}
@@ -182,7 +207,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     //   PdfService.generatePdf({ oPdf: obj, imprimir: false })
     //     .then(async res => {
     //       const objBase = { base64: res.base64, filename: res.file, type: this.tipo_prueba };
-    //       const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')) };
+    //       const obj = { base64: res.base64, titulo: 'PRUEBA REPORTE', height: '76vh', reimprimir: res.reimprimir, fileName: res.file.split('.')[0] };
     //       console.log("obj ", obj);
     //       // this.abrirModalReporte(obj);
     //     })

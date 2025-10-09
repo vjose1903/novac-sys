@@ -4,8 +4,10 @@ import { Ss } from '@core/services/singleton.service';
 import { fun } from '@core/services/functions.service';
 import { PreFacturaClass } from './preFacturas';
 import { tipoDocFacturacion } from './factura';
-import { computed, effect, signal } from '@angular/core';
+import { computed, effect, inject, signal } from '@angular/core';
 import { ObjectVar } from '@core/typescript/constantes';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 export class FactsLocalStorage extends PreFacturaClass {
   index_fact_archivada = signal<number | string>(0);
@@ -42,6 +44,8 @@ export class FactsLocalStorage extends PreFacturaClass {
     { key: tipoDocFacturacion.venta, label: 'facturas de venta', title: 'Venta', singleTitle: 'factura de venta', color: 'green' },
     { key: tipoDocFacturacion.compra, label: 'facturas de compra', title: 'Compra', singleTitle: 'factura de compra', color: 'yellow' },
   ];
+
+  dynamicModalServ = inject(DynamicModalService);
 
   constructor() {
     super();
@@ -144,7 +148,7 @@ export class FactsLocalStorage extends PreFacturaClass {
   quitarFacturaGuardada(archivo_id) {
     let index;
     const allFacturas = FactsLocalStorage.getList();
-    
+
     if (archivo_id) {
       index = allFacturas.findIndex((item: any) => item.archivo_id === archivo_id);
 
@@ -173,19 +177,18 @@ export class FactsLocalStorage extends PreFacturaClass {
   }
 
   openModalRemoveFactura(fact, e) {
-    const confirmationObj = {
+    if (e) e.stopPropagation();
+    
+    const siFunction = () => {
+      this.quitarFacturaGuardada(fact.archivo_id);
+    };
+
+    this.dynamicModalServ.confirmationModal({
       id: 'quitar_factura',
       texto: 'Estas seguro que desea quitar esta factura de la lista.',
-      header: 'Confirmación',
-      siFunction: instance => {
-        this.quitarFacturaGuardada(fact.archivo_id);
-        instance.closeModal(instance.id, 'quitar_factura');
-      },
-      width: '30rem',
-    };
-    this.confirmationModal(confirmationObj);
-
-    e.stopPropagation();
+      btnKind: confirmationButtons.siNo,
+      onYes: siFunction.bind(this),
+    });
   }
 
   getNombreFacturaGuardada(fact: any) {

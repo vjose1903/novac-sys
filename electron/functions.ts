@@ -40,11 +40,7 @@ export default class Functions {
   static setConfigFile(data: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        writeLogs('INICIANDO PROCESO DE SETEO DE CONFIGURACION');
-        
         let pathConfig = (await pathAdd(`/app_config.config`)) as string;
-
-        writeLogs(pathConfig, 'pathConfig');
 
         var encripted = this.encriptar(data);
         fs.writeFileSync(pathConfig, encripted, { encoding: 'utf-8' });
@@ -100,7 +96,7 @@ export default class Functions {
   // __________________________________________________________________________________________________
   static async getDefaultPrinter(win: BrowserWindow) {
     const printers = await win.webContents.getPrintersAsync();
-    const defaultPrinter = printers.find((printer) => printer.isDefault);
+    const defaultPrinter = printers.find(printer => printer.isDefault);
     return defaultPrinter;
   }
 }

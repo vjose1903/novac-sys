@@ -1,95 +1,108 @@
 import { ConfigI } from '../src/app/core/interface/config-interface.js';
 import * as fs from 'fs';
+import * as path from 'path';
 import { pathAdd, writeLogs } from '../main.js';
 import Functions from './functions.js';
-import { BrowserWindow } from 'electron';
-import { serie } from '../src/app/core/typescript/constantes.js';
+import MachineId from './machine-id.js';
 
 const logos = require('../logos.json');
 
 export default class HandlerConfigFile {
-  static default_config: ConfigI = {
-    cliente: 'demo',
-    color_app: 'blue',
-    mode_app: 'light',
-    config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-    direccion_empresa: 'La Vega República Dominicana',
-    logo_empresa: logos.logo_empresa,
-    logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Inspot Technology',
-    rnc_empresa: '000-00000-0',
-    telefono_empresa: '(809) 879-0161',
-    url_servidor: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
-    url_servidor_descargas: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
-    url_servidor_respaldo: 'https://8n3mw1zq-9093.use2.devtunnels.ms',
-    usa_url_principal: true,
-    has_contabilidad: true,
-    is_db_local: false,
-    calcular_itbis: true,
-    is_produccion: false,
-    facturacion_editar_precio: false,
-    vende_sin_inventario: false,
-    use_ecf: false,
-    medida_producto_terminado: 'Producto',
-    serie_default: serie.normal,
+  private static instance: HandlerConfigFile;
+  private static initPromise: Promise<HandlerConfigFile>;
+  private _default_config: ConfigI;
 
-    printer_selected: {
-      venta_contado: 'Ninguna',
-      venta_credito: 'Ninguna',
-      pre_venta: 'Ninguna',
-      cotizacion: 'Ninguna',
-      compra: 'Ninguna',
-      recibo_ingreso: 'Ninguna',
-      conduce: 'Ninguna',
-      nota: 'Ninguna',
-      cuadre_caja: 'Ninguna',
-      reporte: 'Ninguna',
-    },
+  get default_config() {
+    return this._default_config;
+  }
 
-    pages_sizes: {
-      venta_contado: '8.5x5.5',
-      venta_credito: '8.5x11',
-      pre_venta: '8.5x5.5',
-      cotizacion: '8.5x5.5',
-      compra: '8.5x5.5',
-      recibo_ingreso: '8.5x5.5',
-      conduce: '8.5x5.5',
-      nota: '8.5x5.5',
-      cuadre_caja: '8.5x5.5',
-      reporte: '8.5x11',
-    },
+  private constructor() {}
 
-    plantillas_impresion: {
-      nota: 'Detallada',
-    },
+  static getInstance(machineId: MachineId): Promise<HandlerConfigFile> {
+    if (!HandlerConfigFile.initPromise) {
+      HandlerConfigFile.initPromise = HandlerConfigFile.createInstance(machineId);
+    }
+    return HandlerConfigFile.initPromise;
+  }
 
-    documentos_a_imprimir: 'conduce',
-  };
+  private static async createInstance(machineId: MachineId): Promise<HandlerConfigFile> {
+    if (!HandlerConfigFile.instance) {
+      HandlerConfigFile.instance = new HandlerConfigFile();
+      await HandlerConfigFile.instance.initialize(machineId);
+    }
+    return HandlerConfigFile.instance;
+  }
 
-  static checkConfigFile(win: BrowserWindow): Promise<any> {
-    return new Promise<any>(async (resolve, reject) => {
-      const config_path = await pathAdd('/app_config.config');
+  private async initialize(machineId: MachineId): Promise<void> {
+    try {
+      const config = await this.getDefaultConfig();
 
-      const existe_archivo_config = fs.existsSync(config_path);
+      this._default_config = config;
+      this._default_config.logo_empresa = logos.logo_empresa;
+      this._default_config.logo_impresion = logos.logo_impresion;
 
-      setTimeout(() => {
-        writeLogs(existe_archivo_config, ':::::::: existe_archivo_config');
+      this._default_config.machineId = machineId.value;
+    } catch (error) {
+      writeLogs('ERROR al leer archivo de configuración por defecto:', error);
+      throw error;
+    }
+  }
 
-        if (!existe_archivo_config) {
-          Functions.setConfigFile(JSON.stringify(this.default_config))
-            .then(() => {
-              console.log(' ');
-              console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
-              console.log(' ');
-              writeLogs('------ ARCHIVO DE CONFIGURACION CREADO ------');
+  getDefaultConfig() {
+    return new Promise<ConfigI>((resolve, reject) => {
+      try {
+        const configPath = path.join(__dirname, 'default_config.json');
 
-              setTimeout(() => resolve(true), 500);
-            })
-            .catch((err) => reject(false));
+        if (fs.existsSync(configPath)) {
+          const configData = fs.readFileSync(configPath, 'utf-8');
+          resolve(JSON.parse(configData));
         } else {
-          setTimeout(() => resolve(true), 500);
+          writeLogs('ADVERTENCIA: No se encuentra el archivo de configuración por defecto.');
+          reject(new Error('No se encuentra el archivo de configuración por defecto'));
         }
-      }, 500);
+      } catch (error) {
+        writeLogs('ERROR al leer archivo de configuración por defecto:', error);
+        reject(error);
+      }
     });
   }
+
+  configFileExists(args?: { create_if_not_exists: boolean }): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+      const config_path = await pathAdd('/app_config.config');
+
+      const file_exists = fs.existsSync(config_path);
+
+      if (args?.create_if_not_exists && !file_exists) {
+        try {
+          await Functions.setConfigFile(JSON.stringify(this._default_config));
+          resolve(true);
+        } catch (error) {
+          reject(false);
+        }
+      }
+
+      resolve(file_exists);
+    });
+  }
+
+  // checkConfigFile(): Promise<any> {
+  //   return new Promise<any>(async (resolve, reject) => {
+  //     const existe_archivo_config = await this.configFileExists();
+
+  //     writeLogs(existe_archivo_config, ':::::::: existe_archivo_config');
+
+  //     if (!existe_archivo_config) {
+  //       Functions.setConfigFile(JSON.stringify(this.default_config))
+  //         .then(() => {
+  //           writeLogs('------ ARCHIVO DE CONFIGURACION CREADO ------');
+
+  //           setTimeout(() => resolve(true), 500);
+  //         })
+  //         .catch(err => reject(false));
+  //     } else {
+  //       setTimeout(() => resolve(true), 500);
+  //     }
+  //   });
+  // }
 }

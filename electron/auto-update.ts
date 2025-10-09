@@ -1,6 +1,10 @@
-import { autoUpdater, type UpdateDownloadedEvent, type AppUpdater } from 'electron-updater';
+import { autoUpdater, type UpdateDownloadedEvent, type AppUpdater, UpdateCheckResult, UpdateInfo } from 'electron-updater';
+import { PublishConfiguration } from 'builder-util-runtime';
+import * as fs from 'fs';
+import * as path from 'path';
 
 import SharedElectronAngular, {
+  ELECTRON_EVENT_UPDATE_BEFORE_QUIT_FOR_UPDATE,
   ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
   ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
   ELECTRON_EVENT_UPDATE_ERROR,
@@ -11,13 +15,18 @@ import SharedElectronAngular, {
 
 import { writeLogs } from '../main';
 import { BrowserWindow } from 'electron';
+import { sharedState } from './shared-state';
 
 export default class AppUpdate {
   win: BrowserWindow;
   serve_: boolean;
   autoUpdater: AppUpdater;
-  constructor(win, serve_) {
+  updateConfig: PublishConfiguration;
+  app: Electron.App;
+
+  constructor(win, app, serve_) {
     this.win = win;
+    this.app = app;
     this.serve_ = serve_;
     this.autoUpdater = autoUpdater;
   }
@@ -30,86 +39,217 @@ export default class AppUpdate {
       log.transports.file.level = 'info';
       this.autoUpdater.logger = log;
 
-      this.checkForUpdates(this.win);
+      this.getUpdateConfig()
+        .then(config => {
+          this.updateConfig = config;
+          this.initializeUpdatesEvents();
+        })
+        .catch(error => {
+          writeLogs('ERROR al obtener la configuración de actualizaciones:', error);
+        });
     }
   }
 
-  async checkForUpdates(win) {
-    this.autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-demo', token: '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', private: true });
-    this.autoUpdater.checkForUpdatesAndNotify();
+  getUpdateConfig() {
+    return new Promise<PublishConfiguration>((resolve, reject) => {
+      try {
+        const configPath = path.join(__dirname, 'update-config.json');
 
-    writeLogs('-=-=-=-=- handleUpdateEvents -=-=-=-=-');
-    SharedElectronAngular.sendEventToAngular(win, { eventName: 'init', data: { msg: '-=-=-=-=- handleUpdateEvents -=-=-=-=-' } });
+        if (fs.existsSync(configPath)) {
+          const configData = fs.readFileSync(configPath, 'utf-8');
+          resolve(JSON.parse(configData));
+        } else {
+          writeLogs('ADVERTENCIA: No se encuentra el archivo de configuración de actualizaciones.');
+          reject(new Error('No se encuentra el archivo de configuración de actualizaciones'));
+        }
+      } catch (error) {
+        writeLogs('ERROR al leer archivo de configuración de actualizaciones:', error);
+        reject(error);
+      }
+    });
+  }
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // AUTO UPDATE EVENTS
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  async initializeUpdatesEvents() {
+    this.autoUpdater.setFeedURL(this.updateConfig);
 
+    // Configurar para que no descargue automáticamente
+    this.autoUpdater.autoDownload = false;
+
+    // Configurar todos los eventos primero
+    await this.configureUpdateEvents();
+
+    // Ahora que todos los eventos están configurados, verificar actualizaciones
+    this.autoUpdater.checkForUpdates();
+  }
+
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  // AUTO UPDATE EVENTS
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  configureUpdateEvents() {
+    // Mover todos los eventos a este método
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info => {
-      writeLogs(info, 'ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
-      SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, data: { msg: 'Actualizacion no disponible...', body: info } });
-      writeLogs(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
+      SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, data: { msg: 'Actualizacion no disponible...', body: info } });
     });
 
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
-      writeLogs(info, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
-
-      // TODO: hacer que esto sea decidido por el usuario
-      // Iniciar la descarga de la actualización
-      this.autoUpdater.downloadUpdate();
-
-      SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, data: info });
-
-      const dialogOpts = {
-        type: 'info',
-        buttons: ['ok'],
-        title: 'Actualización disponible',
-        message: 'Novac System presenta una nueva actualizacion se empezará a descargar ahora.',
-        detail: `Version a descargar: ${info.version}`,
-      };
-
-      writeLogs('FINAL - ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
+      // Ahora solo enviamos la información al front y dejamos que el usuario decida
+      SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, data: info });
     });
 
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, (event: UpdateDownloadedEvent) => {
-      writeLogs(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
-      writeLogs(event, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
+      SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, data: { msg: 'descarga finalizada...' } });
 
-      const dialogOpts = {
-        type: 'info',
-        buttons: ['Reiniciar'],
-        title: 'Actualizacion descargada',
-        message: process.platform == 'win32' ? event.releaseNotes : event.releaseName,
-        detail: 'Para que las actualizaciones sean efectivas debe de reiniciar la aplicacion.',
-      };
+      // Establecer la bandera ANTES de preparar la actualización
+      sharedState.isUpdaterClosing = true;
+      writeLogs(`sharedState.isUpdaterClosing establecido en: ${sharedState.isUpdaterClosing}`, 'update-downloaded');
 
-      SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, data: { msg: 'descarga finalizada...' } });
-      this.autoUpdater.quitAndInstall();
-
-      // dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      //   SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, data: { msg: 'descarga finalizada...', body: returnValue } });
-      //   if (returnValue.response == 0) this.autoUpdater.quitAndInstall();
-      // });
-
-      writeLogs(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
+      // Limpiar todos los listeners y procesos antes de instalar
+      this.prepareForUpdate();
     });
 
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
-      writeLogs(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, 'ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE >>>>>>>>>>>>');
-      SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, data: { msg: 'verificando actualizacion...', url: this.autoUpdater.getFeedURL() } });
-      writeLogs(' FINAL - ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE >>>>>>>>>>>>');
+      SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, data: { msg: 'verificando actualizacion...', url: this.autoUpdater.getFeedURL() } });
     });
 
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, progress => {
-      writeLogs(progress, ' ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS >>>>>>>>>>>>');
-      SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, data: { msg: 'descarga porciento...', body: progress } });
-      writeLogs('FINAL -  ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS >>>>>>>>>>>>');
+      SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, data: { msg: 'descarga porciento...', body: progress } });
     });
 
     this.autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, error => {
-      writeLogs(error, 'ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
-      SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_EVENT_UPDATE_ERROR, data: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
-      writeLogs('FINAL - ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
+      writeLogs(error, 'ELECTRON_EVENT_UPDATE_ERROR');
+      SharedElectronAngular.sendEventToAngular(this.win, { eventName: ELECTRON_EVENT_UPDATE_ERROR, data: { msg: 'Error en la actualizacion...', body: { msg: 'Error descargando actualizacion...', body: error } } });
     });
+
+    // Evento específico para antes de cerrar la aplicación para actualización
+    this.autoUpdater.on(ELECTRON_EVENT_UPDATE_BEFORE_QUIT_FOR_UPDATE as any, () => {
+      writeLogs('Preparando para cerrar aplicación y actualizar...', 'before-quit-for-update');
+      // Configurar la variable global para indicar que estamos cerrando para actualizar
+      sharedState.isUpdaterClosing = true;
+
+      // Asegurar que la ventana principal sea cerrable
+      if (this.win && !this.win.isDestroyed()) {
+        this.win.setClosable(true);
+        writeLogs('Ventana principal configurada como cerrable antes de actualización', 'before-quit-for-update');
+      }
+    });
+  }
+
+  async downloadUpdate() {
+    return new Promise((resolve, reject) => {
+      try {
+        // Configurar un listener temporal para detectar cuando inicia la descarga
+        const onDownloadStart = () => {
+          writeLogs('Descarga iniciada exitosamente');
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
+          resolve({ success: true, msg: 'Descarga iniciada' });
+        };
+
+        const onError = error => {
+          writeLogs('ERROR al iniciar descarga:', error);
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_ERROR, onError);
+          reject(error);
+        };
+
+        // Escuchar cuando inicia la descarga (primer evento de progreso)
+        this.autoUpdater.once(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
+        this.autoUpdater.once(ELECTRON_EVENT_UPDATE_ERROR, onError);
+
+        // Iniciar la descarga
+        this.autoUpdater.downloadUpdate();
+
+        // Timeout de seguridad en caso de que no se dispare ningún evento
+        setTimeout(() => {
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, onDownloadStart);
+          this.autoUpdater.off(ELECTRON_EVENT_UPDATE_ERROR, onError);
+          reject(new Error('Timeout: No se pudo iniciar la descarga'));
+        }, 30000); // 30 segundos de timeout
+      } catch (error) {
+        writeLogs('ERROR al descargar actualización:', error);
+        reject(error);
+      }
+    });
+  }
+
+  async verifyUpdateAvailable(args?: { notify?: boolean }) {
+    return new Promise<UpdateInfo | null>((resolve, reject) => {
+      const { notify = true } = args || {};
+      // Si notify es false, temporalmente deshabilitar el evento de actualización disponible
+      let originalHandler: any = null;
+      if (!notify) {
+        // Guardar el handler original
+        originalHandler = this.autoUpdater.listeners(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE)[0];
+        // Remover temporalmente el listener
+        this.autoUpdater.removeAllListeners(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE);
+      }
+
+      try {
+
+        this.autoUpdater
+          .checkForUpdates()
+          .then(res => {
+            setTimeout(() => {
+              // Restaurar el handler original si se había removido
+              if (!notify && originalHandler) {
+                this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, originalHandler);
+              }
+
+              if (res) {
+                resolve(res.updateInfo);
+              } else {
+                resolve(null);
+              }
+            }, 1000);
+          })
+          .catch(error => {
+            // Restaurar el handler original en caso de error
+            if (!notify && originalHandler) {
+              this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, originalHandler);
+            }
+            writeLogs('Error al verificar actualizaciones:', error);
+            reject(error);
+          });
+      } catch (error) {
+        // Restaurar el handler original en caso de error
+        if (!notify && originalHandler) {
+          this.autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, originalHandler);
+        }
+        writeLogs('Error en verifyUpdateAvailable:', error);
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * Prepara la aplicación para la actualización limpiando listeners y procesos
+   */
+  private prepareForUpdate() {
+    writeLogs('Preparando aplicación para actualización...', 'prepareForUpdate');
+
+    try {
+      // Solo remover listeners específicos que puedan interferir, NO los de cierre
+      if (this.win) {
+        this.win.removeAllListeners('before-unload');
+        writeLogs('Listeners de before-unload removidos de la ventana', 'prepareForUpdate');
+      }
+
+      this.app.removeAllListeners('before-quit');
+      writeLogs('Listeners de before-quit removidos de la aplicación', 'prepareForUpdate');
+
+      // Ejecutar quitAndInstall primero
+      writeLogs('Ejecutando quitAndInstall...', 'prepareForUpdate');
+      this.autoUpdater.quitAndInstall();
+      writeLogs('quitAndInstall ejecutado exitosamente', 'prepareForUpdate');
+
+      // Timeout de seguridad para forzar el cierre si quitAndInstall falla
+      setTimeout(() => {
+        writeLogs('Timeout de seguridad: forzando cierre de la aplicación', 'prepareForUpdate');
+        this.app.quit();
+      }, 10000); // Aumentado a 10 segundos
+    } catch (error) {
+      writeLogs(`Error preparando actualización: ${error}`, 'prepareForUpdate');
+      // Si hay error, intentar cerrar la aplicación de todas formas
+      this.app.quit();
+    }
   }
 }

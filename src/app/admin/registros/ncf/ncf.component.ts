@@ -12,6 +12,8 @@ import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
 import { DateUtils } from '@vjose1903/dateutils';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-ncf',
@@ -75,8 +77,10 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
 
   htmlServ = inject(HtmlElementsService);
+  dynamicModalServ = inject(DynamicModalService);
+  private tServ = inject(TablasService);
 
-  constructor(private tServ: TablasService) {
+  constructor() {
     super();
   }
 
@@ -85,13 +89,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.necesarioStart();
 
     this.setDateInputs(new Date());
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   ngOnDestroy(): void {
@@ -210,7 +207,9 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   saltar(campo) {
     if (campo != 'send') fun.enfocarInput(campo);
     else {
-      if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
+      if (!this.formIsInvalid()) {
+        fun.setTimeout(() => this.submit(), 250);
+      }
     }
   }
 
@@ -277,20 +276,19 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     const comprobanteData = data;
     comprobanteData.nombre = 'comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo;
 
-    const objConfirmationModal = {
-      id: 'eliminar_comprobante',
-      header: 'Confirmar',
-      texto: `Desea eliminar comprobante para <b>${comprobanteData.tipoC_}</b> numero: <b>${comprobanteData.codigo}</b>`,
-      width: '510px',
-      siFunction: instance => {
-        this.ncfClass.deleteOne(comprobanteData.id).then(res => {
-          const actualPagination = this.tServ.getPaginationById('lista_ncf');
-          this.getPaquetesNCF(actualPagination);
-          instance.closeModal(instance.id, 'eliminar_comprobante');
-        });
-      },
+    const siFunction = () => {
+      this.ncfClass.deleteOne(comprobanteData.id).then(res => {
+        const actualPagination = this.tServ.getPaginationById('lista_ncf');
+        this.getPaquetesNCF(actualPagination);
+      });
     };
-    this.confirmationModal(objConfirmationModal);
+
+    this.dynamicModalServ.confirmationModal({
+      id: 'eliminar_comprobante',
+      texto: `Desea eliminar comprobante para <b>${comprobanteData.tipoC_}</b> numero: <b>${comprobanteData.codigo}</b>`,
+      btnKind: confirmationButtons.siNo,
+      onYes: siFunction.bind(this),
+    });
   }
 
   async submit() {

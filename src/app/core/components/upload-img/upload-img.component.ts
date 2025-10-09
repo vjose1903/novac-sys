@@ -1,12 +1,13 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { fun } from '@core/services/functions.service';
+import { fontAwesome } from '@core/typescript/fontawesome';
 import { RequestC } from '@core/typescript/requests';
 
 @Component({
-    selector: 'app-upload-img',
-    templateUrl: './upload-img.component.html',
-    styleUrls: ['./upload-img.component.scss'],
-    standalone: false
+  selector: 'app-upload-img',
+  templateUrl: './upload-img.component.html',
+  styleUrls: ['./upload-img.component.scss'],
+  standalone: false,
 })
 export class UploadImgComponent implements OnInit {
   nameFile = '';
@@ -15,6 +16,7 @@ export class UploadImgComponent implements OnInit {
   BASE_64;
   FILE_NAME;
   requestClass = new RequestC();
+  fontAwesome = fontAwesome;
 
   @Input() src_img;
   @Input() id;
@@ -24,7 +26,7 @@ export class UploadImgComponent implements OnInit {
 
   ngOnInit() {}
 
-  borrar() {
+  borrar(event) {
     this.src_img = null;
     this.BASE_64 = null;
     this.FILE_NAME = null;
@@ -37,9 +39,7 @@ export class UploadImgComponent implements OnInit {
     if (this.BASE_64 && this.FILE_NAME) {
       const obj = { base_64: this.BASE_64, file_name: this.FILE_NAME };
 
-      this.requestClass.createOne(obj, { afterPath: 'imagenes' }).then((res) => {
-        console.log('res ', res);
-      });
+      this.requestClass.createOne(obj, { afterPath: 'imagenes' }).then(res => {});
     } else fun.toastError('Debe de seleccionar una foto primero', 'ERROR');
   }
 
@@ -51,7 +51,7 @@ export class UploadImgComponent implements OnInit {
     if (files && files.length > 0) {
       reader.readAsDataURL(file);
 
-      reader.onload = (e) => {
+      reader.onload = e => {
         const base64 = reader.result.toString().split(',')[1];
         this.FILE_NAME = files[0].name;
         this.BASE_64 = base64;
