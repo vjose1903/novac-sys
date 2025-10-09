@@ -108,7 +108,7 @@ function createWindow() {
       });
 
       if (serve) {
-        const port = 5220;
+        const port = 5223;
         win.loadURL(`http://localhost:${port}`).catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
 
         setTimeout(() => {

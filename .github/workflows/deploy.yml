@@ -26,7 +26,7 @@ jobs:
 
       # 7️⃣ Ejecutar script de configuración (opcional)
       - name: Ejecutar script de configuración
-        run: node ./scripts/start.js -p -c agrodemi
+        run: node ./scripts/start.js -p -c demo
 
       # 8️⃣ Build de la aplicación (opcional)
       - name: Build Novac App
