@@ -7,9 +7,6 @@
   justify-content: center;
   align-items: center;
 
-<<<<<<< HEAD
-  .power-by-div {
-=======
   .svg-background {
     height: 100%;
     width: 100%;
@@ -26,39 +23,11 @@
   .power-by-div {
     cursor: default !important;
     user-select: none;
->>>>>>> dev
     position: absolute;
     bottom: 1rem;
     right: 1rem;
     display: flex;
     align-items: center;
-<<<<<<< HEAD
-    column-gap: 0.3rem;
-
-    .label {
-      white-space: nowrap;
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-    .inspot {
-      width: 8rem !important;
-    }
-  }
-}
-
-.svg-background {
-  height: 100%;
-  width: 100%;
-}
-
-.version {
-  color: #b3b3b3;
-  font-size: 0.8rem;
-}
-
-.formulario__label {
-  font-family: $globalFont;
-=======
 
     .label {
       white-space: nowrap;
@@ -86,5 +55,4 @@
       background-color: #0000002a;
     }
   }
->>>>>>> dev
 }
