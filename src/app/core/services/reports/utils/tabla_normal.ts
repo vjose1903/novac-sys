@@ -43,13 +43,8 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?, i
   body.push(titulos as TablaRowPdfMake);
 
   if (!configuration.only_titulo && Array.isArray(contendio_)) {
-<<<<<<< HEAD:src/app/core/services/pdf/utils/tabla_normal.ts
     contendio_.forEach((detalle, index_contenido) => {
-      const row = formarCuerpo(data, configuration, detalle, index_contenido);
-=======
-    contendio_.forEach((detalle, j) => {
-      const row = formarCuerpo(data, configuration, detalle, j, is_electronica, offset);
->>>>>>> dev:src/app/core/services/reports/utils/tabla_normal.ts
+      const row = formarCuerpo(data, configuration, detalle, index_contenido, is_electronica, offset);
       body.push(row as TablaRowPdfMake);
     });
   }
@@ -133,11 +128,7 @@ function getTotalizacion(configuration, data) {
   return totalizacion;
 }
 
-<<<<<<< HEAD:src/app/core/services/pdf/utils/tabla_normal.ts
-function formarCuerpo(data, configuration, detalle, index_contenido) {
-=======
-function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 0) {
->>>>>>> dev:src/app/core/services/reports/utils/tabla_normal.ts
+function formarCuerpo(data, configuration, detalle, index_contenido, is_electronica, offset = 0) {
   const row = [];
 
   const brk = data.mostrar_sub_titulo ? configuration.break - 1 : configuration.break;
@@ -150,11 +141,7 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
     const value = fun.getProperty(detalle, info.key);
 
     if (info.key === 'index') {
-<<<<<<< HEAD:src/app/core/services/pdf/utils/tabla_normal.ts
-      text_ = index_contenido + 1;
-=======
-      text_ = offset + j + 1;
->>>>>>> dev:src/app/core/services/reports/utils/tabla_normal.ts
+      text_ = offset + index_contenido + 1;
     } else {
       if (info.formato_fecha) {
         text_ = fun_.my_dateFormater(value);

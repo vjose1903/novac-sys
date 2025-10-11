@@ -18,12 +18,8 @@ export const infoTipoPdf = {
 export const infoResumenPartes = {
   notas: ['total_excento', 'total_gravado', 'itbis', 'descuento', 'total'],
   ventas: ['bruto', 'descuento', 'total', 'efectivo', 'cambio'],
-<<<<<<< HEAD:src/app/core/services/pdf/8.5x5.5/infoPdfs.ts
-  recibo_ingreso: ['total'],
-  pago_factura: ['total'],
-=======
   recibo_ingreso: ['bruto', 'mora', 'total'],
->>>>>>> dev:src/app/core/services/reports/pdf/8.5x5.5/infoPdfs.ts
+  pago_factura: ['total'],
   conduce: [],
   cotizacion: ['bruto', 'descuento', 'itbis', 'total'],
   cuadre_caja: [],

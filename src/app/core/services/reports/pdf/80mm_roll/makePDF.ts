@@ -1,17 +1,10 @@
-import { ConfigService } from './../../configuration.service';
 /* eslint-disable @typescript-eslint/indent */
-<<<<<<< HEAD:src/app/core/services/pdf/80mm_roll/makePDF.ts
-import * as fun_ from '../utils/funciones';
-import { styles_ } from '../utils/files';
-import { ConfigI } from '../../../typescript/config-interface';
-import { getContentWithTablaNormal } from '../utils/tabla_normal';
-=======
+
 import * as fun_ from '../../utils/funciones';
 import { defaultStyle, styles_ } from '../../utils/files';
 import { Ss } from '../../../singleton.service';
-import { ConfigI } from '../../../../interface/config-interface';
+import { ConfigI } from '@core/interface/config-interface';
 import { getContentWithTablaNormal } from '../../utils/tabla_normal';
->>>>>>> dev:src/app/core/services/reports/pdf/80mm_roll/makePDF.ts
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
 import { config_ventas } from './configuraciones/ventas';
 import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
@@ -21,11 +14,8 @@ import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_pre_venta } from './configuraciones/pre_venta';
 import { config_notas } from './configuraciones/notas';
-<<<<<<< HEAD:src/app/core/services/pdf/80mm_roll/makePDF.ts
-import { fun } from '../../functions.service';
-=======
+import { fun } from '@services/functions.service';
 import { serie } from '@core/typescript/constantes';
->>>>>>> dev:src/app/core/services/reports/pdf/80mm_roll/makePDF.ts
 
 const configuraciones = {
   pre_venta: config_pre_venta,
@@ -39,28 +29,20 @@ const configuraciones = {
 };
 
 export function makePDF(data, file_name, tipo_pdf?) {
-<<<<<<< HEAD:src/app/core/services/pdf/80mm_roll/makePDF.ts
-  const is_suplidor = fun.objHas(data, 'suplidor_id') ? true : false;
-=======
   const is_compra = data?.tipo == 'compra' ? true : false;
 
   const is_suplidor = is_compra;
   const is_electronica = data?.serie == serie.electronica;
 
   const configApp: ConfigI = Ss.configServ.config;
->>>>>>> dev:src/app/core/services/reports/pdf/80mm_roll/makePDF.ts
 
   const dd = {
     pageSize: { width: 200, height: 'auto' },
     pageOrientation: 'portrait',
     pageMargins: [5, 20, 5, 20],
-<<<<<<< HEAD:src/app/core/services/pdf/80mm_roll/makePDF.ts
-    content: contenidoPDF(data, is_suplidor, ConfigService.config, tipo_pdf),
-=======
     content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf, is_electronica),
->>>>>>> dev:src/app/core/services/reports/pdf/80mm_roll/makePDF.ts
     images: {
-      logo: `data:image/png;base64,${ConfigService.config.logo_impresion}`,
+      logo: `data:image/png;base64,${configApp.logo_impresion}`,
       barcode: fun_.my_barcode(data.identificador),
     },
     styles: styles_,
