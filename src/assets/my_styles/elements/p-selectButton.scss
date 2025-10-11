@@ -1,13 +1,4 @@
 .p-selectbutton {
-<<<<<<< HEAD:src/assets/my_styles/selectButton.scss
-  padding: 0.4rem;
-  background: #a5a5a526;
-  border-radius: 0.35rem;
-  display: flex;
-  gap: 0.3rem;
-  .p-button {
-    background: #80808012 !important;
-=======
   padding: 0.4rem !important;
   background: #a5a5a526 !important;
   border-radius: 0.4rem !important;
@@ -16,23 +7,17 @@
 
   .p-togglebutton {
     background: transparent !important;
->>>>>>> dev:src/assets/my_styles/elements/p-selectButton.scss
     border: none !important;
     border-radius: 0.25rem !important;
     padding: 0.3rem 0.5rem !important;
     font-weight: 400 !important;
     color: #a2a2a2 !important;
-    
+
     &:hover {
       background: #8080802a !important;
     }
-<<<<<<< HEAD:src/assets/my_styles/selectButton.scss
 
-    &.p-highlight {
-=======
-    
     &.p-togglebutton-checked {
->>>>>>> dev:src/assets/my_styles/elements/p-selectButton.scss
       background: var(--primary08) !important;
       font-weight: 600 !important;
       color: white !important;
