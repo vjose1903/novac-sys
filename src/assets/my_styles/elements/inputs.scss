@@ -5,12 +5,7 @@ input {
 }
 
 .input-group {
-<<<<<<< HEAD:src/assets/my_styles/inputs.scss
   > .prefijo {
-=======
-  .input,
-  input {
->>>>>>> dev:src/assets/my_styles/elements/inputs.scss
     border-top-right-radius: 0rem !important;
     border-bottom-right-radius: 0rem !important;
     z-index: 10;
@@ -18,7 +13,7 @@ input {
     box-shadow: -1px 1px 4px 0px #1d253b4f !important;
   }
 
-  .sufijo {
+  > .sufijo {
     border-top-left-radius: 0rem !important;
     border-bottom-left-radius: 0rem !important;
     z-index: 10;
