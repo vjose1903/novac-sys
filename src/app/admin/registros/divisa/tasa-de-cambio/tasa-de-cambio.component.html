@@ -1,11 +1,11 @@
 <div class="row">
   <div class="col-12 p-0">
     <h5>
-      Divisa: <strong>{{ inputs.divisa.nombre }}</strong>
+      Divisa: <strong>{{ divisa.nombre }}</strong>
     </h5>
     <div class="row">
       <div class="col-6 d-flex justify-content-center align-items-center">
-        <img-component class="imgDivisa" [imagenSrc]="inputs.divisa.img_divisa"></img-component>
+        <img-component class="imgDivisa" [imagenSrc]="divisa.img_divisa"></img-component>
       </div>
       <div class="col-6 p-0">
         <div class="d-flex justify-content-center align-items-center w-100 h-100">
@@ -14,9 +14,8 @@
               <label class="control-label">Tasa actual: </label>
               <p-tag
                 [rounded]="true"
-                [style]="{ background: '#d3eaf5', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block', 'font-size': '0.9rem', 'box-shadow': '1px 1px 3px #00000047', 'padding-left': '1rem' }"
-              >
-                <p class="text-black mb-0">{{ inputs.divisa.current_tasa }}</p>
+                [style]="{ background: '#d3eaf5', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block', 'font-size': '0.9rem', 'box-shadow': '1px 1px 3px #00000047', 'padding-left': '1rem' }">
+                <p class="text-black mb-0">{{ divisa.current_tasa }}</p>
               </p-tag>
             </div>
 
@@ -32,8 +31,8 @@
             </div>
 
             <div class="w-100 d-flex justify-content-end align-items-center">
-              <div [pTooltip]="inputs.divisa.is_principal ? 'No puede cambiar la tasa de cambio de la divisa principal.' : verificateChangeOfCurrency() ? 'El valor de la nueva tasa no puede ser el mismo actual.' : ''" tooltipPosition="left">
-                <button [disabled]="inputs.divisa.is_principal || verificateChangeOfCurrency()" type="submit" (click)="btn_aceptar()" class="btn ml-2 btn-verde">Actualizar</button>
+              <div [pTooltip]="divisa.is_principal ? 'No puede cambiar la tasa de cambio de la divisa principal.' : verificateChangeOfCurrency() ? 'El valor de la nueva tasa no puede ser el mismo actual.' : ''" tooltipPosition="left">
+                <button [disabled]="divisa.is_principal || verificateChangeOfCurrency()" type="submit" (click)="btn_aceptar()" class="btn ml-2 btn-verde">Actualizar</button>
               </div>
             </div>
           </form>
@@ -41,7 +40,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="!inputs.divisa.is_principal" class="col-12 p-0 mt-5">
+  <div *ngIf="!divisa.is_principal" class="col-12 p-0 mt-5">
     <div class="card sombra-light">
       <div class="card-header position-relative d-flex align-items-center p-2">
         <div class="d-flex justify-content-between align-items-center w-100">
@@ -53,11 +52,12 @@
         <div class="row">
           <div class="col-5">
             <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
-            <p-calendar inputId="fecha_desde" [(ngModel)]="desde" inputStyleClass="minSize" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+
+            <p-datepicker #inputFechaDesde inputId="fecha_desde" [(ngModel)]="desde" dateFormat="dd/mm/yy" inputStyleClass="minSize" placeholder="dd/mm/aaaa"></p-datepicker>
           </div>
           <div class="col-5">
             <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
-            <p-calendar inputId="fecha_hasta" [(ngModel)]="hasta" [maxDate]="hastaMaxDate" inputStyleClass="minSize" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-calendar>
+            <p-datepicker #inputFechaHasta inputId="fecha_hasta" [(ngModel)]="hasta" dateFormat="dd/mm/yy" inputStyleClass="minSize" [maxDate]="hastaMaxDate" placeholder="dd/mm/aaaa"></p-datepicker>
           </div>
           <div class="col-1">
             <div class="h-100 d-flex align-items-end pb-1">

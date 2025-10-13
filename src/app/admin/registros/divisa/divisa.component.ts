@@ -14,6 +14,7 @@ import { ModalClass } from '../../components/modal/modal-class';
   selector: 'app-divisa',
   templateUrl: './divisa.component.html',
   styleUrls: ['./divisa.component.scss'],
+  standalone: false,
 })
 export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   

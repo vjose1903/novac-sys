@@ -6,14 +6,14 @@ import { DivisaComponent } from './divisa.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
-import { TablasModule } from '../../components/new_tablas/tablas.module';
-import { PrimengModule } from '../../../modules/primeng.module';
-import { PipesModule } from '../../../core/pipe/pipes.module';
-import { DirectivesModule } from '../../../core/directive/directives.module';
-import { BtnIconModule } from '../../components/btn-icon-circular/btn-icon-circular.module';
-import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer-edit.module';
+import { TablasModule } from '@components/new_tablas/tablas.module';
+import { PrimengModule } from '@modules/primeng.module';
+import { PipesModule } from '@core/pipe/pipes.module';
+import { DirectivesModule } from '@core/directive/directives.module';
+import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
+import { ImgViewerEditModule } from '@components/img-viewer-edit/img-viewer-edit.module';
 import { TasaDeCambioComponent } from './tasa-de-cambio/tasa-de-cambio.component';
-import { ImgModule } from '../../components/img-component/img.module';
+import { ImgModule } from '@components/img-component/img.module';
 
 @NgModule({
   declarations: [DivisaComponent, TasaDeCambioComponent],
