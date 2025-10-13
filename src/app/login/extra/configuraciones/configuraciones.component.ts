@@ -1,49 +1,28 @@
-<<<<<<< HEAD
-import { ConfigService } from './../../../core/services/configuration.service';
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { Component, OnInit, inject } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { MODIFIED_CONFIG_FILE } from '../../../core/typescript/GLOBAL';
-import { MessageTask } from '../../../core/typescript/message-task';
-import { KEYWORD_ELECTRON_CHANGE_CONFIG_FILE } from '../../../../../electron/shared-electron-angular';
-import { fun } from '../../../core/services/functions.service';
-import { SharedService } from '../../../core/services/shared.service';
-=======
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { AfterViewInit, Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
-import { Ss } from '@core/services/singleton.service';
-import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_SET_APP_CONFIG } from '@electron/shared-electron-angular';
+import { MessageTask } from '@core/typescript/message-task';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
->>>>>>> dev
+import { Ss } from '@core/services/singleton.service';
+import { ELECTRON_SET_APP_CONFIG } from '@electron/shared-electron-angular';
 import { Router } from '@angular/router';
 import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
-<<<<<<< HEAD
-
-=======
 import { formFieldId, formFieldName } from './configuraciones.model';
 import { EmpresaService } from '@core/services/empresa.service';
->>>>>>> dev
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
   styleUrls: ['./configuraciones.component.scss'],
   standalone: false,
 })
-<<<<<<< HEAD
-export class ConfiguracionesComponent implements OnInit {
-  config;
-=======
 export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   @Input() is_on_modal: boolean = false;
   @Input() modalConfig!: any;
   configServ = Ss.configServ;
   configApp;
   configCopy;
->>>>>>> dev
   form;
 
   formFieldName = formFieldName;
@@ -76,23 +55,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     { name: 'Nota', key: 'nota' },
     { name: 'Conduce', key: 'conduce' },
     { name: 'Cotización', key: 'cotizacion' },
-<<<<<<< HEAD
     { name: 'Pago Factura', key: 'pago_factura' },
-  ];
-
-  impresiones = [
-    { printerFormControlName: 'printer_venta_contado', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_venta_contado', label: 'Venta Contado', key: 'venta_contado' },
-    { printerFormControlName: 'printer_venta_credito', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_venta_credito', label: 'Venta Credito', key: 'venta_credito' },
-    { printerFormControlName: 'printer_pre_venta', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_pre_venta', label: 'Pre venta', key: 'pre_venta' },
-    { printerFormControlName: 'printer_cotizacion', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_cotizacion', label: 'Cotización', key: 'cotizacion' },
-    { printerFormControlName: 'printer_compra', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_compra', label: 'Factura compras', key: 'compra' },
-    { printerFormControlName: 'printer_recibo_ingreso', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_recibo_ingreso', label: 'Recibos de ingreso', key: 'ingreso' },
-    { printerFormControlName: 'printer_conduce', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_conduce', label: 'Conduce', key: 'conduce' },
-    { printerFormControlName: 'printer_nota', plantillaFormControlName: 'plantilla_impresion_nota', pageSizeFormControlName: 'page_size_nota', label: 'Notas', key: 'nota' },
-    { printerFormControlName: 'printer_cuadre_caja', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_cuadre_caja', label: 'Cuadre de caja', key: 'cuadre' },
-    { printerFormControlName: 'printer_reporte', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_reporte', label: 'Reportes', key: 'reporte' },
-    { printerFormControlName: 'printer_pago_factura', plantillaFormControlName: null, pageSizeFormControlName: 'page_size_pago_factura', label: 'Pago Facturas', key: 'pago_factura' },
-=======
   ];
 
   impresiones = [
@@ -106,78 +69,12 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     { printerFormControlName: formFieldName.printer_nota, pageSizeFormControlName: formFieldName.page_size_nota, label: 'Notas', key: 'nota' },
     { printerFormControlName: formFieldName.printer_cuadre_caja, pageSizeFormControlName: formFieldName.page_size_cuadre_caja, label: 'Cuadre de caja', key: 'cuadre' },
     { printerFormControlName: formFieldName.printer_reporte, pageSizeFormControlName: formFieldName.page_size_reporte, label: 'Reportes', key: 'reporte' },
->>>>>>> dev
+    { printerFormControlName: formFieldName.printer_pago_factura, pageSizeFormControlName: formFieldName.page_size_pago_factura, label: 'Pago Facturas', key: 'pago_factura' },
   ];
 
   htmlServ = inject(HtmlElementsService);
   empresaServ = inject(EmpresaService);
 
-<<<<<<< HEAD
-  htmlServ = inject(HtmlElementsService);
-
-  constructor(private fb: UntypedFormBuilder, public sharedServ: SharedService, private router: Router, public _ipc: IpcService) {}
-
-  ngOnInit(): void {
-    this.config = ConfigService.config;
-    this.configCopy = fun.deepCloning(ConfigService.config);
-
-    this.parseDocumentosAImprimir(this.config).then(() => this.createForm(this.config));
-
-    fun.logGreen('this.config', this.config);
-  }
-
-  createForm(data) {
-    const color_format = this.colores.find((item) => item.descripcion == data.color_app);
-
-    this.form = this.fb.group({
-      nombre_empresa: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
-      rnc_empresa: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
-      direccion_empresa: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
-      telefono_empresa: [{ value: this.getValue(data, 'telefono_empresa'), disabled: false }, Validators.required],
-      logo_empresa: [{ value: this.getValue(data, 'logo_empresa'), disabled: false }, Validators.required],
-      logo_impresion: [{ value: this.getValue(data, 'logo_impresion'), disabled: false }, Validators.required],
-      color_app: [{ value: color_format, disabled: false }, Validators.required],
-      url_servidor: [{ value: this.getValue(data, 'url_servidor'), disabled: false }, Validators.required],
-      url_servidor_respaldo: [{ value: this.getValue(data, 'url_servidor_respaldo'), disabled: false }, Validators.required],
-      url_servidor_descargas: [{ value: this.getValue(data, 'url_servidor_descargas'), disabled: false }, Validators.required],
-      config_password: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
-      usa_url_principal: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
-      has_contabilidad: [{ value: this.getValue(data, 'has_contabilidad'), disabled: false }, Validators.required],
-      // printer_caja_selected: [{ value: this.getValue(data, 'printer_caja_selected'), disabled: false }, Validators.required],
-      // printer_reportes_selected: [{ value: this.getValue(data, 'printer_reportes_selected'), disabled: false }, Validators.required],
-      is_db_local: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
-      calcular_itbis: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
-      is_produccion: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
-      facturacion_editar_precio: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
-      vende_sin_inventario: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
-      can_pagar: [{ value: this.getValue(data, 'can_pagar'), disabled: false }, Validators.required],
-      medida_producto_terminado: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
-      documentos_a_imprimir: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
-
-      page_size_venta_contado: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_contado'), disabled: false }, Validators.required],
-      page_size_venta_credito: [{ value: this.getValuePageSize(data, 'pages_sizes.venta_credito'), disabled: false }, Validators.required],
-      page_size_pre_venta: [{ value: this.getValuePageSize(data, 'pages_sizes.pre_venta'), disabled: false }, Validators.required],
-      page_size_cotizacion: [{ value: this.getValuePageSize(data, 'pages_sizes.cotizacion'), disabled: false }, Validators.required],
-      page_size_compra: [{ value: this.getValuePageSize(data, 'pages_sizes.compra'), disabled: false }, Validators.required],
-      page_size_recibo_ingreso: [{ value: this.getValuePageSize(data, 'pages_sizes.recibo_ingreso'), disabled: false }, Validators.required],
-      page_size_conduce: [{ value: this.getValuePageSize(data, 'pages_sizes.conduce'), disabled: false }, Validators.required],
-      page_size_nota: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
-      page_size_cuadre_caja: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
-      page_size_reporte: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
-      page_size_pago_factura: [{ value: this.getValuePageSize(data, 'pages_sizes.pago_factura'), disabled: false }, Validators.required],
-
-      printer_venta_contado: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
-      printer_venta_credito: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
-      printer_pre_venta: [{ value: this.getValue(data, 'printer_selected.pre_venta'), disabled: false }, Validators.required],
-      printer_cotizacion: [{ value: this.getValue(data, 'printer_selected.cotizacion'), disabled: false }, Validators.required],
-      printer_compra: [{ value: this.getValue(data, 'printer_selected.compra'), disabled: false }, Validators.required],
-      printer_recibo_ingreso: [{ value: this.getValue(data, 'printer_selected.recibo_ingreso'), disabled: false }, Validators.required],
-      printer_conduce: [{ value: this.getValue(data, 'printer_selected.conduce'), disabled: false }, Validators.required],
-      printer_nota: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
-      printer_cuadre_caja: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
-      printer_reporte: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
-      printer_pago_factura: [{ value: this.getValue(data, 'printer_selected.pago_factura'), disabled: false }, Validators.required],
-=======
   constructor(
     private fb: UntypedFormBuilder,
     public sharedServ: SharedService,
@@ -223,8 +120,10 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.is_db_local]: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
       [formFieldName.calcular_itbis]: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
       [formFieldName.is_produccion]: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
+      [formFieldName.has_contabilidad]: [{ value: this.getValue(data, 'has_contabilidad'), disabled: false }, Validators.required],
       [formFieldName.facturacion_editar_precio]: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       [formFieldName.vende_sin_inventario]: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
+      [formFieldName.can_pagar]: [{ value: this.getValue(data, 'can_pagar'), disabled: false }, Validators.required],
       [formFieldName.medida_producto_terminado]: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
       [formFieldName.documentos_a_imprimir]: [{ value: this.getValue(data, 'documentos_a_imprimir'), disabled: false }],
 
@@ -238,7 +137,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.page_size_nota]: [{ value: this.getValuePageSize(data, 'pages_sizes.nota'), disabled: false }, Validators.required],
       [formFieldName.page_size_cuadre_caja]: [{ value: this.getValuePageSize(data, 'pages_sizes.cuadre_caja'), disabled: false }, Validators.required],
       [formFieldName.page_size_reporte]: [{ value: this.getValuePageSize(data, 'pages_sizes.reporte'), disabled: false }, Validators.required],
->>>>>>> dev
+      [formFieldName.page_size_pago_factura]: [{ value: this.getValuePageSize(data, 'pages_sizes.pago_factura'), disabled: false }, Validators.required],
 
       [formFieldName.printer_venta_contado]: [{ value: this.getValue(data, 'printer_selected.venta_contado'), disabled: false }, Validators.required],
       [formFieldName.printer_venta_credito]: [{ value: this.getValue(data, 'printer_selected.venta_credito'), disabled: false }, Validators.required],
@@ -250,6 +149,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.printer_nota]: [{ value: this.getValue(data, 'printer_selected.nota'), disabled: false }, Validators.required],
       [formFieldName.printer_cuadre_caja]: [{ value: this.getValue(data, 'printer_selected.cuadre_caja'), disabled: false }, Validators.required],
       [formFieldName.printer_reporte]: [{ value: this.getValue(data, 'printer_selected.reporte'), disabled: false }, Validators.required],
+      [formFieldName.printer_pago_factura]: [{ value: this.getValue(data, 'printer_selected.pago_factura'), disabled: false }, Validators.required],
     });
 
     this.logo_empresa = `data:image/png;base64,${data.logo_empresa}`;
@@ -258,33 +158,15 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
   getValuePageSize(data, key) {
     const size = fun.getProperty(data, key);
-<<<<<<< HEAD
-    const page_size = this.paper_sizes.find((item) => item.descripcion == size);
-=======
     const page_size = this.paper_sizes.find(item => item.descripcion == size);
->>>>>>> dev
     return page_size;
   }
 
   getDocumentosAImprimir(data) {
-<<<<<<< HEAD
-    const docs = data.documentos_a_imprimir.filter((doc) => doc.selected == true);
-
+    const docs = data.documentos_a_imprimir.filter(doc => doc?.selected === true);
     return docs;
   }
 
-  get_plantillas(key) {
-    const plantillas = this.plantillas_impresion.filter((plantilla) => fun.hasValue(plantilla.key));
-
-    return plantillas;
-  }
-
-=======
-    const docs = data.documentos_a_imprimir.filter(doc => doc.selected);
-    return docs;
-  }
-
->>>>>>> dev
   getValue(data, key) {
     return fun.getProperty(data, key);
   }
@@ -320,24 +202,16 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     return new Promise<any>(resolve => {
       const documentos_config = config.documentos_a_imprimir.split(',');
 
-<<<<<<< HEAD
-      documentos_config.forEach((item) => {
-        const doc = this.documentos_a_imprimir.find((documento) => documento.key == item);
+      documentos_config.forEach(item => {
+        const doc = this.documentos_a_imprimir.find(documento => documento.key == item);
         if (fun.hasValue(doc)) this.documentos_a_imprimir_selected.push(doc);
       });
-=======
-      documentos_config.forEach(item => this.documentos_a_imprimir_selected.push(this.documentos_a_imprimir.find(doc => doc.key == item)));
->>>>>>> dev
       resolve(true);
     });
   }
 
   changeDocumentosAImprimir() {
-<<<<<<< HEAD
-    const documentos_selected = this.documentos_a_imprimir_selected.map((item) => 'key').join(',');
-=======
     const documentos_selected = this.documentos_a_imprimir_selected.map(doc => doc.key).join(',');
->>>>>>> dev
 
     this.form.controls.documentos_a_imprimir.setValue(fun.hasValue(documentos_selected) ? documentos_selected : null);
   }
@@ -367,43 +241,13 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     // Extraer descripción del color
     formulario.color_app = formulario.color_app.descripcion;
 
-<<<<<<< HEAD
-    const pages_sizes = {
-      venta_contado: formulario.page_size_venta_contado.descripcion,
-      venta_credito: formulario.page_size_venta_credito.descripcion,
-      pre_venta: formulario.page_size_pre_venta.descripcion,
-      cotizacion: formulario.page_size_cotizacion.descripcion,
-      compra: formulario.page_size_compra.descripcion,
-      recibo_ingreso: formulario.page_size_recibo_ingreso.descripcion,
-      conduce: formulario.page_size_conduce.descripcion,
-      nota: formulario.page_size_nota.descripcion,
-      cuadre_caja: formulario.page_size_cuadre_caja.descripcion,
-      reporte: formulario.page_size_reporte.descripcion,
-      pago_factura: formulario.page_size_pago_factura.descripcion,
-    };
-
-    const printer_selected = {
-      venta_contado: formulario.printer_venta_contado,
-      venta_credito: formulario.printer_venta_credito,
-      pre_venta: formulario.printer_pre_venta,
-      cotizacion: formulario.printer_cotizacion,
-      compra: formulario.printer_compra,
-      recibo_ingreso: formulario.printer_recibo_ingreso,
-      conduce: formulario.printer_conduce,
-      nota: formulario.printer_nota,
-      cuadre_caja: formulario.printer_cuadre_caja,
-      reporte: formulario.printer_reporte,
-      pago_factura: formulario.printer_pago_factura,
-    };
-=======
     // Mapear tamaños de página
-    const pageSizeKeys = ['venta_contado', 'venta_credito', 'pre_venta', 'cotizacion', 'compra', 'recibo_ingreso', 'conduce', 'nota', 'cuadre_caja', 'reporte'];
+    const pageSizeKeys = ['venta_contado', 'venta_credito', 'pre_venta', 'cotizacion', 'compra', 'recibo_ingreso', 'conduce', 'nota', 'cuadre_caja', 'reporte', 'pago_factura'];
 
     const pages_sizes = pageSizeKeys.reduce((acc, key) => {
       acc[key] = formulario[`page_size_${key}`].descripcion;
       return acc;
     }, {});
->>>>>>> dev
 
     // Mapear impresoras seleccionadas
     const printer_selected = pageSizeKeys.reduce((acc, key) => {
@@ -414,64 +258,6 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     // Eliminar campos individuales del formulario
     const keysToOmit = [...pageSizeKeys.map(key => `page_size_${key}`), ...pageSizeKeys.map(key => `printer_${key}`)];
 
-<<<<<<< HEAD
-      'page_size_venta_contado',
-      'page_size_venta_credito',
-      'page_size_pre_venta',
-      'page_size_compra',
-      'page_size_recibo_ingreso',
-      'page_size_conduce',
-      'page_size_nota',
-      'page_size_cuadre_caja',
-      'page_size_reporte',
-      'page_size_pago_factura',
-
-      'printer_venta_contado',
-      'printer_venta_credito',
-      'printer_pre_venta',
-      'printer_compra',
-      'printer_recibo_ingreso',
-      'printer_conduce',
-      'printer_nota',
-      'printer_cuadre_caja',
-      'printer_reporte',
-      'printer_pago_factura',
-    ];
-
-    formulario = fun.omit(formulario, keys_to_omit);
-
-    formulario['pages_sizes'] = pages_sizes;
-    formulario['printer_selected'] = printer_selected;
-    formulario['plantillas_impresion'] = plantillas_impresion;
-    return formulario;
-  }
-
-  test() {
-    let res = true;
-
-    if (this.form) {
-      if (this.form.valid) {
-        let formulario = this.getFormularioToSend();
-
-        let keysConfig = Object.keys(formulario);
-        const cambios = [];
-
-        keysConfig.forEach((keyC) => {
-          if (typeof this.configCopy[keyC] == 'string') {
-            if (this.configCopy[keyC] != formulario[keyC]) cambios.push(keyC);
-          } else {
-            if (!fun.isEqual(this.configCopy[keyC], formulario[keyC])) cambios.push(keyC);
-          }
-        });
-
-        res = cambios.length > 0 ? false : true;
-      } else res = true;
-    }
-  }
-
-  formIsInvalid() {
-    let res = true;
-=======
     keysToOmit.forEach(key => delete formulario[key]);
 
     // Agregar objetos estructurados
@@ -484,7 +270,6 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   formIsInvalid(): boolean {
     if (!this.form) return true;
     if (!this.form.valid) return true;
->>>>>>> dev
 
     const formulario = this.getFormularioToSend();
     const keysConfig = Object.keys(formulario);

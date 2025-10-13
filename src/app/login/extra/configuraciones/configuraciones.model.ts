@@ -16,8 +16,10 @@ export enum formFieldName {
   is_db_local = 'is_db_local',
   calcular_itbis = 'calcular_itbis',
   is_produccion = 'is_produccion',
+  has_contabilidad = 'has_contabilidad',
   facturacion_editar_precio = 'facturacion_editar_precio',
   vende_sin_inventario = 'vende_sin_inventario',
+  can_pagar = 'can_pagar',
   medida_producto_terminado = 'medida_producto_terminado',
   documentos_a_imprimir = 'documentos_a_imprimir',
 
@@ -31,6 +33,7 @@ export enum formFieldName {
   page_size_nota = 'page_size_nota',
   page_size_cuadre_caja = 'page_size_cuadre_caja',
   page_size_reporte = 'page_size_reporte',
+  page_size_pago_factura = 'page_size_pago_factura',
 
   printer_venta_contado = 'printer_venta_contado',
   printer_venta_credito = 'printer_venta_credito',
@@ -42,6 +45,7 @@ export enum formFieldName {
   printer_nota = 'printer_nota',
   printer_cuadre_caja = 'printer_cuadre_caja',
   printer_reporte = 'printer_reporte',
+  printer_pago_factura = 'printer_pago_factura',
 }
 
 export enum formFieldId {
@@ -60,8 +64,10 @@ export enum formFieldId {
   is_db_local = 'field_is_db_local',
   calcular_itbis = 'field_calcular_itbis',
   is_produccion = 'field_is_produccion',
+  has_contabilidad = 'field_has_contabilidad',
   facturacion_editar_precio = 'field_facturacion_editar_precio',
   vende_sin_inventario = 'field_vende_sin_inventario',
+  can_pagar = 'field_can_pagar',
   medida_producto_terminado = 'field_medida_producto_terminado',
   documentos_a_imprimir = 'field_documentos_a_imprimir',
 
@@ -75,6 +81,7 @@ export enum formFieldId {
   page_size_nota = 'field_page_size_nota',
   page_size_cuadre_caja = 'field_page_size_cuadre_caja',
   page_size_reporte = 'field_page_size_reporte',
+  page_size_pago_factura = 'field_page_size_pago_factura',
 
   printer_venta_contado = 'field_printer_venta_contado',
   printer_venta_credito = 'field_printer_venta_credito',
@@ -86,4 +93,5 @@ export enum formFieldId {
   printer_nota = 'field_printer_nota',
   printer_cuadre_caja = 'field_printer_cuadre_caja',
   printer_reporte = 'field_printer_reporte',
+  printer_pago_factura = 'field_printer_pago_factura',
 }
