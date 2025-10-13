@@ -1,4 +1,3 @@
-<<<<<<< HEAD:src/assets/my_styles/forms.scss
 @mixin noPrimengFocus {
   box-shadow: none !important;
   outline: 0 !important;
@@ -24,27 +23,6 @@
   }
 }
 
-.required-field-label::after {
-  content: '*';
-  color: #e7515a;
-  font-size: 17px;
-  font-weight: 500;
-  transform: translate(1px, -3px);
-  position: absolute;
-}
-
-.p-checkbox-box {
-  &.p-highlight {
-    &[aria-checked='true'] {
-      border-color: #20b9d5 !important;
-      background: #20b9d5 !important;
-    }
-    &[aria-checked='false'] {
-      border-color: #bd4848 !important;
-      background: #bd4848 !important;
-    }
-  }
-=======
 @mixin formField {
   width: 100%;
   background-color: #ffffffe8;
@@ -71,12 +49,33 @@
   background-color: #e9ecef !important;
   opacity: 1 !important;
 }
->>>>>>> dev:src/assets/my_styles/elements/forms.scss
 
 @mixin formFieldFocus {
   border-color: transparent !important;
   box-shadow: 0px 0px 6px var(--primary08) !important;
   outline: 2px solid var(--primary08) !important;
+}
+
+.required-field-label::after {
+  content: '*';
+  color: #e7515a;
+  font-size: 17px;
+  font-weight: 500;
+  transform: translate(1px, -3px);
+  position: absolute;
+}
+
+.p-checkbox-box {
+  &.p-highlight {
+    &[aria-checked='true'] {
+      border-color: #20b9d5 !important;
+      background: #20b9d5 !important;
+    }
+    &[aria-checked='false'] {
+      border-color: #bd4848 !important;
+      background: #bd4848 !important;
+    }
+  }
 }
 
 .p-tag {
@@ -96,118 +95,6 @@
   padding: 0 !important;
 }
 
-<<<<<<< HEAD:src/assets/my_styles/forms.scss
-.p-dropdown {
-  display: flex !important;
-  align-items: center !important;
-  background: #ffffff;
-  border: 1px solid #d0d0d0;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-  color: #1d253b !important;
-  border-radius: 0.25rem !important;
-  box-shadow: 1px 1px 4px 0px rgba(29, 37, 59, 0.2392156863) !important;
-
-  &.p-focus,
-  &.p-dropdown-open {
-    @include primengFocus;
-  }
-
-  &.p-disabled {
-    @include disabledInput;
-  }
-
-  &.p-disabled {
-    background-color: #e9ecef !important;
-    touch-action: none !important;
-    pointer-events: none !important;
-    opacity: 1 !important;
-
-    .p-dropdown-label {
-      color: #acb9c5d4 !important;
-
-      @include noPrimengFocus;
-    }
-  }
-
-  .p-dropdown-label {
-    font-weight: 400 !important;
-    padding: 0.4rem 0.5rem;
-  }
-
-  &.p-inputwrapper-focus {
-    .p-inputtext.p-dropdown-label:enabled:focus {
-      padding: 0 !important;
-      background-color: transparent !important;
-      box-shadow: 0px 0px 0px transparent !important;
-    }
-  }
-
-  &.p-dropdown-clearable {
-    .p-dropdown-label {
-      padding-right: 15px !important;
-    }
-
-    .p-dropdown-clear-icon {
-      margin-right: 0.5rem !important;
-    }
-  }
-
-  &.dropdown-sm {
-    .p-dropdown-label {
-      padding: 0.2rem 0.5rem;
-    }
-  }
-
-  &.min-padding {
-    .p-dropdown-label {
-      padding: 0.4rem 0rem !important;
-    }
-  }
-}
-
-.p-dropdown-panel {
-  z-index: 99999999999 !important;
-
-  .p-dropdown-header {
-    padding: 0.2rem !important;
-
-    .p-dropdown-filter-container {
-      input {
-        &:focus {
-          @include primengFocus;
-        }
-      }
-    }
-  }
-  .p-dropdown-items-wrapper {
-    .p-dropdown-items {
-      .p-dropdown-item {
-        min-height: 2.2rem;
-        text-wrap: wrap;
-        &.p-highlight {
-          background-color: var(--transparente04) !important;
-          color: black;
-          font-weight: 600;
-        }
-      }
-    }
-  }
-}
-
-@mixin campos {
-  background-color: #ffffffe8;
-  color: #1d253b !important;
-  box-shadow: 1px 1px 4px 0px #1d253b3d !important;
-  &:focus {
-    @include primengFocus;
-  }
-  &:hover {
-    cursor: pointer;
-  }
-}
-
-=======
->>>>>>> dev:src/assets/my_styles/elements/forms.scss
 textarea {
   width: 100% !important;
   border-radius: 0.25rem !important;
@@ -269,13 +156,10 @@ textarea {
 }
 
 .form-group {
-<<<<<<< HEAD:src/assets/my_styles/forms.scss
   display: flex;
   flex-direction: column;
-=======
   margin-bottom: 0.9rem;
 
->>>>>>> dev:src/assets/my_styles/elements/forms.scss
   > label {
     color: #1d253b;
   }
@@ -289,27 +173,6 @@ textarea {
   // > input:not(.apple-switch) {
   //   @include formField;
   // }
-}
-
-<<<<<<< HEAD:src/assets/my_styles/forms.scss
-.entrada {
-  border-radius: 0 !important;
-  height: calc(1.5em + 0.3rem + 2px) !important;
-  padding: 0rem 0.3rem 0rem 0.5rem !important;
-  box-shadow: none !important;
-  &:focus {
-    background-color: var(--primary01);
-    border-color: #d4d4d4 !important;
-    box-shadow: 1px 1px #d4d4d4 !important;
-  }
-
-  & > .p-dropdown-label {
-    padding: 0 !important;
-    border-radius: 0 !important;
-  }
-  & > .p-dropdown-trigger {
-    width: auto !important;
-  }
 }
 
 p-inputswitch {
@@ -329,8 +192,6 @@ p-inputswitch {
   }
 }
 
-=======
->>>>>>> dev:src/assets/my_styles/elements/forms.scss
 .p-inputtext:enabled {
   &:focus {
     @include formFieldFocus;
