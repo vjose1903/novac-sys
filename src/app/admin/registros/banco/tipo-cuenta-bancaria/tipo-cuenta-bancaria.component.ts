@@ -1,23 +1,32 @@
-import { HtmlElementsService } from './../../../../core/services/html-elements.service';
-import { TablasService } from './../../../components/new_tablas/tablas.service';
-import { Permisos } from './../../../../core/typescript/permisos';
-import { tableCellType, table_config } from './../../../components/new_tablas/tabla-class';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { Permisos } from '@core/typescript/permisos';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { TipoCuentaBancariaC, TipoCuentaBancariaI, tableTipoCuentaBancaria } from './tipo_cuenta_bancaria';
-import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
-import { MixinClass } from './../../../../core/typescript/MixinClass';
-import { Component, OnInit, inject } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { fun } from './../../../../core/services/functions.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Component, Input, OnInit, inject } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { fun } from '@core/services/functions.service';
 import { NgxPermissionsService } from 'ngx-permissions';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
+import { DirectivesModule } from '@core/directive/directives.module';
+import { SelectModule } from 'primeng/select';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { TablasModule } from '@core/components/new_tablas/tablas.module';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-tipo-cuenta-bancaria',
   templateUrl: './tipo-cuenta-bancaria.component.html',
   styleUrls: ['./tipo-cuenta-bancaria.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, FormErrorMsgComponent, DirectivesModule, SelectModule, SelectButtonModule, TablasModule, TooltipModule],
 })
-export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, ModalI {
-  modalComponent: ModalComponentI;
-  inputs: TipoCuentaBancariaI;
+export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, IDynamicModal {
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
   fun = fun;
   permissions = Permisos;
   hasPermissionsCreateUpdate: boolean;
@@ -34,7 +43,7 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
     colores: true,
     padding: '0.5rem',
     id_tabla: tableTipoCuentaBancaria,
-    padre_functions: { data_request: (params) => this.getTipoCuentasBancarias(params) },
+    padre_functions: { data_request: params => this.getTipoCuentasBancarias(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, is_local: false },
     botones: {
@@ -45,7 +54,11 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
 
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private fb: UntypedFormBuilder, private permissionsService: NgxPermissionsService, private tServ: TablasService) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    private permissionsService: NgxPermissionsService,
+    private tServ: TablasService
+  ) {
     super();
   }
 
@@ -63,7 +76,7 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
   }
 
   createForm() {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       this.formGroup = this.fb.group({
         id: [{ value: null, disabled: false }],
         descripcion: [{ value: null, disabled: false }, Validators.required],
@@ -78,7 +91,7 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
   }
 
   checkPermissions() {
-    this.permissionsService.hasPermission([this.permissions.cuenta_bancaria.create, this.permissions.cuenta_bancaria.update]).then((result) => (this.hasPermissionsCreateUpdate = result));
+    this.permissionsService.hasPermission([this.permissions.cuenta_bancaria.create, this.permissions.cuenta_bancaria.update]).then(result => (this.hasPermissionsCreateUpdate = result));
   }
 
   getTipoCuentasBancarias(params?: { per_page?: number; page?: number; search?: string }) {
@@ -86,7 +99,7 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
     const extra = { parameters: { page: params.page, per_page: params.per_page, paginado: true, filter_target: palabra_a_buscar } };
 
     this.listaTipoCuentasBancarias.length = 0;
-    this.tipoCuentaBancariaClass.getAll(extra).then((res) => {
+    this.tipoCuentaBancariaClass.getAll(extra).then(res => {
       this.listaTipoCuentasBancarias = fun.deepCloning(res.data);
 
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
@@ -128,10 +141,10 @@ export class TipoCuentaBancariaComponent extends MixinClass implements OnInit, M
     }
   }
 
-  btn_aceptar() {
+  submit() {
     const formulario = this.formGroup.getRawValue();
 
-    this.tipoCuentaBancariaClass.createOne(formulario).then((res) => {
+    this.tipoCuentaBancariaClass.createOne(formulario).then(res => {
       this.borrar();
 
       const actualPagination = this.tServ.getPaginationById(tableTipoCuentaBancaria);

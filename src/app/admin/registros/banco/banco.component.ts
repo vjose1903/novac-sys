@@ -1,24 +1,27 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
+import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { ModalClass } from '../../components/modal/modal-class';
-import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { fun } from './../../../core/services/functions.service';
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { customValidators } from './../../../core/typescript/custom-validators';
-import { Permisos } from './../../../core/typescript/permisos';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { fun } from '@core/services/functions.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { customValidators } from '@core/typescript/custom-validators';
+import { Permisos } from '@core/typescript/permisos';
 import { BancoC, bancoFormAttr, bancoFormFieldId, BancoI, ListaBancoC, ListBancoI, nombreBancoConfig } from './banco.utils';
 import { CuentaBancariaFormComponent } from './cuenta-bancaria-form/cuenta-bancaria-form.component';
 import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar, modalTipoCuentaBancaria } from './cuenta-bancaria-form/cuenta_bancaria';
 import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-bancaria.component';
-import { ImagenService } from './../../../core/services/imagen.service';
+import { ImagenService } from '@core/services/imagen.service';
 import { pairwise, startWith } from 'rxjs';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
 @Component({
   selector: 'app-banco',
   templateUrl: './banco.component.html',
   styleUrls: ['./banco.component.scss'],
+  standalone: false,
 })
 export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   formGroup: UntypedFormGroup;
@@ -62,15 +65,19 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_banco',
-    padre_functions: { data_request: (params) => this.getBancos(params) },
+    padre_functions: { data_request: params => this.getBancos(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, is_local: false },
   };
   tablaComponent;
 
   htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+  public imgServ = inject(ImagenService);
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public imgServ: ImagenService) {
+  constructor() {
     super();
   }
 
@@ -79,7 +86,6 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.necesarioStart();
   }
-
 
   ngOnDestroy(): void {
     this._destroy_mixin();
@@ -94,7 +100,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   createForm() {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       this.formGroup = this.fb.group({
         id: [{ value: null, disabled: false }],
         [bancoFormAttr.nombre]: [{ value: null, disabled: false }, Validators.required],
@@ -146,7 +152,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   addItem(cuentaBancaria?: CuentaBancariaI) {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const arrayCuentasBancarias = this.formGroup.get('cuentas_bancarias') as UntypedFormArray;
       arrayCuentasBancarias.push(this.createItemCuentaBancaria(cuentaBancaria));
       resolve();
@@ -161,13 +167,13 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   fillCuentasBancarias(cuentas: Array<CuentaBancariaI>) {
     this.clearArrayCuentasBancarias();
 
-    cuentas.forEach((cuenta) => {
+    cuentas.forEach(cuenta => {
       this.addItem(cuenta);
     });
   }
 
   async getNombresBancos() {
-    this.listaBancosClass.getAll().then((res) => (this.bancosList = res.data));
+    this.listaBancosClass.getAll().then(res => (this.bancosList = res.data));
   }
 
   editCuentaBancaria(previousData, editedData) {
@@ -227,7 +233,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
     this.listaBancos.length = 0;
 
-    this.bancoClass.getAll(extra).then((res) => {
+    this.bancoClass.getAll(extra).then(res => {
       res.data = res.data.map((banco: BancoI) => {
         banco = this.parseBanco(banco);
         banco.warning_bg = fun.isEmpty(banco.rnc) || fun.isEmpty(banco.telefono) || fun.isEmpty(banco.ejecutivo_cuenta) || fun.isEmpty(banco.telefono_ejecutivo_cuenta);
@@ -251,7 +257,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   parseBanco(bancoParsed) {
-    bancoParsed.nombre = this.bancosList.find((banco) => banco.nombre == bancoParsed.nombre);
+    bancoParsed.nombre = this.bancosList.find(banco => banco.nombre == bancoParsed.nombre);
 
     bancoParsed.edit_banco = 'fas fa-pencil-alt';
     bancoParsed.delete_banco = 'far fa-trash-alt';
@@ -281,16 +287,17 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   eliminarReg(data) {
-    const objToSend = {
-      data: data,
-      texto: `¿Está seguro que desea eliminar el banco: <b> ${data.nombre} </b>?`,
-      siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('lista_banco');
-        this.bancoClass.deleteOne(data.id).then((res) => this.getBancos(actualPagination));
-      },
+    const onYes = () => {
+      const actualPagination = this.tServ.getPaginationById('lista_banco');
+      this.bancoClass.deleteOne(data.id).then(res => this.getBancos(actualPagination));
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el banco: <b> ${data.nombre} </b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
   }
 
   nuevoRegistro() {
@@ -317,41 +324,47 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
   openModalCuentasBancarias(cuenta?: CuentaBancariaI) {
     //
 
-    this.openNewModal({
-      component: CuentaBancariaFormComponent,
-      inputs: { cuenta, banco: this.formGroup.getRawValue() },
-      id: modalCuentaBancaria,
-      header: cuenta ? 'Actualizar cuenta bancaria' : 'Registro cuenta bancaria',
-      width: '40rem',
-      botones: { aceptar: { show: true, disable: true, btnId: modalCuentaBancariaBtnAceptar }, cancelar: { show: true, disable: false } },
-    });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.id = modalCuentaBancaria;
+    modalConfig.width = '40rem';
+    modalConfig.component = CuentaBancariaFormComponent;
+    modalConfig.inputs = { cuenta, banco: this.formGroup.getRawValue() };
+    modalConfig.header = cuenta ? 'Actualizar cuenta bancaria' : 'Registro cuenta bancaria';
+
+    modalConfig.botones = [
+      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cancelar', disable: false },
+      { id: modalCuentaBancariaBtnAceptar, clase: 'btn btn-verde', label: 'Aceptar', disable: true },
+    ];
+
+    modalConfig.setCallback((arg: ICallbackModal) => this.processCuentaBancaria(arg));
+    modalConfig.show();
   }
 
-  async getDataFromModal(cuentaBancaria: CuentaBancariaI, search?) {
-    if (cuentaBancaria.modalId == modalCuentaBancaria) {
-      const currentCuenta = this.formGroup.get('cuentas_bancarias').value.find((cuenta) => cuenta.arrayId == cuentaBancaria.arrayId);
-      const promisesArray = [];
+  processCuentaBancaria(arg: ICallbackModal) {
+    if (arg.type == modalCloseType.onHide) return;
+    // TODO: revisar esto
+    const cuentaBancaria = arg.data;
 
-      if (currentCuenta) promisesArray.push(this.editCuentaBancaria(currentCuenta, cuentaBancaria));
-      else promisesArray.push(this.addItem(cuentaBancaria));
+    const currentCuenta = this.formGroup.get('cuentas_bancarias').value.find(cuenta => cuenta.arrayId == cuentaBancaria.arrayId);
+    const promisesArray = [];
 
-      Promise.all(promisesArray).then((res) => {});
-    }
+    if (currentCuenta) promisesArray.push(this.editCuentaBancaria(currentCuenta, cuentaBancaria));
+    else promisesArray.push(this.addItem(cuentaBancaria));
+
+    Promise.all(promisesArray).then(res => {});
   }
 
   openModalTipoCuentasBancarias() {
     //
-    this.openNewModal({
-      component: TipoCuentaBancariaComponent,
-      inputs: null,
-      id: modalTipoCuentaBancaria,
-      header: 'Tipos de cuentas bancarias',
-      width: '70rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
-      },
-    });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.id = modalTipoCuentaBancaria;
+    modalConfig.width = '70rem';
+    modalConfig.component = TipoCuentaBancariaComponent;
+    modalConfig.header = 'Tipos de cuentas bancarias';
+
+    modalConfig.botones = [{ clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cancelar', disable: false }];
+
+    modalConfig.show();
   }
 
   formIsInvalid() {
@@ -414,7 +427,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (typeof formValue.nombre != 'string') formValue.nombre = formValue.nombre.nombre;
 
-    this.bancoClass.createUpdateOne(formValue).then((res) => {
+    this.bancoClass.createUpdateOne(formValue).then(res => {
       const actualPagination = this.tServ.getPaginationById('lista_banco');
       this.getBancos(actualPagination);
       this.borrar(false);

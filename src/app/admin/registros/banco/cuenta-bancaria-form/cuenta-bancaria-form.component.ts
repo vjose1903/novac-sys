@@ -1,24 +1,35 @@
-import { HtmlElementsService } from './../../../../core/services/html-elements.service';
-import { Component, OnInit, inject } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MixinClass } from '../../../../core/typescript/MixinClass';
-import { ModalComponentI, ModalI } from '../../../components/modal/modal-class';
+import { HtmlElementsService } from '@services/html-elements.service';
+import { Component, Input, OnInit, inject } from '@angular/core';
+import { ReactiveFormsModule, FormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { BancoI, ListBancoI } from '../banco.utils';
 import { TipoCuentaBancariaC, TipoCuentaBancariaI } from '../tipo-cuenta-bancaria/tipo_cuenta_bancaria';
-import { fun } from './../../../../core/services/functions.service';
-import { ImagenService } from './../../../../core/services/imagen.service';
+import { fun } from '@services/functions.service';
+import { ImagenService } from '@services/imagen.service';
 import { DivisaService } from './../../divisa/divisa.service';
 import { CuentaBancariaI, modalCuentaBancaria, modalCuentaBancariaBtnAceptar } from './cuenta_bancaria';
-import { booleanYesNo } from './../../../../core/typescript/constantes';
+import { booleanYesNo } from '@core/typescript/constantes';
+import { IDynamicModal, IModalConfiguration } from '@components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
+import { DirectivesModule } from '@core/directive/directives.module';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @Component({
   selector: 'app-cuenta-bancaria-form',
   templateUrl: './cuenta-bancaria-form.component.html',
   styleUrls: ['./cuenta-bancaria-form.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, FormErrorMsgComponent, DirectivesModule, DatePickerModule, SelectModule, SelectButtonModule],
 })
-export class CuentaBancariaFormComponent extends MixinClass implements OnInit, ModalI {
-  modalComponent: ModalComponentI;
-  inputs: { cuenta: CuentaBancariaI; banco: BancoI };
+export class CuentaBancariaFormComponent extends MixinClass implements OnInit, IDynamicModal {
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
+  @Input() cuenta: CuentaBancariaI;
+  @Input() banco: BancoI;
+
   fun = fun;
   formGroup: UntypedFormGroup;
   formInitialValue: CuentaBancariaI;
@@ -33,23 +44,27 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   hasChequeraOptions = booleanYesNo;
   htmlServ = inject(HtmlElementsService);
 
-  constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService, public imgServ: ImagenService) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    public divisaServ: DivisaService,
+    public imgServ: ImagenService
+  ) {
     super();
   }
 
   ngOnInit(): void {
     this.necesarioStart();
-    this.nombreBanco = (this.inputs?.banco?.nombre as ListBancoI)?.nombre;
+    this.nombreBanco = (this.banco?.nombre as ListBancoI)?.nombre;
   }
 
   async necesarioStart() {
     this.initVariables();
     await this.getTipoCuentasBancarias();
 
-    await this.createForm(this.inputs.cuenta).then(() => {
+    await this.createForm(this.cuenta).then(() => {
       this.formInitialValue = this.formGroup.getRawValue();
 
-      this.formGroup.valueChanges.subscribe((change) => {
+      this.formGroup.valueChanges.subscribe(change => {
         this.validateSaveBtnState();
       });
 
@@ -62,7 +77,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   }
 
   createForm(cuenta?) {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const divisa_principal = this.divisaServ.getDivisaPrincipalInfo();
 
       this.formGroup = this.fb.group({
@@ -93,7 +108,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
     const extra = { parameters: { paginado: false } };
 
     this.listaTipoCuentasBancarias.length = 0;
-    this.tipoCuentaBancariaClass.getAll(extra).then((res) => {
+    this.tipoCuentaBancariaClass.getAll(extra).then(res => {
       this.listaTipoCuentasBancarias = fun.deepCloning(res.data);
     });
   }
@@ -122,7 +137,7 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
         siguiente_input = 'campoBalanceBanco';
         break;
       case 'campoBalanceBanco':
-        if (!this.formIsInvalid()) this.btn_aceptar();
+        if (!this.formIsInvalid()) this.submit();
         break;
     }
 
@@ -138,8 +153,8 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
   validateSaveBtnState() {
     const buttonIsDisable = this.formIsInvalid();
 
-    if (this.modalComponent && this.modalComponent.changeStateButton) {
-      this.modalComponent.changeStateButton({ modalId: modalCuentaBancaria, btnId: modalCuentaBancariaBtnAceptar, disable: buttonIsDisable });
+    if (this.modalConfig && this.modalConfig.modalWrapper.changeStateButton) {
+      this.modalConfig.modalWrapper.changeStateButton({ modalId: modalCuentaBancaria, btnId: modalCuentaBancariaBtnAceptar, disable: buttonIsDisable });
     }
   }
 
@@ -160,9 +175,9 @@ export class CuentaBancariaFormComponent extends MixinClass implements OnInit, M
     return fun.hasValue(formulario.divisa_id) ? !this.divisaServ.listaDivisasIndexada[formulario.divisa_id].is_principal : false;
   }
 
-  btn_aceptar() {
+  submit() {
     const formulario = this.formGroup.getRawValue();
 
-    this.modalComponent.closeModal(this.modalComponent.id, formulario);
+    this.modalConfig.close(formulario);
   }
 }
