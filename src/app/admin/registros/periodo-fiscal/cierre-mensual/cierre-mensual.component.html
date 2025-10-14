@@ -1,18 +1,17 @@
 <h5 class="mb-0">
-  Periodo Fiscal <strong>{{ inputs.fecha_inicio }}</strong> - <strong>{{ inputs.fecha_cierre }}</strong>
+  Periodo Fiscal <strong>{{ fecha_inicio }}</strong> - <strong>{{ fecha_cierre }}</strong>
 </h5>
 
 <div class="meses-container">
   <div
     *ngFor="let mes of meses"
     class="mes-item"
-    [ngClass]="{ closed: inputs.detalle_periodo_fiscal[mes] == false, open: inputs.detalle_periodo_fiscal[mes] == true, hold: inputs.detalle_periodo_fiscal[mes] == null }"
-    (click)="openOverlay($event, overlayCierreMensual, mes, inputs.detalle_periodo_fiscal[mes])"
-  >
+    [ngClass]="{ closed: detalle_periodo_fiscal[mes] == false, open: detalle_periodo_fiscal[mes] == true, hold: detalle_periodo_fiscal[mes] == null }"
+    (click)="openOverlay($event, overlayCierreMensual, mes, detalle_periodo_fiscal[mes])">
     {{ mes }}
   </div>
 
-  <p-overlayPanel [dismissable]="true" [showCloseIcon]="false" #overlayCierreMensual styleClass="dropConfigs" (onHide)="cerrarOverlay()" styleClass="cierreMensualOverlay">
+  <p-popover #overlayCierreMensual [dismissable]="true" styleClass="no-carret cierreMensualOverlay" appendTo="body" (onHide)="cerrarOverlay()">
     <ng-template pTemplate>
       <div id="overlayCierreMensual">
         <ul class="overlayCierreMensual" role="menu">
@@ -32,5 +31,5 @@
         </ul>
       </div>
     </ng-template>
-  </p-overlayPanel>
+  </p-popover>
 </div>

@@ -1,21 +1,24 @@
-import { fun } from './../../../core/services/functions.service';
-import { Permisos } from './../../../core/typescript/permisos';
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { requestParameters } from '../../../core/typescript/crud-g';
-import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
-import { TablasService } from '../../components/new_tablas/tablas.service';
+import { fun } from '@core/services/functions.service';
+import { Permisos } from '@core/typescript/permisos';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { requestParameters } from '@core/typescript/crud-g';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
+import { TablasService } from '@components/new_tablas/tablas.service';
 import { PeriodoFiscalC, PeriodoFiscalI } from './periodo-fiscal';
 import { CierreMensualComponent } from './cierre-mensual/cierre-mensual.component';
-import { ModalClass } from '../../components/modal/modal-class';
-import { DateUtils } from '../../../core/typescript/date.utils';
-
+import { DateUtils } from '@vjose1903/dateutils';
 import * as _ from 'lodash';
-const moment = require('../../../core/javascript/moment');
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+
+const moment = require('@core/javascript/moment');
 @Component({
   selector: 'app-periodo-fiscal',
   templateUrl: './periodo-fiscal.component.html',
   styleUrls: ['./periodo-fiscal.component.scss'],
+  standalone: false,
 })
 export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDestroy {
   listaPeriodosFiscales: Array<PeriodoFiscalI> = [];
@@ -50,26 +53,22 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_periodos',
-    padre_functions: { data_request: (params) => this.getPeriodosFiscales(params) },
+    padre_functions: { data_request: params => this.getPeriodosFiscales(params) },
     filtrar: { local: false },
     obj_paginate: { show: true, showTotal: true, is_local: false },
   };
   tablaComponent;
 
-  constructor(private tServ: TablasService) {
+  public dynamicModalServ = inject(DynamicModalService);
+  private tServ = inject(TablasService);
+
+  constructor() {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'reg_periodo_fiscal', is_routing: true });
     this.necesarioStart();
-  }
-
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
   }
 
   ngOnDestroy(): void {
@@ -131,7 +130,7 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
     const only_meses = fun.deepCloning(periodo.detalle_periodo_fiscal);
     delete only_meses.id;
 
-    const is_periodo_months_all_close = Object.values(only_meses).every((item) => item == false);
+    const is_periodo_months_all_close = Object.values(only_meses).every(item => item == false);
 
     if (periodo.estado && periodo.is_open && is_periodo_months_all_close) res = true;
 
@@ -147,18 +146,16 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
       if (params.iconKey == 'cierre_mensual') {
-        this.openNewModal({
-          component: CierreMensualComponent,
-          inputs: params.data,
-          id: 'cierre_mensual_modal',
-          header: 'Cierre Mensual',
-          width: '70rem',
-          height: '20rem',
-          botones: {
-            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
-          },
-        });
+        const modalConfig = new DynamicModalClass();
+        modalConfig.id = 'cierre_mensual_modal';
+        modalConfig.width = '70rem';
+        modalConfig.height = '20rem';
+        modalConfig.component = CierreMensualComponent;
+        modalConfig.inputs = params.data;
+        modalConfig.header = 'Cierre Mensual';
+
+        modalConfig.botones = [{ clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+        modalConfig.show();
       }
 
       if (params.iconKey == 'cierre_anual') {
@@ -168,27 +165,27 @@ export class PeriodoFiscalComponent extends MixinClass implements OnInit, OnDest
   }
 
   modalCierreAnual(data?) {
-    const objConfirmationModal = {
-      id: 'cerrar_anio',
-      header: 'Confirmar',
-      texto: `Estas seguro de que deseas cerrar el Periodo Fiscal: <b>${data.fecha_inicio} - ${data.fecha_cierre}</b>`,
-      width: '500px',
-      siFunction: (instance) => {
-        console.log('Peticion de cerrar año');
+    const onYes = () => {
+      console.log('Peticion de cerrar año');
 
-        // this.periodoFiscalClass.deleteOne(comprobanteData.id).then((res) => {
-        //   const actualPagination = this.tServ.getPaginationById('lista_periodos');
-        //   this.getPeriodosFiscales(actualPagination);
-        //   instance.dismissModal(instance.id);
-        // });
-      },
+      // this.periodoFiscalClass.deleteOne(comprobanteData.id).then((res) => {
+      //   const actualPagination = this.tServ.getPaginationById('lista_periodos');
+      //   this.getPeriodosFiscales(actualPagination);
+      //   instance.dismissModal(instance.id);
+      // });
     };
-    this.confirmationModal(objConfirmationModal);
+
+    this.dynamicModalServ.confirmationModal({
+      id: 'cerrar_anio',
+      texto: `Estas seguro de que deseas cerrar el Periodo Fiscal: <b>${data.fecha_inicio} - ${data.fecha_cierre}</b>`,
+      btnKind: confirmationButtons.cancelarCerrar,
+      onYes: onYes.bind(this),
+    });
   }
 
   abrirNuevoPeriodo() {
     const requestParameters: requestParameters = { afterPath: 'custom/open_new_periodo' };
-    this.periodoFiscalClass.createOne({}, requestParameters).then((res) => {
+    this.periodoFiscalClass.createOne({}, requestParameters).then(res => {
       const actualPagination = this.tServ.getPaginationById('lista_periodos');
       this.getPeriodosFiscales(actualPagination);
     });
