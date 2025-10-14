@@ -21,7 +21,7 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
   @Input() modalWrapper!: DynamicModalComponent;
   @Input() divisa: DivisaI;
 
-  form: UntypedFormGroup;
+  form: UntypedFormGroup; 
 
   desde;
   hasta;

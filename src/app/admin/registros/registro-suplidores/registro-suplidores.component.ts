@@ -155,7 +155,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         return suplidor;
       });
 
-      this.listaSuplidores = res['data'];
+      this.listaSuplidores = res['data'] as SuplidorI[];
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }

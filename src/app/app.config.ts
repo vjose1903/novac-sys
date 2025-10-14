@@ -3,7 +3,7 @@ import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core
 import { importProvidersFrom } from '@angular/core';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
-import { InterceptorService } from './loader/interceptor.service';
+import { InterceptorService } from '@core/services/interceptor.service';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { NgxExtendedPdfViewerModule, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { primeNGLocales } from '@core/typescript/primeNG.locales';

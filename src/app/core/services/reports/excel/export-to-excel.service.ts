@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { exportExcelConfigI } from '../../../interface/export-to-excel.interface';
+import { exportExcelConfigI } from '@core/interface/export-to-excel.interface';
 import { Ss } from '../../singleton.service';
-import { ConfigI } from '../../../interface/config-interface';
-import { MessageTask } from '../../../models/message-task';
-import { ELECTRON_EXPORT_CSV } from '../../../../../../electron/shared-electron-angular';
+import { ConfigI } from '@core/interface/config-interface';
+import { MessageTask } from '@core/typescript/message-task';
+import { ELECTRON_EXPORT_CSV } from '@electron/shared-electron-angular';
 import * as fun_ from '../utils/funciones';
 import { fun } from '../../functions.service';
 import { ReportTypeE } from './excel.interfaces';
@@ -15,7 +15,7 @@ export class ExportToExcelService {
   configApp: ConfigI;
 
   constructor() {
-    this.configApp = Ss.configServ.config
+    this.configApp = Ss.configServ.config;
   }
 
   download(config: exportExcelConfigI, exportData: any) {
