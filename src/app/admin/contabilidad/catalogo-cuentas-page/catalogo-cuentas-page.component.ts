@@ -5,6 +5,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
   selector: 'app-catalogo-cuentas-page',
   templateUrl: './catalogo-cuentas-page.component.html',
   styleUrls: ['./catalogo-cuentas-page.component.scss'],
+  standalone: false,
 })
 export class CatalogoCuentasPageComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnInit() {
