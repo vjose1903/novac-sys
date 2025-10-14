@@ -1,19 +1,21 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { ImagenService } from './../../../core/services/imagen.service';
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
+import { HtmlElementsService } from '@services/html-elements.service';
+import { ImagenService } from '@services/imagen.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Permisos } from '../../../core/typescript/permisos';
+import { Permisos } from '@core/typescript/permisos';
 import { DepositoC, DepositoI, anularDepositoModalId, depositoFormAttr, depositoFormFieldId, depositoTableId } from './deposito.utils';
-import { fun } from '../../../core/services/functions.service';
-import { DateUtils } from '../../../core/typescript/date.utils';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { CuentaBancariaC, CuentaBancariaI } from '../../registros/banco/cuenta-bancaria-form/cuenta_bancaria';
-import { requestParameters } from '../../../core/typescript/crud-g';
-import { PeriodoFiscalC } from '../../registros/periodo-fiscal/periodo-fiscal';
-import { dropdownFilterFocusInput } from '../../../core/typescript/p-dropdown.utils';
-import { DivisaService } from '../../registros/divisa/divisa.service';
+import { fun } from '@services/functions.service';
+import { DateUtils } from '@vjose1903/dateutils';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { CuentaBancariaC, CuentaBancariaI } from '@registros/banco/cuenta-bancaria-form/cuenta_bancaria';
+import { requestParameters } from '@core/typescript/crud-g';
+import { PeriodoFiscalC } from '@registros/periodo-fiscal/periodo-fiscal';
+import { dropdownFilterFocusInput } from '@core/typescript/p-dropdown.utils';
+import { DivisaService } from '@registros/divisa/divisa.service';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-deposito',
@@ -70,7 +72,13 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
   tablaComponent;
 
   htmlServ = inject(HtmlElementsService);
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService, public imgServ: ImagenService) {
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+  public divisaServ = inject(DivisaService);
+  public imgServ = inject(ImagenService);
+  public dynamicModalServ = inject(DynamicModalService);
+
+  constructor() {
     super();
   }
 
@@ -103,7 +111,7 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
     this.depositoList.length = 0;
 
-    this.depositoClass.getAll(extra).then((res) => {
+    this.depositoClass.getAll(extra).then(res => {
       this.depositoList = res.data.map((deposito: DepositoI) => {
         deposito[depositoFormAttr.cuenta_bancaria_id] = deposito.cuenta_bancaria.id;
         deposito[depositoFormAttr.divisa_id] = deposito.divisa.id;
@@ -160,7 +168,7 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
   formatearMonto(formFieldName) {
     const input = this.formGroup.controls[formFieldName];
-    fun.revisarNumber(input, formFieldName).then((res) => {
+    fun.revisarNumber(input, formFieldName).then(res => {
       input.setValue(res.error ? '' : res.number);
     });
   }
@@ -207,7 +215,7 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
         const fecha_equivalente = DateUtils.format({ date: date, dateFormat: 'YYYY-MM-DD' });
 
         const requestParameters: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
-        this.peridoClass.getAll(requestParameters).then((response) => {
+        this.peridoClass.getAll(requestParameters).then(response => {
           this.enableDisableFields(response.data.isOpen ? 'enable' : 'disable');
 
           if (!response.data.isOpen) {
@@ -250,28 +258,25 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   anularItem(deposito: DepositoI) {
-    this.validateOpenPeriod(DateUtils.parse(deposito.fecha_equivalente), 'anulate').then(() => {
+    this.validateOpenPeriod(deposito.fecha_equivalente, 'anulate').then(() => {
       const identifier = deposito.numero_referencia || deposito.comentario;
 
-      const anularFunction = (data) => {
-        this.depositoClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
+      const anularFunction = data => {
+        this.depositoClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then(res => {
           this.reloadDepositosInSamePage();
         });
       };
 
-      this.confirmationModal({
+      this.dynamicModalServ.confirmationModal({
         id: anularDepositoModalId,
-        header: 'Confirmar',
         texto: `Seguro que desea <b class="negrita"> ANULAR </b> el deposito <b class="negrita">${identifier}</b>`,
-        siFunction: (instance) => {
-          anularFunction(deposito);
-          instance.dismissModal(instance.id);
-        },
+        btnKind: confirmationButtons.cancelarAnular,
+        onYes: anularFunction.bind(this),
       });
     });
   }
   editarItem(deposito: DepositoI) {
-    this.validateOpenPeriod(DateUtils.parse(deposito.fecha_equivalente), 'update').then(() => {
+    this.validateOpenPeriod(deposito.fecha_equivalente, 'update').then(() => {
       if (fun.hasValue(this.formGroup)) this.formGroup.reset();
 
       setTimeout(() => {
@@ -298,8 +303,8 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     const month = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
 
-    this.minDate = DateUtils.getFirstDayOfMonth({ year: year, month: month });
-    this.maxDate = month == DateUtils.getActualMonth() ? this.maxDate : DateUtils.getLastDayOfMonth({ year: year, month: month });
+    this.minDate = DateUtils.getFirstDayOfMonth({ year: year, month: month }) as Date;
+    this.maxDate = month == DateUtils.getActualMonth() ? this.maxDate : (DateUtils.getLastDayOfMonth({ year: year, month: month }) as Date);
   }
 
   verificateFieldsState() {
@@ -308,12 +313,12 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     const formulario = this.formGroup.getRawValue();
     const funct = fun.hasValue(formulario?.[depositoFormAttr.id]) ? 'disable' : 'enable';
     const fields = [depositoFormAttr.divisa_id];
-    fields.forEach((field) => this.formGroup.controls[field][funct]());
+    fields.forEach(field => this.formGroup.controls[field][funct]());
   }
 
   enableDisableFields(func: 'enable' | 'disable') {
     const fields = [depositoFormAttr.cuenta_bancaria_id, depositoFormAttr.divisa_id, depositoFormAttr.monto, depositoFormAttr.numero_referencia, depositoFormAttr.comentario];
-    fields.forEach((field) => this.formGroup.controls[field][func]());
+    fields.forEach(field => this.formGroup.controls[field][func]());
   }
 
   borrar() {
@@ -330,7 +335,7 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
     dataToSend.fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
     dataToSend.monto = fun.desformatearStNumber(formulario.monto);
 
-    this.depositoClass.createUpdateOne(dataToSend).then((res) => {
+    this.depositoClass.createUpdateOne(dataToSend).then(res => {
       this.reloadDepositosInSamePage();
       this.borrar();
     });
