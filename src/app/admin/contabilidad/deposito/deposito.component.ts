@@ -21,6 +21,7 @@ import { confirmationButtons } from '@core/components/dynamic-modal/config/dynam
   selector: 'app-deposito',
   templateUrl: './deposito.component.html',
   styleUrls: ['./deposito.component.scss'],
+  standalone: false,
 })
 export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
   formGroup: UntypedFormGroup;
