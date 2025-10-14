@@ -1,4 +1,4 @@
-@import './forms.scss';
+@use './forms.scss' as *;
 
 .p-treetable {
   overflow: hidden;
@@ -13,7 +13,7 @@
 
         .p-treetable-scrollable-header-box {
           .p-treetable-scrollable-header-table {
-            .p-treetable-thead {
+            .p-treetable-thead { 
               tr {
                 th {
                   background: transparent;

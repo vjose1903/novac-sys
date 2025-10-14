@@ -1,6 +1,7 @@
-@import './forms.scss';
+@use './forms.scss' as *;
 
-button:disabled {
+
+button:disabled { 
   cursor: not-allowed !important;
   pointer-events: auto !important;
 }

@@ -1,4 +1,4 @@
-@import './forms';
+@use './forms.scss' as *;
 
 p-autocomplete {
   .p-autocomplete {

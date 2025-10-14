@@ -6,174 +6,187 @@
     </div>
   }
 
-  <form *ngIf="formGroup" [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
-    <div class="row">
-      <div class="col-12 p-0">
-        <div class="form-group">
-          <label class="control-label">Descripcion: <span style="color: red">*</span></label>
-          <input type="text" formControlName="descripcion" [appCapitalice]="'formGroup'" (keydown.enter)="saltar(htmlServ.getId($event))" placeholder="Ingrese descripción" id="campoDescripcion" class="form-control" autocomplete="off" tabindex="-1" />
-          <form-error-msg [control]="formGroup.get('descripcion')"></form-error-msg>
+  @if (formGroup) {
+    <form [formGroup]="formGroup" (keydown.enter)="$event.stopPropagation()">
+      <div class="row">
+        <div class="col-12 p-0">
+          <div class="form-group">
+            <label class="control-label">Descripcion: <span style="color: red">*</span></label>
+            <input
+              type="text"
+              formControlName="descripcion"
+              [appCapitalice]="'formGroup'"
+              (keydown.enter)="saltar(htmlServ.getId($event))"
+              placeholder="Ingrese descripción"
+              id="campoDescripcion"
+              class="form-control"
+              autocomplete="off"
+              tabindex="-1" />
+            <form-error-msg [control]="formGroup.get('descripcion')"></form-error-msg>
+          </div>
         </div>
-      </div>
 
-      <div class="col-6 pl-0">
-        <label class="control-label">No. Cuenta: <span style="color: red">*</span></label>
-        <div class="form-group">
-          <input
-            type="text"
-            formControlName="numero_cuenta"
-            [appCapitalice]="'formGroup'"
-            placeholder="Ingrese no. cuenta"
-            id="campoNumeroCuenta"
-            class="form-control"
-            autocomplete="off"
-            (keydown.enter)="saltar(htmlServ.getId($event))"
-            tabindex="-1" />
+        <div class="col-6 pl-0">
+          <label class="control-label">No. Cuenta: <span style="color: red">*</span></label>
+          <div class="form-group">
+            <input
+              type="text"
+              formControlName="numero_cuenta"
+              [appCapitalice]="'formGroup'"
+              placeholder="Ingrese no. cuenta"
+              id="campoNumeroCuenta"
+              class="form-control"
+              autocomplete="off"
+              (keydown.enter)="saltar(htmlServ.getId($event))"
+              tabindex="-1" />
 
-          <form-error-msg [control]="formGroup.get('numero_cuenta')"></form-error-msg>
+            <form-error-msg [control]="formGroup.get('numero_cuenta')"></form-error-msg>
+          </div>
         </div>
-      </div>
 
-      <div class="col-6 pr-0">
-        <div class="form-group">
-          <label class="control-label">Tipo cuenta: <span style="color: red">*</span></label>
+        <div class="col-6 pr-0">
+          <div class="form-group">
+            <label class="control-label">Tipo cuenta: <span style="color: red">*</span></label>
 
-          <p-select
-            #tipoCuentaDropdown
-            inputId="campoTipoCuenta"
-            [options]="listaTipoCuentasBancarias"
-            appendTo="body"
-            formControlName="tipo_cuenta_bancaria_id"
-            optionLabel="descripcion"
-            optionValue="id"
-            placeholder="Seleccione el tipo de cuenta"
-            styleClass="form-control"
-            (keydown.enter)="saltar(htmlServ.getId($event))"
-            (onFocus)="htmlServ.showPSelectPanel($event, tipoCuentaDropdown)"
-            tabindex="-1"
-            [virtualScroll]="true"
-            [virtualScrollItemSize]="30"></p-select>
+            <p-select
+              #tipoCuentaDropdown
+              inputId="campoTipoCuenta"
+              [options]="listaTipoCuentasBancarias"
+              appendTo="body"
+              formControlName="tipo_cuenta_bancaria_id"
+              optionLabel="descripcion"
+              optionValue="id"
+              placeholder="Seleccione el tipo de cuenta"
+              styleClass="form-control"
+              (keydown.enter)="saltar(htmlServ.getId($event))"
+              (onFocus)="htmlServ.showPSelectPanel($event, tipoCuentaDropdown)"
+              tabindex="-1"
+              [virtualScroll]="true"
+              [virtualScrollItemSize]="30"></p-select>
 
-          <form-error-msg [control]="formGroup.get('tipo_cuenta_bancaria_id')"></form-error-msg>
+            <form-error-msg [control]="formGroup.get('tipo_cuenta_bancaria_id')"></form-error-msg>
+          </div>
         </div>
-      </div>
 
-      <div class="col-6 pl-0">
-        <form-divisa-input formControlName="divisa_id" inputId="campoDivisa" (keydownEnter)="saltar(htmlServ.getId($event))"></form-divisa-input>
-      </div>
-
-      <div class="col-6 pr-0">
-        <div class="form-group">
-          <label class="control-label">Tiene chequera:</label>
-
-          <p-selectButton [options]="hasChequeraOptions" styleClass="opt_same_width" formControlName="has_chequera" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
-
-          <form-error-msg [control]="formGroup.get('has_chequera')"></form-error-msg>
+        <div class="col-6 pl-0">
+          <form-divisa-input formControlName="divisa_id" inputId="campoDivisa" (keydownEnter)="saltar(htmlServ.getId($event))"></form-divisa-input>
         </div>
-      </div>
 
-      <div class="col-12 p-0">
-        <small class="ml-2" style="color: grey">Primera Conciliación</small>
+        <div class="col-6 pr-0">
+          <div class="form-group">
+            <label class="control-label">Tiene chequera:</label>
 
-        <div class="roundedDiv mt-2">
-          <div class="row p-0">
-            <div class="col-12 p-0">
-              <div class="row p-0">
-                <div class="col-12 col-md-6 pl-0">
-                  <small class="control-label">Fecha primera conciliación: </small>
-                  <div class="form-group">
-                    <p-datePicker
-                      inputId="fecha_primera_conciliacion_input"
-                      [maxDate]="maxDate"
-                      inputStyleClass="form-control"
-                      formControlName="fecha_primera_conciliacion"
-                      appendTo="body"
-                      dateFormat="dd/mm/yy"
-                      placeholder="dd/mm/aaaa"
-                      tabindex="-1"
-                      (keydown.enter)="saltar(htmlServ.getId($event))"></p-datePicker>
-                    <form-error-msg [control]="formGroup.get('fecha_primera_conciliacion')"></form-error-msg>
+            <p-selectButton [options]="hasChequeraOptions" styleClass="opt_same_width" formControlName="has_chequera" optionLabel="label" optionValue="value" optionDisabled="disabled" [unselectable]="true" />
+
+            <form-error-msg [control]="formGroup.get('has_chequera')"></form-error-msg>
+          </div>
+        </div>
+
+        <div class="col-12 p-0">
+          <small class="ml-2" style="color: grey">Primera Conciliación</small>
+
+          <div class="roundedDiv mt-2">
+            <div class="row p-0">
+              <div class="col-12 p-0">
+                <div class="row p-0">
+                  <div class="col-12 col-md-6 pl-0">
+                    <small class="control-label">Fecha primera conciliación: </small>
+                    <div class="form-group">
+                      <p-datePicker
+                        inputId="fecha_primera_conciliacion_input"
+                        [maxDate]="maxDate"
+                        inputStyleClass="form-control"
+                        formControlName="fecha_primera_conciliacion"
+                        appendTo="body"
+                        dateFormat="dd/mm/yy"
+                        placeholder="dd/mm/aaaa"
+                        tabindex="-1"
+                        (keydown.enter)="saltar(htmlServ.getId($event))"></p-datePicker>
+                      <form-error-msg [control]="formGroup.get('fecha_primera_conciliacion')"></form-error-msg>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div class="col-12 col-md-6 pl-0">
-              <small class="control-label">Balance inicial en libro: </small>
-              <div class="form-group">
-                <input
-                  type="text"
-                  formControlName="balance_inicial_libro"
-                  [appCapitalice]="'formGroup'"
-                  (keydown.enter)="saltar(htmlServ.getId($event))"
-                  placeholder="Ingrese balance"
-                  id="campoBalanceLibro"
-                  class="form-control"
-                  autocomplete="off"
-                  tabindex="-1" />
-                <form-error-msg [control]="formGroup.get('balance_inicial_libro')"></form-error-msg>
-              </div>
-            </div>
-
-            <div class="col-12 col-md-6 pr-0">
-              <small class="control-label">Balance inicial en banco: </small>
-              <div class="form-group">
-                <input
-                  type="text"
-                  formControlName="balance_inicial_banco"
-                  [appCapitalice]="'formGroup'"
-                  (keydown.enter)="saltar(htmlServ.getId($event))"
-                  placeholder="Ingrese balance"
-                  id="campoBalanceBanco"
-                  class="form-control"
-                  autocomplete="off"
-                  tabindex="-1" />
-                <form-error-msg [control]="formGroup.get('balance_inicial_banco')"></form-error-msg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 p-0 mt-3">
-        <small class="ml-2" style="color: grey">Contabilidad</small>
-
-        <div class="roundedDiv mt-2">
-          <div class="row p-0">
-            <div class="col-12 p-0">
-              <div class="row p-0">
-                <div class="col-12 col-md-3 pl-0">
-                  <small class="control-label">Código: </small>
-                  <input type="text" formControlName="cuenta_contable" placeholder="Auto Generable..." id="campoCuentaContable" class="form-control" autocomplete="off" tabindex="-1" />
-                </div>
-
-                <div class="col-12 col-md-9 p-0">
-                  <small class="control-label">Nombre de la cuenta: </small>
-                  <input type="text" formControlName="nombre_cuenta" placeholder="Auto Generable..." id="campoNombreCuentaContable" class="form-control" autocomplete="off" tabindex="-1" />
+              <div class="col-12 col-md-6 pl-0">
+                <small class="control-label">Balance inicial en libro: </small>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    formControlName="balance_inicial_libro"
+                    [appCapitalice]="'formGroup'"
+                    (keydown.enter)="saltar(htmlServ.getId($event))"
+                    placeholder="Ingrese balance"
+                    id="campoBalanceLibro"
+                    class="form-control"
+                    autocomplete="off"
+                    tabindex="-1" />
+                  <form-error-msg [control]="formGroup.get('balance_inicial_libro')"></form-error-msg>
                 </div>
               </div>
-            </div>
 
-            <small class="control-label mt-2" *ngIf="showPrimaFields()" style="color: grey; font-weight: 100 !important"> Cuenta Prima </small>
-
-            <div class="col-12 p-2 mt-1 colPrima" *ngIf="showPrimaFields()">
-              <div class="row p-0">
-                <div class="col-12 p-0"></div>
-
-                <div class="col-12 col-md-3 pl-0">
-                  <small class="control-label">Código: </small>
-                  <input type="text" formControlName="cuenta_contable_prima" placeholder="Auto Generable..." id="campoCuentaContablePrima" class="form-control" autocomplete="off" />
-                </div>
-
-                <div class="col-12 col-md-9 p-0">
-                  <small class="control-label">Nombre de la cuenta: </small>
-                  <input type="text" formControlName="nombre_cuenta_prima" placeholder="Auto Generable..." id="campoNombreCuentaContablePrima" class="form-control" autocomplete="off" />
+              <div class="col-12 col-md-6 pr-0">
+                <small class="control-label">Balance inicial en banco: </small>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    formControlName="balance_inicial_banco"
+                    [appCapitalice]="'formGroup'"
+                    (keydown.enter)="saltar(htmlServ.getId($event))"
+                    placeholder="Ingrese balance"
+                    id="campoBalanceBanco"
+                    class="form-control"
+                    autocomplete="off"
+                    tabindex="-1" />
+                  <form-error-msg [control]="formGroup.get('balance_inicial_banco')"></form-error-msg>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <div class="col-12 p-0 mt-3">
+          <small class="ml-2" style="color: grey">Contabilidad</small>
+
+          <div class="roundedDiv mt-2">
+            <div class="row p-0">
+              <div class="col-12 p-0">
+                <div class="row p-0">
+                  <div class="col-12 col-md-3 pl-0">
+                    <small class="control-label">Código: </small>
+                    <input type="text" formControlName="cuenta_contable" placeholder="Auto Generable..." id="campoCuentaContable" class="form-control" autocomplete="off" tabindex="-1" />
+                  </div>
+
+                  <div class="col-12 col-md-9 p-0">
+                    <small class="control-label">Nombre de la cuenta: </small>
+                    <input type="text" formControlName="nombre_cuenta" placeholder="Auto Generable..." id="campoNombreCuentaContable" class="form-control" autocomplete="off" tabindex="-1" />
+                  </div>
+                </div>
+              </div>
+
+              @if (showPrimaFields()) {
+                <small class="control-label mt-2" style="color: grey; font-weight: 100 !important"> Cuenta Prima </small>
+
+                <div class="col-12 p-2 mt-1 colPrima">
+                  <div class="row p-0"> 
+                    <div class="col-12 p-0"></div>
+
+                    <div class="col-12 col-md-3 pl-0">
+                      <small class="control-label">Código: </small>
+                      <input type="text" formControlName="cuenta_contable_prima" placeholder="Auto Generable..." id="campoCuentaContablePrima" class="form-control" autocomplete="off" />
+                    </div>
+
+                    <div class="col-12 col-md-9 p-0">
+                      <small class="control-label">Nombre de la cuenta: </small>
+                      <input type="text" formControlName="nombre_cuenta_prima" placeholder="Auto Generable..." id="campoNombreCuentaContablePrima" class="form-control" autocomplete="off" />
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </form>
+    </form>
+  }
 </div>

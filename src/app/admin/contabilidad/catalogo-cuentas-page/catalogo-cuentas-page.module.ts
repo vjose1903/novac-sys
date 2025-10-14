@@ -12,6 +12,6 @@ import { CatalogoCuentasPageRoutingModule } from './catalogo-cuentas-page.routin
 
 @NgModule({
   declarations: [CatalogoCuentasPageComponent],
-  imports: [CommonModule, PipesModule, PrimengModule, BtnIconModule, TablasModule, DirectivesModule, CatalogoCuentasModule, CatalogoCuentasPageRoutingModule],
+  imports: [CommonModule, CatalogoCuentasModule, PipesModule, PrimengModule, BtnIconModule, TablasModule, DirectivesModule, CatalogoCuentasPageRoutingModule],
 })
 export class CatalogoCuentasPageModule {}

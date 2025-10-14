@@ -67,8 +67,8 @@
           </div>
           <div class="col-12 mt-3 mb-2">
             <div class="divContainerHistorial">
-              <div *ngIf="listaHistorial.length" #cardTabla class="fantasma_historial">
-                <dinamic-table [cardTabla]="cardTabla" [(data)]="listaHistorial" [config]="table_config"></dinamic-table>
+              <div #cardTabla class="fantasma_historial">
+                <dinamic-table [cardTabla]="cardTabla" [data]="listaHistorial()" (dataChange)="listaHistorial.set($event)" [config]="table_config"></dinamic-table>
               </div>
             </div>
           </div>

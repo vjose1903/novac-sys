@@ -2,7 +2,7 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { TasaDeCambioC, TasaDeCambioI } from './tasa_de_cambio.utils';
 import { fun } from '@core/services/functions.service';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { DivisaC, DivisaI } from '../divisa.utils';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { DivisaService } from '../divisa.service';
@@ -21,7 +21,7 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
   @Input() modalWrapper!: DynamicModalComponent;
   @Input() divisa: DivisaI;
 
-  form: UntypedFormGroup; 
+  form: UntypedFormGroup;
 
   desde;
   hasta;
@@ -29,7 +29,8 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
 
   tasaDeCambioClass = new TasaDeCambioC();
   divisaClass = new DivisaC();
-  listaHistorial: Array<TasaDeCambioI> = [];
+  listaHistorial = signal<TasaDeCambioI[]>([]);
+  // listaHistorial: Array<TasaDeCambioI> = [];
 
   table_config: table_config = {
     info: [
@@ -79,7 +80,8 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
 
   async getHistorialCambiosTasas() {
     try {
-      this.listaHistorial.length = 0;
+      this.listaHistorial.set([]);
+
       const extra = {
         afterPath: 'custom/get_history_changes',
         parameters: {
@@ -95,7 +97,7 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
 
           historial.customStyles = { fecha_equivalente: { 'text-align': 'start' } };
 
-          this.listaHistorial.push(historial);
+          this.listaHistorial.update(prev => [...prev, historial]);
         });
       });
     } catch (error) {
