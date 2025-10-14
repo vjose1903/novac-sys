@@ -263,7 +263,6 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit, On
   eliminarReg(data) {
     const siFunc = instance => {
       this.removerDetalle(data.arrayId);
-      instance.dismissModal(instance.id);
     };
 
     this.dynamicModalServ.confirmationModal({

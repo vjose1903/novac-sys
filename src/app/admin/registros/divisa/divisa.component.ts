@@ -1,14 +1,16 @@
 import { DivisaService } from './divisa.service';
 import { DivisaC, DivisaI } from './divisa.utils';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { fun } from '../../../core/services/functions.service';
-import { Permisos } from '../../..//core/typescript/permisos';
-import { tableCellType, table_config } from '../../components/new_tablas/tabla-class';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { PhotoDataI } from '../../components/img-viewer-edit/img-viewer-edit.utils';
+import { fun } from '@services/functions.service';
+import { Permisos } from '@core/typescript/permisos';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { PhotoDataI } from '@components/img-viewer-edit/img-viewer-edit.utils';
 import { TasaDeCambioComponent } from './tasa-de-cambio/tasa-de-cambio.component';
-import { ModalClass } from '../../components/modal/modal-class';
+import { DynamicModalClass } from '@components/dynamic-modal/config/dynamic-modal.class';
+import { confirmationButtons, modalActionsE } from '@components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-divisa',
@@ -58,10 +60,11 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   tablaComponent;
   photoData: PhotoDataI;
 
-  constructor(
-    private fb: UntypedFormBuilder,
-    public divisaServ: DivisaService
-  ) {
+  public dynamicModalServ = inject(DynamicModalService);
+  private fb = inject(UntypedFormBuilder);
+  public divisaServ = inject(DivisaService);
+
+  constructor() {
     super();
   }
 
@@ -148,34 +151,37 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
-      if (params.iconKey == 'edit_divisa') this.editarItem(params.data);
+      const divisa = params.data;
+
+      if (params.iconKey == 'edit_divisa') this.editarItem(divisa);
       if (params.iconKey == 'currency_change') {
-        this.openNewModal({
-          component: TasaDeCambioComponent,
-          inputs: { divisa: params.data },
-          id: 'tasa_de_cambio',
-          header: 'Actualizar Tasa de cambio',
-          width: '30rem',
-          botones: {
-            ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [{ clase: 'btn btn-blanco mr-2', function: instance => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
-          },
-        });
+        this.openModalCurrencyChange(divisa);
       }
       if (params.iconKey == 'deactivate_reactivate_divisa') {
-        this.confirmationModal({
+        this.dynamicModalServ.confirmationModal({
           id: 'deactivate_or_reactivate_divisa',
           header: 'Confirmar',
+          btnKind: params.data.estado ? confirmationButtons.cancelarDesactivar : confirmationButtons.cancelarActivar,
           texto: params.data.estado
             ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`
             : `Seguro que desea <b class="negrita"> REACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`,
-          siFunction: instance => {
-            this.deactivateOrReactivateAccount(params.data);
-            instance.dismissModal(instance.id);
-          },
+          onYes: () => this.deactivateOrReactivateAccount(params.data),
         });
       }
     }
+  }
+
+  openModalCurrencyChange(divisa: DivisaI) {
+    const modalConfig = new DynamicModalClass();
+    modalConfig.id = 'tasa_de_cambio';
+    modalConfig.width = '30rem';
+    modalConfig.component = TasaDeCambioComponent;
+    modalConfig.inputs = { divisa };
+    modalConfig.header = 'Actualizar Tasa de cambio';
+
+    modalConfig.botones = [{ clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+
+    modalConfig.show();
   }
 
   editarItem(divisa: DivisaI) {

@@ -17,6 +17,6 @@ import { ImgModule } from '@components/img-component/img.module';
 
 @NgModule({
   declarations: [DivisaComponent, TasaDeCambioComponent],
-  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule,  TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule],
+  imports: [CommonModule, DivisaRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, ImgViewerEditModule, ImgModule],
 })
 export class DivisaModule {}
