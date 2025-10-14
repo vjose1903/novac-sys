@@ -1,25 +1,28 @@
-import { HtmlElementsService } from './../../../core/services/html-elements.service';
-import { ImagenService } from './../../../core/services/imagen.service';
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
+import { HtmlElementsService } from '@services/html-elements.service';
+import { ImagenService } from '@services/imagen.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Permisos } from '../../../core/typescript/permisos';
+import { Permisos } from '@core/typescript/permisos';
 import { TransferenciaC, TransferenciaI, TransferenciaType, anularTransferenciaModalId, nombreBancoTerceroConfig, transferenciaFormAttr, transferenciaFormFieldId, transferenciaTableId, transferenciasType } from './transferencia.utils';
-import { fun } from '../../../core/services/functions.service';
-import { DateUtils } from '../../../core/typescript/date.utils';
-import { TablasService } from '../../components/new_tablas/tablas.service';
+import { fun } from '@services/functions.service';
+import { DateUtils } from '@vjose1903/dateutils';
+import { TablasService } from '@components/new_tablas/tablas.service';
 import { CuentaBancariaC, CuentaBancariaI } from '../../registros/banco/cuenta-bancaria-form/cuenta_bancaria';
-import { requestParameters } from '../../../core/typescript/crud-g';
+import { requestParameters } from '@core/typescript/crud-g';
 import { PeriodoFiscalC } from '../../registros/periodo-fiscal/periodo-fiscal';
-import { dropdownFilterFocusInput } from '../../../core/typescript/p-dropdown.utils';
+import { dropdownFilterFocusInput } from '@core/typescript/p-dropdown.utils';
 import { DivisaService } from '../../registros/divisa/divisa.service';
 import { ListaBancoC, ListBancoI } from '../../registros/banco/banco.utils';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-transferencias',
   templateUrl: './transferencias.component.html',
   styleUrls: ['./transferencias.component.scss'],
+  standalone: false,
 })
 export class TransferenciasComponent extends MixinClass implements OnInit, OnDestroy {
   formGroup = signal<UntypedFormGroup>(undefined);
@@ -37,7 +40,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   cuentasBancariasList = signal<Array<CuentaBancariaI>>([]);
 
   cuentasBancariasFilteredList = computed(() => {
-    return this.cuentasBancariasList().filter((cuenta) => cuenta.id != this.cuentaBancariaOrigenSelected());
+    return this.cuentasBancariasList().filter(cuenta => cuenta.id != this.cuentaBancariaOrigenSelected());
   });
 
   cuentaBancariaOrigenSelected = signal<number | null>(null);
@@ -87,12 +90,16 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   nombreBancoTerceroConfig = nombreBancoTerceroConfig;
 
   dropdownFilterFocusInput = dropdownFilterFocusInput;
-
-  htmlServ = inject(HtmlElementsService);
-
   bancosList: Array<ListBancoI> = [];
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService, public imgServ: ImagenService) {
+  public htmlServ = inject(HtmlElementsService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+  public divisaServ = inject(DivisaService);
+  public imgServ = inject(ImagenService);
+  public dynamicModalServ = inject(DynamicModalService);
+
+  constructor() {
     super();
 
     effect(() => {
@@ -134,7 +141,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
     this.transferenciaList.length = 0;
 
-    this.transferenciaClass.getAll(extra).then((res) => {
+    this.transferenciaClass.getAll(extra).then(res => {
       this.transferenciaList = res.data.map((transferencia: TransferenciaI) => {
         transferencia[transferenciaFormAttr.cuenta_bancaria_origen_id] = transferencia.cuenta_bancaria_origen.id;
         transferencia[transferenciaFormAttr.divisa_id] = transferencia.divisa.id;
@@ -156,7 +163,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   createForm() {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const divisa_principal = this.divisaServ.getDivisaPrincipalInfo();
 
       const formGroup = this.fb.group({
@@ -181,7 +188,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   subscribeFormChanges() {
     this.formGroup()
       .get(transferenciaFormAttr.cuenta_bancaria_origen_id)
-      .valueChanges.subscribe((changes) => {
+      .valueChanges.subscribe(changes => {
         this.cuentaBancariaOrigenSelected.set(changes);
         if (this.cuentaBancariaDestinoSelected == changes) this.formGroup().controls[transferenciaFormAttr.cuenta_bancaria_destino_id].setValue(null);
       });
@@ -199,7 +206,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   async getNombresBancos() {
-    this.listaBancosClass.getAll().then((res) => (this.bancosList = res.data));
+    this.listaBancosClass.getAll().then(res => (this.bancosList = res.data));
   }
 
   dropCuentaBancariaHide(dropdownCuenta, fieldId) {
@@ -210,7 +217,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
 
   formatearMonto(formFieldName) {
     const input = this.formGroup().controls[formFieldName];
-    fun.revisarNumber(input, formFieldName).then((res) => {
+    fun.revisarNumber(input, formFieldName).then(res => {
       input.setValue(res.error ? '' : res.number);
     });
   }
@@ -269,7 +276,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
         const fecha_equivalente = DateUtils.format({ date: date, dateFormat: 'YYYY-MM-DD' });
 
         const requestParameters: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
-        this.peridoClass.getAll(requestParameters).then((response) => {
+        this.peridoClass.getAll(requestParameters).then(response => {
           this.enableDisableFields(response.data.isOpen ? 'enable' : 'disable');
 
           if (!response.data.isOpen) {
@@ -333,36 +340,33 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
   }
 
   aunlarItem(transferencia: TransferenciaI) {
-    this.validateOpenPeriod(DateUtils.parse(transferencia.fecha_equivalente), 'anulate').then(() => {
+    this.validateOpenPeriod(transferencia.fecha_equivalente, 'anulate').then(() => {
       const identifier = transferencia.numero_referencia || transferencia.comentario;
 
-      const anularFunction = (data) => {
-        this.transferenciaClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
+      const anularFunction = data => {
+        this.transferenciaClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then(res => {
           this.reloadTransferenciasInSamePage();
         });
       };
 
-      this.confirmationModal({
+      this.dynamicModalServ.confirmationModal({
         id: anularTransferenciaModalId,
-        header: 'Confirmar',
         texto: `Seguro que desea <b class="negrita"> ANULAR </b> la Transferencia.<br /><br /><b class="negrita">Origen:</b> ${transferencia.cuenta_bancaria_origen.info_completa}<br /><b class="negrita">Destino:</b> ${transferencia.destino_info_completa}<br /><br />${identifier}`,
-        siFunction: (instance) => {
-          anularFunction(transferencia);
-          instance.dismissModal(instance.id);
-        },
+        btnKind: confirmationButtons.cancelarAnular,
+        onYes: anularFunction.bind(this),
       });
     });
   }
 
   editarItem(transferencia: TransferenciaI) {
-    this.validateOpenPeriod(DateUtils.parse(transferencia.fecha_equivalente), 'update').then(() => {
+    this.validateOpenPeriod(transferencia.fecha_equivalente, 'update').then(() => {
       if (fun.hasValue(this.formGroup())) this.formGroup().reset();
 
       setTimeout(() => {
         this.botonLabel = 'Editar';
         this.enableDisableFields('enable');
         this.transferenciaSelected = fun.deepCloning(transferencia);
-        this.transferenciaSelected.fecha_equivalente = this.transferenciaSelected.fecha_equivalente ? DateUtils.parse(this.transferenciaSelected.fecha_equivalente) : null;
+        this.transferenciaSelected.fecha_equivalente = this.transferenciaSelected.fecha_equivalente ? DateUtils.convertStringToDate({ dateString: this.transferenciaSelected.fecha_equivalente }) : null;
         this.transferenciaSelected.monto = this.transferenciaSelected.monto ? fun.roundNumberToDecimal(this.transferenciaSelected.monto) : null;
 
         this.formGroup().patchValue(this.transferenciaSelected);
@@ -382,8 +386,8 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     const month = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
 
-    this.minDate = DateUtils.getFirstDayOfMonth({ year: year, month: month });
-    this.maxDate = month == DateUtils.getActualMonth() ? this.maxDate : DateUtils.getLastDayOfMonth({ year: year, month: month });
+    this.minDate = DateUtils.getFirstDayOfMonth({ year: year, month: month }) as Date;
+    this.maxDate = month == DateUtils.getActualMonth() ? this.maxDate : (DateUtils.getLastDayOfMonth({ year: year, month: month }) as Date);
   }
 
   verificateFieldsState() {
@@ -392,7 +396,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     const formulario = this.formGroup().getRawValue();
     const funct = fun.hasValue(formulario?.[transferenciaFormAttr.id]) ? 'disable' : 'enable';
     const fields = [transferenciaFormAttr.divisa_id];
-    fields.forEach((field) => this.formGroup().controls[field][funct]());
+    fields.forEach(field => this.formGroup().controls[field][funct]());
   }
 
   enableDisableFields(func: 'enable' | 'disable') {
@@ -406,7 +410,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
       transferenciaFormAttr.nombre_banco_tercero,
       transferenciaFormAttr.cuenta_bancaria_tercero,
     ];
-    fields.forEach((field) => this.formGroup().controls[field][func]({ emitEvent: false }));
+    fields.forEach(field => this.formGroup().controls[field][func]({ emitEvent: false }));
   }
 
   borrar() {
@@ -423,7 +427,7 @@ export class TransferenciasComponent extends MixinClass implements OnInit, OnDes
     dataToSend.fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
     dataToSend.monto = fun.desformatearStNumber(formulario.monto);
 
-    this.transferenciaClass.createUpdateOne(dataToSend).then((res) => {
+    this.transferenciaClass.createUpdateOne(dataToSend).then(res => {
       this.reloadTransferenciasInSamePage();
       this.borrar();
     });

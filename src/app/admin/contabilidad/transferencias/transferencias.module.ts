@@ -4,17 +4,17 @@ import { CommonModule } from '@angular/common';
 import { TransferenciasRoutingModule } from './transferencias.routing';
 import { TransferenciasComponent } from './transferencias.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PipesModule } from '../../../core/pipe/pipes.module';
+import { PipesModule } from '@core/pipe/pipes.module';
 import { FormAutoCompleteModule } from '../../../core/components/form-fields/form-auto-complete/form-auto-complete.module';
-import { TablasModule } from '../../components/new_tablas/tablas.module';
-import { DirectivesModule } from '../../../core/directive/directives.module';
-import { CalendarModule } from 'primeng/calendar';
-import { DropdownModule } from 'primeng/dropdown';
-import { ImgModule } from '../../components/img-component/img.module';
-import { ImgViewerEditModule } from '../../components/img-viewer-edit/img-viewer-edit.module';
+import { TablasModule } from '@components/new_tablas/tablas.module';
+import { DirectivesModule } from '@core/directive/directives.module';
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
+import { ImgModule } from '@components/img-component/img.module';
+import { ImgViewerEditModule } from '@components/img-viewer-edit/img-viewer-edit.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { FormDivisaInputModule } from '../../../core/components/form-fields/form-divisa-input/form-divisa-input.module';
+import { FormDivisaInputModule } from '@core/components/form-fields/form-divisa-input/form-divisa-input.module';
 
 @NgModule({
   declarations: [TransferenciasComponent],
@@ -26,14 +26,14 @@ import { FormDivisaInputModule } from '../../../core/components/form-fields/form
     PipesModule,
     TablasModule,
     DirectivesModule,
-    CalendarModule,
-    DropdownModule,
+    DatePickerModule,
+    SelectModule,
     ImgModule,
     ImgViewerEditModule,
     SelectButtonModule,
     FormAutoCompleteModule,
     NgxPermissionsModule.forChild(),
-    FormDivisaInputModule
+    FormDivisaInputModule,
   ],
 })
 export class TransferenciasModule {}
