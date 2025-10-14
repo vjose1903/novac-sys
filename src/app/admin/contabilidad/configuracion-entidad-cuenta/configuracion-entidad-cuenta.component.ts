@@ -1,19 +1,20 @@
 import { CuentaContableC } from '../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
 import { CuentaContableI } from '../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
-import { MixinClass } from './../../../core/typescript/MixinClass';
-import { TablasService } from './../../components/new_tablas/tablas.service';
-import { fun } from './../../../core/services/functions.service';
-import { Permisos } from './../../../core/typescript/permisos';
-import { tableCellType, table_config } from './../../components/new_tablas/tabla-class';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { fun } from '@services/functions.service';
+import { Permisos } from '@core/typescript/permisos';
+import { tableCellType, table_config } from '@components/new_tablas/tabla-class';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './configuracion-entidad-cuenta.utils';
-import { dropdownFilterFocusInput } from './../../../core/typescript/p-dropdown.utils';
+import { dropdownFilterFocusInput } from '@core/typescript/p-dropdown.utils';
 // import * as _ from 'lodash';
 @Component({
   selector: 'app-configuracion-entidad-cuenta',
   templateUrl: './configuracion-entidad-cuenta.component.html',
   styleUrls: ['./configuracion-entidad-cuenta.component.scss'],
+  standalone: false,
 })
 export class ConfiguracionEntidadCuentaComponent extends MixinClass implements OnInit, OnDestroy {
   form: UntypedFormGroup;
@@ -43,7 +44,10 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
   };
   tablaComponent;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+
+  constructor() {
     super();
   }
 
@@ -101,8 +105,8 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
 
       this.listaConfiguraciones.length = 0;
 
-      this.configruacionClass.getAll(extra).then((res) => {
-        res['data'].map((configuracion) => {
+      this.configruacionClass.getAll(extra).then(res => {
+        res['data'].map(configuracion => {
           configuracion.customStyles = {
             descripcion: { 'text-align': 'start', 'padding-left': '2rem', width: '30%', 'font-weight': 500 },
             'cuenta_contable.label': { 'text-align': 'start' },
@@ -132,8 +136,8 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
   checkIfSomethingIsDiferrent() {
     const formValue = fun.pick(this.form.getRawValue(), ['id', 'cuenta_contable_id']);
     const originalValue = fun.pick(
-      this.listaConfiguraciones.find((cuenta) => cuenta.id == formValue.id),
-      ['id', 'cuenta_contable_id'],
+      this.listaConfiguraciones.find(cuenta => cuenta.id == formValue.id),
+      ['id', 'cuenta_contable_id']
     );
 
     return !fun.isEqual(formValue, originalValue);
@@ -161,7 +165,7 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
   }
 
   reset() {
-    const originalValue = this.listaConfiguraciones.find((cuenta) => cuenta.id == this.configuracionSelected.id);
+    const originalValue = this.listaConfiguraciones.find(cuenta => cuenta.id == this.configuracionSelected.id);
     this.form.patchValue(fun.deepCloning(originalValue));
   }
 
@@ -174,7 +178,7 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
   requests() {
     const formValue = this.form.value;
 
-    this.configruacionClass.createUpdateOne(formValue).then((res) => {
+    this.configruacionClass.createUpdateOne(formValue).then(res => {
       this.getConfiguraciones();
       this.borrar();
     });
