@@ -1,14 +1,14 @@
 import { NgControl } from '@angular/forms';
 import { IAutoCompleteConfig, IAutoCompleteBtnNewOption } from './form-auto-complete.utils';
 import { Component, computed, EventEmitter, input, model, OnChanges, OnInit, Optional, Output, Self, signal, SimpleChanges } from '@angular/core';
-import { fun } from '../../../services/functions.service';
-import { customFormsElements } from '../../../typescript/custom-forms-elements/custom-forms-elements';
-import { isEmpty } from '../../../services/pdf/utils/funciones';
+import { fun } from '@core/services/functions.service';
+import { customFormsElements } from '@core/typescript/custom-forms-elements/custom-forms-elements';
 
 @Component({
   selector: 'form-auto-complete',
   templateUrl: './form-auto-complete.component.html',
   styleUrl: './form-auto-complete.component.scss',
+  standalone: false,
 })
 export class FormAutoCompleteComponent extends customFormsElements implements OnInit, OnChanges {
   suggestions = input<any[]>([]);
@@ -30,7 +30,7 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
       const normalizedItemName = fun.normalizeWord(this.newOptionValue());
 
       return normalizedItem?.toLowerCase().includes(normalizedItemName.toLowerCase());
-    }),
+    })
   );
 
   constructor(@Optional() @Self() public control: NgControl) {
@@ -41,7 +41,7 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
     if (this.control) {
       this.fieldName.set(`${this.control.name}`);
       this.formGroup.set(this.control['_parent'].form);
-      this.config.update((value) => ({ ...value, fieldId: `autoComplete-${this.fieldName()}` }));
+      this.config.update(value => ({ ...value, fieldId: `autoComplete-${this.fieldName()}` }));
     }
   }
 
@@ -50,7 +50,7 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
   }
 
   verificateConfig() {
-    if (isEmpty(this.config().canCreateNewOptions)) this.config.update((value) => ({ ...value, canCreateNewOptions: false }));
+    if (fun.isEmpty(this.config().canCreateNewOptions)) this.config.update(value => ({ ...value, canCreateNewOptions: false }));
   }
 
   onCreateAutoCompleteOption(btn: IAutoCompleteBtnNewOption) {}
@@ -66,7 +66,7 @@ export class FormAutoCompleteComponent extends customFormsElements implements On
     if (fun.hasValue(keyValue) && fun.hasValue(value)) {
       const isMultiple = this.multiple();
 
-      if (isMultiple) value = value.map((item) => (fun.isPrimitive(item) ? item : item[keyValue]));
+      if (isMultiple) value = value.map(item => (fun.isPrimitive(item) ? item : item[keyValue]));
       else value = value[keyValue];
     }
 
