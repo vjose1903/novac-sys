@@ -11,13 +11,6 @@ export class CatalogoCuentasPageComponent extends MixinClass implements OnInit, 
     this._init_mixin({ component: 'catalogo_cuentas_page', is_routing: true });
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
-
   ngOnDestroy() {
     this._destroy_mixin();
   }

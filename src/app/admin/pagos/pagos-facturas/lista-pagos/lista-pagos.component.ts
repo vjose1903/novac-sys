@@ -61,15 +61,6 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
     this.necesarioStart();
   }
 
-  // iniciarCambioMenu(arg, callback) {
-  //   if (arg.bool) {
-  //     arg['verificar'] = true;
-
-  //     this.runFinalizarCambioMenu(arg);
-  //     callback({ bool: true });
-  //   }
-  // }
-
   ngOnDestroy() {
     this._destroy_mixin();
   }

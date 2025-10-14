@@ -80,12 +80,6 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
     this.necesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
 
   ngOnDestroy(): void {
     this._destroy_mixin();

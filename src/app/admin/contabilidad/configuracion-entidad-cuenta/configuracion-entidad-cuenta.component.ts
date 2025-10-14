@@ -53,13 +53,6 @@ export class ConfiguracionEntidadCuentaComponent extends MixinClass implements O
     this.necesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
-
   ngOnDestroy(): void {
     this._destroy_mixin();
   }

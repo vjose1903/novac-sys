@@ -91,13 +91,6 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
     this._destroy_mixin();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
-
   async necesarioStart() {
     this.initVariables();
     await this.getCheques(fun.deepCloning(this.tServ.obj_paginate.default));

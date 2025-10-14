@@ -17,7 +17,6 @@ import { ModalClass } from '../../components/modal/modal-class';
   standalone: false,
 })
 export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
-  
   form: UntypedFormGroup;
   botonLabel: string = 'Guardar';
   isCreando: boolean = false;
@@ -59,7 +58,10 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   tablaComponent;
   photoData: PhotoDataI;
 
-  constructor(private fb: UntypedFormBuilder, public divisaServ: DivisaService) {
+  constructor(
+    private fb: UntypedFormBuilder,
+    public divisaServ: DivisaService
+  ) {
     super();
   }
 
@@ -69,20 +71,13 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     this.necesarioStart();
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
-
   ngOnDestroy(): void {
     this._destroy_mixin();
   }
 
   async necesarioStart() {
     await this.createForm();
-    await this.divisaServ.getDivisas().then((divisas) => {
+    await this.divisaServ.getDivisas().then(divisas => {
       this.tablaComponent.changeTableConfig([{ total_count: divisas.length }]);
     });
     fun.enfocarInput('cedula');
@@ -130,11 +125,11 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
 
     const originalValue = fun.pick(
-      this.divisaServ.listaDivisas.find((cuenta) => cuenta.id == formValue.id),
-      pick_values,
+      this.divisaServ.listaDivisas.find(cuenta => cuenta.id == formValue.id),
+      pick_values
     );
 
-    originalValue['img'] = this.divisaServ.listaDivisas.find((cuenta) => cuenta.id == formValue.id)?.img_divisa;
+    originalValue['img'] = this.divisaServ.listaDivisas.find(cuenta => cuenta.id == formValue.id)?.img_divisa;
 
     return !fun.isEqual(formValue, originalValue);
   }
@@ -163,7 +158,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
           width: '30rem',
           botones: {
             ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-            dinamico: [{ clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
+            dinamico: [{ clase: 'btn btn-blanco mr-2', function: instance => instance.dismissModal(instance.id), label: 'Cerrar', disable: false }],
           },
         });
       }
@@ -174,7 +169,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
           texto: params.data.estado
             ? `Seguro que desea <b class="negrita"> DESACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`
             : `Seguro que desea <b class="negrita"> REACTIVAR </b> la divisa <b class="negrita">${params.data.nombre}</b>`,
-          siFunction: (instance) => {
+          siFunction: instance => {
             this.deactivateOrReactivateAccount(params.data);
             instance.dismissModal(instance.id);
           },
@@ -207,7 +202,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   deactivateOrReactivateAccount(data) {
-    this.divisaClass.updateOne({ id: data.id }, { afterPath: 'deactivate_or_reactivate', parameters: { status: !data.estado } }).then((res) => {
+    this.divisaClass.updateOne({ id: data.id }, { afterPath: 'deactivate_or_reactivate', parameters: { status: !data.estado } }).then(res => {
       this.divisaServ.getDivisas();
     });
   }
@@ -230,7 +225,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
       formValue['imagenes'] = [{ file_name: this.photoData.fileName, base_64: this.photoData.src_img, id: idImg }];
     }
 
-    this.divisaClass.createUpdateOne(formValue).then((res) => {
+    this.divisaClass.createUpdateOne(formValue).then(res => {
       this.divisaServ.getDivisas();
       this.borrar();
     });

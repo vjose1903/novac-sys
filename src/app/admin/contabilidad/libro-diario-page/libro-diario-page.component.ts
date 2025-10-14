@@ -59,13 +59,16 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   asientoContableClass = new AsientoContableC();
   filterValue;
 
-  constructor(public tServ: TablasService, private zone: NgZone) {
+  constructor(
+    public tServ: TablasService,
+    private zone: NgZone
+  ) {
     super();
   }
 
   ngOnInit() {
     this._init_mixin({ component: 'libro_diario_page', is_routing: true });
-    this.subWidth = new fun().getWindowSize.subscribe((res) => {
+    this.subWidth = new fun().getWindowSize.subscribe(res => {
       if (res) this.setCantPagView(res.innerWidth, 'width_page');
     });
     this.necesarioStart();
@@ -106,16 +109,6 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
     }, 100);
   }
 
-  iniciarCambioMenu(arg, callback) {
-    console.log('\n\n --- iniciarCambioMenu --- libro diario ');
-    console.log('arg:  ', arg)
-    
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
-
   async necesarioStart() {
     this.initDateVars();
     this.getAsientos(this.paginator).then(() => {
@@ -124,7 +117,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   }
 
   getAsientos(params?: { per_page?: number; page?: number; search?: string }) {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
       const extra = {
@@ -139,7 +132,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
         },
       };
 
-      this.asientoContableClass.getAll(extra).then((res) => {
+      this.asientoContableClass.getAll(extra).then(res => {
         res.data.map((asiento: CabezaAsietoContableI) => {
           asiento.title = `${DateUtils.format({ date: asiento.fecha_equivalente })} - ${asiento.comentario}`;
 
@@ -163,7 +156,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   makeFrontDetalles(detalles_asientos_contables: Array<DetalleAsientoContableI>) {
     let frontDetalles = [];
 
-    detalles_asientos_contables.forEach((detalle) => {
+    detalles_asientos_contables.forEach(detalle => {
       const tipo = detalle.valor_debito ? 'debito' : 'credito';
       const detalleControl = { tipo, ...detalle.cuenta_contable_control, ...this.parseDetalleCuenta({ valor_credito: detalle.valor_credito, valor_debito: detalle.valor_debito }) };
       frontDetalles.push(detalleControl);
@@ -187,10 +180,10 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   }
 
   orderDetalles(detalles) {
-    const registrosConDebito = detalles.filter((entry) => entry.tipo == 'debito');
+    const registrosConDebito = detalles.filter(entry => entry.tipo == 'debito');
     const registrosDebitoOrdenados = registrosConDebito.sort((a, b) => a.codigo - b.codigo);
 
-    const registrosConCredito = detalles.filter((entry) => entry.tipo == 'credito');
+    const registrosConCredito = detalles.filter(entry => entry.tipo == 'credito');
     const registrosCreditoOrdenados = registrosConCredito.sort((a, b) => a.codigo - b.codigo);
 
     if (registrosConDebito.length > 0 && registrosConCredito.length > 0) {
@@ -284,7 +277,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
       botones: {
         ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
         dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
+          { clase: 'btn btn-blanco mr-2', function: instance => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
           { btnId: diurnalFormBtnAceptarId, clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: asientoContable ? 'Editar' : 'Registrar', disable: true },
         ],
       },
