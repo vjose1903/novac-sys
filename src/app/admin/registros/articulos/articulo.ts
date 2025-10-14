@@ -81,7 +81,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
       };
 
       this.getAll(extra)
-        .then(res => resolve(res))
+        .then(res => resolve(res)) 
         .catch(err => reject(err));
     });
   }
