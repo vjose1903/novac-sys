@@ -1,21 +1,23 @@
-import { Ss } from './../../../core/services/singleton.service';
-import { DateUtils } from '../../../core/typescript/date.utils';
+import { Ss } from '@core/services/singleton.service';
+import { DateUtils } from '@vjose1903/dateutils';
 import { EntradaDiarioComponent } from './entrada-diario/entrada-diario.component';
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { Permisos } from '../../../core/typescript/permisos';
-import { fun } from '../../../core/services/functions.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { Permisos } from '@core/typescript/permisos';
+import { fun } from '@core/services/functions.service';
 import { diurnalFormBtnAceptarId, diurnalFormId, searchDiurnalCode } from './libro-diario-page.utils';
-import { rowDataDividerKey, tableCellType, table_config } from '../../components/new_tablas/tabla-class';
+import { rowDataDividerKey, tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { Subscription } from 'rxjs';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { ModalClass } from '../../components/modal/modal-class';
+import { TablasService } from '@components/new_tablas/tablas.service';
 import { AsientoContableC, CabezaAsietoContableI, DetalleAsientoContableI } from './asiento-contable';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-libro-diario-page',
   templateUrl: './libro-diario-page.component.html',
   styleUrls: ['./libro-diario-page.component.scss'],
+  standalone: false,
 })
 export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDestroy {
   permissions = Permisos.cabeza_asiento_contable;
@@ -268,27 +270,27 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
   abrirModalForm(asientoContable?) {
     const inputs = { asientoContable: asientoContable, method: fun.hasValue(asientoContable) ? 'edit' : 'new' };
 
-    this.openNewModal({
-      component: EntradaDiarioComponent,
-      inputs: inputs,
-      id: diurnalFormId,
-      header: `${inputs.method == 'new' ? 'Nueva' : 'Editar'} entrada de libro diario`,
-      width: '45rem',
-      botones: {
-        ...fun.deepCloning(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: instance => instance.dismissModal(instance.id), label: 'Cerrar', disable: false },
-          { btnId: diurnalFormBtnAceptarId, clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: asientoContable ? 'Editar' : 'Registrar', disable: true },
-        ],
-      },
-    });
+    const modalConfig = new DynamicModalClass();
+    modalConfig.id = diurnalFormId;
+    modalConfig.width = '45rem';
+    modalConfig.component = EntradaDiarioComponent;
+    modalConfig.inputs = inputs;
+    modalConfig.header = `${inputs.method == 'new' ? 'Nueva' : 'Editar'} entrada de libro diario`;
+
+    modalConfig.botones = [
+      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { id: diurnalFormBtnAceptarId, clase: 'btn btn-verde', label: asientoContable ? 'Editar' : 'Registrar', disable: true },
+    ];
+
+    modalConfig.setCallback((arg: ICallbackModal) => this.processEntradaDiario(arg));
+    modalConfig.show();
   }
 
-  async getDataFromModal(arg, search?) {
-    if (arg.modalId == diurnalFormId) {
-      this.getAsientos(this.paginator).then(() => {
-        if (arg.extra.method == 'new') this.changeTabsVisibility({ visible: true });
-      });
-    }
+  processEntradaDiario(arg: ICallbackModal) {
+    if (arg.type != modalCloseType.returnData) return;
+    // TODO:  revisar esto
+    this.getAsientos(this.paginator).then(() => {
+      if (arg.extra.method == 'new') this.changeTabsVisibility({ visible: true });
+    });
   }
 }

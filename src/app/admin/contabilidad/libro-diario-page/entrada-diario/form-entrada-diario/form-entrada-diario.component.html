@@ -5,7 +5,7 @@
       <div class="form-group mb-0 cuenta-auxiliar-group">
         <label class="control-label opacity-2 mb-0">Cuenta auxiliar: </label>
 
-        <p-dropdown
+        <p-select
           #dropdownCuenta
           placeholder="Seleccione la cuenta"
           filterPlaceholder="Buscar"
@@ -24,8 +24,7 @@
           (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
           (keyup.enter)="saltar('campoCuentaAuxiliar')"
           (onFocus)="dropCuentaAuxiliarFocus(dropdownCuenta)"
-          (onHide)="dropCuentaAuxiliarHide(dropdownCuenta)"
-        >
+          (onHide)="dropCuentaAuxiliarHide(dropdownCuenta)">
           <!-- (onclick)="dropdownCuenta.show()" -->
           <!-- (onClear)="filter('clear'); dropdownCuenta.focus(); dropdownCuenta.show()" -->
           <!-- (onFocus)="filter('clear'); dropdownCuenta.show()" -->
@@ -35,7 +34,7 @@
               <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>No. Cuenta: </strong> {{ cuenta_auxiliar.codigo }} </span>
             </div>
           </ng-template>
-        </p-dropdown>
+        </p-select>
       </div>
 
       <div class="form-group mb-0 debito-group">
@@ -51,8 +50,7 @@
           (blur)="checkAmount(InputDebito); convertAmount('blur', InputDebito, 'valor_debito'); checkAmountInputState()"
           (focus)="convertAmount('focus', InputDebito, 'valor_debito')"
           (keyup)="checkAmountInputState()"
-          (keydown.enter)="validateAdd()"
-        />
+          (keydown.enter)="validateAdd()" />
       </div>
 
       <div class="form-group mb-0 credito-group">
@@ -68,8 +66,7 @@
           (blur)="checkAmount(InputCredito); convertAmount('blur', InputCredito, 'valor_credito'); checkAmountInputState()"
           (focus)="convertAmount('focus', InputCredito, 'valor_credito')"
           (keyup)="checkAmountInputState()"
-          (keydown.enter)="validateAdd()"
-        />
+          (keydown.enter)="validateAdd()" />
       </div>
 
       <div class="btn-group">
@@ -80,10 +77,9 @@
             [icon_size]="'1rem'"
             [icon]="isEditing ? 'fas fa-pencil-alt' : 'fa-solid fa-plus'"
             [size]="'size-md'"
-            [pTooltip]="disableBtnAdd() ? '' : isEditing ? 'Editar' : 'Añadir'"
+            [tooltip]="disableBtnAdd() ? '' : isEditing ? 'Editar' : 'Añadir'"
             tooltipPosition="left"
-            (clickFunction)="addEntry()"
-          >
+            (clickFunction)="addEntry()">
           </btn-icon-circular>
         </div>
       </div>

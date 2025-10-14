@@ -2,9 +2,9 @@
   <form [formGroup]="formGroup">
     <div class="row">
       <div class="col-12 col-md-4 p-0">
-        <div class="form-group" appMsgError="fecha_equivalente" [form]="formGroup">
+        <div class="form-group">
           <label class="control-label">Fecha de registro: <span style="color: red">*</span></label>
-          <p-calendar
+          <p-datepicker
             inputId="fecha_equivalente_input"
             [maxDate]="maxDate"
             inputStyleClass="form-control"
@@ -13,24 +13,23 @@
             dateFormat="dd/mm/yy"
             placeholder="dd/mm/aaaa"
             (onSelect)="validateOpenPeriod()"
-            (onInput)="validateOpenPeriod()"
-          ></p-calendar>
+            (onInput)="validateOpenPeriod()"></p-datepicker>
 
-          <span id="msgContainer"></span>
+          <form-error-msg [control]="formGroup.get('fecha_equivalente')"></form-error-msg>
         </div>
       </div>
 
       <div class="col-12 p-0">
-        <div class="form-group" appMsgError="comentario" [form]="formGroup">
+        <div class="form-group">
           <label class="control-label">Concepto: <span style="color: red">*</span></label>
           <input id="motivo" formControlName="comentario" class="form-control w-100" [appCapitalice]="'formGroup'" />
 
-          <span id="msgContainer"></span>
+          <form-error-msg [control]="formGroup.get('comentario')"></form-error-msg>
         </div>
       </div>
 
       <div class="col-12 p-0 mt-2">
-        <form-entrada-diario [isOpenMonth]="isOpenMonth" (getDetalleAsientos)="parseDetalleAsientos($event)" [initialDetalleAsientos]="inputs?.asientoContable?.detalles_asientos_contables"></form-entrada-diario>
+        <form-entrada-diario [isOpenMonth]="isOpenMonth" (getDetalleAsientos)="parseDetalleAsientos($event)" [initialDetalleAsientos]="asientoContable?.detalles_asientos_contables"></form-entrada-diario>
       </div>
 
       <!-- <div class="col-12 p-0">

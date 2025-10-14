@@ -1,26 +1,37 @@
-import { requestParameters } from './../../../../core/typescript/crud-g';
+import { requestParameters } from '@core/typescript/crud-g';
 import { PeriodoFiscalC } from './../../../registros/periodo-fiscal/periodo-fiscal';
-import { ModalComponentI, ModalI } from './../../../components/modal/modal-class';
-import { fun } from './../../../../core/services/functions.service';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, UntypedFormArray, UntypedFormGroup, Validators } from '@angular/forms';
+import { fun } from '@core/services/functions.service';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormsModule, ReactiveFormsModule, UntypedFormArray, UntypedFormGroup, Validators } from '@angular/forms';
 import { AsientoContableC, CabezaAsietoContableI, DetalleAsientoContableI, tipoAsiento } from '../asiento-contable';
 import { diurnalFormBtnAceptarId, diurnalFormId } from '../libro-diario-page.utils';
-import { DateUtils } from './../../../../core/typescript/date.utils';
+import { DateUtils } from '@vjose1903/dateutils';
+import { IDynamicModal, IModalConfiguration } from '@components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
+import { CommonModule } from '@angular/common';
+import { DatePickerModule } from 'primeng/datepicker';
+import { FormEntradaDiarioComponent } from './form-entrada-diario/form-entrada-diario.component';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
+import { DirectivesModule } from '@core/directive/directives.module';
 
 @Component({
   selector: 'app-entrada-diario',
   templateUrl: './entrada-diario.component.html',
   styleUrls: ['./entrada-diario.component.scss'],
+  imports: [CommonModule, DatePickerModule, FormsModule, ReactiveFormsModule, FormEntradaDiarioComponent, FormErrorMsgComponent, DirectivesModule],
 })
-export class EntradaDiarioComponent implements OnInit, ModalI {
+export class EntradaDiarioComponent implements OnInit, IDynamicModal {
   formGroup: UntypedFormGroup;
   formGroupInitialValue: any;
   maxDate: Date;
   constructor(private fb: FormBuilder) {}
 
-  modalComponent: ModalComponentI;
-  inputs: { method: 'edit' | 'new'; asientoContable: CabezaAsietoContableI };
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
+
+  @Input() method: 'edit' | 'new';
+  @Input() asientoContable: CabezaAsietoContableI;
+
   peridoClass = new PeriodoFiscalC();
   asientoContableClass = new AsientoContableC();
   isOpenMonth = true;
@@ -31,21 +42,21 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
 
   necesarioStart() {
     this.maxDate = new Date();
-    this.createForm(this.inputs.asientoContable).then(() => {
+    this.createForm(this.asientoContable).then(() => {
       this.formGroupInitialValue = this.formGroup.getRawValue();
 
-      this.formGroup.valueChanges.subscribe((change) => {
+      this.formGroup.valueChanges.subscribe(change => {
         this.validateSaveBtnState();
       });
 
-      if (this.inputs.method == 'new') setTimeout(() => fun.enfocarInput('fecha_equivalente_input'), 250);
+      if (this.method == 'new') setTimeout(() => fun.enfocarInput('fecha_equivalente_input'), 250);
     });
   }
 
   createForm(data?) {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       this.formGroup = this.fb.group({
-        id: [{ value: fun.hasValue(data) ? (this.inputs.method == 'edit' ? data.id : null) : null, disabled: false }],
+        id: [{ value: fun.hasValue(data) ? (this.method == 'edit' ? data.id : null) : null, disabled: false }],
         fecha_equivalente: [{ value: fun.hasValue(data) ? new Date(data.fecha_equivalente) : null, disabled: false }, Validators.required],
         tipo: [{ value: fun.hasValue(data) ? data.tipo : tipoAsiento.manual, disabled: false }],
         comentario: [{ value: fun.hasValue(data) ? data.comentario : null, disabled: false }, Validators.required],
@@ -85,8 +96,8 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
     const arrayDiurnalEntries = this.formGroup.get('detalles_asientos_contables') as UntypedFormArray;
     if (!buttonIsDisable) buttonIsDisable = arrayDiurnalEntries.length == 0;
 
-    if (this.modalComponent && this.modalComponent.changeStateButton) {
-      this.modalComponent.changeStateButton({ modalId: diurnalFormId, btnId: diurnalFormBtnAceptarId, disable: buttonIsDisable });
+    if (this.modalConfig && this.modalConfig.changeStateButton) {
+      this.modalConfig.modalWrapper.changeStateButton({ modalId: diurnalFormId, btnId: diurnalFormBtnAceptarId, disable: buttonIsDisable });
     }
   }
 
@@ -108,7 +119,7 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
       const fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
 
       const extra: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
-      this.peridoClass.getAll(extra).then((response) => {
+      this.peridoClass.getAll(extra).then(response => {
         this.isOpenMonth = response.data.isOpen;
 
         const stateFunction = this.isOpenMonth ? 'enable' : 'disable';
@@ -130,10 +141,10 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
     const arrayDiurnalEntries = this.formGroup.get('detalles_asientos_contables') as UntypedFormArray;
     arrayDiurnalEntries.clear();
 
-    detallesAsientos.forEach((detalleAsiento) => this.addItem(detalleAsiento));
+    detallesAsientos.forEach(detalleAsiento => this.addItem(detalleAsiento));
   }
 
-  btn_aceptar() {
+  submit() {
     const formulario = this.formGroup.getRawValue();
     const dataToSend = fun.deepCloning(formulario);
     dataToSend.fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
@@ -141,9 +152,10 @@ export class EntradaDiarioComponent implements OnInit, ModalI {
     this.asientoContableClass
       .createUpdateOne(dataToSend)
       .then((res: any) => {
-        this.modalComponent.closeModal(this.modalComponent.id, { data: { ...res.data }, extra: { method: this.inputs.method } });
+        // TODO:  revisar esto
+        this.modalConfig.close({ data: { ...res.data }, extra: { method: this.method } });
       })
-      .catch((err) => {
+      .catch(err => {
         console.error('error ', err);
       });
   }
