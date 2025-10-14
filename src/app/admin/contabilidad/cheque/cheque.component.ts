@@ -1,24 +1,27 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { MixinClass } from './../../../core/typescript/MixinClass';
+import { MixinClass } from '@core/typescript/MixinClass';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { DivisaService } from '../../registros/divisa/divisa.service';
-import { fun } from '../../../core/services/functions.service';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { DivisaService } from '@registros/divisa/divisa.service';
+import { fun } from '@services/functions.service';
 import { anularChequeModalId, ChequeC, chequeFormAttr, chequeFormFieldId, ChequeI, chequeTableId } from './cheque.utils';
-import { table_config, tableCellType } from '../../components/new_tablas/tabla-class';
-import { CuentaBancariaC, CuentaBancariaI } from '../../registros/banco/cuenta-bancaria-form/cuenta_bancaria';
-import { PeriodoFiscalC } from '../../registros/periodo-fiscal/periodo-fiscal';
-import { DateUtils } from '../../../core/typescript/date.utils';
-import { requestParameters } from '../../../core/typescript/crud-g';
-import { dropdownFilterFocusInput } from '../../../core/typescript/p-dropdown.utils';
-import { HtmlElementsService } from '../../../core/services/html-elements.service';
-import { ImagenService } from '../../../core/services/imagen.service';
-import { Permisos } from '../../../core/typescript/permisos';
+import { table_config, tableCellType } from '@components/new_tablas/tabla-class';
+import { CuentaBancariaC, CuentaBancariaI } from '@registros/banco/cuenta-bancaria-form/cuenta_bancaria';
+import { PeriodoFiscalC } from '@registros/periodo-fiscal/periodo-fiscal';
+import { DateUtils } from '@vjose1903/dateutils';
+import { requestParameters } from '@core/typescript/crud-g';
+import { dropdownFilterFocusInput } from '@core/typescript/p-dropdown.utils';
+import { HtmlElementsService } from '@services/html-elements.service';
+import { ImagenService } from '@services/imagen.service';
+import { Permisos } from '@core/typescript/permisos';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
 @Component({
   selector: 'app-cheque',
   templateUrl: './cheque.component.html',
   styleUrl: './cheque.component.scss',
+  standalone: false,
 })
 export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
   botonLabel: string;
@@ -76,12 +79,15 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
 
   htmlServ = inject(HtmlElementsService);
   imgServ = inject(ImagenService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+  public divisaServ = inject(DivisaService);
+  public dynamicModalServ = inject(DynamicModalService);
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService, public divisaServ: DivisaService) {
+  constructor() {
     super();
-
   }
-  
+
   ngOnInit(): void {
     this._init_mixin({ component: 'cheque', is_routing: true });
     this.necesarioStart();
@@ -112,9 +118,9 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
     this.chequeList.length = 0;
 
-    this.chequeClass.getAll(extra).then((res) => {
-      console.log("res ", res.data);
-      
+    this.chequeClass.getAll(extra).then(res => {
+      console.log('res ', res.data);
+
       this.chequeList = res.data.map((cheque: ChequeI) => {
         // cheque[chequeFormAttr.cuenta_bancaria_origen_id] = cheque.cuenta_bancaria_origen.id;
         cheque[chequeFormAttr.divisa_id] = cheque.divisa.id;
@@ -132,14 +138,14 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
         return cheque;
       });
 
-      console.log("chequeList ", this.chequeList);
-      
+      console.log('chequeList ', this.chequeList);
+
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
   createForm() {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       const divisa_principal = this.divisaServ.getDivisaPrincipalInfo();
 
       this.formGroup = this.fb.group({
@@ -157,7 +163,7 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   subscribeFormChanges() {
-    this.formGroup.valueChanges.subscribe((changes) => {
+    this.formGroup.valueChanges.subscribe(changes => {
       console.log('changes ', changes);
     });
   }
@@ -168,17 +174,12 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
     const formulario = this.formGroup.getRawValue();
     const funct = fun.hasValue(formulario?.[chequeFormAttr.id]) ? 'disable' : 'enable';
     const fields = [chequeFormAttr.divisa_id];
-    fields.forEach((field) => this.formGroup.controls[field][funct]());
+    fields.forEach(field => this.formGroup.controls[field][funct]());
   }
 
   enableDisableFields(func: 'enable' | 'disable') {
-    const fields = [
-      chequeFormAttr.cuenta_bancaria_id,
-      chequeFormAttr.divisa_id,
-      chequeFormAttr.monto,
-      chequeFormAttr.comentario,
-    ];
-    fields.forEach((field) => this.formGroup.controls[field][func]({ emitEvent: false }));
+    const fields = [chequeFormAttr.cuenta_bancaria_id, chequeFormAttr.divisa_id, chequeFormAttr.monto, chequeFormAttr.comentario];
+    fields.forEach(field => this.formGroup.controls[field][func]({ emitEvent: false }));
   }
 
   formIsInvalid() {
@@ -222,36 +223,33 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   aunlarItem(cheque: ChequeI) {
-    this.validateOpenPeriod(DateUtils.parse(cheque.fecha_equivalente), 'anulate').then(() => {
+    this.validateOpenPeriod(cheque.fecha_equivalente, 'anulate').then(() => {
       const identifier = cheque.numero_referencia || cheque.comentario;
 
-      const anularFunction = (data) => {
-        this.chequeClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then((res) => {
+      const anularFunction = data => {
+        this.chequeClass.deleteOne(null, { afterPath: `anular/${data.id}` }).then(res => {
           this.reloadChequesInSamePage();
         });
       };
 
-      this.confirmationModal({
-        id: anularChequeModalId,
-        header: 'Confirmar',
+      this.dynamicModalServ.confirmationModal({
+        id: 'cancelar_ingreso',
         texto: `Seguro que desea <b class="negrita"> ANULAR </b> el Cheque.<br /><br /><b class="negrita">Origen:</b> ${cheque.cuenta_bancaria_origen.info_completa}<br /><b class="negrita">Destino:</b> ${cheque.destino_info_completa}<br /><br />${identifier}`,
-        siFunction: (instance) => {
-          anularFunction(cheque);
-          instance.dismissModal(instance.id);
-        },
+        btnKind: confirmationButtons.cancelarAnular,
+        onYes: anularFunction.bind(this),
       });
     });
   }
 
   editarItem(cheque: ChequeI) {
-    this.validateOpenPeriod(DateUtils.parse(cheque.fecha_equivalente), 'update').then(() => {
+    this.validateOpenPeriod(cheque.fecha_equivalente, 'update').then(() => {
       if (fun.hasValue(this.formGroup)) this.formGroup.reset();
 
       setTimeout(() => {
         this.botonLabel = 'Editar';
         this.enableDisableFields('enable');
         this.chequeSelected = fun.deepCloning(cheque);
-        this.chequeSelected.fecha_equivalente = this.chequeSelected.fecha_equivalente ? DateUtils.parse(this.chequeSelected.fecha_equivalente) : null;
+        this.chequeSelected.fecha_equivalente = this.chequeSelected.fecha_equivalente ? DateUtils.convertStringToDate({ dateString: this.chequeSelected.fecha_equivalente }) : null;
         this.chequeSelected.monto = this.chequeSelected.monto ? fun.roundNumberToDecimal(this.chequeSelected.monto) : null;
 
         this.formGroup.patchValue(this.chequeSelected);
@@ -271,8 +269,8 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
     const month = currentDate.getMonth() + 1;
     const year = currentDate.getFullYear();
 
-    this.minDate = DateUtils.getFirstDayOfMonth({ year: year, month: month });
-    this.maxDate = month == DateUtils.getActualMonth() ? this.maxDate : DateUtils.getLastDayOfMonth({ year: year, month: month });
+    this.minDate = DateUtils.getFirstDayOfMonth({ year: year, month: month }) as Date;
+    this.maxDate = month == DateUtils.getActualMonth() ? this.maxDate : (DateUtils.getLastDayOfMonth({ year: year, month: month }) as Date);
   }
 
   nuevoRegistro() {
@@ -301,7 +299,7 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
 
   formatearMonto(formFieldName) {
     const input = this.formGroup.controls[formFieldName];
-    fun.revisarNumber(input, formFieldName).then((res) => {
+    fun.revisarNumber(input, formFieldName).then(res => {
       input.setValue(res.error ? '' : res.number);
     });
   }
@@ -328,7 +326,7 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
         const fecha_equivalente = DateUtils.format({ date: date, dateFormat: 'YYYY-MM-DD' });
 
         const requestParameters: requestParameters = { afterPath: 'custom/is_open_month', parameters: { fecha: fecha_equivalente } };
-        this.peridoClass.getAll(requestParameters).then((response) => {
+        this.peridoClass.getAll(requestParameters).then(response => {
           this.enableDisableFields(response.data.isOpen ? 'enable' : 'disable');
 
           if (!response.data.isOpen) {
@@ -363,7 +361,7 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
     dataToSend.fecha_equivalente = DateUtils.format({ date: formulario.fecha_equivalente, dateFormat: 'YYYY-MM-DD' });
     dataToSend.monto = fun.desformatearStNumber(formulario.monto);
 
-    this.chequeClass.createUpdateOne(dataToSend).then((res) => {
+    this.chequeClass.createUpdateOne(dataToSend).then(res => {
       this.reloadChequesInSamePage();
       this.borrar();
     });
