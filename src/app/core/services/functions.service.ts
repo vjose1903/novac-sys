@@ -136,7 +136,7 @@ export class fun extends CustomLodash {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (fun.isEmpty(searchText)) resolve(copyData);
 
-        const data_filtered = fun.deepCloning(copyData).filter((obj) => {
+        const data_filtered = fun.deepCloning(copyData).filter(obj => {
           const obj_picked = fun.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
@@ -446,7 +446,9 @@ export class fun extends CustomLodash {
   // _________________________________________________________________________________________________
 
   static timeout;
-  static awaitTyping(event?: KeyboardEvent, waitingTime = 700): Promise<void> {
+  static awaitTyping(args?: { event?: KeyboardEvent | any; waitingTime?: number }): Promise<void> {
+    const { event, waitingTime = 700 } = args ?? {};
+
     return new Promise(resolve => {
       if (fun.timeout) clearTimeout(fun.timeout);
 
@@ -912,10 +914,6 @@ export class fun extends CustomLodash {
     amount = parseInt(`${(255 * amount) / 100}`);
     return (color = `#${this.subtractLight(color.substring(0, 2), amount)}${this.subtractLight(color.substring(2, 4), amount)}${this.subtractLight(color.substring(4, 6), amount)}`);
   }
-
-
-
-  
 
   // Métodos helper para obtener instancias de servicios
   private static authGuardInstance: any = null;

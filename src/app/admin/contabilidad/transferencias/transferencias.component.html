@@ -17,7 +17,7 @@
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="transferenciaFormAttr.fecha_equivalente" [form]="formGroup()">
                     <label class="control-label" requiredFieldLabel>Fecha: </label>
-                    <p-calendar
+                    <p-datepicker
                       [inputId]="transferenciaFormFieldId.fecha_equivalente"
                       [minDate]="minDate"
                       [maxDate]="maxDate"
@@ -28,8 +28,7 @@
                       dateFormat="dd/mm/yy"
                       placeholder="dd/mm/aaaa"
                       (onSelect)="validateOpenPeriod()"
-                      (onInput)="validateOpenPeriod()"
-                    ></p-calendar>
+                      (onInput)="validateOpenPeriod()"></p-datepicker>
 
                     <span id="msgContainer"></span>
                   </div>
@@ -39,7 +38,7 @@
                   <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_origen_id" [form]="formGroup()">
                     <label class="control-label" requiredFieldLabel>Cuenta Bancaria Origen: </label>
 
-                    <p-dropdown
+                    <p-select
                       #dropdownCuenta
                       [inputId]="transferenciaFormFieldId.cuenta_bancaria_origen_id"
                       placeholder="Seleccione la cuenta"
@@ -54,20 +53,19 @@
                       optionValue="id"
                       [resetFilterOnHide]="true"
                       [autofocusFilter]="false"
-                      styleClass="form-control"
+                      class="form-control"
                       emptyMessage="No existen cuantas bancarias"
                       [showClear]="true"
                       (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
                       (onFocus)="dropdownFilterFocusInput(dropdownCuenta)"
-                      (onHide)="dropCuentaBancariaHide(dropdownCuenta, transferenciaFormAttr.cuenta_bancaria_origen_id)"
-                    >
+                      (onHide)="dropCuentaBancariaHide(dropdownCuenta, transferenciaFormAttr.cuenta_bancaria_origen_id)">
                       <ng-template let-cuenta_bancaria pTemplate="item">
                         <div class="cuenta_bancaria-item">
                           <span class="d-block" style="font-size: 1rem"> <strong>No. Cuenta: </strong> {{ cuenta_bancaria.numero_cuenta }} </span>
                           <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>Banco: </strong> {{ cuenta_bancaria.banco_name }} </span>
                         </div>
                       </ng-template>
-                    </p-dropdown>
+                    </p-select>
                     <span id="msgContainer"></span>
                   </div>
                 </div>
@@ -82,19 +80,18 @@
                       [ngModelOptions]="{ standalone: true }"
                       optionLabel="label"
                       optionValue="value"
-                      [unselectable]="true"
-                    />
+                      [unselectable]="true" />
                   </div>
                 </div>
 
                 <div class="col-12 p-0">
                   <!-- ======================= ENTRE MIS CUENTAS ======================= -->
 
-                  <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.misCuentas,  }">
+                  <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.misCuentas }">
                     <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_destino_id" [form]="formGroup()">
                       <label class="control-label" [requiredFieldLabel]="selectedTransferenciaType() === TransferenciaType.misCuentas">Cuenta Bancaria Destino: </label>
 
-                      <p-dropdown
+                      <p-select
                         #dropdownMisCuentas
                         [inputId]="transferenciaFormFieldId.cuenta_bancaria_destino_id"
                         placeholder="Seleccione la cuenta"
@@ -109,27 +106,26 @@
                         optionValue="id"
                         [resetFilterOnHide]="true"
                         [autofocusFilter]="false"
-                        styleClass="form-control"
+                        class="form-control"
                         emptyMessage="No existen cuantas bancarias"
                         [showClear]="true"
                         (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
                         (onFocus)="dropdownFilterFocusInput(dropdownMisCuentas)"
-                        (onHide)="dropCuentaBancariaHide(dropdownMisCuentas, transferenciaFormAttr.cuenta_bancaria_destino_id)"
-                      >
+                        (onHide)="dropCuentaBancariaHide(dropdownMisCuentas, transferenciaFormAttr.cuenta_bancaria_destino_id)">
                         <ng-template let-cuenta_bancaria pTemplate="item">
                           <div class="cuenta_bancaria-item">
                             <span class="d-block" style="font-size: 1rem"> <strong>No. Cuenta: </strong> {{ cuenta_bancaria.numero_cuenta }} </span>
                             <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>Banco: </strong> {{ cuenta_bancaria.banco_name }} </span>
                           </div>
                         </ng-template>
-                      </p-dropdown>
+                      </p-select>
                       <span id="msgContainer"></span>
                     </div>
                   </div>
                 </div>
 
                 <div class="col-12 p-0">
-                  <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.terceros,  }">
+                  <div class="transition-entrance vertical" [ngClass]="{ show: selectedTransferenciaType() === TransferenciaType.terceros }">
                     <!-- ======================= TERCEROS ======================= -->
                     <div>
                       <form-auto-complete
@@ -137,8 +133,7 @@
                         [(config)]="nombreBancoTerceroConfig"
                         [suggestions]="bancosList"
                         [multiple]="false"
-                        (keydownEnter)="saltar(nombreBancoTerceroConfig.fieldId)"
-                      ></form-auto-complete>
+                        (keydownEnter)="saltar(nombreBancoTerceroConfig.fieldId)"></form-auto-complete>
                     </div>
 
                     <div class="form-group" [appMsgError]="transferenciaFormAttr.cuenta_bancaria_tercero" [form]="formGroup()">
@@ -151,8 +146,7 @@
                         placeholder="Introduzca la cuenta"
                         class="form-control"
                         (focus)="htmlServ.selectValue($event)"
-                        autocomplete="off"
-                      />
+                        autocomplete="off" />
                       <span id="msgContainer"></span>
                     </div>
                   </div>
@@ -174,8 +168,7 @@
                       class="form-control"
                       (focus)="desformatearMonto(transferenciaFormAttr.monto); htmlServ.selectValue($event)"
                       autocomplete="off"
-                      (blur)="formatearMonto(transferenciaFormAttr.monto)"
-                    />
+                      (blur)="formatearMonto(transferenciaFormAttr.monto)" />
                     <span id="msgContainer"></span>
                   </div>
                 </div>
@@ -191,8 +184,7 @@
                       placeholder="Introduzca la referencia"
                       class="form-control"
                       (focus)="htmlServ.selectValue($event)"
-                      autocomplete="off"
-                    />
+                      autocomplete="off" />
                     <span id="msgContainer"></span>
                   </div>
                 </div>

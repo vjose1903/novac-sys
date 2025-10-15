@@ -326,7 +326,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
   }
 
   showDropdownMedida(event, dropdown) {
-    fun.awaitTyping(null, 10).then(() => {
+    fun.awaitTyping({ waitingTime: 10 }).then(() => {
       if (!this.dropdownMedidaOpen && event.type == 'focus') {
         dropdown.show();
         this.changeStateDropDownMedida(true);

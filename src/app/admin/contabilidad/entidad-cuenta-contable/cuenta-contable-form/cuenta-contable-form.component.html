@@ -77,7 +77,7 @@
                     <label class="mb-0" for="search">{{ getDropDownInfo('description') }} </label>
                     <input *ngIf="form.controls.tipo_agrupacion_contable.value == agrupacionesContables.individual" id="cuentaControlInput" class="search-input form-control min" [value]="inputs.selectedConfig.cuenta_contable.label" disabled />
 
-                    <p-dropdown
+                    <p-select
                       #dropdownCuentaControl
                       inputId="cuentaControlSelect"
                       appendTo="body"
@@ -86,7 +86,7 @@
                       [virtualScrollItemSize]="34"
                       optionLabel="descripcion"
                       optionValue="id"
-                      styleClass="form-control min"
+                      class="form-control min"
                       [emptyMessage]="getDropDownInfo('emptyMessage')"
                       [placeholder]="getDropDownInfo('placeholder')"
                       [showClear]="true"
@@ -100,7 +100,7 @@
                           </span>
                         </div>
                       </ng-template>
-                    </p-dropdown>
+                    </p-select>
                     <span id="msgContainer"></span>
                   </div>
                 </div>

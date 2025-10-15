@@ -25,7 +25,7 @@
                   <div class="form-group" appMsgError="cuenta_contable_id" [form]="form">
                     <label class="control-label">Cuenta Contable: <span style="color: red">*</span></label>
 
-                    <p-dropdown
+                    <p-select
                       #dropdownCuenta
                       placeholder="Seleccione la cuenta"
                       filterPlaceholder="Buscar"
@@ -38,7 +38,7 @@
                       optionValue="id"
                       [resetFilterOnHide]="true"
                       [autofocusFilter]="false"
-                      styleClass="form-control"
+                      class="form-control"
                       emptyMessage="No existen cuantas contables"
                       [showClear]="true"
                       (onFocus)="dropCuentaControlFocus(dropdownCuenta)"
@@ -49,7 +49,7 @@
                           <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>No. Cuenta: </strong> {{ cuenta_auxiliar.codigo }} </span>
                         </div>
                       </ng-template>
-                    </p-dropdown>
+                    </p-select>
 
                     <span id="msgContainer"></span>
                   </div>

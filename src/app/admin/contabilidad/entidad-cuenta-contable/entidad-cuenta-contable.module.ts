@@ -8,12 +8,13 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EntidadCuentaContableComponent } from './entidad-cuenta-contable.component';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { AccordionModule } from 'primeng/accordion';
 
 const components = [EntidadCuentaContableComponent, CuentaContableFormComponent];
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, PipesModule, PrimengModule, TablasModule, DirectivesModule, FormsModule, ReactiveFormsModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, PipesModule, PrimengModule, TablasModule, AccordionModule, DirectivesModule, FormsModule, ReactiveFormsModule, NgxPermissionsModule.forChild()],
   exports: components,
 })
 export class EntidadCuentaContableModule {}

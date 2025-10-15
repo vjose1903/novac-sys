@@ -17,7 +17,7 @@
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="depositoFormAttr.fecha_equivalente" [form]="formGroup">
                     <label class="control-label" requiredFieldLabel>Fecha: </label>
-                    <p-calendar
+                    <p-datepicker
                       [inputId]="depositoFormFieldId.fecha_equivalente"
                       [minDate]="minDate"
                       [maxDate]="maxDate"
@@ -28,7 +28,7 @@
                       placeholder="dd/mm/aaaa"
                       (onSelect)="validateOpenPeriod()"
                       (onInput)="validateOpenPeriod()"
-                    ></p-calendar>
+                    ></p-datepicker>
 
                     <span id="msgContainer"></span>
                   </div>
@@ -38,7 +38,7 @@
                   <div class="form-group" [appMsgError]="depositoFormAttr.cuenta_bancaria_id" [form]="formGroup">
                     <label class="control-label" requiredFieldLabel>Cuenta Bancaria: </label>
 
-                    <p-dropdown
+                    <p-select
                       #dropdownCuenta
                       [inputId]="depositoFormFieldId.cuenta_bancaria_id"
                       placeholder="Seleccione la cuenta"
@@ -53,7 +53,7 @@
                       optionValue="id"
                       [resetFilterOnHide]="true"
                       [autofocusFilter]="false"
-                      styleClass="form-control campoCuentaBancaria"
+                      class="form-control campoCuentaBancaria"
                       emptyMessage="No existen cuantas bancarias"
                       [showClear]="true"
                       (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
@@ -67,7 +67,7 @@
                           <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>Banco: </strong> {{ cuenta_bancaria.banco_name }} </span>
                         </div>
                       </ng-template>
-                    </p-dropdown>
+                    </p-select>
                     <span id="msgContainer"></span>
                   </div>
                 </div>

@@ -20,7 +20,7 @@
                 <div class="col-12 p-0">
                   <div class="form-group" [appMsgError]="chequeFormAttr.fecha_equivalente" [form]="formGroup">
                     <label class="control-label" requiredFieldLabel>Fecha: </label>
-                    <p-calendar
+                    <p-datepicker
                       [inputId]="chequeFormFieldId.fecha_equivalente"
                       [minDate]="minDate"
                       [maxDate]="maxDate"
@@ -32,7 +32,7 @@
                       placeholder="dd/mm/aaaa"
                       (onSelect)="validateOpenPeriod()"
                       (onInput)="validateOpenPeriod()"
-                    ></p-calendar>
+                    ></p-datepicker>
 
                     <span id="msgContainer"></span>
                   </div>
@@ -42,7 +42,7 @@
                   <div class="form-group" [appMsgError]="chequeFormAttr.cuenta_bancaria_id" [form]="formGroup">
                     <label class="control-label" requiredFieldLabel>Cuenta Bancaria: </label>
 
-                    <p-dropdown
+                    <p-select
                       #dropdownCuenta
                       [inputId]="chequeFormFieldId.cuenta_bancaria_id"
                       placeholder="Seleccione la cuenta"
@@ -57,7 +57,7 @@
                       optionValue="id"
                       [resetFilterOnHide]="true"
                       [autofocusFilter]="false"
-                      styleClass="form-control"
+                      class="form-control"
                       emptyMessage="No existen cuantas bancarias"
                       [showClear]="true"
                       optionDisabled="disabled"
@@ -81,7 +81,7 @@
                           </div>
                         </div>
                       </ng-template>
-                    </p-dropdown>
+                    </p-select>
                     <span id="msgContainer"></span>
                   </div>
                 </div>

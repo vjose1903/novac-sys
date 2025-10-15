@@ -237,7 +237,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const search = event.target.value;
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
-      fun.awaitTyping(event).then(() => {
+      fun.awaitTyping({ event }).then(() => {
         if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
           const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
 
@@ -516,7 +516,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   changeValorInput(event, column, key, index, value, data) {
-    fun.awaitTyping(event, 250).then(() => {
+    fun.awaitTyping({ event, waitingTime: 250 }).then(() => {
       let newData = fun.deepCloning(this.tServ.rowsEditing.find(item => item.id == data.id));
 
       if (fun.isEmpty(newData) || this.tServ.rowsEditing.length == 0) newData = fun.deepCloning(data);

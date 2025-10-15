@@ -11,10 +11,27 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LibroDiarioPageComponent } from './libro-diario-page.component';
 import { EntradaDiarioComponent } from './entrada-diario/entrada-diario.component';
 import { FormEntradaDiarioComponent } from './entrada-diario/form-entrada-diario/form-entrada-diario.component';
+import { AccordionModule } from 'primeng/accordion';
+import { PaginatorModule } from 'primeng/paginator';
 
 @NgModule({
   declarations: [LibroDiarioPageComponent],
-  imports: [CommonModule, LibroDiarioPageRoutingModule, PipesModule, PrimengModule, BtnIconModule, TablasModule, DirectivesModule, FormsModule, ReactiveFormsModule, NgxPermissionsModule.forChild(), EntradaDiarioComponent, FormEntradaDiarioComponent],
+  imports: [
+    CommonModule,
+    LibroDiarioPageRoutingModule,
+    PipesModule,
+    PrimengModule,
+    BtnIconModule,
+    TablasModule,
+    AccordionModule,
+    PaginatorModule,
+    DirectivesModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgxPermissionsModule.forChild(),
+    EntradaDiarioComponent,
+    FormEntradaDiarioComponent,
+  ],
   exports: [FormEntradaDiarioComponent],
 })
 export class LibroDiarioPageModule {}

@@ -76,7 +76,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
     await this.createForm().then((form) => {
       this.enableDisableIsComunSwitch();
       form.valueChanges.subscribe((changes) => {
-        fun.awaitTyping({ awaitTime: 250 }).then(() => {
+        fun.awaitTyping({ waitingTime: 250 }).then(() => {
           if (!fun.isEqual(changes, this.lastChange)) this.returnData();
         });
       });

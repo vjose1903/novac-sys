@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { TablasService } from '@core/components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { LoaderService } from 'app/loader/loader.service';
+
 import { FacturasRecibidasC, FacturasRecibidasI } from './facturas-recibidas.model';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { FacturasRecibidasService } from './facturas-recibidas.service';
 import { default_per_page, table_config } from '@core/components/new_tablas/tabla-class';
 import { fun } from '@core/services/functions.service';
+import { SuplidorI } from '@registros/registro-suplidores/suplidores';
 @Component({
   selector: 'app-facturas-recibidas',
   templateUrl: './facturas-recibidas.component.html',
@@ -23,7 +24,6 @@ import { fun } from '@core/services/functions.service';
 })
 export class FacturasRecibidasComponent extends MixinClass implements OnInit {
   tServ = inject(TablasService);
-  loadServ = inject(LoaderService);
   facturasRecibidasService = inject(FacturasRecibidasService);
 
   facturaRecibidaSelected: FacturasRecibidasI;
@@ -56,8 +56,6 @@ export class FacturasRecibidasComponent extends MixinClass implements OnInit {
     this.necesarioParaEmpezar();
   }
 
-
-
   necesarioParaEmpezar() {
     this.getFacturasRecibidas(this.tServ.obj_paginate.default);
   }
@@ -74,7 +72,7 @@ export class FacturasRecibidasComponent extends MixinClass implements OnInit {
         if (fun.isEmpty(factura.suplidor)) {
           factura.suplidor = {
             nombre_completo: 'Suplidor no registrado',
-          };
+          } as SuplidorI;
         }
         return factura;
       });

@@ -152,7 +152,7 @@ export class LibroDiarioPageComponent extends MixinClass implements OnInit, OnDe
 
   filter(from?) {
     const params = { ...this.paginator, search: this.filterValue };
-    fun.awaitTyping(null, from == searchDiurnalCode ? 0 : 700).then(() => this.getAsientos(params));
+    fun.awaitTyping({ waitingTime: from == searchDiurnalCode ? 0 : 700 }).then(() => this.getAsientos(params));
   }
 
   makeFrontDetalles(detalles_asientos_contables: Array<DetalleAsientoContableI>) {

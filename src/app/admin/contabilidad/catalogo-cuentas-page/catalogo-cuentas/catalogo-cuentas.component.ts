@@ -154,7 +154,7 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
 
   filter(event: any) {
     this.filter_target = event.target.value;
-    fun.awaitTyping(event).then(() => this.getCuentasContables(this.filter_target));
+    fun.awaitTyping({ event }).then(() => this.getCuentasContables(this.filter_target));
   }
 
   iconsClick(event) {

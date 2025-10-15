@@ -1,14 +1,14 @@
 import { fun } from '@core/services/functions.service';
 import { CrudG } from '@core/typescript/crud-g';
-import { ReporteC } from '../reportes/reporte';
 import * as _ from 'lodash';
 import { csvConfig as csvConfigReciboIngreso } from '@core/services/reports/excel/configs/report/recibo_ingreso';
-import { ReportGroupTypeE } from '../reportes/reporte.utils';
+import { ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { Validators } from '@angular/forms';
 import { reportField } from '@core/components/formularios en modales/form-reportes/form-reportes.component.model';
 import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { DateUtils } from '@vjose1903/dateutils';
+import { ReporteC } from '@admin/reportes/reporte';
 export interface ReciboI {
   id?: number;
   user_id?: number;

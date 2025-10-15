@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { DrawerModule } from 'primeng/drawer';
-import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
@@ -15,8 +14,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 const modulos = [DialogModule, ProgressBarModule, DrawerModule, TooltipModule, SelectModule, InputMaskModule, TagModule, TabsModule, MultiSelectModule, PopoverModule, DatePickerModule];
 
 @NgModule({
-  declarations: [],
-  imports: [CommonModule, ...modulos],
+  imports: modulos,
   exports: modulos,
 })
 export class PrimengModule {}

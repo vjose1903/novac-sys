@@ -16,7 +16,7 @@
               <ul class="overlayExtra" role="menu">
                 @for (option of opcionesExtra(); track option.key; let index_option = $index) {
                   @if (option.condition()) {
-                    <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer br-4" (click)="selectOptionExtra(option, 'click')">
+                    <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer br-4" (click)="selectOptionExtra(option)">
                       <div class="d-flex align-items-center">
                         <strong> {{ option.key }} - </strong> &nbsp;
                         <p id="dropdown-item" class="me-3 mb-0">{{ option.label }}</p>

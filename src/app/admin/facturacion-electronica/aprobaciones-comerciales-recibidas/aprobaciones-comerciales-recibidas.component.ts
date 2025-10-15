@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { TablasService } from '@core/components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { LoaderService } from 'app/loader/loader.service';
 import { CommertialApprovalC, CommertialApprovalI } from './aprobaciones-comerciales-recibidas.model';
 import { AprobacionesComercialesRecibidasService } from './aprobaciones-comerciales-recibidas.service';
 import { default_per_page, table_config } from '@core/components/new_tablas/tabla-class';
@@ -14,6 +13,7 @@ import { DirectivesModule } from '@core/directive/directives.module';
 import { PipesModule } from '@core/pipe/pipes.module';
 import { PrimengModule } from 'app/modules/primeng.module';
 import { NgxPermissionsModule } from 'ngx-permissions';
+import { SuplidorI } from '@registros/registro-suplidores/suplidores';
 
 @Component({
   selector: 'app-aprobaciones-comerciales-recibidas',
@@ -24,7 +24,6 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 })
 export class AprobacionesComercialesRecibidasComponent extends MixinClass implements OnInit {
   tServ = inject(TablasService);
-  loadServ = inject(LoaderService);
 
   commertialApprovalClass = new CommertialApprovalC();
 
@@ -77,7 +76,7 @@ export class AprobacionesComercialesRecibidasComponent extends MixinClass implem
         if (fun.isEmpty(factura.suplidor)) {
           factura.suplidor = {
             nombre_completo: 'Suplidor no registrado',
-          };
+          } as SuplidorI;
         }
         return factura;
       });

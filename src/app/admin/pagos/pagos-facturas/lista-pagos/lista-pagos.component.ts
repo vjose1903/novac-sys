@@ -23,6 +23,7 @@ import { ICallbackModal, modalActionsE } from '@core/components/dynamic-modal/co
   selector: 'app-lista-pagos',
   templateUrl: './lista-pagos.component.html',
   styleUrls: ['./lista-pagos.component.scss'],
+  standalone: false,
 })
 export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy {
   static tablePagosId = 'listado_pagos';
@@ -67,10 +68,10 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
 
   mapeoPagos(data) {
     data.map(pago => {
-      const numberKey = this.pagosService.isReciboIngreso()? 'numero_recibo' : 'numero';
+      const numberKey = this.pagosService.isReciboIngreso() ? 'numero_recibo' : 'numero';
       pago[numberKey] = String(pago[numberKey]).padStart(8, '0');
 
-      const detalleKey = this.pagosService.isReciboIngreso()? 'detalle_recibos' : 'pago_factura_detalles';
+      const detalleKey = this.pagosService.isReciboIngreso() ? 'detalle_recibos' : 'pago_factura_detalles';
       pago['numero_factura'] = pago[detalleKey].length === 1 ? pago[detalleKey][0].descripcion.split(' ')[1] : 'Varios...';
 
       pago['ver'] = 'far fa-eye';
@@ -83,7 +84,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
         { key: 'anular', hover: ['text-green'], leave: ['text-black'] },
       ];
 
-      const entidadKey = this.pagosService.isReciboIngreso()? 'cliente.nombre_completo' : 'suplidor.nombre_completo';
+      const entidadKey = this.pagosService.isReciboIngreso() ? 'cliente.nombre_completo' : 'suplidor.nombre_completo';
 
       pago['customStyles'] = {
         [entidadKey]: { 'text-align': 'start', 'padding-left': '1.5rem' },
@@ -142,8 +143,8 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
           break;
 
         case 'anular':
-          const numberKey = this.pagosService.isReciboIngreso()? 'numero_recibo' : 'numero';
-          const label = this.pagosService.isReciboIngreso()? 'recibo' : 'pago';
+          const numberKey = this.pagosService.isReciboIngreso() ? 'numero_recibo' : 'numero';
+          const label = this.pagosService.isReciboIngreso() ? 'recibo' : 'pago';
           const texto_modal = `Seguro de que desea anular el ${label} <b class="negrita"> #${recibo_selected[numberKey]} </b>`;
 
           const siFunction = () => {
@@ -180,7 +181,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
           const base64 = res.base64;
           const pageOrientation = res.pageOrientation;
 
-          const titulo = this.pagosService.isReciboIngreso()? 'Revisión de recibo de ingreso' : 'Revisión de pago de factura';
+          const titulo = this.pagosService.isReciboIngreso() ? 'Revisión de recibo de ingreso' : 'Revisión de pago de factura';
 
           const obj_pdf = { base64: res.base64, titulo: titulo, reimprimir: true, fileName: _.first(res.file.split('.')) };
 

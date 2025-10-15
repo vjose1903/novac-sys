@@ -1,5 +1,27 @@
-<p-accordion [activeIndex]="activeIndex">
-  <p-accordionTab header="Cuentas Contables">
+<p-accordion [value]="activeIndex">
+  @for (config of inputs.configsEntCuentas; track config.id) {
+    <p-accordion-panel [value]="$index">
+      <p-accordion-header>Cuentas Contables</p-accordion-header>
+      <p-accordion-content>
+        @if (is_initialized) {
+          <div class="row p-0 rowCuentasContables">
+            <div class="col-12 p-0" *ngFor="let config of this.inputs.configsEntCuentas; let index = index">
+              <cuenta-contable-form
+                [inputs]="{ selectedConfig: fun.deepCloning(config), entidad: inputs.entidad }"
+                [configuration]="configuration"
+                [cuentaContableDataCruda]="getData(config.id, 'cruda')"
+                [cuentaContableData]="getData(config.id, 'form')"
+                [infoTipoArticulo]="infoTipoArticulo"
+                [camposDisabled]="camposDisabled"
+                (cuentaContableDataChange)="parseData($event)"></cuenta-contable-form>
+            </div>
+          </div>
+        }
+      </p-accordion-content> 
+    </p-accordion-panel>
+  }
+
+  <!-- <p-accordionTab header="Cuentas Contables">
     <div *ngIf="is_initialized" class="row p-0 rowCuentasContables">
       <div class="col-12 p-0" *ngFor="let config of this.inputs.configsEntCuentas; let index = index">
         <cuenta-contable-form
@@ -9,9 +31,8 @@
           [cuentaContableData]="getData(config.id, 'form')"
           [infoTipoArticulo]="infoTipoArticulo"
           [camposDisabled]="camposDisabled"
-          (cuentaContableDataChange)="parseData($event)"
-        ></cuenta-contable-form>
+          (cuentaContableDataChange)="parseData($event)"></cuenta-contable-form>
       </div>
     </div>
-  </p-accordionTab>
+  </p-accordionTab> -->
 </p-accordion>
