@@ -1,6 +1,8 @@
+import { fun } from '@core/services/functions.service';
+
 export function dropdownFilterFocusInput(drop) {
-  setTimeout(() => {
+  fun.setTimeout(() => {
     const filterInput = drop?.filterViewChild?.nativeElement;
     if (filterInput) filterInput.focus();
-  }, 25);
+  }, 100);
 }

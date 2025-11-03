@@ -13,12 +13,13 @@ import { BtnIconModule } from '@core/components/btn-icon-circular/btn-icon-circu
 import { TablasModule } from '@core/components/new_tablas/tablas.module';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { FormCuentaContableSelectComponent } from '@core/components/form-fields/form-cuenta-contable-select/form-cuenta-contable-select.component';
 
 @Component({
   selector: 'form-entrada-diario',
   templateUrl: './form-entrada-diario.component.html',
   styleUrls: ['./form-entrada-diario.component.scss'],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, SelectModule, BtnIconModule, TablasModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SelectModule, BtnIconModule, TablasModule, FormCuentaContableSelectComponent],
 })
 export class FormEntradaDiarioComponent extends MixinClass implements OnInit, OnChanges {
   cuentasAuxiliares = [];
@@ -109,10 +110,6 @@ export class FormEntradaDiarioComponent extends MixinClass implements OnInit, On
     const formulario = this.formGroup.getRawValue();
 
     if (fun.hasValue(formulario.cuenta_contable_auxiliar_id)) this.saltar('campoCuentaAuxiliar');
-  }
-
-  dropCuentaAuxiliarFocus(drop) {
-    dropdownFilterFocusInput(drop);
   }
 
   checkAmountInputState() {

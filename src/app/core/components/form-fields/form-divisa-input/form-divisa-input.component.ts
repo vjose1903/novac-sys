@@ -1,10 +1,10 @@
 import { Component, EventEmitter, input, Optional, Self, OnInit, Output, signal, inject } from '@angular/core';
-import { customFormsElements } from '../../../typescript/custom-forms-elements/custom-forms-elements';
-import { fun } from '../../../../core/services/functions.service';
+import { customFormsElements } from '@core/typescript/custom-forms-elements/custom-forms-elements';
+import { fun } from '@services/functions.service';
 import { NgControl } from '@angular/forms';
-import { DivisaService } from '../../../../admin/registros/divisa/divisa.service';
-import { HtmlElementsService } from '../../../../core/services/html-elements.service';
-import { ImagenService } from '../../../../core/services/imagen.service';
+import { DivisaService } from '@admin/registros/divisa/divisa.service';
+import { HtmlElementsService } from '@services/html-elements.service';
+import { ImagenService } from '@services/imagen.service';
 
 @Component({
   selector: 'form-divisa-input',

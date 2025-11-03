@@ -1,9 +1,9 @@
 .main-diurnal-container {
   display: grid;
   grid-template-areas:
-    "diurnal-title"
-    "diurnal-body"
-    "diurnal-footer";
+    'diurnal-title'
+    'diurnal-body'
+    'diurnal-footer';
   grid-template-rows: min-content auto min-content;
   height: 100%;
   overflow: hidden;
@@ -23,6 +23,7 @@
 
       .cuenta-auxiliar-group {
         width: 50%;
+        max-width: 20.5rem;
       }
 
       .debito-group {

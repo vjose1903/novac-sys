@@ -1,0 +1,37 @@
+<div class="w-100 position-relative">
+  <div class="form-group mb-0">
+    <label class="control-label opacity-2 mb-0">{{ label() }}</label>
+
+    <p-select
+      #dropdownCuenta
+      [inputId]="inputId()"
+      [disabled]="disabled()"
+      placeholder="Seleccione la cuenta"
+      filterPlaceholder="Buscar"
+      appendTo="body"
+      [ngModel]="valueSignal()"
+      (ngModelChange)="this.returnValue($event); this.onTouched()"
+      [options]="options()"
+      [virtualScrollItemSize]="34"
+      [filter]="true"
+      optionLabel="label"
+      optionValue="id"
+      [resetFilterOnHide]="true"
+      [autofocusFilter]="false"
+      class="campoCuentaAuxiliar"
+      panelStyleClass="campoCuentaAuxiliar-panel"
+      emptyMessage="No existen cuantas contables"
+      [showClear]="true"
+      (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+      (keyup.enter)="emitKeydown($event)"
+      (onFocus)="dropCuentaFocus(dropdownCuenta)"
+      (onHide)="emitHide($event)">
+      <ng-template let-cuenta pTemplate="item">
+        <div class="cuenta-item">
+          <span class="d-block" style="font-size: 1rem"> <strong class="text-s-12">Descripción: </strong> {{ cuenta.descripcion }} </span>
+          <span class="d-block" style="font-size: 0.8rem; color: #787878"> <strong>No. Cuenta: </strong> {{ cuenta.codigo }} </span>
+        </div>
+      </ng-template>
+    </p-select>
+  </div>
+</div>

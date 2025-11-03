@@ -7,55 +7,55 @@
   <div class="catalogo-cuentas-body">
     <div #catalogoCuentasBody class="catalogo-cuentas-fantasma">
       @if (treeNodes.length) {
-      <p-treeTable [value]="treeNodes" [columns]="table_config.info" [scrollable]="true" scrollHeight="{{ treeTableScrollHeight }}" [resizableColumns]="true">
-        <ng-template pTemplate="header" let-columns>
-          <tr #trTreeHead>
-            @for (column of columns; track $index; ) {
-            <th [ngStyle]="column.style">
-              {{ column.titulo }}
-            </th>
-            }
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-columns="columns" let-rowIndex="rowIndex">
-          <tr #trTreeBody [ttRow]="rowNode">
-            @for (column of columns; track $index; let indexBody = $index ) {
-            <td [ngStyle]="tServ.getStyle(rowData, column, rowData.index, table_config.id_tabla)" [ngClass]="{ negrita: rowData.is_control }">
-              @if ($first) {
-              <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+        <p-treeTable [value]="treeNodes" [columns]="table_config.info" [scrollable]="true" scrollHeight="{{ treeTableScrollHeight }}" [resizableColumns]="true">
+          <ng-template pTemplate="header" let-columns>
+            <tr #trTreeHead>
+              @for (column of columns; track $index) {
+                <th [ngStyle]="column.style">
+                  {{ column.titulo }}
+                </th>
               }
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowNode let-rowData="rowData" let-columns="columns" let-rowIndex="rowIndex">
+            <tr #trTreeBody [ttRow]="rowNode">
+              @for (column of columns; track $index; let indexBody = $index) {
+                <td [ngStyle]="tServ.getStyle(rowData, column, rowData.index, table_config.id_tabla)" [ngClass]="{ negrita: rowData.is_control }">
+                  @if ($first) {
+                    <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                  }
 
-              <span [ngSwitch]="column?.tipo">
-                <ng-container *ngSwitchCase="tableCellType.text">
-                  {{ fun.hasValue(column?.key) ? rowData[column.key] : '' }}
-                </ng-container>
+                  <span>
+                    @switch (column?.tipo) {
+                      @case (tableCellType.text) {
+                        {{ fun.hasValue(column?.key) ? rowData[column.key] : '' }}
+                      }
+                      @case (tableCellType.tag) {
+                        <p-tag
+                          [value]="getValueForm(column, rowData)"
+                          [rounded]="true"
+                          [severity]="rowData[column.tag_severity]"
+                          [ngClass]="{ tag_clickable: !!column.click }"
+                          [style]="{
+                            background: rowData[column.row_tag_color],
+                            'white-space': 'nowrap',
+                            width: column.tag_apretada ? 'auto' : '-webkit-fill-available',
+                            overflow: 'hidden',
+                            'text-overflow': 'ellipsis',
+                            display: 'inline-block',
+                          }"></p-tag>
+                      }
 
-                <ng-container *ngSwitchCase="tableCellType.tag">
-                  <p-tag
-                    [value]="getValueForm(column, rowData)"
-                    [rounded]="true"
-                    [severity]="rowData[column.tag_severity]"
-                    [ngClass]="{ tag_clickable: !!column.click }"
-                    [style]="{
-                      background: rowData[column.row_tag_color],
-                      'white-space': 'nowrap',
-                      width: column.tag_apretada ? 'auto' : '-webkit-fill-available',
-                      overflow: 'hidden',
-                      'text-overflow': 'ellipsis',
-                      display: 'inline-block'
-                    }"
-                  ></p-tag>
-                </ng-container>
-
-                <ng-container *ngSwitchCase="tableCellType.icon">
-                  <icons-array [column]="column" [indexBody]="rowData.index" [realIdTabla]="table_config.id_tabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="rowData" (icon_click)="iconsClick($event)"></icons-array>
-                </ng-container>
-              </span>
-            </td>
-            }
-          </tr>
-        </ng-template>
-      </p-treeTable>
+                      @case (tableCellType.icon) {
+                        <icons-array [column]="column" [indexBody]="rowData.index" [config]="table_config" [realIdTabla]="table_config.id_tabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="rowData" (icon_click)="iconsClick($event)"></icons-array>
+                      }
+                    }
+                  </span>
+                </td>
+              }
+            </tr>
+          </ng-template>
+        </p-treeTable>
       }
     </div>
   </div>
