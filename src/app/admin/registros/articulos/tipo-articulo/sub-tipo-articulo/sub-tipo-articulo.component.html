@@ -11,8 +11,8 @@
             </div>
 
             <div class="mt-3">
-              <div class="form-group d-flex">
-                <button *ngIf="checkIfSomethingIsDiferrent()" (click)="borrar()" class="btn mr-2 btn-blanco">Cancelar</button>
+              <div class="d-flex align-items-center gap-2">
+                <button [disabled]="!checkIfSomethingIsDiferrent()" (click)="borrar()" class="btn mr-2 btn-blanco">Cancelar</button>
 
                 <div [pTooltip]="fun.hasValue(subCategoriaSelected) ? (!checkIfSomethingIsDiferrent() ? 'Para editar debe de tener un valor distinto al original' : '') : ''" tooltipPosition="right">
                   <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde">{{ subCategoriaSelected ? 'Editar' : 'Guardar' }}</button>
