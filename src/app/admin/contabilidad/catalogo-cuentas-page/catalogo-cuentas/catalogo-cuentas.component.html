@@ -47,7 +47,15 @@
                       }
 
                       @case (tableCellType.icon) {
-                        <icons-array [column]="column" [indexBody]="rowData.index" [config]="table_config" [realIdTabla]="table_config.id_tabla" [seleccionado]="seleccionado" [rowData]="rowData" [data]="rowData" (icon_click)="iconsClick($event)"></icons-array>
+                        <icons-array
+                          [column]="column"
+                          [indexBody]="rowData.index"
+                          [config]="table_config"
+                          [realIdTabla]="table_config.id_tabla"
+                          [seleccionado]="seleccionado"
+                          [rowData]="rowData"
+                          [data]="rowData"
+                          (icon_click)="iconsClick($event)"></icons-array>
                       }
                     }
                   </span>
