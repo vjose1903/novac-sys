@@ -209,8 +209,11 @@
       <div class="list {{ isCreando || empleadoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado empleados</h4>
-          <div class="btn-wrapper">
-            <button *ngxPermissionsOnly="categoriaEntidadServ.allPermisosCategoriaEnt" (click)="openModalCategorias()" class="btn btn-gris mr-3">Categorias</button>
+
+          <div class="d-flex align-items-center gap-2">
+            <span [pTooltip]="empleadoSelected || isCreando ? 'Para abrir el formulario de categorias, debe de cerrar el formulario de empleados.' : ''" tooltipPosition="left">
+              <button *ngxPermissionsOnly="categoriaEntidadServ.allPermisosCategoriaEnt" [disabled]="empleadoSelected || isCreando" (click)="openModalCategorias()" class="btn btn-gris">Categorias</button>
+            </span>
             <button *ngxPermissionsOnly="permissions.user.create" [disabled]="empleadoSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
           </div>
         </div>

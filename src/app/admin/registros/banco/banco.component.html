@@ -174,8 +174,8 @@
       <div class="list {{ isCreando || formGroup.controls.id.value ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado de bancos</h4>
-          <div class="d-flex">
-            <span [pTooltip]="formGroup.controls.id.value || isCreando ? 'Para abrir el formulario de tipo cuenta bancaria, debe de cerrar el formulario de articulos.' : ''" tooltipPosition="left">
+          <div class="d-flex align-items-center gap-2">
+            <span [pTooltip]="formGroup.controls.id.value || isCreando ? 'Para abrir el formulario de tipo cuenta bancaria, debe de cerrar el formulario de cuentas bancarias.' : ''" tooltipPosition="left">
               <button *ngxPermissionsOnly="allPermisosTipoCuentaBancaria" [disabled]="formGroup.controls.id.value || isCreando" (click)="openModalTipoCuentasBancarias()" class="btn btn-gris mr-3">Tipo cuentas bancarias</button>
             </span>
             <button *ngxPermissionsOnly="permissions.banco.create" [disabled]="formGroup.controls.id.value || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>

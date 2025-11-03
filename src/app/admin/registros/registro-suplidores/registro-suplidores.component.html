@@ -154,8 +154,11 @@
       <div class="list {{ isCreando || suplidorSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 classs="mb-0">Listado Suplidores</h4>
-          <div class="btn-wrapper">
-            <button *ngxPermissionsOnly="categoriaEntidadServ.allPermisosCategoriaEnt" (click)="openModalCategorias()" class="btn btn-gris mr-3">Categorias</button>
+
+          <div class="d-flex align-items-center gap-2">
+            <span [pTooltip]="suplidorSelected || isCreando ? 'Para abrir el formulario de categorias, debe de cerrar el formulario de suplidores.' : ''" tooltipPosition="left">
+              <button *ngxPermissionsOnly="categoriaEntidadServ.allPermisosCategoriaEnt" [disabled]="suplidorSelected || isCreando" (click)="openModalCategorias()" class="btn btn-gris">Categorias</button>
+            </span>
             <button *ngxPermissionsOnly="permissions.suplidor.create" [disabled]="suplidorSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
           </div>
         </div>

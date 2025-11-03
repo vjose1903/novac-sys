@@ -258,8 +258,10 @@
       <div class="list {{ isCreando || clienteSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
           <h4 class="mb-0">Listado clientes</h4>
-          <div class="btn-wrapper">
-            <button *ngxPermissionsOnly="categoriaEntidadServ.allPermisosCategoriaEnt" (click)="openModalCategorias()" class="btn btn-gris mr-3">Categorias</button>
+          <div class="d-flex align-items-center gap-2">
+            <span [pTooltip]="clienteSelected || isCreando ? 'Para abrir el formulario de categorias, debe de cerrar el formulario de clientes.' : ''" tooltipPosition="left">
+              <button *ngxPermissionsOnly="categoriaEntidadServ.allPermisosCategoriaEnt" [disabled]="clienteSelected || isCreando" (click)="openModalCategorias()" class="btn btn-gris">Categorias</button>
+            </span>
             <button *ngxPermissionsOnly="permissions.cliente.create" [disabled]="clienteSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
           </div>
         </div>
