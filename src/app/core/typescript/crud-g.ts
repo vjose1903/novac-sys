@@ -24,6 +24,7 @@ export class CrudG<T> {
   constructor(private path: string) {}
 
   async dynamic(arg?: requestParameters, data: any = null, httpMethod: MetodoHttp = 'get', tipo: 'backend' | 'externo' = 'backend') {
+    
     let url = this.makeUrl(tipo, arg);
 
     return (await this.request(url, httpMethod, data, tipo, arg?.requestParams).toPromise()) as responseModel<T>;
@@ -31,11 +32,15 @@ export class CrudG<T> {
 
   async getAll(arg?: requestParameters, tipo: 'backend' | 'externo' = 'backend'): Promise<responseModel<T>> {
     return new Promise<responseModel<T>>(async (resolve, reject) => {
-      let url = this.makeUrl(tipo, arg);
+      try {
+        let url = this.makeUrl(tipo, arg);
 
-      const response = await lastValueFrom(this.request(url, 'get', null, tipo, arg?.requestParams));
+        const response = await lastValueFrom(this.request(url, 'get', null, tipo, arg?.requestParams));
 
-      resolve(response as responseModel<T>);
+        resolve(response as responseModel<T>);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 

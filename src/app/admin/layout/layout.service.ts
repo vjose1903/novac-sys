@@ -30,8 +30,10 @@ export class LayoutService {
       const subMenuMap = new Map(this.menuItems.filter(item => item.subItems).map(item => [item.id, new Map(item.subItems!.map(sub => [sub.id, sub]))]));
 
       // Procesar permisos
+
       Object.entries(this.menuPermissionsObj).forEach(([fatherId, fatherPerms]) => {
         const fatherItem = menuMap.get(fatherId);
+
         if (!fatherItem) return;
 
         fatherPerms.flatt = fatherPerms.flatt || [];
@@ -43,6 +45,7 @@ export class LayoutService {
           } else {
             const childItem = subMenuMap.get(fatherId)?.get(childId);
             if (childItem) childItem.permission = permissions;
+
             if (Array.isArray(permissions)) permissions.forEach(p => flattSet.add(p));
           }
         });

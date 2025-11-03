@@ -128,8 +128,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
 
     this.layServ.LOGOUT.pipe(takeUntil(this.destroy$)).subscribe(res => {
-      console.log('%c ANDO POR AQUIII', 'color: yellow', res);
-
       if (res && res.bool) {
         this.logOut();
         this.layServ.nextLogOut(undefined);

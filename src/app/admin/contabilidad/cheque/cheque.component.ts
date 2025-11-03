@@ -119,8 +119,6 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
     this.chequeList.length = 0;
 
     this.chequeClass.getAll(extra).then(res => {
-      console.log('res ', res.data);
-
       this.chequeList = res.data.map((cheque: ChequeI) => {
         // cheque[chequeFormAttr.cuenta_bancaria_origen_id] = cheque.cuenta_bancaria_origen.id;
         cheque[chequeFormAttr.divisa_id] = cheque.divisa.id;
@@ -137,8 +135,6 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
         };
         return cheque;
       });
-
-      console.log('chequeList ', this.chequeList);
 
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });

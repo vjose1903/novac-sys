@@ -42,18 +42,19 @@ export const MENU_CONFIG: MenuItemI[] = [
     ],
   },
   {
-    id: 'recibos_ingresos',
-    module: 'recibos_ingresos',
-    title: 'Recibos de ingresos',
+    id: 'pagos',
+    module: 'pagos',
+    title: 'Pagos',
     icon: 'assets/img/reciboIngreso.png',
     permission: [],
-    type: 'single',
-    route: 'recibos/lista_ingresos',
-    navigate: true,
-    activeRoutes: ['recibos', 'lista_ingresos', 'ingresos'],
+    type: 'dropdown',
+    subItems: [
+      { id: 'recibosIngresos', title: 'Recibos de ingresos', permission: [], route: 'pagos/pagos/recibo_ingreso', activeRoutes: ['recibo_ingreso'] },
+      { id: 'cuentasPagar', title: 'Pago de facturas', permission: [], route: 'pagos/pagos/pago_factura', activeRoutes: ['pago_factura'] },
+    ],
   },
   {
-    id: 'viajes',
+    id: 'recibos_viajes',
     module: 'viajes',
     title: 'Pedidos',
     icon: 'assets/img/viaje.png',
@@ -89,6 +90,9 @@ export const MENU_CONFIG: MenuItemI[] = [
       { id: 'camiones', title: 'Camiones', permission: [], route: 'registros/camiones', activeRoutes: ['camiones'] },
       { id: 'roles', title: 'Roles', permission: [], route: 'registros/roles', activeRoutes: ['roles'] },
       { id: 'ncf', title: 'NCF', permission: [], route: 'registros/ncf', activeRoutes: ['ncf'] },
+      { id: 'periodo_fiscal', title: 'Periodo Fiscal', permission: [], route: 'registros/periodo_fiscal', activeRoutes: ['periodo_fiscal'] },
+      { id: 'divisa', title: 'Divisa', permission: [], route: 'registros/divisa', activeRoutes: ['divisa'] },
+      { id: 'banco', title: 'Banco', permission: [], route: 'registros/banco', activeRoutes: ['banco'] },
     ],
   },
   {
@@ -123,10 +127,11 @@ export const MENU_CONFIG: MenuItemI[] = [
     cssClass: 'text-s-13',
     subItems: [
       { id: 'catalogo_cuentas', title: 'Catalogo de cuentas', permission: [], route: 'contabilidad/catalogo_cuentas', activeRoutes: ['catalogo_cuentas'] },
-      { id: 'libro_diario', title: 'Libro Diario', permission: [], route: 'contabilidad/libro_diario', activeRoutes: ['libro_diario'] },
-      { id: 'config_cuentas', title: 'Config. de cuentas', tooltip: 'Configuración de cuentas contables', permission: [], route: 'contabilidad/configuracion_entidad_cuenta', activeRoutes: ['configuracion_entidad_cuenta'] },
-      { id: 'transferencias', title: 'Transferencias', permission: [], route: 'contabilidad/transferencia', activeRoutes: ['transferencia'], cssClass: 'text-s-13' },
-      { id: 'cheques', title: 'Cheques', permission: [], route: 'contabilidad/cheque', activeRoutes: ['cheque'] },
+      { id: 'asientos_contables', title: 'Libro Diario', permission: [], route: 'contabilidad/libro_diario', activeRoutes: ['libro_diario'] },
+      { id: 'configuracion_entidad_cuenta', title: 'Config. de cuentas', tooltip: 'Configuración de cuentas contables', permission: [], route: 'contabilidad/configuracion_entidad_cuenta', activeRoutes: ['configuracion_entidad_cuenta'] },
+      { id: 'deposito', title: 'Depósito', permission: [], route: 'contabilidad/deposito', activeRoutes: ['deposito'] },
+      { id: 'transferencia', title: 'Transferencias', permission: [], route: 'contabilidad/transferencia', activeRoutes: ['transferencia'], cssClass: 'text-s-13' },
+      { id: 'cheque', title: 'Cheques', permission: [], route: 'contabilidad/cheque', activeRoutes: ['cheque'] },
     ],
   },
   {
@@ -161,9 +166,13 @@ export const menuPermissionsObj = {
     commertial_approval: Object.values(Permisos.commertial_approval_reception),
     flatt: [],
   },
-  ingresos: {
-    recibos_ingresos: Object.values(Permisos.recibo_ingreso),
-    viajes: [Permisos.factura_venta.get_viajes_sin_completar],
+  pagos: {
+    recibosIngresos: Object.values(Permisos.recibo_ingreso),
+    cuentasPagar: Object.values(Permisos.pagos_compras),
+    flatt: [],
+  },
+  recibos_viajes: {
+    recibos_viajes: [Permisos.factura_venta.get_viajes_sin_completar],
     flatt: [],
   },
   conduce: {
@@ -178,6 +187,9 @@ export const menuPermissionsObj = {
     camiones: Object.values(Permisos.vehiculo),
     roles: Object.values(Permisos.role),
     ncf: Object.values(Permisos.secuencia_comprobante),
+    periodo_fiscal: Object.values(Permisos.periodo_fiscal),
+    divisa: Object.values(Permisos.divisa),
+    banco: Object.values(Permisos.banco),
     flatt: [],
   },
   produccion: {
@@ -186,6 +198,15 @@ export const menuPermissionsObj = {
   },
   inventario: {
     inventario: Object.values(Permisos.movimiento_inventario),
+    flatt: [],
+  },
+  contabilidad: {
+    catalogo_cuentas: [...Object.values(Permisos.grupo_cuenta), ...Object.values(Permisos.cuenta_contable)],
+    configuracion_entidad_cuenta: Object.values(Permisos.configuracion_entidad_cuenta),
+    asientos_contables: Object.values(Permisos.cabeza_asiento_contable),
+    deposito: Object.values(Permisos.deposito),
+    transferencia: Object.values(Permisos.transferencia),
+    cheque: Object.values(Permisos.cheque),
     flatt: [],
   },
   reportes: {

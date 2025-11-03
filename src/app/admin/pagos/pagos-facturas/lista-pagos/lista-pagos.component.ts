@@ -1,5 +1,5 @@
 import { Ss } from '@core/services/singleton.service';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import * as _ from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TablasService } from '@components/new_tablas/tablas.service';
@@ -25,7 +25,8 @@ import { ICallbackModal, modalActionsE } from '@core/components/dynamic-modal/co
   styleUrls: ['./lista-pagos.component.scss'],
   standalone: false,
 })
-export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy {
+export class ListaPagosComponent extends MixinClass implements OnInit, OnChanges, OnDestroy {
+  @Input() tipo_pago: any;
   static tablePagosId = 'listado_pagos';
 
   table_config: table_config = {
@@ -59,6 +60,9 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
 
   async ngOnInit() {
     this._init_mixin({ component: 'lista_recibos', is_routing: true });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
     this.necesarioStart();
   }
 
@@ -107,26 +111,29 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnDestroy
 
   async necesarioStart() {
     this.configApp = Ss.configServ.config;
-    this.pagosService.tipoPago.set(this.route.snapshot.params['tipo'] as tipoPagoE);
+    this.pagosService.tipoPago.set(this.tipo_pago as tipoPagoE);
     this.table_config.info = tableConfigPagos[this.pagosService.tipoPago()];
     await this.getPagos(this.tServ.obj_paginate.default);
   }
 
   async getPagos(params?: { per_page?: number; page?: number; search?: string }) {
-    try {
-      const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
+    const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
-      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
-      classToQuery[this.pagosService.tipoPago()].getAll(extra).then(res => {
+    classToQuery[this.pagosService.tipoPago()]
+      .getAll(extra)
+      .then(res => {
         res['data'] = this.mapeoPagos(res['data']);
         this.lista_pagos = fun.deepCloning(res['data']);
 
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      })
+      .catch(err => {
+        this.lista_pagos = [];
       });
-    } catch (error) {}
   }
 
   navegar() {
