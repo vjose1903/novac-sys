@@ -114,6 +114,22 @@ export const MENU_CONFIG: MenuItemI[] = [
     activeRoutes: ['inventario'],
   },
   {
+    id: 'contabilidad',
+    module: 'contabilidad',
+    title: 'Contabilidad',
+    icon: 'assets/img/contabilidad.png',
+    permission: [],
+    type: 'dropdown',
+    cssClass: 'text-s-13',
+    subItems: [
+      { id: 'catalogo_cuentas', title: 'Catalogo de cuentas', permission: [], route: 'contabilidad/catalogo_cuentas', activeRoutes: ['catalogo_cuentas'] },
+      { id: 'libro_diario', title: 'Libro Diario', permission: [], route: 'contabilidad/libro_diario', activeRoutes: ['libro_diario'] },
+      { id: 'config_cuentas', title: 'Config. de cuentas', tooltip: 'Configuración de cuentas contables', permission: [], route: 'contabilidad/configuracion_entidad_cuenta', activeRoutes: ['configuracion_entidad_cuenta'] },
+      { id: 'transferencias', title: 'Transferencias', permission: [], route: 'contabilidad/transferencia', activeRoutes: ['transferencia'], cssClass: 'text-s-13' },
+      { id: 'cheques', title: 'Cheques', permission: [], route: 'contabilidad/cheque', activeRoutes: ['cheque'] },
+    ],
+  },
+  {
     id: 'reportes',
     module: 'reportes',
     title: 'Reportes',
@@ -198,6 +214,7 @@ export interface SubMenuItemI {
   route: string;
   activeRoutes?: string[];
   cssClass?: string;
+  tooltip?: string;
 }
 
 export interface MenuClickEvent {

@@ -21,6 +21,7 @@ import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.m
 import { MenuItemComponent } from './components/menu-item/menu-item.component';
 import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { TooltipModule } from 'primeng/tooltip';
 @NgModule({
   declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
   imports: [
@@ -37,6 +38,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     NgxExtendedPdfViewerModule,
     MenuItemComponent,
     FormErrorMsgComponent,
+    TooltipModule
   ],
 })
 export class LayoutModule {}

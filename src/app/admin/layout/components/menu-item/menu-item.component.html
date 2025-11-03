@@ -7,7 +7,7 @@
   @if (menuItem.type === 'dropdown' && menuItem.subItems) {
     <div class="subMenuFactura" [ngClass]="{ subMenuFacturaA: isSubMenuActive }">
       @for (subItem of menuItem.subItems; track subItem) {
-        <h4 *ngxPermissionsOnly="subItem.permission" class="opcion" [ngClass]="getSubItemClasses(subItem)" (click)="onSubMenuClick($event, subItem)">
+        <h4 *ngxPermissionsOnly="subItem.permission" class="opcion" [ngClass]="getSubItemClasses(subItem)" (click)="onSubMenuClick($event, subItem)" [pTooltip]="subItem?.tooltip ?? ''">
           {{ subItem.title }}
         </h4>
       }
