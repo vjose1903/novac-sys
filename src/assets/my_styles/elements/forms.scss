@@ -154,6 +154,13 @@ textarea {
     border-color: #ced4da;
     height: 100%;
   }
+
+  &.right {
+    .input-group-text {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+  }
 }
 
 .form-group {

@@ -22,7 +22,7 @@
                       </div>
                       <div class="col-6 p-0">
                         <div class="row">
-                          <div class="pr-0 col-12">
+                          <div class="pe-0 col-12">
                             <div>
                               <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
                               <label>
@@ -46,7 +46,7 @@
                                     formControlName="cedula"
                                     [autoClear]="false"></p-inputMask>
 
-                                  <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
+                                  <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append right" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                                     <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                                   </div>
                                 </div>
@@ -67,7 +67,7 @@
                                     formControlName="rnc"
                                     [autoClear]="false"></p-inputMask>
 
-                                  <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
+                                  <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append right" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                                     <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                                   </div>
                                 </div>
@@ -75,14 +75,14 @@
                               </div>
                             }
                           </div>
-                          <div class="pr-0 col-12">
+                          <div class="pe-0 col-12">
                             <div class="form-group" appMsgError="nombre" [form]="form">
                               <label class="control-label">Nombre: <span style="color: red">*</span></label>
                               <input id="campoNombre" appCapitalice="formGroup" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="nombre" placeholder="Introduzca nombre" class="form-control" autocomplete="off" autofocus />
                               <span id="msgContainer"></span>
                             </div>
                           </div>
-                          <div class="pr-0 col-12 mb-3">
+                          <div class="pe-0 col-12 mb-3">
                             <div class="form-group" appMsgError="apellido" [form]="form">
                               <label class="control-label">Apellido: <span style="color: red">*</span></label>
                               <input id="campoApellido" appCapitalice="formGroup" (keydown.enter)="saltar('campoTelefono')" type="text" formControlName="apellido" placeholder="Introduzca apellido" class="form-control" autocomplete="off" />
@@ -92,7 +92,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pr-2 mt-4">
+                      <div class="col-6 p-0 pe-2 mt-4">
                         <div class="form-group" appMsgError="telefono" [form]="form">
                           <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
@@ -111,7 +111,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pl-2 mt-4">
+                      <div class="col-6 p-0 ps-2 mt-4">
                         <div class="form-group" appMsgError="sexo" [form]="form">
                           <label class="control-label">Sexo: <span style="color: red">*</span></label>
                           <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
@@ -122,7 +122,7 @@
                           <span id="msgContainer"></span>
                         </div>
                       </div>
-                      <div class="col-6 p-0 pr-2">
+                      <div class="col-6 p-0 pe-2">
                         <div class="form-group" appMsgError="limite_credito" [form]="form">
                           <label class="control-label">Dias credito: <span style="color: red">*</span></label>
                           <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
@@ -134,7 +134,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pl-2">
+                      <div class="col-6 p-0 ps-2">
                         <div class="form-group" appMsgError="maximo_credito" [form]="form">
                           <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
 
@@ -151,7 +151,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pr-2">
+                      <div class="col-6 p-0 pe-2">
                         <div class="form-group" appMsgError="vendedor_id" [form]="form">
                           <label class="control-label">Vendedor: <span style="color: red">*</span></label>
                           <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('provincia_select')">

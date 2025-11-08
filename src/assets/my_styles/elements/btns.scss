@@ -251,21 +251,39 @@ input[type='text'] {
   &.btn-theme {
     background: var(--transparente04);
     border: 1px solid var(--transparente05);
+    transition: all 0.2s ease;
 
-    &:hover {
-      background: var(--primary04);
-      border: 1px solid var(--primary04);
+    &:hover:not(:disabled) {
+      background: var(--primary05);
+      border-color: var(--primary05);
     }
 
     &:focus {
       @include primengFocus;
+      background: var(--primary04) !important;
     }
 
+
+
     &.selected {
-      background: var(--primary08);
-      &:hover {
-        background: var(--primary09);
+      background: var(--primary08) !important;
+      border-color: var(--primary08) !important;
+      color: white !important;
+      
+      &:hover:not(:disabled) {
+        background: var(--primary10) !important;
+        border-color: var(--primary10) !important;
       }
+      
+      &:focus {
+        background: var(--primary09) !important;
+        border-color: var(--primary09) !important;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   }
 }

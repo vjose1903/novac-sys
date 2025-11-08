@@ -552,74 +552,111 @@ img {
 
   .colFormularioListado {
     grid-area: colFormularioListado;
+    > div {
+      justify-content: end;
+      gap: 0.5rem;
+      > .form {
+        transition: all 0.3s;
+        &.showForm {
+          width: 50%;
+        }
 
-    .form {
-      height: 100%;
-      transition: all 0.3s;
-      &.showForm {
-        width: 50%;
-        margin-right: 0.5rem;
+        &.minForm {
+          &.showForm {
+            width: 40%;
+          }
+        }
+
+        &.hideForm {
+          width: 0%;
+          overflow: hidden;
+        }
+
+        display: grid;
+        grid-template-areas:
+          'titulo_card_area'
+          'card_content_area';
+        grid-template-rows: min-content auto;
+
+        > .tituloFormClass {
+          grid-area: titulo_card_area;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          min-height: 3.3rem;
+        }
+
+        > .cardFormClass {
+          grid-area: card_content_area;
+          padding: 0.8rem;
+          border-radius: 1rem !important;
+          background-color: white;
+          box-shadow: 0px 4px 14px -6px black;
+          height: fit-content;
+          position: relative;
+          > .formContainer {
+            display: grid;
+
+            grid-template-areas:
+              'formulario'
+              'botones';
+            grid-template-rows: 1fr auto;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            padding: 0.6rem;
+            overflow: hidden;
+            row-gap: 0.8rem;
+
+            .formulario {
+              grid-area: formulario;
+              overflow: auto;
+              padding: 0.4rem;
+            }
+
+            .botones {
+              grid-area: botones;
+            }
+          }
+        }
       }
 
-      &.hideForm {
-        width: 0%;
-        overflow: hidden;
-      }
+      > .list {
+        transition: all 0.3s;
+        &.FormList {
+          width: 50%;
+        }
 
-      display: grid;
-      grid-template-areas:
-        'titulo_card_area'
-        'card_content_area';
-      grid-template-rows: min-content auto;
+        &.minForm {
+          &.FormList {
+            width: 60%;
+          }
+        }
 
-      .tituloFormClass {
-        grid-area: titulo_card_area;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        min-height: 3.3rem;
-      }
-
-      .cardFormClass {
-        grid-area: card_content_area;
-        padding: 0.8rem;
-        border-radius: 1rem !important;
-        height: min-content;
-        background-color: white;
-        box-shadow: 0px 4px 14px -6px black;
-      }
-    }
-
-    .list {
-      height: 100%;
-      transition: all 0.3s;
-      &.FormList {
-        width: 50%;
-      }
-
-      &.onlyList {
-        width: 100%;
-      }
-
-      display: grid;
-      grid-template-areas:
-        'titulo_card_area'
-        'card_content_area';
-      grid-template-rows: min-content auto;
-
-      .tituloCardClass {
-        grid-area: titulo_card_area;
-      }
-
-      .cardContentClass {
-        grid-area: card_content_area;
-        border-radius: 1rem !important;
-        position: relative;
-        .divTabla {
-          position: absolute;
-          height: 100%;
+        &.onlyList {
           width: 100%;
-          @include my_cards;
+        }
+
+        display: grid;
+        grid-template-areas:
+          'titulo_card_area'
+          'card_content_area';
+        grid-template-rows: min-content auto;
+
+        > .tituloCardClass {
+          grid-area: titulo_card_area;
+        }
+
+        > .cardContentClass {
+          grid-area: card_content_area;
+          border-radius: 1rem !important;
+          position: relative;
+          > .divTabla {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            @include my_cards;
+          }
         }
       }
     }

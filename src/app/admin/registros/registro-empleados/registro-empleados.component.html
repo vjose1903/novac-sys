@@ -19,7 +19,7 @@
                     <div class="row">
                       <div class="col-12 p-0 mb-3">
                         <div class="row">
-                          <div class="col-6 p-0 pr-2">
+                          <div class="col-6 p-0 pe-2">
                             <div class="form-groupd-flex" style="flex-wrap: nowrap">
                               <label class="control-label">Cedula: <span style="color: red">*</span></label>
                               <p-inputMask
@@ -40,7 +40,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pr-2">
+                      <div class="col-6 p-0 pe-2">
                         <div class="form-group">
                           <label class="control-label">Nombre: <span style="color: red">*</span></label>
                           <input #inputNombre type="text" formControlName="nombre" [appCapitalice]="'formGroup'" id="campoNombre" (keydown.enter)="saltar('campoApellido')" placeholder="Introduzca nombre" class="form-control" autocomplete="off" />
@@ -48,7 +48,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pl-2">
+                      <div class="col-6 p-0 ps-2">
                         <div class="form-group">
                           <label class="control-label">Apellido: <span style="color: red">*</span></label>
                           <input
@@ -65,7 +65,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pr-2">
+                      <div class="col-6 p-0 pe-2">
                         <div class="form-group">
                           <label class="control-label">Usuario: <span style="color: red">*</span></label>
                           <input #inputUsuario (keydown.enter)="saltar('campoTelefono')" type="text" id="campoUsuario" formControlName="usuario" placeholder="Introduzca usuario" class="form-control" autocomplete="off" />
@@ -73,7 +73,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pl-2">
+                      <div class="col-6 p-0 ps-2">
                         <div class="form-group">
                           <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
@@ -92,7 +92,7 @@
                         </div>
                       </div>
 
-                      <div class="col-8 p-0 pr-2">
+                      <div class="col-8 p-0 pe-2">
                         <div class="form-group">
                           <label class="control-label">Email: <span style="color: red">*</span> </label>
                           <input #inputEmail id="campoEmail" (keydown.enter)="saltar('campoSexo')" type="text" formControlName="email" placeholder="Introduzca email" class="form-control" autocomplete="off" />
@@ -100,7 +100,7 @@
                         </div>
                       </div>
 
-                      <div class="col-4 p-0 pl-2">
+                      <div class="col-4 p-0 ps-2">
                         <div class="form-group">
                           <label class="control-label">Sexo: <span style="color: red">*</span></label>
                           <select #selectSexo id="campoSexo" (keydown.enter)="saltar('campoFecha')" formControlName="sexo" class="form-control">
@@ -112,7 +112,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pr-2">
+                      <div class="col-6 p-0 pe-2">
                         <div class="form-group">
                           <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
                           <p-datepicker #inputFecha inputId="campoFecha" formControlName="fecha_nacimiento" dateFormat="dd/mm/yy" [maxDate]="maxDateBirth" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('campoRole')"></p-datepicker>
@@ -120,7 +120,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pl-2">
+                      <div class="col-6 p-0 ps-2">
                         <div class="form-group">
                           <label class="control-label">Role: <span style="color: red">*</span></label>
 
@@ -142,7 +142,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 p-0 pr-2">
+                      <div class="col-6 p-0 pe-2">
                         @if (!editando) {
                           <div class="form-group">
                             <label class="control-label">Contraseña:<span style="color: red">*</span></label>
@@ -151,7 +151,7 @@
                           </div>
                         }
                       </div>
-                      <div class="col-6 p-0 pl-2">
+                      <div class="col-6 p-0 ps-2">
                         @if (!editando) {
                           <div class="form-group">
                             <label class="control-label">Confirmar Contraseña:<span style="color: red">*</span></label>
@@ -186,7 +186,7 @@
                 </div>
 
                 <div class="botones">
-                  <div class="p-0 w-100 mt-5 d-flex justify-content-between">
+                  <div class="p-0 w-100 mt-2 d-flex justify-content-between">
                     <div class="d-flex column-gap-2">
                       <button [disabled]="!nombreHasValue()" class="btn btn-blanco" id="borrarBtn" (click)="borrar()">Borrar</button>
                       <button [disabled]="formIsInvalid()" (click)="submit()" class="btn btn-verde" id="sendBtn">{{ boton }}</button>

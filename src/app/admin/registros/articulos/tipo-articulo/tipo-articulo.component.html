@@ -1,7 +1,7 @@
 <div class="catArticuloContainer">
   <div class="row h-100 w-100">
     @if (hasPermissionsCreateUpdate) {
-      <div class="col-6 pl-0 pt-3">
+      <div class="col-6 ps-0 pt-3">
         <form [formGroup]="form" class="h-100" (keydown.enter)="$event.stopPropagation()">
           <div class="card card-padding sombra-light">
             <div class="form-group" appMsgError="descripcion" [form]="form">

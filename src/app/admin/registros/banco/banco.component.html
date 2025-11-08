@@ -18,7 +18,7 @@
                   <form-auto-complete [formControlName]="bancoFormAttr.nombre" [(config)]="nombreBancoConfig" [suggestions]="bancosList" [multiple]="false" (keydownEnter)="saltar(nombreBancoConfig.fieldId)"></form-auto-complete>
                 </div>
 
-                <div class="col-6 pl-0">
+                <div class="col-6 ps-0">
                   <label class="control-label">Rnc: <span style="color: red">*</span></label>
                   <div class="form-group" appMsgError="rnc" [form]="formGroup">
                     <!-- (keydown.enter)="saltar('campoNombre')" -->
@@ -37,7 +37,7 @@
                   </div>
                 </div>
 
-                <div class="col-6 pr-0">
+                <div class="col-6 pe-0">
                   <div class="form-group" appMsgError="telefono" [form]="formGroup">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
@@ -82,7 +82,7 @@
                   <div class="ejecutivoDiv mt-2">
                     <div class="row w-100 h-100">
                       <div class="col-12 p-0"></div>
-                      <div class="col-6 pl-0">
+                      <div class="col-6 ps-0">
                         <div class="form-group mb-2" appMsgError="ejecutivo_cuenta" [form]="formGroup">
                           <label class="control-label">Nombre: <span style="color: red">*</span></label>
                           <input
@@ -99,7 +99,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 pr-0">
+                      <div class="col-6 pe-0">
                         <div class="form-group mb-2" appMsgError="telefono_ejecutivo_cuenta" [form]="formGroup">
                           <label class="control-label">Telefono: <span style="color: red">*</span></label>
 

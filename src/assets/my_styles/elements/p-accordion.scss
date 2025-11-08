@@ -1,129 +1,72 @@
 @use './forms.scss' as *;
 
 .p-accordion {
-  p-accordiontab {
-    .p-accordion-tab {
-      .p-accordion-header {
-        &:focus {
-          @include noPrimengFocus;
-        }
-
-        .p-accordion-header-link {
-          border: 0px solid transparent !important;
-          background: var(--primary01) !important;
-          letter-spacing: 0.8px;
-          color: black;
-
-          &:hover {
-            text-decoration: none;
-            filter: brightness(0.9);
-          }
-
-          &:focus {
-            @include primengFocus;
-          }
-        }
-
-        &.p-highlight {
-          .p-accordion-header-link {
-            background: var(--primary07) !important;
-            box-shadow: 0px 4px 4px #69696940;
-            color: white !important;
-          }
-        }
+  .p-accordionpanel {
+    .p-accordionheader {
+      &:focus {
+        @include noPrimengFocus;
       }
 
-      .p-toggleable-content {
-        .p-accordion-content {
-          border: 1px solid #e5e5e5;
-          padding: 0.4rem;
-          background: var(--mode01);
-          box-shadow: 0px 1px 5px 1px #00000014;
-        }
+      border: 0px solid transparent !important;
+      background: var(--primary01) !important;
+      letter-spacing: 0.8px;
+      border-radius: 8px !important;
+      color: black;
+
+      &:hover {
+        text-decoration: none;
+        filter: brightness(0.9);
+      }
+
+      &:focus {
+        @include primengFocus;
+      }
+
+      &[aria-expanded='true'] {
+        background: var(--primary07) !important;
+        box-shadow: 0px 4px 4px #69696940;
+        color: white !important;
+        border-radius: 8px 8px 0 0 !important;
+      }
+    }
+
+    .p-accordioncontent {
+      .p-accordioncontent-content {
+        border: 1px solid #e5e5e5;
+        padding: 0.4rem;
+        background: var(--mode01);
+        box-shadow: 0px 1px 5px 1px #00000014;
       }
     }
   }
 
   &.no-content-padding {
-    p-accordiontab {
-      .p-accordion-tab {
-        .p-accordion-header {
-          .p-accordion-header-link {
-            &:hover {
-            }
-
-            &:focus {
-            }
-          }
-
-          &.p-highlight {
-            .p-accordion-header-link {
-            }
-          }
-        }
-
-        .p-toggleable-content {
-          .p-accordion-content {
-            padding: 0rem !important;
-          }
+    .p-accordionpanel {
+      .p-accordioncontent {
+        .p-accordioncontent-content {
+          padding: 0rem !important;
         }
       }
     }
   }
 
   &.grey-header {
-    p-accordiontab {
-      .p-accordion-tab {
-        .p-accordion-header {
-          .p-accordion-header-link {
-            background: var(--mode03) !important;
-            &:hover {
-            }
+    .p-accordionpanel {
+      .p-accordionheader {
+        background: var(--mode03) !important;
 
-            &:focus {
-            }
-          }
-
-          &.p-highlight {
-            .p-accordion-header-link {
-              background: var(--mode04) !important;
-              color: #0a0a0a !important;
-            }
-          }
-        }
-
-        .p-toggleable-content {
-          .p-accordion-content {
-            padding: 0rem !important;
-          }
+        &[aria-expanded='true'] {
+          background: var(--mode04) !important;
+          color: #0a0a0a !important;
         }
       }
     }
   }
 
   &.header-p-1 {
-    p-accordiontab {
-      .p-accordion-tab {
-        .p-accordion-header {
-          .p-accordion-header-link {
-            padding: 0.5rem;
-            &:hover {
-            }
-
-            &:focus {
-            }
-          }
-
-          &.p-highlight {
-            .p-accordion-header-link {
-            }
-          }
-        }
-
-        .p-toggleable-content {
-          .p-accordion-content {
-          }
-        }
+    .p-accordionpanel {
+      .p-accordionheader {
+        padding: 0.5rem;
       }
     }
   }

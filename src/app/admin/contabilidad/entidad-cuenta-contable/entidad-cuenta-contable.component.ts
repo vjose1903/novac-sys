@@ -25,8 +25,13 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
   @Output() cuentasContablesDataChange = new EventEmitter<Array<FormEntidadCuentaContableI>>();
   is_initialized: boolean = false;
   fun = fun;
+
   ngOnInit(): void {
     this.checkConfig();
+
+    console.log('%c cuentasContablesDataCruda ', 'color: red', JSON.parse(JSON.stringify(this.cuentasContablesDataCruda)));
+    console.log('%c cuentasContablesData ', 'color: lime', JSON.parse(JSON.stringify(this.cuentasContablesData)));
+    console.log('%c inputs ', 'color: yellow', JSON.parse(JSON.stringify(this.inputs)));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -34,7 +39,6 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
       this.is_initialized = false;
       this.initEntidadCuentasContables();
     }
-
 
     if (fun.objHas(changes, 'inputs')) this.initEntidadCuentasContables();
     if (fun.objHas(changes, 'configuration')) this.checkConfig();
@@ -50,7 +54,7 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
 
   initEntidadCuentasContables() {
     for (const config of this.inputs.configsEntCuentas) {
-      let entidad_cuenta: FormEntidadCuentaContableI = this.cuentasContablesData?.find((cuenta) => cuenta.configuracion_entidad_cuenta_id == config.id);
+      let entidad_cuenta: FormEntidadCuentaContableI = this.cuentasContablesData?.find(cuenta => cuenta.configuracion_entidad_cuenta_id == config.id);
 
       if (fun.isEmpty(entidad_cuenta)) {
         entidad_cuenta = fun.deepCloning(entidadCuentaContableBlank);
@@ -61,8 +65,8 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
       }
     }
 
-    const ids_current_configs = this.inputs.configsEntCuentas.map((config) => config.id);
-    this.cuentasContablesData = this.cuentasContablesData.filter((cuenta) => ids_current_configs.includes(cuenta.configuracion_entidad_cuenta_id));
+    const ids_current_configs = this.inputs.configsEntCuentas.map(config => config.id);
+    this.cuentasContablesData = this.cuentasContablesData.filter(cuenta => ids_current_configs.includes(cuenta.configuracion_entidad_cuenta_id));
 
     this.is_initialized = true;
     this.emitChanges();
@@ -70,14 +74,14 @@ export class EntidadCuentaContableComponent implements OnInit, OnChanges {
 
   getData(config_id: number, tipo: 'cruda' | 'form') {
     let entidad_cuenta: any;
-    if (tipo == 'cruda') entidad_cuenta = this.cuentasContablesDataCruda?.find((cuenta) => cuenta.configuracion_entidad_cuenta_id == config_id) as EntidadCuentaContableI;
-    if (tipo == 'form') entidad_cuenta = this.cuentasContablesData?.find((cuenta) => cuenta.configuracion_entidad_cuenta_id == config_id) as FormEntidadCuentaContableI;
+    if (tipo == 'cruda') entidad_cuenta = this.cuentasContablesDataCruda?.find(cuenta => cuenta.configuracion_entidad_cuenta_id == config_id) as EntidadCuentaContableI;
+    if (tipo == 'form') entidad_cuenta = this.cuentasContablesData?.find(cuenta => cuenta.configuracion_entidad_cuenta_id == config_id) as FormEntidadCuentaContableI;
 
     return entidad_cuenta;
   }
 
   parseData(entidad_cuenta_contable: FormEntidadCuentaContableI) {
-    const current_cuenta = this.cuentasContablesData.find((cuenta) => cuenta.configuracion_entidad_cuenta_id == entidad_cuenta_contable.configuracion_entidad_cuenta_id);
+    const current_cuenta = this.cuentasContablesData.find(cuenta => cuenta.configuracion_entidad_cuenta_id == entidad_cuenta_contable.configuracion_entidad_cuenta_id);
 
     if (fun.hasValue(current_cuenta)) Object.assign(current_cuenta, entidad_cuenta_contable);
     this.emitChanges();

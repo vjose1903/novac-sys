@@ -132,7 +132,6 @@ export class ThemeService {
     documentElement.setProperty('--primary07', '#19c119');
     documentElement.setProperty('--primary08', '#059e19');
     documentElement.setProperty('--primary09', '#1e6f15');
-
     documentElement.setProperty('--primary10', '#0b580b');
 
     documentElement.setProperty('--secondary01', '#ffff1e');

@@ -17,9 +17,13 @@
                 <div class="formulario">
                   <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
                     <div class="row">
-                      <div class="col-6 p-0 pr-2">
-                        <div>
-                          <label class="mr-2"> <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />Cedula</label>
+                      <div class="col-6 p-0 pe-2">
+                        <div class="d-flex align-items-center gap-3">
+                          <label>
+                            <input type="radio" value="1" class="mr-1" name="identificacion" id="identificacion-cedula" (click)="changeIdent(true)" />
+                            Cedula
+                          </label>
+
                           <label>
                             <input type="radio" value="1" name="identificacion" id="identificacion-rnc" class="mr-1" (click)="changeIdent(false)" />Rnc
                             <span style="color: red">*</span>
@@ -41,7 +45,7 @@
                                 formControlName="cedula"
                                 [autoClear]="false"></p-inputMask>
 
-                              <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
+                              <div (click)="setDocumentoPrincipal('cedula')" class="input-group-append right" pTooltip="{{ doc_principal === 'cedula' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                                 <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'cedula' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                               </div>
                             </div>
@@ -62,7 +66,7 @@
                                 formControlName="rnc"
                                 [autoClear]="false"></p-inputMask>
 
-                              <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
+                              <div (click)="setDocumentoPrincipal('rnc')" class="input-group-append right" pTooltip="{{ doc_principal === 'rnc' ? 'Principal' : 'Seleccionar como principal' }}" tooltipPosition="right">
                                 <span class="input-group-text c-pointer"><i class="{{ doc_principal === 'rnc' ? 'far fa-star text-warning' : 'far fa-square' }}"></i></span>
                               </div>
                             </div>
@@ -71,7 +75,7 @@
                         }
                       </div>
 
-                      <div class="col-6 p-0 pl-2">
+                      <div class="col-6 p-0 ps-2">
                         <div class="form-group mb-2" appMsgError="telefono" [form]="form">
                           <label class="control-label">Telefono: <span style="color: red">*</span></label>
                           <p-inputMask
@@ -106,7 +110,7 @@
                         </div>
                       </div>
 
-                      <div class="col-6 pr-0">
+                      <div class="col-6 pe-0">
                         <form-divisa-input formControlName="divisa_id" inputId="campoDivisa" (keydownEnter)="saltar('campoDir')" (onChangeValue)="changeDivisa($event)"></form-divisa-input>
                       </div>
 
