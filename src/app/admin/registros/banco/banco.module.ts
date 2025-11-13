@@ -16,6 +16,7 @@ import { TipoCuentaBancariaComponent } from './tipo-cuenta-bancaria/tipo-cuenta-
 import { FormAutoCompleteModule } from '@core/components/form-fields/form-auto-complete/form-auto-complete.module';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { FormDivisaInputModule } from '@core/components/form-fields/form-divisa-input/form-divisa-input.module';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 
 @NgModule({
   declarations: [BancoComponent],
@@ -37,6 +38,7 @@ import { FormDivisaInputModule } from '@core/components/form-fields/form-divisa-
     FormDivisaInputModule,
     CuentaBancariaFormComponent,
     TipoCuentaBancariaComponent,
+    FormErrorMsgComponent,
   ],
 })
 export class BancoModule {}

@@ -19,8 +19,8 @@
                 </div>
 
                 <div class="col-6 ps-0">
-                  <label class="control-label">Rnc: <span style="color: red">*</span></label>
-                  <div class="form-group" appMsgError="rnc" [form]="formGroup">
+                  <label class="control-label"> Rnc: <span style="color: red">*</span> </label>
+                  <div class="form-group">
                     <!-- (keydown.enter)="saltar('campoNombre')" -->
                     <p-inputMask
                       mask="999-99999-9"
@@ -31,14 +31,14 @@
                       [inputId]="bancoFormFieldId[bancoFormAttr.rnc]"
                       placeholder="___-_____-_"
                       [formControlName]="bancoFormAttr.rnc"
-                      [autoClear]="false"
-                    ></p-inputMask>
-                    <span id="msgContainer"></span>
+                      [autoClear]="false"></p-inputMask>
+
+                    <form-error-msg [control]="formGroup.get(bancoFormAttr.rnc)"></form-error-msg>
                   </div>
                 </div>
 
                 <div class="col-6 pe-0">
-                  <div class="form-group" appMsgError="telefono" [form]="formGroup">
+                  <div class="form-group">
                     <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
                     <!-- (keydown.enter)="saltar('campoEmail')" -->
@@ -51,15 +51,14 @@
                       [inputId]="bancoFormFieldId[bancoFormAttr.telefono]"
                       placeholder="(___) ___-____"
                       [formControlName]="bancoFormAttr.telefono"
-                      [autoClear]="false"
-                    ></p-inputMask>
+                      [autoClear]="false"></p-inputMask>
 
-                    <span id="msgContainer"></span>
+                    <form-error-msg [control]="formGroup.get(bancoFormAttr.telefono)"></form-error-msg>
                   </div>
                 </div>
 
                 <div class="col-12 p-0">
-                  <div class="form-group" appMsgError="comentario" [form]="formGroup">
+                  <div class="form-group">
                     <label class="control-label">Comentario </label>
                     <textarea
                       [id]="bancoFormFieldId[bancoFormAttr.comentario]"
@@ -71,9 +70,8 @@
                       class="form-control"
                       cols="30"
                       rows="3"
-                      tabindex="-1"
-                    ></textarea>
-                    <span id="msgContainer"></span>
+                      tabindex="-1"></textarea>
+                    <form-error-msg [control]="formGroup.get(bancoFormAttr.comentario)"></form-error-msg>
                   </div>
                 </div>
 
@@ -83,9 +81,10 @@
                     <div class="row w-100 h-100">
                       <div class="col-12 p-0"></div>
                       <div class="col-6 ps-0">
-                        <div class="form-group mb-2" appMsgError="ejecutivo_cuenta" [form]="formGroup">
+                        <div class="form-group mb-2">
                           <label class="control-label">Nombre: <span style="color: red">*</span></label>
                           <input
+                            #inputEjecutivoCuenta
                             type="text"
                             [formControlName]="bancoFormAttr.ejecutivo_cuenta"
                             [appCapitalice]="'formGroup'"
@@ -93,14 +92,13 @@
                             [id]="bancoFormFieldId[bancoFormAttr.ejecutivo_cuenta]"
                             class="form-control"
                             tabindex="-1"
-                            autocomplete="off"
-                          />
-                          <span id="msgContainer"></span>
+                            autocomplete="off" />
+                          <form-error-msg [control]="formGroup.get(bancoFormAttr.ejecutivo_cuenta)" [fieldElement]="inputEjecutivoCuenta"></form-error-msg>
                         </div>
                       </div>
 
                       <div class="col-6 pe-0">
-                        <div class="form-group mb-2" appMsgError="telefono_ejecutivo_cuenta" [form]="formGroup">
+                        <div class="form-group mb-2">
                           <label class="control-label">Telefono: <span style="color: red">*</span></label>
 
                           <!-- (keydown.enter)="saltar('campoEmail')" -->
@@ -113,10 +111,9 @@
                             [inputId]="bancoFormFieldId[bancoFormAttr.telefono_ejecutivo_cuenta]"
                             placeholder="(___) ___-____"
                             [formControlName]="bancoFormAttr.telefono_ejecutivo_cuenta"
-                            [autoClear]="false"
-                          ></p-inputMask>
+                            [autoClear]="false"></p-inputMask>
 
-                          <span id="msgContainer"></span>
+                          <form-error-msg [control]="formGroup.get(bancoFormAttr.telefono_ejecutivo_cuenta)"></form-error-msg>
                         </div>
                       </div>
                     </div>
