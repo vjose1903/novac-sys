@@ -46,7 +46,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
 
   table_config: table_config = {
     info: [
-      { titulo: '1', tipo: tableCellType.icon, key: 'incomplete', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'incomplete', tooltip: 'Información Incompleta', text_color: 'incomplete_color' }] },
+      { titulo: '1', tipo: tableCellType.icon, key: 'incomplete', style: { width: '2rem', color: 'var(--transparente00)' }, iconsArray: [{ key: 'incomplete', tooltip: 'Información Incompleta', text_color: 'incomplete_color' }] },
       { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre.nombre', style: { width: '45%', 'text-align': 'start' } },
       { titulo: 'Rnc', tipo: tableCellType.text, key: 'rnc' },
       { titulo: 'Telefono', tipo: tableCellType.text, key: 'telefono' },
@@ -241,9 +241,7 @@ export class BancoComponent extends MixinClass implements OnInit, OnDestroy {
         banco.incomplete = banco.warning_bg ? 'fas fa-exclamation-triangle' : '';
 
         banco.customStyles = {
-          incomplete: [{ key: 'incomplete', isTd: true, estilos: 'width: 2rem !important;' }],
           actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 11% !important;' },
             { key: 'edit_banco', estilos: 'font-size: 1.1rem !important' },
             { key: 'delete_banco', estilos: 'font-size: 1.1rem !important' },
           ],

@@ -128,7 +128,6 @@ export class ChequeComponent extends MixinClass implements OnInit, OnDestroy {
 
         cheque.customStyles = {
           actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 8rem !important;' },
             { key: 'edit_cheque', estilos: 'font-size: 1.1rem !important' },
             { key: 'anular_cheque', estilos: 'font-size: 1.1rem !important' },
           ],

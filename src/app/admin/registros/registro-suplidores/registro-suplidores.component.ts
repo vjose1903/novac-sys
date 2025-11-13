@@ -148,10 +148,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         suplidor.img_divisa_tooltip = suplidor?.divisa?.nombre ? suplidor?.divisa?.nombre : 'Divisa no registrada';
         suplidor.codigo = String(suplidor.id).padStart(5, '0');
 
-        suplidor.customStyles = {
-          img_divisa: { 'padding-left': '1rem', 'padding-right': '1rem' },
-        };
-
         return suplidor;
       });
 

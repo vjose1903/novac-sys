@@ -122,7 +122,6 @@ export class DepositoComponent extends MixinClass implements OnInit, OnDestroy {
 
         deposito.customStyles = {
           actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 8rem !important;' },
             { key: 'edit_deposito', estilos: 'font-size: 1.1rem !important' },
             { key: 'anular_deposito', estilos: 'font-size: 1.1rem !important' },
           ],

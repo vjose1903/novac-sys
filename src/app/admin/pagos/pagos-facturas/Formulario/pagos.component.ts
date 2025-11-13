@@ -264,7 +264,6 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
       factura.customStyles = {
         actions: [
-          { key: 'actions', isTd: true, estilos: 'width: 6% !important; padding: 0.6rem 0rem !important' },
           { key: 'historyPagos', estilos: 'font-size: 1rem !important' },
           { key: 'pedido', estilos: 'font-size: 1rem !important' },
           { key: 'ver', estilos: 'font-size: 1rem !important' },

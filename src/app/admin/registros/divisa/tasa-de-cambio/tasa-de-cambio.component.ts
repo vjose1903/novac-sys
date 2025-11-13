@@ -34,7 +34,7 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
 
   table_config: table_config = {
     info: [
-      { titulo: 'Fecha', tipo: tableCellType.text, key: 'fecha_equivalente', estilos: [{ 'text-align': 'left' }] },
+      { titulo: 'Fecha', tipo: tableCellType.text, key: 'fecha_equivalente', style: { 'text-align': 'left' } },
       { titulo: 'Valor', tipo: tableCellType.text, key: 'monto' },
     ],
     colores: false,
@@ -94,8 +94,6 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
         res['data'].map((historial: TasaDeCambioI) => {
           historial.fecha_equivalente = DateUtils.format({ date: historial.fecha_equivalente });
           historial.monto = `${this.divisaPrincipal.simbolo} ${fun.roundNumberToDecimal(historial.valor)}`;
-
-          historial.customStyles = { fecha_equivalente: { 'text-align': 'start' } };
 
           this.listaHistorial.update(prev => [...prev, historial]);
         });

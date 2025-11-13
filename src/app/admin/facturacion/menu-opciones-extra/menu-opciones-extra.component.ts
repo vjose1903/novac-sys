@@ -176,7 +176,6 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
 
         fact.customStyles = {
           actions: [
-            { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
             { key: 'view', estilos: 'font-size: 1.1rem !important;' },
             { key: 'rellenar_factura', estilos: 'font-size: 1.1rem !important; margin:  0rem 0.8rem !important;' },
           ],

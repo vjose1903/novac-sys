@@ -26,9 +26,9 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   formPermissions = [Permisos.role.create, Permisos.role.update];
   table_roles_config: table_config = {
     info: [
-      { titulo: 'Nombre', key: 'nombre', tipo: tableCellType.text, estilos: [{ width: '20%' }, { 'text-align': 'left' }] },
-      { titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text, estilos: [{ width: '50%' }, { 'text-align': 'left' }] },
-      { titulo: 'Activo', key: 'estado_', tag_severity: 'estado_tag', tag_apretada: true, tipo: tableCellType.tag, estilos: [{ width: '10%' }] },
+      { titulo: 'Nombre', key: 'nombre', tipo: tableCellType.text, style: { width: '20%', 'text-align': 'left' } },
+      { titulo: 'Descripcion', key: 'descripcion', tipo: tableCellType.text, style: { width: '50%', 'text-align': 'left' } },
+      { titulo: 'Activo', key: 'estado_', tag_severity: 'estado_tag', tag_apretada: true, tipo: tableCellType.tag, style: { width: '10%' } },
     ],
 
     colores: true,
@@ -105,8 +105,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
         res['data'].map(role => {
           role.estado_ = role.estado ? 'SI' : 'NO';
           role.estado_tag = role.estado ? 'success' : 'danger';
-
-          role.customStyles = { nombre: { width: '20%', 'text-align': 'left' }, descripcion: { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, estado_: { width: '10%' } };
           return role;
         });
 

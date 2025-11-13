@@ -392,7 +392,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
           fact.customStyles = {
             actions: [
-              { key: 'actions', isTd: true, estilos: 'width: 8% !important;' },
               { key: 'view', estilos: 'font-size: 1.2rem !important;' },
               { key: 'duplicate', estilos: 'font-size: 1.2rem !important;' },
               { key: 'delete', estilos: 'font-size: 1.2rem !important;' },

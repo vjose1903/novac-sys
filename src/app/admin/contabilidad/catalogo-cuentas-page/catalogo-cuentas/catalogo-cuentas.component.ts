@@ -109,10 +109,8 @@ export class CatalogoCuentasComponent extends MixinClass implements OnInit {
     cuentaParsed.index = utils.current_index;
 
     cuentaParsed.customStyles = {
-      codigo: { width: '23%' },
-      status: { width: '10%' },
+      
       actions: [
-        { key: 'actions', isTd: true, estilos: 'width: 11% !important;' },
         { key: 'add_account', estilos: 'font-size: 1.1rem !important;' },
         { key: 'edit_account', estilos: 'font-size: 1.1rem !important' },
         { key: 'deactivate_reactivate_account', estilos: 'font-size: 1.1rem !important' },

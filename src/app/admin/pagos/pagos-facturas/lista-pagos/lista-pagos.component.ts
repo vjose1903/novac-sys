@@ -88,16 +88,8 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnChanges
         { key: 'anular', hover: ['text-green'], leave: ['text-black'] },
       ];
 
-      const entidadKey = this.pagosService.isReciboIngreso() ? 'cliente.nombre_completo' : 'suplidor.nombre_completo';
-
       pago['customStyles'] = {
-        [entidadKey]: { 'text-align': 'start', 'padding-left': '1.5rem' },
-        [numberKey]: { width: '8%' },
-        fecha_equivalente: { width: '10%' },
-        numero_factura: { width: '12%' },
-        total: { width: '12%', 'text-align': 'end', 'padding-right': '1.5rem' },
         actions: [
-          { key: 'actions', isTd: true, estilos: 'width: 9% !important; padding-left: 1rem !important' },
           { key: 'ver', estilos: 'font-size:1rem !important' },
           { key: 'anular', estilos: 'margin-left: 1rem !important; font-size:1rem !important' },
         ],
