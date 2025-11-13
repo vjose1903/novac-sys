@@ -1,8 +1,9 @@
 <div class="w-100 position-relative">
-  <div class="form-group d-flex flex-column" [id]="'section-' + fieldName()" [appMsgError]="fieldName()" [form]="formGroup()">
+  <div class="form-group" [id]="'section-' + fieldName()">
     <label [for]="'input-' + fieldName()" class="control-label" [requiredFieldLabel]="config().required">{{ config().label }}</label>
 
     <p-autoComplete
+      #autoCompleteRef
       [id]="config().fieldId"
       [inputId]="config().fieldId"
       [ngModel]="valueSignal()"
@@ -11,7 +12,7 @@
       [dropdown]="config()?.dropdown || false"
       [multiple]="multiple()"
       [showEmptyMessage]="true"
-      class="p-autocomplete{{ config().dropdown ? ' dropdown-style' : '' }}"
+      class="p-autocomplete {{ config().dropdown ? ' dropdown-style' : '' }}"
       panelStyleClass="p-autocomplete-panel"
       [forceSelection]="true"
       [placeholder]="config().placeholder"
@@ -63,6 +64,6 @@
       </ng-template>
     </p-autoComplete>
 
-    <span id="msgContainer"></span>
+    <form-error-msg [control]="this.control?.control" [fieldElement]="autoCompleteRef"></form-error-msg>
   </div>
 </div>

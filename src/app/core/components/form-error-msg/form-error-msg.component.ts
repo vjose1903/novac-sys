@@ -8,10 +8,11 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
 import { MultiSelect } from 'primeng/multiselect';
+import { AutoComplete } from 'primeng/autocomplete';
 import { Ss } from '@core/services/singleton.service';
 import { fun } from '@core/services/functions.service';
 
-type PrimeNGComponent = InputMask | InputNumber | Select | DatePicker | MultiSelect;
+type PrimeNGComponent = InputMask | InputNumber | Select | DatePicker | MultiSelect | AutoComplete;
 type FieldElement = ElementRef<HTMLInputElement> | HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | PrimeNGComponent;
 
 @Component({
@@ -115,11 +116,21 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
   }
 
   private isPrimeNGComponent(element: any): element is PrimeNGComponent {
-    return element && typeof element === 'object' && (element instanceof InputMask || element instanceof InputNumber || element instanceof Select || element instanceof DatePicker || element instanceof MultiSelect);
+    return element && typeof element === 'object' && (element instanceof InputMask || element instanceof InputNumber || element instanceof Select || element instanceof DatePicker || element instanceof MultiSelect || element instanceof AutoComplete);
   }
 
   private async getPrimeNGElement(component: PrimeNGComponent): Promise<HTMLElement | null> {
-    const rootElement = component.el?.nativeElement;
+    let rootElement: HTMLElement | null = null;
+
+    // Intentar acceder al elemento nativo de diferentes formas según el componente
+    if (component.el) {
+      rootElement = component.el.nativeElement;
+    } else if ((component as any).container) {
+      rootElement = (component as any).container.nativeElement;
+    } else if ((component as any).elementRef) {
+      rootElement = (component as any).elementRef.nativeElement;
+    }
+
     if (!rootElement) return null;
 
     // Configuración específica por tipo de componente
@@ -144,35 +155,45 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
 
     if (component instanceof DatePicker) return { selectors: ['input.p-inputtext', 'input'] };
 
+    if (component instanceof AutoComplete) return { selectors: ['input'] };
+
     return { selectors: [] };
   }
 
   private setupHTMLEvents(element: HTMLElement): void {
-    const events$ = [];
-
-    // Eventos básicos para todos los elementos
-    events$.push(fromEvent(element, 'blur').pipe(takeUntil(this.destroy$)));
-
-    // Eventos específicos según el tipo de elemento
-    if (this.isInputElement(element)) {
-      events$.push(fromEvent(element, 'input').pipe(takeUntil(this.destroy$)));
-    }
-
-    if (this.isSelectLikeElement(element)) {
-      events$.push(fromEvent(element, 'change').pipe(takeUntil(this.destroy$)), fromEvent(element, 'click').pipe(takeUntil(this.destroy$)));
-
-      // Eventos específicos para MultiSelect
-      if (this.isMultiSelectElement(element)) {
-        this.setupMultiSelectEvents(element, events$);
-      }
-    }
-
-    // Combinar todos los eventos con debounce
-    merge(...events$)
-      .pipe(debounceTime(10), takeUntil(this.destroy$))
+    // Evento blur: marca como touched y verifica errores
+    fromEvent(element, 'blur')
+      .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.control!.markAsTouched();
         this.checkErrors();
+      });
+
+    // Eventos input: solo verifica errores si ya está touched
+    if (this.isInputElement(element)) {
+      this.subscribeToTouchedCheck(element, 'input');
+    }
+
+    // Eventos change y click: solo verifica errores si ya está touched
+    if (this.isSelectLikeElement(element)) {
+      merge(fromEvent(element, 'change'), fromEvent(element, 'click'))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          if (this.control!.touched) this.checkErrors();
+        });
+
+      // Eventos específicos para MultiSelect
+      if (this.isMultiSelectElement(element)) {
+        this.setupMultiSelectEvents(element);
+      }
+    }
+  }
+
+  private subscribeToTouchedCheck(element: HTMLElement, eventType: string): void {
+    fromEvent(element, eventType)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.control!.touched) this.checkErrors();
       });
   }
 
@@ -181,19 +202,35 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
   }
 
   private isSelectLikeElement(element: HTMLElement): boolean {
-    return element.tagName === 'SELECT' || element.getAttribute('role') === 'combobox' || element.classList.contains('p-multiselect') || element.classList.contains('p-multiselect-label') || element.classList.contains('p-select');
+    return (
+      element.tagName === 'SELECT' ||
+      element.getAttribute('role') === 'combobox' ||
+      element.classList.contains('p-multiselect') ||
+      element.classList.contains('p-multiselect-label') ||
+      element.classList.contains('p-select') ||
+      element.classList.contains('p-autocomplete')
+    );
   }
 
   private isMultiSelectElement(element: HTMLElement): boolean {
     return element.classList.contains('p-multiselect') || element.classList.contains('p-multiselect-label');
   }
 
-  private setupMultiSelectEvents(element: HTMLElement, events$: any[]): void {
-    // Eventos de teclado
-    events$.push(fromEvent(element, 'keydown').pipe(takeUntil(this.destroy$)));
+  private setupMultiSelectEvents(element: HTMLElement): void {
+    // Evento focusout: marca como touched y verifica errores (similar a blur)
+    fromEvent(element, 'focusout')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.control!.markAsTouched();
+        this.checkErrors();
+      });
 
-    // Evento focusout más confiable para MultiSelect
-    events$.push(fromEvent(element, 'focusout').pipe(takeUntil(this.destroy$)));
+    // Eventos de teclado: solo verifica errores si ya está touched
+    fromEvent(element, 'keydown')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.control!.touched) this.checkErrors();
+      });
 
     // Observer para cambios en aria-expanded (apertura/cierre del dropdown)
     this.setupAriaExpandedObserver(element);
@@ -223,13 +260,19 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
 
       const checkForElement = () => {
         attempts++;
+        let foundElement: HTMLElement | null = null;
 
         for (const selector of selectors) {
-          const foundElement = parentElement.querySelector(selector);
-          if (foundElement) {
-            resolve(foundElement as HTMLElement);
-            return;
+          const element = parentElement.querySelector(selector);
+          if (element) {
+            foundElement = element as HTMLElement;
+            break;
           }
+        }
+
+        if (foundElement) {
+          resolve(foundElement);
+          return;
         }
 
         if (attempts >= maxAttempts) {

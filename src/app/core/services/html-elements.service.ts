@@ -50,7 +50,7 @@ export class HtmlElementsService {
     const inputElement = event.target as HTMLInputElement;
 
     const value = fun.hasValue(control) ? control.value : inputElement.value;
-    const valueTimmed = value.trim();
+    const valueTimmed = value?.trim() ?? '';
 
     if (fun.hasValue(control)) control.setValue(valueTimmed);
     else inputElement.value = valueTimmed;
