@@ -94,7 +94,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', style: { width: '3.5rem', padding: '0.5rem 0rem', 'padding-left': '0.2rem' } },
+      { titulo: 'Cod.', tipo: tableCellType.text, key: 'codigo', style: { width: '4.5rem', padding: '0.5rem 0rem', 'padding-left': '0.1rem' } },
       { titulo: 'Articulo', tipo: tableCellType.text, key: 'nombre', style: { width: '37%', 'text-align': 'left' } },
       { titulo: 'Medida', tipo: tableCellType.text, key: 'medida', style: { padding: '0.5rem 0rem' } },
       { titulo: 'Precio', tipo: tableCellType.formatoNumero, key: 'precio_principal' },
@@ -264,14 +264,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     this.listaArticulos.length = 0;
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true, parameters: { cuentas_contables: true } }).then(res => {
-      res.data.map(async arti => {
-        arti.customStyles = {
-          codigo: { width: '12%' },
-          nombre: { width: '37%', 'text-align': 'left', 'padding-left': '0.5rem' },
-          medida: { width: '13%' },
-          precio_principal: { width: '20%' },
-        };
-      });
 
       this.listaArticulos = res.data;
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);

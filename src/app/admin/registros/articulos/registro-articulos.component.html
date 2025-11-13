@@ -639,18 +639,18 @@
                     }
                   </form>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-12 mt-3 p-0" style="display: flex; justify-content: space-between">
-                  <div>
-                    <button class="btn me-2" id="btn-blanco" (click)="borrar(true)">Borrar</button>
-                    <button [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn" id="btn-verde">{{ botonLabel }}</button>
-                    @if ((!tipoArticuloSelected || tipoArticuloSelected?.descripcion === 'Producto terminado') && recalcular === true) {
-                      <button class="btn ms-2" id="btn-blanco" (click)="recalcularFunc()">Recarcular</button>
-                    }
-                  </div>
-                  <div>
-                    <button class="btn ms-2" id="btn-blanco" (click)="borrar(true); isCreando = false" style="max-width: 6rem">Cerrar</button>
+                <div class="botones">
+                  <div class="p-0 w-100 mt-1 d-flex justify-content-between">
+                    <div class="d-flex column-gap-2">
+                      <button class="btn me-2" id="btn-blanco" (click)="borrar(true)">Borrar</button>
+                      <button [disabled]="formIsInvalid()" (click)="submit()" type="submit" class="btn" id="btn-verde">{{ botonLabel }}</button>
+                      @if ((!tipoArticuloSelected || tipoArticuloSelected?.descripcion === 'Producto terminado') && recalcular === true) {
+                        <button class="btn ms-2" id="btn-blanco" (click)="recalcularFunc()">Recarcular</button>
+                      }
+                    </div>
+                    <div>
+                      <button class="btn ms-2" id="btn-blanco" (click)="borrar(true); isCreando = false" style="max-width: 6rem">Cerrar</button>
+                    </div>
                   </div>
                 </div>
               </div>
