@@ -22,20 +22,21 @@
     'cuerpo';
   grid-template-rows: min-content auto;
 
-  > .colTitulo {
+  .colTitulo {
     grid-area: colTitulo;
   }
-  > .cuerpo {
+  .cuerpo {
     grid-area: cuerpo;
-
     position: relative;
-    > .cardListados {
+
+    .cardListados {
       position: absolute;
       height: 100%;
       width: 100%;
 
-      > .divFiltro {
+      .divFiltro {
         position: absolute;
+        top: 0;
         display: flex;
         justify-content: space-between;
         width: 100%;

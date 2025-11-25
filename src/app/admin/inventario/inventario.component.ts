@@ -48,7 +48,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   tipo_articulos;
 
   filtrado = false;
-  filtro = null;
+  filtro = 'todos';
 
   palabra_buscar;
   fechaFactura: string;
@@ -100,6 +100,8 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     this.palabra_buscar = palabra_a_buscar;
 
+    console.log('this.filtro ',this.filtro);
+    
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro }).then(res => {
       this.listaArticulos = fun.deepCloning(res.data);
 
