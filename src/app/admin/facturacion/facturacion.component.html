@@ -83,7 +83,7 @@
                     #condicionInput
                     id="condicion"
                     (keydown.enter)="saltar(htmlServ.getId($event), condicionInput.value)"
-                    class="form-control inputE"
+                    class="inputE"
                     [(ngModel)]="condicion_fact"
                     (change)="cambiarCondicion(htmlServ.getValue($event))"
                     tabindex="-1"
@@ -129,7 +129,7 @@
                     id="venta"
                     (keydown.enter)="saltar(htmlServ.getId($event), ventaInput.value)"
                     (change)="selectModoFactura(htmlServ.getValue($event))"
-                    class="form-control inputE"
+                    class="inputE"
                     [(ngModel)]="modo_factura"
                     (blur)="checkCambiosModoyCondicionFactura({ elemento_html: $event.target })"
                     tabindex="-1"

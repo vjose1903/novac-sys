@@ -21,7 +21,7 @@
                   id="tipoI"
                   [ngModel]="tipo_documento_selected()"
                   (ngModelChange)="tipo_documento_selected.set($event)"
-                  class="form-control inputE"
+                  class="inputE"
                   (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
                   (change)="changeSelect('tipo_documento', htmlServ.getValue($event))"
                   value="">
@@ -40,7 +40,7 @@
               <select
                 id="buscarPorI"
                 [(ngModel)]="buscar_por"
-                class="form-control inputE"
+                class="inputE"
                 (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
                 (change)="changeSelect('buscar_por', htmlServ.getValue($event))"
                 value=""
@@ -74,7 +74,7 @@
             @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected() != 'cotizacion') {
               <div class="form-group flex-1">
                 <label class="control-label mb-0">Tipo factura : </label>
-                <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))">
+                <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))">
                   <option [value]="null" selected disabled>Escoger tipo</option>
                   <option value="3">Factura de consumo</option>
                   <option value="2">Factura con Valor Fiscal</option>

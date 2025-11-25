@@ -47,7 +47,7 @@
                   </div>
 
                   <div class="col-8 pe-0">
-                    <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
+                    <select (keydown.enter)="saltar('agregar')" class="inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
                       <option [value]="null" disabled></option>
                       @for (item of optionsMedidas; track $index) {
                         <option value="{{ item }}">{{ item }}</option>

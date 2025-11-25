@@ -339,7 +339,6 @@ export class FacturaC extends CrudG<FacturasI> {
         { old_key: 'numero_factura', new_key: 'numero_documento' },
       ]);
 
-      // TODO: revisar si es necesario este formato
       data_parsed.fecha_equivalente = DateUtils.format({ date: data_parsed.fecha_equivalente, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm:ss', separator: 'T' });
 
       data_parsed.tipo_pdf = data_parsed.tipo_pdf.toUpperCase();
