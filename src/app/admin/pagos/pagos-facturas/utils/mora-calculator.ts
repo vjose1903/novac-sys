@@ -3,7 +3,7 @@ import { fun } from '@core/services/functions.service';
 import { FacturasI, Pago } from '../../../facturacion/factura';
 
 export class MoraCalculator {
-  last_pago_valido: Pago;
+  last_recibo_valido: Pago;
   factura_is_vencida: boolean;
   abonos_a_mora: number = 0;
 
@@ -19,7 +19,7 @@ export class MoraCalculator {
       this.abonos_a_mora += fun.desformatearStNumber(pago.mora);
     }
 
-    this.last_pago_valido = recibos.find(pago => fun.desformatearStNumber(pago.deposito) > 0);
+    this.last_recibo_valido = recibos.find(recibo => fun.desformatearStNumber(recibo.deposito) > 0);
 
     this.factura_is_vencida = fechaActual > new Date(this.factura.fecha_vencimiento).setHours(1, 0, 0, 0);
   }
@@ -38,6 +38,7 @@ export class MoraCalculator {
   }
 
   getMora(args: { porcentaje: number | string; formateado?: boolean }): string | number {
+    
     let { porcentaje, formateado = true } = args;
 
     if (!this.hasMora || porcentaje === mora_personalizada) return '0.00';
@@ -79,11 +80,11 @@ export class MoraCalculator {
   }
 
   getFechaCompare() {
-    const pagos = this.factura?.pagos || [];
+    const pagos = this.factura?.recibos || [];
 
     if (pagos.length > 0 && this.factura_is_vencida) {
-      if (this.last_pago_valido) {
-        return this.last_pago_valido.fecha_equivalente;
+      if (this.last_recibo_valido) {
+        return this.last_recibo_valido.fecha_equivalente;
       }
     }
 

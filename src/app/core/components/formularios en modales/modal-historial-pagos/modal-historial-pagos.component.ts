@@ -114,11 +114,6 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
     this.activeIndex.set(this.getInitialActiveIndex());
 
     this.processingTabChange = false;
-
-    this.pagos = this.pagos.map(abono => {
-      abono.total = abono.deposito + abono.mora;
-      return abono;
-    });
   }
 
   arrayHasData(tipo) {

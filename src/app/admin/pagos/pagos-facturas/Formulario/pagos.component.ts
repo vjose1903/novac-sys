@@ -250,9 +250,9 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
         factura.mora = moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
       }
 
-      const recibos = factura.recibos ?? []
-      const pagos = factura.pagos ?? []
-      const notas = factura.notas ?? []
+      const recibos = factura?.recibos ?? [];
+      const pagos = factura?.pagos ?? [];
+      const notas = factura?.notas ?? [];
 
       const modalMoviemientos = recibos.length > 0 || notas.length > 0 || pagos.length > 0;
 
@@ -507,10 +507,10 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
           });
         }
       }
-      
-      const pagos = data.pagos ?? [];
-      const notas = data.notas ?? [];
-      const recibos = data.recibos ?? [];
+
+      const pagos = data?.pagos ?? [];
+      const notas = data?.notas ?? [];
+      const recibos = data?.recibos ?? [];
 
       if (params.iconKey == 'historyPagos' && (pagos.length || notas.length || recibos.length)) {
         const config = {};
@@ -858,7 +858,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       const cantidadEfectivoModalConfig = new DynamicModalClass();
 
       cantidadEfectivoModalConfig.id = 'cambioEfectivo_IngresosComponent';
-      cantidadEfectivoModalConfig.inputs = inputs; 
+      cantidadEfectivoModalConfig.inputs = inputs;
       cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
       cantidadEfectivoModalConfig.width = '35rem';
       cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
@@ -907,9 +907,6 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       obj.suplidor_id = this.entidadAdepositar().id;
       obj.pago_factura_detalles = this.detalleYtotal.detalle;
     }
-
-    console.log("OBJ ", obj);
-    
 
     const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 

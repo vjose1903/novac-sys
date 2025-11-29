@@ -87,8 +87,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   saltar(campo, valor?) {
-    console.log('SALTAR ', campo);
-
     if (campo === 'send') {
       if (this.tipo_modal != TipoCantidadEfectivo.noDevuelta && parseFloat(fun.desformatearStNumber(this.efectivo)) < fun.desformatearStNumber(this.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
