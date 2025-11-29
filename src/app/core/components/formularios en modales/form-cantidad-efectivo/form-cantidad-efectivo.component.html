@@ -7,24 +7,30 @@
           {{ formatoNumero(total_factura) }}
         </span>
       </div>
-      <h3 class="label w-100 mt-3">EFECTIVO: RD$</h3>
-      <input
-        type="text"
-        class="form-control inputEfectivo"
-        (focus)="htmlServ.selectValue($event)"
-        (keyup)="calcularDevueta()"
-        (keydown.enter)="saltar('formaPago')"
-        [(ngModel)]="efectivo"
-        (ngModelChange)="validarForm('input')"
-        (blur)="revisarPrecio($event.target)"
-        id="inputEfectivo" />
-      <h3 class="label w-100 mt-3">FORMA DE PAGO</h3>
-      <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control inputEfectivo">
-        <option value="Efectivo">Efectivo</option>
-        <option value="Tarjeta">Tarjeta</option>
-        <option value="Transferencia">Transferencia Bancaria</option>
-        <option value="Cheque">Cheque</option>
-      </select>
+
+      <div class="form-group">
+        <h3 class="label w-100 mt-3">EFECTIVO: RD$</h3>
+        <input
+          type="text"
+          class="form-control inputEfectivo"
+          (focus)="htmlServ.selectValue($event)"
+          (keyup)="calcularDevueta()"
+          (keydown.enter)="saltar('formaPago')"
+          [(ngModel)]="efectivo"
+          (ngModelChange)="validarForm('input')"
+          (blur)="revisarPrecio($event.target)"
+          id="inputEfectivo" />
+      </div>
+      
+      <div class="form-group">
+        <h3 class="label w-100 mt-3">FORMA DE PAGO</h3>
+        <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control inputEfectivo">
+          <option value="Efectivo">Efectivo</option>
+          <option value="Tarjeta">Tarjeta</option>
+          <option value="Transferencia">Transferencia Bancaria</option>
+          <option value="Cheque">Cheque</option>
+        </select>
+      </div>
 
       <div class="d-flex mt-3">
         <h3 class="label w-100">DEVUELTA: RD$</h3>

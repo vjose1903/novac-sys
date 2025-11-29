@@ -216,7 +216,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (fun.hasValue(params.order_by)) parameters['order_by'] = params.order_by;
 
-    const classDinamic = this.pagosService.isReciboIngreso()? 'clienteClass' : 'suplidorClass';
+    const classDinamic = this.pagosService.isReciboIngreso() ? 'clienteClass' : 'suplidorClass';
 
     const res = await this[classDinamic].getAll({ afterPath: `custom/get_balances/${entidad_id}`, parameters: parameters });
 
@@ -250,7 +250,11 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
         factura.mora = moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
       }
 
-      const modalMoviemientos = factura.recibos.length > 0 || factura.notas.length > 0 || factura.pagos.length > 0;
+      const recibos = factura.recibos ?? []
+      const pagos = factura.pagos ?? []
+      const notas = factura.notas ?? []
+
+      const modalMoviemientos = recibos.length > 0 || notas.length > 0 || pagos.length > 0;
 
       factura.tooltip_pedido = 'Modificar datos del pedido';
       factura.colorPedido = 'green';
@@ -406,7 +410,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     this.tipoFacturaId = Ss.factServ.lista_tipos_facturas?.find(tipoFactura => tipoFactura.descripcion.toLowerCase() == this.pagosService.tipoPago())?.id;
 
     if (fun.hasValue(entidad_id)) {
-      const classDinamic = this.pagosService.isReciboIngreso()? 'clienteClass' : 'suplidorClass';
+      const classDinamic = this.pagosService.isReciboIngreso() ? 'clienteClass' : 'suplidorClass';
 
       const entidad_response = await this[classDinamic].getOne(entidad_id);
       this.processPropietarioModal({
@@ -438,7 +442,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     this.debiendo_sin_mora.set(0);
 
     // Limpiar input de la entidad
-    const entidadInputId = this.pagosService.isReciboIngreso()? 'clienteI' : 'entidadI';
+    const entidadInputId = 'entidadI';
     const entidadInput = document.getElementById(entidadInputId) as HTMLInputElement;
     if (entidadInput) entidadInput.value = '';
 
@@ -446,16 +450,15 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     this.resetVariables();
 
     // Navegar y enfocar input después de un breve delay
-    if (this.pagosService.isReciboIngreso) {
+    if (this.pagosService.isReciboIngreso()) {
       this.router.navigateByUrl('/admin/recibos/ingresos/0/0');
-      fun.setTimeout(() => fun.enfocarInput('clienteI'), 250);
-    } else {
-      fun.setTimeout(() => fun.enfocarInput('entidadI'), 250);
     }
+
+    fun.setTimeout(() => fun.enfocarInput('entidadI'), 250);
   }
 
   abrirModalDinamicText(tipo: 'cancelar' | 'nuevo') {
-    const entidadTipo = this.pagosService.isReciboIngreso()? 'Recibo de ingresos' : 'Pago de facturas';
+    const entidadTipo = this.pagosService.isReciboIngreso() ? 'Recibo de ingresos' : 'Pago de facturas';
     const textoModal = tipo == 'cancelar' ? `¿Seguro de que desea cancelar el <strong>${entidadTipo}</strong>?` : `¿Seguro de que desea iniciar una nueva búsqueda para el <strong>${entidadTipo}</strong>?`;
 
     this.dynamicModalServ.confirmationModal({
@@ -476,7 +479,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       params = { ...params, ...order_by };
       this.pedirPagosPorEntidad(this.entidadAdepositar().id, params);
     } else {
-      fun.toastWarning(`Debe de seleccionar un ${this.pagosService.isReciboIngreso()? 'cliente' : 'suplidor'} para continuar.`, 'AVISO');
+      fun.toastWarning(`Debe de seleccionar un ${this.pagosService.isReciboIngreso() ? 'cliente' : 'suplidor'} para continuar.`, 'AVISO');
     }
   }
 
@@ -490,30 +493,37 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
   tableClickIcon(params) {
     if (params.columnKey == 'actions') {
+      const data = params.data;
+
       if (params.iconKey == 'pedido') {
-        if (params.data.is_viaje) {
+        if (data.is_viaje) {
           this.dynamicModalServ.confirmationModal({
             id: 'move_to_viajes',
             texto: '¿Seguro que desea dirigirse al modulo de viajes para modificar los datos del pedido?.',
             btnKind: confirmationButtons.siNo,
             onYes: () => {
-              this.router.navigateByUrl(`/admin/recibos/viajes/${params.data.id}`);
+              this.router.navigateByUrl(`/admin/recibos/viajes/${data.id}`);
             },
           });
         }
       }
-      if (params.iconKey == 'historyPagos' && (params.data.pagos.length || params.data.notas.length || params.data.recibos.length)) {
+      
+      const pagos = data.pagos ?? [];
+      const notas = data.notas ?? [];
+      const recibos = data.recibos ?? [];
+
+      if (params.iconKey == 'historyPagos' && (pagos.length || notas.length || recibos.length)) {
         const config = {};
-        const configKey = this.pagosService.isReciboIngreso()? 'showPagos' : 'showRecibos';
+        const configKey = this.pagosService.isReciboIngreso() ? 'showPagos' : 'showRecibos';
         config[configKey] = false;
 
-        this.facturaClass.abrirModalHistorial({ pagos: params.data.pagos, notas: params.data.notas, recibos: params.data.recibos, config });
+        this.facturaClass.abrirModalHistorial({ pagos: pagos, notas: notas, recibos: recibos, config });
       }
 
       if (params.iconKey == 'ver') {
-        this.facturaClass.parseDataToPdf(params.data).then(dataFactura => {
+        this.facturaClass.parseDataToPdf(data).then(dataFactura => {
           let botonesDinamicos = [
-            { clase: 'btn btn-gris', function: instance => this.verDetalles(params.data), label: 'Ver detalles', disable: false as any },
+            { clase: 'btn btn-gris', function: instance => this.verDetalles(data), label: 'Ver detalles', disable: false as any },
             { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false as any },
           ];
 
@@ -736,10 +746,10 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
       entidadModalConf.id = PagosComponent.modalBuscarEntidadId;
       entidadModalConf.inputs = {
-        metodo: this.pagosService.isReciboIngreso()? tipoDocFacturacion.venta : tipoDocFacturacion.compra,
+        metodo: this.pagosService.isReciboIngreso() ? tipoDocFacturacion.venta : tipoDocFacturacion.compra,
         palabra_a_buscar: nombre,
       };
-      entidadModalConf.header = this.pagosService.isReciboIngreso()? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR';
+      entidadModalConf.header = this.pagosService.isReciboIngreso() ? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR';
       entidadModalConf.width = '57rem';
       entidadModalConf.height = '32rem';
       entidadModalConf.component = BuscarClienteSuplidorComponent;
@@ -756,18 +766,16 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     const { data, type, factura_a_buscar = undefined } = args as any;
 
     if (type == modalCloseType.onHide && fun.isEmpty(this.entidadAdepositar())) {
-      const inputId = this.pagosService.isReciboIngreso()? 'clienteI' : 'entidadI';
-      fun.enfocarInput(inputId);
+      fun.enfocarInput('entidadI');
     }
 
     if (type == modalCloseType.returnData) {
       if (data?.tipo == 'data_no_found') {
-        const inputId = this.pagosService.isReciboIngreso()? 'clienteI' : 'entidadI';
-        fun.enfocarAndSelectInput(inputId);
+        fun.enfocarAndSelectInput('entidadI');
       } else {
         this.entidadAdepositar.set(data);
-        const inputId = this.pagosService.isReciboIngreso()? 'clienteI' : 'entidadI';
-        (document.getElementById(inputId) as any).value = data.nombre_completo;
+
+        (document.getElementById('entidadI') as any).value = data.nombre_completo;
         const parameters = { ...this.table_config.obj_paginate, factura_a_buscar: factura_a_buscar };
         this.pedirPagosPorEntidad(data.id, parameters);
       }
@@ -776,7 +784,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
   // Método híbrido para formar detalles de pagos/recibos
   formarDetallePagos() {
-    if (this.pagosService.isReciboIngreso) {
+    if (this.pagosService.isReciboIngreso()) {
       // Lógica para recibos de ingreso con mora
       const formatFechaFactura = fact => `${fact.pagoT ? 'Saldo' : 'Abono'} ${fact.numero_comprobante} ${DateUtils.format({ date: fact.fecha_equivalente, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm:ss' })}`;
 
@@ -843,15 +851,14 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     } else {
       this.detalleYtotal = await this.formarDetallePagos();
 
-      const tipo_modal = this.pagosService.isReciboIngreso()? TipoCantidadEfectivo.devuelta : TipoCantidadEfectivo.noDevuelta;
-      const documento = this.pagosService.isReciboIngreso()? DocumentoDevuelta.reciboIngreso : DocumentoDevuelta.pagoFactura;
+      const tipo_modal = this.pagosService.isReciboIngreso() ? TipoCantidadEfectivo.devuelta : TipoCantidadEfectivo.noDevuelta;
 
-      const inputs = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, documento: documento, tipo_modal: tipo_modal, formaPago: 'Efectivo' };
+      const inputs = { total_factura: this.detalleYtotal.total_recibo, tipo_modal: tipo_modal, formaPago: 'Efectivo' };
 
       const cantidadEfectivoModalConfig = new DynamicModalClass();
 
       cantidadEfectivoModalConfig.id = 'cambioEfectivo_IngresosComponent';
-      cantidadEfectivoModalConfig.inputs = inputs;
+      cantidadEfectivoModalConfig.inputs = inputs; 
       cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
       cantidadEfectivoModalConfig.width = '35rem';
       cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
@@ -890,7 +897,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     };
 
     // Configuración híbrida según el tipo de pago
-    if (this.pagosService.isReciboIngreso) {
+    if (this.pagosService.isReciboIngreso()) {
       obj.cliente_id = this.entidadAdepositar().id;
       obj.bruto = this.detalleYtotal.bruto || 0;
       obj.mora = this.detalleYtotal.mora || 0;
@@ -901,10 +908,13 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       obj.pago_factura_detalles = this.detalleYtotal.detalle;
     }
 
+    console.log("OBJ ", obj);
+    
+
     const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
     classToQuery[this.pagosService.tipoPago()].createUpdateOne(obj).then(res => {
-      const pago = this.pagosService.isReciboIngreso()? res['data'].recibo : res['data'];
+      const pago = this.pagosService.isReciboIngreso() ? res['data'].recibo : res['data'];
 
       const actualPagination = this.tServ.getPaginationById(PagosComponent.tablaPagosId);
       this.pedirPagosPorEntidad(this.entidadAdepositar().id, actualPagination);

@@ -40,7 +40,7 @@
       <div class="d-flex flex-column">
         <span class="text-w-600 mb-2">Porcentajes</span>
 
-        @for (porcentaje of porcentajes; track $index) {
+        @for (porcentaje of porcentajes; track porcentaje) {
           <div class="d-flex flex-column gap-0">
             <div class="porcentaje-item pt-1">
               <span>{{ porcentaje == mora_personalizada ? 'Personalizado' : porcentaje + '%' }}</span>

@@ -16,35 +16,39 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
   processingTabChange = true;
 
   table_pagos_config: table_config = {
+    track_key: 'id',
     info: [
       { titulo: 'Fecha abono', tipo: tableCellType.date, key: 'fecha_equivalente' },
-      { titulo: 'NO. recibo', tipo: 'text', key: 'numero_recibo' },
-      { titulo: 'Abonado', tipo: 'formatoNumero', key: 'deposito' },
-      { titulo: 'Mora', tipo: 'formatoNumero', key: 'mora' },
-      { titulo: 'Total', tipo: 'formatoNumero', key: 'total' },
+      { titulo: 'NO. recibo', tipo: tableCellType.text, key: 'numero_recibo' },
+      { titulo: 'Abonado', tipo: tableCellType.formatoNumero, key: 'deposito' },
+      { titulo: 'Total', tipo: tableCellType.formatoNumero, key: 'total' },
     ],
     colores: true,
     id_tabla: 'listado_pagos',
   };
   tablaPagosComponent;
-
+  
   table_notas_config: table_config = {
+    track_key: 'id',
     info: [
-      { titulo: 'NO. comprobante', tipo: 'text', key: 'numero_comprobante' },
-      { titulo: 'Tipo', tipo: 'text', key: 'tipo_label' },
-      { titulo: 'Monto', tipo: 'formatoNumero', key: 'total' },
       { titulo: 'Fecha nota', tipo: tableCellType.date, key: 'fecha_equivalente' },
+      { titulo: 'NO. comprobante', tipo: tableCellType.text, key: 'numero_comprobante' },
+      { titulo: 'Tipo', tipo: tableCellType.text, key: 'tipo_label' },
+      { titulo: 'Monto', tipo: tableCellType.formatoNumero, key: 'total' },
     ],
     colores: true,
     id_tabla: 'listado_notas',
   };
   tablaNotasComponent;
-
+  
   table_recibos_config: table_config = {
+    track_key: 'id',
     info: [
+      { titulo: 'Fecha abono', tipo: tableCellType.text, key: 'fecha_equivalente' },
       { titulo: 'NO. recibo', tipo: tableCellType.text, key: 'numero_recibo' },
       { titulo: 'Abonado', tipo: tableCellType.formatoNumero, key: 'deposito' },
-      { titulo: 'Fecha abono', tipo: tableCellType.text, key: 'fecha_equivalente' },
+      { titulo: 'Mora', tipo: tableCellType.formatoNumero, key: 'mora' },
+      { titulo: 'Total', tipo: tableCellType.formatoNumero, key: 'total' },
     ],
     colores: true,
     id_tabla: 'listado_recibos',

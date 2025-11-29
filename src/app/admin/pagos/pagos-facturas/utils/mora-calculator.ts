@@ -10,16 +10,16 @@ export class MoraCalculator {
   constructor(public factura: FacturasI) {
     const fechaActual = this.getFechaActual();
 
-    const pagos = this.factura.pagos.sort((a, b) => new Date(b.fecha_equivalente).getTime() - new Date(a.fecha_equivalente).getTime());
+    const recibos = this.factura.recibos.sort((a, b) => new Date(b.fecha_equivalente).getTime() - new Date(a.fecha_equivalente).getTime());
 
     // sumar los pagos recientes que no tienen pago a capital
-    for (let i = 0; i < pagos.length; i++) {
-      const pago = pagos[i];
+    for (let i = 0; i < recibos.length; i++) {
+      const pago = recibos[i];
       if (fun.desformatearStNumber(pago.deposito) > 0) break;
       this.abonos_a_mora += fun.desformatearStNumber(pago.mora);
     }
 
-    this.last_pago_valido = pagos.find(pago => fun.desformatearStNumber(pago.deposito) > 0);
+    this.last_pago_valido = recibos.find(pago => fun.desformatearStNumber(pago.deposito) > 0);
 
     this.factura_is_vencida = fechaActual > new Date(this.factura.fecha_vencimiento).setHours(1, 0, 0, 0);
   }

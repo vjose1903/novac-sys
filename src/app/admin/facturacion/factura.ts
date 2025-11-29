@@ -417,6 +417,7 @@ export class FacturaC extends CrudG<FacturasI> {
       recibos.map(recibo => {
         recibo.numero_recibo = String(recibo.numero_recibo).padStart(8, '0');
         recibo.fecha_equivalente = DateUtils.format({ date: recibo.fecha_equivalente });
+        recibo.total = recibo.mora + recibo.deposito;
         return recibo;
       });
 
@@ -600,6 +601,7 @@ export interface Recibo {
   balance_anterior_factura: number;
   pago_total: boolean;
   deposito: number;
+  mora: number;
   descripcion: string;
   pago_a_tiempo: boolean;
   is_ultimo: boolean;

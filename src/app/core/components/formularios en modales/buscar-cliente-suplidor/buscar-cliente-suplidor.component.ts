@@ -36,6 +36,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   paraFiltroClientes;
 
   table_config: table_config = {
+    track_key: 'id',
     info: [],
     focusRow: true,
     focusSearchInput: true,

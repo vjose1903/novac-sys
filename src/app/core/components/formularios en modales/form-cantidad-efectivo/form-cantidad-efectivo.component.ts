@@ -87,14 +87,17 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   saltar(campo, valor?) {
-    if (campo === 'inputFormaPago') {
-      fun.enfocarInput(campo);
-    }
+    console.log('SALTAR ', campo);
+
     if (campo === 'send') {
       if (this.tipo_modal != TipoCantidadEfectivo.noDevuelta && parseFloat(fun.desformatearStNumber(this.efectivo)) < fun.desformatearStNumber(this.total_factura)) {
         fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
         fun.enfocarInput('inputEfectivo');
+      } else {
+        this.btn_aceptar();
       }
+    } else {
+      fun.enfocarInput(campo);
     }
   }
 
