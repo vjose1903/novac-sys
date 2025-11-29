@@ -860,7 +860,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       cantidadEfectivoModalConfig.id = 'cambioEfectivo_IngresosComponent';
       cantidadEfectivoModalConfig.inputs = inputs;
       cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
-      cantidadEfectivoModalConfig.width = '35rem';
+      cantidadEfectivoModalConfig.width = '45rem';
       cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
       cantidadEfectivoModalConfig.closableEsc = true;
       cantidadEfectivoModalConfig.botones = [

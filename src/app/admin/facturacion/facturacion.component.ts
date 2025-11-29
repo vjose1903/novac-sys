@@ -1485,7 +1485,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cantidadEfectivoModalConfig.id = 'cambioEfectivo';
     cantidadEfectivoModalConfig.inputs = obj;
     cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
-    cantidadEfectivoModalConfig.width = '35rem';
+    cantidadEfectivoModalConfig.width = '45rem';
     cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
     cantidadEfectivoModalConfig.closableEsc = true;
     cantidadEfectivoModalConfig.botones = [

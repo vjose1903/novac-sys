@@ -1,11 +1,11 @@
 @if (metodo != tipoDocFacturacion.compra) {
   <div class="row">
     <div class="col-12">
-      <div class="d-flex">
-        <h3 class="label w-100">TOTAL: RD$</h3>
-        <span class="negrita w-100 total text-end">
+      <div class="d-flex align-items-center flex-wrap gap-2">
+        <h3 class="label mb-0">TOTAL: RD$</h3>
+        <div class="negrita total flex-1 text-end">
           {{ formatoNumero(total_factura) }}
-        </span>
+        </div>
       </div>
 
       <div class="form-group">
@@ -21,7 +21,7 @@
           (blur)="revisarPrecio($event.target)"
           id="inputEfectivo" />
       </div>
-      
+
       <div class="form-group">
         <h3 class="label w-100 mt-3">FORMA DE PAGO</h3>
         <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control inputEfectivo">
@@ -44,12 +44,12 @@
   <!-- ======================================================= -->
 
   <div class="row">
-    <div class="col-12">
-      <div class="d-flex si-wrap">
-        <h3 class="label w-100 no-wrap me-2">TOTAL DE COMPRA: RD$</h3>
-        <span class="negrita w-100 total">
+    <div class="col-12 p-0">
+      <div class="d-flex align-items-center flex-wrap gap-2">
+        <h3 class="label flex-nowrap mb-0">TOTAL DE COMPRA: RD$</h3>
+        <div class="negrita total flex-1 text-end">
           {{ formatoNumero(total_factura) }}
-        </span>
+        </div>
       </div>
       @if (cambios_articulos) {
         <div class="cambioDePrecios mb-3">
