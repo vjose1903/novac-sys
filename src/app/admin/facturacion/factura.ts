@@ -91,6 +91,7 @@ export enum tipoDocFacturacion {
   nota_credito = 'nota_credito',
   nota_debito = 'nota_debito',
   conduce = 'conduce',
+  pago_factura = 'pago_factura',
 }
 
 export enum tipoDocFacturacionLabel {
@@ -430,7 +431,6 @@ export class FacturaC extends CrudG<FacturasI> {
       pagos.map(pago => {
         pago.numero = String(pago.numero).padStart(8, '0');
         pago.fecha_equivalente = DateUtils.format({ date: pago.fecha_equivalente });
-        pago.numero_recibo = String(pago.numero_recibo).padStart(8, '0');
         return pago;
       });
 

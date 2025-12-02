@@ -71,7 +71,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       { titulo: 'Fecha Venc.', alert_msg: 'Fecha de vencimiento de la factura', tipo: 'text', text_color: 'colorFecha', key: 'fechaV' },
       { titulo: 'Total facturado', tipo: 'formatoNumero', key: 'total_factura' },
       { titulo: 'Balance factura', tipo: 'formatoNumero', key: 'balance' },
-      { titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora', returnData: data => this.getDataFromMoraSelector.bind(this)(data) } } },
+      { id: 'mora', titulo: 'Mora', tipo: 'none', rowTransform: { component: (rowData: any) => MoraSelectorComponent, inputs: { key: 'mora', returnData: data => this.getDataFromMoraSelector.bind(this)(data) } } },
       {
         titulo: 'Seleccione',
         tipo: 'switch',
@@ -144,11 +144,19 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     return debiendo - recibiendo <= 1 ? 0 : debiendo - recibiendo;
   });
 
-  mora_general = computed(() => this.all_facturas().reduce((sum, item) => fun.desformatearStNumber(item.mora) + sum, 0));
+  mora_general = computed(() => this.all_facturas().reduce((sum, item) => fun.desformatearStNumber(item?.mora ?? 0) + sum, 0));
 
   debiendo_con_mora = computed(() => {
     return Number(this.debiendo_sin_mora()) + Number(this.mora_general());
   });
+
+  get isPagoFactura() {
+    return this.pagosService.isPagoFactura();
+  }
+
+  get isReciboIngreso() {
+    return this.pagosService.isReciboIngreso();
+  }
 
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
@@ -216,7 +224,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
     if (fun.hasValue(params.order_by)) parameters['order_by'] = params.order_by;
 
-    const classDinamic = this.pagosService.isReciboIngreso() ? 'clienteClass' : 'suplidorClass';
+    const classDinamic = this.isReciboIngreso ? 'clienteClass' : 'suplidorClass';
 
     const res = await this[classDinamic].getAll({ afterPath: `custom/get_balances/${entidad_id}`, parameters: parameters });
 
@@ -240,14 +248,18 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       factura.colorFecha = DateUtils.format({ date: factura.fecha_vencimiento, dateFormat: 'YYYY-MM-DD' }) < fechaA ? 'red' : 'black';
       factura.monto = fun.hasValue(factura_selected) ? fun.roundNumberToDecimal(factura_selected.monto) : '0.00';
 
-      const moraCalculator = new MoraCalculator(factura);
+      if (this.isReciboIngreso) {
+        const moraCalculator = new MoraCalculator(factura);
 
-      if (fun.hasValue(factura_selected)) {
-        factura.porcentaje_mora = factura_selected.porcentaje_mora ?? this.porcentajeSelected;
-        factura.mora = factura_selected.mora ?? moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
+        if (fun.hasValue(factura_selected)) {
+          factura.porcentaje_mora = factura_selected.porcentaje_mora ?? this.porcentajeSelected;
+          factura.mora = factura_selected.mora ?? moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
+        } else {
+          factura.porcentaje_mora = this.porcentajeSelected;
+          factura.mora = moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
+        }
       } else {
-        factura.porcentaje_mora = this.porcentajeSelected;
-        factura.mora = moraCalculator.getMora({ porcentaje: this.porcentajeSelected });
+        factura.mora = 0;
       }
 
       const recibos = factura?.recibos ?? [];
@@ -398,6 +410,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
   async necesarioStart() {
     this.checkRoute();
+    this.parseTableConfig();
   }
 
   async checkRoute() {
@@ -407,19 +420,22 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
     // Configurar el tipo de pago desde el input
     this.pagosService.tipoPago.set(this.tipo as tipoPagoE);
-    this.tipoFacturaId = Ss.factServ.lista_tipos_facturas?.find(tipoFactura => tipoFactura.descripcion.toLowerCase() == this.pagosService.tipoPago())?.id;
+    this.tipoFacturaId = Ss.factServ.lista_tipos_facturas?.find(tipoFactura => tipoFactura.key.toLowerCase() == this.pagosService.tipoPago().toLowerCase())?.id;
 
     if (fun.hasValue(entidad_id)) {
-      const classDinamic = this.pagosService.isReciboIngreso() ? 'clienteClass' : 'suplidorClass';
+      const classDinamic = this.isReciboIngreso ? 'clienteClass' : 'suplidorClass';
 
       const entidad_response = await this[classDinamic].getOne(entidad_id);
-      this.processPropietarioModal({
-        data: entidad_response.data,
-        factura_a_buscar: factura_id,
-        type: modalCloseType.returnData,
-      } as any);
+
+      this.processPropietarioModal({ data: entidad_response.data, factura_a_buscar: factura_id, type: modalCloseType.returnData } as any);
     } else {
       fun.enfocarInput('entidadI');
+    }
+  }
+
+  parseTableConfig() {
+    if (this.isPagoFactura) {
+      this.table_config.info = this.table_config.info.filter(info => info.id != 'mora');
     }
   }
 
@@ -450,7 +466,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     this.resetVariables();
 
     // Navegar y enfocar input después de un breve delay
-    if (this.pagosService.isReciboIngreso()) {
+    if (this.isReciboIngreso) {
       this.router.navigateByUrl('/admin/recibos/ingresos/0/0');
     }
 
@@ -458,7 +474,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   abrirModalDinamicText(tipo: 'cancelar' | 'nuevo') {
-    const entidadTipo = this.pagosService.isReciboIngreso() ? 'Recibo de ingresos' : 'Pago de facturas';
+    const entidadTipo = this.isReciboIngreso ? 'Recibo de ingresos' : 'Pago de facturas';
     const textoModal = tipo == 'cancelar' ? `¿Seguro de que desea cancelar el <strong>${entidadTipo}</strong>?` : `¿Seguro de que desea iniciar una nueva búsqueda para el <strong>${entidadTipo}</strong>?`;
 
     this.dynamicModalServ.confirmationModal({
@@ -479,7 +495,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       params = { ...params, ...order_by };
       this.pedirPagosPorEntidad(this.entidadAdepositar().id, params);
     } else {
-      fun.toastWarning(`Debe de seleccionar un ${this.pagosService.isReciboIngreso() ? 'cliente' : 'suplidor'} para continuar.`, 'AVISO');
+      fun.toastWarning(`Debe de seleccionar un ${this.isReciboIngreso ? 'cliente' : 'suplidor'} para continuar.`, 'AVISO');
     }
   }
 
@@ -514,7 +530,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
       if (params.iconKey == 'historyPagos' && (pagos.length || notas.length || recibos.length)) {
         const config = {};
-        const configKey = this.pagosService.isReciboIngreso() ? 'showPagos' : 'showRecibos';
+        const configKey = this.isReciboIngreso ? 'showPagos' : 'showRecibos';
         config[configKey] = false;
 
         this.facturaClass.abrirModalHistorial({ pagos: pagos, notas: notas, recibos: recibos, config });
@@ -602,7 +618,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
         // Calcular nuevo monto
         const balance = fun.desformatearStNumber(item.balance);
-        const mora = fun.desformatearStNumber(item.mora);
+        const mora = fun.desformatearStNumber(item?.mora ?? 0);
         const new_monto = fun.roundNumberToDecimal(Big(balance).plus(mora).toNumber());
 
         // Actualizar selección
@@ -636,7 +652,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
         facts.map(fact => {
           if (fact.id == factura.id) {
             // Determinar valores a usar
-            const new_mora = fun.hasValue(mora) ? mora : factura.mora;
+            const new_mora = fun.hasValue(mora) ? mora : (factura?.mora ?? 0);
             const new_porcentaje_mora = fun.hasValue(porcentaje_mora) ? porcentaje_mora : factura.porcentaje_mora;
 
             // Retornar factura actualizada
@@ -661,7 +677,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     if (fun.hasValue(factura_en_turno)) {
       const total = factura_en_turno.balance;
       const monto = fun.desformatearStNumber(factura_en_turno.monto);
-      const mora = fun.desformatearStNumber(factura_en_turno.mora);
+      const mora = fun.desformatearStNumber(factura_en_turno?.mora ?? 0);
 
       if (isNaN(monto) || fun.isEmpty(monto)) {
         fun.toastWarning('Debe de introducir un Monto', 'AVISO');
@@ -685,7 +701,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     const factura = this.facturas.find(fact => fact.id == params.data.id);
 
     const balance = fun.desformatearStNumber(params.data.balance);
-    const mora = fun.desformatearStNumber(params.data.mora);
+    const mora = fun.desformatearStNumber(params?.data?.mora ?? 0);
     let monto = fun.desformatearStNumber(params.value);
     const balance_plus_mora = fun.desformatearStNumber(fun.roundNumberToDecimal(Big(balance).plus(mora).toNumber()));
 
@@ -746,10 +762,10 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
       entidadModalConf.id = PagosComponent.modalBuscarEntidadId;
       entidadModalConf.inputs = {
-        metodo: this.pagosService.isReciboIngreso() ? tipoDocFacturacion.venta : tipoDocFacturacion.compra,
+        metodo: this.isReciboIngreso ? tipoDocFacturacion.venta : tipoDocFacturacion.compra,
         palabra_a_buscar: nombre,
       };
-      entidadModalConf.header = this.pagosService.isReciboIngreso() ? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR';
+      entidadModalConf.header = this.isReciboIngreso ? 'BUSCAR CLIENTE' : 'BUSCAR SUPLIDOR';
       entidadModalConf.width = '57rem';
       entidadModalConf.height = '32rem';
       entidadModalConf.component = BuscarClienteSuplidorComponent;
@@ -784,14 +800,14 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
 
   // Método híbrido para formar detalles de pagos/recibos
   formarDetallePagos() {
-    if (this.pagosService.isReciboIngreso()) {
+    if (this.isReciboIngreso) {
       // Lógica para recibos de ingreso con mora
       const formatFechaFactura = fact => `${fact.pagoT ? 'Saldo' : 'Abono'} ${fact.numero_comprobante} ${DateUtils.format({ date: fact.fecha_equivalente, dateFormat: 'YYYY-MM-DD', hourFormat: 'HH:mm:ss' })}`;
 
       return this.facturasSelected().reduce(
         (acc, fact) => {
           const monto = Big(fun.desformatearStNumber(fact.monto));
-          const mora = fun.desformatearStNumber(fact.mora);
+          const mora = fun.desformatearStNumber(fact?.mora ?? 0);
 
           // Calcula la mora recibida y el depósito
           const mora_received = Math.min(monto.toNumber(), mora);
@@ -851,7 +867,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     } else {
       this.detalleYtotal = await this.formarDetallePagos();
 
-      const tipo_modal = this.pagosService.isReciboIngreso() ? TipoCantidadEfectivo.devuelta : TipoCantidadEfectivo.noDevuelta;
+      const tipo_modal = this.isReciboIngreso ? TipoCantidadEfectivo.devuelta : TipoCantidadEfectivo.noDevuelta;
 
       const inputs = { total_factura: this.detalleYtotal.total_recibo, tipo_modal: tipo_modal, formaPago: 'Efectivo' };
 
@@ -860,7 +876,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
       cantidadEfectivoModalConfig.id = 'cambioEfectivo_IngresosComponent';
       cantidadEfectivoModalConfig.inputs = inputs;
       cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
-      cantidadEfectivoModalConfig.width = '45rem';
+      cantidadEfectivoModalConfig.width = '40rem';
       cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
       cantidadEfectivoModalConfig.closableEsc = true;
       cantidadEfectivoModalConfig.botones = [
@@ -897,10 +913,10 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     };
 
     // Configuración híbrida según el tipo de pago
-    if (this.pagosService.isReciboIngreso()) {
+    if (this.isReciboIngreso) {
       obj.cliente_id = this.entidadAdepositar().id;
-      obj.bruto = this.detalleYtotal.bruto || 0;
-      obj.mora = this.detalleYtotal.mora || 0;
+      obj.bruto = this.detalleYtotal.bruto ?? 0;
+      obj.mora = this.detalleYtotal?.mora ?? 0;
       obj.detalle_recibos = this.detalleYtotal.detalle;
       obj.balance_cliente = this.restando();
     } else {
@@ -911,7 +927,7 @@ export class PagosComponent extends MixinClass implements OnInit, OnDestroy {
     const classToQuery = { [tipoPagoE.recibosIngresos]: this.reciboClass, [tipoPagoE.pagosFacturas]: this.pagoClass };
 
     classToQuery[this.pagosService.tipoPago()].createUpdateOne(obj).then(res => {
-      const pago = this.pagosService.isReciboIngreso() ? res['data'].recibo : res['data'];
+      const pago = this.isReciboIngreso ? res['data'].recibo : res['data'];
 
       const actualPagination = this.tServ.getPaginationById(PagosComponent.tablaPagosId);
       this.pedirPagosPorEntidad(this.entidadAdepositar().id, actualPagination);

@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { AfterViewInit, Component, Input, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { MessageTask } from '@core/typescript/message-task';
 import { fun } from '@core/services/functions.service';
@@ -29,6 +29,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   formFieldId = formFieldId;
   logo_empresa;
   logo_impresion;
+  activeTabIndex = 0;
 
   colores = [
     { label: 'Rojo', descripcion: 'red', color: '#bd0000' },
@@ -79,7 +80,8 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     private fb: UntypedFormBuilder,
     public sharedServ: SharedService,
     private router: Router,
-    public _ipc: IpcService
+    public _ipc: IpcService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -89,6 +91,10 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     this.parseDocumentosAImprimir(this.configApp).then(() => {
       this.createForm(this.configApp);
       this.formIsInvalid();
+      fun.setTimeout(() => {
+        this.activeTabIndex = 0;
+        this.cdr.detectChanges();
+      }, 0);
     });
 
     this.empresaServ.setEmpresa();
@@ -245,13 +251,13 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     const pageSizeKeys = ['venta_contado', 'venta_credito', 'pre_venta', 'cotizacion', 'compra', 'recibo_ingreso', 'conduce', 'nota', 'cuadre_caja', 'reporte', 'pago_factura'];
 
     const pages_sizes = pageSizeKeys.reduce((acc, key) => {
-      acc[key] = formulario[`page_size_${key}`].descripcion;
+      acc[key] = formulario[`page_size_${key}`]?.descripcion || null;
       return acc;
     }, {});
 
     // Mapear impresoras seleccionadas
     const printer_selected = pageSizeKeys.reduce((acc, key) => {
-      acc[key] = formulario[`printer_${key}`];
+      acc[key] = formulario[`printer_${key}`] || null;
       return acc;
     }, {});
 

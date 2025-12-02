@@ -4,7 +4,7 @@
   </div>
 
   <div class="widget-content overflow-hidden">
-    <p-tabs class="back-light panel-padding-0 panel-overflow-auto" [value]="0">
+    <p-tabs class="back-light panel-padding-0 panel-overflow-auto" [value]="activeTabIndex">
       <p-tablist>
         <p-tab [value]="0"> Informaciones generales </p-tab>
         <p-tab [value]="1"> Impresiones </p-tab>
@@ -325,6 +325,7 @@
         <!-- <a class="btn me-2" id="btn-gris" (click)="test()">Test</a> -->
 
         <button class="btn btn-sm" id="btn-blanco" (click)="salir()">Salir</button>
+        <!-- <button class="btn btn-sm btn-warning"  (click)="test()">test</button> -->
         <button type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn btn-sm" id="btn-verde">Guardar</button>
       </div>
 

@@ -22,10 +22,9 @@ export class FacturacionService {
   cotizacion_selected;
   productos_devueltos = [];
   filasDetalle;
-  
+
   tipoFacturaClass = new TiposFacturaC();
   serieType = signal(serie.electronica);
-
 
   isCompra = computed(() => this.tipoDocumento() == tipoDocFacturacion.compra);
   isVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.venta);
@@ -137,6 +136,8 @@ export class FacturacionService {
     if (this.isCotizacionOrPreVenta(metodo, actualPath)) {
       res.descripcion = metodo === tipoDocFacturacion.cotizacion ? 'Cotización' : 'Pre-venta';
       res.tipo = metodo;
+    } else if (metodo === tipoDocFacturacion.pago_factura) {
+      res.descripcion = 'Pago de factura';
     } else if (condicion_fact === 'Crédito') {
       res.descripcion = 'Factura a Crédito';
     } else if (condicion_fact === 'conduce') {

@@ -18,16 +18,15 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
   table_pagos_config: table_config = {
     track_key: 'id',
     info: [
-      { titulo: 'Fecha abono', tipo: tableCellType.date, key: 'fecha_equivalente' },
-      { titulo: 'NO. recibo', tipo: tableCellType.text, key: 'numero_recibo' },
-      { titulo: 'Abonado', tipo: tableCellType.formatoNumero, key: 'deposito' },
-      { titulo: 'Total', tipo: tableCellType.formatoNumero, key: 'total' },
+      { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente' },
+      { titulo: 'NO. pago', tipo: tableCellType.text, key: 'numero' },
+      { titulo: 'Pagado', tipo: tableCellType.formatoNumero, key: 'deposito' },
     ],
     colores: true,
     id_tabla: 'listado_pagos',
   };
   tablaPagosComponent;
-  
+
   table_notas_config: table_config = {
     track_key: 'id',
     info: [
@@ -40,7 +39,7 @@ export class ModalHistorialPagosComponent extends MixinClass implements OnInit, 
     id_tabla: 'listado_notas',
   };
   tablaNotasComponent;
-  
+
   table_recibos_config: table_config = {
     track_key: 'id',
     info: [

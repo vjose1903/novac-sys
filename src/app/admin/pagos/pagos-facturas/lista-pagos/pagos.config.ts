@@ -26,7 +26,7 @@ export const tableConfigPagos: { [key: string]: Array<table_info> } = {
   [tipoPagoE.pagosFacturas]: [
     { titulo: 'No. pago', style: { width: '8%' }, key: 'numero', tipo: tableCellType.text },
     { titulo: 'Fecha pago', style: { width: '10%' }, key: 'fecha_equivalente', tipo: tableCellType.date },
-    { titulo: 'Suplidor', key: 'suplidor.nombre_completo', tipo: tableCellType.text, style: { 'text-align': 'start', 'padding-left': '1.5rem' } },
+    { titulo: 'Suplidor', key: 'suplidor.nombre', tipo: tableCellType.text, style: { 'text-align': 'start', 'padding-left': '1.5rem' } },
     { titulo: 'No. factura', key: 'numero_factura', tipo: tableCellType.text, style: { width: '12%' } },
     { titulo: 'Total recibido', key: 'total', tipo: tableCellType.formatoNumero, style: { width: '12%', 'text-align': 'end' } },
     {

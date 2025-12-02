@@ -24,7 +24,7 @@ export class ConfirmacionImprimirComponent implements OnInit, IDynamicModal {
 
     if (key == teclasCode._enter) this.submit();
   }
-
+ 
   constructor(
     private shServ: SharedService,
     public factServ: FacturacionService

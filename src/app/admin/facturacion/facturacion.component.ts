@@ -35,7 +35,6 @@ import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } fr
 import { CanComponentDeactivate, CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 
-
 const moment = require('../../core/javascript/moment');
 
 @Component({
@@ -206,9 +205,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   constructor() {
     super();
-    
+
     this.formPropietario = this.fb.group({ id: null, direccion: null, telefono: null, nombre_completo: null });
-    
+
     this.timeInterval = setInterval(() => (this.fecha = DateUtils.format({ include_hour: true })), 1000);
   }
 
@@ -218,7 +217,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   ngOnChanges(changes: SimpleChanges): void {
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
-    
+
     this.validatePermisos().then(result => {
       this.rellenarVariables().then(async () => {
         await this.cuerpo.rellenarVariables();
@@ -1090,7 +1089,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       if (this.checkCamionIsSelected(camion)) {
         fun.pull(
           this.movimientosSelected,
-          this.movimientosSelected.find((mov) => mov.vehiculo_id == camion.id),
+          this.movimientosSelected.find(mov => mov.vehiculo_id == camion.id)
         );
       } else {
         this.movimientosSelected.push({ vehiculo_id: camion.id, user_id: null });
@@ -1485,7 +1484,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cantidadEfectivoModalConfig.id = 'cambioEfectivo';
     cantidadEfectivoModalConfig.inputs = obj;
     cantidadEfectivoModalConfig.header = 'Cantidad de efectivo';
-    cantidadEfectivoModalConfig.width = '45rem';
+    cantidadEfectivoModalConfig.width = '40rem';
     cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
     cantidadEfectivoModalConfig.closableEsc = true;
     cantidadEfectivoModalConfig.botones = [
