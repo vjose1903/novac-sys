@@ -48,6 +48,14 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnChanges
 
   permissions = Permisos;
 
+  get isPagoFactura() {
+    return this.pagosService.isPagoFactura();
+  }
+
+  get isReciboIngreso() {
+    return this.pagosService.isReciboIngreso();
+  }
+
   private router = inject(Router);
   private tServ = inject(TablasService);
   private route = inject(ActivatedRoute);
@@ -182,7 +190,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnChanges
 
           const titulo = this.pagosService.isReciboIngreso() ? 'Revisión de recibo de ingreso' : 'Revisión de pago de factura';
 
-          const obj_pdf = { base64: res.base64, titulo: titulo, reimprimir: true, fileName: _.first(res.file.split('.')) };
+          const obj_pdf = { base64: res.base64, reimprimir: true, fileName: _.first(res.file.split('.')) };
 
           Ss.loadServ.isLoading.next(false);
 
@@ -190,7 +198,7 @@ export class ListaPagosComponent extends MixinClass implements OnInit, OnChanges
 
           viewPdfModalConf.id = 'revision_pago';
           viewPdfModalConf.inputs = obj_pdf;
-          viewPdfModalConf.header = 'BUSCAR ARTICULO';
+          viewPdfModalConf.header = titulo;
           viewPdfModalConf.width = '57rem';
           viewPdfModalConf.height = '40rem';
           viewPdfModalConf.component = PdfViewerComponent;

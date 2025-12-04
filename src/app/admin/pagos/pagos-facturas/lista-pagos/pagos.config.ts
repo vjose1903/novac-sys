@@ -18,8 +18,8 @@ export const tableConfigPagos: { [key: string]: Array<table_info> } = {
       key: 'actions',
       style: { width: '9%', color: '#000' },
       iconsArray: [
-        { key: 'ver', rowTooltip: 'tooltip_ver', text_color: 'colorNegro' },
-        { key: 'anular', rowTooltip: 'tooltip_anular', text_color: 'colorNegro' },
+        { id: 'ver_recibo', key: 'ver', rowTooltip: 'tooltip_ver', text_color: 'colorNegro' },
+        { id: 'anular_recibo', key: 'anular', rowTooltip: 'tooltip_anular', text_color: 'colorNegro' },
       ],
     },
   ],
@@ -35,8 +35,8 @@ export const tableConfigPagos: { [key: string]: Array<table_info> } = {
       key: 'actions',
       style: { width: '9%', color: '#000' },
       iconsArray: [
-        { key: 'ver', rowTooltip: 'tooltip_ver', text_color: 'colorNegro' },
-        { key: 'anular', rowTooltip: 'tooltip_anular', text_color: 'colorNegro' },
+        { id: 'ver_pago', key: 'ver', rowTooltip: 'tooltip_ver', text_color: 'colorNegro' },
+        { id: 'anular_pago', key: 'anular', rowTooltip: 'tooltip_anular', text_color: 'colorNegro' },
       ],
     },
   ],

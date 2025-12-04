@@ -12,6 +12,7 @@ import { config_recibo_ingreso } from './configuraciones/recibo_ingreso';
 import { config_conduce } from './configuraciones/conduce';
 import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_cuadre_caja } from './configuraciones/cuadre_caja';
+import { config_pago_factura } from './configuraciones/pago_factura';
 import { fun } from '../../../functions.service';
 import * as numLetra from '../../utils/numero_letras';
 import { serie } from '@core/typescript/constantes';
@@ -26,15 +27,15 @@ const configuraciones = {
   conduce: config_conduce,
   cotizacion: config_cotizacion,
   cuadre_caja: config_cuadre_caja,
+  pago_factura: config_pago_factura,
 };
 
 export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const tipo_pdf = `${base_tipo_pdf}${post_tipo_pdf}`;
-  const is_compra = data?.tipo === 'compra' ? true : false;
+  const is_suplidor = data?.tipo === 'compra' || base_tipo_pdf === 'pago_factura' ? true : false;
 
-  const is_suplidor = is_compra;
   const is_electronica = data?.serie == serie.electronica;
-  
+
   const configApp: ConfigI = Ss.configServ.config;
   const configuration = configuraciones[tipo_pdf];
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';

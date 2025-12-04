@@ -80,7 +80,7 @@ export class PagoC extends CrudG<PagoI> {
       data_parsed['contenido_reporte'].map(detalle => {
         detalle['tipo'] = _.split(detalle.descripcion, ' ')[0];
         detalle['comprobante_fiscal'] = _.split(detalle.descripcion, ' ')[1];
-        detalle['fecha'] = `${detalle.descripcion.split(' ')[2]} ${detalle.descripcion.split(' ')[4]}`;
+        detalle['fecha'] = `${detalle.descripcion.split(' ')[2]} ${detalle.descripcion.split(' ')[3]}`;
       });
 
       resolve(data_parsed);
