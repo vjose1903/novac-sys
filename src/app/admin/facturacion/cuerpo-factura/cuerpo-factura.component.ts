@@ -198,6 +198,14 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
+  inputIsDisabled(index: number) {
+    return fun.isEmpty(this.factServ.propietario_factura) || this.factServ.filasDetalle.at(index).value.from_pre_factura;
+  }
+
+  inputPrecioIsDisabled(index: number) {
+    return this.readPrecio() || this.factServ.filasDetalle.at(index).value.from_pre_factura;
+  }
+
   checkIfRowContainArticulo(index) {
     let res = false;
     if (this.factServ.filasDetalle) {

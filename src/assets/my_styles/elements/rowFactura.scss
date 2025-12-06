@@ -18,6 +18,10 @@
     @include entrada-focus;
   }
 
+  &.disabled {
+    pointer-events: none !important;
+  }
+
   &.p-select {
     padding: 0rem 0.1rem 0rem 0.2rem !important;
     .p-select-label {
@@ -31,6 +35,20 @@
 
     &.p-focus {
       @include entrada-focus;
+    }
+  }
+}
+
+.entrada-wrapper {
+  position: relative;
+  display: inline-block;
+  width: -webkit-fill-available;
+
+  &.disabled {
+    cursor: not-allowed !important;
+
+    .entrada {
+      pointer-events: none !important;
     }
   }
 }

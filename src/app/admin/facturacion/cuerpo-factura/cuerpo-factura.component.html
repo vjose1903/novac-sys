@@ -80,26 +80,27 @@
                           </div>
 
                           <!--  ::::::::::::  CODIGO  ::::::::::::  -->
-                          <input
-                            [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
-                            type="text"
-                            class="form-control entrada"
-                            id="codigo-{{ index_cuerpo }}"
-                            [maxlength]="minCodigo"
-                            (focus)="verificarSecuencia(index_cuerpo)"
-                            (keyup)="checkCodigo(index_cuerpo)"
-                            (keyup.enter)="saltar('cantidad-', index_cuerpo)"
-                            formControlName="codigo"
-                            tabindex="-1" />
+                          <div class="entrada-wrapper" [ngClass]="{ disabled: inputIsDisabled(index_cuerpo) }">
+                            <input
+                              [ngClass]="{ disabled: inputIsDisabled(index_cuerpo) }"
+                              type="text"
+                              class="form-control entrada"
+                              id="codigo-{{ index_cuerpo }}"
+                              [maxlength]="minCodigo"
+                              (focus)="verificarSecuencia(index_cuerpo)"
+                              (keyup)="checkCodigo(index_cuerpo)"
+                              (keyup.enter)="saltar('cantidad-', index_cuerpo)"
+                              formControlName="codigo"
+                              tabindex="-1" />
+                          </div>
                         </div>
                       </div>
                     </td>
                     <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
                     <td class="column-cantidad p-0">
-                      <!-- <div class="position-absolute" style="width: 20px; height: 20px; background:red; z-index:999999" (click)="$event.stopPropagation(); test()"></div> -->
-                      <div class="position-relative" class="position-relative">
+                      <div class="position-relative entrada-wrapper" [ngClass]="{ disabled: inputIsDisabled(index_cuerpo) }">
                         <input
-                          [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
+                          [ngClass]="{ disabled: inputIsDisabled(index_cuerpo) }"
                           type="number"
                           min="1"
                           class="form-control entrada input_cantidad"
@@ -109,15 +110,14 @@
                           (focus)="verificarSecuencia(index_cuerpo)"
                           (blur)="calcularMontosRow(index_cuerpo)"
                           tabindex="-1" />
-                        <!-- <div style="background-color: red; width: 20px; height: 20px; top:0" class="position-absolute" (click)="probando(index_cuerpo)"></div> -->
                       </div>
                     </td>
                     <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
                     <td class="column-unidad p-0">
-                      <div class="position-relative">
+                      <div class="position-relative entrada-wrapper" [ngClass]="{ disabled: inputIsDisabled(index_cuerpo) }">
                         @if (inputDrop !== 'unidad-' + index_cuerpo) {
                           <input
-                            [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
+                            [ngClass]="{ disabled: inputIsDisabled(index_cuerpo) }"
                             type="text"
                             class="form-control entrada input-unidad"
                             id="unidad-{{ index_cuerpo }}"
@@ -153,15 +153,15 @@
                     </td>
                     <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
                     <td class="column-descripcion p-0">
-                      <div class="position-relative">
+                      <div class="position-relative entrada-wrapper disabled">
                         <input type="text" class="form-control entrada inDES disabled" id="descripcion-{{ index_cuerpo }}" formControlName="descripcion" tabindex="-1" />
                       </div>
                     </td>
                     <!--  ::::::::::::  DESCUENTO  ::::::::::::  -->
                     <td class="column-descuento p-0">
-                      <div class="position-relative">
+                      <div class="position-relative entrada-wrapper" [ngClass]="{ disabled: inputIsDisabled(index_cuerpo) }">
                         <input
-                          [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
+                          [ngClass]="{ disabled: inputIsDisabled(index_cuerpo) }"
                           type="text"
                           class="form-control entrada campoNumeros input_cantidad"
                           id="descuento_valor-{{ index_cuerpo }}"
@@ -174,7 +174,11 @@
                     </td>
                     <!--  ::::::::::::  PRECIO \ COSTO ::::::::::::  -->
                     <td class="column-precio p-0">
-                      <div class="position-relative" [pTooltip]="item_cuerpo.controls.is_bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
+                      <div
+                        class="position-relative entrada-wrapper"
+                        [ngClass]="{ disabled: inputPrecioIsDisabled(index_cuerpo) }"
+                        [pTooltip]="item_cuerpo.controls.is_bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''"
+                        tooltipPosition="right">
                         <div class="precio-div">
                           @if (item_cuerpo.controls.is_bad_price.value) {
                             <i class="fa-solid {{ getInfoBadPrice(index_cuerpo).icon }} iconArrow"></i>
@@ -187,7 +191,7 @@
                             (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
                             id="{{ precioCostoKey }}-{{ index_cuerpo }}"
                             [formControlName]="precioCostoKey"
-                            [ngClass]="{ disabled: readPrecio() || item_cuerpo.controls.from_pre_factura.value, warningAlert: item_cuerpo.controls.is_bad_price.value }"
+                            [ngClass]="{ disabled: inputPrecioIsDisabled(index_cuerpo), warningAlert: item_cuerpo.controls.is_bad_price.value }"
                             tabindex="-1" />
                         </div>
                       </div>
@@ -195,14 +199,14 @@
                     <!--  ::::::::::::  ITBIS  ::::::::::::  -->
                     @if (configApp.calcular_itbis) {
                       <td class="column-itbis p-0">
-                        <div class="position-relative">
+                        <div class="position-relative entrada-wrapper disabled">
                           <input type="text" class="form-control entrada inITBIS campoNumeros disabled" id="itbis-{{ index_cuerpo }}" formControlName="itbis" tabindex="-1" />
                         </div>
                       </td>
                     }
                     <!--  ::::::::::::  TOTAL  ::::::::::::  -->
                     <td class="column-total p-0">
-                      <div class="position-relative">
+                      <div class="position-relative entrada-wrapper disabled">
                         <input type="text" class="form-control entrada inTOT campoNumeros disabled" id="total-{{ index_cuerpo }}" formControlName="total" tabindex="-1" />
                       </div>
                     </td>

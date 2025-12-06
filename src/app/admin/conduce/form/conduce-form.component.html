@@ -16,11 +16,13 @@
                   (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
                   (focus)="htmlServ.selectValue($event)"
                   placeholder="Nombre Cliente"
-                  class="form-control mb-4 inputE"
+                  class="form-control inputE"
                   autocomplete="off"
                   [ngClass]="{ disabled: !!cliente }"
                   value=""
                   tabindex="-1" />
+              </div>
+              <div class="d-flex gap-2">
                 <button class="btn btn-gris" (click)="goBack()">Atrás</button>
                 <button [disabled]="!cliente" class="btn btn-gris ms-2" (click)="abrirModalDinamicText('nuevo')">Nueva Búsqueda</button>
               </div>
@@ -103,23 +105,26 @@
                                     </div>
 
                                     <!--  ::::::::::::  CODIGO  ::::::::::::  -->
-                                    <input
-                                      type="text"
-                                      class="form-control entrada"
-                                      [maxlength]="minCodigo"
-                                      id="cod-{{ index_cuerpo }}"
-                                      (focus)="verificarSecuencia(index_cuerpo)"
-                                      (keydown.enter)="saltar('can-', index_cuerpo)"
-                                      formControlName="cod"
-                                      (keyup)="checkCodigo(index_cuerpo)"
-                                      tabindex="-1"
-                                      [ngClass]="{ disabled: disableCamposFactAdelantadas(index_cuerpo) }" />
+                                    <div class="entrada-wrapper" [ngClass]="{ disabled: disableCamposFactAdelantadas(index_cuerpo) }">
+                                      <input
+                                        type="text"
+                                        class="form-control entrada"
+                                        [maxlength]="minCodigo"
+                                        id="cod-{{ index_cuerpo }}"
+                                        (focus)="verificarSecuencia(index_cuerpo)"
+                                        (keydown.enter)="saltar('can-', index_cuerpo)"
+                                        formControlName="cod"
+                                        (keyup)="checkCodigo(index_cuerpo)"
+                                        tabindex="-1"
+                                        [ngClass]="{ disabled: disableCamposFactAdelantadas(index_cuerpo) }" />
+                                    </div>
                                   </div>
                                 </div>
                               </td>
+
                               <!--  ::::::::::::  CANTIDAD  ::::::::::::  -->
                               <td class="CAN_ p-0">
-                                <div class="position-relative">
+                                <div class="position-relative entrada-wrapper">
                                   <input
                                     type="number"
                                     min="1"
@@ -133,9 +138,10 @@
                                     tabindex="-1" />
                                 </div>
                               </td>
+
                               <!--  ::::::::::::  UNIDAD  ::::::::::::  -->
                               <td class="UNI_ p-0">
-                                <div class="position-relative">
+                                <div class="position-relative entrada-wrapper" [ngClass]="{ disabled: disableCamposFactAdelantadas(index_cuerpo) }">
                                   @if (inputDrop !== 'uni-' + index_cuerpo) {
                                     <input
                                       type="text"
@@ -150,7 +156,7 @@
                                     <p-select
                                       #pDropdownMedida
                                       panelStyleClass="panel-dropdown-unidad"
-                                      styleClass="form-control entrada"
+                                      class="form-control entrada"
                                       inputId="uni-{{ index_cuerpo }}"
                                       formControlName="uni"
                                       appendTo="body"
@@ -172,7 +178,7 @@
                               </td>
                               <!--  ::::::::::::  DESCRIPCION  ::::::::::::  -->
                               <td class="DES_ p-0">
-                                <div class="position-relative">
+                                <div class="position-relative entrada-wrapper disabled">
                                   <input type="text" class="form-control entrada inDES_ disabled" id="des-{{ index_cuerpo }}" formControlName="des" tabindex="-1" />
                                 </div>
                               </td>
