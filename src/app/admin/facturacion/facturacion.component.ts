@@ -1300,7 +1300,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         botones.push({ clase: 'btn btn-gris', function: instance => this.router.navigateByUrl('/admin/dashboard') && instance.close(), label: label, disable: false });
       }
 
-      const include_contado = this.factServ.isVenta() || this.factServ.isCotizacion();
+      const isVentaNotAdelantada = this.factServ.isVenta() && !this.is_adelantada;
+      const include_contado = isVentaNotAdelantada || this.factServ.isCotizacion();
 
       let after_select = { send_factura: args?.send_factura };
       if (Object.values(after_select).every(value => fun.isEmpty(value))) after_select = null;
