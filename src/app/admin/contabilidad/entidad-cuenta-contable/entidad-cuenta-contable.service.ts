@@ -21,6 +21,10 @@ export class EntidadCuentaContableService {
       return acc;
     }, {});
 
+    console.log("configuracionesIndexadas ", configuracionesIndexadas);
+    console.log("params ", params);
+    
+
     if (params.configsEntCuentas.length == params.entidad_cuentas_contables.length) {
       const all_has_agrupacion = params.entidad_cuentas_contables.every((cuenta) => cuenta.tipo_agrupacion_contable != null);
 

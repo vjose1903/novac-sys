@@ -15,9 +15,10 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { ConfigArticulosComponent } from './configuracion_articulos/config-articulos/config-articulos.component';
 import { TipoArticuloComponent } from './tipo-articulo/tipo-articulo.component';
 import { SubTipoArticuloComponent } from './tipo-articulo/sub-tipo-articulo/sub-tipo-articulo.component';
+import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 
 @NgModule({
   declarations: [RegistroArticulosComponent, ConfigArticulosComponent, TipoArticuloComponent, SubTipoArticuloComponent],
-  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, EntidadCuentaContableModule],
+  imports: [CommonModule, ArticulosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, PipesModule, TablasModule, DirectivesModule, NgxPermissionsModule.forChild(), BtnIconModule, EntidadCuentaContableModule, FormErrorMsgComponent],
 })
 export class RegistroArticulosModule {}

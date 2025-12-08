@@ -81,11 +81,8 @@ export class ArticuloC extends CrudG<ArticuloI> {
         ...parameters,
       };
 
-      console.log('extra ',extra);
-      
-
       this.getAll(extra)
-        .then(res => resolve(res)) 
+        .then(res => resolve(res))
         .catch(err => reject(err));
     });
   }

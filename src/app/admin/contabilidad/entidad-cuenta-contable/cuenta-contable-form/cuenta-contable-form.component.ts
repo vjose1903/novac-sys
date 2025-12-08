@@ -1,5 +1,5 @@
 import { fun } from './../../../../core/services/functions.service';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, signal, computed, Signal, WritableSignal } from '@angular/core';
 import { CategoriaEntidadContableService } from '../../categoria-entidad-contable/categoria-entidad-contable.service';
 import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CategoriaEntidadContableC, CategoriaEntidadContableI, entidadesContables } from '../../categoria-entidad-contable/categoria-entidad-contable.utils';
@@ -45,7 +45,18 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
   individualConfig: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } };
 
-  constructor(private fb: UntypedFormBuilder, public catEntContServ: CategoriaEntidadContableService) {}
+  // Signals para optimizar el cálculo de labels
+  private formValueSignal: WritableSignal<FormEntidadCuentaContableI | null> = signal(null);
+  private listadoCategoriasSignal: WritableSignal<Array<CategoriaEntidadContableI>> = signal([]);
+  showRevertBtnSignal: WritableSignal<boolean> = signal(false);
+
+  cuentaControlLabel: Signal<string> = computed(() => this.computeCuentaLabel('control'));
+  cuentaContableLabel: Signal<string> = computed(() => this.computeCuentaLabel('contable'));
+
+  constructor(
+    private fb: UntypedFormBuilder,
+    public catEntContServ: CategoriaEntidadContableService
+  ) {}
 
   ngOnInit(): void {
     this.necesarioStart();
@@ -64,6 +75,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
       this.updateOriginalData();
 
       this.enableDisableIsComunSwitch();
+      this.updateSignals();
     }
 
     if (fun.objHas(changes, 'configuration') || fun.objHas(changes, 'infoTipoArticulo')) this.checkConfig();
@@ -73,9 +85,11 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
     this.currentEntidad = this.inputs.entidad;
     this.isArticulo = this.inputs?.entidad == CategoriaEntidadContableC.entidad.articulo;
 
-    await this.createForm().then((form) => {
+    await this.createForm().then(form => {
       this.enableDisableIsComunSwitch();
-      form.valueChanges.subscribe((changes) => {
+      this.updateSignals();
+      form.valueChanges.subscribe(changes => {
+        this.updateSignals();
         fun.awaitTyping({ waitingTime: 250 }).then(() => {
           if (!fun.isEqual(changes, this.lastChange)) this.returnData();
         });
@@ -94,8 +108,8 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
     let cuenta_per_config_sub_categoria;
 
     if (this.isArticulo) {
-      cuenta_per_config_categoria = this.infoTipoArticulo?.categoria?.cuentas_contables.find((cuenta_per_config) => cuenta_per_config.key == this.inputs.selectedConfig.key);
-      cuenta_per_config_sub_categoria = this.infoTipoArticulo?.sub_categoria?.cuentas_contables.find((cuenta_per_config) => cuenta_per_config.key == this.inputs.selectedConfig.key);
+      cuenta_per_config_categoria = this.infoTipoArticulo?.categoria?.cuentas_contables.find(cuenta_per_config => cuenta_per_config.key == this.inputs.selectedConfig.key);
+      cuenta_per_config_sub_categoria = this.infoTipoArticulo?.sub_categoria?.cuentas_contables.find(cuenta_per_config => cuenta_per_config.key == this.inputs.selectedConfig.key);
     }
 
     if (!this.inputs.selectedConfig.has_individual) this.individualConfig.btn.individual = false;
@@ -129,16 +143,18 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
   getCuentaPerConfig() {
     const formValue = this.form.getRawValue();
-    return this.infoTipoArticulo[formValue.tipo_agrupacion_contable]?.cuentas_contables.find((cuenta_per_config) => cuenta_per_config.key == this.inputs.selectedConfig.key);
+
+    return this.infoTipoArticulo[formValue.tipo_agrupacion_contable]?.cuentas_contables.find(cuenta_per_config => cuenta_per_config.key == this.inputs.selectedConfig.key);
   }
 
   async getCategorias() {
     CategoriaEntidadContableService.getCategoriasByEntidad({ paginado: false, config_id: this.inputs.selectedConfig.id, entidad: this.inputs.entidad, showMsgs: false })
-      .then((res) => {
+      .then(res => {
         this.listadoCategorias = res['data'];
         this.hasCategories = true;
+        this.updateSignals();
       })
-      .catch((err) => {
+      .catch(err => {
         this.hasCategories = false;
       });
   }
@@ -151,6 +167,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
   revertChanges() {
     this.form.patchValue(this.dataOriginal);
     this.selectCategoria();
+    this.updateSignals();
   }
 
   changeHasCuenta() {
@@ -162,6 +179,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
     this.form.controls.tipo_categoria.setValue(null);
     this.form.controls.tipo_categoria_id.setValue(null);
     this.form.controls.is_comun.setValue(false);
+    this.updateSignals();
   }
 
   changeAgrupacion(tipo: agrupacionContable) {
@@ -182,6 +200,7 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
       this.form.controls.tipo_categoria_id.setValue(cuentaPerConfig?.origen_tipo_id);
     }
+    this.updateSignals();
   }
 
   selectCategoria() {
@@ -191,16 +210,22 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
     if (!this.isArticulo && fun.isEmpty(formValue.tipo_categoria_id)) this.form.controls.is_comun.setValue(false);
     this.checkConfig();
+    this.updateSignals();
   }
 
-  getCuentaLabel(tipo: 'control' | 'contable') {
-    const formulario = this.form.getRawValue();
+  private computeCuentaLabel(tipo: 'control' | 'contable'): string {
+    const formulario = this.formValueSignal();
+    const listadoCategorias = this.listadoCategoriasSignal();
+    const showRevert = this.showRevertBtnSignal();
+
+    if (!formulario) return `Seleccione la ${this.getDropDownInfo('description')}`;
+
     let cuenta;
 
     if (formulario.tipo_agrupacion_contable == 'individual') cuenta = this.inputs.selectedConfig.cuenta_contable.label;
 
     if (formulario.tipo_agrupacion_contable != 'individual') {
-      const categoriaSelected = this.listadoCategorias.find((categoria) => categoria.id == formulario.tipo_categoria_id);
+      const categoriaSelected = listadoCategorias.find(categoria => categoria.id == formulario.tipo_categoria_id);
 
       if (formulario.is_comun) {
         if (tipo == 'control') {
@@ -214,9 +239,10 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
 
       if (this.isArticulo) {
         const cuenta_per_config = this.getCuentaPerConfig();
+
         const tipo_cuenta = tipo == 'control' ? 'control' : formulario.is_comun ? 'auxiliar' : 'control';
 
-        let temp_cuenta = cuenta_per_config[`label_${tipo_cuenta}`];
+        let temp_cuenta = cuenta_per_config?.[`label_${tipo_cuenta}`];
 
         if (fun.isEmpty(temp_cuenta)) temp_cuenta = this.inputs.selectedConfig.cuenta_contable.label;
 
@@ -224,11 +250,17 @@ export class CuentaContableFormComponent implements OnInit, OnChanges, OnDestroy
       }
     }
 
-    if (fun.hasValue(this.cuentaContableDataCruda) && tipo == 'contable' && !this.showRevertBtn()) {
+    if (fun.hasValue(this.cuentaContableDataCruda) && tipo == 'contable' && !showRevert) {
       cuenta = this.cuentaContableDataCruda?.cuenta_contable.label;
     }
 
     return cuenta || `Seleccione la ${this.getDropDownInfo('description')}`;
+  }
+
+  private updateSignals() {
+    this.formValueSignal.set(this.form?.getRawValue() || null);
+    this.listadoCategoriasSignal.set(this.listadoCategorias);
+    this.showRevertBtnSignal.set(this.showRevertBtn());
   }
 
   getDropDownInfo(tipo: 'placeholder' | 'emptyMessage' | 'description') {

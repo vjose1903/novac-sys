@@ -2,7 +2,7 @@
   @if (form) {
     <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
       <div class="actions">
-        @if (showRevertBtn()) {
+        @if (showRevertBtnSignal()) {
           <div class="circle" (click)="revertChanges()" [pTooltip]="'Revertir cambios'" tooltipPosition="left">
             <i class="fa-solid fa-arrow-rotate-left"></i>
           </div>
@@ -71,13 +71,13 @@
                   <div class="row">
                     <div class="col-12 p-0">
                       <label class="mb-0 mt-1" for="search">Cuenta Control </label>
-                      <input id="cuentaControlInput" class="search-input form-control min" [value]="getCuentaLabel('control')" disabled />
+                      <input id="cuentaControlInput" class="search-input form-control min" [value]="cuentaControlLabel()" disabled />
                     </div>
 
-                    @if (form.controls.is_comun.value || (fun.hasValue(form.controls.id.value) && !this.showRevertBtn())) {
+                    @if (form.controls.is_comun.value || (fun.hasValue(form.controls.id.value) && !showRevertBtnSignal())) {
                       <div class="col-12 p-0">
                         <label class="mb-0 mt-1" for="search"> <strong>Cuenta Contable</strong> </label>
-                        <input id="cuentaContableInput" class="search-input form-control min font-bold" [value]="getCuentaLabel('contable')" disabled />
+                        <input id="cuentaContableInput" class="search-input form-control min font-bold" [value]="cuentaContableLabel()" disabled />
                       </div>
                     }
 
@@ -123,7 +123,7 @@
                         </div>
                         <div class="{{ !isArticulo ? 'col-4' : 'col-12' }} p-0">
                           <div class="form-group mb-0 switchDiv h-100 align-items-end justify-content-end">
-                            <div class="d-flex align-items-center ml-4">
+                            <div class="d-flex align-items-center ml-4 gap-2">
                               <div [pTooltip]="getIsComunSwitchTooltip()" tooltipPosition="left" class="h-100 d-flex align-items-center">
                                 <input formControlName="is_comun" class="apple-switch" type="checkbox" />
                               </div>

@@ -56,6 +56,7 @@
                         <div class="form-group">
                           <label class="control-label">Nombre: <span style="color: red">*</span></label>
                           <input
+                            #inputNombre
                             (keydown.enter)="saltar('tipo')"
                             (focus)="htmlServ.selectValue($event)"
                             type="text"
@@ -65,15 +66,16 @@
                             class="form-control"
                             autocomplete="off"
                             id="nombre" />
-                          @if (!form.controls['nombre'].valid && (form.controls['nombre'].dirty || form.controls['nombre'].touched)) {
-                            <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                          }
+
+                          <form-error-msg [control]="form.controls['nombre']" [fieldElement]="inputNombre"> </form-error-msg>
                         </div>
                       </div>
+
                       <div class="{{ tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado' ? 'col-4' : 'col-6' }} p-0">
                         <div class="form-group">
                           <label class="control-label">Tipo: <span style="color: red">*</span></label>
                           <select
+                            #inputTipoArticulo
                             (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : listaSubTipoArticulos.length ? 'campoSubTipo' : 'vendido')"
                             id="tipo"
                             formControlName="tipo_articulo_id"
@@ -85,9 +87,8 @@
                               <option [disabled]="tipo.codigo == 'producto_terminado' ? !hasPermissionUpdateFormula : false" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
                             }
                           </select>
-                          @if (!form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)) {
-                            <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione tipo de articulo</div>
-                          }
+
+                          <form-error-msg [control]="form.controls['tipo_articulo_id']" [fieldElement]="inputTipoArticulo"> </form-error-msg>
                         </div>
                       </div>
 
@@ -98,6 +99,7 @@
                           tooltipPosition="left">
                           <label class="control-label">Sub tipo:</label>
                           <select
+                            #inputSubTipoArticulo
                             (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
                             id="campoSubTipo"
                             formControlName="sub_tipo_articulo_id"
@@ -109,9 +111,8 @@
                               <option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
                             </ng-container>
                           </select>
-                          @if (!form.controls['sub_tipo_articulo_id'].valid && (form.controls['sub_tipo_articulo_id'].dirty || form.controls['sub_tipo_articulo_id'].touched)) {
-                            <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione sub tipo de articulo</div>
-                          }
+
+                          <form-error-msg [control]="form.controls['sub_tipo_articulo_id']" [fieldElement]="inputSubTipoArticulo"> </form-error-msg>
                         </div>
                       </div>
 
@@ -119,15 +120,13 @@
                         <div class="col-4 pe-0">
                           <div class="form-group">
                             <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                            <select formControlName="vendido_en" (keydown.enter)="saltar('articulo_id', -1)" id="vendido" class="form-control" value="">
+                            <select #inputVendidoEn formControlName="vendido_en" (keydown.enter)="saltar('articulo_id', -1)" id="vendido" class="form-control" value="">
                               <option [value]="null" disabled>Tipo</option>
                               @for (item of vendidoEn; track item) {
                                 <option value="{{ item.backend }}">{{ item.front }}</option>
                               }
                             </select>
-                            @if (!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)) {
-                              <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione una opcion</div>
-                            }
+                            <form-error-msg [control]="form.controls['vendido_en']" [fieldElement]="inputVendidoEn"> </form-error-msg>
                           </div>
                         </div>
                       }
@@ -136,6 +135,7 @@
                           <div class="form-group">
                             <label class="control-label">Precio venta: <span style="color: red">*</span></label>
                             <input
+                              #inputPrecioVenta
                               type="text"
                               (keydown.enter)="saltar('existencia')"
                               id="precio_principal"
@@ -146,9 +146,7 @@
                               autocomplete="off"
                               (blur)="calculatePriceLibra()"
                               (blur)="revisarPrecio('precio_principal')" />
-                            @if (!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)) {
-                              <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                            }
+                            <form-error-msg [control]="form.controls['precio_principal']" [fieldElement]="inputPrecioVenta"> </form-error-msg>
                           </div>
                         </div>
                       }
@@ -160,7 +158,7 @@
                             <div class="form-group">
                               <label class="control-label">Comprado en: <span style="color: red">*</span></label>
                               <!-- (keydown.enter)="saltar(tipoArticuloSelected?.descripcion === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
-                              <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn(htmlServ.getValue($event))">
+                              <select #inputMedida formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn(htmlServ.getValue($event))">
                                 <option [value]="null" disabled>Tipo</option>
                                 <option value="Quintal">Quintal</option>
                                 <option value="Libra">Libra</option>
@@ -170,9 +168,7 @@
                                 <option value="Galon">Galón</option>
                                 <option value="Bolsa">Bolsa</option>
                               </select>
-                              @if (!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione una opcion</div>
-                              }
+                              <form-error-msg [control]="form.controls['medida']" [fieldElement]="inputMedida"> </form-error-msg>
                             </div>
                           </div>
                         }
@@ -181,15 +177,13 @@
                           <div class="col-6 pe-0">
                             <div class="form-group">
                               <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                              <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
+                              <select #inputVendidoEn formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
                                 <option [value]="null" disabled>Tipo</option>
                                 @for (item of vendidoEn; track item) {
                                   <option value="{{ item.backend }}">{{ item.front }}</option>
                                 }
                               </select>
-                              @if (!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione una opcion</div>
-                              }
+                              <form-error-msg [control]="form.controls['vendido_en']" [fieldElement]="inputVendidoEn"> </form-error-msg>
                             </div>
                           </div>
                         }
@@ -199,6 +193,7 @@
                             <div class="form-group">
                               <label class="control-label">Costo: <span style="color: red">*</span></label>
                               <input
+                                #inputCostoPrincipal
                                 type="text"
                                 (keydown.enter)="saltar('precio_principal')"
                                 id="costo_principal"
@@ -209,9 +204,7 @@
                                 (focus)="htmlServ.selectValue($event)"
                                 autocomplete="off"
                                 (blur)="revisarPrecio('costo_principal')" />
-                              @if (!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                              }
+                              <form-error-msg [control]="form.controls['costo_principal']" [fieldElement]="inputCostoPrincipal"> </form-error-msg>
                             </div>
                           </div>
                         }
@@ -220,6 +213,7 @@
                             <div class="form-group">
                               <label class="control-label">Precio venta: <span style="color: red">*</span></label>
                               <input
+                                #inputPrecioPrincipal
                                 type="text"
                                 (keydown.enter)="saltar('existencia')"
                                 id="precio_principal"
@@ -230,9 +224,7 @@
                                 autocomplete="off"
                                 (blur)="calculatePriceLibra()"
                                 (blur)="revisarPrecio('precio_principal')" />
-                              @if (!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                              }
+                              <form-error-msg [control]="form.controls['precio_principal']" [fieldElement]="inputPrecioPrincipal"> </form-error-msg>
                             </div>
                           </div>
                         }
@@ -243,6 +235,7 @@
                               <div class="row">
                                 <div class="col-6 ps-0">
                                   <input
+                                    #inputAvisoExistencia
                                     type="Number"
                                     (keydown.enter)="saltar('medida_alerta')"
                                     id="existencia"
@@ -262,9 +255,8 @@
                                   </select>
                                 </div>
                               </div>
-                              @if (!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                              }
+
+                              <form-error-msg [control]="form.controls['aviso_existencia']" [fieldElement]="inputAvisoExistencia"> </form-error-msg>
                               @if (articulo_no_paquete) {
                                 <div class="alerta text-danger ms-1" style="font-size: 12px">Este Articulo no contiene Paquetes</div>
                               }
@@ -274,7 +266,7 @@
                       </div>
                     }
                     @if (form.controls['medida'].value === 'Quintal' || tipoArticuloSelected?.descripcion === 'Producto terminado') {
-                      <hr class="raya" />
+                      <hr class="raya mx-0" />
                     }
                     <!-- ======================================================================================================================= -->
                     <!--  PRODUCTO TERMINADO -->
@@ -378,13 +370,14 @@
                           </div>
                         </ng-container>
                         @if (!tipoArticuloSelected || tipoArticuloSelected?.descripcion === 'Producto terminado') {
-                          <hr class="raya mt-1" />
+                          <hr class="raya mt-1 mx-0" />
                         }
                         <div class="row">
                           <div class="col-4 ps-0">
                             <div class="form-group">
                               <label class="control-label">Otros Costos: <span style="color: red">*</span></label>
                               <input
+                                #inputOtrosCostos
                                 type="text"
                                 (keydown.enter)="saltar('costo_principal')"
                                 id="otros_costos"
@@ -394,15 +387,15 @@
                                 (blur)="calculateCostoPT(); revisarPrecio('otros_costos')"
                                 (focus)="htmlServ.selectValue($event)"
                                 autocomplete="off" />
-                              @if (!form.controls['otros_costos'].valid && (form.controls['otros_costos'].dirty || form.controls['otros_costos'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                              }
+                              <form-error-msg [control]="form.controls['otros_costos']" [fieldElement]="inputOtrosCostos"> </form-error-msg>
                             </div>
                           </div>
+
                           <div class="col-4 ps-0">
                             <div class="form-group">
                               <label class="control-label">Costo: <span style="color: red">*</span></label>
                               <input
+                                #inputCostoPrincipal
                                 type="text"
                                 (keydown.enter)="saltar('precio_principal')"
                                 id="costo_principal"
@@ -413,15 +406,14 @@
                                 (focus)="htmlServ.selectValue($event)"
                                 autocomplete="off"
                                 (blur)="revisarPrecio('costo_principal')" />
-                              @if (!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                              }
+                              <form-error-msg [control]="form.controls['costo_principal']" [fieldElement]="inputCostoPrincipal"> </form-error-msg>
                             </div>
                           </div>
                           <div class="col-4 p-0">
                             <div class="form-group">
                               <label class="control-label">Precio venta: <span style="color: red">*</span></label>
                               <input
+                                #inputPrecioPrincipal
                                 type="text"
                                 (keydown.enter)="saltar('existencia')"
                                 id="precio_principal"
@@ -431,17 +423,17 @@
                                 (focus)="htmlServ.selectValue($event)"
                                 autocomplete="off"
                                 (blur)="calculatePriceLibra(); revisarPrecio('precio_principal')" />
-                              @if (!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                              }
+                              <form-error-msg [control]="form.controls['precio_principal']" [fieldElement]="inputPrecioPrincipal"> </form-error-msg>
                             </div>
                           </div>
+
                           <div class="col-6 mt-1 p-0">
                             <div class="form-group">
                               <label class="control-label">Alertar existencia: </label>
                               <div class="row">
                                 <div class="col-6 ps-0">
                                   <input
+                                    #inputAvisoExistencia
                                     type="Number"
                                     (keydown.enter)="saltar('medida_alerta')"
                                     id="existencia"
@@ -461,9 +453,8 @@
                                   </select>
                                 </div>
                               </div>
-                              @if (!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)) {
-                                <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                              }
+
+                              <form-error-msg [control]="form.controls['aviso_existencia']" [fieldElement]="inputAvisoExistencia"> </form-error-msg>
                               @if (articulo_no_paquete) {
                                 <div class="alerta text-danger ms-1" style="font-size: 12px">Este Articulo no se contiene Paquetes</div>
                               }
@@ -489,18 +480,20 @@
                       </div>
                     }
                     @if (showContenido(form.controls['medida'].value)) {
-                      <hr class="raya" />
+                      <hr class="raya mx-0" />
                     }
                     <!-- ======================================================================================================================= -->
                     <!--  CONTENIDO DE LA CAJA O SACO O GALON -->
                     <!-- ======================================================================================================================= -->
                     @if (showContenido(form.controls['medida'].value)) {
                       <div class="row">
-                        <span class="w-100 text-green">Contenido {{ form.controls['medida'].value }}</span>
+                        <span class="w-100 text-green p-0">Contenido {{ form.controls['medida'].value }}</span>
+
                         <div class="col-3 p-0">
                           <label class="control-label">Contiene: </label>
                           <div class="form-group">
                             <input
+                              #inputCantidadContenidoPadre
                               (keydown.enter)="saltar('medidaPadre')"
                               (focus)="htmlServ.selectValue($event)"
                               type="Number"
@@ -510,11 +503,10 @@
                               class="form-control input_cantidad"
                               min="1"
                               autocomplete="off" />
-                            @if (!form.controls['cantidad_contenido_padre'].valid && (form.controls['cantidad_contenido_padre'].dirty || form.controls['cantidad_contenido_padre'].touched)) {
-                              <div class="alerta text-danger ms-1" style="font-size: 12px">Cantidad de la caja</div>
-                            }
+                            <form-error-msg [control]="form.controls['cantidad_contenido_padre']" [fieldElement]="inputCantidadContenidoPadre"> </form-error-msg>
                           </div>
                         </div>
+
                         <div class="col-5">
                           <div class="form-group">
                             <label class="control-label text-transparent">medida </label>
@@ -540,9 +532,12 @@
                         </div>
                         <div class="col-4 p-0">
                           <div class="form-group">
-                            <label class="control-label">Precio </label> {{ ' ' }}
-                            <label class="control-label">{{ form.controls['medida_contenido_padre'].value }} </label>
+                            <div class="d-flex align-items-center gap-1 flex-wrap">
+                              <label class="control-label">Precio </label> {{ ' ' }}
+                              <label class="control-label">{{ form.controls['medida_contenido_padre'].value }} </label>
+                            </div>
                             <input
+                              #inputPrecioPadre
                               (keydown.enter)="saltar(form.controls['medida_contenido_padre'].value === 'Paquete' ? 'contenidoHijo' : 'send')"
                               type="text"
                               id="precio_padre"
@@ -553,26 +548,25 @@
                               (blur)="revisarPrecio('precio_padre')"
                               (blur)="calculatePriceHijo()"
                               autocomplete="off" />
-                            @if (!form.controls['precio_padre'].valid && (form.controls['precio_padre'].dirty || form.controls['precio_padre'].touched)) {
-                              <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                            }
+                            <form-error-msg [control]="form.controls['precio_padre']" [fieldElement]="inputPrecioPadre"> </form-error-msg>
                           </div>
                         </div>
                       </div>
                     }
                     @if (form.controls['medida_contenido_padre'].value === 'Paquete') {
-                      <hr class="raya" />
+                      <hr class="raya mx-0" />
                     }
                     <!-- ======================================================================================================================= -->
                     <!--  CONTENIDO DEL PAQUETE -->
                     <!-- ======================================================================================================================= -->
                     @if (form.controls['medida_contenido_padre'].value === 'Paquete') {
                       <div class="row">
-                        <span class="w-100 text-green">Contenido Paquete</span>
+                        <span class="w-100 text-green p-0">Contenido Paquete</span>
                         <div class="col-3 p-0">
                           <label class="control-label">Contiene: </label>
                           <div class="form-group">
                             <input
+                              #inputCantidadContenidoHijo
                               type="Number"
                               (focus)="htmlServ.selectValue($event)"
                               (keydown.enter)="saltar('medidaHijo')"
@@ -582,28 +576,26 @@
                               (blur)="calculatePriceHijo()"
                               class="form-control input_cantidad"
                               autocomplete="off" />
-                            @if (!form.controls['cantidad_contenido_hijo'].valid && (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)) {
-                              <div class="alerta text-danger ms-1" style="font-size: 12px">Cantidad del paquete</div>
-                            }
+                            <form-error-msg [control]="form.controls['cantidad_contenido_hijo']" [fieldElement]="inputCantidadContenidoHijo"> </form-error-msg>
                           </div>
                         </div>
                         <div class="col-5">
                           <div class="form-group">
                             <label class="control-label text-transparent">medida </label>
-                            <select (keydown.enter)="saltar('precio_hijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
+                            <select #inputMedidaContenidoHijo (keydown.enter)="saltar('precio_hijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
                               <option [value]="null" disabled>Seleccione</option>
                               <option value="Unidad">Unidad</option>
                             </select>
-                            @if (!form.controls['medida_contenido_hijo'].valid && (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)) {
-                              <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                            }
+                            <form-error-msg [control]="form.controls['medida_contenido_hijo']" [fieldElement]="inputMedidaContenidoHijo"> </form-error-msg>
                           </div>
                         </div>
+
                         <div class="col-4 p-0">
                           <div class="form-group">
                             <label class="control-label">Precio </label> {{ ' ' }}
                             <label class="control-label">{{ form.controls['medida_contenido_hijo'].value }} </label>
                             <input
+                              #inputPrecioHijo
                               id="precio_hijo"
                               (keydown.enter)="saltar('send')"
                               type="text"
@@ -613,9 +605,7 @@
                               (focus)="htmlServ.selectValue($event)"
                               (blur)="revisarPrecio('precio_hijo')"
                               autocomplete="off" />
-                            @if (!form.controls['precio_hijo'].valid && (form.controls['precio_hijo'].dirty || form.controls['precio_hijo'].touched)) {
-                              <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
-                            }
+                            <form-error-msg [control]="form.controls['precio_hijo']" [fieldElement]="inputPrecioHijo"> </form-error-msg>
                           </div>
                         </div>
                       </div>

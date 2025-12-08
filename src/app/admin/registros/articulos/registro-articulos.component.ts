@@ -264,7 +264,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     this.listaArticulos.length = 0;
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true, parameters: { cuentas_contables: true } }).then(res => {
-
       this.listaArticulos = res.data;
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
@@ -302,7 +301,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.checkCuentasContables();
     this.modifyValidators();
 
-    this.getSubTipoArticulos().finally(() => this.modifyValidators());
+    await this.getSubTipoArticulos().finally(() => this.modifyValidators());
 
     if (this.tipoArticuloSelected.codigo == 'materia_prima') {
       this.form.controls.is_materia_prima.setValue(true);
@@ -846,35 +845,33 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   async editarItem(articulo: ArticuloI) {
     this.borrar();
-
     this.form.patchValue(articulo);
     this.articuloSelected = articulo;
     this.botonLabel = 'Editar';
     this.COMPRADOEN = '';
     this.MEDIDACAJA = '';
+    this.is_combo = articulo.is_combo;
+    this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(articulo.cuentas_contables);
 
     await this.selectTipoArticulo(articulo.tipo_articulo_id);
     await this.selectSubTipoArticulo(articulo.sub_tipo_articulo_id);
+
     if (fun.hasValue(this.ARRAY_FORMULA)) this.resetArray();
 
-    this.is_combo = articulo.is_combo;
+    const { formulas_productos_terminados: formulas, contenido_articulos: contenidos } = articulo;
+    const tieneFormulas = formulas?.length > 0;
 
-    this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(articulo.cuentas_contables);
-
-    if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
+    if (articulo.is_combo || tieneFormulas) {
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(fun.roundNumberToDecimal(articulo.otros_costos));
 
-      if (articulo.formulas_productos_terminados.length) {
+      if (tieneFormulas) {
         this.form.controls.medida.setValue(this.medida_config);
         this.resetCompradoEn(this.medida_config);
-
-        for (let index = 0; index < articulo.formulas_productos_terminados.length; index++) {
-          const ingredient = articulo.formulas_productos_terminados[index];
-
+        formulas.forEach((ingredient, index) => {
           this.addItem();
           this.fillFormula(ingredient, index);
-        }
+        });
       } else {
         this.addItem();
       }
@@ -882,68 +879,44 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.COMPRADOEN = articulo.medida;
     }
 
-    if (articulo.contenido_articulos.length > 0) this.MEDIDACAJA = articulo.contenido_articulos[0].medida;
+    if (contenidos.length > 0) this.MEDIDACAJA = contenidos[0].medida;
 
-    this.fillDropAlerta(articulo.medida).then(() => {
-      for (let indexContenido = 0; indexContenido < articulo.contenido_articulos.length; indexContenido++) {
-        const contenido = articulo.contenido_articulos[indexContenido];
+    await this.fillDropAlerta(articulo.medida);
+    this.llenarContenidoArticulos(contenidos);
+    this.form.controls.costo_principal.setValue(fun.roundNumberToDecimal(articulo.costo_principal));
+    this.form.controls.precio_principal.setValue(fun.roundNumberToDecimal(articulo.precio_principal));
+    this.form.controls.medida_alerta.setValue(articulo.medida_alerta);
+    this.modifyValidators();
+  }
 
-        if (articulo.contenido_articulos.length === 1) {
-          if (articulo.contenido_articulos[0].medida === 'Libra') {
-            this.form.controls.precio_libra.setValue(fun.roundNumberToDecimal(contenido.precio));
-            this.form.controls.costo_padre.setValue(contenido.costo);
-            this.form.controls.id_contenido_padre.setValue(contenido.id);
-          } else {
-            this.form.controls.precio_unidad.setValue(fun.roundNumberToDecimal(contenido.precio));
-            this.form.controls.costo_padre.setValue(contenido.costo);
-            this.form.controls.id_contenido_padre.setValue(contenido.id);
-          }
-        }
+  private llenarContenidoArticulos(contenidos: ArticuloI['contenido_articulos']) {
+    const controls = this.form.controls;
+    const esContenidoUnico = contenidos.length === 1;
 
-        if (contenido.condicion === 'hijo') {
-          this.form.controls.cantidad_contenido_hijo.setValue(contenido.cantidad);
-          this.form.controls.medida_contenido_hijo.setValue(contenido.medida);
-          this.form.controls.precio_hijo.setValue(fun.roundNumberToDecimal(contenido.precio));
-          this.form.controls.costo_hijo.setValue(contenido.costo);
-          this.form.controls.id_contenido_hijo.setValue(contenido.id);
-          this.form.controls.referencia_hijo.setValue(contenido.referencia);
-        } else {
-          this.form.controls.cantidad_contenido_padre.setValue(contenido.cantidad);
-          this.form.controls.medida_contenido_padre.setValue(contenido.medida);
+    if (esContenidoUnico) {
+      const contenido = contenidos[0];
+      const camposPrecio = contenido.medida === 'Libra' ? 'precio_libra' : 'precio_unidad';
+      controls[camposPrecio].setValue(fun.roundNumberToDecimal(contenido.precio));
+      controls.costo_padre.setValue(contenido.costo);
+      controls.id_contenido_padre.setValue(contenido.id);
+    }
 
-          this.form.controls.precio_padre.setValue(fun.roundNumberToDecimal(contenido.precio));
-          this.form.controls.costo_padre.setValue(contenido.costo);
-          this.form.controls.id_contenido_padre.setValue(contenido.id);
-        }
-      }
+    for (const contenido of contenidos) {
+      const esHijo = contenido.condicion === 'hijo';
+      const sufijo = esHijo ? 'hijo' : 'padre';
 
-      this.form.controls.costo_principal.setValue(fun.roundNumberToDecimal(articulo.costo_principal));
-      this.form.controls.precio_principal.setValue(fun.roundNumberToDecimal(articulo.precio_principal));
-      this.form.controls.medida_alerta.setValue(articulo.medida_alerta);
-      this.modifyValidators();
-    });
+      controls[`cantidad_contenido_${sufijo}`].setValue(contenido.cantidad);
+      controls[`medida_contenido_${sufijo}`].setValue(contenido.medida);
+      controls[`precio_${sufijo}`].setValue(fun.roundNumberToDecimal(contenido.precio));
+      controls[`costo_${sufijo}`].setValue(contenido.costo);
+      controls[`id_contenido_${sufijo}`].setValue(contenido.id);
+
+      if (esHijo) controls.referencia_hijo.setValue(contenido.referencia);
+    }
   }
 
   nuevoRegistro() {
     this.isCreando = true;
-  }
-
-  checkIfSomethingIsDiferrent() {
-    // TODO: falta implementar correctamente.
-    const pick_values = ['cedula', 'rnc', 'nombre', 'apellido', 'telefono', 'sexo', 'limite_credito', 'maximo_credito', 'vendedor_id', 'direccion', 'id', 'img'];
-    const formValue = fun.pick(this.form.getRawValue(), pick_values);
-    formValue['maximo_credito'] = fun.desformatearStNumber(formValue['maximo_credito']);
-    formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
-
-    const originalArticulo = this.listaArticulos.find(cliente => cliente.id == formValue.id);
-    const originalValue = fun.pick(originalArticulo, pick_values);
-
-    originalValue['img'] = originalArticulo.img_cliente;
-    originalValue['cedula'] = originalArticulo?.documentos_de_identidad.find(doc => doc.descripcion == 'cedula')?.documento;
-    originalValue['rnc'] = originalArticulo?.documentos_de_identidad.find(doc => doc.descripcion == 'rnc')?.documento;
-    originalValue['cuentas_contables'] = fun.deepCloning(this.entCuentaContServ.parseCuentasFromBackend(originalArticulo?.cuentas_contables));
-
-    return !fun.isEqual(formValue, originalValue);
   }
 
   formarContenido() {
@@ -1045,7 +1018,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
             id: 'aviso_cuentas',
             texto: 'Confirme las <b class="negrita">CUENTAS CONTABLES</b>, una vez registrado el articulo, no se podrán modificar sus <b class="negrita"> CUENTAS CONTABLES </b> ¿Desea continuar?',
             width: '30rem',
-            btnKind: confirmationButtons.cancelarEliminar,
+            btnKind: confirmationButtons.cancelarAceptar,
             onYes: () => this.sendData(),
           });
         } else {
@@ -1091,6 +1064,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       articuloData['otros_costos'] = formulario.otros_costos;
       articuloData['formulas_productos_terminados'] = this.formarFormula();
     }
+    console.log(" ");
+    console.log("articuloData ", articuloData);
 
     this.articuloClass.createUpdateOne(articuloData).then(res => {
       this.necesarioStart();
