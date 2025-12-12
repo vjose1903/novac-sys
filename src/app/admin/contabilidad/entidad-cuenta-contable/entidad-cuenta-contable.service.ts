@@ -62,10 +62,10 @@ export class EntidadCuentaContableService {
       const values_pick = ['id', 'configuracion_entidad_cuenta_id', 'tipo_agrupacion_contable', 'is_comun'];
 
       const cuentaParsed: FormEntidadCuentaContableI = fun.pick(fun.deepCloning(cuenta), values_pick);
-
+      
       cuentaParsed.has_cuenta = cuenta?.tipo_agrupacion_contable != agrupacionesContables.sin_cuenta;
       cuentaParsed.tipo_categoria_id = cuenta?.origen_categoria?.id || null;
-      cuentaParsed.tipo_categoria = null; //TODO: ver como hacer esta parte para articulos.
+      cuentaParsed.tipo_categoria = cuenta?.origen_categoria?.table_name || null;
 
       return cuentaParsed;
     });

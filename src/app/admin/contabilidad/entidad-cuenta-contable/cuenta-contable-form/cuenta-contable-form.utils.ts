@@ -13,8 +13,8 @@ export const agrupacionesContables = {
 };
 
 export const tipoCategoria = {
-  tipoArticulo: 'tipo_articulo',
-  subTipoArticulo: 'sub_tipo_articulo',
+  tipoArticulo: 'tipo_articulos',
+  subTipoArticulo: 'sub_tipo_articulos',
 };
 export interface EntidadCuentaContableI {
   id: number;
@@ -30,6 +30,7 @@ export interface EntidadCuentaContableI {
 export interface OrigenCategoria {
   id: number;
   descripcion: string;
+  table_name?: string;
 }
 
 export interface FormEntidadCuentaContableI {

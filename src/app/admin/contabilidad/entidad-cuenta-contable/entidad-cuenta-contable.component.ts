@@ -1,10 +1,19 @@
 import { fun } from './../../../core/services/functions.service';
 import { ConfiguracionEntidadCuentaI } from './../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, computed, effect, input, model, signal } from '@angular/core';
 import { entidadesContables } from '../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { EntidadCuentaContableI, FormEntidadCuentaContableI, entidadCuentaContableBlank } from './cuenta-contable-form/cuenta-contable-form.utils';
 import { TipoArticuloI } from '../../registros/articulos/tipo-articulo/tipo-articulo';
 import { SubTipoArticuloI } from '../../registros/articulos/tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
+
+export interface EntidadCuentaContableInputs {
+  configsEntCuentas: Array<ConfiguracionEntidadCuentaI>;
+  entidad: entidadesContables;
+}
+
+export interface EntidadCuentaContableConfig {
+  btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean };
+}
 
 @Component({
   selector: 'entidad-cuenta-contable',
@@ -12,82 +21,98 @@ import { SubTipoArticuloI } from '../../registros/articulos/tipo-articulo/sub-ti
   styleUrls: ['./entidad-cuenta-contable.component.scss'],
   standalone: false,
 })
-export class EntidadCuentaContableComponent implements OnInit, OnChanges {
+export class EntidadCuentaContableComponent {
+  // Inputs como signals
+  inputs = input.required<EntidadCuentaContableInputs>();
+  configuration = input<EntidadCuentaContableConfig>({});
+  camposDisabled = input<boolean>(false);
+  infoTipoArticulo = input<{ categoria?: TipoArticuloI; sub_categoria?: SubTipoArticuloI }>();
+  cuentasContablesDataCruda = input<EntidadCuentaContableI[]>([]);
+
+  // Model para two-way binding
+  cuentasContablesData = model<FormEntidadCuentaContableI[]>([]);
+
+  // Estado interno
   activeIndex = 0;
-  @Input() inputs: { configsEntCuentas: Array<ConfiguracionEntidadCuentaI>; entidad: entidadesContables };
-  @Input() configuration: { btn?: { individual?: boolean; categoria?: boolean; subCategoria?: boolean } } = {};
-  @Input() camposDisabled: boolean = false;
-  @Input() infoTipoArticulo: { categoria?: TipoArticuloI; sub_categoria?: SubTipoArticuloI };
 
-  @Input() cuentasContablesDataCruda: EntidadCuentaContableI[] = [];
+  // Configuración procesada
+  processedConfig = computed(() => {
+    const config = this.configuration();
+    return {
+      btn: {
+        individual: config?.btn?.individual ?? true,
+        categoria: config?.btn?.categoria ?? true,
+        subCategoria: config?.btn?.subCategoria ?? true,
+      },
+    };
+  });
 
-  @Input() cuentasContablesData: FormEntidadCuentaContableI[] = [];
-  @Output() cuentasContablesDataChange = new EventEmitter<Array<FormEntidadCuentaContableI>>();
-  is_initialized: boolean = false;
-  fun = fun;
+  // Computed para las cuentas inicializadas
+  initializedCuentas = computed(() => {
+    const configs = this.inputs().configsEntCuentas;
+    const datosCrudos = this.cuentasContablesDataCruda();
+    const datosActuales = this.cuentasContablesData();
 
-  ngOnInit(): void {
-    this.checkConfig();
-
-    console.log('%c cuentasContablesDataCruda ', 'color: red', JSON.parse(JSON.stringify(this.cuentasContablesDataCruda)));
-    console.log('%c cuentasContablesData ', 'color: lime', JSON.parse(JSON.stringify(this.cuentasContablesData)));
-    console.log('%c inputs ', 'color: yellow', JSON.parse(JSON.stringify(this.inputs)));
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (fun.objHas(changes, 'cuentasContablesData')) {
-      this.is_initialized = false;
-      this.initEntidadCuentasContables();
+    // Si hay datos crudos, usar los datos actuales (ya parseados)
+    if (fun.hasValue(datosCrudos)) {
+      return datosActuales.filter(cuenta => configs.some(c => c.id === cuenta.configuracion_entidad_cuenta_id));
     }
 
-    if (fun.objHas(changes, 'inputs')) this.initEntidadCuentasContables();
-    if (fun.objHas(changes, 'configuration')) this.checkConfig();
-  }
+    // Si no hay datos crudos, crear blanks para las configuraciones que faltan
+    const cuentasResultado: FormEntidadCuentaContableI[] = [];
 
-  checkConfig() {
-    if (!fun.objHas(this.configuration, 'btn')) this.configuration.btn = {};
+    for (const config of configs) {
+      let cuenta = datosActuales.find(c => c.configuracion_entidad_cuenta_id === config.id);
 
-    if (!fun.objHas(this.configuration.btn, 'individual')) this.configuration.btn.individual = true;
-    if (!fun.objHas(this.configuration.btn, 'categoria')) this.configuration.btn.categoria = true;
-    if (!fun.objHas(this.configuration.btn, 'subCategoria')) this.configuration.btn.subCategoria = true;
-  }
-
-  initEntidadCuentasContables() {
-    for (const config of this.inputs.configsEntCuentas) {
-      let entidad_cuenta: FormEntidadCuentaContableI = this.cuentasContablesData?.find(cuenta => cuenta.configuracion_entidad_cuenta_id == config.id);
-
-      if (fun.isEmpty(entidad_cuenta)) {
-        entidad_cuenta = fun.deepCloning(entidadCuentaContableBlank);
-        entidad_cuenta.configuracion_entidad_cuenta_id = config.id;
-        if (!config.has_comun) entidad_cuenta.is_comun = true;
-
-        this.cuentasContablesData.push(entidad_cuenta);
+      if (!cuenta) {
+        cuenta = fun.deepCloning(entidadCuentaContableBlank);
+        cuenta.configuracion_entidad_cuenta_id = config.id;
+        if (!config.has_comun) cuenta.is_comun = true;
       }
+
+      cuentasResultado.push(cuenta);
     }
 
-    const ids_current_configs = this.inputs.configsEntCuentas.map(config => config.id);
-    this.cuentasContablesData = this.cuentasContablesData.filter(cuenta => ids_current_configs.includes(cuenta.configuracion_entidad_cuenta_id));
+    return cuentasResultado;
+  });
 
-    this.is_initialized = true;
-    this.emitChanges();
+  // Flag para saber si está inicializado
+  isInitialized = signal(false);
+
+  constructor() {
+    // Effect para sincronizar las cuentas inicializadas con el model
+    effect(() => {
+      const cuentas = this.initializedCuentas();
+      const datosActuales = this.cuentasContablesData();
+
+      // Solo actualizar si hay diferencias
+      if (!fun.isEqual(cuentas, datosActuales)) {
+        this.cuentasContablesData.set(cuentas);
+        this.isInitialized.set(true);
+      } else if (!this.isInitialized()) {
+        this.isInitialized.set(true);
+      }
+    });
   }
 
-  getData(config_id: number, tipo: 'cruda' | 'form') {
-    let entidad_cuenta: any;
-    if (tipo == 'cruda') entidad_cuenta = this.cuentasContablesDataCruda?.find(cuenta => cuenta.configuracion_entidad_cuenta_id == config_id) as EntidadCuentaContableI;
-    if (tipo == 'form') entidad_cuenta = this.cuentasContablesData?.find(cuenta => cuenta.configuracion_entidad_cuenta_id == config_id) as FormEntidadCuentaContableI;
-
-    return entidad_cuenta;
+  // Obtener datos de una cuenta específica
+  getCuentaCruda(configId: number): EntidadCuentaContableI | undefined {
+    return this.cuentasContablesDataCruda()?.find(cuenta => cuenta.configuracion_entidad_cuenta_id === configId);
   }
 
-  parseData(entidad_cuenta_contable: FormEntidadCuentaContableI) {
-    const current_cuenta = this.cuentasContablesData.find(cuenta => cuenta.configuracion_entidad_cuenta_id == entidad_cuenta_contable.configuracion_entidad_cuenta_id);
-
-    if (fun.hasValue(current_cuenta)) Object.assign(current_cuenta, entidad_cuenta_contable);
-    this.emitChanges();
+  getCuentaForm(configId: number): FormEntidadCuentaContableI | undefined {
+    return this.cuentasContablesData()?.find(cuenta => cuenta.configuracion_entidad_cuenta_id === configId);
   }
 
-  emitChanges() {
-    this.cuentasContablesDataChange.emit(this.cuentasContablesData);
+  // Actualizar una cuenta específica
+  updateCuenta(cuentaActualizada: FormEntidadCuentaContableI) {
+    const cuentas = this.cuentasContablesData();
+    const index = cuentas.findIndex(c => c.configuracion_entidad_cuenta_id === cuentaActualizada.configuracion_entidad_cuenta_id);
+
+    if (index !== -1) {
+      const nuevasCuentas = [...cuentas];
+      nuevasCuentas[index] = { ...cuentaActualizada };
+      this.cuentasContablesData.set(nuevasCuentas);
+    }
   }
 }

@@ -2,35 +2,21 @@
   <p-accordion-panel [value]="0">
     <p-accordion-header>Cuentas Contables</p-accordion-header>
     <p-accordion-content>
-      @if (is_initialized) {
+      @if (isInitialized()) {
         <div class="d-flex flex-column row-gap-2">
-          @for (config of inputs.configsEntCuentas; track config.id) {
+          @for (config of inputs().configsEntCuentas; track config.id) {
             <cuenta-contable-form
-              [inputs]="{ selectedConfig: fun.deepCloning(config), entidad: inputs.entidad }"
-              [configuration]="configuration"
-              [cuentaContableDataCruda]="getData(config.id, 'cruda')"
-              [cuentaContableData]="getData(config.id, 'form')"
-              [infoTipoArticulo]="infoTipoArticulo"
-              [camposDisabled]="camposDisabled"
-              (cuentaContableDataChange)="parseData($event)"></cuenta-contable-form>
+              [inputs]="{ selectedConfig: config, entidad: inputs().entidad }"
+              [configuration]="processedConfig()"
+              [cuentaContableDataCruda]="getCuentaCruda(config.id)"
+              [cuentaContableData]="getCuentaForm(config.id)"
+              [infoTipoArticulo]="infoTipoArticulo()"
+              [camposDisabled]="camposDisabled()"
+              (cuentaContableDataChange)="updateCuenta($event)">
+            </cuenta-contable-form>
           }
         </div>
       }
     </p-accordion-content>
   </p-accordion-panel>
-
-  <!-- <p-accordionTab header="Cuentas Contables">
-    <div *ngIf="is_initialized" class="row p-0 rowCuentasContables">
-      <div class="col-12 p-0" *ngFor="let config of this.inputs.configsEntCuentas; let index = index">
-        <cuenta-contable-form
-          [inputs]="{ selectedConfig: fun.deepCloning(config), entidad: inputs.entidad }"
-          [configuration]="configuration"
-          [cuentaContableDataCruda]="getData(config.id, 'cruda')"
-          [cuentaContableData]="getData(config.id, 'form')"
-          [infoTipoArticulo]="infoTipoArticulo"
-          [camposDisabled]="camposDisabled"
-          (cuentaContableDataChange)="parseData($event)"></cuenta-contable-form>
-      </div>
-    </div>
-  </p-accordionTab> -->
 </p-accordion>

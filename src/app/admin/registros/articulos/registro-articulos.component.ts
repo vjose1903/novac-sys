@@ -114,6 +114,31 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   entidadContable: entidadesContables = CategoriaEntidadContableC.entidad.articulo;
   fun = fun;
   maxSizeTypeE = maxSizeTypeE;
+  tipoCategoria = tipoCategoria;
+
+  get isTipoArticuloDisabled(): boolean {
+    return this.listaEntidadCuentasContables.some(cuenta => cuenta.tipo_categoria === tipoCategoria.tipoArticulo && fun.hasValue(cuenta.id));
+  }
+
+  get tooltipTipoArticulo(): string {
+    return this.isTipoArticuloDisabled ? 'No se puede cambiar el tipo de artículo porque ya existe una cuenta contable registrada con este tipo.' : '';
+  }
+
+  checkTipoArticuloDisabled() {
+    if (this.isTipoArticuloDisabled) this.form.controls.tipo_articulo_id.disable();
+    else this.form.controls.tipo_articulo_id.enable();
+  }
+
+  get isSubTipoArticuloDisabledByCuenta(): boolean {
+    return this.listaEntidadCuentasContables.some(cuenta => cuenta.tipo_categoria === tipoCategoria.subTipoArticulo && fun.hasValue(cuenta.id));
+  }
+
+  get tooltipSubTipoArticulo(): string {
+    if (fun.isEmpty(this.tipoArticuloSelected)) return 'Debe seleccionar un tipo de articulo primero.';
+    if (this.listaSubTipoArticulos.length === 0) return 'No existen sub tipo articulos para el tipo de articulo seleccionado.';
+    if (this.isSubTipoArticuloDisabledByCuenta) return 'No se puede cambiar el sub tipo de artículo porque ya existe una cuenta contable registrada con este sub tipo.';
+    return '';
+  }
 
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
@@ -294,10 +319,11 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     }
   }
 
-  async selectTipoArticulo(tipo_id) {
+  async selectTipoArticulo(arg: { tipo_id: number; resetSubTipo: boolean }) {
+    const { tipo_id, resetSubTipo } = arg;
     this.tipoArticuloSelected = this.listaTipoArticulos.find(val => val.id == Number(tipo_id));
     this.subTipoArticuloSelected = undefined;
-    this.form.controls.sub_tipo_articulo_id.setValue(null);
+    if (resetSubTipo) this.form.controls.sub_tipo_articulo_id.setValue(null);
     this.checkCuentasContables();
     this.modifyValidators();
 
@@ -329,6 +355,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   checkCuentasContables() {
+    // Solo filtrar cuentas por categoría si NO estamos editando un artículo existente
+    if (fun.hasValue(this.articuloSelected)) return;
+
     this.listaEntidadCuentasContables = this.listaEntidadCuentasContables.filter(cuenta => ![tipoCategoria.tipoArticulo, tipoCategoria.subTipoArticulo].includes(cuenta.tipo_categoria));
   }
 
@@ -354,7 +383,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         }
       }
 
-      this.listaSubTipoArticulos.length > 0 ? this.form.controls.sub_tipo_articulo_id.enable() : this.form.controls.sub_tipo_articulo_id.disable();
+      this.listaSubTipoArticulos.length > 0 && !this.isSubTipoArticuloDisabledByCuenta ? this.form.controls.sub_tipo_articulo_id.enable() : this.form.controls.sub_tipo_articulo_id.disable();
     }
   }
 
@@ -464,8 +493,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
     if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
 
-    this.listaEntidadCuentasContables.length = 0;
-    this.listaSubTipoArticulos.length = 0;
+    this.listaEntidadCuentasContables = [];
+    this.listaSubTipoArticulos = [];
+    this.form.controls.tipo_articulo_id.enable();
     this.botonLabel = 'Registrar';
     [this.recalcular, this.is_combo] = Array(2).fill(false);
 
@@ -852,8 +882,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.MEDIDACAJA = '';
     this.is_combo = articulo.is_combo;
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(articulo.cuentas_contables);
+    this.checkTipoArticuloDisabled();
 
-    await this.selectTipoArticulo(articulo.tipo_articulo_id);
+    await this.selectTipoArticulo({ tipo_id: articulo.tipo_articulo_id, resetSubTipo: false });
     await this.selectSubTipoArticulo(articulo.sub_tipo_articulo_id);
 
     if (fun.hasValue(this.ARRAY_FORMULA)) this.resetArray();
@@ -1064,8 +1095,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       articuloData['otros_costos'] = formulario.otros_costos;
       articuloData['formulas_productos_terminados'] = this.formarFormula();
     }
-    console.log(" ");
-    console.log("articuloData ", articuloData);
 
     this.articuloClass.createUpdateOne(articuloData).then(res => {
       this.necesarioStart();

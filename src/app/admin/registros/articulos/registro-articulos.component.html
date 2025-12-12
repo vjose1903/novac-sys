@@ -72,14 +72,14 @@
                       </div>
 
                       <div class="{{ tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado' ? 'col-4' : 'col-6' }} p-0">
-                        <div class="form-group">
+                        <div class="form-group" [pTooltip]="tooltipTipoArticulo" tooltipPosition="left">
                           <label class="control-label">Tipo: <span style="color: red">*</span></label>
                           <select
                             #inputTipoArticulo
                             (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : listaSubTipoArticulos.length ? 'campoSubTipo' : 'vendido')"
                             id="tipo"
                             formControlName="tipo_articulo_id"
-                            (change)="selectTipoArticulo(htmlServ.getValue($event))"
+                            (change)="selectTipoArticulo({ tipo_id: htmlServ.getValue($event), resetSubTipo: true })"
                             class="form-control"
                             value="">
                             <option [value]="null" disabled>Tipo de articulo</option>
@@ -93,10 +93,7 @@
                       </div>
 
                       <div class="{{ tipoArticuloSelected && tipoArticuloSelected?.codigo == 'producto_terminado' ? 'col-4' : 'col-6' }} pe-0">
-                        <div
-                          class="form-group"
-                          [pTooltip]="fun.isEmpty(tipoArticuloSelected) ? 'Debe seleccionar un tipo de articulo primero.' : listaSubTipoArticulos.length == 0 ? 'No existen sub tipo articulos para el tipo de articulo seleccionado.' : ''"
-                          tooltipPosition="left">
+                        <div class="form-group" [pTooltip]="tooltipSubTipoArticulo" tooltipPosition="left">
                           <label class="control-label">Sub tipo:</label>
                           <select
                             #inputSubTipoArticulo
