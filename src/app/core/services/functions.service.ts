@@ -808,12 +808,9 @@ export class fun extends CustomLodash {
         // Resetear el estado del guard y limpiar cache
         const authGuard = fun.getAuthGuardInstance();
         const currentUserService = fun.getCurrentUserServiceInstance();
-        console.log('1');
 
         if (authGuard) authGuard.resetValidation();
         if (currentUserService) currentUserService.clearValidationCache();
-
-        console.log('2');
 
         Ss.layServ.nextLogOut({ bool: true });
         resolve(true);

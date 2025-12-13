@@ -1068,8 +1068,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     const articuloData = {
       id: fun.hasValue(formulario.id) ? Number(formulario.id) : null,
-      tipo_articulo_id: Number(formulario.tipo_articulo_id),
-      sub_tipo_articulo_id: Number(formulario.sub_tipo_articulo_id),
+      tipo_articulo_id: fun.hasValue(formulario.tipo_articulo_id) ? Number(formulario.tipo_articulo_id) : null,
+      sub_tipo_articulo_id: fun.hasValue(formulario.sub_tipo_articulo_id) ? Number(formulario.sub_tipo_articulo_id) : null,
       nombre: formulario.nombre,
       costo_principal: this.tipoArticuloSelected.tipo != 'servicio' ? fun.desformatearStNumber(formulario.costo_principal) : 0,
       precio_principal: fun.desformatearStNumber(formulario.precio_principal),

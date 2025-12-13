@@ -8,80 +8,87 @@
           </div>
         }
 
-        <input formControlName="has_cuenta" class="apple-switch ml-2" type="checkbox" (change)="changeHasCuenta()" [ngClass]="{ disabled: camposDisabled() }" />
+        @if (!cuentaIsCreated()) {
+          <input formControlName="has_cuenta" class="apple-switch ml-2" type="checkbox" (change)="changeHasCuenta()" [ngClass]="{ disabled: camposDisabled() }" />
+        }
       </div>
 
       <div class="row p-0">
         <div class="col-12 p-0 mb-3">
-          <div class="d-flex align-items-center">
+          <div class="d-flex flex-column align-items-start justify-content-center">
             <h6 class="mb-0 c-default">
               <strong>{{ configEntContableClass.getConfigLabel(inputs().selectedConfig) }}</strong>
             </h6>
+            @if (cuentaIsCreated()) {
+              <i class="text-c-black-50 text-s-12">Cuenta Contable creada no se puede modificar</i>
+            }
           </div>
         </div>
 
         @if (form().get('has_cuenta')?.value) {
           <div class="col-12 p-0">
             <div class="row">
-              <div class="col-12 p-0 mb-3">
-                <p-buttongroup>
-                  @if (individualConfig()?.btn?.individual) {
-                    <button
-                      pButton
-                      pRipple
-                      styleClass="p-button-sm"
-                      class="btn-theme p-1 px-2"
-                      (click)="changeAgrupacion(agrupacionesContables.individual)"
-                      [ngClass]="{ selected: form().get('tipo_agrupacion_contable')?.value === agrupacionesContables.individual }"
-                      [disabled]="camposDisabled()">
-                      Individual
-                    </button>
-                  }
+              @if (!cuentaIsCreated()) {
+                <div class="col-12 p-0 mb-3">
+                  <p-buttongroup>
+                    @if (individualConfig()?.btn?.individual) {
+                      <button
+                        pButton
+                        pRipple
+                        styleClass="p-button-sm"
+                        class="btn-theme p-1 px-2"
+                        (click)="changeAgrupacion(agrupacionesContables.individual)"
+                        [ngClass]="{ selected: form().get('tipo_agrupacion_contable')?.value === agrupacionesContables.individual }"
+                        [disabled]="camposDisabled()">
+                        Individual
+                      </button>
+                    }
 
-                  @if (individualConfig()?.btn?.categoria && hasCategories()) {
-                    <button
-                      pButton
-                      pRipple
-                      styleClass="p-button-sm"
-                      class="btn-theme p-1 px-2"
-                      (click)="changeAgrupacion(agrupacionesContables.categoria)"
-                      [ngClass]="{ selected: form().get('tipo_agrupacion_contable')?.value === agrupacionesContables.categoria }"
-                      [disabled]="camposDisabled()">
-                      Categoria
-                    </button>
-                  }
+                    @if (individualConfig()?.btn?.categoria && hasCategories()) {
+                      <button
+                        pButton
+                        pRipple
+                        styleClass="p-button-sm"
+                        class="btn-theme p-1 px-2"
+                        (click)="changeAgrupacion(agrupacionesContables.categoria)"
+                        [ngClass]="{ selected: form().get('tipo_agrupacion_contable')?.value === agrupacionesContables.categoria }"
+                        [disabled]="camposDisabled()">
+                        Categoria
+                      </button>
+                    }
 
-                  @if (individualConfig()?.btn?.subCategoria && hasCategories()) {
-                    <button
-                      pButton
-                      pRipple
-                      styleClass="p-button-sm"
-                      class="btn-theme p-1 px-2"
-                      (click)="changeAgrupacion(agrupacionesContables.sub_categoria)"
-                      [ngClass]="{ selected: form().get('tipo_agrupacion_contable')?.value === agrupacionesContables.sub_categoria }"
-                      [disabled]="camposDisabled()">
-                      Sub Categoria
-                    </button>
-                  }
-                </p-buttongroup>
-              </div>
+                    @if (individualConfig()?.btn?.subCategoria && hasCategories()) {
+                      <button
+                        pButton
+                        pRipple
+                        styleClass="p-button-sm"
+                        class="btn-theme p-1 px-2"
+                        (click)="changeAgrupacion(agrupacionesContables.sub_categoria)"
+                        [ngClass]="{ selected: form().get('tipo_agrupacion_contable')?.value === agrupacionesContables.sub_categoria }"
+                        [disabled]="camposDisabled()">
+                        Sub Categoria
+                      </button>
+                    }
+                  </p-buttongroup>
+                </div>
+              }
 
               @if (form().get('tipo_agrupacion_contable')?.value != null) {
                 <div class="col-12 p-0">
                   <div class="row">
                     <div class="col-12 p-0">
                       <label class="mb-0 mt-1" for="search">Cuenta Control</label>
-                      <input id="cuentaControlInput" class="search-input form-control min" [value]="cuentaControlLabel()" disabled />
+                      <input id="cuentaControlInput" class="search-input form-control min text-s-13" [value]="cuentaControlLabel()" disabled />
                     </div>
 
-                    @if (form().get('is_comun')?.value || fun.hasValue(form().get('id')?.value) && !showRevertBtn()) {
+                    @if (form().get('is_comun')?.value || (cuentaIsCreated() && !showRevertBtn())) {
                       <div class="col-12 p-0">
                         <label class="mb-0 mt-1" for="search"><strong>Cuenta Contable</strong></label>
-                        <input id="cuentaContableInput" class="search-input form-control min font-bold" [value]="cuentaContableLabel()" disabled />
+                        <input id="cuentaContableInput" class="search-input form-control min font-bold text-s-13" [value]="cuentaContableLabel()" disabled />
                       </div>
                     }
 
-                    @if (form().get('tipo_agrupacion_contable')?.value !== agrupacionesContables.individual) {
+                    @if (form().get('tipo_agrupacion_contable')?.value !== agrupacionesContables.individual && !cuentaIsCreated()) {
                       <div class="row mt-3 w-100 rowCategoria">
                         <div class="col-8 p-0">
                           @if (!isArticulo()) {
@@ -119,6 +126,7 @@
                             </div>
                           }
                         </div>
+
                         <div class="{{ !isArticulo() ? 'col-4' : 'col-12' }} p-0">
                           <div class="form-group mb-0 switchDiv h-100 align-items-end justify-content-end">
                             <div class="d-flex align-items-center ml-4 gap-2">
