@@ -262,17 +262,20 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
       cuenta = selectedConfig.cuenta_contable.label;
     } else if (formulario.tipo_agrupacion_contable) {
       const categoriaSelected = categorias.find(c => c.id === formulario.tipo_categoria_id);
+
       cuenta = formulario.is_comun ? (tipo === 'control' ? categoriaSelected?.cuenta_contable_control?.label : categoriaSelected?.cuenta_contable_auxiliar?.label) : categoriaSelected?.cuenta_contable_control?.label;
 
       if (this.isArticulo()) {
         const cuentaPerConfig = this.getCuentaPerConfig();
+
         const tipoCuenta = tipo === 'control' ? 'control' : formulario.is_comun ? 'auxiliar' : 'control';
+
         cuenta = cuentaPerConfig?.[`label_${tipoCuenta}`] || selectedConfig.cuenta_contable.label;
       }
     }
 
     // Mostrar cuenta del backend si no hay cambios
-    if (fun.hasValue(crudaData) && tipo === 'contable' && !this.showRevertBtn()) {
+    if (fun.hasValue(crudaData) && this.cuentaIsCreated() && tipo === 'contable' && !this.showRevertBtn()) {
       cuenta = crudaData?.cuenta_contable?.label;
     }
 
