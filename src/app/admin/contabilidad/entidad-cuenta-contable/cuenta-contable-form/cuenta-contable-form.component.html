@@ -98,7 +98,8 @@
                               @if (form().get('tipo_agrupacion_contable')?.value === agrupacionesContables.individual) {
                                 <input id="cuentaControlInput" class="search-input form-control min" [value]="inputs().selectedConfig.cuenta_contable.label" disabled />
                               }
-
+                              {{ categoriaSeleccionada()?.descripcion }}
+                              <pre>{{form().getRawValue() | json}}</pre>
                               <p-select
                                 #dropdownCuentaControl
                                 inputId="cuentaControlSelect"
@@ -127,14 +128,12 @@
                           }
                         </div>
 
-                        <div class="{{ !isArticulo() ? 'col-4' : 'col-12' }} p-0">
-                          <div class="form-group mb-0 switchDiv h-100 align-items-end justify-content-end">
-                            <div class="d-flex align-items-center ml-4 gap-2">
-                              <div [pTooltip]="getIsComunSwitchTooltip()" tooltipPosition="left" class="h-100 d-flex align-items-center">
-                                <input formControlName="is_comun" class="apple-switch" type="checkbox" />
-                              </div>
-                              <span class="ml-2 mb-0">Cuenta Común</span>
+                        <div class="{{ !isArticulo() ? 'col-4' : 'col-12' }} p-0 d-flex align-items-end justify-content-end">
+                          <div class="mb-0 switchDiv">
+                            <div [pTooltip]="getIsComunSwitchTooltip()" tooltipPosition="left" class="h-100 d-flex align-items-center">
+                              <input formControlName="is_comun" class="apple-switch" type="checkbox" />
                             </div>
+                            <span class="ml-2 mb-0" [ngClass]="{ 'text-s-12': !isArticulo() }">Cuenta Común</span>
                           </div>
                         </div>
                       </div>

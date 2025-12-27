@@ -60,6 +60,7 @@ export class CategoriaEntidadContableService {
 
   static getCategoriasByEntidad(params: { entidad: entidadesContables; config_id: number; tipo_articulo_id?: number; search?: string; per_page?: number; page?: number; paginado?: boolean; showMsgs?: boolean }) {
     return new Promise<any>((resolve, reject) => {
+      params.showMsgs = false;
       if (params.entidad == CategoriaEntidadContableC.entidad.articulo) {
         this.getSubTipoArticulo(params)
           .then(result => resolve(result))

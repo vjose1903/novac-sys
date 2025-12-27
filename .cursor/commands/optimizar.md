@@ -1,0 +1,5 @@
+- el codigo seleccionado lo tienes que optimizar
+- debes de mantener los returns si existen y sus caracteristicas
+- somo el mejorar el rendimiento y su flujo
+- tratar de realizar early returns siempre que se pueda
+- no cambiar ninguna logica de negocio solo mejorar

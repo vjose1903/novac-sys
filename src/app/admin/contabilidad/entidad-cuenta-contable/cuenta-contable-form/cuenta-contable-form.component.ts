@@ -42,6 +42,7 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
   listadoCategorias = signal<CategoriaEntidadContableI[]>([]);
   hasCategories = signal(true);
   dataOriginal = signal<FormEntidadCuentaContableI | null>(null);
+  selectedCategoriaId = signal<number | null>(null);
   private lastLoadedId = signal<number | null>(null);
   private onDestroy$ = new Subject<void>();
 
@@ -85,6 +86,10 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
 
   cuentaControlLabel = computed(() => this.computeCuentaLabel('control'));
   cuentaContableLabel = computed(() => this.computeCuentaLabel('contable'));
+  categoriaSeleccionada = computed(() => {
+    const id = this.selectedCategoriaId();
+    return this.listadoCategorias().find(c => c.id === id);
+  });
 
   constructor(
     private fb: FormBuilder,
@@ -103,6 +108,7 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
         this.syncFormState();
         this.dataOriginal.set(fun.deepCloning(currentForm.getRawValue()));
         this.lastLoadedId.set(data.id);
+        this.selectedCategoriaId.set(data.tipo_categoria_id ?? null);
       }
     });
   }
@@ -138,6 +144,7 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
     this.syncFormState();
     this.dataOriginal.set(fun.deepCloning(this.form().getRawValue()));
     this.lastLoadedId.set(data?.id ?? null);
+    this.selectedCategoriaId.set(data?.tipo_categoria_id ?? null);
 
     this.form()
       .valueChanges.pipe(takeUntil(this.onDestroy$))
@@ -192,6 +199,7 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
         entidad: this.inputs().entidad,
         showMsgs: false,
       });
+      console.log('Categorias cargadas:', res['data']);
       this.listadoCategorias.set(res['data']);
       this.hasCategories.set(true);
     } catch {
@@ -242,10 +250,24 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
     const f = this.form();
     if (!f) return;
 
-    this.syncFormState();
-    if (!this.isArticulo() && fun.isEmpty(f.get('tipo_categoria_id')?.value)) {
-      f.get('is_comun')?.setValue(false);
+    const tipoCategoriaId = f.get('tipo_categoria_id')?.value;
+    this.selectedCategoriaId.set(tipoCategoriaId);
+
+    if (!this.isArticulo()) {
+      const tipoCategoria = fun.hasValue(tipoCategoriaId) ? 'categorias_entidades_contables' : null;
+      f.get('tipo_categoria')?.setValue(tipoCategoria, { emitEvent: false });
+
+      if (fun.isEmpty(tipoCategoriaId)) {
+        f.get('is_comun')?.setValue(false, { emitEvent: false });
+      }
     }
+
+    console.log(
+      typeof this.form().get('tipo_categoria_id')?.value,
+      typeof this.listadoCategorias()[0]?.id
+    );
+    
+    this.syncFormState();
   }
 
   private computeCuentaLabel(tipo: 'control' | 'contable'): string {

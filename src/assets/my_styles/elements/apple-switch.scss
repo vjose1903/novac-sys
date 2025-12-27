@@ -14,7 +14,7 @@ input.apple-switch {
   border-radius: 50px;
   box-shadow: inset -13px 0 0 0 #e6e5e5;
   transition-duration: 500ms;
-  
+
   &:disabled,
   &.disabled {
     filter: brightness(0.9) !important;
@@ -63,4 +63,10 @@ input.apple-switch {
       }
     }
   }
+}
+
+.switchDiv {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }

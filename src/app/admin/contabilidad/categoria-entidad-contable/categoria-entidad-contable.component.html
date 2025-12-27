@@ -1,63 +1,70 @@
 <div class="catEntContContainer">
-  <p-tabs [(value)]="tabIndex" [scrollable]="true" styleClass="my_tabView p-0" (onChange)="changeTabIndex($event)">
-    <!-- <p-tablist>
-      <p-tab [value]="0">Marcas</p-tab>
-      <p-tab [value]="1">Modelos</p-tab>
-    </p-tablist> -->
-    <!-- <p-tabView [scrollable]="true" [(activeIndex)]="tabIndex" styleClass="my_tabView p-0" (onChange)="changeTabIndex($event)"> -->
-    <!-- <p-tabPanel
-      id="p-tabView-{{ config.key }}-{{ config.id }}"
-      #tabPanel
-      [closable]="false"
-      *ngFor="let config of inputs.configsEntCuentas"
-      headerStyleClass="p-tabView-{{ config.key }}-{{ config.id }}"
-      header="{{ configEntContableClass.getConfigLabel(config) }}">
+  <p-tabs [value]="tabIndex()" [scrollable]="true" styleClass="my_tabView p-0" (valueChange)="changeTabIndex($event)">
+    <p-tablist>
+      @for (config of configsEntCuentas(); track config.id; let i = $index) {
+        <p-tab [value]="i">
+          {{ configEntContableClass.getConfigLabel(config) }}
+        </p-tab>
+      }
+    </p-tablist>
 
-      <div class="row h-100 w-100">
-        <div *ngIf="hasPermissionsCreateUpdate" class="col-6 ps-0 pt-3">
-          <form [formGroup]="form" class="h-100" (keydown.enter)="$event.stopPropagation()">
-            <div class="card card-padding sombra-light">
-              <div *ngIf="fun.isEmpty(categoriaSelected) && inputs.configsEntCuentas.length > 1" class="col-12 p-0 mb-2">
-                <div class="form-group switchDiv d-flex align-items-center">
-                  <input formControlName="same_in_all_config" class="apple-switch" type="checkbox" />
-                  <span class="ml-2 mb-0">Registrar en todos los apartados</span>
-                </div>
-              </div>
+    <p-tabpanels>
+      @for (config of configsEntCuentas(); track config.id; let i = $index) {
+        <p-tabpanel [value]="i">
+          <div class="row h-100 w-100">
+            @if (hasPermissionsCreateUpdate()) {
+              <div class="col-6 ps-0 pt-3">
+                <form [formGroup]="form" class="h-100" (keydown.enter)="$event.stopPropagation()">
+                  <div class="card card-padding sombra-light">
+                    @if (fun.isEmpty(categoriaSelected()) && configsEntCuentas().length > 1) {
+                      <div class="col-12 p-0 mb-4">
+                        <div class="switchDiv">
+                          <input formControlName="same_in_all_config" class="apple-switch" type="checkbox" />
+                          <span class="ml-2 mb-0">Registrar en todos los apartados</span>
+                        </div>
+                      </div>
+                    }
 
-              <div>
-                <div class="form-group" appMsgError="descripcion" [form]="form">
-                  <label class="control-label">Descripcion: <span style="color: red">*</span></label>
-                  <input (focus)="htmlServ.selectValue($event)" type="text" id="campoDescripcion" formControlName="descripcion" class="form-control mb-2" autocomplete="off" />
-                  <span id="msgContainer"></span>
-                </div>
-              </div>
+                    <div>
+                      <div class="form-group">
+                        <label class="control-label">Descripcion: <span style="color: red">*</span></label>
+                        <input #campoDescripcion (focus)="htmlServ.selectValue($event)" type="text" id="campoDescripcion" formControlName="descripcion" class="form-control" autocomplete="off" />
+                        <form-error-msg [control]="form.get('descripcion')" ></form-error-msg>
+                        <!-- <form-error-msg [control]="form.get('descripcion')" [fieldElement]="campoDescripcion"></form-error-msg> -->
+                      </div>
+                    </div>
 
-              <div class="mt-3">
-                <div class="form-group d-flex">
-                  <button *ngIf="categoriaSelected" (click)="borrar()" class="btn mr-2 btn-blanco">Cancelar</button>
+                    <div class="mt-3">
+                      <div class="form-group d-flex">
+                        @if (categoriaSelected()) {
+                          <button (click)="borrar()" class="btn mr-2 btn-blanco">Cancelar</button>
+                        }
 
-                  <div [pTooltip]="fun.hasValue(categoriaSelected) ? (!checkIfSomethingIsDiferrent() ? 'Para editar debe de tener un valor distinto al original' : '') : ''" tooltipPosition="right">
-                    <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde">{{ categoriaSelected ? 'Editar' : 'Guardar' }}</button>
+                        <div [pTooltip]="fun.hasValue(categoriaSelected()) ? (!checkIfSomethingIsDiferrent() ? 'Para editar debe de tener un valor distinto al original' : '') : ''" tooltipPosition="right">
+                          <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn btn-verde">{{ categoriaSelected() ? 'Editar' : 'Guardar' }}</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </form>
+              </div>
+            }
+
+            <div class="{{ hasPermissionsCreateUpdate() ? 'col-6' : 'col-12' }} p-0">
+              <div #cardMarca class="h-100">
+                <dinamic-table
+                  [cardTabla]="cardMarca"
+                  [data]="listadoCategorias()"
+                  [seleccionado]="categoriaSelected()?.id"
+                  [(TablasComponent)]="tablaComponent"
+                  [config]="table_config"
+                  [post_id]="'-' + config.id"
+                  (table_events)="handle_table_events($event)"></dinamic-table>
               </div>
             </div>
-          </form>
-        </div>
-
-        <div class="{{ hasPermissionsCreateUpdate ? 'col-6' : 'col-12' }} p-0">
-          <div #cardMarca class="h-100">
-            <dinamic-table
-              [cardTabla]="cardMarca"
-              [(data)]="listadoCategorias"
-              [seleccionado]="categoriaSelected?.id"
-              [(TablasComponent)]="tablaComponent"
-              [config]="table_config"
-              [post_id]="'-' + config.id"
-              (table_events)="handle_table_events($event)"></dinamic-table>
           </div>
-        </div>
-      </div>
-    </p-tabPanel> -->
+        </p-tabpanel>
+      }
+    </p-tabpanels>
   </p-tabs>
 </div>
