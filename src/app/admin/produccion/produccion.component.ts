@@ -197,59 +197,53 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     return res;
   }
 
-  calcularCantidadAProduccir() {
+  async calcularCantidadAProduccir() {
     this.ingredientesParaProduccion = [];
-    if (this.cantidad_producir && this.medida_producir) {
-      this.ingredientes.forEach(async ingrediente => {
-        let cantidad_formula = ingrediente.cantidad;
-        let contenidos_ingrediente = ingrediente.contenido;
-        const contenido_a_producir = {};
-        let cantidad_calculada = cantidad_formula * this.cantidad_producir;
 
-        for (const key in contenidos_ingrediente) {
-          const contenido = contenidos_ingrediente[key];
+    if (!this.cantidad_producir || !this.medida_producir) return;
 
-          if (!key.includes('Saco_')) {
-            contenido_a_producir[key] = cantidad_calculada / contenido;
-          }
+    const listaProduccion = this.lista_produccion();
+    const tieneProduccionPrevia = listaProduccion.length > 0;
+
+    for (const ingrediente of this.ingredientes) {
+      const contenidoAProducir = {};
+      let cantidadCalculada = ingrediente.cantidad * this.cantidad_producir;
+
+      for (const [clave, valorContenido] of Object.entries(ingrediente.contenido)) {
+        if (!clave.includes('Saco_')) contenidoAProducir[clave] = cantidadCalculada / (valorContenido as number);
+      }
+
+      if (tieneProduccionPrevia) {
+        const todosLosIngredientes = listaProduccion.flatMap(producto => (producto.articulo_id !== ingrediente.articulo_id ? fun.getProperty(producto, 'ingredientes') : []));
+
+        const ingredientesIguales = todosLosIngredientes.filter(item => item.articulo_combo_id === ingrediente.articulo_combo_id);
+
+        if (ingredientesIguales.length) {
+          cantidadCalculada = ingredientesIguales.reduce((acumulado, item) => acumulado + item.cantidad_en_unidades, cantidadCalculada);
         }
+      }
 
-        if (this.lista_produccion().length > 0) {
-          const lista_produccion = this.lista_produccion();
+      const parametrosVerificacion = { afterPath: `check_excede/${ingrediente.articulo_combo_id}`, parameters: { cantidad: cantidadCalculada } };
+      const respuesta = await this.articuloClass.getAll(parametrosVerificacion);
+      const excedeExistencia = respuesta['data'];
 
-          const all_ingredientes = lista_produccion.map(producto => (producto.articulo_id != ingrediente.articulo_id ? fun.getProperty(producto, 'ingredientes') : [])).flat(Infinity);
-          const ingredientesIguales = all_ingredientes.filter(item => item.articulo_combo == ingrediente.articulo_combo);
+      if (excedeExistencia) {
+        this.cantidad_producir = null;
+        this.ingredientesParaProduccion = [];
+        fun.toastError(`No tiene suficiente ${ingrediente.nombre}, para realizar la cantidad introducida de ${this.producto_terminado_en_turno.nombre}`, 'ERROR');
+        fun.enfocarInput('cantidad_producir');
+        return;
+      }
 
-          if (ingredientesIguales.length) cantidad_calculada = ingredientesIguales.reduce((acumulado, item) => acumulado + item.cantidad_en_unidades, cantidad_calculada);
-        }
-
-        const extra = { afterPath: `check_excede/${ingrediente.articulo_combo}`, parameters: { cantidad: cantidad_calculada } };
-
-        await this.articuloClass.getAll(extra).then(res => {
-          const excede = res['data'];
-          if (excede) {
-            this.cantidad_producir = null;
-            this.ingredientesParaProduccion = [];
-
-            fun.toastError('No tiene suficiente ' + ingrediente.nombre + ', para realizar la cantidad introducida de ' + this.producto_terminado_en_turno.nombre, 'ERROR');
-            fun.enfocarInput('cantidad_producir');
-          } else {
-            this.ingredientesParaProduccion.push({
-              nombre: ingrediente.nombre,
-              existencia: contenido_a_producir,
-              articulo_id: ingrediente.articulo_id,
-              contenido: ingrediente.contenido,
-              articulo_combo: ingrediente.articulo_combo,
-              cantidad_en_unidades: contenido_a_producir[ingrediente.medida],
-              medida: ingrediente.medida,
-            });
-            this.ingredientesParaProduccion.sort((a, b) => {
-              if (a.articulo_combo < b.articulo_combo) return -1;
-              if (a.articulo_combo > b.articulo_combo) return 1;
-              return 0;
-            });
-          }
-        });
+      this.ingredientesParaProduccion.push({
+        nombre: ingrediente.nombre,
+        existencia: contenidoAProducir,
+        articulo_id: ingrediente.articulo_id,
+        contenido: ingrediente.contenido,
+        articulo_combo: ingrediente.articulo_combo,
+        articulo_combo_id: ingrediente.articulo_combo_id,
+        cantidad_en_unidades: contenidoAProducir[ingrediente.medida],
+        medida: ingrediente.medida,
       });
     }
   }
@@ -281,8 +275,6 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       };
 
       this.lista_produccion.update(prev => [...prev, obj]);
-
-      console.log(this.lista_produccion());
 
       fun.setTimeout(() => {
         this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion().length }]);
@@ -367,6 +359,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
       const obj = {
         articulo_combo: ingrediente.articulo_combo,
+        articulo_combo_id: ingrediente.articulo_combo_id ?? ingrediente?.articulo_combo?.id,
         cantidad_en_unidades: ingrediente.cantidad_en_unidades,
       };
       ingredientes_format.push(obj);
