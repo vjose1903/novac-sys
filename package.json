@@ -63,7 +63,7 @@
     "node-machine-id": "1.1.12",
     "pdfmake": "0.2.18",
     "primeicons": "7.0.0",
-    "primeng": "20.0.0",
+    "primeng": "21.0.2",
     "qrcode": "1.5.4"
   },
   "devDependencies": {
