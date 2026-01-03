@@ -2,7 +2,7 @@ import { fun } from './../../../core/services/functions.service';
 import { ConfiguracionEntidadCuentaI } from './../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { Component, computed, effect, input, model, signal } from '@angular/core';
 import { entidadesContables } from '../categoria-entidad-contable/categoria-entidad-contable.utils';
-import { EntidadCuentaContableI, FormEntidadCuentaContableI, entidadCuentaContableBlank } from './cuenta-contable-form/cuenta-contable-form.utils';
+import { EntidadCuentaContableI, FormEntidadCuentaContableI, cuentaContableFormDefaults } from './cuenta-contable-form/cuenta-contable-form.utils';
 import { TipoArticuloI } from '../../registros/articulos/tipo-articulo/tipo-articulo';
 import { SubTipoArticuloI } from '../../registros/articulos/tipo-articulo/sub-tipo-articulo/sub-tipo-articulo';
 
@@ -65,7 +65,7 @@ export class EntidadCuentaContableComponent {
       let cuenta = datosActuales.find(c => c.configuracion_entidad_cuenta_id === config.id);
 
       if (!cuenta) {
-        cuenta = fun.deepCloning(entidadCuentaContableBlank);
+        cuenta = fun.deepCloning(cuentaContableFormDefaults);
         cuenta.configuracion_entidad_cuenta_id = config.id;
         if (!config.has_comun) cuenta.is_comun = true;
       }
