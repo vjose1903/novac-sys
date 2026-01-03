@@ -139,7 +139,7 @@ export interface paginateI {
 }
 
 export interface btnTableI {
-  btnId?: string;
+  btn_id?: string;
   show: boolean;
   name?: string;
   tooltip?: string;

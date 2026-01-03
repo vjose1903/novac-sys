@@ -1,11 +1,7 @@
-import { ConfigI } from '@core/interface/config-interface';
-import { FormEntidadCuentaContableI } from './../../contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
-import { EntidadCuentaContableService } from './../../contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
-import { CategoriaEntidadContableC, entidadesContables } from './../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
-import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from './../../contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import * as _ from 'lodash';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { customValidators } from '@core/typescript/custom-validators';
 import { pattern } from '@core/typescript/constantes';
@@ -19,11 +15,15 @@ import { Permisos } from '@core/typescript/permisos';
 import { CategoriaEntidadContableService } from '../../contabilidad/categoria-entidad-contable/categoria-entidad-contable.service';
 import { DocumentoDeIdentidadI } from '@core/typescript/documentos_de_identidad.utils';
 import { maxSizeTypeE } from '@core/directive/max-sizer.directive';
-import * as _ from 'lodash';
 import { Ss } from '@core/services/singleton.service';
-import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { ConfiguracionEntidadCuentaC, ConfiguracionEntidadCuentaI } from '@admin/contabilidad/configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
+import { FormEntidadCuentaContableI } from '@admin/contabilidad/entidad-cuenta-contable/cuenta-contable-form/cuenta-contable-form.utils';
+import { CategoriaEntidadContableC, entidadesContables } from '@admin/contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
+import { ConfigI } from '@core/interface/config-interface';
+import { EntidadCuentaContableService } from '@admin/contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
 
 @Component({
   selector: 'app-registro-empleados',

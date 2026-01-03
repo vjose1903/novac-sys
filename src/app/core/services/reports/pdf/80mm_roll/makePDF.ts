@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/indent */
-
 import * as fun_ from '../../utils/funciones';
 import { defaultStyle, styles_ } from '../../utils/files';
 import { Ss } from '../../../singleton.service';
-import { ConfigI } from '@core/interface/config-interface';
+import { ConfigI } from '../../../../interface/config-interface';
 import { getContentWithTablaNormal } from '../../utils/tabla_normal';
 import { infoPropietarioPartes, infoFacturaPartes, cierrePdf, infoResumenPartes } from './infoPdfs';
 import { config_ventas } from './configuraciones/ventas';
@@ -14,7 +13,6 @@ import { config_cuadre_caja } from './configuraciones/cuadre_caja';
 import { config_cotizacion } from './configuraciones/cotizacion';
 import { config_pre_venta } from './configuraciones/pre_venta';
 import { config_notas } from './configuraciones/notas';
-import { fun } from '@services/functions.service';
 import { serie } from '@core/typescript/constantes';
 
 const configuraciones = {

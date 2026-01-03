@@ -8,7 +8,6 @@ import { tableCellType, rowDataDividerKey, medidas, table_config, table_info, bt
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { teclasCode } from '@core/typescript/constantes';
 import * as _ from 'lodash';
-
 import { ResizeEvent } from '@core/directive/element-resized.directive';
 
 @Component({
@@ -147,8 +146,16 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }, 0);
   }
 
+  focusSearchInput() {
+    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
+      fun.setTimeout(() => {
+        fun.enfocarInput(`search-${this.realIdTabla}`);
+      }, 100);
+    }
+  }
+
   verifyButtons(config: table_config) {
-    const verifyId = (btn: btnTableI) => (btn.btnId ??= `${fun.generateKey()}-${btn.icon}`);
+    const verifyId = (btn: btnTableI) => (btn.btn_id ??= `${fun.generateKey()}-${btn.icon}`);
 
     if (config.botones) {
       for (const key in config.botones) {
@@ -180,7 +187,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const value = fun.getProperty(data, column.key);
 
     const evaluar_value = item => (fun.hasValue(column.capitalice) ? fun.capitalice(item) : item);
-
     switch (column.tipo) {
       case 'textList':
         return value.reduce((acumulado, item) => {
@@ -398,19 +404,17 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     const actualPage = this.tServ.getPaginatorPageByNumber(actualPagination?.page, `paginator-${this.realIdTabla}`);
 
-    fun.setTimeout(() => {
-      this.zone.run(() => {
-        if (actualPage) {
-          actualPage.setAttribute('clickeado_por', 'maquina');
-          actualPage.click();
-          fun.setTimeout(() => {
-            actualPage.removeAttribute('clickeado_por');
-          }, 2000);
-        }
+    requestAnimationFrame(() => {
+      if (actualPage) {
+        actualPage.setAttribute('clickeado_por', 'maquina');
+        actualPage.click();
+        fun.setTimeout(() => {
+          actualPage.removeAttribute('clickeado_por');
+        }, 2000);
+      }
 
-        this.cantPagesView = actual;
-      });
-    }, 100);
+      this.cantPagesView = actual;
+    });
   }
 
   getColor(myColor) {

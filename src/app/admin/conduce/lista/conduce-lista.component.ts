@@ -1,10 +1,10 @@
-import { default_per_page, tableCellType, table_config } from '@components/new_tablas/tabla-class';
 import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
+import { LoaderService } from '@core/services/loader.service';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
 import { Ss } from '@core/services/singleton.service';
-
+import { default_per_page, table_config, tableCellType } from '@components/new_tablas/tabla-class';
 import { ConfigI } from '@core/interface/config-interface';
 import { Permisos } from '@core/typescript/permisos';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
@@ -60,6 +60,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
   private dynamicModalServ = inject(DynamicModalService);
   private router = inject(Router);
   private tServ = inject(TablasService);
+  public loadServ = inject(LoaderService);
 
   constructor() {
     super();
@@ -160,7 +161,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
     PdfService.generatePdf({ oPdf: obj, imprimir: false })
       .then(async res => {
-        Ss.loadServ.isLoading.next(false);
+        this.loadServ.isLoading.next(false);
 
         const fileName = res.file;
         const base64 = res.base64;
@@ -194,7 +195,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
       })
       .catch(err => {
         fun.toastError(err.msg, 'ERROR');
-        Ss.loadServ.isLoading.next(false);
+        this.loadServ.isLoading.next(false);
       });
   }
 

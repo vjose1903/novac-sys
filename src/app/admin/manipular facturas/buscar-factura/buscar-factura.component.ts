@@ -619,8 +619,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
       if (params.columnKey == 'actions') {
         if (params.iconKey == 'view') {
           this.facturaClass.parseDataToPdf(documento).then(factura_parsed => {
-            console.log('factura_parsed ',factura_parsed);
-            
+            console.log('factura_parsed ', factura_parsed);
+
             this.facturaSelected = factura_parsed;
             const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
             this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota: this.buscarPara.includes('nota'), documento: 'factura' });

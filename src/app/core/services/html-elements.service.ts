@@ -73,10 +73,14 @@ export class HtmlElementsService {
   }
 
   showPSelectPanel(event, dropdown) {
-    if (event.type == 'focus' && !dropdown.overlayVisible) {
-      requestAnimationFrame(() => {
-        dropdown.show();
-      });
-    }
+    fun.setTimeout(() => {
+      if (event.type == 'focus' && !dropdown.overlayVisible) {
+        console.log('event ', event);
+        console.log('dropdown ', dropdown);
+        requestAnimationFrame(() => {
+          dropdown.show();
+        });
+      }
+    }, 10);
   }
 }

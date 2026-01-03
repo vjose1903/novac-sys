@@ -45,7 +45,6 @@ export class LayoutService {
           } else {
             const childItem = subMenuMap.get(fatherId)?.get(childId);
             if (childItem) childItem.permission = permissions;
-
             if (Array.isArray(permissions)) permissions.forEach(p => flattSet.add(p));
           }
         });

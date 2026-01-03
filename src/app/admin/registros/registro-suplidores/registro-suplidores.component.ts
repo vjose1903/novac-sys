@@ -374,7 +374,6 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
     this.changeStateCampos(true);
     this.patchDocumentos(data.documentos_de_identidad);
-
     fun.setTimeout(() => fun.enfocarInput('rnc'), 1);
   }
 

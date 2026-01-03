@@ -2,7 +2,6 @@
 @use './splash-styles.scss' as *;
 @use './assets/my_styles/main.scss' as *;
 
-
 .visually-hidden {
   display: none !important;
 }
@@ -284,16 +283,6 @@ body {
 .no-selectable {
   user-select: none;
 }
-
-.c-default {
-  &:hover {
-    cursor: default !important;
-  }
-}
-
-img {
-  user-select: none;
-}
 // ========================================================
 // TEXT_COLOR
 // ========================================================
@@ -374,44 +363,6 @@ img {
   height: 2rem;
   box-shadow: none !important;
   width: 100% !important;
-}
-
-/* ====================================================== */
-/* BADGE */
-/* ====================================================== */
-.badge {
-  cursor: default !important;
-  font-size: 1rem;
-  padding: 0.5rem;
-  box-shadow: 1px 1px 1px black;
-  letter-spacing: 1px;
-
-  &.text-shadow {
-    text-shadow: 1px 1px 1px #000000cf;
-  }
-  &.bg-red {
-    background-color: #eb3a3a;
-  }
-
-  &.bg-reen {
-    background-color: #1ade48;
-  }
-
-  &.bg-blue {
-    background-color: #1a44de;
-  }
-
-  &.bg-yellow {
-    background-color: #e9e61e;
-  }
-
-  &.bg-orange {
-    background-color: #ffa711;
-  }
-
-  &.disable {
-    filter: brightness(1.6) contrast(0.5);
-  }
 }
 
 .bg-secondary {
@@ -552,111 +503,74 @@ img {
 
   .colFormularioListado {
     grid-area: colFormularioListado;
-    > div {
-      justify-content: end;
-      gap: 0.5rem;
-      > .form {
-        transition: all 0.3s;
-        &.showForm {
-          width: 50%;
-        }
 
-        &.minForm {
-          &.showForm {
-            width: 40%;
-          }
-        }
-
-        &.hideForm {
-          width: 0%;
-          overflow: hidden;
-        }
-
-        display: grid;
-        grid-template-areas:
-          'titulo_card_area'
-          'card_content_area';
-        grid-template-rows: min-content auto;
-
-        > .tituloFormClass {
-          grid-area: titulo_card_area;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          min-height: 3.3rem;
-        }
-
-        > .cardFormClass {
-          grid-area: card_content_area;
-          padding: 0.8rem;
-          border-radius: 1rem !important;
-          background-color: white;
-          box-shadow: 0px 4px 14px -6px black;
-          height: fit-content;
-          position: relative;
-          > .formContainer {
-            display: grid;
-
-            grid-template-areas:
-              'formulario'
-              'botones';
-            grid-template-rows: 1fr auto;
-            box-sizing: border-box;
-            width: 100%;
-            height: 100%;
-            padding: 0.6rem;
-            overflow: hidden;
-            row-gap: 0.8rem;
-
-            .formulario {
-              grid-area: formulario;
-              overflow: auto;
-              padding: 0.4rem;
-            }
-
-            .botones {
-              grid-area: botones;
-            }
-          }
-        }
+    .form {
+      height: 100%;
+      transition: all 0.3s;
+      &.showForm {
+        width: 50%;
+        margin-right: 0.5rem;
       }
 
-      > .list {
-        transition: all 0.3s;
-        &.FormList {
-          width: 50%;
-        }
+      &.hideForm {
+        width: 0%;
+        overflow: hidden;
+      }
 
-        &.minForm {
-          &.FormList {
-            width: 60%;
-          }
-        }
+      display: grid;
+      grid-template-areas:
+        'titulo_card_area'
+        'card_content_area';
+      grid-template-rows: min-content auto;
 
-        &.onlyList {
+      .tituloFormClass {
+        grid-area: titulo_card_area;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 3.3rem;
+      }
+
+      .cardFormClass {
+        grid-area: card_content_area;
+        padding: 0.8rem;
+        border-radius: 1rem !important;
+        height: min-content;
+        background-color: white;
+        box-shadow: 0px 4px 14px -6px black;
+      }
+    }
+
+    .list {
+      height: 100%;
+      transition: all 0.3s;
+      &.FormList {
+        width: 50%;
+      }
+
+      &.onlyList {
+        width: 100%;
+      }
+
+      display: grid;
+      grid-template-areas:
+        'titulo_card_area'
+        'card_content_area';
+      grid-template-rows: min-content auto;
+
+      .tituloCardClass {
+        grid-area: titulo_card_area;
+      }
+
+      .cardContentClass {
+        grid-area: card_content_area;
+        border-radius: 1rem !important;
+        position: relative;
+        .divTabla {
+          position: absolute;
+          height: 100%;
           width: 100%;
-        }
-
-        display: grid;
-        grid-template-areas:
-          'titulo_card_area'
-          'card_content_area';
-        grid-template-rows: min-content auto;
-
-        > .tituloCardClass {
-          grid-area: titulo_card_area;
-        }
-
-        > .cardContentClass {
-          grid-area: card_content_area;
-          border-radius: 1rem !important;
-          position: relative;
-          > .divTabla {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-            @include my_cards;
-          }
+          @include my_cards;
         }
       }
     }

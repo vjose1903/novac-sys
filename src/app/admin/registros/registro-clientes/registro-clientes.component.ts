@@ -24,6 +24,7 @@ import { ProvinciaC } from '@core/typescript/classes/provincia.model';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons, ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { Ss } from '@core/services/singleton.service';
+
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
@@ -145,11 +146,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         img: [{ value: null, disabled: false }],
       });
 
-      // this.form.valueChanges.subscribe(val => {
-      //   console.log(' ');
-      //   console.log('val ', val);
-      //   console.log('this.form ', this.form);
-      // });
 
       resolve();
     });
@@ -363,7 +359,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
         }
+      } else if (campo == 'municipio_select') {
+        if (fun.hasValue(formulario.provincia_id)) fun.enfocarInput(campo);
       } else fun.enfocarInput(campo);
+    } else if (campo == 'campoDir') {
+      if (fun.hasValue(formulario.municipio_id)) fun.enfocarInput(campo);
     } else {
       if (!this.formIsInvalid()) {
         fun.setTimeout(() => this.submit(), 250);
@@ -448,7 +448,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     ];
 
     const documentos_registrados = this.documentos_de_identidad ?? [];
-
     documentos_identidad.map(element => {
       const doc_backend = documentos_registrados.find(doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
 

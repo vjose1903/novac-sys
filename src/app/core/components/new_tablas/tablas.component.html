@@ -1,7 +1,7 @@
 <div #dinamicTable class="dinamicTable position-relative" [sizeCatcher]="cardTabla" [ngStyle]="{ padding: config.padding }">
   <!-- FILTER -->
   @if (config?.filtrar?.show) {
-    <div id="searchDiv-{{ realIdTabla }}" class="searchDiv d-flex align-items-center gap-2" style="max-width: 17rem; z-index: 9">
+    <div id="searchDiv-{{ realIdTabla }}" class="searchDiv d-flex align-items-center gap-2" style="max-width: 17rem; z-index: 9" onElementReady (elementReady)="focusSearchInput()">
       <label class="search-label me-2" for="search">Busqueda </label>
       @if (config?.filtrar?.local) {
         <input id="search-{{ realIdTabla }}" class="search-input form-control min" [filterTarget]="config.filterTargets" [DataFilter]="copyData" (onFilter)="dataLocalFilter($event)" (keyup)="filter($event)" />

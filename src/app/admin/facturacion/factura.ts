@@ -92,6 +92,7 @@ export enum tipoDocFacturacion {
   nota_debito = 'nota_debito',
   conduce = 'conduce',
   pago_factura = 'pago_factura',
+  recibo_ingreso = 'recibo_ingreso',
 }
 
 export enum tipoDocFacturacionLabel {

@@ -169,7 +169,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   }
 
   getDocumentosAImprimir(data) {
-    const docs = data.documentos_a_imprimir.filter(doc => doc?.selected === true);
+    const docs = data.documentos_a_imprimir.filter(doc => doc?.selected == true);
     return docs;
   }
 

@@ -15,12 +15,12 @@ import { MixinClass } from '@core/typescript/MixinClass';
 import { ArticuloC } from '@registros/articulos/articulo';
 import { FacturaC, request_factura_campo, tipoDocFacturacion, FacturasI } from '../../facturacion/factura';
 import { ModalSeleccionarArticuloComponent } from '@components/formularios en modales/modal-seleccionar-articulo/modal-seleccionar-articulo.component';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
-import { PdfService } from '@core/services/reports/pdf/pdf.service';
 
 @Component({
   selector: 'app-conduce-form',

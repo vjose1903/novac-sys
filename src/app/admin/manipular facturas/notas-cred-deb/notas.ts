@@ -59,6 +59,8 @@ export class NotaC extends CrudG<any> {
 
       temp_data_parsed.ncf_modificado = temp_data_parsed.facturas_aplicadas[0]?.cabecera_factura?.numero_comprobante || '';
 
+      temp_data_parsed.ncf_modificado = temp_data_parsed.facturas_aplicadas[0]?.cabecera_factura?.numero_comprobante || '';
+
       const data_parsed = fun.remplaceKeyFromJson(temp_data_parsed, [{ old_key: 'tipo_factura', new_key: 'tipo_pdf' }]);
 
       data_parsed.fecha = new Date(data_parsed.fecha_equivalente);

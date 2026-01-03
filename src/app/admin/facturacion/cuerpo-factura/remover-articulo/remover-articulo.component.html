@@ -1,7 +1,8 @@
 @if (!is_prefactura_selected) {
   <p class="mb-0 d-block">Seguro que desea remover el articulo:</p>
   <strong class="mb-0">{{ nombre }}</strong>
-} @else {
+}
+@if (is_prefactura_selected) {
   <div>
     @if (data_detalle.is_defectuoso) {
       Seguro que desea retirar el articulo defectuoso: <strong>{{ nombre }}</strong>

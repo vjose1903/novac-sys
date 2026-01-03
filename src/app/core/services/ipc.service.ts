@@ -92,7 +92,6 @@ export class IpcService {
 
         try {
           const taskResult = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
-
           // Ejecutar resolución dentro de la zona de Angular
           this.ngZone.run(() => {
             if (taskResult.error == false || !('error' in taskResult) || fun.isEmpty(taskResult?.error)) {

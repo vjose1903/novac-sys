@@ -11,9 +11,8 @@ import { default_per_page, tableCellType, table_config } from '@components/new_t
 import { Permisos } from '@core/typescript/permisos';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
-
 import * as _ from 'lodash';
-const moment = require('@core/javascript/moment');
+const moment = require('../../../core/javascript/moment');
 
 @Component({
   selector: 'app-ncf',

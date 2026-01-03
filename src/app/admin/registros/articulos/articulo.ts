@@ -9,23 +9,6 @@ import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/c
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { DateUtils } from '@vjose1903/dateutils';
 
-export enum tipos_articulos {
-  veterinaria = 'veterinaria',
-  materia_prima = 'materia_prima',
-  producto_terminado = 'producto_terminado',
-  otro = 'otro',
-  materiales_de_oficina = 'materiales_de_oficina',
-  servicios_legales = 'servicios_legales',
-  servicios_contables = 'servicios_contables',
-  dulces = 'dulces',
-}
-
-export class TipoArticuloC extends CrudG<any> {
-  constructor() {
-    super('tipo_articulos');
-  }
-}
-
 export interface ArticuloI {
   data?: any;
   id?: number;
@@ -68,7 +51,6 @@ export class ArticuloC extends CrudG<ArticuloI> {
   getArticulosFiltrado(arg: { buscar: any; fecha: any; parameters?: any; tipo?: any; page?: number; per_page?: number; paginado?: boolean; is_compra?: boolean }) {
     return new Promise<any>((resolve, reject) => {
       const { buscar, fecha, parameters, tipo = 'todos', page = 1, per_page = 20, paginado = true, is_compra = false } = arg;
-
       let extra = { afterPath: `filtro/${buscar}`, parameters: {} };
 
       extra['parameters'] = {

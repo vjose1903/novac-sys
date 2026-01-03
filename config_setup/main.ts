@@ -29,7 +29,7 @@ import SharedElectronAngular, {
   ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE,
 } from './electron/shared-electron-angular';
 
-import AppUpdate from './electron/auto-update'
+import AppUpdate from './electron/auto-update';
 import DockerHandler from './electron/docker-handler';
 import { operativeSystemE } from './src/app/core/typescript/constantes';
 import ExportToExcel from './electron/export-to-excel';
@@ -126,11 +126,16 @@ function createWindow() {
 
       // Evento cuando se intenta cerrar la ventana con el boton de cerrar
       win.on('close', (event: any) => {
+        writeLogs(`Evento close disparado. isUpdaterClosing: ${sharedState.isUpdaterClosing}`, 'close-event');
         if (!sharedState.isUpdaterClosing) {
+          writeLogs('Preparando confirmación de cierre...', 'close-event');
           event.preventDefault();
           sendCloseConfirmation();
         } else {
-          closeApp();
+          // Cuando se está actualizando, permitir el cierre sin prevención
+          writeLogs('Cerrando aplicación para actualización...', 'close-event');
+          // No prevenir el evento para permitir que la ventana se cierre normalmente
+          // El proceso de actualización se encargará del resto
         }
       });
 
@@ -154,11 +159,19 @@ try {
   });
 
   // Quit when all windows are closed.
-  app.on('window-all-closed', () => closeApp());
+  app.on('window-all-closed', () => {
+    writeLogs(`Evento window-all-closed disparado. isUpdaterClosing: ${sharedState.isUpdaterClosing}`, 'window-all-closed');
+    if (!sharedState.isUpdaterClosing) {
+      writeLogs('Cerrando aplicación normalmente...', 'window-all-closed');
+      closeApp();
+    } else {
+      writeLogs('Todas las ventanas cerradas durante actualización, permitiendo cierre automático...', 'window-all-closed');
+    }
+  });
 } catch (e) {
   // Catch Error
   throw e;
-}
+} 
 
 // Función para mostrar y restaurar la ventana
 function showWindow() {
@@ -318,7 +331,7 @@ function continuarCargandoArchivos() {
 async function beforeCreateWindow(win) {
   // ----- Manejar las actualizaciones -----
   const serve_ = await getServer_();
-  auto_updater = new AppUpdate(win, serve_);
+  auto_updater = new AppUpdate(win, app, serve_);
   auto_updater.init();
   // ---------------------------------------
 
@@ -353,8 +366,36 @@ async function handleEvent(event: any, obj: string) {
         break;
       //
       case ELECTRON_EVENT_DOWNLOAD_UPDATE:
-        writeLogs('Descargando actualización');
-        auto_updater.downloadUpdate();
+        writeLogs('Verificando si hay actualización disponible antes de descargar');
+        auto_updater
+          .verifyUpdateAvailable({ notify: false })
+          .then(res => {
+            if (res) {
+              writeLogs('Descargando actualización');
+              auto_updater
+                .downloadUpdate()
+                .then(downloadResult => {
+                  task.response = { msg: 'Descarga iniciada exitosamente', available: true, downloadStarted: true };
+                  event.reply(ELECTRON_RESPONSE, task);
+                })
+                .catch(downloadError => {
+                  writeLogs('Error al iniciar descarga:', downloadError);
+                  task.error = true;
+                  task.response = { msg: 'Error al iniciar descarga', available: true, downloadStarted: false, error: downloadError };
+                  event.reply(ELECTRON_RESPONSE, task);
+                });
+            } else {
+              writeLogs('No hay actualización disponible para descargar');
+              task.response = { msg: 'No hay actualización disponible', available: false };
+              event.reply(ELECTRON_RESPONSE, task);
+            }
+          })
+          .catch(err => {
+            writeLogs('Error al verificar actualización:', err);
+            task.error = true;
+            task.response = { msg: 'Error al verificar actualización', error: err };
+            event.reply(ELECTRON_RESPONSE, task);
+          });
         break;
       //
       case ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE:
@@ -567,24 +608,25 @@ export function parsePath(path_temp) {
   return isMacOs() ? path_temp : path_temp.split('/').join('\\');
 }
 
-export function pathAdd(addToPath = '', resource = true): Promise<string> {
+export function pathAdd(addToPath = '', inAsar = false): Promise<string> {
   return new Promise<string>(async resolve => {
-    let path_temp;
-    const pjson = require('./package.json');
     const serve_ = await getServer_();
 
+    let path_temp;
     if (serve_) {
-      path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(pjson.name.toLowerCase())) + pjson.name;
+      // En desarrollo, usar process.cwd()
+      path_temp = process.cwd();
     } else {
-      if (resource) {
-        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name + '/resources';
+      if (inAsar) {
+        // En producción, usar app.getAppPath() que funciona correctamente con ASAR
+        path_temp = app.getAppPath();
       } else {
-        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.name.toLowerCase())) + app.name;
+        // Para directorios fuera del ASAR, usar la ruta del ejecutable y agregar /resources
+        path_temp = app.getPath('exe').substr(0, app.getPath('exe').toLowerCase().indexOf(app.getName().toLowerCase())) + app.getName() + '/resources';
       }
     }
 
     path_temp = path_temp + addToPath;
-
     resolve(parsePath(path_temp));
   });
 }

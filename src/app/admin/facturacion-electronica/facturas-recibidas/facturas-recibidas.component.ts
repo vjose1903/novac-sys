@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { TablasService } from '@core/components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-
 import { FacturasRecibidasC, FacturasRecibidasI } from './facturas-recibidas.model';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';

@@ -11,7 +11,6 @@ import * as _ from 'lodash';
 import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
-
 export interface SuplidorI {
   id: number;
   nombre: string;
@@ -26,7 +25,6 @@ export interface SuplidorI {
   codigo: string;
   [nombreProp: string]: any;
 }
-
 
 export class SuplidorC extends CrudG<SuplidorI> {
   constructor() {
@@ -61,9 +59,9 @@ export class SuplidorC extends CrudG<SuplidorI> {
 
   static async getSuplidores(name) {
     if (fun.hasValue(name)) {
-      fun.awaitTyping().then((res) => {
+      fun.awaitTyping().then(res => {
         const extra = { afterPath: `filtro/${name}`, parameters: { paginado: false } };
-        new SuplidorC().getAll(extra).then((res) => {
+        new SuplidorC().getAll(extra).then(res => {
           SuplidorC.inputsSelectSuplidor[0].items = Array.isArray(res['data']) ? res['data'] : [];
         });
       });
@@ -91,15 +89,14 @@ export class SuplidorC extends CrudG<SuplidorI> {
       if (reportIncludedInSwitches.includes(tipo)) {
         inputs['dinamyc_switches'] = SuplidorC.inputsIncludeSaldadas;
       }
-      
+
       function returnDataFromModal(arg: ICallbackModal) {
         if (arg.type != modalCloseType.returnData) return;
         SuplidorC.requestReporte(arg.data, params);
         resolve(arg.data);
       }
-      
-      ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 
+      ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 
       new DynamicModalClass(ReporteC.objReporte).show();
     });
@@ -139,7 +136,7 @@ export class SuplidorC extends CrudG<SuplidorI> {
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
     ReporteC.configCsv = csvConfigSuplidorProd;
-    ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then((response) => {
+    ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
       let objPdfView = {
         ...response,
         titulo: pdfParams.titulo,
@@ -156,7 +153,6 @@ export class SuplidorC extends CrudG<SuplidorI> {
     // params.inputs['filtrarSuplidor'] = null;
     // params.inputs['metodo'] = 'compra';
     // params.inputs['palabra_a_buscar'] = ' ';
-
     // let objModal: ConfigureModalI = {
     //   id: params.tipo,
     //   inputs: params.inputs,
@@ -175,4 +171,3 @@ export enum CxP {
   detallado = 2,
   agrupado = 3,
 }
-

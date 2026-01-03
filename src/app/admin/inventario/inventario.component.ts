@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild, OnDestroy, ElementRef, inject } from '@angular/core';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ArticuloC, TipoArticuloC } from '@registros/articulos/articulo';
+import { ArticuloC } from '@registros/articulos/articulo';
+import { TipoArticuloC } from '@registros/articulos/tipo-articulo/tipo-articulo';
 import { ReporteC } from '../reportes/reporte';
 import { MovimientosFormComponent } from '@components/formularios en modales/movimientos-form/movimientos-form.component';
 import { fun } from '@core/services/functions.service';
@@ -100,8 +101,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     this.palabra_buscar = palabra_a_buscar;
 
-    console.log('this.filtro ',this.filtro);
-    
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro }).then(res => {
       this.listaArticulos = fun.deepCloning(res.data);
 

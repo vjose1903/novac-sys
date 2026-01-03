@@ -1,25 +1,27 @@
 <div class="position-relative">
   @if (windowsWidth >= 768) {
     <div class="table-btn-container">
-      @for (btn of botones?.dinamico; track btn.btnId) { 
+      @for (btn of botones?.dinamico; track btn.btn_id) {
         @if (btn?.show) {
           <span pTooltip="{{ btn?.tooltip || dato[btn?.tooltipKey] }}" (click)="handleFunctionsBtnDinamic($event, btn, dato)" tooltipPosition="left" *ngxPermissionsOnly="btn?.permiso">
             <i class="table-btn-icon  {{ btn?.icon }}"></i>
           </span>
         }
-      } 
-      
+      }
+
       @if (botones?.mostrar?.show) {
         <span pTooltip="Mostrar" (click)="clickBtn($event, dato, 'mostrar')" tooltipPosition="left" *ngxPermissionsOnly="botones?.mostrar?.permiso">
-          <i  class="table-btn-icon far fa-eye"></i>
+          <i class="table-btn-icon far fa-eye"></i>
         </span>
-      } @if (botones?.editar?.show) {
+      }
+      @if (botones?.editar?.show) {
         <span pTooltip="Editar" (click)="clickBtn($event, dato, 'update')" tooltipPosition="left" *ngxPermissionsOnly="botones?.editar?.permiso">
-          <i  class="table-btn-icon fas fa-pencil-alt"></i>
+          <i class="table-btn-icon fas fa-pencil-alt"></i>
         </span>
-      } @if (botones?.borrar?.show) {
+      }
+      @if (botones?.borrar?.show) {
         <span pTooltip="Borrar" (click)="clickBtn($event, dato, 'delete')" tooltipPosition="left" *ngxPermissionsOnly="botones?.borrar?.permiso">
-          <i  class="table-btn-icon far fa-trash-alt"></i>
+          <i class="table-btn-icon far fa-trash-alt"></i>
         </span>
       }
     </div>

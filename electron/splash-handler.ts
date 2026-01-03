@@ -1,6 +1,6 @@
 import { BrowserWindow, shell } from 'electron';
 import * as path from 'path';
-import { writeLogs } from '../main';
+import { writeLogs, pathAdd } from '../main';
 
 // Enum para tipos de errores
 export enum ErrorType {
@@ -50,7 +50,7 @@ export default class SplashHandler {
    * o se rechaza si hay un error
    */
   createSplash(type: string = 'splash'): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (this.splash) {
         this.splash.close();
         this.splash = null;
@@ -71,30 +71,46 @@ export default class SplashHandler {
         show: false, // No mostrar hasta que esté listo
       });
 
-      const splashUrl = `file://${path.join(process.cwd(), this.serve ? 'src/splash' : 'dist/browser/splash', `${type}.html`)}`;
+      let splashUrl: string;
 
-      this.splash.loadURL(splashUrl);
-      this.splash.show();
-      this.splash.center();
-
-      // Manejar errores de carga
-      this.splash.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
-        writeLogs(`Error cargando splash: ${errorCode} - ${errorDescription}`, 'createSplash');
-        reject(new Error(`Error cargando splash: ${errorCode} - ${errorDescription}`));
-      });
-
-      this.splash.webContents.on('did-finish-load', () => {
-        if (type === 'splash') {
-          resolve(); // Resolver la promesa cuando el splash de carga esté listo
+      try {
+        if (this.serve) {
+          // En desarrollo, buscar en src/splash
+          splashUrl = `file://${path.join(process.cwd(), 'src/splash', `${type}.html`)}`;
         } else {
-          // Para splash de error, cerrar después de un tiempo
-          shell.beep();
-          setTimeout(() => {
-            this.splash?.close();
-            process.exit(1);
-          }, 6000);
+          // En producción, usar pathAdd para obtener la ruta correcta
+          const splashPath = await pathAdd('/dist/browser/splash', true);
+          splashUrl = `file://${path.join(splashPath, `${type}.html`)}`;
         }
-      });
+
+        writeLogs(`Cargando splash desde: ${splashUrl}`, 'createSplash');
+
+        this.splash.loadURL(splashUrl);
+        this.splash.show();
+        this.splash.center();
+
+        // Manejar errores de carga
+        this.splash.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+          writeLogs(`Error cargando splash: ${errorCode} - ${errorDescription}`, 'createSplash');
+          reject(new Error(`Error cargando splash: ${errorCode} - ${errorDescription}`));
+        });
+
+        this.splash.webContents.on('did-finish-load', () => {
+          if (type === 'splash') {
+            resolve(); // Resolver la promesa cuando el splash de carga esté listo
+          } else {
+            // Para splash de error, cerrar después de un tiempo
+            shell.beep();
+            setTimeout(() => {
+              this.splash?.close();
+              process.exit(1);
+            }, 6000);
+          }
+        });
+      } catch (error) {
+        writeLogs(`Error construyendo ruta del splash: ${error}`, 'createSplash');
+        reject(error);
+      }
     });
   }
 

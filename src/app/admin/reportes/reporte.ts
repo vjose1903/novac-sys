@@ -1,4 +1,4 @@
-import { viewerOptions } from '@components/pdf-viewer/pdf-viewer';
+import { ReporteBackendResponseI, ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { Ss } from '@core/services/singleton.service';
 import { fun } from '@core/services/functions.service';
@@ -6,7 +6,6 @@ import { CrudG } from '@core/typescript/crud-g';
 import { FormReportesComponent } from '@components/formularios en modales/form-reportes/form-reportes.component';
 import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import * as _ from 'lodash';
-import { ReporteBackendResponseI, ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
 import { ExportToExcelService } from '@core/services/reports/excel/export-to-excel.service';
 import { exportExcelConfigI } from '@core/interface/export-to-excel.interface';
 import { IModalConfiguration, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';

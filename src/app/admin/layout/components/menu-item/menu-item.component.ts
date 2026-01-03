@@ -4,7 +4,6 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { MenuClickEvent, MenuItemI, SubMenuItemI } from '../../utils/menu-items';
 import { fun } from '@core/services/functions.service';
 import { Subject } from 'rxjs';
-import { Ss } from '@core/services/singleton.service';
 import { PrimengModule } from "@modules/primeng.module";
 @Component({
   selector: 'app-menu-item',

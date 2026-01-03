@@ -1,9 +1,50 @@
 @use './forms.scss' as *;
 
-
-button:disabled { 
+button:disabled {
   cursor: not-allowed !important;
   pointer-events: auto !important;
+}
+
+// =====================================================================================================================================================================
+// ICONO             ===================================================================================================================================================
+// =====================================================================================================================================================================
+.btnIcon {
+  border-radius: 0.4rem;
+  color: #adb7be;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    position: absolute;
+  }
+
+  &.sm {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &:hover {
+    background: #cfcfcf2e;
+    cursor: pointer;
+  }
+
+  &.bg-red {
+    background: #fc2c2c;
+    color: #3a0303e0 !important;
+
+    &:hover {
+      filter: brightness(0.6);
+      cursor: pointer;
+    }
+  }
+
+  &.disable {
+    background: #7a7a7a2e;
+    color: #b1b1b1a4;
+  }
 }
 
 // ========================================================
@@ -263,18 +304,16 @@ input[type='text'] {
       background: var(--primary04) !important;
     }
 
-
-
     &.selected {
       background: var(--primary08) !important;
       border-color: var(--primary08) !important;
       color: white !important;
-      
+
       &:hover:not(:disabled) {
         background: var(--primary10) !important;
         border-color: var(--primary10) !important;
       }
-      
+
       &:focus {
         background: var(--primary09) !important;
         border-color: var(--primary09) !important;

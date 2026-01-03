@@ -9,9 +9,9 @@ export class CapitaliceDirective {
   @Input('appCapitalice') type: 'formGroup' | 'input';
 
   constructor(private element: ElementRef) {}
-  @HostListener('focusin', ['$event'])
-  @HostListener('input', ['$event.target.value'])
-  onInput(value) {
+  @HostListener('focusin')
+  @HostListener('input')
+  onInput() {
     this.capitalice();
   }
 

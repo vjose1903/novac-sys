@@ -55,7 +55,7 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
 
   table_config: table_config = {
     info: [
-      { titulo: 'No. Doc.', tooltip: 'Número de documento', tipo: tableCellType.text, key: 'secuencia', style: { width: '7rem' } },
+      { titulo: 'No. Doc.', tipo: tableCellType.text, key: 'secuencia', tooltip: 'Número de documento', style: { width: '7rem' } },
       { titulo: 'Cliente', tipo: tableCellType.text, key: 'cliente.nombre_completo', style: { 'text-align': 'start', 'padding-left': '1rem', width: '45%' } },
       { titulo: 'Fecha', tipo: tableCellType.date, key: 'fecha_equivalente', style: { width: '6rem' } },
       { titulo: 'Total', tipo: tableCellType.formatoNumero, key: 'total_factura' },

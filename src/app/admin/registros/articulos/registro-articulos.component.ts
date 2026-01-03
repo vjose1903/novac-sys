@@ -25,6 +25,7 @@ import { maxSizeTypeE } from '@core/directive/max-sizer.directive';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -156,7 +157,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this._init_mixin({ component: 'reg_articulo', is_routing: true });
     this.configApp = Ss.configServ.config;
     this.createForm();
-
     this.medida_config = this.configApp.medida_producto_terminado;
 
     this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then(result => {

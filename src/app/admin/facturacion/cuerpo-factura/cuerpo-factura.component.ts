@@ -374,8 +374,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     detalle['articulo'] = articulo;
     detalle['unidades'] = this.llenarArrayUnidades(articulo);
     detalle['codigo'] = articulo.codigo;
-    detalle['precio'] = fun.roundNumberToDecimal(data.precio);
-    detalle['costo'] = fun.roundNumberToDecimal(data.costo);
+    detalle['precio'] = fun.roundNumberToDecimal(articulo.precio_principal);
+    detalle['costo'] = fun.roundNumberToDecimal(articulo.costo_principal);
     detalle['descuento_valor'] = fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : fun.roundNumberToDecimal(data.descuento_valor);
     detalle['cantidad'] = data.cantidad;
     detalle['cantidad_initial'] = fun.hasValue(data.cantidad) ? data.cantidad : 0;
@@ -390,9 +390,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     detalle['from_pre_factura'] = data.from_pre_factura || false;
     detalle['vende_sin_inventario'] = this.configApp.vende_sin_inventario;
 
-    detalle['is_bad_price'] = this.getBadPrice(data).bool;
+    detalle['is_bad_price'] = this.getBadPrice(data, articulo).bool;
     detalle['actual_price'] = data?.actual_price;
-    detalle['actual_price_value'] = this.getBadPrice(data).monto;
+    detalle['actual_price_value'] = this.getBadPrice(data, articulo).monto;
     detalle['producto_initial'] = fun.hasValue(data?.producto_initial) ? data.producto_initial : null;
 
     let unidad = fun.hasValue(data.peso_saco) ? `Saco de ${data.peso_saco} libras` : data.unidad;
@@ -410,12 +410,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const current_detalle = this.factServ.filasDetalle.at(arg).getRawValue();
   }
 
-  getBadPrice(data) {
+  getBadPrice(data, articulo) {
     const response = { bool: false, monto: '' };
 
     const medida = data.peso_saco || data.unidad.includes('Saco de') ? `Saco_${data.peso_saco}` : data.unidad;
 
-    let current_monto = this.factServ.isCompra() ? data.costo : data.precio;
+    let current_monto = this.factServ.isCompra() ? articulo.costo_principal : articulo.precio_principal;
 
     const tipo = this.factServ.isCompra() ? 'costo' : 'precio';
     let actual_price_monto = fun.hasValue(data.actual_price) ? data.actual_price[medida][tipo] : current_monto;
@@ -488,7 +488,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       buscarArticuloModalConf.component = BuscarArticuloComponent;
       buscarArticuloModalConf.closableEsc = true;
 
-      buscarArticuloModalConf.setCallback((args: ICallbackModal) => this.llenarRowDespuesDeFiltro(args));
+      buscarArticuloModalConf.setCallback((args: ICallbackModal) => this.llenarRowDespuesDeFiltro(args, index));
       buscarArticuloModalConf.show();
 
       setTimeout(() => fun.enfocarInput('input_fantasma'), 10);
@@ -500,7 +500,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           is_compra: this.factServ.isCompra(),
         });
 
-        this.llenarRowDespuesDeFiltro({ data: { articulo: res.data[0], index } }, false);
+        this.llenarRowDespuesDeFiltro({ data: { articulo: res.data[0], index } }, index, false);
       } catch (error) {}
     }
   }
@@ -916,11 +916,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     if (this.inputDrop) fun.setTimeout(() => fun.enfocarInput(this.inputDrop), 10);
   }
 
-  llenarRowDespuesDeFiltro(args: ICallbackModal | { data: any }, fromModal: boolean = true) {
-    if (fromModal && (args as ICallbackModal).type == modalCloseType.onHide) return;
+  llenarRowDespuesDeFiltro(args: ICallbackModal | { data: any }, index: number, fromModal: boolean = true) {
+    if (fromModal && (args as ICallbackModal).type == modalCloseType.onHide) {
+      if (!(args as ICallbackModal).hasReturnData) {
+        fun.enfocarAndSelectInput(`codigo-${index}`);
+      }
+      return;
+    }
 
-    const { articulo, index, tipo } = args.data;
-
+    const { articulo, tipo } = args.data;
     if (fun.hasValue(tipo) && tipo == 'data_no_found') {
       fun.enfocarAndSelectInput(`codigo-${index}`);
       return;

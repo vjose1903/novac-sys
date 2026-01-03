@@ -14,11 +14,11 @@ import { FacturaC } from '@admin/facturacion/factura';
 import { Environment } from '@environments/environment';
 import { Ss } from '@core/services/singleton.service';
 import { compra_contado_valor_fiscal, compra_credito_valor_fiscal, conduce, nota_credito, recibo_de_ingreso, venta_contado_consumo, ventas_productos_rango, venta_credito_consumo } from '../../assets/facturas';
+import { ConfigI } from '@core/interface/config-interface';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { ICallbackModal, modalCloseType, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ConfigI } from '@core/interface/config-interface';
 
 @Component({
   selector: 'app-login',

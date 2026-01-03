@@ -50,7 +50,7 @@ export default class FirebaseConfigHandler {
    * Lee la configuración de Firebase desde el archivo JSON
    */
   private async getFirebaseConfig(): Promise<FirebaseConfig> {
-    const pathConfig = (await pathAdd('/fb.config')) as string;
+    const pathConfig = (await pathAdd('/fb.config', true)) as string;
 
     if (!fs.existsSync(pathConfig)) {
       throw new Error('Archivo de configuración de Firebase no encontrado');
@@ -70,7 +70,7 @@ export default class FirebaseConfigHandler {
    * Lee el cliente actual
    */
   private async getActualClient(): Promise<string> {
-    const pathFile = (await pathAdd('/actual_cliente.json')) as string;
+    const pathFile = (await pathAdd('/actual_cliente.json', true)) as string;
 
     if (!fs.existsSync(pathFile)) {
       throw new Error('Archivo de cliente actual no encontrado');

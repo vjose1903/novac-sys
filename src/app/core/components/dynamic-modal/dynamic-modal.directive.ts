@@ -9,3 +9,4 @@ export class DynamicModalDirective {
 
   constructor(public viewContainerRef: ViewContainerRef) {}
 }
+

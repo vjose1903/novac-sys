@@ -5,7 +5,6 @@ import { getContentWithTablaAgrupada } from '../utils/tabla_agrupada';
 import { ConfigI } from '@core/interface/config-interface';
 import { fun } from '@services/functions.service';
 import { Ss } from '../../singleton.service';
-
 import { config_ventas } from './8.5x5.5/configuraciones/reportes/ventas';
 import { config_cxc } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc';
 import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cuentas_cobrar/cxc_ant_preventa';
@@ -74,7 +73,6 @@ export function makeReporte(data) {
   console.log('%c data ', 'color: red', data);
   console.log('%c tipo_reporte ', 'color: orange', data.tipo_reporte);
   console.log('%c configuraciones ', 'color: lime', configuraciones);
-
   const configuration = configuraciones[data.tipo_reporte];
   console.log('%c configuration ', 'color: magenta', configuration);
 

@@ -3,9 +3,8 @@ import { DirectivesModule } from '@core/directive/directives.module';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { InputMaskModule } from 'primeng/inputmask';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ImgViewerEditModule } from '@core/components/img-viewer-edit/img-viewer-edit.module';
 import { SelectModule } from 'primeng/select';
-
+import { ImgViewerEditModule } from '@core/components/img-viewer-edit/img-viewer-edit.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConfiguracionesRoutingModule } from './configuraciones.routing';

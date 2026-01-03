@@ -38,7 +38,7 @@ import { TooltipModule } from 'primeng/tooltip';
     NgxExtendedPdfViewerModule,
     MenuItemComponent,
     FormErrorMsgComponent,
-    TooltipModule
+    TooltipModule,
   ],
 })
 export class LayoutModule {}

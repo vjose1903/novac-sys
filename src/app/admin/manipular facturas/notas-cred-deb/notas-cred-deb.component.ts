@@ -75,7 +75,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   table_config: table_config = {
     info: [
       { titulo: ' ', key: 'select', tipo: tableCellType.switch, select_all: true, style: { width: '3.5rem' } },
-      { titulo: 'Articulo', key: 'descripcion', tipo: tableCellType.text , style: { 'text-align': 'left', 'min-width': '10rem', width: '30%', 'padding-left': '0.5rem' } },
+      { titulo: 'Articulo', key: 'descripcion', tipo: tableCellType.text, style: { 'text-align': 'left', 'min-width': '10rem', width: '30%', 'padding-left': '0.5rem' } },
       { titulo: 'Cantidad', key: 'cantidad_', tipo: tableCellType.text, style: { width: '7rem', 'text-align': 'center' } },
       { titulo: 'Descuento', key: 'descuento_valor', tipo: tableCellType.formatoNumero },
       { titulo: 'Precio', key: 'precio', tipo: tableCellType.formatoNumero },
@@ -243,11 +243,11 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   tableInputBlur(params) {
     const { data, id_tabla, column, index } = params;
     const { key } = column;
-    
+
     const current_detalle = this.detalleNota().find(detalle => detalle.id == data.id);
     const detalle_factura = this.factura.detalle_facturas.find(detalle => detalle.id == data.id);
     const itbis = this.configApp.calcular_itbis ? current_detalle.precio_real * 0.18 : 0;
-    
+
     if (fun.hasValue(current_detalle)) {
       const precio_real = fun.desformatearStNumber(current_detalle.precio_real);
       const precio = fun.desformatearStNumber(current_detalle.precio);

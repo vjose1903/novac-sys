@@ -58,8 +58,6 @@ export class AprobacionesComercialesRecibidasComponent extends MixinClass implem
     this.necesarioParaEmpezar();
   }
 
-
-
   necesarioParaEmpezar() {
     this.getFacturasRecibidas(this.tServ.obj_paginate.default);
   }

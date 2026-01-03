@@ -35,8 +35,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   is_print: boolean;
   documentos_a_imprimir = [];
   configApp: ConfigI;
-
-  TipoCantidadEfectivo = TipoCantidadEfectivo;
   DocumentoDevuelta = DocumentoDevuelta;
 
   tipoDocFacturacion = tipoDocFacturacion;
