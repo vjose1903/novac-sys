@@ -1,12 +1,6 @@
-// Types
-export * from './signal-form.types';
+// Re-exportar API nativa de Angular
+export { form, Field, required, email, min, max, minLength, maxLength, pattern, debounce } from '@angular/forms/signals';
 
-// Validators
-export * from './signal-form.validators';
-
-// Config (Form Class)
-export * from './signal-form.config';
-
-// Builder
-export * from './signal-form.builder';
-
+// Exportar wrapper con funcionalidades extras
+export { SignalFormInstance, createSignalForm } from './signal-form.config';
+export { SignalFormBuilder, signalForm } from './signal-form.builder';

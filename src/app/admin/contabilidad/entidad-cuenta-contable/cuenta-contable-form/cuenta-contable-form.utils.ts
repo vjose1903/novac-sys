@@ -2,8 +2,7 @@ import { fun } from './../../../../core/services/functions.service';
 import { entidadesContables } from './../../categoria-entidad-contable/categoria-entidad-contable.utils';
 import { ConfiguracionEntidadCuentaI } from '../../configuracion-entidad-cuenta/configuracion-entidad-cuenta.utils';
 import { CuentaContableI } from '../../catalogo-cuentas-page/catalogo-cuentas/cuentas-contables-form/cuentas_contables.utils';
-import { SignalFormBuilder } from './../../../../core/services/signal-form/signal-form.builder';
-import { SignalFormInstance } from './../../../../core/services/signal-form/signal-form.config';
+import { signalForm, SignalFormInstance } from './../../../../core/services/signal-form';
 
 // ========== TIPOS ==========
 
@@ -86,18 +85,7 @@ export const cuentaContableFormDefaults: CuentaContableFormModel = {
 // ========== BUILDER DEL FORMULARIO ==========
 
 export function createCuentaContableForm(initialData?: Partial<CuentaContableFormModel>): SignalFormInstance<CuentaContableFormModel> {
-  const defaults = { ...cuentaContableFormDefaults, ...initialData };
-
-  return SignalFormBuilder.create<CuentaContableFormModel>()
-    .addField('id', { defaultValue: defaults.id })
-    .addField('tipo_agrupacion_contable', { defaultValue: defaults.tipo_agrupacion_contable })
-    .addField('tipo_categoria', { defaultValue: defaults.tipo_categoria })
-    .addField('tipo_categoria_id', { defaultValue: defaults.tipo_categoria_id })
-    .addField('is_comun', { defaultValue: defaults.is_comun })
-    .addField('has_cuenta', { defaultValue: defaults.has_cuenta })
-    .addField('configuracion_entidad_cuenta_id', { defaultValue: defaults.configuracion_entidad_cuenta_id })
-    .setValidateOnChange(false)
-    .build();
+  return signalForm<CuentaContableFormModel>({ ...cuentaContableFormDefaults, ...initialData });
 }
 
 // ========== FUNCIONES HELPER ==========

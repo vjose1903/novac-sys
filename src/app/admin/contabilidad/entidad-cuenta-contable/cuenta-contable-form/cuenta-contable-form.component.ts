@@ -81,7 +81,7 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
   showRevertBtn = computed(() => this.form.hasChanges());
 
   categoriaSeleccionada = computed(() => {
-    const id = this.form.tipo_categoria_id();
+    const id = this.form.tipo_categoria_id().value();
     return this.listadoCategorias().find(c => c.id === id);
   });
 
@@ -142,7 +142,7 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
   }
 
   private getCuentaPerConfig() {
-    const tipoAgrupacion = this.form.tipo_agrupacion_contable();
+    const tipoAgrupacion = this.form.tipo_agrupacion_contable().value();
     const infoTipo = this.infoTipoArticulo();
     return infoTipo?.[tipoAgrupacion]?.cuentas_contables?.find(c => c.key === this.inputs().selectedConfig.key);
   }
@@ -210,9 +210,9 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
   }
 
   private computeCuentaLabel(tipo: 'control' | 'contable'): string {
-    const tipoAgrupacion = this.form.tipo_agrupacion_contable();
-    const tipoCategoriaId = this.form.tipo_categoria_id();
-    const isComun = this.form.is_comun();
+    const tipoAgrupacion = this.form.tipo_agrupacion_contable().value();
+    const tipoCategoriaId = this.form.tipo_categoria_id().value();
+    const isComun = this.form.is_comun().value();
     const categorias = this.listadoCategorias();
     const selectedConfig = this.inputs().selectedConfig;
     const crudaData = this.cuentaContableDataCruda();
@@ -240,7 +240,7 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
   }
 
   getDropDownInfo(tipo: 'placeholder' | 'emptyMessage' | 'description'): string {
-    const isCategoria = this.form.tipo_agrupacion_contable() === 'categoria';
+    const isCategoria = this.form.tipo_agrupacion_contable().value() === 'categoria';
     if (tipo === 'emptyMessage') return `No existen ${isCategoria ? 'categorias' : 'sub categorias'} registradas.`;
     if (tipo === 'placeholder') return `Seleccione la ${isCategoria ? 'categoria' : 'sub categoria'}.`;
     return isCategoria ? 'Categoria' : 'Sub Categoria';
@@ -249,7 +249,7 @@ export class CuentaContableFormComponent implements OnInit, OnDestroy {
   getIsComunSwitchTooltip(): string {
     if (this.isArticulo()) {
       if (!this.isComunEnabled()) return 'Solo acepta cuenta común.';
-    } else if (fun.isEmpty(this.form.tipo_categoria_id())) {
+    } else if (fun.isEmpty(this.form.tipo_categoria_id().value())) {
       return `Primero ${this.getDropDownInfo('placeholder').toLowerCase()}`;
     }
     return '';
