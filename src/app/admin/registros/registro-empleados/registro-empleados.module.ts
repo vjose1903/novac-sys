@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { RegistroEmpleadosRoutingModule } from './registro-empleados.routing';
 import { RegistroEmpleadosComponent } from './registro-empleados.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Field } from '@angular/forms/signals';
 import { PrimengModule } from '../../../modules/primeng.module';
 import { TablasModule } from '@components/new_tablas/tablas.module';
 import { DirectivesModule } from '@core/directive/directives.module';
@@ -20,6 +21,7 @@ import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-erro
     RegistroEmpleadosRoutingModule,
     FormsModule,
     ReactiveFormsModule,
+    Field,
     PrimengModule,
     TablasModule,
     DirectivesModule,

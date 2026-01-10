@@ -64,14 +64,6 @@
   color: var(--primary04);
 }
 
-.form-control[type='text'],
-.form-control[type='number'] {
-  pointer-events: initial;
-  &:read-only {
-    pointer-events: none !important;
-  }
-}
-
 .btn_invisible_ {
   border: 0px transparent;
   background-color: transparent;

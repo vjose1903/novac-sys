@@ -3,16 +3,16 @@
 
 .p-multiselect {
   width: 100%;
-  border-radius: 0.25rem !important;
-  background-color: #ffffffe8 !important;
-  color: #1d253b !important;
-  background: #ffffff;
-  border: 1px solid #ced4da !important;
-  box-shadow: 1px 1px 4px 0px rgba(29, 37, 59, 0.2392156863) !important;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  @include formField;
 
   &:hover {
     cursor: pointer;
+  }
+
+  &.disabled,
+  &.p-disabled,
+  &:disabled {
+    @include disabledInput;
   }
 
   .p-multiselect-label-container {

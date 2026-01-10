@@ -17,7 +17,11 @@ export class CapitaliceDirective {
 
   capitalice() {
     setTimeout(() => {
-      this.element.nativeElement.value = fun.capitalice(this.element.nativeElement.value);
+      const input = this.element.nativeElement;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      input.value = fun.capitalice(input.value);
+      input.setSelectionRange(start, end);
     }, 1);
   }
 }

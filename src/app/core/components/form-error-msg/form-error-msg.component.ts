@@ -1,5 +1,6 @@
-import { Component, Input, OnDestroy, OnInit, ElementRef, ChangeDetectionStrategy, signal, computed, DestroyRef, inject } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ElementRef, ChangeDetectionStrategy, signal, computed, DestroyRef, inject, effect } from '@angular/core';
 import { AbstractControl, TouchedChangeEvent } from '@angular/forms';
+import { FieldState } from '@angular/forms/signals';
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -43,14 +44,20 @@ const COMPONENT_SELECTORS = new Map<abstract new (...args: any[]) => PrimeNGComp
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormErrorMsgComponent implements OnInit, OnDestroy {
+  /** Control de Reactive Forms (deprecated, usar fieldState) */
   @Input() control?: AbstractControl | null;
+
+  /** FieldState de Signal Forms (nueva API) */
+  @Input() fieldState?: FieldState<any> | null;
+
   @Input() fieldName?: string;
   @Input() fieldElement?: FieldElement;
 
   private readonly destroyRef = inject(DestroyRef);
   private mutationObserver?: MutationObserver;
+  private isSignalForms = false;
 
-  // Signals para estado reactivo
+  // Signals para estado reactivo (Reactive Forms)
   private readonly controlState = signal<{ invalid: boolean; dirty: boolean; touched: boolean; errors: any }>({
     invalid: false,
     dirty: false,
@@ -60,16 +67,56 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
 
   // Computed signals para derivar valores
   readonly showError = computed(() => {
+    // Si es Signal Forms, usar directamente los signals del FieldState
+    if (this.isSignalForms && this.fieldState) {
+      const invalid = !this.fieldState.valid();
+      const dirty = this.fieldState.dirty();
+      const touched = this.fieldState.touched();
+      const value = this.fieldState.value();
+      // Mostrar error si: (dirty o touched) O (tiene valor y es inválido por validación custom)
+      const hasValue = value !== null && value !== undefined && value !== '';
+      const shouldShow = invalid && (dirty || touched || hasValue);
+      return shouldShow;
+    }
+
+    // Reactive Forms
     const state = this.controlState();
     return state.invalid && (state.dirty || state.touched);
   });
 
   readonly errorMessage = computed(() => {
-    if (!this.showError()) return '';
+    const show = this.showError();
+    // console.log('📝 errorMessage - showError:', show);
+    if (!show) return '';
 
-    const errors = this.controlState().errors;
+    let errors: any;
+
+    // Obtener errores según el tipo
+    if (this.isSignalForms && this.fieldState) {
+      errors = this.fieldState.errors();
+    } else {
+      errors = this.controlState().errors;
+    }
+
+    // console.log('📝 errorMessage - errors:', JSON.stringify(errors));
     if (!errors) return '';
 
+    // Si es un array de errores (Signal Forms)
+    if (Array.isArray(errors)) {
+      const firstError = errors[0];
+      // console.log('📝 errorMessage - firstError:', JSON.stringify(firstError));
+      if (firstError?.message) return firstError.message;
+      // Signal Forms usa 'kind', Reactive Forms usa 'type'
+      const errorKey = firstError?.kind || firstError?.type;
+      if (errorKey) {
+        const errorMessageFn = this.ERROR_MESSAGES[errorKey];
+        if (typeof errorMessageFn === 'function') return errorMessageFn(firstError);
+        return errorMessageFn || `Error en el campo: ${errorKey}`;
+      }
+      return 'Error de validación';
+    }
+
+    // Formato de errores de Reactive Forms (objeto)
     const firstErrorKey = Object.keys(errors)[0];
     const errorValue = errors[firstErrorKey];
     const errorMessageFn = this.ERROR_MESSAGES[firstErrorKey];
@@ -80,7 +127,12 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
 
   private readonly ERROR_MESSAGES: Record<string, string | ((error: any) => string)> = {
     required: 'Este campo es requerido.',
-    minlength: (error: any) => `Cant. mínima de letras es: ${error.requiredLength}.`,
+    // Reactive Forms (lowercase)
+    minlength: (error: any) => `Cant. mínima de letras es: ${error.requiredLength || error.minLength}.`,
+    maxlength: (error: any) => `Máximo ${error.requiredLength || error.maxLength} caracteres.`,
+    // Signal Forms (camelCase)
+    minLength: (error: any) => `Cant. mínima de letras es: ${error.requiredLength || error.minLength}.`,
+    maxLength: (error: any) => `Máximo ${error.requiredLength || error.maxLength} caracteres.`,
     max: (error: any) => `Valor maximo requerido es: ${error.max} - actualmente tiene: ${error.actual}.`,
     min: (error: any) => `Valor mínimo requerido es: ${error.min} - actualmente tiene: ${error.actual}.`,
     ip: 'Intoduzca una ip valida.',
@@ -89,10 +141,17 @@ export class FormErrorMsgComponent implements OnInit, OnDestroy {
     email: 'Ingrese una email válido.',
     sinRayas: () => `Complete el campo: ${this.fieldName || 'este campo'}`,
     pattern: 'Formato inválido.',
-    maxlength: (error: any) => `Máximo ${error.requiredLength} caracteres.`,
   };
 
   async ngOnInit(): Promise<void> {
+    // Detectar si se usa Signal Forms
+    this.isSignalForms = !!this.fieldState;
+
+    // Para Signal Forms, no necesitamos configuración adicional
+    // los signals se actualizan automáticamente
+    if (this.isSignalForms) return;
+
+    // Reactive Forms legacy
     if (!this.control) return;
 
     if (this.fieldElement) {

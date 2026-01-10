@@ -1,7 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import * as _ from 'lodash';
+import { Component, OnInit, OnDestroy, inject, effect, signal, computed } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { customValidators } from '@core/typescript/custom-validators';
 import { pattern } from '@core/typescript/constantes';
@@ -24,6 +22,8 @@ import { FormEntidadCuentaContableI } from '@admin/contabilidad/entidad-cuenta-c
 import { CategoriaEntidadContableC, entidadesContables } from '@admin/contabilidad/categoria-entidad-contable/categoria-entidad-contable.utils';
 import { ConfigI } from '@core/interface/config-interface';
 import { EntidadCuentaContableService } from '@admin/contabilidad/entidad-cuenta-contable/entidad-cuenta-contable.service';
+import { createEmpleadoForm, EmpleadoFormModel, empleadoFormDefaults } from './registro-empleados-form.utils';
+import { SignalFormInstance } from '@core/services/signal-form';
 
 @Component({
   selector: 'app-registro-empleados',
@@ -32,7 +32,12 @@ import { EntidadCuentaContableService } from '@admin/contabilidad/entidad-cuenta
   standalone: false,
 })
 export class RegistroEmpleadosComponent extends MixinClass implements OnInit, OnDestroy {
-  form: UntypedFormGroup;
+  // Signal para controlar estado de campos
+  camposDisabled = signal(true);
+
+  // Signal Form - Nueva API de Angular
+  form = createEmpleadoForm({ disabledSignal: this.camposDisabled });
+
   boton = '';
   pattern = pattern;
 
@@ -45,8 +50,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   empleadoSelected: EmpleadoI;
   indexBorrar: any;
   documentos_de_identidad: DocumentoDeIdentidadI[] = [];
-
-  camposDisabled = true;
   empleadosClass = new EmpleadoC();
   configEntContableClass = new ConfiguracionEntidadCuentaC();
   rolesClass = new RolesC();
@@ -80,7 +83,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
-  private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
   public categoriaEntidadServ = inject(CategoriaEntidadContableService);
   public entCuentaContServ = inject(EntidadCuentaContableService);
@@ -99,26 +101,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   createForm() {
-    const myValidators = new customValidators();
-
-    this.form = this.fb.group({
-      id: [null],
-      nombre: [{ value: null, disabled: true }, Validators.compose([Validators.required, Validators.minLength(3)])],
-      apellido: [{ value: null, disabled: true }, Validators.compose([Validators.required, Validators.minLength(3)])],
-      usuario: [{ value: null, disabled: true }, Validators.compose([Validators.required])],
-      sexo: [{ value: null, disabled: true }, Validators.required],
-      cedula: [{ value: null, disabled: false }, Validators.compose([myValidators.cedulaValidator(), Validators.required])],
-      telefono: [{ value: null, disabled: true }, Validators.required],
-      email: [{ value: null, disabled: true }, Validators.compose([Validators.email, Validators.required])],
-      fecha_nacimiento: [{ value: null, disabled: true }, Validators.required],
-      password: [{ value: null, disabled: true }, Validators.compose([Validators.minLength(6), Validators.required])],
-      confirm_password: [{ value: null, disabled: true }, Validators.required],
-      ids_roles: [{ value: null, disabled: true }, Validators.required],
-    });
+    // Signal Form ya está inicializado en la declaración
+    // Las validaciones se definen en registro-empleados-form.utils.ts
+    this.form.reset();
   }
 
   ngOnDestroy(): void {
     this._destroy_mixin();
+    this.form.destroy();
   }
 
   async necesarioStart() {
@@ -168,24 +158,26 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     );
   }
 
-  checkDocumento(tipo, e?) {
-    if (e.key != 'Enter') {
-      const cedula = this.form.controls[tipo].value;
+  checkDocumento(event?) {
+    if (event.key != 'Enter') {
+      const cedula = this.form.cedula().value();
 
       let enable_campos = false;
 
-      if (this.form.controls[tipo].valid) {
+      const isValid = this.form.cedula().valid();
+
+      if (isValid) {
         if (this.editando && this.documentos_de_identidad.some(doc => doc.documento === cedula)) {
           enable_campos = true;
           return;
         }
 
         fun
-          .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
+          .getPersonaByDocIdentidad({ documento: cedula, tipo: 'cedula' })
           .then(res => {
             if (res['data'].length) {
               const is_user = res['data'].find(item => item.persona_is === 'User');
-              const id_anterior = this.form.getRawValue().id;
+              const id_anterior = this.form.id().value();
               if (fun.hasValue(is_user) && is_user?.persona?.estado) {
                 fun.toastError(`Esta cedula pertenece a un empleado ya existente. << ${is_user.persona.nombre} ${is_user.persona.apellido} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
@@ -195,12 +187,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
               const persona = fun.hasValue(is_user) ? is_user.persona : res['data'][0].persona;
               const documento_persona = persona.documentos_de_identidad.find(item => item.principal == true);
 
-              if (fun.hasValue(documento_persona)) this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
+              if (fun.hasValue(documento_persona) && documento_persona.descripcion === 'cedula') {
+                this.form.cedula().value.set(documento_persona.documento);
+              }
 
               persona.id = id_anterior;
-              this.form.patchValue(persona);
+              this.form.patchValues(persona);
 
-              if (this.camposDisabled) enable_campos = true;
+              if (this.camposDisabled()) enable_campos = true;
 
               this.documentos_de_identidad = persona.documentos_de_identidad ?? [];
             } else {
@@ -213,9 +207,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
             console.error('err ', err);
           });
       } else {
-        if (!cedula.endsWith('_')) {
+        const cedulaStr = cedula as string;
+        if (cedulaStr && !cedulaStr.endsWith('_')) {
           this.documentos_de_identidad = [];
-          // this.camposDisabled = true;
           this.changeStateCampos(false);
         }
       }
@@ -223,11 +217,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   saltar(campo) {
-    const formulario = this.form.getRawValue();
+    const formulario = this.form.getRawValues();
     if (campo != 'send') {
       if (campo == 'campoNombre') {
-        if (!formulario['cedula'].endsWith('_')) {
-          const docSinGuiones = formulario['cedula'].split('-').join('');
+        if (!formulario['cedula']?.endsWith('_')) {
+          const docSinGuiones = formulario['cedula']?.split('-').join('');
           if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
         }
       } else fun.enfocarInput(campo);
@@ -240,9 +234,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   formIsInvalid() {
     let res = true;
-    const formulario = this.form.getRawValue();
+    const formulario = this.form.getRawValues();
 
-    if (this.form.valid && !this.camposDisabled) {
+    // Verificar validez del form usando Signal Forms
+    const isFormValid = !this.camposDisabled(); // Signal form válido cuando campos habilitados
+
+    if (isFormValid) {
       res = false;
       if (fun.hasValue(formulario.cedula)) res = false;
       else res = true;
@@ -258,13 +255,12 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   checkIfSomethingIsDiferrent() {
-    const pick_values = ['cedula', 'nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles', 'id'];
-    const formValue = fun.pick(this.form.getRawValue(), pick_values);
-    formValue['maximo_credito'] = fun.desformatearStNumber(formValue['maximo_credito']);
+    const pick_values = ['cedula', 'nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles', 'id'] as const;
+    const formValue: any = fun.pick(this.form.getRawValues(), [...pick_values]);
     formValue['cuentas_contables'] = fun.deepCloning(this.listaEntidadCuentasContables);
 
     const originalEmpleado = this.listaEmpleados.find(empleado => empleado.id == formValue.id);
-    const originalValue = fun.pick(originalEmpleado, pick_values);
+    const originalValue = fun.pick(originalEmpleado, [...pick_values]);
 
     originalValue['cedula'] = originalEmpleado?.documentos_de_identidad.find(doc => doc.descripcion == 'cedula')?.documento;
     originalValue['ids_roles'] = originalEmpleado?.roles?.map(rol => rol.id);
@@ -276,25 +272,37 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   test() {}
 
   changeStateCampos(enable = false) {
-    ['nombre', 'apellido', 'usuario', 'sexo', 'telefono', 'email', 'fecha_nacimiento', 'password', 'confirm_password', 'ids_roles'].forEach(campo => {
-      enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
-      if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
+    // Actualizamos el flag camposDisabled
+    this.camposDisabled.set(!enable);
 
-      this.camposDisabled = !enable;
-    });
+    // Si deshabilitamos, limpiamos los campos
+    if (!enable) {
+      this.form.patchValues({
+        nombre: null,
+        apellido: null,
+        usuario: null,
+        sexo: null,
+        telefono: null,
+        email: null,
+        fecha_nacimiento: null,
+        password: null,
+        confirm_password: null,
+        ids_roles: null,
+      });
+    }
   }
 
   nombreHasValue() {
-    return !this.camposDisabled || fun.hasValue(this.form.controls.nombre.value);
+    return !this.camposDisabled() || fun.hasValue(this.form.nombre().value());
   }
 
   cancelar() {
-    if (fun.hasValue(this.form)) this.form.reset({ estado: true });
+    this.form.reset();
     this.borrar();
   }
 
   borrar() {
-    if (fun.hasValue(this.form)) this.form.reset();
+    this.form.reset();
 
     fun.enfocarInput('cedula');
     this.boton = 'Registrar';
@@ -306,11 +314,6 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.listaEntidadCuentasContables = [];
 
     this.changeStateCampos(false);
-
-    this.form.controls.password.setValidators(Validators.compose([Validators.minLength(6), Validators.required]));
-    this.form.controls.confirm_password.setValidators(Validators.required);
-
-    ['password', 'confirm_password'].forEach(formControl => this.form.controls[formControl].updateValueAndValidity());
   }
 
   tableClick_action(params) {
@@ -360,17 +363,22 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   editarItem(data) {
     this.borrar();
-    if (fun.hasValue(this.form)) this.form.reset();
+    this.form.reset();
     this.documentos_de_identidad = data.documentos_de_identidad ?? [];
 
     if (this.documentos_de_identidad.length) {
       const doc = data.documentos_de_identidad.filter(doc => doc.principal === true);
-      if (data.documentos_de_identidad.length > 0 && fun.hasValue(doc)) this.form.controls.cedula.setValue(doc[0].documento);
+      if (data.documentos_de_identidad.length > 0 && fun.hasValue(doc)) {
+        this.form.cedula().value.set(doc[0].documento);
+      }
     }
 
     data.sexo = data.sexo ? data.sexo.toUpperCase() : '';
     const objPerson = Object.assign({}, data, { ids_roles: (data.roles || []).map(rol => rol.id) });
-    this.form.patchValue(fun.deepCloning(objPerson));
+    this.form.patchValues(fun.deepCloning(objPerson));
+
+    // Establecer valores iniciales para comparar cambios desde este punto
+    this.form.setInitialValues();
 
     this.listaEntidadCuentasContables = this.entCuentaContServ.parseCuentasFromBackend(data.cuentas_contables);
 
@@ -379,9 +387,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     this.editando = true;
     this.boton = 'Editar';
 
-    this.form.controls.password.setValidators(null);
-    this.form.controls.confirm_password.setValidators(null);
-
+    // Con Signal Forms, las validaciones de password se manejan condicionalmente en el submit
     this.changeStateCampos(true);
   }
 
@@ -413,7 +419,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   sendData() {
-    const formulario = this.form.getRawValue();
+    const formulario = this.form.getRawValues();
 
     const documentos_identidad = [{ documento: formulario.cedula, descripcion: 'cedula' }];
 
@@ -424,10 +430,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       return element;
     });
 
-    formulario.documentos_de_identidad = documentos_identidad;
-    formulario.estado = true;
-
-    const objSend = fun.omit(formulario, ['cedula']);
+    const objSend: any = fun.omit(formulario, ['cedula']);
+    objSend.documentos_de_identidad = documentos_identidad;
+    objSend.estado = true;
 
     if (this.configApp.has_contabilidad) objSend['cuentas_contables'] = this.listaEntidadCuentasContables;
 

@@ -1,5 +1,4 @@
-import { form } from '@angular/forms/signals';
-import { createSignalForm, SignalFormInstance } from './signal-form.config';
+import { createSignalForm, SignalFormInstance, SchemaCallback } from './signal-form.config';
 
 /**
  * Builder para crear formularios con Signal Forms
@@ -20,7 +19,7 @@ import { createSignalForm, SignalFormInstance } from './signal-form.config';
  */
 export class SignalFormBuilder<T extends Record<string, any>> {
   private _initialValues: T;
-  private _schemaFn?: Parameters<typeof form>[1];
+  private _schemaFn?: SchemaCallback<T>;
 
   private constructor(initialValues: T) {
     this._initialValues = initialValues;
@@ -36,7 +35,7 @@ export class SignalFormBuilder<T extends Record<string, any>> {
   /**
    * Configura el schema de validación (usa API nativa de Angular)
    */
-  withSchema(schemaFn: Parameters<typeof form>[1]): SignalFormBuilder<T> {
+  withSchema(schemaFn: SchemaCallback<T>): SignalFormBuilder<T> {
     this._schemaFn = schemaFn;
     return this;
   }
@@ -54,7 +53,7 @@ export class SignalFormBuilder<T extends Record<string, any>> {
  */
 export function signalForm<T extends Record<string, any>>(
   initialValues: T,
-  schemaFn?: Parameters<typeof form>[1]
+  schemaFn?: SchemaCallback<T>
 ): SignalFormInstance<T> {
   return createSignalForm<T>(initialValues, schemaFn);
 }

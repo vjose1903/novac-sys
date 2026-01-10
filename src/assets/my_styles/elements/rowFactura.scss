@@ -57,10 +57,6 @@
   min-width: 11rem !important;
 }
 
-[tabindex='-1']:focus:not(:focus-visible):not(.entrada) {
-  @include formFieldFocus;
-}
-
 .div-row-codigo {
   display: grid;
   grid-template-columns: 0px 1fr;

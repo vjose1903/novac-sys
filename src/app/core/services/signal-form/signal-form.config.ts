@@ -1,5 +1,12 @@
-import { signal, WritableSignal } from '@angular/core';
+import { signal, WritableSignal, computed, Signal } from '@angular/core';
 import { form, FieldState } from '@angular/forms/signals';
+
+/**
+ * Tipo para el callback de schema
+ * Nota: Los campos son 'any' para compatibilidad con Angular.
+ * Consulta la interfaz del modelo para ver los tipos esperados.
+ */
+export type SchemaCallback<T> = (schema: { [K in keyof T]: any }) => void;
 
 /**
  * Tipo del field de Angular Signal Forms
@@ -33,11 +40,11 @@ export type SignalFormInstance<T extends Record<string, any>> = FieldsOf<T> & {
   /** Signal del modelo */
   readonly model: WritableSignal<T>;
 
-  /** Verifica si hay cambios vs valores iniciales */
-  hasChanges(): boolean;
+  /** Signal que indica si hay cambios vs valores iniciales */
+  readonly hasChanges: Signal<boolean>;
 
-  /** Obtiene campos que cambiaron */
-  getChangedFields(): (keyof T)[];
+  /** Signal con los campos que cambiaron */
+  readonly changedFields: Signal<(keyof T)[]>;
 
   /** Establece valores iniciales para comparación */
   setInitialValues(values?: T): void;
@@ -83,33 +90,59 @@ export type SignalFormInstance<T extends Record<string, any>> = FieldsOf<T> & {
  * form.reset()
  * ```
  */
-export function createSignalForm<T extends Record<string, any>>(initialValues: T, schemaFn?: Parameters<typeof form>[1]): SignalFormInstance<T> {
-  let _initialValues = { ...initialValues };
+export function createSignalForm<T extends Record<string, any>>(initialValues: T, schemaFn?: SchemaCallback<T>): SignalFormInstance<T> {
+  const _defaultValues = { ...initialValues }; // Valores por defecto (para reset)
+  let _initialValues = { ...initialValues }; // Valores para comparar cambios
   const _model = signal<T>({ ...initialValues });
-  const _fields = form(_model, schemaFn);
+  const _fields = form(_model, schemaFn as any);
   const _formSubscriptions = new Set<(values: T) => void>();
   let _unsubscribe: (() => void) | null = null;
+
+  // Normaliza valores para comparación (trata masks vacíos como null)
+  const normalizeValue = (value: any): any => {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'string') {
+      // Si es string vacío o solo contiene guiones bajos y guiones (mask vacío)
+      const trimmed = value.trim();
+      if (trimmed === '' || /^[_\-\s]+$/.test(trimmed)) return null;
+    }
+    return value;
+  };
+
+  // Compara dos valores normalizados
+  const areValuesEqual = (a: any, b: any): boolean => {
+    return normalizeValue(a) === normalizeValue(b);
+  };
+
+  // Computed signals para detectar cambios
+  const _hasChanges = computed(() => {
+    const current = _model();
+    for (const key of Object.keys(_initialValues) as (keyof T)[]) {
+      if (!areValuesEqual(current[key], _initialValues[key])) return true;
+    }
+    return false;
+  });
+
+  const _changedFields = computed(() => {
+    const current = _model();
+    const changed: (keyof T)[] = [];
+    for (const key of Object.keys(_initialValues) as (keyof T)[]) {
+      if (!areValuesEqual(current[key], _initialValues[key])) changed.push(key);
+    }
+    return changed;
+  });
 
   const extras = {
     get model() {
       return _model;
     },
 
-    hasChanges(): boolean {
-      const current = _model();
-      for (const key of Object.keys(_initialValues) as (keyof T)[]) {
-        if (current[key] !== _initialValues[key]) return true;
-      }
-      return false;
+    get hasChanges() {
+      return _hasChanges;
     },
 
-    getChangedFields(): (keyof T)[] {
-      const current = _model();
-      const changed: (keyof T)[] = [];
-      for (const key of Object.keys(_initialValues) as (keyof T)[]) {
-        if (current[key] !== _initialValues[key]) changed.push(key);
-      }
-      return changed;
+    get changedFields() {
+      return _changedFields;
     },
 
     setInitialValues(values?: T): void {
@@ -121,8 +154,18 @@ export function createSignalForm<T extends Record<string, any>>(initialValues: T
     },
 
     reset(values?: Partial<T>): void {
-      const newValues = { ..._initialValues, ...values };
+      const newValues = { ..._defaultValues, ...values };
       _model.set(newValues);
+      // También resetear initialValues a los defaults para comparación
+      _initialValues = { ..._defaultValues };
+      // Resetear estado de cada campo (pristine, untouched)
+      for (const key of Object.keys(_defaultValues)) {
+        const field = (_fields as any)[key];
+        if (field && typeof field === 'function') {
+          const fieldState = field();
+          if (fieldState?.reset) fieldState.reset();
+        }
+      }
     },
 
     getRawValues(): T {
@@ -181,9 +224,8 @@ export function createSignalForm<T extends Record<string, any>>(initialValues: T
       }
       // Luego en fields de Angular (el target es _fields)
       const fieldValue = Reflect.get(target, prop, receiver);
-      if (fieldValue !== undefined) {
-        return fieldValue;
-      }
+      if (fieldValue !== undefined) return fieldValue;
+
       return undefined;
     },
     has(target, prop) {
