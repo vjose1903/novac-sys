@@ -15,8 +15,6 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?, i
   const titulos = [];
   const body = [];
 
-  console.log(':::::::: configuration=> ', configuration);
-
   configuration.info.forEach((titulo_config, i) => {
     try {
       const obj_titulo = {
@@ -178,7 +176,7 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
     }
 
     const isNullValue = value == null && info.null_cell_value != null;
-    
+
     obj = {
       text: text_,
       alignment: isNullValue && info.alignment_body_null ? info.alignment_body_null : info.alignment_body,
