@@ -15,6 +15,8 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?, i
   const titulos = [];
   const body = [];
 
+  console.log(':::::::: configuration=> ', configuration);
+
   configuration.info.forEach((titulo_config, i) => {
     try {
       const obj_titulo = {
@@ -32,6 +34,10 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?, i
           const condicion = titulo_config.fillColorCondition[i];
           if (condicion.object == 'data' && data[condicion.key] == condicion.value) obj_titulo['fillColor'] = condicion.color;
         }
+      }
+
+      if (titulo_config.border_l != null || titulo_config.border_r != null) {
+        obj_titulo['border'] = [titulo_config.border_l ?? false, false, titulo_config.border_r ?? false, false];
       }
 
       titulos.push(obj_titulo as TablaRowPdfMake);
@@ -68,7 +74,11 @@ export function makeTablaNormal(configuration, data, index_data?, index_info?, i
                 return 1;
               }
             },
-            vLineWidth: (i, node) => 0,
+            vLineWidth: (i, node) => {
+              if (i === 0 || i === node.table.widths.length) return 0;
+              const colIndex = i - 1;
+              return configuration.info[colIndex]?.vLineAfter ? 0.5 : 0;
+            },
             hLineColor: (i, node) => {
               if (configuration.isLineLight) {
                 return i == node.table.body.length ? 'black' : i == 1 ? '#b5b5b5' : '#ebebeb';
@@ -142,6 +152,8 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
 
     if (info.key === 'index') {
       text_ = offset + j + 1;
+    } else if (value == null && info.null_cell_value != null) {
+      text_ = info.null_cell_value;
     } else {
       if (info.formato_fecha) {
         text_ = fun_.my_dateFormater(value);
@@ -165,9 +177,11 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
       if (is_electronica && 'showExento' in info && info.showExento && !detalle.calcular_itbis) text_ = `${text_} - E`;
     }
 
+    const isNullValue = value == null && info.null_cell_value != null;
+    
     obj = {
       text: text_,
-      alignment: info.alignment_body,
+      alignment: isNullValue && info.alignment_body_null ? info.alignment_body_null : info.alignment_body,
       margin: info.margin_body ? info.margin_body : [0, 0, 0, 0],
       style: info.style_body,
       noWrap: info.noWrap,
@@ -181,6 +195,10 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
         const condicion = info.fillColorCondition[i];
         if (condicion.object == 'data' && detalle[condicion.key] == condicion.value) obj['fillColor'] = condicion.color;
       }
+    }
+
+    if (info.border_l != null || info.border_r != null) {
+      obj['border'] = [info.border_l ?? false, false, info.border_r ?? false, false];
     }
 
     row.push(obj);
