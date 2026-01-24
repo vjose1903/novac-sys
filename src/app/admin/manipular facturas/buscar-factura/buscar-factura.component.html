@@ -169,16 +169,14 @@
 <!-- SIDE NOTAS -->
 <!-- ============================================================================================================================================ -->
 
-<p-drawer [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '75%', 'z-index': 99999 }" (onHide)="onHideSide()">
+<p-drawer [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '85%', 'z-index': 99999 }" (onHide)="onHideSide()">
   <div class="w-100 h-100 d-flex flex-column gap-2">
     <div>
       <p-selectButton [options]="notasSerieOptions" [ngModel]="notaSerieSelected()" (ngModelChange)="changeNotaSerie($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
     </div>
     <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
       <div class="innerTablas">
-        @if (notas.length) {
-          <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
-        }
+        <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
       </div>
     </div>
   </div>

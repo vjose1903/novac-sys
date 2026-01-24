@@ -162,9 +162,11 @@ export class ClienteC extends CrudG<any> {
             const esRecibo = item.tipo?.toLowerCase().includes('recibo');
             if (esRecibo) {
               item.recibo_fecha = item.fecha;
+              item.recibo_numero = item.numero_documento;
               item.recibo_monto = item.total;
             } else {
               item.nota_fecha = item.fecha;
+              item.nota_comprobante = item.numero_documento;
               item.nota_tipo = item.tipo;
               item.nota_monto = item.total;
             }
