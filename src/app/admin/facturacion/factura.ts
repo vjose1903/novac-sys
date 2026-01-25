@@ -256,9 +256,9 @@ export class FacturaC extends CrudG<FacturasI> {
     }
   }
 
-  getFacturaById(id: number) {
+  getFacturaById(id: number): Promise<any> {
     const extra = { parameters: { actual_price: true, movimientos_viaje: true } };
-    return new Promise(resolve => this.getOne(id, extra).then(res => resolve(res)));
+    return this.getOne(id, extra);
   }
 
   getFacturasByParams(args: {

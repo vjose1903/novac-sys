@@ -22,7 +22,7 @@ jobs:
 
       # 6️⃣ Instalar dependencias
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       # 7️⃣ Ejecutar script de configuración (opcional)
       - name: Ejecutar script de configuración

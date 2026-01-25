@@ -324,8 +324,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
 
   reportTypeHasfield(fieldReport: string) {
     const reportTypeMap = {
-      [reportField.dynamicSelection]: ['movimientos_vehiculo', 'recibos'],
-      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos', 'cuentas_cobrar_cliente', 'recibos'],
+      [reportField.dynamicSelection]: ['movimientos_vehiculo', 'recibos', 'notas'],
+      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos', 'cuentas_cobrar_cliente', 'recibos', 'notas'],
       [reportField.serieField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
       [reportField.conditionField]: ['ventas_cliente', 'ventas_rango', 'ventas_diarias'],
       [reportField.typeField]: ['ventas_rango', 'recibos', 'ventas_productos', 'cuentas_cobrar_ant_saldo', 'notas', 'pago_facturas', 'cuentas_pagar_ant_saldo'],
