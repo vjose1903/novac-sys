@@ -130,7 +130,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     }
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize(): void {
     fun.setWindowSize(window);
   }

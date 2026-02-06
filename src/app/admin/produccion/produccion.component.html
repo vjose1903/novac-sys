@@ -90,7 +90,7 @@
               <div class="text-center tituloIngre">Producción</div>
               @if (ingredientesParaProduccion.length > 0) {
                 <div id="produccion_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                  @for (ingrediente of ingredientesParaProduccion; track ingrediente.id; let index_ingrediente = $index) {
+                  @for (ingrediente of ingredientesParaProduccion; track $index; let index_ingrediente = $index) {
                     <div class="ingredientesList d-flex">
                       <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
                       <div class="" style="width: 100%">
