@@ -849,34 +849,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     const dataModal = { id: 'pdfViewer-modal', header: documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA', show_estado: true };
 
     this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos);
-
-    // PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
-    //   .then(async res => {
-    //     const viewPdfModalConf = new DynamicModalClass();
-
-    //     viewPdfModalConf.id = 'pdfViewer-modal';
-    //     viewPdfModalConf.inputs = {
-    //       show_estado: true,
-    //       estado_documento: factura.estado,
-    //       base64: res.base64,
-    //       documento: documento,
-    //       reimprimir: res.reimprimir,
-    //       fileName: res.file.split('.')[0],
-    //       factura: factura,
-    //     };
-    //     viewPdfModalConf.header = documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
-    //     viewPdfModalConf.width = '57rem';
-    //     viewPdfModalConf.height = '70vh';
-    //     viewPdfModalConf.component = PdfViewerComponent;
-    //     viewPdfModalConf.closableEsc = true;
-
-    //     this.agregarBotones(botonesDinamicos, factura, type, crear_nota, dataDB, documento);
-
-    //     viewPdfModalConf.botones = botonesDinamicos;
-
-    //     viewPdfModalConf.show();
-    //   })
-    //   .catch(err => fun.toastError(err.msg, 'ERROR'));
   }
 
   private agregarBotones(botonesDinamicos: IButtonDynamic[], factura: FacturasI, type: string, crear_nota: boolean, dataDB?: any, documento?: string): void {
@@ -894,8 +866,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     if (crear_nota) botonesDinamicos.push(botones.crearNotaButton);
 
     // Agregar botones adicionales según condiciones
-    if (this.para == 'Visualizar') {
-      if (factura.estado) botonesDinamicos.push(botones.rePrintButton);
+    const isVisualizar = this.para == 'Visualizar';
+    const isNota = type == 'nota';
+
+    if (isVisualizar || isNota) {
+      if (factura.estado || isNota) botonesDinamicos.push(botones.rePrintButton);
 
       if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion') {
         botonesDinamicos.push(botones.cloneButton);

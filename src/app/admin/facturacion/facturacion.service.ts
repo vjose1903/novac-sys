@@ -143,12 +143,13 @@ export class FacturacionService {
       res.descripcion = 'Factura a Crédito';
     } else if (condicion_fact === 'conduce') {
       res.descripcion = 'Conduce de mercancía';
-    } else if (this.isNotaCreditoOrDebito(metodo)) {
-      res.descripcion = metodo === tipoDocFacturacion.nota_credito ? 'Nota de Crédito' : 'Nota de Débito';
     } else if (this.isFacturaConValorFiscal()) {
       res.descripcion = 'Factura con valor fiscal';
     } else if (modo_factura === 'adelantada') {
       res.descripcion = 'Factura adelantada';
+    } else if (modo_factura.includes('nota_')) {
+      const tipo = modo_factura.split('_')[1];
+      res.descripcion = tipo == 'credito' ? 'Nota de Crédito' : 'Nota de Débito';
     } else if (is_viaje) {
       res.descripcion = 'Factura de viaje';
     } else {
@@ -165,10 +166,6 @@ export class FacturacionService {
 
   private isCotizacionOrPreVenta(metodo: string, actualPath: string): boolean {
     return (metodo === tipoDocFacturacion.cotizacion || metodo === tipoDocFacturacion.pre_venta) && (actualPath.includes('cotizacion') || actualPath.includes('pre_venta'));
-  }
-
-  private isNotaCreditoOrDebito(metodo: string): boolean {
-    return metodo === tipoDocFacturacion.nota_credito || metodo === tipoDocFacturacion.nota_debito;
   }
 
   private isFacturaConValorFiscal(): boolean {
