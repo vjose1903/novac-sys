@@ -379,23 +379,36 @@ export class FacturaC extends CrudG<FacturasI> {
     detalleDocModalConf.show();
   }
 
-  handleMostrarFactura(toPDFData, dataModal?, botones_dinamicos?: IButtonDynamic[]) {
+  handleMostrarFactura(
+    toPDFData,
+    dataModal?: { id?: string; header?: string; show_estado?: boolean; width?: string; height?: string; callback?: (args: ICallbackModal) => void },
+    botones_dinamicos?: IButtonDynamic[]
+  ) {
     return new Promise<void>((resolve, reject) => {
       PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
         .then(async res => {
           const { data: factura } = toPDFData;
-          const inputs = { base64: res.base64, reimprimir: res.reimprimir, fileName: _.first(res.file.split('.')), show_estado: dataModal.show_estado, estado_documento: factura.estado, documento: toPDFData.documento, factura: factura };
+          const inputs = {
+            base64: res.base64,
+            reimprimir: res.reimprimir,
+            fileName: _.first(res.file.split('.')),
+            show_estado: dataModal?.show_estado,
+            estado_documento: factura?.estado,
+            documento: toPDFData.documento,
+            factura: factura,
+          };
 
           const viewPdfModalConf = new DynamicModalClass();
 
-          viewPdfModalConf.id = 'pdfViewer-modal';
+          viewPdfModalConf.id = dataModal?.id ?? 'pdfViewer-modal';
           viewPdfModalConf.inputs = inputs;
-          viewPdfModalConf.header = dataModal.header;
-          viewPdfModalConf.width = '57rem';
-          viewPdfModalConf.height = '70vh';
+          viewPdfModalConf.header = dataModal?.header ?? 'MOSTRAR FACTURA';
+          viewPdfModalConf.width = dataModal?.width ?? '57rem';
+          viewPdfModalConf.height = dataModal?.height ?? '70vh';
           viewPdfModalConf.component = PdfViewerComponent;
           viewPdfModalConf.closableEsc = true;
           viewPdfModalConf.botones = botones_dinamicos ? botones_dinamicos : [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+          if (dataModal?.callback) viewPdfModalConf.setCallback(dataModal.callback);
 
           viewPdfModalConf.show();
 

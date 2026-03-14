@@ -8,7 +8,7 @@
         [breakpoints]="{ '767px': '90vw' }"
         [position]="modalConfig.position!"
         [contentStyleClass]="modalConfig.contentStyleClass!"
-        [baseZIndex]="10000"
+        [baseZIndex]="modalConfig.baseZIndex ?? 10000"
         [draggable]="false"
         [maximizable]="modalConfig.maximizable!"
         [modal]="true"

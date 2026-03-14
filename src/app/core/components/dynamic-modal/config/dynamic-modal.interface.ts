@@ -58,6 +58,7 @@ export interface IModalConfiguration {
   modalWrapper?: IModalComponent;
   width?: string;
   height?: string;
+  baseZIndex?: number;
   botones?: Array<IButtonDynamic>;
   resizable?: boolean;
   html?: string | undefined;
