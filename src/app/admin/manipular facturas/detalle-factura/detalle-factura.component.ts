@@ -11,6 +11,7 @@ import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-mo
 import { FacturaC, tipoDocFacturacion } from '@admin/facturacion/factura';
 import { LoaderService } from '../../../loader/loader.service';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { NotaC } from '../notas-cred-deb/notas';
 
 interface FacturaAfectada {
   key: string;
@@ -18,11 +19,22 @@ interface FacturaAfectada {
   numero: string;
 }
 
-interface ModalRestoreState {
-  reciboData: any;
+interface PdfModalRestoreConfig {
+  id: string;
+  header: string;
+  width?: string;
+  height?: string;
+  show_estado?: boolean;
+  pdfType: string;
   documento: string;
-  restoreRevisionRecibo: boolean;
+}
+
+interface ModalRestoreState {
+  sourceData: any;
+  documento: string;
+  restoreSourcePdfModal: boolean;
   restoreDetalle: boolean;
+  sourcePdfModalConfig: PdfModalRestoreConfig | null;
 }
 
 @Component({
@@ -48,6 +60,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
     { label: 'Comprobante', key: 'numero_comprobante', tipo: 'tag', div_clase: 'col-12 p-0', clase_string: 'text-black mb-0', bg_tag: '#bfbfbf' },
   ];
   facturaClass = new FacturaC();
+  notaClass = new NotaC();
   _ipc = inject(IpcService);
   loadServ = inject(LoaderService);
   dynamicModalServ = inject(DynamicModalService);
@@ -94,12 +107,12 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   }
 
   loadFacturasAfectadas() {
-    if (this.documento != 'recibo') return;
+    if (!this.showFacturasAfectadasSection()) return;
 
-    const detallesRecibo = this.getDetallesRecibo();
+    const detallesAfectacion = this.documento == 'nota' ? this.getDetallesNota() : this.getDetallesRecibo();
     const facturasMap = new Map<string, FacturaAfectada>();
 
-    detallesRecibo.forEach(detalle => {
+    detallesAfectacion.forEach(detalle => {
       const facturaId = this.getFacturaId(detalle);
       const numero = this.getFacturaAfectada(detalle);
 
@@ -111,7 +124,8 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
       facturasMap.set(key, { key, facturaId, numero: numero || `ID ${facturaId}` });
     });
 
-    this.facturasAfectadas = Array.from(facturasMap.values());
+    const facturas = Array.from(facturasMap.values());
+    this.facturasAfectadas = this.documento == 'nota' ? facturas.slice(0, 1) : facturas;
   }
 
   getDetallesRecibo() {
@@ -120,8 +134,20 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
     return [];
   }
 
+  getDetallesNota() {
+    if (Array.isArray(this.data?.facturas_aplicadas)) return this.data.facturas_aplicadas;
+    if (Array.isArray(this.data?.contenido_reporte)) return this.data.contenido_reporte;
+    return [];
+  }
+
   getFacturaAfectada(detalle) {
-    const comprobante = detalle?.comprobante_fiscal || detalle?.numero_comprobante || this.getComprobanteFromDescripcion(detalle?.descripcion);
+    const comprobante =
+      detalle?.cabecera_factura?.numero_comprobante ||
+      detalle?.comprobante_fiscal ||
+      detalle?.numero_comprobante ||
+      this.data?.document_reference?.document_referenced?.numero_comprobante ||
+      this.getComprobanteFromDescripcion(detalle?.descripcion);
+
     return fun.hasValue(comprobante) ? `${comprobante}`.trim() : null;
   }
 
@@ -137,6 +163,36 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
     if (!fun.hasValue(descripcion)) return null;
     const [, comprobante] = `${descripcion}`.trim().split(' ');
     return fun.hasValue(comprobante) ? comprobante.trim() : null;
+  }
+
+  showFacturasAfectadasSection() {
+    return this.documento == 'recibo' || this.documento == 'nota';
+  }
+
+  showFacturasCount() {
+    return this.documento == 'recibo';
+  }
+
+  getFacturasAfectadasSubtitle() {
+    if (this.documento == 'recibo') return 'Facturas que recibieron pagos con este recibo';
+    if (this.documento == 'nota') return `Facturas afectadas por la ${this.getTipoNotaLabel()}`;
+    return 'Facturas afectadas';
+  }
+
+  getFacturasAfectadasEmptyMessage() {
+    if (this.documento == 'nota') return `No se encontró factura afectada para esta ${this.getTipoNotaLabel()}.`;
+    return 'No hay facturas afectadas para este recibo.';
+  }
+
+  getTipoNotaLabel() {
+    const tipoBase = [this.data?.tipo, this.data?.tipo_factura, this.data?.tipo_pdf, this.data?.descripcion, this.data?.titulo]
+      .filter(value => fun.hasValue(value))
+      .map(value => fun.normalizarTexto(`${value}`.toLowerCase()))
+      .join(' ');
+
+    if (tipoBase.includes('credito')) return 'nota de crédito';
+    if (tipoBase.includes('debito')) return 'nota de débito';
+    return 'nota';
   }
 
   async verFacturaAfectada(factura: FacturaAfectada) {
@@ -180,20 +236,50 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   }
 
   prepareModalRestoreState() {
-    const restoreRevisionRecibo = this.closeModalById('revision_recibo');
+    const sourcePdfModalConfig = this.getSourcePdfModalConfig();
+    const restoreSourcePdfModal = sourcePdfModalConfig ? this.closeModalById(sourcePdfModalConfig.id) : false;
     const restoreDetalle = this.closeModalById('detalle_factura');
 
-    if (!restoreRevisionRecibo && !restoreDetalle) {
+    if (!restoreSourcePdfModal && !restoreDetalle) {
       this.modalRestoreState = null;
       return;
     }
 
     this.modalRestoreState = {
-      reciboData: fun.deepCloning(this.data),
+      sourceData: fun.deepCloning(this.data),
       documento: this.documento || 'recibo',
-      restoreRevisionRecibo,
+      restoreSourcePdfModal,
       restoreDetalle,
+      sourcePdfModalConfig,
     };
+  }
+
+  getSourcePdfModalConfig(): PdfModalRestoreConfig | null {
+    if (this.documento == 'recibo') {
+      return {
+        id: 'revision_recibo',
+        header: 'Revisión de recibo de ingreso',
+        width: '57rem',
+        height: '40rem',
+        show_estado: false,
+        pdfType: 'recibo_ingreso',
+        documento: 'recibo',
+      };
+    }
+
+    if (this.documento == 'nota') {
+      return {
+        id: 'pdfViewer-modal',
+        header: 'MOSTRAR NOTA',
+        width: '57rem',
+        height: '70vh',
+        show_estado: true,
+        pdfType: 'nota',
+        documento: 'nota',
+      };
+    }
+
+    return null;
   }
 
   closeModalById(modalId: string): boolean {
@@ -230,10 +316,10 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
 
     if (!restoreState) return;
 
-    if (restoreState.restoreRevisionRecibo) {
+    if (restoreState.restoreSourcePdfModal && restoreState.sourcePdfModalConfig) {
       this.loadServ.isLoading.next(true);
       try {
-        await this.openRevisionReciboModal(restoreState.reciboData);
+        await this.openSourcePdfModal(restoreState.sourceData, restoreState.sourcePdfModalConfig);
       } catch (error) {
         console.error(error);
       } finally {
@@ -242,14 +328,34 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
     }
 
     if (restoreState.restoreDetalle) {
-      this.facturaClass.modalVerDetalles(restoreState.reciboData, restoreState.documento);
+      this.facturaClass.modalVerDetalles(restoreState.sourceData, restoreState.documento);
     }
   }
 
-  openRevisionReciboModal(reciboData) {
-    const toPDFData = { data: reciboData, type: 'recibo_ingreso' };
-    const dataModal = { id: 'revision_recibo', header: 'Revisión de recibo de ingreso', width: '57rem', height: '40rem' };
+  async openSourcePdfModal(sourceData, sourcePdfModalConfig: PdfModalRestoreConfig) {
+    const toPDFData = await this.getSourceToPdfData(sourceData, sourcePdfModalConfig);
+    const dataModal = {
+      id: sourcePdfModalConfig.id,
+      header: sourcePdfModalConfig.header,
+      width: sourcePdfModalConfig.width,
+      height: sourcePdfModalConfig.height,
+      show_estado: sourcePdfModalConfig.show_estado,
+    };
+
     return this.facturaClass.handleMostrarFactura(toPDFData, dataModal, [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }]);
+  }
+
+  async getSourceToPdfData(sourceData, sourcePdfModalConfig: PdfModalRestoreConfig) {
+    if (sourcePdfModalConfig.pdfType == 'nota') {
+      try {
+        const notaParsed = await this.notaClass.parseDataToPdf(sourceData);
+        return { data: notaParsed, type: 'nota', documento: sourcePdfModalConfig.documento };
+      } catch (error) {
+        return { data: sourceData, type: 'nota', documento: sourcePdfModalConfig.documento };
+      }
+    }
+
+    return { data: sourceData, type: sourcePdfModalConfig.pdfType, documento: sourcePdfModalConfig.documento };
   }
 
   cleanTemporalState() {

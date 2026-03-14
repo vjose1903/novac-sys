@@ -41,14 +41,16 @@
     }
   </section>
 
-  @if (documento == 'recibo') {
+  @if (showFacturasAfectadasSection()) {
     <section class="facturas-afectadas">
       <div class="facturas-afectadas-header">
         <div>
           <p class="facturas-title mb-0">Facturas afectadas</p>
-          <small class="facturas-subtitle">Facturas que recibieron pagos con este recibo</small>
+          <small class="facturas-subtitle">{{ getFacturasAfectadasSubtitle() }}</small>
         </div>
-        <span class="facturas-count">{{ facturasAfectadas.length }}</span>
+        @if (showFacturasCount()) {
+          <span class="facturas-count">{{ facturasAfectadas.length }}</span>
+        }
       </div>
 
       @if (facturasAfectadas.length > 0) {
@@ -72,7 +74,7 @@
           </div>
         </div>
       } @else {
-        <div class="facturas-empty mt-3">No hay facturas afectadas para este recibo.</div>
+        <div class="facturas-empty mt-3">{{ getFacturasAfectadasEmptyMessage() }}</div>
       }
     </section>
   }
