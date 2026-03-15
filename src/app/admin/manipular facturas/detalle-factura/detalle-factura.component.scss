@@ -20,24 +20,17 @@
 
 .cliente-label {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
+  font-weight: 500;
   color: #475569;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-weight: 700;
 }
 
 .cliente-pill {
   margin-top: 0.35rem;
-  border-radius: 0.68rem;
-  padding: 0.52rem 0.7rem;
-  background: color-mix(in srgb, var(--detail-card) 95%, #dbe7fb);
   color: #1f2937;
   font-weight: 700;
-  border: 1px solid #d7e1f1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .detalle-info-item {
@@ -59,10 +52,10 @@
 
 .detalle-info-label {
   color: var(--detail-label);
-  font-size: 0.72rem;
+  font-size: 0.65rem;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  font-weight: 700;
 }
 
 .detalle-text-value {
