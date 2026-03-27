@@ -24,6 +24,16 @@ function getPageMargin(is_contado) {
   return margins;
 }
 
+function escapeSvgText(value: unknown) {
+  return `${value ?? ''}`
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '');
+}
+
 const tableColumnsWidth = [15, 190, 60, 60, 60, 60, 70];
 
 export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
@@ -310,6 +320,12 @@ function tableTotalizacion(args: { is_general: boolean; total_excento: number; t
 
 function afterContent(data, is_contado, is_venta, configApp: ConfigI) {
   const numero_letra = numLetra.NumeroALetras(data.total_factura);
+  const svgNombreEmpresa = escapeSvgText(configApp.nombre_empresa);
+  const svgDireccionEmpresa = escapeSvgText(configApp.direccion_empresa);
+  const svgTelefonoEmpresa = escapeSvgText(configApp.telefono_empresa);
+  const svgRncEmpresa = escapeSvgText(configApp.rnc_empresa);
+  const svgNumeroLetra = escapeSvgText(numero_letra);
+  const svgNombreCliente = escapeSvgText(data.cliente?.nombre);
 
   const totalizacion = parseTotalizacion(data.detalle_facturas);
 
@@ -367,12 +383,12 @@ function afterContent(data, is_contado, is_venta, configApp: ConfigI) {
                           {
                             svg: `<svg viewBox="0 0 700 180">
                             <rect height="180" width="43" fill="#ffffff" rx="5" ry="5" x="0" y="0" stroke="black" />
-                            <text transform="translate(11, ${infoPagare[configApp.cliente].altura_nombre}) rotate(-90)" font-weight="bold" style="font-size: 8.5px" > ${configApp.nombre_empresa} </text>
-                            <text transform="translate(23, ${infoPagare[configApp.cliente].altura_direccion}) rotate(-90)" style="font-size: 8.5"> ${configApp.direccion_empresa} </text>
+                            <text transform="translate(11, ${infoPagare[configApp.cliente].altura_nombre}) rotate(-90)" font-weight="bold" style="font-size: 8.5px" > ${svgNombreEmpresa} </text>
+                            <text transform="translate(23, ${infoPagare[configApp.cliente].altura_direccion}) rotate(-90)" style="font-size: 8.5"> ${svgDireccionEmpresa} </text>
                             <text transform="translate(35, 176) rotate(-90)" font-weight="bold" style="font-size: 8.5" > Telefono: </text>
-                            <text transform="translate(35, 137) rotate(-90)" style="font-size: 8.5"> ${configApp.telefono_empresa} - </text>
+                            <text transform="translate(35, 137) rotate(-90)" style="font-size: 8.5"> ${svgTelefonoEmpresa} - </text>
                             <text transform="translate(35, 73) rotate(-90)" font-weight="bold" style="font-size: 8.5" > Rnc: </text>
-                            <text transform="translate(35, 55) rotate(-90)" style="font-size: 8.5"> ${configApp.rnc_empresa} </text>
+                            <text transform="translate(35, 55) rotate(-90)" style="font-size: 8.5"> ${svgRncEmpresa} </text>
                           </svg>`,
                           },
                         ],
@@ -394,10 +410,10 @@ function afterContent(data, is_contado, is_venta, configApp: ConfigI) {
 
 
                               <text transform="translate(8, 40)" style="font-size: 9px"> Debo y pagaré a  </text>
-                              <text transform="translate(83 40)" style="font-size: 9px" font-weight="bold"> ${configApp.nombre_empresa} </text>
+                              <text transform="translate(83 40)" style="font-size: 9px" font-weight="bold"> ${svgNombreEmpresa} </text>
                               <text transform="translate(${configApp.nombre_empresa.length * 6.5}, 40)" style="font-size: 9px"> la cantidad de :  </text>
 
-                              <text transform="translate(8, 55)" style="font-size: 10px" font-weight="bold">** ${numero_letra} **</text>
+                              <text transform="translate(8, 55)" style="font-size: 10px" font-weight="bold">** ${svgNumeroLetra} **</text>
 
                               <text transform="translate(8, 67)" style="font-size: 9px"> Valor recibido a mi (nuestra) entera satisfacción segun la</text>
                               <text transform="translate(240, 67)" style="font-size: 9px" font-weight="bold"> Factura No. ${fun_.my_padStart(data.numero_documento, 8, '0')}</text>
@@ -407,7 +423,7 @@ function afterContent(data, is_contado, is_venta, configApp: ConfigI) {
 
 
                               <text transform="translate(8, 106)" style="font-size: 9px" font-weight="bold"> A: </text>
-                              <text transform="translate(25, 106)" style="font-size: 12px" font-weight="bold"> ${data.cliente.nombre} </text>
+                              <text transform="translate(25, 106)" style="font-size: 12px" font-weight="bold"> ${svgNombreCliente} </text>
                               <line x1="20" y1="110" x2="500" y2="110" style="stroke:#000000;stroke-width:1" />
 
                               <text transform="translate(8, 128)" style="font-size: 9px" font-weight="bold"> RD$ </text>
