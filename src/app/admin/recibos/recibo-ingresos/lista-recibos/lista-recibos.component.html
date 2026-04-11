@@ -1,9 +1,14 @@
 <div class="mainRecibos">
   <div class="mb-2 titulo">
-    <h3 class="negrita">Recibos de ingreso</h3>
+    <div class="d-flex align-items-center gap-2">
+      <h3 class="negrita mb-0">Recibos de ingreso</h3>
+      <app-configuracion-recibos></app-configuracion-recibos>
+    </div>
   </div>
-  <div *ngxPermissionsOnly="permissions.recibo_ingreso.create" class="mb-3 botonNuevo">
-    <button class="btn btn-verde" (click)="navegar()">Nuevo recibo <i class="fas fa-hand-holding-usd"></i></button>
+  <div class="mb-3 botonNuevo d-flex align-items-center gap-2">
+    <ng-container *ngxPermissionsOnly="permissions.recibo_ingreso.create">
+      <button class="btn btn-verde" (click)="navegar()">Nuevo recibo <i class="fas fa-hand-holding-usd"></i></button>
+    </ng-container>
   </div>
   <div class="divTabla">
     <div #cardTabla id="cardTabla" class="card cardListados">

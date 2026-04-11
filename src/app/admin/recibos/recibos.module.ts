@@ -14,9 +14,11 @@ import { DirectivesModule } from '@core/directive/directives.module';
 import { DetalleFacturaModule } from '../manipular facturas/detalle-factura/detalle-factura.module';
 import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
 import { MoraSelectorComponent } from './recibo-ingresos/components/mora-selector/mora-selector.component';
+import { ConfiguracionRecibosComponent } from './configuracion-recibos/configuracion-recibos.component';
+import { ConfigRecibosModalComponent } from './configuracion-recibos/config-recibos-modal.component';
 
 @NgModule({
-  declarations: [IngresosComponent, ListaRecibosComponent, ReciboViajesComponent],
+  declarations: [IngresosComponent, ListaRecibosComponent, ReciboViajesComponent, ConfiguracionRecibosComponent, ConfigRecibosModalComponent],
   imports: [CommonModule, RecibosRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtnIconModule, MoraSelectorComponent],
 })
 export class RecibosModule {}

@@ -161,6 +161,9 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
         return permiso;
       });
+
+      console.log("this.listaPermisos ", this.listaPermisos);
+      
     });
   }
 

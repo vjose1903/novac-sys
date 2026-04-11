@@ -6,7 +6,7 @@ export const config_recibos = {
     margin_general: [0, 0, 0, 0],
     isBreak: false,
     only_titulo: false,
-    widths: [24, 60, '*', 54, 'auto', 'auto', 'auto'],
+    widths: [23, 55, '*', 52, 'auto', 'auto', 'auto'],
     mostrar_total: true,
     mostrar_bruto: true,
     mostrar_mora: true,

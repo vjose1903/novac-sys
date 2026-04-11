@@ -1,0 +1,16 @@
+@if (form) {
+  <form [formGroup]="form">
+    <div class="form-group mb-3" [appMsgError]="'card_percentage'" [form]="form">
+      <label class="control-label">Porciento Tarjeta: <span style="color: red">*</span></label>
+
+      <div class="input-group">
+        <input type="number" id="card_percentage" class="form-control input_cantidad" formControlName="card_percentage" placeholder="Introduzca el porciento" (focus)="htmlServ.selectValue($event)" autocomplete="off" aria-describedby="sufijo" />
+        <div class="input-group-append">
+          <span class="input-group-text sufijo" id="sufijo">%</span>
+        </div>
+      </div>
+
+      <span id="msgContainer_card_percentage"></span>
+    </div>
+  </form>
+}

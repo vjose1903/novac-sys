@@ -1,0 +1,3 @@
+<ng-container *ngxPermissionsOnly="[permissions.recibo_configuration.read_all, permissions.recibo_configuration.read_one, permissions.recibo_configuration.update]">
+  <btn-icon-circular [id]="'btnConfiguracionRecibos'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" [tooltip]="'Configuraciones de recibos'" [tooltipPosition]="'right'" (clickFunction)="openModalConfig()"> </btn-icon-circular>
+</ng-container>
