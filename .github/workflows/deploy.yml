@@ -8,21 +8,27 @@ on:
 jobs:
   release:
     runs-on: windows-latest
+
     steps:
+      # 1️⃣ Clonar el repositorio
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
-      - name: Install Node.js and NPM
-        uses: actions/setup-node@v1
+      # 2️⃣ Configurar Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 22.13.1
+          node-version: '22.13.1'
 
+      # 6️⃣ Instalar dependencias
       - name: Install dependencies
-        run: npm i --force
+        run: npm ci --legacy-peer-deps
 
+      # 7️⃣ Ejecutar script de configuración (opcional)
       - name: Ejecutar script de configuración
         run: node ./scripts/start.js -p -c agrodemi
-        
+
+      # 8️⃣ Build de la aplicación (opcional)
       - name: Build Novac App
         id: build-novac-app
         env:

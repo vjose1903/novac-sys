@@ -444,13 +444,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     if (this.totalGeneral() == 0) {
       fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
     } else {
-      const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: `nota_${this.tipoNota}`, is_viaje: false };
+      const obj = { modo_factura: `nota_${this.tipoNota}`, condicion_fact: 'nota', metodo: `nota`, is_viaje: false };
 
       const confirmationImprimirModalConf = new DynamicModalClass();
 
       confirmationImprimirModalConf.id = 'confirmacionImprimir';
       confirmationImprimirModalConf.inputs = obj;
-      confirmationImprimirModalConf.header = 'Confirmación';
+      confirmationImprimirModalConf.header = 'Confirmación'; 
       confirmationImprimirModalConf.width = '30rem';
       confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
       confirmationImprimirModalConf.botones = [

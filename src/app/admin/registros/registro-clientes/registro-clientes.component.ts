@@ -120,7 +120,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       });
 
       // this.form.valueChanges.subscribe(val => {
-      //   console.log(' ');
+      //   p(' ');
       //   console.log('val ', val);
       //   console.log('this.form ', this.form);
       // });
@@ -168,6 +168,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'vendedor' } };
     this.empleadosClass.getAll(extra).then(res => {
       this.vendedores = res['data'];
+
       this.form.controls.vendedor_id.setValue(this.vendedores[0].id);
     });
   }
@@ -200,7 +201,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   editarItem(data) {
-    this.documentos_de_identidad = data.documentos_de_identidad;
+    this.documentos_de_identidad = data.documentos_de_identidad ?? [];
 
     this.form.patchValue(data);
 
@@ -297,7 +298,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
               if (this.camposDisabled) enable_campos = true;
 
-              this.documentos_de_identidad = persona.documentos_de_identidad;
+              this.documentos_de_identidad = persona.documentos_de_identidad ?? [];
             } else {
               enable_campos = true;
             }
@@ -309,7 +310,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
           });
       } else {
         if (!this.editando && documento.endsWith('_')) {
-          this.documentos_de_identidad = undefined;
+          this.documentos_de_identidad = [];
           // this.camposDisabled = true;
           this.changeStateCampos(false);
         }
@@ -319,7 +320,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   saltar(campo) {
     const formulario = this.form.getRawValue();
-    console.log('campo ', campo);
 
     if (campo != 'send') {
       if (campo == 'campoNombre') {
@@ -329,7 +329,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
         }
+      } else if (campo == 'municipio_select') {
+        if (fun.hasValue(formulario.provincia_id)) fun.enfocarInput(campo);
       } else fun.enfocarInput(campo);
+    } else if (campo == 'campoDir') {
+      if (fun.hasValue(formulario.municipio_id)) fun.enfocarInput(campo);
     } else {
       if (!this.formIsInvalid()) {
         fun.setTimeout(() => this.submit(), 250);
@@ -366,8 +370,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       { documento: formulario.rnc, descripcion: 'rnc' },
     ];
 
+    const documentos_registrados = this.documentos_de_identidad ?? [];
     documentos_identidad.map(element => {
-      const doc_backend = this.documentos_de_identidad.find(doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+      const doc_backend = documentos_registrados.find(doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
 
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;
@@ -416,7 +421,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
     this.doc_is_cedula = true;
-    this.documentos_de_identidad = undefined;
+    this.documentos_de_identidad = [];
     this.boton = 'Guardar';
     this.editando = false;
     this.changeStateCampos(false);

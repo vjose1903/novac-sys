@@ -23,6 +23,7 @@ export const ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED = 'update-downloaded';
 export const ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE = 'update-not-available';
 export const ELECTRON_EVENT_CONFIG_FILE_MODIFIED = 'config-file-modified';
 export const ELECTRON_EVENT_UPDATE_ERROR = 'error';
+export const ELECTRON_EVENT_UPDATE_BEFORE_QUIT_FOR_UPDATE = 'before-quit-for-update';
 
 export type MetodoHttp = 'get' | 'post' | 'put' | 'delete';
 export interface PeticionElectron {

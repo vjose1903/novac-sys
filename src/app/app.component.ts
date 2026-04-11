@@ -130,7 +130,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     }
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize(): void {
     fun.setWindowSize(window);
   }
@@ -147,6 +147,9 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     this.setupSubscriptions();
     Ss.layServ.parseMenu();
     this.verifyIsReady();
+
+    // TODO: temporal
+    // this.mostrar_modal_actualizacion({ version: '1.0.0' });
   }
 
   ngAfterViewInit(): void {
@@ -303,27 +306,49 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
 
   mostrar_modal_actualizacion(info: any): void {
     this.zone.run(() => {
-      const propietarioModalConf = new DynamicModalClass();
+      const updateModalConf = new DynamicModalClass();
 
-      propietarioModalConf.id = 'actualizar_app';
-      propietarioModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
-      propietarioModalConf.width = '40rem';
-      propietarioModalConf.html = `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`;
-      propietarioModalConf.closableEsc = true;
-      propietarioModalConf.botones = [
-        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
-        { clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance) },
+      updateModalConf.id = 'actualizar_app';
+      updateModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
+      updateModalConf.width = '40rem';
+      updateModalConf.html = `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`;
+      updateModalConf.closableEsc = true;
+      updateModalConf.botones = [
+        { id: 'cancelUpdateBtn', clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { id: 'updateBtn', clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance, updateModalConf), showProcess: true },
       ];
-
-      propietarioModalConf.show();
+      updateModalConf.disableAllButtonsIfAnyProcessing = true;
+      updateModalConf.show();
     });
   }
 
-  iniciar_descarga_actualizacion(modalInstance?: DynamicModalClass): void {
+  iniciar_descarga_actualizacion(modalInstance?: DynamicModalClass, updateModalConf?: DynamicModalClass): void {
+    console.log('modalInstance ', modalInstance);
+    console.log('updateModalConf ', updateModalConf);
+    const updateBtn = updateModalConf.botones.find(btn => btn.id === 'updateBtn');
+
     const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
-    this._ipc.sendTask(task).then(res => {
-      this.visible.set(true);
-      if (modalInstance) modalInstance.close();
+    this._ipc.sendTask(task).then((res: any) => {
+      fun.setTimeout(() => {
+        console.log('res ---> ', res);
+        if (res.available) {
+          if (res.downloadStarted) {
+            // Cerrar el modal de actualización solo cuando la descarga realmente inicie
+            if (modalInstance) modalInstance.close();
+            this.visible.set(true);
+          } else {
+            fun.toastError(res.msg, 'ERROR');
+          }
+        } else {
+          fun.toastInfo(res.msg, 'INFORMACIÓN');
+        }
+
+        try {
+          if (updateBtn) updateBtn.processing = false;
+        } catch (error) {
+          console.error('Error al actualizar el botón de procesamiento:', error);
+        }
+      }, 0);
     });
   }
 

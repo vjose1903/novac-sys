@@ -155,6 +155,26 @@ export class ClienteC extends CrudG<any> {
     function transformRequestResponse(requestResponse) {
       requestResponse['tipo_reporte'] = requestResponse['tipo_reporte'].replace('cuentas_cobrar', 'cxc');
 
+      if (requestResponse['tipo_reporte'] === 'cuentas_con_pagos') {
+        requestResponse.contenido_reporte = requestResponse.contenido_reporte
+          .sort((a, b) => a.factura_numero_comprobante.localeCompare(b.factura_numero_comprobante))
+          .map(item => {
+            const esRecibo = item.tipo?.toLowerCase().includes('recibo');
+            if (esRecibo) {
+              item.recibo_fecha = item.fecha;
+              item.recibo_numero = item.numero_documento;
+              item.recibo_monto = item.total;
+            } else {
+              item.nota_fecha = item.fecha;
+              item.nota_comprobante = item.numero_documento;
+              item.nota_tipo = item.tipo;
+              item.nota_monto = item.total;
+            }
+            return item;
+          });
+        return requestResponse;
+      }
+
       if (hasPermisoPreVenta && objTipo['cuentas_cobrar_ant_saldo'] != 3 && pdfParams.tipo != 'ventas_cliente') requestResponse['tipo_reporte'] += '_preventa';
       if (includeMora) {
         requestResponse['tipo_reporte'] += '_mora';

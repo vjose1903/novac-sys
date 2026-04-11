@@ -101,9 +101,21 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     info: [
       { titulo: '1', tipo: 'icon', key: 'estado', style: { width: '2rem', color: 'var(--transparente00)' }, iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
       { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
-      { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante' },
+      { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre_completo', style: { 'text-align': 'start' } },
+      { titulo: 'Comprobante Nota', tipo: 'text', key: 'numero_comprobante' },
       { titulo: 'Total nota', tipo: 'formatoNumero', key: 'total' },
-      { titulo: 'Acciones', tipo: 'icon', key: 'actions', iconsArray: [{ key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' }], style: { width: '5rem' } },
+      { titulo: 'Fact. Afectada', tipo: 'text', key: 'factura_afectada' },
+      {
+        titulo: 'Acciones',
+        tipo: 'icon',
+        key: 'actions',
+        column_gap: '0.5rem',
+        iconsArray: [
+          { key: 'invoice', tooltip: 'Ver factura afectada', text_color: 'invoiceColor' },
+          { key: 'view', tooltip: 'Ver Nota', text_color: 'viewColor' },
+        ],
+        style: { width: '7rem' },
+      },
     ],
     colores: true,
     filtrar: { local: false },
@@ -284,6 +296,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           nota.tipo = this.buscarPara;
           const estatus = this.getIsActiveInfo(nota);
 
+          const factura_aplicada_comprobante = nota.facturas_aplicadas[0].cabecera_factura.numero_comprobante;
+
+          nota.factura_afectada = nota.facturas_aplicadas.length > 1 ? 'Varios...' : factura_aplicada_comprobante;
           nota.secuencia = nota.numero_documento.toString().padStart(8, '0');
           nota.total = Math.abs(nota.total);
           nota.selectedColor = 'gris-claro';
@@ -293,10 +308,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           nota.is_active_tooltip = estatus.tooltip;
           nota.is_active_color = estatus.color;
 
+          nota.invoice = 'fas fa-file-invoice-dollar';
+          nota.invoiceColor = 'gris-claro';
           nota.iconsMoveEvents = [{ key: 'view', hover: ['fa-eye', 'text-black'], leave: ['fa-eye-slash', 'text-gris-claro'] }];
+          nota.iconsMoveEvents.push({ key: 'invoice', hover: ['fa-file-invoice-dollar', 'text-black'], leave: ['fa-file-invoice-dollar', 'text-gris-claro'] });
 
           nota.customStyles = {
-            actions: [{ key: 'view', estilos: 'font-size: 1.2rem !important' }],
+            actions: [
+              { key: 'view', estilos: 'font-size: 1.2rem !important' },
+              { key: 'invoice', estilos: 'font-size: 1.2rem !important' },
+            ],
           };
 
           this.notas.push(nota);
@@ -604,6 +625,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
             this.mostrarFactura({ factura: data_parsed, type: 'nota', dataDB: params.data, documento: 'nota' });
           });
         }
+        if (params.iconKey == 'invoice') {
+          this.verFacturaAfectada(params.data);
+        }
       }
     } else if (params.id_tabla == shearchDocumentTableId) {
       if (params.columnKey == 'actions') {
@@ -638,6 +662,28 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           });
         }
       }
+    }
+  }
+
+  async verFacturaAfectada(nota) {
+    const facturaAplicada = nota.facturas_aplicadas?.[0];
+    const facturaId = facturaAplicada?.cabecera_factura?.id ?? facturaAplicada?.cabecera_factura_id;
+
+    if (!facturaId) {
+      fun.toastError('No se encontró la factura afectada', 'ERROR');
+      return;
+    }
+
+    try {
+      const res = await this.facturaClass.getFacturaById(facturaId);
+      const facturaDb = res?.data ?? res;
+      const facturaParsed = await this.facturaClass.parseDataToPdf(facturaDb);
+      const tipo = facturaDb.tipo == tipoDocFacturacion.cotizacion ? 'cotizacion' : facturaDb.tipo == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
+
+      this.mostrarFactura({ factura: facturaParsed, type: tipo, dataDB: facturaDb, documento: 'factura' });
+    } catch (error) {
+      const msg = error?.error?.msg || 'No se pudo obtener la factura afectada';
+      fun.toastError(msg, 'ERROR');
     }
   }
 
@@ -803,34 +849,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     const dataModal = { id: 'pdfViewer-modal', header: documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA', show_estado: true };
 
     this.facturaClass.handleMostrarFactura(toPDFData, dataModal, botonesDinamicos);
-
-    // PdfService.generatePdf({ oPdf: toPDFData, imprimir: false })
-    //   .then(async res => {
-    //     const viewPdfModalConf = new DynamicModalClass();
-
-    //     viewPdfModalConf.id = 'pdfViewer-modal';
-    //     viewPdfModalConf.inputs = {
-    //       show_estado: true,
-    //       estado_documento: factura.estado,
-    //       base64: res.base64,
-    //       documento: documento,
-    //       reimprimir: res.reimprimir,
-    //       fileName: res.file.split('.')[0],
-    //       factura: factura,
-    //     };
-    //     viewPdfModalConf.header = documento == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR FACTURA';
-    //     viewPdfModalConf.width = '57rem';
-    //     viewPdfModalConf.height = '70vh';
-    //     viewPdfModalConf.component = PdfViewerComponent;
-    //     viewPdfModalConf.closableEsc = true;
-
-    //     this.agregarBotones(botonesDinamicos, factura, type, crear_nota, dataDB, documento);
-
-    //     viewPdfModalConf.botones = botonesDinamicos;
-
-    //     viewPdfModalConf.show();
-    //   })
-    //   .catch(err => fun.toastError(err.msg, 'ERROR'));
   }
 
   private agregarBotones(botonesDinamicos: IButtonDynamic[], factura: FacturasI, type: string, crear_nota: boolean, dataDB?: any, documento?: string): void {
@@ -848,8 +866,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     if (crear_nota) botonesDinamicos.push(botones.crearNotaButton);
 
     // Agregar botones adicionales según condiciones
-    if (this.para == 'Visualizar') {
-      if (factura.estado) botonesDinamicos.push(botones.rePrintButton);
+    const isVisualizar = this.para == 'Visualizar';
+    const isNota = type == 'nota';
+
+    if (isVisualizar || isNota) {
+      if (factura.estado || isNota) botonesDinamicos.push(botones.rePrintButton);
 
       if (this.buscarPara == 'solo_ver' && factura.estado && type == 'facturacion') {
         botonesDinamicos.push(botones.cloneButton);

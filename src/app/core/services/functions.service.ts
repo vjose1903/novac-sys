@@ -9,6 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
 import { MessageTask } from '../models/message-task';
 import { RetryOptions } from '../interface/retry-until';
+import { TitleCasePipe } from '@angular/common';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun {
@@ -760,6 +761,17 @@ export class fun {
     }
     if (lastName) base = base[lastName] = value;
     return base;
+  }
+
+  /**
+   * Nombre: toTitleCase
+   * Descripcion : Esta funcion retorna un string en formato titleCase
+   * @param string El string a convertir
+   * @returns El string convertido a titleCase
+   */
+  static toTitleCase(string: string) {
+    const titleCasePipe = new TitleCasePipe();
+    return titleCasePipe.transform(string);
   }
 
   /**
