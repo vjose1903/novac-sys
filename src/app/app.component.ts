@@ -38,9 +38,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
 import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
-import { Firestore } from '@angular/fire/firestore';
 import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { FIRESTORE } from '@core/tokens/firebase.tokens';
+import { Firestore } from 'firebase/firestore';
 
 @Component({
   selector: 'app-root',
@@ -64,7 +65,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   public sharedServ = inject(SharedService);
   public permissionsService = inject(NgxPermissionsService);
   public dynamicModalService = inject(DynamicModalService);
-  public firestore = inject(Firestore);
+  public firestore = inject(FIRESTORE);
   public injector = inject(Injector);
 
   // Subject para manejar la destrucción del componente
