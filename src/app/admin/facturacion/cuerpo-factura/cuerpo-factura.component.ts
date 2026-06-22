@@ -361,12 +361,18 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   llenarDetalles(data, articulo, index) {
     const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
     const detalle = {};
+    const unidades = this.llenarArrayUnidades(articulo);
+    const unidad = fun.hasValue(data.peso_saco) ? `Saco de ${data.peso_saco} libras` : data.unidad;
+    const unidadSelected = unidades.find(item => item.value?.toLowerCase() === unidad?.toLowerCase());
+    const precio = fun.hasValue(data.precio) ? data.precio : unidadSelected?.precio ?? articulo.precio_principal;
+    const costo = fun.hasValue(data.costo) ? data.costo : unidadSelected?.costo ?? articulo.costo_principal;
+
     detalle['detalle_id'] = fun.hasValue(data?.id) ? data?.id : null;
     detalle['articulo'] = articulo;
-    detalle['unidades'] = this.llenarArrayUnidades(articulo);
+    detalle['unidades'] = unidades;
     detalle['codigo'] = articulo.codigo;
-    detalle['precio'] = fun.roundNumberToDecimal(articulo.precio_principal);
-    detalle['costo'] = fun.roundNumberToDecimal(articulo.costo_principal);
+    detalle['precio'] = fun.roundNumberToDecimal(precio);
+    detalle['costo'] = fun.roundNumberToDecimal(costo);
     detalle['descuento_valor'] = fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : fun.roundNumberToDecimal(data.descuento_valor);
     detalle['cantidad'] = data.cantidad;
     detalle['cantidad_initial'] = fun.hasValue(data.cantidad) ? data.cantidad : 0;
@@ -386,8 +392,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     detalle['actual_price_value'] = this.getBadPrice(data, articulo).monto;
     detalle['producto_initial'] = fun.hasValue(data?.producto_initial) ? data.producto_initial : null;
 
-    let unidad = fun.hasValue(data.peso_saco) ? `Saco de ${data.peso_saco} libras` : data.unidad;
-
     detalle['unidad'] = unidad;
 
     formGroup.patchValue(detalle);
@@ -406,10 +410,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const medida = data.peso_saco || data.unidad.includes('Saco de') ? `Saco_${data.peso_saco}` : data.unidad;
 
-    let current_monto = this.factServ.isCompra() ? articulo.costo_principal : articulo.precio_principal;
-
     const tipo = this.factServ.isCompra() ? 'costo' : 'precio';
-    let actual_price_monto = fun.hasValue(data.actual_price) ? data.actual_price[medida][tipo] : current_monto;
+    let current_monto = this.factServ.isCompra() ? data.costo : data.precio;
+    if (!fun.hasValue(current_monto)) current_monto = this.factServ.isCompra() ? articulo.costo_principal : articulo.precio_principal;
+
+    const actual_price = data.actual_price?.[medida]?.[tipo];
+    let actual_price_monto = fun.hasValue(actual_price) ? actual_price : current_monto;
 
     if (data.is_defectuoso) actual_price_monto = actual_price_monto / 2;
 
