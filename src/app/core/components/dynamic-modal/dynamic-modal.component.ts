@@ -152,7 +152,6 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
 
         // Pasar inputs si existen
         if (config.inputs) {
-          this.setComponentInput(componente, 'inputs', config.inputs);
           Object.keys(config.inputs).forEach(key => {
             this.setComponentInput(componente, key, config.inputs[key]);
           });
