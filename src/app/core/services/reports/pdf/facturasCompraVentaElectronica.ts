@@ -111,7 +111,10 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
         },
 
         {
-          text: [{ text: `RNC ${is_venta ? 'cliente' : 'suplidor'} : `, style: 'letra10' }, is_venta ? { text: data.cliente.rnc, style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
+          text: [
+            { text: `RNC ${is_venta ? 'cliente' : 'suplidor'} : `, style: 'letra10' },
+            is_venta ? { text: data.cliente?.rnc ?? data.NoCliente_rnc ?? '----------', style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' },
+          ],
           margin: [0, 4, 0, 0],
         },
 

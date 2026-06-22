@@ -356,7 +356,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
 
   const propietarioConfig = {
     nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.capitalice(evaluar_nombre) || '' },
-    doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario.rnc || '' },
+    doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario?.rnc ?? data?.NoCliente_rnc ?? '' },
     direccion: { label: 'Dirección: ', valor: propietario.direccion || '' },
     recibido: { label: 'Recibido: ', valorArray: [fun_.roundNumberToDecimal(data?.total), ` - ${fun_.my_capitalize(numero_letra)}`] },
   };

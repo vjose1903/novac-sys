@@ -985,6 +985,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const paquete = await this.ncfClass.getAll({ afterPath: `custom/${this.factServ.tipoFactura.id}/true` });
       this.paqueteComprobante = paquete.data;
 
+      console.log("this.paqueteComprobante ", this.paqueteComprobante);
+      
+
       // Verificar si hay fecha válida para procesar
       if (!fun.hasValue(this.paqueteComprobante?.fecha_valida)) {
         return true;
