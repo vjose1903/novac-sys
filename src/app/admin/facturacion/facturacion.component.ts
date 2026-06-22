@@ -1592,7 +1592,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     // Verificación FC > 250k
-    if (this.factServ.isVenta() && this.factServ.tipoFacturaReferenciaSelected == comprobanteElectronico.factura_de_consumo && fun.desformatearStNumber(this.TOTAL) > 250000 && fun.isEmpty(this.factServ?.propietario_factura?.id)) {
+    const esClienteCasualConDocumento = fun.isEmpty(this.factServ?.propietario_factura?.id) && fun.hasValue(this.factServ?.propietario_factura?.NoCliente_rnc);
+
+    if (this.factServ.isVenta() && this.factServ.tipoFacturaReferenciaSelected == comprobanteElectronico.factura_de_consumo && fun.desformatearStNumber(this.TOTAL) > 250000 && fun.isEmpty(this.factServ?.propietario_factura?.id) && !esClienteCasualConDocumento) {
       fun.toastWarning('Se debe seleccionar un cliente, para las Facturas de Consumo Electrónico, con valor mayor a RD$250,000.00', 'Aviso');
       return this.abrirModalPropietario({ send_factura: true });
     }
