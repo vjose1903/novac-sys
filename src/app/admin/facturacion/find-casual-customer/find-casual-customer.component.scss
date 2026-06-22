@@ -50,3 +50,15 @@
   background: #f6f7f8;
   font-size: 0.9rem;
 }
+
+.consulta-loading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+}
+
+.consulta-loading i {
+  font-size: 0.95rem;
+}

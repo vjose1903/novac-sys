@@ -35,11 +35,11 @@ export class FacturacionService {
   isComprobanteElectronico = computed(() => this.serieType() == serie.electronica);
   isComprobanteNormal = computed(() => this.serieType() == serie.normal);
 
-  public get clienteContado(): { id?: any; direccion?: string; telefono?: any; nombre_completo?: string } {
+  public get clienteContado(): { id?: any; direccion?: string; nombre_completo?: string } {
     if (fun.hasValue(Ss.configServ)) {
       const configApp = Ss.configServ.config;
 
-      return { id: null, nombre_completo: 'Cliente contado', direccion: configApp.direccion_empresa, telefono: null };
+      return { id: null, nombre_completo: 'Cliente contado', direccion: configApp.direccion_empresa };
     } else {
       return {};
     }

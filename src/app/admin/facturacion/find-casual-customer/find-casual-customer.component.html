@@ -13,7 +13,10 @@
   </div>
 
   @if (isLoading) {
-    <div class="consulta-status text-muted">Consultando documento...</div>
+    <div class="consulta-status consulta-loading text-muted">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <span>Consultando documento...</span>
+    </div>
   }
 
   @if (nombreCompleto) {

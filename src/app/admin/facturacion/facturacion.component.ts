@@ -206,7 +206,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   constructor() {
     super();
 
-    this.formPropietario = this.fb.group({ id: null, direccion: null, telefono: null, nombre_completo: null, documento_identidad: null, documento_identidad_tipo: null, NoCliente_rnc: null });
+    this.formPropietario = this.fb.group({ id: null, direccion: null, nombre_completo: null, documento_identidad: null, documento_identidad_tipo: null, NoCliente_rnc: null });
     this.timeInterval = fun.setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
   }
 
@@ -985,9 +985,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const paquete = await this.ncfClass.getAll({ afterPath: `custom/${this.factServ.tipoFactura.id}/true` });
       this.paqueteComprobante = paquete.data;
 
-      console.log("this.paqueteComprobante ", this.paqueteComprobante);
-      
-
       // Verificar si hay fecha válida para procesar
       if (!fun.hasValue(this.paqueteComprobante?.fecha_valida)) {
         return true;
@@ -1504,10 +1501,30 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     if (args.type == modalCloseType.returnData) {
       const { data } = args;
+      const normalizeText = (value: any) => String(value ?? '').trim().toLowerCase();
+      const clienteContadoNombre = normalizeText(this.factServ.clienteContado.nombre_completo);
 
-      this.factServ.propietario_factura = data;
+      const esContado =
+        fun.isEmpty(data?.id) &&
+        (normalizeText(data?.nombre_completo) === clienteContadoNombre || normalizeText(data?.nombre) === clienteContadoNombre);
 
-      this.formPropietario.patchValue(this.factServ.propietario_factura);
+      this.factServ.propietario_factura = esContado
+        ? {
+            ...data,
+            nombre_completo: this.factServ.clienteContado.nombre_completo,
+            direccion: this.factServ.clienteContado.direccion,
+            NoCliente_rnc: null,
+            documento_identidad: null,
+            documento_identidad_tipo: null,
+          }
+        : data;
+
+      this.formPropietario.patchValue({
+        ...this.factServ.propietario_factura,
+        NoCliente_rnc: null,
+        ...(esContado ? { nombre_completo: this.factServ.clienteContado.nombre_completo, direccion: this.factServ.clienteContado.direccion } : {}),
+      });
+      if (esContado) this.formPropietario.controls.nombre_completo.setValue(this.factServ.clienteContado.nombre_completo);
       const balance = Number(this.factServ.propietario_factura.balance);
       const maxCred = Number(this.factServ.propietario_factura.maximo_credito);
 

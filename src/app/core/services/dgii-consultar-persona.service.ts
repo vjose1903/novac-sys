@@ -106,7 +106,7 @@ export class DgiiConsultarPersonaService {
     const sufijos = new Set(['SRL', 'SA', 'SAS', 'EIRL', 'LLC', 'INC', 'LTD', 'CORP', 'CIA']);
     const normalizada = palabra.replace(/\./g, '').toUpperCase();
 
-    return sufijos.has(normalizada) || (palabra === palabra.toUpperCase() && normalizada.length <= 3);
+    return sufijos.has(normalizada);
   }
 
   private esParticula(palabra: string): boolean {
