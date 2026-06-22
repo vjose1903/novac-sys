@@ -718,16 +718,66 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
           if (this.factura_guardada && this.factura_guardada?.archivo_id) {
             const factura_esentials = (data: FacturasI) => {
-              let dataParsed = { ...data };
-              delete dataParsed.archivo_id;
-              delete dataParsed.archivo_date;
-              dataParsed.detalle_facturas = dataParsed.detalle_facturas.map(detalle => {
-                const dataParsedDetalle = fun.pick(detalle, ['key', 'articulo_id', 'cantidad', 'costo', 'precio', 'itbis', 'total', 'unidad']);
-                dataParsedDetalle.unidad = dataParsedDetalle.unidad.toLowerCase();
-                return dataParsedDetalle;
-              });
+              if (!data) return null;
 
-              return dataParsed;
+              const isEmpty = value => value === undefined || value === null || value === '';
+              const normalizeText = value => (isEmpty(value) ? null : String(value).trim());
+              const normalizeNumber = value => {
+                if (isEmpty(value)) return null;
+
+                const numberValue = Number(fun.desformatearStNumber(value));
+                return Number.isFinite(numberValue) ? Number(fun.roundNumberToDecimal(numberValue)) : value;
+              };
+              const normalizeDate = value => {
+                if (isEmpty(value)) return null;
+
+                const date = moment(value);
+                return date.isValid() ? date.format('YYYY-MM-DD') : value;
+              };
+              const normalizeBoolean = value => value === true;
+              const normalizeDetails = (data.detalle_facturas || [])
+                .map(detalle => ({
+                  articulo_id: normalizeNumber(detalle.articulo_id ?? (detalle.articulo as any)?.id),
+                  codigo: normalizeText(detalle.codigo),
+                  cantidad: normalizeNumber(detalle.cantidad),
+                  costo: normalizeNumber(detalle.costo),
+                  precio: normalizeNumber(detalle.precio),
+                  descuento_valor: normalizeNumber(detalle.descuento_valor),
+                  unidad: normalizeText(detalle.unidad)?.toLowerCase(),
+                  is_defectuoso: normalizeBoolean(detalle.is_defectuoso),
+                  is_devuelto: normalizeBoolean(detalle.is_devuelto),
+                  peso_saco: normalizeNumber(detalle.peso_saco),
+                  calcular_saco: normalizeBoolean(detalle.calcular_saco),
+                }))
+                .sort((a, b) => fun.compare(a, b, ['articulo_id', 'codigo', 'unidad', 'cantidad', 'precio'], 'asc'));
+              const normalizeMovimientos = (data.is_viaje ? data.movimientos_viaje || [] : [])
+                .map(movimiento => ({
+                  vehiculo_id: normalizeNumber(movimiento.vehiculo_id),
+                  user_id: normalizeNumber(movimiento.user_id),
+                }))
+                .sort((a, b) => fun.compare(a, b, ['vehiculo_id', 'user_id'], 'asc'));
+
+              return {
+                tipo: normalizeText(data.tipo),
+                action: normalizeText(data.action),
+                condicion: normalizeText(data.condicion),
+                forma_pago: normalizeText(data.forma_pago),
+                cliente_id: normalizeNumber(data.cliente_id),
+                suplidor_id: normalizeNumber(data.suplidor_id),
+                NoCliente_nombre: normalizeText(data.NoCliente_nombre),
+                NoCliente_direccion: normalizeText(data.NoCliente_direccion),
+                tipo_factura_id: normalizeNumber(data.tipo_factura_id),
+                numero_comprobante: normalizeText(data.numero_comprobante),
+                costoYgasto: normalizeText(data.costoYgasto),
+                factura_pendiente: normalizeBoolean(data.factura_pendiente),
+                is_adelantada: normalizeBoolean(data.is_adelantada),
+                is_viaje: normalizeBoolean(data.is_viaje),
+                fecha_equivalente: data.factura_pendiente ? normalizeDate(data.fecha_equivalente) : null,
+                fecha_vencimiento: normalizeDate(data.fecha_vencimiento),
+                fecha_viaje: data.is_viaje ? normalizeDate(data.fecha_viaje) : null,
+                movimientos_viaje: normalizeMovimientos,
+                detalle_facturas: normalizeDetails,
+              };
             };
 
             const factura_en_turno_storage = fun.deepCloning(this.objArchivo.factura_en_turno_storage);
