@@ -288,7 +288,7 @@ export class fun {
     return new Promise((resolve, reject) => {
       let extra = { afterPath: 'persona', parameters: {} };
 
-      extra['parameters'] = { all: true, documentos_de_identidad: true, filter_key: 'cedula', filter_value: params.documento };
+      extra['parameters'] = { all: true, documentos_de_identidad: true, filter_key: params.tipo, filter_value: params.documento };
 
       new DocumentosC()
         .getAll(extra)

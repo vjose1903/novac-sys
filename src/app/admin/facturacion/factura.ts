@@ -515,6 +515,7 @@ export interface FacturasI {
   tipo: string;
   NoCliente_nombre: null;
   NoCliente_direccion: null;
+  NoCliente_rnc?: string | null;
   costoYgasto: null;
   pagada: boolean;
   vendedor_id: number;

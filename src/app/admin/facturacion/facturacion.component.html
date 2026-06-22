@@ -290,22 +290,26 @@
           <!-- ======================================================================================================================================================================== -->
           <div class="{{ factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
             <form [formGroup]="formPropietario">
-              <div class="d-flex" style="height: 1.7rem">
+              <div class="d-flex align-items-center mb-2 h-fit">
                 <!-- ================== PROPIETARIO ================== -->
-                <h5>
+                <h5 class="mb-0">
                   <strong>{{ factServ.isCompra() ? 'Suplidor' : 'Cliente' }}:</strong>
                 </h5>
-                <span class="ms-3">
-                  <btn-icon-circular
-                    [id]="'btnBuscarClienteSuplidor'"
-                    [icon]="'fas fa-search'"
-                    [size]="'size-md'"
-                    [icon_size]="'1rem'"
-                    [tooltip]="factServ.isCompra() ? 'Buscar suplidor' : 'Buscar cliente'"
-                    [tooltipPosition]="'right'"
-                    (clickFunction)="abrirModalPropietario()">
-                  </btn-icon-circular>
-                </span>
+                <div class="ms-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <btn-icon-circular
+                      [id]="'btnBuscarClienteSuplidor'"
+                      [icon]="'fas fa-search'"
+                      [size]="'size-md'"
+                      [icon_size]="'1rem'"
+                      [tooltip]="factServ.isCompra() ? 'Buscar suplidor' : 'Buscar cliente'"
+                      [tooltipPosition]="'right'"
+                      (clickFunction)="abrirModalPropietario()">
+                    </btn-icon-circular>
+
+                    <button type="button" class="btn btn-sm btn-tema" (click)="openFindCasualCustomerModal()">Cliente Casual</button>
+                  </div>
+                </div>
               </div>
               <div class="row">
                 <div class="col-7 ps-0">
@@ -329,13 +333,33 @@
                   }
                 </div>
 
-                <div class="col-5 pe-0">
+                <div class="col-5 p-0">
                   <div class="form-group">
-                    <!-- ================== TELEFONO ================== -->
-                    <span class="control-label titulos">Telefono:</span>
-                    <input type="text" class="form-control inputE disabled" formControlName="telefono" placeholder="(___)___-____" autocomplete="off" id="inputTelefono" [readOnly]="true" tabindex="-1" />
-                    @if (!formPropietario.controls['telefono'].valid && (formPropietario.controls['telefono'].dirty || formPropietario.controls['telefono'].touched)) {
-                      <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el numero de telefono</div>
+                    <!-- ================== DOCUMENTO ================== -->
+                    <span class="control-label titulos">Documento Identidad:</span>
+                    @if (propietarioDocumentoTipo == 'rnc') {
+                      <p-inputMask
+                        class="d-block"
+                        inputId="inputDocumentoIdentidad"
+                        formControlName="documento_identidad"
+                        mask="999-99999-9"
+                        placeholder="___-_____-_"
+                        styleClass="form-control inputE disabled"
+                        [autoClear]="false"
+                        tabindex="-1"></p-inputMask>
+                    } @else {
+                      <p-inputMask
+                        class="d-block"
+                        inputId="inputDocumentoIdentidad"
+                        formControlName="documento_identidad"
+                        mask="999-9999999-9"
+                        placeholder="___-_______-_"
+                        styleClass="form-control inputE disabled"
+                        [autoClear]="false"
+                        tabindex="-1"></p-inputMask>
+                    }
+                    @if (!formPropietario.controls['documento_identidad'].valid && (formPropietario.controls['documento_identidad'].dirty || formPropietario.controls['documento_identidad'].touched)) {
+                      <div class="alerta text-danger ms-1" style="font-size: 12px">Introduzca el documento de identidad</div>
                     }
                   </div>
                 </div>

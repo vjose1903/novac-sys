@@ -34,6 +34,7 @@ import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { CanComponentDeactivate, CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { FindCasualCustomerComponent } from './find-casual-customer/find-casual-customer.component';
 
 @Component({
   selector: 'app-facturacion',
@@ -205,7 +206,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   constructor() {
     super();
 
-    this.formPropietario = this.fb.group({ id: null, direccion: null, telefono: null, nombre_completo: null });
+    this.formPropietario = this.fb.group({ id: null, direccion: null, telefono: null, nombre_completo: null, documento_identidad: null, documento_identidad_tipo: null, NoCliente_rnc: null });
     this.timeInterval = fun.setInterval(() => (this.fecha = this.my_timeDateFormater(new Date())), 1000);
   }
 
@@ -503,7 +504,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.filterChoferesTargets = ['nombre', 'apellido', 'nombre_completo'];
 
         if (this.factServ.isVenta()) {
-          this.formPropietario.patchValue(this.factServ.clienteContado);
+          this.formPropietario.patchValue({ ...this.factServ.clienteContado, documento_identidad: null, documento_identidad_tipo: null, NoCliente_rnc: null });
         } else {
           if (fun.hasValue(this.formPropietario)) this.formPropietario.reset();
         }
@@ -702,10 +703,61 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.factServ.propietario_factura = cliente_response.data;
         this.factServ.propietario_factura.nombre_completo = this.factServ.propietario_factura.nombre_completo;
       } else {
-        this.factServ.propietario_factura = { id: null, direccion: arg['NoCliente_direccion'], nombre_completo: arg['NoCliente_nombre'], telefono: '' };
+        this.factServ.propietario_factura = {
+          id: null,
+          direccion: arg['NoCliente_direccion'],
+          nombre_completo: arg['NoCliente_nombre'],
+          NoCliente_rnc: arg['NoCliente_rnc'] ?? null,
+        };
       }
     }
     this.formPropietario.patchValue(this.factServ.propietario_factura);
+    this.syncPropietarioDocumento(this.factServ.propietario_factura);
+  }
+
+  private syncPropietarioDocumento(propietario: any) {
+    const documento = this.getPropietarioDocumentoInfo(propietario);
+
+    this.formPropietario.patchValue(
+      {
+        documento_identidad_tipo: documento.tipo,
+        documento_identidad: this.normalizeDocumentoIdentidad(documento.documento),
+        NoCliente_rnc: fun.hasValue(propietario?.NoCliente_rnc) ? propietario.NoCliente_rnc : null,
+      },
+      { emitEvent: false }
+    );
+  }
+
+  private normalizeDocumentoIdentidad(documento: string | null): string | null {
+    if (fun.isEmpty(documento)) return null;
+
+    return String(documento).replace(/\D/g, '');
+  }
+
+  private getPropietarioDocumentoInfo(propietario: any): { documento: string | null; tipo: 'cedula' | 'rnc' | null } {
+    const docs = propietario?.documentos_de_identidad ?? [];
+    const docPrincipal = docs.find(doc => doc?.principal && ['cedula', 'rnc'].includes(String(doc?.descripcion ?? '').toLowerCase()));
+    const documentoDirecto = propietario?.documento_identidad ?? propietario?.documento ?? propietario?.NoCliente_rnc ?? propietario?.cedula ?? propietario?.rnc ?? null;
+
+    if (fun.hasValue(docPrincipal?.documento)) {
+      return {
+        documento: docPrincipal.documento,
+        tipo: String(docPrincipal.descripcion).toLowerCase() === 'rnc' ? 'rnc' : 'cedula',
+      };
+    }
+
+    if (fun.hasValue(documentoDirecto)) {
+      const documentoNormalizado = String(documentoDirecto).replace(/\D/g, '');
+      const tipo = documentoNormalizado.length === 9 ? 'rnc' : documentoNormalizado.length === 11 ? 'cedula' : null;
+
+      return { documento: documentoDirecto, tipo };
+    }
+
+    return { documento: null, tipo: null };
+  }
+
+  get propietarioDocumentoTipo(): 'cedula' | 'rnc' | null {
+    return this.formPropietario?.controls?.documento_identidad_tipo?.value ?? this.getPropietarioDocumentoInfo(this.factServ.propietario_factura).tipo;
   }
 
   checkSituaciones(args: { goOut: boolean }): Promise<{ factura_en_proceso: boolean; abrirModal?: boolean; texto_modal?: string; archivo_id?: any }> {
@@ -768,6 +820,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 suplidor_id: normalizeNumber(data.suplidor_id),
                 NoCliente_nombre: normalizeText(data.NoCliente_nombre),
                 NoCliente_direccion: normalizeText(data.NoCliente_direccion),
+                NoCliente_rnc: normalizeText(data.NoCliente_rnc),
                 tipo_factura_id: normalizeNumber(data.tipo_factura_id),
                 numero_comprobante: normalizeText(data.numero_comprobante),
                 costoYgasto: normalizeText(data.costoYgasto),
@@ -1375,6 +1428,67 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
+  openFindCasualCustomerModal() {
+    const modalConfig = new DynamicModalClass();
+
+    modalConfig.id = 'findCasualCustomer';
+    modalConfig.header = 'Cliente Casual';
+    modalConfig.width = '28rem';
+    modalConfig.component = FindCasualCustomerComponent;
+    modalConfig.closableEsc = true;
+    modalConfig.botones = [
+      { id: 'btnCancelar', clase: 'btn btn-gray', action: modalActionsE.close, label: 'Cancelar', disable: false },
+      {
+        id: 'btnAceptar',
+        clase: 'btn btn-green',
+        functionInOtherComponent: 'submit',
+        label: 'Aceptar',
+        disable: {
+          function: () => !modalConfig.componentInstance || !(modalConfig.componentInstance as any).canAccept,
+        },
+      },
+    ];
+    modalConfig.setCallback(this.processCasualCustomerModal.bind(this));
+    modalConfig.show();
+  }
+
+  processCasualCustomerModal(args: ICallbackModal) {
+    if (args.type !== modalCloseType.returnData) return;
+
+    const data = args.data;
+
+    if (data?.is_existing_client) {
+      this.factServ.propietario_factura = data.cliente;
+      this.formPropietario.patchValue({
+        ...data.cliente,
+        documento_identidad: data.cliente.documento_identidad ?? data.cliente.documento ?? data.cliente.rnc ?? null,
+        documento_identidad_tipo: data.cliente.documento_identidad_tipo ?? this.getPropietarioDocumentoInfo(data.cliente).tipo,
+        NoCliente_rnc: null,
+      });
+      this.syncPropietarioDocumento(this.factServ.propietario_factura);
+      this.cuerpo.seleccionarCampoEnTurno();
+      return;
+    }
+
+    if (data?.is_no_cliente) {
+      const noCliente = {
+        id: null,
+        direccion: this.configApp?.direccion_empresa ?? this.factServ.clienteContado.direccion,
+        nombre_completo: data.NoCliente_nombre,
+        NoCliente_nombre: data.NoCliente_nombre,
+        NoCliente_direccion: this.configApp?.direccion_empresa ?? this.factServ.clienteContado.direccion,
+        NoCliente_rnc: data.NoCliente_rnc,
+        documento_identidad: data.NoCliente_rnc,
+        documento_identidad_tipo: data.NoCliente_rnc?.replace(/\D/g, '').length === 9 ? 'rnc' : 'cedula',
+      };
+
+      this.factServ.propietario_factura = noCliente;
+      this.formPropietario.patchValue({ ...noCliente });
+      this.syncPropietarioDocumento(this.factServ.propietario_factura);
+      this.cuerpo.seleccionarCampoEnTurno();
+    }
+  }
+
   processPropietarioModal(args: ICallbackModal) {
     if (args.type == modalCloseType.onHide) {
       let documento = this.getDocumentoDescripcion();
@@ -1936,6 +2050,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         cabecera_fact['cliente_id'] = null;
         cabecera_fact['NoCliente_nombre'] = this.formPropietario.controls.nombre_completo.value;
         cabecera_fact['NoCliente_direccion'] = this.formPropietario.controls.direccion.value;
+        cabecera_fact['NoCliente_rnc'] = this.formPropietario.controls.NoCliente_rnc.value ?? null;
       } else {
         cabecera_fact['cliente_id'] = this.factServ.propietario_factura.id;
       }
