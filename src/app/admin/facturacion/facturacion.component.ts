@@ -843,14 +843,17 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   procesoRellenoFacturaArchivada(factura) {
     this.rellenando_factura_archivada = true;
+    this.showDeactivationModal.set(false);
 
     return this.procesoRelleno(factura).then(
       () => {
         this.actualizarLayServFactGuardada(factura);
         this.rellenando_factura_archivada = false;
+        this.showDeactivationModal.set(true);
       },
       error => {
         this.rellenando_factura_archivada = false;
+        this.showDeactivationModal.set(true);
         throw error;
       },
     );
