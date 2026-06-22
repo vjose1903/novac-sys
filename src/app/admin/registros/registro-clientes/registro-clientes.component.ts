@@ -64,6 +64,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   provincia_id = signal<number | null>(null);
   documento_identidad = signal<string | null>(null);
+  private documentoEnConsulta: string | null = null;
+  private ultimaConsultaDocumento: string | null = null;
+  private ultimaConsultaAt = 0;
 
   readonly provincias = resource({
     loader: () => {
@@ -261,6 +264,11 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   async checkDocumento(tipo, e?) {
     if (e.key != 'Enter') {
       const documento = this.form.controls[tipo].value ?? '';
+      const documentoNormalizado = documento.replace(/\s+/g, '');
+      const ahora = Date.now();
+
+      if (this.documentoEnConsulta === documentoNormalizado) return;
+      if (this.ultimaConsultaDocumento === documentoNormalizado && ahora - this.ultimaConsultaAt < 1000) return;
 
       let enable_campos = false;
 
@@ -270,9 +278,14 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
           return;
         }
 
-        await fun
-          .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: tipo })
-          .then(async (res: any) => {
+        this.documentoEnConsulta = documentoNormalizado;
+        this.ultimaConsultaDocumento = documentoNormalizado;
+        this.ultimaConsultaAt = ahora;
+
+        try {
+          await fun
+            .getPersonaByDocIdentidad({ documento: documento, tipo: tipo })
+            .then(async (res: any) => {
             if (res['data'].length) {
               const is_cliente = res.data.find(item => item.persona_is.toLowerCase() == 'cliente');
               const id_anterior = this.form.getRawValue().id;
@@ -317,9 +330,12 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
             if (enable_campos) this.changeStateCampos(true);
           })
-          .catch(err => {
+            .catch(err => {
             console.error('err ', err);
-          });
+            });
+        } finally {
+            this.documentoEnConsulta = null;
+        }
       } else {
         if (!this.editando && documento?.endsWith('_')) {
           this.documentos_de_identidad = [];
