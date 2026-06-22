@@ -81,11 +81,17 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   escucharCambiosEnForm() {
     this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(changes => {
-      if (!fun.isEqual(this.lastCuerpoChange, fun.deepCloning(this.factServ.getDetallesLlenos())) && fun.hasValue(this.factServ.getDetallesLlenos())) {
-        this.lastCuerpoChange = fun.deepCloning(this.factServ.getDetallesLlenos());
-        fun.setTimeout(() => {
-          this.emitirCambiosForm(this.factServ.getDetallesLlenos());
-        }, 250);
+      const detallesActuales = this.factServ.getDetallesLlenos();
+      if (fun.hasValue(detallesActuales)) {
+        const detallesClonados = fun.deepCloning(detallesActuales);
+
+        if (!fun.isEqual(this.lastCuerpoChange, detallesClonados)) {
+          this.lastCuerpoChange = detallesClonados;
+
+          fun.setTimeout(() => {
+            this.emitirCambiosForm(this.factServ.getDetallesLlenos());
+          }, 250);
+        }
       }
     });
   }
@@ -104,7 +110,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
     });
 
-    this.getCuerpoFactura.emit({ tipo: 'cuerpo', data: fun.deepCloning(detalle_factura) });
+    this.getCuerpoFactura.emit({ tipo: 'cuerpo', data: detalle_factura });
   }
 
   async rellenarVariables(): Promise<boolean> {
@@ -674,87 +680,81 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
-    return new Promise<void>(resolve => {
-      const formGroup = this.factServ.filasDetalle.at(params.index) as FormGroup;
-      const { unidad, cantidad, cantidad_initial, unidades } = formGroup.getRawValue();
+    const formGroup = this.factServ.filasDetalle.at(params.index) as FormGroup;
+    const { unidad, cantidad, cantidad_initial, unidades } = formGroup.getRawValue();
 
-      // Calcular cantidad mínima basada en la unidad seleccionada
-      const cantidadMinima = unidad && unidades?.length > 0 ? unidades.find(uni => uni.value.toLowerCase() === unidad.toLowerCase())?.cantidad || 1 : 1;
+    // Calcular cantidad mínima basada en la unidad seleccionada
+    const cantidadMinima = unidad && unidades?.length > 0 ? unidades.find(uni => uni.value.toLowerCase() === unidad.toLowerCase())?.cantidad || 1 : 1;
 
-      // Calcular cantidades en unidades
-      const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
-      const cant_unidades_initial = params.clean ? 0 : (cantidad_initial || 0) * cantidadMinima;
+    // Calcular cantidades en unidades
+    const cant_unidades = params.clean ? 0 : cantidad * cantidadMinima;
+    const cant_unidades_initial = params.clean ? 0 : (cantidad_initial || 0) * cantidadMinima;
 
-      // Preparar objeto de detalles a actualizar
-      const detalles = {
-        cantidad_en_unidades: cant_unidades,
-        cantidad_en_unidades_initial: cant_unidades_initial,
-      };
+    // Preparar objeto de detalles a actualizar
+    const detalles = {
+      cantidad_en_unidades: cant_unidades,
+      cantidad_en_unidades_initial: cant_unidades_initial,
+    };
 
-      // Limpiar precio y total si no hay unidades
-      if (cant_unidades === 0) {
-        detalles['precio'] = null;
-        detalles['total'] = null;
-      }
+    // Limpiar precio y total si no hay unidades
+    if (cant_unidades === 0) {
+      detalles['precio'] = null;
+      detalles['total'] = null;
+    }
 
-      formGroup.patchValue(detalles);
-      resolve();
-    });
+    formGroup.patchValue(detalles);
   }
 
   calcularMontosRow(index: number) {
-    return new Promise<any>((resolve, reject) => {
-      const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
-      const detalle = {};
-      let { cantidad, articulo, codigo, key, precio, costo, descuento_valor } = formGroup.value;
+    const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
+    const detalle = {};
+    let { cantidad, articulo, codigo, key, precio, costo, descuento_valor } = formGroup.value;
 
-      precio = fun.desformatearStNumber(precio);
-      costo = fun.desformatearStNumber(costo);
-      let descuento = fun.desformatearStNumber(descuento_valor);
+    precio = fun.desformatearStNumber(precio);
+    costo = fun.desformatearStNumber(costo);
+    let descuento = fun.desformatearStNumber(descuento_valor);
 
-      const precioOcosto = this.factServ.isCompra() ? costo : precio;
+    const precioOcosto = this.factServ.isCompra() ? costo : precio;
 
-      const total = precioOcosto * cantidad - descuento;
-      const itbis = articulo?.calcular_itbis ? total * 0.18 : 0;
+    const total = precioOcosto * cantidad - descuento;
+    const itbis = articulo?.calcular_itbis ? total * 0.18 : 0;
 
-      if (descuento == 0 || fun.isEmpty(descuento)) {
-        if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
-          formGroup.controls['descuento_valor'].reset();
+    if (descuento == 0 || fun.isEmpty(descuento)) {
+      if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
+        formGroup.controls['descuento_valor'].reset();
 
-          if (fun.hasValue(total) && total > 0) {
-            detalle['total'] = fun.roundNumberToDecimal(total);
-          }
-          this.sacarDescuento(key);
-        }
-      } else {
-        if (descuento < 0) {
-          fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
-          detalle['descuento_valor'] = 0;
-          fun.enfocarInput(`descuento_valor-${index}`);
-        }
-      }
-
-      if (fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
-        if (total < 0) {
-          fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
-          fun.enfocarAndSelectInput(`descuento_valor-${index}`);
-        } else {
-          let currentDescuento = this.listaDeDescuentos.find(item => item.key == key);
-
-          if (fun.hasValue(currentDescuento)) currentDescuento.valor = descuento;
-          else this.listaDeDescuentos.push({ key: key, valor: descuento });
-
+        if (fun.hasValue(total) && total > 0) {
           detalle['total'] = fun.roundNumberToDecimal(total);
-          detalle['itbis'] = fun.roundNumberToDecimal(itbis);
-          this.ajustarSecuencia();
         }
+        this.sacarDescuento(key);
       }
+    } else {
+      if (descuento < 0) {
+        fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
+        detalle['descuento_valor'] = 0;
+        fun.enfocarInput(`descuento_valor-${index}`);
+      }
+    }
 
-      formGroup.patchValue(detalle);
+    if (fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad) && fun.hasValue(descuento)) {
+      if (total < 0) {
+        fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
+        fun.enfocarAndSelectInput(`descuento_valor-${index}`);
+      } else {
+        let currentDescuento = this.listaDeDescuentos.find(item => item.key == key);
 
-      this.enviarTotalesGenerales();
-      resolve(true);
-    });
+        if (fun.hasValue(currentDescuento)) currentDescuento.valor = descuento;
+        else this.listaDeDescuentos.push({ key: key, valor: descuento });
+
+        detalle['total'] = fun.roundNumberToDecimal(total);
+        detalle['itbis'] = fun.roundNumberToDecimal(itbis);
+        this.ajustarSecuencia();
+      }
+    }
+
+    formGroup.patchValue(detalle);
+
+    this.enviarTotalesGenerales();
   }
 
   sacarDescuento(key) {
@@ -777,7 +777,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     return fun.revisarNumber(input, `${formControlName}-${index}`).then(res => {
       if (!res.error) {
-        const value = fun.roundNumberToDecimal(res.number) != '0.00' ? fun.roundNumberToDecimal(res.number) : null;
+        const roundedNumber = fun.roundNumberToDecimal(res.number);
+        const value = roundedNumber != '0.00' ? roundedNumber : null;
         input.setValue(value);
       } else {
         input.setValue(null);
