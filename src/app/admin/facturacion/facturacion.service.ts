@@ -147,7 +147,7 @@ export class FacturacionService {
       res.descripcion = 'Factura con valor fiscal';
     } else if (modo_factura === 'adelantada') {
       res.descripcion = 'Factura adelantada';
-    } else if (modo_factura.includes('nota_')) {
+    } else if (modo_factura?.includes('nota_')) {
       const tipo = modo_factura.split('_')[1];
       res.descripcion = tipo == 'credito' ? 'Nota de Crédito' : 'Nota de Débito';
     } else if (is_viaje) {

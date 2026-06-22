@@ -32,7 +32,7 @@
     </table>
     <div class="contenido-fact" #cuadro>
       <form [formGroup]="form" action="">
-        @for (item_cuerpo of factServ.filasDetalle.controls; track item_cuerpo; let index_cuerpo = $index) {
+        @for (item_cuerpo of factServ.filasDetalle.controls; track index_cuerpo; let index_cuerpo = $index) {
           <div formArrayName="rowFactura">
             <ng-container [formGroupName]="index_cuerpo">
               <p-popover #dropRowMenu appendTo="body">
