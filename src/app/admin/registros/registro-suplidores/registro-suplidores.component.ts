@@ -14,6 +14,7 @@ import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { DgiiConsultarPersonaService } from '@core/services/dgii-consultar-persona.service';
 
 @Component({
   selector: 'app-registro-suplidores',
@@ -34,6 +35,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   doc_is_cedula = false;
   doc_principal = 'rnc';
   documentos_de_identidad: any;
+  documentoEnConsulta: string | null = null;
+  ultimaConsultaDocumento: string | null = null;
+  ultimaConsultaAt = 0;
 
   isCreando: boolean = false;
 
@@ -62,6 +66,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
+  private dgiiConsultarPersonaServ = inject(DgiiConsultarPersonaService);
   private fb = inject(UntypedFormBuilder);
   private route = inject(ActivatedRoute);
   private tServ = inject(TablasService);
@@ -153,8 +158,10 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     const formulario = this.form.getRawValue();
     if (campo != 'send') {
       if (campo == 'campoTelefono') {
-        if (!_.endsWith(formulario[this.doc_principal], '_')) {
-          const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
+        const documento = formulario[this.doc_principal] ?? '';
+
+        if (!_.endsWith(documento, '_')) {
+          const docSinGuiones = _.join(_.split(documento, '-'), '');
           if (this.doc_principal == 'cedula') {
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
@@ -185,9 +192,14 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
     this.form.controls.rnc.updateValueAndValidity();
   }
 
-  checkDocumento(tipo, e?) {
+  async checkDocumento(tipo, e?) {
     if (e.key != 'Enter') {
-      const documento = this.form.controls[tipo].value;
+      const documento = this.form.controls[tipo].value ?? '';
+      const documentoNormalizado = documento.replace(/\s+/g, '');
+      const ahora = Date.now();
+
+      if (this.documentoEnConsulta === documentoNormalizado) return;
+      if (this.ultimaConsultaDocumento === documentoNormalizado && ahora - this.ultimaConsultaAt < 1000) return;
 
       let enable_campos = false;
 
@@ -197,9 +209,14 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           return;
         }
 
-        fun
-          .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
-          .then(res => {
+        this.documentoEnConsulta = documentoNormalizado;
+        this.ultimaConsultaDocumento = documentoNormalizado;
+        this.ultimaConsultaAt = ahora;
+
+        try {
+          await fun
+            .getPersonaByDocIdentidad({ documento: documento, tipo: tipo })
+            .then(async res => {
             if (res['data'].length) {
               const is_suplidor = _.find(res['data'], item => item.persona_is === 'Suplidor');
               const id_anterior = this.form.getRawValue().id;
@@ -227,6 +244,14 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
               this.documentos_de_identidad = persona.documentos_de_identidad;
             } else {
+              const dgiiPersona = await this.dgiiConsultarPersonaServ.consultarPersona(documento);
+
+              if (dgiiPersona) {
+                this.form.controls.nombre.setValue(`${dgiiPersona.nombre ?? ''} ${dgiiPersona.apellido ?? ''}`.trim());
+              } else {
+                this.form.controls.nombre.reset();
+              }
+
               enable_campos = true;
             }
 
@@ -235,6 +260,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           .catch(err => {
             console.error('err ', err);
           });
+        } finally {
+          this.documentoEnConsulta = null;
+        }
       } else {
         if (!_.endsWith(documento, '_')) {
           this.documentos_de_identidad = undefined;
