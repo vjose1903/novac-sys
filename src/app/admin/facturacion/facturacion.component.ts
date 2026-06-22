@@ -970,6 +970,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     } else {
       this.fecha_vencimiento = null;
     }
+
+    this.validarClienteCasualPermitido();
   }
 
   async calcularPorcientoComprobante(): Promise<boolean> {
@@ -1546,6 +1548,29 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
   }
 
+  canShowClienteCasualButton(): boolean {
+    return this.factServ.isVenta() && this.condicion_fact === 'Contado' && this.modo_factura === 'normal';
+  }
+
+  private isClienteCasualSeleccionado(): boolean {
+    return fun.isEmpty(this.factServ?.propietario_factura?.id) && fun.hasValue(this.factServ?.propietario_factura?.NoCliente_rnc);
+  }
+
+  private limpiarClienteCasualSeleccionado() {
+    this.factServ.propietario_factura = null;
+    this.formPropietario.reset();
+    fun.toastWarning('No se pueden tener clientes casuales con los parametros introducidos', 'Aviso');
+  }
+
+  private validarClienteCasualPermitido() {
+    if (this.isClienteCasualSeleccionado() && !this.canShowClienteCasualButton()) {
+      this.limpiarClienteCasualSeleccionado();
+      return false;
+    }
+
+    return true;
+  }
+
   // =============================================
   //  MODAL CANCELAR
   // =============================================
@@ -1795,6 +1820,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       detalle.retirado = valorRetirado ?? detalle.cantidad_en_unidades;
       detalle.retirado_en_venta = valorRetirado ?? detalle.cantidad_en_unidades;
     });
+
+    this.validarClienteCasualPermitido();
   }
 
   getCantidadArticulos() {

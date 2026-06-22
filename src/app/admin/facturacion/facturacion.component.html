@@ -307,7 +307,9 @@
                       (clickFunction)="abrirModalPropietario()">
                     </btn-icon-circular>
 
-                    <button type="button" class="btn btn-sm btn-tema" (click)="openFindCasualCustomerModal()">Cliente Casual</button>
+                    @if (canShowClienteCasualButton()) {
+                      <button type="button" class="btn btn-sm btn-tema" (click)="openFindCasualCustomerModal()">Cliente Casual</button>
+                    }
                   </div>
                 </div>
               </div>
