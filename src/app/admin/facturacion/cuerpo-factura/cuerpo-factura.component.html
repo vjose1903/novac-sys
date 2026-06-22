@@ -181,7 +181,7 @@
                           }
                           <input
                             type="text"
-                            (blur)="handleInputEvent('blur', precioCostoKey, index_cuerpo); calcularMontosRow(index_cuerpo)"
+                            (blur)="handleInputEvent('blur', precioCostoKey, index_cuerpo)"
                             (focus)="verificarSecuencia(index_cuerpo)"
                             class="form-control entrada campoNumeros {{ factServ.isVenta() ? 'inPRE' : '' }}"
                             (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"

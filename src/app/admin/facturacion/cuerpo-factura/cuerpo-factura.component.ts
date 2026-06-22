@@ -773,9 +773,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   revisarPrecio(formControlName, index) {
-    let input = (this.factServ.filasDetalle.at(index) as FormGroup).controls[formControlName];
+    const input = (this.factServ.filasDetalle.at(index) as FormGroup).controls[formControlName];
 
-    fun.revisarNumber(input, `${formControlName}-${index}`).then(res => {
+    return fun.revisarNumber(input, `${formControlName}-${index}`).then(res => {
       if (!res.error) {
         const value = fun.roundNumberToDecimal(res.number) != '0.00' ? fun.roundNumberToDecimal(res.number) : null;
         input.setValue(value);
@@ -785,13 +785,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     });
   }
 
-  handleInputEvent(type, formControlName, index) {
-    let input = (this.factServ.filasDetalle.at(index) as FormGroup).controls[formControlName];
+  async handleInputEvent(type, formControlName, index) {
+    const input = (this.factServ.filasDetalle.at(index) as FormGroup).controls[formControlName];
 
     if (type == 'focus' && fun.hasValue(input.value)) input.setValue(fun.desformatearStNumber(input.value));
     if (type == 'blur') {
-      this.revisarPrecio(formControlName, index);
-      fun.setTimeout(() => this.calcularMontosRow(index), 10);
+      await this.revisarPrecio(formControlName, index);
+      await this.calcularMontosRow(index);
     }
   }
 

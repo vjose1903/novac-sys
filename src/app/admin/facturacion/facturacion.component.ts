@@ -1698,10 +1698,26 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   calculatePrecio(costo): number {
+    costo = fun.desformatearStNumber(costo);
+
     if (costo > 0 || costo != null || costo) {
       const precio = costo / this.configArticuloClass.getWinPercentCalc(this.config_articulos);
-      return fun.desformatearStNumber(fun.roundNumberToDecimal(precio));
+      const precio_rounded = fun.roundToNearestMultipleOf5(precio);
+      return fun.desformatearStNumber(fun.roundNumberToDecimal(precio_rounded));
     }
+  }
+
+  calculatePrecioLibra(precio) {
+    precio = fun.desformatearStNumber(precio);
+
+    const precioLibra = precio / 100;
+    return fun.roundNumberToDecimal(fun.roundToNearestMultipleOf5(precioLibra));
+  }
+
+  calculateCostoLibra(costo) {
+    costo = fun.desformatearStNumber(costo);
+
+    return fun.roundNumberToDecimal(costo / 100);
   }
 
   procesarCambioCostos(costoDB, costoRow, articulo) {
@@ -1709,6 +1725,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     const { contenido_articulos } = articulo;
     const newPrecio = this.calculatePrecio(costoRow);
+    const newPrecioLibra = this.calculatePrecioLibra(newPrecio);
+    const newCostoLibra = this.calculateCostoLibra(costoRow);
+    const esQuintal = articulo.medida === 'Quintal';
 
     // Buscar contenidos padre e hijo
     const contenidoPadre = contenido_articulos.find(contenido => contenido.condicion === 'padre');
@@ -1717,8 +1736,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     // Procesar contenido padre si existe
     if (contenidoPadre) {
       const { cantidad: cantPadre } = contenidoPadre;
-      contenidoPadre.precio = fun.desformatearStNumber(this.calcNewAmounts(cantPadre, newPrecio));
-      contenidoPadre.costo = fun.desformatearStNumber(this.calcNewAmounts(cantPadre, costoRow));
+      if (esQuintal) {
+        contenidoPadre.precio = fun.desformatearStNumber(newPrecioLibra);
+        contenidoPadre.costo = fun.desformatearStNumber(newCostoLibra);
+        contenidoPadre.cantidad = 100;
+      } else {
+        contenidoPadre.precio = fun.desformatearStNumber(this.calcNewAmounts(cantPadre, newPrecio));
+        contenidoPadre.costo = fun.desformatearStNumber(this.calcNewAmounts(cantPadre, costoRow));
+      }
     }
 
     // Procesar contenido hijo si existe
