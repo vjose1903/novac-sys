@@ -1,8 +1,30 @@
 @use './forms.scss' as *;
 
 .p-inputmask {
-  @include formField;
-  
+  display: block;
+  width: 100%;
+  background-color: transparent;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0.25rem !important;
+  overflow: hidden;
+  padding: 0;
+
+  input {
+    @include formField;
+
+    &:disabled,
+    &[disabled] {
+      background-color: #e9ecef !important;
+      border: 1px solid #ced4da !important;
+      box-shadow: none !important;
+      opacity: 1 !important;
+      color: #1d253b !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      -webkit-text-fill-color: #1d253b !important;
+    }
+  }
 
   &:focus {
     box-shadow: none;
@@ -15,11 +37,24 @@
 
   &.disabled,
   &:disabled {
-    @include formFieldDisabled;
+    background-color: transparent !important;
+
+    input {
+      @include formFieldDisabled;
+      border-color: #ced4da !important;
+      box-shadow: none !important;
+    }
   }
 
   &.with-right-btn {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
+  }
+
+  &:has(> .p-inputtext:disabled),
+  &:has(> .p-inputtext[disabled]) {
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    user-select: none !important;
   }
 }
