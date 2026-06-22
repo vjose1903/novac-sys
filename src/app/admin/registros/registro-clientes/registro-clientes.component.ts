@@ -12,6 +12,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { Permisos } from '../../../core/typescript/permisos';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DgiiConsultarPersonaService } from '@core/services/dgii-consultar-persona.service';
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
@@ -82,6 +83,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
+  private dgiiConsultarPersonaServ = inject(DgiiConsultarPersonaService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
 
@@ -258,7 +260,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   async checkDocumento(tipo, e?) {
     if (e.key != 'Enter') {
-      const documento = this.form.controls[tipo].value;
+      const documento = this.form.controls[tipo].value ?? '';
 
       let enable_campos = false;
 
@@ -300,6 +302,16 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
               this.documentos_de_identidad = persona.documentos_de_identidad ?? [];
             } else {
+              const dgiiPersona = await this.dgiiConsultarPersonaServ.consultarPersona(documento);
+
+              if (dgiiPersona) {
+                this.form.controls.nombre.setValue(dgiiPersona.nombre);
+                this.form.controls.apellido.setValue(dgiiPersona.apellido);
+              } else {
+                this.form.controls.nombre.reset();
+                this.form.controls.apellido.reset();
+              }
+
               enable_campos = true;
             }
 
@@ -309,7 +321,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
             console.error('err ', err);
           });
       } else {
-        if (!this.editando && documento.endsWith('_')) {
+        if (!this.editando && documento?.endsWith('_')) {
           this.documentos_de_identidad = [];
           // this.camposDisabled = true;
           this.changeStateCampos(false);
@@ -323,8 +335,10 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     if (campo != 'send') {
       if (campo == 'campoNombre') {
-        if (!formulario[this.doc_principal].endsWith('_')) {
-          const docSinGuiones = formulario[this.doc_principal].split('-').join('');
+        const documentoPrincipal = formulario[this.doc_principal] ?? '';
+
+        if (!documentoPrincipal.endsWith('_')) {
+          const docSinGuiones = documentoPrincipal.split('-').join('');
           if (this.doc_principal == 'cedula') {
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
