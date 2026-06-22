@@ -294,7 +294,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
             this.localPagination(page, per_page);
           } else {
             if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-              this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
+              this.config.padre_functions.data_request({ per_page: per_page, page: page, search: actualPagination.search });
             } else {
               fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
             }
