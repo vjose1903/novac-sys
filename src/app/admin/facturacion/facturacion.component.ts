@@ -190,6 +190,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   tipoDocFacturacion = tipoDocFacturacion;
   fun = fun;
   isInitialized = false;
+  rellenando_factura_archivada = false;
   config_articulos: ConfigArticuloI;
 
   facturasSerieOptions = seriesDGII();
@@ -236,6 +237,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           //
         } else {
           fun.setTimeout(() => {
+            if (this.rellenando_factura_archivada) return;
             if (this.factServ.isPreVenta() || this.factServ.isCotizacion()) this.abrirModalPropietario();
             else fun.enfocarInput('tipoFact');
           }, 5);
@@ -814,15 +816,11 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             if (result.abrirModal) {
               let siFunction = () => {
                 this.agregarFacturaALocalStorage();
-                this.procesoRelleno(factura).then(() => {
-                  this.actualizarLayServFactGuardada(factura);
-                });
+                this.procesoRellenoFacturaArchivada(factura);
               };
 
               let noFunction = () => {
-                this.procesoRelleno(factura).then(() => {
-                  this.actualizarLayServFactGuardada(factura);
-                });
+                this.procesoRellenoFacturaArchivada(factura);
               };
 
               this.dynamicModalServ.confirmationModal({
@@ -833,18 +831,29 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
                 onNo: noFunction.bind(this),
               });
             } else {
-              this.procesoRelleno(factura).then(() => {
-                this.actualizarLayServFactGuardada(factura);
-              });
+              this.procesoRellenoFacturaArchivada(factura);
             }
           } else {
-            this.procesoRelleno(factura).then(() => {
-              this.actualizarLayServFactGuardada(factura);
-            });
+            this.procesoRellenoFacturaArchivada(factura);
           }
         });
       }
     }
+  }
+
+  procesoRellenoFacturaArchivada(factura) {
+    this.rellenando_factura_archivada = true;
+
+    return this.procesoRelleno(factura).then(
+      () => {
+        this.actualizarLayServFactGuardada(factura);
+        this.rellenando_factura_archivada = false;
+      },
+      error => {
+        this.rellenando_factura_archivada = false;
+        throw error;
+      },
+    );
   }
 
   actualizarLayServFactGuardada(factura) {
