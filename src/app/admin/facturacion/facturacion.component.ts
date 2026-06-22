@@ -596,7 +596,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       this.factServ
         .setTipos({ metodo: this.factServ.tipoDocumento(), serie: currentSerie, equivalentSerie, tipoFacturaId: factura.tipo_factura_id })
-        .then(result => {
+        .then(async result => {
           // Configurar factura pendiente
           this.factura_pendiente = factura?.factura_pendiente || false;
 
@@ -660,10 +660,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
             this.factura_a_rellenar = factura;
           }
 
+          if (factura.is_viaje && this.hasPermisoCamiones) await this.getersMovimientoViaje();
+
           // Configurar productos devueltos y movimientos
           this.factServ.productos_devueltos = productos_devueltos;
+          this.movimientosSelected = [];
 
-          if (fun.objHas(factura, 'movimientos_viaje')) {
+          if (factura.is_viaje && fun.objHas(factura, 'movimientos_viaje') && fun.hasValue(factura.movimientos_viaje)) {
             factura.movimientos_viaje.forEach(movimiento => this.movimientosSelected.push({ vehiculo_id: movimiento.vehiculo_id, user_id: movimiento.user_id }));
           }
 
@@ -760,7 +763,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           if (result.factura_en_proceso) {
             if (result.abrirModal) {
               let siFunction = () => {
-                this.procesoArchivarFactura();
+                this.agregarFacturaALocalStorage();
                 this.procesoRelleno(factura).then(() => {
                   this.actualizarLayServFactGuardada(factura);
                 });
@@ -817,8 +820,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         if (sali_de == 'venta' && valor == 'adelantada' && dont_have_propietario) buscar = true;
 
         if (sali_de == 'fecha_viaje') {
-          this.getersMovimientoViaje();
-          document.getElementById('btnCamion').click();
+          this.getersMovimientoViaje().then(() => document.getElementById('btnCamion')?.click());
         }
 
         if (this.modo_factura != 'viaje') this.movimientosSelected = [];
@@ -1240,24 +1242,18 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   async getCamiones() {
     const extra = { afterPath: `filtro/ `, parameters: { paginado: false } };
-    this.vehiculoClass.getAll(extra).then(res => {
-      this.camiones = res['data'].map(camion => {
-        camion.selected = false;
-        return camion;
-      });
+    return this.vehiculoClass.getAll(extra).then(res => {
+      this.camiones = res['data'].map(camion => ({ ...camion, selected: false }));
       this.copyCamiones = fun.deepCloning(this.camiones);
     });
   }
 
   async getChoferes() {
     const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'chofer' } };
-    this.userClass.getAll(extra).then(res => {
-      this.choferes = res['data'].map(chofer => {
-        chofer.selected = false;
-        return chofer;
-      });
+    return this.userClass.getAll(extra).then(res => {
+      this.choferes = res['data'].map(chofer => ({ ...chofer, selected: false }));
+      this.copyChoferes = fun.deepCloning(this.choferes);
     });
-    this.copyChoferes = fun.deepCloning(this.choferes);
   }
 
   filterCamion(camionesFiltrados) {
