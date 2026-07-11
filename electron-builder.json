@@ -5,11 +5,13 @@
     "output": "actualizacion/"
   },
   "extraMetadata": {
-    "main": "dist/out-tsc/main.js"
+    "main": "main.js"
   },
   "files": [
     "./*",
     "**/*",
+    "main.js",
+    "electron/**/*.js",
     "!**/*.ts",
     "!*.code-workspace",
     "!./LICENSE.md",
