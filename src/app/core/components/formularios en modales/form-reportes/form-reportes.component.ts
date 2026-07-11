@@ -11,7 +11,7 @@ import { ArticuloC } from '@registros/articulos/articulo';
 import { ClienteC, CxC } from '@registros/registro-clientes/cliente';
 // import { TipoPagoReporte } from '../../../pagos/class/pagos/pagos';
 // import { TipoReciboReporte } from '../../../pagos/class/ingresos/recibos';
-import { formControlMap, reportField, switchGroup } from './form-reportes.component.model';
+import { dynamicFieldConfig, formControlMap, reportField, switchGroup } from './form-reportes.component.model';
 import { ReportDateTypeE, ReportGroupTypeE } from '@admin/reportes/reporte.utils';
 import { tFacturaKey } from '@admin/facturacion/factura';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
@@ -48,13 +48,14 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   clienteClass = new ClienteC();
   dinamycSelectionReady: boolean = false;
   dinamycSwitchReady: boolean = false;
+  advancedFiltersReady: boolean = false;
 
   facturasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
 
   ReportDateTypeE = ReportDateTypeE;
   reportField = reportField;
 
-  currentReportFields: reportField[] = [];
+  currentReportFields: string[] = [];
   formUpdateTrigger = signal(0);
 
   isSomeFieldEmpty = computed(() => {
@@ -72,6 +73,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   @Input() dynamic_switches!: any;
   @Input() conditionalRender!: any;
   @Input() switchGroup!: switchGroup;
+  @Input() advanced_filters!: dynamicFieldConfig[];
+
+  advancedFiltersAccordionValue: string | number | string[] | number[] | null = null;
+  previousColumnasAntiguedadSelection: string[] = [];
 
   private fb = inject(UntypedFormBuilder);
 
@@ -92,6 +97,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     await this.createForm();
     await this.checkDynamicFields();
     await this.addValidators();
+    this.handleAdvancedFiltersRules();
     await this.verifyReportFields({ setValue: true });
 
     this.subscribeFormChanges();
@@ -115,6 +121,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
 
   subscribeFormChanges() {
     this.form.valueChanges.pipe(debounceTime(50)).subscribe(() => {
+      this.handleAdvancedFiltersRules();
       this.verifyReportFields({ setValue: false });
       this.formUpdateTrigger.update(val => val + 1);
     });
@@ -150,6 +157,20 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
 
         fun.setTimeout(() => {
           this.dinamycSwitchReady = true;
+        }, 10);
+      }
+
+      if (fun.hasValue(this.advanced_filters)) {
+        for (let index = 0; index < this.advanced_filters?.length; index++) {
+          const element = this.advanced_filters[index];
+
+          this.form.addControl(element.formControl, this.fb.control(element.defaultValue ?? element.initialValue ?? null));
+
+          if (fun.hasValue(element?.validators)) this.form.controls[element.formControl].setValidators(element.validators);
+        }
+
+        fun.setTimeout(() => {
+          this.advancedFiltersReady = true;
         }, 10);
       }
 
@@ -300,12 +321,13 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   verifyReportFields(args: { setValue?: boolean }) {
     const { setValue } = args;
 
-    this.currentReportFields = Object.values(reportField)
+    this.currentReportFields = (Object.values(reportField) as reportField[])
       .filter(field => this.reportTypeHasfield(field) && this.verifyConditionalRender(field))
       .map(field => formControlMap[field])
       .filter(field => fun.hasValue(field));
 
     if (this.dynamic_selections) this.dynamic_selections.forEach(selection => this.currentReportFields.push(selection.formControl));
+    if (this.advanced_filters) this.advanced_filters.filter(field => field.required).forEach(field => this.currentReportFields.push(field.formControl));
   }
 
   setDesdeHastaControls(params?: { begin_of_year?: boolean }) {
@@ -325,7 +347,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   reportTypeHasfield(fieldReport: string) {
     const reportTypeMap = {
       [reportField.dynamicSelection]: ['movimientos_vehiculo', 'recibos', 'notas'],
-      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos', 'cuentas_cobrar_cliente', 'recibos', 'notas'],
+      [reportField.customerField]: ['ventas_cliente', 'cuentas_con_pagos', 'cuentas_cobrar_cliente', 'cuentas_cobrar_ant_saldo', 'recibos', 'notas'],
       [reportField.serieField]: ['ventas_diarias', 'ventas_rango', 'ventas_cliente'],
       [reportField.conditionField]: ['ventas_cliente', 'ventas_rango', 'ventas_diarias'],
       [reportField.typeField]: ['ventas_rango', 'recibos', 'ventas_productos', 'cuentas_cobrar_ant_saldo', 'notas', 'pago_facturas', 'cuentas_pagar_ant_saldo'],
@@ -409,6 +431,72 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     }
   }
 
+  handleAdvancedFiltersRules() {
+    if (this.tipo_reporte != 'cuentas_cobrar_ant_saldo' || !this.form?.controls['filtrar_por_cliente']) return;
+
+    const filtrarPorCliente = !!this.form.controls['filtrar_por_cliente'].value;
+    const tipoControl = this.form.controls['tipo'];
+    const clienteControl = this.form.controls['cliente_id'];
+    const columnasAntiguedadControl = this.form.controls['columnas_antiguedad'];
+
+    if (filtrarPorCliente) {
+      tipoControl.setValue(CxC.detallado, { emitEvent: false });
+      tipoControl.disable({ emitEvent: false });
+      clienteControl.setValidators(Validators.required);
+    } else {
+      tipoControl.enable({ emitEvent: false });
+      clienteControl.setValidators([]);
+      clienteControl.setValue(null, { emitEvent: false });
+    }
+
+    tipoControl.updateValueAndValidity({ emitEvent: false });
+    clienteControl.updateValueAndValidity({ emitEvent: false });
+
+    if (columnasAntiguedadControl) {
+      this.normalizeColumnasAntiguedadSelection(columnasAntiguedadControl);
+    }
+  }
+
+  hasAdvancedFilters() {
+    return Array.isArray(this.advanced_filters) && this.advanced_filters.length > 0;
+  }
+
+  getAdvancedFiltersByType(controlType: dynamicFieldConfig['controlType']) {
+    if (!Array.isArray(this.advanced_filters)) return [];
+    return this.advanced_filters.filter(filter => (filter.controlType ?? 'select') === controlType);
+  }
+
+  isTypeDisabled() {
+    return this.tipo_reporte == 'cuentas_cobrar_ant_saldo' && !!this.form?.controls['filtrar_por_cliente']?.value;
+  }
+
+  normalizeColumnasAntiguedadSelection(control) {
+    const allValue = ClienteC.allColumnasAntiguedadValue;
+    const rawSelection = Array.isArray(control.value) ? control.value.filter(item => fun.hasValue(item)) : [];
+    const hasAll = rawSelection.includes(allValue);
+    const previousHasAll = this.previousColumnasAntiguedadSelection.includes(allValue);
+    let normalizedSelection = [...rawSelection];
+
+    if (normalizedSelection.length === 0) {
+      normalizedSelection = [allValue];
+    } else if (hasAll && normalizedSelection.length > 1) {
+      normalizedSelection = previousHasAll ? normalizedSelection.filter(item => item != allValue) : [allValue];
+    }
+
+    if (normalizedSelection.length === 0) {
+      normalizedSelection = [allValue];
+    }
+
+    const shouldUpdate =
+      normalizedSelection.length !== rawSelection.length || normalizedSelection.some((item, index) => item !== rawSelection[index]);
+
+    if (shouldUpdate) {
+      control.setValue(normalizedSelection, { emitEvent: false });
+    }
+
+    this.previousColumnasAntiguedadSelection = [...normalizedSelection];
+  }
+
   setValidator(control) {
     this.form.controls[control].setValidators(Validators.required);
     this.form.controls[control].updateValueAndValidity();
@@ -448,6 +536,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   }
 
   submit() {
-    this.modalConfig.close({ data: { ...this.form.value, switchGroup: { ...this.switchGroup } } });
+    this.modalConfig.close({ data: { ...this.form.getRawValue(), switchGroup: { ...this.switchGroup } } });
   }
 }

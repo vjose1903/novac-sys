@@ -13,6 +13,30 @@ export enum reportField {
   simpleSwitchField = 'simpleSwitchField',
 }
 
+export interface dynamicFieldOption {
+  label: string;
+  value: any;
+}
+
+export interface dynamicFieldConfig {
+  id?: string;
+  label: string;
+  formControl: string;
+  validators?: any;
+  defaultValue?: any;
+  initialValue?: any;
+  placeholder?: string;
+  items?: dynamicFieldOption[] | any[];
+  optionLabel?: string | null;
+  optionValue?: string | null;
+  notFoundText?: string;
+  searchFunction?: (value?: string) => void;
+  blurFunction?: () => void;
+  disabledFunction?: () => boolean;
+  controlType?: 'select' | 'multiselect' | 'switch';
+  required?: boolean;
+}
+
 export interface switchGroup {
   title: string;
   array: { label: string; value: any }[];

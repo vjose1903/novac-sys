@@ -1,3 +1,5 @@
+const columnasAntiguedadKeys = ['cero_to_treinta', 'treinta_uno_to_sesenta', 'sesenta_uno_to_noventa', 'noventa_uno_to_more'];
+
 export const config_cxc_ant = {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // DETALLADO
@@ -225,3 +227,20 @@ export const config_cxc_ant = {
     ],
   },
 };
+
+export function filterCxcAntConfiguration(configuration, columnasAntiguedad?: string[]) {
+  if (!Array.isArray(columnasAntiguedad) || columnasAntiguedad.length === 0) return configuration;
+
+  const allowedColumns = new Set(columnasAntiguedad);
+  const info = configuration.info.filter(column => !columnasAntiguedadKeys.includes(column.key) || allowedColumns.has(column.key));
+  const widths = configuration.widths.filter((width, index) => {
+    const key = configuration.info[index]?.key;
+    return !columnasAntiguedadKeys.includes(key) || allowedColumns.has(key);
+  });
+
+  return {
+    ...configuration,
+    info,
+    widths,
+  };
+}

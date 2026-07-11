@@ -60,6 +60,39 @@
       </div>
     }
 
+    @if (hasAdvancedFilters() && advancedFiltersReady) {
+      <div class="col-12 p-0 mb-2">
+        <p-accordion [value]="advancedFiltersAccordionValue" (valueChange)="advancedFiltersAccordionValue = $event" styleClass="advanced-filters-accordion header-md">
+          <p-accordion-panel value="advanced">
+            <p-accordion-header>Filtros avanzados</p-accordion-header>
+            <p-accordion-content>
+              <div class="advanced-filters-body">
+            @for (advanced_switch of getAdvancedFiltersByType('switch'); track advanced_switch.formControl) {
+              <div class="form-group horizontal-layout mb-2">
+                <label class="control-label mb-0 advanced-filter-label">{{ advanced_switch.label }}:</label>
+                <input [formControlName]="advanced_switch.formControl" class="apple-switch" type="checkbox" />
+              </div>
+            }
+
+            @for (advanced_selection of getAdvancedFiltersByType('multiselect'); track advanced_selection.formControl) {
+              <div class="form-group">
+                <label class="control-label mb-0 advanced-filter-label">{{ advanced_selection.label }}:</label>
+                <p-selectButton
+                  styleClass="advanced-columns-select-button"
+                  [options]="advanced_selection.items"
+                  [formControlName]="advanced_selection.formControl"
+                  [optionLabel]="advanced_selection.optionLabel ?? 'label'"
+                  [optionValue]="advanced_selection.optionValue ?? 'value'"
+                  [multiple]="true" />
+              </div>
+            }
+              </div>
+            </p-accordion-content>
+          </p-accordion-panel>
+        </p-accordion>
+      </div>
+    }
+
     <!-- ----- DINAMYC SELECTION -----  -->
 
     @if (verifyConditionalRender(reportField.dynamicSelection) && dinamycSelectionReady && reportTypeHasfield(reportField.dynamicSelection)) {
@@ -132,7 +165,7 @@
       <div class="col-12 p-0">
         <div class="form-group">
           <label class="control-label mb-0">Tipo: <span style="color: red">*</span> </label>
-          <select formControlName="tipo" class="form-control" (change)="changeTipo()">
+          <select formControlName="tipo" class="form-control" (change)="changeTipo()" [attr.disabled]="isTypeDisabled() ? true : null">
             <option disabled>Seleccione</option>
             @for (tipo of tipos; track tipo) {
               <option [value]="tipo.id">{{ tipo.label }}</option>
