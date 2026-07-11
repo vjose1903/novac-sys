@@ -8,23 +8,21 @@
     "main": "main.js"
   },
   "files": [
-    "./*",
-    "**/*",
-    "main.js",
-    "electron/**/*.js",
-    "!**/*.ts",
-    "!*.code-workspace",
-    "!./LICENSE.md",
-    "!./package-lock.json",
-    "!./e2e/",
-    "!./config_setup/",
-    "!./angular.json",
-    "!./_config.yml",
-    "!./tsconfig.json",
-    "!./tslint.json",
-    "!./actualizacion/",
-    "!./actualizacion.zip",
-    "!./log/"
+    {
+      "from": ".",
+      "to": ".",
+      "filter": [
+        "package.json",
+        "main.js",
+        "dist/**/*",
+        "electron/**/*.js",
+        "electron/**/*.json",
+        "logos.json",
+        "actual_cliente.json",
+        "fb.config",
+        "app_config.config"
+      ]
+    }
   ],
   "extraFiles": [
     {
