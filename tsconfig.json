@@ -22,18 +22,18 @@
     "types": ["node"],
     "typeRoots": ["node_modules/@types"],
     "lib": ["ES2023", "dom"],
-    "baseUrl": "./src",
     "allowJs": true,
     "checkJs": false,
     "useDefineForClassFields": false,
     "paths": {
-      "@core/*": ["app/core/*"],
-      "@services/*": ["app/core/services/*"],
-      "@components/*": ["app/core/components/*"],
-      "@registros/*": ["app/admin/registros/*"],
-      "@admin/*": ["app/admin/*"],
-      "@environments/*": ["environments/*"],
-      "@electron/*": ["../electron/*"]
+      "app/*": ["./src/app/*"],
+      "@core/*": ["./src/app/core/*"],
+      "@services/*": ["./src/app/core/services/*"],
+      "@components/*": ["./src/app/core/components/*"],
+      "@registros/*": ["./src/app/admin/registros/*"],
+      "@admin/*": ["./src/app/admin/*"],
+      "@environments/*": ["./src/environments/*"],
+      "@electron/*": ["./src/electron/*"]
     }
   },
   "files": [],
