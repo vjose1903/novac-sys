@@ -353,44 +353,6 @@ body {
   width: 100% !important;
 }
 
-/* ====================================================== */
-/* BADGE */
-/* ====================================================== */
-.badge {
-  cursor: default !important;
-  font-size: 1rem;
-  padding: 0.5rem;
-  box-shadow: 1px 1px 1px black;
-  letter-spacing: 1px;
-
-  &.text-shadow {
-    text-shadow: 1px 1px 1px #000000cf;
-  }
-  &.bg-red {
-    background-color: #eb3a3a;
-  }
-
-  &.bgreen {
-    background-color: #1ade48;
-  }
-
-  &.bg-blue {
-    background-color: #1a44de;
-  }
-
-  &.bg-yellow {
-    background-color: #e9e61e;
-  }
-
-  &.bg-orange {
-    background-color: #ffa711;
-  }
-
-  &.disable {
-    filter: brightness(1.6) contrast(0.5);
-  }
-}
-
 .bg-secondary {
   background-color: #6c757d !important;
 }

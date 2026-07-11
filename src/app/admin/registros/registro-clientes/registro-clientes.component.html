@@ -110,8 +110,17 @@
                   </div>
                   <div class="col-6 p-0 pe-2">
                     <div class="form-group" [appMsgError]="'telefono'" [form]="form">
-                      <label class="control-label">Telefono: <span style="color: red">*</span></label>
-                      <p-inputMask (keydown.enter)="saltar('campoSexo')" mask="(999) 999-9999" tabindex="-1" styleClass="form-control" inputId="campoTelefono" placeholder="(___) ___-____" formControlName="telefono" [autoClear]="false"></p-inputMask>
+                      <label class="control-label d-block">Telefono: <span style="color: red">*</span></label>
+                      <p-inputMask
+                        class="d-block"
+                        (keydown.enter)="saltar('campoSexo')"
+                        mask="(999) 999-9999"
+                        tabindex="-1"
+                        styleClass="form-control"
+                        inputId="campoTelefono"
+                        placeholder="(___) ___-____"
+                        formControlName="telefono"
+                        [autoClear]="false"></p-inputMask>
                       <span id="msgContainer_telefono"></span>
                     </div>
                   </div>
@@ -178,7 +187,6 @@
                               (onChange)="form.controls.municipio_id.setValue(null)"
                               (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
                               (keyup.enter)="saltar('municipio_select'); pSelectProvincia.hide()"
-                              (onFocus)="htmlServ.showPSelectPanel($event, pSelectProvincia)"
                               [resetFilterOnHide]="true" />
                           }
                         </div>
@@ -201,7 +209,6 @@
                               emptyFilterMessage="Municipio no encontrado"
                               (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
                               (keyup.enter)="saltar('campoDir'); pSelectMunicipio.hide()"
-                              (onFocus)="htmlServ.showPSelectPanel($event, pSelectMunicipio)"
                               [resetFilterOnHide]="true" />
                           </div>
                         </div>

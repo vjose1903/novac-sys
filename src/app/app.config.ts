@@ -11,13 +11,13 @@ import Nora from '@primeuix/themes/nora';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { provideRouter, withRouterConfig, withComponentInputBinding } from '@angular/router';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getDatabase, provideDatabase } from '@angular/fire/database';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 import { Environment } from '@environments/environment';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import { FIRESTORE } from '@core/tokens/firebase.tokens';
 
 // Registrar el locale español
 registerLocaleData(localeEs);
@@ -63,8 +63,9 @@ export const appConfig: ApplicationConfig = {
     }),
 
     // FIREBASE
-    provideFirebaseApp(() => initializeApp(Environment.firebaseConfig)),
-    provideDatabase(() => getDatabase()),
-    provideFirestore(() => getFirestore()),
+    {
+      provide: FIRESTORE,
+      useFactory: () => getFirestore(initializeApp(Environment.firebaseConfig)),
+    },
   ],
 };

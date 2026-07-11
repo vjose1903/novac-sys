@@ -18,8 +18,8 @@ export class ConduceC extends CrudG<any> {
       data_parsed['numero_documento'] = data_parsed['identificador'];
       data_parsed['usuario'] = data.user.nombre_completo;
 
-      const documento = data.cliente.documentos_de_identidad.find(documento => documento.principal);
-      data_parsed['cliente']['rnc'] = documento ? documento.documento : '----------';
+      const documento = data?.cliente?.documentos_de_identidad?.find(documento => documento.principal);
+      data_parsed['cliente']['rnc'] = documento ? documento.documento : data?.cliente?.rnc ?? data?.NoCliente_rnc ?? '----------';
 
       data_parsed['contenido_reporte'].map(detalle => {
         detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${unidadAbrev[fun.normalizarTexto(detalle.unidad)]}.`;

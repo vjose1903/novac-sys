@@ -12,6 +12,7 @@ export class DynamicModalClass {
   componentInstance!: IDynamicModal;
   width: string | undefined;
   height: string | undefined;
+  baseZIndex: number | undefined;
   padding: string | undefined;
   overflow: 'hidden' | 'auto' | undefined;
   private _botones: Array<IButtonDynamic>;
@@ -25,6 +26,7 @@ export class DynamicModalClass {
   closableEsc: boolean | undefined;
   closableClickOutside: boolean | undefined;
   confirmToClose: boolean | undefined;
+  disableAllButtonsIfAnyProcessing: boolean | undefined;
 
   returnData!: Function;
   hideModal!: Function;
@@ -46,6 +48,7 @@ export class DynamicModalClass {
     this.component = params && fun.objHas(params, 'component') ? params.component : undefined;
     this.width = params && fun.objHas(params, 'width') ? params.width : '50vw';
     this.height = params && fun.objHas(params, 'height') ? params.height : undefined;
+    this.baseZIndex = params && fun.objHas(params, 'baseZIndex') ? params.baseZIndex : 10000;
     this.padding = params && fun.objHas(params, 'padding') ? params.padding : '1rem';
     this.overflow = params && fun.objHas(params, 'overflow') ? params.overflow : 'hidden';
     this.inputs = params && fun.objHas(params, 'inputs') ? params.inputs : undefined;
@@ -62,6 +65,7 @@ export class DynamicModalClass {
     this.confirmToClose = params && fun.objHas(params, 'confirmToClose') ? params.confirmToClose : false;
     this.html = params && fun.objHas(params, 'html') ? params.html : undefined;
     this.callback = params && fun.objHas(params, 'callback') ? params.callback : undefined;
+    this.disableAllButtonsIfAnyProcessing = params && fun.objHas(params, 'disableAllButtonsIfAnyProcessing') ? params.disableAllButtonsIfAnyProcessing : false;
 
     this.returnData = (arg: ICallbackModal) => this.runCallback(arg);
     this.hideModal = (arg: ICallbackModal) => this.runCallback(arg);

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/
 import { DomSanitizer } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { DynamicModalClass } from './config/dynamic-modal.class';
-import { IButtonDynamic, ICallbackModal, IModalConfiguration, modalActionsE, modalCloseType } from './config/dynamic-modal.interface';
+import { IDynamicModal, IButtonDynamic, ICallbackModal, IModalConfiguration, modalActionsE, modalCloseType } from './config/dynamic-modal.interface';
 import { DynamicModalDirective } from './dynamic-modal.directive';
 import { fun } from '@services/functions.service';
 import { Ss } from '@services/singleton.service';
@@ -44,9 +44,10 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
 
   handleCloseModal(modalId: string, dataToReturn?: ICallbackModal) {
     const modal: DynamicModalClass = Ss.dynamicModalService.findModalConfigById(modalId);
+
     if (modal) {
       if (dataToReturn && modal.returnData) modal.returnData({ data: dataToReturn, modalId: modalId, type: modalCloseType.returnData });
-      if (modal.hideModal) modal.hideModal({ modalId, type: modalCloseType.onHide });
+      if (modal.hideModal) modal.hideModal({ modalId, type: modalCloseType.onHide, hasReturnData: !!dataToReturn });
 
       Ss.dynamicModalService.modalsConfigurations = this.modalsConfig.filter(modalConfig => modalConfig.id != modalId);
     }
@@ -126,11 +127,16 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
         return;
       }
 
-      fun.setTimeout(() => {
-        const currentReceptor = this.modalReceptor['_results'].find((receptor: any) => receptor.modalReceptorId == config.id);
-        
+      const tryRender = (attempt = 0) => {
+        const currentReceptor = this.modalReceptor?.toArray().find((receptor: any) => receptor.modalReceptorId == config.id);
+
         if (!currentReceptor) {
-          resolve();
+          if (attempt >= 20) {
+            resolve();
+            return;
+          }
+
+          fun.setTimeout(() => tryRender(attempt + 1), 25);
           return;
         }
 
@@ -146,7 +152,6 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
 
         // Pasar inputs si existen
         if (config.inputs) {
-          componente.instance.inputs = config.inputs;
           Object.keys(config.inputs).forEach(key => {
             this.setComponentInput(componente, key, config.inputs[key]);
           });
@@ -155,10 +160,12 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
         // Forzar inicialización completa del componente y sus hijos
         this.initializeComponent(componente);
 
-        currentConfig.componentInstance = componente.instance;
+        currentConfig.componentInstance = componente.instance as IDynamicModal;
 
         resolve();
-      }, 1);
+      };
+
+      tryRender();
     });
   }
 
@@ -192,15 +199,29 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
     if (buttonToChange) buttonToChange.disable = params.disable;
   }
 
-  getButtonState(btnConfig: IButtonDynamic) {
+  getButtonState(btnConfig: IButtonDynamic, modalId: string) {
+    const currentModalConfig: DynamicModalClass = Ss.dynamicModalService.findModalConfigById(modalId);
     let res = false;
+
+    if (btnConfig.showProcess && btnConfig.processing) return true;
 
     if (btnConfig.disable && fun.objHas(btnConfig, 'disable')) {
       if (typeof btnConfig.disable == 'boolean') return btnConfig.disable;
       res = btnConfig.disable.function();
     }
 
+    if (currentModalConfig.disableAllButtonsIfAnyProcessing) {
+      if (this.someButtonIsProcessing(modalId)) return true;
+    }
+
     return res;
+  }
+
+  someButtonIsProcessing(modalId: string) {
+    const currentModalConfig: DynamicModalClass = Ss.dynamicModalService.findModalConfigById(modalId);
+    const botones = currentModalConfig.botones;
+    const anyProcessing = botones.some(button => button.showProcess && button.processing);
+    return anyProcessing;
   }
 
   getButtonTooltip(btnConfig: IButtonDynamic) {
@@ -210,6 +231,8 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
   async dynamicFunction(modalConfig: DynamicModalClass, buttonConfig: IButtonDynamic) {
     if (modalConfig.id) {
       const modal: DynamicModalClass = Ss.dynamicModalService.findModalConfigById(modalConfig.id);
+
+      if (buttonConfig.showProcess) buttonConfig.processing = true;
 
       if (buttonConfig.action) {
         if (buttonConfig.action === modalActionsE.close) modal.close();

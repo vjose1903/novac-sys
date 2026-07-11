@@ -66,11 +66,10 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
   ngOnInit(): void {
     this.isSuplidor = this.metodo == tipoDocFacturacion.compra;
+    this.configApp = Ss.configServ.config;
 
     this.table_config.info = this.isSuplidor ? this.compraInfo : this.ventaInfo;
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
-
-    this.configApp = Ss.configServ.config;
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
@@ -105,7 +104,11 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
             this.dataFiltro.set(copyData);
           }
 
-          this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+          if (this.tablaComponent) {
+            this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+          } else {
+            fun.setTimeout(() => this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]), 50);
+          }
         })
         .catch(error => {
           if (where === 'init') this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id });

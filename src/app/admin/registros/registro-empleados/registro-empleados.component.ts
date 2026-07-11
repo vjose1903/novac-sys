@@ -12,6 +12,7 @@ import { ChangePasswordComponent } from '@components/formularios en modales/chan
 import { fun } from '@core/services/functions.service';
 import { RolesC } from '../roles/roles';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { DgiiConsultarPersonaService } from '@core/services/dgii-consultar-persona.service';
 
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
@@ -36,6 +37,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   empleadoSelected: any;
   indexBorrar: any;
   documentos_de_identidad: any;
+  documentoEnConsulta: string | null = null;
+  ultimaConsultaDocumento: string | null = null;
+  ultimaConsultaAt = 0;
 
   camposDisabled = true;
   empleadosClass = new EmpleadoC();
@@ -65,6 +69,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
+  private dgiiConsultarPersonaServ = inject(DgiiConsultarPersonaService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
 
@@ -148,9 +153,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     );
   }
 
-  checkDocumento(tipo, e?) {
+  async checkDocumento(tipo, e?) {
     if (e.key != 'Enter') {
-      const cedula = this.form.controls[tipo].value;
+      const cedula = this.form.controls[tipo].value ?? '';
+      const documentoNormalizado = cedula.replace(/\s+/g, '');
+      const ahora = Date.now();
+
+      if (this.documentoEnConsulta === documentoNormalizado) return;
+      if (this.ultimaConsultaDocumento === documentoNormalizado && ahora - this.ultimaConsultaAt < 1000) return;
 
       let enable_campos = false;
 
@@ -160,9 +170,14 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
           return;
         }
 
-        fun
-          .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: 'cedula' })
-          .then(res => {
+        this.documentoEnConsulta = documentoNormalizado;
+        this.ultimaConsultaDocumento = documentoNormalizado;
+        this.ultimaConsultaAt = ahora;
+
+        try {
+          await fun
+            .getPersonaByDocIdentidad({ documento: cedula, tipo: 'cedula' })
+            .then(async res => {
             if (res['data'].length) {
               const is_user = _.find(res['data'], item => item.persona_is === 'User');
               const id_anterior = this.form.getRawValue().id;
@@ -184,6 +199,16 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
               this.documentos_de_identidad = persona.documentos_de_identidad;
             } else {
+              const dgiiPersona = await this.dgiiConsultarPersonaServ.consultarPersona(cedula);
+
+              if (dgiiPersona) {
+                this.form.controls.nombre.setValue(dgiiPersona.nombre);
+                this.form.controls.apellido.setValue(dgiiPersona.apellido);
+              } else {
+                this.form.controls.nombre.reset();
+                this.form.controls.apellido.reset();
+              }
+
               enable_campos = true;
             }
 
@@ -192,6 +217,9 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
           .catch(err => {
             console.error('err ', err);
           });
+        } finally {
+          this.documentoEnConsulta = null;
+        }
       } else {
         if (!_.endsWith(cedula, '_')) {
           this.documentos_de_identidad = undefined;
@@ -206,8 +234,10 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     const formulario = this.form.getRawValue();
     if (campo != 'send') {
       if (campo == 'campoNombre') {
-        if (!_.endsWith(formulario['cedula'], '_')) {
-          const docSinGuiones = _.join(_.split(formulario['cedula'], '-'), '');
+        const documento = formulario['cedula'] ?? '';
+
+        if (!_.endsWith(documento, '_')) {
+          const docSinGuiones = _.join(_.split(documento, '-'), '');
           if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
         }
       } else fun.enfocarInput(campo);

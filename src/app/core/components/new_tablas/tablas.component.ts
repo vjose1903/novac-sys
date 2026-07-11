@@ -133,16 +133,18 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
       this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
 
-      if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
-        fun.setTimeout(() => {
-          fun.enfocarInput(`search-${this.realIdTabla}`);
-        }, 100);
-      }
-
       this.config.info.map(item => {
         if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
       });
     }, 0);
+  }
+
+  focusSearchInput() {
+    if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
+      fun.setTimeout(() => {
+        fun.enfocarInput(`search-${this.realIdTabla}`);
+      }, 100);
+    }
   }
 
   verifyButtons(config: table_config) {
@@ -292,7 +294,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
             this.localPagination(page, per_page);
           } else {
             if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-              this.config.padre_functions.data_request({ per_page: per_page, page: page, search: null });
+              this.config.padre_functions.data_request({ per_page: per_page, page: page, search: actualPagination.search });
             } else {
               fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
             }
@@ -388,19 +390,17 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     const actualPage = this.getPaginatorPageByNumber(actualPagination?.page);
 
-    fun.setTimeout(() => {
-      this.zone.run(() => {
-        if (actualPage) {
-          actualPage.setAttribute('clickeado_por', 'maquina');
-          actualPage.click();
-          fun.setTimeout(() => {
-            actualPage.removeAttribute('clickeado_por');
-          }, 2000);
-        }
+    requestAnimationFrame(() => {
+      if (actualPage) {
+        actualPage.setAttribute('clickeado_por', 'maquina');
+        actualPage.click();
+        fun.setTimeout(() => {
+          actualPage.removeAttribute('clickeado_por');
+        }, 2000);
+      }
 
-        this.cantPagesView = actual;
-      });
-    }, 100);
+      this.cantPagesView = actual;
+    });
   }
 
   getColor(myColor) {

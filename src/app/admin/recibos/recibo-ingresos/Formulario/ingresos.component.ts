@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ReciboC } from '../../recibos';
-import { FacturaC, FacturasI } from '../../../facturacion/factura';
+import { FacturaC, FacturasI, tipoDocFacturacion } from '../../../facturacion/factura';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { FormCantidadEfectivoComponent } from '@components/formularios en modales/form-cantidad-efectivo/form-cantidad-efectivo.component';
 import { BuscarClienteSuplidorComponent } from '@components/formularios en modales/buscar-cliente-suplidor/buscar-cliente-suplidor.component';
@@ -763,7 +763,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       fun.toastError('Todas las facturas seleccionadas deben de tener un monto a pagar', 'ERROR');
     } else {
       this.detalleYtotal = await this.formarDetalleRecibos();
-      const obj = { total_factura: this.detalleYtotal.total_recibo, devuelta: 0, factura_de: 'recibo_ingreso', tipo_modal: 'devuelta', formaPago: 'Efectivo' };
+      const obj = { total_factura: this.detalleYtotal.total_recibo, metodo: tipoDocFacturacion.recibo_ingreso, formaPago: 'Efectivo' };
 
       const cantidadEfectivoModalConfig = new DynamicModalClass();
 

@@ -10,6 +10,8 @@ import { serie, unidadAbrev } from '@core/typescript/constantes';
 import Big from 'big.js';
 import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { Validators } from '@angular/forms';
+import { reportField } from '@core/components/formularios en modales/form-reportes/form-reportes.component.model';
 
 export enum comprobanteNormal {
   debito = '03',
@@ -19,6 +21,11 @@ export enum comprobanteNormal {
 export enum comprobanteElectronico {
   debito = '33',
   credito = '34',
+}
+
+export enum SearchByNota {
+  general = 1,
+  por_cliente = 2,
 }
 
 export class NotaC extends CrudG<any> {
@@ -43,6 +50,30 @@ export class NotaC extends CrudG<any> {
     all: {
       nota_debito: `${comprobanteNormal.debito},${comprobanteElectronico.debito}`,
       nota_credito: `${comprobanteNormal.credito},${comprobanteElectronico.credito}`,
+    },
+  };
+
+  static inputsBuscarPor = [
+    {
+      label: 'Buscar por',
+      formControl: 'search_by',
+      items: [
+        { label: 'General', value: SearchByNota.general },
+        { label: 'Cliente', value: SearchByNota.por_cliente },
+      ],
+      searchFunction: () => {},
+      initialValue: SearchByNota.general,
+      blurFunction: () => {},
+      placeholder: 'Seleccione el tipo de busqueda',
+      notFoundText: 'Tipo de busqueda no encontrado',
+      disabledFunction: () => false,
+      validators: Validators.required,
+    },
+  ];
+
+  static clienteConditionalRender = {
+    [reportField.customerField]: (formValue: any) => {
+      return formValue.search_by == SearchByNota.por_cliente;
     },
   };
 
@@ -108,6 +139,8 @@ export class NotaC extends CrudG<any> {
       const { tipo, titulo } = params;
       const inputs = { tipo_reporte: tipo };
 
+      inputs['dynamic_selections'] = NotaC.inputsBuscarPor;
+      inputs['conditionalRender'] = { ...NotaC.clienteConditionalRender };
       ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 
       function returnDataFromModal(arg: ICallbackModal) {
@@ -123,15 +156,31 @@ export class NotaC extends CrudG<any> {
   static requestReporte(reporteParams, pdfParams) {
     let requestParameters;
     const formReporte = reporteParams.data;
+    const searchBy = formReporte.search_by || SearchByNota.general;
 
-    requestParameters = { desde: fun.my_dateFormater(formReporte.desde, false), hasta: fun.my_dateFormater(formReporte.hasta, false), tipo_factura_id: formReporte.tipo };
+    requestParameters = {
+      desde: fun.my_dateFormater(formReporte.desde, false),
+      hasta: fun.my_dateFormater(formReporte.hasta, false),
+      tipo_factura_id: formReporte.tipo,
+      search_by: searchBy,
+      cliente_id: formReporte.cliente_id || null,
+    };
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
     ReporteC.configCsv = csvConfig;
-    ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
+    ReporteC.requestReporteAndMakePdf(requestParams, 'reporte', transformRequestResponse).then(response => {
       let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')) };
 
       ReporteC.visualizarReporte(objPdfView);
     });
+
+    function transformRequestResponse(requestResponse) {
+      requestResponse.contenido_reporte = requestResponse.contenido_reporte.map(item => {
+        if (item.cliente_nombre.length > 70) item.cliente_nombre = item.cliente_nombre.substring(0, 70) + '...';
+        return item
+      });
+      if (searchBy == SearchByNota.por_cliente) requestResponse.tipo_reporte = 'notas_cliente';
+      return requestResponse;
+    }
   }
 }

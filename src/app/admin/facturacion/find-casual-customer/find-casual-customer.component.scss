@@ -1,0 +1,64 @@
+.find-casual-customer {
+  min-height: 9rem;
+}
+
+.persona-result {
+  border: 1px solid #d8e2dc;
+  border-radius: 6px;
+  padding: 0.8rem 0.9rem;
+  background: #f8fbf9;
+}
+
+.result-source {
+  margin-bottom: 0.45rem;
+}
+
+.source-tag {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.22rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.source-tag.existing {
+  background: #dceee4;
+  color: #1f6b3d;
+}
+
+.source-tag.dgii {
+  background: #fff0d6;
+  color: #8a5a00;
+}
+
+.persona-result .label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #6c757d;
+  font-size: 0.78rem;
+}
+
+.persona-result strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.consulta-status {
+  border-radius: 6px;
+  padding: 0.55rem 0.7rem;
+  background: #f6f7f8;
+  font-size: 0.9rem;
+}
+
+.consulta-loading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+}
+
+.consulta-loading i {
+  font-size: 0.95rem;
+}

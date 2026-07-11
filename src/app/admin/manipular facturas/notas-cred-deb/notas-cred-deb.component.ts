@@ -227,15 +227,28 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   async checkCantidadEnUnidades() {
     this.detalleNota.update(detalles => {
       detalles.map(detalle => {
-        if (!detalle.cantidad_en_unidades_nota) detalle.cantidad_en_unidades_nota = 0;
+        const cant_nota = fun.desformatearStNumber(detalle.cant_nota);
+        const unidad_minima = this.getCantidadUnidadesBase(detalle);
 
-        const unidad = detalle.peso_saco ? `${detalle.unidad}_${detalle.peso_saco}` : detalle.unidad;
-        const unidad_minima = detalle.contenidos[unidad];
-        if (detalle.cant_nota) detalle.cantidad_en_unidades_nota = fun.desformatearStNumber(detalle.cant_nota) * unidad_minima;
+        detalle.cantidad_en_unidades_nota = cant_nota > 0 ? cant_nota * unidad_minima : 0;
       });
 
       return detalles;
     });
+  }
+
+  private getCantidadUnidadesBase(detalle: DetalleFactura): number {
+    const cantidad = fun.desformatearStNumber(detalle.cantidad);
+    const cantidadEnUnidades = fun.desformatearStNumber(detalle.cantidad_en_unidades);
+
+    if (cantidad > 0 && cantidadEnUnidades > 0) {
+      return cantidadEnUnidades / cantidad;
+    }
+
+    const unidad = detalle.peso_saco ? `${detalle.unidad}_${detalle.peso_saco}` : detalle.unidad;
+    const unidadMinima = detalle.contenidos?.[unidad];
+
+    return fun.desformatearStNumber(unidadMinima);
   }
 
   async selectAll(info) {}
@@ -444,13 +457,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     if (this.totalGeneral() == 0) {
       fun.toastWarning('Total de la nota de ' + this.tipoNota + ' no puede ser 0.', 'Aviso');
     } else {
-      const obj = { modo_factura: 'nota', condicion_fact: 'nota', metodo: `nota_${this.tipoNota}`, is_viaje: false };
+      const obj = { modo_factura: `nota_${this.tipoNota}`, condicion_fact: 'nota', metodo: `nota`, is_viaje: false };
 
       const confirmationImprimirModalConf = new DynamicModalClass();
 
       confirmationImprimirModalConf.id = 'confirmacionImprimir';
       confirmationImprimirModalConf.inputs = obj;
-      confirmationImprimirModalConf.header = 'Confirmación';
+      confirmationImprimirModalConf.header = 'Confirmación'; 
       confirmationImprimirModalConf.width = '30rem';
       confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
       confirmationImprimirModalConf.botones = [
@@ -509,7 +522,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         // TODO: VER COMO AGREGO EL CODIGO Y PROBAR LO DE LA DESCRIPCION NO ME CONVENCE
         objDetalleTemp['total'] = fun.desformatearStNumber(objDetalleTemp.total_nota);
         objDetalleTemp['itbis'] = can_return_itbis ? fun.desformatearStNumber(objDetalleTemp.itbis) : 0;
-        objDetalleTemp['cantidad_en_unidades'] = cantidad_en_unidades_nota;
+        objDetalleTemp['cantidad_en_unidades'] = cantidad_en_unidades_nota ?? 0;
         objDetalleTemp['cantidad'] = cant_nota;
         objDetalleTemp['cantidad_origin'] = cantidad;
         objDetalleTemp['codigo'] = cantidad;

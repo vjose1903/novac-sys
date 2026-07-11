@@ -30,7 +30,7 @@
                       <span class="d-block">
                         <b class="negrita">{{ factura.tipo === 'compra' ? 'Rnc suplidor :' : 'Rnc cliente :' }}</b>
                         &nbsp;
-                        <span>{{ factura.cliente?.rnc }}</span>
+                        <span>{{ factura.cliente?.rnc ?? factura.NoCliente_rnc ?? '----------' }}</span>
                       </span>
                       <span class="d-block">
                         <b class="negrita">Direccion :</b>&nbsp; <span>{{ factura.cliente?.direccion }}</span>

@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs, updateDoc, deleteDoc, query, where, limit, DocumentReference, WhereFilterOp } from '@angular/fire/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, updateDoc, deleteDoc, query, where, limit, DocumentReference, WhereFilterOp } from 'firebase/firestore';
 import { Ss } from '@core/services/singleton.service';
 import { fun } from '@core/services/functions.service';
 import { runInInjectionContext, Injector, inject } from '@angular/core';

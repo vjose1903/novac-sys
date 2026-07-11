@@ -9,7 +9,7 @@ import { SharedService } from './shared.service';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
 import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
-import { Firestore } from '@angular/fire/firestore';
+import { Firestore } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',

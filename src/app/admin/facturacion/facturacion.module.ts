@@ -16,9 +16,10 @@ import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.m
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
+import { FindCasualCustomerComponent } from './find-casual-customer/find-casual-customer.component';
 
 @NgModule({
-  declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent, MenuOpcionesExtraComponent, RetornarDevueltoComponent],
+  declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent, MenuOpcionesExtraComponent, RetornarDevueltoComponent, FindCasualCustomerComponent],
   imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, BtnIconModule, SelectButtonModule],
   providers: [CanDeactivateGuard]
 })
