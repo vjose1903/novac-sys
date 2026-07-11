@@ -19,17 +19,21 @@
 }
 
 <p-dialog [closable]="false" [closeOnEscape]="false" header="Porcentaje de descarga" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
-  <div class="d-flex justify-content-between mb-2 position-relative">
-    <span class="negrita">Descargando actualizacion...</span>
-    <div class="me-2">
-      <span class="negrita">{{ objPercent()?.transferred }} Mb / </span>
-      <span class="negrita gris">{{ objPercent()?.total }} Mb</span>
+  @if (objPercent()) {
+    <div class="d-flex justify-content-between mb-2 position-relative">
+      <span class="negrita">Descargando actualización...</span>
+      <div class="me-2">
+        <span class="negrita">{{ objPercent()?.transferred }} MB / </span>
+        <span class="negrita gris">{{ objPercent()?.total }} MB</span>
+      </div>
     </div>
-  </div>
-  <p-progressBar [value]="objPercent()?.percent"></p-progressBar>
-  <div class="me-2">
-    <span> </span>
-  </div>
+    <p-progressBar [value]="objPercent()?.percent"></p-progressBar>
+  } @else {
+    <div class="d-flex align-items-center justify-content-center gap-2 py-3">
+      <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+      <span>Preparando descarga...</span>
+    </div>
+  }
 </p-dialog>
 
 <dynamic-modal></dynamic-modal>

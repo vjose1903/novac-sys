@@ -169,7 +169,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
         case 'checking':
           this.counter.set(0);
           this.objPercent.set(null);
-          fun.logYellow('update:checking', state);
           break;
         case 'available':
           this.counter.set(0);
@@ -183,7 +182,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
           break;
         case 'downloading':
           this.visible.set(true);
-          fun.logGreen('update:downloading', state);
           if (state.progress) {
             this.downloadProgression(state.progress);
           }
@@ -193,7 +191,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
           this.visible.set(true);
           break;
         case 'not-available':
-          fun.logBlue('update:not-available', state);
           this.counter.set(0);
           this.objPercent.set(null);
           this.visible.set(false);
@@ -307,15 +304,12 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   }
 
   iniciar_descarga_actualizacion(modalInstance?: DynamicModalClass, updateModalConf?: DynamicModalClass): void {
-    console.log('modalInstance ', modalInstance);
-    console.log('updateModalConf ', updateModalConf);
     const updateBtn = updateModalConf.botones.find(btn => btn.id === 'updateBtn');
 
     this._ipc
       .downloadUpdate()
       .then((res: any) => {
         fun.setTimeout(() => {
-          console.log('res ---> ', res);
           if (res.started) {
             if (modalInstance) modalInstance.close();
             this.visible.set(true);

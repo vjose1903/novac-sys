@@ -44,7 +44,8 @@ export default class AppUpdate {
     writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
 
     const log = require('electron-log');
-    log.transports.file.level = 'info';
+    log.transports.file.level = 'warn';
+    log.transports.console.level = 'warn';
     this.autoUpdater.logger = log;
     this.autoUpdater.autoDownload = false;
 
@@ -104,18 +105,15 @@ export default class AppUpdate {
     if (this.state.status !== 'available') return { started: false, status: this.state.status, message: 'No hay una actualización lista para descargar' };
 
     this.isDownloading = true;
+    writeLogs(`El usuario aceptó instalar la versión ${this.state.updateInfo?.version ?? 'disponible'}`, 'ACTUALIZACION ACEPTADA');
     this.setState({
       ...this.state,
       status: 'downloading',
       message: 'Iniciando descarga de actualización...',
-      progress: {
-        transferred: 0,
-        total: 0,
-        percent: 0,
-        bytesPerSecond: 0,
-      },
+      progress: null,
       error: null,
     });
+    writeLogs('Iniciando descarga de actualización', 'INICIANDO DESCARGA');
 
     try {
       this.autoUpdater.downloadUpdate().catch(error => {
@@ -177,6 +175,7 @@ export default class AppUpdate {
     });
 
     this.autoUpdater.on('update-available', (info: UpdateInfo) => {
+      writeLogs(`Versión disponible: ${info.version}`, 'ACTUALIZACION ENCONTRADA');
       this.setState({
         status: 'available',
         source: this.state.source,
@@ -201,6 +200,8 @@ export default class AppUpdate {
     });
 
     this.autoUpdater.on('download-progress', progress => {
+      if (!Number.isFinite(progress.total) || progress.total <= 0) return;
+
       this.setState({
         ...this.state,
         status: 'downloading',
@@ -263,12 +264,16 @@ export default class AppUpdate {
 
     setTimeout(() => {
       try {
+        BrowserWindow.getAllWindows().forEach(window => {
+          if (!window.isDestroyed()) window.destroy();
+        });
+        this.win = null;
         this.autoUpdater.quitAndInstall(false, true);
       } catch (error) {
         writeLogs(error, 'ERROR ejecutando quitAndInstall');
         this.app.quit();
       }
-    }, 150);
+    }, 300);
   }
 
   private setState(state: DesktopUpdateState) {

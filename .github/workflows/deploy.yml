@@ -2,8 +2,15 @@ name: Build and Deploy
 
 on:
   push:
+    branches:
+      - master
     tags:
       - v*
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/deploy.yml
+      - config_setup/deploy.yml
 
 jobs:
   release:
@@ -40,10 +47,12 @@ jobs:
 
       # 7️⃣ Ejecutar script de configuración (opcional)
       - name: Ejecutar script de configuración
+        if: startsWith(github.ref, 'refs/tags/v')
         run: node ./scripts/start.js -p -c agrodemi
 
       # 8️⃣ Build de la aplicación (opcional)
       - name: Build Novac App
+        if: startsWith(github.ref, 'refs/tags/v')
         id: build-novac-app
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
