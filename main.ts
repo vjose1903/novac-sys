@@ -59,7 +59,7 @@ const serve = args.some(val => val === '--serve');
 const appFilePath = `file://${path.join(app.getAppPath(), 'dist', 'browser', 'index.html')}`;
 const iconPath = path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', 'assets', 'icons', isMacOs() ? 'mac/icon.icns' : 'win/icon.ico');
 const preloadPath = path.join(__dirname, 'electron', 'preload.js');
-const mainRuntimeConfigPath = path.join(app.getAppPath(), 'electron', 'main-runtime-config.json');
+const mainRuntimeConfigPath = path.join(__dirname, 'electron', 'main-runtime-config.json');
 
 function getServePort() {
   try {
@@ -442,13 +442,13 @@ async function getAppConfig(): Promise<ConfigI> {
   try {
     const config: ConfigI = await Functions.getConfigFile();
 
-    const [printer_list, pjson] = await Promise.all([pdf_printer.getPrinters(), Promise.resolve(require('./package.json'))]);
+    const printer_list = await pdf_printer.getPrinters();
 
     const enrichedConfig = {
       ...config,
       operative_system: isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows,
       printersList: ['Ninguna', ...printer_list],
-      app_version: pjson.version,
+      app_version: app.getVersion(),
     };
 
     return enrichedConfig;
