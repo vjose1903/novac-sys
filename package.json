@@ -1,14 +1,14 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "9.0.1",
+  "version": "10.0.0",
   "description": "Sistema facturación e inventario NOVAC.",
   "author": {
     "name": "Victor Jose Vásquez Santos",
     "email": "vjose1903@outlook.es"
   },
   "keywords": [],
-  "main": "main.js",
+  "main": "dist/out-tsc/main.js",
   "private": true,
   "scripts": {
     "ng": "ng",
