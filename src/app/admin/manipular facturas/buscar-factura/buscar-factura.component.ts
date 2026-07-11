@@ -27,7 +27,7 @@ import { DateUtils } from '@vjose1903/dateutils';
 import { confirmationButtons, IButtonDynamic, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
-const moment = require('../../../core/javascript/moment');
+import moment from '../../../core/javascript/moment';
 
 @Component({
   selector: 'app-buscar-factura',

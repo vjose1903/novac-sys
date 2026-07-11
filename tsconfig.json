@@ -9,9 +9,17 @@
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
+    "strict": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "target": "ES2022",
     "module": "ES2022",
+    "types": ["node"],
     "typeRoots": ["node_modules/@types"],
     "lib": ["ES2023", "dom"],
     "baseUrl": "./src",
@@ -28,12 +36,12 @@
       "@electron/*": ["../electron/*"]
     }
   },
-  "files": [
-    "src/main.ts", 
-    "src/polyfills.ts"
+  "files": [],
+  "references": [
+    { "path": "./src/tsconfig.app.json" },
+    { "path": "./src/tsconfig.spec.json" },
+    { "path": "./tsconfig.serve.json" }
   ],
-  "include": ["src/*/.ts", "main.ts"],
-  "exclude": ["node_modules"],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

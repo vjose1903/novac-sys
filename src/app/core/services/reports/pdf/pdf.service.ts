@@ -5,8 +5,6 @@ import * as facturasCompraVentaElectronica from './facturasCompraVentaElectronic
 import * as cuadreCaja from './cuadreCaja';
 import * as reportes from './reportes';
 import { Ss } from '../../singleton.service';
-import { MessageTask } from '../../../models/message-task';
-import { ELECTRON_PRINT_BASE64 } from '../../../../../../electron/shared-electron-angular';
 import { ConfigI } from '../../../interface/config-interface';
 import { fun } from '../../functions.service';
 import { Injectable } from '@angular/core';
@@ -14,7 +12,7 @@ import { Injectable } from '@angular/core';
 import { vfs } from '../utils/vfs_fonts';
 import { fonts } from '../utils/pdfFonts';
 import { serie } from '@core/typescript/constantes';
-const pdfMake = require('pdfmake/build/pdfmake');
+import pdfMake from 'pdfmake/build/pdfmake';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
@@ -151,8 +149,7 @@ export class PdfService {
 
   static async imprimirBase64(oBase: { base64: string; file: string; type: string; printer: string; pageOrientation: string }): Promise<any> {
     try {
-      const task = new MessageTask(ELECTRON_PRINT_BASE64, oBase);
-      const res = await Ss._ipc.sendTask(task);
+      const res = await Ss._ipc.printBase64(oBase);
 
       res['pageOrientation'] = oBase.pageOrientation;
       return res;

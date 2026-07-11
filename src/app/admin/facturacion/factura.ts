@@ -5,7 +5,7 @@ import { ModalHistorialPagosComponent } from '@components/formularios en modales
 import { CrudG } from '@core/typescript/crud-g';
 import * as _ from 'lodash';
 import { fun } from '@core/services/functions.service';
-const moment = require('../../core/javascript/moment');
+import moment from '../../core/javascript/moment';
 import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ReporteC } from '../reportes/reporte';

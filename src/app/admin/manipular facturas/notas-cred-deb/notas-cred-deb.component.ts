@@ -1,7 +1,7 @@
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
 import { Component, OnInit, OnDestroy, Input, signal, computed, effect, inject } from '@angular/core';
-const moment = require('../../../core/javascript/moment');
+import moment from '../../../core/javascript/moment';
 import { Router } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-const moment = require('../../../../core/javascript/moment');
+import moment from '../../../../core/javascript/moment';
 
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';

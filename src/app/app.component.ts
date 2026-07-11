@@ -11,20 +11,7 @@ import { LayoutService } from '@admin/layout/layout.service';
 import { ConfigurationService } from '@services/configuration.service';
 import { EmpresaService } from '@core/services/empresa.service';
 import { ThemeService } from '@services/theme.service';
-import { MessageTask } from '@core/models/message-task';
-
-import {
-  ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
-  ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
-  ELECTRON_EVENT_UPDATE_ERROR,
-  ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
-  ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
-  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE,
-  ELECTRON_CLOSE_CONFIRMATION,
-  ELECTRON_SHOW_CLOSE_CONFIRMATION,
-  ELECTRON_GET_APP_CONFIG,
-  ELECTRON_EVENT_DOWNLOAD_UPDATE,
-} from '../../electron/shared-electron-angular';
+import { DesktopUpdateState } from '@electron/shared-electron-angular';
 
 import { takeUntil, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
@@ -79,49 +66,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   objPercent = signal<any>(null);
   counter = signal<number>(0);
   isReady = signal<boolean>(false);
-
-  // Mapa de eventos de Electron para mejor organización
-  private readonly electronEventHandlers = {
-    [ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE]: (data: any) => {
-      fun.logYellow(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
-    },
-    [ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE]: (data: any) => {
-      fun.logOrange(`${ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE} `, data);
-      this.mostrar_modal_actualizacion(data);
-    },
-    [ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS]: (data: any) => {
-      this.visible.set(true);
-      fun.logGreen(`${ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS} `, data);
-      this.downloadProgression(data.body);
-    },
-    [ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED]: () => {
-      this.visible.set(false);
-    },
-    [ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE]: (data: any) => {
-      fun.logBlue(`${ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE} `, data);
-    },
-    [ELECTRON_EVENT_UPDATE_ERROR]: (data: any) => {
-      fun.logRed(`${ELECTRON_EVENT_UPDATE_ERROR} `, data);
-      fun.toastError(data.msg, 'ERRROR');
-      this.visible.set(false);
-    },
-    [ELECTRON_SHOW_CLOSE_CONFIRMATION]: () => {
-      const token = fun.getAuthToken();
-      console.log('token', token);
-
-      if (fun.hasValue(token)) {
-        console.log('1');
-
-        this.cerrar_app();
-      } else {
-        console.log('2');
-        this.sendCloseConfirmation();
-      }
-    },
-    test: () => {
-      // Evento de prueba
-    },
-  };
+  private lastHandledAvailableVersion: string | null = null;
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
@@ -203,31 +148,70 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       this.imgLogo.set(`data:image/png;base64,${config.logo_empresa}`);
     });
 
-    // Eventos de Electron
-    this._ipc.electronEvents$.pipe(takeUntil(this.destroy$)).subscribe(res => {
-      if (fun.hasValue(res)) {
-        this.handleElectronEvent(res);
+    this._ipc.updateState$.pipe(takeUntil(this.destroy$)).subscribe(state => {
+      this.handleUpdateState(state);
+    });
+
+    this._ipc.closeRequested$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      const token = fun.getAuthToken();
+
+      if (fun.hasValue(token)) {
+        this.cerrar_app();
+      } else {
+        this.sendCloseConfirmation();
       }
     });
   }
 
-  /**
-   * Maneja los eventos de Electron de forma organizada
-   */
-  private handleElectronEvent(event: any): void {
+  private handleUpdateState(state: DesktopUpdateState): void {
     this.zone.run(() => {
-      const handler = this.electronEventHandlers[event.eventName];
-      if (handler) {
-        handler(event.data);
+      switch (state.status) {
+        case 'checking':
+          this.counter.set(0);
+          this.objPercent.set(null);
+          fun.logYellow('update:checking', state);
+          break;
+        case 'available':
+          this.counter.set(0);
+          this.objPercent.set(null);
+          this.visible.set(false);
+          fun.logOrange('update:available', state);
+          if (state.updateInfo?.version && this.lastHandledAvailableVersion !== state.updateInfo.version) {
+            this.lastHandledAvailableVersion = state.updateInfo.version;
+            this.mostrar_modal_actualizacion(state.updateInfo);
+          }
+          break;
+        case 'downloading':
+          this.visible.set(true);
+          fun.logGreen('update:downloading', state);
+          if (state.progress) {
+            this.downloadProgression(state.progress);
+          }
+          break;
+        case 'downloaded':
+        case 'installing':
+          this.visible.set(true);
+          break;
+        case 'not-available':
+          fun.logBlue('update:not-available', state);
+          this.counter.set(0);
+          this.objPercent.set(null);
+          this.visible.set(false);
+          break;
+        case 'error':
+          fun.logRed('update:error', state);
+          fun.toastError(state.error?.message || state.message || 'Error en la actualización', 'ERROR');
+          this.counter.set(0);
+          this.objPercent.set(null);
+          this.visible.set(false);
+          break;
       }
     });
   }
 
   async loadAppConfig(): Promise<void> {
     try {
-      const task = new MessageTask(ELECTRON_GET_APP_CONFIG);
-      const config = (await this._ipc.sendTask(task)) as any;
-
+      const config = (await this._ipc.getAppConfig()) as any;
       this.configServ.config = config;
     } catch (error) {
       console.error('Error cargando configuración:', error);
@@ -301,8 +285,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   }
 
   sendCloseConfirmation(): void {
-    const task = new MessageTask(ELECTRON_CLOSE_CONFIRMATION);
-    this._ipc.sendTask(task);
+    this._ipc.confirmClose();
   }
 
   mostrar_modal_actualizacion(info: any): void {
@@ -328,42 +311,43 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     console.log('updateModalConf ', updateModalConf);
     const updateBtn = updateModalConf.botones.find(btn => btn.id === 'updateBtn');
 
-    const task = new MessageTask(ELECTRON_EVENT_DOWNLOAD_UPDATE);
-    this._ipc.sendTask(task).then((res: any) => {
-      fun.setTimeout(() => {
-        console.log('res ---> ', res);
-        if (res.available) {
-          if (res.downloadStarted) {
-            // Cerrar el modal de actualización solo cuando la descarga realmente inicie
+    this._ipc
+      .downloadUpdate()
+      .then((res: any) => {
+        fun.setTimeout(() => {
+          console.log('res ---> ', res);
+          if (res.started) {
             if (modalInstance) modalInstance.close();
             this.visible.set(true);
           } else {
-            fun.toastError(res.msg, 'ERROR');
+            fun.toastInfo(res.message, 'INFORMACIÓN');
           }
-        } else {
-          fun.toastInfo(res.msg, 'INFORMACIÓN');
-        }
 
-        try {
-          if (updateBtn) updateBtn.processing = false;
-        } catch (error) {
-          console.error('Error al actualizar el botón de procesamiento:', error);
-        }
-      }, 0);
-    });
+          try {
+            if (updateBtn) updateBtn.processing = false;
+          } catch (error) {
+            console.error('Error al actualizar el botón de procesamiento:', error);
+          }
+        }, 0);
+      })
+      .catch(error => {
+        if (updateBtn) updateBtn.processing = false;
+        fun.toastError(error?.message || 'No se pudo iniciar la descarga de la actualización', 'ERROR');
+      });
   }
 
   downloadProgression(object: any): void {
     this.zone.run(() => {
-      if (this.counter() === 1) this.visible.set(true);
+      if (this.counter() === 0) this.visible.set(true);
 
       this.counter.update(prev => prev + 1);
+      const normalizedProgress = { ...object };
 
-      object.transferred = parseFloat(fun.roundNumberToDecimal(object.transferred / 1000000));
-      object.total = parseFloat(fun.roundNumberToDecimal(object.total / 1000000));
-      object.percent = parseFloat(fun.roundNumberToDecimal(object.percent));
+      normalizedProgress.transferred = parseFloat(fun.roundNumberToDecimal(normalizedProgress.transferred / 1000000));
+      normalizedProgress.total = parseFloat(fun.roundNumberToDecimal(normalizedProgress.total / 1000000));
+      normalizedProgress.percent = parseFloat(fun.roundNumberToDecimal(normalizedProgress.percent));
 
-      this.objPercent.set(object);
+      this.objPercent.set(normalizedProgress);
       this.cdRef.detectChanges();
     });
   }

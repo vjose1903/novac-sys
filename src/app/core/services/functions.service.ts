@@ -1,13 +1,11 @@
 import { SpanishInflector } from './../typescript/spanish-inflector';
-const moment = require('../javascript/moment');
+import moment from '../javascript/moment';
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 
 import { ConfigI } from '../interface/config-interface';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
-import { ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
-import { MessageTask } from '../models/message-task';
 import { RetryOptions } from '../interface/retry-until';
 import { TitleCasePipe } from '@angular/common';
 
@@ -28,12 +26,7 @@ export class fun {
   // Descripcion : Esta funcion recarga el electron
   // _________________________________________________________________________________________________
   static reloadElectron() {
-    const task = new MessageTask(ELECTRON_RELOAD);
-
-    Ss._ipc
-      .sendTask(task)
-      .then(res => {})
-      .catch(err => console.error(err));
+    Ss._ipc.reloadApp().catch(err => console.error(err));
   }
   // __________________________________________________________________________________________________
   // Nombre: removerDuplicados

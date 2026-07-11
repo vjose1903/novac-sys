@@ -1,19 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../out-tsc/app",
-    "baseUrl": "./",
-    "types": [],
-    "paths": {
-      "@core/*": ["app/core/*"],
-      "@services/*": ["app/core/services/*"],
-      "@components/*": ["app/core/components/*"],
-      "@registros/*": ["app/admin/registros/*"],
-      "@admin/*": ["app/admin/*"],
-      "@environments/*": ["environments/*"],
-      "@electron/*": ["../electron/*"]
-    }
+    "outDir": "../out-tsc/app"
   },
-  "files": ["main.ts", "polyfills.ts"],
-  "include": ["src/**/*.d.ts"]
+  "files": ["main.ts", "polyfills.ts", "typings.d.ts"],
+  "include": ["**/*.ts", "**/*.d.ts"],
+  "exclude": ["**/*.spec.ts", "test.ts", "polyfills-test.ts"]
 }

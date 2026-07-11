@@ -1,4 +1,4 @@
-import { exportExcelColumnsI, exportExcelConfigI } from '../src/app/core/interface/export-to-excel.interface.js';
+import { exportExcelColumnsI, exportExcelSerializableConfigI } from '../src/app/core/interface/export-to-excel.interface.js';
 import { shell } from 'electron';
 import * as path from 'path';
 import { parsePath, writeLogs } from '../main.js';
@@ -28,7 +28,7 @@ export default class ExportToExcel {
     }
   }
 
-  generateCSV(params: { fileName: string; excelData: Array<string[]>; configuration: exportExcelConfigI }) {
+  generateCSV(params: { fileName: string; excelData: Array<string[]>; configuration: exportExcelSerializableConfigI }) {
     return new Promise(async (resolve, reject) => {
       try {
         const fileName = params.fileName;

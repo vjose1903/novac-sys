@@ -2,7 +2,7 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
-const moment = require('../../../core/javascript/moment');
+import moment from '../../../core/javascript/moment';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { customValidators } from '@core/typescript/custom-validators';
 import { pattern } from '@core/typescript/constantes';

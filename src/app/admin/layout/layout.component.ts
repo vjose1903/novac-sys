@@ -14,8 +14,6 @@ import { ConfigI } from '@core/interface/config-interface';
 import { fun } from '@core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 import { serie } from '@core/typescript/constantes';
-import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_SET_APP_CONFIG, ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE } from '../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 import { NavigationService } from '@core/services/navigation.service';
@@ -183,10 +181,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   changeSerieDefault() {
     const new_config = { ...this.configApp, serie_default: this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica };
 
-    const task = new MessageTask(ELECTRON_SET_APP_CONFIG, new_config);
-
     this._ipc
-      .sendTask(task)
+      .setAppConfig(new_config)
       .then(res => this.refreshPage())
       .catch(err => {
         console.error(err);
@@ -196,9 +192,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   verificarActualizaciones() {
-    const task = new MessageTask(ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE);
-
-    this._ipc.sendTask(task).then(res => {
+    this._ipc.checkForUpdates().then(res => {
       console.log('res ---> ', res);
     });
   }

@@ -10,7 +10,7 @@ import { config_cxc } from './8.5x5.5/configuraciones/reportes/cxc';
 import { config_cxc_ant_preventa } from './8.5x5.5/configuraciones/reportes/cxc_ant_preventa';
 import { config_ventas_cliente } from './8.5x5.5/configuraciones/reportes/ventas_cliente';
 import { config_cxc_preventa } from './8.5x5.5/configuraciones/reportes/cxc_preventa';
-import { config_cxc_ant } from './8.5x5.5/configuraciones/reportes/cxc_ant';
+import { config_cxc_ant, filterCxcAntConfiguration } from './8.5x5.5/configuraciones/reportes/cxc_ant';
 import { config_inventario } from './8.5x5.5/configuraciones/reportes/inventario';
 import { config_recibos } from './8.5x5.5/configuraciones/reportes/recibos';
 import { config_ventas_prod } from './8.5x5.5/configuraciones/reportes/ventas_prod';
@@ -62,7 +62,7 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
-  const configuration = configuraciones[data.tipo_reporte];
+  const configuration = getReporteConfiguration(data);
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
   const configApp: ConfigI = Ss.configServ.config;
@@ -88,6 +88,22 @@ export function makeReporte(data) {
   const obj = { doc: dd, file: 'reporte.pdf', type: 'base64', pageOrientation: pageO };
 
   return obj;
+}
+
+function getReporteConfiguration(data) {
+  let configuration = configuraciones[data.tipo_reporte];
+
+  if (data.tipo_reporte?.startsWith('cxc_ant')) {
+    configuration = filterCxcAntConfiguration(configuration, normalizeColumnasAntiguedad(data.columnas_antiguedad));
+  }
+
+  return configuration;
+}
+
+function normalizeColumnasAntiguedad(columnasAntiguedad: string[] | string) {
+  if (Array.isArray(columnasAntiguedad)) return columnasAntiguedad.filter(item => fun.hasValue(item));
+  if (typeof columnasAntiguedad === 'string' && fun.hasValue(columnasAntiguedad)) return columnasAntiguedad.split(',').map(item => item.trim()).filter(item => fun.hasValue(item));
+  return [];
 }
 
 // ==========================================================================================================================================================

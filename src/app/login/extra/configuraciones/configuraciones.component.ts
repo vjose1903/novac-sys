@@ -2,8 +2,6 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { AfterViewInit, Component, Input, OnInit, inject } from '@angular/core';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { Ss } from '@core/services/singleton.service';
-import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_SET_APP_CONFIG } from '@electron/shared-electron-angular';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
 import { Router } from '@angular/router';
@@ -300,10 +298,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       // Crear o actualizar configuración
       const config_response = isNewConfig ? await this.configServ.createConfig(formulario) : await this.configServ.updateConfig(formulario);
 
-      // Enviar tarea a Electron
-      const task = new MessageTask(ELECTRON_SET_APP_CONFIG, config_response);
-
-      await this._ipc.sendTask(task);
+      await this._ipc.setAppConfig(config_response);
 
       // Manejar éxito
       this.handleSubmitSuccess(config_response);

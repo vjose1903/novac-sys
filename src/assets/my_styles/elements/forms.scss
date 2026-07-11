@@ -1,3 +1,15 @@
+@mixin noPrimengFocus {
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+@mixin primengFocus {
+  outline: 0 none;
+  outline-offset: 0;
+  border-color: transparent !important;
+  box-shadow: 0px 0px 6px var(--primary08) !important;
+}
+
 @mixin formField {
   width: 100%;
   background-color: #ffffffe8;

@@ -5,7 +5,7 @@ import { MenuOpcionesExtraComponent } from './menu-opciones-extra/menu-opciones-
 import { Component, OnInit, OnDestroy, ViewChild, HostListener, AfterViewInit, inject, OnChanges, SimpleChanges, Input, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-const moment = require('../../core/javascript/moment');
+import moment from '../../core/javascript/moment';
 import * as _ from 'lodash';
 import { CuerpoFacturaComponent } from './cuerpo-factura/cuerpo-factura.component';
 import { FacturacionService } from './facturacion.service';

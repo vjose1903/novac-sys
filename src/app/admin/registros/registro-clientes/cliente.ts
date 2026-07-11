@@ -7,12 +7,13 @@ import { DateUtils } from '@vjose1903/dateutils';
 import { Validators } from '@angular/forms';
 import { ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
 import { csvConfig as csvConfigCxc } from '@core/services/reports/excel/configs/report/cxc';
-import { csvConfig as csvConfigCxcAnt } from '@core/services/reports/excel/configs/report/cxc_ant';
+import { csvConfig as csvConfigCxcAnt, filterCxcAntCsvConfig } from '@core/services/reports/excel/configs/report/cxc_ant';
 import { csvConfig as csvConfigVentasCliente } from '@core/services/reports/excel/configs/report/ventas_cliente';
 import { csvConfig as csvConfigCxcHistorico } from '@core/services/reports/excel/configs/report/cxc_historico';
 import { MoraCalculator } from '../../recibos/recibo-ingresos/utils/mora-calculator';
 import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { dynamicFieldConfig, reportField } from '@components/formularios en modales/form-reportes/form-reportes.component.model';
 
 export enum CxC {
   por_cliente = 1,
@@ -22,6 +23,41 @@ export enum CxC {
 }
 
 export class ClienteC extends CrudG<any> {
+  static readonly allColumnasAntiguedadValue = 'todas';
+  static readonly columnasAntiguedadOptions = [
+    { label: 'Todas', value: ClienteC.allColumnasAntiguedadValue },
+    { label: '0 - 30 días', value: 'cero_to_treinta' },
+    { label: '31 - 60 días', value: 'treinta_uno_to_sesenta' },
+    { label: '61 - 90 días', value: 'sesenta_uno_to_noventa' },
+    { label: 'Más de 90 días', value: 'noventa_uno_to_more' },
+  ];
+
+  static advancedFiltersCxcAnt: dynamicFieldConfig[] = [
+    {
+      label: 'Filtrar por cliente',
+      formControl: 'filtrar_por_cliente',
+      defaultValue: false,
+      controlType: 'switch',
+      disabledFunction: () => false,
+      required: false,
+    },
+    {
+      label: 'Columnas de antigüedad',
+      formControl: 'columnas_antiguedad',
+      defaultValue: [ClienteC.allColumnasAntiguedadValue],
+      items: ClienteC.columnasAntiguedadOptions,
+      optionLabel: 'label',
+      optionValue: 'value',
+      placeholder: 'Todas las columnas',
+      controlType: 'multiselect',
+      required: false,
+    },
+  ];
+
+  static conditionalRenderCxcAnt = {
+    [reportField.customerField]: (formValue: any) => !!formValue.filtrar_por_cliente,
+  };
+
   constructor() {
     super('clientes');
   }
@@ -67,7 +103,16 @@ export class ClienteC extends CrudG<any> {
         inputs['dynamic_switches'].push(ClienteC.inputsIncludeMora);
       }
 
+      if (tipo == 'cuentas_cobrar_ant_saldo') {
+        inputs['advanced_filters'] = ClienteC.advancedFiltersCxcAnt;
+        inputs['conditionalRender'] = { ...ClienteC.conditionalRenderCxcAnt };
+      }
+
       ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
+
+      if (tipo == 'cuentas_cobrar_ant_saldo') {
+        ReporteC.objReporte = { ...ReporteC.objReporte, width: '46rem' };
+      }
 
       function returnDataFromModal(arg: ICallbackModal) {
         if (arg.type != modalCloseType.returnData) return;
@@ -93,6 +138,9 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: reporteParams.data.tipo };
         tipo = requestParameters['tipo'];
+        const columnasAntiguedadSeleccionadas = Array.isArray(formReporte.columnas_antiguedad)
+          ? formReporte.columnas_antiguedad.filter(item => item != ClienteC.allColumnasAntiguedadValue)
+          : [];
 
         if (tipo == CxC.por_cliente) {
           requestParameters['cliente_id'] = formReporte.cliente_id;
@@ -102,6 +150,20 @@ export class ClienteC extends CrudG<any> {
         requestParameters['desde'] = DateUtils.format({ date: formReporte.desde, dateFormat: 'YYYY-MM-DD' });
         requestParameters['hasta'] = DateUtils.format({ date: formReporte.hasta, dateFormat: 'YYYY-MM-DD' });
         requestParameters['include_pagadas'] = formReporte.include_pagadas ?? false;
+
+        if (pdfParams.tipo == 'cuentas_cobrar_ant_saldo') {
+          if (formReporte.filtrar_por_cliente && fun.hasValue(formReporte.cliente_id)) {
+            requestParameters['cliente_id'] = formReporte.cliente_id;
+          }
+
+          if (
+            Array.isArray(formReporte.columnas_antiguedad) &&
+            formReporte.columnas_antiguedad.length > 0 &&
+            !formReporte.columnas_antiguedad.includes(ClienteC.allColumnasAntiguedadValue)
+          ) {
+            requestParameters['columnas_antiguedad'] = formReporte.columnas_antiguedad.join(',');
+          }
+        }
 
         if (formReporte.mostrar_balance_anterior) {
           requestParameters.tipo = CxC.historico;
@@ -117,7 +179,8 @@ export class ClienteC extends CrudG<any> {
             ReporteC.configCsv = csvConfigCxc;
           }
         } else if (pdfParams.tipo == 'cuentas_cobrar_ant_saldo') {
-          ReporteC.configCsv = csvConfigCxcAnt[tipo == CxC.detallado ? 'detallado' : 'agrupado'];
+          const csvConfigBase = csvConfigCxcAnt[tipo == CxC.detallado ? 'detallado' : 'agrupado'];
+          ReporteC.configCsv = filterCxcAntCsvConfig(csvConfigBase, columnasAntiguedadSeleccionadas);
         }
 
         pdfParams.tipo = 'cuentas_cobrar';
@@ -153,6 +216,12 @@ export class ClienteC extends CrudG<any> {
     });
 
     function transformRequestResponse(requestResponse) {
+      if (pdfParams.tipo == 'cuentas_cobrar') {
+        requestResponse.columnas_antiguedad = Array.isArray(formReporte.columnas_antiguedad)
+          ? formReporte.columnas_antiguedad.filter(item => item != ClienteC.allColumnasAntiguedadValue)
+          : [];
+      }
+
       requestResponse['tipo_reporte'] = requestResponse['tipo_reporte'].replace('cuentas_cobrar', 'cxc');
 
       if (requestResponse['tipo_reporte'] === 'cuentas_con_pagos') {

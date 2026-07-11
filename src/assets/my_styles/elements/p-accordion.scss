@@ -1,0 +1,112 @@
+@use './forms.scss' as *;
+
+.p-accordion {
+  .p-accordionpanel {
+    .p-accordionheader {
+      &:focus {
+        @include noPrimengFocus;
+      }
+
+      border: 0px solid transparent !important;
+      background: var(--primary01) !important;
+      letter-spacing: 0.8px;
+      border-radius: 8px !important;
+      color: black;
+
+      &:hover {
+        text-decoration: none;
+        filter: brightness(0.9);
+      } 
+
+      &:focus {
+        @include primengFocus;
+      }
+
+      &[aria-expanded='true'] {
+        background: var(--primary07) !important;
+        box-shadow: 0px 4px 4px #69696940;
+        color: white !important;
+        border-radius: 8px 8px 0 0 !important;
+
+        .p-accordionheader-toggle-icon {
+          color: white !important;
+        }
+      }
+    }
+
+    .p-accordioncontent {
+      .p-accordioncontent-content {
+        border: 1px solid #e5e5e5;
+        padding: 0.4rem;
+        background: var(--mode01);
+        box-shadow: 0px 1px 5px 1px #00000014;
+        border-radius: 0 0 8px 8px;
+      }
+    }
+  }
+
+  &.no-content-padding {
+    .p-accordionpanel {
+      .p-accordioncontent {
+        .p-accordioncontent-content {
+          padding: 0rem !important;
+        }
+      }
+    }
+  }
+
+  &.grey-header {
+    .p-accordionpanel {
+      .p-accordionheader {
+        background: var(--mode03) !important;
+
+        &[aria-expanded='true'] {
+          background: var(--mode04) !important;
+          color: #0a0a0a !important;
+        }
+      }
+    }
+  }
+
+  &.header-p-1 {
+    .p-accordionpanel {
+      .p-accordionheader {
+        padding: 0.5rem;
+      }
+    }
+  }
+
+  &.header-sm {
+    .p-accordionpanel {
+      .p-accordionheader {
+        padding: 0.35rem 0.75rem;
+      }
+    }
+  }
+
+  &.header-md {
+    .p-accordionpanel {
+      .p-accordionheader {
+        padding: 0.6rem 0.95rem;
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
