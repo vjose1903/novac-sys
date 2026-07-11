@@ -5,7 +5,7 @@
     "declaration": false,
     "module": "commonjs",
     "moduleResolution": "node",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "types": ["node"],
     "lib": ["ES2023", "dom"]
   },

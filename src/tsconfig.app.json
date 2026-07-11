@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "../out-tsc/app",
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "5.0"
   },
   "files": ["main.ts", "polyfills.ts", "typings.d.ts"],
   "include": ["**/*.ts", "**/*.d.ts"],
