@@ -8,7 +8,7 @@
     "email": "vjose1903@outlook.es"
   },
   "keywords": [],
-  "main": "main.js",
+  "main": "dist/out-tsc/main.js",
   "private": true,
   "scripts": {
     "ng": "ng",
