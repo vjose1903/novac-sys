@@ -64,7 +64,7 @@
             ],
             "scripts": [],
 
-            "allowedCommonJsDependencies": ["rxjs", "rxjs/operators"]
+            "allowedCommonJsDependencies": ["rxjs", "rxjs/operators", "lodash", "pdfmake/build/pdfmake", "jsbarcode", "qrcode"]
           },
           "configurations": {
             "dev": {

@@ -4,13 +4,15 @@
   "directories": {
     "output": "actualizacion/"
   },
+  "extraMetadata": {
+    "main": "dist/out-tsc/main.js"
+  },
   "files": [
     "./*",
     "**/*",
     "!**/*.ts",
     "!*.code-workspace",
     "!./LICENSE.md",
-    "!./package.json",
     "!./package-lock.json",
     "!./e2e/",
     "!./config_setup/",
