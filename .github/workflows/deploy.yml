@@ -2,15 +2,8 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - master
     tags:
       - v*
-    paths:
-      - package.json
-      - package-lock.json
-      - .github/workflows/deploy.yml
-      - config_setup/deploy.yml
 
 jobs:
   release:
@@ -28,31 +21,16 @@ jobs:
           node-version: '22.13.1'
           package-manager-cache: false
 
-      - name: Get npm cache directory
-        id: npm-cache
-        shell: pwsh
-        run: '"path=$(npm config get cache)" >> $env:GITHUB_OUTPUT'
-
-      - name: Restore npm cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.npm-cache.outputs.path }}
-          key: ${{ runner.os }}-node-22-npm-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-22-npm-
-
       # 6️⃣ Instalar dependencias
       - name: Install dependencies
         run: npm ci --legacy-peer-deps --prefer-offline --no-audit --no-fund
 
       # 7️⃣ Ejecutar script de configuración (opcional)
       - name: Ejecutar script de configuración
-        if: startsWith(github.ref, 'refs/tags/v')
         run: node ./scripts/start.js -p -c agrodemi
 
       # 8️⃣ Build de la aplicación (opcional)
       - name: Build Novac App
-        if: startsWith(github.ref, 'refs/tags/v')
         id: build-novac-app
         env:
           GITHUB_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
