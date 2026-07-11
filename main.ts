@@ -1,4 +1,5 @@
 import { app, BrowserWindow, screen, ipcMain } from 'electron';
+import * as fs from 'fs';
 import * as path from 'path';
 import { ConfigI } from './src/app/core/interface/config-interface';
 
@@ -58,6 +59,24 @@ const serve = args.some(val => val === '--serve');
 const appFilePath = `file://${path.join(app.getAppPath(), 'dist', 'browser', 'index.html')}`;
 const iconPath = path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', 'assets', 'icons', isMacOs() ? 'mac/icon.icns' : 'win/icon.ico');
 const preloadPath = path.join(__dirname, 'electron', 'preload.js');
+const mainRuntimeConfigPath = path.join(app.getAppPath(), 'electron', 'main-runtime-config.json');
+
+function getServePort() {
+  try {
+    if (fs.existsSync(mainRuntimeConfigPath)) {
+      const configData = fs.readFileSync(mainRuntimeConfigPath, 'utf-8');
+      const config = JSON.parse(configData);
+
+      if (typeof config?.port === 'number' && Number.isFinite(config.port)) {
+        return config.port;
+      }
+    }
+  } catch (error) {
+    writeLogs(error, 'ERROR leyendo main-runtime-config.json');
+  }
+
+  return 5220;
+}
 
 function createInitialSplash() {
   // Iniciar splash de carga y manejar el flujo
@@ -113,7 +132,7 @@ function createWindow() {
       });
 
       if (serve) {
-        const port = 5220;
+        const port = getServePort();
         win.loadURL(`http://localhost:${port}`).catch(err => closeAppAndSplashError('Failed to load URL: ' + err));
 
         setTimeout(() => {
