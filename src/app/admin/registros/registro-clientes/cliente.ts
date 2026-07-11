@@ -7,7 +7,7 @@ import { DateUtils } from '@vjose1903/dateutils';
 import { Validators } from '@angular/forms';
 import { ReporteViewModalConfigI } from '@core/interface/reporte-view-modal-config';
 import { csvConfig as csvConfigCxc } from '@core/services/reports/excel/configs/report/cxc';
-import { csvConfig as csvConfigCxcAnt } from '@core/services/reports/excel/configs/report/cxc_ant';
+import { csvConfig as csvConfigCxcAnt, filterCxcAntCsvConfig } from '@core/services/reports/excel/configs/report/cxc_ant';
 import { csvConfig as csvConfigVentasCliente } from '@core/services/reports/excel/configs/report/ventas_cliente';
 import { csvConfig as csvConfigCxcHistorico } from '@core/services/reports/excel/configs/report/cxc_historico';
 import { MoraCalculator } from '../../recibos/recibo-ingresos/utils/mora-calculator';
@@ -138,6 +138,9 @@ export class ClienteC extends CrudG<any> {
       case 'cuentas_cobrar_ant_saldo':
         requestParameters = { tipo: reporteParams.data.tipo };
         tipo = requestParameters['tipo'];
+        const columnasAntiguedadSeleccionadas = Array.isArray(formReporte.columnas_antiguedad)
+          ? formReporte.columnas_antiguedad.filter(item => item != ClienteC.allColumnasAntiguedadValue)
+          : [];
 
         if (tipo == CxC.por_cliente) {
           requestParameters['cliente_id'] = formReporte.cliente_id;
@@ -176,7 +179,8 @@ export class ClienteC extends CrudG<any> {
             ReporteC.configCsv = csvConfigCxc;
           }
         } else if (pdfParams.tipo == 'cuentas_cobrar_ant_saldo') {
-          ReporteC.configCsv = csvConfigCxcAnt[tipo == CxC.detallado ? 'detallado' : 'agrupado'];
+          const csvConfigBase = csvConfigCxcAnt[tipo == CxC.detallado ? 'detallado' : 'agrupado'];
+          ReporteC.configCsv = filterCxcAntCsvConfig(csvConfigBase, columnasAntiguedadSeleccionadas);
         }
 
         pdfParams.tipo = 'cuentas_cobrar';

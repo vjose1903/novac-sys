@@ -2,7 +2,7 @@ import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
 import { CrudG } from '@core/typescript/crud-g';
 import * as _ from 'lodash';
-const moment = require('../../../core/javascript/moment');
+import moment from '../../../core/javascript/moment';
 import { fun } from '@core/services/functions.service';
 import { ReporteC } from '../../reportes/reporte';
 import { csvConfig } from '@core/services/reports/excel/configs/report/notas';

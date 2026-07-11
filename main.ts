@@ -125,7 +125,6 @@ function createWindow() {
         webPreferences: {
           preload: preloadPath,
           nodeIntegration: false,
-          allowRunningInsecureContent: serve ? true : false,
           contextIsolation: true,
           sandbox: true,
         },

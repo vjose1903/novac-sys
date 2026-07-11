@@ -19,6 +19,10 @@ export interface exportExcelConfigI {
   type: ReportTypeE;
 }
 
+export interface exportExcelSerializableConfigI {
+  columns: Array<exportExcelColumnsI>;
+}
+
 export interface exportExcelTitleRowInColsI {
   index: number;
   title: string;

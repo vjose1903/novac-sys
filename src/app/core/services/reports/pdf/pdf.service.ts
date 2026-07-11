@@ -12,7 +12,7 @@ import { Injectable } from '@angular/core';
 import { vfs } from '../utils/vfs_fonts';
 import { fonts } from '../utils/pdfFonts';
 import { serie } from '@core/typescript/constantes';
-const pdfMake = require('pdfmake/build/pdfmake');
+import pdfMake from 'pdfmake/build/pdfmake';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {

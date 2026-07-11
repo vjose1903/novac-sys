@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { exportExcelConfigI } from '../../../interface/export-to-excel.interface';
+import { exportExcelConfigI, exportExcelSerializableConfigI } from '../../../interface/export-to-excel.interface';
 import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../interface/config-interface';
 import * as fun_ from '../utils/funciones';
@@ -102,8 +102,12 @@ export class ExportToExcelService {
 
   private exportCsv(fileName: string, excelData: Array<string[]>, config: exportExcelConfigI) {
     return new Promise<any>((resolve, reject) => {
+      const serializableConfig: exportExcelSerializableConfigI = {
+        columns: config.columns,
+      };
+
       Ss._ipc
-        .exportCsv({ fileName, excelData, configuration: config })
+        .exportCsv({ fileName, excelData, configuration: serializableConfig })
         .then(res => resolve(res))
         .catch(err => reject(err));
     });

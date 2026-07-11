@@ -1,8 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-import {
-  DESKTOP_EVENT_CHANNEL,
-  DESKTOP_INVOKE_CHANNEL,
+import type {
   DesktopCommandName,
   DesktopCommandPayloadMap,
   DesktopCommandResponseMap,
@@ -10,6 +8,9 @@ import {
   DesktopEventListener,
   DesktopInvokeRequest,
 } from './shared-electron-angular';
+
+const DESKTOP_INVOKE_CHANNEL = 'desktop:invoke';
+const DESKTOP_EVENT_CHANNEL = 'desktop:event';
 
 const desktopApi = {
   invoke<TCommand extends DesktopCommandName>(command: TCommand, payload?: DesktopCommandPayloadMap[TCommand]) {

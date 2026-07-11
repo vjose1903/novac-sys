@@ -33,3 +33,16 @@ export const csvConfig: multipleExportExcelConfigI = {
     ],
   },
 };
+
+const columnasAntiguedadKeys = ['cero_to_treinta', 'treinta_uno_to_sesenta', 'sesenta_uno_to_noventa', 'noventa_uno_to_more'];
+
+export function filterCxcAntCsvConfig(config, columnasAntiguedad?: string[]) {
+  if (!Array.isArray(columnasAntiguedad) || columnasAntiguedad.length === 0) return config;
+
+  const allowedColumns = new Set(columnasAntiguedad);
+
+  return {
+    ...config,
+    columns: config.columns.filter(column => !columnasAntiguedadKeys.includes(column.key) || allowedColumns.has(column.key)),
+  };
+}

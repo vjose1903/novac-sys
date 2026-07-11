@@ -9,6 +9,9 @@ import { IDynamicModal, IModalComponent } from '../../config/dynamic-modal.inter
 export class SampleComponentModalComponent implements IDynamicModal {
   inputs!: { propiedad: string };
   modalComponent!: IModalComponent;
+  modalConfig: any;
+  modalWrapper: any;
+
   submit() {
     ////console.log('toco el boton submit');
   }

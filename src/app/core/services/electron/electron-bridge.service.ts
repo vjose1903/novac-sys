@@ -18,15 +18,17 @@ export class ElectronBridgeService {
   private unsubscribeEvents: (() => void) | null = null;
 
   constructor(private readonly ngZone: NgZone) {
-    if (this.isElectron) {
-      this.unsubscribeEvents = window.electronAPI.onEvent(event => {
+    const electronApi = this.getElectronApi();
+
+    if (electronApi) {
+      this.unsubscribeEvents = electronApi.onEvent(event => {
         this.ngZone.run(() => this.eventsSubject.next(event));
       });
     }
   }
 
   get isElectron(): boolean {
-    return typeof window !== 'undefined' && typeof window.electronAPI !== 'undefined';
+    return !!this.getElectronApi();
   }
 
   get events$(): Observable<DesktopEventEnvelope> {
@@ -34,11 +36,13 @@ export class ElectronBridgeService {
   }
 
   invoke<TCommand extends DesktopCommandName>(command: TCommand, payload?: DesktopCommandPayloadMap[TCommand]) {
-    if (!this.isElectron) {
+    const electronApi = this.getElectronApi();
+
+    if (!electronApi) {
       return Promise.reject(new Error(`Electron API no disponible para el comando ${command}`)) as Promise<DesktopCommandResponseMap[TCommand]>;
     }
 
-    return window.electronAPI.invoke(command, payload) as Promise<DesktopCommandResponseMap[TCommand]>;
+    return electronApi.invoke(command, payload) as Promise<DesktopCommandResponseMap[TCommand]>;
   }
 
   onEvent<TEvent extends DesktopEventName>(eventName: TEvent) {
@@ -46,5 +50,10 @@ export class ElectronBridgeService {
       filter(event => event.eventName === eventName),
       map(event => event.payload as DesktopEventPayloadMap[TEvent])
     );
+  }
+
+  private getElectronApi() {
+    if (typeof window === 'undefined') return undefined;
+    return window.electronAPI;
   }
 }

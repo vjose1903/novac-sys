@@ -1,5 +1,7 @@
 import { DesktopCommandName, DesktopCommandPayloadMap, DesktopCommandResponseMap, DesktopEventEnvelope, DesktopEventListener } from '../electron/shared-electron-angular';
 
+declare var require: any;
+declare var module: any;
 declare var nodeModule: NodeModule;
 interface NodeModule {
   id: string;

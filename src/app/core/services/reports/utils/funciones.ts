@@ -1,4 +1,5 @@
-var JsBarcode = require('jsbarcode');
+import JsBarcode from 'jsbarcode';
+import QRCode from 'qrcode';
 
 // =========================================================================================================
 export function my_barcode(code) {
@@ -10,8 +11,6 @@ export function my_barcode(code) {
 
 export function my_qrcode(code, size = 200) {
   if (isEmpty(code)) return '';
-  // Necesitamos instalar la biblioteca qrcode: npm install qrcode
-  const QRCode = require('qrcode');
 
   // Crear un elemento canvas
   const canvas = document.createElement('canvas');

@@ -3,7 +3,7 @@ import { Ss } from '@core/services/singleton.service';
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import * as _ from 'lodash';
 
-const moment = require('../../../core/javascript/moment');
+import moment from '../../../core/javascript/moment';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { FacturaC, TiposFacturaC } from '../../facturacion/factura';

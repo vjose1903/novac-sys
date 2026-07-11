@@ -1,5 +1,5 @@
 import { SpanishInflector } from './../typescript/spanish-inflector';
-const moment = require('../javascript/moment');
+import moment from '../javascript/moment';
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 

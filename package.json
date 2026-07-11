@@ -18,7 +18,7 @@
     "clean:actualizacion": "rimraf ./actualizacion",
     "clean:dist": "rimraf ./dist",
     "start": "npm-run-all -p ng:serve electron:serve",
-    "ng:serve": "ng serve --port 5220 -c web",
+    "ng:serve": "ng serve --port 5220 -c dev",
     "electron:serve": "wait-on tcp:5220 && npm run electron:serve-tsc && npx electron . --serve",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
     "build": "npm run clean:dist && npm run electron:serve-tsc && ng build --stats-json --base-href ./",

@@ -20,7 +20,7 @@ import { MoraCalculator } from '../utils/mora-calculator';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
-const moment = require('../../../../core/javascript/moment');
+import moment from '../../../../core/javascript/moment';
 
 @Component({
   selector: 'app-ingresos',

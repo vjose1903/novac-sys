@@ -96,6 +96,13 @@ export interface DesktopUpdateState {
 
 export type DesktopEventListener = (event: DesktopEventEnvelope) => void;
 
+type DesktopEventWindow = {
+  isDestroyed(): boolean;
+  webContents: {
+    send(channel: string, event: DesktopEventEnvelope): void;
+  };
+};
+
 export function createIdleUpdateState(): DesktopUpdateState {
   return {
     status: 'idle',
@@ -108,7 +115,7 @@ export function createIdleUpdateState(): DesktopUpdateState {
 }
 
 export function sendDesktopEvent(
-  win: Electron.BrowserWindow | null | undefined,
+  win: DesktopEventWindow | null | undefined,
   event: DesktopEventEnvelope
 ) {
   if (!win || win.isDestroyed()) return;

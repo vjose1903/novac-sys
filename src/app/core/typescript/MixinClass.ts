@@ -1,4 +1,4 @@
-const moment = require('../javascript/moment');
+import moment from '../javascript/moment';
 import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
 import { TablaClass } from '@core/components/new_tablas/tabla-class';
