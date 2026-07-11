@@ -1,4 +1,5 @@
-// Estado compartido de la aplicación
+export type AppClosingReason = 'none' | 'user-confirmed' | 'update-install';
+
 export const sharedState = {
-  isUpdaterClosing: false
-}; 
+  closingReason: 'none' as AppClosingReason,
+};

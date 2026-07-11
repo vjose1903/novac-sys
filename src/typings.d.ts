@@ -1,11 +1,17 @@
-/* SystemJS module definition */
+import { DesktopCommandName, DesktopCommandPayloadMap, DesktopCommandResponseMap, DesktopEventEnvelope, DesktopEventListener } from '../electron/shared-electron-angular';
+
 declare var nodeModule: NodeModule;
 interface NodeModule {
   id: string;
 }
 
-declare var window: Window;
-interface Window {
-  process: any;
-  require: any;
+declare global {
+  interface Window {
+    electronAPI?: {
+      invoke<TCommand extends DesktopCommandName>(command: TCommand, payload?: DesktopCommandPayloadMap[TCommand]): Promise<DesktopCommandResponseMap[TCommand]>;
+      onEvent(listener: DesktopEventListener): () => void;
+    };
+  }
 }
+
+export {};

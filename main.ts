@@ -9,24 +9,22 @@ import HandlerConfigFile from './electron/handler-config-file';
 import FirebaseConfigHandler from './electron/firebase-config-handler';
 import SplashHandler, { ErrorType, TypedError } from './electron/splash-handler';
 
-import SharedElectronAngular, {
-  ELECTRON_EVENT_DECRYPT,
-  ELECTRON_EVENT_ENCRYPT,
-  ELECTRON_GET_APP_CONFIG,
-  ELECTRON_PRINT_BASE64,
-  ELECTRON_RESPONSE,
-  ELECTRON_SENDER,
-  ELECTRON_SET_APP_CONFIG,
-  ELECTRON_TEST,
-  ELECTRON_RELOAD,
-  ELECTRON_CLOSE_CONFIRMATION,
-  ELECTRON_SHOW_CLOSE_CONFIRMATION,
-  MessageTaskInterface,
-  ELECTRON_EXPORT_CSV,
-  ELECTRON_FOCUS_WINDOW,
-  ELECTRON_OPEN_WEB_BROWSER,
-  ELECTRON_EVENT_DOWNLOAD_UPDATE,
-  ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE,
+import {
+  DESKTOP_COMMAND_CONFIRM_CLOSE,
+  DESKTOP_COMMAND_EXPORT_CSV,
+  DESKTOP_COMMAND_FOCUS_WINDOW,
+  DESKTOP_COMMAND_GET_APP_CONFIG,
+  DESKTOP_COMMAND_OPEN_EXTERNAL,
+  DESKTOP_COMMAND_PRINT_BASE64,
+  DESKTOP_COMMAND_RELOAD_APP,
+  DESKTOP_COMMAND_SET_APP_CONFIG,
+  DESKTOP_COMMAND_UPDATE_CHECK,
+  DESKTOP_COMMAND_UPDATE_DOWNLOAD,
+  DESKTOP_COMMAND_UPDATE_GET_STATE,
+  DESKTOP_EVENT_APP_CLOSE_REQUESTED,
+  DESKTOP_INVOKE_CHANNEL,
+  DesktopInvokeRequest,
+  sendDesktopEvent,
 } from './electron/shared-electron-angular';
 
 import AppUpdate from './electron/auto-update';
@@ -59,6 +57,7 @@ const serve = args.some(val => val === '--serve');
 
 const appFilePath = `file://${path.join(app.getAppPath(), 'dist', 'browser', 'index.html')}`;
 const iconPath = path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', 'assets', 'icons', isMacOs() ? 'mac/icon.icns' : 'win/icon.ico');
+const preloadPath = path.join(__dirname, 'electron', 'preload.js');
 
 function createInitialSplash() {
   // Iniciar splash de carga y manejar el flujo
@@ -104,7 +103,13 @@ function createWindow() {
         height: size.height,
         minHeight: size.height,
         icon: iconPath,
-        webPreferences: { nodeIntegration: true, allowRunningInsecureContent: serve ? true : false, contextIsolation: false },
+        webPreferences: {
+          preload: preloadPath,
+          nodeIntegration: false,
+          allowRunningInsecureContent: serve ? true : false,
+          contextIsolation: true,
+          sandbox: true,
+        },
       });
 
       if (serve) {
@@ -126,17 +131,12 @@ function createWindow() {
 
       // Evento cuando se intenta cerrar la ventana con el boton de cerrar
       win.on('close', (event: any) => {
-        writeLogs(`Evento close disparado. isUpdaterClosing: ${sharedState.isUpdaterClosing}`, 'close-event');
-        if (!sharedState.isUpdaterClosing) {
-          writeLogs('Preparando confirmación de cierre...', 'close-event');
-          event.preventDefault();
-          sendCloseConfirmation();
-        } else {
-          // Cuando se está actualizando, permitir el cierre sin prevención
-          writeLogs('Cerrando aplicación para actualización...', 'close-event');
-          // No prevenir el evento para permitir que la ventana se cierre normalmente
-          // El proceso de actualización se encargará del resto
-        }
+        writeLogs(`Evento close disparado. closingReason: ${sharedState.closingReason}`, 'close-event');
+        if (sharedState.closingReason !== 'none') return;
+
+        writeLogs('Preparando confirmación de cierre...', 'close-event');
+        event.preventDefault();
+        sendCloseConfirmation();
       });
 
       resolve(win);
@@ -154,14 +154,16 @@ try {
     Console.clean().then(async () => {
       // Inicializar SplashHandler
       splash_handler = SplashHandler.getInstance(serve, iconPath);
+      auto_updater = new AppUpdate(app, serve);
+      auto_updater.init();
       createInitialSplash();
     });
   });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
-    writeLogs(`Evento window-all-closed disparado. isUpdaterClosing: ${sharedState.isUpdaterClosing}`, 'window-all-closed');
-    if (!sharedState.isUpdaterClosing) {
+    writeLogs(`Evento window-all-closed disparado. closingReason: ${sharedState.closingReason}`, 'window-all-closed');
+    if (sharedState.closingReason === 'none') {
       writeLogs('Cerrando aplicación normalmente...', 'window-all-closed');
       closeApp();
     } else {
@@ -192,7 +194,10 @@ function showWindow() {
 export function sendCloseConfirmation() {
   writeLogs(' ----- SEND CLOSE CONFIRMATION -----');
   showWindow();
-  SharedElectronAngular.sendEventToAngular(win, { eventName: ELECTRON_SHOW_CLOSE_CONFIRMATION, data: {} });
+  sendDesktopEvent(win, {
+    eventName: DESKTOP_EVENT_APP_CLOSE_REQUESTED,
+    payload: { reason: 'user-request' },
+  });
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -209,12 +214,16 @@ export function closeAppAndSplashError(error: string, type: string = 'splash_err
 // Close the app
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 export function closeApp() {
+  if (sharedState.closingReason === 'none') {
+    sharedState.closingReason = 'user-confirmed';
+  }
+
   if (win) {
     win.destroy();
-    app.quit();
-
-    writeLogs('###### CIERRE DE LA APLICACION ######');
   }
+
+  app.quit();
+  writeLogs('###### CIERRE DE LA APLICACION ######');
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -329,13 +338,8 @@ function continuarCargandoArchivos() {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 async function beforeCreateWindow(win) {
-  // ----- Manejar las actualizaciones -----
-  const serve_ = await getServer_();
-  auto_updater = new AppUpdate(win, app, serve_);
-  auto_updater.init();
-  // ---------------------------------------
-
   pdf_printer = PdfPrinter.getInstance(win);
+  auto_updater.attachWindow(win);
 
   // Desmontar Firebase Config Handler ya que Angular está listo
   if (firebaseConfigHandler && firebaseConfigHandler.isReady()) {
@@ -348,169 +352,68 @@ async function beforeCreateWindow(win) {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Handle angular events
+// Desktop commands
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-ipcMain.on(ELECTRON_SENDER, handleEvent);
+ipcMain.handle(DESKTOP_INVOKE_CHANNEL, handleDesktopCommand);
 
-async function handleEvent(event: any, obj: string) {
+async function handleDesktopCommand(_event: Electron.IpcMainInvokeEvent, request: DesktopInvokeRequest) {
   try {
-    const task = JSON.parse(obj) as MessageTaskInterface;
-    const parameters = task?.data ? JSON.parse(task.data) : task?.data;
-    writeLogs(task, 'Nueva tarea recibida');
+    const command = request?.command;
+    const payload = request?.payload;
 
-    let res;
+    writeLogs(request, 'Nuevo comando desktop');
 
-    switch (task.eventName) {
-      case ELECTRON_TEST:
-        // test function
-        break;
-      //
-      case ELECTRON_EVENT_DOWNLOAD_UPDATE:
-        writeLogs('Verificando si hay actualización disponible antes de descargar');
-        auto_updater
-          .verifyUpdateAvailable({ notify: false })
-          .then(res => {
-            if (res) {
-              writeLogs('Descargando actualización');
-              auto_updater
-                .downloadUpdate()
-                .then(downloadResult => {
-                  task.response = { msg: 'Descarga iniciada exitosamente', available: true, downloadStarted: true };
-                  event.reply(ELECTRON_RESPONSE, task);
-                })
-                .catch(downloadError => {
-                  writeLogs('Error al iniciar descarga:', downloadError);
-                  task.error = true;
-                  task.response = { msg: 'Error al iniciar descarga', available: true, downloadStarted: false, error: downloadError };
-                  event.reply(ELECTRON_RESPONSE, task);
-                });
-            } else {
-              writeLogs('No hay actualización disponible para descargar');
-              task.response = { msg: 'No hay actualización disponible', available: false };
-              event.reply(ELECTRON_RESPONSE, task);
-            }
-          })
-          .catch(err => {
-            writeLogs('Error al verificar actualización:', err);
-            task.error = true;
-            task.response = { msg: 'Error al verificar actualización', error: err };
-            event.reply(ELECTRON_RESPONSE, task);
-          });
-        break;
-      //
-      case ELECTRON_EVENT_VERIFICATE_UPDATE_AVAILABLE:
-        writeLogs('Verificando actualizaciones');
-        auto_updater
-          .verifyUpdateAvailable()
-          .then(res => {
-            task.response = res;
-            event.reply(ELECTRON_RESPONSE, task);
-          })
-          .catch(err => {
-            task.error = true;
-            task.response = err;
-            event.reply(ELECTRON_RESPONSE, task);
-          });
-        break;
-      //
-      case ELECTRON_RELOAD:
+    switch (command) {
+      case DESKTOP_COMMAND_RELOAD_APP:
         writeLogs('RECARGANDO ELECTRON');
         win?.reload();
         if (!serve) win?.loadURL(appFilePath);
-        break;
-      //
-      case ELECTRON_OPEN_WEB_BROWSER:
-        openBrowser.open(parameters.url);
-        break;
-      //
-      case ELECTRON_EVENT_DECRYPT:
-        res = Functions.desEncriptar(task.data);
-        task.response = res.object;
-        event.reply(ELECTRON_RESPONSE, task);
-        break;
-      //
-      case ELECTRON_EVENT_ENCRYPT:
-        res = Functions.encriptar(task.data);
-        task.response = res;
-        event.reply(ELECTRON_RESPONSE, task);
-        break;
-      //
-      case ELECTRON_PRINT_BASE64:
+        return;
+      case DESKTOP_COMMAND_OPEN_EXTERNAL:
+        openBrowser.open((payload as { url: string }).url);
+        return { ok: true };
+      case DESKTOP_COMMAND_PRINT_BASE64: {
         writeLogs('INICIANDO PROCESO DE IMPRESION');
 
-        const { base64, file: fileName, printer, type = 'reporte', pageOrientation = 'portrait' } = parameters;
-
-        pdf_printer
-          .generatePdfFileFromBase64({ fileName, base64, type, pageOrientation, printer })
-          .then(res => {
-            task.response = res;
-            event.reply(ELECTRON_RESPONSE, task);
-          })
-          .catch(err => {
-            task.error = true;
-            task.response = err;
-            event.reply(ELECTRON_RESPONSE, task);
-          });
-
-        break;
-      //
-      case ELECTRON_EXPORT_CSV:
+        const { base64, file: fileName, printer, type = 'reporte', pageOrientation = 'portrait' } = payload as {
+          base64: string;
+          file: string;
+          printer: string;
+          type?: string;
+          pageOrientation?: string;
+        };
+        return await pdf_printer.generatePdfFileFromBase64({ fileName, base64, type, pageOrientation, printer });
+      }
+      case DESKTOP_COMMAND_EXPORT_CSV:
         writeLogs('INICIANDOO PROCESO DE EXPORTACION');
-
-        export_to_excel
-          .generateCSV(parameters)
-          .then(res => {
-            task.response = res;
-            event.reply(ELECTRON_RESPONSE, task);
-          })
-          .catch(err => {
-            task.error = true;
-            task.response = err;
-            event.reply(ELECTRON_RESPONSE, task);
-          });
-
-        break;
-      //
-      case ELECTRON_GET_APP_CONFIG:
-        getAppConfig()
-          .then(config => {
-            task.response = config;
-            event.reply(ELECTRON_RESPONSE, task);
-          })
-          .catch(err => {
-            task.error = true;
-            task.response = err;
-            event.reply(ELECTRON_RESPONSE, task);
-          });
-        break;
-      //
-      case ELECTRON_SET_APP_CONFIG:
-        Functions.setConfigFile(task.data).then(() => {
-          task.response = 'LISTO';
-          event.reply(ELECTRON_RESPONSE, task);
-        });
-        break;
-      //
-      case ELECTRON_CLOSE_CONFIRMATION:
+        return await export_to_excel.generateCSV(payload as { fileName: string; excelData: Array<string[]>; configuration: any });
+      case DESKTOP_COMMAND_GET_APP_CONFIG:
+        return await getAppConfig();
+      case DESKTOP_COMMAND_SET_APP_CONFIG:
+        await Functions.setConfigFile(JSON.stringify(payload));
+        return 'LISTO';
+      case DESKTOP_COMMAND_CONFIRM_CLOSE:
         writeLogs(' ----- CLOSE CONFIRMATION -----');
+        sharedState.closingReason = 'user-confirmed';
         closeApp();
-        break;
-      //
-      case ELECTRON_FOCUS_WINDOW:
+        return { ok: true };
+      case DESKTOP_COMMAND_FOCUS_WINDOW:
         writeLogs(' ----- FOCUS WINDOW -----');
-        showWindow().then(() => {
-          task.data = 'FOCUS LISTO';
-          event.reply(ELECTRON_RESPONSE, task);
-        });
-        break;
-      //
+        await showWindow();
+        return { ok: true };
+      case DESKTOP_COMMAND_UPDATE_CHECK:
+        return await auto_updater.checkForUpdates(((payload as { source?: 'auto' | 'manual' } | undefined)?.source) || 'manual');
+      case DESKTOP_COMMAND_UPDATE_DOWNLOAD:
+        return await auto_updater.downloadUpdate();
+      case DESKTOP_COMMAND_UPDATE_GET_STATE:
+        return auto_updater.getState();
       default:
-        event.reply(ELECTRON_RESPONSE);
-        break;
+        throw new Error(`Comando desktop no soportado: ${command}`);
     }
   } catch (error) {
-    console.error('HANDLE EVENTE error ', error);
-    writeLogs(error, 'HANDLE EVENT ERROR ');
+    console.error('HANDLE DESKTOP COMMAND error ', error);
+    writeLogs(error, 'HANDLE DESKTOP COMMAND ERROR');
+    throw error;
   }
 }
 

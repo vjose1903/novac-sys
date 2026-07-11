@@ -9,7 +9,7 @@
     "types": ["node"],
     "lib": ["es2017", "es2016", "es2015", "dom", "ES2021.String"]
   },
-  "files": ["main.ts"],
+  "files": ["main.ts", "electron/preload.ts"],
   "include": ["./electron/"],
   "exclude": ["node_modules", "**/*.spec.ts", "/src/**", "/src/*", "src/*", "src/**", "./config_setup/"]
 }

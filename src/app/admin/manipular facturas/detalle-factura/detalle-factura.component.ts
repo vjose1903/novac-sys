@@ -2,8 +2,6 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { fun } from '@core/services/functions.service';
 import { serie, TrackStatusEnum } from '@core/typescript/constantes';
 import { ModalDetalleFacturaI } from './detalle-factura.model';
-import { MessageTask } from '@core/models/message-task';
-import { ELECTRON_OPEN_WEB_BROWSER } from '../../../../../electron/shared-electron-angular';
 import { IpcService } from '@core/services/ipc.service';
 import { DateUtils } from '@vjose1903/dateutils';
 import { ICallbackModal, IDynamicModal, IModalConfiguration, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
@@ -363,9 +361,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   }
 
   openBrowser() {
-    const task = new MessageTask(ELECTRON_OPEN_WEB_BROWSER, { url: this.data.qr_url_dgii });
-
-    this._ipc.sendTask(task).catch(err => {
+    this._ipc.openExternal(this.data.qr_url_dgii).catch(err => {
       if (err.msg) fun.toastError(err.msg, 'ERROR');
       else fun.toastError('Error buscar el estado de la factura', 'ERROR');
       console.error(err);

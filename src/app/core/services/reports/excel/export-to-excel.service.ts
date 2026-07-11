@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { exportExcelConfigI } from '../../../interface/export-to-excel.interface';
 import { Ss } from '../../singleton.service';
 import { ConfigI } from '../../../interface/config-interface';
-import { MessageTask } from '../../../models/message-task';
-import { ELECTRON_EXPORT_CSV } from '../../../../../../electron/shared-electron-angular';
 import * as fun_ from '../utils/funciones';
 import { fun } from '../../functions.service';
 import { ReportTypeE } from './excel.interfaces';
@@ -104,10 +102,8 @@ export class ExportToExcelService {
 
   private exportCsv(fileName: string, excelData: Array<string[]>, config: exportExcelConfigI) {
     return new Promise<any>((resolve, reject) => {
-      const task = new MessageTask(ELECTRON_EXPORT_CSV, { fileName, excelData, configuration: config });
-
       Ss._ipc
-        .sendTask(task)
+        .exportCsv({ fileName, excelData, configuration: config })
         .then(res => resolve(res))
         .catch(err => reject(err));
     });

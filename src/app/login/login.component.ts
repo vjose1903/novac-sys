@@ -12,7 +12,6 @@ import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { RequestC } from '@core/typescript/requests';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Ss } from '@core/services/singleton.service';
-import { MessageTask } from '@core/models/message-task';
 import { ConfigI } from '@core/interface/config-interface';
 import { fun } from '@core/services/functions.service';
 import { CurrentUserService } from '@core/services/current-user.service';
