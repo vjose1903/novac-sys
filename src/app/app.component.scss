@@ -60,3 +60,11 @@ body {
     transition: width 150ms linear;
   }
 }
+
+:host ::ng-deep .update-download-dialog .p-dialog-content {
+  padding-top: 1rem !important;
+}
+
+:host ::ng-deep .update-download-progress-value {
+  background: #0d6efd !important;
+}
