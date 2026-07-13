@@ -55,7 +55,6 @@ const files = [
   { tipo: 'reemplazo', file_name: 'environment/environment.dev.ts', path: 'src/environments/environment.dev.ts' },
   { tipo: 'reemplazo', file_name: 'environment/environment.prod.ts', path: 'src/environments/environment.prod.ts' },
   { tipo: 'reemplazo', file_name: 'index.html', path: 'src/index.html' },
-  { tipo: 'reemplazo', file_name: 'package.json', path: 'package.json' },
   { tipo: 'reemplazo', file_name: 'deploy.yml', path: '.github/workflows/deploy.yml' }
 ];
 
