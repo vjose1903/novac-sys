@@ -11,8 +11,6 @@ import { LayoutService } from '@admin/layout/layout.service';
 import { ConfigurationService } from '@services/configuration.service';
 import { EmpresaService } from '@core/services/empresa.service';
 import { ThemeService } from '@services/theme.service';
-import { DesktopUpdateState } from '@electron/shared-electron-angular';
-
 import { takeUntil, Subject } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -25,10 +23,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
 import { DynamicModalComponent } from '@components/dynamic-modal/dynamic-modal.component';
-import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
-import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { FIRESTORE } from '@core/tokens/firebase.tokens';
 import { Firestore } from 'firebase/firestore';
+import { AppUpdateUiService } from '@core/services/electron/app-update-ui.service';
 
 @Component({
   selector: 'app-root',
@@ -54,6 +52,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   public dynamicModalService = inject(DynamicModalService);
   public firestore = inject(FIRESTORE);
   public injector = inject(Injector);
+  public updateUi = inject(AppUpdateUiService);
 
   // Subject para manejar la destrucción del componente
   private readonly destroy$ = new Subject<void>();
@@ -61,12 +60,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   // Propiedades del componente
   loading = signal<boolean>(false);
   objProgress: any;
-  visible = signal<boolean>(false);
   imgLogo = signal<string>('');
-  objPercent = signal<any>(null);
-  counter = signal<number>(0);
   isReady = signal<boolean>(false);
-  private lastHandledAvailableVersion: string | null = null;
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
@@ -93,9 +88,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     this.setupSubscriptions();
     Ss.layServ.parseMenu();
     this.verifyIsReady();
-
-    // TODO: temporal
-    // this.mostrar_modal_actualizacion({ version: '1.0.0' });
   }
 
   ngAfterViewInit(): void {
@@ -129,6 +121,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       firestore: this.firestore,
       injector: this.injector,
     });
+
+    this.updateUi.initialize();
   }
 
   /**
@@ -148,10 +142,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       this.imgLogo.set(`data:image/png;base64,${config.logo_empresa}`);
     });
 
-    this._ipc.updateState$.pipe(takeUntil(this.destroy$)).subscribe(state => {
-      this.handleUpdateState(state);
-    });
-
     this._ipc.closeRequested$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       const token = fun.getAuthToken();
 
@@ -159,48 +149,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
         this.cerrar_app();
       } else {
         this.sendCloseConfirmation();
-      }
-    });
-  }
-
-  private handleUpdateState(state: DesktopUpdateState): void {
-    this.zone.run(() => {
-      switch (state.status) {
-        case 'checking':
-          this.counter.set(0);
-          this.objPercent.set(null);
-          break;
-        case 'available':
-          this.counter.set(0);
-          this.objPercent.set(null);
-          this.visible.set(false);
-          if (state.source === 'manual') break;
-          if (state.updateInfo?.version && this.lastHandledAvailableVersion !== state.updateInfo.version) {
-            this.lastHandledAvailableVersion = state.updateInfo.version;
-            this.mostrar_modal_actualizacion(state.updateInfo);
-          }
-          break;
-        case 'downloading':
-          this.visible.set(true);
-          if (state.progress) {
-            this.downloadProgression(state.progress);
-          }
-          break;
-        case 'downloaded':
-        case 'installing':
-          this.visible.set(true);
-          break;
-        case 'not-available':
-          this.counter.set(0);
-          this.objPercent.set(null);
-          this.visible.set(false);
-          break;
-        case 'error':
-          this.counter.set(0);
-          this.objPercent.set(null);
-          this.visible.set(false);
-          fun.toastError(state.error?.message || state.message || 'Error en la actualización', 'ERROR');
-          break;
       }
     });
   }
@@ -282,80 +230,5 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
 
   sendCloseConfirmation(): void {
     this._ipc.confirmClose();
-  }
-
-  mostrar_modal_actualizacion(info: any): void {
-    this.zone.run(() => {
-      const updateModalConf = new DynamicModalClass();
-
-      updateModalConf.id = 'actualizar_app';
-      updateModalConf.width = '40rem';
-      this.configurar_modal_actualizacion_disponible(updateModalConf, info);
-      updateModalConf.show();
-    });
-  }
-
-  private configurar_modal_actualizacion_disponible(updateModalConf: DynamicModalClass, info: any): void {
-    updateModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
-    updateModalConf.html = `
-      <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary rounded-3">
-        <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-primary-subtle text-primary" style="width: 3rem; height: 3rem">
-          <i class="pi pi-download" aria-hidden="true"></i>
-        </div>
-        <div>
-          <h5 class="mb-1 text-secondary">Nueva versión disponible</h5>
-          <p class="mb-2 text-body-secondary">Hay una actualización de Novac System lista para descargar e instalar.</p>
-          <span class="d-inline-flex align-items-center px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.8rem; font-weight: 500">
-            <span>Versión disponible: <strong>${info.version}</strong></span>
-          </span>
-        </div>
-      </div>
-    `;
-    updateModalConf.closable = true;
-    updateModalConf.closableEsc = true;
-    updateModalConf.botones = [
-      { id: 'cancelUpdateBtn', clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
-      { id: 'updateBtn', clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance, updateModalConf), showProcess: true },
-    ];
-    updateModalConf.disableAllButtonsIfAnyProcessing = true;
-  }
-
-  iniciar_descarga_actualizacion(modalInstance?: DynamicModalClass, updateModalConf?: DynamicModalClass): void {
-    const updateBtn = updateModalConf.botones.find(btn => btn.id === 'updateBtn');
-
-    this._ipc
-      .downloadUpdate()
-      .then((res: any) => {
-        fun.setTimeout(() => {
-          if (res.started) {
-            if (modalInstance) modalInstance.close();
-            this.visible.set(true);
-          } else {
-            fun.toastInfo(res.message, 'INFORMACIÓN');
-          }
-
-          if (updateBtn) updateBtn.processing = false;
-        }, 0);
-      })
-      .catch(error => {
-        if (updateBtn) updateBtn.processing = false;
-        fun.toastError(error?.message || 'No se pudo iniciar la descarga de la actualización', 'ERROR');
-      });
-  }
-
-  downloadProgression(object: any): void {
-    this.zone.run(() => {
-      if (this.counter() === 0) this.visible.set(true);
-
-      this.counter.update(prev => prev + 1);
-      const normalizedProgress = { ...object };
-
-      normalizedProgress.transferred = parseFloat(fun.roundNumberToDecimal(normalizedProgress.transferred / 1000000));
-      normalizedProgress.total = parseFloat(fun.roundNumberToDecimal(normalizedProgress.total / 1000000));
-      normalizedProgress.percent = parseFloat(fun.roundNumberToDecimal(normalizedProgress.percent));
-
-      this.objPercent.set(normalizedProgress);
-      this.cdRef.detectChanges();
-    });
   }
 }

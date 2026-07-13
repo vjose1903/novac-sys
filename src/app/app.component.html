@@ -18,20 +18,48 @@
   <router-outlet></router-outlet>
 }
 
-<p-dialog [closable]="false" [closeOnEscape]="false" header="Porcentaje de descarga" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
-  @if (objPercent()) {
-    <div class="d-flex justify-content-between mb-2 position-relative">
-      <span class="negrita">Descargando actualización...</span>
-      <div class="me-2">
-        <span class="negrita">{{ objPercent()?.transferred }} MB / </span>
-        <span class="negrita gris">{{ objPercent()?.total }} MB</span>
+<p-dialog
+  [closable]="updateUi.isDevelopment"
+  [closeOnEscape]="updateUi.isDevelopment"
+  header="DESCARGANDO ACTUALIZACIÓN"
+  [visible]="updateUi.visible()"
+  (visibleChange)="updateUi.setVisible($event)"
+  [modal]="true"
+  [style]="{ width: '40rem', maxWidth: '90vw' }"
+  [baseZIndex]="10000"
+  [draggable]="false"
+  [resizable]="false">
+  @if (updateUi.progress()) {
+    <div class="mt-3 p-3 bg-body-tertiary rounded-3">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-primary-subtle text-primary" style="width: 3rem; height: 3rem">
+          <i class="pi pi-download" aria-hidden="true"></i>
+        </div>
+        <div class="flex-grow-1">
+          <h5 class="mb-1 text-secondary">Descargando actualización</h5>
+          <p class="mb-0 text-body-secondary">Mantén la aplicación abierta mientras se completa la descarga.</p>
+        </div>
+        <span class="px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.85rem; font-weight: 600">
+          {{ updateUi.progress()?.percent }}%
+        </span>
+      </div>
+
+      <p-progressBar styleClass="update-download-progress" color="#0d6efd" [showValue]="false" [value]="updateUi.progress()?.percent"></p-progressBar>
+
+      <div class="d-flex justify-content-between mt-2 text-body-secondary" style="font-size: 0.85rem">
+        <span>{{ updateUi.progress()?.transferred }} MB descargados</span>
+        <span>{{ updateUi.progress()?.total }} MB en total</span>
       </div>
     </div>
-    <p-progressBar [value]="objPercent()?.percent"></p-progressBar>
   } @else {
-    <div class="d-flex align-items-center justify-content-center gap-2 py-3">
-      <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
-      <span>Preparando descarga...</span>
+    <div class="d-flex align-items-center gap-3 mt-3 p-4 bg-body-tertiary rounded-3">
+      <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-primary-subtle text-primary" style="width: 3rem; height: 3rem">
+        <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+      </div>
+      <div>
+        <h5 class="mb-1 text-secondary">Preparando descarga</h5>
+        <p class="mb-0 text-body-secondary">Estamos preparando los archivos de la actualización. Esto puede tardar unos segundos.</p>
+      </div>
     </div>
   }
 </p-dialog>

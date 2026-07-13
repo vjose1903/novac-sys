@@ -50,3 +50,13 @@ body {
   text-shadow: 5px 4px 6px black;
   text-transform: uppercase;
 }
+
+:host ::ng-deep .update-download-progress {
+  height: 0.7rem;
+  border-radius: 999px;
+  overflow: hidden;
+
+  .p-progressbar-value {
+    transition: width 150ms linear;
+  }
+}

@@ -295,6 +295,20 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     updateModalConf.closable = true;
     updateModalConf.closableEsc = true;
     updateModalConf.botones = [
+      ...(!Environment.production
+        ? [
+            {
+              id: 'simulateDownloadBtn',
+              clase: 'btn btn-primary',
+              label: 'Simular descarga',
+              disable: false,
+              function: instance => {
+                instance.close();
+                this._ipc.simulateUpdateDownload();
+              },
+            },
+          ]
+        : []),
       { id: 'cancelUpdateBtn', clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
       { id: 'updateBtn', clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance, updateModalConf), showProcess: true },
     ];

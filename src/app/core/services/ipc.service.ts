@@ -76,6 +76,10 @@ export class IpcService {
     return this.update.downloadUpdate();
   }
 
+  simulateUpdateDownload() {
+    this.update.simulateDownload();
+  }
+
   refreshUpdateState() {
     return this.update.refreshState();
   }

@@ -12,12 +12,15 @@ import {
 } from '@electron/shared-electron-angular';
 
 import { ElectronBridgeService } from './electron-bridge.service';
+import { Environment } from '@environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ElectronUpdateService {
   private readonly stateSubject = new BehaviorSubject<DesktopUpdateState>(createIdleUpdateState());
+  private simulatedPreparationTimer: ReturnType<typeof setTimeout> | null = null;
+  private simulatedProgressTimer: ReturnType<typeof setInterval> | null = null;
   readonly state$ = this.stateSubject.asObservable();
 
   constructor(private readonly bridge: ElectronBridgeService) {
@@ -48,5 +51,56 @@ export class ElectronUpdateService {
 
   downloadUpdate() {
     return this.bridge.invoke(DESKTOP_COMMAND_UPDATE_DOWNLOAD);
+  }
+
+  simulateDownload(): void {
+    if (Environment.production) return;
+
+    this.clearSimulationTimers();
+    const total = 125_000_000;
+    const bytesPerSecond = 18_000_000;
+
+    this.stateSubject.next({
+      ...this.currentState,
+      status: 'downloading',
+      source: 'manual',
+      progress: null,
+      message: 'Preparando descarga...',
+      error: null,
+    });
+
+    this.simulatedPreparationTimer = setTimeout(() => {
+      let percent = 0;
+
+      this.simulatedProgressTimer = setInterval(() => {
+        percent = Math.min(percent + 4, 100);
+
+        this.stateSubject.next({
+          ...this.currentState,
+          status: 'downloading',
+          source: 'manual',
+          progress: {
+            transferred: total * (percent / 100),
+            total,
+            percent,
+            bytesPerSecond,
+          },
+          message: 'Descargando actualización...',
+          error: null,
+        });
+
+        if (percent === 100 && this.simulatedProgressTimer) {
+          clearInterval(this.simulatedProgressTimer);
+          this.simulatedProgressTimer = null;
+        }
+      }, 150);
+    }, 1800);
+  }
+
+  private clearSimulationTimers(): void {
+    if (this.simulatedPreparationTimer) clearTimeout(this.simulatedPreparationTimer);
+    if (this.simulatedProgressTimer) clearInterval(this.simulatedProgressTimer);
+    this.simulatedPreparationTimer = null;
+    this.simulatedProgressTimer = null;
   }
 }
