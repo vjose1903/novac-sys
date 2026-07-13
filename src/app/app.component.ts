@@ -174,7 +174,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
           this.counter.set(0);
           this.objPercent.set(null);
           this.visible.set(false);
-          fun.logOrange('update:available', state);
+          if (state.source === 'manual') break;
           if (state.updateInfo?.version && this.lastHandledAvailableVersion !== state.updateInfo.version) {
             this.lastHandledAvailableVersion = state.updateInfo.version;
             this.mostrar_modal_actualizacion(state.updateInfo);
@@ -196,11 +196,10 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
           this.visible.set(false);
           break;
         case 'error':
-          fun.logRed('update:error', state);
-          fun.toastError(state.error?.message || state.message || 'Error en la actualización', 'ERROR');
           this.counter.set(0);
           this.objPercent.set(null);
           this.visible.set(false);
+          fun.toastError(state.error?.message || state.message || 'Error en la actualización', 'ERROR');
           break;
       }
     });
@@ -290,17 +289,35 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       const updateModalConf = new DynamicModalClass();
 
       updateModalConf.id = 'actualizar_app';
-      updateModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
       updateModalConf.width = '40rem';
-      updateModalConf.html = `<p>¡NOVAC SYSTEM tiene una <strong>ACTUALIZACIÓN DISPONIBLE</strong>! ¿Desea descargar e instalar la versión ${info.version}?</p>`;
-      updateModalConf.closableEsc = true;
-      updateModalConf.botones = [
-        { id: 'cancelUpdateBtn', clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
-        { id: 'updateBtn', clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance, updateModalConf), showProcess: true },
-      ];
-      updateModalConf.disableAllButtonsIfAnyProcessing = true;
+      this.configurar_modal_actualizacion_disponible(updateModalConf, info);
       updateModalConf.show();
     });
+  }
+
+  private configurar_modal_actualizacion_disponible(updateModalConf: DynamicModalClass, info: any): void {
+    updateModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
+    updateModalConf.html = `
+      <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary rounded-3">
+        <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-primary-subtle text-primary" style="width: 3rem; height: 3rem">
+          <i class="pi pi-download" aria-hidden="true"></i>
+        </div>
+        <div>
+          <h5 class="mb-1 text-secondary">Nueva versión disponible</h5>
+          <p class="mb-2 text-body-secondary">Hay una actualización de Novac System lista para descargar e instalar.</p>
+          <span class="d-inline-flex align-items-center px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.8rem; font-weight: 500">
+            <span>Versión disponible: <strong>${info.version}</strong></span>
+          </span>
+        </div>
+      </div>
+    `;
+    updateModalConf.closable = true;
+    updateModalConf.closableEsc = true;
+    updateModalConf.botones = [
+      { id: 'cancelUpdateBtn', clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+      { id: 'updateBtn', clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance, updateModalConf), showProcess: true },
+    ];
+    updateModalConf.disableAllButtonsIfAnyProcessing = true;
   }
 
   iniciar_descarga_actualizacion(modalInstance?: DynamicModalClass, updateModalConf?: DynamicModalClass): void {
@@ -317,11 +334,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
             fun.toastInfo(res.message, 'INFORMACIÓN');
           }
 
-          try {
-            if (updateBtn) updateBtn.processing = false;
-          } catch (error) {
-            console.error('Error al actualizar el botón de procesamiento:', error);
-          }
+          if (updateBtn) updateBtn.processing = false;
         }, 0);
       })
       .catch(error => {

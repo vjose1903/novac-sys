@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { DynamicModalClass } from './config/dynamic-modal.class';
@@ -20,7 +20,10 @@ import { TooltipModule } from 'primeng/tooltip';
 export class DynamicModalComponent implements OnInit, OnDestroy {
   @ViewChildren(DynamicModalDirective) modalReceptor!: QueryList<DynamicModalDirective>;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(
+    private sanitizer: DomSanitizer,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   subModalConfig!: Subscription;
 
@@ -109,6 +112,8 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
         }
       }
     }
+
+    this.cdRef.detectChanges();
   }
 
   searchInArray(array, source, target) {

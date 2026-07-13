@@ -5,7 +5,12 @@ import { pathAdd, writeLogs } from '../main.js';
 import Functions from './functions.js';
 import MachineId from './machine-id.js';
 
-const logos = require('../logos.json');
+function resolveRuntimeFile(packagedPath: string, sourcePath: string): string {
+  return fs.existsSync(packagedPath) ? packagedPath : sourcePath;
+}
+
+const logosPath = resolveRuntimeFile(path.join(__dirname, '..', 'logos.json'), path.join(process.cwd(), 'logos.json'));
+const logos = JSON.parse(fs.readFileSync(logosPath, 'utf-8'));
 
 export default class HandlerConfigFile {
   private static instance: HandlerConfigFile;
@@ -51,7 +56,7 @@ export default class HandlerConfigFile {
   getDefaultConfig() {
     return new Promise<ConfigI>((resolve, reject) => {
       try {
-        const configPath = path.join(__dirname, 'default_config.json');
+        const configPath = resolveRuntimeFile(path.join(__dirname, 'default_config.json'), path.join(process.cwd(), 'electron', 'default_config.json'));
 
         if (fs.existsSync(configPath)) {
           const configData = fs.readFileSync(configPath, 'utf-8');

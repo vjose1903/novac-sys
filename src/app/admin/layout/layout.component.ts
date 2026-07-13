@@ -22,6 +22,7 @@ import { ConfiguracionesComponent } from '../../login/extra/configuraciones/conf
 import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { Environment } from '@environments/environment';
+import { DesktopUpdateState } from '@electron/shared-electron-angular';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
@@ -192,9 +193,158 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   verificarActualizaciones() {
-    this._ipc.checkForUpdates().then(res => {
-      console.log('res ---> ', res);
-    });
+    const updateModalConf = this.crear_modal_verificando_actualizacion();
+    updateModalConf.show();
+
+    this._ipc
+      .checkForUpdates()
+      .then(state => {
+        Ss.zone.run(() => this.actualizar_modal_verificacion(updateModalConf, state));
+      })
+      .catch(() => {
+        Ss.zone.run(() => this.mostrar_error_verificacion(updateModalConf));
+      });
+  }
+
+  private crear_modal_verificando_actualizacion(): DynamicModalClass {
+    const updateModalConf = new DynamicModalClass();
+    updateModalConf.id = 'actualizar_app';
+    updateModalConf.header = 'VERIFICANDO ACTUALIZACIÓN';
+    updateModalConf.width = '40rem';
+    updateModalConf.html = `
+      <div class="d-flex align-items-center justify-content-center gap-2 px-3 py-4 bg-body-tertiary text-secondary rounded-3">
+        <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+        <span>Verificando actualizaciones...</span>
+      </div>
+    `;
+    updateModalConf.closable = false;
+    updateModalConf.closableEsc = false;
+    updateModalConf.botones = [{ id: 'hiddenUpdateFooterBtn', clase: 'd-none', label: '', disable: true }];
+    return updateModalConf;
+  }
+
+  private actualizar_modal_verificacion(updateModalConf: DynamicModalClass, state: DesktopUpdateState): void {
+    if (state.status === 'available' && state.updateInfo) {
+      this.mostrar_actualizacion_disponible(updateModalConf, state.updateInfo);
+      return;
+    }
+
+    if (state.status === 'not-available') {
+      updateModalConf.header = 'NOVAC SYSTEM ESTÁ ACTUALIZADO';
+      updateModalConf.html = `
+        <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary rounded-3">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-success-subtle text-success" style="width: 3rem; height: 3rem">
+            <i class="pi pi-check" aria-hidden="true"></i>
+          </div>
+          <div>
+            <h5 class="mb-1 text-secondary">Ya estás en la última versión disponible</h5>
+            <p class="mb-2 text-body-secondary">No hay nuevas actualizaciones para instalar.</p>
+            <span class="d-inline-flex align-items-center px-3 py-1 rounded-pill bg-success-subtle text-success border border-success-subtle" style="font-size: 0.8rem; font-weight: 500">
+              <span>Versión actual: <strong>${this.configApp.app_version}</strong></span>
+            </span>
+          </div>
+        </div>
+      `;
+      updateModalConf.closable = true;
+      updateModalConf.closableEsc = true;
+      updateModalConf.botones = [
+        ...(!Environment.production
+          ? [
+              {
+                id: 'simulateUpdateBtn',
+                clase: 'btn btn-blanco',
+                label: 'Simular actualización',
+                disable: false,
+                function: () => this.mostrar_actualizacion_disponible(updateModalConf, { version: this.obtener_version_simulada() }),
+              },
+            ]
+          : []),
+        { id: 'closeUpdateBtn', clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      ];
+      this.refrescar_modal_actualizacion(updateModalConf);
+    }
+  }
+
+  private obtener_version_simulada(): string {
+    const currentVersion = String(this.configApp.app_version);
+    const versionSegments = currentVersion.split('.');
+    const lastSegment = Number(versionSegments.at(-1));
+
+    if (!Number.isInteger(lastSegment)) return `${currentVersion}.1`;
+
+    versionSegments[versionSegments.length - 1] = String(lastSegment + 1);
+    return versionSegments.join('.');
+  }
+
+  private mostrar_actualizacion_disponible(updateModalConf: DynamicModalClass, info: any): void {
+    updateModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
+    updateModalConf.html = `
+      <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary rounded-3">
+        <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-primary-subtle text-primary" style="width: 3rem; height: 3rem">
+          <i class="pi pi-download" aria-hidden="true"></i>
+        </div>
+        <div>
+          <h5 class="mb-1 text-secondary">Nueva versión disponible</h5>
+          <p class="mb-2 text-body-secondary">Hay una actualización de Novac System lista para descargar e instalar.</p>
+          <span class="d-inline-flex align-items-center px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.8rem; font-weight: 500">
+            <span>Versión disponible: <strong>${info.version}</strong></span>
+          </span>
+        </div>
+      </div>
+    `;
+    updateModalConf.closable = true;
+    updateModalConf.closableEsc = true;
+    updateModalConf.botones = [
+      { id: 'cancelUpdateBtn', clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+      { id: 'updateBtn', clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance, updateModalConf), showProcess: true },
+    ];
+    updateModalConf.disableAllButtonsIfAnyProcessing = true;
+    this.refrescar_modal_actualizacion(updateModalConf);
+  }
+
+  private mostrar_error_verificacion(updateModalConf: DynamicModalClass): void {
+    updateModalConf.header = 'ERROR DE ACTUALIZACIÓN';
+    updateModalConf.html = '<p class="mb-0">No se pudo verificar si existen actualizaciones.</p>';
+    updateModalConf.closable = true;
+    updateModalConf.closableEsc = true;
+    updateModalConf.botones = [{ id: 'closeUpdateBtn', clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+    this.refrescar_modal_actualizacion(updateModalConf);
+  }
+
+  private refrescar_modal_actualizacion(updateModalConf: DynamicModalClass): void {
+    if (!updateModalConf.id || !updateModalConf.modalWrapper) return;
+
+    updateModalConf.modalWrapper.changeModalConfig(
+      {
+        header: updateModalConf.header,
+        html: updateModalConf.html,
+        closable: updateModalConf.closable,
+        closableEsc: updateModalConf.closableEsc,
+        botones: updateModalConf.botones,
+        disableAllButtonsIfAnyProcessing: updateModalConf.disableAllButtonsIfAnyProcessing,
+      },
+      updateModalConf.id
+    );
+  }
+
+  private iniciar_descarga_actualizacion(modalInstance: DynamicModalClass, updateModalConf: DynamicModalClass): void {
+    const updateBtn = updateModalConf.botones.find(btn => btn.id === 'updateBtn');
+
+    this._ipc
+      .downloadUpdate()
+      .then(res => {
+        if (res.started) {
+          modalInstance.close();
+        } else {
+          fun.toastInfo(res.message, 'INFORMACIÓN');
+        }
+
+        if (updateBtn) updateBtn.processing = false;
+      })
+      .catch(error => {
+        if (updateBtn) updateBtn.processing = false;
+        fun.toastError(error?.message || 'No se pudo iniciar la descarga de la actualización', 'ERROR');
+      });
   }
 
   checkCuadre() {

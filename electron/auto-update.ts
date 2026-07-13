@@ -25,6 +25,7 @@ export default class AppUpdate {
   private isInitialized = false;
   private isChecking = false;
   private isDownloading = false;
+  private activeCheck: Promise<DesktopUpdateState> | null = null;
 
   constructor(app: Electron.App, serve_: boolean) {
     this.app = app;
@@ -70,9 +71,47 @@ export default class AppUpdate {
   }
 
   async checkForUpdates(source: DesktopUpdateCheckSource = 'manual') {
-    if (this.serve_) return this.getState();
+    if (this.serve_) {
+      if (source !== 'manual' || this.isChecking) {
+        return this.getState();
+      }
+
+      this.isChecking = true;
+      this.setState({
+        status: 'checking',
+        source: 'manual',
+        message: 'Verificando actualizaciones...',
+        error: null,
+        checkedAt: new Date().toISOString(),
+      });
+
+      try {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        this.setState({
+          status: 'not-available',
+          source: 'manual',
+          updateInfo: { version: this.app.getVersion() },
+          progress: null,
+          checkedAt: new Date().toISOString(),
+          message: 'No hay actualizaciones disponibles',
+          error: null,
+        });
+        return this.getState();
+      } finally {
+        this.isChecking = false;
+      }
+    }
+
     if (!this.updateConfig) throw new Error('Update feed no configurado');
-    if (this.isChecking || this.isDownloading || this.state.status === 'installing') return this.getState();
+    if (this.isDownloading || this.state.status === 'installing') return this.getState();
+    if (this.isChecking) {
+      if (source === 'manual' && this.state.status === 'checking') {
+        this.setState({ ...this.state, source: 'manual' });
+      }
+
+      return this.activeCheck ?? this.getState();
+    }
 
     this.isChecking = true;
     this.setState({
@@ -83,19 +122,26 @@ export default class AppUpdate {
       checkedAt: new Date().toISOString(),
     });
 
+    this.activeCheck = (async () => {
+      try {
+        await this.autoUpdater.checkForUpdates();
+        return this.getState();
+      } catch (error) {
+        this.setState({
+          status: 'error',
+          source: this.state.source ?? source,
+          message: 'Error verificando actualizaciones',
+          error: this.normalizeError(error),
+        });
+        throw error;
+      }
+    })();
+
     try {
-      await this.autoUpdater.checkForUpdates();
-      return this.getState();
-    } catch (error) {
-      this.setState({
-        status: 'error',
-        source,
-        message: 'Error verificando actualizaciones',
-        error: this.normalizeError(error),
-      });
-      throw error;
+      return await this.activeCheck;
     } finally {
       this.isChecking = false;
+      this.activeCheck = null;
     }
   }
 

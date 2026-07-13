@@ -59,7 +59,8 @@ const serve = args.some(val => val === '--serve');
 const appFilePath = `file://${path.join(app.getAppPath(), 'dist', 'browser', 'index.html')}`;
 const iconPath = path.join(app.getAppPath(), serve ? 'src' : 'dist/browser', 'assets', 'icons', isMacOs() ? 'mac/icon.icns' : 'win/icon.ico');
 const preloadPath = path.join(__dirname, 'electron', 'preload.js');
-const mainRuntimeConfigPath = path.join(__dirname, 'electron', 'main-runtime-config.json');
+const packagedMainRuntimeConfigPath = path.join(__dirname, 'electron', 'main-runtime-config.json');
+const mainRuntimeConfigPath = fs.existsSync(packagedMainRuntimeConfigPath) ? packagedMainRuntimeConfigPath : path.join(process.cwd(), 'electron', 'main-runtime-config.json');
 
 function getServePort() {
   try {
