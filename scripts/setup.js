@@ -4,8 +4,6 @@ const path = require('path');
 const clientes = ['brendy', 'agrodemi', 'vasquez', 'demo'];
 const [cliente_selected, nivel] = process.argv.slice(2);
 
-const CUSTOM_ACCESS = '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';
-
 const setup_ = {
   demo: {
     TITLE_APP: 'Novac System - DEMO',
@@ -14,7 +12,6 @@ const setup_ = {
     CUSTOMER_NAME: 'demo',
     DOCKER_NAME: 'demo',
     NAME_UPDATE_REPO: 'novac-system-demo',
-    CUSTOM_ACCESS: CUSTOM_ACCESS,
     DGII_DATE: '',
   },
   agrodemi: {
@@ -24,7 +21,6 @@ const setup_ = {
     CUSTOMER_NAME: 'agrodemi',
     DOCKER_NAME: 'agrodemi',
     NAME_UPDATE_REPO: 'novac-system-agrodemi',
-    CUSTOM_ACCESS: CUSTOM_ACCESS,
     DGII_DATE: '2025-05-15',
   },
   brendy: {
@@ -34,7 +30,6 @@ const setup_ = {
     CUSTOMER_NAME: 'brendy',
     DOCKER_NAME: 'brendy',
     NAME_UPDATE_REPO: 'novac-system-brendy',
-    CUSTOM_ACCESS: CUSTOM_ACCESS,
     DGII_DATE: '',
   },
   vasquez: {
@@ -44,7 +39,6 @@ const setup_ = {
     CUSTOMER_NAME: 'vasquez',
     DOCKER_NAME: 'vasquez',
     NAME_UPDATE_REPO: 'novac-system-vasquez',
-    CUSTOM_ACCESS: CUSTOM_ACCESS,
     DGII_DATE: '',
   },
 };
@@ -54,6 +48,7 @@ const files = [
   { tipo: 'move', file_name: 'logos/logos', extension: 'json', path: 'logos.json' },
 
   { tipo: 'reemplazo', file_name: 'docker-handler.ts', path: 'electron/docker-handler.ts' },
+  { tipo: 'reemplazo', file_name: 'electron-builder.json', path: 'electron-builder.json' },
   { tipo: 'reemplazo', file_name: 'main-runtime-config.json', path: 'electron/main-runtime-config.json' },
   { tipo: 'reemplazo', file_name: 'update-config.json', path: 'electron/update-config.json' },
   { tipo: 'reemplazo', file_name: 'environment/environment.ts', path: 'src/environments/environment.ts' },

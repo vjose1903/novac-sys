@@ -42,7 +42,14 @@
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
     "asarUnpack": [],
-    "publish": ["github"],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "vjose1903",
+        "repo": "novac-system-agrodemi",
+        "releaseType": "release"
+      }
+    ],
     "target": ["NSIS"]
   },
   "nsis": {
