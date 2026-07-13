@@ -25,7 +25,9 @@ export default class AppUpdate {
   private isInitialized = false;
   private isChecking = false;
   private isDownloading = false;
+  private isInstalling = false;
   private activeCheck: Promise<DesktopUpdateState> | null = null;
+  private initializationPromise: Promise<void> | null = null;
 
   constructor(app: Electron.App, serve_: boolean) {
     this.app = app;
@@ -52,10 +54,13 @@ export default class AppUpdate {
 
     this.configureUpdateEvents();
 
-    this.getUpdateConfig()
-      .then(config => {
-        this.updateConfig = config;
-        this.autoUpdater.setFeedURL(config);
+    this.initializationPromise = this.getUpdateConfig().then(config => {
+      this.updateConfig = config;
+      this.autoUpdater.setFeedURL(config);
+    });
+
+    this.initializationPromise
+      .then(() => {
         this.checkForUpdates('auto').catch(error => {
           writeLogs(error, 'ERROR en auto-check de actualizaciones');
         });
@@ -101,6 +106,10 @@ export default class AppUpdate {
       } finally {
         this.isChecking = false;
       }
+    }
+
+    if (!this.updateConfig && this.initializationPromise) {
+      await this.initializationPromise;
     }
 
     if (!this.updateConfig) throw new Error('Update feed no configurado');
@@ -274,15 +283,6 @@ export default class AppUpdate {
       this.installDownloadedUpdate();
     });
 
-    this.autoUpdater.on('before-quit-for-update' as any, () => {
-      sharedState.closingReason = 'update-install';
-      this.setState({
-        ...this.state,
-        status: 'installing',
-        message: 'Instalando actualización...',
-      });
-    });
-
     this.autoUpdater.on('error', error => {
       this.isChecking = false;
       this.isDownloading = false;
@@ -297,6 +297,9 @@ export default class AppUpdate {
   }
 
   private installDownloadedUpdate() {
+    if (this.isInstalling) return;
+
+    this.isInstalling = true;
     sharedState.closingReason = 'update-install';
     this.setState({
       ...this.state,
@@ -314,10 +317,17 @@ export default class AppUpdate {
           if (!window.isDestroyed()) window.destroy();
         });
         this.win = null;
-        this.autoUpdater.quitAndInstall(false, true);
+
+        const silentInstall = process.platform === 'win32';
+        this.autoUpdater.quitAndInstall(silentInstall, true);
+
+        if (silentInstall) {
+          // NSIS is already detached; force the Electron main process out if app.quit() stalls.
+          setTimeout(() => this.app.exit(0), 1000);
+        }
       } catch (error) {
         writeLogs(error, 'ERROR ejecutando quitAndInstall');
-        this.app.quit();
+        this.app.exit(1);
       }
     }, 300);
   }
