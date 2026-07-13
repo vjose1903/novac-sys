@@ -135,7 +135,7 @@ export class AppUpdateUiService {
       ...progress,
       transferred: parseFloat(fun.roundNumberToDecimal(progress.transferred / 1000000)),
       total: parseFloat(fun.roundNumberToDecimal(progress.total / 1000000)),
-      percent: parseFloat(fun.roundNumberToDecimal(progress.percent)),
+      percent: Math.floor(progress.percent),
     });
   }
 

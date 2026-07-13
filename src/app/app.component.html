@@ -40,7 +40,7 @@
           <h5 class="mb-1 text-secondary">Descargando actualización</h5>
           <p class="mb-0 text-body-secondary">Mantén la aplicación abierta mientras se completa la descarga.</p>
         </div>
-        <span class="px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.85rem; font-weight: 600">
+        <span class="update-download-percent px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle">
           {{ updateUi.progress()?.percent }}%
         </span>
       </div>
@@ -63,6 +63,13 @@
       </div>
     </div>
   }
+
+  <div class="update-download-note mt-3">
+    <strong class="d-block mb-1 text-danger">NOTA</strong>
+    <p class="mb-0 text-body-secondary">
+      Al finalizar la descarga, Novac System se cerrará para instalar la nueva versión. No abras la aplicación manualmente; se iniciará automáticamente cuando finalice la instalación.
+    </p>
+  </div>
 </p-dialog>
 
 <dynamic-modal></dynamic-modal>
