@@ -222,16 +222,11 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       pageOrientation,
     };
 
-    console.log(obj);
-
     PdfService.imprimirBase64(obj)
       .then(res => {
         fun.toastSuccess('Recibo de ingreso reimpreso !!', 'CORRECTO');
       })
-      .catch(err => {
-        console.error(err);
-        fun.toastError(err.msg, 'ERROR');
-      });
+      .catch(() => {});
   }
 
   async anularRecibo(id) {

@@ -556,7 +556,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.notasClass.parseDataToPdf(res['data']).then(data_parsed => {
       const objToPdf = { data: data_parsed, type: 'nota' };
 
-      PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch(err => fun.toastError(err.msg, 'ERROR'));
+      PdfService.generatePdf({ oPdf: objToPdf, imprimir: this.is_print }).catch(() => {});
       this.layServ.nextCheckCuadreToday(true);
       this.router.navigateByUrl(`/admin/manipular/buscarFactura/nota_${this.tipoNota}`);
     });

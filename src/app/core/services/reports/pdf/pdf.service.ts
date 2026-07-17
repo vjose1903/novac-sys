@@ -14,6 +14,28 @@ import { fonts } from '../utils/pdfFonts';
 import { serie } from '@core/typescript/constantes';
 import pdfMake from 'pdfmake/build/pdfmake';
 
+type PrintErrorCode =
+  | 'PRINT_PRINTER_NOT_CONFIGURED'
+  | 'PRINT_PAYLOAD_INCOMPLETE'
+  | 'PRINT_INVALID_PDF'
+  | 'PRINT_PDF_GENERATION_FAILED'
+  | 'PRINT_WRITE_PERMISSION'
+  | 'PRINT_WRITE_DISK_SPACE'
+  | 'PRINT_WRITE_FAILED'
+  | 'PRINT_PDF_NOT_FOUND'
+  | 'PRINT_ENGINE_NOT_FOUND'
+  | 'PRINT_PRINTER_NOT_AVAILABLE'
+  | 'PRINT_PERMISSION_DENIED'
+  | 'PRINT_COMMAND_FAILED'
+  | 'PRINT_UNEXPECTED_ERROR';
+
+type PrintErrorResponse = {
+  status: false;
+  code: PrintErrorCode;
+  msg: string;
+  handled?: boolean;
+};
+
 @Injectable({ providedIn: 'root' })
 export class PdfService {
   constructor() {}
@@ -103,7 +125,7 @@ export class PdfService {
                 resolve(res);
               }
             })
-            .catch(err => reject(err));
+            .catch(err => reject(params.imprimir ? this.handlePrintError(err) : err));
         } else {
           const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no' });
           fun.toastError('Error generando el pdf.', 'ERROR');
@@ -140,7 +162,6 @@ export class PdfService {
           resolve(respuesta);
         });
       } catch (error) {
-        console.error('Error en createPdfFromBase64:', error);
         const respuesta = this.makeStatusObj({ msg: 'Error escribiendo el pdf.', status: 'no', body: error });
         reject(respuesta);
       }
@@ -149,14 +170,61 @@ export class PdfService {
 
   static async imprimirBase64(oBase: { base64: string; file: string; type: string; printer: string; pageOrientation: string }): Promise<any> {
     try {
+      if (this.printerNotConfigured(oBase.printer)) {
+        throw this.printError('PRINT_PRINTER_NOT_CONFIGURED', 'No hay impresora configurada para este tipo de impresión.');
+      }
+
       const res = await Ss._ipc.printBase64(oBase);
+      if (res?.status === false) throw this.normalizePrintError(res);
 
       res['pageOrientation'] = oBase.pageOrientation;
       return res;
     } catch (error) {
-      console.error('Error en imprimirBase64:', error);
-      throw error;
+      throw this.handlePrintError(error);
     }
+  }
+
+  private static printerNotConfigured(printer: string): boolean {
+    return fun.isEmpty(printer) || String(printer).trim() === 'Ninguna';
+  }
+
+  private static normalizePrintError(error: any): PrintErrorResponse {
+    if (error?.status === false && error?.msg) return this.printError((error.code ?? 'PRINT_UNEXPECTED_ERROR') as PrintErrorCode, error.msg);
+
+    const errorMessage = String(error?.message ?? error?.msg ?? error ?? '').toLowerCase();
+
+    if (errorMessage.includes('object could not be cloned')) {
+      return this.printError('PRINT_PAYLOAD_INCOMPLETE', 'Los datos enviados a impresión contienen información no válida.');
+    }
+
+    if (errorMessage.includes('escribiendo el pdf') || errorMessage.includes('generando el pdf')) {
+      return this.printError('PRINT_PDF_GENERATION_FAILED', 'No se pudo generar el PDF antes de enviarlo a impresión.');
+    }
+
+    if (errorMessage.includes('impresora') || errorMessage.includes('printer')) {
+      return this.printError('PRINT_PRINTER_NOT_AVAILABLE', 'La impresora configurada no está disponible o no responde.');
+    }
+
+    if (errorMessage.includes('pdf') && (errorMessage.includes('not found') || errorMessage.includes('no se encontró'))) {
+      return this.printError('PRINT_PDF_NOT_FOUND', 'No se encontró el archivo PDF generado para imprimir.');
+    }
+
+    return this.printError('PRINT_UNEXPECTED_ERROR', 'Ocurrió un error inesperado durante el proceso de impresión.');
+  }
+
+  private static handlePrintError(error: any): PrintErrorResponse {
+    if (error?.status === false && error?.handled) return error;
+
+    const printError = this.normalizePrintError(error);
+
+    if (printError.code === 'PRINT_UNEXPECTED_ERROR') console.error('Error en imprimirBase64:', error);
+    fun.toastError(printError.msg, 'ERROR');
+
+    return { ...printError, handled: true };
+  }
+
+  private static printError(code: PrintErrorCode, msg: string): PrintErrorResponse {
+    return { status: false, code, msg };
   }
 
   static makeStatusObj(oStatus) {

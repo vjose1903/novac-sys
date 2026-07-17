@@ -2142,7 +2142,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.facturaClass.parseDataToPdf(res['data']).then(async factura_parsed => {
         const obj = { data: factura_parsed, type: documento.tipo };
 
-        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(`Error imprimiendo la ${documento.descripcion}.`, 'ERROR'));
+        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(() => {});
 
         this.layServ.nextCheckCuadreToday(true);
 

@@ -916,7 +916,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
 
         this.cancelarConduce();
         this.goBack();
-        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(err => fun.toastError(err['msg'], 'ERROR'));
+        PdfService.generatePdf({ oPdf: obj, imprimir: this.is_print }).catch(() => {});
       });
     });
   }

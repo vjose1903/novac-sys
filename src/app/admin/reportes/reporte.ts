@@ -118,22 +118,26 @@ export class ReporteC extends CrudG<any> {
   static imprimirPDF(objPdf, modalInstance?) {
     Ss.loadServ.isLoading.next(true);
     const printerSelected = Ss.configServ.config.printer_selected;
+    const type = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
+    const entidad = type == 'reporte' ? 'reporte' : 'cuadre_caja';
 
-    objPdf['type'] = objPdf.file == 'cuadre.pdf' ? 'cuadre' : 'reporte';
+    const printPayload = {
+      base64: objPdf.base64,
+      file: objPdf.file,
+      type,
+      printer: printerSelected[entidad],
+      pageOrientation: objPdf.pageOrientation,
+    };
 
-    const entidad = objPdf['type'] == 'reporte' ? 'reporte' : 'cuadre_caja';
-    objPdf['printer'] = printerSelected[entidad];
-
-    PdfService.imprimirBase64(objPdf)
+    PdfService.imprimirBase64(printPayload)
       .then(res => {
         Ss.loadServ.isLoading.next(false);
 
         fun.toastSuccess('Reporte generado correctamente!!', 'CORRECTO');
         if (modalInstance) modalInstance.close();
       })
-      .catch(err => {
+      .catch(() => {
         Ss.loadServ.isLoading.next(false);
-        fun.toastError(err.msg, 'ERROR');
       });
   }
 

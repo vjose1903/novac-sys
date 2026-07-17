@@ -376,11 +376,12 @@ async function beforeCreateWindow(win) {
 ipcMain.handle(DESKTOP_INVOKE_CHANNEL, handleDesktopCommand);
 
 async function handleDesktopCommand(_event: Electron.IpcMainInvokeEvent, request: DesktopInvokeRequest) {
+  const command = request?.command;
+
   try {
-    const command = request?.command;
     const payload = request?.payload;
 
-    writeLogs(request, 'Nuevo comando desktop');
+    writeLogs(sanitizeDesktopRequest(request), 'Nuevo comando desktop');
 
     switch (command) {
       case DESKTOP_COMMAND_RELOAD_APP:
@@ -430,10 +431,51 @@ async function handleDesktopCommand(_event: Electron.IpcMainInvokeEvent, request
         throw new Error(`Comando desktop no soportado: ${command}`);
     }
   } catch (error) {
-    console.error('HANDLE DESKTOP COMMAND error ', error);
-    writeLogs(error, 'HANDLE DESKTOP COMMAND ERROR');
-    throw error;
+    if (command === DESKTOP_COMMAND_PRINT_BASE64) return getDesktopErrorResponse(error);
+
+    if (error?.status !== false) {
+      console.error('HANDLE DESKTOP COMMAND error ', error);
+      writeLogs(error, 'HANDLE DESKTOP COMMAND ERROR');
+    }
+    throw new Error(getDesktopErrorMessage(error));
   }
+}
+
+function sanitizeDesktopRequest(request: DesktopInvokeRequest) {
+  if (request?.command !== DESKTOP_COMMAND_PRINT_BASE64) return request;
+
+  const payload = request.payload as { base64?: string };
+
+  return {
+    ...request,
+    payload: {
+      ...payload,
+      base64: payload?.base64 ? `[base64:${payload.base64.length} chars]` : payload?.base64,
+    },
+  };
+}
+
+function getDesktopErrorMessage(error: any): string {
+  return error?.msg ?? error?.message ?? String(error ?? 'Error ejecutando comando desktop');
+}
+
+function getDesktopErrorResponse(error: any) {
+  if (error?.status === false) {
+    return {
+      status: false,
+      code: error.code ?? 'PRINT_UNEXPECTED_ERROR',
+      msg: error.msg ?? 'Ocurrió un error inesperado durante el proceso de impresión.',
+    };
+  }
+
+  console.error('HANDLE DESKTOP PRINT COMMAND error ', error);
+  writeLogs(error, 'HANDLE DESKTOP PRINT COMMAND ERROR');
+
+  return {
+    status: false,
+    code: 'PRINT_UNEXPECTED_ERROR',
+    msg: 'Ocurrió un error inesperado durante el proceso de impresión.',
+  };
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

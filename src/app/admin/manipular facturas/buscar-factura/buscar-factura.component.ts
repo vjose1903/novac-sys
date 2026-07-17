@@ -980,11 +980,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         fun.toastSuccess(res.msg, 'CORRECTO');
         modalInstance.close();
       })
-      .catch(err => {
-        console.error('err ', err);
-
+      .catch(() => {
         this.loadServ.isLoading.next(false);
-        fun.toastError(err.msg, 'ERROR');
       });
   }
 

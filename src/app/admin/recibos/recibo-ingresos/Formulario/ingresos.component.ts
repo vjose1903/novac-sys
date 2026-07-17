@@ -826,7 +826,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           .then(async res => {
             this.layServ.nextCheckCuadreToday(true);
           })
-          .catch(err => fun.toastError(err.msg, 'ERROR'));
+          .catch(() => {});
       });
     });
   }

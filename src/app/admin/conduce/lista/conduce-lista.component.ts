@@ -211,19 +211,11 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   imprimir_base64(fileName, base64, pageOrientation) {
     const obj = { base64: base64, file: fileName, type: 'conduce', printer: this.configApp.printer_selected.conduce, pageOrientation: pageOrientation };
-    try {
-      PdfService.imprimirBase64(obj)
-        .then(async res => {
-          fun.toastSuccess('Conduce de mercancía reimpreso !!', 'CORRECTO');
-        })
-        .catch(err => {
-          console.error(err);
-
-          fun.toastError(err['msg'], 'ERROR');
-        });
-    } catch (error) {
-      console.error(error);
-    }
+    PdfService.imprimirBase64(obj)
+      .then(async res => {
+        fun.toastSuccess('Conduce de mercancía reimpreso !!', 'CORRECTO');
+      })
+      .catch(() => {});
   }
 
   async anularRecibo(id) {
