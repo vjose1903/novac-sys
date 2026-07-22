@@ -16,6 +16,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { CuerpoFacturaFormService } from './services/cuerpo-factura-form.service';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -60,6 +61,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   dynamicModalServ = inject(DynamicModalService);
   private fb = inject(UntypedFormBuilder);
+  private formServ = inject(CuerpoFacturaFormService);
   public factServ = inject(FacturacionService);
 
   constructor() {
@@ -124,16 +126,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       // Resetear variables a undefined
       [this.precioDetalle, this.inputDrop, this.factServ.filasDetalle] = Array(3).fill(undefined);
 
-      // Crear formulario con FormArray
-      this.form = this.fb.group({
-        rowFactura: this.fb.array([]),
-      });
-
+      this.form = this.formServ.createForm(this.fb);
       const formArray = this.form.get('rowFactura') as UntypedFormArray;
-
-      // Crear 26 elementos del formulario de una vez
-      const formItems = Array.from({ length: 26 }, () => this.createItem());
-      formItems.forEach(item => formArray.push(item));
 
       // Configurar variables del servicio
       this.factServ.filasDetalle = formArray;
@@ -240,35 +234,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   // =============================================
 
   createItem(): UntypedFormGroup {
-    return this.fb.group({
-      key: [null],
-      articulo: [null],
-      unidades: [null],
-      detalle_id: [null],
-      codigo: [null],
-      cantidad: [null],
-      cantidad_initial: [0],
-      cantidad_ant: [null],
-      descripcion: [null],
-      unidad: [null],
-      precio: [null],
-      costo: [null],
-      descuento_valor: [null],
-      total: [null],
-      itbis: [null],
-      cantidad_en_unidades: [0],
-      cantidad_en_unidades_initial: [0],
-      calcular_saco: [false],
-      is_defectuoso: [false],
-      is_devuelto: [false],
-      from_pre_factura: [false],
-      vende_sin_inventario: [false],
-      is_bad_price: [false],
-      actual_price: [null],
-      actual_price_value: [null],
-      key_initial: [null],
-      producto_initial: [null],
-    });
+    return this.formServ.createItem(this.fb);
   }
 
   addItem(): void {
