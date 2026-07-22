@@ -1,5 +1,5 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore, doc, getDoc, setDoc, collection, query, where, limit, getDocs, addDoc } from 'firebase/firestore';
+import { getFirestore, Firestore, doc, getDoc, setDoc, collection, query, where, limit, getDocs, addDoc, runTransaction } from 'firebase/firestore';
 import { ConfigI, EmpresaI } from '../src/app/core/interface/config-interface.js';
 import { pathAdd, writeLogs } from '../main';
 import MachineId from './machine-id.js';
@@ -304,31 +304,46 @@ export default class FirebaseConfigHandler {
 
   private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>): Promise<Partial<ConfigI>> {
     const generalConfigRef = this.getGeneralConfigRef();
-    const generalSnapshot = await getDoc(generalConfigRef);
+    const defaultGeneralConfig = this.makeDefaultGeneralConfig();
 
-    if (generalSnapshot.exists()) {
-      const currentGeneralConfig = this.mapDocumentToObject<ConfigI>(generalSnapshot);
-      const normalizedGeneralConfig = {
-        ...this.makeDefaultGeneralConfig(),
-        ...this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS),
-      };
+    const generalConfigResult = await runTransaction(this.db, async transaction => {
+      const generalSnapshot = await transaction.get(generalConfigRef);
 
-      if (this.hasMissingKeys(currentGeneralConfig, GENERAL_CONFIG_KEYS)) {
-        await setDoc(generalConfigRef, this.removeUndefinedValues(normalizedGeneralConfig), { merge: true });
+      if (generalSnapshot.exists()) {
+        return {
+          created: false,
+          data: this.mapDocumentToObject<ConfigI>(generalSnapshot),
+        };
       }
 
-      return normalizedGeneralConfig;
+      const migratedGeneralConfig = {
+        ...defaultGeneralConfig,
+        ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
+      };
+
+      transaction.set(generalConfigRef, this.removeUndefinedValues(migratedGeneralConfig));
+      return {
+        created: true,
+        data: migratedGeneralConfig,
+      };
+    });
+
+    if (generalConfigResult.created) {
+      writeLogs('----- Configuración general creada en Firebase -----');
+      return generalConfigResult.data;
     }
 
-    const migratedGeneralConfig = {
-      ...this.makeDefaultGeneralConfig(),
-      ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
+    const currentGeneralConfig = generalConfigResult.data;
+    const normalizedGeneralConfig = {
+      ...defaultGeneralConfig,
+      ...this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS),
     };
 
-    await setDoc(generalConfigRef, this.removeUndefinedValues(migratedGeneralConfig), { merge: true });
-    writeLogs('----- Configuración general creada en Firebase -----');
+    if (this.hasMissingKeys(currentGeneralConfig, GENERAL_CONFIG_KEYS)) {
+      await setDoc(generalConfigRef, this.removeUndefinedValues(normalizedGeneralConfig), { merge: true });
+    }
 
-    return migratedGeneralConfig;
+    return normalizedGeneralConfig;
   }
 
   /**

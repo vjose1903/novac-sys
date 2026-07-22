@@ -29,6 +29,20 @@ export class ConfigurationService extends FirebaseRequest<ConfigI> {
   }
 
   set config(value: ConfigI) {
+    const currentConfig = this._config.value;
+
+    if (currentConfig === value) {
+      this._config.next(currentConfig);
+      return;
+    }
+
+    if (currentConfig && value) {
+      Object.keys(currentConfig).forEach(key => delete (currentConfig as any)[key]);
+      Object.assign(currentConfig, value);
+      this._config.next(currentConfig);
+      return;
+    }
+
     this._config.next(value);
   }
 
