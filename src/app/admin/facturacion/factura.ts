@@ -522,6 +522,7 @@ export interface FacturasI {
   balance: number;
   devuelta: number;
   is_adelantada: boolean;
+  is_external: boolean;
   is_nota: boolean;
   is_viaje: boolean;
   tiene_nota: boolean;

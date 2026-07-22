@@ -94,6 +94,7 @@ export enum confirmationButtons {
   cancelarContinuar = 'cancelar-continuar',
   cancelarEliminar = 'cancelar-eliminar',
   copiarSalir = 'copiar-salir',
+  cancelarNuevaCopiar = 'cancelar-nueva-copiar',
   continuarOSalir = 'cancelar-salir',
   cancelarRemover = 'cancelar-remover',
   cancelarDesactivar = 'cancelar-desactivar',
@@ -168,6 +169,11 @@ export const confirmBtnConfig: IConfirmBtnConfig = {
   [confirmationButtons.copiarSalir]: {
     noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Copiar', icon: fontAwesome.faSolid.copy, clase: 'btn-green', showProcess: false, id: 'btnCopiar' },
+  },
+  [confirmationButtons.cancelarNuevaCopiar]: {
+    cancelarBtn: { label: 'Cancelar', icon: null, clase: 'btn-gray', showProcess: false, id: 'btnCancelar' },
+    noBtn: { label: 'Comenzar nueva', icon: fontAwesome.faSolid.plus, clase: 'btn-light-grey', showProcess: false, id: 'btnNueva' },
+    siBtn: { label: 'Copiar datos actuales', icon: fontAwesome.faSolid.copy, clase: 'btn-green', showProcess: false, id: 'btnCopiar' },
   },
   [confirmationButtons.continuarOSalir]: {
     noBtn: { label: 'Continuar Editando', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnContinuarEditando' },

@@ -52,6 +52,7 @@ export class FacturacionArchiveCompareService {
       costoYgasto: this.normalizeText(data.costoYgasto),
       factura_pendiente: this.normalizeBoolean(data.factura_pendiente),
       is_adelantada: this.normalizeBoolean(data.is_adelantada),
+      is_external: this.normalizeBoolean(data.is_external),
       is_viaje: this.normalizeBoolean(data.is_viaje),
       fecha_equivalente: data.factura_pendiente ? this.normalizeDate(data.fecha_equivalente) : null,
       fecha_vencimiento: this.normalizeDate(data.fecha_vencimiento),

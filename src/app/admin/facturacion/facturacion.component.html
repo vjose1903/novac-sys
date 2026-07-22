@@ -33,18 +33,19 @@
 
     <div class="d-flex align-items-center gap-2">
       @if (configApp.usa_facturas_externas) {
-        <div class="sin_comprobante_btn"></div>
+        <div class="sin_comprobante_btn" (click)="activarFacturaSinComprobante()"></div>
       }
 
       @if (!factServ.isCotizacion() && !factServ.isPreVenta()) {
         <p-selectButton
           [options]="facturasSerieOptions"
-          [ngModel]="factServ.serieType()"
+          [ngModel]="is_external ? null : factServ.serieType()"
           (ngModelChange)="factServ.serieType.set($event)"
           (ngModelChange)="changeSerie()"
           optionLabel="label"
           optionValue="value"
           optionDisabled="disabled"
+          [disabled]="is_external"
           [allowEmpty]="false" />
       }
     </div>
@@ -57,30 +58,32 @@
           @if (factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion) {
             <div class="col-3 divRight ps-0">
               <div class="row">
-                <div class="col-3 ps-0">
-                  <!-- ================== TIPO ================== -->
-                  <span class="titulos"><strong>Tipo:</strong></span>
-                  <input
-                    #tipoFact
-                    id="tipoFact"
-                    placement="right"
-                    triggers="focus"
-                    type="text"
-                    (keydown.enter)="saltar('tipo', tipoFact.value)"
-                    class="form-control w-100 inputE"
-                    [ngClass]="{ badAlert: errorComprobante }"
-                    [(ngModel)]="factServ.tipoFacturaReferenciaSelected"
-                    (blur)="checkTipoFactura(); tiposFacturas.hide()"
-                    (focus)="tiposFacturas.toggle($event)"
-                    tabindex="-1"
-                    [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
-                    [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }" />
-                  <p-popover [dismissable]="false" styleClass="padding-md" #tiposFacturas appendTo="body">
-                    <div style="width: 21rem" [innerHtml]="factServ.htmlTiposFacturas"></div>
-                  </p-popover>
-                </div>
+                @if (!is_external) {
+                  <div class="col-3 ps-0">
+                    <!-- ================== TIPO ================== -->
+                    <span class="titulos"><strong>Tipo:</strong></span>
+                    <input
+                      #tipoFact
+                      id="tipoFact"
+                      placement="right"
+                      triggers="focus"
+                      type="text"
+                      (keydown.enter)="saltar('tipo', tipoFact.value)"
+                      class="form-control w-100 inputE"
+                      [ngClass]="{ badAlert: errorComprobante }"
+                      [(ngModel)]="factServ.tipoFacturaReferenciaSelected"
+                      (blur)="checkTipoFactura(); tiposFacturas.hide()"
+                      (focus)="tiposFacturas.toggle($event)"
+                      tabindex="-1"
+                      [readOnly]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar)"
+                      [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }" />
+                    <p-popover [dismissable]="false" styleClass="padding-md" #tiposFacturas appendTo="body">
+                      <div style="width: 21rem" [innerHtml]="factServ.htmlTiposFacturas"></div>
+                    </p-popover>
+                  </div>
+                }
 
-                <div class="{{ factServ.isCompra() ? 'col-6' : 'col-9' }} p-0">
+                <div class="{{ is_external ? 'col-12 ps-0' : factServ.isCompra() ? 'col-6' : 'col-9' }} p-0">
                   <!-- ================== CONDICION ================== -->
                   <span class="titulos"><strong>Condición:</strong></span>
                   <select
@@ -91,8 +94,8 @@
                     [(ngModel)]="condicion_fact"
                     (change)="cambiarCondicion(htmlServ.getValue($event))"
                     tabindex="-1"
-                    [disabled]="(factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
-                    [ngClass]="{ disabled: factServ.action == 'update' && fun.hasValue(factura_a_rellenar) }">
+                    [disabled]="is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
+                    [ngClass]="{ disabled: is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) }">
                     <option value="Contado">Contado</option>
                     <option value="Crédito">Crédito</option>
                   </select>
@@ -137,8 +140,8 @@
                     [(ngModel)]="modo_factura"
                     (blur)="checkCambiosModoyCondicionFactura({ elemento_html: $event.target })"
                     tabindex="-1"
-                    [disabled]="(factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
-                    [ngClass]="{ disabled: (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante }">
+                    [disabled]="is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
+                    [ngClass]="{ disabled: is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante }">
                     <option value="" disabled selected>Modo de venta</option>
                     <option value="normal">Normal</option>
                     <option *ngxPermissionsOnly="permissions.factura_venta.seleccionar_camion_en_facturacion" value="viaje">Viaje</option>
