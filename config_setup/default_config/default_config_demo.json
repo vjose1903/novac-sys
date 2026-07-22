@@ -13,6 +13,7 @@
   "url_servidor": "https://8n3mw1zq-9093.use2.devtunnels.ms",
   "url_servidor_respaldo": "https://8n3mw1zq-9093.use2.devtunnels.ms",
   "usa_url_principal": true,
+  "usa_facturas_externas": false,
   "has_contabilidad": true,
   "is_db_local": false,
   "calcular_itbis": true,

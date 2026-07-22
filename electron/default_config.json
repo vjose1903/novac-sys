@@ -13,6 +13,7 @@
   "url_servidor": "https://agrodemi.inspot-technology.com",
   "url_servidor_respaldo": "http://10.0.0.9:9090",
   "usa_url_principal": true,
+  "usa_facturas_externas": true,
   "has_contabilidad": true,
   "is_db_local": false,
   "calcular_itbis": false,

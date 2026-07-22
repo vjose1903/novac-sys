@@ -47,7 +47,7 @@ export interface DesktopCommandPayloadMap {
 
 export interface DesktopCommandResponseMap {
   [DESKTOP_COMMAND_GET_APP_CONFIG]: any;
-  [DESKTOP_COMMAND_SET_APP_CONFIG]: 'LISTO';
+  [DESKTOP_COMMAND_SET_APP_CONFIG]: any;
   [DESKTOP_COMMAND_RELOAD_APP]: void;
   [DESKTOP_COMMAND_FOCUS_WINDOW]: { ok: true };
   [DESKTOP_COMMAND_CONFIRM_CLOSE]: { ok: true };

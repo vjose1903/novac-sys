@@ -1,5 +1,5 @@
 {
-  "appId":"com.inspot-technology.novac",
+  "appId": "com.inspot-technology.novac",
   "productName": "Novac-System",
   "directories": {
     "output": "actualizacion/"
@@ -35,10 +35,9 @@
     {
       "from": "./print/",
       "to": "resources/print/",
-      "filter": [ "**/*" ]
+      "filter": ["**/*"]
     }
   ],
-
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
     "asarUnpack": [],

@@ -301,7 +301,16 @@ async function initializeBaseComponents(): Promise<void> {
 
 // Función auxiliar para manejar configuración existente
 async function handleExistingConfig(): Promise<void> {
-  const config = await Functions.getConfigFile();
+  let config = normalizeLocalConfig(await Functions.getConfigFile());
+
+  try {
+    const firebaseHandler = await ensureFirebaseConfigHandler();
+    config = await firebaseHandler.getAppConfig(config);
+    await Functions.setConfigFile(JSON.stringify(config));
+  } catch (error) {
+    writeLogs(error, 'ERROR refrescando configuración existente desde Firebase, usando configuración local');
+  }
+
   writeLogs(config.is_db_local, 'config.is_db_local');
 
   if (config.is_db_local) {
@@ -326,7 +335,7 @@ async function handleLocalDatabase(): Promise<boolean> {
 // Función auxiliar para manejar nueva configuración
 async function handleNewConfig(): Promise<void> {
   try {
-    firebaseConfigHandler = await FirebaseConfigHandler.getInstance(machineId);
+    firebaseConfigHandler = await ensureFirebaseConfigHandler();
 
     try {
       const firebaseConfig = await firebaseConfigHandler.getAppConfig();
@@ -359,15 +368,16 @@ function continuarCargandoArchivos() {
 async function beforeCreateWindow(win) {
   pdf_printer = PdfPrinter.getInstance(win);
   auto_updater.attachWindow(win);
+}
 
-  // Desmontar Firebase Config Handler ya que Angular está listo
-  if (firebaseConfigHandler && firebaseConfigHandler.isReady()) {
-    try {
-      await firebaseConfigHandler.dispose();
-    } catch (error) {
-      writeLogs(error, 'ERROR al desmontar Firebase Config Handler');
-    }
+async function ensureFirebaseConfigHandler(): Promise<FirebaseConfigHandler> {
+  if (!machineId) machineId = await MachineId.getInstance();
+  if (!handlerConfigFile) handlerConfigFile = await HandlerConfigFile.getInstance(machineId);
+  if (!firebaseConfigHandler || !firebaseConfigHandler.isReady()) {
+    firebaseConfigHandler = await FirebaseConfigHandler.getInstance(machineId);
   }
+
+  return firebaseConfigHandler;
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -386,6 +396,7 @@ async function handleDesktopCommand(_event: Electron.IpcMainInvokeEvent, request
     switch (command) {
       case DESKTOP_COMMAND_RELOAD_APP:
         writeLogs('RECARGANDO ELECTRON');
+        await getAppConfig();
         win?.reload();
         if (!serve) win?.loadURL(appFilePath);
         return;
@@ -410,8 +421,7 @@ async function handleDesktopCommand(_event: Electron.IpcMainInvokeEvent, request
       case DESKTOP_COMMAND_GET_APP_CONFIG:
         return await getAppConfig();
       case DESKTOP_COMMAND_SET_APP_CONFIG:
-        await Functions.setConfigFile(JSON.stringify(payload));
-        return 'LISTO';
+        return await setAppConfig(payload as ConfigI);
       case DESKTOP_COMMAND_CONFIRM_CLOSE:
         writeLogs(' ----- CLOSE CONFIRMATION -----');
         sharedState.closingReason = 'user-confirmed';
@@ -483,7 +493,18 @@ function getDesktopErrorResponse(error: any) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function getAppConfig(): Promise<ConfigI> {
   try {
-    const config: ConfigI = await Functions.getConfigFile();
+    let config: ConfigI;
+    const localConfig = await getLocalConfigIfExists();
+
+    try {
+      const firebaseHandler = await ensureFirebaseConfigHandler();
+      config = await firebaseHandler.getAppConfig(localConfig);
+      await Functions.setConfigFile(JSON.stringify(config));
+    } catch (firebaseError) {
+      writeLogs(firebaseError, 'ERROR refrescando configuración desde Firebase, usando configuración local');
+      config = normalizeLocalConfig(localConfig || (await Functions.getConfigFile()));
+      await Functions.setConfigFile(JSON.stringify(config));
+    }
 
     const printer_list = await pdf_printer.getPrinters();
 
@@ -508,6 +529,39 @@ async function getAppConfig(): Promise<ConfigI> {
       type: errorContext.type,
     };
   }
+}
+
+async function getLocalConfigIfExists(): Promise<ConfigI | null> {
+  try {
+    return normalizeLocalConfig(await Functions.getConfigFile());
+  } catch (error) {
+    return null;
+  }
+}
+
+async function setAppConfig(config: ConfigI): Promise<ConfigI> {
+  const firebaseHandler = await ensureFirebaseConfigHandler();
+  const configResponse = await firebaseHandler.updateAppConfig(config);
+
+  await Functions.setConfigFile(JSON.stringify(configResponse));
+
+  const printer_list = await pdf_printer.getPrinters();
+
+  return {
+    ...configResponse,
+    operative_system: isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows,
+    printersList: ['Ninguna', ...printer_list],
+    app_version: app.getVersion(),
+  };
+}
+
+function normalizeLocalConfig(config: Partial<ConfigI>): ConfigI {
+  return {
+    ...handlerConfigFile.default_config,
+    usa_facturas_externas: false,
+    ...config,
+    machineId: config.machineId || machineId?.value,
+  } as ConfigI;
 }
 
 // Función auxiliar para determinar el contexto del error

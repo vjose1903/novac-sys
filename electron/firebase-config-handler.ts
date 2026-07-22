@@ -16,6 +16,38 @@ interface FirebaseConfig {
   appId: string;
 }
 
+const GENERAL_CONFIG_COLLECTION = 'general_configuration';
+const GENERAL_CONFIG_DOCUMENT_ID = 'app';
+
+const GENERAL_CONFIG_KEYS: Array<keyof ConfigI> = [
+  'cliente',
+  'nombre_empresa',
+  'rnc_empresa',
+  'direccion_empresa',
+  'telefono_empresa',
+  'logo_empresa',
+  'logo_impresion',
+  'color_app',
+  'mode_app',
+  'url_servidor',
+  'url_servidor_respaldo',
+  'config_password',
+  'usa_url_principal',
+  'usa_facturas_externas',
+  'is_produccion',
+  'has_contabilidad',
+  'calcular_itbis',
+  'is_db_local',
+  'facturacion_editar_precio',
+  'vende_sin_inventario',
+  'use_ecf',
+  'documentos_a_imprimir',
+  'serie_default',
+  'medida_producto_terminado',
+];
+
+const MACHINE_CONFIG_KEYS: Array<keyof ConfigI> = ['machineId', 'pages_sizes', 'printer_selected'];
+
 export default class FirebaseConfigHandler {
   private static instance: FirebaseConfigHandler;
   private static initPromise: Promise<FirebaseConfigHandler>;
@@ -157,6 +189,11 @@ export default class FirebaseConfigHandler {
     return collection(this.db, stringRef);
   }
 
+  private getGeneralConfigRef() {
+    const stringRef = `${this.empresaCollection}/${this._empresa.id}/${GENERAL_CONFIG_COLLECTION}/${GENERAL_CONFIG_DOCUMENT_ID}`;
+    return doc(this.db, stringRef);
+  }
+
   /**
    * Obtiene el snapshot de configuración actual
    */
@@ -166,30 +203,152 @@ export default class FirebaseConfigHandler {
     return await getDocs(q);
   }
 
+  private pickConfigValues(source: Partial<ConfigI>, keys: Array<keyof ConfigI>): Partial<ConfigI> {
+    const result: Partial<ConfigI> = {};
+
+    keys.forEach(key => {
+      if (source && source[key] !== undefined) (result as any)[key] = source[key];
+    });
+
+    return result;
+  }
+
+  private removeUndefinedValues<T extends object>(source: T): T {
+    return Object.entries(source).reduce((acc, [key, value]) => {
+      if (value !== undefined) (acc as any)[key] = value;
+      return acc;
+    }, {} as T);
+  }
+
+  private makeDefaultGeneralConfig(): Partial<ConfigI> {
+    return {
+      usa_facturas_externas: false,
+      ...this.pickConfigValues(this.handlerConfigFile.default_config, GENERAL_CONFIG_KEYS),
+    };
+  }
+
+  private makeDefaultMachineConfig(): Partial<ConfigI> {
+    return {
+      ...this.pickConfigValues(this.handlerConfigFile.default_config, MACHINE_CONFIG_KEYS),
+      machineId: this.machineId,
+    };
+  }
+
+  private mergeConfig(generalConfig: Partial<ConfigI>, machineConfig: Partial<ConfigI>): ConfigI {
+    return this.removeUndefinedValues({
+      ...this.handlerConfigFile.default_config,
+      usa_facturas_externas: false,
+      ...generalConfig,
+      ...machineConfig,
+      machineId: this.machineId,
+    }) as ConfigI;
+  }
+
+  private hasMissingKeys(source: Partial<ConfigI>, keys: Array<keyof ConfigI>): boolean {
+    return keys.some(key => source?.[key] === undefined);
+  }
+
+  private hasOnlyKeys(source: Partial<ConfigI>, keys: Array<keyof ConfigI>): boolean {
+    const allowedKeys = new Set(keys.map(String));
+    return Object.keys(source || {})
+      .filter(key => key !== 'id')
+      .every(key => allowedKeys.has(key));
+  }
+
+  private async getMachineConfig(seedConfig?: Partial<ConfigI>): Promise<{ data: Partial<ConfigI>; legacyData: Partial<ConfigI>; needsSave: boolean; docRef?: any }> {
+    const configSnapshot = await this.getCurrentConfigSnapShot();
+
+    if (configSnapshot.empty) {
+      const legacyData = seedConfig || this.handlerConfigFile.default_config;
+      return {
+        data: {
+          ...this.makeDefaultMachineConfig(),
+          ...this.pickConfigValues(legacyData, MACHINE_CONFIG_KEYS),
+          machineId: this.machineId,
+        },
+        legacyData,
+        needsSave: true,
+      };
+    }
+
+    const docSnapshot = configSnapshot.docs[0];
+    const data = this.mapDocumentToObject<ConfigI>(docSnapshot);
+    const needsSave = this.hasMissingKeys(data, MACHINE_CONFIG_KEYS) || !this.hasOnlyKeys(data, MACHINE_CONFIG_KEYS);
+
+    return {
+      data: {
+        ...this.makeDefaultMachineConfig(),
+        ...this.pickConfigValues(data, MACHINE_CONFIG_KEYS),
+        machineId: this.machineId,
+      },
+      legacyData: data,
+      needsSave,
+      docRef: docSnapshot.ref,
+    };
+  }
+
+  private async upsertMachineConfig(machineConfig: Partial<ConfigI>, docRef?: any): Promise<void> {
+    const data = this.removeUndefinedValues({
+      ...this.pickConfigValues(machineConfig, MACHINE_CONFIG_KEYS),
+      machineId: this.machineId,
+    });
+
+    if (docRef) {
+      await setDoc(docRef, data);
+      return;
+    }
+
+    const configCollectionRef = this.getCurrentConfigCollection();
+    await addDoc(configCollectionRef, data);
+  }
+
+  private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>): Promise<Partial<ConfigI>> {
+    const generalConfigRef = this.getGeneralConfigRef();
+    const generalSnapshot = await getDoc(generalConfigRef);
+
+    if (generalSnapshot.exists()) {
+      const currentGeneralConfig = this.mapDocumentToObject<ConfigI>(generalSnapshot);
+      const normalizedGeneralConfig = {
+        ...this.makeDefaultGeneralConfig(),
+        ...this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS),
+      };
+
+      if (this.hasMissingKeys(currentGeneralConfig, GENERAL_CONFIG_KEYS)) {
+        await setDoc(generalConfigRef, this.removeUndefinedValues(normalizedGeneralConfig), { merge: true });
+      }
+
+      return normalizedGeneralConfig;
+    }
+
+    const migratedGeneralConfig = {
+      ...this.makeDefaultGeneralConfig(),
+      ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
+    };
+
+    await setDoc(generalConfigRef, this.removeUndefinedValues(migratedGeneralConfig), { merge: true });
+    writeLogs('----- Configuración general creada en Firebase -----');
+
+    return migratedGeneralConfig;
+  }
+
   /**
    * Obtiene la configuración de la aplicación desde Firestore
    */
-  async getAppConfig(): Promise<ConfigI> {
+  async getAppConfig(seedConfig?: Partial<ConfigI>): Promise<ConfigI> {
     if (!this.isInitialized || !this.db || !this.machineId) {
       throw new Error('Firebase Config Handler no está inicializado');
     }
 
     try {
-      const configSnapshot = await this.getCurrentConfigSnapShot();
+      const machineConfigResult = await this.getMachineConfig(seedConfig);
+      const generalConfig = await this.getOrCreateGeneralConfig(machineConfigResult.legacyData);
 
-      if (!configSnapshot.empty) {
-        writeLogs('----- Configuración encontrada en Firebase -----');
-        const doc = configSnapshot.docs[0];
-        const data = this.mapDocumentToObject<ConfigI>(doc);
-
-        return data;
-      } else {
-        writeLogs('----- Configuración no encontrada en Firebase, creando nueva -----');
-        const defaultConfig = { ...this.handlerConfigFile.default_config };
-        delete defaultConfig.id;
-
-        return await this.updateAppConfig(defaultConfig);
+      if (machineConfigResult.needsSave) {
+        await this.upsertMachineConfig(machineConfigResult.data, machineConfigResult.docRef);
       }
+
+      writeLogs('----- Configuración mergeada encontrada en Firebase -----');
+      return this.mergeConfig(generalConfig, machineConfigResult.data);
     } catch (error) {
       writeLogs(error, 'ERROR al obtener configuración desde Firebase');
 
@@ -206,24 +365,22 @@ export default class FirebaseConfigHandler {
     }
 
     try {
-      const configSnapshot = await this.getCurrentConfigSnapShot();
+      const generalConfig = {
+        ...this.makeDefaultGeneralConfig(),
+        ...this.pickConfigValues(config, GENERAL_CONFIG_KEYS),
+      };
+      const machineConfig = {
+        ...this.makeDefaultMachineConfig(),
+        ...this.pickConfigValues(config, MACHINE_CONFIG_KEYS),
+        machineId: this.machineId,
+      };
 
-      let docRef;
-      if (!configSnapshot.empty) {
-        // Actualizar documento existente
-        docRef = configSnapshot.docs[0].ref;
-        await setDoc(docRef, config, { merge: true });
-      } else {
-        // Crear nuevo documento
-        const configCollectionRef = this.getCurrentConfigCollection();
-        docRef = await addDoc(configCollectionRef, config);
-      }
+      await setDoc(this.getGeneralConfigRef(), this.removeUndefinedValues(generalConfig), { merge: true });
 
-      // Obtener el documento actualizado/creado
-      const docSnapshot = await getDoc(docRef);
-      const config_response = this.mapDocumentToObject<ConfigI>(docSnapshot);
+      const currentMachineConfig = await this.getMachineConfig();
+      await this.upsertMachineConfig(machineConfig, currentMachineConfig.docRef);
 
-      return config_response;
+      return this.mergeConfig(generalConfig, machineConfig);
     } catch (error) {
       writeLogs(error, 'ERROR al actualizar configuración en Firebase');
 

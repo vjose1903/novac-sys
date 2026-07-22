@@ -23,6 +23,7 @@ export interface ConfigI {
   url_servidor_respaldo:       string;
   config_password:             string;
   usa_url_principal:           boolean;
+  usa_facturas_externas:       boolean;
   is_produccion:               boolean;
   has_contabilidad:            boolean;
   calcular_itbis:              boolean;

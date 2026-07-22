@@ -243,6 +243,12 @@
                         <label [for]="formFieldId.calcular_itbis" class="mb-0 c-pointer">Usa Itbis</label>
                         <form-error-msg [control]="form.get(formFieldName.calcular_itbis)"></form-error-msg>
                       </div>
+
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.usa_facturas_externas" formControlName="usa_facturas_externas" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.usa_facturas_externas" class="mb-0 c-pointer">Usa facturas externas</label>
+                        <form-error-msg [control]="form.get(formFieldName.usa_facturas_externas)"></form-error-msg>
+                      </div>
                     </div>
                   </div>
                 </div>

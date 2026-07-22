@@ -13,6 +13,7 @@
   "url_servidor": "https://novac-brendy.ddns.net",
   "url_servidor_respaldo": "http://localhost:9091",
   "usa_url_principal": false,
+  "usa_facturas_externas": false,
   "has_contabilidad": true,
   "is_db_local": true,
   "calcular_itbis": false,

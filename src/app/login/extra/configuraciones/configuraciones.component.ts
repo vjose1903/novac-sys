@@ -113,6 +113,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.url_servidor_respaldo]: [{ value: this.getValue(data, 'url_servidor_respaldo'), disabled: false }, Validators.required],
       [formFieldName.config_password]: [{ value: this.getValue(data, 'config_password'), disabled: false }, Validators.required],
       [formFieldName.usa_url_principal]: [{ value: this.getValue(data, 'usa_url_principal'), disabled: false }, Validators.required],
+      [formFieldName.usa_facturas_externas]: [{ value: this.getValue(data, 'usa_facturas_externas') ?? false, disabled: false }, Validators.required],
       [formFieldName.serie_default]: [{ value: this.getValue(data, 'serie_default'), disabled: false }],
 
       [formFieldName.is_db_local]: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
@@ -292,13 +293,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
         cliente: this.getValue(this.configApp, 'cliente'),
       };
 
-      const config_id = formulario[formFieldName.id];
-      const isNewConfig = fun.isEmpty(config_id) || config_id === 'default';
-
-      // Crear o actualizar configuración
-      const config_response = isNewConfig ? await this.configServ.createConfig(formulario) : await this.configServ.updateConfig(formulario);
-
-      await this._ipc.setAppConfig(config_response);
+      const config_response = await this._ipc.setAppConfig(formulario);
 
       // Manejar éxito
       this.handleSubmitSuccess(config_response);
