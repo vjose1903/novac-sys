@@ -98,7 +98,7 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "novac-system:build:dev",
-            "hmr": true
+            "hmr": false
           },
           "configurations": {
             "dev": {

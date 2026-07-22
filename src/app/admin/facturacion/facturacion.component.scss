@@ -129,6 +129,17 @@
 
   .colTitulo {
     grid-area: colTitulo;
+
+    .sin_comprobante_btn {
+      height: 2.5rem;
+      width: 3rem;
+      border-radius: 0.5rem;
+
+      &:hover {
+        cursor: pointer;
+        background-color: #0000000e;
+      }
+    }
   }
   .colCard {
     grid-area: colCard;
@@ -296,8 +307,6 @@
   font-weight: 600;
   font-size: 0.7rem;
 }
-
-
 
 .factura_guardada {
   min-height: 8rem;

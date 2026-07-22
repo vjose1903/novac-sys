@@ -31,7 +31,9 @@
       }
     </div>
 
-    <div class="d-flex">
+    <div class="d-flex align-items-center gap-2">
+      <div class="sin_comprobante_btn"></div>
+
       @if (!factServ.isCotizacion() && !factServ.isPreVenta()) {
         <p-selectButton
           [options]="facturasSerieOptions"
