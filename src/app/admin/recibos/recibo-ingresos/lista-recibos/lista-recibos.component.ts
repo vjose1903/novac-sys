@@ -1,5 +1,4 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -52,7 +51,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   tablaComponent;
 
   lista_recibos;
-  rowSelected: any;
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
@@ -79,30 +77,32 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   mapeoRecibos(data) {
-    return (data ?? []).map(recibo => {
-      const detalle_recibos = recibo.detalle_recibos ?? [];
-      const esUnSoloDetalle = detalle_recibos.length === 1;
+    return (data ?? []).map(recibo => this.mapReciboListItem(recibo));
+  }
 
-      return {
-        ...recibo,
-        numero_recibo: recibo.numero_recibo?.toString().padStart(8, '0') ?? '--------',
-        numero_factura: esUnSoloDetalle ? detalle_recibos[0].descripcion?.split(' ')[1] ?? '--------' : 'Varios...',
-        ver: 'far fa-eye',
-        anular: 'far fa-trash-alt',
-        tooltip_ver: 'Ver',
-        tooltip_anular: 'Anular',
-        iconsMoveEvents: [
-          { key: 'ver', hover: ['text-green'], leave: ['text-black'] },
-          { key: 'anular', hover: ['text-green'], leave: ['text-black'] },
+  mapReciboListItem(recibo) {
+    const detalle_recibos = recibo.detalle_recibos ?? [];
+    const esUnSoloDetalle = detalle_recibos.length === 1;
+
+    return {
+      ...recibo,
+      numero_recibo: recibo.numero_recibo?.toString().padStart(8, '0') ?? '--------',
+      numero_factura: esUnSoloDetalle ? detalle_recibos[0].descripcion?.split(' ')[1] ?? '--------' : 'Varios...',
+      ver: 'far fa-eye',
+      anular: 'far fa-trash-alt',
+      tooltip_ver: 'Ver',
+      tooltip_anular: 'Anular',
+      iconsMoveEvents: [
+        { key: 'ver', hover: ['text-green'], leave: ['text-black'] },
+        { key: 'anular', hover: ['text-green'], leave: ['text-black'] },
+      ],
+      customStyles: {
+        actions: [
+          { key: 'ver', estilos: 'font-size:1rem !important' },
+          { key: 'anular', estilos: 'margin-left: 1rem !important; font-size:1rem !important' },
         ],
-        customStyles: {
-          actions: [
-            { key: 'ver', estilos: 'font-size:1rem !important' },
-            { key: 'anular', estilos: 'margin-left: 1rem !important; font-size:1rem !important' },
-          ],
-        },
-      };
-    });
+      },
+    };
   }
 
   async necesarioStart() {
@@ -179,35 +179,38 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
         const { file: fileName, base64, pageOrientation } = res;
         const obj_pdf = { base64, reimprimir: true, fileName: fileName.split('.')[0], };
 
-        const reciboModalConf = new DynamicModalClass();
-        reciboModalConf.id = 'revision_recibo';
-        reciboModalConf.inputs = obj_pdf;
-        reciboModalConf.header = 'Revisión de recibo de ingreso';
-        reciboModalConf.width = '57rem';
-        reciboModalConf.height = '40rem';
-        reciboModalConf.component = PdfViewerComponent;
-        reciboModalConf.closableEsc = true;
-
-        reciboModalConf.botones = [
-          { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false },
-          { clase: 'btn btn-gris', function: instance => this.verDetalles(obj.data), label: 'Ver detalles', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: instance => {
-              this.imprimir_base64(fileName, base64, pageOrientation);
-              instance.close();
-            },
-            label: 'Imprimir',
-            disable: false,
-          },
-        ];
-
-        reciboModalConf.show();
+        this.openReciboPdfModal({ obj_pdf, data: obj.data, fileName, base64, pageOrientation });
       })
       .finally(() => {
         this.loadServ.isLoading.next(false);
       })
       .catch(() => {});
+  }
+
+  openReciboPdfModal(params: { obj_pdf: any; data: any; fileName: string; base64: string; pageOrientation: string }) {
+    const reciboModalConf = new DynamicModalClass();
+    reciboModalConf.id = 'revision_recibo';
+    reciboModalConf.inputs = params.obj_pdf;
+    reciboModalConf.header = 'Revisión de recibo de ingreso';
+    reciboModalConf.width = '57rem';
+    reciboModalConf.height = '40rem';
+    reciboModalConf.component = PdfViewerComponent;
+    reciboModalConf.closableEsc = true;
+    reciboModalConf.botones = [
+      { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { clase: 'btn btn-gris', function: instance => this.verDetalles(params.data), label: 'Ver detalles', disable: false },
+      {
+        clase: 'btn btn-verde',
+        function: instance => {
+          this.imprimir_base64(params.fileName, params.base64, params.pageOrientation);
+          instance.close();
+        },
+        label: 'Imprimir',
+        disable: false,
+      },
+    ];
+
+    reciboModalConf.show();
   }
 
   verDetalles(data) {

@@ -75,30 +75,14 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
     params = params ?? this.tServ.obj_paginate.default;
 
-    let palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
+    const palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
+    const service = this.isSuplidor ? this.suplidorClass : this.clienteClass;
 
-    const classDinamic = this.isSuplidor ? 'suplidorClass' : 'clienteClass';
     try {
-      const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
+      const res = await service.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
 
       if (res.data && res.data.length > 0) {
-        const contado_name = 'Cliente contado';
-        const cliente_contado = { id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null };
-        const busqueda_include_contado = contado_name.includes(palabra_a_buscar);
-
-        if (this.include_contado && !this.isSuplidor && busqueda_include_contado) res.data.unshift(cliente_contado);
-
-        res.data.map(async entidad => {
-          entidad.nombre = entidad.nombre ? fun.capitalice(entidad.nombre) : '----------';
-          entidad.apellido = entidad.apellido ? fun.capitalice(entidad.apellido) : '----------';
-          entidad.telefono = entidad.telefono ?? '----------';
-
-          const doc = entidad?.documentos_de_identidad?.find(documento => documento.principal);
-          entidad.documento_identidad = doc ? doc.documento : '----------';
-          return entidad;
-        });
-
-        this.dataFiltro.set(res.data);
+        this.dataFiltro.set(this.mapEntidadesFiltro(res.data, palabra_a_buscar));
       } else {
         this.dataFiltro.set([]);
       }
@@ -116,6 +100,25 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
         fun.toastError('No se pudo realizar la búsqueda', 'ERROR');
       }
     }
+  }
+
+  mapEntidadesFiltro(data: any[], palabra_a_buscar: string) {
+    const contado_name = 'Cliente contado';
+
+    if (this.include_contado && !this.isSuplidor && contado_name.includes(palabra_a_buscar)) {
+      data.unshift({ id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null });
+    }
+
+    return data.map(entidad => {
+      entidad.nombre = entidad.nombre ? fun.capitalice(entidad.nombre) : '----------';
+      entidad.apellido = entidad.apellido ? fun.capitalice(entidad.apellido) : '----------';
+      entidad.telefono = entidad.telefono ?? '----------';
+
+      const doc = entidad?.documentos_de_identidad?.find(documento => documento.principal);
+      entidad.documento_identidad = doc ? doc.documento : '----------';
+
+      return entidad;
+    });
   }
 
   tableClickRow(event) {
