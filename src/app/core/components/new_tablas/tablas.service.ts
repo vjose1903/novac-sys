@@ -54,6 +54,8 @@ export class TablasService {
   }
 
   modifyPaginationById(id, params: Array<paginateI>) {
+    if (!this.obj_paginate[id]) this.obj_paginate[id] = fun.deepCloning(this.obj_paginate.default);
+
     params.forEach(param => {
       const key = Object.keys(param)[0];
       const value = param[key];

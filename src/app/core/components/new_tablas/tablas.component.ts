@@ -232,7 +232,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
         if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
-          const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
+          const actualPagination = this.getActualPagination();
 
           if (fun.hasValue(search)) {
             if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.realIdTabla, [{ ant_page: actualPagination.page }]);
@@ -259,7 +259,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       order == null ? (newOrder = 'asc') : order == 'asc' ? (newOrder = 'desc') : (newOrder = null);
       row.sort.order = newOrder;
 
-      const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
+      const actualPagination = this.getActualPagination();
       this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: actualPagination.search });
     }
   }
@@ -281,13 +281,13 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       this.zone.run(() => {
         const page = event.page + 1;
         const per_page = event.rows;
-        const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
+        const actualPagination = this.getActualPagination();
 
         const actualPage = this.getPaginatorPageByNumber(page);
 
         const clickeado_por = actualPage?.getAttribute('clickeado_por');
 
-        if (fun.hasValue(actualPagination) && (page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
+        if ((page != actualPagination.page || per_page != actualPagination.per_page) && (fun.isEmpty(clickeado_por) || clickeado_por != 'maquina')) {
           this.tServ.modifyPaginationById(id, [{ page: page }, { per_page: per_page }, { per_page_options: actualPagination.per_page_options }, { is_local: actualPagination.is_local }]);
 
           if (actualPagination.is_local) {
@@ -308,6 +308,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   test() {
     console.log('paginator --> ', fun.deepCloning(this.tServ.getPaginationById(this.realIdTabla)));
+  }
+
+  getActualPagination() {
+    return this.tServ.getPaginationById(this.realIdTabla) ?? this.config.obj_paginate ?? this.tServ.obj_paginate.default;
   }
 
   reloadPagination() {
