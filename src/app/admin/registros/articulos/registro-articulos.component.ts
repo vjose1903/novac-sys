@@ -153,7 +153,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     return new Promise(async resolve => {
       const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
 
-      this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.materia_prima }).then(res => {
+      this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.materia_prima, mode: 'formula' }).then(res => {
         this.listaMateriasPrimas = fun.deepCloning(res['data']);
 
         this.listaMateriasPrimasIndexed = this.listaMateriasPrimas.reduce((acu: any, item: any) => {
@@ -207,7 +207,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     this.listaArticulos.length = 0;
-    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true }).then(res => {
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true, mode: 'list' }).then(res => {
       this.listaArticulos = res.data;
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
@@ -761,6 +761,9 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   async editarItem(articulo) {
     this.borrar();
 
+    articulo = await this.getArticuloFullForEdit(articulo);
+    if (fun.isEmpty(articulo)) return;
+
     this.form.patchValue(articulo);
     this.articuloSelected = articulo;
     this.boton = 'Editar';
@@ -832,6 +835,25 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.form.controls.medida_alerta.setValue(articulo.medida_alerta);
       this.modificateValidators();
     });
+  }
+
+  private async getArticuloFullForEdit(articulo) {
+    try {
+      const res = await this.articuloClass.getArticulosFiltrado({
+        buscar: articulo.codigo,
+        fecha: this.fechaFactura,
+        tipo: 'todos',
+        mode: 'full',
+        match: 'exact',
+        limit: 1,
+      });
+
+      return Array.isArray(res?.data) ? res.data[0] : res?.data;
+    } catch (error) {
+      console.error(error);
+      fun.toastError('Error buscando el detalle del artículo.', 'ERROR');
+      return null;
+    }
   }
 
   nuevoRegistro() {

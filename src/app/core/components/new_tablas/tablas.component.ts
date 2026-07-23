@@ -394,7 +394,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     const actualPage = this.getPaginatorPageByNumber(actualPagination?.page);
 
-    requestAnimationFrame(() => {
+    window.setTimeout(() => {
       if (actualPage) {
         actualPage.setAttribute('clickeado_por', 'maquina');
         actualPage.click();
@@ -404,7 +404,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       }
 
       this.cantPagesView = actual;
-    });
+    }, 0);
   }
 
   getColor(myColor) {
@@ -559,10 +559,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   quantityTooltip(dato, column) {
-    if (dato.tipo_articulo.tipo === 'servicio') return null;
+    if (dato?.tipo_articulo?.tipo === 'servicio') return null;
 
     const { key, pluralize, order, sub_key } = this.dynamicTooltipEntities[column.key];
-    const objeto = dato[key];
+    const objeto = dato?.[key];
+    if (!objeto) return '';
     const keys = Object.keys(objeto);
 
     if (keys.length <= 1) return '';
@@ -582,10 +583,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   quantityLabel(dato, column) {
-    if (dato.tipo_articulo.tipo === 'servicio') return 'N/A';
+    if (dato?.tipo_articulo?.tipo === 'servicio') return 'N/A';
 
     const { key, pluralize, order, sub_key } = this.dynamicTooltipEntities[column.key];
-    const objeto = dato[key];
+    const objeto = dato?.[key];
+    if (!objeto) return 'N/A';
     const keys = Object.keys(objeto);
 
     if (keys.length === 0) return 'N/A';

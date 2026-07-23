@@ -44,8 +44,8 @@ export class BuscarArticuloComponent extends MixinClass implements IDynamicModal
   btn_aceptar() {}
 
   ngAfterViewInit(): void {
-    if (this.metodo === tipoDocFacturacion.compra) this.table_config.info.push({ titulo: 'Costo', tipo: tableCellType.quantityTooltip, key: 'costo' });
-    else this.table_config.info.push({ titulo: 'Precio', tipo: tableCellType.quantityTooltip, key: 'precio' });
+    if (this.metodo === tipoDocFacturacion.compra) this.table_config.info.push({ titulo: 'Costo', tipo: tableCellType.formatoNumero, key: 'costo_principal' });
+    else this.table_config.info.push({ titulo: 'Precio', tipo: tableCellType.formatoNumero, key: 'precio_principal' });
     
     this.buscarArticulos(this.tServ.obj_paginate.default, 'init');
   }
@@ -63,6 +63,7 @@ export class BuscarArticuloComponent extends MixinClass implements IDynamicModal
         paginado: true,
         fecha: this.fecha_articulo,
         is_compra: is_compra,
+        mode: 'usable',
       });
 
       this.dataFiltro.set(res?.data);

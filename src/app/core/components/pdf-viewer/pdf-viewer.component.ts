@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input } from '@angular/core';
 
 import { viewerOptions } from './pdf-viewer';
 import { fun } from '@core/services/functions.service';
@@ -12,7 +12,7 @@ import { FacturasI } from '@admin/facturacion/factura';
   styleUrls: ['./pdf-viewer.component.scss'],
   standalone: false,
 })
-export class PdfViewerComponent implements IDynamicModal {
+export class PdfViewerComponent implements IDynamicModal, AfterViewInit {
   @Input() modalWrapper!: DynamicModalComponent;
   @Input() modalConfig!: IModalConfiguration;
 
@@ -26,12 +26,19 @@ export class PdfViewerComponent implements IDynamicModal {
   @Input() factura: FacturasI = null;
 
   fun = fun;
+  readyToRender = false;
 
   get ncf_referenced() {
     return this.factura?.document_reference?.document_referenced?.numero_comprobante;
   }
 
   constructor() {}
+
+  ngAfterViewInit() {
+    window.setTimeout(() => {
+      this.readyToRender = true;
+    });
+  }
 
   submit() {}
 }

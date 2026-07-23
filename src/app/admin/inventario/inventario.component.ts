@@ -100,7 +100,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     this.palabra_buscar = palabra_a_buscar;
 
-    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro }).then(res => {
+    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro, mode: 'list' }).then(res => {
       this.listaArticulos = fun.deepCloning(res.data);
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
@@ -125,14 +125,17 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     fun.setTimeout(() => this.getArticulos(actualPagination), 500);
   }
 
-  movimientoInventario(arg) {
+  async movimientoInventario(arg) {
     const tipoArticuloSelected = this.tipo_articulos.find(val => val.id == Number(arg.data.tipo_articulo_id));
 
     if (tipoArticuloSelected.tipo != 'servicio') {
+      const articulo = await this.getArticuloUsableForMovimiento(arg.data);
+      if (fun.isEmpty(articulo)) return;
+
       const modalConfig = new DynamicModalClass();
       modalConfig.width = '30rem';
       modalConfig.component = MovimientosFormComponent;
-      modalConfig.inputs = { data: arg.data };
+      modalConfig.inputs = { data: articulo };
       modalConfig.id = 'inventarioModal';
       modalConfig.header = 'Movimientos de inventario';
 
@@ -145,6 +148,26 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       modalConfig.show();
     } else {
       fun.toastWarning('El articulo seleccionado no requiere movimientos de inventario', 'AVISO');
+    }
+  }
+
+  private async getArticuloUsableForMovimiento(articulo) {
+    try {
+      const res = await this.articuloClass.getArticulosFiltrado({
+        buscar: articulo.codigo,
+        fecha: this.fechaFactura,
+        is_compra: false,
+        tipo: 'todos',
+        mode: 'usable',
+        match: 'exact',
+        limit: 1,
+      });
+
+      return Array.isArray(res?.data) ? res.data[0] : res?.data;
+    } catch (error) {
+      console.error(error);
+      fun.toastError('Error buscando el detalle del artículo.', 'ERROR');
+      return null;
     }
   }
 

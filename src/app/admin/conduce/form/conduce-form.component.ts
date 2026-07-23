@@ -719,7 +719,14 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     const cant_actual = cant_en_unidades_actual / multiplo;
 
     // Obtener artículo filtrado
-    const result = await this.articuloClass.getArticulosFiltrado({ buscar: element.codigo, fecha: this.fechaConduce });
+    const result = await this.articuloClass.getArticulosFiltrado({
+      buscar: element.codigo,
+      fecha: this.fechaConduce,
+      tipo: 'todos',
+      mode: 'usable',
+      match: 'exact',
+      limit: 1,
+    });
 
     const articulo = result['data'][0];
     const filaControl = this.filasDetalle.at(i) as any;

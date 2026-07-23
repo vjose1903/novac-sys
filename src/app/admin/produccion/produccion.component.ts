@@ -74,7 +74,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   async getProductosTerminados() {
     const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
 
-    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.producto_terminado }).then(res => {
+    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.producto_terminado, mode: 'formula' }).then(res => {
       res['data'].map(producto_terminado => {
         producto_terminado.optionDisabled = false;
         this.listaProductos.update(prev => [...prev, producto_terminado]);
@@ -197,6 +197,10 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     return res;
   }
 
+  getIngredienteArticuloId(ingrediente) {
+    return ingrediente?.articulo_combo_id ?? ingrediente?.articulo_combo?.id ?? ingrediente?.articulo_combo;
+  }
+
   async calcularCantidadAProduccir() {
     this.ingredientesParaProduccion = [];
 
@@ -206,6 +210,13 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     const tieneProduccionPrevia = listaProduccion.length > 0;
 
     for (const ingrediente of this.ingredientes) {
+      const articuloComboId = this.getIngredienteArticuloId(ingrediente);
+
+      if (!fun.hasValue(articuloComboId)) {
+        fun.toastError(`No se pudo identificar el artículo ingrediente ${ingrediente.nombre}.`, 'ERROR');
+        return;
+      }
+
       const contenidoAProducir = {};
       let cantidadCalculada = ingrediente.cantidad * this.cantidad_producir;
 
@@ -216,14 +227,14 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       if (tieneProduccionPrevia) {
         const todosLosIngredientes = listaProduccion.flatMap(producto => (producto.articulo_id !== ingrediente.articulo_id ? fun.getProperty(producto, 'ingredientes') : []));
 
-        const ingredientesIguales = todosLosIngredientes.filter(item => item.articulo_combo_id === ingrediente.articulo_combo_id);
+        const ingredientesIguales = todosLosIngredientes.filter(item => this.getIngredienteArticuloId(item) === articuloComboId);
 
         if (ingredientesIguales.length) {
           cantidadCalculada = ingredientesIguales.reduce((acumulado, item) => acumulado + item.cantidad_en_unidades, cantidadCalculada);
         }
       }
 
-      const parametrosVerificacion = { afterPath: `check_excede/${ingrediente.articulo_combo_id}`, parameters: { cantidad: cantidadCalculada } };
+      const parametrosVerificacion = { afterPath: `check_excede/${articuloComboId}`, parameters: { cantidad: cantidadCalculada } };
       const respuesta = await this.articuloClass.getAll(parametrosVerificacion);
       const excedeExistencia = respuesta['data'];
 
@@ -241,7 +252,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
         articulo_id: ingrediente.articulo_id,
         contenido: ingrediente.contenido,
         articulo_combo: ingrediente.articulo_combo,
-        articulo_combo_id: ingrediente.articulo_combo_id,
+        articulo_combo_id: articuloComboId,
         cantidad_en_unidades: contenidoAProducir[ingrediente.medida],
         medida: ingrediente.medida,
       });

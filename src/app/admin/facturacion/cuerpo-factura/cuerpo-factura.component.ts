@@ -322,7 +322,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       let articulo = row.articulo;
 
       if (fun.isEmpty(articulo) || fun.isEmpty(row.articulo.id)) {
-        const res = await this.articuloClass.getArticulosFiltrado({ buscar: row.codigo, fecha: this.fechaFactura });
+        const res = await this.articuloClass.getArticulosFiltrado({
+          buscar: row.codigo,
+          fecha: this.fechaFactura,
+          is_compra: this.factServ.isCompra(),
+          tipo: 'todos',
+          mode: 'usable',
+          match: 'exact',
+          limit: 1,
+        });
         articulo = res['data'][0];
       }
 
@@ -467,6 +475,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           buscar: codigo,
           fecha: this.fechaFactura,
           is_compra: this.factServ.isCompra(),
+          tipo: 'todos',
+          mode: 'usable',
+          match: 'exact',
+          limit: 1,
         });
 
         this.llenarRowDespuesDeFiltro({ data: { articulo: res.data[0], index } }, index, false);

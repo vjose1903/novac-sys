@@ -34,7 +34,10 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subModalConfig = Ss.dynamicModalService.modalsConfigurations$.subscribe((dynamicModal: any) => {
       if (dynamicModal && dynamicModal.visible) {
-        this.renderizarComponente(dynamicModal);
+        this.renderizarComponente(dynamicModal).catch(error => {
+          console.error(error);
+          fun.toastError('Error mostrando el contenido del modal.', 'ERROR');
+        });
       } else {
         if (dynamicModal && dynamicModal.id) this.handleCloseModal(dynamicModal.id);
       }
@@ -136,11 +139,12 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
       }
 
       const tryRender = (attempt = 0) => {
+        this.cdRef.detectChanges();
         const currentReceptor = this.modalReceptor?.toArray().find((receptor: any) => receptor.modalReceptorId == config.id);
 
         if (!currentReceptor) {
           if (attempt >= 20) {
-            resolve();
+            reject(new Error(`No se encontró el receptor del modal: ${config.id}`));
             return;
           }
 
@@ -173,7 +177,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
         resolve();
       };
 
-      tryRender();
+      window.setTimeout(() => tryRender(), 0);
     });
   }
 

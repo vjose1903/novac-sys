@@ -56,14 +56,17 @@ export interface ArticuloI {
   [prop: string]: any;
 }
 
+export type ArticuloFiltroMode = 'select' | 'list' | 'usable' | 'formula' | 'full';
+export type ArticuloFiltroMatch = 'exact' | 'search';
+
 export class ArticuloC extends CrudG<ArticuloI> {
   constructor() {
     super('articulos');
   }
 
-  getArticulosFiltrado(arg: { buscar: any; fecha: any; parameters?: any; tipo?: any; page?: number; per_page?: number; paginado?: boolean; is_compra?: boolean }) {
+  getArticulosFiltrado(arg: { buscar: any; fecha: any; parameters?: any; tipo?: any; page?: number; per_page?: number; paginado?: boolean; is_compra?: boolean; mode?: ArticuloFiltroMode; match?: ArticuloFiltroMatch; limit?: number }) {
     return new Promise<any>((resolve, reject) => {
-      const { buscar, fecha, parameters, tipo = 'todos', page = 1, per_page = 20, paginado = true, is_compra = false } = arg;
+      const { buscar, fecha, parameters, tipo = 'todos', page = 1, per_page = 20, paginado = true, is_compra = false, mode, match, limit } = arg;
       let extra = { afterPath: `filtro/${buscar}`, parameters: {} };
 
       extra['parameters'] = {
@@ -73,6 +76,9 @@ export class ArticuloC extends CrudG<ArticuloI> {
         is_compra: is_compra,
         tipo: tipo,
         fecha: fecha,
+        mode: mode,
+        match: match,
+        limit: limit,
         ...parameters,
       };
 

@@ -184,7 +184,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     if (fun.hasValue(name)) {
       fun.awaitTyping().then(res => {
         try {
-          this.articuloClass.getArticulosFiltrado({ buscar: name, fecha: this.Fecha, paginado: false, is_compra: true }).then(res => (this.listaArticulos = res['data']));
+          this.articuloClass.getArticulosFiltrado({ buscar: name, fecha: this.Fecha, paginado: false, is_compra: true, mode: 'select' }).then(res => (this.listaArticulos = res['data']));
         } catch (error) {
           console.error(error);
           fun.toastError('Error buscando articulos registrados.', 'ERROR');
