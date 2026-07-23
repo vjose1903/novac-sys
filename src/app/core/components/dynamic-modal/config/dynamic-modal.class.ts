@@ -27,6 +27,8 @@ export class DynamicModalClass {
   closableClickOutside: boolean | undefined;
   confirmToClose: boolean | undefined;
   disableAllButtonsIfAnyProcessing: boolean | undefined;
+  focusOnShow: boolean | undefined;
+  secondDetectChanges: boolean | undefined;
 
   returnData!: Function;
   hideModal!: Function;
@@ -66,6 +68,8 @@ export class DynamicModalClass {
     this.html = params && fun.objHas(params, 'html') ? params.html : undefined;
     this.callback = params && fun.objHas(params, 'callback') ? params.callback : undefined;
     this.disableAllButtonsIfAnyProcessing = params && fun.objHas(params, 'disableAllButtonsIfAnyProcessing') ? params.disableAllButtonsIfAnyProcessing : false;
+    this.focusOnShow = params && fun.objHas(params, 'focusOnShow') ? params.focusOnShow : true;
+    this.secondDetectChanges = params && fun.objHas(params, 'secondDetectChanges') ? params.secondDetectChanges : true;
 
     this.returnData = (arg: ICallbackModal) => this.runCallback(arg);
     this.hideModal = (arg: ICallbackModal) => this.runCallback(arg);
@@ -74,10 +78,10 @@ export class DynamicModalClass {
   }
 
   show() {
-    fun.setTimeout(() => {
+    queueMicrotask(() => {
       this.visible = true;
       Ss.dynamicModalService.updateModalConfig(this);
-    }, 0);
+    });
   }
 
   close(dataToReturn?: ICallbackModal) {

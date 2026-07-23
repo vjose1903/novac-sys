@@ -57,8 +57,11 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
   }
 
   handleModalShow(modalId: string) {
+    const modal = Ss.dynamicModalService.findModalConfigById(modalId);
+    if (!modal.focusOnShow) return;
+
     // Cuando el modal se muestra, establecer el foco en el input oculto
-    fun.setTimeout(() => {
+    window.setTimeout(() => {
       this.setModalFocus();
     }, 50);
   }
@@ -141,7 +144,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
             return;
           }
 
-          fun.setTimeout(() => tryRender(attempt + 1), 25);
+          window.setTimeout(() => tryRender(attempt + 1), 25);
           return;
         }
 
@@ -184,9 +187,11 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
 
   private initializeComponent(componente: any): void {
     componente.changeDetectorRef.detectChanges();
+    const currentConfig = componente.instance?.modalConfig;
+    if (!currentConfig?.secondDetectChanges) return;
 
     // Segundo ciclo de detección para componentes hijos
-    fun.setTimeout(() => {
+    window.setTimeout(() => {
       componente.changeDetectorRef.detectChanges();
       this.setModalFocus();
     }, 100);

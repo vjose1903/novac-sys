@@ -79,14 +79,14 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   mapeoRecibos(data) {
-    return data.map(recibo => {
-      const { detalle_recibos } = recibo;
+    return (data ?? []).map(recibo => {
+      const detalle_recibos = recibo.detalle_recibos ?? [];
       const esUnSoloDetalle = detalle_recibos.length === 1;
 
       return {
         ...recibo,
-        numero_recibo: recibo.numero_recibo.toString().padStart(8, '0'),
-        numero_factura: esUnSoloDetalle ? detalle_recibos[0].descripcion.split(' ')[1] : 'Varios...',
+        numero_recibo: recibo.numero_recibo?.toString().padStart(8, '0') ?? '--------',
+        numero_factura: esUnSoloDetalle ? detalle_recibos[0].descripcion?.split(' ')[1] ?? '--------' : 'Varios...',
         ver: 'far fa-eye',
         anular: 'far fa-trash-alt',
         tooltip_ver: 'Ver',
@@ -110,6 +110,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async getRecibos(params?: { per_page?: number; page?: number; search?: string }) {
+    params = params ?? this.tServ.obj_paginate.default;
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = {
       afterPath: `filtro/${palabra_a_buscar}`,
@@ -124,9 +125,10 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       const res = await this.reciboClass.getAll(extra);
       res.data = this.mapeoRecibos(res.data);
       this.lista_recibos = fun.deepCloning(res.data);
-      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error('Error al obtener recibos:', error);
+      fun.toastError('No se pudo cargar el listado de recibos', 'ERROR');
     }
   }
 
@@ -161,6 +163,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
   makeReciboPdf(arg) {
     const recibo_selected = this.lista_recibos.find(recibo => recibo.id === arg.id);
+    if (!recibo_selected) return;
 
     this.reciboClass.parseDataToPdf(recibo_selected).then(recibo_parsed => {
       const obj = { data: recibo_parsed, type: 'recibo_ingreso', retunBase64: true };
@@ -173,8 +176,6 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
     PdfService.generatePdf({ oPdf: obj, imprimir: false })
       .then(res => {
-        this.loadServ.isLoading.next(false);
-
         const { file: fileName, base64, pageOrientation } = res;
         const obj_pdf = { base64, reimprimir: true, fileName: fileName.split('.')[0], };
 
@@ -203,10 +204,10 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
 
         reciboModalConf.show();
       })
-      .catch(err => {
-        fun.toastError(err.msg, 'ERROR');
+      .finally(() => {
         this.loadServ.isLoading.next(false);
-      });
+      })
+      .catch(() => {});
   }
 
   verDetalles(data) {
@@ -234,7 +235,10 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       const extra = { afterPath: `revertir/by_id/${id}` };
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
 
-      this.reciboClass.dynamic(extra).then(res => this.getRecibos(actualPagination));
-    } catch (error) {}
+      await this.reciboClass.dynamic(extra);
+      await this.getRecibos(actualPagination);
+    } catch (error) {
+      fun.toastError('No se pudo anular el recibo de ingreso', 'ERROR');
+    }
   }
 }

@@ -71,6 +71,8 @@ export interface IModalConfiguration {
   closableClickOutside?: boolean;
   confirmToClose?: boolean;
   disableAllButtonsIfAnyProcessing?: boolean;
+  focusOnShow?: boolean;
+  secondDetectChanges?: boolean;
 
   close?: (dataToReturn?: any) => void;
   show?: () => void;

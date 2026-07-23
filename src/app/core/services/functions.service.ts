@@ -632,10 +632,10 @@ export class fun {
   // Nombre: setTimeOut
   // Descripcion : Esta funcion ejecuta una funcion despues de un tiempo
   // __________________________________________________________________________________________________
-  static setTimeout(callback: () => void, time: number) {
+  static setTimeout(callback: () => void, time: number, markForCheck = true) {
     const timeout = setTimeout(() => {
       callback();
-      Ss.cdRef.markForCheck();
+      if (markForCheck) Ss.cdRef.markForCheck();
     }, time);
 
     return timeout;

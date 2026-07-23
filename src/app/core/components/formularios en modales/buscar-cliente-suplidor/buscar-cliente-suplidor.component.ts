@@ -38,7 +38,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   table_config: table_config = {
     info: [],
     focusRow: true,
-    focusSearchInput: true,
+    focusSearchInput: false,
     id_tabla: 'buscar_cliente_suplidor',
     padre_functions: { data_request: params => this.buscarClientesOrSuplidor(params) },
     filtrar: { local: false },
@@ -73,47 +73,49 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   }
 
   async buscarClientesOrSuplidor(params?: { per_page: number; page: number; search: string }, where?) {
-    const copyData = fun.deepCloning(this.dataFiltro());
+    params = params ?? this.tServ.obj_paginate.default;
 
     let palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
 
     const classDinamic = this.isSuplidor ? 'suplidorClass' : 'clienteClass';
     try {
-      this[classDinamic]
-        .getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } })
-        .then(res => {
-          if (res.data && res.data.length > 0) {
-            const contado_name = 'Cliente contado';
-            const cliente_contado = { id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null };
-            const busqueda_include_contado = contado_name.includes(palabra_a_buscar);
+      const res = await this[classDinamic].getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
 
-            if (this.include_contado && !this.isSuplidor && busqueda_include_contado) res.data.unshift(cliente_contado);
+      if (res.data && res.data.length > 0) {
+        const contado_name = 'Cliente contado';
+        const cliente_contado = { id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null };
+        const busqueda_include_contado = contado_name.includes(palabra_a_buscar);
 
-            res.data.map(async entidad => {
-              entidad.nombre = entidad.nombre ? fun.capitalice(entidad.nombre) : '----------';
-              entidad.apellido = entidad.apellido ? fun.capitalice(entidad.apellido) : '----------';
-              entidad.telefono = entidad.telefono ?? '----------';
+        if (this.include_contado && !this.isSuplidor && busqueda_include_contado) res.data.unshift(cliente_contado);
 
-              const doc = entidad?.documentos_de_identidad?.find(documento => documento.principal);
-              entidad.documento_identidad = doc ? doc.documento : '----------';
-              return entidad;
-            });
+        res.data.map(async entidad => {
+          entidad.nombre = entidad.nombre ? fun.capitalice(entidad.nombre) : '----------';
+          entidad.apellido = entidad.apellido ? fun.capitalice(entidad.apellido) : '----------';
+          entidad.telefono = entidad.telefono ?? '----------';
 
-            this.dataFiltro.set(res.data);
-          } else {
-            this.dataFiltro.set(copyData);
-          }
-
-          if (this.tablaComponent) {
-            this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
-          } else {
-            fun.setTimeout(() => this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]), 50);
-          }
-        })
-        .catch(error => {
-          if (where === 'init') this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id });
+          const doc = entidad?.documentos_de_identidad?.find(documento => documento.principal);
+          entidad.documento_identidad = doc ? doc.documento : '----------';
+          return entidad;
         });
-    } catch (error) {}
+
+        this.dataFiltro.set(res.data);
+      } else {
+        this.dataFiltro.set([]);
+      }
+
+      if (this.tablaComponent) {
+        this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      } else {
+        window.setTimeout(() => this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]), 50);
+      }
+    } catch (error) {
+      this.dataFiltro.set([]);
+      if (where === 'init') {
+        this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id });
+      } else {
+        fun.toastError('No se pudo realizar la búsqueda', 'ERROR');
+      }
+    }
   }
 
   tableClickRow(event) {

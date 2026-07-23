@@ -18,6 +18,7 @@
                 placeholder="Nombre Cliente"
                 class="form-control mb-4"
                 autocomplete="off"
+                [disabled]="!!clienteAdepositar()"
                 [ngClass]="{ disabled: !!clienteAdepositar() }" />
             </div>
             <div class="widget-footer">
@@ -123,7 +124,7 @@
     @if (facturas && facturas?.length) {
       <div class="d-flex justify-content-end gap-3">
         <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
-        <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+        <input [disabled]="!isOneFacturaWithMonto() || isSubmitting" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
       </div>
     }
   </div>

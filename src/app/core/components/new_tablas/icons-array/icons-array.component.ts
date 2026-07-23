@@ -32,6 +32,10 @@ export class IconsArrayComponent {
     return this.column.iconsArray.filter(objIcon => this.showIcon(objIcon, this.rowData));
   }
 
+  getIconTrack(objIcon, index: number) {
+    return objIcon.id || `${this.getIconKey(objIcon) || 'icon'}-${index}`;
+  }
+
   getIconKey(objIcon) {
     if (typeof objIcon.key == 'string') return objIcon.key;
     if (typeof objIcon.key == 'object') return objIcon.key.key;

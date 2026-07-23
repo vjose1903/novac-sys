@@ -94,7 +94,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
 
-    fun.setTimeout(() => {
+    window.setTimeout(() => {
       this.ready = true;
     }, 250);
   }
@@ -113,7 +113,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   handleConfig() {
-    fun.setTimeout(() => {
+    queueMicrotask(() => {
       if (!this.config.padding) this.config.padding = '0rem';
       if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
       if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
@@ -136,12 +136,12 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       this.config.info.map(item => {
         if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
       });
-    }, 0);
+    });
   }
 
   focusSearchInput() {
     if ('focusSearchInput' in this.config && this.config.focusSearchInput) {
-      fun.setTimeout(() => {
+      window.setTimeout(() => {
         fun.enfocarInput(`search-${this.realIdTabla}`);
       }, 100);
     }
@@ -277,7 +277,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   paginatorChange(event, id) {
-    fun.setTimeout(() => {
+    window.setTimeout(() => {
       this.zone.run(() => {
         const page = event.page + 1;
         const per_page = event.rows;
@@ -315,7 +315,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   localPagination(page, per_page) {
-    const copyData = fun.deepCloning(this.copyData);
+    const copyData = this.copyData || [];
 
     // Validar que page y per_page sean válidos
     if (!page || page <= 0 || !per_page || per_page <= 0) {
@@ -326,7 +326,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const inicio = (page - 1) * per_page;
     const final = inicio + per_page;
 
-    let dataParsed = copyData.slice(inicio, final);
+    let dataParsed = fun.deepCloning(copyData.slice(inicio, final));
 
     dataParsed = dataParsed.map(item => {
       const key = this.config.obj_paginate?.key ?? 'id';
@@ -394,7 +394,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       if (actualPage) {
         actualPage.setAttribute('clickeado_por', 'maquina');
         actualPage.click();
-        fun.setTimeout(() => {
+        window.setTimeout(() => {
           actualPage.removeAttribute('clickeado_por');
         }, 2000);
       }
@@ -508,7 +508,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   updateDataCopy(data) {
     if (!data) return;
 
-    this.copyData = fun.deepCloning(data);
+    this.copyData = this.config.copyDataDeep === false ? [...data] : fun.deepCloning(data);
 
     if (fun.hasValue(this.config.obj_paginate) && this.config.obj_paginate.is_local) {
       this.changeTableConfig([{ total_count: data.length }]);
@@ -523,9 +523,9 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       // ================================================
       // CUSTOM STYLES
       // ================================================
-      fun.setTimeout(() => {
+      queueMicrotask(() => {
         this.changeStylesTitles();
-      }, 0);
+      });
 
       // ================================================
 

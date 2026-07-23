@@ -1,5 +1,5 @@
 <div class="d-flex {{ column.div_class ? column.div_class : 'justify-content-center align-items-center ' }} w-100" [ngStyle]="{ 'column-gap': column.column_gap || 0 }">
-  @for (objIcon of visibleIcons; track objIcon.id) {
+  @for (objIcon of visibleIcons; track getIconTrack(objIcon, $index)) {
   <div>
     <span class="span_icon" [ngClass]="{ icon_disable: disableInput(rowData, objIcon) }">
       <i

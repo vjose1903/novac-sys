@@ -160,6 +160,7 @@ interface filtarI {
 
 export interface table_config {
   track_key?: string;
+  copyDataDeep?: boolean;
   focusSearchInput?: boolean;
   padding?: string;
   padre_functions?: padreFunctionsI;
