@@ -68,7 +68,7 @@
                       'bg-light': config.focusRow && RowElement.id == row_id,
                       'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData }),
                     }"
-                    style="cursor: pointer; color: var(--letras)"
+                    style="cursor: pointer"
                     [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
                     #RowElement
                     (click)="clickROW(rowData, getIndex(indexBody))">
@@ -227,7 +227,7 @@
                                   </span>
                                 }
                                 @default {
-                                  <span id="{{ column.key }}-{{ getIndex(indexBody) }}" class=" {{ rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'text-black' }}" style="width: 100%">
+                                  <span id="{{ column.key }}-{{ getIndex(indexBody) }}" [ngClass]="rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'table-cell-text'" style="width: 100%">
                                     {{ getValueForm(column, rowData) }}
                                     {{ column.alerta && config?.colores && rowData.danger ? '(Inactivo)' : '' }}
                                   </span>

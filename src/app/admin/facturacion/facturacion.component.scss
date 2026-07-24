@@ -158,14 +158,24 @@
   .cabezaFactura {
     grid-area: cabezaFactura;
     background-color: var(--primary01);
+    color: var(--app-accent-soft-text);
     border-radius: 1rem 1rem 0rem 0rem !important;
     padding: 0.6rem;
+
+    .titulos,
+    .control-label,
+    h5,
+    span:not(.text-danger),
+    strong {
+      color: var(--app-accent-soft-text);
+    }
   }
 
   .cuerpoFactura {
     grid-area: cuerpoFactura;
     width: 100%;
     position: relative;
+    background: var(--app-surface);
     .fantasma-cuerpo {
       position: absolute;
       height: 100%;
@@ -178,6 +188,9 @@
     width: 100%;
     display: flex;
     align-items: center;
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-radius: 0 0 1rem 1rem;
   }
 }
 
@@ -199,7 +212,7 @@
   background-color: var(--transparente01);
   display: flex;
   position: relative;
-  color: black;
+  color: var(--app-tinted-surface-text);
   border-radius: 0.5rem;
   padding: 0.4rem 0.5rem;
   > .label {

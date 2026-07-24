@@ -15,6 +15,7 @@ import { fun } from '@core/services/functions.service';
 import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
 import { serie } from '@core/typescript/constantes';
 import { IpcService } from '@core/services/ipc.service';
+import { ThemeMode, ThemeService } from '@core/services/theme.service';
 import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
 import { NavigationService } from '@core/services/navigation.service';
 import { ModalPasswordConfigComponent } from '../../login/extra/modal-password-config/modal-password-config.component';
@@ -63,6 +64,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   my_capitalize = fun.capitalice;
 
   copyToClipboardServ = inject(CopyToClipboardService);
+  themeServ = inject(ThemeService);
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -190,6 +192,23 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         if (err.msg) fun.toastError(err.msg, 'ERROR');
         else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
       });
+  }
+
+  changeThemeMode() {
+    const previous_config = { ...this.configApp };
+    const mode_app: ThemeMode = this.configApp.mode_app === 'dark' ? 'light' : 'dark';
+    const new_config = { ...this.configApp, mode_app };
+
+    this.themeServ.setTheme(new_config.color_app, mode_app);
+    this.configServ.config = new_config;
+
+    this._ipc.setAppConfig(new_config).catch(err => {
+      this.themeServ.setTheme(previous_config.color_app, previous_config.mode_app);
+      this.configServ.config = previous_config;
+      console.error(err);
+      if (err.msg) fun.toastError(err.msg, 'ERROR');
+      else fun.toastError('Error al cambiar el tema de la aplicación', 'ERROR');
+    });
   }
 
   verificarActualizaciones() {

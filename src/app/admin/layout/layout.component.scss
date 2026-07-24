@@ -87,7 +87,7 @@
       z-index: 1;
       .title {
         grid-area: title;
-        background-color: #c9c9c9;
+        background-color: var(--app-surface-muted);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -135,15 +135,18 @@
       .navBar {
         grid-area: navBar;
         height: 2rem;
-        box-shadow: 1px 1px 5px 0.2px #9c9c9c;
+        background: var(--app-surface);
+        box-shadow: var(--app-shadow);
         display: flex;
         justify-content: flex-end;
         align-items: center;
+        color: var(--app-text);
       }
 
       .contenido {
         grid-area: contenido;
-        background-color: #e4e4e4d2;
+        background-color: var(--app-bg);
+        color: var(--app-text);
         padding: 0.8rem 1rem;
         overflow-y: auto;
 
@@ -193,7 +196,8 @@
   max-width: 300px;
   min-width: 300px;
   margin: 0;
-  background: #fff;
+  background: var(--app-surface);
+  color: var(--app-text);
   padding: 0;
   list-style: none;
 
@@ -201,21 +205,26 @@
     padding: 0.5rem;
     background-color: var(--primary01);
 
-    h3 {
-      color: black;
+    h3,
+    h4,
+    p {
+      color: #1d253b;
     }
   }
 
   /* botones de opciones */
   .popover-item {
-    display: block;
-    color: #333;
+    display: flex;
+    align-items: center;
+    color: var(--app-text);
+    gap: 0.4rem;
+    justify-content: flex-start;
     padding: 15px 20px;
     font-size: 14px;
     cursor: pointer;
 
     &:hover {
-      background: #efefef;
+      background: var(--app-hover);
       text-decoration: none;
     }
 
@@ -259,7 +268,7 @@
 
 .sidenav-container {
   height: 100%;
-  background-color: #e4e4e4d2;
+  background-color: var(--app-bg);
   overflow: hidden;
   z-index: 0 !important;
 }
@@ -304,7 +313,7 @@
 }
 .right a {
   text-decoration-line: none;
-  color: black;
+  color: var(--app-text);
   font-size: 1rem;
 }
 

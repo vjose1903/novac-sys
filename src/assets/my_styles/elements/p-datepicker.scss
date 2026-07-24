@@ -26,11 +26,11 @@
 
         .p-datepicker-prev-button,
         .p-datepicker-next-button {
-          color: #000000a1 !important;
+          color: var(--app-text) !important;
           border-radius: 100%;
 
           &:hover {
-            background-color: #00000021 !important;
+            background-color: var(--app-hover) !important;
           }
 
           &:focus {
@@ -41,12 +41,12 @@
         .p-datepicker-title {
           .p-datepicker-select-month,
           .p-datepicker-select-year {
-            color: #000000a1 !important;
+            color: var(--app-text) !important;
             border-radius: 10rem;
             padding: 0.3rem 0.6rem !important;
 
             &:hover {
-              background-color: #00000021 !important;
+              background-color: var(--app-hover) !important;
             }
           }
         }
@@ -94,7 +94,7 @@
 
                   &::after {
                     content: 'Hoy';
-                    color: #000000a1 !important;
+                    color: var(--app-text) !important;
                     position: absolute;
                     top: -1.3rem;
                     display: none;

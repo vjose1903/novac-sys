@@ -1,5 +1,5 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore, doc, getDoc, setDoc, collection, query, where, limit, getDocs, addDoc, runTransaction } from 'firebase/firestore';
+import { getFirestore, Firestore, doc, getDoc, setDoc, collection, query, where, limit, getDocs, addDoc, runTransaction, deleteField } from 'firebase/firestore';
 import { ConfigI, EmpresaI } from '../src/app/core/interface/config-interface.js';
 import { pathAdd, writeLogs } from '../main';
 import MachineId from './machine-id.js';
@@ -28,7 +28,6 @@ const GENERAL_CONFIG_KEYS: Array<keyof ConfigI> = [
   'logo_empresa',
   'logo_impresion',
   'color_app',
-  'mode_app',
   'url_servidor',
   'url_servidor_respaldo',
   'config_password',
@@ -46,7 +45,7 @@ const GENERAL_CONFIG_KEYS: Array<keyof ConfigI> = [
   'medida_producto_terminado',
 ];
 
-const MACHINE_CONFIG_KEYS: Array<keyof ConfigI> = ['machineId', 'pages_sizes', 'printer_selected'];
+const MACHINE_CONFIG_KEYS: Array<keyof ConfigI> = ['machineId', 'mode_app', 'pages_sizes', 'printer_selected'];
 
 export default class FirebaseConfigHandler {
   private static instance: FirebaseConfigHandler;
@@ -339,8 +338,8 @@ export default class FirebaseConfigHandler {
       ...this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS),
     };
 
-    if (this.hasMissingKeys(currentGeneralConfig, GENERAL_CONFIG_KEYS)) {
-      await setDoc(generalConfigRef, this.removeUndefinedValues(normalizedGeneralConfig), { merge: true });
+    if (this.hasMissingKeys(currentGeneralConfig, GENERAL_CONFIG_KEYS) || !this.hasOnlyKeys(currentGeneralConfig, GENERAL_CONFIG_KEYS)) {
+      await setDoc(generalConfigRef, { ...this.removeUndefinedValues(normalizedGeneralConfig), mode_app: deleteField() }, { merge: true });
     }
 
     return normalizedGeneralConfig;
@@ -390,7 +389,7 @@ export default class FirebaseConfigHandler {
         machineId: this.machineId,
       };
 
-      await setDoc(this.getGeneralConfigRef(), this.removeUndefinedValues(generalConfig), { merge: true });
+      await setDoc(this.getGeneralConfigRef(), { ...this.removeUndefinedValues(generalConfig), mode_app: deleteField() }, { merge: true });
 
       const currentMachineConfig = await this.getMachineConfig();
       await this.upsertMachineConfig(machineConfig, currentMachineConfig.docRef);

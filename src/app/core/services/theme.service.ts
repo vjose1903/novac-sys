@@ -1,16 +1,21 @@
 import { Injectable } from '@angular/core';
 
+type ThemeColor = 'red' | 'blue' | 'green';
+export type ThemeMode = 'light' | 'dark';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
   constructor() {}
 
-  setTheme(newTreme) {
-    localStorage.setItem('theme', newTreme);
+  setTheme(newTheme: ThemeColor, mode: ThemeMode = this.getMode()) {
+    localStorage.setItem('theme', newTheme);
+    localStorage.setItem('theme-mode', mode);
 
     const availableThemes = { red: this.themeRed, blue: this.themeBlue, green: this.themeGreen };
-    availableThemes[newTreme]();
+    availableThemes[newTheme]?.call(this, mode);
+    this.setMode(mode);
   }
 
   getProperty(property) {
@@ -21,8 +26,107 @@ export class ThemeService {
     return localStorage.getItem('theme') || 'red';
   }
 
-  themeRed() {
+  getMode(): ThemeMode {
+    return (localStorage.getItem('theme-mode') as ThemeMode) || 'light';
+  }
+
+  setMode(mode: ThemeMode) {
+    localStorage.setItem('theme-mode', mode);
+
+    const documentElement = document.documentElement;
+    const rootStyle = documentElement.style;
+
+    documentElement.dataset.themeMode = mode;
+    document.body?.classList.toggle('theme-dark', mode === 'dark');
+    document.body?.classList.toggle('theme-light', mode !== 'dark');
+
+    if (mode === 'dark') {
+      rootStyle.setProperty('--app-bg', '#14171d');
+      rootStyle.setProperty('--app-bg-soft', '#1b2028');
+      rootStyle.setProperty('--app-surface', '#202631');
+      rootStyle.setProperty('--app-surface-soft', '#2a313d');
+      rootStyle.setProperty('--app-surface-muted', '#313946');
+      rootStyle.setProperty('--app-text', '#eef2f7');
+      rootStyle.setProperty('--app-text-muted', '#b4becb');
+      rootStyle.setProperty('--app-border', '#3a4554');
+      rootStyle.setProperty('--app-hover', '#333d4b');
+      rootStyle.setProperty('--app-input-bg', '#1c222b');
+      rootStyle.setProperty('--app-input-disabled-bg', '#303845');
+      rootStyle.setProperty('--app-shadow', '0 10px 24px -18px #000');
+      rootStyle.setProperty('--app-overlay-shadow', '0 12px 24px -14px #000');
+      rootStyle.setProperty('--app-button-shadow', '0 2px 4px 0 #0000007d');
+      rootStyle.setProperty('--app-table-header-bg', 'var(--primary02)');
+      rootStyle.setProperty('--app-table-header-text', '#edf2f7');
+      rootStyle.setProperty('--app-table-row-bg', '#252e39');
+      rootStyle.setProperty('--app-table-row-hover-bg', '#303a47');
+      rootStyle.setProperty('--app-table-row-selected-bg', '#334b3b');
+      rootStyle.setProperty('--app-table-text', '#edf2f7');
+      rootStyle.setProperty('--app-table-border', '#3f4a59');
+      rootStyle.setProperty('--app-paginator-button-text', '#6f7f93');
+      rootStyle.setProperty('--app-accent-soft-text', 'rgba(255, 255, 255, 0.86)');
+      rootStyle.setProperty('--app-tinted-surface-text', '#edf2f7');
+      rootStyle.setProperty('--app-modal-close-text', '#9aa8bd');
+      rootStyle.setProperty('--app-border-menu-item', '#0000004d');
+      return;
+    }
+
+    rootStyle.setProperty('--app-bg', '#e4e4e4d2');
+    rootStyle.setProperty('--app-bg-soft', '#f2f2f2');
+    rootStyle.setProperty('--app-surface', '#ffffff');
+    rootStyle.setProperty('--app-surface-soft', '#f8f9fa');
+    rootStyle.setProperty('--app-surface-muted', '#e9ecef');
+    rootStyle.setProperty('--app-text', '#1d253b');
+    rootStyle.setProperty('--app-text-muted', '#657081');
+    rootStyle.setProperty('--app-border', '#ced4da');
+    rootStyle.setProperty('--app-hover', '#efefef');
+    rootStyle.setProperty('--app-input-bg', '#ffffffe8');
+    rootStyle.setProperty('--app-input-disabled-bg', '#e9ecef');
+    rootStyle.setProperty('--app-shadow', '0 4px 14px -6px #000');
+    rootStyle.setProperty('--app-overlay-shadow', '0 5px 10px 0 #00000043');
+    rootStyle.setProperty('--app-button-shadow', '0 2px 3px 0 #a0a0a0');
+    rootStyle.setProperty('--app-table-header-bg', 'var(--primary06)');
+    rootStyle.setProperty('--app-table-header-text', '#101820');
+    rootStyle.setProperty('--app-table-row-bg', '#ffffff');
+    rootStyle.setProperty('--app-table-row-hover-bg', '#e9e9e9');
+    rootStyle.setProperty('--app-table-row-selected-bg', 'var(--transparente05)');
+    rootStyle.setProperty('--app-table-text', '#101820');
+    rootStyle.setProperty('--app-table-border', '#e5e5e554');
+    rootStyle.setProperty('--app-paginator-button-text', 'var(--app-text-muted)');
+    rootStyle.setProperty('--app-accent-soft-text', '#1d253b');
+    rootStyle.setProperty('--app-tinted-surface-text', '#101820');
+    rootStyle.setProperty('--app-modal-close-text', 'var(--app-text-muted)');
+    rootStyle.setProperty('--app-border-menu-item', '#41414163');
+  }
+
+  themeRed(mode: ThemeMode = 'light') {
     const documentElement = document.documentElement.style;
+
+    if (mode === 'dark') {
+      documentElement.setProperty('--transparente00', '#4b1f1f18');
+      documentElement.setProperty('--transparente01', '#6e3333c4');
+      documentElement.setProperty('--transparente02', '#7f3b3b73');
+      documentElement.setProperty('--transparente03', '#8b34345c');
+      documentElement.setProperty('--transparente04', '#9c2f2f85');
+      documentElement.setProperty('--transparente05', '#5c15156b');
+
+      documentElement.setProperty('--primary01', '#4a1f1f');
+      documentElement.setProperty('--primary02', '#5d2525');
+      documentElement.setProperty('--primary03', '#753030');
+      documentElement.setProperty('--primary04', '#8f3636');
+      documentElement.setProperty('--primary05', '#7a3838');
+      documentElement.setProperty('--primary06', '#9b303085');
+      documentElement.setProperty('--primary07', '#a92323');
+      documentElement.setProperty('--primary08', '#8b1717');
+      documentElement.setProperty('--primary09', '#6a1717');
+      documentElement.setProperty('--primary10', '#3f0f0f');
+
+      documentElement.setProperty('--secondary01', '#b65d13');
+      documentElement.setProperty('--secondary02', '#8d4e28');
+      documentElement.setProperty('--secondary03', '#6e4215');
+      documentElement.setProperty('--secondary04', '#513436');
+      documentElement.setProperty('--secondary05', '#372f2fd6');
+      return;
+    }
 
     documentElement.setProperty('--transparente00', '#98767612');
     documentElement.setProperty('--transparente01', '#a16363c4');
@@ -49,8 +153,35 @@ export class ThemeService {
     documentElement.setProperty('--secondary05', '#4d433dd6');
   }
 
-  themeBlue() {
+  themeBlue(mode: ThemeMode = 'light') {
     const documentElement = document.documentElement.style;
+
+    if (mode === 'dark') {
+      documentElement.setProperty('--transparente00', '#1d314818');
+      documentElement.setProperty('--transparente01', '#2a425bc4');
+      documentElement.setProperty('--transparente02', '#2f587373');
+      documentElement.setProperty('--transparente03', '#324a5f8f');
+      documentElement.setProperty('--transparente04', '#2f5f9285');
+      documentElement.setProperty('--transparente05', '#17375f6b');
+
+      documentElement.setProperty('--primary01', '#20394f');
+      documentElement.setProperty('--primary02', '#284b64');
+      documentElement.setProperty('--primary03', '#315f82');
+      documentElement.setProperty('--primary04', '#2d6c9f');
+      documentElement.setProperty('--primary05', '#365f7d');
+      documentElement.setProperty('--primary06', '#2c6fb285');
+      documentElement.setProperty('--primary07', '#21679d');
+      documentElement.setProperty('--primary08', '#175383');
+      documentElement.setProperty('--primary09', '#173e60');
+      documentElement.setProperty('--primary10', '#10283f');
+
+      documentElement.setProperty('--secondary01', '#b87919');
+      documentElement.setProperty('--secondary02', '#2197a0');
+      documentElement.setProperty('--secondary03', '#14757a');
+      documentElement.setProperty('--secondary04', '#1d4358');
+      documentElement.setProperty('--secondary05', '#2c3c40d6');
+      return;
+    }
 
     documentElement.setProperty('--transparente00', '#76889812');
     documentElement.setProperty('--transparente01', '#768898c4');
@@ -77,8 +208,35 @@ export class ThemeService {
     documentElement.setProperty('--secondary05', '#384d52d6');
   }
 
-  themeGreen() {
+  themeGreen(mode: ThemeMode = 'light') {
     const documentElement = document.documentElement.style;
+
+    if (mode === 'dark') {
+      documentElement.setProperty('--transparente00', '#1f402718');
+      documentElement.setProperty('--transparente01', '#315d3dc4');
+      documentElement.setProperty('--transparente02', '#3a6d4573');
+      documentElement.setProperty('--transparente03', '#34795273');
+      documentElement.setProperty('--transparente04', '#2c874585');
+      documentElement.setProperty('--transparente05', '#145d216b');
+
+      documentElement.setProperty('--primary01', '#24452b');
+      documentElement.setProperty('--primary02', '#2d6a3b');
+      documentElement.setProperty('--primary03', '#347a43');
+      documentElement.setProperty('--primary04', '#2e875d');
+      documentElement.setProperty('--primary05', '#3f7a49');
+      documentElement.setProperty('--primary06', '#2e9a4585');
+      documentElement.setProperty('--primary07', '#239128');
+      documentElement.setProperty('--primary08', '#1c761f');
+      documentElement.setProperty('--primary09', '#1b5a17');
+      documentElement.setProperty('--primary10', '#103c12');
+
+      documentElement.setProperty('--secondary01', '#a8a815');
+      documentElement.setProperty('--secondary02', '#789823');
+      documentElement.setProperty('--secondary03', '#657d12');
+      documentElement.setProperty('--secondary04', '#3d493f');
+      documentElement.setProperty('--secondary05', '#30322fd6');
+      return;
+    }
 
     documentElement.setProperty('--transparente00', '#76987b0f');
     documentElement.setProperty('--transparente01', '#779882c4');

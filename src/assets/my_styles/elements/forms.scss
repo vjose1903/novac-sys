@@ -12,10 +12,10 @@
 
 @mixin formField {
   width: 100%;
-  background-color: #ffffffe8;
-  color: #1d253b !important;
+  background-color: var(--app-input-bg) !important;
+  color: var(--app-text) !important;
   box-shadow: 1px 1px 4px 0px #1d253b3d !important;
-  border: 1px solid #ced4da !important;
+  border: 1px solid var(--app-border) !important;
   border-radius: 0.25rem !important;
   transition:
     background-color 0.2s,
@@ -34,10 +34,13 @@
 
 @mixin formFieldDisabled {
   background-color: #e9ecef !important;
+  background-color: var(--app-input-disabled-bg) !important;
   opacity: 1 !important;
 }
 
 @mixin formFieldFocus {
+  background-color: var(--app-input-bg) !important;
+  color: var(--app-text) !important;
   border-color: transparent !important;
   box-shadow: 0px 0px 6px var(--primary08) !important;
   outline: 2px solid var(--primary08) !important;
@@ -99,6 +102,7 @@ textarea {
   &.disabled,
   &:disabled {
     background-color: #e9ecef;
+    background-color: var(--app-input-disabled-bg);
     touch-action: none !important;
     pointer-events: none !important;
   }
@@ -111,8 +115,9 @@ textarea {
 
 .input-group-append {
   .input-group-text {
-    background-color: #e9ecef;
-    border-color: #ced4da;
+    background-color: var(--app-input-disabled-bg);
+    border-color: var(--app-border);
+    color: var(--app-text);
     height: 100%;
   }
 }
@@ -121,7 +126,7 @@ textarea {
   margin-bottom: 0.9rem;
 
   > label {
-    color: #1d253b;
+    color: var(--app-text);
   }
 
   &.horizontal-layout {

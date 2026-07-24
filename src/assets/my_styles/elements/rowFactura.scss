@@ -1,10 +1,37 @@
 @use './forms.scss' as *;
 
+:root {
+  --invoice-table-header-bg: #ffffff;
+  --invoice-table-header-text: #050505;
+  --invoice-table-header-border: #d7dde5;
+  --invoice-table-body-bg: var(--app-surface-muted);
+  --invoice-table-body-text: var(--app-text);
+  --invoice-table-border: var(--app-border);
+  --invoice-table-input-bg: var(--app-input-bg);
+  --invoice-table-input-text: var(--app-text);
+  --invoice-table-input-disabled-bg: var(--app-surface-muted);
+  --invoice-table-input-disabled-text: var(--app-text);
+}
+
+.theme-dark {
+  --invoice-table-header-bg: var(--app-table-header-bg);
+  --invoice-table-header-text: var(--app-table-header-text);
+  --invoice-table-header-border: #303947;
+  --invoice-table-body-bg: #2b3441;
+  --invoice-table-body-text: #edf2f7;
+  --invoice-table-border: #485363;
+  --invoice-table-input-bg: #202832;
+  --invoice-table-input-text: #f4f7fb;
+  --invoice-table-input-disabled-bg: #2b3441;
+  --invoice-table-input-disabled-text: #dce3ec;
+}
+
 @mixin entrada-focus {
   border: 2px solid var(--primary08) !important;
   box-shadow: none !important;
   outline: none !important;
-  background-color: var(--primary01) !important;
+  background-color: var(--app-input-bg) !important;
+  color: var(--app-text) !important;
 }
 
 .entrada {
@@ -12,7 +39,7 @@
   height: calc(1.5em + 0.3rem + 2px) !important;
   padding: 0rem 0.3rem 0rem 0.2rem !important;
   box-shadow: none !important;
-  border: 1px solid #ced4da !important;
+  border: 1px solid var(--app-border) !important;
 
   &:focus {
     @include entrada-focus;
@@ -37,6 +64,62 @@
 
 .panel-dropdown-unidad {
   min-width: 11rem !important;
+}
+
+.cuerpo-fact {
+  .titulos-fact {
+    background: var(--invoice-table-header-bg);
+    color: var(--invoice-table-header-text);
+    border-bottom: 1px solid var(--invoice-table-header-border);
+    margin-bottom: 0 !important;
+
+    th {
+      background: var(--invoice-table-header-bg);
+      color: var(--invoice-table-header-text);
+      border-color: var(--invoice-table-header-border);
+      border-bottom-color: var(--invoice-table-header-border);
+    }
+  }
+
+  .contenido-fact {
+    background: var(--invoice-table-body-bg);
+    color: var(--invoice-table-body-text);
+    border-top: 0;
+
+    .table-cuerpo-factura {
+      margin-bottom: 0;
+      color: var(--invoice-table-body-text);
+      border-top: 0;
+
+      tr {
+        background: var(--invoice-table-body-bg);
+      }
+
+      td {
+        border-color: var(--invoice-table-border);
+      }
+
+      .iconArrow {
+        color: var(--app-text-muted);
+      }
+
+      .entrada {
+        background-color: var(--invoice-table-input-bg) !important;
+        color: var(--invoice-table-input-text) !important;
+        border-color: var(--invoice-table-border) !important;
+
+        &::placeholder {
+          color: var(--app-text-muted);
+        }
+
+        &.disabled,
+        &:disabled {
+          background-color: var(--invoice-table-input-disabled-bg) !important;
+          color: var(--invoice-table-input-disabled-text) !important;
+        }
+      }
+    }
+  }
 }
 
 [tabindex='-1']:focus:not(:focus-visible):not(.entrada) {

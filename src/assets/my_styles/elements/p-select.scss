@@ -43,7 +43,9 @@
       padding: 0.2rem !important;
 
       .p-select-filter {
-        border: 1px solid #ced4da !important;
+        background: var(--app-input-bg) !important;
+        border: 1px solid var(--app-border) !important;
+        color: var(--app-text) !important;
         border-radius: 0.25rem !important;
 
         &:focus {
@@ -59,7 +61,7 @@
           text-wrap: wrap;
           &.p-select-option-selected {
             background-color: var(--transparente04) !important;
-            color: black;
+            color: var(--app-text);
             font-weight: 600;
           }
         }

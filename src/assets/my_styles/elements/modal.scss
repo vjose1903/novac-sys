@@ -6,7 +6,9 @@
   border: 0px solid transparent !important;
   border-radius: 0.5rem !important;
   overflow: hidden !important;
-  box-shadow: 0px 3px 11px 0px #00000057 !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  box-shadow: var(--app-overlay-shadow) !important;
 
   .p-dialog-header {
     background-color: var(--primary02) !important;
@@ -20,8 +22,11 @@
 
     .p-dialog-header-actions {
       .p-dialog-close-button {
+        color: var(--app-modal-close-text) !important;
+
         &:hover {
           background: #0000002e !important;
+          color: var(--app-text) !important;
         }
       }
     }
@@ -31,9 +36,13 @@
     // padding: 1rem !important;
     // height: inherit !important;
     // overflow: hidden;
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
   }
 
   .p-dialog-footer {
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
     padding: 0.7rem !important;
   }
 }

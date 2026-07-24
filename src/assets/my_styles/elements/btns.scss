@@ -92,7 +92,7 @@ input[type='text'] {
 }
 
 .btn-light-grey {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  box-shadow: var(--app-button-shadow);
   background-color: #e9e9e9 !important;
   color: black !important;
   border: 1px solid #e9e9e9 !important;
@@ -115,7 +115,7 @@ input[type='text'] {
 #btn-gris,
 .btn-gray,
 .btn-gris {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  box-shadow: var(--app-button-shadow);
   background-color: gray !important;
   color: white !important;
   border: 1px solid gray !important;
@@ -137,7 +137,7 @@ input[type='text'] {
 
 .btn-blanco,
 #btn-blanco {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  box-shadow: var(--app-button-shadow);
   background-color: #e9e9e9 !important;
   color: black !important;
   border: 1px solid #e9e9e9 !important;
@@ -160,7 +160,7 @@ input[type='text'] {
 .btn-verde,
 .btn-green,
 #btn-verde {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  box-shadow: var(--app-button-shadow);
   background-color: #1eb037 !important;
   color: white !important;
   border: 1px solid #1eb037 !important;
@@ -181,7 +181,7 @@ input[type='text'] {
 }
 
 .btn-tema {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  box-shadow: var(--app-button-shadow);
   background-color: var(--primary07) !important;
   color: white !important;
   border: 1px solid var(--primary07) !important;
@@ -211,7 +211,7 @@ input[type='text'] {
 
 .btn-amarillo,
 #btn-amarillo {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  box-shadow: var(--app-button-shadow);
   background-color: #ffef38 !important;
   color: #000000 !important;
   border: 1px solid #ffef38 !important;
@@ -233,7 +233,7 @@ input[type='text'] {
 
 .btn-azul,
 #btn-azul {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  box-shadow: var(--app-button-shadow);
   background-color: #3b82f6 !important;
   color: white !important;
   border: 1px solid #3b82f6 !important;
@@ -255,7 +255,7 @@ input[type='text'] {
 
 .btn-danger,
 #btn-danger {
-  box-shadow: 0px 2px 3px 0px #a0a0a0;
+  box-shadow: var(--app-button-shadow);
   background-color: #fc2c2c !important;
   color: white !important;
   border: 1px solid #fc2c2c !important;

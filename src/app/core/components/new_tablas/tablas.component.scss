@@ -42,7 +42,8 @@
     .divTable {
       overflow: auto;
       position: absolute;
-      box-shadow: 0px 1px 5px 1px #00000014;
+      box-shadow: var(--app-shadow);
+      color: var(--app-text);
       &.redondo {
         border-radius: 13px;
         .myTable {
@@ -77,11 +78,12 @@
           }
 
           &.colorTitulo {
-            background: var(--primary06);
+            background: var(--app-table-header-bg);
+            color: var(--app-table-header-text);
           }
 
           &.noColorTitulo {
-            background: #c6c6c6a8;
+            background: var(--app-surface-muted);
           }
 
           .thHead {
@@ -114,9 +116,11 @@
               display: table;
               width: 100%;
               table-layout: fixed;
+              background: var(--app-table-row-bg);
+              color: var(--app-table-text);
 
               &.bg-selected {
-                background: var(--transparente05) !important;
+                background: var(--app-table-row-selected-bg) !important;
               }
 
               &.danger {
@@ -134,22 +138,23 @@
               }
 
               &.bg-light {
-                background-color: #dbd8d8 !important;
+                background-color: var(--app-surface-muted) !important;
               }
 
               &.bg-more-light {
-                background-color: #e9e9e9 !important;
+                background-color: var(--app-surface-soft) !important;
               }
 
               &:hover {
-                background-color: #e9e9e9 !important;
+                background-color: var(--app-table-row-hover-bg) !important;
               }
 
               > td {
                 text-align: center;
                 border-top: 0px solid transparent !important;
-                border-bottom: 0.5px solid #e5e5e554;
+                border-bottom: 0.5px solid var(--app-table-border);
                 vertical-align: middle !important;
+                color: inherit;
 
                 padding: 0.6rem 0rem;
                 &:first-child {
@@ -185,6 +190,10 @@
                 &.btnAccion {
                 }
               }
+            }
+
+            .table-cell-text {
+              color: inherit !important;
             }
           }
         }

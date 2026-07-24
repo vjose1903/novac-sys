@@ -14,9 +14,11 @@
     min-width: 2rem !important;
     height: 2rem !important;
     border-radius: 0.4rem !important;
+    color: var(--app-paginator-button-text) !important;
 
     &:hover {
-      background: #efefef !important;
+      background: var(--app-hover) !important;
+      color: var(--app-text) !important;
     }
 
     &.p-disabled {
@@ -26,9 +28,11 @@
 
   .p-paginator-pages {
     .p-paginator-page {
+      color: var(--app-text) !important;
       font-size: 0.75rem;
       &.p-paginator-page-selected {
         background-color: var(--primary07) !important;
+        color: #ffffff !important;
         
         &:hover {
           background-color: var(--primary08) !important;
@@ -45,7 +49,9 @@
 
   .p-select {
     max-width: 4.5rem !important;
-    border: 1px solid #a6a6a6a6 !important;
+    background: var(--app-input-bg) !important;
+    color: var(--app-text) !important;
+    border: 1px solid var(--app-border) !important;
     padding: 0.25rem 0.3rem;
     border-radius: 0.3rem;
 
@@ -56,9 +62,14 @@
 
     .p-select-label {
       width: 2rem;
+      color: var(--app-text) !important;
       padding: 0 !important;
       background-color: transparent !important;
       border: 0px solid transparent !important;
+    }
+
+    .p-select-dropdown {
+      color: var(--app-text) !important;
     }
   }
 }
