@@ -60,9 +60,9 @@ export default class SplashHandler {
       writeLogs(`Tipo de splash: ${type}`, 'createSplash');
 
       this.splash = new BrowserWindow({
-        width: 650,
+        width: 850,
         minWidth: 650,
-        height: 500,
+        height: 700,
         minHeight: 500,
         transparent: true,
         frame: false,
