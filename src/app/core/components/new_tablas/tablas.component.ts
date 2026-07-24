@@ -17,19 +17,24 @@ import { ResizeEvent } from '@core/directive/element-resized.directive';
 export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   ready = false;
 
-  @HostListener('window:keyup', ['$event'])
+  @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: any) {
     if (!this.tServ.blockRowMovement && this.config.focusRow && this.ready) {
       const key = event.keyCode;
 
-      if (key == teclasCode._arriba) this.mover_foco('up');
-      else if (key == teclasCode._abajo) this.mover_foco('down');
-      else if (key == teclasCode._enter) this.ENTER(this.row_id);
+      if (key == teclasCode._arriba) {
+        event.preventDefault();
+        this.mover_foco('up');
+      } else if (key == teclasCode._abajo) {
+        event.preventDefault();
+        this.mover_foco('down');
+      } else if (key == teclasCode._enter) this.ENTER(this.row_id);
     }
   }
 
   row_id;
   actualRowIndex = 0;
+  scrollToTopOnNextData = false;
   copyData: any;
 
   seleccionado_id: any;
@@ -228,21 +233,25 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     if ([teclasCode._abajo, teclasCode._arriba, teclasCode._izquierda, teclasCode._derecha, teclasCode._enter].includes(event.keyCode)) return;
 
     const search = event.target.value;
+    this.resetRowFocus();
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
       fun.awaitTyping(event).then(() => {
         if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
           const actualPagination = this.getActualPagination();
+          let page = actualPagination.page;
 
           if (fun.hasValue(search)) {
             if (fun.isEmpty(actualPagination.ant_page)) this.tServ.modifyPaginationById(this.realIdTabla, [{ ant_page: actualPagination.page }]);
-            this.tServ.modifyPaginationById(this.realIdTabla, [{ page: 1 }]);
+            page = 1;
+            this.tServ.modifyPaginationById(this.realIdTabla, [{ page }]);
           } else if (fun.isEmpty(search) && fun.hasValue(actualPagination.ant_page)) {
-            this.tServ.modifyPaginationById(this.realIdTabla, [{ page: actualPagination.ant_page }]);
+            page = actualPagination.ant_page;
+            this.tServ.modifyPaginationById(this.realIdTabla, [{ page }]);
             this.tServ.modifyPaginationById(this.realIdTabla, [{ ant_page: null }]);
           }
 
-          this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page: actualPagination.page, search: search });
+          this.config.padre_functions.data_request({ per_page: actualPagination.per_page, page, search: search });
         } else {
           fun.logRed('----- Debe de especificar en la configuracion de la tabla cual es la funcion para pedir la data ----- ');
         }
@@ -350,6 +359,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   dataLocalFilter(newData) {
     this.data.length = 0;
     newData.forEach(dato => this.data.push(dato));
+    this.resetRowFocus();
+    window.setTimeout(() => this.scrollToFirstRow(), 50);
     const id = this.realIdTabla;
     const actualPagination = this.tServ.getPaginationById(id);
 
@@ -534,6 +545,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       // ================================================
 
       this.updateTablasComponent();
+
+      if (this.scrollToTopOnNextData) {
+        this.scrollToTopOnNextData = false;
+        window.setTimeout(() => this.scrollToFirstRow(), 50);
+      }
     }
   }
 
@@ -699,6 +715,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   // ========================================================================
 
   mover_foco(direccion: 'up' | 'down') {
+    if (!this.data || this.data.length == 0) return;
+
+    const activeElement = document.activeElement as HTMLElement;
+    const searchInputHasFocus = activeElement?.id === `search-${this.realIdTabla}`;
+
     if (direccion == 'up') {
       if (this.actualRowIndex == 0) this.actualRowIndex = this.data.length - 1;
       else this.actualRowIndex = this.actualRowIndex - 1;
@@ -710,7 +731,26 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
 
     fun.scrollTo({ id: this.row_id, behavior: 'smooth', block: 'center', inline: 'center' });
-    fun.enfocarInput(this.row_id);
+
+    if (searchInputHasFocus) activeElement.focus();
+    else fun.enfocarInput(this.row_id);
+  }
+
+  resetRowFocus() {
+    this.actualRowIndex = 0;
+    this.row_id = `row-${this.realIdTabla}-${this.actualRowIndex}`;
+    this.scrollToTopOnNextData = true;
+  }
+
+  scrollToFirstRow() {
+    const tableBody = document.getElementById(`body_${this.realIdTabla}`)?.parentElement;
+
+    if (tableBody) {
+      tableBody.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    document.getElementById(`row-${this.realIdTabla}-0`)?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
   }
 
   ENTER(arg) {

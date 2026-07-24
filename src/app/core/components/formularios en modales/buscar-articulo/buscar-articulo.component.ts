@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, signal } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, signal } from '@angular/core';
 import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';
 import { TablasService } from '../../new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -13,7 +13,7 @@ import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-mo
   styleUrls: ['./buscar-articulo.component.scss'],
   standalone: false,
 })
-export class BuscarArticuloComponent extends MixinClass implements IDynamicModal, AfterViewInit {
+export class BuscarArticuloComponent extends MixinClass implements IDynamicModal, OnInit, AfterViewInit {
   articuloClass = new ArticuloC(); 
   constructor(private tServ: TablasService) {
     super();
@@ -34,6 +34,8 @@ export class BuscarArticuloComponent extends MixinClass implements IDynamicModal
       { titulo: 'Existencia', tipo: tableCellType.quantityTooltip, key: 'cantidades' },
     ],
     focusRow: true,
+    focusSearchInput: true,
+    filtrar: { show: true, local: false },
     id_tabla: 'buscar_articulo',
     padre_functions: { data_request: params => this.buscarArticulos(params) },
     obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
@@ -43,15 +45,38 @@ export class BuscarArticuloComponent extends MixinClass implements IDynamicModal
 
   btn_aceptar() {}
 
+  ngOnInit(): void {
+    this.table_config.obj_paginate.search = this.getPalabraABuscar();
+  }
+
   ngAfterViewInit(): void {
     if (this.metodo === tipoDocFacturacion.compra) this.table_config.info.push({ titulo: 'Costo', tipo: tableCellType.formatoNumero, key: 'costo_principal' });
     else this.table_config.info.push({ titulo: 'Precio', tipo: tableCellType.formatoNumero, key: 'precio_principal' });
-    
+
+    this.setInitialSearchValue();
     this.buscarArticulos(this.tServ.obj_paginate.default, 'init');
   }
 
+  getPalabraABuscar() {
+    return this.palabra_a_buscar || ' ';
+  }
+
+  setInitialSearchValue() {
+    const search = this.getPalabraABuscar();
+
+    this.tServ.modifyPaginationById(this.table_config.id_tabla, [
+      { search },
+      { page: 1 },
+    ]);
+
+    window.setTimeout(() => {
+      const searchInput = document.getElementById(`search-${this.table_config.id_tabla}`) as HTMLInputElement;
+      if (searchInput) searchInput.value = search.trim();
+    }, 150);
+  }
+
   async buscarArticulos(params?: { per_page: number; page: number; search: string }, where?) {
-    let palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
+    let palabra_a_buscar = where == 'init' ? this.getPalabraABuscar() : params.search || ' ';
 
     const is_compra = this.metodo === 'compra';
 
@@ -72,7 +97,13 @@ export class BuscarArticuloComponent extends MixinClass implements IDynamicModal
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       }
     } catch (error) {
-      this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id, index: this.index });
+      this.dataFiltro.set([]);
+
+      if (this.tablaComponent?.changeTableConfig) {
+        this.tablaComponent.changeTableConfig([{ total_count: 0 }]);
+      }
+
+      if (where == 'init') this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id, index: this.index });
     }
   }
 
