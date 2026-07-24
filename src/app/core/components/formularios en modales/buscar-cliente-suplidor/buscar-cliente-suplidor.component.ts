@@ -34,6 +34,8 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   @Input() after_select: any = null;
 
   paraFiltroClientes;
+  clienteSortFields = ['id', 'nombre', 'apellido', 'telefono', 'direccion', 'limite_credito', 'maximo_credito', 'balance', 'created_at', 'updated_at'];
+  suplidorSortFields = ['id', 'nombre', 'telefono', 'direccion', 'email', 'created_at', 'updated_at'];
 
   table_config: table_config = {
     info: [],
@@ -47,18 +49,18 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   tablaComponent: any;
 
   ventaInfo: table_info[] = [
-    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
-    { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Nombre', tipo: 'text', key: 'nombre', sort: { key: 'nombre', order: null } },
+    { titulo: 'Apellido', tipo: 'text', key: 'apellido', sort: { key: 'apellido', order: null } },
+    { titulo: 'Teléfono', tipo: 'text', key: 'telefono', sort: { key: 'telefono', order: null } },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
+    { titulo: 'Direccion', tipo: 'text', key: 'direccion', sort: { key: 'direccion', order: null } },
   ];
 
   compraInfo: table_info[] = [
-    { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-    { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
+    { titulo: 'Nombre', tipo: 'text', key: 'nombre', sort: { key: 'nombre', order: null } },
+    { titulo: 'Teléfono', tipo: 'text', key: 'telefono', sort: { key: 'telefono', order: null } },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
+    { titulo: 'Direccion', tipo: 'text', key: 'direccion', sort: { key: 'direccion', order: null } },
   ];
   configApp!: ConfigI;
   isSuplidor: boolean = false;
@@ -77,9 +79,10 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
 
     const palabra_a_buscar = where == 'init' ? this.palabra_a_buscar : params.search || ' ';
     const service = this.isSuplidor ? this.suplidorClass : this.clienteClass;
+    const sort = this.getSortParams();
 
     try {
-      const res = await service.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } });
+      const res = await service.getAll({ afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, ...sort } });
 
       if (res.data && res.data.length > 0) {
         this.dataFiltro.set(this.mapEntidadesFiltro(res.data, palabra_a_buscar));
@@ -100,6 +103,26 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
         fun.toastError('No se pudo realizar la búsqueda', 'ERROR');
       }
     }
+  }
+
+  getSortParams() {
+    const sort = this.tServ.parseSort(this.table_config);
+    if (!fun.hasValue(sort.order_by)) return {};
+
+    const allowedFields = this.isSuplidor ? this.suplidorSortFields : this.clienteSortFields;
+    const orderBy = sort.order_by
+      .split(',')
+      .map(item => {
+        const [campo, direccion = 'asc'] = item.split(':');
+        if (!allowedFields.includes(campo)) return null;
+        return `${campo}:${direccion == 'desc' ? 'desc' : 'asc'}`;
+      })
+      .filter(item => fun.hasValue(item));
+
+    if (!this.isSuplidor && orderBy.length == 1 && orderBy[0].startsWith('nombre:')) orderBy.push('apellido:asc');
+    if (!this.isSuplidor && orderBy.length == 1 && orderBy[0].startsWith('apellido:')) orderBy.push('nombre:asc');
+
+    return orderBy.length ? { order_by: orderBy.join(',') } : {};
   }
 
   mapEntidadesFiltro(data: any[], palabra_a_buscar: string) {

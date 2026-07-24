@@ -41,15 +41,16 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   clienteClass = new ClienteC();
   empleadosClass = new EmpleadoC();
   provinciaClass = new ProvinciaC();
+  clienteSortFields = ['id', 'nombre', 'apellido', 'telefono', 'direccion', 'limite_credito', 'maximo_credito', 'balance', 'created_at', 'updated_at'];
   fun = fun;
   permissions = Permisos;
   formPermissions = [Permisos.cliente.create, Permisos.cliente.update];
 
   table_config: table_config = {
     info: [
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-      { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
-      { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre', sort: { key: 'nombre', order: null } },
+      { titulo: 'Apellido', tipo: 'text', key: 'apellido', sort: { key: 'apellido', order: null } },
+      { titulo: 'Telefono', tipo: 'text', key: 'telefono', sort: { key: 'telefono', order: null } },
       { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     ],
     colores: true,
@@ -180,8 +181,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   async getClientes(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const sort = this.getClientesSortParams();
 
-    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, ...sort } };
 
     this.clienteClass.getAll(extra).then(res => {
       res['data'].map(cliente => {
@@ -194,6 +196,25 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
+  }
+
+  getClientesSortParams() {
+    const sort = this.tServ.parseSort(this.table_config);
+    if (!fun.hasValue(sort.order_by)) return {};
+
+    const orderBy = sort.order_by
+      .split(',')
+      .map(item => {
+        const [campo, direccion = 'asc'] = item.split(':');
+        if (!this.clienteSortFields.includes(campo)) return null;
+        return `${campo}:${direccion == 'desc' ? 'desc' : 'asc'}`;
+      })
+      .filter(item => fun.hasValue(item));
+
+    if (orderBy.length == 1 && orderBy[0].startsWith('nombre:')) orderBy.push('apellido:asc');
+    if (orderBy.length == 1 && orderBy[0].startsWith('apellido:')) orderBy.push('nombre:asc');
+
+    return orderBy.length ? { order_by: orderBy.join(',') } : {};
   }
 
   getPhotoData(img) {

@@ -45,11 +45,12 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   camposDisabled: boolean = true;
   editando: boolean = false;
   suplidorClass = new SuplidorC();
+  suplidorSortFields = ['id', 'nombre', 'telefono', 'direccion', 'email', 'created_at', 'updated_at'];
   permissions = Permisos;
   table_config: table_config = {
     info: [
       { titulo: 'Cod.', tipo: 'text', key: 'codigo' },
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre', sort: { key: 'nombre', order: null } },
       { titulo: 'Rnc', tipo: 'text', key: 'documento_identidad' },
     ],
 
@@ -112,8 +113,9 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
 
   async getSuplidores(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const sort = this.getSuplidoresSortParams();
 
-    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, ...sort } };
 
     this.listaSuplidores.length = 0;
     this.suplidorClass.getAll(extra).then(res => {
@@ -128,6 +130,22 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
       this.listaSuplidores = res['data'];
       this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
     });
+  }
+
+  getSuplidoresSortParams() {
+    const sort = this.tServ.parseSort(this.table_config);
+    if (!fun.hasValue(sort.order_by)) return {};
+
+    const orderBy = sort.order_by
+      .split(',')
+      .map(item => {
+        const [campo, direccion = 'asc'] = item.split(':');
+        if (!this.suplidorSortFields.includes(campo)) return null;
+        return `${campo}:${direccion == 'desc' ? 'desc' : 'asc'}`;
+      })
+      .filter(item => fun.hasValue(item));
+
+    return orderBy.length ? { order_by: orderBy.join(',') } : {};
   }
 
   marcarCheck(arg) {
