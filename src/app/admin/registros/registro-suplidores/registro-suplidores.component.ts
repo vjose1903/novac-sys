@@ -45,7 +45,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   camposDisabled: boolean = true;
   editando: boolean = false;
   suplidorClass = new SuplidorC();
-  suplidorSortFields = ['id', 'nombre', 'telefono', 'direccion', 'email', 'created_at', 'updated_at'];
+  suplidorSortFields = ['nombre'];
   permissions = Permisos;
   table_config: table_config = {
     info: [

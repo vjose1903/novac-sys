@@ -34,8 +34,8 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   @Input() after_select: any = null;
 
   paraFiltroClientes;
-  clienteSortFields = ['id', 'nombre', 'apellido', 'telefono', 'direccion', 'limite_credito', 'maximo_credito', 'balance', 'created_at', 'updated_at'];
-  suplidorSortFields = ['id', 'nombre', 'telefono', 'direccion', 'email', 'created_at', 'updated_at'];
+  clienteSortFields = ['nombre', 'apellido'];
+  suplidorSortFields = ['nombre'];
 
   table_config: table_config = {
     info: [],
@@ -51,16 +51,16 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
   ventaInfo: table_info[] = [
     { titulo: 'Nombre', tipo: 'text', key: 'nombre', sort: { key: 'nombre', order: null } },
     { titulo: 'Apellido', tipo: 'text', key: 'apellido', sort: { key: 'apellido', order: null } },
-    { titulo: 'Teléfono', tipo: 'text', key: 'telefono', sort: { key: 'telefono', order: null } },
+    { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Direccion', tipo: 'text', key: 'direccion', sort: { key: 'direccion', order: null } },
+    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
 
   compraInfo: table_info[] = [
     { titulo: 'Nombre', tipo: 'text', key: 'nombre', sort: { key: 'nombre', order: null } },
-    { titulo: 'Teléfono', tipo: 'text', key: 'telefono', sort: { key: 'telefono', order: null } },
+    { titulo: 'Teléfono', tipo: 'text', key: 'telefono' },
     { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
-    { titulo: 'Direccion', tipo: 'text', key: 'direccion', sort: { key: 'direccion', order: null } },
+    { titulo: 'Direccion', tipo: 'text', key: 'direccion' },
   ];
   configApp!: ConfigI;
   isSuplidor: boolean = false;

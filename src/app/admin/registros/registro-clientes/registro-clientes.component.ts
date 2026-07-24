@@ -41,7 +41,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   clienteClass = new ClienteC();
   empleadosClass = new EmpleadoC();
   provinciaClass = new ProvinciaC();
-  clienteSortFields = ['id', 'nombre', 'apellido', 'telefono', 'direccion', 'limite_credito', 'maximo_credito', 'balance', 'created_at', 'updated_at'];
+  clienteSortFields = ['nombre', 'apellido'];
   fun = fun;
   permissions = Permisos;
   formPermissions = [Permisos.cliente.create, Permisos.cliente.update];
@@ -50,7 +50,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     info: [
       { titulo: 'Nombre', tipo: 'text', key: 'nombre', sort: { key: 'nombre', order: null } },
       { titulo: 'Apellido', tipo: 'text', key: 'apellido', sort: { key: 'apellido', order: null } },
-      { titulo: 'Telefono', tipo: 'text', key: 'telefono', sort: { key: 'telefono', order: null } },
+      { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
       { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     ],
     colores: true,
