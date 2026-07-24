@@ -29,6 +29,7 @@
 
   &:hover {
     cursor: pointer;
+    border-color: var(--app-input-hover-border) !important;
   }
 }
 
@@ -85,7 +86,7 @@ textarea {
   border-radius: 0.25rem !important;
 
   &:hover {
-    border-color: #ced4da !important;
+    border-color: var(--app-input-hover-border) !important;
   }
 
   &:focus {
@@ -144,7 +145,7 @@ textarea {
     @include formFieldFocus;
   }
   &:hover {
-    border-color: #20b9d5;
+    border-color: var(--app-input-hover-border) !important;
   }
 }
 

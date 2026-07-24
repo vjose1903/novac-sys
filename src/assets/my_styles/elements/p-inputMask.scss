@@ -15,14 +15,14 @@
 
     &:disabled,
     &[disabled] {
-      background-color: #e9ecef !important;
-      border: 1px solid #ced4da !important;
+      background-color: var(--app-input-disabled-bg) !important;
+      border: 1px solid var(--app-border) !important;
       box-shadow: none !important;
       opacity: 1 !important;
-      color: #1d253b !important;
+      color: var(--app-input-disabled-text) !important;
       cursor: not-allowed !important;
-      pointer-events: none !important;
-      -webkit-text-fill-color: #1d253b !important;
+      pointer-events: auto !important;
+      -webkit-text-fill-color: var(--app-input-disabled-text) !important;
     }
   }
 
@@ -41,7 +41,7 @@
 
     input {
       @include formFieldDisabled;
-      border-color: #ced4da !important;
+      border-color: var(--app-border) !important;
       box-shadow: none !important;
     }
   }
@@ -54,7 +54,12 @@
   &:has(> .p-inputtext:disabled),
   &:has(> .p-inputtext[disabled]) {
     cursor: not-allowed !important;
-    pointer-events: none !important;
+    pointer-events: auto !important;
     user-select: none !important;
+  }
+
+  &:has(input:disabled),
+  &:has(input[disabled]) {
+    cursor: not-allowed !important;
   }
 }

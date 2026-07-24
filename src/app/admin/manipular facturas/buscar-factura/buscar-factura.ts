@@ -4,7 +4,7 @@ export class BuscarFacturaC {
   static tables_config = {
     venta: {
       info: [
-        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: '', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
         { titulo: 'No. Factura', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
         { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
         { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '9rem' }] },
@@ -33,7 +33,7 @@ export class BuscarFacturaC {
 
     compra: {
       info: [
-        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: '', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
         { titulo: 'No. Factura', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
         { titulo: 'Tipo', tipo: 'text', key: 'tipo_factura' },
         { titulo: 'Comprobante', tipo: 'text', key: 'numero_comprobante', estilos: [{ width: '9rem' }] },
@@ -58,7 +58,7 @@ export class BuscarFacturaC {
 
     pre_venta: {
       info: [
-        { titulo: '1', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
+        { titulo: '', tipo: 'icon', key: 'estado', estilos: [{ width: '2rem' }, { color: 'var(--transparente00)' }], iconsArray: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }] },
         { titulo: 'No. Pre-venta', tipo: 'text', key: 'secuencia', estilos: [{ width: '7rem' }] },
         { titulo: 'Fecha', tipo: 'date', key: 'fecha_equivalente' },
         { titulo: 'Cliente', tipo: 'text', key: 'cliente.nombre' },

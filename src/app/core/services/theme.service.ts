@@ -69,6 +69,7 @@ export class ThemeService {
       rootStyle.setProperty('--app-text', '#eef2f7');
       rootStyle.setProperty('--app-text-muted', '#b4becb');
       rootStyle.setProperty('--app-border', '#3a4554');
+      rootStyle.setProperty('--app-input-hover-border', '#526071');
       rootStyle.setProperty('--app-drawer-divider', 'var(--app-bg-soft)');
       rootStyle.setProperty('--app-hover', '#333d4b');
       rootStyle.setProperty('--app-select-option-selected-bg', '#3a4554');
@@ -81,6 +82,8 @@ export class ThemeService {
       rootStyle.setProperty('--app-no-receipt-button-hover', '#29303bab');
       rootStyle.setProperty('--app-popover-account-name', '#ffffff');
       rootStyle.setProperty('--app-popover-account-email', 'rgba(255, 255, 255, 0.72)');
+      rootStyle.setProperty('--app-footer-text', 'rgba(255, 255, 255, 0.82)');
+      rootStyle.setProperty('--app-black-text', 'var(--app-text)');
       rootStyle.setProperty('--app-scrollbar-thumb', 'var(--app-border)');
       rootStyle.setProperty('--app-scrollbar-thumb-hover', 'var(--app-border)');
       rootStyle.setProperty('--app-row-action-bg', 'var(--app-surface-soft)');
@@ -90,6 +93,7 @@ export class ThemeService {
       rootStyle.setProperty('--app-row-action-disabled-text', 'color-mix(in srgb, var(--app-text) 25%, transparent)');
       rootStyle.setProperty('--app-input-bg', '#1c222b');
       rootStyle.setProperty('--app-input-disabled-bg', '#303845');
+      rootStyle.setProperty('--app-input-disabled-text', 'rgba(238, 242, 247, 0.62)');
       rootStyle.setProperty('--app-shadow', '0 10px 24px -18px #000');
       rootStyle.setProperty('--app-overlay-shadow', '0 12px 24px -14px #000');
       rootStyle.setProperty('--app-button-shadow', '0 2px 4px 0 #0000007d');
@@ -121,6 +125,7 @@ export class ThemeService {
     rootStyle.setProperty('--app-text', '#1d253b');
     rootStyle.setProperty('--app-text-muted', '#657081');
     rootStyle.setProperty('--app-border', '#ced4da');
+    rootStyle.setProperty('--app-input-hover-border', '#98a5b2');
     rootStyle.setProperty('--app-drawer-divider', 'var(--app-border)');
     rootStyle.setProperty('--app-hover', '#efefef');
     rootStyle.setProperty('--app-select-option-selected-bg', '#e9ecef');
@@ -133,6 +138,8 @@ export class ThemeService {
     rootStyle.setProperty('--app-no-receipt-button-hover', '#0000000e');
     rootStyle.setProperty('--app-popover-account-name', '#000000');
     rootStyle.setProperty('--app-popover-account-email', '#000000b3');
+    rootStyle.setProperty('--app-footer-text', '#ffffff');
+    rootStyle.setProperty('--app-black-text', '#000000');
     rootStyle.setProperty('--app-scrollbar-thumb', '#c1c1c1');
     rootStyle.setProperty('--app-scrollbar-thumb-hover', '#919191');
     rootStyle.setProperty('--app-row-action-bg', '#bbbbbbd7');
@@ -142,6 +149,7 @@ export class ThemeService {
     rootStyle.setProperty('--app-row-action-disabled-text', '#adacac');
     rootStyle.setProperty('--app-input-bg', '#ffffffe8');
     rootStyle.setProperty('--app-input-disabled-bg', '#e9ecef');
+    rootStyle.setProperty('--app-input-disabled-text', '#1d253b');
     rootStyle.setProperty('--app-shadow', '0 4px 14px -6px #000');
     rootStyle.setProperty('--app-overlay-shadow', '0 5px 10px 0 #00000043');
     rootStyle.setProperty('--app-button-shadow', '0 2px 3px 0 #a0a0a0');

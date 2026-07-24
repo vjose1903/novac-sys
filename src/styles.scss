@@ -119,6 +119,7 @@ body {
   --app-text: #1d253b;
   --app-text-muted: #657081;
   --app-border: #ced4da;
+  --app-input-hover-border: #98a5b2;
   --app-drawer-divider: var(--app-border);
   --app-hover: #efefef;
   --app-select-option-selected-bg: #e9ecef;
@@ -131,6 +132,8 @@ body {
   --app-no-receipt-button-hover: #0000000e;
   --app-popover-account-name: #000000;
   --app-popover-account-email: #000000b3;
+  --app-footer-text: #ffffff;
+  --app-black-text: #000000;
   --app-scrollbar-thumb: #c1c1c1;
   --app-scrollbar-thumb-hover: #919191;
   --app-row-action-bg: #bbbbbbd7;
@@ -141,6 +144,7 @@ body {
   --app-input-bg: #ffffffe8;
   --app-input-focus-bg: var(--primary01);
   --app-input-disabled-bg: #e9ecef;
+  --app-input-disabled-text: #1d253b;
   --app-shadow: 0 4px 14px -6px #000;
   --app-overlay-shadow: 0 5px 10px 0 #00000043;
   --app-button-shadow: 0 2px 3px 0 #a0a0a0;
@@ -178,7 +182,7 @@ body {
 .border,
 .border-primary-subtle,
 .border-success-subtle {
-  border-color: var(--app-border) !important;
+  border-color: var(--app-input-hover-border) !important;
 }
 
 .p-dialog,
@@ -224,6 +228,16 @@ select option:focus,
 select option:hover {
   background-color: var(--app-hover) !important;
   color: var(--app-text) !important;
+}
+
+input[type='text']:not(:focus):hover,
+input[type='number']:not(:focus):hover,
+textarea:not(:focus):hover,
+select:not(:focus):hover,
+.p-inputtext:not(:focus):hover,
+.p-inputnumber-input:not(:focus):hover,
+.p-inputmask input:not(:focus):hover {
+  border-color: var(--app-input-hover-border) !important;
 }
 
 .table-cell-text {
@@ -437,7 +451,7 @@ select option:hover {
   color: #ffc400 !important;
 }
 .text-black {
-  color: #000000 !important;
+  color: var(--app-black-text) !important;
 }
 .text-gris-claro {
   color: #a0a0a0 !important;

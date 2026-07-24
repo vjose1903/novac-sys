@@ -5,7 +5,7 @@
 }
 
 .index {
-  background: #80808021;
+  background: var(--app-table-row-bg) !important;
 }
 
 .show_color {
@@ -84,6 +84,10 @@
 
           &.noColorTitulo {
             background: var(--app-surface-muted);
+          }
+
+          &.colorTitulo > tr > .thHead:first-child {
+            background: var(--app-table-header-bg) !important;
           }
 
           .thHead {
