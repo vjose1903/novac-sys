@@ -262,55 +262,6 @@
   }
 }
 
-.sort-icon {
-  position: relative;
-  width: 15px;
-  display: inline-block;
-  transform: translate(3px, -4px);
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) translateY(-4px);
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-bottom: 8px solid #80808038; /* Flecha hacia arriba */
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) translateY(7px); /* Desplazar hacia abajo */
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-top: 8px solid #80808038; /* Flecha hacia abajo */
-  }
-
-  /* ordenado ascendente */
-  &.order-asc {
-    &::after {
-      /* Flecha hacia arriba */
-      border-bottom-color: var(--primary09);
-    }
-  }
-
-  /* ordenado descendente */
-  &.order-desc {
-    &::before {
-      /* Flecha hacia abajo */
-      border-top-color: var(--primary09);
-    }
-  }
-}
-
 @media (min-width: 992px) {
   // =====================================================================================================================================================================
   // PANTALLAS LG ========================================================================================================================================================

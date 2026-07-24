@@ -45,6 +45,31 @@
     color: var(--app-text) !important;
     padding: 0.7rem !important;
   }
+
+  .find-casual-customer {
+    color: var(--app-text);
+
+    .persona-result {
+      background: var(--app-surface-soft) !important;
+      border-color: var(--app-border) !important;
+      color: var(--app-text) !important;
+
+      .label,
+      strong {
+        color: var(--app-text) !important;
+      }
+    }
+
+    .source-tag {
+      background: var(--app-surface-muted) !important;
+      color: var(--app-text) !important;
+    }
+
+    .consulta-status {
+      background: var(--app-surface-muted) !important;
+      color: var(--app-text) !important;
+    }
+  }
 }
 
 .overlay {

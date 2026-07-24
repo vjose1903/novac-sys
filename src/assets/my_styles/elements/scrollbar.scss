@@ -20,14 +20,14 @@ Not supports in Firefox and IE */
 
 /* scrollbar itself */
 ::-webkit-scrollbar-thumb {
-  background-color: #c1c1c1;
+  background-color: var(--app-scrollbar-thumb);
   border-radius: 16px;
   width: 7px;
   height: 7px;
 
   &:hover {
     cursor: pointer !important;
-    background-color: #919191 !important;
+    background-color: var(--app-scrollbar-thumb-hover) !important;
   }
 }
 

@@ -11,10 +11,15 @@
 
   .p-tablist {
     grid-area: p-tablist;
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
+
     .p-tablist-content {
+      background: var(--app-surface) !important;
+
       .p-tablist-tab-list {
-        border-color: #d8d8d8 !important;
-        background: transparent !important;
+        border-color: var(--app-drawer-divider) !important;
+        background: var(--app-surface) !important;
         padding-bottom: 0.2rem !important;
 
         .p-tab {
@@ -22,10 +27,12 @@
           margin: 0.2rem !important;
           border-radius: 0.6rem !important;
           font-weight: 400 !important;
-          background: #0000001f !important;
+          background: var(--app-surface-muted) !important;
+          color: var(--app-text-muted) !important;
 
           &.p-tab-active {
             background: var(--primary07) !important;
+            color: var(--app-accent-soft-text) !important;
             box-shadow: 0px 2.3px 0px 0px var(--primary08) !important;
           }
 
@@ -75,7 +82,8 @@
 
   .p-tabpanels {
     grid-area: p-tabpanels;
-    background-color: transparent !important;
+    background-color: var(--app-surface) !important;
+    color: var(--app-text) !important;
     border: 0px solid transparent !important;
     height: 100%;
     // overflow-y: auto;

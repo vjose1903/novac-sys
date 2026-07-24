@@ -18,10 +18,14 @@
     .p-drawer-content {
       overflow: visible;
       padding: 0 !important;
+      background: var(--app-surface) !important;
+      color: var(--app-text) !important;
 
       .contendioSidebar {
         overflow: hidden;
         display: grid;
+        background: var(--app-surface);
+        color: var(--app-text);
 
         grid-template-areas:
           'head'
@@ -31,12 +35,12 @@
         > .head {
           grid-area: head;
           width: 100%;
-          border-bottom: 1px solid var(--transparente05) !important;
+          border-bottom: 1px solid var(--app-drawer-divider) !important;
           padding: 1rem 0.5rem;
 
           > .tituloSidebar {
             font-size: 1.4rem;
-            color: var(--primary10);
+            color: var(--app-text);
             padding: 0;
             font-weight: 500;
           }
@@ -44,10 +48,36 @@
 
         > .cuerpoContenidoSidar {
           grid-area: cuerpoContenidoSidar;
+          background: var(--app-surface);
+          color: var(--app-text);
 
           overflow: hidden;
           > .no_fact {
             font-weight: 400;
+            color: var(--app-text);
+          }
+
+          .factura_guardada .info_fact {
+            background: var(--app-surface-soft);
+            border-color: var(--app-border);
+            box-shadow: var(--app-shadow);
+            color: var(--app-text);
+
+            &.activa {
+              background: var(--transparente05) !important;
+              border-color: var(--primary07) !important;
+              box-shadow: 0 0 5.4px var(--primary07) !important;
+
+              &:hover {
+                background: var(--transparente04) !important;
+              }
+            }
+
+            .tipoFactura,
+            .iconFacturaGuardada,
+            .btn_borrar_factura_gurdada {
+              color: var(--app-text);
+            }
           }
         }
       }

@@ -119,19 +119,43 @@ body {
   --app-text: #1d253b;
   --app-text-muted: #657081;
   --app-border: #ced4da;
+  --app-drawer-divider: var(--app-border);
   --app-hover: #efefef;
+  --app-select-option-selected-bg: #e9ecef;
+  --app-select-option-selected-text: var(--app-text);
+  --app-selectbutton-active-bg: var(--primary07);
+  --app-selectbutton-active-hover-bg: var(--primary08);
+  --app-selectbutton-bg: #dedede;
+  --app-selectbutton-hover-bg: #cfcfcf;
+  --app-selectbutton-active-text: #ffffff;
+  --app-no-receipt-button-hover: #0000000e;
+  --app-popover-account-name: #000000;
+  --app-popover-account-email: #000000b3;
+  --app-scrollbar-thumb: #c1c1c1;
+  --app-scrollbar-thumb-hover: #919191;
+  --app-row-action-bg: #bbbbbbd7;
+  --app-row-action-hover-bg: #a0a0a0d7;
+  --app-row-action-text: #777676;
+  --app-row-action-active-text: #454545;
+  --app-row-action-disabled-text: #adacac;
   --app-input-bg: #ffffffe8;
+  --app-input-focus-bg: var(--primary01);
   --app-input-disabled-bg: #e9ecef;
   --app-shadow: 0 4px 14px -6px #000;
   --app-overlay-shadow: 0 5px 10px 0 #00000043;
   --app-button-shadow: 0 2px 3px 0 #a0a0a0;
+  --app-button-neutral-bg: #e9e9e9;
+  --app-button-neutral-text: #000000;
+  --app-button-neutral-border: #e9e9e9;
   --app-table-header-bg: var(--primary06);
   --app-table-header-text: #101820;
   --app-table-row-bg: #ffffff;
   --app-table-row-hover-bg: #e9e9e9;
   --app-table-row-selected-bg: var(--transparente05);
   --app-table-text: #101820;
-  --app-table-border: #e5e5e554;
+  --app-table-border: #d8dee4;
+  --app-table-sort-icon: #10182021;
+  --app-table-sort-active: #12a218;
   --app-paginator-button-text: var(--app-text-muted);
   --app-accent-soft-text: #1d253b;
   --app-tinted-surface-text: #101820;
@@ -179,10 +203,27 @@ body {
 
 .p-select-option:not(.p-select-option-selected):hover,
 .p-multiselect-option:not(.p-multiselect-option-selected):hover,
+.p-select-option.p-focus:not(.p-select-option-selected),
+.p-multiselect-option.p-focus:not(.p-multiselect-option-selected),
+.p-select-option:not(.p-select-option-selected):focus,
+.p-multiselect-option:not(.p-multiselect-option-selected):focus,
 .p-datepicker-day:not(.p-datepicker-day-selected):hover,
 .p-datepicker-month:not(.p-datepicker-month-selected):hover,
 .p-datepicker-year:not(.p-datepicker-year-selected):hover {
   background: var(--app-hover) !important;
+  color: var(--app-text) !important;
+}
+
+select option {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
+select option:checked,
+select option:focus,
+select option:hover {
+  background-color: var(--app-hover) !important;
+  color: var(--app-text) !important;
 }
 
 .table-cell-text {

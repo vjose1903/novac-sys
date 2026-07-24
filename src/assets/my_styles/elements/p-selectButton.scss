@@ -1,6 +1,6 @@
 .p-selectbutton {
   padding: 0.4rem !important;
-  background: #a5a5a526 !important;
+  background: var(--app-selectbutton-bg) !important;
   border-radius: 0.4rem !important;
   display: flex !important;
   gap: 0.3rem !important;
@@ -11,18 +11,18 @@
     border-radius: 0.25rem !important;
     padding: 0.3rem 0.5rem !important;
     font-weight: 400 !important;
-    color: #a2a2a2 !important;
+    color: var(--app-text-muted) !important;
     
     &:hover {
-      background: #8080802a !important;
+      background: var(--app-selectbutton-hover-bg) !important;
     }
     
     &.p-togglebutton-checked {
-      background: var(--primary08) !important;
+      background: var(--app-selectbutton-active-bg) !important;
       font-weight: 600 !important;
-      color: white !important;
+      color: var(--app-selectbutton-active-text) !important;
       &:hover {
-        background: var(--primary09) !important;
+        background: var(--app-selectbutton-active-hover-bg) !important;
       }
     }
   }

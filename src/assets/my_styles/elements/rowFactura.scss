@@ -2,35 +2,27 @@
 
 :root {
   --invoice-table-header-bg: #ffffff;
-  --invoice-table-header-text: #050505;
-  --invoice-table-header-border: #d7dde5;
-  --invoice-table-body-bg: var(--app-surface-muted);
-  --invoice-table-body-text: var(--app-text);
-  --invoice-table-border: var(--app-border);
+  --invoice-table-header-text: #101820;
+  --invoice-table-header-border: var(--app-table-border);
+  --invoice-table-body-bg: var(--app-table-row-bg);
+  --invoice-table-body-text: var(--app-table-text);
+  --invoice-table-border: var(--app-table-border);
   --invoice-table-input-bg: var(--app-input-bg);
-  --invoice-table-input-text: var(--app-text);
+  --invoice-table-input-text: var(--app-table-text);
   --invoice-table-input-disabled-bg: var(--app-surface-muted);
-  --invoice-table-input-disabled-text: var(--app-text);
+  --invoice-table-input-disabled-text: var(--app-table-text);
 }
 
-.theme-dark {
+:root[data-theme-mode='dark'] {
   --invoice-table-header-bg: var(--app-table-header-bg);
   --invoice-table-header-text: var(--app-table-header-text);
-  --invoice-table-header-border: #303947;
-  --invoice-table-body-bg: #2b3441;
-  --invoice-table-body-text: #edf2f7;
-  --invoice-table-border: #485363;
-  --invoice-table-input-bg: #202832;
-  --invoice-table-input-text: #f4f7fb;
-  --invoice-table-input-disabled-bg: #2b3441;
-  --invoice-table-input-disabled-text: #dce3ec;
 }
 
 @mixin entrada-focus {
   border: 2px solid var(--primary08) !important;
   box-shadow: none !important;
   outline: none !important;
-  background-color: var(--app-input-bg) !important;
+  background-color: var(--app-input-focus-bg) !important;
   color: var(--app-text) !important;
 }
 
@@ -86,6 +78,11 @@
     color: var(--invoice-table-body-text);
     border-top: 0;
 
+    .position-relative:has(> .entrada.disabled),
+    .div-row-codigo:has(> .entrada.disabled) {
+      cursor: not-allowed;
+    }
+
     .table-cuerpo-factura {
       margin-bottom: 0;
       color: var(--invoice-table-body-text);
@@ -108,6 +105,13 @@
         color: var(--invoice-table-input-text) !important;
         border-color: var(--invoice-table-border) !important;
 
+        &:focus,
+        &.p-focus {
+          background-color: var(--app-input-focus-bg) !important;
+          color: var(--app-text) !important;
+          border-color: var(--primary08) !important;
+        }
+
         &::placeholder {
           color: var(--app-text-muted);
         }
@@ -122,6 +126,16 @@
   }
 }
 
+.layoutConduce .titles {
+  background: var(--invoice-table-header-bg);
+  color: var(--invoice-table-header-text);
+
+  th {
+    background: var(--invoice-table-header-bg);
+    color: var(--invoice-table-header-text);
+  }
+}
+
 [tabindex='-1']:focus:not(:focus-visible):not(.entrada) {
   @include formFieldFocus;
 }
@@ -129,6 +143,15 @@
 .div-row-codigo {
   display: grid;
   grid-template-columns: 0px 1fr;
+
+  &:not(.started) {
+    grid-template-columns: 1fr;
+
+    .btnConfig {
+      display: none;
+    }
+  }
+
   &.started {
     grid-template-columns: min-content 1fr !important;
   }
@@ -140,21 +163,25 @@
   align-items: center;
   justify-content: center;
   height: calc(1.5em + 0.3rem + 2px) !important;
-  border-bottom: 1px solid #ced4da !important;
-  color: #777676;
+  border-bottom: 1px solid var(--invoice-table-border) !important;
+  color: var(--app-row-action-text);
   padding: 3px;
   cursor: default;
 
-  background-color: #bbbbbbd7;
+  background-color: var(--app-row-action-bg);
 
   &:not(.disabled):hover {
-    color: #454545 !important;
-    background-color: #a0a0a0d7;
+    color: var(--app-row-action-active-text) !important;
+    background-color: var(--app-row-action-hover-bg);
     cursor: pointer;
   }
 
+  &:not(.disabled) {
+    color: var(--app-row-action-active-text) !important;
+  }
+
   &.disabled {
-    color: #adacac !important;
+    color: var(--app-row-action-disabled-text) !important;
     &:hover {
       cursor: not-allowed !important;
     }

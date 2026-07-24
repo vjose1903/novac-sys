@@ -137,7 +137,7 @@
 
       &:hover {
         cursor: pointer;
-        background-color: #0000000e;
+        background-color: var(--app-no-receipt-button-hover);
       }
     }
   }

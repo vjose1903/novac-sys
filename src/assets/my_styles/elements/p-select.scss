@@ -33,6 +33,16 @@
   .p-select-clear-icon {
     margin-right: 0.5rem !important;
   }
+
+  .p-select-dropdown {
+    color: var(--app-text) !important;
+
+    svg {
+      color: var(--app-text) !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+    }
+  }
 }
 
 .p-overlay:has(.p-overlay-content .p-select-overlay) {
@@ -60,8 +70,8 @@
           min-height: 2.2rem;
           text-wrap: wrap;
           &.p-select-option-selected {
-            background-color: var(--transparente04) !important;
-            color: var(--app-text);
+            background-color: var(--app-select-option-selected-bg) !important;
+            color: var(--app-select-option-selected-text) !important;
             font-weight: 600;
           }
         }

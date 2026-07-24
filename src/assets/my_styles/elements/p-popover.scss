@@ -1,6 +1,9 @@
 .p-popover {
-  border: 0 solid transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
   border-radius: 0.4rem !important;
+  background: var(--app-surface) !important;
+  background-clip: padding-box !important;
   overflow: hidden !important;
   box-shadow: var(--app-overlay-shadow) !important;
 
@@ -10,9 +13,49 @@
     padding: 0 !important;
   }
 
+  .popover-cuenta .popover-header {
+    h3,
+    h4 {
+      color: var(--app-popover-account-name) !important;
+    }
+
+    p {
+      color: var(--app-popover-account-email) !important;
+    }
+  }
+
+  .popover-cuenta .popover-item,
+  .popover-cuenta .popover-item:hover {
+    text-decoration: none !important;
+  }
+
+  .hoverlable,
+  .dropRowMenu li,
+  .overlayExtra li,
+  .ulMovimientoViaje li {
+    color: var(--app-text) !important;
+
+    &:hover,
+    &.indicador:hover,
+    &.selected:hover {
+      background: var(--app-hover) !important;
+      color: var(--app-text) !important;
+    }
+
+    > *,
+    a,
+    span,
+    p,
+    strong,
+    i {
+      color: inherit !important;
+    }
+  }
+
   &::before,
   &::after {
-    border-bottom-color: var(--app-surface) !important;
+    display: none !important;
+    border-color: transparent !important;
   }
 
   &.no-carret {
@@ -44,31 +87,6 @@
 .p-popover-close {
   background: var(--primary09) !important;
   border-radius: 50%;
-}
-
-.datta-dark {
-  .p-popover {
-    background: transparent !important;
-    .p-popover-content {
-      // background: $menu-dark-background !important;
-      color: #ffffffcc !important;
-      border-radius: 0.3rem;
-    }
-    &::before,
-    &::after {
-      // border-bottom-color: $menu-dark-background !important;
-    }
-
-    &.oscuro {
-      .p-popover-content {
-        background: #262a31 !important;
-      }
-      &::before,
-      &::after {
-        border-bottom-color: #262a31 !important;
-      }
-    }
-  }
 }
 
 .filterOverlay {

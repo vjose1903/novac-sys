@@ -1,4 +1,5 @@
 import { operativeSystemE, serie } from "../typescript/constantes";
+import type { ThemeColor, ThemeMode } from '../typescript/theme.types';
 
 export interface EmpresaI {
   id: string;
@@ -15,8 +16,8 @@ export interface ConfigI {
   telefono_empresa:            string;
   logo_empresa:                string;
   logo_impresion:              string;
-  color_app:                   colors;
-  mode_app:                    modes;
+  color_app:                   ThemeColor;
+  mode_app:                    ThemeMode;
   machineId?:                  string;
   operative_system?:           operativeSystemE;
   url_servidor:                string;
@@ -39,9 +40,6 @@ export interface ConfigI {
   serie_default:               serie;
   medida_producto_terminado:   string;
 }
-
-type colors = 'red' | 'blue' | 'green';
-type modes = 'light' | 'dark';
 
 export interface Documentos {
   venta_contado:   string;

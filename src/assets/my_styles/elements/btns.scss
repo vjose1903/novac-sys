@@ -93,9 +93,9 @@ input[type='text'] {
 
 .btn-light-grey {
   box-shadow: var(--app-button-shadow);
-  background-color: #e9e9e9 !important;
-  color: black !important;
-  border: 1px solid #e9e9e9 !important;
+  background-color: var(--app-button-neutral-bg) !important;
+  color: var(--app-button-neutral-text) !important;
+  border: 1px solid var(--app-button-neutral-border) !important;
   &:hover {
     cursor: pointer;
     filter: brightness(0.6);
@@ -138,9 +138,9 @@ input[type='text'] {
 .btn-blanco,
 #btn-blanco {
   box-shadow: var(--app-button-shadow);
-  background-color: #e9e9e9 !important;
-  color: black !important;
-  border: 1px solid #e9e9e9 !important;
+  background-color: var(--app-button-neutral-bg) !important;
+  color: var(--app-button-neutral-text) !important;
+  border: 1px solid var(--app-button-neutral-border) !important;
   &:hover {
     cursor: pointer;
     filter: brightness(0.6);

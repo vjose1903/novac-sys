@@ -1,44 +1,64 @@
 import { Injectable } from '@angular/core';
-
-type ThemeColor = 'red' | 'blue' | 'green';
-export type ThemeMode = 'light' | 'dark';
+import type { ThemeColor, ThemeMode } from '@core/typescript/theme.types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
-  constructor() {}
+  private activeColor: ThemeColor = 'red';
+  private activeMode: ThemeMode = 'light';
 
-  setTheme(newTheme: ThemeColor, mode: ThemeMode = this.getMode()) {
-    localStorage.setItem('theme', newTheme);
-    localStorage.setItem('theme-mode', mode);
+  applyTheme(color: ThemeColor, mode: ThemeMode = this.getMode()): void {
+    const themeColor = this.normalizeColor(color);
+    const themeMode = this.normalizeMode(mode);
 
-    const availableThemes = { red: this.themeRed, blue: this.themeBlue, green: this.themeGreen };
-    availableThemes[newTheme]?.call(this, mode);
-    this.setMode(mode);
+    this.activeColor = themeColor;
+    this.activeMode = themeMode;
+
+    this.applyColorPalette(themeColor, themeMode);
+    this.applyModePalette(themeMode);
+    this.applyThemeAttributes(themeColor, themeMode);
   }
 
   getProperty(property) {
     return document.documentElement.style.getPropertyValue(property);
   }
 
-  getTheme() {
-    return localStorage.getItem('theme') || 'red';
+  getTheme(): ThemeColor {
+    return this.activeColor;
   }
 
   getMode(): ThemeMode {
-    return (localStorage.getItem('theme-mode') as ThemeMode) || 'light';
+    return this.activeMode;
   }
 
-  setMode(mode: ThemeMode) {
-    localStorage.setItem('theme-mode', mode);
+  setColor(color: ThemeColor): void {
+    this.applyTheme(color, this.getMode());
+  }
 
+  setMode(mode: ThemeMode): void {
+    this.applyTheme(this.getTheme(), mode);
+  }
+
+  private normalizeColor(color: string | null | undefined): ThemeColor {
+    return color === 'red' || color === 'blue' || color === 'green' ? color : 'red';
+  }
+
+  private normalizeMode(mode: string | null | undefined): ThemeMode {
+    return mode === 'dark' ? 'dark' : 'light';
+  }
+
+  private applyThemeAttributes(color: ThemeColor, mode: ThemeMode): void {
     const documentElement = document.documentElement;
-    const rootStyle = documentElement.style;
 
+    documentElement.dataset.themeColor = color;
     documentElement.dataset.themeMode = mode;
-    document.body?.classList.toggle('theme-dark', mode === 'dark');
-    document.body?.classList.toggle('theme-light', mode !== 'dark');
+    documentElement.classList.remove('theme-color-red', 'theme-color-blue', 'theme-color-green');
+    documentElement.classList.add(`theme-color-${color}`);
+  }
+
+  private applyModePalette(mode: ThemeMode): void {
+    const rootStyle = document.documentElement.style;
 
     if (mode === 'dark') {
       rootStyle.setProperty('--app-bg', '#14171d');
@@ -49,12 +69,33 @@ export class ThemeService {
       rootStyle.setProperty('--app-text', '#eef2f7');
       rootStyle.setProperty('--app-text-muted', '#b4becb');
       rootStyle.setProperty('--app-border', '#3a4554');
+      rootStyle.setProperty('--app-drawer-divider', 'var(--app-bg-soft)');
       rootStyle.setProperty('--app-hover', '#333d4b');
+      rootStyle.setProperty('--app-select-option-selected-bg', '#3a4554');
+      rootStyle.setProperty('--app-select-option-selected-text', 'rgba(255, 255, 255, 0.86)');
+      rootStyle.setProperty('--app-selectbutton-active-bg', 'var(--primary08)');
+      rootStyle.setProperty('--app-selectbutton-active-hover-bg', 'var(--primary09)');
+      rootStyle.setProperty('--app-selectbutton-bg', '#313946b3');
+      rootStyle.setProperty('--app-selectbutton-hover-bg', '#414c5b');
+      rootStyle.setProperty('--app-selectbutton-active-text', '#ffffff');
+      rootStyle.setProperty('--app-no-receipt-button-hover', '#29303bab');
+      rootStyle.setProperty('--app-popover-account-name', '#ffffff');
+      rootStyle.setProperty('--app-popover-account-email', 'rgba(255, 255, 255, 0.72)');
+      rootStyle.setProperty('--app-scrollbar-thumb', 'var(--app-border)');
+      rootStyle.setProperty('--app-scrollbar-thumb-hover', 'var(--app-border)');
+      rootStyle.setProperty('--app-row-action-bg', 'var(--app-surface-soft)');
+      rootStyle.setProperty('--app-row-action-hover-bg', 'var(--app-surface-muted)');
+      rootStyle.setProperty('--app-row-action-text', 'color-mix(in srgb, var(--app-text) 35%, transparent)');
+      rootStyle.setProperty('--app-row-action-active-text', 'var(--app-accent-soft-text)');
+      rootStyle.setProperty('--app-row-action-disabled-text', 'color-mix(in srgb, var(--app-text) 25%, transparent)');
       rootStyle.setProperty('--app-input-bg', '#1c222b');
       rootStyle.setProperty('--app-input-disabled-bg', '#303845');
       rootStyle.setProperty('--app-shadow', '0 10px 24px -18px #000');
       rootStyle.setProperty('--app-overlay-shadow', '0 12px 24px -14px #000');
       rootStyle.setProperty('--app-button-shadow', '0 2px 4px 0 #0000007d');
+      rootStyle.setProperty('--app-button-neutral-bg', 'var(--app-surface-muted)');
+      rootStyle.setProperty('--app-button-neutral-text', 'var(--app-text)');
+      rootStyle.setProperty('--app-button-neutral-border', 'var(--app-border)');
       rootStyle.setProperty('--app-table-header-bg', 'var(--primary02)');
       rootStyle.setProperty('--app-table-header-text', '#edf2f7');
       rootStyle.setProperty('--app-table-row-bg', '#252e39');
@@ -62,6 +103,8 @@ export class ThemeService {
       rootStyle.setProperty('--app-table-row-selected-bg', '#334b3b');
       rootStyle.setProperty('--app-table-text', '#edf2f7');
       rootStyle.setProperty('--app-table-border', '#3f4a59');
+      rootStyle.setProperty('--app-table-sort-icon', '#ffffff2e');
+      rootStyle.setProperty('--app-table-sort-active', '#004703');
       rootStyle.setProperty('--app-paginator-button-text', '#6f7f93');
       rootStyle.setProperty('--app-accent-soft-text', 'rgba(255, 255, 255, 0.86)');
       rootStyle.setProperty('--app-tinted-surface-text', '#edf2f7');
@@ -78,19 +121,42 @@ export class ThemeService {
     rootStyle.setProperty('--app-text', '#1d253b');
     rootStyle.setProperty('--app-text-muted', '#657081');
     rootStyle.setProperty('--app-border', '#ced4da');
+    rootStyle.setProperty('--app-drawer-divider', 'var(--app-border)');
     rootStyle.setProperty('--app-hover', '#efefef');
+    rootStyle.setProperty('--app-select-option-selected-bg', '#e9ecef');
+    rootStyle.setProperty('--app-select-option-selected-text', 'var(--app-text)');
+    rootStyle.setProperty('--app-selectbutton-active-bg', 'var(--primary07)');
+    rootStyle.setProperty('--app-selectbutton-active-hover-bg', 'var(--primary08)');
+    rootStyle.setProperty('--app-selectbutton-bg', '#dedede');
+    rootStyle.setProperty('--app-selectbutton-hover-bg', '#cfcfcf');
+    rootStyle.setProperty('--app-selectbutton-active-text', '#ffffff');
+    rootStyle.setProperty('--app-no-receipt-button-hover', '#0000000e');
+    rootStyle.setProperty('--app-popover-account-name', '#000000');
+    rootStyle.setProperty('--app-popover-account-email', '#000000b3');
+    rootStyle.setProperty('--app-scrollbar-thumb', '#c1c1c1');
+    rootStyle.setProperty('--app-scrollbar-thumb-hover', '#919191');
+    rootStyle.setProperty('--app-row-action-bg', '#bbbbbbd7');
+    rootStyle.setProperty('--app-row-action-hover-bg', '#a0a0a0d7');
+    rootStyle.setProperty('--app-row-action-text', '#777676');
+    rootStyle.setProperty('--app-row-action-active-text', '#454545');
+    rootStyle.setProperty('--app-row-action-disabled-text', '#adacac');
     rootStyle.setProperty('--app-input-bg', '#ffffffe8');
     rootStyle.setProperty('--app-input-disabled-bg', '#e9ecef');
     rootStyle.setProperty('--app-shadow', '0 4px 14px -6px #000');
     rootStyle.setProperty('--app-overlay-shadow', '0 5px 10px 0 #00000043');
     rootStyle.setProperty('--app-button-shadow', '0 2px 3px 0 #a0a0a0');
+    rootStyle.setProperty('--app-button-neutral-bg', '#e9e9e9');
+    rootStyle.setProperty('--app-button-neutral-text', '#000000');
+    rootStyle.setProperty('--app-button-neutral-border', '#e9e9e9');
     rootStyle.setProperty('--app-table-header-bg', 'var(--primary06)');
     rootStyle.setProperty('--app-table-header-text', '#101820');
     rootStyle.setProperty('--app-table-row-bg', '#ffffff');
     rootStyle.setProperty('--app-table-row-hover-bg', '#e9e9e9');
     rootStyle.setProperty('--app-table-row-selected-bg', 'var(--transparente05)');
     rootStyle.setProperty('--app-table-text', '#101820');
-    rootStyle.setProperty('--app-table-border', '#e5e5e554');
+    rootStyle.setProperty('--app-table-border', '#d8dee4');
+    rootStyle.setProperty('--app-table-sort-icon', '#10182021');
+    rootStyle.setProperty('--app-table-sort-active', '#12a218');
     rootStyle.setProperty('--app-paginator-button-text', 'var(--app-text-muted)');
     rootStyle.setProperty('--app-accent-soft-text', '#1d253b');
     rootStyle.setProperty('--app-tinted-surface-text', '#101820');
@@ -98,7 +164,12 @@ export class ThemeService {
     rootStyle.setProperty('--app-border-menu-item', '#41414163');
   }
 
-  themeRed(mode: ThemeMode = 'light') {
+  private applyColorPalette(color: ThemeColor, mode: ThemeMode): void {
+    const availableThemes = { red: this.themeRed, blue: this.themeBlue, green: this.themeGreen };
+    availableThemes[color].call(this, mode);
+  }
+
+  private themeRed(mode: ThemeMode = 'light') {
     const documentElement = document.documentElement.style;
 
     if (mode === 'dark') {
@@ -153,7 +224,7 @@ export class ThemeService {
     documentElement.setProperty('--secondary05', '#4d433dd6');
   }
 
-  themeBlue(mode: ThemeMode = 'light') {
+  private themeBlue(mode: ThemeMode = 'light') {
     const documentElement = document.documentElement.style;
 
     if (mode === 'dark') {
@@ -208,7 +279,7 @@ export class ThemeService {
     documentElement.setProperty('--secondary05', '#384d52d6');
   }
 
-  themeGreen(mode: ThemeMode = 'light') {
+  private themeGreen(mode: ThemeMode = 'light') {
     const documentElement = document.documentElement.style;
 
     if (mode === 'dark') {

@@ -39,7 +39,6 @@
 }
 
 @mixin formFieldFocus {
-  background-color: var(--app-input-bg) !important;
   color: var(--app-text) !important;
   border-color: transparent !important;
   box-shadow: 0px 0px 6px var(--primary08) !important;

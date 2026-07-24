@@ -138,7 +138,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
 
     // Solo escuchar cambios en la configuración para recargarla
     this.configServ.config$.pipe(takeUntil(this.destroy$)).subscribe(config => {
-      this.themeService.setTheme(config.color_app, config.mode_app);
+      this.themeService.applyTheme(config.color_app, config.mode_app);
       this.imgLogo.set(`data:image/png;base64,${config.logo_empresa}`);
     });
 
