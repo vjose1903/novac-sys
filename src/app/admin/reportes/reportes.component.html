@@ -1,51 +1,54 @@
-<div class="widget">
-  <div class="widget-header px-2">
-    <h4 class="negrita">Reportes</h4>
+<div class="widget reportes-page">
+  <div class="widget-header reportes-header px-2">
+    <div>
+      <span class="reportes-kicker">Centro de información</span>
+      <h4 class="negrita">Reportes</h4>
+    </div>
+    <span class="reportes-header-mark"><i class="fas fa-chart-line"></i></span>
   </div>
   <div class="widget-body overflow-auto">
-    <div class="shadow-container p-2">
+    <div class="shadow-container reportes-content p-2">
       <div class="row">
         <div class="col-12 col-md-6 p-0">
           <div class="d-flex flex-column">
-            <div class="card card-padding sombra mb-3">
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuadre', titulo: 'Reporte de cuadre de caja' })"><i class="fas fa-cash-register"></i> Cuadre de caja </span>
+            <div class="card report-card report-card-featured card-padding sombra mb-3">
+              <span class="report-link" (click)="openReporteForm({ tipo: 'cuadre', titulo: 'Reporte de cuadre de caja' })"><i class="fas fa-cash-register"></i><span>Cuadre de caja</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
             </div>
 
-            <div class="card card-padding sombra mb-3">
-              <h5 class="negrita subrayado">Ventas</h5>
+            <div class="card report-card card-padding sombra mb-3">
+              <h5 class="report-card-title"><span class="report-card-icon"><i class="fas fa-receipt"></i></span>Ventas</h5>
 
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_diarias', titulo: 'Reporte de ventas diarias' })"><i class="fas fa-calendar-day"></i> Relación de ventas diarias</span>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_rango', titulo: 'Reporte de ventas por fechas' })"><i class="fas fa-calendar-alt"></i> Relación de ventas por fechas</span>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_productos', titulo: 'Reporte de productos vendidos por dia' })"> <i class="fas fa-shopping-basket"></i> Relación de productos vendidos </span>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_con_pagos', titulo: 'Reporte de facturas a crédito con sus pagos' })"> <i class="fas fa-file-invoice-dollar"></i> Relación de ventas a crédito con sus movimientos </span>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'ventas_cliente', titulo: 'Reporte de venta por cliente' })"> <i class="fas fa-user-tag"></i> Relación de ventas por cliente </span>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'ventas_diarias', titulo: 'Reporte de ventas diarias' })"><i class="fas fa-calendar-day"></i><span>Relación de ventas diarias</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'ventas_rango', titulo: 'Reporte de ventas por fechas' })"><i class="fas fa-calendar-alt"></i><span>Relación de ventas por fechas</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'ventas_productos', titulo: 'Reporte de productos vendidos por dia' })"><i class="fas fa-shopping-basket"></i><span>Relación de productos vendidos</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'cuentas_con_pagos', titulo: 'Reporte de facturas a crédito con sus pagos' })"><i class="fas fa-file-invoice-dollar"></i><span>Relación de ventas a crédito con sus movimientos</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'ventas_cliente', titulo: 'Reporte de venta por cliente' })"><i class="fas fa-user-tag"></i><span>Relación de ventas por cliente</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
               @if (hasPermisoCamiones) {
-                <span class="btnLetra" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"> <i class="fas fa-truck-moving"></i> Relación de viajes por camión </span>
+                <span class="report-link" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"><i class="fas fa-truck-moving"></i><span>Relación de viajes por camión</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
               }
             </div>
 
-            <div class="card card-padding sombra mb-3">
-              <h5 class="negrita subrayado">Productos</h5>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'inventario', titulo: 'Reporte de inventario' })"> <i class="fas fa-boxes"></i> Inventario </span>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'suplidor_prod', titulo: 'Reporte de suplidor por producto' })"> <i class="fa-solid fa-user-tie"></i> Suplidor por producto </span>
+            <div class="card report-card card-padding sombra mb-3">
+              <h5 class="report-card-title"><span class="report-card-icon"><i class="fas fa-boxes"></i></span>Productos</h5>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'inventario', titulo: 'Reporte de inventario' })"><i class="fas fa-boxes"></i><span>Inventario</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'suplidor_prod', titulo: 'Reporte de suplidor por producto' })"><i class="fa-solid fa-user-tie"></i><span>Suplidor por producto</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
             </div>
           </div>
         </div>
 
         <div class="col-12 col-md-6 p-0 ps-md-3">
           <div class="d-flex flex-column">
-            <div class="card card-padding sombra mb-3">
-              <h5 class="negrita subrayado">Cuentas</h5>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_cliente', titulo: 'Selección de cliente para reporte de CxC' })">
-                <i class="fas fa-comments-dollar"></i>
-                Relación de CxC por cliente
+            <div class="card report-card card-padding sombra mb-3">
+              <h5 class="report-card-title"><span class="report-card-icon"><i class="fas fa-wallet"></i></span>Cuentas</h5>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'cuentas_cobrar_cliente', titulo: 'Selección de cliente para reporte de CxC' })">
+                <i class="fas fa-comments-dollar"></i><span>Relación de CxC por cliente</span><i class="fas fa-arrow-right report-link-arrow"></i>
               </span>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'cuentas_cobrar_ant_saldo', titulo: 'Reporte de CxC por antiguedad de saldos' })"> <i class="fas fa-comment-dollar"></i> Relación de CxC por antiguedad de saldo </span>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'cuentas_cobrar_ant_saldo', titulo: 'Reporte de CxC por antiguedad de saldos' })"><i class="fas fa-comment-dollar"></i><span>Relación de CxC por antiguedad de saldo</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
             </div>
 
-            <div class="card card-padding sombra">
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'recibos', titulo: 'Reporte de recibos de ingreso' })"> <i class="fas fa-hand-holding-usd"></i> Recibos ingreso </span>
-              <span class="btnLetra" (click)="openReporteForm({ tipo: 'notas', titulo: 'Reporte de notas' })"> <i class="fa-solid fa-note-sticky"></i> Notas crédito/débito </span>
+            <div class="card report-card card-padding sombra">
+              <span class="report-link" (click)="openReporteForm({ tipo: 'recibos', titulo: 'Reporte de recibos de ingreso' })"><i class="fas fa-hand-holding-usd"></i><span>Recibos ingreso</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
+              <span class="report-link" (click)="openReporteForm({ tipo: 'notas', titulo: 'Reporte de notas' })"><i class="fa-solid fa-note-sticky"></i><span>Notas crédito/débito</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
             </div>
           </div>
         </div>
