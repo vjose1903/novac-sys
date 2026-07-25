@@ -6,6 +6,14 @@
 
   @include formField;
 
+  .p-select-label {
+    color: var(--app-text) !important;
+
+    &.p-placeholder {
+      color: var(--app-text-muted) !important;
+    }
+  }
+
   
   &.p-focus,
   &.p-select-open {

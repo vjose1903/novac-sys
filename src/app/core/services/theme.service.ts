@@ -146,6 +146,10 @@ export class ThemeService {
       rootStyle.setProperty('--app-switch-disabled-knob', '#697384');
       rootStyle.setProperty('--app-switch-disabled-active', '#526071');
       rootStyle.setProperty('--app-select-all-icon', '#8b98aa');
+      rootStyle.setProperty('--app-travel-tag-bg', '#303845');
+      rootStyle.setProperty('--app-travel-tag-text', '#d6dde7');
+      rootStyle.setProperty('--app-travel-pending-tag-bg', '#633b43');
+      rootStyle.setProperty('--app-travel-pending-tag-text', '#f1b7c0');
       rootStyle.setProperty('--app-table-header-bg', 'var(--primary02)');
       rootStyle.setProperty('--app-table-header-text', '#edf2f7');
       rootStyle.setProperty('--app-table-row-bg', '#252e39');
@@ -232,6 +236,10 @@ export class ThemeService {
     rootStyle.setProperty('--app-switch-disabled-knob', '#eef0f2');
     rootStyle.setProperty('--app-switch-disabled-active', '#aeb6bf');
     rootStyle.setProperty('--app-select-all-icon', '#6b7280');
+    rootStyle.setProperty('--app-travel-tag-bg', '#bfbfbf');
+    rootStyle.setProperty('--app-travel-tag-text', '#000000');
+    rootStyle.setProperty('--app-travel-pending-tag-bg', '#e9c1c1');
+    rootStyle.setProperty('--app-travel-pending-tag-text', '#000000');
     rootStyle.setProperty('--app-table-header-bg', 'var(--primary06)');
     rootStyle.setProperty('--app-table-header-text', '#101820');
     rootStyle.setProperty('--app-table-row-bg', '#ffffff');

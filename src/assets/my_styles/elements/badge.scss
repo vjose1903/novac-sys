@@ -35,3 +35,19 @@
     filter: brightness(1.6) contrast(0.5);
   }
 }
+
+.travel-selected-tag,
+.travel-pending-tag {
+  background: var(--app-travel-tag-bg) !important;
+  color: var(--app-travel-tag-text) !important;
+
+  .p-tag-value,
+  p {
+    color: inherit !important;
+  }
+}
+
+.travel-pending-tag {
+  background: var(--app-travel-pending-tag-bg) !important;
+  color: var(--app-travel-pending-tag-text) !important;
+}

@@ -59,24 +59,24 @@
               <span class="d-flex flex-column">
                 <small class="negrita p-0 me-2">Cliente:</small>
 
-                <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                  <p class="text-black mb-0">{{ viaje_selected?.cliente.nombre_completo }}</p>
+                <p-tag [rounded]="true" styleClass="travel-selected-tag" [style]="{ 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                  <p class="mb-0">{{ viaje_selected?.cliente.nombre_completo }}</p>
                 </p-tag>
               </span>
 
               <span class="d-flex flex-column">
                 <small class="negrita p-0 me-2">Total facturado:</small>
 
-                <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                  <p class="text-black mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
+                <p-tag [rounded]="true" styleClass="travel-selected-tag" [style]="{ 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                  <p class="mb-0">{{ formatoNumero(viaje_selected?.total_factura) }}</p>
                 </p-tag>
               </span>
 
               @if (monto_pendiente > 0) {
                 <span class="d-flex flex-column">
                   <small class="negrita p-0 me-2 text-red">Monto pendiente:</small>
-                  <p-tag [rounded]="true" [style]="{ background: '#e9c1c1', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-                    <p class="text-black mb-0">{{ formatoNumero(monto_pendiente) }}</p>
+                  <p-tag [rounded]="true" styleClass="travel-pending-tag" [style]="{ 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
+                    <p class="mb-0">{{ formatoNumero(monto_pendiente) }}</p>
                   </p-tag>
                 </span>
               }
