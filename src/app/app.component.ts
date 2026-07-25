@@ -156,6 +156,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   async loadAppConfig(): Promise<void> {
     try {
       const config = (await this._ipc.getAppConfig()) as any;
+      this.themeService.applyTheme(config.color_app, config.mode_app);
       this.configServ.config = config;
     } catch (error) {
       console.error('Error cargando configuración:', error);

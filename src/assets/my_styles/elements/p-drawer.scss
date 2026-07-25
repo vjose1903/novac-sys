@@ -1,6 +1,33 @@
 @use './forms.scss' as *;
 
 .p-drawer {
+  .p-drawer-close-button {
+    .p-button:hover {
+      background: var(--app-hover) !important;
+      color: var(--app-text) !important;
+    }
+  }
+
+  &.sideFact {
+    z-index: 999 !important;
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
+    border-color: var(--app-border) !important;
+
+    .p-drawer-content {
+      height: 100%;
+      padding: 1rem !important;
+      background: var(--app-surface) !important;
+      color: var(--app-text) !important;
+    }
+
+    .p-drawer-header {
+      background: var(--app-surface) !important;
+      color: var(--app-text) !important;
+      border-color: var(--app-drawer-divider) !important;
+    }
+  }
+
   &.my_sidebar {
     z-index: 999 !important;
     opacity: 1 !important;

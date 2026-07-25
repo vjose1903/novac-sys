@@ -9,6 +9,24 @@
   }
 }
 
+.dinamicTable {
+  
+
+  .inputTabla:disabled,
+  .inputTabla[disabled],
+  .p-select.p-disabled {
+    background: var(--app-table-input-disabled-bg) !important;
+    border-color: var(--app-table-input-disabled-border) !important;
+    color: var(--app-table-input-disabled-text) !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
+  }
+
+  .inputTabla:disabled {
+    -webkit-text-fill-color: var(--app-table-input-disabled-text) !important;
+  }
+}
+
 .sort-icon {
   position: relative;
   width: 15px;

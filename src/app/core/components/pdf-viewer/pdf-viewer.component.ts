@@ -5,6 +5,7 @@ import { fun } from '@core/services/functions.service';
 import { IDynamicModal, IModalConfiguration } from '../dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '../dynamic-modal/dynamic-modal.component';
 import { FacturasI } from '@admin/facturacion/factura';
+import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -32,7 +33,7 @@ export class PdfViewerComponent implements IDynamicModal, AfterViewInit {
     return this.factura?.document_reference?.document_referenced?.numero_comprobante;
   }
 
-  constructor() {}
+  constructor(public themeService: ThemeService) {}
 
   ngAfterViewInit() {
     window.setTimeout(() => {

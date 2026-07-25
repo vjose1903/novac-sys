@@ -75,7 +75,7 @@
   background-color: var(--transparente05);
   display: flex;
   position: relative;
-  color: black;
+  color: var(--app-tinted-surface-text);
   border-radius: 0.5rem;
   padding: 0.4rem 0.5rem;
   > .label {

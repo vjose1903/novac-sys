@@ -128,12 +128,12 @@ export interface IConfirmationButtonProps {
 
 export const confirmBtnConfig: IConfirmBtnConfig = {
   [confirmationButtons.siNo]: {
-    noBtn: { label: 'No', icon: fontAwesome.faSolid.x, iconColor: 'black', clase: 'btn-light-grey', showProcess: false, id: 'btnNo' },
+    noBtn: { label: 'No', icon: fontAwesome.faSolid.x, iconColor: 'var(--app-button-cancel-icon)', clase: 'btn-light-grey', showProcess: false, id: 'btnNo' },
     siBtn: { label: 'Si', icon: fontAwesome.faSolid.check, iconColor: 'white', clase: 'btn-green', showProcess: false, id: 'btnSi' },
   },
   [confirmationButtons.siNoCancelar]: {
     cancelarBtn: { label: 'Cancelar', icon: null, clase: 'btn-gray', showProcess: false, id: 'btnCancelar' },
-    noBtn: { label: 'No', icon: fontAwesome.faSolid.x, iconColor: 'black', clase: 'btn-light-grey', showProcess: false, id: 'btnNo' },
+    noBtn: { label: 'No', icon: fontAwesome.faSolid.x, iconColor: 'var(--app-button-cancel-icon)', clase: 'btn-light-grey', showProcess: false, id: 'btnNo' },
     siBtn: { label: 'Si', icon: fontAwesome.faSolid.check, iconColor: 'white', clase: 'btn-green', showProcess: false, id: 'btnSi' },
   },
   [confirmationButtons.cancelarContinuar]: {

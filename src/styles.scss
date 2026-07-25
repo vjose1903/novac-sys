@@ -134,6 +134,13 @@ body {
   --app-popover-account-email: #000000b3;
   --app-footer-text: #ffffff;
   --app-black-text: #000000;
+  --app-detail-border: #dce3ee;
+  --app-detail-bg: #f7f9fc;
+  --app-detail-card: #ffffff;
+  --app-detail-label: #64748b;
+  --app-detail-value: #0f172a;
+  --app-detail-muted: #64748b;
+  --app-detail-item-hover-border: #c5d2e6;
   --app-scrollbar-thumb: #c1c1c1;
   --app-scrollbar-thumb-hover: #919191;
   --app-row-action-bg: #bbbbbbd7;
@@ -151,6 +158,12 @@ body {
   --app-button-neutral-bg: #e9e9e9;
   --app-button-neutral-text: #000000;
   --app-button-neutral-border: #e9e9e9;
+  --app-button-cancel-icon: #000000;
+  --app-switch-off-bg: #ffffff;
+  --app-switch-off-border: #d9dadc;
+  --app-switch-off-shadow: #e6e5e5;
+  --app-switch-knob-bg: #ffffff;
+  --app-switch-knob-shadow: #48484833;
   --app-table-header-bg: var(--primary06);
   --app-table-header-text: #101820;
   --app-table-row-bg: #ffffff;
@@ -158,6 +171,9 @@ body {
   --app-table-row-selected-bg: var(--transparente05);
   --app-table-text: #101820;
   --app-table-border: #d8dee4;
+  --app-table-input-disabled-bg: #e9ecef;
+  --app-table-input-disabled-text: #657081;
+  --app-table-input-disabled-border: #c5cbd2;
   --app-table-sort-icon: #10182021;
   --app-table-sort-active: #12a218;
   --app-paginator-button-text: var(--app-text-muted);

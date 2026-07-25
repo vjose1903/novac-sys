@@ -14,6 +14,7 @@
     <ngx-extended-pdf-viewer
       [base64Src]="base64"
       [filenameForDownload]="fileName"
+      [theme]="themeService.getMode()"
       [showDownloadButton]="viewerOptions?.showDownloadButton || false"
       [showOpenFileButton]="viewerOptions?.showOpenFileButton || false"
       [showSecondaryToolbarButton]="viewerOptions?.showSecondaryToolbarButton || false"

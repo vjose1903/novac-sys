@@ -79,7 +79,7 @@ export class DynamicModalService {
         disable: false,
         iconName: cancelarBtn.icon,
         iconSize: '16px',
-        iconColor: cancelarBtn.iconColor ?? 'black',
+        iconColor: cancelarBtn.iconColor ?? 'var(--app-button-cancel-icon)',
         showProcess: cancelarBtn.showProcess,
       });
     }
@@ -98,7 +98,7 @@ export class DynamicModalService {
         disable: false,
         iconName: noBtn.icon,
         iconSize: '16px',
-        iconColor: noBtn.iconColor ?? 'black',
+        iconColor: noBtn.iconColor ?? 'var(--app-button-cancel-icon)',
         showProcess: noBtn.showProcess,
       });
     }

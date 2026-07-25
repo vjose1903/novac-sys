@@ -1,11 +1,24 @@
 .splash-container {
   position: relative;
-  background: #e8e8e8;
+  background: var(--app-bg, #e8e8e8);
+  color: var(--app-text, #1d253b);
+
+  :root[data-theme-mode='dark'] & {
+    background: #14171d;
+    color: #eef2f7;
+
+    .msg {
+      background: #2b6b91;
+      color: #eef2f7;
+    }
+  }
+
   .msg {
     position: absolute;
     right: 3rem;
     top: 2rem;
-    background: #298dcd87;
+    background: #8ec5e5;
+    color: #1d253b;
     padding: 0.2rem 1rem;
     border-radius: 1rem;
   }

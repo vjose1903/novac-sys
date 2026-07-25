@@ -5,6 +5,12 @@
     <meta charset="utf-8" />
     <title>Novac System - AGRODEMI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        const cachedTheme = JSON.parse(localStorage.getItem('novac-theme-cache') || 'null');
+        if (cachedTheme?.mode === 'dark') document.documentElement.dataset.themeMode = 'dark';
+      } catch {}
+    </script>
   </head>
   <body>
     <app-root>

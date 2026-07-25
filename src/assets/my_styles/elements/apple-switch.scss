@@ -9,10 +9,10 @@ input.apple-switch {
   width: 35px;
   min-width: 35px;
   height: 23px;
-  background-color: #ffffff;
-  border: 1px solid #d9dadc;
+  background-color: var(--app-switch-off-bg);
+  border: 1px solid var(--app-switch-off-border);
   border-radius: 50px;
-  box-shadow: inset -13px 0 0 0 #e6e5e5;
+  box-shadow: inset -13px 0 0 0 var(--app-switch-off-shadow);
   transition-duration: 500ms;
   
   &:disabled,
@@ -28,9 +28,9 @@ input.apple-switch {
     left: 1px;
     width: 17.5px;
     height: 16.2px;
-    background-color: transparent;
+    background-color: var(--app-switch-knob-bg);
     border-radius: 50%;
-    box-shadow: 1px 1px 6px #48484833;
+    box-shadow: 1px 1px 6px var(--app-switch-knob-shadow);
     transition-duration: 500ms;
   }
 
@@ -48,7 +48,7 @@ input.apple-switch {
     width: 30px;
     height: 19px;
     min-width: 30px;
-    box-shadow: inset -12px 0 0 0 #e6e5e5;
+    box-shadow: inset -12px 0 0 0 var(--app-switch-off-shadow);
 
     &:after {
       width: 15.5px;

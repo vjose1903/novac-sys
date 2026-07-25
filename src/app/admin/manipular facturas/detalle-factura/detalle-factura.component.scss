@@ -1,9 +1,9 @@
 .detalle-shell {
-  --detail-border: #dce3ee;
-  --detail-bg: #f7f9fc;
-  --detail-card: #ffffff;
-  --detail-label: #64748b;
-  --detail-value: #0f172a;
+  --detail-border: var(--app-detail-border);
+  --detail-bg: var(--app-detail-bg);
+  --detail-card: var(--app-detail-card);
+  --detail-label: var(--app-detail-label);
+  --detail-value: var(--app-detail-value);
 
   display: flex;
   flex-direction: column;
@@ -22,14 +22,14 @@
   display: block;
   font-size: 0.65rem;
   font-weight: 500;
-  color: #475569;
+  color: var(--app-detail-label);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .cliente-pill {
   margin-top: 0.35rem;
-  color: #1f2937;
+  color: var(--app-detail-value);
   font-weight: 700;
 }
 
@@ -102,12 +102,12 @@
 
 .facturas-title {
   font-weight: 700;
-  color: #1e293b;
+  color: var(--app-detail-value);
 }
 
 .facturas-subtitle {
   display: block;
-  color: #64748b;
+  color: var(--app-detail-muted);
 }
 
 .facturas-count {
@@ -139,9 +139,9 @@
 }
 
 .factura-item {
-  border: 1px solid #d9e2ef;
+  border: 1px solid var(--detail-border);
   border-radius: 0.67rem;
-  background: #fff;
+  background: var(--detail-card);
   padding: 0.58rem 0.66rem;
   cursor: pointer;
   transition:
@@ -154,7 +154,7 @@
 
 .factura-item:hover {
   transform: translateY(-1px) scale(1.015);
-  border-color: #c5d2e6;
+  border-color: var(--app-detail-item-hover-border);
   box-shadow: 0 10px 18px -16px rgba(26, 39, 68, 0.78);
 }
 
@@ -163,7 +163,7 @@
 }
 
 .factura-item:focus-visible {
-  outline: 2px solid #b7c9e6;
+  outline: 2px solid var(--app-detail-item-hover-border);
   outline-offset: 1px;
 }
 
@@ -174,14 +174,14 @@
 
 .factura-item-label {
   display: block;
-  color: #64748b;
+  color: var(--app-detail-muted);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .factura-item-value {
-  color: #0f172a;
+  color: var(--detail-value);
   font-size: 0.92rem;
   line-height: 1.2;
 }
@@ -194,18 +194,18 @@
 }
 
 .factura-eye-icon {
-  color: #9ca3af;
+  color: var(--app-detail-muted);
   font-size: 0.86rem;
   line-height: 1;
   flex-shrink: 0;
 }
 
 .facturas-empty {
-  border: 1px dashed #c9d6ea;
+  border: 1px dashed var(--detail-border);
   border-radius: 0.65rem;
-  background: #fff;
+  background: var(--detail-card);
   padding: 0.58rem 0.74rem;
-  color: #64748b;
+  color: var(--app-detail-muted);
   font-size: 0.88rem;
 }
 

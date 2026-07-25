@@ -68,7 +68,6 @@
                       'bg-light': config.focusRow && RowElement.id == row_id,
                       'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData }),
                     }"
-                    style="cursor: pointer"
                     [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
                     #RowElement
                     (click)="clickROW(rowData, getIndex(indexBody))">
