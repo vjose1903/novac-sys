@@ -20,7 +20,7 @@
           <thead class="text-center position-relative thead letras {{ config.colorTitulo ? 'colorTitulo' : 'noColorTitulo' }}">
             <tr id="titulosHeader-{{ realIdTabla }}" class="titulosHeader">
               @for (row of config.info; track $index; let index_head = $index) {
-                <th class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }" id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="row?.style ? row.style : {}" (click)="sort(row)">
+                <th class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort), 'titulo-oculto': row?.titulo?.toString() === '1' }" id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="row?.style ? row.style : {}" (click)="sort(row)">
                   @if (row.alert_msg) {
                     <i class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
                   }

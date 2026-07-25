@@ -243,7 +243,7 @@ export class ThemeService {
     rootStyle.setProperty('--app-table-header-bg', 'var(--primary06)');
     rootStyle.setProperty('--app-table-header-text', '#101820');
     rootStyle.setProperty('--app-table-row-bg', '#ffffff');
-    rootStyle.setProperty('--app-table-row-hover-bg', '#e9e9e9');
+    rootStyle.setProperty('--app-table-row-hover-bg', '#e9e9e9a1');
     rootStyle.setProperty('--app-table-row-selected-bg', 'var(--transparente05)');
     rootStyle.setProperty('--app-table-text', '#101820');
     rootStyle.setProperty('--app-table-border', '#d8dee4');

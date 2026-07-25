@@ -25,6 +25,11 @@
   .thead.colorTitulo {
     background: var(--app-table-header-bg) !important;
     color: var(--app-table-header-text) !important;
+
+    > tr > .thHead {
+      background: var(--app-table-header-bg) !important;
+      color: var(--app-table-header-text) !important;
+    }
   }
 
   .thead.noColorTitulo {
@@ -32,7 +37,16 @@
     color: var(--app-text) !important;
   }
 
-  .thHead,
+  .thHead {
+    color: inherit;
+    border-color: var(--app-table-border) !important;
+
+    &.titulo-oculto,
+    &.titulo-oculto .titulo {
+      color: transparent !important;
+    }
+  }
+
   .tableTD {
     color: inherit !important;
     border-color: var(--app-table-border) !important;
