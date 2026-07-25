@@ -1,8 +1,16 @@
 <div class="row ProductionRow">
+  <div class="col-12 p-0 production-hero">
+    <div>
+      <div class="production-section-kicker">Operaciones</div>
+      <h2>Producción</h2>
+    </div>
+    <span class="production-hero-state">Nueva elaboración</span>
+  </div>
   <div class="col-12 p-0 arriba">
     <div class="row">
-      <div class="col-4">
-        <div #cardFormulario class="card card-padding-1 sombra h-100">
+      <div class="col-4 p-0">
+        <div #cardFormulario class="card card-padding-1 sombra h-100 production-form-card">
+          <div class="production-section-kicker">Nueva producción</div>
           <h5>Seleccione el producto a elaborar:</h5>
           <div class="row">
             <div class="col-12 p-0">
@@ -17,6 +25,7 @@
                     [(ngModel)]="producto_terminado_en_turno"
                     optionLabel="nombre"
                     [filter]="true"
+                    appendTo="body"
                     optionDisabled="optionDisabled"
                     filterBy="nombre"
                     (onHide)="saltar('cantidad_producir')"
@@ -40,15 +49,15 @@
                       id="cantidad_producir"
                       [(ngModel)]="cantidad_producir"
                       (focus)="htmlServ.selectValue($event)"
-                      placeholder="Cantidad a producir"
+                      placeholder="Cantidad"
                       class="form-control inputE input_cantidad"
                       autocomplete="off"
                       (blur)="calcularCantidadAProduccir()" />
                   </div>
 
                   <div class="col-8 pe-0">
-                    <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
-                      <option [value]="null" disabled></option>
+                    <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [class.production-select-placeholder]="!medida_producir" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
+                      <option value="" disabled>Medida</option>
                       @for (item of optionsMedidas; track $index) {
                         <option value="{{ item }}">{{ item }}</option>
                       }
@@ -65,9 +74,15 @@
           </div>
         </div>
       </div>
-      <div class="col-8 ps-0">
-        <div class="card card-padding-1 sombra cardIngredientes" [ngStyle]="{ 'max-height': cardFormulario.offsetHeight + 'px' }">
-          <h4 class="titulo">Ingredientes</h4>
+      <div class="col-8 p-0">
+        <div class="card card-padding-1 sombra cardIngredientes production-ingredients-card" [ngStyle]="{ 'max-height': cardFormulario.offsetHeight + 'px' }">
+          <div class="production-panel-heading">
+            <div>
+              <div class="production-section-kicker">Composición del producto</div>
+              <h4 class="titulo">Ingredientes</h4>
+            </div>
+            <span class="production-panel-status">Inventario / producción</span>
+          </div>
 
           <div class="row h-100 cuerpo">
             <div class="col-6 p-0 fondoGris bordes">
@@ -109,9 +124,16 @@
     </div>
   </div>
 
-  <div class="col-12 medio">
-    <div id="cardTabla" class="card card-padding-1 sombra h-100">
+  <div class="col-12 medio p-0">
+    <div id="cardTabla" class="card card-padding-1 sombra h-100 production-table-card">
       <div #cardTablaProd class="divProducciones">
+        <div class="production-table-heading">
+          <div>
+            <div class="production-section-kicker">Orden de elaboración</div>
+            <h3>Detalle de producción</h3>
+          </div>
+          <span class="production-table-count">Productos agregados</span>
+        </div>
         <div class="divTabla">
           <dinamic-table
             onElementReady

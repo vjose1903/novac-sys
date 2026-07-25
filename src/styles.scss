@@ -213,6 +213,15 @@ body {
   color: var(--app-text-muted) !important;
 }
 
+input::placeholder,
+textarea::placeholder,
+.p-inputtext::placeholder,
+.p-inputnumber-input::placeholder,
+.p-inputmask input::placeholder {
+  color: var(--app-text-muted) !important;
+  opacity: 0.7 !important;
+}
+
 .border,
 .border-primary-subtle,
 .border-success-subtle {

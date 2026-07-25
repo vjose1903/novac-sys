@@ -18,7 +18,7 @@ import { confirmationButtons } from '@core/components/dynamic-modal/config/dynam
 export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy {
   producto_terminado_en_turno;
   cantidad_producir;
-  medida_producir;
+  medida_producir = '';
 
   lista_produccion = signal<any[]>([]);
   ingredientes = [];
@@ -85,7 +85,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   async getIngredients() {
     this.ingredientes = [...this.producto_terminado_en_turno.formulas_productos_terminados].sort((a, b) => fun.compare(a, b, 'articulo_combo', 'asc'));
     this.ingredientesParaProduccion.length = 0;
-    [this.cantidad_producir, this.medida_producir] = Array(2).fill(null);
+    this.cantidad_producir = null;
+    this.medida_producir = '';
   }
 
   lookOters(objeto) {
@@ -262,7 +263,10 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   borrarForm() {
     this.ingredientes = [];
     this.ingredientesParaProduccion = [];
-    [this.producto_terminado_en_turno, this.medida_producir, this.cantidad_producir, this.articuloEditando] = Array(4).fill(null);
+    this.producto_terminado_en_turno = null;
+    this.medida_producir = '';
+    this.cantidad_producir = null;
+    this.articuloEditando = null;
   }
 
   agregarAlista() {

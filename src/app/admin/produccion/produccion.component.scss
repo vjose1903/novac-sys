@@ -2,27 +2,197 @@
   display: flex;
   flex-flow: column;
   height: 100%;
+  min-height: 0;
 }
 
 .ProductionRow {
   display: grid;
-  grid-row-gap: 1rem;
+  grid-row-gap: 1.25rem;
   height: 100%;
+  min-height: 0;
+  overflow: visible;
   grid-template-areas:
+    "hero"
     "arriba"
     "medio"
     "abajo";
 
-  grid-template-rows: min-content auto min-content;
+  grid-template-rows: min-content min-content minmax(0, 1fr) min-content;
+
+  .production-hero {
+    align-items: end;
+    display: flex;
+    grid-area: hero;
+    justify-content: space-between;
+    padding: 0 0.25rem 0.25rem;
+  }
+
+  .production-hero h2,
+  .production-table-heading h3 {
+    color: var(--app-text);
+    font-weight: 800;
+    letter-spacing: 0;
+    margin: 0;
+  }
+
+  .production-hero h2 {
+    font-size: 1.75rem;
+  }
+
+  .production-hero-state,
+  .production-table-count {
+    color: var(--app-text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .arriba > .row {
+    display: grid;
+    grid-template-columns: minmax(20rem, 0.9fr) minmax(0, 2fr);
+    gap: 1.25rem;
+  }
+
+  .arriba > .row > .col-4,
+  .arriba > .row > .col-8 {
+    flex: none;
+    max-width: none;
+    min-width: 0;
+    width: auto;
+  }
 
   .arriba {
     grid-area: arriba;
   }
   .medio {
     grid-area: medio;
+    min-height: 0;
+    min-width: 0;
+    overflow: visible;
   }
   .abajo {
     grid-area: abajo;
+  }
+
+  .card {
+    border: 1px solid var(--app-card-border) !important;
+    background: var(--app-surface) !important;
+    box-shadow: var(--app-overlay-shadow) !important;
+  }
+
+  .arriba > .row {
+    align-items: stretch;
+  }
+
+  .arriba .card-padding-1 {
+    padding: 1.15rem !important;
+  }
+
+  .production-form-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--app-border) !important;
+    border-left: 0.35rem solid var(--primary06) !important;
+    border-radius: 1rem !important;
+  }
+
+  .production-form-card::before {
+    content: none;
+  }
+
+  .arriba h5,
+  .cardIngredientes .titulo {
+    color: var(--app-text);
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .arriba h5 {
+    max-width: 18rem;
+    margin: 0 0 1rem;
+    line-height: 1.15;
+  }
+
+  .production-section-kicker {
+    color: var(--app-text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+  }
+
+  .arriba .form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .arriba .control-label {
+    display: block;
+    margin-bottom: 0.4rem !important;
+  }
+
+  .production-form-card .form-group .row {
+    align-items: center;
+    display: flex;
+    gap: 0;
+    margin-inline: 0;
+  }
+
+  .production-form-card .form-group .row > .col-4,
+  .production-form-card .form-group .row > .col-8 {
+    padding: 0 !important;
+  }
+
+  .production-form-card .form-group .row > .col-4 {
+    flex: 0 0 35%;
+    width: 35%;
+  }
+
+  .production-form-card .form-group .row > .col-4 .inputE {
+    border-radius: 0.4rem 0 0 0.4rem !important;
+  }
+
+  .production-form-card .form-group .row > .col-8 {
+    flex: 1 1 auto;
+    width: auto;
+  }
+
+  .production-form-card .form-group .row > .col-8 .inputE {
+    border-radius: 0 0.4rem 0.4rem 0 !important;
+  }
+
+  .production-select-placeholder {
+    color: var(--app-text-muted) !important;
+    opacity: 0.7;
+  }
+
+  .arriba .btn {
+    min-height: 2.5rem;
+    padding-inline: 0.85rem;
+  }
+
+  .cardIngredientes {
+    padding: 1.15rem !important;
+    gap: 0.85rem;
+    border-radius: 1rem !important;
+  }
+
+  .cardIngredientes .titulo {
+    font-size: 1.45rem;
+    margin: 0;
+  }
+
+  .production-panel-heading {
+    align-items: end;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .production-panel-status {
+    color: var(--app-text-muted);
+    font-size: 0.75rem;
+    padding-bottom: 0.2rem;
+    white-space: nowrap;
   }
 }
 .cardIngredientes {
@@ -30,38 +200,81 @@
   grid-row-gap: 0.5rem;
   height: 100%;
   grid-template-areas:
-    "titulo"
+    "heading"
     "cuerpo";
 
   grid-template-rows: min-content auto;
 
   .titulo {
-    grid-area: titulo;
+    grid-area: heading;
     margin-bottom: 0;
   }
   .cuerpo {
     grid-area: cuerpo;
+    overflow: hidden;
   }
 }
 
+.production-panel-heading {
+  grid-area: heading;
+}
+
 .bordes {
-  border: 1px solid grey;
+  border: 1px solid var(--app-table-border);
+  overflow: hidden;
+}
+
+.cardIngredientes .cuerpo > .bordes:first-child {
+  border-radius: 0.75rem 0 0 0.75rem;
+}
+
+.cardIngredientes .cuerpo > .bordes:last-child {
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+.cardIngredientes .cuerpo > .bordes:first-child .tituloIngre {
+  border-top-left-radius: 0.75rem;
+}
+
+.cardIngredientes .cuerpo > .bordes:last-child .tituloIngre {
+  border-top-right-radius: 0.75rem;
 }
 .fondoGris {
-  background-color: #f1f1f1d0;
+  background-color: var(--app-surface-muted);
 }
 .ingredientesList {
+  align-items: baseline;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  min-width: 0;
   padding: 0.5rem 0rem 0.5rem 0.5rem;
-  border-bottom: 0.5px solid grey;
+  color: var(--app-text);
+  border-bottom: 0.5px solid var(--app-table-border);
+}
+
+.ingredientesList > div {
+  flex: 0 0 auto;
+  margin-left: auto;
+  text-align: right;
+  width: auto !important;
 }
 .tituloIngre {
   background-color: var(--primary01);
-  border-bottom: 1px solid grey;
+  color: var(--app-table-header-text);
+  border-bottom: 1px solid var(--app-table-border);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .Nombreingre {
+  flex: 1 1 auto;
   font-weight: bold;
-  width: 20vw;
+  min-width: 0;
+  width: auto;
 }
 
 .cantidadInve {
@@ -72,6 +285,12 @@
 .fondoBlanco {
   min-height: 22vh;
   max-height: 22vh;
+  background-color: var(--app-table-row-bg);
+  color: var(--app-table-text);
+}
+
+.fondoGris {
+  background-color: var(--app-surface-muted);
 }
 
 .scroll-container-prod {
@@ -82,6 +301,81 @@
 
   overflow: auto;
   overflow-x: hidden;
+}
+
+.medio .card-padding-1 {
+  padding: 1rem !important;
+}
+
+.production-table-card {
+  border: 1px solid var(--app-border) !important;
+  border-radius: 1rem !important;
+  padding: 1rem !important;
+}
+
+.production-table-heading {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 0.35rem 0.8rem;
+}
+
+.production-table-heading h3 {
+  font-size: 1.15rem;
+}
+
+.production-table-count {
+  padding-bottom: 0.15rem;
+}
+
+.medio .divTabla {
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--app-card-border);
+  border-radius: 0.75rem;
+}
+
+.abajo {
+  padding-inline: 0.25rem;
+
+  .btn {
+    min-width: 6.5rem;
+    min-height: 2.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .ProductionRow {
+    .production-hero {
+      align-items: start;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .arriba .col-4,
+    .arriba .col-8 {
+      width: 100%;
+      padding: 0 !important;
+      margin-bottom: 1rem;
+    }
+
+    .arriba .col-8 {
+      margin-bottom: 0;
+    }
+
+    .arriba > .row {
+      display: block;
+    }
+
+    .abajo > div {
+      justify-content: stretch !important;
+
+      .btn {
+        flex: 1;
+      }
+    }
+  }
 }
 
 .Nombreingre,
