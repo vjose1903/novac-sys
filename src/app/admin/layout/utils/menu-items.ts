@@ -89,6 +89,7 @@ export const MENU_CONFIG: MenuItemI[] = [
       { id: 'camiones', title: 'Camiones', permission: [], route: 'registros/camiones', activeRoutes: ['camiones'] },
       { id: 'roles', title: 'Roles', permission: [], route: 'registros/roles', activeRoutes: ['roles'] },
       { id: 'ncf', title: 'NCF', permission: [], route: 'registros/ncf', activeRoutes: ['ncf'] },
+      { id: 'divisa', title: 'Divisa', permission: [], route: 'registros/divisa', activeRoutes: ['divisa'] },
     ],
   },
   {
@@ -162,6 +163,7 @@ export const menuPermissionsObj = {
     camiones: Object.values(Permisos.vehiculo),
     roles: Object.values(Permisos.role),
     ncf: Object.values(Permisos.secuencia_comprobante),
+    divisa: Object.values(Permisos.divisa),
     flatt: [],
   },
   produccion: {

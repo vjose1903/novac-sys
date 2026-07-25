@@ -25,6 +25,7 @@ import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { Environment } from '@environments/environment';
 import { DesktopUpdateState } from '@electron/shared-electron-angular';
+import { DivisaService } from '@registros/divisa/divisa.service';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
@@ -66,6 +67,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
   copyToClipboardServ = inject(CopyToClipboardService);
   themeServ = inject(ThemeService);
+  divisaServ = inject(DivisaService);
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -93,7 +95,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
           fun.setTimeout(() => {
             const token = fun.getAuthToken();
-            if (token) this.checkCuadre();
+            if (token) {
+              this.checkCuadre();
+              this.divisaServ.getDivisas();
+            }
           }, 500);
 
           this.initNavigate = false;

@@ -63,6 +63,12 @@
   padding: 0 !important;
 }
 
+.required-field-label::after {
+  content: '*';
+  color: #e7515a;
+  font-size: 17px;
+}
+
 textarea {
   width: 100% !important;
   border-radius: 0.25rem !important;

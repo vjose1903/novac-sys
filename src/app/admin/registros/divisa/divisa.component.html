@@ -1,0 +1,92 @@
+<div class="row rowResgitro">
+  <div class="col-12 p-0 colTitulo">
+    <h4 class="negrita mb-0">Registro de Divisas</h4>
+  </div>
+
+  <div class="col-12 p-0 colFormularioListado">
+    <div class="d-flex h-100">
+      <ng-container *ngxPermissionsOnly="formPermissions">
+        <div class="contenedorRegistro form {{ isCreando || divisaSelected ? 'showForm' : 'hideForm' }}" *ngIf="isCreando || divisaSelected">
+          <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
+            <h4 class="mb-0">Formulario</h4>
+          </div>
+
+          <div class="card cardFormClass">
+            <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
+              <div class="row">
+                <div class="col-12 p-0">
+                  <div class="tag-principal">
+                    <p-tag
+                      *ngIf="divisaSelected?.is_principal"
+                      [value]="' Divisa Principal '"
+                      [rounded]="true"
+                      [severity]="'success'"
+                      [style]="{ 'white-space': 'nowrap', width: 'auto', overflow: 'hidden', 'text-overflow': 'ellipsis', display: 'inline-block' }"
+                    ></p-tag>
+                  </div>
+                </div>
+                <div class="col-5 p-0">
+                  <img-viewer-edit [src_img]="photoData?.src_img" (getPhotoData)="getPhotoData($event)" [id]="'divisa-img-' + (photoData?.id || 0)"></img-viewer-edit>
+                </div>
+                <div class="col-7">
+                  <div class="row">
+                    <div class="col-12 p-0">
+                      <div class="form-group" appMsgError="simbolo" [form]="form">
+                        <label class="control-label">Simbolo: <span style="color: red">*</span></label>
+                        <input type="text" formControlName="simbolo" id="campoSimbolo" class="form-control" autocomplete="off" />
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-12 p-0">
+                      <div class="form-group" appMsgError="nombre" [form]="form">
+                        <label class="control-label">Nombre: <span style="color: red">*</span></label>
+                        <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" id="campoNombre" class="form-control" autocomplete="off" />
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="botonLabel == 'Guardar'" class="col-12 p-0">
+                      <div class="form-group" appMsgError="current_tasa" [form]="form">
+                        <label class="control-label">Tasa actual: <span style="color: red">*</span></label>
+
+                        <div class="input-group">
+                          <span class="input-group-text prefijo" id="currency">$</span>
+                          <input type="Number" min="1" formControlName="current_tasa" id="campoNombre" class="form-control input_cantidad" autocomplete="off" aria-describedby="currency" />
+                        </div>
+
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div class="p-0 mt-5 d-flex justify-content-between">
+              <div>
+                <button (click)="borrar()" class="btn mr-2 btn-blanco" style="max-width: 6rem">Borrar</button>
+
+                <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn ml-2 btn-verde" style="max-width: 6rem">{{ botonLabel }}</button>
+              </div>
+              <div>
+                <input class="btn ml-2" value="Cerrar" id="btn-blanco" (click)="borrar(); isCreando = false" style="max-width: 6rem" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="list {{ isCreando || divisaSelected ? 'FormList' : 'onlyList' }}">
+        <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
+          <h4 class="mb-0">Listado de divisas</h4>
+          <button *ngxPermissionsOnly="permissions.divisa.create" [disabled]="divisaSelected || isCreando" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+        </div>
+        <div #cardTabla id="cardTabla" class="card cardContentClass">
+          <div *ngIf="divisaServ.listaDivisas.length" class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="divisaServ.listaDivisas" [seleccionado]="divisaSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

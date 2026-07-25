@@ -27,6 +27,8 @@ import { confirmationButtons } from '@core/components/dynamic-modal/config/dynam
 import { FIRESTORE } from '@core/tokens/firebase.tokens';
 import { Firestore } from 'firebase/firestore';
 import { AppUpdateUiService } from '@core/services/electron/app-update-ui.service';
+import { ImagenService } from '@core/services/imagen.service';
+import { DivisaService } from '@admin/registros/divisa/divisa.service';
 
 @Component({
   selector: 'app-root',
@@ -53,6 +55,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   public firestore = inject(FIRESTORE);
   public injector = inject(Injector);
   public updateUi = inject(AppUpdateUiService);
+  public imgServ = inject(ImagenService);
+  public divisaServ = inject(DivisaService);
 
   // Subject para manejar la destrucción del componente
   private readonly destroy$ = new Subject<void>();
@@ -120,6 +124,8 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
       dynamicModalService: this.dynamicModalService,
       firestore: this.firestore,
       injector: this.injector,
+      imgServ: this.imgServ,
+      divisaServ: this.divisaServ,
     });
 
     this.updateUi.initialize();

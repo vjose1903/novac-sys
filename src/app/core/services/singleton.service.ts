@@ -10,6 +10,8 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { FacturacionService } from '@admin/facturacion/facturacion.service';
 import { DynamicModalService } from '@components/dynamic-modal/dynamic-modal.service';
 import { Firestore } from 'firebase/firestore';
+import { ImagenService } from './imagen.service';
+import { DivisaService } from '@admin/registros/divisa/divisa.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +23,8 @@ export class Ss {
   public static configServ: ConfigurationService;
   public static loadServ: LoaderService;
   public static factServ: FacturacionService;
+  public static imgServ: ImagenService;
+  public static divisaServ: DivisaService;
   public static firestore: Firestore;
   public static injector: Injector;
 

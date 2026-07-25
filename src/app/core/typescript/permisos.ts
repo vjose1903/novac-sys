@@ -260,4 +260,22 @@ export const Permisos = {
     read_all: 'commertial_approval_reception_read_all',
     read_one: 'commertial_approval_reception_read_one',
   },
+  configuracion_entidad_cuenta: {
+    read_all: 'configuracion_entidad_cuenta_read_all',
+    read_one: 'configuracion_entidad_cuenta_read_one',
+    update: 'configuracion_entidad_cuenta_update',
+  },
+  divisa: {
+    create: 'divisa_create',
+    read_all: 'divisa_read_all',
+    read_one: 'divisa_read_one',
+    update: 'divisa_update',
+    destroy: 'divisa_destroy',
+  },
+  tasa_cambio: {
+    read_all: 'tasa_cambio_read_all',
+    read_one: 'tasa_cambio_read_one',
+    update: 'tasa_cambio_update',
+    get_history_changes: 'tasa_cambio_get_history_changes',
+  },
 };
