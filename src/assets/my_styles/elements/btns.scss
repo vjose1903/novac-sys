@@ -51,6 +51,10 @@ button:disabled {
 // BOTONES
 // ========================================================
 
+.btnSelect {
+  color: var(--app-select-all-icon) !important;
+}
+
 .disableBtn {
   pointer-events: none !important;
   filter: grayscale(74%);

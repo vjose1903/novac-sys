@@ -71,6 +71,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     this.configApp = Ss.configServ.config;
 
     this.table_config.info = this.isSuplidor ? this.compraInfo : this.ventaInfo;
+    this.table_config.obj_paginate.search = this.palabra_a_buscar || ' ';
     this.buscarClientesOrSuplidor(this.tServ.obj_paginate.default, 'init');
   }
 

@@ -47,7 +47,8 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #ffe500;
+          background: var(--app-warning-soft-bg);
+          color: var(--app-warning-soft-text);
           padding: 0.1rem 0.5rem;
           border-radius: 8px;
           cursor: copy;

@@ -42,14 +42,30 @@
     border-bottom: 1px solid var(--app-table-border) !important;
   }
 
-  .table_input:has(> .inputTabla:disabled),
-  .table_input:has(> .inputTabla[disabled]) {
+  .table_input:has(> input[disabled]) {
     cursor: not-allowed !important;
+    position: relative;
+    width: 100%;
 
-    > .inputTabla:disabled,
-    > .inputTabla[disabled] {
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      z-index: 10;
+      pointer-events: auto;
+      cursor: not-allowed !important;
+    }
+
+    > input[disabled] {
       pointer-events: none !important;
     }
+  }
+
+  .table-input-disabled-overlay {
+    position: absolute;
+    inset: -1px;
+    z-index: 10;
+    cursor: not-allowed !important;
   }
 
   .inputTabla:disabled,

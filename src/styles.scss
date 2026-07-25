@@ -119,6 +119,12 @@ body {
   --app-text: #1d253b;
   --app-text-muted: #657081;
   --app-empty-text: rgba(0, 0, 0, 0.6);
+  --app-progress-bg: #d3dce6;
+  --app-warning-soft-bg: #ffe500;
+  --app-warning-soft-text: #101820;
+  --app-mora-bg: #80808040;
+  --app-mora-border: #cccccc;
+  --app-mora-text: #5b5b5b;
   --app-border: #ced4da;
   --app-card-border: #ced4da;
   --app-input-hover-border: #98a5b2;
@@ -166,6 +172,12 @@ body {
   --app-switch-off-shadow: #e6e5e5;
   --app-switch-knob-bg: #ffffff;
   --app-switch-knob-shadow: #48484833;
+  --app-switch-disabled-bg: #d6d9dd;
+  --app-switch-disabled-border: #b8c0c8;
+  --app-switch-disabled-shadow: #c0c5ca;
+  --app-switch-disabled-knob: #eef0f2;
+  --app-switch-disabled-active: #aeb6bf;
+  --app-select-all-icon: #6b7280;
   --app-table-header-bg: var(--primary06);
   --app-table-header-text: #101820;
   --app-table-row-bg: #ffffff;
@@ -341,6 +353,7 @@ select:not(:focus):hover,
   }
 }
 .p-progressbar {
+  background: var(--app-progress-bg) !important;
   box-shadow: 3px 3px 11px 0px #00000061;
 }
 

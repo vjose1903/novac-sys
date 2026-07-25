@@ -15,12 +15,6 @@ input.apple-switch {
   box-shadow: inset -13px 0 0 0 var(--app-switch-off-shadow);
   transition-duration: 500ms;
   
-  &:disabled,
-  &.disabled {
-    filter: brightness(0.9) !important;
-    pointer-events: none !important;
-  }
-
   &:after {
     content: '';
     position: absolute;
@@ -60,6 +54,32 @@ input.apple-switch {
 
       &:after {
         left: 12px;
+      }
+    }
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: var(--app-switch-disabled-bg) !important;
+    border-color: var(--app-switch-disabled-border) !important;
+    box-shadow: inset -13px 0 0 0 var(--app-switch-disabled-shadow) !important;
+    pointer-events: none !important;
+
+    &:after {
+      background-color: var(--app-switch-disabled-knob);
+      box-shadow: 1px 1px 6px #0000001f;
+    }
+
+    &:checked {
+      border-color: var(--primary07) !important;
+      box-shadow: inset 13px 0 0 0 var(--primary07) !important;
+    }
+
+    &.size-sm {
+      box-shadow: inset -12px 0 0 0 var(--app-switch-disabled-shadow) !important;
+
+      &:checked {
+        box-shadow: inset 12px 0 0 0 var(--primary07) !important;
       }
     }
   }
