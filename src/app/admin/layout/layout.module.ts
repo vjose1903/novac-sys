@@ -21,6 +21,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
 import { MenuItemComponent } from './components/menu-item/menu-item.component';
 import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
+import { NgxEchartsModule } from 'ngx-echarts';
+import * as echarts from 'echarts';
 @NgModule({
   declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
   imports: [
@@ -35,6 +37,7 @@ import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-erro
     NgxPermissionsModule.forChild(),
     BtnIconModule,
     NgxExtendedPdfViewerModule,
+    NgxEchartsModule.forRoot({ echarts }),
     MenuItemComponent,
     FormErrorMsgComponent,
   ],

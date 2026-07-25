@@ -1,5 +1,193 @@
-<div class="cuerpo">
-  <!-- <button class="btn btn-gris" (click)="prueba()">prueba</button> -->
-  <img id="imgd" class="img-fluid opacidad_" style="opacity: 50% !important; height: 40rem" [src]="imgLogo" alt="" />
+<div class="dashboard">
+  <section class="hero-block dashboard-block" [ngClass]="heroState().status">
+    <div class="hero-copy">
+      <div class="block-toolbar">
+        <span class="eyebrow">Dashboard operativo</span>
+        <button class="filter-button" type="button" (click)="resetDraftFilter(heroState().id); heroFilter.toggle($event)">
+          <i class="fas fa-sliders"></i>
+          {{ getBlockFilterLabel(heroState().id) }}
+        </button>
+      </div>
+
+      <h1>{{ heroState().data?.title || heroConfig.title }}</h1>
+      <p>{{ heroState().data?.subtitle || heroConfig.subtitle }}</p>
+
+      <div class="hero-kpis">
+        @if (heroState().status === 'loading') {
+          @for (item of [1, 2, 3]; track item) {
+            <article class="mini-kpi skeleton-card">
+              <span></span>
+              <strong></strong>
+            </article>
+          }
+        } @else {
+          @for (card of getHeroKpis(); track card.id) {
+            <article class="mini-kpi" [ngClass]="getKpiTone(card.id)">
+              <span>{{ card.title }}</span>
+              <strong>{{ formatKpiValue(card) }}</strong>
+            </article>
+          }
+        }
+      </div>
+    </div>
+
+    <aside class="focus-panel">
+      <span>Foco inmediato</span>
+
+      @if (heroState().status === 'loading') {
+        @for (item of [1, 2, 3]; track item) {
+          <div class="focus-item skeleton-card">
+            <span></span>
+            <strong></strong>
+            <p></p>
+          </div>
+        }
+      } @else if (heroState().status === 'error') {
+        <div class="empty-state danger">{{ heroState().error }}</div>
+      } @else if (heroState().status === 'no-data') {
+        <div class="empty-state">No hay datos</div>
+      } @else {
+        @for (item of getHeroFocusItems(); track item.id) {
+          <div class="focus-item" [ngClass]="item.severity || 'info'">
+            <span>{{ item.title }}</span>
+            <strong>{{ formatKpiValue(item) }}</strong>
+            <p>{{ item.description || item.subtitle }}</p>
+          </div>
+        }
+      }
+    </aside>
+
+    <p-popover #heroFilter styleClass="dashboard-filter-popover" appendTo="body">
+      <ng-container *ngTemplateOutlet="filterPopover; context: { popover: heroFilter, blockId: heroState().id, title: heroConfig.title }"></ng-container>
+    </p-popover>
+  </section>
+
+  @for (sectionState of kpiSectionStates(); track sectionState.id) {
+    <section class="kpi-section dashboard-block" [ngClass]="sectionState.status">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">{{ sectionState.data?.eyebrow || 'Indicadores' }}</span>
+          <h2>{{ sectionState.data?.title || getBlockTitle(sectionState.id) }}</h2>
+          <p>{{ sectionState.data?.description || getBlockSubtitle(sectionState.id) }}</p>
+        </div>
+
+        <button class="filter-button" type="button" (click)="resetDraftFilter(sectionState.id); kpiFilter.toggle($event)">
+          <i class="fas fa-sliders"></i>
+          {{ getBlockFilterLabel(sectionState.id) }}
+        </button>
+      </div>
+
+      <div class="kpi-grid">
+        @if (sectionState.status === 'loading') {
+          @for (item of [1, 2, 3, 4]; track item) {
+            <article class="kpi-card skeleton-card">
+              <span></span>
+              <strong></strong>
+              <p></p>
+            </article>
+          }
+        } @else if (sectionState.status === 'error') {
+          <div class="empty-state danger">{{ sectionState.error }}</div>
+        } @else if (sectionState.status === 'no-data') {
+          <div class="empty-state">No hay datos</div>
+        } @else {
+          @for (card of sectionState.data?.cards || []; track card.id) {
+            <article class="kpi-card" [ngClass]="getKpiTone(card.id)">
+              <span>{{ card.title }}</span>
+              <strong>{{ formatKpiValue(card) }}</strong>
+              <p>{{ card.subtitle }}</p>
+            </article>
+          }
+        }
+      </div>
+
+      <p-popover #kpiFilter styleClass="dashboard-filter-popover" appendTo="body">
+        <ng-container *ngTemplateOutlet="filterPopover; context: { popover: kpiFilter, blockId: sectionState.id, title: sectionState.data?.title || getBlockTitle(sectionState.id) }"></ng-container>
+      </p-popover>
+    </section>
+  }
+
+  <section class="charts-grid">
+    @for (chartState of chartStates(); track chartState.id) {
+      <article class="chart-block dashboard-block" [ngClass]="chartState.status">
+        <div class="section-head">
+          <div>
+            <h2>{{ chartState.data?.title || getBlockTitle(chartState.id) }}</h2>
+            <p>{{ chartState.data?.subtitle || getBlockSubtitle(chartState.id) }}</p>
+          </div>
+
+          <button class="filter-button" type="button" (click)="resetDraftFilter(chartState.id); chartFilter.toggle($event)">
+            <i class="fas fa-sliders"></i>
+            {{ getBlockFilterLabel(chartState.id) }}
+          </button>
+        </div>
+
+        <div class="chart-body">
+          @if (chartState.status === 'loading') {
+            <div class="chart-skeleton" [ngClass]="getChartSkeletonType(chartState.id)">
+              @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+                <span [style.height.%]="18 + item * 10"></span>
+              }
+            </div>
+          } @else if (chartState.status === 'error') {
+            <div class="empty-state danger">{{ chartState.error }}</div>
+          } @else if (chartState.status === 'no-data') {
+            <div class="empty-state">No hay datos</div>
+          } @else if (chartState.data) {
+            <div echarts [options]="chartState.data.option" [autoResize]="true" class="echart"></div>
+          } @else {
+            <div class="empty-state">No hay datos</div>
+          }
+        </div>
+
+        <p-popover #chartFilter styleClass="dashboard-filter-popover" appendTo="body">
+          <ng-container *ngTemplateOutlet="filterPopover; context: { popover: chartFilter, blockId: chartState.id, title: chartState.data?.title || getBlockTitle(chartState.id) }"></ng-container>
+        </p-popover>
+      </article>
+    }
+  </section>
 </div>
 
+<ng-template #filterPopover let-popover="popover" let-blockId="blockId" let-title="title">
+  <div class="filter-panel">
+    <div class="filter-panel-head">
+      <strong>Filtrar {{ title }}</strong>
+      <button type="button" (click)="popover.hide()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <label>Periodo</label>
+    <select [ngModel]="draftFilters()[blockId]?.preset" (ngModelChange)="changePreset(blockId, $event)">
+      @for (option of periodOptions; track option.preset) {
+        <option [value]="option.preset">{{ option.label }}</option>
+      }
+    </select>
+
+    @if (isCustomRange(blockId)) {
+      <div class="date-grid">
+        <label>
+          Fecha inicial
+          <input type="date" [ngModel]="draftFilters()[blockId]?.startDate" (ngModelChange)="changeCustomDate(blockId, 'startDate', $event)" />
+        </label>
+
+        <label>
+          Fecha final
+          <input type="date" [ngModel]="draftFilters()[blockId]?.endDate" (ngModelChange)="changeCustomDate(blockId, 'endDate', $event)" />
+        </label>
+      </div>
+    }
+
+    <div class="filter-actions">
+      <button class="primary" type="button" (click)="applyFilter(blockId, 'block', popover)">
+        <i class="fas fa-chart-column"></i>
+        Solo este bloque
+      </button>
+
+      <button type="button" (click)="applyFilter(blockId, 'all', popover)">
+        <i class="fas fa-layer-group"></i>
+        Todos los bloques
+      </button>
+    </div>
+  </div>
+</ng-template>
