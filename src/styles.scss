@@ -118,7 +118,9 @@ body {
   --app-surface-muted: #e9ecef;
   --app-text: #1d253b;
   --app-text-muted: #657081;
+  --app-empty-text: rgba(0, 0, 0, 0.6);
   --app-border: #ced4da;
+  --app-card-border: #ced4da;
   --app-input-hover-border: #98a5b2;
   --app-drawer-divider: var(--app-border);
   --app-hover: #efefef;
@@ -283,7 +285,7 @@ select:not(:focus):hover,
 
 .rayaTop {
   border: 0 !important;
-  border-top: 2px solid #0000001a !important;
+  border-top: 2px solid var(--app-border) !important;
   margin: 0 !important;
 }
 
@@ -619,8 +621,10 @@ select:not(:focus):hover,
 @mixin my_cards {
   border-radius: 1rem !important;
   height: 100%;
-  background-color: white;
-  box-shadow: 0px 4px 14px -6px black;
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  border: 1px solid var(--app-card-border) !important;
+  box-shadow: var(--app-overlay-shadow);
 }
 
 .rowResgitro {

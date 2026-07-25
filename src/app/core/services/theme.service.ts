@@ -87,7 +87,9 @@ export class ThemeService {
       rootStyle.setProperty('--app-surface-muted', '#313946');
       rootStyle.setProperty('--app-text', '#eef2f7');
       rootStyle.setProperty('--app-text-muted', '#b4becb');
+      rootStyle.setProperty('--app-empty-text', 'rgba(238, 242, 247, 0.42)');
       rootStyle.setProperty('--app-border', '#3a4554');
+      rootStyle.setProperty('--app-card-border', '#29303b');
       rootStyle.setProperty('--app-input-hover-border', '#526071');
       rootStyle.setProperty('--app-drawer-divider', 'var(--app-bg-soft)');
       rootStyle.setProperty('--app-hover', '#333d4b');
@@ -159,7 +161,9 @@ export class ThemeService {
     rootStyle.setProperty('--app-surface-muted', '#e9ecef');
     rootStyle.setProperty('--app-text', '#1d253b');
     rootStyle.setProperty('--app-text-muted', '#657081');
+    rootStyle.setProperty('--app-empty-text', 'rgba(0, 0, 0, 0.45)');
     rootStyle.setProperty('--app-border', '#ced4da');
+    rootStyle.setProperty('--app-card-border', '#ced4da');
     rootStyle.setProperty('--app-input-hover-border', '#98a5b2');
     rootStyle.setProperty('--app-drawer-divider', 'var(--app-border)');
     rootStyle.setProperty('--app-hover', '#efefef');

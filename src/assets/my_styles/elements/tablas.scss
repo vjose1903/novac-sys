@@ -10,7 +10,47 @@
 }
 
 .dinamicTable {
-  
+  color: var(--app-table-text);
+
+  .divTable,
+  .myTable,
+  .divBody,
+  .tbody,
+  .tfoot,
+  .pieTabla {
+    background: var(--app-table-row-bg) !important;
+    color: var(--app-table-text) !important;
+  }
+
+  .thead.colorTitulo {
+    background: var(--app-table-header-bg) !important;
+    color: var(--app-table-header-text) !important;
+  }
+
+  .thead.noColorTitulo {
+    background: var(--app-surface-muted) !important;
+    color: var(--app-text) !important;
+  }
+
+  .thHead,
+  .tableTD {
+    color: inherit !important;
+    border-color: var(--app-table-border) !important;
+  }
+
+  .thead:not(.colorTitulo) {
+    border-bottom: 1px solid var(--app-table-border) !important;
+  }
+
+  .table_input:has(> .inputTabla:disabled),
+  .table_input:has(> .inputTabla[disabled]) {
+    cursor: not-allowed !important;
+
+    > .inputTabla:disabled,
+    > .inputTabla[disabled] {
+      pointer-events: none !important;
+    }
+  }
 
   .inputTabla:disabled,
   .inputTabla[disabled],
