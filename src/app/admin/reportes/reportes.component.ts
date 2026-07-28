@@ -4,6 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LoaderService } from '../../loader/loader.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import * as _ from 'lodash';
+import { Router } from '@angular/router';
 import { ReporteC } from './reporte';
 import { ClienteC } from '@registros/registro-clientes/cliente';
 import { FacturaC } from '../facturacion/factura';
@@ -45,7 +46,7 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
     notas: NotaC,
   };
 
-  constructor(public loadServ: LoaderService) {
+  constructor(public loadServ: LoaderService, private router: Router) {
     super();
   }
 
@@ -61,5 +62,9 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   openReporteForm(params: { tipo: string; titulo: string }) {
     ReporteC.configCsv = undefined;
     this.instancesClases[params.tipo.toString()].openModalReporteForm({ tipo: params.tipo, titulo: params.titulo });
+  }
+
+  openCuadres() {
+    this.router.navigate(['/admin/cuadres']);
   }
 }

@@ -63,6 +63,10 @@ const routes: Routes = [
         canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.reporte), 'admin/dashboard')],
         canDeactivate: [CanDeactivateGuard],
       },
+      {
+        path: 'cuadres',
+        loadChildren: () => import('../cuadres/cuadres.module').then(m => m.CuadresModule),
+      },
     ],
   },
 ];

@@ -1,0 +1,34 @@
+<section class="summary">
+  <div>
+    <span>Facturas consumidor final</span>
+    <strong>{{ backendTotals?.final_consumer_invoices_total || '0.00' }}</strong>
+  </div>
+  <div>
+    <span>Recibo de ingresos</span>
+    <strong>{{ backendTotals?.income_receipts_total || '0.00' }}</strong>
+  </div>
+  <div>
+    <span>Total sistema</span>
+    <strong>{{ systemIncomeTotal }}</strong>
+  </div>
+  <div>
+    <span>Efectivo físico</span>
+    <strong>{{ physicalCashTotal }}</strong>
+  </div>
+  <div>
+    <span>Otros métodos</span>
+    <strong>{{ otherPaymentMethodsTotal }}</strong>
+  </div>
+  <div>
+    <span>Transferencias adicionales</span>
+    <strong>{{ additionalTransfersTotal }}</strong>
+  </div>
+  <div class="summary-total">
+    <span>Total efectivo del día</span>
+    <strong>{{ operationalTotal }}</strong>
+  </div>
+  <div class="summary-total">
+    <span>Fondo de caja</span>
+    <strong>{{ fondoCaja() }}</strong>
+  </div>
+</section>
