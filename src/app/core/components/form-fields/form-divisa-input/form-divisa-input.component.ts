@@ -14,6 +14,11 @@ import { ImagenService } from '@services/imagen.service';
 })
 export class FormDivisaInputComponent extends customFormsElements implements OnInit {
   inputId = input<string>('');
+  label = input<string>('Divisa');
+  showLabel = input<boolean>(true);
+  isDisabled = input<boolean>(false);
+  options = input<any[]>([]);
+  selectedCodeVariant = input<boolean>(false);
 
   fun = fun;
   hasValue = fun.hasValue;
@@ -33,7 +38,7 @@ export class FormDivisaInputComponent extends customFormsElements implements OnI
   ngOnInit(): void {
     if (this.control) {
       this.fieldName.set(`${this.control.name}`);
-      this.formGroup.set(this.control['_parent'].form);
+      this.formGroup.set(this.control['_parent']?.form || null);
     }
   }
 
@@ -43,7 +48,27 @@ export class FormDivisaInputComponent extends customFormsElements implements OnI
     this.onChangeValue.emit(value)
   }
 
+  selectedDivisa() {
+    return this.findDivisa(this.valueSignal());
+  }
 
+  findDivisa(id: any) {
+    return (this.options().length ? this.options() : this.divisaServ.listaDivisas).find(divisa => divisa.id == id);
+  }
+
+  divisaImageFile(divisa: any) {
+    return divisa?.imagen?.file_name || divisa?.imagen?.fileName || '';
+  }
+
+  divisaDisplayName(divisa: any) {
+    const code = divisa?.code || divisa?.codigo;
+    const name = divisa?.nombre || divisa?.simbolo || '';
+    return code && name ? `${code} - ${name}` : code || name;
+  }
+
+  divisaCode(divisa: any) {
+    return divisa?.code || divisa?.codigo || divisa?.simbolo || divisa?.nombre || '';
+  }
 
   emitKeydown(event: any) {
     this.keydownEnter.emit(event);

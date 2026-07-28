@@ -61,11 +61,21 @@
         height: 100% !important;
 
         grid-template-areas:
-          'thead'
-          'tbody'
+          'table-scroll'
           'tfoot';
 
-        grid-template-rows: [head-start] min-content [body-start] auto [body-end] min-content [foot-end];
+        grid-template-rows: [scroll-start] auto [scroll-end] min-content [foot-end];
+
+        .tableScrollArea {
+          grid-area: table-scroll;
+          display: grid;
+          grid-template-areas:
+            'thead'
+            'tbody';
+          grid-template-rows: [head-start] min-content [body-start] auto [body-end];
+          min-height: 0;
+          overflow: hidden;
+        }
 
         .thead {
           grid-area: thead;

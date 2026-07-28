@@ -12,6 +12,7 @@ export interface DivisaI {
   id: number;
   nombre: string;
   simbolo: string;
+  code: string;
   is_principal: boolean;
   estado: boolean;
   imagen: ImagenI;

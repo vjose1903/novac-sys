@@ -5,6 +5,7 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { TablasModule } from '@components/new_tablas/tablas.module';
 import { DirectivesModule } from '@core/directive/directives.module';
 import { PrimengModule } from '../../modules/primeng.module';
+import { FormDivisaInputModule } from '@core/components/form-fields/form-divisa-input/form-divisa-input.module';
 import { CuadreDenominationInputComponent } from './components/cuadre-denomination-input/cuadre-denomination-input.component';
 import { CuadreMovementsEditorComponent } from './components/cuadre-movements-editor/cuadre-movements-editor.component';
 import { CuadreSummaryComponent } from './components/cuadre-summary/cuadre-summary.component';
@@ -13,6 +14,6 @@ import { CuadresRoutingModule } from './cuadres.routing';
 
 @NgModule({
   declarations: [CuadresComponent, CuadreDenominationInputComponent, CuadreMovementsEditorComponent, CuadreSummaryComponent],
-  imports: [CommonModule, CuadresRoutingModule, FormsModule, ReactiveFormsModule, TablasModule, DirectivesModule, PrimengModule, NgxPermissionsModule.forChild()],
+  imports: [CommonModule, CuadresRoutingModule, FormsModule, ReactiveFormsModule, TablasModule, DirectivesModule, PrimengModule, FormDivisaInputModule, NgxPermissionsModule.forChild()],
 })
 export class CuadresModule {}

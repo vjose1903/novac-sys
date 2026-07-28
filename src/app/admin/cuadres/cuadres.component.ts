@@ -5,7 +5,9 @@ import { Permisos } from '@core/typescript/permisos';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { Ss } from '@core/services/singleton.service';
-import { CuadreCajaSignalC, CuadreDenominacion, CuadreListItem, CuadreMovimiento, CuadrePrepareResponse, CuadreSystemIncome } from './cuadre-caja.model';
+import { fun } from '@core/services/functions.service';
+import { DivisaService } from '@admin/registros/divisa/divisa.service';
+import { CuadreCajaSignalC, CuadreDenominacion, CuadreDivisa, CuadreListItem, CuadreMovimiento, CuadrePrepareResponse, CuadreSystemIncome } from './cuadre-caja.model';
 
 interface CuadreListRequest {
   page: number;
@@ -53,6 +55,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   reconciliationTolerance = signal('0.00');
   systemIncome = signal<CuadreSystemIncome>(this.emptySystemIncome());
   totals = signal<Record<string, string>>({});
+  divisaPrincipal = signal<CuadreDivisa | null>(null);
+  divisas = signal<CuadreDivisa[]>([]);
   bills = signal<CuadreDenominacion[]>(this.defaultBills());
   coins = signal<CuadreDenominacion[]>(this.defaultCoins());
   foreignCurrency = signal<CuadreDenominacion[]>([]);
@@ -92,6 +96,14 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   };
 
   readonly selectedIsNewFlow = computed(() => this.resolveIsNewFlow(this.selectedCuadre()));
+  readonly principalDivisaOptions = computed(() => {
+    const divisa = this.divisaPrincipal();
+    return divisa ? [divisa] : [];
+  });
+  readonly foreignDivisaOptions = computed(() => {
+    const principalId = this.divisaPrincipal()?.id || this.divisaServ.getDivisaPrincipalInfo()?.id;
+    return this.divisas().filter(divisa => divisa.id !== principalId && !divisa.is_principal);
+  });
   readonly listaCuadres = computed(() => {
     const response = this.listResource.value();
     const data = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
@@ -158,7 +170,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return this.cuadreApi.actionRequest(request.id, request.action, {});
   }, { defaultValue: null });
 
-  constructor(private tServ: TablasService) {
+  constructor(private tServ: TablasService, private divisaServ: DivisaService) {
     super();
 
     effect(() => {
@@ -184,6 +196,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._init_mixin({ component: 'cuadres', is_routing: true });
+    this.ensureDivisasLoaded();
   }
 
   ngOnDestroy(): void {
@@ -296,6 +309,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     if (!response) return;
 
     const stored = response.exists_cuadre ? response.cuadre : null;
+    this.divisaPrincipal.set(response.divisa_principal || stored?.divisa_principal || null);
+    this.divisas.set(response.divisas || stored?.divisas || []);
     const normalized = this.normalizePreparedData(response, stored);
 
     this.existsCuadre.set(response.exists_cuadre);
@@ -337,10 +352,9 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
         reconciliation_tolerance: this.reconciliationTolerance() || '0.00',
         denominaciones: [...this.bills(), ...this.coins(), ...this.foreignCurrency()].map(item => ({
           denomination_type: item.denomination_type,
-          currency_code: item.currency_code || 'DOP',
+          divisa_id: this.divisaIdByLine(item),
           denomination_value: item.denomination_value || '0.00',
           quantity: item.quantity || '0',
-          exchange_rate: item.exchange_rate || '1.000000',
         })),
         movimientos: [...this.otherPaymentMethods(), ...this.additionalTransfers()].map(item => ({
           movement_group: item.movement_group,
@@ -384,12 +398,13 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   private normalizeDenominations(responseItems: CuadreDenominacion[] = [], storedItems: CuadreDenominacion[] = [], type, fallback: CuadreDenominacion[]) {
     const source = responseItems.length ? responseItems : storedItems.filter(item => item.denomination_type === type);
+    const defaultCurrency = this.defaultCurrencyForType(type);
     const normalized = source.map(item => ({
       denomination_type: type,
-      currency_code: item.currency_code || (type === 'foreign_currency' ? 'USD' : 'DOP'),
+      divisa_id: item.divisa_id || this.findDivisaByCurrencyCode(item.currency_code)?.id || defaultCurrency.divisa_id,
+      currency_code: item.currency_code || defaultCurrency.currency_code,
       denomination_value: String(item.denomination_value || '0.00'),
       quantity: String(item.quantity || '0'),
-      exchange_rate: String(item.exchange_rate || '1.000000'),
     }));
 
     return normalized.length ? normalized : fallback;
@@ -417,7 +432,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       legacy_flow_icon: 'fas fa-history',
       legacy_flow_tooltip: 'Realizado con el modelo antiguo',
       legacy_flow_color: 'warning',
-      closing_date_label: item.closing_date || item.fecha || '----------',
+      closing_date_label: this.formatDateLabel(item.closing_date || item.fecha),
       status_label: this.statusLabel(status),
       status_severity: this.statusSeverity(status),
       system_income_total: item.system_income_total || item.totals?.system_income_total || '0.00',
@@ -437,6 +452,10 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     };
 
     return labels[status] || status || 'Borrador';
+  }
+
+  private formatDateLabel(date: string) {
+    return date ? fun.date_formater({ date, dateFormat: 'DD/MM/YYYY' }) : '----------';
   }
 
   private statusSeverity(status: string) {
@@ -463,7 +482,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private denominationTotal(item: CuadreDenominacion) {
-    return Number(item.denomination_value || 0) * Number(item.quantity || 0) * Number(item.exchange_rate || 1);
+    return Number(item.denomination_value || 0) * Number(item.quantity || 0) * this.exchangeRateForDenomination(item);
   }
 
   private sumMovements(items: CuadreMovimiento[]) {
@@ -479,6 +498,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.reconciliationTolerance.set('0.00');
     this.systemIncome.set(this.emptySystemIncome());
     this.totals.set({});
+    this.divisaPrincipal.set(null);
+    this.divisas.set([]);
     this.bills.set(this.defaultBills());
     this.coins.set(this.defaultCoins());
     this.foreignCurrency.set([]);
@@ -487,22 +508,22 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private defaultBills(): CuadreDenominacion[] {
+    const currency = this.defaultCurrencyForType('bill');
     return ['50.00', '100.00', '200.00', '500.00', '1000.00', '2000.00'].map(value => ({
       denomination_type: 'bill',
-      currency_code: 'DOP',
+      ...currency,
       denomination_value: value,
       quantity: '0',
-      exchange_rate: '1.000000',
     }));
   }
 
   private defaultCoins(): CuadreDenominacion[] {
+    const currency = this.defaultCurrencyForType('coin');
     return ['5.00', '10.00', '25.00'].map(value => ({
       denomination_type: 'coin',
-      currency_code: 'DOP',
+      ...currency,
       denomination_value: value,
       quantity: '0',
-      exchange_rate: '1.000000',
     }));
   }
 
@@ -538,5 +559,73 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const month = `${date.getMonth() + 1}`.padStart(2, '0');
     const day = `${date.getDate()}`.padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  private ensureDivisasLoaded() {
+    if (this.divisaServ.listaDivisas.length) {
+      this.applyDefaultDivisas();
+      return;
+    }
+
+    this.divisaServ.getDivisas().then(() => this.applyDefaultDivisas());
+  }
+
+  private applyDefaultDivisas() {
+    this.bills.set(this.applyDefaultCurrencyToItems(this.bills(), 'bill'));
+    this.coins.set(this.applyDefaultCurrencyToItems(this.coins(), 'coin'));
+    this.foreignCurrency.set(this.applyDefaultCurrencyToItems(this.foreignCurrency(), 'foreign_currency'));
+  }
+
+  private applyDefaultCurrencyToItems(items: CuadreDenominacion[], type) {
+    const defaultCurrency = this.defaultCurrencyForType(type);
+    return items.map(item => {
+      if (item.divisa_id) return item;
+      const divisa = this.findDivisaByCurrencyCode(item.currency_code);
+      return {
+        ...item,
+        divisa_id: divisa?.id || defaultCurrency.divisa_id,
+        currency_code: item.currency_code || defaultCurrency.currency_code,
+      };
+    });
+  }
+
+  private defaultCurrencyForType(type) {
+    const divisa = type === 'foreign_currency' ? this.getDefaultForeignDivisa() : this.divisaPrincipal() || this.divisaServ.getDivisaPrincipalInfo();
+    return {
+      divisa_id: divisa?.id,
+      currency_code: this.currencyCode(divisa) || (type === 'foreign_currency' ? 'USD' : 'DOP'),
+    };
+  }
+
+  private getDefaultForeignDivisa() {
+    const principalId = this.divisaPrincipal()?.id || this.divisaServ.getDivisaPrincipalInfo()?.id;
+    return (
+      this.divisas().find(item => item.id !== principalId && !item.is_principal) ||
+      this.divisaServ.listaDivisas.find(item => item.estado && item.id !== principalId && !item.is_principal) ||
+      this.divisaServ.listaDivisas.find(item => item.id !== principalId && !item.is_principal)
+    );
+  }
+
+  private findDivisaByCurrencyCode(currencyCode: string) {
+    if (!currencyCode) return undefined;
+    return [this.divisaPrincipal(), ...this.divisas(), ...this.divisaServ.listaDivisas]
+      .filter(item => !!item)
+      .find(divisa => [this.currencyCode(divisa), divisa?.code, divisa?.simbolo].includes(currencyCode));
+  }
+
+  private exchangeRateForDenomination(item: CuadreDenominacion) {
+    if (item.denomination_type !== 'foreign_currency') return 1;
+    const divisa = [this.divisaPrincipal(), ...this.divisas(), ...this.divisaServ.listaDivisas]
+      .filter(value => !!value)
+      .find(divisa => divisa.id == item.divisa_id);
+    return Number(divisa?.current_tasa || 1);
+  }
+
+  private divisaIdByLine(item: CuadreDenominacion) {
+    return item.divisa_id || this.defaultCurrencyForType(item.denomination_type).divisa_id;
+  }
+
+  private currencyCode(divisa: any) {
+    return divisa?.code || divisa?.codigo || divisa?.simbolo || divisa?.nombre || '';
   }
 }

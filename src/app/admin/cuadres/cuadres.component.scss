@@ -3,6 +3,11 @@
 }
 
 .cuadres-form.showForm {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 7rem);
+  min-height: 0;
+  overflow: hidden;
   width: 62% !important;
 }
 
@@ -10,12 +15,53 @@
   width: 38% !important;
 }
 
+.cuadres-page .list.FormList .divTabla {
+  overflow: hidden;
+}
+
+:host ::ng-deep .cuadres-page .list.FormList dinamic-table .dinamicTable {
+  min-width: 0;
+}
+
+:host ::ng-deep .cuadres-page .list.FormList dinamic-table .divTable {
+  overflow: hidden !important;
+}
+
+:host ::ng-deep .cuadres-page .list.FormList dinamic-table .tableScrollArea {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+:host ::ng-deep .cuadres-page .list.FormList dinamic-table .divBody {
+  min-width: 760px;
+  overflow-x: hidden !important;
+}
+
+:host ::ng-deep .cuadres-page .list.FormList dinamic-table .tbody {
+  overflow-x: hidden !important;
+}
+
+:host ::ng-deep .cuadres-page .list.FormList dinamic-table .thead,
+:host ::ng-deep .cuadres-page .list.FormList dinamic-table .tbody > tr {
+  min-width: 760px;
+}
+
 .cuadre-card {
   background: var(--app-surface) !important;
   border: 1px solid var(--app-card-border);
   color: var(--app-text);
-  max-height: calc(100vh - 8rem);
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cuadre-card-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
+  padding-right: 0.25rem;
 }
 
 .cuadre-source {
@@ -114,11 +160,14 @@
 
 .form-footer-actions {
   align-items: center;
+  border-top: 1px solid var(--app-border);
   display: flex;
+  flex: 0 0 auto;
   flex-wrap: wrap;
   gap: 0.75rem;
   justify-content: space-between;
   margin-top: 0.85rem;
+  padding-top: 0.85rem;
 }
 
 .state-actions {
@@ -190,6 +239,11 @@
 
   .cuadre-card {
     max-height: none;
+    overflow: visible;
+  }
+
+  .cuadre-card-scroll {
+    overflow: visible;
   }
 }
 

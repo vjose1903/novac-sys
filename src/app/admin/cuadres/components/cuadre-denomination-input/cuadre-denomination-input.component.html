@@ -1,28 +1,38 @@
 <section class="cuadre-section">
   <div class="cuadre-section-header">
     <h5>{{ title }}</h5>
-    <button type="button" class="btn btn-sm btn-tema" (click)="addItem()" [disabled]="readonly"><i class="fas fa-plus"></i></button>
+    @if (!fixedRows) {
+      <button type="button" class="btn btn-sm btn-tema" (click)="addItem()" [disabled]="readonly"><i class="fas fa-plus"></i></button>
+    }
   </div>
 
-  <div class="cuadre-grid cuadre-grid-denominations">
+  <div class="cuadre-grid cuadre-grid-denominations" [class.fixed-rows]="fixedRows">
     <strong>Moneda</strong>
     <strong>Denominación</strong>
     <strong>Cantidad</strong>
-    <strong>@if (type === 'foreign_currency') { Tasa } @else { Total }</strong>
     @if (type === 'foreign_currency') {
-      <strong>Total</strong>
+      <strong>Tasa</strong>
     }
-    <span></span>
+    <strong>Total</strong>
+    @if (!fixedRows) {
+      <span></span>
+    }
 
     @for (item of items; track $index) {
-      <input class="form-control form-control-sm" [value]="item.currency_code" [readonly]="readonly" (input)="patchItem($index, 'currency_code', $any($event.target).value)" />
-      <input class="form-control form-control-sm text-end" [value]="item.denomination_value" [readonly]="readonly" (input)="patchItem($index, 'denomination_value', $any($event.target).value)" />
-      <input class="form-control form-control-sm text-end" [value]="item.quantity" [readonly]="readonly" (input)="patchItem($index, 'quantity', $any($event.target).value)" />
+      <form-divisa-input [showLabel]="false" [selectedCodeVariant]="true" [options]="availableDivisas()" [ngModel]="selectedDivisaId(item)" (ngModelChange)="changeDivisa($index, $event)" [isDisabled]="readonly || fixedRows"></form-divisa-input>
+      @if (fixedRows) {
+        <span class="cuadre-denomination-value">{{ denominationLabel(item) }}</span>
+      } @else {
+        <input class="form-control form-control-sm text-end" [value]="item.denomination_value" [readonly]="readonly" (focus)="clearZeroOnFocus($index, 'denomination_value', $event)" (blur)="restoreZeroOnBlur($index, 'denomination_value', $event)" (input)="patchItem($index, 'denomination_value', $any($event.target).value)" />
+      }
+      <input class="form-control form-control-sm text-end" [value]="item.quantity" [readonly]="readonly" (focus)="clearZeroOnFocus($index, 'quantity', $event)" (blur)="restoreZeroOnBlur($index, 'quantity', $event)" (input)="patchItem($index, 'quantity', $any($event.target).value)" />
       @if (type === 'foreign_currency') {
-        <input class="form-control form-control-sm text-end" [value]="item.exchange_rate" [readonly]="readonly" (input)="patchItem($index, 'exchange_rate', $any($event.target).value)" />
+        <span class="cuadre-denomination-value">{{ exchangeRateLabel(item) }}</span>
       }
       <span class="cuadre-line-total">{{ lineTotal(item) }}</span>
-      <button type="button" class="btn btn-sm btn-light cuadre-icon-btn" (click)="removeItem($index)" [disabled]="readonly"><i class="fas fa-trash"></i></button>
+      @if (!fixedRows) {
+        <button type="button" class="btn btn-sm cuadre-icon-btn cuadre-remove-btn" (click)="removeItem($index)" [disabled]="readonly"><i class="fas fa-trash"></i></button>
+      }
     } @empty {
       <span class="cuadre-empty">Sin líneas registradas.</span>
     }

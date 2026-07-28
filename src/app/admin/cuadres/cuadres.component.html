@@ -18,95 +18,97 @@
             </div>
 
             <div class="card cardFormClass cuadre-card">
-              <div class="steps">
-                <span [class.active]="step() >= 1">1. Fecha</span>
-                <span [class.active]="step() >= 2">2. Sistema</span>
-                <span [class.active]="step() >= 3">3. Captura</span>
-                <span [class.active]="step() >= 4">4. Resumen</span>
-              </div>
-
-              <section class="cuadre-section date-section">
-                <div>
-                  <label class="control-label">Fecha de cierre</label>
-                  <p-datepicker
-                    inputId="closingDate"
-                    [ngModel]="closingDateValue()"
-                    (ngModelChange)="setClosingDate($event)"
-                    appendTo="body"
-                    dateFormat="dd/mm/yy"
-                    placeholder="dd/mm/aaaa"
-                    inputStyleClass="form-control"
-                    [disabled]="existsCuadre()"></p-datepicker>
+              <div class="cuadre-card-scroll">
+                <div class="steps">
+                  <span [class.active]="step() >= 1">1. Fecha</span>
+                  <span [class.active]="step() >= 2">2. Sistema</span>
+                  <span [class.active]="step() >= 3">3. Captura</span>
+                  <span [class.active]="step() >= 4">4. Resumen</span>
                 </div>
-                <button type="button" class="btn btn-tema" (click)="prepare()" [disabled]="!closingDate() || prepareResource.isLoading()">Preparar</button>
-              </section>
 
-              @if (step() >= 3) {
-                <section class="system-preview">
+                <section class="cuadre-section date-section">
                   <div>
-                    <span>Facturas consumidor final</span>
-                    <strong>{{ systemIncome().final_consumer_invoices_total }}</strong>
+                    <label class="control-label">Fecha de cierre</label>
+                    <p-datepicker
+                      inputId="closingDate"
+                      [ngModel]="closingDateValue()"
+                      (ngModelChange)="setClosingDate($event)"
+                      appendTo="body"
+                      dateFormat="dd/mm/yy"
+                      placeholder="dd/mm/aaaa"
+                      inputStyleClass="form-control"
+                      [disabled]="existsCuadre()"></p-datepicker>
                   </div>
-                  <div>
-                    <span>Recibo de ingresos</span>
-                    <strong>{{ systemIncome().income_receipts_total }}</strong>
-                  </div>
-                  <div>
-                    <span>Total sistema</span>
-                    <strong>{{ systemIncome().system_income_total }}</strong>
-                  </div>
+                  <button type="button" class="btn btn-tema" (click)="prepare()" [disabled]="!closingDate() || prepareResource.isLoading()">Preparar</button>
                 </section>
 
-                @if (selectedIsNewFlow()) {
-                  <div class="cuadre-form-grid">
-                    <app-cuadre-denomination-input title="Billetes" type="bill" [items]="bills()" [readonly]="readOnly()" (itemsChange)="setBills($event)" />
-                    <app-cuadre-denomination-input title="Monedas" type="coin" [items]="coins()" [readonly]="readOnly()" (itemsChange)="setCoins($event)" />
-                    <app-cuadre-denomination-input class="foreign-currency" title="Divisas" type="foreign_currency" [items]="foreignCurrency()" [readonly]="readOnly()" (itemsChange)="setForeignCurrency($event)" />
-                    <app-cuadre-movements-editor title="Tarjetas, cheques, depósitos y transferencias" group="other_payment_methods" [items]="otherPaymentMethods()" [readonly]="readOnly()" (itemsChange)="setOtherPaymentMethods($event)" />
-                    <app-cuadre-movements-editor title="Transferencias adicionales" group="additional_transfers" [items]="additionalTransfers()" [readonly]="readOnly()" (itemsChange)="setAdditionalTransfers($event)" />
-                  </div>
-
-                  <div class="notes-grid">
-                    <div class="form-group">
-                      <label class="control-label">Observaciones</label>
-                      <textarea class="form-control" rows="3" [value]="notes()" [readonly]="readOnly()" (input)="notes.set($any($event.target).value)"></textarea>
+                @if (step() >= 3) {
+                  <section class="system-preview">
+                    <div>
+                      <span>Facturas consumidor final</span>
+                      <strong>{{ systemIncome().final_consumer_invoices_total }}</strong>
                     </div>
-                    <div class="form-group">
-                      <label class="control-label">Tolerancia</label>
-                      <input class="form-control text-end" [value]="reconciliationTolerance()" [readonly]="readOnly()" (input)="reconciliationTolerance.set($any($event.target).value)" />
+                    <div>
+                      <span>Recibo de ingresos</span>
+                      <strong>{{ systemIncome().income_receipts_total }}</strong>
                     </div>
-                  </div>
-
-                  <app-cuadre-summary
-                    [systemIncomeTotal]="systemIncome().system_income_total"
-                    [operationalTotal]="operationalTotal()"
-                    [physicalCashTotal]="physicalCashTotal()"
-                    [otherPaymentMethodsTotal]="otherPaymentMethodsTotal()"
-                    [additionalTransfersTotal]="additionalTransfersTotal()"
-                    [backendTotals]="summaryTotals()" />
-                } @else {
-                  <section class="legacy-summary">
-                    <div class="legacy-summary-header">
-                      <i class="fas fa-history"></i>
-                      <span>Realizado con el modelo antiguo</span>
-                    </div>
-                    <div class="legacy-summary-grid">
-                      <div>
-                        <span>Total sistema</span>
-                        <strong>{{ selectedCuadre()?.system_income_total || selectedCuadre()?.totals?.system_income_total || '0.00' }}</strong>
-                      </div>
-                      <div>
-                        <span>Total operativo</span>
-                        <strong>{{ selectedCuadre()?.operational_total || selectedCuadre()?.totals?.operational_total || selectedCuadre()?.total || '0.00' }}</strong>
-                      </div>
-                      <div>
-                        <span>Diferencia</span>
-                        <strong>{{ selectedCuadre()?.difference || selectedCuadre()?.totals?.difference || '0.00' }}</strong>
-                      </div>
+                    <div>
+                      <span>Total sistema</span>
+                      <strong>{{ systemIncome().system_income_total }}</strong>
                     </div>
                   </section>
+
+                  @if (selectedIsNewFlow()) {
+                    <div class="cuadre-form-grid">
+                      <app-cuadre-denomination-input title="Billetes" type="bill" [items]="bills()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setBills($event)" />
+                      <app-cuadre-denomination-input title="Monedas" type="coin" [items]="coins()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setCoins($event)" />
+                      <app-cuadre-denomination-input class="foreign-currency" title="Divisas" type="foreign_currency" [items]="foreignCurrency()" [divisas]="foreignDivisaOptions()" [readonly]="readOnly()" (itemsChange)="setForeignCurrency($event)" />
+                      <app-cuadre-movements-editor title="Tarjetas, cheques, depósitos y transferencias" group="other_payment_methods" [items]="otherPaymentMethods()" [readonly]="readOnly()" (itemsChange)="setOtherPaymentMethods($event)" />
+                      <app-cuadre-movements-editor title="Transferencias adicionales" group="additional_transfers" [items]="additionalTransfers()" [readonly]="readOnly()" (itemsChange)="setAdditionalTransfers($event)" />
+                    </div>
+
+                    <div class="notes-grid">
+                      <div class="form-group">
+                        <label class="control-label">Observaciones</label>
+                        <textarea class="form-control" rows="3" [value]="notes()" [readonly]="readOnly()" (input)="notes.set($any($event.target).value)"></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label">Tolerancia</label>
+                        <input class="form-control text-end" [value]="reconciliationTolerance()" [readonly]="readOnly()" (input)="reconciliationTolerance.set($any($event.target).value)" />
+                      </div>
+                    </div>
+
+                    <app-cuadre-summary
+                      [systemIncomeTotal]="systemIncome().system_income_total"
+                      [operationalTotal]="operationalTotal()"
+                      [physicalCashTotal]="physicalCashTotal()"
+                      [otherPaymentMethodsTotal]="otherPaymentMethodsTotal()"
+                      [additionalTransfersTotal]="additionalTransfersTotal()"
+                      [backendTotals]="summaryTotals()" />
+                  } @else {
+                    <section class="legacy-summary">
+                      <div class="legacy-summary-header">
+                        <i class="fas fa-history"></i>
+                        <span>Realizado con el modelo antiguo</span>
+                      </div>
+                      <div class="legacy-summary-grid">
+                        <div>
+                          <span>Total sistema</span>
+                          <strong>{{ selectedCuadre()?.system_income_total || selectedCuadre()?.totals?.system_income_total || '0.00' }}</strong>
+                        </div>
+                        <div>
+                          <span>Total operativo</span>
+                          <strong>{{ selectedCuadre()?.operational_total || selectedCuadre()?.totals?.operational_total || selectedCuadre()?.total || '0.00' }}</strong>
+                        </div>
+                        <div>
+                          <span>Diferencia</span>
+                          <strong>{{ selectedCuadre()?.difference || selectedCuadre()?.totals?.difference || '0.00' }}</strong>
+                        </div>
+                      </div>
+                    </section>
+                  }
                 }
-              }
+              </div>
 
               <div class="form-footer-actions">
                 <div>

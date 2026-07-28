@@ -16,69 +16,70 @@
     <div #divTable class="divTable {{ config.redondo ? 'redondo' : '' }}" [sizeCatcher]="fantasma">
       @if (config.info) {
         <table class="myTable" id="content_{{ realIdTabla }}">
-          <!-- THEAD -->
-          <thead class="text-center position-relative thead letras {{ config.colorTitulo ? 'colorTitulo' : 'noColorTitulo' }}">
-            <tr id="titulosHeader-{{ realIdTabla }}" class="titulosHeader">
-              @for (row of config.info; track $index; let index_head = $index) {
-                <th class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort), 'titulo-oculto': row?.titulo?.toString() === '1' }" id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="row?.style ? row.style : {}" (click)="sort(row)">
-                  @if (row.alert_msg) {
-                    <i class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
-                  }
+          <div class="tableScrollArea">
+            <!-- THEAD -->
+            <thead class="text-center position-relative thead letras {{ config.colorTitulo ? 'colorTitulo' : 'noColorTitulo' }}">
+              <tr id="titulosHeader-{{ realIdTabla }}" class="titulosHeader">
+                @for (row of config.info; track $index; let index_head = $index) {
+                  <th class="titulo-{{ index_head }} b-sizing thHead {{ config.table_size }} " [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort), 'titulo-oculto': row?.titulo?.toString() === '1' }" id="titulo_{{ realIdTabla }}_{{ row.key }}" [ngStyle]="row?.style ? row.style : {}" (click)="sort(row)">
+                    @if (row.alert_msg) {
+                      <i class="fa-solid fa-circle-info alert_msg" [pTooltip]="row.alert_msg" tooltipPosition="top"></i>
+                    }
 
-                  <span [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }">
-                    @switch (row?.tipo) {
-                      @case ('inputSwitch') {
-                        <span [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }">
-                          @if (!row?.select_all) {
-                            {{ row?.titulo }}
-                          }
-                          @if (row?.select_all) {
-                            <input class="apple-switch" type="checkbox" [checked]="are_all_selected(row)" [pTooltip]="are_all_selected(row) ? 'Deseleccionar todo' : 'Seleccionar todo'" tooltipPosition="top" (change)="changeValorSelectAll(row)" />
-                          }
-                        </span>
+                    <span [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }">
+                      @switch (row?.tipo) {
+                        @case ('inputSwitch') {
+                          <span [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }">
+                            @if (!row?.select_all) {
+                              {{ row?.titulo }}
+                            }
+                            @if (row?.select_all) {
+                              <input class="apple-switch" type="checkbox" [checked]="are_all_selected(row)" [pTooltip]="are_all_selected(row) ? 'Deseleccionar todo' : 'Seleccionar todo'" tooltipPosition="top" (change)="changeValorSelectAll(row)" />
+                            }
+                          </span>
+                        }
+                        @default {
+                          <span class="titulo" [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }" [pTooltip]="row.tooltip || ''" tooltipPosition="top"> {{ row.titulo }} </span>
+                        }
                       }
-                      @default {
-                        <span class="titulo" [ngClass]="{ 'c-pointer': fun.hasValue(row?.sort) }" [pTooltip]="row.tooltip || ''" tooltipPosition="top"> {{ row.titulo }} </span>
+                      @if (fun.hasValue(row?.sort)) {
+                        <div class="sort-icon" [ngClass]="{ 'order-asc': row?.sort?.order == 'asc', 'order-desc': row?.sort?.order == 'desc' }"></div>
                       }
-                    }
-                    @if (fun.hasValue(row?.sort)) {
-                      <div class="sort-icon" [ngClass]="{ 'order-asc': row?.sort?.order == 'asc', 'order-desc': row?.sort?.order == 'desc' }"></div>
-                    }
-                  </span>
+                    </span>
+                  </th>
+                }
+                <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" [ngStyle]="config?.botones?.styles">
+                  <span class="titulo"> Acciones </span>
                 </th>
-              }
-              <th class="b-sizing thHead {{ config.table_size }}" [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" [ngStyle]="config?.botones?.styles">
-                <span class="titulo"> Acciones </span>
-              </th>
-            </tr>
-          </thead>
-          <!-- TBODY -->
-          <div class="divBody">
-            @if (data && data.length > 0) {
-              <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
-                @for (rowData of data; track config.track_key ? rowData[config.track_key] : $index; let indexBody = $index) {
-                  <tr
-                    class="text-center"
-                    id="row-{{ realIdTabla }}-{{ getIndex(indexBody) }}"
-                    [ngClass]="{
-                      greenTd: checkBackgroundTr({ tipo: 'greenTd', dato: rowData }),
-                      danger: checkBackgroundTr({ tipo: 'danger', dato: rowData }),
-                      warning: rowData?.panico > 0 && config?.colores,
-                      'bg-selected': config?.colores && fun.hasValue(seleccionado) && seleccionado == rowData?.id,
-                      'bg-light': config.focusRow && RowElement.id == row_id,
-                      'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData }),
-                    }"
-                    [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
-                    #RowElement
-                    (click)="clickROW(rowData, getIndex(indexBody))">
-                    @for (column of config.info; track $index; let index_column = $index) {
-                      <td
-                        class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
-                        id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
-                        [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
-                        <span class="titulo_sm" [ngStyle]="column?.style ? column.style : {}"> {{ column?.titulo_sm }} </span>
-                        <span [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
-                          <div class="d-flex w-100" [ngClass]="{ 'gap-2': fun.hasValue(column?.rowTransform) && column?.tipo != 'none' }">
+              </tr>
+            </thead>
+            <!-- TBODY -->
+            <div class="divBody">
+              @if (data && data.length > 0) {
+                <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
+                  @for (rowData of data; track config.track_key ? rowData[config.track_key] : $index; let indexBody = $index) {
+                    <tr
+                      class="text-center"
+                      id="row-{{ realIdTabla }}-{{ getIndex(indexBody) }}"
+                      [ngClass]="{
+                        greenTd: checkBackgroundTr({ tipo: 'greenTd', dato: rowData }),
+                        danger: checkBackgroundTr({ tipo: 'danger', dato: rowData }),
+                        warning: rowData?.panico > 0 && config?.colores,
+                        'bg-selected': config?.colores && fun.hasValue(seleccionado) && seleccionado == rowData?.id,
+                        'bg-light': config.focusRow && RowElement.id == row_id,
+                        'bg-more-light': checkBackgroundTr({ tipo: 'subrayar', dato: rowData }),
+                      }"
+                      [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
+                      #RowElement
+                      (click)="clickROW(rowData, getIndex(indexBody))">
+                      @for (column of config.info; track $index; let index_column = $index) {
+                        <td
+                          class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
+                          id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
+                          [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                          <span class="titulo_sm" [ngStyle]="column?.style ? column.style : {}"> {{ column?.titulo_sm }} </span>
+                          <span [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
+                            <div class="d-flex w-100" [ngClass]="{ 'gap-2': fun.hasValue(column?.rowTransform) && column?.tipo != 'none' }">
                             @if (fun.hasValue(column?.rowTransform)) {
                               <span [ngClass]="{ 'flex-1': column?.tipo == 'none' }">
                                 <ng-container *ngComponentOutlet="getComponent(rowData, column); inputs: getComponentInputs(rowData, column)"> </ng-container>
@@ -236,32 +237,33 @@
                                 }
                               }
                             </span>
-                          </div>
-                        </span>
-                      </td>
-                    }
-                    @if (fun.hasValue(config.botones)) {
-                      <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
-                        <span class="titulo_sm"> Acciones </span>
-                        <app-btnacciones
-                          [index_body]="getIndex(indexBody)"
-                          [id_tabla]="realIdTabla"
-                          [dato]="rowData"
-                          [data]="data"
-                          [botones]="config.botones"
-                          (functionsBtnDinamic)="functionsBtnDinamic($event)"
-                          (clickBoton)="handle_table_events('click_action', $event)"></app-btnacciones>
-                      </td>
-                    }
-                  </tr>
-                }
-              </tbody>
-            } @else {
-              <div class="d-flex justify-content-center align-items-center h-100">
-                <h5 class="text-c-black-60 text-italic">{{ emptyMessage || 'No hay datos' }}</h5>
+                            </div>
+                          </span>
+                        </td>
+                      }
+                      @if (fun.hasValue(config.botones)) {
+                        <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
+                          <span class="titulo_sm"> Acciones </span>
+                          <app-btnacciones
+                            [index_body]="getIndex(indexBody)"
+                            [id_tabla]="realIdTabla"
+                            [dato]="rowData"
+                            [data]="data"
+                            [botones]="config.botones"
+                            (functionsBtnDinamic)="functionsBtnDinamic($event)"
+                            (clickBoton)="handle_table_events('click_action', $event)"></app-btnacciones>
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              } @else {
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  <h5 class="text-c-black-60 text-italic">{{ emptyMessage || 'No hay datos' }}</h5>
+                </div>
+              }
+            </div>
               </div>
-            }
-          </div>
           <!-- TFOOT -->
           <tfoot class="tfoot w-100">
             @if (config?.obj_paginate && config?.obj_paginate.show != false) {

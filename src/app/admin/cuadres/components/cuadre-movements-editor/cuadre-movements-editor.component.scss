@@ -39,6 +39,18 @@
   justify-content: center;
 }
 
+.cuadre-remove-btn {
+  background: transparent;
+  border-color: transparent;
+  color: #dc3545;
+}
+
+.cuadre-remove-btn:hover:not(:disabled) {
+  background: rgba(220, 53, 69, 0.14);
+  border-color: transparent;
+  color: #dc3545;
+}
+
 .cuadre-empty {
   color: var(--app-text-muted);
   grid-column: 1 / -1;

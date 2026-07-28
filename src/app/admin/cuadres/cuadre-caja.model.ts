@@ -6,11 +6,24 @@ export type MovementGroup = 'other_payment_methods' | 'additional_transfers';
 
 export interface CuadreDenominacion {
   denomination_type: DenominationType;
-  currency_code: string;
+  divisa_id?: number;
+  currency_code?: string;
   denomination_value: string;
   quantity: string;
-  exchange_rate: string;
+  exchange_rate?: string;
   description?: string;
+}
+
+export interface CuadreDivisa {
+  id: number;
+  nombre: string;
+  simbolo: string;
+  code?: string;
+  current_tasa?: string;
+  tasa_cambio_id?: number;
+  is_principal?: boolean;
+  estado?: boolean;
+  imagen?: any;
 }
 
 export interface CuadreMovimiento {
@@ -37,6 +50,8 @@ export interface CuadrePrepareResponse {
   source: 'stored' | 'calculated';
   closing_date: string;
   cuadre?: any;
+  divisa_principal?: CuadreDivisa;
+  divisas?: CuadreDivisa[];
   system_income?: CuadreSystemIncome;
   denominations?: {
     bills?: CuadreDenominacion[];

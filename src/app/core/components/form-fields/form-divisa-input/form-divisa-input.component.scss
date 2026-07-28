@@ -1,0 +1,25 @@
+.divisa-selected-code,
+.divisa-option-code {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-width: 0;
+}
+
+.divisa-image {
+  display: block;
+  width: 1.8rem;
+  flex: 0 0 1.8rem;
+}
+
+.divisa-option-text {
+  display: grid;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.divisa-option-text small {
+  color: var(--text-color-secondary);
+  font-weight: 400;
+  opacity: .65;
+}

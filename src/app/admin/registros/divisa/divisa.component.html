@@ -39,6 +39,14 @@
                     </div>
 
                     <div class="col-12 p-0">
+                      <div class="form-group" appMsgError="code" [form]="form">
+                        <label class="control-label">Código: <span style="color: red">*</span></label>
+                        <input type="text" formControlName="code" id="campoCodigo" class="form-control" autocomplete="off" />
+                        <span id="msgContainer"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-12 p-0">
                       <div class="form-group" appMsgError="nombre" [form]="form">
                         <label class="control-label">Nombre: <span style="color: red">*</span></label>
                         <input type="text" formControlName="nombre" [appCapitalice]="'formGroup'" id="campoNombre" class="form-control" autocomplete="off" />

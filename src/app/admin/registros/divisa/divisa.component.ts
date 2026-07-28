@@ -44,6 +44,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
       { titulo: '', tipo: tableCellType.tag, key: 'es_principal', tag_color: 'green', tooltip: 'Divisa Principal', tag_apretada: true, estilos: [{ width: '2rem' }] },
       { titulo: 'Imagen', tipo: tableCellType.img, key: 'img_divisa', estilos: [{ 'padding-left': '0.5rem' }, { 'padding-right': '0.5rem' }, { width: '5rem' }] },
       { titulo: 'Simbolo', tipo: tableCellType.text, key: 'simbolo', estilos: [{ width: '10%' }] },
+      { titulo: 'Código', tipo: tableCellType.text, key: 'code', estilos: [{ width: '10%' }] },
       { titulo: 'Nombre', tipo: tableCellType.text, key: 'nombre', estilos: [{ 'text-align': 'left' }, { 'padding-left': '0.3rem' }] },
       { titulo: 'Tasa actual', tipo: tableCellType.text, key: 'tasa_actual', estilos: [{ 'text-align': 'center' }, { width: '8%' }] },
       { titulo: 'Estado', tipo: tableCellType.tag, key: 'status', row_tag_color: 'status_tag_color', estilos: [{ 'text-align': 'center' }, { width: '10%' }] },
@@ -63,7 +64,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_divisa',
-    obj_paginate: { show: true, showTotal: true, showPaginator: false },
+    obj_paginate: { show: true, showTotal: true },
   };
   tablaComponent;
   photoData: PhotoDataI;
@@ -99,6 +100,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     this.form = this.fb.group({
       id: [{ value: null, disabled: false }],
       simbolo: [{ value: null, disabled: false }, Validators.required],
+      code: [{ value: null, disabled: false }, Validators.required],
       nombre: [{ value: null, disabled: false }, Validators.required],
       is_principal: [{ value: false, disabled: false }],
       current_tasa: [{ value: null, disabled: false }],
@@ -133,7 +135,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   checkIfSomethingIsDiferrent() {
-    const pick_values = ['simbolo', 'nombre', 'current_tasa', 'id', 'img'];
+    const pick_values = ['simbolo', 'code', 'nombre', 'current_tasa', 'id', 'img'];
     const formValue = fun.pick(this.form.getRawValue(), pick_values);
 
     const originalValue = fun.pick(

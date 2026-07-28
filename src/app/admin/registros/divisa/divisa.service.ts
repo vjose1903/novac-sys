@@ -41,6 +41,7 @@ export class DivisaService {
               es_principal: { padding: 0, width: '2rem' },
               img_divisa: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '5rem' },
               simbolo: { width: '10%' },
+              code: { width: '10%' },
               nombre: { 'text-align': 'start', 'padding-left': '0.3rem' },
               tasa_actual: { width: '8%' },
               status: [
