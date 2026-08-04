@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { fun } from '@services/functions.service';
 import { CuadreMovimiento, MovementGroup } from '../../cuadre-caja.model';
 
 @Component({
@@ -46,6 +47,6 @@ export class CuadreMovementsEditorComponent {
   }
 
   sectionTotal() {
-    return this.items.reduce((total, item) => total + Number(item.amount || 0), 0).toFixed(2);
+    return fun.roundNumberToDecimal(this.items.reduce((total, item) => total + Number(item.amount || 0), 0));
   }
 }

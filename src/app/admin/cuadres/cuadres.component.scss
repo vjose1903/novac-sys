@@ -118,15 +118,15 @@
 
 .system-preview {
   display: grid;
-  gap: 0.65rem;
-  grid-template-columns: repeat(3, 1fr);
+  column-gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   margin-bottom: 0.85rem;
+  row-gap: 1rem;
 }
 
 .system-preview div {
   border-right: 1px solid var(--app-border);
   display: grid;
-  gap: 0.25rem;
   padding-right: 0.65rem;
 }
 
@@ -136,8 +136,8 @@
 
 .system-preview span {
   color: var(--app-text-muted);
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.59rem;
+  font-weight: 500;
   text-transform: uppercase;
 }
 

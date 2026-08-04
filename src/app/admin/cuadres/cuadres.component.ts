@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, computed, effect, signal } from '@angular/core';
 import { httpResource } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Permisos } from '@core/typescript/permisos';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
@@ -117,7 +118,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   readonly physicalCashTotal = computed(() => {
     const all = [...this.bills(), ...this.coins(), ...this.foreignCurrency()];
-    return all.reduce((total, item) => total + this.denominationTotal(item), 0).toFixed(2);
+    return this.formatAmount(all.reduce((total, item) => total + this.denominationTotal(item), 0));
   });
 
   readonly otherPaymentMethodsTotal = computed(() => this.sumMovements(this.otherPaymentMethods()));
@@ -127,6 +128,15 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     final_consumer_invoices_total: this.systemIncome().final_consumer_invoices_total,
     income_receipts_total: this.systemIncome().income_receipts_total,
   }));
+  readonly systemPaymentMethods = computed(() => {
+    const methods = this.systemIncome().payment_methods || {};
+    return [
+      { label: 'Efectivo', value: this.formatAmount(methods.cash || '0.00') },
+      { label: 'Cheques', value: this.formatAmount(methods.check || '0.00') },
+      { label: 'Tarjetas', value: this.formatAmount(methods.card || '0.00') },
+      { label: 'Transferencias', value: this.formatAmount(methods.bank_transfer || '0.00') },
+    ];
+  });
   readonly closingDateValue = computed(() => this.dateFromString(this.closingDate()));
 
   readonly readOnly = computed(() => {
@@ -136,7 +146,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   });
 
   readonly operationalTotal = computed(() => {
-    return (Number(this.physicalCashTotal()) + Number(this.otherPaymentMethodsTotal()) + Number(this.additionalTransfersTotal())).toFixed(2);
+    return this.formatAmount(Number(fun.desformatearStNumber(this.physicalCashTotal())) + Number(fun.desformatearStNumber(this.otherPaymentMethodsTotal())) + Number(fun.desformatearStNumber(this.additionalTransfersTotal())));
   });
 
   listResource = httpResource<any>(() => {
@@ -170,7 +180,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return this.cuadreApi.actionRequest(request.id, request.action, {});
   }, { defaultValue: null });
 
-  constructor(private tServ: TablasService, private divisaServ: DivisaService) {
+  constructor(private tServ: TablasService, private divisaServ: DivisaService, private route: ActivatedRoute) {
     super();
 
     effect(() => {
@@ -197,6 +207,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._init_mixin({ component: 'cuadres', is_routing: true });
     this.ensureDivisasLoaded();
+    if (this.route.snapshot.queryParamMap.get('nuevo') === 'true') this.nuevoRegistro();
   }
 
   ngOnDestroy(): void {
@@ -238,6 +249,10 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const id = Number(this.selectedCuadre()?.id);
     if (!id) return;
     this.actionRequest.set({ id, action, nonce: Date.now() });
+  }
+
+  formatAmount(value: string | number) {
+    return fun.roundNumberToDecimal(value || '0.00');
   }
 
   closeForm() {
@@ -305,18 +320,19 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return this.selectedIsNewFlow() && this.isCurrentClosingDate() && ['submitted', 'reviewed', 'approved', 'rejected'].includes(this.selectedCuadre()?.status || this.selectedCuadre()?.estado);
   }
 
-  private applyPrepareResponse(response: CuadrePrepareResponse) {
-    if (!response) return;
+  private applyPrepareResponse(response: CuadrePrepareResponse | any) {
+    const prepareResponse = this.unwrapPrepareResponse(response);
+    if (!prepareResponse) return;
 
-    const stored = response.exists_cuadre ? response.cuadre : null;
-    this.divisaPrincipal.set(response.divisa_principal || stored?.divisa_principal || null);
-    this.divisas.set(response.divisas || stored?.divisas || []);
-    const normalized = this.normalizePreparedData(response, stored);
+    const stored = prepareResponse.exists_cuadre ? prepareResponse.cuadre : null;
+    this.divisaPrincipal.set(prepareResponse.divisa_principal || stored?.divisa_principal || null);
+    this.divisas.set(prepareResponse.divisas || stored?.divisas || []);
+    const normalized = this.normalizePreparedData(prepareResponse, stored);
 
-    this.existsCuadre.set(response.exists_cuadre);
-    this.source.set(response.source);
+    this.existsCuadre.set(prepareResponse.exists_cuadre);
+    this.source.set(prepareResponse.source);
     this.selectedCuadre.set(stored ? this.mapListItem(stored) : null);
-    this.closingDate.set(response.closing_date || this.closingDate());
+    this.closingDate.set(prepareResponse.closing_date || this.closingDate());
     this.systemIncome.set(normalized.systemIncome);
     this.totals.set(normalized.totals);
     this.notes.set(normalized.notes);
@@ -327,6 +343,10 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.otherPaymentMethods.set(normalized.otherPaymentMethods);
     this.additionalTransfers.set(normalized.additionalTransfers);
     this.step.set(3);
+  }
+
+  private unwrapPrepareResponse(response: CuadrePrepareResponse | any): CuadrePrepareResponse | null {
+    return response?.data?.exists_cuadre !== undefined ? response.data : response;
   }
 
   private afterSave(response: any) {
@@ -371,9 +391,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const denominaciones = stored?.denominaciones || stored?.denominations || [];
     const movimientos = stored?.movimientos || stored?.movements || [];
     const responseMovements = response.movements || {};
-    const responseDenominations = response.denominations || {};
-    const systemIncome = response.system_income || stored?.system_income || this.emptySystemIncome();
-    const totals = response.totals || stored?.totals || {};
+    const systemIncome = stored ? stored?.system_income || this.emptySystemIncome() : response.system_income || this.emptySystemIncome();
+    const totals = stored ? stored?.totals || {} : response.totals || {};
     const suggested = (responseMovements.suggested_from_system || []).map(item => ({ ...item, movement_group: item.movement_group || 'other_payment_methods' }));
     const isNewFlow = stored ? this.resolveIsNewFlow(stored) : true;
 
@@ -388,11 +407,11 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       totals,
       notes: stored?.notes || '',
       reconciliationTolerance: stored?.reconciliation_tolerance || '0.00',
-      bills: isNewFlow ? this.normalizeDenominations(responseDenominations.bills, denominaciones, 'bill', this.defaultBills()) : [],
-      coins: isNewFlow ? this.normalizeDenominations(responseDenominations.coins, denominaciones, 'coin', this.defaultCoins()) : [],
-      foreignCurrency: isNewFlow ? this.normalizeDenominations(responseDenominations.foreign_currency, denominaciones, 'foreign_currency', []) : [],
-      otherPaymentMethods: isNewFlow ? this.normalizeMovements([...(responseMovements.other_payment_methods || []), ...suggested], movimientos, 'other_payment_methods') : [],
-      additionalTransfers: isNewFlow ? this.normalizeMovements(responseMovements.additional_transfers, movimientos, 'additional_transfers') : [],
+      bills: isNewFlow ? this.normalizeDenominations([], denominaciones, 'bill', this.defaultBills()) : [],
+      coins: isNewFlow ? this.normalizeDenominations([], denominaciones, 'coin', this.defaultCoins()) : [],
+      foreignCurrency: isNewFlow ? this.normalizeDenominations([], denominaciones, 'foreign_currency', []) : [],
+      otherPaymentMethods: isNewFlow ? this.normalizeMovements(stored ? [] : suggested, movimientos, 'other_payment_methods') : [],
+      additionalTransfers: isNewFlow ? this.normalizeMovements([], movimientos, 'additional_transfers') : [],
     };
   }
 
@@ -486,7 +505,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private sumMovements(items: CuadreMovimiento[]) {
-    return items.reduce((total, item) => total + Number(item.amount || 0), 0).toFixed(2);
+    return this.formatAmount(items.reduce((total, item) => total + Number(item.amount || 0), 0));
   }
 
   private resetForm() {

@@ -65,6 +65,6 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   openCuadres() {
-    this.router.navigate(['/admin/cuadres']);
+    this.router.navigate(['/admin/cuadres'], { queryParams: { nuevo: true } });
   }
 }

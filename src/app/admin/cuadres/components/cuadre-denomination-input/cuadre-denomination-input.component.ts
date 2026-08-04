@@ -132,6 +132,6 @@ export class CuadreDenominationInputComponent {
   }
 
   private formatAmount(value: number, digits = 2) {
-    return value.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+    return fun.roundNumberToDecimal(value, digits);
   }
 }

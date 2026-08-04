@@ -53,11 +53,14 @@ export class FormDivisaInputComponent extends customFormsElements implements OnI
   }
 
   findDivisa(id: any) {
-    return (this.options().length ? this.options() : this.divisaServ.listaDivisas).find(divisa => divisa.id == id);
+    const option = (this.options().length ? this.options() : this.divisaServ.listaDivisas).find(divisa => divisa.id == id);
+    const local = this.divisaServ.listaDivisas.find(divisa => divisa.id == id);
+    return option && local ? { ...local, ...option, imagen: option.imagen || local.imagen } : option || local;
   }
 
   divisaImageFile(divisa: any) {
-    return divisa?.imagen?.file_name || divisa?.imagen?.fileName || '';
+    const local = this.divisaServ.listaDivisas.find(item => item.id == divisa?.id);
+    return divisa?.imagen?.file_name || local?.imagen?.file_name || '';
   }
 
   divisaDisplayName(divisa: any) {

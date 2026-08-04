@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { fun } from '@services/functions.service';
 
 @Component({
   selector: 'app-cuadre-summary',
@@ -14,11 +15,15 @@ export class CuadreSummaryComponent {
   @Input() additionalTransfersTotal = '0.00';
   @Input() backendTotals: Record<string, string> = {};
 
+  formatAmount(value: string | number) {
+    return fun.roundNumberToDecimal(value || '0.00');
+  }
+
   fondoCaja() {
-    return (Number(this.operationalTotal || 0) - Number(this.systemIncomeTotal || 0)).toFixed(2);
+    return fun.roundNumberToDecimal(Number(fun.desformatearStNumber(this.operationalTotal || 0)) - Number(fun.desformatearStNumber(this.systemIncomeTotal || 0)));
   }
 
   difference() {
-    return (Number(this.operationalTotal || 0) - Number(this.systemIncomeTotal || 0)).toFixed(2);
+    return fun.roundNumberToDecimal(Number(fun.desformatearStNumber(this.operationalTotal || 0)) - Number(fun.desformatearStNumber(this.systemIncomeTotal || 0)));
   }
 }

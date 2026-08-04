@@ -12,8 +12,6 @@
               <h4 class="mb-0">Cuadre de caja</h4>
               @if (existsCuadre()) {
                 <span class="cuadre-source">Guardado</span>
-              } @else if (source() === 'calculated') {
-                <span class="cuadre-source">Calculado</span>
               }
             </div>
 
@@ -45,16 +43,22 @@
                   <section class="system-preview">
                     <div>
                       <span>Facturas consumidor final</span>
-                      <strong>{{ systemIncome().final_consumer_invoices_total }}</strong>
+                      <strong>{{ formatAmount(systemIncome().final_consumer_invoices_total) }}</strong>
                     </div>
                     <div>
                       <span>Recibo de ingresos</span>
-                      <strong>{{ systemIncome().income_receipts_total }}</strong>
+                      <strong>{{ formatAmount(systemIncome().income_receipts_total) }}</strong>
                     </div>
                     <div>
                       <span>Total sistema</span>
-                      <strong>{{ systemIncome().system_income_total }}</strong>
+                      <strong>{{ formatAmount(systemIncome().system_income_total) }}</strong>
                     </div>
+                    @for (method of systemPaymentMethods(); track method.label) {
+                      <div>
+                        <span>{{ method.label }}</span>
+                        <strong>{{ method.value }}</strong>
+                      </div>
+                    }
                   </section>
 
                   @if (selectedIsNewFlow()) {
