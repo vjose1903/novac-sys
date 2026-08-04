@@ -67,6 +67,10 @@ const routes: Routes = [
         path: 'cuadres',
         loadChildren: () => import('../cuadres/cuadres.module').then(m => m.CuadresModule),
       },
+      {
+        path: 'calendario',
+        loadChildren: () => import('../calendario/calendario.module').then(m => m.CalendarioModule),
+      },
     ],
   },
 ];

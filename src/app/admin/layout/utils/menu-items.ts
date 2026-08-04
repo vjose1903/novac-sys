@@ -115,6 +115,17 @@ export const MENU_CONFIG: MenuItemI[] = [
     activeRoutes: ['inventario'],
   },
   {
+    id: 'calendario',
+    module: 'calendario',
+    title: 'Calendario',
+    icon: 'assets/img/calendario.png',
+    permission: [],
+    type: 'single',
+    route: 'calendario',
+    navigate: true,
+    activeRoutes: ['calendario'],
+  },
+  {
     id: 'reportes',
     module: 'reportes',
     title: 'Reportes',
@@ -176,6 +187,10 @@ export const menuPermissionsObj = {
   },
   reportes: {
     reportes: Object.values(Permisos.reporte),
+    flatt: [],
+  },
+  calendario: {
+    calendario: [Permisos.calendario.read_all],
     flatt: [],
   },
 };

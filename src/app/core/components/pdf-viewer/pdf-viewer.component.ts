@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input } from '@angular/core';
 
 import { viewerOptions } from './pdf-viewer';
 import { fun } from '@core/services/functions.service';
@@ -33,11 +33,12 @@ export class PdfViewerComponent implements IDynamicModal, AfterViewInit {
     return this.factura?.document_reference?.document_referenced?.numero_comprobante;
   }
 
-  constructor(public themeService: ThemeService) {}
+  constructor(public themeService: ThemeService, private cdRef: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
     window.setTimeout(() => {
       this.readyToRender = true;
+      this.cdRef.detectChanges();
     });
   }
 

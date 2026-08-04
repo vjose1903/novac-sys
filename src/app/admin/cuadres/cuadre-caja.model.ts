@@ -49,6 +49,9 @@ export interface CuadrePrepareResponse {
   exists_cuadre: boolean;
   source: 'stored' | 'calculated';
   closing_date: string;
+  closing_version?: 'detailed' | 'legacy' | string;
+  flow_type?: 'new' | 'legacy' | string;
+  is_new_flow?: boolean;
   cuadre?: any;
   divisa_principal?: CuadreDivisa;
   divisas?: CuadreDivisa[];

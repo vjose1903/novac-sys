@@ -104,6 +104,13 @@ export const Permisos = {
     update: 'cuadre_caja_update',
     destroy: 'cuadre_caja_destroy',
     check_today_cuadre: 'cuadre_caja_check_today_cuadre',
+    prepare: 'cuadre_caja_prepare',
+    system_income_preview: 'cuadre_caja_system_income_preview',
+    submit: 'cuadre_caja_submit',
+    review: 'cuadre_caja_review',
+    approve: 'cuadre_caja_approve',
+    reject: 'cuadre_caja_reject',
+    reopen: 'cuadre_caja_reopen',
   },
   mantenimiento_articulo: {
     create: 'mantenimiento_articulo_create',
@@ -260,11 +267,6 @@ export const Permisos = {
     read_all: 'commertial_approval_reception_read_all',
     read_one: 'commertial_approval_reception_read_one',
   },
-  configuracion_entidad_cuenta: {
-    read_all: 'configuracion_entidad_cuenta_read_all',
-    read_one: 'configuracion_entidad_cuenta_read_one',
-    update: 'configuracion_entidad_cuenta_update',
-  },
   divisa: {
     create: 'divisa_create',
     read_all: 'divisa_read_all',
@@ -277,5 +279,17 @@ export const Permisos = {
     read_one: 'tasa_cambio_read_one',
     update: 'tasa_cambio_update',
     get_history_changes: 'tasa_cambio_get_history_changes',
+  },
+  calendario: {
+    create: 'calendario_create',
+    read_all: 'calendario_read_all',
+    read_one: 'calendario_read_one',
+    update: 'calendario_update',
+    destroy: 'calendario_destroy',
+    read_event_types: 'calendario_read_event_types',
+    create_event_type: 'calendario_create_event_type',
+    update_event_type: 'calendario_update_event_type',
+    destroy_event_type: 'calendario_destroy_event_type',
+    search_linkables: 'calendario_search_linkables',
   },
 };

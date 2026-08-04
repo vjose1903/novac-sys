@@ -1,6 +1,9 @@
 @use './animateCss.scss' as *;
 @use './splash-styles.scss' as *;
 @use './assets/my_styles/main.scss' as *;
+@import 'fullcalendar/skeleton.css';
+@import 'fullcalendar/themes/classic/theme.css';
+@import 'fullcalendar/themes/classic/palette.css';
 
 .visually-hidden {
   display: none !important;

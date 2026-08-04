@@ -1,0 +1,90 @@
+.calendar-page {
+  height: 100%;
+  min-height: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+  padding: 8px;
+}
+
+.calendar-main {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calendar-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+  }
+}
+
+.calendar-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--app-selectbutton-active-bg);
+  color: var(--app-selectbutton-active-text);
+  font-weight: 700;
+  padding: 9px 14px;
+}
+
+.calendar-layout {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 12px;
+}
+
+.calendar-board {
+  min-width: 0;
+  min-height: 0;
+}
+
+.calendar-sidebar {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calendar-info-panel {
+  border: 1px solid var(--app-card-border);
+  background: var(--app-surface);
+  border-radius: 8px;
+  padding: 14px;
+
+  h6 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0;
+    color: var(--app-text-muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 1100px) {
+  .calendar-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-sidebar {
+    display: none;
+  }
+}

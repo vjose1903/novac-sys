@@ -1,0 +1,9 @@
+<div class="calendar-legend">
+  <h6>Tipos de evento</h6>
+  <ul>
+    <li *ngFor="let type of eventTypes">
+      <span class="legend-dot" [style.background]="type.color"></span>
+      <span>{{ type.name }}</span>
+    </li>
+  </ul>
+</div>

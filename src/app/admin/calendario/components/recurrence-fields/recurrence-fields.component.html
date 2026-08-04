@@ -1,0 +1,45 @@
+<div class="section" [formGroup]="form">
+  <h6>Repeticion</h6>
+
+  <div class="form-grid">
+    <label class="field">
+      <span>Se repite</span>
+      <select formControlName="recurrence_type">
+        <option *ngFor="let option of recurrenceOptions" [value]="option.value">{{ option.label }}</option>
+      </select>
+    </label>
+
+    <label class="field" *ngIf="recurrenceType !== 'none'">
+      <span>Cada</span>
+      <input type="number" min="1" step="1" formControlName="recurrence_interval" />
+    </label>
+  </div>
+
+  <div class="week-days" *ngIf="recurrenceType === 'weekly'">
+    <span>Dias</span>
+    <div>
+      <button *ngFor="let day of weekDays" type="button" [class.active]="hasDay(day.value)" (click)="toggleDay(day.value)">
+        {{ day.label }}
+      </button>
+    </div>
+  </div>
+
+  <div class="form-grid" *ngIf="recurrenceType !== 'none'">
+    <label class="field">
+      <span>Finaliza</span>
+      <select formControlName="recurrence_end_type">
+        <option *ngFor="let option of finishOptions" [value]="option.value">{{ option.label }}</option>
+      </select>
+    </label>
+
+    <label class="field" *ngIf="finishType === 'until'">
+      <span>Fecha final</span>
+      <input type="date" formControlName="recurrence_until" />
+    </label>
+
+    <label class="field" *ngIf="finishType === 'count'">
+      <span>Ocurrencias</span>
+      <input type="number" min="1" step="1" formControlName="recurrence_count" />
+    </label>
+  </div>
+</div>

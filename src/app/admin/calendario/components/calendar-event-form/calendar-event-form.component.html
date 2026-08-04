@@ -1,0 +1,137 @@
+<div class="calendar-modal-backdrop">
+  <form class="event-modal" [class.expanded]="expanded" [formGroup]="form" (ngSubmit)="save()">
+    <header>
+      <h5>{{ isEditing ? 'Editar evento' : 'Nuevo evento' }}</h5>
+      <div>
+        <button type="button" class="icon-action" (click)="expanded = !expanded" aria-label="Expandir">
+          <i class="fas" [class.fa-expand-alt]="!expanded" [class.fa-compress-alt]="expanded"></i>
+        </button>
+        <button type="button" class="icon-action" (click)="closed.emit()" aria-label="Cerrar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="holiday-warning" *ngIf="isHoliday">Los feriados globales no se editan desde este formulario.</div>
+
+      <label class="field wide">
+        <span>Titulo <b>*</b></span>
+        <input type="text" formControlName="title" placeholder="Ej. Reunion con cliente" />
+      </label>
+
+      <div class="form-grid">
+        <label class="field">
+          <span>Tipo <b>*</b></span>
+          <select formControlName="calendar_event_type_id">
+            <option [ngValue]="null">Selecciona tipo</option>
+            <option *ngFor="let type of eventTypes" [ngValue]="type.id">{{ type.name }}</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Ubicacion</span>
+          <input type="text" formControlName="location" placeholder="Oficina, telefono, enlace..." />
+        </label>
+      </div>
+
+      <label class="field color-field">
+        <span>Color</span>
+        <app-calendar-color-picker [value]="form.get('color')?.value" [defaultColor]="selectedTypeColor" (valueChange)="setColor($event)"></app-calendar-color-picker>
+      </label>
+
+      <label class="field wide">
+        <span>Descripcion</span>
+        <textarea formControlName="description" rows="4"></textarea>
+      </label>
+
+      <section class="section">
+        <h6>Fecha y hora</h6>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Desde <b>*</b></span>
+            <input type="date" formControlName="start_date" />
+          </label>
+          <label class="field">
+            <span>Hasta <b>*</b></span>
+            <input type="date" formControlName="end_date" />
+          </label>
+        </div>
+
+        <div class="form-grid" *ngIf="!allDay">
+          <label class="field">
+            <span>Hora inicio</span>
+            <input type="time" step="300" formControlName="start_time" />
+          </label>
+          <label class="field">
+            <span>Hora fin</span>
+            <input type="time" step="300" formControlName="end_time" />
+          </label>
+        </div>
+
+        <label class="check-field">
+          <input type="checkbox" formControlName="all_day" />
+          <span>Todo el dia</span>
+        </label>
+
+        <label class="check-field">
+          <input type="checkbox" formControlName="is_working_day" />
+          <span>Dia laborable</span>
+        </label>
+      </section>
+
+      <app-calendar-recurrence-fields [form]="form"></app-calendar-recurrence-fields>
+
+      <section class="section">
+        <h6>Relacion</h6>
+        <div class="form-grid relation-grid">
+          <label class="field">
+            <span>Entidad vinculada</span>
+            <select [(ngModel)]="linkEntityType" [ngModelOptions]="{ standalone: true }">
+              <option value="">Selecciona entidad</option>
+              <option *ngFor="let entityType of entityTypes" [value]="entityType">{{ entityType }}</option>
+            </select>
+          </label>
+
+          <label class="field" *ngIf="linkEntityType">
+            <span>Buscar</span>
+            <input type="text" [(ngModel)]="linkQuery" [ngModelOptions]="{ standalone: true }" (input)="searchLinkables()" placeholder="Nombre o referencia" />
+          </label>
+        </div>
+
+        <div class="link-results" *ngIf="linkResults.length">
+          <button type="button" *ngFor="let record of linkResults" (click)="addLink(record)">
+            <span>{{ record.label }}</span>
+            <small>{{ record.entity_type }}</small>
+          </button>
+        </div>
+
+        <div class="selected-links" *ngIf="links.length">
+          <span *ngFor="let link of links; let index = index">
+            {{ link.label }}
+            <button type="button" (click)="removeLink(index)" aria-label="Quitar relacion">
+              <i class="fas fa-times"></i>
+            </button>
+          </span>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <button *ngIf="isEditing && !isHoliday" class="danger-btn" type="button" (click)="deleteCurrent()" [disabled]="deleting">
+        <i class="fas fa-trash"></i>
+        <span>Eliminar</span>
+      </button>
+      <span class="footer-spacer"></span>
+      <button class="secondary-btn" type="button" (click)="closed.emit()">
+        <i class="fas fa-times"></i>
+        <span>Cancelar</span>
+      </button>
+      <button class="save-btn" type="submit" [disabled]="saving || isHoliday">
+        <i class="fas fa-save"></i>
+        <span>Guardar</span>
+      </button>
+    </footer>
+  </form>
+</div>

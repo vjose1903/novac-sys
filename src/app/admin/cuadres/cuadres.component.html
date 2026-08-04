@@ -10,9 +10,6 @@
           <div class="form showForm cuadres-form">
             <div class="tituloFormClass">
               <h4 class="mb-0">Cuadre de caja</h4>
-              @if (existsCuadre()) {
-                <span class="cuadre-source">Guardado</span>
-              }
             </div>
 
             <div class="card cardFormClass cuadre-card">
@@ -33,35 +30,42 @@
                       appendTo="body"
                       dateFormat="dd/mm/yy"
                       placeholder="dd/mm/aaaa"
-                      inputStyleClass="form-control"
-                      [disabled]="existsCuadre()"></p-datepicker>
+                      inputStyleClass="form-control"></p-datepicker>
                   </div>
-                  <button type="button" class="btn btn-tema" (click)="prepare()" [disabled]="!closingDate() || prepareResource.isLoading()">Preparar</button>
+                  <button type="button" class="btn btn-tema" (click)="prepare()" [disabled]="!closingDate() || prepareResource.isLoading()">Consultar</button>
                 </section>
 
                 @if (step() >= 3) {
-                  <section class="system-preview">
-                    <div>
-                      <span>Facturas consumidor final</span>
-                      <strong>{{ formatAmount(systemIncome().final_consumer_invoices_total) }}</strong>
-                    </div>
-                    <div>
-                      <span>Recibo de ingresos</span>
-                      <strong>{{ formatAmount(systemIncome().income_receipts_total) }}</strong>
-                    </div>
-                    <div>
-                      <span>Total sistema</span>
-                      <strong>{{ formatAmount(systemIncome().system_income_total) }}</strong>
-                    </div>
-                    @for (method of systemPaymentMethods(); track method.label) {
-                      <div>
-                        <span>{{ method.label }}</span>
-                        <strong>{{ method.value }}</strong>
-                      </div>
-                    }
-                  </section>
-
                   @if (selectedIsNewFlow()) {
+                    <section class="system-preview">
+                      <div>
+                        <span>Facturas consumidor final</span>
+                        <strong>{{ formatAmount(systemIncome().final_consumer_invoices_total) }}</strong>
+                      </div>
+                      <div>
+                        <span>Recibo de ingresos</span>
+                        <strong>{{ formatAmount(systemIncome().income_receipts_total) }}</strong>
+                      </div>
+                      <div>
+                        <span>Total sistema</span>
+                        <strong>{{ formatAmount(systemIncome().system_income_total) }}</strong>
+                      </div>
+                      <div>
+                        <span>Fondo inicial</span>
+                        <strong>{{ formatAmount(openingCashFund()) }}</strong>
+                      </div>
+                      <div>
+                        <span>Total esperado</span>
+                        <strong>{{ formatAmount(expectedTotal()) }}</strong>
+                      </div>
+                      @for (method of systemPaymentMethods(); track method.label) {
+                        <div>
+                          <span>{{ method.label }}</span>
+                          <strong>{{ method.value }}</strong>
+                        </div>
+                      }
+                    </section>
+
                     <div class="cuadre-form-grid">
                       <app-cuadre-denomination-input title="Billetes" type="bill" [items]="bills()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setBills($event)" />
                       <app-cuadre-denomination-input title="Monedas" type="coin" [items]="coins()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setCoins($event)" />
@@ -71,13 +75,26 @@
                     </div>
 
                     <div class="notes-grid">
-                      <div class="form-group">
-                        <label class="control-label">Observaciones</label>
+                      <div class="form-group notes-observations">
+                        <label class="control-label">
+                          Observaciones
+                          <i class="fas fa-info-circle field-info" pTooltip="Comentario opcional para documentar cualquier detalle del cuadre." tooltipPosition="top"></i>
+                        </label>
                         <textarea class="form-control" rows="3" [value]="notes()" [readonly]="readOnly()" (input)="notes.set($any($event.target).value)"></textarea>
                       </div>
                       <div class="form-group">
-                        <label class="control-label">Tolerancia</label>
+                        <label class="control-label">
+                          Tolerancia
+                          <i class="fas fa-info-circle field-info" pTooltip="Margen permitido para considerar el cuadre balanceado cuando exista una diferencia mínima." tooltipPosition="top"></i>
+                        </label>
                         <input class="form-control text-end" [value]="reconciliationTolerance()" [readonly]="readOnly()" (input)="reconciliationTolerance.set($any($event.target).value)" />
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label">
+                          Fondo próximo día
+                          <i class="fas fa-info-circle field-info" pTooltip="Monto de efectivo que se dejará como fondo inicial para el próximo cuadre. No se suma como ingreso." tooltipPosition="top"></i>
+                        </label>
+                        <input class="form-control text-end" [value]="nextDayCashFund()" [readonly]="readOnly()" (input)="nextDayCashFund.set($any($event.target).value || '0.00')" />
                       </div>
                     </div>
 
@@ -87,6 +104,8 @@
                       [physicalCashTotal]="physicalCashTotal()"
                       [otherPaymentMethodsTotal]="otherPaymentMethodsTotal()"
                       [additionalTransfersTotal]="additionalTransfersTotal()"
+                      [openingCashFund]="openingCashFund()"
+                      [expectedTotal]="expectedTotal()"
                       [backendTotals]="summaryTotals()" />
                   } @else {
                     <section class="legacy-summary">
@@ -95,18 +114,12 @@
                         <span>Realizado con el modelo antiguo</span>
                       </div>
                       <div class="legacy-summary-grid">
-                        <div>
-                          <span>Total sistema</span>
-                          <strong>{{ selectedCuadre()?.system_income_total || selectedCuadre()?.totals?.system_income_total || '0.00' }}</strong>
-                        </div>
-                        <div>
-                          <span>Total operativo</span>
-                          <strong>{{ selectedCuadre()?.operational_total || selectedCuadre()?.totals?.operational_total || selectedCuadre()?.total || '0.00' }}</strong>
-                        </div>
-                        <div>
-                          <span>Diferencia</span>
-                          <strong>{{ selectedCuadre()?.difference || selectedCuadre()?.totals?.difference || '0.00' }}</strong>
-                        </div>
+                        @for (row of legacySummaryRows(); track row.label) {
+                          <div>
+                            <span>{{ row.label }}</span>
+                            <strong>{{ formatAmount(row.value) }}</strong>
+                          </div>
+                        }
                       </div>
                     </section>
                   }
@@ -114,12 +127,15 @@
               </div>
 
               <div class="form-footer-actions">
-                <div>
-                  <button type="button" class="btn me-2" id="btn-blanco" (click)="closeForm()" style="max-width: 6rem">Cerrar</button>
-                </div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                  @if (step() >= 3 && !readOnly()) {
-                    <button type="button" class="btn btn-tema" (click)="saveCuadre()" [disabled]="saveResource.isLoading()">Guardar cuadre</button>
+                  <button type="button" class="btn btn-sm me-2" id="btn-blanco" (click)="clearForm()" style="max-width: 6rem">Borrar</button>
+
+                  @if (step() >= 3 && !existsCuadre() && !readOnly()) {
+                    <button type="button" class="btn btn-sm btn-tema" (click)="saveCuadre()" [disabled]="saveResource.isLoading()">Guardar</button>
+                  }
+
+                  @if (step() >= 3 && existsCuadre()) {
+                    <button type="button" class="btn btn-sm btn-warning text-dark" (click)="printCuadre()">{{ savedInCurrentForm() ? 'Imprimir' : 'Reimprimir' }}</button>
                   }
 
                   @if (step() >= 3 && existsCuadre()) {
@@ -139,6 +155,9 @@
                       }
                     </div>
                   }
+                </div>
+                <div>
+                  <button type="button" class="btn btn-sm ms-2" id="btn-blanco" (click)="closeForm()" style="max-width: 6rem">Cerrar</button>
                 </div>
               </div>
             </div>

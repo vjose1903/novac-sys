@@ -13,6 +13,8 @@ export class CuadreSummaryComponent {
   @Input() physicalCashTotal = '0.00';
   @Input() otherPaymentMethodsTotal = '0.00';
   @Input() additionalTransfersTotal = '0.00';
+  @Input() openingCashFund = '0.00';
+  @Input() expectedTotal = '0.00';
   @Input() backendTotals: Record<string, string> = {};
 
   formatAmount(value: string | number) {
@@ -20,10 +22,11 @@ export class CuadreSummaryComponent {
   }
 
   fondoCaja() {
-    return fun.roundNumberToDecimal(Number(fun.desformatearStNumber(this.operationalTotal || 0)) - Number(fun.desformatearStNumber(this.systemIncomeTotal || 0)));
+    return this.difference();
   }
 
   difference() {
-    return fun.roundNumberToDecimal(Number(fun.desformatearStNumber(this.operationalTotal || 0)) - Number(fun.desformatearStNumber(this.systemIncomeTotal || 0)));
+    const expected = this.expectedTotal || this.backendTotals?.expected_total || this.systemIncomeTotal || '0.00';
+    return fun.roundNumberToDecimal(Number(fun.desformatearStNumber(this.operationalTotal || 0)) - Number(fun.desformatearStNumber(expected || 0)));
   }
 }

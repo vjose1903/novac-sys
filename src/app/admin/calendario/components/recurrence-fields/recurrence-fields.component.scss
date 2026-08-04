@@ -1,0 +1,71 @@
+.section {
+  border-top: 1px solid var(--app-border);
+  padding-top: 16px;
+}
+
+h6 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  color: var(--app-text);
+  font-size: 13px;
+  font-weight: 800;
+
+  input,
+  select {
+    height: 38px;
+    border: 1px solid var(--app-border);
+    border-radius: 10px;
+    background: var(--app-input-bg, var(--app-surface));
+    color: var(--app-text);
+    padding: 0 10px;
+    font-weight: 500;
+  }
+}
+
+.week-days {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  font-size: 13px;
+  font-weight: 800;
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  button {
+    width: 34px;
+    height: 30px;
+    border: 1px solid var(--app-border);
+    border-radius: 7px;
+    background: var(--app-surface);
+    color: var(--app-text);
+    font-weight: 800;
+  }
+
+  button.active {
+    border-color: var(--app-selectbutton-active-bg);
+    background: var(--app-selectbutton-active-bg);
+    color: var(--app-selectbutton-active-text);
+  }
+}
+
+@media (max-width: 720px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

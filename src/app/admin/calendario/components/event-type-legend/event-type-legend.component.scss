@@ -1,0 +1,35 @@
+.calendar-legend {
+  border: 1px solid var(--app-card-border);
+  background: var(--app-surface);
+  border-radius: 8px;
+  padding: 14px;
+
+  h6 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--app-text);
+  }
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
