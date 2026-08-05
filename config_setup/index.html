@@ -5,6 +5,17 @@
     <meta charset="utf-8" />
     <title>$$TITLE_APP$$</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        const cachedTheme = JSON.parse(localStorage.getItem('novac-theme-cache') || 'null');
+        if (cachedTheme?.mode) {
+          document.documentElement.dataset.themeMode = cachedTheme.mode;
+        }
+        if (cachedTheme?.color) {
+          document.documentElement.dataset.themeColor = cachedTheme.color;
+        }
+      } catch {}
+    </script>
   </head>
   <body>
     <app-root>

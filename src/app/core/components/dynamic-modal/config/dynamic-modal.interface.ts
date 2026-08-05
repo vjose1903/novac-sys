@@ -101,6 +101,7 @@ export enum confirmationButtons {
   cancelarRemover = 'cancelar-remover',
   cancelarDesactivar = 'cancelar-desactivar',
   cancelarAnular = 'cancelar-anular',
+  cancelarRechazar = 'cancelar-rechazar',
   cancelarActivar = 'cancelar-activar',
   cancelarAceptar = 'cancelar-aceptar',
   cancelarCerrar = 'cancelar-cerrar',
@@ -167,6 +168,10 @@ export const confirmBtnConfig: IConfirmBtnConfig = {
   [confirmationButtons.cancelarAnular]: {
     noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
     siBtn: { label: 'Anular', icon: fontAwesome.faSolid.ban, clase: 'btn-danger', showProcess: false, id: 'btnAnular' },
+  },
+  [confirmationButtons.cancelarRechazar]: {
+    noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },
+    siBtn: { label: 'Rechazar', icon: fontAwesome.faSolid.ban, clase: 'btn-danger', showProcess: false, id: 'btnRechazar' },
   },
   [confirmationButtons.copiarSalir]: {
     noBtn: { label: 'Cancelar', icon: null, clase: 'btn-light-grey', showProcess: false, id: 'btnCancelar' },

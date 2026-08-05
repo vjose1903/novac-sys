@@ -106,6 +106,7 @@
                       [additionalTransfersTotal]="additionalTransfersTotal()"
                       [openingCashFund]="openingCashFund()"
                       [expectedTotal]="expectedTotal()"
+                      [creditInvoicesTotal]="creditInvoicesTotal()"
                       [backendTotals]="summaryTotals()" />
                   } @else {
                     <section class="legacy-summary">
@@ -142,9 +143,6 @@
                     <div class="state-actions">
                       @if (canSubmit()) {
                         <button type="button" class="btn btn-sm btn-light" (click)="runStateAction('submit')">Enviar</button>
-                      }
-                      @if (canReview()) {
-                        <button type="button" class="btn btn-sm btn-light" (click)="runStateAction('review')">Revisar</button>
                       }
                       @if (canApproveReject()) {
                         <button type="button" class="btn btn-sm btn-light" (click)="runStateAction('approve')">Aprobar</button>

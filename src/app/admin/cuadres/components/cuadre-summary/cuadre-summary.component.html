@@ -39,4 +39,8 @@
     <span>Diferencia</span>
     <strong>{{ fondoCaja() }}</strong>
   </div>
+  <div class="summary-info">
+    <span>Facturas a crédito</span>
+    <strong>{{ formatAmount(creditInvoicesTotal || backendTotals?.credit_invoices_total || '0.00') }}</strong>
+  </div>
 </section>

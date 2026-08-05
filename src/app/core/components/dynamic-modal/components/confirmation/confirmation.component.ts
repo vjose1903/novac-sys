@@ -22,7 +22,7 @@ export class ConfirmationComponent implements OnInit, IDynamicModal {
   @Input() iconSize: string;
   @Input() iconColor: string;
   @Input() showReasonInput: boolean;
-  @Input() onYes?: () => void | Promise<void>;
+  @Input() onYes?: (reason?: string) => void | Promise<void>;
 
   reason!: string;
 
@@ -41,14 +41,14 @@ export class ConfirmationComponent implements OnInit, IDynamicModal {
     if (modalWrapper && modalWrapper.changeStateButton) {
       modalWrapper.changeStateButton({
         modalId: this.modalConfig.id,
-        btnId: 'btnEliminar',
+        btnId: this.modalConfig.inputs?.reasonButtonId || 'btnEliminar',
         disable: buttonIsDisable,
       });
     }
   }
 
   submit(arg?: any) {
-    if (this.onYes) this.onYes();
+    if (this.onYes) this.onYes(this.reason);
     this.modalConfig.close();
   }
 }

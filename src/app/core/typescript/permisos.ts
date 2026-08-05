@@ -107,7 +107,6 @@ export const Permisos = {
     prepare: 'cuadre_caja_prepare',
     system_income_preview: 'cuadre_caja_system_income_preview',
     submit: 'cuadre_caja_submit',
-    review: 'cuadre_caja_review',
     approve: 'cuadre_caja_approve',
     reject: 'cuadre_caja_reject',
     reopen: 'cuadre_caja_reopen',

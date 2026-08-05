@@ -15,6 +15,7 @@ export class CuadreSummaryComponent {
   @Input() additionalTransfersTotal = '0.00';
   @Input() openingCashFund = '0.00';
   @Input() expectedTotal = '0.00';
+  @Input() creditInvoicesTotal = '0.00';
   @Input() backendTotals: Record<string, string> = {};
 
   formatAmount(value: string | number) {

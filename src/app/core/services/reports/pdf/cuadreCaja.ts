@@ -10,10 +10,11 @@ import { ConfigI } from '../../../interface/config-interface';
 
 export function makePDF(data) {
   const configApp: ConfigI = Ss.configServ.config;
+  const reportData = normalizeReportData(data);
 
   try {
-    if (isNewFlow(data)) return makeDetailedPDF(data, configApp);
-    return makeLegacyPDF(data, configApp);
+    if (isNewFlow(reportData)) return makeDetailedPDF(reportData, configApp);
+    return makeLegacyPDF(reportData, configApp);
   } catch (error) {
     return error;
   }
@@ -43,9 +44,9 @@ function makeLegacyPDF(data, configApp: ConfigI) {
 function makeDetailedPDF(data, configApp: ConfigI) {
   const dd = {
     pageSize: 'LETTER',
-    pageMargins: [42, 82, 42, 28],
+    pageMargins: [34, 98, 34, 28],
     pageOrientation: 'portrait',
-    header: cabeceraCuadreCompacto(data, configApp),
+    header: cabeceraCuadreModerno(data, configApp),
     content: contenidoReporteDetallado(data),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
@@ -139,45 +140,46 @@ function cabeceraReporte(data, configApp: ConfigI, currentPage, pageCount) {
   }
 }
 
-function cabeceraCuadreCompacto(data, configApp: ConfigI) {
-  const header = () => [
+function cabeceraCuadreModerno(data, configApp: ConfigI) {
+  const header = (currentPage, pageCount) => [
     {
-      margin: [42, 10, 42, 0],
+      margin: [34, 12, 34, 0],
       columns: [
         {
-          width: 70,
-          stack: [{ image: 'logo', width: 58, opacity: 0.9, margin: [0, 4, 0, 0] }],
+          width: 76,
+          stack: [{ image: 'logo', width: 58, opacity: 0.92, margin: [0, 2, 0, 0] }],
         },
         {
           width: '*',
           stack: [
-            { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra10' },
+            { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
             { text: configApp.direccion_empresa, alignment: 'center', style: 'letra8' },
             {
               text: [
                 { text: 'Telefono: ', style: 'letra8', bold: true },
                 { text: configApp.telefono_empresa, style: 'letra8' },
-              ],
-              alignment: 'center',
-            },
-            {
-              text: [
-                { text: 'RNC No. ', style: 'letra8', bold: true },
+                { text: '  RNC: ', style: 'letra8', bold: true },
                 { text: configApp.rnc_empresa, style: 'letra8' },
               ],
               alignment: 'center',
             },
-            { text: 'CUADRE DIARIO DE CAJA', alignment: 'center', bold: true, style: 'letra10', margin: [0, 4, 0, 0] },
+            { text: 'CUADRE DIARIO DE CAJA', alignment: 'center', bold: true, style: 'letra12', margin: [0, 7, 0, 0] },
           ],
         },
         {
-          width: 85,
+          width: 142,
           stack: [
-            { text: 'FECHA:', bold: true, alignment: 'center', style: 'letra9', margin: [0, 38, 0, 2] },
-            { text: formatDate(getClosingDate(data)), bold: true, alignment: 'center', style: 'letra9' },
+            metadataText('Pag... :  ', `${currentPage} de ${pageCount}`),
+            metadataText('Fecha : ', `${formatDate(new Date())} - ${fun_.my_houreFormater(new Date())}`),
+            metadataText('Realizado por: ', userName(data.prepared_by) || data.realizado_por || data.usuario || ''),
+            metadataText('Aprobado por: ', userName(data.approved_by)),
+            metadataText('No... :  ', data.numero_documento || data.numero_reporte || data.id || ''),
           ],
         },
       ],
+    },
+    {
+      canvas: [{ type: 'line', x1: 34, y1: 5, x2: 578, y2: 5, lineWidth: 0.8, lineColor: '#222222' }],
     },
   ];
 
@@ -256,6 +258,7 @@ function contenidoReporteDetallado(data) {
   const additionalTransfersTotal = getFirstValue(totals, ['additional_transfers_total'], sumMovements(additionalTransfers));
   const operationalTotal = getFirstValue(totals, ['operational_total', 'total'], toNumber(physicalCashTotal) + toNumber(otherPaymentMethodsTotal) + toNumber(additionalTransfersTotal));
   const systemIncomeTotal = getFirstValue(systemIncome, ['system_income_total'], getFirstValue(totals, ['system_income_total'], 0));
+  const creditInvoicesTotal = getFirstValue(systemIncome, ['credit_invoices_total'], getFirstValue(totals, ['credit_invoices_total'], 0));
   const openingCashFund = getFirstValue(totals, ['opening_cash_fund'], 0);
   const expectedTotal = getFirstValue(totals, ['expected_total'], toNumber(systemIncomeTotal) + toNumber(openingCashFund));
   const differenceAmount = getFirstValue(totals, ['difference_amount', 'difference'], toNumber(operationalTotal) - toNumber(expectedTotal));
@@ -276,6 +279,7 @@ function contenidoReporteDetallado(data) {
       expectedTotal,
       differenceAmount,
     }),
+    makeInformativeCreditInvoicesSection(creditInvoicesTotal),
     makeSignatureSection(),
     data.notes ? { text: `Observaciones: ${data.notes}`, style: 'letra8', margin: [0, 8, 0, 0] } : emptyBlock(),
   ].filter(item => !!item);
@@ -284,26 +288,23 @@ function contenidoReporteDetallado(data) {
 function makeCompactDenominationSection(title: string, rows: any[], showRate: boolean) {
   const body = [
     [
-      { text: title, bold: true, style: 'letra9', margin: [0, 0, 0, 2] },
-      {},
-      {},
-      { text: 'CANTIDAD', bold: true, style: 'letra9', alignment: 'center' },
-      showRate ? { text: 'TASA', bold: true, style: 'letra9', alignment: 'right' } : {},
-      { text: 'TOTAL', bold: true, style: 'letra9', alignment: 'right' },
+      tableHeaderCell('MONEDA'),
+      tableHeaderCell('DENOM.'),
+      tableHeaderCell('CANTIDAD'),
+      showRate ? tableHeaderCell('TASA') : tableHeaderCell(''),
+      tableHeaderCell('TOTAL'),
     ],
     ...(rows.length
       ? rows.map(item => [
-        { text: showRate ? getCurrencyCode(item) : '', style: 'letra8', alignment: 'right' },
+        { text: getCurrencyCode(item), style: 'letra8', alignment: 'center' },
         { text: formatInteger(item.denomination_value), style: 'letra9', alignment: 'right' },
-        { text: 'X', style: 'letra9', alignment: 'center' },
-        { text: formatAmount(item.quantity), style: 'letra9', alignment: 'right' },
+        { text: formatQuantity(item.quantity), style: 'letra9', alignment: 'right' },
         showRate ? { text: formatRate(item.exchange_rate || item.current_tasa || item.tasa || 1), style: 'letra9', alignment: 'right' } : {},
         { text: formatAmount(getDenominationTotal(item)), style: 'letra9', alignment: 'right' },
       ])
-      : [[{}, { text: '-', style: 'letra9', alignment: 'right' }, {}, { text: '-', style: 'letra9', alignment: 'right' }, showRate ? {} : {}, { text: '-', style: 'letra9', alignment: 'right' }]]),
+      : [[{}, { text: '-', style: 'letra9', alignment: 'right' }, { text: '-', style: 'letra9', alignment: 'right' }, showRate ? {} : {}, { text: '-', style: 'letra9', alignment: 'right' }]]),
     [
-      {},
-      { text: 'TOTAL', bold: true, style: 'letra9', alignment: 'right' },
+      { text: 'TOTAL', bold: true, style: 'letra9', alignment: 'left', margin: [7, 2, 0, 2] },
       {},
       {},
       {},
@@ -313,39 +314,40 @@ function makeCompactDenominationSection(title: string, rows: any[], showRate: bo
 
   return {
     margin: [0, 0, 0, 5],
-    table: {
-      widths: [70, 58, 18, '*', showRate ? 58 : 20, 105],
-      body,
-    },
-    layout: compactLineLayout(),
+    stack: [
+      sectionTitle(title),
+      {
+        table: {
+          widths: [62, 72, '*', showRate ? 58 : 20, 105],
+          body,
+        },
+        layout: sectionTableLayout(),
+      },
+    ],
   };
 }
 
 function makeCompactTotalLine(label: string, total) {
   return {
-    margin: [0, 0, 0, 8],
+    margin: [0, -5, 0, 8],
     table: {
       widths: [160, '*', 105],
-      body: [[{}, { text: label, bold: true, style: 'letra9', alignment: 'left' }, { text: formatAmount(total), bold: true, style: 'letra9', alignment: 'right' }]],
+      body: [[{ text: label, bold: true, style: 'letra9', alignment: 'left', margin: [7, 3, 0, 3] }, {}, { text: formatAmount(total), bold: true, style: 'letra9', alignment: 'right', margin: [0, 3, 8, 3] }]],
     },
-    layout: noBorderLayout(),
+    layout: totalBandLayout('#dcdcdc', false),
   };
 }
 
 function makeCompactMovementSection(prefix: string, label: string, rows: any[], total) {
   const visibleRows = rows.length ? rows : [{ description: '', amount: 0 }];
   const body = [
+    [tableHeaderCell(prefix), tableHeaderCell(label), tableHeaderCell('MONTO')],
     ...visibleRows.map((item, index) => [
-      {
-        stack: [
-          index === 0 ? { text: prefix, bold: true, style: 'letra9' } : { text: '', style: 'letra9' },
-          index === 0 ? { text: label, bold: true, style: 'letra9', margin: [0, 4, 0, 0] } : { text: '', style: 'letra9' },
-        ],
-      },
-      { text: item.description || paymentMethodLabel(item.payment_method) || '', style: 'letra9', margin: [0, 2, 0, 0] },
-      { text: formatAmount(item.amount), style: 'letra9', alignment: 'right', margin: [0, 2, 0, 0] },
+      { text: '', style: 'letra9' },
+      { text: item.description || paymentMethodLabel(item.payment_method) || '', style: 'letra9', margin: [0, 1, 0, 1] },
+      { text: formatAmount(item.amount), style: 'letra9', alignment: 'right', margin: [0, 1, 0, 1] },
     ]),
-    [{}, {}, { text: formatAmount(total), bold: true, style: 'letra9', alignment: 'right', margin: [0, 2, 0, 0] }],
+    [{ text: 'TOTAL', bold: true, style: 'letra9', alignment: 'left', margin: [7, 2, 0, 2] }, {}, { text: formatAmount(total), bold: true, style: 'letra9', alignment: 'right' }],
   ];
 
   return {
@@ -354,7 +356,7 @@ function makeCompactMovementSection(prefix: string, label: string, rows: any[], 
       widths: [92, '*', 105],
       body,
     },
-    layout: compactLineLayout(),
+    layout: sectionTableLayout(),
   };
 }
 
@@ -373,12 +375,30 @@ function makeCompactTotalsSection(values) {
     margin: [0, 0, 0, 0],
     table: {
       widths: ['*', 125],
-      body: rows.map(row => [
-        { text: row[0], style: 'letra9', bold: true, margin: [0, 2, 0, 2] },
-        row[2] ? boxedNumber(row[1]) : { text: formatAmount(row[1]), style: 'letra9', alignment: 'right', margin: [0, 2, 8, 2] },
-      ]),
+      body: rows.map(row => totalRow(row[0], row[1], row[2])),
     },
-    layout: compactTotalsLayout(),
+    layout: modernTotalsLayout(),
+  };
+}
+
+function totalRow(label, value, highlighted = false) {
+  return [
+    { text: label, style: 'letra9', bold: true, margin: [7, 3, 0, 3] },
+    { text: formatAmount(value), style: 'letra9', bold: highlighted, alignment: 'right', margin: [0, 3, 8, 3] },
+  ];
+}
+
+function makeInformativeCreditInvoicesSection(total) {
+  return {
+    margin: [0, 7, 0, 0],
+    table: {
+      widths: ['*', 125],
+      body: [[
+        { text: 'FACTURAS A CREDITO', style: 'letra9', bold: true, margin: [7, 3, 0, 3] },
+        { text: formatAmount(total), style: 'letra9', bold: true, alignment: 'right', margin: [0, 3, 8, 3] },
+      ]],
+    },
+    layout: totalBandLayout('#eeeeee', true),
   };
 }
 
@@ -404,23 +424,69 @@ function makeSignatureSection() {
   };
 }
 
-function compactLineLayout() {
+function metadataText(label, value) {
   return {
-    hLineWidth: (i, node) => (i === node.table.body.length - 1 ? 0.7 : 0),
+    text: [
+      { text: label, style: 'letra8', bold: true },
+      { text: value ? String(value) : '', style: 'letra8' },
+    ],
+    alignment: 'left',
+    margin: [0, 1, 0, 0],
+  };
+}
+
+function sectionTitle(title: string) {
+  return { text: title, bold: true, style: 'letra10', margin: [0, 4, 0, 2] };
+}
+
+function tableHeaderCell(text) {
+  return { text, style: 'letra8', bold: true, alignment: text === 'MONEDA' ? 'center' : 'right', margin: [0, 2, 0, 2] };
+}
+
+function modernTableLayout() {
+  return {
+    hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 0 : 0.45),
     vLineWidth: () => 0,
-    hLineColor: () => '#555555',
-    paddingLeft: () => 2,
-    paddingRight: () => 2,
+    hLineColor: () => '#d9e0e6',
+    paddingLeft: () => 4,
+    paddingRight: () => 4,
     paddingTop: () => 1,
     paddingBottom: () => 1,
   };
 }
 
-function compactTotalsLayout() {
+function sectionTableLayout() {
   return {
-    hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 0 : 0.5),
+    fillColor: (rowIndex, node) => (rowIndex === node.table.body.length - 1 ? '#eeeeee' : null),
+    hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 0 : 0.45),
     vLineWidth: () => 0,
-    hLineColor: () => '#777777',
+    hLineColor: () => '#d9e0e6',
+    paddingLeft: () => 4,
+    paddingRight: () => 4,
+    paddingTop: () => 1,
+    paddingBottom: () => 1,
+  };
+}
+
+function totalBandLayout(color = '#eeeeee', showTopLine = true) {
+  return {
+    fillColor: () => color,
+    hLineWidth: (i, node) => (i === 0 ? (showTopLine ? 0.7 : 0) : i === node.table.body.length ? 0.7 : 0),
+    vLineWidth: () => 0,
+    hLineColor: () => '#222222',
+    paddingLeft: () => 0,
+    paddingRight: () => 0,
+    paddingTop: () => 0,
+    paddingBottom: () => 0,
+  };
+}
+
+function modernTotalsLayout() {
+  return {
+    fillColor: rowIndex => (rowIndex === 0 || rowIndex === 6 ? '#dcdcdc' : null),
+    hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 0.7 : 0.35),
+    vLineWidth: () => 0,
+    hLineColor: (i, node) => (i === 0 || i === node.table.body.length ? '#222222' : '#c9c9c9'),
     paddingLeft: () => 0,
     paddingRight: () => 0,
     paddingTop: () => 1,
@@ -439,25 +505,6 @@ function noBorderLayout() {
   };
 }
 
-function boxedNumber(value) {
-  return {
-    table: {
-      widths: ['*'],
-      body: [[{ text: formatAmount(value), bold: true, style: 'letra9', alignment: 'right', margin: [6, 1, 6, 1] }]],
-    },
-    layout: {
-      hLineWidth: () => 1,
-      vLineWidth: () => 1,
-      hLineColor: () => '#333333',
-      vLineColor: () => '#333333',
-      paddingLeft: () => 0,
-      paddingRight: () => 0,
-      paddingTop: () => 0,
-      paddingBottom: () => 0,
-    },
-  };
-}
-
 function emptyBlock() {
   return { text: '', margin: [0, 0, 0, 0] };
 }
@@ -469,6 +516,10 @@ function isNewFlow(data) {
   if (data?.closing_version === 'detailed') return true;
   if (data?.closing_version === 'legacy') return false;
   return false;
+}
+
+function normalizeReportData(data) {
+  return data?.data?.cuadre || data?.cuadre || data?.data || data || {};
 }
 
 function getClosingDate(data) {
@@ -485,6 +536,10 @@ function formatAmount(value) {
 
 function formatInteger(value) {
   return Math.round(toNumber(value || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function formatQuantity(value) {
+  return formatInteger(value);
 }
 
 function formatRate(value) {
@@ -551,4 +606,10 @@ function paymentMethodLabel(method) {
     other: 'Otro',
   };
   return labels[method] || method || '';
+}
+
+function userName(user) {
+  if (!user) return '';
+  if (typeof user === 'string') return user;
+  return user.nombre_completo || [user.nombre, user.apellido].filter(item => !!item).join(' ') || user.name || '';
 }

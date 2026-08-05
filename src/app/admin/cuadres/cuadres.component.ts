@@ -10,6 +10,8 @@ import { fun } from '@core/services/functions.service';
 import { DivisaService } from '@admin/registros/divisa/divisa.service';
 import { CuadreCajaSignalC, CuadreDenominacion, CuadreDivisa, CuadreListItem, CuadreMovimiento, CuadrePrepareResponse, CuadreSystemIncome } from './cuadre-caja.model';
 import { CuadreC } from './cuadres';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 interface CuadreListRequest {
   page: number;
@@ -26,6 +28,7 @@ interface CuadreSaveRequest {
 interface CuadreActionRequest {
   id: number;
   action: string;
+  body?: any;
   nonce: number;
 }
 
@@ -120,17 +123,18 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   });
 
   readonly physicalCashTotal = computed(() => {
-    if (this.existsCuadre() && this.selectedIsNewFlow()) return this.formatAmount(this.totals()?.physical_cash_total || '0.00');
+    if (this.useStoredTotals()) return this.formatAmount(this.totals()?.physical_cash_total || '0.00');
     const all = [...this.bills(), ...this.coins(), ...this.foreignCurrency()];
     return this.formatAmount(all.reduce((total, item) => total + this.denominationTotal(item), 0));
   });
 
-  readonly otherPaymentMethodsTotal = computed(() => (this.existsCuadre() && this.selectedIsNewFlow() ? this.formatAmount(this.totals()?.other_payment_methods_total || '0.00') : this.sumMovements(this.otherPaymentMethods())));
-  readonly additionalTransfersTotal = computed(() => (this.existsCuadre() && this.selectedIsNewFlow() ? this.formatAmount(this.totals()?.additional_transfers_total || '0.00') : this.sumMovements(this.additionalTransfers())));
+  readonly otherPaymentMethodsTotal = computed(() => (this.useStoredTotals() ? this.formatAmount(this.totals()?.other_payment_methods_total || '0.00') : this.sumMovements(this.otherPaymentMethods())));
+  readonly additionalTransfersTotal = computed(() => (this.useStoredTotals() ? this.formatAmount(this.totals()?.additional_transfers_total || '0.00') : this.sumMovements(this.additionalTransfers())));
   readonly summaryTotals = computed(() => ({
     ...this.totals(),
     final_consumer_invoices_total: this.systemIncome().final_consumer_invoices_total,
     income_receipts_total: this.systemIncome().income_receipts_total,
+    credit_invoices_total: this.creditInvoicesTotal(),
     opening_cash_fund: this.openingCashFund(),
     expected_total: this.expectedTotal(),
     difference_amount: this.differenceAmount(),
@@ -161,16 +165,18 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   readonly readOnly = computed(() => {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
     const isToday = this.closingDate() === this.today();
-    return !isToday || !this.selectedIsNewFlow() || (this.existsCuadre() && !['draft', 'reopened', 'rejected'].includes(status));
+    return !isToday || !this.selectedIsNewFlow() || (this.existsCuadre() && !['reopened', 'rejected'].includes(status));
   });
+  readonly useStoredTotals = computed(() => this.existsCuadre() && this.selectedIsNewFlow() && this.readOnly());
 
   readonly operationalTotal = computed(() => {
-    if (this.existsCuadre() && this.selectedIsNewFlow()) return this.formatAmount(this.totals()?.operational_total || '0.00');
+    if (this.useStoredTotals()) return this.formatAmount(this.totals()?.operational_total || '0.00');
     return this.formatAmount(Number(fun.desformatearStNumber(this.physicalCashTotal())) + Number(fun.desformatearStNumber(this.otherPaymentMethodsTotal())) + Number(fun.desformatearStNumber(this.additionalTransfersTotal())));
   });
   readonly openingCashFund = computed(() => this.totals()?.opening_cash_fund || '0.00');
+  readonly creditInvoicesTotal = computed(() => this.systemIncome().credit_invoices_total || this.totals()?.credit_invoices_total || '0.00');
   readonly expectedTotal = computed(() => this.totals()?.expected_total || this.formatAmount(Number(fun.desformatearStNumber(this.systemIncome().system_income_total || 0)) + Number(fun.desformatearStNumber(this.openingCashFund() || 0))));
-  readonly differenceAmount = computed(() => (this.existsCuadre() && this.selectedIsNewFlow() ? this.formatAmount(this.totals()?.difference_amount || '0.00') : this.formatAmount(Number(fun.desformatearStNumber(this.operationalTotal() || 0)) - Number(fun.desformatearStNumber(this.expectedTotal() || 0)))));
+  readonly differenceAmount = computed(() => (this.useStoredTotals() ? this.formatAmount(this.totals()?.difference_amount || '0.00') : this.formatAmount(Number(fun.desformatearStNumber(this.operationalTotal() || 0)) - Number(fun.desformatearStNumber(this.expectedTotal() || 0)))));
 
   listResource = httpResource<any>(() => {
     const request = this.listRequest();
@@ -200,10 +206,10 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   stateActionResource = httpResource<any>(() => {
     const request = this.actionRequest();
     if (!request) return undefined;
-    return this.cuadreApi.actionRequest(request.id, request.action, {});
+    return this.cuadreApi.actionRequest(request.id, request.action, request.body || {});
   }, { defaultValue: null });
 
-  constructor(private tServ: TablasService, private divisaServ: DivisaService, private route: ActivatedRoute) {
+  constructor(private tServ: TablasService, private divisaServ: DivisaService, private route: ActivatedRoute, private dynamicModalServ: DynamicModalService) {
     super();
 
     effect(() => {
@@ -303,9 +309,14 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   runStateAction(action: string) {
-    if (!this.isCurrentClosingDate() || !this.selectedIsNewFlow()) return;
+    const canProcessHistoricalReview = ['approve', 'reject'].includes(action);
+    if ((!this.isCurrentClosingDate() && !canProcessHistoricalReview) || !this.selectedIsNewFlow()) return;
     const id = Number(this.selectedCuadre()?.id);
     if (!id) return;
+    if (action === 'reject') {
+      this.openRejectModal(id);
+      return;
+    }
     this.actionRequest.set({ id, action, nonce: Date.now() });
   }
 
@@ -363,19 +374,29 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   canSubmit() {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
-    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && Number(this.selectedCuadre()?.id) && ['draft', 'reopened', 'rejected'].includes(status);
-  }
-
-  canReview() {
-    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && (this.selectedCuadre()?.status || this.selectedCuadre()?.estado) === 'submitted';
+    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && Number(this.selectedCuadre()?.id) && ['reopened', 'rejected'].includes(status);
   }
 
   canApproveReject() {
-    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && (this.selectedCuadre()?.status || this.selectedCuadre()?.estado) === 'reviewed';
+    return this.selectedIsNewFlow() && Number(this.selectedCuadre()?.id) && (this.selectedCuadre()?.status || this.selectedCuadre()?.estado) === 'submitted';
   }
 
   canReopen() {
-    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && ['submitted', 'reviewed', 'approved', 'rejected'].includes(this.selectedCuadre()?.status || this.selectedCuadre()?.estado);
+    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && ['approved', 'rejected', 'cancelled'].includes(this.selectedCuadre()?.status || this.selectedCuadre()?.estado);
+  }
+
+  private openRejectModal(id: number) {
+    this.dynamicModalServ.confirmationModal({
+      id: 'rechazar_cuadre_caja',
+      header: 'Rechazar cuadre',
+      width: '34rem',
+      texto: '<p>Indica el motivo por el que este cuadre será rechazado.</p>',
+      btnKind: confirmationButtons.cancelarRechazar,
+      iconName: 'fa-solid fa-triangle-exclamation',
+      iconColor: '#dc3545',
+      showReasonInput: true,
+      onYes: reason => this.actionRequest.set({ id, action: 'reject', body: { reason: reason || '' }, nonce: Date.now() }),
+    });
   }
 
   private applyPrepareResponse(response: CuadrePrepareResponse | any) {
@@ -465,6 +486,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
         final_consumer_invoices_total: systemIncome.final_consumer_invoices_total || totals.final_consumer_invoices_total || '0.00',
         income_receipts_total: systemIncome.income_receipts_total || totals.income_receipts_total || '0.00',
         system_income_total: systemIncome.system_income_total || totals.system_income_total || '0.00',
+        credit_invoices_total: systemIncome.credit_invoices_total || totals.credit_invoices_total || '0.00',
       },
       totals,
       notes: stored?.notes || '',
@@ -552,7 +574,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private mapListItem(item: any) {
-    const status = item.status || item.estado || 'draft';
+    const status = item.status || item.estado || 'submitted';
     const isNewFlow = this.resolveIsNewFlow(item);
     return {
       ...item,
@@ -573,15 +595,14 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   private statusLabel(status: string) {
     const labels = {
-      draft: 'Borrador',
       submitted: 'Enviado',
-      reviewed: 'Revisado',
       approved: 'Aprobado',
       rejected: 'Rechazado',
       reopened: 'Reabierto',
+      cancelled: 'Cancelado',
     };
 
-    return labels[status] || status || 'Borrador';
+    return labels[status] || status || 'Enviado';
   }
 
   private formatDateLabel(date: string) {
@@ -590,12 +611,11 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   private statusSeverity(status: string) {
     const severities = {
-      draft: 'info',
       submitted: 'warn',
-      reviewed: 'warn',
       approved: 'success',
       rejected: 'danger',
       reopened: 'info',
+      cancelled: 'secondary',
     };
 
     return severities[status] || 'info';

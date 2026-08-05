@@ -1,6 +1,6 @@
 import { CrudGSignal } from '@core/typescript/crud-g-signal';
 
-export type CuadreEstado = 'draft' | 'submitted' | 'reviewed' | 'approved' | 'rejected' | 'reopened';
+export type CuadreEstado = 'submitted' | 'approved' | 'rejected' | 'reopened' | 'cancelled';
 export type DenominationType = 'bill' | 'coin' | 'foreign_currency';
 export type MovementGroup = 'other_payment_methods' | 'additional_transfers';
 
@@ -38,10 +38,12 @@ export interface CuadreSystemIncome {
   final_consumer_invoices_total: string;
   income_receipts_total: string;
   system_income_total: string;
+  credit_invoices_total?: string;
   payment_methods?: Record<string, string>;
   invoice_payment_methods?: Record<string, string>;
   receipt_payment_methods?: Record<string, string>;
   invoices?: any[];
+  credit_invoices?: any[];
   receipts?: any[];
 }
 

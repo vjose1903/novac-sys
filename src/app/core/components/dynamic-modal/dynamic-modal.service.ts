@@ -47,11 +47,12 @@ export class DynamicModalService {
     showReasonInput?: boolean;
     onCancelar?: () => void | Promise<void>;
     onNo?: () => void | Promise<void>;
-    onYes?: () => void | Promise<void>;
+    onYes?: (reason?: string) => void | Promise<void>;
   }) {
     const { id, texto, header = 'Confirmación', btnKind = confirmationButtons.cancelarContinuar, width = '40vw', iconName, iconSize, iconColor, closableClickOutside, showReasonInput = false, onNo, onYes, onCancelar } = params;
 
-    const inputs = { html: texto, iconName, iconSize, iconColor, showReasonInput, onYes };
+    const currentBtnConfig = confirmBtnConfig[btnKind];
+    const inputs = { html: texto, iconName, iconSize, iconColor, showReasonInput, onYes, reasonButtonId: currentBtnConfig?.siBtn?.id };
 
     const confirmationModal = new DynamicModalClass();
     confirmationModal.id = id;
@@ -61,8 +62,6 @@ export class DynamicModalService {
     confirmationModal.component = ConfirmationComponent;
     confirmationModal.closableClickOutside = closableClickOutside;
     confirmationModal.botones = [];
-
-    const currentBtnConfig = confirmBtnConfig[btnKind];
 
     // Configurar botón de cancelar si es necesario
     if (currentBtnConfig.cancelarBtn) {
