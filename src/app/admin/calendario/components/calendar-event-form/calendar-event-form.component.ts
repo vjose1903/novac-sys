@@ -1,27 +1,33 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
 import { CalendarEventInput, CalendarEventLink, CalendarEventPayload, CalendarEventType, CalendarLinkableRecord } from '../../calendario.models';
 import { CalendarioService } from '../../services/calendario.service';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
 import { RecurrenceFieldsComponent } from '../recurrence-fields/recurrence-fields.component';
+import { TimePickerInputComponent } from '@core/components/form-fields/time-picker-input/time-picker-input.component';
 
 @Component({
   selector: 'app-calendar-event-form',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ColorPickerComponent, RecurrenceFieldsComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SelectModule, DatePickerModule, ColorPickerComponent, RecurrenceFieldsComponent, TimePickerInputComponent],
   templateUrl: './calendar-event-form.component.html',
   styleUrls: ['./calendar-event-form.component.scss'],
 })
-export class CalendarEventFormComponent implements OnInit, OnChanges {
+export class CalendarEventFormComponent implements OnInit, OnChanges, IDynamicModal {
   @Input() event?: CalendarEventInput;
   @Input() startDate?: string;
   @Input() eventTypes: CalendarEventType[] = [];
+  @Input() modalConfig!: IModalConfiguration;
+  @Input() modalWrapper!: DynamicModalComponent;
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
   @Output() deleted = new EventEmitter<void>();
 
   form!: FormGroup;
-  expanded = false;
   saving = false;
   deleting = false;
   linkEntityType = '';
@@ -29,6 +35,8 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
   linkResults: CalendarLinkableRecord[] = [];
   links: CalendarEventLink[] = [];
   entityTypes = ['Cliente', 'User', 'Suplidor', 'Vehiculo'];
+  entityTypeOptions = this.entityTypes.map(entityType => ({ label: entityType, value: entityType }));
+  private linkSearchRequestId = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -62,8 +70,14 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
     return this.eventTypes.find(type => type.id === typeId)?.color || '#2563eb';
   }
 
+  submit() {
+    return this.save();
+  }
+
   async save() {
-    if (this.form.invalid || this.isHoliday) {
+    if (this.saving) return;
+
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
@@ -72,21 +86,28 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
     try {
       await this.calendarioService.saveEvent(this.makePayload());
       this.saved.emit();
+      this.closeWithRefresh();
     } finally {
       this.saving = false;
     }
   }
 
   async deleteCurrent() {
-    if (!this.event?.id || this.isHoliday) return;
+    if (!this.event?.id || this.isHoliday || this.deleting) return;
 
     this.deleting = true;
     try {
       await this.calendarioService.deleteEvent(String(this.event.id));
       this.deleted.emit();
+      this.closeWithRefresh();
     } finally {
       this.deleting = false;
     }
+  }
+
+  close() {
+    if (this.modalConfig?.close) this.modalConfig.close();
+    else this.closed.emit();
   }
 
   setColor(color: string | null) {
@@ -94,7 +115,28 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
   }
 
   async searchLinkables() {
-    this.linkResults = await this.calendarioService.searchLinkables(this.linkEntityType, this.linkQuery);
+    const requestId = ++this.linkSearchRequestId;
+    const entityType = this.linkEntityType;
+    const query = this.linkQuery;
+
+    if (!entityType) {
+      this.linkResults = [];
+      return;
+    }
+
+    const results = await this.calendarioService.searchLinkables(entityType, query);
+
+    setTimeout(() => {
+      if (requestId === this.linkSearchRequestId && entityType === this.linkEntityType && query === this.linkQuery) {
+        this.linkResults = results;
+      }
+    });
+  }
+
+  changeLinkEntityType(value: string) {
+    this.linkEntityType = value;
+    this.linkQuery = '';
+    this.linkResults = [];
   }
 
   addLink(record: CalendarLinkableRecord) {
@@ -118,7 +160,7 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
   }
 
   private buildForm() {
-    const today = this.toDateInput(new Date());
+    const today = new Date();
 
     this.form = this.fb.group({
       title: ['', Validators.required],
@@ -153,7 +195,7 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
       location: props.location ?? '',
       color: this.event?.color || null,
       description: props.description ?? '',
-      start_date: this.toDateInput(start),
+      start_date: start,
       end_date: this.toEndDateInput(end, Boolean(this.event?.allDay)),
       start_time: this.toTimeInput(start, '09:00'),
       end_time: this.toTimeInput(end, '10:00'),
@@ -179,18 +221,20 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
       location: value.location || null,
       calendar_event_type_id: Number(value.calendar_event_type_id),
       color: value.color || null,
-      start_date: value.start_date,
-      end_date: value.end_date,
+      start_date: this.toDateInput(value.start_date),
+      end_date: this.toDateInput(value.end_date),
       start_time: value.all_day ? null : value.start_time,
       end_time: value.all_day ? null : value.end_time,
       all_day: Boolean(value.all_day),
       is_working_day: Boolean(value.is_working_day),
+      is_holiday: this.isHoliday ? true : undefined,
+      holiday_key: this.isHoliday ? this.event?.extendedProps?.holidayKey ?? null : undefined,
       timezone: this.calendarioService.getTimezone(),
       recurrence_type: value.recurrence_type,
       recurrence_rule: null,
       recurrence_interval: Number(value.recurrence_interval || 1),
       recurrence_days: value.recurrence_type === 'weekly' ? value.recurrence_days ?? [] : [],
-      recurrence_until: recurrenceEndType === 'until' ? value.recurrence_until : null,
+      recurrence_until: recurrenceEndType === 'until' ? this.toDateInput(value.recurrence_until) : null,
       recurrence_count: recurrenceEndType === 'count' ? Number(value.recurrence_count || 1) : null,
       links: this.links,
     };
@@ -207,7 +251,12 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
     return payload;
   }
 
+  private closeWithRefresh() {
+    if (this.modalConfig?.close) this.modalConfig.close({ refresh: true });
+  }
+
   private toDateInput(date: Date) {
+    if (!(date instanceof Date)) return this.toDateInput(this.parseEventDate(date));
     if (Number.isNaN(date.getTime())) return this.toDateInput(new Date());
     const year = date.getFullYear();
     const month = `${date.getMonth() + 1}`.padStart(2, '0');
@@ -228,10 +277,10 @@ export class CalendarEventFormComponent implements OnInit, OnChanges {
   }
 
   private toEndDateInput(date: Date, allDay: boolean) {
-    if (!allDay) return this.toDateInput(date);
+    if (!allDay) return date;
     const adjusted = new Date(date);
     adjusted.setDate(adjusted.getDate() - 1);
-    return this.toDateInput(adjusted);
+    return adjusted;
   }
 
   private toTimeInput(date: Date, fallback: string) {

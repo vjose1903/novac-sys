@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
 import { WEEK_DAYS } from '../../calendario.models';
 
 @Component({
   selector: 'app-calendar-recurrence-fields',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, DatePickerModule, SelectModule],
   templateUrl: './recurrence-fields.component.html',
   styleUrls: ['./recurrence-fields.component.scss'],
 })

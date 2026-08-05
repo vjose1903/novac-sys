@@ -1400,6 +1400,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       return this.abrirModalPropietario({ send_factura: true });
     }
 
+    if (this.factServ.isVenta() && this.condicion_fact == 'Crédito' && fun.isEmpty(this.factServ?.propietario_factura?.id)) {
+      return fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
+    }
+
     // Procesar según el tipo de documento
     if (this.factServ.tipoDocumento() != tipoDocFacturacion.compra && (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.isPreVenta() || this.factServ.isCotizacion())) {
       return this.abrirModalConfirmacionImprimir();

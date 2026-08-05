@@ -134,6 +134,7 @@ export class ThemeService {
       rootStyle.setProperty('--app-button-neutral-bg', 'var(--app-surface-muted)');
       rootStyle.setProperty('--app-button-neutral-text', 'var(--app-text)');
       rootStyle.setProperty('--app-button-neutral-border', 'var(--app-border)');
+      rootStyle.setProperty('--app-button-default-icon', '#ffffff');
       rootStyle.setProperty('--app-button-cancel-icon', '#eef2f7');
       rootStyle.setProperty('--app-switch-off-bg', '#e0e0e079');
       rootStyle.setProperty('--app-switch-off-border', '#40454a');
@@ -224,6 +225,7 @@ export class ThemeService {
     rootStyle.setProperty('--app-button-neutral-bg', '#e9e9e9');
     rootStyle.setProperty('--app-button-neutral-text', '#000000');
     rootStyle.setProperty('--app-button-neutral-border', '#e9e9e9');
+    rootStyle.setProperty('--app-button-default-icon', '#000000');
     rootStyle.setProperty('--app-button-cancel-icon', '#000000');
     rootStyle.setProperty('--app-switch-off-bg', '#ffffff');
     rootStyle.setProperty('--app-switch-off-border', '#d9dadc');

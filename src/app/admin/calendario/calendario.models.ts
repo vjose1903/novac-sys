@@ -43,6 +43,9 @@ export interface CalendarEventExtendedProps {
   isHoliday?: boolean;
   isWorkingDay?: boolean;
   source?: string;
+  holidayKey?: string;
+  updatedAt?: string;
+  updated_at?: string;
   timezone?: string;
   recurrenceRule?: string | null;
   links?: CalendarEventLink[];
@@ -67,6 +70,8 @@ export interface CalendarEventPayload {
   end_time?: string | null;
   all_day: boolean;
   is_working_day: boolean;
+  is_holiday?: boolean;
+  holiday_key?: string | null;
   timezone: string;
   recurrence_type?: CalendarRecurrenceType;
   recurrence_rule?: string | null;

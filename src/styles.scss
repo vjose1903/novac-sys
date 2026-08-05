@@ -2,8 +2,8 @@
 @use './splash-styles.scss' as *;
 @use './assets/my_styles/main.scss' as *;
 @import 'fullcalendar/skeleton.css';
-@import 'fullcalendar/themes/classic/theme.css';
-@import 'fullcalendar/themes/classic/palette.css';
+@import 'fullcalendar/themes/monarch/theme.css';
+@import 'fullcalendar/themes/monarch/palettes/blue.css';
 
 .visually-hidden {
   display: none !important;
@@ -169,6 +169,7 @@ body {
   --app-button-neutral-bg: #e9e9e9;
   --app-button-neutral-text: #000000;
   --app-button-neutral-border: #e9e9e9;
+  --app-button-default-icon: #000000;
   --app-button-cancel-icon: #000000;
   --app-switch-off-bg: #ffffff;
   --app-switch-off-border: #d9dadc;

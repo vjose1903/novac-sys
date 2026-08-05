@@ -19,7 +19,7 @@ interface InflightRequest {
   priority: number;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class CalendarioService {
   private readonly timezone = 'America/Santo_Domingo';
   private readonly dbName = 'novac_calendar_cache';

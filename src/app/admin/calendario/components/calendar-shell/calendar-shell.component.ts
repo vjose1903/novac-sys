@@ -6,7 +6,7 @@ import interactionPlugin from '@fullcalendar/angular/interaction';
 import listPlugin from '@fullcalendar/angular/list';
 import timeGridPlugin from '@fullcalendar/angular/timegrid';
 import allLocales from '@fullcalendar/angular/locales-all';
-import themePlugin from '@fullcalendar/angular/themes/classic';
+import themePlugin from '@fullcalendar/angular/themes/monarch';
 import { CalendarioService } from '../../services/calendario.service';
 import { CalendarEventInput } from '../../calendario.models';
 
@@ -38,8 +38,10 @@ export class CalendarShellComponent {
     dayMaxEvents: 3,
     headerToolbar: false,
     eventDisplay: 'block',
-    displayEventTime: true,
+    displayEventTime: false,
     eventClass: info => (info.event.extendedProps?.isWorkingDay === false ? 'calendar-non-working-event' : ''),
+    eventDidMount: info => this.applyEventColors(info),
+    dayCellClass: info => (info.isOther ? 'calendar-other-month-day' : ''),
     datesSet: info => this.handleDatesSet(info),
     dateClick: info => this.handleDateClick(info),
     eventClick: info => this.handleEventClick(info),
@@ -101,6 +103,16 @@ export class CalendarShellComponent {
     this.dateSelected.emit(this.toDateOnly(info.dateStr));
   }
 
+  private applyEventColors(info: any) {
+    const event = info.event as any;
+    const color = event.backgroundColor || event.borderColor || event.color || '#2563eb';
+    const textColor = event.textColor || event.contrastColor || '#ffffff';
+
+    info.el.style.setProperty('--calendar-event-color', color);
+    info.el.style.setProperty('--calendar-event-text-color', textColor);
+    info.el.classList.add('calendar-colored-event');
+  }
+
   private toDateOnly(value: string) {
     return value.slice(0, 10);
   }
@@ -122,12 +134,27 @@ export class CalendarShellComponent {
     if (!this.visibleRange || !this.calendar) return;
 
     const api = this.calendar.getApi();
-    const events = this.calendarioService.getVisibleEvents(this.visibleRange.start, this.visibleRange.end);
+    const events = this.calendarioService
+      .getVisibleEvents(this.visibleRange.start, this.visibleRange.end)
+      .map(event => this.withEventColors(event));
 
     api.batchRendering(() => {
       api.removeAllEventSources();
       api.removeAllEvents();
       api.addEventSource(events);
     });
+  }
+
+  private withEventColors(event: CalendarEventInput): CalendarEventInput {
+    const color = event.color || event.backgroundColor || event.borderColor || '#2563eb';
+    const textColor = event.textColor || '#ffffff';
+
+    return {
+      ...event,
+      color,
+      backgroundColor: color,
+      borderColor: color,
+      textColor,
+    };
   }
 }

@@ -13,21 +13,8 @@
 
       <aside class="calendar-sidebar">
         <app-event-type-legend [eventTypes]="eventTypes"></app-event-type-legend>
-        <div class="calendar-info-panel">
-          <h6>Google Calendar</h6>
-          <p>El enlace se genera al guardar el evento desde el backend.</p>
-        </div>
       </aside>
     </div>
   </div>
 
-  <app-calendar-event-form
-    *ngIf="formVisible"
-    [event]="selectedEvent"
-    [startDate]="selectedStartDate"
-    [eventTypes]="eventTypes"
-    (closed)="closeForm()"
-    (saved)="refreshCalendar()"
-    (deleted)="refreshCalendar()"
-  ></app-calendar-event-form>
 </section>

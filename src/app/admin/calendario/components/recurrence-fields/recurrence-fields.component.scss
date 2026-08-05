@@ -1,36 +1,25 @@
-.section {
-  border-top: 1px solid var(--app-border);
-  padding-top: 16px;
-}
-
-h6 {
-  margin: 0 0 12px;
+.calendar-section-title {
+  margin: 0 0 0.75rem;
   font-size: 13px;
   font-weight: 800;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
+:host ::ng-deep {
+  .calendar-compact-select.p-select {
+    height: 2.625rem !important;
+    min-height: 2.625rem !important;
+    padding: 0 !important;
+  }
 
-.field {
-  display: grid;
-  gap: 7px;
-  color: var(--app-text);
-  font-size: 13px;
-  font-weight: 800;
+  .calendar-compact-select .p-select-label,
+  .calendar-compact-select .p-select-dropdown {
+    display: flex;
+    align-items: center;
+  }
 
-  input,
-  select {
-    height: 38px;
-    border: 1px solid var(--app-border);
-    border-radius: 10px;
-    background: var(--app-input-bg, var(--app-surface));
-    color: var(--app-text);
-    padding: 0 10px;
-    font-weight: 500;
+  .calendar-compact-select .p-select-label {
+    height: 100%;
+    padding: 0.2rem 0.75rem !important;
   }
 }
 
@@ -65,7 +54,14 @@ h6 {
 }
 
 @media (max-width: 720px) {
-  .form-grid {
-    grid-template-columns: 1fr;
+  .calendar-recurrence {
+    .col-6,
+    .col-12 {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      width: 100%;
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
   }
 }

@@ -54,7 +54,7 @@
                       Procesando...
                     } @else {
                       @if (dynamic_boton.iconName) {
-                        <i class="{{ dynamic_boton.iconName }}" [ngStyle]="{ 'font-size': dynamic_boton.iconSize ?? '20px', color: dynamic_boton.iconColor ?? 'white' }"></i>
+                        <i class="{{ dynamic_boton.iconName }}" [ngStyle]="{ 'font-size': dynamic_boton.iconSize ?? '20px', color: dynamic_boton.iconColor ?? 'currentColor' }"></i>
                       }
                       {{ dynamic_boton.label }}
                     }

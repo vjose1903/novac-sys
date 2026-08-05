@@ -1,4 +1,4 @@
-<div class="color-picker">
+<div class="color-picker" [class.open]="open">
   <button class="color-trigger" type="button" (click)="open = !open">
     <span class="color-dot" [style.background]="previewColor"></span>
     <i class="fas fa-chevron-down"></i>
