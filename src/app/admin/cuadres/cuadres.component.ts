@@ -449,29 +449,31 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return {
       cuadre_caja: {
         closing_date: this.closingDate(),
-        next_day_cash_fund: this.plainNumber(this.nextDayCashFund() || '0.00'),
+        next_day_cash_fund: this.toNumber(this.nextDayCashFund()),
         notes: this.notes() || '',
-        reconciliation_tolerance: this.plainNumber(this.reconciliationTolerance() || '0.00'),
+        reconciliation_tolerance: this.toNumber(this.reconciliationTolerance()),
         denominaciones: [...this.bills(), ...this.coins(), ...this.foreignCurrency()].map(item => ({
           denomination_type: item.denomination_type,
           divisa_id: this.divisaIdByLine(item),
-          denomination_value: this.plainNumber(item.denomination_value || '0.00'),
-          quantity: this.plainNumber(item.quantity || '0'),
+          denomination_value: this.toNumber(item.denomination_value),
+          quantity: this.toNumber(item.quantity),
         })),
         movimientos: [...this.otherPaymentMethods(), ...this.additionalTransfers()].map(item => ({
           movement_group: item.movement_group,
           payment_method: item.payment_method,
           description: item.description || '',
           reference: item.reference || '',
-          amount: this.plainNumber(item.amount || '0.00'),
+          amount: this.toNumber(item.amount),
         })),
       },
     };
   }
 
-  private plainNumber(value: any) {
-    const stringValue = String(value ?? '');
-    return stringValue.includes(',') ? String(fun.desformatearStNumber(stringValue)) : stringValue;
+  private toNumber(value: any): number {
+    const cleaned = String(value ?? '').replace(/[^\d.-]/g, '');
+    if (cleaned === '' || cleaned === '-' || cleaned === '.') return 0;
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
   }
 
   private normalizePreparedData(response: CuadrePrepareResponse, stored: any) {
