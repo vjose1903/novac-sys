@@ -63,6 +63,38 @@
   padding-top: 0.75rem;
 }
 
+:host ::ng-deep {
+  .cuadre-method-select,
+  .cuadre-method-select.p-select {
+    width: 100%;
+  }
+
+  .cuadre-method-select.p-select {
+    align-items: center;
+    display: flex;
+    height: calc(1.5em + 0.5rem + 2px) !important;
+    min-height: calc(1.5em + 0.5rem + 2px) !important;
+    padding: 0 !important;
+  }
+
+  .cuadre-method-select .p-select-label,
+  .cuadre-method-select .p-select-dropdown {
+    align-items: center;
+    color: var(--app-text);
+    display: flex;
+  }
+
+  .cuadre-method-select .p-select-label {
+    height: 100%;
+    line-height: 1.5;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  .cuadre-method-select .p-select-dropdown {
+    width: 1.8rem;
+  }
+}
+
 @media (max-width: 767px) {
   .cuadre-grid {
     grid-template-columns: 1fr;

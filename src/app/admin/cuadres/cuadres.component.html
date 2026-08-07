@@ -145,11 +145,11 @@
                         <button type="button" class="btn btn-sm btn-light" (click)="runStateAction('submit')">Enviar</button>
                       }
                       @if (canApproveReject()) {
-                        <button type="button" class="btn btn-sm btn-light" (click)="runStateAction('approve')">Aprobar</button>
-                        <button type="button" class="btn btn-sm btn-light" (click)="runStateAction('reject')">Rechazar</button>
+                        <button type="button" class="btn btn-sm btn-success" (click)="runStateAction('approve')">Aprobar</button>
+                        <button type="button" class="btn btn-sm btn-danger" (click)="runStateAction('reject')">Rechazar</button>
                       }
                       @if (canReopen()) {
-                        <button type="button" class="btn btn-sm btn-light" (click)="runStateAction('reopen')">Reabrir</button>
+                        <button type="button" class="btn btn-sm btn-primary" (click)="runStateAction('reopen')">Reabrir</button>
                       }
                     </div>
                   }

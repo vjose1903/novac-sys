@@ -309,7 +309,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   runStateAction(action: string) {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
-    const canProcessHistoricalReview = ['approve', 'reject'].includes(action) || (action === 'submit' && ['reopened', 'rejected'].includes(status));
+    const canProcessHistoricalReview = ['approve', 'reject'].includes(action) || (action === 'submit' && ['reopened', 'rejected'].includes(status)) || (action === 'reopen' && ['submitted', 'approved', 'rejected', 'cancelled'].includes(status));
     if ((!this.isCurrentClosingDate() && !canProcessHistoricalReview) || !this.selectedIsNewFlow()) return;
     const id = Number(this.selectedCuadre()?.id);
     if (!id) return;
@@ -382,7 +382,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   canReopen() {
-    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && ['approved', 'rejected', 'cancelled'].includes(this.selectedCuadre()?.status || this.selectedCuadre()?.estado);
+    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && ['submitted', 'approved', 'rejected', 'cancelled'].includes(this.selectedCuadre()?.status || this.selectedCuadre()?.estado);
   }
 
   private openRejectModal(id: number) {
@@ -536,7 +536,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       payment_method: this.normalizePaymentMethod(item.payment_method || item['method'] || item['forma_pago'] || item.description),
       description: item.description || '',
       reference: item.reference || '',
-      amount: String(item.amount || '0.00'),
+      amount: fun.roundNumberToDecimal(item.amount || '0.00'),
     }));
   }
 
@@ -560,7 +560,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private normalizePaymentMethod(method: string) {
-    const value = String(method || '').toLowerCase();
+    const value = String(method || '').trim().toLowerCase();
     if (value.includes('efect') || value === 'cash') return 'cash';
     if (value.includes('cheq') || value === 'check') return 'check';
     if (value.includes('tarj') || value === 'card') return 'card';

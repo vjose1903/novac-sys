@@ -268,8 +268,8 @@ function contenidoReporteDetallado(data) {
     makeCompactDenominationSection('MONEDAS', coins, false),
     foreignCurrency.length ? makeCompactDenominationSection('DIVISAS', foreignCurrency, true) : emptyBlock(),
     makeCompactTotalLine('TOTALES', physicalCashTotal),
-    makeCompactMovementSection('MAS:', 'CHEQUES;', otherPaymentMethods, otherPaymentMethodsTotal),
-    makeCompactMovementSection('MAS:', 'TRANSF.', additionalTransfers, additionalTransfersTotal),
+    makeCompactMovementSection('TARJETAS, CHEQUES, DEPOSITOS Y TRANSFERENCIAS', otherPaymentMethods, otherPaymentMethodsTotal),
+    makeCompactMovementSection('TRANSFERENCIAS ADICIONALES', additionalTransfers, additionalTransfersTotal),
     makeCompactTotalsSection({
       finalConsumerInvoicesTotal: getFirstValue(systemIncome, ['final_consumer_invoices_total'], getFirstValue(totals, ['final_consumer_invoices_total'], 0)),
       incomeReceiptsTotal: getFirstValue(systemIncome, ['income_receipts_total'], getFirstValue(totals, ['income_receipts_total'], 0)),
@@ -338,25 +338,41 @@ function makeCompactTotalLine(label: string, total) {
   };
 }
 
-function makeCompactMovementSection(prefix: string, label: string, rows: any[], total) {
-  const visibleRows = rows.length ? rows : [{ description: '', amount: 0 }];
+function makeCompactMovementSection(title: string, rows: any[], total) {
+  const visibleRows = rows.length ? rows : [{ payment_method: '', description: '', reference: '', amount: 0 }];
   const body = [
-    [tableHeaderCell(prefix), tableHeaderCell(label), tableHeaderCell('MONTO')],
-    ...visibleRows.map((item, index) => [
-      { text: '', style: 'letra9' },
-      { text: item.description || paymentMethodLabel(item.payment_method) || '', style: 'letra9', margin: [0, 1, 0, 1] },
+    [
+      tableHeaderCell('METODO', 'left'),
+      tableHeaderCell('DESCRIPCION', 'left'),
+      tableHeaderCell('REFERENCIA', 'left'),
+      tableHeaderCell('MONTO'),
+    ],
+    ...visibleRows.map(item => [
+      { text: paymentMethodLabel(item.payment_method) || '', style: 'letra9', margin: [7, 1, 0, 1] },
+      { text: item.description || '', style: 'letra9', margin: [0, 1, 0, 1] },
+      { text: item.reference || '', style: 'letra9', margin: [0, 1, 0, 1] },
       { text: formatAmount(item.amount), style: 'letra9', alignment: 'right', margin: [0, 1, 0, 1] },
     ]),
-    [{ text: 'TOTAL', bold: true, style: 'letra9', alignment: 'left', margin: [7, 2, 0, 2] }, {}, { text: formatAmount(total), bold: true, style: 'letra9', alignment: 'right' }],
+    [
+      { text: 'TOTAL', bold: true, style: 'letra9', alignment: 'left', margin: [7, 2, 0, 2] },
+      {},
+      {},
+      { text: formatAmount(total), bold: true, style: 'letra9', alignment: 'right' },
+    ],
   ];
 
   return {
     margin: [0, 0, 0, 8],
-    table: {
-      widths: [92, '*', 105],
-      body,
-    },
-    layout: sectionTableLayout(),
+    stack: [
+      sectionTitle(title),
+      {
+        table: {
+          widths: [92, '*', 120, 105],
+          body,
+        },
+        layout: sectionTableLayout(),
+      },
+    ],
   };
 }
 
@@ -439,8 +455,8 @@ function sectionTitle(title: string) {
   return { text: title, bold: true, style: 'letra10', margin: [0, 4, 0, 2] };
 }
 
-function tableHeaderCell(text) {
-  return { text, style: 'letra8', bold: true, alignment: text === 'MONEDA' ? 'center' : 'right', margin: [0, 2, 0, 2] };
+function tableHeaderCell(text, alignment?) {
+  return { text, style: 'letra8', bold: true, alignment: alignment || (text === 'MONEDA' ? 'center' : 'right'), margin: [0, 2, 0, 2] };
 }
 
 function modernTableLayout() {
