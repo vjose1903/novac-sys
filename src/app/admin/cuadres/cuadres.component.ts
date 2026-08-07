@@ -164,8 +164,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   readonly readOnly = computed(() => {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
-    const isToday = this.closingDate() === this.today();
-    return !isToday || !this.selectedIsNewFlow() || (this.existsCuadre() && !['reopened', 'rejected'].includes(status));
+    return !this.selectedIsNewFlow() || (this.existsCuadre() && !['reopened', 'rejected'].includes(status));
   });
   readonly useStoredTotals = computed(() => this.existsCuadre() && this.selectedIsNewFlow() && this.readOnly());
 
@@ -309,7 +308,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   runStateAction(action: string) {
-    const canProcessHistoricalReview = ['approve', 'reject'].includes(action);
+    const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
+    const canProcessHistoricalReview = ['approve', 'reject'].includes(action) || (action === 'submit' && ['reopened', 'rejected'].includes(status));
     if ((!this.isCurrentClosingDate() && !canProcessHistoricalReview) || !this.selectedIsNewFlow()) return;
     const id = Number(this.selectedCuadre()?.id);
     if (!id) return;
@@ -374,7 +374,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   canSubmit() {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
-    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && Number(this.selectedCuadre()?.id) && ['reopened', 'rejected'].includes(status);
+    return this.selectedIsNewFlow() && Number(this.selectedCuadre()?.id) && ['reopened', 'rejected'].includes(status);
   }
 
   canApproveReject() {
