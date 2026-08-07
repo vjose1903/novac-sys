@@ -18,7 +18,10 @@ export class CuadreMovementsEditorComponent {
   paymentMethods = [
     { value: 'card', label: 'Tarjeta' },
     { value: 'check', label: 'Cheque' },
+    { value: 'deposit', label: 'Depósito' },
     { value: 'bank_transfer', label: 'Transferencia' },
+    { value: 'petty_cash_check', label: 'Cheque de caja chica' },
+    { value: 'other', label: 'Otro' },
   ];
 
   addItem() {

@@ -139,6 +139,10 @@
                     <button type="button" class="btn btn-sm btn-warning text-dark" (click)="printCuadre()">{{ savedInCurrentForm() ? 'Imprimir' : 'Reimprimir' }}</button>
                   }
 
+                  @if (step() >= 3 && existsCuadre() && selectedIsNewFlow()) {
+                    <button type="button" class="btn btn-sm btn-gris" (click)="openDetailsModal()">Detalles</button>
+                  }
+
                   @if (step() >= 3 && existsCuadre()) {
                     <div class="state-actions">
                       @if (canSubmit()) {

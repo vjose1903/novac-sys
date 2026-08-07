@@ -44,14 +44,14 @@ function makeLegacyPDF(data, configApp: ConfigI) {
 function makeDetailedPDF(data, configApp: ConfigI) {
   const dd = {
     pageSize: 'LETTER',
-    pageMargins: [34, 98, 34, 28],
+    pageMargins: [34, 82, 34, 28],
     pageOrientation: 'portrait',
     header: cabeceraCuadreModerno(data, configApp),
     content: contenidoReporteDetallado(data),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
-    styles: styles_,
+    styles: detailedStyles(),
     defaultStyle,
   };
 
@@ -186,6 +186,17 @@ function cabeceraCuadreModerno(data, configApp: ConfigI) {
   return header;
 }
 
+function detailedStyles() {
+  return {
+    ...styles_,
+    letra8: { ...styles_.letra8, fontSize: 6.8 },
+    letra9: { ...styles_.letra9, fontSize: 7.6 },
+    letra10: { ...styles_.letra10, fontSize: 8.4 },
+    letra11: { ...styles_.letra11, fontSize: 9.2 },
+    letra12: { ...styles_.letra12, fontSize: 10.5 },
+  };
+}
+
 // ================================================================================================================================================
 // CONTENIDO
 // =========================================================~======================================================================================
@@ -262,6 +273,7 @@ function contenidoReporteDetallado(data) {
   const openingCashFund = getFirstValue(totals, ['opening_cash_fund'], 0);
   const expectedTotal = getFirstValue(totals, ['expected_total'], toNumber(systemIncomeTotal) + toNumber(openingCashFund));
   const differenceAmount = getFirstValue(totals, ['difference_amount', 'difference'], toNumber(operationalTotal) - toNumber(expectedTotal));
+  const notes = String(data.notes || '').trim();
 
   return [
     makeCompactDenominationSection('BILLETES', bills, false),
@@ -281,7 +293,7 @@ function contenidoReporteDetallado(data) {
     }),
     makeInformativeCreditInvoicesSection(creditInvoicesTotal),
     makeSignatureSection(),
-    data.notes ? { text: `Observaciones: ${data.notes}`, style: 'letra8', margin: [0, 8, 0, 0] } : emptyBlock(),
+    notes ? { text: `Observaciones: ${notes}`, style: 'letra8', margin: [0, 8, 0, 0] } : emptyBlock(),
   ].filter(item => !!item);
 }
 

@@ -11,7 +11,9 @@ import { DivisaService } from '@admin/registros/divisa/divisa.service';
 import { CuadreCajaSignalC, CuadreDenominacion, CuadreDivisa, CuadreListItem, CuadreMovimiento, CuadrePrepareResponse, CuadreSystemIncome } from './cuadre-caja.model';
 import { CuadreC } from './cuadres';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
-import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { CuadreDetailModalComponent } from './components/cuadre-detail-modal/cuadre-detail-modal.component';
 
 interface CuadreListRequest {
   page: number;
@@ -307,6 +309,22 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     });
   }
 
+  openDetailsModal() {
+    if (!this.selectedIsNewFlow() || !this.existsCuadre()) return;
+
+    const modalConfig = new DynamicModalClass({
+      id: 'detalle_cuadre_caja',
+      header: 'DETALLES CUADRE',
+      component: CuadreDetailModalComponent,
+      width: '42rem',
+      padding: '1rem',
+      inputs: { data: this.selectedCuadre() },
+      botones: [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }],
+    });
+
+    modalConfig.show();
+  }
+
   runStateAction(action: string) {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
     const canProcessHistoricalReview = ['approve', 'reject'].includes(action) || (action === 'submit' && ['reopened', 'rejected'].includes(status)) || (action === 'reopen' && ['submitted', 'approved', 'rejected', 'cancelled'].includes(status));
@@ -317,7 +335,12 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       this.openRejectModal(id);
       return;
     }
-    this.actionRequest.set({ id, action, nonce: Date.now() });
+    if (action === 'reopen') {
+      this.openReopenModal(id);
+      return;
+    }
+    const body = action === 'submit' ? this.buildSubmitBody() : undefined;
+    this.actionRequest.set({ id, action, body, nonce: Date.now() });
   }
 
   formatAmount(value: string | number) {
@@ -382,7 +405,9 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   canReopen() {
-    return this.selectedIsNewFlow() && this.isCurrentClosingDate() && ['submitted', 'approved', 'rejected', 'cancelled'].includes(this.selectedCuadre()?.status || this.selectedCuadre()?.estado);
+    const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
+    const canReopenStatus = this.isCurrentClosingDate() ? ['submitted', 'approved', 'rejected', 'cancelled'].includes(status) : status === 'submitted';
+    return this.selectedIsNewFlow() && Number(this.selectedCuadre()?.id) && canReopenStatus;
   }
 
   private openRejectModal(id: number) {
@@ -396,6 +421,20 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       iconColor: '#dc3545',
       showReasonInput: true,
       onYes: reason => this.actionRequest.set({ id, action: 'reject', body: { reason: reason || '' }, nonce: Date.now() }),
+    });
+  }
+
+  private openReopenModal(id: number) {
+    this.dynamicModalServ.confirmationModal({
+      id: 'reabrir_cuadre_caja',
+      header: 'Reabrir cuadre',
+      width: '34rem',
+      texto: '<p>Indica el motivo por el que este cuadre será reabierto.</p>',
+      btnKind: confirmationButtons.cancelarAceptar,
+      iconName: 'fa-solid fa-lock-open',
+      iconColor: '#ffc107',
+      showReasonInput: true,
+      onYes: reason => this.actionRequest.set({ id, action: 'reopen', body: { reason: reason || '' }, nonce: Date.now() }),
     });
   }
 
@@ -449,23 +488,58 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return {
       cuadre_caja: {
         closing_date: this.closingDate(),
+        denominations: {
+          bills: this.bills().map(item => this.mapDenominationLine(item)),
+          coins: this.coins().map(item => this.mapDenominationLine(item)),
+          foreign_currency: this.foreignCurrency().map(item => this.mapDenominationLine(item)),
+        },
+        movements: {
+          other_payment_methods: this.otherPaymentMethods().map(item => this.mapMovementLine(item)),
+          additional_transfers: this.additionalTransfers().map(item => this.mapMovementLine(item)),
+        },
         next_day_cash_fund: this.toNumber(this.nextDayCashFund()),
-        notes: this.notes() || '',
         reconciliation_tolerance: this.toNumber(this.reconciliationTolerance()),
-        denominaciones: [...this.bills(), ...this.coins(), ...this.foreignCurrency()].map(item => ({
-          denomination_type: item.denomination_type,
-          divisa_id: this.divisaIdByLine(item),
-          denomination_value: this.toNumber(item.denomination_value),
-          quantity: this.toNumber(item.quantity),
-        })),
-        movimientos: [...this.otherPaymentMethods(), ...this.additionalTransfers()].map(item => ({
-          movement_group: item.movement_group,
-          payment_method: item.payment_method,
-          description: item.description || '',
-          reference: item.reference || '',
-          amount: this.toNumber(item.amount),
-        })),
+        notes: this.notes() || '',
+        source_type: 'manual',
       },
+    };
+  }
+
+  private buildSubmitBody() {
+    return {
+      cuadre_caja: {
+        closing_date: this.closingDate(),
+        denominations: {
+          bills: this.bills().map(item => this.mapDenominationLine(item)),
+          coins: this.coins().map(item => this.mapDenominationLine(item)),
+          foreign_currency: this.foreignCurrency().map(item => this.mapDenominationLine(item)),
+        },
+        movements: {
+          other_payment_methods: this.otherPaymentMethods().map(item => this.mapMovementLine(item)),
+          additional_transfers: this.additionalTransfers().map(item => this.mapMovementLine(item)),
+        },
+        next_day_cash_fund: this.toNumber(this.nextDayCashFund()),
+        reconciliation_tolerance: this.toNumber(this.reconciliationTolerance()),
+        notes: this.notes() || '',
+      },
+    };
+  }
+
+  private mapDenominationLine(item: CuadreDenominacion) {
+    return {
+      divisa_id: this.divisaIdByLine(item),
+      currency_code: item.currency_code || this.defaultCurrencyForType(item.denomination_type).currency_code,
+      denomination_value: this.toNumber(item.denomination_value),
+      quantity: this.toNumber(item.quantity),
+    };
+  }
+
+  private mapMovementLine(item: CuadreMovimiento) {
+    return {
+      payment_method: item.payment_method,
+      description: item.description || '',
+      reference: item.reference || '',
+      amount: this.toNumber(item.amount),
     };
   }
 
@@ -484,6 +558,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const storedSystemIncome = stored?.system_income || stored?.system_income_details || {};
     const systemIncome = stored && isNewFlow ? storedSystemIncome : response.system_income || this.emptySystemIncome();
     const totals = stored ? stored?.totals || {} : response.totals || {};
+    const responseTotals = response.totals || {};
+    const reconciliationTolerance = stored && isNewFlow ? stored?.totals?.reconciliation_tolerance ?? responseTotals?.reconciliation_tolerance ?? '0.00' : '0.00';
     const suggested = (responseMovements.suggested_from_system || []).map(item => ({ ...item, movement_group: item.movement_group || 'other_payment_methods' }));
 
     return {
@@ -497,8 +573,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       },
       totals,
       notes: stored?.notes || '',
-      reconciliationTolerance: stored?.reconciliation_tolerance || '0.00',
-      nextDayCashFund: totals.next_day_cash_fund || stored?.next_day_cash_fund || stored?.fondo_caja_siguiente || stored?.fondo_para_siguiente_dia || '0.00',
+      reconciliationTolerance: fun.roundNumberToDecimal(reconciliationTolerance),
+      nextDayCashFund: fun.roundNumberToDecimal(totals.next_day_cash_fund || stored?.next_day_cash_fund || stored?.fondo_caja_siguiente || stored?.fondo_para_siguiente_dia || '0.00'),
       bills: isNewFlow ? this.normalizeDenominations([], denominaciones, 'bill', this.defaultBills()) : [],
       coins: isNewFlow ? this.normalizeDenominations([], denominaciones, 'coin', this.defaultCoins()) : [],
       foreignCurrency: isNewFlow ? this.normalizeDenominations([], denominaciones, 'foreign_currency', []) : [],

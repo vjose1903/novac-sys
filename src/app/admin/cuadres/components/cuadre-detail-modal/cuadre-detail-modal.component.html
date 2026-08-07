@@ -1,0 +1,55 @@
+<div class="mainContainer detalle-shell">
+  <section class="cliente-card">
+    <span class="cliente-label">Cuadre de caja</span>
+    <div class="cliente-pill">{{ formatDate(data?.closing_date || data?.fecha) }}</div>
+  </section>
+
+  <section class="detalle-info-grid row g-2">
+    @for (item of mainInfo; track item.label) {
+      <div class="col-12 col-md-4 p-0 pe-md-2">
+        <article class="detalle-info-item">
+          <p class="detalle-info-label mb-1">{{ item.label }}</p>
+          <span class="detalle-text-value">{{ item.value }}</span>
+        </article>
+      </div>
+    }
+  </section>
+
+  <section class="facturas-afectadas">
+    <div class="facturas-afectadas-header">
+      <div>
+        <p class="facturas-title mb-0">Historial del cuadre</p>
+        <small class="facturas-subtitle">Usuarios, fechas y motivos registrados.</small>
+      </div>
+    </div>
+
+    <div class="audit-list mt-3">
+      @for (item of auditItems; track item.key) {
+        <article class="audit-row" [ngClass]="eventClass(item.type)">
+          <span class="audit-marker"></span>
+          <div class="audit-row-main">
+            <div>
+              <span class="factura-item-label">{{ item.label }}</span>
+              <strong class="factura-item-value">{{ item.user || 'No registrado' }}</strong>
+            </div>
+            <div>
+              <span class="factura-item-label">Fecha</span>
+              <span class="audit-date">{{ item.date }}</span>
+            </div>
+            @if (fun.hasValue(item.reason)) {
+              <button type="button" class="btn btn-sm btn-link audit-reason-btn" (click)="toggleReason(item.key)">
+                {{ isReasonExpanded(item.key) ? 'Ocultar razón' : 'Ver razón' }}
+              </button>
+            }
+          </div>
+          <div class="audit-reason-panel" [class.show]="isReasonExpanded(item.key)">
+            <span>Razón</span>
+            <p>{{ item.reason }}</p>
+          </div>
+        </article>
+      } @empty {
+        <div class="facturas-empty">No hay historial registrado para este cuadre.</div>
+      }
+    </div>
+  </section>
+</div>
