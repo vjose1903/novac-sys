@@ -10,8 +10,9 @@ import { OnElementReadyDirective } from './on-element-ready.directive';
 import { ElementResizedDirective } from './element-resized.directive';
 import { RequiredFieldDirective } from './required-field.directive';
 import { CapitaliceDirective } from './capitalice.directive';
+import { NumeroFormatoDirective } from './numero-formato.directive';
 
-const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, SizeCatcherDirective, MultiClickDirective, OnElementReadyDirective, ElementResizedDirective, RequiredFieldDirective, CapitaliceDirective];
+const directives = [MsgErrorDirective, PaswordConfirmDirective, OnScrollDirective, DataFilterDirective, SizeCatcherDirective, MultiClickDirective, OnElementReadyDirective, ElementResizedDirective, RequiredFieldDirective, CapitaliceDirective, NumeroFormatoDirective];
 
 @NgModule({
   declarations: directives,

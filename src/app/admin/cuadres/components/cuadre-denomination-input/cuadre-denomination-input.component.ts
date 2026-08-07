@@ -42,24 +42,6 @@ export class CuadreDenominationInputComponent {
     this.itemsChange.emit(next);
   }
 
-  clearZeroOnFocus(index: number, key: keyof CuadreDenominacion, event: FocusEvent) {
-    if (this.readonly) return;
-    const input = event.target as HTMLInputElement;
-    if (input.value.trim() !== '' && Number(input.value) === 0) {
-      input.value = '';
-      this.patchItem(index, key, '');
-    }
-  }
-
-  restoreZeroOnBlur(index: number, key: keyof CuadreDenominacion, event: FocusEvent) {
-    if (this.readonly) return;
-    const input = event.target as HTMLInputElement;
-    if (input.value.trim() === '') {
-      input.value = '0';
-      this.patchItem(index, key, '0');
-    }
-  }
-
   changeDivisa(index: number, divisaId: number) {
     const divisa = this.availableDivisas().find(item => item.id == divisaId) || this.divisaServ.getDivisaInfoById(divisaId);
     const next = this.items.map((item, itemIndex) =>
@@ -79,7 +61,7 @@ export class CuadreDenominationInputComponent {
   }
 
   denominationLabel(item: CuadreDenominacion) {
-    return Number(item.denomination_value || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+    return fun.roundNumberToDecimal(item.denomination_value || 0, 0);
   }
 
   sectionTotal() {
@@ -116,8 +98,8 @@ export class CuadreDenominationInputComponent {
   }
 
   private itemTotal(item: CuadreDenominacion) {
-    const value = Number(item.denomination_value || 0);
-    const quantity = Number(item.quantity || 0);
+    const value = Number(fun.desformatearStNumber(item.denomination_value || 0));
+    const quantity = Number(fun.desformatearStNumber(item.quantity || 0));
     return value * quantity * this.exchangeRate(item);
   }
 

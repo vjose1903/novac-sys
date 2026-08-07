@@ -87,14 +87,14 @@
                           Tolerancia
                           <i class="fas fa-info-circle field-info" pTooltip="Margen permitido para considerar el cuadre balanceado cuando exista una diferencia mínima." tooltipPosition="top"></i>
                         </label>
-                        <input class="form-control text-end" [value]="reconciliationTolerance()" [readonly]="readOnly()" (input)="reconciliationTolerance.set($any($event.target).value)" />
+                        <input class="form-control text-end" appNumeroFormato [value]="reconciliationTolerance()" [readonly]="readOnly()" (input)="reconciliationTolerance.set($any($event.target).value)" (appNumeroFormatoBlur)="reconciliationTolerance.set($event)" />
                       </div>
                       <div class="form-group">
                         <label class="control-label">
                           Fondo próximo día
                           <i class="fas fa-info-circle field-info" pTooltip="Monto de efectivo que se dejará como fondo inicial para el próximo cuadre. No se suma como ingreso." tooltipPosition="top"></i>
                         </label>
-                        <input class="form-control text-end" [value]="nextDayCashFund()" [readonly]="readOnly()" (input)="nextDayCashFund.set($any($event.target).value || '0.00')" />
+                        <input class="form-control text-end" appNumeroFormato [value]="nextDayCashFund()" [readonly]="readOnly()" (input)="nextDayCashFund.set($any($event.target).value || '0.00')" (appNumeroFormatoBlur)="nextDayCashFund.set($event)" />
                       </div>
                     </div>
 

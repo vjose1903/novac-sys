@@ -47,6 +47,6 @@ export class CuadreMovementsEditorComponent {
   }
 
   sectionTotal() {
-    return fun.roundNumberToDecimal(this.items.reduce((total, item) => total + Number(item.amount || 0), 0));
+    return fun.roundNumberToDecimal(this.items.reduce((total, item) => total + Number(fun.desformatearStNumber(item.amount || 0)), 0));
   }
 }

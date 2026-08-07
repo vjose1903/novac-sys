@@ -449,24 +449,29 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return {
       cuadre_caja: {
         closing_date: this.closingDate(),
-        next_day_cash_fund: this.nextDayCashFund() || '0.00',
+        next_day_cash_fund: this.plainNumber(this.nextDayCashFund() || '0.00'),
         notes: this.notes() || '',
-        reconciliation_tolerance: this.reconciliationTolerance() || '0.00',
+        reconciliation_tolerance: this.plainNumber(this.reconciliationTolerance() || '0.00'),
         denominaciones: [...this.bills(), ...this.coins(), ...this.foreignCurrency()].map(item => ({
           denomination_type: item.denomination_type,
           divisa_id: this.divisaIdByLine(item),
-          denomination_value: item.denomination_value || '0.00',
-          quantity: item.quantity || '0',
+          denomination_value: this.plainNumber(item.denomination_value || '0.00'),
+          quantity: this.plainNumber(item.quantity || '0'),
         })),
         movimientos: [...this.otherPaymentMethods(), ...this.additionalTransfers()].map(item => ({
           movement_group: item.movement_group,
           payment_method: item.payment_method,
           description: item.description || '',
           reference: item.reference || '',
-          amount: item.amount || '0.00',
+          amount: this.plainNumber(item.amount || '0.00'),
         })),
       },
     };
+  }
+
+  private plainNumber(value: any) {
+    const stringValue = String(value ?? '');
+    return stringValue.includes(',') ? String(fun.desformatearStNumber(stringValue)) : stringValue;
   }
 
   private normalizePreparedData(response: CuadrePrepareResponse, stored: any) {
@@ -632,11 +637,11 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private denominationTotal(item: CuadreDenominacion) {
-    return Number(item.denomination_value || 0) * Number(item.quantity || 0) * this.exchangeRateForDenomination(item);
+    return Number(fun.desformatearStNumber(item.denomination_value || 0)) * Number(fun.desformatearStNumber(item.quantity || 0)) * this.exchangeRateForDenomination(item);
   }
 
   private sumMovements(items: CuadreMovimiento[]) {
-    return this.formatAmount(items.reduce((total, item) => total + Number(item.amount || 0), 0));
+    return this.formatAmount(items.reduce((total, item) => total + Number(fun.desformatearStNumber(item.amount || 0)), 0));
   }
 
   private resetForm() {
