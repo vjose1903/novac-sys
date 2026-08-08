@@ -1,19 +1,13 @@
 .dashboard {
-  background:
-    radial-gradient(circle at 0 0, color-mix(in srgb, var(--primary07) 13%, transparent), transparent 22rem),
-    radial-gradient(circle at 100% 12rem, color-mix(in srgb, #38bdf8 8%, transparent), transparent 24rem),
-    linear-gradient(180deg, var(--app-bg-soft), var(--app-bg));
   color: var(--app-text);
   min-height: calc(100vh - 5.6rem);
-  padding: 0.75rem;
 }
 
 .dashboard-block {
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--app-surface) 96%, var(--primary07)), var(--app-surface));
-  border: 1px solid color-mix(in srgb, var(--app-card-border) 76%, var(--primary07));
-  border-radius: 0.75rem;
-  box-shadow: 0 14px 34px -26px #000;
+  background: var(--app-surface);
+  border: 1px solid color-mix(in srgb, var(--app-card-border) 74%, transparent);
+  border-radius: 0.9rem;
+  box-shadow: 0 10px 28px -24px rgba(0, 0, 0, 0.45);
   color: var(--app-text);
 }
 
@@ -27,42 +21,26 @@
   display: none;
 }
 
-.hero-block {
-  display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(18rem, 0.75fr);
-  gap: 0.8rem;
-  margin-bottom: 0.9rem;
-  overflow: hidden;
-  padding: 1rem;
-  position: relative;
+.hero-heading {
+  margin-bottom: 1rem;
+  padding: 0.3rem 0.35rem 0.15rem;
 }
 
-.hero-block::before,
-.dashboard-block::before {
-  background: linear-gradient(90deg, var(--primary07), color-mix(in srgb, var(--primary07) 35%, var(--app-surface)));
-  content: '';
-  height: 0.2rem;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.hero-copy h1 {
+.hero-heading h1 {
   color: var(--app-text);
-  font-size: 1.65rem;
+  font-size: 1.48rem;
   font-weight: 700;
   line-height: 1.15;
-  margin: 0.7rem 0 0.4rem;
+  margin: 0 0 0.35rem;
   max-width: 46rem;
 }
 
-.hero-copy p,
+.hero-heading p,
 .section-head p,
 .focus-item p,
 .kpi-card p {
   color: var(--app-text-muted);
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   line-height: 1.25;
   margin: 0;
 }
@@ -77,23 +55,34 @@
   gap: 0.75rem;
 }
 
+.block-toolbar {
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+}
+
+.chart-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
 .eyebrow,
 .mini-kpi span,
 .kpi-card span,
 .focus-item span {
   color: var(--app-text-muted);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.055rem;
+  letter-spacing: 0.045rem;
   text-transform: uppercase;
 }
 
 .filter-button,
-.filter-actions button,
-.filter-panel select,
-.filter-panel input {
+.filter-actions button {
   background: var(--app-input-bg);
-  border: 1px solid color-mix(in srgb, var(--app-border) 82%, var(--primary07));
+  border: 1px solid color-mix(in srgb, var(--app-border) 86%, transparent);
   border-radius: 999px;
   color: var(--app-text);
   font-weight: 700;
@@ -106,36 +95,65 @@
   display: inline-flex;
   font-size: 0.74rem;
   gap: 0.4rem;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
   white-space: nowrap;
+}
+
+.filter-button:focus-visible {
+  border-color: var(--primary07);
+  box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--primary07) 18%, transparent);
+  outline: 0;
 }
 
 .filter-button:hover,
 .filter-actions button:hover {
   border-color: var(--primary07);
   cursor: pointer;
-  box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--primary07) 16%, transparent);
+  box-shadow: 0 6px 18px -16px color-mix(in srgb, var(--primary07) 70%, #000);
 }
 
-.hero-kpis,
+.filter-button:active {
+  transform: scale(0.97);
+}
+
 .kpi-grid {
   display: grid;
-  gap: 0.7rem;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  margin-top: 0.8rem;
+  gap: 0.72rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 0.85rem;
+}
+
+.kpi-grid-stack {
+  display: grid;
+  gap: 0.72rem;
+  margin-top: 0.85rem;
+}
+
+.kpi-grid-stack .kpi-grid {
+  margin-top: 0;
+}
+
+.kpi-grid.three-cols {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .mini-kpi,
 .kpi-card,
 .focus-item {
   --kpi-tone: var(--primary07);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--kpi-tone) 15%, var(--app-surface)) 0%, var(--app-surface) 72%),
-    var(--app-surface);
-  border: 1px solid color-mix(in srgb, var(--kpi-tone) 32%, var(--app-border));
-  border-radius: 0.85rem;
-  box-shadow: 0 14px 30px -24px color-mix(in srgb, var(--kpi-tone) 75%, #000);
+  align-items: center;
+  background: var(--app-surface);
+  border: 1px solid color-mix(in srgb, var(--app-border) 72%, transparent);
+  border-radius: 0.72rem;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+  display: grid;
+  gap: 0.72rem;
+  grid-template-columns: 2.55rem minmax(0, 1fr);
   min-width: 0;
-  padding: 0.8rem 0.8rem 0.75rem 1rem;
+  padding: 0.78rem 0.85rem;
   position: relative;
   transition:
     border-color 0.15s,
@@ -143,55 +161,67 @@
     transform 0.15s;
 }
 
-.mini-kpi {
-  border-left: 0;
-}
-
-.mini-kpi::before,
-.kpi-card::before,
-.focus-item::before {
-  background: linear-gradient(180deg, var(--kpi-tone), color-mix(in srgb, var(--kpi-tone) 45%, var(--app-surface)));
-  border-radius: 999px;
-  bottom: 0.75rem;
-  content: '';
-  left: 0.5rem;
-  position: absolute;
-  top: 0.75rem;
-  width: 0.2rem;
-}
-
-.mini-kpi::after,
-.kpi-card::after {
-  background: color-mix(in srgb, var(--kpi-tone) 18%, transparent);
-  border-radius: 999px;
-  content: '';
-  height: 2.25rem;
-  position: absolute;
-  right: -0.55rem;
-  top: -0.55rem;
-  width: 2.25rem;
-}
-
 .mini-kpi:hover,
 .kpi-card:hover,
 .focus-item:hover {
-  border-color: color-mix(in srgb, var(--kpi-tone) 58%, var(--app-border));
-  box-shadow: 0 18px 34px -24px color-mix(in srgb, var(--kpi-tone) 76%, #000);
-  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--kpi-tone) 30%, var(--app-border));
+  box-shadow: 0 10px 22px -18px rgba(16, 24, 40, 0.22);
+  transform: translateY(-1px);
+}
+
+.kpi-icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--kpi-tone) 12%, var(--app-surface));
+  border-radius: 999px;
+  color: var(--kpi-tone);
+  display: inline-flex;
+  font-size: 1rem;
+  height: 2.55rem;
+  justify-content: center;
+  width: 2.55rem;
+}
+
+.kpi-content {
+  min-width: 0;
 }
 
 .mini-kpi strong,
 .kpi-card strong,
 .focus-item strong {
-  color: var(--app-text);
+  color: var(--kpi-tone);
   display: block;
-  font-size: 1.06rem;
+  font-size: 0.95rem;
+  font-weight: 800;
   line-height: 1.15;
-  margin-top: 0.3rem;
+  margin-top: 0.18rem;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.mini-kpi strong[pTooltip],
+.kpi-card strong[pTooltip] {
+  cursor: default;
+}
+
+.mini-kpi p,
+.kpi-card p,
+.focus-item p {
+  color: var(--app-text-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 0.18rem;
+}
+
+.mini-kpi p::before,
+.kpi-card p::before,
+.focus-item p::before {
+  color: var(--kpi-tone);
+  content: '▲';
+  font-size: 0.52rem;
+  margin-right: 0.25rem;
 }
 
 .tone-primary {
@@ -231,40 +261,40 @@
 }
 
 .focus-panel {
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--app-bg-soft) 88%, var(--primary07)), var(--app-bg-soft));
-  border: 1px solid color-mix(in srgb, var(--app-border) 84%, var(--primary07));
-  border-radius: 0.75rem;
-  padding: 0.75rem;
+  align-self: stretch;
+  background: color-mix(in srgb, var(--primary07) 10%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--primary07) 22%, var(--app-border));
+  border-radius: 0 0.9rem 0.9rem 0;
+  margin: 0;
+  padding: 1rem 0.9rem;
 }
 
 .focus-item {
-  --kpi-tone: var(--primary07);
+  background: var(--app-surface);
+  border-color: color-mix(in srgb, var(--app-border) 72%, transparent);
 }
 
 .focus-panel > span {
-  color: var(--app-text-muted);
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 0.55rem;
+  color: var(--primary07);
+  display: flex;
+  font-size: 0.78rem;
+  font-weight: 700;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.focus-title i {
+  color: var(--primary07);
+  font-size: 0.95rem;
 }
 
 .focus-item {
-  border-left: 1px solid color-mix(in srgb, var(--app-border) 78%, transparent);
   margin-bottom: 0.5rem;
 }
 
-.focus-item.warning::before {
-  background: #d99a00;
-}
-
-.focus-item.danger::before {
-  background: #d64550;
-}
-
-.focus-item.success::before {
-  background: #1eb037;
+.focus-item:last-child {
+  margin-bottom: 0;
 }
 
 .focus-item.warning {
@@ -281,53 +311,97 @@
 
 .kpi-section,
 .chart-block {
-  margin-bottom: 0.9rem;
+  margin-bottom: 1rem;
   overflow: hidden;
-  padding: 0.85rem 0.15rem;
+  padding: 0.85rem 0;
   position: relative;
 }
 
+.overview-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: minmax(0, 1.7fr) minmax(17rem, 0.8fr);
+  margin-bottom: 1rem;
+}
+
+.overview-grid .chart-block,
+.overview-grid .focus-panel {
+  margin-bottom: 0;
+}
+
 .chart-block {
-  padding: 0.85rem;
+  background: var(--app-surface);
+  border-color: color-mix(in srgb, var(--app-border) 54%, transparent);
+  border-radius: 0.85rem;
+  box-shadow: none;
+  overflow: visible;
+  padding: 0.8rem 0.85rem 0.9rem;
+}
+
+.featured-chart .echart {
+  height: 18rem;
+  min-height: 18rem;
+}
+
+.chart-block::before {
+  display: none;
 }
 
 .section-head {
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.45rem;
   padding: 0 0.15rem;
 }
 
 .section-head h2 {
   color: var(--app-text);
-  font-size: 0.88rem;
-  font-weight: 800;
+  font-size: 0.9rem;
+  font-weight: 700;
   margin: 0 0 0.15rem;
 }
 
 .charts-grid {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  margin-bottom: 1rem;
+}
+
+.ranking-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.secondary-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .chart-body {
+  background: transparent;
+  border-radius: 0.7rem;
   min-height: 13rem;
+  padding: 0.15rem 0 0;
 }
 
 .echart {
-  height: 17rem;
-  min-height: 17rem;
+  height: 16rem;
+  min-height: 16rem;
+  width: 100%;
+}
+
+.chart-reveal-placeholder {
+  height: 16rem;
+  min-height: 16rem;
   width: 100%;
 }
 
 .chart-skeleton {
   align-items: end;
-  background: var(--app-bg-soft);
-  border: 1px solid color-mix(in srgb, var(--app-border) 84%, var(--primary07));
-  border-radius: 0.65rem;
+  background: linear-gradient(180deg, var(--app-surface), var(--app-surface-soft));
+  border: 1px solid color-mix(in srgb, var(--app-border) 58%, transparent);
+  border-radius: 0.7rem;
   display: flex;
   gap: 0.55rem;
-  height: 11.5rem;
-  padding: 0.8rem;
+  height: 12rem;
+  padding: 1.1rem 1rem 0.85rem;
 }
 
 .chart-skeleton span,
@@ -341,6 +415,7 @@
 }
 
 .chart-skeleton span {
+  border-radius: 999px 999px 0.25rem 0.25rem;
   flex: 1;
 }
 
@@ -362,8 +437,8 @@
 
 .empty-state {
   align-items: center;
-  background: var(--app-bg-soft);
-  border: 1px dashed color-mix(in srgb, var(--app-border) 76%, var(--primary07));
+  background: color-mix(in srgb, var(--app-surface-soft) 92%, var(--app-surface));
+  border: 1px dashed color-mix(in srgb, var(--app-border) 82%, transparent);
   border-radius: 0.65rem;
   color: var(--app-empty-text);
   display: flex;
@@ -381,56 +456,187 @@
 .filter-panel {
   background: var(--app-surface);
   color: var(--app-text);
-  min-width: 22rem;
+  min-width: 21.5rem;
+  padding: 0.55rem;
 }
 
 .filter-panel-head {
-  border-bottom: 1px solid var(--app-border);
-  margin: -0.5rem -0.5rem 0.85rem;
-  padding: 0.65rem 0.8rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--app-border) 58%, transparent);
+  margin: -0.55rem -0.55rem 0.6rem;
+  padding: 0.48rem 0.6rem;
+}
+
+.filter-panel-head strong {
+  color: var(--app-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .filter-panel-head button {
   align-items: center;
-  background: var(--app-button-neutral-bg);
-  border: 1px solid var(--app-button-neutral-border);
+  background: color-mix(in srgb, var(--app-surface-muted) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-border) 56%, transparent);
   border-radius: 999px;
-  color: var(--app-button-neutral-text);
+  color: var(--app-text-muted);
   display: inline-flex;
-  height: 1.8rem;
+  height: 1.5rem;
   justify-content: center;
-  width: 1.8rem;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+  width: 1.5rem;
+}
+
+.filter-panel-head button:hover {
+  background: color-mix(in srgb, var(--primary07) 10%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--primary07) 42%, var(--app-border));
+  color: var(--app-text);
+}
+
+.filter-panel-head button:active,
+.filter-actions button:active {
+  transform: scale(0.97);
 }
 
 .filter-panel label {
-  color: var(--app-text);
+  color: var(--app-text-muted);
   display: block;
+  font-size: 0.64rem;
   font-weight: 700;
-  margin-bottom: 0.35rem;
+  letter-spacing: 0;
+  margin-bottom: 0.18rem;
 }
 
-.filter-panel select,
-.filter-panel input {
-  border-radius: 0.45rem;
-  margin-bottom: 0.75rem;
+.filter-panel p-select,
+.filter-panel p-datepicker {
+  display: block;
+  margin-bottom: 0.42rem;
   width: 100%;
 }
 
 .date-grid {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.45rem;
   grid-template-columns: 1fr 1fr;
 }
 
 .filter-actions button {
+  align-items: center;
   color: var(--app-button-neutral-text);
+  display: inline-flex;
   flex: 1;
+  font-size: 0.74rem;
+  gap: 0.32rem;
+  justify-content: center;
+  min-height: 1.85rem;
+  padding-inline: 0.65rem;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    color 140ms ease,
+    transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .filter-actions .primary {
   background: var(--primary07);
   border-color: var(--primary07);
   color: #fff;
+}
+
+:host ::ng-deep .dashboard-filter-popover {
+  background: var(--app-surface);
+  border: 1px solid color-mix(in srgb, var(--app-border) 70%, transparent);
+  border-radius: 0.8rem;
+  box-shadow: 0 16px 38px -28px rgba(0, 0, 0, 0.48);
+  max-width: min(34rem, calc(100vw - 1.5rem));
+  overflow: hidden;
+}
+
+:host ::ng-deep .dashboard-filter-popover .p-popover-content {
+  background: transparent;
+  border-radius: inherit;
+  padding: 0;
+}
+
+:host ::ng-deep .dashboard-filter-popover .p-popover-arrow {
+  display: none;
+}
+
+:host ::ng-deep .dashboard-select-control,
+:host ::ng-deep .dashboard-date-control {
+  width: 100%;
+}
+
+:host ::ng-deep .dashboard-select-control.p-select,
+:host ::ng-deep .chart-type-select.p-select,
+:host ::ng-deep .dashboard-date-control .p-datepicker-input {
+  background: color-mix(in srgb, var(--app-surface) 94%, var(--app-bg-soft));
+  border: 1px solid color-mix(in srgb, var(--app-border) 76%, transparent);
+  border-radius: 0.55rem;
+  box-shadow: none;
+  color: var(--app-text);
+  min-height: 1.6rem;
+}
+
+:host ::ng-deep .dashboard-select-control .p-select-label,
+:host ::ng-deep .chart-type-select .p-select-label,
+:host ::ng-deep .dashboard-date-control .p-datepicker-input {
+  color: var(--app-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.05;
+  padding: 0.12rem 0.42rem;
+}
+
+:host ::ng-deep .chart-type-select {
+  min-width: 7.25rem;
+  width: auto;
+}
+
+:host ::ng-deep .chart-type-select .p-select-label {
+  font-size: 0.72rem;
+}
+
+:host ::ng-deep .dashboard-select-control .p-select-dropdown,
+:host ::ng-deep .chart-type-select .p-select-dropdown {
+  color: var(--app-text-muted);
+  padding-inline: 0.35rem;
+  width: 1.8rem;
+}
+
+:host ::ng-deep .dashboard-date-control .p-datepicker-input {
+  height: 1.6rem;
+}
+
+:host ::ng-deep .dashboard-select-control.p-focus,
+:host ::ng-deep .chart-type-select.p-focus,
+:host ::ng-deep .dashboard-date-control .p-datepicker-input:focus {
+  border-color: var(--primary07);
+  box-shadow: 0 0 0 0.14rem color-mix(in srgb, var(--primary07) 14%, transparent);
+}
+
+:host ::ng-deep .dashboard-select-panel {
+  border-color: color-mix(in srgb, var(--app-border) 70%, var(--primary07));
+}
+
+@media (max-width: 520px) {
+  .filter-panel {
+    min-width: calc(100vw - 2.5rem);
+  }
+
+  .date-grid,
+  .filter-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 @keyframes dashboardPulse {
@@ -444,19 +650,26 @@
   }
 }
 
-.kpi-card p,
-.focus-item p {
-  font-size: 0.8rem;
-  line-height: 1.25;
-}
 
 @media (max-width: 1100px) {
-  .hero-block,
+  .overview-grid,
   .charts-grid {
     grid-template-columns: 1fr;
   }
 
-  .hero-copy h1 {
+  .hero-heading h1 {
     font-size: 1.35rem;
+  }
+
+  .kpi-grid,
+  .kpi-grid.three-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .kpi-grid,
+  .kpi-grid.three-cols {
+    grid-template-columns: 1fr;
   }
 }

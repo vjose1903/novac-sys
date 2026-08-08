@@ -1,89 +1,113 @@
 <div class="dashboard">
-  <section class="hero-block dashboard-block" [ngClass]="heroState().status">
-    <div class="hero-copy">
-      <div class="block-toolbar">
-        <span class="eyebrow">Dashboard operativo</span>
-        <button class="filter-button" type="button" (click)="resetDraftFilter(heroState().id); heroFilter.toggle($event)">
-          <i class="fas fa-sliders"></i>
-          {{ getBlockFilterLabel(heroState().id) }}
-        </button>
-      </div>
-
-      <h1>{{ heroState().data?.title || heroConfig.title }}</h1>
-      <p>{{ heroState().data?.subtitle || heroConfig.subtitle }}</p>
-
-      <div class="hero-kpis">
-        @if (heroState().status === 'loading') {
-          @for (item of [1, 2, 3]; track item) {
-            <article class="mini-kpi skeleton-card">
-              <span></span>
-              <strong></strong>
-            </article>
-          }
-        } @else {
-          @for (card of getHeroKpis(); track card.id) {
-            <article class="mini-kpi" [ngClass]="getKpiTone(card.id)">
-              <span>{{ card.title }}</span>
-              <strong>{{ formatKpiValue(card) }}</strong>
-            </article>
-          }
-        }
-      </div>
-    </div>
-
-    <aside class="focus-panel">
-      <span>Foco inmediato</span>
-
-      @if (heroState().status === 'loading') {
-        @for (item of [1, 2, 3]; track item) {
-          <div class="focus-item skeleton-card">
-            <span></span>
-            <strong></strong>
-            <p></p>
-          </div>
-        }
-      } @else if (heroState().status === 'error') {
-        <div class="empty-state danger">{{ heroState().error }}</div>
-      } @else if (heroState().status === 'no-data') {
-        <div class="empty-state">No hay datos</div>
-      } @else {
-        @for (item of getHeroFocusItems(); track item.id) {
-          <div class="focus-item" [ngClass]="item.severity || 'info'">
-            <span>{{ item.title }}</span>
-            <strong>{{ formatKpiValue(item) }}</strong>
-            <p>{{ item.description || item.subtitle }}</p>
-          </div>
-        }
-      }
-    </aside>
-
-    <p-popover #heroFilter styleClass="dashboard-filter-popover" appendTo="body">
-      <ng-container *ngTemplateOutlet="filterPopover; context: { popover: heroFilter, blockId: heroState().id, title: heroConfig.title }"></ng-container>
-    </p-popover>
+  <section class="hero-heading">
+    <h1>Así está funcionando tu negocio</h1>
+    <p>{{ heroState().data?.subtitle || heroConfig.subtitle }}</p>
   </section>
 
-  @for (sectionState of kpiSectionStates(); track sectionState.id) {
-    <section class="kpi-section dashboard-block" [ngClass]="sectionState.status">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">{{ sectionState.data?.eyebrow || 'Indicadores' }}</span>
-          <h2>{{ sectionState.data?.title || getBlockTitle(sectionState.id) }}</h2>
-          <p>{{ sectionState.data?.description || getBlockSubtitle(sectionState.id) }}</p>
-        </div>
+  <section class="overview-grid">
+    @for (chartState of mainChartStates(); track chartState.id) {
+      <ng-container *ngTemplateOutlet="chartBlock; context: { chartState: chartState, featured: true }"></ng-container>
+    }
+  </section>
 
-        <button class="filter-button" type="button" (click)="resetDraftFilter(sectionState.id); kpiFilter.toggle($event)">
-          <i class="fas fa-sliders"></i>
-          {{ getBlockFilterLabel(sectionState.id) }}
-        </button>
+  @for (sectionState of visibleKpiSectionStates(); track sectionState.id) {
+    <ng-container *ngTemplateOutlet="kpiSectionBlock; context: { sectionState: sectionState }"></ng-container>
+  }
+
+  <section class="charts-grid">
+    @for (chartState of summaryChartStates(); track chartState.id) {
+      <ng-container *ngTemplateOutlet="chartBlock; context: { chartState: chartState }"></ng-container>
+    }
+  </section>
+
+  <section class="charts-grid ranking-grid">
+    @for (chartState of rankingChartStates(); track chartState.id) {
+      <ng-container *ngTemplateOutlet="chartBlock; context: { chartState: chartState }"></ng-container>
+    }
+  </section>
+
+  @if (secondaryChartStates().length) {
+    <section class="charts-grid secondary-grid">
+      @for (chartState of secondaryChartStates(); track chartState.id) {
+        <ng-container *ngTemplateOutlet="chartBlock; context: { chartState: chartState }"></ng-container>
+      }
+    </section>
+  }
+</div>
+
+<ng-template #kpiSectionBlock let-sectionState="sectionState">
+  <section class="kpi-section dashboard-block" [ngClass]="sectionState.status">
+    <div class="section-head">
+      <div>
+        <h2>{{ sectionState.data?.title || getBlockTitle(sectionState.id) }}</h2>
+        <p>{{ sectionState.data?.description || getBlockSubtitle(sectionState.id) }}</p>
       </div>
 
+      <button class="filter-button" type="button" (click)="resetDraftFilter(sectionState.id); kpiFilter.toggle($event)">
+        <i class="fas fa-sliders"></i>
+        {{ getBlockFilterLabel(sectionState.id) }}
+      </button>
+    </div>
+
+    @if (sectionState.id === 'sales_kpis') {
+      <div class="kpi-grid-stack">
+        @if (sectionState.status === 'loading') {
+          @for (row of getKpiSkeletonRows(sectionState.id); track $index) {
+            <div class="kpi-grid" [class.three-cols]="row.length === 3">
+              @for (item of row; track item) {
+                <article class="kpi-card skeleton-card">
+                  <div class="kpi-icon"></div>
+                  <div class="kpi-content">
+                    <span></span>
+                    <strong></strong>
+                    <p></p>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        } @else if (sectionState.status === 'error') {
+          <div class="empty-state danger">{{ sectionState.error }}</div>
+        } @else if (sectionState.status === 'no-data') {
+          <div class="empty-state">No hay datos</div>
+        } @else {
+          @for (row of getSalesKpiRows(sectionState); track $index) {
+            <div class="kpi-grid" [class.three-cols]="row.length === 3">
+              @for (card of row; track card.id) {
+                <article class="kpi-card" [ngClass]="getKpiTone(card.id, card.title)">
+                  <div class="kpi-icon">
+                    <i class="fas" [ngClass]="getKpiIcon(card.id, card.title)"></i>
+                  </div>
+
+                  <div class="kpi-content">
+                    <span>{{ card.title }}</span>
+                    <strong
+                      #kpiValue
+                      [pTooltip]="formatKpiValue(card)"
+                      tooltipPosition="top"
+                      [tooltipDisabled]="!isTextOverflowing(kpiValue)"
+                    >{{ formatKpiValue(card) }}</strong>
+                    @if (shouldShowKpiSubtitle(card)) {
+                      <p>{{ card.subtitle }}</p>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        }
+      </div>
+    } @else {
       <div class="kpi-grid">
         @if (sectionState.status === 'loading') {
-          @for (item of [1, 2, 3, 4]; track item) {
+          @for (item of getKpiSkeletonItems(sectionState.id); track item) {
             <article class="kpi-card skeleton-card">
-              <span></span>
-              <strong></strong>
-              <p></p>
+              <div class="kpi-icon"></div>
+              <div class="kpi-content">
+                <span></span>
+                <strong></strong>
+                <p></p>
+              </div>
             </article>
           }
         } @else if (sectionState.status === 'error') {
@@ -91,64 +115,85 @@
         } @else if (sectionState.status === 'no-data') {
           <div class="empty-state">No hay datos</div>
         } @else {
-          @for (card of sectionState.data?.cards || []; track card.id) {
-            <article class="kpi-card" [ngClass]="getKpiTone(card.id)">
-              <span>{{ card.title }}</span>
-              <strong>{{ formatKpiValue(card) }}</strong>
-              <p>{{ card.subtitle }}</p>
+          @for (card of getKpiCards(sectionState); track card.id) {
+            <article class="kpi-card" [ngClass]="getKpiTone(card.id, card.title)">
+              <div class="kpi-icon">
+                <i class="fas" [ngClass]="getKpiIcon(card.id, card.title)"></i>
+              </div>
+
+              <div class="kpi-content">
+                <span>{{ card.title }}</span>
+                <strong
+                  #kpiValue
+                  [pTooltip]="formatKpiValue(card)"
+                  tooltipPosition="top"
+                  [tooltipDisabled]="!isTextOverflowing(kpiValue)"
+                >{{ formatKpiValue(card) }}</strong>
+                @if (shouldShowKpiSubtitle(card)) {
+                  <p>{{ card.subtitle }}</p>
+                }
+              </div>
             </article>
           }
         }
       </div>
+    }
 
-      <p-popover #kpiFilter styleClass="dashboard-filter-popover" appendTo="body">
-        <ng-container *ngTemplateOutlet="filterPopover; context: { popover: kpiFilter, blockId: sectionState.id, title: sectionState.data?.title || getBlockTitle(sectionState.id) }"></ng-container>
-      </p-popover>
-    </section>
-  }
+    <p-popover #kpiFilter styleClass="dashboard-filter-popover" appendTo="body">
+      <ng-container *ngTemplateOutlet="filterPopover; context: { popover: kpiFilter, blockId: sectionState.id, title: sectionState.data?.title || getBlockTitle(sectionState.id) }"></ng-container>
+    </p-popover>
+  </section>
+</ng-template>
 
-  <section class="charts-grid">
-    @for (chartState of chartStates(); track chartState.id) {
-      <article class="chart-block dashboard-block" [ngClass]="chartState.status">
-        <div class="section-head">
-          <div>
-            <h2>{{ chartState.data?.title || getBlockTitle(chartState.id) }}</h2>
-            <p>{{ chartState.data?.subtitle || getBlockSubtitle(chartState.id) }}</p>
-          </div>
+<ng-template #chartBlock let-chartState="chartState" let-featured="featured">
+  <article
+    #chartViewport
+    class="chart-block dashboard-block"
+    [class.featured-chart]="featured"
+    [ngClass]="chartState.status"
+    [attr.data-chart-id]="chartState.id"
+  >
+    <div class="section-head">
+      <div>
+        <h2>{{ chartState.data?.title || getBlockTitle(chartState.id) }}</h2>
+        <p>{{ chartState.data?.subtitle || getBlockSubtitle(chartState.id) }}</p>
+      </div>
 
-          <button class="filter-button" type="button" (click)="resetDraftFilter(chartState.id); chartFilter.toggle($event)">
-            <i class="fas fa-sliders"></i>
-            {{ getBlockFilterLabel(chartState.id) }}
-          </button>
-        </div>
+      <div class="chart-actions">
+        <button class="filter-button" type="button" (click)="resetDraftFilter(chartState.id); chartFilter.toggle($event)">
+          <i class="fas fa-sliders"></i>
+          {{ getBlockFilterLabel(chartState.id) }}
+        </button>
+      </div>
+    </div>
 
-        <div class="chart-body">
-          @if (chartState.status === 'loading') {
-            <div class="chart-skeleton" [ngClass]="getChartSkeletonType(chartState.id)">
-              @for (item of [1, 2, 3, 4, 5, 6]; track item) {
-                <span [style.height.%]="18 + item * 10"></span>
-              }
-            </div>
-          } @else if (chartState.status === 'error') {
-            <div class="empty-state danger">{{ chartState.error }}</div>
-          } @else if (chartState.status === 'no-data') {
-            <div class="empty-state">No hay datos</div>
-          } @else if (chartState.data) {
-            <div echarts [options]="chartState.data.option" [autoResize]="true" class="echart"></div>
-          } @else {
-            <div class="empty-state">No hay datos</div>
+    <div class="chart-body">
+      @if (chartState.status === 'loading') {
+        <div class="chart-skeleton" [ngClass]="getChartSkeletonType(chartState.id)">
+          @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+            <span [style.height.%]="18 + item * 10"></span>
           }
         </div>
+      } @else if (chartState.status === 'error') {
+        <div class="empty-state danger">{{ chartState.error || chartState.data?.errorMessage }}</div>
+      } @else if (chartState.status === 'no-data') {
+        <div class="empty-state">{{ chartState.data?.emptyMessage || 'No hay datos' }}</div>
+      } @else if (chartState.data && isChartReadyForRender(chartState.id)) {
+        <div echarts [options]="chartState.data.option" [autoResize]="true" class="echart"></div>
+      } @else if (chartState.data) {
+        <div class="chart-reveal-placeholder"></div>
+      } @else {
+        <div class="empty-state">No hay datos</div>
+      }
+    </div>
 
-        <p-popover #chartFilter styleClass="dashboard-filter-popover" appendTo="body">
-          <ng-container *ngTemplateOutlet="filterPopover; context: { popover: chartFilter, blockId: chartState.id, title: chartState.data?.title || getBlockTitle(chartState.id) }"></ng-container>
-        </p-popover>
-      </article>
-    }
-  </section>
-</div>
+    <p-popover #chartFilter styleClass="dashboard-filter-popover" appendTo="body">
+      <ng-container *ngTemplateOutlet="filterPopover; context: { popover: chartFilter, blockId: chartState.id, title: chartState.data?.title || getBlockTitle(chartState.id), chartState: chartState }"></ng-container>
+    </p-popover>
+  </article>
+</ng-template>
 
-<ng-template #filterPopover let-popover="popover" let-blockId="blockId" let-title="title">
+<ng-template #filterPopover let-popover="popover" let-blockId="blockId" let-title="title" let-chartState="chartState">
   <div class="filter-panel">
     <div class="filter-panel-head">
       <strong>Filtrar {{ title }}</strong>
@@ -157,23 +202,63 @@
       </button>
     </div>
 
-    <label>Periodo</label>
-    <select [ngModel]="draftFilters()[blockId]?.preset" (ngModelChange)="changePreset(blockId, $event)">
-      @for (option of periodOptions; track option.preset) {
-        <option [value]="option.preset">{{ option.label }}</option>
-      }
-    </select>
+    @if (chartState) {
+      <label for="dashboard-chart-type-{{ blockId }}">Tipo de gráfico</label>
+      <p-select
+        inputId="dashboard-chart-type-{{ blockId }}"
+        styleClass="dashboard-select-control"
+        panelStyleClass="dashboard-select-panel"
+        [options]="getAvailableChartTypes(blockId)"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [ngModel]="chartState.data?.type || getChartSkeletonType(blockId)"
+        (ngModelChange)="changeChartType(blockId, $event)"
+        [disabled]="chartState.status !== 'success' || !chartState.data"
+      ></p-select>
+    }
+
+    <label for="dashboard-period-{{ blockId }}">Periodo</label>
+    <p-select
+      inputId="dashboard-period-{{ blockId }}"
+      styleClass="dashboard-select-control"
+      panelStyleClass="dashboard-select-panel"
+      [options]="periodOptions"
+      optionLabel="label"
+      optionValue="preset"
+      appendTo="body"
+      [ngModel]="draftFilters()[blockId]?.preset"
+      (ngModelChange)="changePreset(blockId, $event)"
+    ></p-select>
 
     @if (isCustomRange(blockId)) {
       <div class="date-grid">
         <label>
           Fecha inicial
-          <input type="date" [ngModel]="draftFilters()[blockId]?.startDate" (ngModelChange)="changeCustomDate(blockId, 'startDate', $event)" />
+          <p-datepicker
+            styleClass="dashboard-date-control"
+            inputStyleClass="dashboard-date-input"
+            appendTo="body"
+            dateFormat="dd/mm/yy"
+            placeholder="dd/mm/aaaa"
+            [showIcon]="false"
+            [ngModel]="draftFilters()[blockId]?.startDateValue"
+            (ngModelChange)="changeCustomDate(blockId, 'startDate', $event)"
+          ></p-datepicker>
         </label>
 
         <label>
           Fecha final
-          <input type="date" [ngModel]="draftFilters()[blockId]?.endDate" (ngModelChange)="changeCustomDate(blockId, 'endDate', $event)" />
+          <p-datepicker
+            styleClass="dashboard-date-control"
+            inputStyleClass="dashboard-date-input"
+            appendTo="body"
+            dateFormat="dd/mm/yy"
+            placeholder="dd/mm/aaaa"
+            [showIcon]="false"
+            [ngModel]="draftFilters()[blockId]?.endDateValue"
+            (ngModelChange)="changeCustomDate(blockId, 'endDate', $event)"
+          ></p-datepicker>
         </label>
       </div>
     }
