@@ -330,10 +330,13 @@
   border-color: color-mix(in srgb, var(--app-border) 50%, transparent);
   border-radius: 1rem;
   box-shadow: 0 14px 32px -30px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
   overflow: visible;
   padding: 0.9rem 1rem 1rem;
 }
 
+.featured-chart .chart-body,
 .featured-chart .echart {
   height: 18rem;
   min-height: 18rem;
@@ -371,10 +374,18 @@
 }
 
 .chart-body {
+  align-items: stretch;
   background: transparent;
   border-radius: 0.8rem;
-  min-height: 13rem;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 16rem;
   padding: 0.25rem 0 0;
+}
+
+.chart-body > * {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .echart {
@@ -391,35 +402,266 @@
 }
 
 .chart-reveal-placeholder {
+  flex: 1 1 auto;
   height: 16rem;
   min-height: 16rem;
   width: 100%;
 }
 
 .chart-skeleton {
+  --skeleton-base: color-mix(in srgb, var(--app-surface-muted) 70%, transparent);
+  --skeleton-strong: color-mix(in srgb, var(--primary07) 22%, var(--app-surface-muted));
+  --skeleton-soft: color-mix(in srgb, var(--primary07) 10%, var(--app-surface-soft));
+  --skeleton-highlight: color-mix(in srgb, var(--primary07) 34%, var(--app-surface-muted));
   align-items: end;
-  background: linear-gradient(180deg, var(--app-surface), var(--app-surface-soft));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-surface-soft) 54%, transparent), transparent),
+    var(--app-surface);
   border: 1px solid color-mix(in srgb, var(--app-border) 58%, transparent);
-  border-radius: 0.7rem;
+  border-radius: 0.85rem;
   display: flex;
+  flex: 1 1 auto;
   gap: 0.55rem;
-  height: 12rem;
+  min-height: 100%;
+  overflow: hidden;
   padding: 1.1rem 1rem 0.85rem;
+  position: relative;
+  width: 100%;
 }
 
 .chart-skeleton span,
 .skeleton-card span,
 .skeleton-card strong,
 .skeleton-card p {
-  animation: dashboardPulse 1.2s ease-in-out infinite;
+  animation: dashboardPulse 1.35s ease-in-out infinite;
   background: linear-gradient(90deg, var(--app-surface-muted), var(--app-hover), var(--app-surface-muted));
   border-radius: 0.3rem;
   display: block;
 }
 
 .chart-skeleton span {
-  border-radius: 999px 999px 0.25rem 0.25rem;
+  background: linear-gradient(90deg, var(--skeleton-base), var(--skeleton-strong), var(--skeleton-base));
+  border-radius: 999px 999px 0.28rem 0.28rem;
   flex: 1;
+  transform-origin: bottom;
+}
+
+.chart-skeleton.line,
+.chart-skeleton.area-line {
+  align-items: stretch;
+  display: block;
+  padding: 1rem;
+}
+
+.chart-skeleton.line span,
+.chart-skeleton.area-line span,
+.chart-skeleton.pie span,
+.chart-skeleton.doughnut span,
+.chart-skeleton.rose-pie span,
+.chart-skeleton.gauge span,
+.chart-skeleton.radial-progress span,
+.chart-skeleton.radar span {
+  display: none;
+}
+
+.chart-skeleton.line::before,
+.chart-skeleton.area-line::before {
+  animation: dashboardLineTrace 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  background: linear-gradient(90deg, transparent, var(--skeleton-strong), transparent);
+  bottom: 2.2rem;
+  clip-path: polygon(0 68%, 14% 56%, 27% 62%, 41% 32%, 56% 46%, 72% 20%, 88% 34%, 100% 14%, 100% 20%, 88% 40%, 72% 26%, 56% 52%, 41% 38%, 27% 68%, 14% 62%, 0 74%);
+  content: '';
+  height: 7.5rem;
+  left: 1.1rem;
+  position: absolute;
+  right: 1.1rem;
+  z-index: 2;
+}
+
+.chart-skeleton.area-line::after {
+  animation: dashboardAreaRise 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  background: linear-gradient(180deg, var(--skeleton-soft), transparent);
+  bottom: 0.85rem;
+  clip-path: polygon(0 68%, 14% 56%, 27% 62%, 41% 32%, 56% 46%, 72% 20%, 88% 34%, 100% 14%, 100% 100%, 0 100%);
+  content: '';
+  height: 9rem;
+  left: 1.1rem;
+  position: absolute;
+  right: 1.1rem;
+  z-index: 1;
+}
+
+.chart-skeleton.bar span {
+  animation: dashboardBarLift 1.25s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  border-radius: 0.42rem 0.42rem 0.16rem 0.16rem;
+}
+
+.chart-skeleton.stacked-bar span {
+  animation: dashboardBarLift 1.35s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  background:
+    linear-gradient(
+      180deg,
+      var(--skeleton-strong) 0 32%,
+      color-mix(in srgb, #2563eb 26%, var(--app-surface-muted)) 32% 62%,
+      color-mix(in srgb, #d97706 22%, var(--app-surface-muted)) 62% 100%
+    );
+  border-radius: 0.42rem 0.42rem 0.16rem 0.16rem;
+}
+
+.chart-skeleton.bar span:nth-child(2),
+.chart-skeleton.stacked-bar span:nth-child(2) { animation-delay: 90ms; }
+.chart-skeleton.bar span:nth-child(3),
+.chart-skeleton.stacked-bar span:nth-child(3) { animation-delay: 180ms; }
+.chart-skeleton.bar span:nth-child(4),
+.chart-skeleton.stacked-bar span:nth-child(4) { animation-delay: 270ms; }
+.chart-skeleton.bar span:nth-child(5),
+.chart-skeleton.stacked-bar span:nth-child(5) { animation-delay: 360ms; }
+.chart-skeleton.bar span:nth-child(6),
+.chart-skeleton.stacked-bar span:nth-child(6) { animation-delay: 450ms; }
+
+.chart-skeleton.ranking-bar {
+  align-items: stretch;
+  flex-direction: column-reverse;
+  justify-content: center;
+  padding-block: 1rem;
+}
+
+.chart-skeleton.ranking-bar span {
+  animation: dashboardRankSweep 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  border-radius: 0.2rem 999px 999px 0.2rem;
+  flex: 0 0 0.78rem;
+  transform-origin: left;
+}
+
+.chart-skeleton.ranking-bar span:nth-child(1) { animation-delay: 300ms; width: 34%; }
+.chart-skeleton.ranking-bar span:nth-child(2) { animation-delay: 240ms; width: 42%; }
+.chart-skeleton.ranking-bar span:nth-child(3) { animation-delay: 180ms; width: 49%; }
+.chart-skeleton.ranking-bar span:nth-child(4) { animation-delay: 120ms; width: 58%; }
+.chart-skeleton.ranking-bar span:nth-child(5) { animation-delay: 60ms; width: 74%; }
+.chart-skeleton.ranking-bar span:nth-child(6) { width: 92%; }
+
+.chart-skeleton.pie,
+.chart-skeleton.doughnut,
+.chart-skeleton.rose-pie,
+.chart-skeleton.gauge,
+.chart-skeleton.radial-progress,
+.chart-skeleton.radar {
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-skeleton.pie::before,
+.chart-skeleton.doughnut::before,
+.chart-skeleton.rose-pie::before,
+.chart-skeleton.radial-progress::before {
+  animation: dashboardDonutBreathe 1.8s ease-in-out infinite;
+  background:
+    conic-gradient(
+      from -40deg,
+      var(--skeleton-strong) 0 38%,
+      color-mix(in srgb, #2563eb 22%, var(--app-surface-muted)) 38% 68%,
+      color-mix(in srgb, #d97706 18%, var(--app-surface-muted)) 68% 100%
+    );
+  border-radius: 50%;
+  content: '';
+  height: min(8.6rem, 72%);
+  width: min(8.6rem, 72%);
+}
+
+.chart-skeleton.doughnut::after,
+.chart-skeleton.radial-progress::after {
+  animation: none;
+  background: var(--app-surface);
+  border-radius: 50%;
+  content: '';
+  height: min(5.2rem, 44%);
+  position: absolute;
+  width: min(5.2rem, 44%);
+}
+
+.chart-skeleton.rose-pie::before {
+  animation: dashboardRosePulse 1.9s ease-in-out infinite;
+  clip-path: polygon(50% 50%, 50% 0, 72% 15%, 100% 34%, 78% 56%, 93% 100%, 52% 82%, 28% 98%, 25% 64%, 0 44%, 30% 35%);
+}
+
+.chart-skeleton.gauge::before {
+  animation: dashboardGaugeSweep 1.8s ease-in-out infinite;
+  background:
+    conic-gradient(
+      from 270deg,
+      transparent 0 25%,
+      var(--skeleton-strong) 25% 63%,
+      var(--skeleton-base) 63% 75%,
+      transparent 75% 100%
+    );
+  border-radius: 50%;
+  content: '';
+  height: min(9rem, 76%);
+  width: min(9rem, 76%);
+}
+
+.chart-skeleton.gauge::after {
+  animation: none;
+  background: var(--app-surface);
+  border-radius: 50% 50% 0 0;
+  bottom: 1.6rem;
+  content: '';
+  height: min(4.3rem, 38%);
+  position: absolute;
+  width: min(7rem, 58%);
+}
+
+.chart-skeleton.funnel {
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.chart-skeleton.funnel span {
+  animation: dashboardFunnelDrop 1.55s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  border-radius: 0.24rem;
+  flex: 0 0 1.1rem;
+  clip-path: polygon(8% 0, 92% 0, 82% 100%, 18% 100%);
+  transform-origin: center;
+}
+
+.chart-skeleton.funnel span:nth-child(1) { width: 88%; }
+.chart-skeleton.funnel span:nth-child(2) { animation-delay: 70ms; width: 74%; }
+.chart-skeleton.funnel span:nth-child(3) { animation-delay: 140ms; width: 60%; }
+.chart-skeleton.funnel span:nth-child(4) { animation-delay: 210ms; width: 46%; }
+.chart-skeleton.funnel span:nth-child(5) { animation-delay: 280ms; width: 32%; }
+.chart-skeleton.funnel span:nth-child(6) { animation-delay: 350ms; width: 18%; }
+
+.chart-skeleton.treemap {
+  display: grid;
+  gap: 0.35rem;
+  grid-template-columns: 1.2fr 1fr 0.8fr;
+  grid-template-rows: 1fr 0.8fr 0.7fr;
+  padding: 1rem;
+}
+
+.chart-skeleton.treemap span {
+  animation: dashboardTileBreathe 1.55s ease-in-out infinite;
+  background: var(--skeleton-base);
+  border-radius: 0.42rem;
+  display: block;
+}
+
+.chart-skeleton.treemap span:nth-child(1) { grid-row: span 3; }
+.chart-skeleton.treemap span:nth-child(2) { animation-delay: 100ms; grid-row: span 2; }
+.chart-skeleton.treemap span:nth-child(3) { animation-delay: 180ms; grid-column: 3; }
+.chart-skeleton.treemap span:nth-child(4) { animation-delay: 260ms; grid-column: 3; }
+.chart-skeleton.treemap span:nth-child(5) { animation-delay: 340ms; grid-column: 2 / 4; }
+.chart-skeleton.treemap span:nth-child(6) { display: none; }
+
+.chart-skeleton.radar::before {
+  animation: dashboardRadarPulse 1.65s ease-in-out infinite;
+  background: radial-gradient(circle, var(--skeleton-soft) 0 34%, transparent 35%), var(--skeleton-base);
+  clip-path: polygon(50% 3%, 91% 28%, 82% 78%, 50% 97%, 18% 78%, 9% 28%);
+  content: '';
+  height: min(8.4rem, 70%);
+  width: min(8.4rem, 70%);
 }
 
 .skeleton-card span {
@@ -645,11 +887,155 @@
 @keyframes dashboardPulse {
   0%,
   100% {
-    opacity: 0.55;
+    opacity: 0.58;
   }
 
   50% {
     opacity: 1;
+  }
+}
+
+@keyframes dashboardBarLift {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scaleY(0.82);
+  }
+
+  48% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes dashboardRankSweep {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scaleX(0.84);
+  }
+
+  48% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes dashboardLineTrace {
+  0% {
+    opacity: 0.42;
+    transform: translateX(-3%) scaleX(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(0) scaleX(1);
+  }
+
+  100% {
+    opacity: 0.42;
+    transform: translateX(3%) scaleX(0.92);
+  }
+}
+
+@keyframes dashboardAreaRise {
+  0%,
+  100% {
+    opacity: 0.32;
+    transform: translateY(0.35rem) scaleY(0.92);
+  }
+
+  50% {
+    opacity: 0.72;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes dashboardDonutBreathe {
+  0%,
+  100% {
+    opacity: 0.68;
+    transform: rotate(-6deg) scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: rotate(7deg) scale(1);
+  }
+}
+
+@keyframes dashboardRosePulse {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: rotate(-5deg) scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: rotate(6deg) scale(1.03);
+  }
+}
+
+@keyframes dashboardGaugeSweep {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: rotate(-4deg) scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: rotate(5deg) scale(1);
+  }
+}
+
+@keyframes dashboardFunnelDrop {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: translateY(-0.12rem) scaleX(0.92);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+}
+
+@keyframes dashboardTileBreathe {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: scale(0.975);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dashboardRadarPulse {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: rotate(-3deg) scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: rotate(4deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-skeleton span,
+  .chart-skeleton::before,
+  .skeleton-card span,
+  .skeleton-card strong,
+  .skeleton-card p {
+    animation: dashboardPulse 2s ease-in-out infinite;
   }
 }
 
