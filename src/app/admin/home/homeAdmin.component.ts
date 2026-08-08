@@ -112,6 +112,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   private readonly chartStorageKey = 'novac-dashboard-chart-types';
   private chartObserver?: IntersectionObserver;
   private chartViewportChangesSub?: Subscription;
+  private themeConfigSub?: Subscription;
   private readonly prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   @ViewChildren('chartViewport') private chartViewportRefs?: QueryList<ElementRef<HTMLElement>>;
@@ -241,6 +242,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   ngOnInit() {
     this._init_mixin({ component: 'home', is_routing: true });
     this.initDashboardState();
+    this.listenThemeChanges();
     this.loadDashboard();
   }
 
@@ -556,6 +558,30 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
     this.syncFilter(chart.id, fallbackFilter);
   }
 
+  private listenThemeChanges() {
+    let lastThemeKey = `${Ss.configServ.config?.color_app || ''}:${Ss.configServ.config?.mode_app || ''}`;
+
+    this.themeConfigSub = Ss.configServ.config$.subscribe(config => {
+      const themeKey = `${config?.color_app || ''}:${config?.mode_app || ''}`;
+      if (!themeKey || themeKey === lastThemeKey) return;
+
+      lastThemeKey = themeKey;
+      queueMicrotask(() => this.reparseChartOptions());
+    });
+  }
+
+  private reparseChartOptions() {
+    this.chartStates.update(states =>
+      states.map(state => {
+        if (!state.data) return state;
+
+        const chartType = this.getSelectedChartType(state.id);
+        const chart = { ...state.data, type: chartType };
+        return { ...state, data: { ...chart, option: this.chartParser.parse(chart, chartType) } };
+      })
+    );
+  }
+
   private syncFilter(blockId: string, filter: DashboardAppliedFilter) {
     this.appliedFilters.update(filters => ({ ...filters, [blockId]: { ...filter } }));
     this.draftFilters.update(filters => ({ ...filters, [blockId]: this.toDraftFilter(filter) }));
@@ -804,6 +830,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   ngOnDestroy() {
     this.chartObserver?.disconnect();
     this.chartViewportChangesSub?.unsubscribe();
+    this.themeConfigSub?.unsubscribe();
     this.dashboardResource.destroy();
     this._destroy_mixin();
   }

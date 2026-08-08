@@ -80,30 +80,9 @@
     .menu {
       grid-area: menu;
       display: grid;
-      grid-template-areas:
-        'title'
-        'sideBar';
-      grid-template-rows: min-content auto;
+      grid-template-areas: 'sideBar';
+      grid-template-rows: auto;
       z-index: 1;
-      .title {
-        grid-area: title;
-        background-color: var(--app-surface-muted);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 2rem;
-        overflow: hidden;
-
-        .titulo {
-          font-size: 1.5rem;
-          color: var(--primary10);
-          font-weight: 400;
-          &:hover {
-            cursor: pointer;
-            color: var(--primary09);
-          }
-        }
-      }
 
       .sideBar {
         grid-area: sideBar;

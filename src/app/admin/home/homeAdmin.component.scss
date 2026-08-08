@@ -382,9 +382,16 @@
 }
 
 .echart {
+  background: transparent;
   height: 16rem;
   min-height: 16rem;
   width: 100%;
+}
+
+:host ::ng-deep .echart > div,
+:host ::ng-deep .echart canvas,
+:host ::ng-deep .echart svg {
+  background: transparent !important;
 }
 
 .chart-reveal-placeholder {

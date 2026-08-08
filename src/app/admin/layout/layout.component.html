@@ -7,10 +7,6 @@
 <div class="fantasma">
   <div class="layout">
     <div class="menu">
-      <div class="title">
-        <span class="titulo" (click)="cambiarMenu({ event: $event, url: 'dashboard', navigate: true })">Inicio</span>
-      </div>
-
       <div class="sideBar">
         <div class="menuContent">
           @for (menuItem of layServ.menuItems; track menuItem; let first = $first; let last = $last) {

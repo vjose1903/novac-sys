@@ -3,6 +3,17 @@ import { Permisos } from '@core/typescript/permisos';
 
 export const MENU_CONFIG: MenuItemI[] = [
   {
+    id: 'dashboard',
+    module: 'dashboard',
+    title: 'Dashboard',
+    icon: 'assets/img/dashboard.png',
+    permission: [],
+    type: 'single',
+    route: 'dashboard',
+    navigate: true,
+    activeRoutes: ['dashboard'],
+  },
+  {
     id: 'facturacion',
     module: 'factura',
     title: 'Facturación',

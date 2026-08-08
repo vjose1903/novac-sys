@@ -274,6 +274,9 @@ export class DashboardChartParserService {
   private treemap(context: ChartParseContext): any {
     const categoryColumn = context.categoryColumn || context.dimensionColumn;
     const metric = this.primaryMetric(context);
+    const surfaceColor = this.cssVar('--app-surface', '#ffffff');
+    const textColor = this.cssVar('--app-text', '#1d253b');
+    const borderColor = this.cssVar('--app-card-border', this.cssVar('--app-border', '#ced4da'));
 
     return this.baseOption({
       tooltip: { trigger: 'item' },
@@ -283,9 +286,33 @@ export class DashboardChartParserService {
           type: 'treemap',
           roam: false,
           breadcrumb: { show: false },
-          label: { show: true, formatter: '{b}' },
+          label: { show: true, formatter: '{b}', color: '#ffffff', fontSize: 11, fontWeight: 700 },
           upperLabel: { show: false },
-          itemStyle: { borderWidth: 2, borderColor: this.cssVar('--app-surface', '#ffffff'), gapWidth: 3 },
+          itemStyle: { borderWidth: 2, borderColor, gapWidth: 3 },
+          nodeClick: false,
+          levels: [
+            {
+              itemStyle: {
+                borderColor: surfaceColor,
+                borderWidth: 0,
+                gapWidth: 0,
+              },
+            },
+            {
+              label: { color: '#ffffff' },
+              itemStyle: {
+                borderColor,
+                borderWidth: 2,
+                gapWidth: 3,
+              },
+              emphasis: {
+                label: { color: '#ffffff' },
+                itemStyle: {
+                  borderColor: textColor,
+                },
+              },
+            },
+          ],
           data: context.rows.map(row => ({ name: this.label(row, categoryColumn), value: Number(row[metric.key] || 0) })),
         },
       ],
@@ -404,6 +431,7 @@ export class DashboardChartParserService {
       color: this.colors,
       textStyle: { color: textColor },
       ...option,
+      backgroundColor: 'transparent',
       tooltip: this.normalizeTooltip(option.tooltip),
       legend: option.legend ? { itemWidth: 9, itemHeight: 9, icon: 'circle', textStyle: { color: mutedColor, fontSize: 11 }, ...option.legend } : option.legend,
       xAxis: option.xAxis ? this.normalizeAxis(option.xAxis, textColor, mutedColor, borderColor) : option.xAxis,
@@ -450,9 +478,10 @@ export class DashboardChartParserService {
         subtext: 'No hay datos disponibles',
         left: 'center',
         top: 'center',
-        textStyle: { fontSize: 13 },
-        subtextStyle: { fontSize: 11 },
+        textStyle: { color: this.cssVar('--app-text', '#1d253b'), fontSize: 13 },
+        subtextStyle: { color: this.cssVar('--app-text-muted', '#657081'), fontSize: 11 },
       },
+      backgroundColor: 'transparent',
       series: [],
     };
   }
