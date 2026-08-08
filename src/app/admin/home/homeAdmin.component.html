@@ -145,13 +145,21 @@
   </section>
 </ng-template>
 
-<ng-template #chartBlock let-chartState="chartState" let-featured="featured">
+<ng-template #chartBlock let-chartState="chartState" let-featured="featured" let-fullscreen="fullscreen">
   <article
     #chartViewport
     class="chart-block dashboard-block"
     [class.featured-chart]="featured"
+    [class.fullscreen-chart]="fullscreen"
+    [class.expanded-source]="!fullscreen && expandedChart()?.state?.id === chartState.id"
     [ngClass]="chartState.status"
     [attr.data-chart-id]="chartState.id"
+    [attr.tabindex]="fullscreen ? null : 0"
+    [attr.role]="fullscreen ? null : 'button'"
+    [attr.aria-label]="fullscreen ? null : 'Ampliar gráfico ' + (chartState.data?.title || getBlockTitle(chartState.id))"
+    (click)="!fullscreen && openExpandedChart($event, chartState)"
+    (keydown.enter)="!fullscreen && openExpandedChart($event, chartState)"
+    (keydown.space)="!fullscreen && openExpandedChart($event, chartState)"
   >
     <div class="section-head">
       <div>
@@ -160,7 +168,7 @@
       </div>
 
       <div class="chart-actions">
-        <button class="filter-button" type="button" (click)="resetDraftFilter(chartState.id); chartFilter.toggle($event)">
+        <button class="filter-button" type="button" (click)="$event.stopPropagation(); resetDraftFilter(chartState.id); chartFilter.toggle($event)">
           <i class="fas fa-sliders"></i>
           {{ getBlockFilterLabel(chartState.id) }}
         </button>
@@ -179,7 +187,7 @@
       } @else if (chartState.status === 'no-data') {
         <div class="empty-state">{{ chartState.data?.emptyMessage || 'No hay datos' }}</div>
       } @else if (chartState.data && isChartReadyForRender(chartState.id)) {
-        <div echarts [options]="chartState.data.option" [autoResize]="true" class="echart"></div>
+        <div echarts [options]="fullscreen ? chartState.data.fullscreenOption : chartState.data.option" [autoResize]="true" class="echart"></div>
       } @else if (chartState.data) {
         <div class="chart-reveal-placeholder"></div>
       } @else {
@@ -206,7 +214,7 @@
       <label for="dashboard-chart-type-{{ blockId }}">Tipo de gráfico</label>
       <p-select
         inputId="dashboard-chart-type-{{ blockId }}"
-        styleClass="dashboard-select-control"
+        class="dashboard-select-control"
         panelStyleClass="dashboard-select-panel"
         [options]="getAvailableChartTypes(blockId)"
         optionLabel="label"
@@ -221,7 +229,7 @@
     <label for="dashboard-period-{{ blockId }}">Periodo</label>
     <p-select
       inputId="dashboard-period-{{ blockId }}"
-      styleClass="dashboard-select-control"
+      class="dashboard-select-control"
       panelStyleClass="dashboard-select-panel"
       [options]="periodOptions"
       optionLabel="label"
@@ -236,7 +244,8 @@
         <label>
           Fecha inicial
           <p-datepicker
-            styleClass="dashboard-date-control"
+            class="dashboard-date-control"
+            panelStyleClass="dashboard-datepicker-panel"
             inputStyleClass="dashboard-date-input"
             appendTo="body"
             dateFormat="dd/mm/yy"
@@ -250,7 +259,8 @@
         <label>
           Fecha final
           <p-datepicker
-            styleClass="dashboard-date-control"
+            class="dashboard-date-control"
+            panelStyleClass="dashboard-datepicker-panel"
             inputStyleClass="dashboard-date-input"
             appendTo="body"
             dateFormat="dd/mm/yy"
@@ -276,3 +286,12 @@
     </div>
   </div>
 </ng-template>
+
+@if (expandedChart(); as expanded) {
+  <app-dashboard-fullscreen-card
+    [contentTemplate]="chartBlock"
+    [context]="{ chartState: expanded.state, featured: true, fullscreen: true }"
+    [originRect]="expanded.originRect"
+    (closed)="closeExpandedChart()"
+  ></app-dashboard-fullscreen-card>
+}

@@ -60,6 +60,7 @@ interface DashboardChartBlock {
   status?: DashboardBlockStatus;
   data: DashboardChartData;
   option?: any;
+  fullscreenOption?: any;
   emptyMessage?: string;
   errorMessage?: string;
 }
@@ -175,6 +176,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   kpiSectionStates = signal<DashboardBlockState<DashboardKpiSection>[]>([]);
   chartStates = signal<DashboardBlockState<DashboardChartBlock>[]>([]);
   visibleChartIds = signal<Set<string>>(new Set());
+  expandedChart = signal<{ state: DashboardBlockState<DashboardChartBlock>; originRect: DOMRect } | null>(null);
   appliedFilters = signal<Record<string, DashboardAppliedFilter>>({});
   draftFilters = signal<Record<string, DashboardDraftFilter>>({});
   dashboardRequest = signal<DashboardRequestContext | null>(null);
@@ -401,9 +403,26 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
       states.map(state => {
         if (state.id !== blockId || !state.data) return state;
         const chart = { ...state.data, type: selectedType };
-        return { ...state, data: { ...chart, option: this.chartParser.parse(chart, selectedType) } };
+        const option = this.chartParser.parse(chart, selectedType);
+        return { ...state, data: { ...chart, option, fullscreenOption: this.withoutChartInitialAnimation(option) } };
       })
     );
+  }
+
+  openExpandedChart(event: Event, chartState: DashboardBlockState<DashboardChartBlock>) {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('button, a, input, select, textarea, p-select, p-datepicker')) return;
+
+    if (event instanceof KeyboardEvent) event.preventDefault();
+    const element = event.currentTarget as HTMLElement | null;
+    if (!element) return;
+
+    this.expandedChart.set({ state: chartState, originRect: element.getBoundingClientRect() });
+    this.markChartVisible(chartState.id);
+  }
+
+  closeExpandedChart() {
+    this.expandedChart.set(null);
   }
 
   getKpiTone(cardId: string, title = ''): string {
@@ -552,7 +571,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
       data: this.normalizeChartData(chart.data),
     };
     const status = chart.status === 'error' ? 'error' : chart.status === 'no-data' || this.isChartEmpty(parsedChart) ? 'no-data' : 'success';
-    const data = { ...parsedChart, option: this.chartParser.parse(parsedChart, chartType) };
+    const option = this.chartParser.parse(parsedChart, chartType);
+    const data = { ...parsedChart, option, fullscreenOption: this.withoutChartInitialAnimation(option) };
 
     this.chartStates.update(states => states.map(state => (state.id === chart.id ? { id: chart.id, status, data, error: chart.errorMessage } : state)));
     this.syncFilter(chart.id, fallbackFilter);
@@ -577,7 +597,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
 
         const chartType = this.getSelectedChartType(state.id);
         const chart = { ...state.data, type: chartType };
-        return { ...state, data: { ...chart, option: this.chartParser.parse(chart, chartType) } };
+        const option = this.chartParser.parse(chart, chartType);
+        return { ...state, data: { ...chart, option, fullscreenOption: this.withoutChartInitialAnimation(option) } };
       })
     );
   }
@@ -585,6 +606,102 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   private syncFilter(blockId: string, filter: DashboardAppliedFilter) {
     this.appliedFilters.update(filters => ({ ...filters, [blockId]: { ...filter } }));
     this.draftFilters.update(filters => ({ ...filters, [blockId]: this.toDraftFilter(filter) }));
+  }
+
+  private withoutChartInitialAnimation(option: any): any {
+    const fullscreenOption = this.enlargeFullscreenChartOption(option);
+
+    return {
+      ...fullscreenOption,
+      animation: false,
+      animationDuration: 0,
+      animationDurationUpdate: 0,
+      series: Array.isArray(fullscreenOption?.series)
+        ? fullscreenOption.series.map(series => ({
+            ...series,
+            animation: false,
+            animationDuration: 0,
+            animationDurationUpdate: 0,
+          }))
+        : fullscreenOption?.series,
+    };
+  }
+
+  private enlargeFullscreenChartOption(option: any): any {
+    const series = Array.isArray(option?.series)
+      ? option.series.map(series => this.enlargeFullscreenSeries(series))
+      : option?.series;
+    const hasAxis = Boolean(option?.xAxis || option?.yAxis);
+
+    return {
+      ...option,
+      legend: option?.legend ? { ...option.legend, textStyle: { ...(option.legend.textStyle || {}), fontSize: 13 } } : option?.legend,
+      grid: hasAxis
+        ? {
+            ...(option?.grid || {}),
+            left: 26,
+            right: 30,
+            top: 52,
+            bottom: 30,
+            containLabel: true,
+          }
+        : option?.grid,
+      radar: option?.radar ? { ...option.radar, radius: '72%' } : option?.radar,
+      series,
+    };
+  }
+
+  private enlargeFullscreenSeries(series: any): any {
+    if (series?.type === 'pie') {
+      const isDoughnut = Array.isArray(series.radius);
+      return {
+        ...series,
+        center: ['50%', '50%'],
+        radius: isDoughnut ? ['41%', '74%'] : '76%',
+        label: { ...(series.label || {}), fontSize: 13 },
+        labelLine: { ...(series.labelLine || {}), length: 20, length2: 16 },
+      };
+    }
+
+    if (series?.type === 'gauge') {
+      return {
+        ...series,
+        radius: '79%',
+        center: ['50%', '54%'],
+        axisLine: {
+          ...(series.axisLine || {}),
+          lineStyle: { ...(series.axisLine?.lineStyle || {}), width: 18 },
+        },
+        detail: { ...(series.detail || {}), fontSize: 34 },
+      };
+    }
+
+    if (series?.type === 'funnel') {
+      return {
+        ...series,
+        left: '6%',
+        top: 18,
+        bottom: 40,
+        width: '88%',
+        label: { ...(series.label || {}), fontSize: 13 },
+      };
+    }
+
+    if (series?.type === 'treemap') {
+      return {
+        ...series,
+        label: { ...(series.label || {}), fontSize: 13 },
+      };
+    }
+
+    if (series?.type === 'bar') {
+      return {
+        ...series,
+        barMaxWidth: series.barMaxWidth ? Math.max(series.barMaxWidth, 34) : 34,
+      };
+    }
+
+    return series;
   }
 
   private wasBlockReceived(blockId: string, response: DashboardResponse): boolean {

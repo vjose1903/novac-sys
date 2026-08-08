@@ -349,6 +349,15 @@ select:not(:focus):hover,
   z-index: 99999999 !important;
 }
 
+.dashboard-filter-popover {
+  z-index: 99999920 !important;
+}
+
+.dashboard-select-panel,
+.dashboard-datepicker-panel {
+  z-index: 99999940 !important;
+}
+
 .input_cantidad {
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {

@@ -334,12 +334,56 @@
   flex-direction: column;
   overflow: visible;
   padding: 0.75rem 0.85rem 0.85rem;
+  transition:
+    border-color 160ms ease,
+    box-shadow 180ms ease,
+    transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.chart-block:not(.fullscreen-chart) {
+  cursor: pointer;
+}
+
+.chart-block:not(.fullscreen-chart):hover {
+  border-color: color-mix(in srgb, var(--primary07) 34%, var(--app-border));
+  box-shadow: 0 18px 40px -28px color-mix(in srgb, var(--primary07) 36%, #000);
+  transform: translateY(-2px);
+}
+
+.chart-block:not(.fullscreen-chart):focus-visible {
+  border-color: var(--primary07);
+  box-shadow:
+    0 0 0 0.15rem color-mix(in srgb, var(--primary07) 18%, transparent),
+    0 18px 40px -28px color-mix(in srgb, var(--primary07) 36%, #000);
+  outline: 0;
+}
+
+.chart-block.fullscreen-chart {
+  cursor: default;
+  transform: none;
+}
+
+.chart-block.expanded-source {
+  pointer-events: none;
 }
 
 .featured-chart .chart-body,
 .featured-chart .echart {
   height: 18rem;
   min-height: 18rem;
+}
+
+.chart-block.fullscreen-chart .chart-body {
+  height: min(70vh, calc(var(--final-height, 78vh) - 4.8rem)) !important;
+  min-height: min(70vh, calc(var(--final-height, 78vh) - 4.8rem)) !important;
+}
+
+.chart-block.fullscreen-chart .echart,
+.chart-block.fullscreen-chart .chart-skeleton,
+.chart-block.fullscreen-chart .empty-state,
+.chart-block.fullscreen-chart .chart-reveal-placeholder {
+  height: 100% !important;
+  min-height: min(70vh, calc(var(--final-height, 78vh) - 4.8rem)) !important;
 }
 
 .chart-block::before {

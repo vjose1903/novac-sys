@@ -55,7 +55,7 @@
 }
 
 .p-overlay:has(.p-overlay-content .p-select-overlay) {
-  z-index: 999999 !important;
+  z-index: 999999999 !important;
   max-width: min-content !important;
   .p-select-overlay {
     .p-select-header {

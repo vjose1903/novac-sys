@@ -11,6 +11,7 @@ import { ValidateRayaAbajo } from '../../directives/validaciones';
 import { TablasModule } from '@components/new_tablas/tablas.module';
 
 import { HomeAdminComponent } from '../home/homeAdmin.component';
+import { DashboardFullscreenCardComponent } from '../home/dashboard-fullscreen-card.component';
 import { InventarioComponent } from '../inventario/inventario.component';
 import { ProduccionComponent } from '../produccion/produccion.component';
 import { TabsModule } from 'primeng/tabs';
@@ -24,7 +25,7 @@ import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-erro
 import { NgxEchartsModule } from 'ngx-echarts';
 import * as echarts from 'echarts';
 @NgModule({
-  declarations: [LayoutComponent, HomeAdminComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
+  declarations: [LayoutComponent, HomeAdminComponent, DashboardFullscreenCardComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
   imports: [
     CommonModule,
     LayoutRoutingModule,

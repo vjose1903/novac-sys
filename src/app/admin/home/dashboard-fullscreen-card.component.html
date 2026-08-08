@@ -1,0 +1,19 @@
+<div #backdropElement class="dashboard-fullscreen-backdrop" [class.closing]="isClosing" (click)="close()">
+  <section
+    #panelElement
+    class="dashboard-fullscreen-panel"
+    [class.closing]="isClosing"
+    [ngStyle]="animationStyle"
+    role="dialog"
+    aria-modal="true"
+    (click)="$event.stopPropagation()"
+  >
+    <button class="dashboard-fullscreen-close" type="button" aria-label="Cerrar gráfico" (click)="close()">
+      <i class="fas fa-times"></i>
+    </button>
+
+    @if (contentTemplate) {
+      <ng-container *ngTemplateOutlet="contentTemplate; context: context"></ng-container>
+    }
+  </section>
+</div>
