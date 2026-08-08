@@ -140,18 +140,20 @@ export class DashboardChartParserService {
     const xColumn = context.dimensionColumn || context.categoryColumn;
     const metricColumns = context.chartType === 'stacked-bar' ? context.metricColumns : [this.primaryMetric(context)].filter(Boolean);
     const categories = this.unique(context.rows.map(row => this.label(row, xColumn)));
+    const isLineChart = context.chartType === 'line' || context.chartType === 'area-line';
     const groupedSeries = this.hasSeriesGrouping(context)
       ? this.makeGroupedSeries(context, categories)
       : metricColumns.map(metric => ({
           name: metric.label,
-          type: context.chartType === 'line' || context.chartType === 'area-line' ? 'line' : 'bar',
+          type: isLineChart ? 'line' : 'bar',
           stack: context.chartType === 'stacked-bar' ? 'total' : undefined,
-          smooth: context.chartType === 'line' || context.chartType === 'area-line',
-          areaStyle: context.chartType === 'area-line' ? {} : undefined,
+          smooth: isLineChart,
+          areaStyle: context.chartType === 'area-line' ? { opacity: 0.2 } : undefined,
           symbol: 'circle',
           symbolSize: 6,
-          lineStyle: context.chartType === 'line' || context.chartType === 'area-line' ? { width: 3 } : undefined,
-          itemStyle: context.chartType.includes('bar') || context.chartType === 'bar' ? { borderRadius: [7, 7, 2, 2] } : undefined,
+          emphasis: { focus: 'series' },
+          lineStyle: isLineChart ? { width: 3, cap: 'round', join: 'round' } : undefined,
+          itemStyle: context.chartType.includes('bar') || context.chartType === 'bar' ? { borderRadius: [8, 8, 3, 3] } : undefined,
           barMaxWidth: context.chartType.includes('bar') || context.chartType === 'bar' ? 28 : undefined,
           data: categories.map(category => {
             const row = context.rows.find(item => this.label(item, xColumn) === category);
@@ -162,7 +164,7 @@ export class DashboardChartParserService {
     return this.baseOption({
       tooltip: { trigger: 'axis', axisPointer: { type: context.chartType === 'line' || context.chartType === 'area-line' ? 'line' : 'shadow' } },
       legend: { top: 0, type: 'scroll' },
-      grid: { left: 14, right: 16, top: 36, bottom: 12, containLabel: true },
+      grid: { left: 14, right: 16, top: 34, bottom: 10, containLabel: true },
       xAxis: { type: 'category', data: categories },
       yAxis: { type: 'value' },
       series: groupedSeries,
@@ -201,6 +203,7 @@ export class DashboardChartParserService {
     const categoryColumn = context.categoryColumn || context.dimensionColumn;
     const metric = this.primaryMetric(context);
     const isDoughnut = context.chartType === 'doughnut';
+    const surfaceColor = this.cssVar('--app-surface', '#ffffff');
 
     return this.baseOption({
       tooltip: { trigger: 'item' },
@@ -213,6 +216,7 @@ export class DashboardChartParserService {
           center: ['50%', '43%'],
           roseType: context.chartType === 'rose-pie' ? 'radius' : undefined,
           avoidLabelOverlap: true,
+          itemStyle: { borderColor: surfaceColor, borderRadius: 4, borderWidth: 2 },
           label: { color: this.cssVar('--app-text-muted', '#657081'), fontSize: 11 },
           labelLine: { length: 10, length2: 8, lineStyle: { color: this.cssVar('--app-border', '#ced4da') } },
           emphasis: { scale: true, scaleSize: 8 },
@@ -356,18 +360,20 @@ export class DashboardChartParserService {
     const seriesColumn = context.seriesColumn || context.categoryColumn;
     const metric = this.primaryMetric(context);
     const seriesNames = this.unique(context.rows.map(row => this.label(row, seriesColumn)));
+    const isLineChart = context.chartType === 'line' || context.chartType === 'area-line';
 
     return seriesNames.map(name => ({
       name,
-      type: context.chartType === 'line' || context.chartType === 'area-line' ? 'line' : 'bar',
+      type: isLineChart ? 'line' : 'bar',
       stack: context.chartType === 'stacked-bar' ? 'total' : undefined,
-      smooth: context.chartType === 'line' || context.chartType === 'area-line',
-      areaStyle: context.chartType === 'area-line' ? {} : undefined,
+      smooth: isLineChart,
+      areaStyle: context.chartType === 'area-line' ? { opacity: 0.18 } : undefined,
       symbol: 'circle',
       symbolSize: 6,
-      lineStyle: context.chartType === 'line' || context.chartType === 'area-line' ? { width: 3 } : undefined,
+      emphasis: { focus: 'series' },
+      lineStyle: isLineChart ? { width: 3, cap: 'round', join: 'round' } : undefined,
       barMaxWidth: context.chartType.includes('bar') || context.chartType === 'bar' ? 28 : undefined,
-      itemStyle: context.chartType.includes('bar') || context.chartType === 'bar' ? { borderRadius: [7, 7, 2, 2] } : undefined,
+      itemStyle: context.chartType.includes('bar') || context.chartType === 'bar' ? { borderRadius: [8, 8, 3, 3] } : undefined,
       data: categories.map(category => {
         const row = context.rows.find(item => this.label(item, xColumn) === category && this.label(item, seriesColumn) === name);
         return Number(row?.[metric.key] || 0);
@@ -447,13 +453,13 @@ export class DashboardChartParserService {
       borderColor: this.cssVar('--app-border', '#ced4da'),
       borderWidth: 1,
       appendToBody: true,
-      padding: [9, 11],
+      padding: [10, 12],
       textStyle: {
         color: this.cssVar('--app-text', '#1d253b'),
         fontSize: 12,
         fontWeight: 500,
       },
-      extraCssText: 'box-shadow: 0 14px 34px -24px rgba(0,0,0,.45); border-radius: 10px;',
+      extraCssText: 'box-shadow: 0 18px 40px -26px rgba(0,0,0,.55); border-radius: 12px;',
       ...tooltip,
     };
   }

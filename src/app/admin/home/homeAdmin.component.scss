@@ -1,13 +1,15 @@
 .dashboard {
   color: var(--app-text);
   min-height: calc(100vh - 5.6rem);
+  padding: 0.85rem 1rem 1.25rem;
 }
 
 .dashboard-block {
-  background: var(--app-surface);
-  border: 1px solid color-mix(in srgb, var(--app-card-border) 74%, transparent);
-  border-radius: 0.9rem;
-  box-shadow: 0 10px 28px -24px rgba(0, 0, 0, 0.45);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-surface) 98%, var(--primary07)), var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--app-card-border) 58%, transparent);
+  border-radius: 1.05rem;
+  box-shadow: 0 16px 34px -30px rgba(0, 0, 0, 0.55);
   color: var(--app-text);
 }
 
@@ -22,16 +24,16 @@
 }
 
 .hero-heading {
-  margin-bottom: 1rem;
-  padding: 0.3rem 0.35rem 0.15rem;
+  margin-bottom: 0.9rem;
+  padding: 0.15rem 0.25rem 0.45rem;
 }
 
 .hero-heading h1 {
   color: var(--app-text);
-  font-size: 1.48rem;
-  font-weight: 700;
+  font-size: clamp(1.45rem, 1.9vw, 2rem);
+  font-weight: 800;
   line-height: 1.15;
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.28rem;
   max-width: 46rem;
 }
 
@@ -40,7 +42,7 @@
 .focus-item p,
 .kpi-card p {
   color: var(--app-text-muted);
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   line-height: 1.25;
   margin: 0;
 }
@@ -81,8 +83,8 @@
 
 .filter-button,
 .filter-actions button {
-  background: var(--app-input-bg);
-  border: 1px solid color-mix(in srgb, var(--app-border) 86%, transparent);
+  background: color-mix(in srgb, var(--app-surface) 82%, var(--app-bg-soft));
+  border: 1px solid color-mix(in srgb, var(--app-border) 72%, transparent);
   border-radius: 999px;
   color: var(--app-text);
   font-weight: 700;
@@ -112,7 +114,7 @@
 .filter-actions button:hover {
   border-color: var(--primary07);
   cursor: pointer;
-  box-shadow: 0 6px 18px -16px color-mix(in srgb, var(--primary07) 70%, #000);
+  box-shadow: 0 10px 24px -20px color-mix(in srgb, var(--primary07) 75%, #000);
 }
 
 .filter-button:active {
@@ -145,15 +147,16 @@
 .focus-item {
   --kpi-tone: var(--primary07);
   align-items: center;
-  background: var(--app-surface);
-  border: 1px solid color-mix(in srgb, var(--app-border) 72%, transparent);
-  border-radius: 0.72rem;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--kpi-tone) 7%, var(--app-surface)) 0%, var(--app-surface) 58%);
+  border: 1px solid color-mix(in srgb, var(--kpi-tone) 18%, var(--app-border));
+  border-radius: 0.95rem;
+  box-shadow: 0 13px 28px -26px rgba(0, 0, 0, 0.5);
   display: grid;
-  gap: 0.72rem;
-  grid-template-columns: 2.55rem minmax(0, 1fr);
+  gap: 0.78rem;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
   min-width: 0;
-  padding: 0.78rem 0.85rem;
+  padding: 0.82rem 0.95rem;
   position: relative;
   transition:
     border-color 0.15s,
@@ -164,21 +167,22 @@
 .mini-kpi:hover,
 .kpi-card:hover,
 .focus-item:hover {
-  border-color: color-mix(in srgb, var(--kpi-tone) 30%, var(--app-border));
-  box-shadow: 0 10px 22px -18px rgba(16, 24, 40, 0.22);
-  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--kpi-tone) 42%, var(--app-border));
+  box-shadow: 0 18px 34px -26px color-mix(in srgb, var(--kpi-tone) 48%, #000);
+  transform: translateY(-2px);
 }
 
 .kpi-icon {
   align-items: center;
-  background: color-mix(in srgb, var(--kpi-tone) 12%, var(--app-surface));
+  background: color-mix(in srgb, var(--kpi-tone) 13%, var(--app-surface));
   border-radius: 999px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kpi-tone) 16%, transparent);
   color: var(--kpi-tone);
   display: inline-flex;
-  font-size: 1rem;
-  height: 2.55rem;
+  font-size: 1.05rem;
+  height: 2.75rem;
   justify-content: center;
-  width: 2.55rem;
+  width: 2.75rem;
 }
 
 .kpi-content {
@@ -190,7 +194,7 @@
 .focus-item strong {
   color: var(--kpi-tone);
   display: block;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 800;
   line-height: 1.15;
   margin-top: 0.18rem;
@@ -213,15 +217,6 @@
   font-weight: 600;
   line-height: 1.2;
   margin-top: 0.18rem;
-}
-
-.mini-kpi p::before,
-.kpi-card p::before,
-.focus-item p::before {
-  color: var(--kpi-tone);
-  content: '▲';
-  font-size: 0.52rem;
-  margin-right: 0.25rem;
 }
 
 .tone-primary {
@@ -311,7 +306,7 @@
 
 .kpi-section,
 .chart-block {
-  margin-bottom: 1rem;
+  margin-bottom: 1.05rem;
   overflow: hidden;
   padding: 0.85rem 0;
   position: relative;
@@ -319,9 +314,9 @@
 
 .overview-grid {
   display: grid;
-  gap: 0.8rem;
+  gap: 0.95rem;
   grid-template-columns: minmax(0, 1.7fr) minmax(17rem, 0.8fr);
-  margin-bottom: 1rem;
+  margin-bottom: 1.05rem;
 }
 
 .overview-grid .chart-block,
@@ -330,12 +325,13 @@
 }
 
 .chart-block {
-  background: var(--app-surface);
-  border-color: color-mix(in srgb, var(--app-border) 54%, transparent);
-  border-radius: 0.85rem;
-  box-shadow: none;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-surface) 98%, var(--primary07)), var(--app-surface));
+  border-color: color-mix(in srgb, var(--app-border) 50%, transparent);
+  border-radius: 1rem;
+  box-shadow: 0 14px 32px -30px rgba(0, 0, 0, 0.55);
   overflow: visible;
-  padding: 0.8rem 0.85rem 0.9rem;
+  padding: 0.9rem 1rem 1rem;
 }
 
 .featured-chart .echart {
@@ -348,22 +344,22 @@
 }
 
 .section-head {
-  margin-bottom: 0.45rem;
-  padding: 0 0.15rem;
+  margin-bottom: 0.55rem;
+  padding: 0 0.05rem;
 }
 
 .section-head h2 {
   color: var(--app-text);
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: 0.96rem;
+  font-weight: 800;
   margin: 0 0 0.15rem;
 }
 
 .charts-grid {
   display: grid;
-  gap: 0.8rem;
+  gap: 0.95rem;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  margin-bottom: 1rem;
+  margin-bottom: 1.05rem;
 }
 
 .ranking-grid {
@@ -376,9 +372,9 @@
 
 .chart-body {
   background: transparent;
-  border-radius: 0.7rem;
+  border-radius: 0.8rem;
   min-height: 13rem;
-  padding: 0.15rem 0 0;
+  padding: 0.25rem 0 0;
 }
 
 .echart {
@@ -675,6 +671,10 @@
 }
 
 @media (max-width: 680px) {
+  .dashboard {
+    padding: 0.65rem;
+  }
+
   .kpi-grid,
   .kpi-grid.three-cols {
     grid-template-columns: 1fr;
