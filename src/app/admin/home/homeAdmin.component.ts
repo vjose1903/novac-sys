@@ -648,9 +648,21 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
             containLabel: true,
           }
         : option?.grid,
+      xAxis: option?.xAxis ? this.enlargeFullscreenAxis(option.xAxis) : option?.xAxis,
       radar: option?.radar ? { ...option.radar, radius: '72%' } : option?.radar,
       series,
     };
+  }
+
+  private enlargeFullscreenAxis(axis: any): any {
+    const normalizeAxis = item => ({
+      ...item,
+      axisLabel: item?.axisLabel?.formatter
+        ? { ...item.axisLabel, formatter: value => String(value || '').slice(0, 20) }
+        : item?.axisLabel,
+    });
+
+    return Array.isArray(axis) ? axis.map(normalizeAxis) : normalizeAxis(axis);
   }
 
   private enlargeFullscreenSeries(series: any): any {

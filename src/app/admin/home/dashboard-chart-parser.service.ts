@@ -137,11 +137,12 @@ export class DashboardChartParserService {
   }
 
   private axisChart(context: ChartParseContext): any {
-    const xColumn = context.dimensionColumn || context.categoryColumn;
+    const isLineChart = context.chartType === 'line' || context.chartType === 'area-line';
+    const hasGrouping = this.hasSeriesGrouping(context);
+    const xColumn = hasGrouping || isLineChart ? context.dimensionColumn || context.categoryColumn : context.categoryColumn || context.dimensionColumn;
     const metricColumns = context.chartType === 'stacked-bar' ? context.metricColumns : [this.primaryMetric(context)].filter(Boolean);
     const categories = this.unique(context.rows.map(row => this.label(row, xColumn)));
-    const isLineChart = context.chartType === 'line' || context.chartType === 'area-line';
-    const groupedSeries = this.hasSeriesGrouping(context)
+    const groupedSeries = hasGrouping
       ? this.makeGroupedSeries(context, categories)
       : metricColumns.map(metric => ({
           name: metric.label,
@@ -165,7 +166,11 @@ export class DashboardChartParserService {
       tooltip: { trigger: 'axis', axisPointer: { type: context.chartType === 'line' || context.chartType === 'area-line' ? 'line' : 'shadow' } },
       legend: { top: 0, type: 'scroll' },
       grid: { left: 14, right: 16, top: 34, bottom: 10, containLabel: true },
-      xAxis: { type: 'category', data: categories },
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLabel: isLineChart ? undefined : { formatter: value => this.shortAxisLabel(value) },
+      },
       yAxis: { type: 'value' },
       series: groupedSeries,
     });
@@ -423,6 +428,10 @@ export class DashboardChartParserService {
 
   private unique(values: string[]): string[] {
     return Array.from(new Set(values.filter(value => value !== '')));
+  }
+
+  private shortAxisLabel(value: string): string {
+    return String(value || '').slice(0, 4);
   }
 
   private colorAt(index: number): string {
