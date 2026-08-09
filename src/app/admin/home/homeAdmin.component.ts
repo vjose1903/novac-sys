@@ -137,8 +137,6 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
     { value: 'pie', label: 'Pastel' },
     { value: 'doughnut', label: 'Dona' },
     { value: 'rose-pie', label: 'Rosa' },
-    { value: 'gauge', label: 'Medidor' },
-    { value: 'radial-progress', label: 'Progreso' },
     { value: 'funnel', label: 'Embudo' },
     { value: 'treemap', label: 'Mapa' },
     { value: 'radar', label: 'Radar' },
@@ -147,7 +145,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   readonly chartConfigs: DashboardBlockConfig[] = [
     { id: 'sales_by_period', type: 'chart', title: 'Ventas por período', subtitle: 'Evolución de ventas en el rango seleccionado.', chartType: 'area-line', chartTypes: ['area-line', 'line', 'bar'] },
     { id: 'cash_vs_credit_sales', type: 'chart', title: 'Contado vs crédito', subtitle: 'Comparación de ventas contado y crédito.', chartType: 'doughnut', chartTypes: ['doughnut', 'pie', 'bar'] },
-    { id: 'invoiced_vs_collected', type: 'chart', title: 'Facturado vs cobrado', subtitle: 'Relación entre monto facturado y pagos recibidos.', chartType: 'gauge', chartTypes: ['gauge', 'radial-progress', 'doughnut'] },
+    { id: 'invoiced_vs_collected', type: 'chart', title: 'Facturado vs cobrado', subtitle: 'Relación entre monto facturado y pagos recibidos.', chartType: 'doughnut', chartTypes: ['doughnut', 'pie', 'bar'] },
     { id: 'ar_aging', type: 'chart', title: 'CxC por antigüedad', subtitle: 'Balance pendiente agrupado por vencimiento.', chartType: 'bar', chartTypes: ['bar', 'ranking-bar', 'doughnut'] },
     { id: 'monthly_pending_balance', type: 'chart', title: 'Balance pendiente mensual', subtitle: 'Evolución del balance pendiente.', chartType: 'line', chartTypes: ['line', 'area-line', 'bar'] },
     { id: 'top_customers', type: 'chart', title: 'Top 10 clientes', subtitle: 'Clientes con mayor volumen de ventas.', chartType: 'ranking-bar', chartTypes: ['ranking-bar', 'bar', 'treemap', 'pie', 'doughnut'] },
