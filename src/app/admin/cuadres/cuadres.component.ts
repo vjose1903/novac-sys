@@ -502,7 +502,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   canArchiveCurrentForm() {
-    return this.isCreando() && this.selectedIsNewFlow() && !this.readOnly() && !this.formPristine();
+    return this.isCreando() && this.step() >= 3 && fun.hasValue(this.source()) && this.selectedIsNewFlow() && !this.readOnly() && !this.formPristine();
   }
 
   canSubmit() {
