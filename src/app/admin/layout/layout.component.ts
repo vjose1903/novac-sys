@@ -85,7 +85,13 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.initNavigate = true;
       }
 
-      if (routerEvent instanceof NavigationEnd || routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
+      if (routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
+        this.showLoading = false;
+        this.initNavigate = false;
+        return;
+      }
+
+      if (routerEvent instanceof NavigationEnd) {
         this.showLoading = false;
 
         if (this.initNavigate) {
