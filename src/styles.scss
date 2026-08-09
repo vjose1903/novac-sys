@@ -767,3 +767,7 @@ select:not(:focus):hover,
   height: 0;
   position: absolute;
 }
+
+.min-w-fit-action {
+  min-width: 5rem;
+}

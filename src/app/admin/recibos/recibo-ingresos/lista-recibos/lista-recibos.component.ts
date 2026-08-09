@@ -125,6 +125,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
       const res = await this.reciboClass.getAll(extra);
       res.data = this.mapeoRecibos(res.data);
       this.lista_recibos = fun.deepCloning(res.data);
+      this.table_config.total_count = res.total_registros;
       this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error('Error al obtener recibos:', error);

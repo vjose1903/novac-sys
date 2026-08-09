@@ -75,7 +75,7 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
         botones.push({
           id: 'cancelBtn',
           label: options?.cancelText || 'Cancelar',
-          clase: 'btn btn-blanco',
+          clase: 'btn btn-blanco text-nowrap w-auto min-w-fit-action',
           function: async () => {
             if (options?.onCancel) {
               await options.onCancel();
@@ -91,7 +91,7 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
         botones.push({
           id: 'noBtn',
           label: options?.noText || 'No',
-          clase: 'btn btn-blanco w-9',
+          clase: 'btn btn-blanco text-nowrap w-auto min-w-fit-action',
           function: async () => {
             if (options?.onNo) {
               await options.onNo();
@@ -106,7 +106,7 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
       botones.push({
         id: 'yesBtn',
         label: options?.yesText || 'Si',
-        clase: 'btn btn-verde w-9',
+        clase: 'btn btn-verde text-nowrap w-auto min-w-fit-action',
         function: async () => {
           if (options?.onYes) {
             await options.onYes();

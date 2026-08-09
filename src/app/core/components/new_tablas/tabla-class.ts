@@ -41,6 +41,7 @@ export interface table_info {
   interactWithMouse?: boolean;
   inputEvents?: string;
   textAlign?: 'start' | 'center' | 'end';
+  numberDecimals?: number;
   tooltip?: string;
   column_gap?: string;
   rowTooltip?: string;

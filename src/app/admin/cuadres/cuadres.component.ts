@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, computed, effect, signal, untracked } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Permisos } from '@core/typescript/permisos';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
@@ -14,6 +15,7 @@ import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-moda
 import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { CuadreDetailModalComponent } from './components/cuadre-detail-modal/cuadre-detail-modal.component';
+import { ArchivedCuadreSnapshot, CuadreArchiveStorageService } from './services/cuadre-archive-storage.service';
 
 interface CuadreListRequest {
   page: number;
@@ -71,6 +73,9 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   foreignCurrency = signal<CuadreDenominacion[]>([]);
   otherPaymentMethods = signal<CuadreMovimiento[]>([]);
   additionalTransfers = signal<CuadreMovimiento[]>([]);
+  archivedCuadre = signal<ArchivedCuadreSnapshot | null>(null);
+  archivedCuadreRestored = signal(false);
+  formPristine = signal(true);
 
   table_config: table_config = {
     info: [
@@ -210,11 +215,12 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return this.cuadreApi.actionRequest(request.id, request.action, request.body || {});
   }, { defaultValue: null });
 
-  constructor(private tServ: TablasService, private divisaServ: DivisaService, private route: ActivatedRoute, private dynamicModalServ: DynamicModalService) {
+  constructor(private tServ: TablasService, private divisaServ: DivisaService, private route: ActivatedRoute, private dynamicModalServ: DynamicModalService, private archiveStorageServ: CuadreArchiveStorageService) {
     super();
 
     effect(() => {
       const total = this.listaCuadresTotal();
+      this.table_config.total_count = total;
       queueMicrotask(() => this.tablaComponent?.changeTableConfig([{ total_count: total }]));
     });
 
@@ -258,7 +264,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._init_mixin({ component: 'cuadres', is_routing: true });
     this.ensureDivisasLoaded();
-    if (this.route.snapshot.queryParamMap.get('nuevo') === 'true') this.nuevoRegistro();
+    this.loadArchivedCuadreOnEntry().catch(() => fun.toastWarning('No se pudo leer el cuadre archivado localmente.', 'AVISO'));
+    if (this.route.snapshot.queryParamMap.get('nuevo') === 'true' && !this.isCreando()) this.nuevoRegistro();
   }
 
   ngOnDestroy(): void {
@@ -278,6 +285,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.resetForm();
     this.closingDate.set(this.today());
     this.isCreando.set(true);
+    this.markPristine();
   }
 
   prepare() {
@@ -289,16 +297,93 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   setClosingDate(date: Date | string) {
     if (!date) return;
     this.closingDate.set(typeof date === 'string' ? date : this.dateToString(date));
+    this.markDirty();
   }
 
   clearForm() {
     this.resetForm();
     this.closingDate.set(this.today());
+    this.markPristine();
   }
 
   saveCuadre() {
     if (this.readOnly()) return;
     this.saveRequest.set({ body: this.buildSaveBody(), nonce: Date.now() });
+  }
+
+  canDeactivate(): boolean | Promise<boolean> {
+    if (!this.shouldConfirmArchiveBeforeLeaving()) return true;
+
+    return CanDeactivateGuard.showConfirmationModal('Estas a punto de salir del modulo de cuadres, <strong>¿desea archivar el cuadre que esta en proceso para continuarlo luego?</strong>', {
+      showCancelButton: true,
+      showNoButton: true,
+      cancelText: 'Cancelar',
+      noText: 'No',
+      yesText: 'Aceptar',
+      header: 'Confirmación',
+      width: '32rem',
+      onYes: async () => {
+        await this.archiveCurrentForm({ showToast: false });
+      },
+    });
+  }
+
+  confirmArchiveCuadre() {
+    if (!this.canArchiveCurrentForm()) {
+      fun.toastWarning('Debe de iniciar un cuadre para archivarlo.', 'AVISO');
+      return;
+    }
+
+    this.dynamicModalServ.confirmationModal({
+      id: 'archivar_cuadre_caja',
+      texto: '¿Seguro que desea archivar este <strong>cuadre de caja</strong> para continuarlo luego?',
+      btnKind: confirmationButtons.siNo,
+      onYes: () => this.archiveCurrentForm(),
+    });
+  }
+
+  restoreArchivedCuadre() {
+    const archived = this.archivedCuadre();
+    if (!archived) return;
+
+    if (this.shouldConfirmArchiveBeforeLeaving()) {
+      this.dynamicModalServ.confirmationModal({
+        id: 'restaurar_cuadre_archivado',
+        texto: 'El formulario tiene datos sin archivar. <strong>Si continua se perderan y se recuperara el cuadre archivado.</strong>',
+        btnKind: confirmationButtons.cancelarAceptar,
+        onYes: () => this.restoreArchivedSnapshot(archived),
+      });
+      return;
+    }
+
+    this.restoreArchivedSnapshot(archived);
+  }
+
+  confirmDeleteArchivedCuadre(event?: Event) {
+    event?.stopPropagation();
+    if (!this.archivedCuadre()) return;
+
+    if (this.archivedCuadreRestored()) {
+      CanDeactivateGuard.showConfirmationModal('Este cuadre archivado ya esta cargado en el formulario. <strong>¿Desea borrar solo el archivo local o borrar el archivo y limpiar el formulario actual?</strong>', {
+        showCancelButton: true,
+        showNoButton: true,
+        cancelText: 'Cancelar',
+        noText: 'Solo borrar',
+        yesText: 'Borrar y limpiar',
+        header: 'Eliminar cuadre archivado',
+        width: '34rem',
+        onNo: () => this.deleteArchivedCuadre(),
+        onYes: () => this.deleteArchivedCuadre({ clearForm: true }),
+      });
+      return;
+    }
+
+    this.dynamicModalServ.confirmationModal({
+      id: 'eliminar_cuadre_archivado',
+      texto: '¿Seguro que desea borrar el <strong>cuadre archivado</strong>? Esta acción solo elimina la copia local.',
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: () => this.deleteArchivedCuadre(),
+    });
   }
 
   printCuadre() {
@@ -352,6 +437,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.selectedCuadre.set(null);
     this.prepareClosingDate.set(null);
     this.step.set(1);
+    this.markPristine();
   }
 
   tableClick_action(params) {
@@ -377,22 +463,46 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   setBills(items: CuadreDenominacion[]) {
     this.bills.set(items);
+    this.markDirty();
   }
 
   setCoins(items: CuadreDenominacion[]) {
     this.coins.set(items);
+    this.markDirty();
   }
 
   setForeignCurrency(items: CuadreDenominacion[]) {
     this.foreignCurrency.set(items);
+    this.markDirty();
   }
 
   setOtherPaymentMethods(items: CuadreMovimiento[]) {
     this.otherPaymentMethods.set(items.map(item => ({ ...item, movement_group: 'other_payment_methods' })));
+    this.markDirty();
   }
 
   setAdditionalTransfers(items: CuadreMovimiento[]) {
     this.additionalTransfers.set(items.map(item => ({ ...item, movement_group: 'additional_transfers' })));
+    this.markDirty();
+  }
+
+  setNotes(value: string) {
+    this.notes.set(value || '');
+    this.markDirty();
+  }
+
+  setReconciliationTolerance(value: string) {
+    this.reconciliationTolerance.set(value || '0.00');
+    this.markDirty();
+  }
+
+  setNextDayCashFund(value: string) {
+    this.nextDayCashFund.set(value || '0.00');
+    this.markDirty();
+  }
+
+  canArchiveCurrentForm() {
+    return this.isCreando() && this.selectedIsNewFlow() && !this.readOnly() && !this.formPristine();
   }
 
   canSubmit() {
@@ -462,6 +572,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.otherPaymentMethods.set(normalized.otherPaymentMethods);
     this.additionalTransfers.set(normalized.additionalTransfers);
     this.step.set(3);
+    this.markPristine();
   }
 
   private unwrapPrepareResponse(response: CuadrePrepareResponse | any): CuadrePrepareResponse | null {
@@ -476,12 +587,14 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.step.set(4);
     this.loadCuadres(this.tServ.getPaginationById('lista_cuadres') || this.listRequest());
     Ss.layServ.nextCheckCuadreToday(true);
+    this.markPristine();
   }
 
   private afterAction(response: any) {
     const cuadre = response?.data || response?.cuadre || response;
     if (cuadre) this.selectedCuadre.set(cuadre);
     this.loadCuadres(this.tServ.getPaginationById('lista_cuadres') || this.listRequest());
+    this.markPristine();
   }
 
   private buildSaveBody() {
@@ -688,8 +801,12 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return labels[status] || status || 'Enviado';
   }
 
-  private formatDateLabel(date: string) {
+  formatDateLabel(date: string | null | undefined) {
     return date ? fun.date_formater({ date, dateFormat: 'DD/MM/YYYY' }) : '----------';
+  }
+
+  formatArchivedAt(date: string | null | undefined) {
+    return date ? fun.date_formater({ date, dateFormat: 'DD/MM/YYYY', con_hora: true }) : '----------';
   }
 
   private statusSeverity(status: string) {
@@ -741,6 +858,114 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.foreignCurrency.set([]);
     this.otherPaymentMethods.set([]);
     this.additionalTransfers.set([]);
+  }
+
+  private async loadArchivedCuadreOnEntry() {
+    const archived = await this.archiveStorageServ.get();
+    if (!archived) {
+      this.archivedCuadre.set(null);
+      this.archivedCuadreRestored.set(false);
+      return;
+    }
+
+    this.archivedCuadre.set(archived);
+    this.restoreArchivedSnapshot(archived);
+  }
+
+  private async archiveCurrentForm(options: { showToast?: boolean } = {}) {
+    const { showToast = true } = options;
+    try {
+      const archived = await this.archiveStorageServ.save(this.createArchiveSnapshot());
+      this.archivedCuadre.set(archived);
+      this.archivedCuadreRestored.set(false);
+      this.resetForm();
+      this.closingDate.set(this.today());
+      this.isCreando.set(false);
+      this.markPristine();
+      if (showToast) fun.toastSuccess('Cuadre archivado para continuar luego.', 'ARCHIVADO');
+    } catch {
+      fun.toastError('No se pudo archivar el cuadre localmente.', 'ERROR');
+      throw new Error('No se pudo archivar el cuadre localmente.');
+    }
+  }
+
+  private restoreArchivedSnapshot(archived: ArchivedCuadreSnapshot) {
+    const form = archived.form || {};
+    this.resetForm();
+    this.step.set(form.step || 1);
+    this.selectedCuadre.set(form.selectedCuadre || null);
+    this.savedInCurrentForm.set(!!form.savedInCurrentForm);
+    this.closingDate.set(form.closingDate || this.today());
+    this.source.set(form.source || null);
+    this.existsCuadre.set(!!form.existsCuadre);
+    this.notes.set(form.notes || '');
+    this.reconciliationTolerance.set(form.reconciliationTolerance || '0.00');
+    this.nextDayCashFund.set(form.nextDayCashFund || '0.00');
+    this.systemIncome.set({ ...this.emptySystemIncome(), ...(form.systemIncome || {}) });
+    this.totals.set(form.totals || {});
+    this.divisaPrincipal.set(form.divisaPrincipal || null);
+    this.divisas.set(form.divisas || []);
+    this.bills.set(form.bills || this.defaultBills());
+    this.coins.set(form.coins || this.defaultCoins());
+    this.foreignCurrency.set(form.foreignCurrency || []);
+    this.otherPaymentMethods.set(form.otherPaymentMethods || []);
+    this.additionalTransfers.set(form.additionalTransfers || []);
+    this.isCreando.set(true);
+    this.archivedCuadre.set(archived);
+    this.archivedCuadreRestored.set(true);
+    this.markDirty();
+  }
+
+  private async deleteArchivedCuadre(options: { clearForm?: boolean } = {}) {
+    await this.archiveStorageServ.clear();
+    this.archivedCuadre.set(null);
+    this.archivedCuadreRestored.set(false);
+
+    if (options.clearForm) {
+      this.resetForm();
+      this.closingDate.set(this.today());
+      this.isCreando.set(false);
+      this.markPristine();
+    }
+  }
+
+  private createArchiveSnapshot() {
+    return this.clone({
+      step: this.step(),
+      selectedCuadre: this.selectedCuadre(),
+      savedInCurrentForm: this.savedInCurrentForm(),
+      closingDate: this.closingDate(),
+      source: this.source(),
+      existsCuadre: this.existsCuadre(),
+      notes: this.notes(),
+      reconciliationTolerance: this.reconciliationTolerance(),
+      nextDayCashFund: this.nextDayCashFund(),
+      systemIncome: this.systemIncome(),
+      totals: this.totals(),
+      divisaPrincipal: this.divisaPrincipal(),
+      divisas: this.divisas(),
+      bills: this.bills(),
+      coins: this.coins(),
+      foreignCurrency: this.foreignCurrency(),
+      otherPaymentMethods: this.otherPaymentMethods(),
+      additionalTransfers: this.additionalTransfers(),
+    });
+  }
+
+  private shouldConfirmArchiveBeforeLeaving() {
+    return this.canArchiveCurrentForm();
+  }
+
+  private markDirty() {
+    if (!this.readOnly()) this.formPristine.set(false);
+  }
+
+  private markPristine() {
+    this.formPristine.set(true);
+  }
+
+  private clone<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value));
   }
 
   private defaultBills(): CuadreDenominacion[] {

@@ -54,7 +54,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     super();
     effect(() => {
       if (this.tableIsInitialized()) {
-        this.tablaComponent.changeTableConfig([{ total_count: 0 }]);
+        this.table_config.total_count = 0;
+        this.tablaComponent?.changeTableConfig([{ total_count: 0 }]);
       }
     });
   }
@@ -292,7 +293,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
       this.lista_produccion.update(prev => [...prev, obj]);
 
       fun.setTimeout(() => {
-        this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion().length }]);
+        this.table_config.total_count = this.lista_produccion().length;
+        this.tablaComponent?.changeTableConfig([{ total_count: this.lista_produccion().length }]);
       }, 100);
     }
 
@@ -327,7 +329,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   eliminarReg(data) {
     this.disableOption(data.id, false);
     this.lista_produccion.update(prev => prev.filter(item => item.articulo_id != data.id));
-    this.tablaComponent.changeTableConfig([{ total_count: this.lista_produccion().length }]);
+    this.table_config.total_count = this.lista_produccion().length;
+    this.tablaComponent?.changeTableConfig([{ total_count: this.lista_produccion().length }]);
   }
 
   abrirModalDinamicText(tipo, data = null) {

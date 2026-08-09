@@ -60,6 +60,7 @@ Usa estos componentes cuando el caso coincida con pantallas existentes:
 
 - Usar `dinamic-table` para listados CRUD.
 - Configurar `table_config` siguiendo el modulo vecino: columnas `info`, `id_tabla`, `filtrar`, `obj_paginate`, `botones`, `padre_functions`.
+- Para paginacion y total de registros, aplicar `docs/ai/11-list-ui-standards.md`.
 - Para sort remoto, revisar `TablasService.parseSort(table_config)`.
 
 ## Teclado y UX existente

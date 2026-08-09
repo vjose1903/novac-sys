@@ -19,6 +19,7 @@ Antes de crear un componente nuevo, revisar si alguno de estos ya cubre el caso.
   - `(table_events)="handle_table_events($event)"`.
 - Soporta paginacion, busqueda local/remota, sort, botones por fila, colores, transformaciones de fila, iconos, imagenes, switches, inputs y dropdowns.
 - Tipos de celda frecuentes: `text`, `date`, `formatoNumero`, `tag`, `color`, `switch`, `inputSwitch`, `dropDown`, `input`, `img`, `icon`, `index`.
+- Para listados remotos con total de registros, configurar `obj_paginate.show = true`, `obj_paginate.showTotal = true`, `is_local = false` y actualizar la tabla con `tablaComponent.changeTableConfig([{ total_count: res.total_registros }])`.
 
 ## Modal dinamico
 

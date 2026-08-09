@@ -133,7 +133,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const vehiculos = _.orderBy(res.data, ['id'], ['asc']);
     this.listaVehiculos.set(vehiculos);
 
-    this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+    this.table_config.total_count = res.total_registros;
+    this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
   }
 
   async getMarcas() {

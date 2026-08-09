@@ -91,6 +91,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
         this.dataFiltro.set([]);
       }
 
+      this.table_config.total_count = res.total_registros;
       if (this.tablaComponent) {
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       } else {
@@ -98,6 +99,8 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
       }
     } catch (error) {
       this.dataFiltro.set([]);
+      this.table_config.total_count = 0;
+      this.tablaComponent?.changeTableConfig([{ total_count: 0 }]);
       if (where === 'init') {
         this.modalConfig.close({ tipo: 'data_no_found', modal_id: this.modalConfig.id });
       } else {

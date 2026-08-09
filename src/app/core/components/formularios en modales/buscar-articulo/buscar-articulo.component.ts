@@ -92,12 +92,14 @@ export class BuscarArticuloComponent extends MixinClass implements IDynamicModal
       });
 
       this.dataFiltro.set(res?.data);
+      this.table_config.total_count = res.total_registros;
 
       if (this.tablaComponent?.changeTableConfig) {
         this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
       }
     } catch (error) {
       this.dataFiltro.set([]);
+      this.table_config.total_count = 0;
 
       if (this.tablaComponent?.changeTableConfig) {
         this.tablaComponent.changeTableConfig([{ total_count: 0 }]);

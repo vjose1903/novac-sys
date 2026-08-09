@@ -169,7 +169,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
       if (params.paginado) {
         this.listadoMarcas.set(res.data);
-        this.tablaMarcaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+        this.table_marca_config.total_count = res.total_registros;
+        this.tablaMarcaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
       }
     });
   }
@@ -186,7 +187,8 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
       });
 
       this.listadoModelos.set(res.data);
-      this.tablaModeloComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      this.table_modelo_config.total_count = res.total_registros;
+      this.tablaModeloComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

@@ -84,6 +84,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     return numformat;
   }
 
+  formatoTotalRegistros(total) {
+    if (fun.isEmpty(total)) return 0;
+    return fun.roundNumberToDecimal(total, 0);
+  }
+
   ngOnInit() {
     this.realIdTabla = this.config.id_tabla + this.post_id;
 

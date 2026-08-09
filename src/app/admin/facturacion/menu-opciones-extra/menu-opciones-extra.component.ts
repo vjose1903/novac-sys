@@ -188,10 +188,14 @@ export class MenuOpcionesExtraComponent extends MixinClass implements OnInit, ID
       this.documentos.set(documentos.sort((a, b) => fun.compare(a, b, 'id', 'desc')));
 
       if (this.documentos().length > 0) {
+        this.table_config.total_count = res.total_registros;
         fun.setTimeout(() => {
-          if (this.tablaComponent) this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+          this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
         }, 100);
       } else {
+        this.table_config.total_count = 0;
+        this.tablaComponent?.changeTableConfig([{ total_count: 0 }]);
+
         if (this.filter_key == this.filter_options.cliente) {
           fun.toastError('Este cliente no tiene facturas del tipo seleccionada', 'ERROR');
         } else if (this.filter_key == this.filter_options.numero_documento) {

@@ -102,7 +102,8 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro, mode: 'list' }).then(res => {
       this.listaArticulos = fun.deepCloning(res.data);
-      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      this.table_roles_config.total_count = res.total_registros;
+      this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 

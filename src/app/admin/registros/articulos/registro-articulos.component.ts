@@ -209,7 +209,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.listaArticulos.length = 0;
     this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, page: params.page, per_page: params.per_page, fecha: this.fechaFactura, paginado: true, mode: 'list' }).then(res => {
       this.listaArticulos = res.data;
-      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      this.table_config.total_count = res.total_registros;
+      this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -283,11 +284,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         this.form.controls[key].updateValueAndValidity();
       }
     }
-  }
-
-  capitalice(control, arg) {
-    const campo = this.form.get(control);
-    campo.setValue(fun.capitalice(arg));
   }
 
   createForm() {

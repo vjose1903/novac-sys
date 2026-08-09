@@ -324,9 +324,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         });
 
         this.showSide = true;
+        this.table_notas_config.total_count = res.total_registros;
 
         fun.setTimeout(() => {
-          this.tablaNotasComponent.changeTableConfig([{ total_count: res.total_registros }]);
+          this.tablaNotasComponent?.changeTableConfig([{ total_count: res.total_registros }]);
         }, 10);
       } catch (err) {
         console.error(err);
@@ -443,8 +444,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
               this.mostrarFactura({ factura: factura_parsed, type: tipo, crear_nota, documento: 'factura' });
             });
           } else {
+            this.table_config.total_count = res.total_registros;
             fun.setTimeout(() => {
-              this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+              this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
             }, 100);
           }
         }
