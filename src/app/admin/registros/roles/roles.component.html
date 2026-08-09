@@ -6,7 +6,6 @@
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
-        @if (isCreando || roleSelected) {
         <div class="form {{ isCreando || roleSelected ? 'showForm' : 'hideForm' }} ">
           <div class="tituloFormClass">
             <h4 class="mb-0">Formulario</h4>
@@ -79,7 +78,6 @@
             </div>
           </div>
         </div>
-        }
       </ng-container>
 
       <div class="list {{ isCreando || roleSelected ? 'FormList' : 'onlyList' }}">

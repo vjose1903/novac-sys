@@ -6,8 +6,7 @@
   <div class="col-12 p-0 colFormularioListado">
     <div class="d-flex h-100">
       <ng-container *ngxPermissionsOnly="formPermissions">
-        @if (isCreando || empleadoSelected) {
-          <div class="contenedorRegistro" class="form {{ isCreando || empleadoSelected ? 'showForm' : 'hideForm' }} ">
+        <div class="contenedorRegistro" class="form {{ isCreando || empleadoSelected ? 'showForm' : 'hideForm' }} ">
             <div class="tituloFormClass d-flex justify-content-between align-items-center" style="min-height: 3.3rem">
               <h4 class="mb-0">Formulario</h4>
             </div>
@@ -189,8 +188,7 @@
                 </div>
               </div>
             </div>
-          </div>
-        }
+        </div>
       </ng-container>
       <div class="list {{ isCreando || empleadoSelected ? 'FormList' : 'onlyList' }}">
         <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
