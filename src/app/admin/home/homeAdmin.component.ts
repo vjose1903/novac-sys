@@ -425,6 +425,10 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
     this.expandedChart.set(null);
   }
 
+  getExpandedChartState(expanded: { state: DashboardBlockState<DashboardChartBlock>; originRect: DOMRect }): DashboardBlockState<DashboardChartBlock> {
+    return this.chartStates().find(state => state.id === expanded.state.id) || expanded.state;
+  }
+
   getKpiTone(cardId: string, title = ''): string {
     const value = this.normalizeLookupText(`${cardId} ${title}`);
     if (value.includes('receivable') || value.includes('pending') || value.includes('debt') || value.includes('cxc') || value.includes('cuentasporcobrar')) return 'tone-blue';

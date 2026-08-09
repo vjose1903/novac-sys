@@ -290,7 +290,7 @@
 @if (expandedChart(); as expanded) {
   <app-dashboard-fullscreen-card
     [contentTemplate]="chartBlock"
-    [context]="{ chartState: expanded.state, featured: true, fullscreen: true }"
+    [context]="{ chartState: getExpandedChartState(expanded), featured: true, fullscreen: true }"
     [originRect]="expanded.originRect"
     (closed)="closeExpandedChart()"
   ></app-dashboard-fullscreen-card>

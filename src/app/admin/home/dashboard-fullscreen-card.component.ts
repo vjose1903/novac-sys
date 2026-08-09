@@ -115,7 +115,7 @@ export class DashboardFullscreenCardComponent implements AfterViewInit, OnDestro
 
     this.backdropAnimation = backdrop.animate([
       { opacity: 1, offset: 0 },
-      { opacity: 1, offset: 0.82 },
+      { opacity: 1, offset: 0.94 },
       { opacity: 0, offset: 1 },
     ], {
       duration: 220,
@@ -133,14 +133,14 @@ export class DashboardFullscreenCardComponent implements AfterViewInit, OnDestro
       {
         borderRadius: '1.03rem',
         opacity: 1,
-        transform: this.originTransform(0.86),
-        offset: 0.86,
+        transform: this.originTransform(0.97),
+        offset: 0.97,
       },
       {
         borderRadius: '1rem',
         opacity: 0,
-        transform: this.originTransform(0.96),
-        offset: 0.96,
+        transform: this.originTransform(0.992),
+        offset: 0.992,
       },
       {
         borderRadius: '1rem',

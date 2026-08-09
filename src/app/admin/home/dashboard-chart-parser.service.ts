@@ -448,6 +448,13 @@ export class DashboardChartParserService {
   private normalizeTooltip(tooltip: any): any {
     if (!tooltip) return tooltip;
 
+    const extraCssText = [
+      tooltip.extraCssText,
+      'box-shadow: 0 18px 40px -26px rgba(0,0,0,.55); border-radius: 12px; z-index: 99999960 !important; pointer-events: none;',
+    ]
+      .filter(Boolean)
+      .join(' ');
+
     return {
       backgroundColor: this.cssVar('--app-surface', '#ffffff'),
       borderColor: this.cssVar('--app-border', '#ced4da'),
@@ -459,8 +466,8 @@ export class DashboardChartParserService {
         fontSize: 12,
         fontWeight: 500,
       },
-      extraCssText: 'box-shadow: 0 18px 40px -26px rgba(0,0,0,.55); border-radius: 12px;',
       ...tooltip,
+      extraCssText,
     };
   }
 
