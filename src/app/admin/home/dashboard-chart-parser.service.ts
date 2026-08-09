@@ -155,9 +155,9 @@ export class DashboardChartParserService {
           lineStyle: isLineChart ? { width: 3, cap: 'round', join: 'round' } : undefined,
           itemStyle: context.chartType.includes('bar') || context.chartType === 'bar' ? { borderRadius: [8, 8, 3, 3] } : undefined,
           barMaxWidth: context.chartType.includes('bar') || context.chartType === 'bar' ? 28 : undefined,
-          data: categories.map(category => {
+          data: categories.map((category, index) => {
             const row = context.rows.find(item => this.label(item, xColumn) === category);
-            return Number(row?.[metric.key] || 0);
+            return this.chartDataItem(Number(row?.[metric.key] || 0), index, context.chartType);
           }),
         }));
 
@@ -220,9 +220,10 @@ export class DashboardChartParserService {
           label: { color: this.cssVar('--app-text-muted', '#657081'), fontSize: 11 },
           labelLine: { length: 10, length2: 8, lineStyle: { color: this.cssVar('--app-border', '#ced4da') } },
           emphasis: { scale: true, scaleSize: 8 },
-          data: context.rows.map(row => ({
+          data: context.rows.map((row, index) => ({
             name: this.label(row, categoryColumn),
             value: Number(row[metric.key] || 0),
+            itemStyle: { color: this.colorAt(index) },
           })),
         },
       ],
@@ -269,7 +270,7 @@ export class DashboardChartParserService {
           label: { color: this.cssVar('--app-text', '#1d253b'), fontWeight: 600 },
           labelLine: { lineStyle: { color: this.cssVar('--app-border', '#ced4da') } },
           emphasis: { label: { fontWeight: 700 } },
-          data: rows.map(row => ({ name: this.label(row, categoryColumn), value: Number(row[metric.key] || 0) })),
+          data: rows.map((row, index) => ({ name: this.label(row, categoryColumn), value: Number(row[metric.key] || 0), itemStyle: { color: this.colorAt(index) } })),
         },
       ],
     });
@@ -317,7 +318,7 @@ export class DashboardChartParserService {
               },
             },
           ],
-          data: context.rows.map(row => ({ name: this.label(row, categoryColumn), value: Number(row[metric.key] || 0) })),
+          data: context.rows.map((row, index) => ({ name: this.label(row, categoryColumn), value: Number(row[metric.key] || 0), itemStyle: { color: this.colorAt(index) } })),
         },
       ],
     });
@@ -346,9 +347,12 @@ export class DashboardChartParserService {
         {
           name: context.block.title,
           type: 'radar',
-          data: rows.map(row => ({
+          data: rows.map((row, index) => ({
             name: this.label(row, categoryColumn),
             value: metrics.map(metric => Number(row[metric.key] || 0)),
+            areaStyle: { color: this.colorWithAlpha(this.colorAt(index), 0.12) },
+            itemStyle: { color: this.colorAt(index) },
+            lineStyle: { color: this.colorAt(index), width: 2 },
           })),
         },
       ],
@@ -374,9 +378,9 @@ export class DashboardChartParserService {
       lineStyle: isLineChart ? { width: 3, cap: 'round', join: 'round' } : undefined,
       barMaxWidth: context.chartType.includes('bar') || context.chartType === 'bar' ? 28 : undefined,
       itemStyle: context.chartType.includes('bar') || context.chartType === 'bar' ? { borderRadius: [8, 8, 3, 3] } : undefined,
-      data: categories.map(category => {
+      data: categories.map((category, index) => {
         const row = context.rows.find(item => this.label(item, xColumn) === category && this.label(item, seriesColumn) === name);
-        return Number(row?.[metric.key] || 0);
+        return this.chartDataItem(Number(row?.[metric.key] || 0), index, context.chartType);
       }),
     }));
   }
@@ -423,6 +427,30 @@ export class DashboardChartParserService {
 
   private colorAt(index: number): string {
     return this.colors[index % this.colors.length];
+  }
+
+  private chartDataItem(value: number, index: number, chartType: DashboardChartType): number | { value: number; itemStyle: any } {
+    const color = this.colorAt(index);
+
+    if (chartType === 'line' || chartType === 'area-line') {
+      return value;
+    }
+
+    if (chartType === 'bar' || chartType === 'stacked-bar') {
+      return { value, itemStyle: { color, borderRadius: [8, 8, 3, 3] } };
+    }
+
+    return value;
+  }
+
+  private colorWithAlpha(hex: string, alpha: number): string {
+    const normalized = hex.replace('#', '');
+    const value = parseInt(normalized, 16);
+    const r = (value >> 16) & 255;
+    const g = (value >> 8) & 255;
+    const b = value & 255;
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
   private baseOption(option: any): any {
