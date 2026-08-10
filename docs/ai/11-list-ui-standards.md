@@ -35,6 +35,7 @@ El estandar vigente para listados CRUD debe verse alineado con las pantallas mod
 - El titulo de pantalla vive en `colTitulo` con `screen-title-block` y `screen-module-kicker`; no envolverlo en cards locales ni crear headers duplicados. El kicker debe indicar el modulo real de la pantalla.
 - El listado debe caber dentro del padding de `.contenido`; no usar alturas con `100vh` en el modulo si eso hace que la tabla o su footer salgan del area visible del layout.
 - El titulo del listado usa `tituloCardClass` con `h4` compacto y jerarquia visual sobria.
+- En pantallas solo-listado, sin formulario asociado, no agregar subtitulo `Listado`; el header de pantalla debe contener el titulo y la accion principal a la derecha.
 - La tabla vive dentro de `cardContentClass > .divTabla` o `cardListados`: superficie `var(--app-surface)`, borde `var(--app-card-border)`, radio cercano a `1rem`, sombra `var(--app-overlay-shadow)` y overflow interno.
 - El filtro de busqueda se presenta limpio e integrado en la card, sin bloque contenedor, borde ni fondo adicional alrededor de `searchDiv`.
 - Las tablas dentro de modales tambien deben respetar separacion vertical entre `searchDiv` y el header de tabla; no dejar la busqueda pegada al encabezado.
