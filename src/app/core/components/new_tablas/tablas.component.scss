@@ -25,6 +25,7 @@
 .dinamicTable {
   display: grid !important;
   column-gap: 0rem;
+  row-gap: 0.75rem;
   grid-template-rows: [filter-start] min-content [filter-end fantasma-start] auto [fantasma-end];
   grid-template-columns: [filter-start fantasma-start] auto [filter-end fantasma-end];
 
@@ -90,10 +91,6 @@
 
           &.noColorTitulo {
             background: var(--app-surface-muted);
-          }
-
-          &.colorTitulo > tr > .thHead:first-child {
-            background: var(--app-table-header-bg) !important;
           }
 
           .thHead {
@@ -211,12 +208,20 @@
         .tfoot {
           grid-area: tfoot;
           .pieTabla {
-            padding: 0.3rem 0rem 0.3rem 0.7rem;
+            background: var(--app-surface-soft) !important;
+            border-top: 1px solid var(--app-table-border);
+            padding: 0.25rem 0.55rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 0.5rem;
+
+            h6 {
+              color: var(--app-text);
+              font-size: 0.9rem;
+              font-weight: 700;
+            }
 
             .pagination-total {
               white-space: nowrap;

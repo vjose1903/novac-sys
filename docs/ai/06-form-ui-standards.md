@@ -25,6 +25,20 @@ Referencias rapidas:
 - Card/listado: `card cardContentClass`, `tituloCardClass`, `divTabla`.
 - Permisos visibles con `*ngxPermissionsOnly="formPermissions"` o permisos especificos por accion.
 
+## Estandar visual moderno
+
+El estandar vigente para pantallas de listado/formulario toma como referencia visual `src/app/admin/produccion/produccion.component.*` y `src/app/admin/reportes/reportes.component.*`.
+
+- Mantener el shell global `rowResgitro`; no crear estilos locales nuevos para resolver bordes, sombras, radios, titulos o densidad del CRUD si las clases estandar lo cubren.
+- El encabezado de pantalla usa `colTitulo` con `screen-title-block`, `screen-module-kicker` y titulo fuerte, sin cards ni barras adicionales. El kicker debe indicar el modulo real, por ejemplo `Registros`, `Operaciones` o `Reportes`.
+- El formulario usa `tituloFormClass` + `card cardFormClass`: superficie `var(--app-surface)`, borde `var(--app-card-border)`, sombra `var(--app-overlay-shadow)`, radio de `1rem` y acento lateral con `var(--primary06)`.
+- Los formularios largos deben vivir dentro de `cardFormClass`; no mover scroll al body ni crear wrappers paralelos para simular la card.
+- El formulario debe estar cerrado por defecto al entrar a una pantalla de listado. El estado cerrado no debe mostrar el titulo `Formulario`, pero la apertura/cierre entre `showForm` y `hideForm` debe conservar una transicion suave de ancho/opacidad.
+- Labels y controles mantienen la densidad compacta del sistema: label semibold, margen inferior corto, inputs existentes (`form-control`, `inputE`, PrimeNG) y manejo de errores actual.
+- Los botones principales del header/listado deben verse como acciones modernas: radio medio, peso semibold, sombra contenida y feedback hover/active.
+- Reutilizar los mismos tokens globales usados por produccion/reportes: `--app-text`, `--app-text-muted`, `--app-surface`, `--app-card-border`, `--app-overlay-shadow`, `--app-border`, `--primary01`, `--primary06`, `--primary07`.
+- Si una pantalla necesita una variacion por dominio, limitarla a detalles propios del modulo. El look base de CRUD debe salir de `src/styles.scss`.
+
 ## Campos
 
 - Usar Reactive Forms (`UntypedFormGroup`, `UntypedFormBuilder`, `Validators`) cuando el modulo vecino lo use.

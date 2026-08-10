@@ -27,6 +27,22 @@ El listado debe renderizar la tabla dinamica asi:
 
 Mantener nombres reales del modulo (`listaClientes`, `clienteSelected`, `listaArticulos`, `articuloSelected`, etc.).
 
+## Estandar visual moderno
+
+El estandar vigente para listados CRUD debe verse alineado con las pantallas modernas de produccion de productos terminados y reportes.
+
+- Mantener `rowResgitro`, `colTitulo`, `colFormularioListado`, `tituloCardClass`, `cardContentClass` y `divTabla`; esas clases definen el shell visual global.
+- El titulo de pantalla vive en `colTitulo` con `screen-title-block` y `screen-module-kicker`; no envolverlo en cards locales ni crear headers duplicados. El kicker debe indicar el modulo real de la pantalla.
+- El titulo del listado usa `tituloCardClass` con `h4` compacto y jerarquia visual sobria.
+- La tabla vive dentro de `cardContentClass > .divTabla` o `cardListados`: superficie `var(--app-surface)`, borde `var(--app-card-border)`, radio cercano a `1rem`, sombra `var(--app-overlay-shadow)` y overflow interno.
+- El filtro de busqueda se presenta limpio e integrado en la card, sin bloque contenedor, borde ni fondo adicional alrededor de `searchDiv`.
+- Las tablas dentro de modales tambien deben respetar separacion vertical entre `searchDiv` y el header de tabla; no dejar la busqueda pegada al encabezado.
+- El header de tabla debe usar el mismo color estandar que las tablas de busqueda en modales: `var(--app-table-header-bg)`.
+- El header de tabla debe usar un fondo uniforme en todas sus columnas; la primera columna no debe tener un color distinto.
+- El pie con total y paginacion debe salir del estilo global de `dinamic-table`: fondo suave, borde superior y controles alineados. No duplicar ese footer en wrappers de listados o modales.
+- No crear SCSS por modulo para repetir sombras, radios, bordes o paddings del contenedor del listado. Solo agregar estilos locales cuando la tabla tenga un caso visual propio.
+- Mantener `dinamic-table` como tabla estandar. El rediseño cambia el contenedor y jerarquia visual, no el contrato de datos ni la configuracion de columnas, filtros, botones o paginacion.
+
 ## Paginacion remota
 
 Para listados backend paginados, configurar `table_config.obj_paginate` con este patron:

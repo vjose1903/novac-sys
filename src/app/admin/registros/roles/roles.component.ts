@@ -61,7 +61,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   accionesClass = new AccionesC();
 
   roleSelected: any;
-  permiso_selected: any;
+  permiso_selected: any = { acciones: [] };
 
   isCreando: boolean = false;
   TablasComponent;
@@ -138,7 +138,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     this.boton = params.clean ? 'Registrar' : 'Actualizar';
-    this.permiso_selected = _.first(this.listaPermisos);
+    this.permiso_selected = _.first(this.listaPermisos) || { acciones: [] };
   }
 
   getPermisos() {

@@ -274,7 +274,7 @@
                   </div>
                 }
 
-                <div id="divPaginator" class="pagination-controls" elementResized (resized)="divPaginatorChangeWidth($event)">
+                <div id="divPaginator-{{ realIdTabla }}" class="pagination-controls" elementResized (resized)="divPaginatorChangeWidth($event)">
                   <p-paginator
                     id="paginator-{{ realIdTabla }}"
                     [first]="tServ.getPaginationById(realIdTabla)?.page_front"

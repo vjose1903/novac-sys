@@ -1,7 +1,12 @@
 <div class="row rowResgitro">
   <div class="col-12 p-0 colTitulo d-flex">
-    <h4 class="negrita mb-0 me-3">Registro de articulos</h4>
-    <btn-icon-circular [id]="'btnConfiguracionArticulo'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" [tooltip]="'Configuraciones de articulos'" [tooltipPosition]="'right'" (clickFunction)="openModalConfig()"> </btn-icon-circular>
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Registros</span>
+      <div class="screen-title-row">
+        <h4 class="negrita mb-0 me-3">Registro de articulos</h4>
+        <btn-icon-circular [id]="'btnConfiguracionArticulo'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" [tooltip]="'Configuraciones de articulos'" [tooltipPosition]="'right'" (clickFunction)="openModalConfig()"> </btn-icon-circular>
+      </div>
+    </div>
   </div>
 
   <div class="col-12 p-0 colFormularioListado">

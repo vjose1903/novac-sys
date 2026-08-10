@@ -81,17 +81,20 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
     this.router.events.pipe(takeUntil(this.destroy$)).subscribe((routerEvent: Event | RouterEvent) => {
       if (routerEvent instanceof NavigationStart) {
+        document.body.classList.add('crud-route-navigating');
         this.showLoading = true;
         this.initNavigate = true;
       }
 
       if (routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
+        document.body.classList.remove('crud-route-navigating');
         this.showLoading = false;
         this.initNavigate = false;
         return;
       }
 
       if (routerEvent instanceof NavigationEnd) {
+        document.body.classList.remove('crud-route-navigating');
         this.showLoading = false;
 
         if (this.initNavigate) {
@@ -153,6 +156,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   ngOnDestroy() {
+    document.body.classList.remove('crud-route-navigating');
     this._destroy_mixin();
     this.destroy$.next();
     this.destroy$.complete();

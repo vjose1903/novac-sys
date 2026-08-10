@@ -398,7 +398,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     const actualPagination = this.tServ.getPaginationById(this.realIdTabla);
 
     if (tipo == 'width_page') {
-      const divPaginator = document.getElementById('divPaginator');
+      const divPaginator = document.getElementById(`divPaginator-${this.realIdTabla}`);
       if (divPaginator) width = divPaginator.offsetWidth;
     }
 
