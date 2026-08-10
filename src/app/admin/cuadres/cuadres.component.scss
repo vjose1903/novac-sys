@@ -68,9 +68,8 @@
 }
 
 .cuadres-form.showForm {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 7rem);
+  grid-template-rows: var(--crud-section-title-height) minmax(0, 1fr);
+  height: 100%;
   min-height: 0;
   overflow: hidden;
   width: 62% !important;
@@ -118,6 +117,7 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  height: 100% !important;
   min-height: 0;
   overflow: hidden;
 }

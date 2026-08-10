@@ -1,6 +1,9 @@
 <div class="row rowResgitro cuadres-page">
   <div class="col-12 p-0 colTitulo">
-    <h4 class="negrita mb-0">Cuadres de caja</h4>
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Operaciones</span>
+      <h4 class="negrita mb-0">Cuadres de caja</h4>
+    </div>
     @if (archivedCuadre()) {
       <div class="cuadre-archive-tag">
         <button type="button" class="cuadre-archive-tag-main" (click)="restoreArchivedCuadre()" [disabled]="archivedCuadreRestored()">

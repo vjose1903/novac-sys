@@ -125,11 +125,13 @@
       .contenido {
         grid-area: contenido;
         background-color: var(--app-bg);
+        box-sizing: border-box;
         color: var(--app-text);
         padding: 0.8rem 1rem;
         overflow-y: auto;
 
         max-height: calc(100vh - 4rem);
+        min-height: 0;
         position: relative;
 
         // Media query para pantallas pequeñas
