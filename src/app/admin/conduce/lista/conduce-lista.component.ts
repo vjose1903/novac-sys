@@ -36,7 +36,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         titulo: 'Acciones',
         tipo: 'icon',
         key: 'actions',
-        estilos: [{ width: '9%' }, { color: '#000' }],
+        estilos: [{ width: '9%' }],
         iconsArray: [
           { key: 'ver', rowTooltip: 'tooltip_ver', text_color: 'colorNegro' },
           { key: 'anular', rowTooltip: 'tooltip_anular', text_color: 'colorNegro' },

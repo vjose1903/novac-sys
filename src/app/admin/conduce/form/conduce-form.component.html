@@ -1,54 +1,56 @@
 <div class="row layoutConduce h-100">
+  <div class="col-12 p-0 titulo">
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Operaciones</span>
+      <h2 class="negrita">Conduce</h2>
+    </div>
+  </div>
   <div class="col-12 p-0 arriba">
-    <div class="row">
-      <div class="col-5">
-        <div class="row gridSelecClient h-100">
-          <div class="col-12 p-0 mb-3 titulo">
-            <h2 class="negrita">Conduce</h2>
-          </div>
-          <div class="col-12 p-0 colCard">
-            <div class="card card-padding sombra h-100">
-              <div class="form-group">
-                <label class="control-label">Cliente: </label>
-                <input
-                  type="text"
-                  id="clienteI"
-                  (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
-                  (focus)="htmlServ.selectValue($event)"
-                  placeholder="Nombre Cliente"
-                  class="form-control mb-4 inputE"
-                  autocomplete="off"
-                  [ngClass]="{ disabled: !!cliente }"
-                  value=""
-                  tabindex="-1" />
-                <button class="btn btn-gris" (click)="goBack()">Atrás</button>
-                <button [disabled]="!cliente" class="btn btn-gris ms-2" (click)="abrirModalDinamicText('nuevo')">Nueva Búsqueda</button>
-              </div>
+    <div class="conduce-top-grid">
+      <div class="client-search-card">
+        <div class="card card-padding h-100">
+          <div class="widget h-100">
+            <div class="widget-content">
+              <label class="control-label">Cliente: </label>
+              <input
+                type="text"
+                id="clienteI"
+                (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
+                (focus)="htmlServ.selectValue($event)"
+                placeholder="Nombre Cliente"
+                class="form-control inputE"
+                autocomplete="off"
+                [ngClass]="{ disabled: !!cliente }"
+                value=""
+                tabindex="-1" />
+            </div>
+            <div class="widget-footer">
+              <button class="btn btn-blanco" (click)="goBack()">Atrás</button>
+              <button [disabled]="!cliente" class="btn btn-gris" (click)="abrirModalDinamicText('nuevo')">Nueva Búsqueda</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-7">
-        @if (facturas_adelantadas.length > 0) {
-          <div class="row">
-            <div class="col-12 mb-3">
-              <h3>Ventas adelantadas</h3>
-            </div>
-            <div class="col-12">
-              <div #cardTablaAdelantadas id="cardTabla" class="card sombra bordeRedondeado factAdelantadas overflowHidden">
-                <dinamic-table [cardTabla]="cardTablaAdelantadas" [(data)]="facturas_adelantadas" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
-              </div>
+
+      @if (facturas_adelantadas.length > 0) {
+        <div class="future-sales-card">
+          <div class="future-sales-title">
+            <h3>Ventas adelantadas</h3>
+          </div>
+          <div class="future-sales-table">
+            <div #cardTablaAdelantadas id="cardTabla" class="card factAdelantadas">
+              <dinamic-table [cardTabla]="cardTablaAdelantadas" [(data)]="facturas_adelantadas" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
             </div>
           </div>
-        }
-      </div>
+        </div>
+      }
     </div>
   </div>
   <!-- ================================================================================================================================================ -->
   <!-- ================================================================================================================================================ -->
   @if (cliente) {
-    <div class="col-12 mt-3 abajo">
-      <div class="card sombra bordeRedondeado h-100 cardConduce overflow-hidden">
+    <div class="col-12 abajo p-0">
+      <div class="card h-100 cardConduce overflow-hidden">
         <div class="cuerpo">
           <div class="fantasma-cuerpo">
             <table class="table mb-0 titles">
@@ -187,17 +189,17 @@
             </div>
           </div>
         </div>
-        <div class="row pt-2 botones">
-          <div class="col-12 mb-2">
-            <span class="titulos w-100">
-              Articulos a despachar: <strong> {{ getCantidadArticulos() }}</strong>
+        <div class="botones">
+          <div class="conduce-footer-summary">
+            <span class="titulos">
+              <i class="fa-solid fa-boxes-stacked"></i>
+              <span>Articulos a despachar:</span>
+              <strong>{{ getCantidadArticulos() }}</strong>
             </span>
           </div>
-          <div class="col-2 ms-4">
-            <app-btncircular [alto]="'100px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (pulsar)="imprimirConduce()"></app-btncircular>
-          </div>
-          <div class="col-2">
-            <app-btncircular [alto]="'100px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (pulsar)="abrirModalDinamicText('cancelar')"></app-btncircular>
+          <div class="conduce-footer-actions">
+            <app-btncircular [alto]="'84px'" [accion]="'Imprimir Conduce'" [nombreImg]="'printer'" (pulsar)="imprimirConduce()"></app-btncircular>
+            <app-btncircular [alto]="'84px'" [accion]="'Cancelar Conduce'" [nombreImg]="'cancelar'" (pulsar)="abrirModalDinamicText('cancelar')"></app-btncircular>
           </div>
         </div>
       </div>
