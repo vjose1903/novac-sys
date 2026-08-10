@@ -1,34 +1,65 @@
 <div class="divListadoViajes">
   <div class="titulo">
-    <h4 class="negrita p-0">Listado de viajes</h4>
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Pedidos</span>
+      <h4 class="negrita p-0">Listado de pedidos</h4>
+    </div>
   </div>
   <div class="tarjetas">
-    <div class="d-flex justify-content-between align-items-end rayaBottom mb-3 pb-2">
-      <div class="colores w-70">
-        @if (viajes?.length && viajes_pendientes_cant > 0) {
-          <span class="badge text-shadow bg-red text-white">Cantidad de viajes pendientes {{ viajes_pendientes_cant }}</span>
+    <div class="travel-status-panel">
+      <div class="status-metrics">
+        @if (viajes_cant > 0 && viajes_pendientes_cant > 0) {
+          <div class="status-metric pending">
+            <span class="status-icon"><i class="fas fa-clock"></i></span>
+            <span>
+              <small>Pendientes</small>
+              <strong>{{ viajes_pendientes_cant }}</strong>
+            </span>
+          </div>
         }
-        @if (viajes?.length && viajes_pendientes_cant > 0 && viajes_completados_cant > 0) {
-          <span class="badge text-shadow bg-blue text-white">Cantidad de viajes completados {{ viajes_completados_cant }}</span>
+        @if (viajes_cant > 0 && viajes_abonados_cant > 0) {
+          <div class="status-metric credited">
+            <span class="status-icon"><i class="far fa-check-square"></i></span>
+            <span>
+              <small>Abonados</small>
+              <strong>{{ viajes_abonados_cant }}</strong>
+            </span>
+          </div>
         }
-        @if (viajes?.length == 0) {
-          <span class="badge text-shadow bg-green text-white">No tiene viajes pendientes</span>
+        @if (viajes_cant > 0 && viajes_completados_cant > 0) {
+          <div class="status-metric completed">
+            <span class="status-icon"><i class="fas fa-check"></i></span>
+            <span>
+              <small>Completados</small>
+              <strong>{{ viajes_completados_cant }}</strong>
+            </span>
+          </div>
         }
-        @if (viajes?.length > 0 && viajes_pendientes_cant == 0) {
-          <span class="badge text-shadow bg-green text-white">Todos los viajes fueron completados</span>
+        @if (viajes_cant == 0) {
+          <div class="status-metric clear">
+            <span class="status-icon"><i class="fas fa-check"></i></span>
+            <span>
+              <small>Estado</small>
+              <strong>No tiene pedidos pendientes</strong>
+            </span>
+          </div>
+        }
+        @if (viajes_cant > 0 && viajes_pendientes_cant == 0 && viajes_abonados_cant == 0) {
+          <div class="status-metric clear">
+            <span class="status-icon"><i class="fas fa-check-double"></i></span>
+            <span>
+              <small>Estado</small>
+              <strong>Todos los pedidos fueron completados</strong>
+            </span>
+          </div>
         }
       </div>
 
-      @if (viajes?.length > 0 && viajes_completados_cant > 0) {
-        <div class="w-30">
-          <div class="d-flex justify-content-between">
-            <span class="negrita">Porcentaje de viajes completos</span>
-            <div>
-              <span style="flex-wrap: nowrap">
-                <span class="negrita">{{ viajes_completados_cant }} / </span>
-                <span class="negrita gris">{{ viajes_cant }}</span>
-              </span>
-            </div>
+      @if (viajes_cant > 0) {
+        <div class="status-progress">
+          <div class="status-progress-head">
+            <span>Progreso</span>
+            <strong>{{ viajes_completados_cant }} / <span>{{ viajes_cant }}</span></strong>
           </div>
           <p-progressBar [value]="viajes_cant_porciento"></p-progressBar>
         </div>

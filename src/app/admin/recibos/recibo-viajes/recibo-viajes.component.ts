@@ -96,6 +96,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   choferes = [];
 
   viajes_pendientes_cant = 0;
+  viajes_abonados_cant = 0;
   viajes_completados_cant = 0;
   viajes_cant_porciento: any;
   viajes_cant: any;
@@ -187,8 +188,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
 
   async getViajes(params?: { per_page: number; page: number; search: string }) {
     return new Promise<any>(async (resolve, reject) => {
-      this.viajes_completados_cant = 0;
-      this.viajes_pendientes_cant = 0;
+      this.resetViajesSummary();
       this.viajes.length = 0;
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -227,23 +227,35 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         this.viajes.push(viaje);
       });
 
-      this.viajes_cant = res.total_registros ? res.total_registros : 0;
-
-      this.viajes_completados_cant = this.viajes.filter(v => fun.hasValue(v.fecha_completada)).length;
-      this.viajes_pendientes_cant = this.viajes.filter(v => fun.isEmpty(v.fecha_completada)).length;
-
-      fun.setTimeout(() => {
-        this.viajes_cant_porciento = (this.viajes_completados_cant / this.viajes_cant) * 100;
-        this.viajes_cant_porciento = fun.roundNumberToDecimal(this.viajes_cant_porciento);
-        this.table_config.total_count = res.total_registros;
-        this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
-      }, 5);
+      this.applyViajesSummary((res as any).summary, res.total_registros);
 
       this.table_config.total_count = res.total_registros;
       this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
 
       resolve(true);
     });
+  }
+
+  resetViajesSummary() {
+    this.viajes_completados_cant = 0;
+    this.viajes_abonados_cant = 0;
+    this.viajes_pendientes_cant = 0;
+    this.viajes_cant_porciento = 0;
+    this.viajes_cant = 0;
+  }
+
+  applyViajesSummary(summary, totalRegistros = 0) {
+    const total = summary?.total_registros ?? totalRegistros ?? 0;
+
+    this.viajes_cant = total;
+    this.viajes_completados_cant = summary?.viajes_completados_count ?? 0;
+    this.viajes_abonados_cant = summary?.viajes_abonados_count ?? 0;
+    this.viajes_pendientes_cant = summary?.viajes_pendientes_count ?? 0;
+    this.viajes_cant_porciento =
+      summary?.viajes_completados_percent ??
+      summary?.viajes_completados_porcentaje ??
+      summary?.viajes_completados_porciento ??
+      (total > 0 ? fun.roundNumberToDecimal((this.viajes_completados_cant / total) * 100) : 0);
   }
 
   parseMovimientosViaje(movimiento_viaje) {
