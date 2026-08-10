@@ -62,12 +62,6 @@
         <div class="row">
           @if (factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion) {
             <div class="col-3 divRight ps-0 invoice-document-panel">
-              <div class="invoice-panel-heading">
-                <span class="invoice-panel-icon">
-                  <i class="fa-solid fa-file-invoice"></i>
-                </span>
-                <span>Documento</span>
-              </div>
               <div class="row invoice-field-grid">
                 @if (!is_external) {
                   <div class="col-3 ps-0">
@@ -332,7 +326,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-7 ps-0">
+                <div class="col-7 ps-0 mb-2">
                   <!-- ================== NOMBRE ================== -->
                   <span class="control-label titulos me-2">Nombre:</span>
                   <input
@@ -354,7 +348,7 @@
                 </div>
 
                 <div class="col-5 p-0">
-                  <div class="form-group">
+                  <div class="form-group mb-0">
                     <!-- ================== DOCUMENTO ================== -->
                     <span class="control-label titulos">Documento Identidad:</span>
                     @if (propietarioDocumentoTipo == 'rnc') {
@@ -385,7 +379,7 @@
                 </div>
 
                 <div class="col-12 p-0">
-                  <div class="form-group">
+                  <div class="form-group mb-0">
                     <!-- ================== DIRECCION ================== -->
                     <span class="control-label titulos me-2">Direccion:</span>
                     <input
@@ -455,32 +449,32 @@
           </div>
 
           <div class="factura-footer-actions">
-              <div *ngxPermissionsOnly="factServ.isVenta() ? permissions.factura_venta.create : permissions.factura_compra.create">
-                <app-btncircular [alto]="'84px'" [accion]="'Terminar ' + getDocumentoDescripcion().descripcion_short" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
-              </div>
+            <div *ngxPermissionsOnly="factServ.isVenta() ? permissions.factura_venta.create : permissions.factura_compra.create">
+              <app-btncircular [alto]="'84px'" [accion]="'Terminar ' + getDocumentoDescripcion().descripcion_short" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
+            </div>
+            <div>
+              <app-btncircular
+                [alto]="'84px'"
+                [accion]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar) ? 'Cancelar Edición' : 'Cancelar ' + getDocumentoDescripcion().descripcion_short"
+                [nombreImg]="'cancelar'"
+                (pulsar)="cancelarFactura()"></app-btncircular>
+            </div>
+            <div>
+              <app-btncircular
+                [alto]="'84px'"
+                [accion]="fun.hasValue(factura_guardada) ? getDocumentoDescripcion().descripcion_short + ' ya está archivada' : 'Archivar ' + getDocumentoDescripcion().descripcion_short"
+                [nombreImg]="'guardarFactura'"
+                (pulsar)="archivarFactura()"></app-btncircular>
+            </div>
+            @if (factServ.isVenta()) {
               <div>
-                <app-btncircular
-                  [alto]="'84px'"
-                  [accion]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar) ? 'Cancelar Edición' : 'Cancelar ' + getDocumentoDescripcion().descripcion_short"
-                  [nombreImg]="'cancelar'"
-                  (pulsar)="cancelarFactura()"></app-btncircular>
+                @if (fun.isEmpty(factura_a_rellenar)) {
+                  <app-btncircular [alto]="'84px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
+                }
               </div>
-              <div>
-                <app-btncircular
-                  [alto]="'84px'"
-                  [accion]="fun.hasValue(factura_guardada) ? getDocumentoDescripcion().descripcion_short + ' ya está archivada' : 'Archivar ' + getDocumentoDescripcion().descripcion_short"
-                  [nombreImg]="'guardarFactura'"
-                  (pulsar)="archivarFactura()"></app-btncircular>
-              </div>
-              @if (factServ.isVenta()) {
-                <div>
-                  @if (fun.isEmpty(factura_a_rellenar)) {
-                    <app-btncircular [alto]="'84px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
-                  }
-                </div>
-              }
+            }
 
-              <!-- <div *ngIf="factServ.isVenta">
+            <!-- <div *ngIf="factServ.isVenta">
               <app-btncircular
                 [alto]="'100px'"
                 [accion]="'PRUEBA'"

@@ -168,6 +168,8 @@ export class ThemeService {
       rootStyle.setProperty('--app-tinted-surface-text', '#edf2f7');
       rootStyle.setProperty('--app-modal-close-text', '#9aa8bd');
       rootStyle.setProperty('--app-border-menu-item', '#0000004d');
+      rootStyle.setProperty('--transparente-mode-00', '#ffffff0a');
+
       return;
     }
 
@@ -259,6 +261,7 @@ export class ThemeService {
     rootStyle.setProperty('--app-tinted-surface-text', '#101820');
     rootStyle.setProperty('--app-modal-close-text', 'var(--app-text-muted)');
     rootStyle.setProperty('--app-border-menu-item', '#41414163');
+    rootStyle.setProperty('--transparente-mode-00', '#ffffff45');
   }
 
   private applyColorPalette(color: ThemeColor, mode: ThemeMode): void {
