@@ -1322,8 +1322,16 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return fun.isEmpty(this.factServ?.propietario_factura?.id) && fun.hasValue(this.factServ?.propietario_factura?.NoCliente_rnc);
   }
 
+  private isClienteContadoSeleccionado(): boolean {
+    const propietario = this.factServ?.propietario_factura ?? this.formPropietario?.getRawValue();
+    const nombrePropietario = String(propietario?.nombre_completo ?? '').trim().toLowerCase();
+    const nombreContado = String(this.factServ.clienteContado.nombre_completo ?? '').trim().toLowerCase();
+
+    return fun.isEmpty(propietario?.id) && nombrePropietario === nombreContado;
+  }
+
   private tienePropietarioSeleccionado(): boolean {
-    return fun.hasValue(this.factServ?.propietario_factura?.id) || this.isClienteCasualSeleccionado();
+    return fun.hasValue(this.factServ?.propietario_factura?.id) || this.isClienteCasualSeleccionado() || (this.is_external && this.isClienteContadoSeleccionado());
   }
 
   private limpiarClienteCasualSeleccionado() {
