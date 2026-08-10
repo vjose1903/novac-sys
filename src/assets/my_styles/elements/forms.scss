@@ -85,6 +85,33 @@ textarea {
   border: 1px solid #a6a6a6a6 !important;
   border-radius: 0.25rem !important;
   @include formField;
+
+  &.disabled,
+  &:disabled {
+    background-color: var(--app-input-disabled-bg) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-input-disabled-text) !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
+    touch-action: none !important;
+    pointer-events: none !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+  }
+
+  &.disabled:focus,
+  &:disabled:focus,
+  &.disabled.ng-invalid,
+  &.disabled.ng-dirty,
+  &.disabled.ng-touched {
+    background-color: var(--app-input-disabled-bg) !important;
+    border-color: var(--app-border) !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    color: var(--app-input-disabled-text) !important;
+    -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+  }
 }
 
 .form-control {
@@ -108,9 +135,29 @@ textarea {
   &.disabled,
   &:disabled {
     background-color: #e9ecef;
-    background-color: var(--app-input-disabled-bg);
+    background-color: var(--app-input-disabled-bg) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-input-disabled-text) !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
     touch-action: none !important;
     pointer-events: none !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+  }
+
+  &.disabled:focus,
+  &:disabled:focus,
+  &.disabled.ng-invalid,
+  &.disabled.ng-dirty,
+  &.disabled.ng-touched {
+    background-color: var(--app-input-disabled-bg) !important;
+    border-color: var(--app-border) !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    color: var(--app-input-disabled-text) !important;
+    -webkit-text-fill-color: var(--app-input-disabled-text) !important;
   }
 
   &.with-right-btn {

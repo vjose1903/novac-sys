@@ -36,6 +36,7 @@ Referencias rapidas:
   - Contenedor de error `span id="msgContainer_campo"`.
 - Patron nuevo permitido: `<form-error-msg [control]="form.get('campo')">`.
 - No inventar un sistema visual nuevo para errores, labels o espaciado.
+- Si el estilo aplica a campos reutilizables o componentes usados en mas de una pantalla, colocarlo en el SCSS global correspondiente bajo `src/assets/my_styles/elements/` antes que en el SCSS de un modulo puntual.
 
 ## PrimeNG usado en formularios
 

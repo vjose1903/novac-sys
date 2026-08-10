@@ -14,14 +14,29 @@
     @include formField;
 
     &:disabled,
-    &[disabled] {
+    &[disabled],
+    &.disabled {
       background-color: var(--app-input-disabled-bg) !important;
       border: 1px solid var(--app-border) !important;
       box-shadow: none !important;
       opacity: 1 !important;
       color: var(--app-input-disabled-text) !important;
       cursor: not-allowed !important;
-      pointer-events: auto !important;
+      pointer-events: none !important;
+      -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+    }
+
+    &:disabled:focus,
+    &[disabled]:focus,
+    &.disabled:focus,
+    &.disabled.ng-invalid,
+    &.disabled.ng-dirty,
+    &.disabled.ng-touched {
+      background-color: var(--app-input-disabled-bg) !important;
+      border-color: var(--app-border) !important;
+      box-shadow: none !important;
+      outline: 0 !important;
+      color: var(--app-input-disabled-text) !important;
       -webkit-text-fill-color: var(--app-input-disabled-text) !important;
     }
   }
@@ -52,14 +67,16 @@
   }
 
   &:has(> .p-inputtext:disabled),
-  &:has(> .p-inputtext[disabled]) {
+  &:has(> .p-inputtext[disabled]),
+  &:has(> .p-inputtext.disabled) {
     cursor: not-allowed !important;
-    pointer-events: auto !important;
+    pointer-events: none !important;
     user-select: none !important;
   }
 
   &:has(input:disabled),
-  &:has(input[disabled]) {
+  &:has(input[disabled]),
+  &:has(input.disabled) {
     cursor: not-allowed !important;
   }
 }
