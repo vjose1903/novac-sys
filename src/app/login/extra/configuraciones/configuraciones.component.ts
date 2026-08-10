@@ -9,6 +9,7 @@ import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 import { formFieldId, formFieldName } from './configuraciones.model';
 import { EmpresaService } from '@core/services/empresa.service';
+import { ThemeService } from '@core/services/theme.service';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -70,6 +71,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
   htmlServ = inject(HtmlElementsService);
   empresaServ = inject(EmpresaService);
+  themeServ = inject(ThemeService);
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -291,6 +293,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       const formulario = {
         ...this.getFormularioToSend(),
         cliente: this.getValue(this.configApp, 'cliente'),
+        mode_app: this.themeServ.getMode(),
       };
 
       const config_response = await this._ipc.setAppConfig(formulario);
