@@ -193,6 +193,28 @@ textarea {
   // }
 }
 
+.sin_comprobante_btn {
+  height: 2.5rem;
+  width: 3rem;
+  border-radius: 0.5rem;
+  opacity: 0;
+  background-color: var(--app-no-receipt-button-hover);
+
+  &:hover {
+    cursor: pointer;
+    opacity: 0.3;
+  }
+
+  &.active {
+    opacity: 1 !important;
+    background-color: var(--transparente05) !important;
+
+    &:hover {
+      opacity: 1 !important;
+    }
+  }
+}
+
 .p-inputtext:enabled {
   &:focus {
     @include formFieldFocus;

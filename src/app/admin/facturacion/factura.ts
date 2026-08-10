@@ -220,6 +220,7 @@ export class FacturaC extends CrudG<FacturasI> {
       requestParams.parameters['desde'] = fun.my_dateFormater(params.reporte.data.desde, false);
       requestParams.parameters['hasta'] = fun.my_dateFormater(params.reporte.data.hasta, false);
       requestParams.parameters['serie'] = params.reporte.data.serie;
+      if (params.reporte.data.is_external === true) requestParams.parameters['is_external'] = true;
 
       for (let index = 0; index < FacturaC.inputsMovimientosViaje.length; index++) {
         const item = FacturaC.inputsMovimientosViaje[index];

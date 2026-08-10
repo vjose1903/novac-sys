@@ -77,6 +77,11 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
 
   advancedFiltersAccordionValue: string | number | string[] | number[] | null = null;
   previousColumnasAntiguedadSelection: string[] = [];
+  is_external = false;
+
+  private readonly externalReportTypes = ['ventas_diarias', 'ventas_rango'];
+  private lastExternalReportClickAt = 0;
+  private previousExternalReportFormState: { serie: any; condicion: any; tipo_factura_id: any } | null = null;
 
   private fb = inject(UntypedFormBuilder);
 
@@ -470,6 +475,52 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     return this.tipo_reporte == 'cuentas_cobrar_ant_saldo' && !!this.form?.controls['filtrar_por_cliente']?.value;
   }
 
+  showExternalReportButton() {
+    return this.externalReportTypes.includes(this.tipo_reporte) && Ss.configServ.config?.usa_facturas_externas === true;
+  }
+
+  activarReporteFacturasExternas() {
+    const now = Date.now();
+    const diff = now - this.lastExternalReportClickAt;
+    this.lastExternalReportClickAt = now;
+
+    if (diff >= 200) return;
+
+    this.setExternalReportState(!this.is_external);
+  }
+
+  setExternalReportState(isExternal: boolean) {
+    this.is_external = isExternal;
+
+    if (isExternal) {
+      this.previousExternalReportFormState = {
+        serie: this.form.controls.serie.value,
+        condicion: this.form.controls.condicion.value,
+        tipo_factura_id: this.form.controls.tipo_factura_id.value,
+      };
+      this.form.controls.serie.setValue(serie.all, { emitEvent: false });
+      this.form.controls.condicion.setValue('Contado', { emitEvent: false });
+      this.form.controls.tipo_factura_id.setValue(0, { emitEvent: false });
+      this.disableExternalReportControls();
+    } else {
+      this.enableExternalReportControls();
+      if (fun.hasValue(this.previousExternalReportFormState)) {
+        this.form.patchValue(this.previousExternalReportFormState, { emitEvent: false });
+      }
+      this.previousExternalReportFormState = null;
+    }
+
+    this.formUpdateTrigger.update(val => val + 1);
+  }
+
+  disableExternalReportControls() {
+    ['serie', 'condicion', 'tipo_factura_id'].forEach(control => this.form.controls[control]?.disable({ emitEvent: false }));
+  }
+
+  enableExternalReportControls() {
+    ['serie', 'condicion', 'tipo_factura_id'].forEach(control => this.form.controls[control]?.enable({ emitEvent: false }));
+  }
+
   normalizeColumnasAntiguedadSelection(control) {
     const allValue = ClienteC.allColumnasAntiguedadValue;
     const rawSelection = Array.isArray(control.value) ? control.value.filter(item => fun.hasValue(item)) : [];
@@ -536,6 +587,6 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   }
 
   submit() {
-    this.modalConfig.close({ data: { ...this.form.getRawValue(), switchGroup: { ...this.switchGroup } } });
+    this.modalConfig.close({ data: { ...this.form.getRawValue(), is_external: this.is_external === true, switchGroup: { ...this.switchGroup } } });
   }
 }
