@@ -5,30 +5,35 @@
 <div class="rowFacturacion">
   <div class="colTitulo mb-2 d-flex justify-content-between">
     <div class="d-flex align-items-center">
-      <h4 class="negrita mb-0">{{ titulo | titlecase }}</h4>
+      <div class="screen-title-block">
+        <span class="screen-module-kicker">Facturación</span>
+        <div class="screen-title-row">
+          <h4 class="negrita mb-0">{{ titulo | titlecase }}</h4>
 
-      @if (opcionesExtra().length > 0 && factServ.isVenta()) {
-        <div class="ms-3">
-          <btn-icon-circular id="btnExtra" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
+          @if (opcionesExtra().length > 0 && factServ.isVenta()) {
+            <div class="title-extra-action">
+              <btn-icon-circular id="btnExtra" icon="fa-solid fa-ellipsis" size="size-md" tooltip="Opciones Extras" tooltipPosition="right" (clickFunction)="openOverlay($event, overlayExtra, 'extra')"> </btn-icon-circular>
 
-          <p-popover #overlayExtra [dismissable]="false" styleClass="padding-sm" (onHide)="cerrarOverlay()">
-            <div id="overlayExtra">
-              <ul class="overlayExtra" role="menu">
-                @for (option of opcionesExtra(); track option.key; let index_option = $index) {
-                  @if (option.condition()) {
-                    <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer br-4" (click)="selectOptionExtra(option, 'click')">
-                      <div class="d-flex align-items-center">
-                        <strong> {{ option.key }} - </strong> &nbsp;
-                        <p id="dropdown-item" class="me-3 mb-0">{{ option.label }}</p>
-                      </div>
-                    </li>
-                  }
-                }
-              </ul>
+              <p-popover #overlayExtra [dismissable]="false" styleClass="padding-sm" (onHide)="cerrarOverlay()">
+                <div id="overlayExtra">
+                  <ul class="overlayExtra" role="menu">
+                    @for (option of opcionesExtra(); track option.key; let index_option = $index) {
+                      @if (option.condition()) {
+                        <li id="overlayExtra-{{ option.key }}" role="menuitem" class="hoverlable c-pointer br-4" (click)="selectOptionExtra(option, 'click')">
+                          <div class="d-flex align-items-center">
+                            <strong> {{ option.key }} - </strong> &nbsp;
+                            <p id="dropdown-item" class="me-3 mb-0">{{ option.label }}</p>
+                          </div>
+                        </li>
+                      }
+                    }
+                  </ul>
+                </div>
+              </p-popover>
             </div>
-          </p-popover>
+          }
         </div>
-      }
+      </div>
     </div>
 
     <div class="d-flex align-items-center gap-2">
@@ -56,8 +61,14 @@
       <div class="cabezaFactura">
         <div class="row">
           @if (factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion) {
-            <div class="col-3 divRight ps-0">
-              <div class="row">
+            <div class="col-3 divRight ps-0 invoice-document-panel">
+              <div class="invoice-panel-heading">
+                <span class="invoice-panel-icon">
+                  <i class="fa-solid fa-file-invoice"></i>
+                </span>
+                <span>Documento</span>
+              </div>
+              <div class="row invoice-field-grid">
                 @if (!is_external) {
                   <div class="col-3 ps-0">
                     <!-- ================== TIPO ================== -->
@@ -295,9 +306,9 @@
           }
           <!-- ======================================================================================================================================================================== -->
           <!-- ======================================================================================================================================================================== -->
-          <div class="{{ factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
+          <div class="invoice-owner-panel {{ factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion ? 'col-5 divRight' : 'col-8' }}">
             <form [formGroup]="formPropietario">
-              <div class="d-flex align-items-center mb-2 h-fit">
+              <div class="invoice-panel-heading invoice-owner-heading">
                 <!-- ================== PROPIETARIO ================== -->
                 <h5 class="mb-0">
                   <strong>{{ factServ.isCompra() ? 'Suplidor' : 'Cliente' }}:</strong>
@@ -399,22 +410,19 @@
           </div>
           <!-- ======================================================================================================================================================================== -->
           <!-- ======================================================================================================================================================================== -->
-          <div
-            class="col-4"
-            style="
-              display: grid;
-              grid-template-rows: min-content;
-              grid-template-areas:
-                '.'
-                '.'
-                '.';
-            ">
-            <div class="encabezadoRigth fecha">
+          <div class="col-4 invoice-total-panel">
+            <div class="encabezadoRigth fecha invoice-date-card">
+              <span class="invoice-panel-icon">
+                <i class="fa-regular fa-clock"></i>
+              </span>
               <span class="titulos w-100">
                 Fecha : <strong> {{ fecha }}</strong>
               </span>
             </div>
-            <div class="cuadroTotal">RD$ {{ formatoNumero(TOTAL) }}</div>
+            <div class="cuadroTotal">
+              <span class="invoice-total-label">Total</span>
+              <span>RD$ {{ formatoNumero(TOTAL) }}</span>
+            </div>
             @if (factura_pendiente) {
               <div class="encabezadoRight fechaA">
                 <span class="w-100 text-danger letrasT fechaAtrasada">
@@ -425,7 +433,7 @@
           </div>
         </div>
       </div>
-      <div class="cuerpoFactura mb-2">
+      <div class="cuerpoFactura">
         <div class="fantasma-cuerpo">
           <app-cuerpo-factura
             [factura]="factura_a_rellenar"
@@ -437,28 +445,29 @@
         </div>
       </div>
       <div class="pieFactura">
-        <div class="row mx-0 w-100">
-          <div class="col-12">
-            <span class="titulos w-100">
-              Articulos: <strong> {{ getCantidadArticulos() }}</strong>
+        <div class="factura-footer-layout">
+          <div class="factura-footer-summary">
+            <span class="titulos">
+              <i class="fa-solid fa-boxes-stacked"></i>
+              <span>Articulos:</span>
+              <strong>{{ getCantidadArticulos() }}</strong>
             </span>
           </div>
 
-          <div class="col-7">
-            <div class="h-100 d-flex justify-content-around align-items-center ms-4">
+          <div class="factura-footer-actions">
               <div *ngxPermissionsOnly="factServ.isVenta() ? permissions.factura_venta.create : permissions.factura_compra.create">
-                <app-btncircular [alto]="'100px'" [accion]="'Terminar ' + getDocumentoDescripcion().descripcion_short" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
+                <app-btncircular [alto]="'84px'" [accion]="'Terminar ' + getDocumentoDescripcion().descripcion_short" [nombreImg]="'printer'" (pulsar)="imprimirFactura()"></app-btncircular>
               </div>
               <div>
                 <app-btncircular
-                  [alto]="'100px'"
+                  [alto]="'84px'"
                   [accion]="factServ.action == 'update' && fun.hasValue(factura_a_rellenar) ? 'Cancelar Edición' : 'Cancelar ' + getDocumentoDescripcion().descripcion_short"
                   [nombreImg]="'cancelar'"
                   (pulsar)="cancelarFactura()"></app-btncircular>
               </div>
               <div>
                 <app-btncircular
-                  [alto]="'100px'"
+                  [alto]="'84px'"
                   [accion]="fun.hasValue(factura_guardada) ? getDocumentoDescripcion().descripcion_short + ' ya está archivada' : 'Archivar ' + getDocumentoDescripcion().descripcion_short"
                   [nombreImg]="'guardarFactura'"
                   (pulsar)="archivarFactura()"></app-btncircular>
@@ -466,7 +475,7 @@
               @if (factServ.isVenta()) {
                 <div>
                   @if (fun.isEmpty(factura_a_rellenar)) {
-                    <app-btncircular [alto]="'100px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
+                    <app-btncircular [alto]="'84px'" [accion]="'Ingresar Factura pendientes'" [nombreImg]="'calendar'" (pulsar)="ingresarFecha()"></app-btncircular>
                   }
                 </div>
               }
@@ -479,9 +488,8 @@
                 (click)="prueba()"
               ></app-btncircular>
             </div> -->
-            </div>
           </div>
-          <div class="col-5 d-flex justify-content-end">
+          <div class="factura-footer-totals">
             <div class="mostrarNumeros w-100">
               <div class="row">
                 <div class="col-12 cuadroResumenTotal mb-2">
