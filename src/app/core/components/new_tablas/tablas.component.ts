@@ -59,6 +59,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   @Output() dataChange = new EventEmitter<any>();
 
   cantPagesView: number = 5;
+  cantPagesViewTimeout;
   private destroy$ = new Subject<void>();
 
   fun = fun;
@@ -91,6 +92,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ngOnInit() {
     this.realIdTabla = this.config.id_tabla + this.post_id;
+    this.handleConfig();
 
     new fun().getWindowSize.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
@@ -111,7 +113,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ngAfterViewInit() {
     this.changeStylesTitles();
-    this.handleConfig();
   }
 
   ngOnDestroy() {
@@ -120,32 +121,31 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     this.tServ.deletePaginationById(this.realIdTabla);
     this.tServ.resetRowEditing();
+    window.clearTimeout(this.cantPagesViewTimeout);
   }
 
   handleConfig() {
-    queueMicrotask(() => {
-      if (!this.config.padding) this.config.padding = '0rem';
-      if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
-      if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
-      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config, 'obj_paginate.showDropDown')) this.config.obj_paginate.showDropDown = true;
-      if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
-      if (!this.config.filterTargets) this.config.filterTargets = this.config.info.map(info => Object.values(fun.pick(info, ['key']))[0]);
+    if (!this.config.padding) this.config.padding = '0rem';
+    if (!fun.objHas(this.config, 'redondo')) this.config.redondo = true;
+    if (fun.objHas(this.config, 'filtrar') && !fun.objHas(this.config, 'filtrar.show')) this.config.filtrar.show = true;
+    if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'showDropDown')) this.config.obj_paginate.showDropDown = true;
+    if (!fun.objHas(this.config, 'colorTitulo')) this.config.colorTitulo = true;
+    if (!this.config.filterTargets) this.config.filterTargets = this.config.info.map(info => Object.values(fun.pick(info, ['key']))[0]);
 
-      if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
-        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
-        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
-        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
-        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
-        if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
-      }
+    if (fun.objHas(this.config, 'obj_paginate') && fun.hasValue(this.config.obj_paginate)) {
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page')) this.config.obj_paginate.page = this.tServ.obj_paginate.default.page;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'page_front')) this.config.obj_paginate.page_front = this.tServ.obj_paginate.default.page_front;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page')) this.config.obj_paginate.per_page = this.tServ.obj_paginate.default.per_page;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'search')) this.config.obj_paginate.search = this.tServ.obj_paginate.default.search;
+      if (fun.objHas(this.config, 'obj_paginate') && !fun.objHas(this.config.obj_paginate, 'per_page_options')) this.config.obj_paginate.per_page_options = this.tServ.obj_paginate.default.per_page_options;
+    }
 
-      this.verifyButtons(this.config);
+    this.verifyButtons(this.config);
 
-      this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
+    this.tServ.initPagination(this.realIdTabla, this.config.obj_paginate || fun.deepCloning(this.tServ.obj_paginate.default));
 
-      this.config.info.map(item => {
-        if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
-      });
+    this.config.info.map(item => {
+      if (!fun.objHas(item, 'titulo_sm')) item.titulo_sm = item.titulo;
     });
   }
 
@@ -410,7 +410,8 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     const actualPage = this.getPaginatorPageByNumber(actualPagination?.page);
 
-    window.setTimeout(() => {
+    window.clearTimeout(this.cantPagesViewTimeout);
+    this.cantPagesViewTimeout = window.setTimeout(() => {
       if (actualPage) {
         actualPage.setAttribute('clickeado_por', 'maquina');
         actualPage.click();
@@ -419,8 +420,10 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
         }, 2000);
       }
 
-      this.cantPagesView = actual;
-    }, 0);
+      this.zone.run(() => {
+        this.cantPagesView = actual;
+      });
+    }, 50);
   }
 
   getColor(myColor) {
