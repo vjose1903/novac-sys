@@ -9,8 +9,9 @@
 
 .IngresosRow {
   display: grid;
-  grid-row-gap: 1rem;
+  grid-row-gap: 0.75rem;
   height: 100%;
+  min-height: 0;
   grid-template-areas:
     'titulo'
     'arriba'
@@ -20,50 +21,105 @@
 
   .titulo {
     grid-area: titulo;
+
+    .screen-module-kicker {
+      color: var(--app-text-muted);
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      margin-bottom: 0.18rem;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      color: var(--app-text);
+      font-size: 1.65rem;
+      font-weight: 800 !important;
+      letter-spacing: 0;
+      line-height: 1.12;
+      margin: 0;
+    }
   }
   .arriba {
     grid-area: arriba;
   }
   .medio {
     grid-area: medio;
+    min-height: 0;
 
     .cardFacturas {
+      background: var(--app-surface) !important;
+      border: 1px solid var(--app-card-border) !important;
+      border-radius: 1rem !important;
+      box-shadow: var(--app-overlay-shadow) !important;
       display: grid;
       grid-template-areas:
         'header'
         'divFantasma';
       grid-template-rows: min-content auto;
       height: 100%;
+      min-height: 0;
+      overflow: hidden;
 
       .header {
+        background: linear-gradient(135deg, color-mix(in srgb, var(--app-surface-soft) 88%, var(--primary06)), var(--app-surface));
+        border-bottom: 1px solid var(--app-card-border);
         grid-area: header;
-        margin-top: 0.5rem;
         display: flex;
         justify-content: flex-end;
         align-items: center;
-        padding-right: 1rem;
+        padding: 0.55rem 0.75rem;
+
+        .receipt-table-actions {
+          align-items: center;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          justify-content: flex-end;
+        }
 
         .more-pages {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: var(--app-warning-soft-bg);
-          color: var(--app-warning-soft-text);
-          padding: 0.1rem 0.5rem;
-          border-radius: 8px;
+          background: color-mix(in srgb, var(--app-warning-soft-bg) 40%, var(--app-surface));
+          border: 1px solid color-mix(in srgb, var(--app-warning-soft-bg) 65%, var(--app-card-border));
+          color: #92400e;
+          font-size: 0.82rem;
+          font-weight: 700;
+          padding: 0.32rem 0.6rem;
+          border-radius: 0.6rem;
           cursor: copy;
         }
 
+        .mora-general-control {
+          align-items: center;
+          color: var(--app-text);
+          display: inline-flex;
+          font-size: 0.9rem;
+          font-weight: 600;
+          gap: 0.5rem;
+        }
+
         .btnSelect {
-          font-size: 1.5rem;
+          color: var(--app-text-muted);
+          font-size: 1.25rem;
+          transition:
+            color 0.2s ease,
+            transform 0.2s ease;
           &:hover {
+            color: var(--primary08);
             cursor: pointer;
+            transform: translateY(-1px);
           }
         }
       }
       .divFantasma {
         grid-area: divFantasma;
         position: relative;
+        min-height: 0;
 
         .tablaIngresos {
           position: absolute;
@@ -78,7 +134,66 @@
   }
 }
 
+.receipt-top-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(17rem, 0.58fr) minmax(0, 1.42fr);
+}
+
+.client-search-card {
+  min-height: 0;
+
+  .card {
+    background: var(--app-surface) !important;
+    border: 1px solid var(--app-card-border) !important;
+    border-radius: 1rem !important;
+    box-shadow: var(--app-overlay-shadow) !important;
+    overflow: hidden;
+    padding: 0 !important;
+  }
+
+  .widget {
+    display: grid;
+    grid-template-rows: auto min-content;
+    min-height: 11rem;
+  }
+
+  .widget-content {
+    align-content: start;
+    display: grid;
+    padding: 1rem;
+  }
+
+  .control-label {
+    color: var(--app-text);
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+  }
+
+  .form-control {
+    background: var(--app-surface-soft);
+    border-color: var(--app-card-border);
+    color: var(--app-text);
+    margin-bottom: 0 !important;
+    min-height: 2.4rem;
+  }
+
+  .widget-footer {
+    align-items: center;
+    background: var(--app-surface-soft);
+    border-top: 1px solid var(--app-card-border);
+    display: flex;
+    gap: 0.65rem;
+    justify-content: flex-start;
+    padding: 0.75rem 1rem;
+  }
+}
+
 .clienteAdepositar {
+  background: var(--app-surface) !important;
+  border: 1px solid var(--app-card-border);
+  border-radius: 1rem;
+  box-shadow: var(--app-overlay-shadow);
   display: grid;
   height: 100%;
   grid-template-areas:
@@ -86,42 +201,269 @@
     'cuerpo'
     'porcentaje';
   grid-template-rows: min-content auto min-content;
+  min-height: 11rem;
+  overflow: hidden;
 
   .nombre_cliente {
+    border-bottom: 1px solid var(--app-card-border);
     grid-area: nombre_cliente;
+    padding: 0.8rem 1rem 0.65rem;
+
+    h3 {
+      color: var(--app-text);
+      font-size: 1.45rem;
+      line-height: 1.1;
+    }
   }
   .cuerpo {
     grid-area: cuerpo;
+    padding: 0.75rem 1rem;
 
     .cajas {
       display: grid;
-      height: 100%;
       grid-template-areas:
         'centro centro'
         'izquierda derecha';
-      grid-template-columns: auto auto;
-      grid-template-rows: auto;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-rows: min-content;
+      gap: 0.5rem;
 
       .centro {
         grid-area: centro;
       }
 
       .izquierda {
+        align-content: start;
+        align-self: start;
         grid-area: izquierda;
+        display: grid;
+        gap: 0.45rem;
       }
 
       .derecha {
+        align-content: start;
+        align-self: start;
         grid-area: derecha;
+        display: grid;
+        gap: 0.45rem;
       }
     }
   }
   .porcentaje {
+    border-top: 1px solid var(--app-card-border);
     grid-area: porcentaje;
+    padding: 0.65rem 1rem 0.8rem;
+
+    span {
+      color: var(--app-text-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    ::ng-deep .p-progressbar {
+      background: var(--app-progress-bg);
+      border-radius: 999px;
+      height: 0.5rem;
+      overflow: hidden;
+    }
+
+    ::ng-deep .p-progressbar-value {
+      background: linear-gradient(90deg, var(--primary06), var(--primary08));
+      border-radius: inherit;
+    }
+
+    ::ng-deep .p-progressbar-label {
+      display: none;
+    }
+  }
+}
+
+.metric-card {
+  align-items: center;
+  border: 1px solid var(--app-card-border);
+  border-radius: 0.65rem;
+  color: var(--app-text);
+  display: flex;
+  font-size: 0.86rem;
+  font-weight: 800;
+  gap: 0.7rem;
+  height: 2.35rem;
+  min-height: 2rem;
+  padding: 0.38rem 0.55rem;
+
+  .metric-icon {
+    align-items: center;
+    border-radius: 0.48rem;
+    display: inline-flex;
+    flex: 0 0 1.55rem;
+    height: 1.55rem;
+    justify-content: center;
+    width: 1.55rem;
+  }
+
+  .metric-label {
+    color: var(--metric-text-color, var(--app-text-muted));
+  }
+
+  .metric-value {
+    color: var(--app-text);
+    font-variant-numeric: tabular-nums;
+    margin-left: auto;
+  }
+}
+
+.metric-neutral {
+  background: color-mix(in srgb, var(--app-surface-soft) 72%, var(--app-surface));
+  --metric-text-color: color-mix(in srgb, var(--app-text-muted) 82%, var(--app-text));
+
+  .metric-icon {
+    background: color-mix(in srgb, var(--app-text-muted) 14%, transparent);
+    color: var(--app-text-muted);
+  }
+}
+
+.metric-info {
+  background: color-mix(in srgb, #22c7e8 16%, var(--app-surface));
+  border-color: rgba(34, 199, 232, 0.42);
+  --metric-text-color: #0e7490;
+
+  .metric-icon {
+    background: rgba(34, 199, 232, 0.2);
+    color: #0891b2;
+  }
+}
+
+.metric-success {
+  background: color-mix(in srgb, var(--primary06) 18%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--primary08) 42%, var(--app-card-border));
+  --metric-text-color: var(--primary08);
+
+  .metric-icon {
+    background: color-mix(in srgb, var(--primary08) 18%, transparent);
+    color: var(--primary08);
+  }
+}
+
+.metric-warning {
+  background: color-mix(in srgb, #facc15 18%, var(--app-surface));
+  border-color: rgba(202, 138, 4, 0.42);
+  --metric-text-color: #854d0e;
+
+  .metric-icon {
+    background: rgba(250, 204, 21, 0.24);
+    color: #a16207;
+  }
+}
+
+.metric-orange {
+  background: color-mix(in srgb, #f59e0b 18%, var(--app-surface));
+  border-color: rgba(245, 158, 11, 0.42);
+  --metric-text-color: #9a3412;
+
+  .metric-icon {
+    background: rgba(245, 158, 11, 0.24);
+    color: #c2410c;
+  }
+}
+
+.metric-primary {
+  background: color-mix(in srgb, #7c3aed 16%, var(--app-surface));
+  border-color: rgba(124, 58, 237, 0.42);
+  --metric-text-color: #5b21b6;
+
+  .metric-icon {
+    background: rgba(124, 58, 237, 0.2);
+    color: #6d28d9;
+  }
+}
+
+.metric-blue {
+  background: color-mix(in srgb, #2563eb 15%, var(--app-surface));
+  border-color: rgba(37, 99, 235, 0.38);
+  --metric-text-color: #1d4ed8;
+
+  .metric-icon {
+    background: rgba(37, 99, 235, 0.2);
+    color: #2563eb;
+  }
+}
+
+.metric-danger {
+  background: color-mix(in srgb, #dc3545 16%, var(--app-surface));
+  border-color: rgba(220, 53, 69, 0.42);
+  --metric-text-color: #b91c1c;
+
+  .metric-icon {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+  }
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .IngresosRow {
+    .medio {
+      .cardFacturas {
+        .header {
+          .more-pages {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: rgba(251, 191, 36, 0.38);
+            color: #fbbf24;
+          }
+        }
+      }
+    }
+  }
+
+  .metric-neutral {
+    --metric-text-color: #cbd5e1;
+  }
+
+  .metric-info {
+    --metric-text-color: #67e8f9;
+  }
+
+  .metric-success {
+    --metric-text-color: #86efac;
+  }
+
+  .metric-warning {
+    --metric-text-color: #fde68a;
+  }
+
+  .metric-orange {
+    --metric-text-color: #fdba74;
+  }
+
+  .metric-primary {
+    --metric-text-color: #c4b5fd;
+  }
+
+  .metric-blue {
+    --metric-text-color: #93c5fd;
+  }
+
+  .metric-danger {
+    --metric-text-color: #fca5a5;
   }
 }
 
 .facturas-seleccionadas {
+  color: var(--app-text);
+  font-weight: 700;
   position: absolute;
-  bottom: 0.5rem;
+  bottom: 0.65rem;
   left: 1rem;
+}
+
+.receipt-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 1100px) {
+  .receipt-top-grid {
+    grid-template-columns: 1fr;
+  }
 }

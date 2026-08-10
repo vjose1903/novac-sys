@@ -1,12 +1,15 @@
 <div class="row IngresosRow">
   <div class="col-12 titulo">
-    <h3 class="negrita mb-0">Realizar recibo de ingreso</h3>
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Recibos</span>
+      <h3 class="negrita mb-0">Realizar recibo de ingreso</h3>
+    </div>
   </div>
   <div class="col-12 p-0 arriba">
-    <div class="row">
-      <div class="col-4">
-        <div class="card card-padding sombra h-100">
-          <div class="widget">
+    <div class="receipt-top-grid">
+      <div class="client-search-card">
+        <div class="card card-padding h-100">
+          <div class="widget h-100">
             <div class="widget-content">
               <label class="control-label">Cliente: </label>
 
@@ -22,16 +25,14 @@
                 [ngClass]="{ disabled: !!clienteAdepositar() }" />
             </div>
             <div class="widget-footer">
-              <div class="d-flex gap-3">
-                <button class="btn btn-blanco" (click)="goBack()">Atrás</button>
-                <button [disabled]="!clienteAdepositar()" class="btn btn-gris" (click)="abrirModalDinamicText('nuevo')">Nueva Búsqueda</button>
-              </div>
+              <button class="btn btn-blanco" (click)="goBack()">Atrás</button>
+              <button [disabled]="!clienteAdepositar()" class="btn btn-gris" (click)="abrirModalDinamicText('nuevo')">Nueva Búsqueda</button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="col-8 ps-0">
+      <div class="client-summary-card">
         @if (clienteAdepositar()) {
           <div class="clienteAdepositar">
             <div class="nombre_cliente">
@@ -39,38 +40,54 @@
             </div>
             <div class="cuerpo">
               <div class="cajas">
-                <div class="izquierda pe-2">
-                  <span class="w-100 detalleBalance badge bg-secondary text-shadow text-white mb-2">
-                    <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
+                <div class="izquierda">
+                  <span class="detalleBalance metric-card metric-neutral">
+                    <span class="metric-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                    <span class="metric-label">Total Facturado:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(totalFacturado) }}</span>
                   </span>
 
-                  <span class="w-100 detalleBalance badge bg-info text-shadow mb-2">
-                    <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
+                  <span class="detalleBalance metric-card metric-info">
+                    <span class="metric-icon"><i class="fas fa-hand-holding-usd"></i></span>
+                    <span class="metric-label">Total abonado:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(totalPagado) }}</span>
                   </span>
                   @if (facturasSelected().length) {
-                    <span class="w-100 detalleBalance badge bg-green text-shadow text-white mb-2">
-                      <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo()) }}</span>
+                    <span class="detalleBalance metric-card metric-success">
+                      <span class="metric-icon"><i class="fas fa-cash-register"></i></span>
+                      <span class="metric-label">Recibiendo:</span>
+                      <span class="metric-value">RD$ {{ formatoNumero(recibiendo()) }}</span>
                     </span>
                   }
                   @if (facturasSelected().length) {
-                    <span class="w-100 detalleBalance badge bg-warning text-shadow mb-2">
-                      <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando()) }}</span>
+                    <span class="detalleBalance metric-card metric-warning">
+                      <span class="metric-icon"><i class="fas fa-hourglass-half"></i></span>
+                      <span class="metric-label">Faltando:</span>
+                      <span class="metric-value">RD$ {{ formatoNumero(restando()) }}</span>
                     </span>
                   }
                 </div>
-                <div class="derecha ps-2">
-                  <span class="w-100 detalleBalance badge bg-orange text-shadow text-white mb-2">
-                    <span>Mora:</span> <span>RD$ {{ formatoNumero(mora_general()) }}</span>
+                <div class="derecha">
+                  <span class="detalleBalance metric-card metric-orange">
+                    <span class="metric-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                    <span class="metric-label">Mora:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(mora_general()) }}</span>
                   </span>
 
-                  <span class="w-100 detalleBalance badge bg-blue text-shadow text-white mb-2">
-                    <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
+                  <span class="detalleBalance metric-card metric-blue">
+                    <span class="metric-icon"><i class="fas fa-arrow-trend-up"></i></span>
+                    <span class="metric-label">Total notas débito:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(totalNotasDebito) }}</span>
                   </span>
-                  <span class="w-100 detalleBalance badge bg-primary text-shadow text-white mb-2">
-                    <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotasCredito) }}</span>
+                  <span class="detalleBalance metric-card metric-primary">
+                    <span class="metric-icon"><i class="fas fa-arrow-trend-down"></i></span>
+                    <span class="metric-label">Total notas crédito:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(totalNotasCredito) }}</span>
                   </span>
-                  <span class="w-100 detalleBalance badge bg-danger text-shadow text-white mb-2">
-                    <span> Debiendo:</span> <span>RD$ {{ formatoNumero(debiendo_con_mora()) }} </span>
+                  <span class="detalleBalance metric-card metric-danger">
+                    <span class="metric-icon"><i class="fas fa-circle-exclamation"></i></span>
+                    <span class="metric-label">Debiendo:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(debiendo_con_mora()) }} </span>
                   </span>
                 </div>
               </div>
@@ -90,15 +107,15 @@
   </div>
   <div class="col-12 medio">
     @if (facturas && facturas?.length) {
-      <div class="card sombra cardFacturas br-10">
+      <div class="card cardFacturas">
         <div class="header">
-          <div class="d-flex align-items-center gap-3">
+          <div class="receipt-table-actions">
             @if (this.all_facturas().length > this.tablaComponent?.config.obj_paginate.per_page) {
               <div class="more-pages animated flash slower infinite"><strong class="me-2">Atención: </strong> Existen múltiples páginas</div>
             }
 
-            <div class="d-flex align-items-center gap-2">
-              Mora General
+            <div class="mora-general-control">
+              <span>Mora General</span>
               <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" [(porcentajeSelected)]="porcentajeSelected" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
             </div>
 
@@ -122,7 +139,7 @@
   </div>
   <div class="col-12 abajo">
     @if (facturas && facturas?.length) {
-      <div class="d-flex justify-content-end gap-3">
+      <div class="receipt-actions">
         <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
         <input [disabled]="!isOneFacturaWithMonto() || isSubmitting" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
       </div>
