@@ -134,10 +134,12 @@
       height: 2.5rem;
       width: 3rem;
       border-radius: 0.5rem;
+      opacity: 0;
+      background-color: var(--app-no-receipt-button-hover);
 
       &:hover {
         cursor: pointer;
-        background-color: var(--app-no-receipt-button-hover);
+        opacity: 0.3;
       }
     }
   }

@@ -206,6 +206,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   isInitialized = false;
   rellenando_factura_archivada = false;
   config_articulos: ConfigArticuloI;
+  private lastExternalFacturaClickAt = 0;
 
   facturasSerieOptions = seriesDGII();
   htmlServ = inject(HtmlElementsService);
@@ -656,6 +657,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   activarFacturaSinComprobante() {
+    const now = Date.now();
+    const diff = now - this.lastExternalFacturaClickAt;
+    this.lastExternalFacturaClickAt = now;
+
+    if (diff >= 200) return;
+
     this.externalFlowServ.requestExternalFactura(this);
   }
 
