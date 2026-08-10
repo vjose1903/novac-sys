@@ -329,6 +329,7 @@ export class FacturaC extends CrudG<FacturasI> {
         'security_code',
         'is_ncf_modificado',
         'document_reference',
+        'is_external',
       ];
       const pick_factura = [...pick_factura1, ...pick_factura2];
 

@@ -57,7 +57,7 @@ export class FacturacionExternalFlowService {
     ctx.is_external = false;
   }
 
-  private async activateExternalState(ctx: FacturacionExternalFlowContext): Promise<void> {
+  async activateExternalState(ctx: FacturacionExternalFlowContext): Promise<void> {
     ctx.is_external = true;
     ctx.condicion_fact = 'Contado';
     ctx.modo_factura = 'normal';

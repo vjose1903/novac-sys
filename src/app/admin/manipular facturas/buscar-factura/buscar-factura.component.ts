@@ -882,7 +882,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
           const isAfterCertificationDate = DateUtils.compareDates(this.certificacionDate, DateUtils.format({ date: factura.fecha_equivalente, dateFormat: 'YYYY-MM-DD' })) >= 0;
 
-          if (isAfterCertificationDate) botonesDinamicos.push(botones.reemplaceButton);
+          if (isAfterCertificationDate && factura.is_external !== true) botonesDinamicos.push(botones.reemplaceButton);
         }
       }
     }

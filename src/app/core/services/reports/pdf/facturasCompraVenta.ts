@@ -69,7 +69,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
             ],
             [
               { text: 'FACTURA A ' + data.condicion.toUpperCase(), alignment: 'right', bold: true, style: 'letra10' },
-              { text: data.tipo_pdf, style: 'letra10', alignment: 'right' },
+              { text: data.is_external ? '' : data.tipo_pdf, style: 'letra10', alignment: 'right' },
             ],
           ],
         },

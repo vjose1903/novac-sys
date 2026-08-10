@@ -536,6 +536,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         }
       }
 
+      const shouldActivateExternalFlow = original_factura.action === actionFacturacion.update && this.isExternalFactura(factura);
+      this.is_external = shouldActivateExternalFlow;
+
       if (original_factura.action !== actionFacturacion.duplicate) this.setPropietario(factura);
 
       const { currentSerie, equivalentSerie } = this.refillStateServ.getSerieForRefill({ factura, action: original_factura.action, configApp: this.configApp });
@@ -543,6 +546,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       this.factServ
         .setTipos({ metodo: this.factServ.tipoDocumento(), serie: currentSerie, equivalentSerie, tipoFacturaId: factura.tipo_factura_id })
         .then(async result => {
+          if (shouldActivateExternalFlow) await this.externalFlowServ.activateExternalState(this);
+
           // Configurar factura pendiente
           this.factura_pendiente = factura?.factura_pendiente || false;
 
@@ -556,7 +561,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           }
 
           // Configurar NCF si es necesario
-          const tipoFacturaValido = fun.hasValue(this.factServ.tipoFactura) && this.factServ.tipoFactura.referencia !== '00' && this.factServ.tipoFactura.referencia !== '02' && this.factServ.isVenta();
+          const tipoFacturaValido = !this.is_external && fun.hasValue(this.factServ.tipoFactura) && this.factServ.tipoFactura.referencia !== '00' && this.factServ.tipoFactura.referencia !== '02' && this.factServ.isVenta();
           if (tipoFacturaValido) {
             this.ncfClass.getAll({ afterPath: `custom/${this.factServ.tipoFactura.id}/true` }).then(res => {
               this.paqueteComprobante = res.data;
@@ -568,14 +573,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           this.fecha_vencimiento = factura.tipo === 'compra' ? new Date(factura.fecha_vencimiento) : new Date();
 
           // Configurar propiedades de la factura
-          this.is_viaje = factura.is_viaje;
-          this.condicion_fact = this.refillStateServ.shouldForceContado(factura.action) ? this.condicion_fact : factura.condicion;
+          this.is_viaje = this.is_external ? false : factura.is_viaje;
+          this.condicion_fact = this.is_external ? 'Contado' : this.refillStateServ.shouldForceContado(factura.action) ? this.condicion_fact : factura.condicion;
 
           // Configurar NCF y costo para compras
           this.NCFcompra.set(factura.tipo === tipoDocFacturacion.compra ? factura.numero_comprobante : undefined);
           this.CostoYgasto.set(factura.tipo === tipoDocFacturacion.compra ? factura.costoYgasto : '');
 
-          this.modo_factura = this.refillStateServ.getModoFactura({ factura, action: this.factServ.action });
+          this.modo_factura = this.is_external ? 'normal' : this.refillStateServ.getModoFactura({ factura, action: this.factServ.action });
 
           // Configurar factura seleccionada según el tipo de acción
           if (original_factura.action === actionFacturacion.bill_from_cotizacion) {
@@ -1322,6 +1327,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return fun.isEmpty(this.factServ?.propietario_factura?.id) && fun.hasValue(this.factServ?.propietario_factura?.NoCliente_rnc);
   }
 
+  private isExternalFactura(factura: any): boolean {
+    return factura?.is_external === true || factura?.is_external === 'true';
+  }
+
   private isClienteContadoSeleccionado(): boolean {
     const propietario = this.factServ?.propietario_factura ?? this.formPropietario?.getRawValue();
     const nombrePropietario = String(propietario?.nombre_completo ?? '').trim().toLowerCase();
@@ -1758,7 +1767,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
         this.layServ.nextCheckCuadreToday(true);
 
-        if (this.factServ.action == actionFacturacion.update) this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
+        if (this.factServ.action == actionFacturacion.update) {
+          this.showDeactivationModal.set(false);
+          this.router.navigateByUrl('/admin/manipular/buscarFactura/solo_ver');
+        }
         else {
           // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
           fun.setTimeout(() => {
