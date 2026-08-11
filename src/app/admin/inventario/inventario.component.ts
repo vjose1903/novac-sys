@@ -80,6 +80,10 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
     return fun.roundNumberToDecimal(num);
   }
 
+  cantidadInventarioFormateada() {
+    return fun.roundNumberToDecimal(this.cant_inventario || 0, 0);
+  }
+
   async necesarioParaEmpezar() {
     await this.getArticulos(this.tServ.obj_paginate.default);
     await this.getStock();

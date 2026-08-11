@@ -1,53 +1,171 @@
-.divRoles {
-  display: flex;
-  flex-flow: column;
-  height: 100%;
-}
-
-.filtroArticulos {
-  height: 1.9rem;
-  max-width: 13rem;
-  padding: 0rem 0.5rem !important;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 2;
-  z-index: 99;
-}
-
 .mainInventario {
-  height: 100%;
+  color: var(--app-text);
   display: grid;
   grid-template-areas:
-    "colTitulo"
-    "cuerpo";
-  grid-template-rows: min-content auto;
+    'colTitulo'
+    'cuerpo';
+  grid-template-rows: min-content minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  row-gap: 0.75rem;
 
   > .colTitulo {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
     grid-area: colTitulo;
+    justify-content: space-between;
+    min-height: 3.15rem;
+    padding: 0 0.25rem;
+
+    .screen-title-block {
+      min-width: 0;
+    }
+
+    .screen-module-kicker {
+      color: var(--app-text-muted);
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      margin-bottom: 0.18rem;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      color: var(--app-text);
+      font-size: 1.65rem;
+      font-weight: 800 !important;
+      letter-spacing: 0;
+      line-height: 1.12;
+      margin: 0;
+    }
+
+    .inventory-total-card {
+      align-items: center;
+      background: color-mix(in srgb, var(--primary06) 12%, var(--app-surface));
+      border: 1px solid color-mix(in srgb, var(--primary08) 28%, var(--app-card-border));
+      border-radius: 0.9rem;
+      display: inline-flex;
+      gap: 0.6rem;
+      min-height: 2.75rem;
+      padding: 0.42rem 0.75rem;
+    }
+
+    .inventory-total-icon {
+      align-items: center;
+      background: color-mix(in srgb, var(--primary06) 22%, var(--app-surface));
+      border-radius: 0.65rem;
+      color: var(--primary08);
+      display: inline-flex;
+      flex: 0 0 2rem;
+      height: 2rem;
+      justify-content: center;
+      width: 2rem;
+    }
+
+    .inventory-total-copy {
+      display: grid;
+      gap: 0.05rem;
+      line-height: 1.1;
+
+      .inventory-total-label {
+        color: var(--app-text-muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      strong {
+        color: var(--app-text);
+        font-size: 1.12rem;
+        font-weight: 800;
+      }
+    }
   }
+
   > .cuerpo {
     grid-area: cuerpo;
-
+    min-height: 0;
     position: relative;
-    > .cardListados {
-      position: absolute;
+
+    > .inventory-table-card {
+      background: var(--app-surface) !important;
+      border: 1px solid var(--app-card-border) !important;
+      border-radius: 1rem !important;
+      box-shadow: var(--app-overlay-shadow) !important;
       height: 100%;
+      overflow: hidden;
+      position: absolute;
       width: 100%;
 
       > .divFiltro {
-        position: absolute;
+        align-items: center;
         display: flex;
+        gap: 0.65rem;
         justify-content: space-between;
-        width: 100%;
-        padding-left: 18rem;
-
-        > .filtroArticulos {
-          margin-top: 0.5rem;
-        }
-        > .btnReporte {
-          margin: 0.15rem 0.5rem 0rem 0rem;
-        }
+        left: 18.4rem;
+        position: absolute;
+        right: 0.7rem;
+        top: 0.55rem;
+        z-index: 99;
       }
     }
+  }
+}
+
+.filtroArticulos {
+  background: var(--app-surface) !important;
+  border: 1px solid var(--app-card-border) !important;
+  border-radius: 0.55rem !important;
+  box-shadow: 0 0.25rem 0.6rem #00000017;
+  color: var(--app-text) !important;
+  font-size: 0.82rem;
+  font-weight: 700;
+  height: 2.15rem;
+  line-height: 1.2;
+  max-width: 14rem;
+  min-width: 12.5rem;
+  padding: 0.25rem 0.65rem !important;
+}
+
+:host ::ng-deep {
+  .mainInventario {
+    dinamic-table {
+      .dinamicTable {
+        background: var(--app-surface) !important;
+        gap: 0.85rem;
+        padding: 0.85rem !important;
+      }
+
+      .searchDiv {
+        background: transparent;
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .mainInventario {
+    > .colTitulo {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    > .cuerpo > .inventory-table-card > .divFiltro {
+      align-items: flex-start;
+      flex-direction: column;
+      left: 0.85rem;
+      right: 0.85rem;
+      top: 3.9rem;
+    }
+  }
+
+  .filtroArticulos {
+    max-width: 100%;
+    width: 100%;
   }
 }
