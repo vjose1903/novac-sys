@@ -1,28 +1,45 @@
 .p-selectbutton {
-  padding: 0.4rem !important;
-  background: var(--app-selectbutton-bg) !important;
-  border-radius: 0.4rem !important;
-  display: flex !important;
-  gap: 0.3rem !important;
+  align-items: center;
+  background: color-mix(in srgb, var(--app-selectbutton-bg) 58%, var(--app-surface)) !important;
+  border: 1px solid color-mix(in srgb, var(--app-card-border) 82%, transparent) !important;
+  border-radius: 0.75rem !important;
+  display: inline-flex !important;
+  gap: 0.25rem !important;
+  padding: 0.22rem !important;
 
   .p-togglebutton {
     background: transparent !important;
-    border: none !important;
-    border-radius: 0.25rem !important;
-    padding: 0.3rem 0.5rem !important;
-    font-weight: 400 !important;
+    border: 1px solid transparent !important;
+    border-radius: 0.58rem !important;
     color: var(--app-text-muted) !important;
-    
-    &:hover {
-      background: var(--app-selectbutton-hover-bg) !important;
+    font-weight: 700 !important;
+    min-height: 2rem;
+    padding: 0.3rem 0.68rem !important;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+
+    &:not(.p-disabled):hover {
+      background: color-mix(in srgb, var(--app-selectbutton-hover-bg) 58%, var(--app-surface)) !important;
+      border-color: transparent !important;
+      color: var(--app-text) !important;
     }
-    
+
     &.p-togglebutton-checked {
       background: var(--app-selectbutton-active-bg) !important;
-      font-weight: 600 !important;
+      border-color: color-mix(in srgb, var(--app-selectbutton-active-bg) 72%, var(--app-card-border)) !important;
+      box-shadow: 0 0.4rem 0.9rem color-mix(in srgb, var(--app-selectbutton-active-bg) 22%, transparent);
       color: var(--app-selectbutton-active-text) !important;
-      &:hover {
+      font-weight: 800 !important;
+      transform: translateY(-1px);
+
+      &:not(.p-disabled):hover {
         background: var(--app-selectbutton-active-hover-bg) !important;
+        border-color: transparent !important;
+        color: var(--app-selectbutton-active-text) !important;
       }
     }
   }

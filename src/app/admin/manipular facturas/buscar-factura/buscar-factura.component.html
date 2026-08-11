@@ -1,19 +1,30 @@
 <div class="row BuscarFacturaRow">
   <div class="col-12 titulo">
-    <h3 class="mb-0">
-      Buscar facturas:
-      @if (para) {
-        <b>{{ para }}</b>
-      }
-    </h3>
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Facturación</span>
+      <div class="screen-title-row">
+        <h3 class="mb-0">Buscar facturas</h3>
+        @if (para) {
+          <span class="context-tag">{{ para }}</span>
+        }
+      </div>
+    </div>
   </div>
 
   <div class="col-12 p-0 arriba">
-    <div class="row">
-      <div class="col-7">
-        <div class="card card-padding sombra">
+    <div class="row search-layout {{ buscarPara.includes('nota') ? 'has-side-panel' : 'is-search-only' }}">
+      <div class="col-7 search-main-col">
+        <div class="card search-card">
+          <div class="search-card-header">
+            <div class="search-card-title">
+              <span class="search-card-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </span>
+              <span>Filtros</span>
+            </div>
+          </div>
           <!-- ================ TIPO DOCUMENTO  ================ -->
-          <div class="d-flex gap-3">
+          <div class="search-fields-row search-row-primary {{ buscarPara == 'solo_ver' ? 'has-document-type' : '' }}">
             @if (buscarPara == 'solo_ver') {
               <div class="form-group flex-1">
                 <label class="control-label mb-0">Tipo: </label>
@@ -59,16 +70,23 @@
                 <option value="4">Ultimas 50 {{ tipo_documento_selected() == 'cotizacion' ? 'cotizaciones' : 'facturas' }}</option>
               </select>
             </div>
+
           </div>
 
-          <!-- SERIE FACTURA -->
-
-          <div class="form-group flex-1">
-            <label class="control-label mb-0">Serie factura: </label>
+          <div class="search-series-panel">
+            <div class="series-panel-label">
+              <span class="series-panel-icon">
+                <i class="fa-solid fa-layer-group"></i>
+              </span>
+              <div>
+                <span>Serie factura</span>
+                <small>Filtra por el tipo de comprobante</small>
+              </div>
+            </div>
             <p-selectButton [options]="facturasSerieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
           </div>
 
-          <div class="d-flex gap-3">
+          <div class="search-fields-row search-row-secondary">
             <!-- ================ TIPO FACTURA  ================ -->
 
             @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected() != 'cotizacion') {
@@ -129,34 +147,46 @@
           </div>
         </div>
       </div>
-      <div class="col-5">
-        <div class="w-100 h-100 d-flex justify-content-between flex-column">
-          @if (buscarPara.includes('nota')) {
-            <btn-icon-circular
-              [id]="'btnNota'"
-              [icon]="'fas fa-history'"
-              [size]="'size-lg'"
-              [tooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
-              [tooltipPosition]="'top'"
-              (clickFunction)="openSide()">
-            </btn-icon-circular>
-          }
-
-          @if (buscarPara.includes('nota') && mostrarListaFacturas()) {
-            <div class="d-flex justify-content-end">
-              <div class="form-group mb-0">
-                <label class="control-label mb-0">Serie {{ para }}: </label>
-                <p-selectButton [options]="makeNotasSerieOptions" [ngModel]="makeNotaSerieSelected()" (ngModelChange)="makeNotaSerieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+      @if (buscarPara.includes('nota')) {
+        <div class="col-5 search-side-col">
+          <div class="search-side-panel">
+            <div class="note-history-card">
+              <div class="note-history-copy">
+                <span class="note-history-icon">
+                  <i class="fa-solid fa-clock-rotate-left"></i>
+                </span>
+                <div>
+                  <span class="note-kicker">Historial</span>
+                  <strong>{{ buscarPara === 'nota_credito' ? 'Notas de crédito' : 'Notas de débito' }}</strong>
+                  <small>Consulta documentos generados</small>
+                </div>
               </div>
+              <btn-icon-circular
+                [id]="'btnNota'"
+                [icon]="'fas fa-history'"
+                [size]="'size-lg'"
+                [tooltip]="buscarPara === 'nota_credito' ? 'Ver notas de crédito anteriores' : 'Ver notas de debito anteriores'"
+                [tooltipPosition]="'top'"
+                (clickFunction)="openSide()">
+              </btn-icon-circular>
             </div>
-          }
+
+            @if (mostrarListaFacturas()) {
+              <div class="note-series-card">
+                <div class="form-group mb-0">
+                  <label class="control-label mb-0">Serie {{ para }}: </label>
+                  <p-selectButton [options]="makeNotasSerieOptions" [ngModel]="makeNotaSerieSelected()" (ngModelChange)="makeNotaSerieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+                </div>
+              </div>
+            }
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
   <div class="col-12 abajo">
     @if (mostrarListaFacturas()) {
-      <div #cardTablaVerFacturas class="card sombra h-100 tablaContent br-10">
+      <div #cardTablaVerFacturas class="card tablaContent">
         <div class="divTabla">
           <dinamic-table [cardTabla]="cardTablaVerFacturas" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
@@ -170,11 +200,22 @@
 <!-- ============================================================================================================================================ -->
 
 <p-drawer [(visible)]="showSide" position="right" styleClass="sideFact" [style]="{ width: '85%', 'z-index': 99999 }" (onHide)="onHideSide()">
-  <div class="w-100 h-100 d-flex flex-column gap-2">
-    <div>
+  <ng-template #header>
+    <div class="notes-drawer-header">
+      <div class="notes-drawer-title">
+        <span class="search-card-icon">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </span>
+        <div>
+          <h4 class="mb-0">Notas anteriores</h4>
+          <span>Historial de documentos aplicados</span>
+        </div>
+      </div>
       <p-selectButton [options]="notasSerieOptions" [ngModel]="notaSerieSelected()" (ngModelChange)="changeNotaSerie($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
     </div>
-    <div #cardTablaNota id="cardTablaNota" class="divContainerTabla">
+  </ng-template>
+  <div class="notes-drawer-content">
+    <div #cardTablaNota id="cardTablaNota" class="divContainerTabla notes-table-card">
       <div class="innerTablas">
         <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
       </div>

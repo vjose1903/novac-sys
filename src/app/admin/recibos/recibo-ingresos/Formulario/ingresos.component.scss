@@ -162,6 +162,10 @@
     align-content: start;
     display: grid;
     padding: 1rem;
+
+    .client-filter-title {
+      margin-bottom: 0.75rem;
+    }
   }
 
   .control-label {

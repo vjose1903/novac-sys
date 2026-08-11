@@ -291,6 +291,30 @@ select:not(:focus):hover,
   color: inherit !important;
 }
 
+.filter-card-title {
+  align-items: center;
+  color: var(--app-text);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 800;
+  gap: 0.5rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+
+  .filter-card-icon {
+    align-items: center;
+    background: color-mix(in srgb, var(--primary06) 20%, var(--app-surface));
+    border-radius: 0.6rem;
+    color: var(--primary08);
+    display: inline-flex;
+    flex: 0 0 1.9rem;
+    height: 1.9rem;
+    justify-content: center;
+    width: 1.9rem;
+  }
+}
+
 
 .scroll-container {
   display: flex;
