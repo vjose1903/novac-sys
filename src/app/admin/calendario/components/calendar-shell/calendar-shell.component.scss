@@ -1,27 +1,35 @@
 .calendar-shell {
-  height: 100%;
-  min-height: 0;
+  background: var(--app-surface);
+  border: 1px solid var(--app-card-border);
+  border-radius: 1rem;
+  box-shadow: var(--app-overlay-shadow);
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--app-card-border);
-  background: var(--app-surface);
-  border-radius: 8px;
-  padding: 12px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0.85rem;
 }
 
 .calendar-toolbar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 10px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--app-surface-soft) 88%, var(--primary06)), var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--app-card-border) 78%, transparent);
+  border-radius: 0.85rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: auto 1fr auto;
+  margin-bottom: 0.75rem;
+  padding: 0.55rem;
 
   h5 {
-    margin: 0;
-    font-size: 20px;
+    color: var(--app-text);
+    font-size: 1.2rem;
     font-weight: 800;
-    text-transform: capitalize;
+    line-height: 1.1;
+    margin: 0;
     text-align: center;
+    text-transform: capitalize;
   }
 }
 
@@ -29,69 +37,91 @@
 .view-switch {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.35rem;
 }
 
 .view-switch {
-  justify-content: flex-end;
-  background: var(--app-surface-muted);
-  border: 1px solid var(--app-border);
-  border-radius: 8px;
-  padding: 3px;
+  background: color-mix(in srgb, var(--app-selectbutton-bg) 58%, var(--app-surface)) !important;
+  border: 1px solid color-mix(in srgb, var(--app-card-border) 82%, transparent) !important;
+  border-radius: 0.75rem;
   justify-self: end;
+  justify-content: flex-end;
+  padding: 0.22rem;
   width: max-content;
 
   button {
-    border: 0;
     background: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.58rem;
     color: var(--app-text-muted);
-    border-radius: 6px;
-    padding: 8px 11px;
-    font-size: 12px;
+    font-size: 0.76rem;
     font-weight: 800;
+    min-height: 2rem;
+    padding: 0.3rem 0.68rem;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
 
     &:focus,
-    &:hover,
-    &.active {
-      background: var(--app-hover);
+    &:hover {
+      background: color-mix(in srgb, var(--app-selectbutton-hover-bg) 58%, var(--app-surface));
       color: var(--app-text);
     }
 
     &.active {
       background: var(--app-selectbutton-active-bg);
+      box-shadow: 0 0.4rem 0.9rem color-mix(in srgb, var(--app-selectbutton-active-bg) 22%, transparent);
       color: var(--app-selectbutton-active-text);
+      transform: translateY(-1px);
     }
   }
 }
 
 .icon-btn,
 .today-btn {
-  border: 0;
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 0.6rem;
   font-weight: 800;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
 
 .icon-btn {
-  width: 40px;
-  height: 34px;
-  color: var(--app-selectbutton-active-text);
-  background: var(--app-selectbutton-active-bg);
+  background: color-mix(in srgb, var(--primary06) 18%, var(--app-surface));
+  color: var(--primary08);
+  height: 2.25rem;
+  width: 2.35rem;
+
+  &:hover {
+    background: var(--app-selectbutton-active-bg);
+    color: var(--app-selectbutton-active-text);
+    transform: translateY(-1px);
+  }
 }
 
 .today-btn {
-  height: 34px;
-  padding: 0 12px;
-  color: var(--app-text-muted);
-  background: var(--app-surface-muted);
+  background: var(--app-surface);
+  color: var(--app-text);
+  height: 2.25rem;
+  padding: 0 0.8rem;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary06) 12%, var(--app-surface));
+    color: var(--primary08);
+    transform: translateY(-1px);
+  }
 }
 
 .calendar-host {
   --calendar-grid-border: color-mix(in srgb, var(--app-border) 60%, var(--app-surface));
 
-  min-height: 0;
-  flex: 1;
   border: 1px solid var(--app-border);
-  border-radius: 8px;
+  border-radius: 0.9rem;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 

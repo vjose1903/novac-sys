@@ -1,13 +1,17 @@
 <section class="calendar-page">
-  <div class="calendar-main">
-    <div class="calendar-titlebar">
-      <h4>Calendario</h4>
-      <button class="calendar-primary-btn" type="button" (click)="openNewEvent()">
-        <i class="fas fa-plus"></i>
-        <span>Agregar evento</span>
-      </button>
+  <div class="calendar-titlebar">
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Operaciones</span>
+      <h3 class="mb-0">Calendario</h3>
     </div>
 
+    <button class="calendar-primary-btn" type="button" (click)="openNewEvent()">
+      <i class="fas fa-plus"></i>
+      <span>Agregar evento</span>
+    </button>
+  </div>
+
+  <div class="calendar-main">
     <div class="calendar-layout">
       <app-calendar-shell class="calendar-board" (eventSelected)="openEvent($event)" (dateSelected)="openNewEvent($event)"></app-calendar-shell>
 
