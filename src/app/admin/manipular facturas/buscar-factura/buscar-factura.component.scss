@@ -73,6 +73,7 @@
 
       &.has-side-panel {
         grid-template-columns: minmax(30rem, 58%) minmax(18rem, 34%);
+        justify-content: space-between;
       }
 
       > [class*='col-'] {
@@ -303,6 +304,45 @@
   .abajo {
     grid-area: abajo;
     min-height: 0;
+    position: relative;
+
+    .table-top-actions {
+      display: flex;
+      justify-content: flex-end;
+      min-height: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      transform: translateY(calc(-100% - 0.75rem));
+      z-index: 2;
+
+      .note-series-card {
+        align-items: center;
+        background: var(--app-surface) !important;
+        border: 1px solid var(--app-card-border) !important;
+        border-radius: 1rem !important;
+        box-shadow: var(--app-overlay-shadow) !important;
+        color: var(--app-text);
+        display: flex;
+        justify-content: flex-end;
+        padding: 0.65rem 0.8rem;
+
+        .form-group {
+          align-items: center;
+          display: flex;
+          gap: 0.65rem;
+          margin-bottom: 0;
+        }
+
+        .control-label,
+        label {
+          color: var(--app-text);
+          font-size: 0.88rem;
+          font-weight: 800;
+          line-height: 1.25;
+        }
+      }
+    }
 
     > .tablaContent {
       background: var(--app-surface) !important;

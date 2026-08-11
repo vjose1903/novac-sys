@@ -25,9 +25,13 @@
 .dinamicTable {
   display: grid !important;
   column-gap: 0rem;
-  row-gap: 0.75rem;
+  row-gap: 0;
   grid-template-rows: [filter-start] min-content [filter-end fantasma-start] auto [fantasma-end];
   grid-template-columns: [filter-start fantasma-start] auto [filter-end fantasma-end];
+
+  &.has-filter {
+    row-gap: 0.75rem;
+  }
 
   .searchDiv {
     // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;

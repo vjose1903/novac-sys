@@ -434,6 +434,16 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     return moment(fecha).format('DD/MM/YYYY');
   }
 
+  formatoFechaValida(fecha) {
+    const parsedDate = new Date(fecha);
+    const isDateUtilsValid = DateUtils.isValid(parsedDate);
+    const isMomentValid = moment(fecha).isValid();
+
+    if (!isDateUtilsValid || !isMomentValid) return '-';
+
+    return this.formatoFecha(fecha);
+  }
+
   // =============================================
   //  MODAL CANCELAR
   // =============================================

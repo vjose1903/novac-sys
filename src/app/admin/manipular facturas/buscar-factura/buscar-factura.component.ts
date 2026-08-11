@@ -369,6 +369,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         this.facturas.length = 0;
 
         const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
+        const use_for = this.getUseForParam();
 
         const args = {
           campo: this.buscar_por,
@@ -379,7 +380,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           paginado: true,
           tipo: this.tipo_documento_selected(),
           movimientos_viaje: true,
-          extra_params: { serie: this.serieSelected() },
+          extra_params: { serie: this.serieSelected(), ...(use_for ? { use_for } : {}) },
         };
 
         const res = await this.facturaClass.getFacturasByParams(args);
@@ -467,6 +468,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         reject();
       }
     });
+  }
+
+  getUseForParam() {
+    if (this.buscarPara === 'solo_ver') return 'visualizar';
+    if (this.buscarPara === 'nota_credito' || this.buscarPara === 'nota_debito') return this.buscarPara;
+
+    return null;
   }
 
   getIsActiveInfo(documento) {

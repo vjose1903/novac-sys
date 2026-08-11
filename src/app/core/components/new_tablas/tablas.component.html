@@ -1,4 +1,4 @@
-<div #dinamicTable class="dinamicTable position-relative" [sizeCatcher]="cardTabla" [ngStyle]="{ padding: config.padding }">
+<div #dinamicTable class="dinamicTable position-relative" [ngClass]="{ 'has-filter': config?.filtrar?.show, 'without-filter': !config?.filtrar?.show }" [sizeCatcher]="cardTabla" [ngStyle]="{ padding: config.padding }">
   <!-- FILTER -->
   @if (config?.filtrar?.show) {
     <div id="searchDiv-{{ realIdTabla }}" class="searchDiv d-flex align-items-center" style="max-width: 17rem; z-index: 9" onElementReady (elementReady)="focusSearchInput()">
