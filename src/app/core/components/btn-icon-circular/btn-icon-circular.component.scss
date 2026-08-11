@@ -1,12 +1,13 @@
 .btn-circle-icon {
-  border-radius: 50%;
   background-color: var(--primary02);
-  position: relative;
-  justify-content: center;
+  border-radius: 50%;
+  box-shadow: var(--app-button-shadow);
+  color: var(--app-text);
   align-items: center;
   display: flex;
+  justify-content: center;
+  position: relative;
   z-index: 1;
-  box-shadow: var(--app-button-shadow);
 
   &:hover {
     filter: brightness(0.8);
@@ -21,6 +22,7 @@
   }
 
   > i {
+    color: currentColor;
     position: absolute;
   }
 
@@ -53,5 +55,11 @@
 
     max-height: 2.4rem;
     min-height: 2.4rem;
+  }
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .btn-circle-icon {
+    color: var(--app-text);
   }
 }
