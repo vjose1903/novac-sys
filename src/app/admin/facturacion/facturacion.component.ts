@@ -1339,8 +1339,25 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return fun.isEmpty(propietario?.id) && nombrePropietario === nombreContado;
   }
 
+  private isClienteContadoPermitido(): boolean {
+    const facturaConsumoReferencia = comprobante[this.factServ.serieType()]?.factura_de_consumo;
+
+    return (
+      this.factServ.isVenta() &&
+      this.condicion_fact === 'Contado' &&
+      this.modo_factura === 'normal' &&
+      !this.is_viaje &&
+      !this.is_adelantada &&
+      this.factServ.tipoFacturaReferenciaSelected == facturaConsumoReferencia
+    );
+  }
+
+  private tienePropietarioIdentificadoSeleccionado(): boolean {
+    return fun.hasValue(this.factServ?.propietario_factura?.id) || this.isClienteCasualSeleccionado();
+  }
+
   private tienePropietarioSeleccionado(): boolean {
-    return fun.hasValue(this.factServ?.propietario_factura?.id) || this.isClienteCasualSeleccionado() || (this.is_external && this.isClienteContadoSeleccionado());
+    return this.tienePropietarioIdentificadoSeleccionado() || (this.isClienteContadoSeleccionado() && (this.is_external || this.isClienteContadoPermitido()));
   }
 
   private limpiarClienteCasualSeleccionado() {
@@ -1391,6 +1408,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   async imprimirFactura() {
     const documento = this.getDocumentoDescripcion();
 
+    if (this.factServ.isVenta() && this.condicion_fact == 'Crédito' && !this.tienePropietarioIdentificadoSeleccionado()) {
+      return fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
+    }
+
     // Verificación de propietario
     if (!this.tienePropietarioSeleccionado()) {
       const entidad = this.factServ.isCompra() ? 'suplidor' : 'cliente';
@@ -1418,13 +1439,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     // Verificación FC > 250k
     const esClienteCasualConDocumento = this.isClienteCasualSeleccionado();
 
-    if (this.factServ.isVenta() && this.factServ.tipoFacturaReferenciaSelected == comprobanteElectronico.factura_de_consumo && fun.desformatearStNumber(this.TOTAL) > 250000 && !this.tienePropietarioSeleccionado() && !esClienteCasualConDocumento) {
+    if (this.factServ.isVenta() && this.factServ.tipoFacturaReferenciaSelected == comprobanteElectronico.factura_de_consumo && fun.desformatearStNumber(this.TOTAL) > 250000 && !this.tienePropietarioIdentificadoSeleccionado() && !esClienteCasualConDocumento) {
       fun.toastWarning('Se debe seleccionar un cliente, para las Facturas de Consumo Electrónico, con valor mayor a RD$250,000.00', 'Aviso');
       return this.abrirModalPropietario({ send_factura: true });
-    }
-
-    if (this.factServ.isVenta() && this.condicion_fact == 'Crédito' && !this.tienePropietarioSeleccionado()) {
-      return fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
     }
 
     // Procesar según el tipo de documento
