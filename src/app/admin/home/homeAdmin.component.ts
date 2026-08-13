@@ -339,8 +339,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
     if (sectionState.id !== 'sales_kpis') return this.filterConfiguredKpis(sectionCards);
 
     return this.orderSalesKpiCards(this.dedupeKpiCards([
-      ...(this.heroState().data?.primaryKpis || []),
       ...sectionCards,
+      ...(this.heroState().data?.primaryKpis || []),
       ...this.getHeroFocusItems(),
     ]));
   }

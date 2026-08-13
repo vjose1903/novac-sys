@@ -70,6 +70,13 @@
   justify-content: flex-end;
 }
 
+.dashboard-filter-btn {
+  font-size: 0.78rem;
+  font-weight: 500;
+  min-width: fit-content;
+  white-space: nowrap;
+}
+
 .eyebrow,
 .mini-kpi span,
 .kpi-card span,
@@ -79,46 +86,6 @@
   font-weight: 700;
   letter-spacing: 0.045rem;
   text-transform: uppercase;
-}
-
-.filter-button,
-.filter-actions button {
-  background: color-mix(in srgb, var(--app-surface) 82%, var(--app-bg-soft));
-  border: 1px solid color-mix(in srgb, var(--app-border) 72%, transparent);
-  border-radius: 999px;
-  color: var(--app-text);
-  font-weight: 700;
-  min-height: 1.8rem;
-  padding: 0.25rem 0.65rem;
-}
-
-.filter-button {
-  align-items: center;
-  display: inline-flex;
-  font-size: 0.74rem;
-  gap: 0.4rem;
-  transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
-  white-space: nowrap;
-}
-
-.filter-button:focus-visible {
-  border-color: var(--primary07);
-  box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--primary07) 18%, transparent);
-  outline: 0;
-}
-
-.filter-button:hover,
-.filter-actions button:hover {
-  border-color: var(--primary07);
-  cursor: pointer;
-  box-shadow: 0 10px 24px -20px color-mix(in srgb, var(--primary07) 75%, #000);
-}
-
-.filter-button:active {
-  transform: scale(0.97);
 }
 
 .kpi-grid {
@@ -762,34 +729,6 @@
   letter-spacing: 0;
 }
 
-.filter-panel-head button {
-  align-items: center;
-  background: color-mix(in srgb, var(--app-surface-muted) 72%, transparent);
-  border: 1px solid color-mix(in srgb, var(--app-border) 56%, transparent);
-  border-radius: 999px;
-  color: var(--app-text-muted);
-  display: inline-flex;
-  height: 1.5rem;
-  justify-content: center;
-  transition:
-    background 140ms ease,
-    border-color 140ms ease,
-    color 140ms ease,
-    transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
-  width: 1.5rem;
-}
-
-.filter-panel-head button:hover {
-  background: color-mix(in srgb, var(--primary07) 10%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--primary07) 42%, var(--app-border));
-  color: var(--app-text);
-}
-
-.filter-panel-head button:active,
-.filter-actions button:active {
-  transform: scale(0.97);
-}
-
 .filter-panel label {
   color: var(--app-text-muted);
   display: block;
@@ -810,30 +749,6 @@
   display: grid;
   gap: 0.45rem;
   grid-template-columns: 1fr 1fr;
-}
-
-.filter-actions button {
-  align-items: center;
-  color: var(--app-button-neutral-text);
-  display: inline-flex;
-  flex: 1;
-  font-size: 0.74rem;
-  gap: 0.32rem;
-  justify-content: center;
-  min-height: 1.85rem;
-  padding-inline: 0.65rem;
-  transition:
-    background 140ms ease,
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    color 140ms ease,
-    transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.filter-actions .primary {
-  background: var(--primary07);
-  border-color: var(--primary07);
-  color: #fff;
 }
 
 :host ::ng-deep .dashboard-filter-popover {
