@@ -1,0 +1,78 @@
+.confirmation-content {
+  align-items: flex-start;
+  color: var(--app-text);
+  display: grid;
+  gap: 0.85rem;
+  grid-template-areas:
+    'icon copy'
+    'reason reason';
+  grid-template-columns: min-content minmax(0, 1fr);
+  min-height: 4.25rem;
+}
+
+.confirmation-icon-shell {
+  align-items: center;
+  background: color-mix(in srgb, var(--primary06) 18%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--primary08) 26%, transparent);
+  border-radius: 0.9rem;
+  color: var(--primary08);
+  display: inline-flex;
+  grid-area: icon;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+
+  &.default-icon {
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--primary06) 22%, transparent), transparent),
+      color-mix(in srgb, var(--primary06) 14%, var(--app-surface));
+  }
+}
+
+.confirmation-copy {
+  align-self: center;
+  grid-area: copy;
+  min-width: 0;
+
+  p {
+    color: var(--app-text);
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  strong {
+    font-weight: 800;
+  }
+}
+
+.confirmation-reason {
+  grid-area: reason;
+
+  textarea {
+    background: var(--app-input-bg);
+    border-color: var(--app-border);
+    border-radius: 0.65rem;
+    color: var(--app-text);
+    min-height: 7.5rem;
+    resize: vertical;
+
+    &:focus {
+      border-color: var(--primary07);
+      box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 20%, transparent);
+    }
+  }
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .confirmation-icon-shell {
+    background: color-mix(in srgb, var(--primary06) 18%, var(--app-surface));
+    border-color: color-mix(in srgb, var(--primary08) 36%, transparent);
+    color: #86efac;
+  }
+
+  .confirmation-copy p {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}

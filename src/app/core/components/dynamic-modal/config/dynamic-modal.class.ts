@@ -21,6 +21,7 @@ export class DynamicModalClass {
   position: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'topleft' | 'topright' | 'bottomleft' | 'bottomright' | undefined;
   transitionOptions: string | undefined;
   contentStyleClass: string | undefined;
+  styleClass: string | undefined;
   maximizable: boolean | undefined;
   closable: boolean | undefined;
   closableEsc: boolean | undefined;
@@ -60,6 +61,7 @@ export class DynamicModalClass {
     this.resizable = params && fun.objHas(params, 'resizable') ? params.resizable : false;
     this.transitionOptions = params && fun.objHas(params, 'transitionOptions') ? params.transitionOptions : '100ms';
     this.contentStyleClass = params && fun.objHas(params, 'contentStyleClass') ? params.contentStyleClass : '';
+    this.styleClass = params && fun.objHas(params, 'styleClass') ? params.styleClass : '';
     this.closable = params && fun.objHas(params, 'closable') ? params.closable : true;
     this.closableEsc = params && fun.objHas(params, 'closableEsc') ? params.closableEsc : false;
     this.maximizable = params && fun.objHas(params, 'maximizable') ? params.maximizable : false;

@@ -834,10 +834,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     modalConfig.inputs = obj;
     modalConfig.id = 'removerArticulo';
     modalConfig.header = 'Confirmación';
+    modalConfig.contentStyleClass = 'confirmation-modal-content';
+    modalConfig.styleClass = 'confirmation-dialog';
+    modalConfig.transitionOptions = '180ms cubic-bezier(0.23, 1, 0.32, 1)';
 
     modalConfig.botones = [
-      { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
-      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+      { clase: 'btn-light-grey', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      { id: 'btn_aceptar', clase: 'btn-green', label: 'Aceptar', disable: false },
     ];
 
     modalConfig.setCallback(this.procesoQuitarArticulo.bind(this));

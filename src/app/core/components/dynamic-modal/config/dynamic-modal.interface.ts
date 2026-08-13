@@ -65,6 +65,7 @@ export interface IModalConfiguration {
   position?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
   transitionOptions?: string;
   contentStyleClass?: string;
+  styleClass?: string;
   maximizable?: boolean;
   closable?: boolean;
   closableEsc?: boolean;

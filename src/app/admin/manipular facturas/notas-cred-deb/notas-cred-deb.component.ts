@@ -473,12 +473,15 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
       confirmationImprimirModalConf.id = 'confirmacionImprimir';
       confirmationImprimirModalConf.inputs = obj;
-      confirmationImprimirModalConf.header = 'Confirmación'; 
+      confirmationImprimirModalConf.header = 'Confirmación';
       confirmationImprimirModalConf.width = '30rem';
       confirmationImprimirModalConf.component = ConfirmacionImprimirComponent;
+      confirmationImprimirModalConf.contentStyleClass = 'confirmation-modal-content';
+      confirmationImprimirModalConf.styleClass = 'confirmation-dialog';
+      confirmationImprimirModalConf.transitionOptions = '180ms cubic-bezier(0.23, 1, 0.32, 1)';
       confirmationImprimirModalConf.botones = [
-        { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
-        { id: 'btnConfirmar', clase: 'btn btn-verde', label: 'Confirmar', disable: false },
+        { clase: 'btn-light-grey', action: modalActionsE.close, label: 'Cancelar', disable: false },
+        { id: 'btnConfirmar', clase: 'btn-green', label: 'Confirmar', disable: false },
       ];
 
       confirmationImprimirModalConf.setCallback(this.processImprimir.bind(this));

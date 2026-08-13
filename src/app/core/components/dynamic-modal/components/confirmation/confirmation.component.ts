@@ -30,7 +30,10 @@ export class ConfirmationComponent implements OnInit, IDynamicModal {
   ngOnInit() {
     if (this.iconName) {
       if (fun.isEmpty(this.iconSize)) this.iconSize = '40px';
-      if (fun.isEmpty(this.iconColor)) this.iconColor = 'black';
+      if (fun.isEmpty(this.iconColor)) this.iconColor = 'var(--primary08)';
+    } else {
+      this.iconSize = '1.35rem';
+      this.iconColor = 'var(--primary08)';
     }
     if (this.showReasonInput) this.validateDeleteBtnState();
   }

@@ -8,6 +8,7 @@
         [breakpoints]="{ '767px': '90vw' }"
         [position]="modalConfig.position!"
         [contentStyleClass]="modalConfig.contentStyleClass!"
+        [styleClass]="modalConfig.styleClass!"
         [baseZIndex]="modalConfig.baseZIndex ?? 10000"
         [draggable]="false"
         [maximizable]="modalConfig.maximizable!"
@@ -45,10 +46,10 @@
 
         @if (hasAnyBtn(modalConfig)) {
           <ng-template pTemplate="footer">
-            <div class="d-flex justify-content-end align-items-center mt-2 gap-3">
+            <div class="dynamic-modal-footer d-flex justify-content-end align-items-center mt-2 gap-3">
               @for (dynamic_boton of modalConfig?.botones; track dynamic_boton) {
                 <span [pTooltip]="getButtonTooltip(dynamic_boton)" tooltipPosition="top">
-                  <button [disabled]="getButtonState(dynamic_boton, modalConfig.id!)" class="btn btn-sm {{ dynamic_boton.clase }} d-flex align-items-center justify-content-center gap-2" (click)="dynamicFunction(modalConfig, dynamic_boton)">
+                  <button [disabled]="getButtonState(dynamic_boton, modalConfig.id!)" class="dynamic-modal-button btn btn-sm {{ dynamic_boton.clase }} d-flex align-items-center justify-content-center gap-2" (click)="dynamicFunction(modalConfig, dynamic_boton)">
                     @if (dynamic_boton.showProcess && dynamic_boton.processing) {
                       <i class="pi pi-spinner pi-spin"></i>
                       Procesando...

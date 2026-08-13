@@ -1,54 +1,58 @@
-@if (!is_prefactura_selected) {
-  <p class="mb-0 d-block">Seguro que desea remover el articulo:</p>
-  <strong class="mb-0">{{ nombre }}</strong>
-}
-@if (is_prefactura_selected) {
-  <div>
-    @if (data_detalle.is_defectuoso) {
-      Seguro que desea retirar el articulo defectuoso: <strong>{{ nombre }}</strong>
-    }
-    @if (!data_detalle.is_defectuoso) {
-      <h2><strong>Articulo: </strong> {{ nombre }}</h2>
-      <p>Especifique la razón de quitar este articulo de la Pre-factura.</p>
-      <div>
-        <hr class="rayaTop" />
-      </div>
-      <form [formGroup]="form">
-        <div class="row">
-          <div class="col-5">
-            <div class="d-flex align-items-center h-100">
-              <label class="control-label me-2 mb-0">Devolver todo: </label>
-              <input class="apple-switch" type="checkbox" formControlName="all" (change)="changeValorCheck()" />
-            </div>
-          </div>
-          <div class="col-7">
-            <div class="form-group">
-              <label class="control-label mt-3">Cantidad: </label>
-              <input
-                id="cantidad"
-                min="1"
-                [max]="cantidad"
-                (keydown.enter)="saltar('razon')"
-                (focus)="htmlServ.selectValue($event)"
-                (blur)="checkCantidad()"
-                type="number"
-                class="form-control input_cantidad"
-                formControlName="cantidad"
-                placeholder="Introduzca la cantidad"
-                autocomplete="off" />
-            </div>
-          </div>
-          <div class="col-12">
-            <div class="form-group">
-              <label class="control-label">Razón: </label>
-              <select id="razon" (keydown.enter)="saltar('send')" formControlName="razon" class="form-control">
-                <option value="no_venta">Solo devolver</option>
-                <option value="producto_defectuoso">Producto defectuoso</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </form>
-    }
+<div class="remove-confirmation" [class.prefactura]="is_prefactura_selected">
+  <div class="remove-confirmation-head">
+    <div class="remove-confirmation-icon">
+      <i class="fa-solid fa-trash-can"></i>
+    </div>
+
+    <div class="remove-confirmation-copy">
+      @if (!is_prefactura_selected) {
+        <span>Seguro que desea remover el artículo</span>
+        <strong>{{ nombre }}</strong>
+      }
+
+      @if (is_prefactura_selected && data_detalle.is_defectuoso) {
+        <span>Seguro que desea retirar el artículo defectuoso</span>
+        <strong>{{ nombre }}</strong>
+      }
+
+      @if (is_prefactura_selected && !data_detalle.is_defectuoso) {
+        <span>Artículo</span>
+        <strong>{{ nombre }}</strong>
+        <small>Especifique la razón de quitar este artículo de la pre-factura.</small>
+      }
+    </div>
   </div>
-}
+
+  @if (is_prefactura_selected && !data_detalle.is_defectuoso) {
+    <form class="remove-confirmation-form" [formGroup]="form">
+      <label class="remove-switch-row">
+        <span>Devolver todo</span>
+        <input class="apple-switch" type="checkbox" formControlName="all" (change)="changeValorCheck()" />
+      </label>
+
+      <div class="form-group">
+        <label class="control-label">Cantidad: </label>
+        <input
+          id="cantidad"
+          min="1"
+          [max]="cantidad"
+          (keydown.enter)="saltar('razon')"
+          (focus)="htmlServ.selectValue($event)"
+          (blur)="checkCantidad()"
+          type="number"
+          class="form-control input_cantidad"
+          formControlName="cantidad"
+          placeholder="Introduzca la cantidad"
+          autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label class="control-label">Razón: </label>
+        <select id="razon" (keydown.enter)="saltar('send')" formControlName="razon" class="form-control">
+          <option value="no_venta">Solo devolver</option>
+          <option value="producto_defectuoso">Producto defectuoso</option>
+        </select>
+      </div>
+    </form>
+  }
+</div>
