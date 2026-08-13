@@ -1,75 +1,263 @@
 .menuList {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  align-items: center;
-  justify-content: flex-end;
-  min-height: 7rem;
   position: relative;
+  width: 100%;
 
-  .tituloMenu {
-    transform: scale(0);
-    font-size: inherit;
-    // position: absolute;
-    transition: all 0.2s;
-    margin: 0;
-    width: 100%;
-
-    &.tituloMenuA {
-      font-weight: 600;
-    }
+  &::before {
+    background: var(--primary08);
+    border-radius: 0 0.5rem 0.5rem 0;
+    content: '';
+    height: 3.4rem;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0.7rem;
+    transform: scaleY(0.55);
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease;
+    width: 0.22rem;
   }
 
-  &:hover .tituloMenu,
-  .tituloMenuA {
-    transform: scale(1);
+  &.active::before {
+    opacity: 1;
+    transform: scaleY(1);
   }
+}
+
+.menuButton {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.85rem;
+  color: color-mix(in srgb, #ffffff 88%, var(--primary01));
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  min-height: 5.75rem;
+  padding: 0.45rem 0.35rem;
+  position: relative;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+  width: calc(100% - 0.95rem);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary08) 16%, transparent);
+    border-color: color-mix(in srgb, #ffffff 12%, transparent);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 0.16rem color-mix(in srgb, var(--primary08) 38%, transparent);
+    outline: 0;
+  }
+}
+
+.active > .menuButton {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary07) 28%, transparent), color-mix(in srgb, var(--primary09) 12%, transparent)),
+    color-mix(in srgb, var(--primary08) 18%, transparent);
+  border-color: color-mix(in srgb, #ffffff 16%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 18%, transparent),
+    0 12px 24px -20px #000000d9;
+}
+
+.iconFrame {
+  align-items: center;
+  background: color-mix(in srgb, #ffffff 10%, transparent);
+  border: 1px solid color-mix(in srgb, #ffffff 16%, transparent);
+  border-radius: 50%;
+  display: inline-flex;
+  height: 4.15rem;
+  justify-content: center;
+  padding: 0.22rem;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  width: 4.15rem;
+}
+
+.menuButton:hover .iconFrame {
+  background: color-mix(in srgb, var(--primary05) 70%, var(--primary02));
+  border-color: color-mix(in srgb, var(--primary10) 28%, transparent);
+  box-shadow: 0 10px 20px -15px #000000d9;
+  transform: translateY(-0.9rem) scale(0.96);
+}
+
+.active .iconFrame {
+  background: color-mix(in srgb, var(--primary06) 62%, var(--primary03));
+  border-color: color-mix(in srgb, var(--primary10) 28%, transparent);
+  box-shadow: 0 10px 20px -15px #000000d9;
+  transform: translateY(-0.9rem) scale(0.96);
+}
+
+.iconosMenu {
+  border-radius: 50%;
+  display: block;
+  filter: saturate(0.72) contrast(0.95);
+  height: 3.55rem;
+  object-fit: contain;
+  transition:
+    filter 160ms ease,
+    transform 160ms ease;
+  width: 3.55rem;
+
+  &.iconosMenuA,
+  .menuButton:hover & {
+    filter: saturate(1) contrast(1.04);
+    transform: scale(1.03);
+  }
+}
+
+.tituloMenu {
+  align-items: center;
+  color: currentColor;
+  display: flex;
+  font-size: 0.82rem;
+  font-weight: 400;
+  height: 1.8rem;
+  justify-content: center;
+  letter-spacing: 0;
+  line-height: 1.06;
+  margin: 0;
+  max-width: 6.25rem;
+  opacity: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  padding: 0;
+  position: absolute;
+  bottom: 0.28rem;
+  left: 0.25rem;
+  right: 0.25rem;
   text-align: center;
+  text-shadow:
+    0 1px 1px color-mix(in srgb, #000000 70%, transparent),
+    0 0 8px color-mix(in srgb, var(--primary10) 58%, transparent);
+  transform: translateY(-0.28rem) scale(0.96);
+  transition:
+    opacity 150ms ease,
+    transform 180ms ease;
+  white-space: pre-line;
+  will-change: opacity, transform;
 
-  .iconosMenu {
-    border: 2px solid var(--app-border-menu-item);
-    border-radius: 50%;
-    margin: 0rem auto 0px auto;
-    filter: grayscale(50%);
-    height: 4.5rem;
-    width: 4.5rem;
-    &.iconosMenuA {
-      background: var(--primary07);
-      filter: grayscale(10%) contrast(-20%);
+  &.tituloMenuA {
+    color: #ffffff;
+    font-weight: 800;
+  }
+}
+
+.menuButton:hover .tituloMenu,
+.active > .menuButton .tituloMenu {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.subMenuFactura {
+  background: color-mix(in srgb, var(--primary10) 34%, var(--primary04));
+  border: 1px solid color-mix(in srgb, #ffffff 18%, transparent);
+  border-radius: 0.82rem;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent),
+    0 12px 20px -18px #000000d9;
+  display: grid;
+  gap: 0.28rem;
+  margin: 0.18rem auto 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 0.35rem;
+  position: relative;
+  transform: translateY(-0.2rem);
+  transition:
+    max-height 220ms ease,
+    opacity 160ms ease,
+    padding 160ms ease,
+    transform 160ms ease;
+  width: calc(100% - 0.95rem);
+
+  &.subMenuFacturaA {
+    max-height: 30rem;
+    opacity: 1;
+    padding: 0.42rem 0.45rem 0.5rem;
+    transform: translateY(0);
+  }
+
+  .opcion {
+    background: color-mix(in srgb, var(--primary10) 22%, var(--primary06));
+    border: 1px solid color-mix(in srgb, #ffffff 15%, transparent);
+    border-radius: 0.52rem;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 400;
+    line-height: 1.1;
+    margin: 0;
+    padding: 0.38rem 0.35rem;
+    position: relative;
+    text-align: center;
+    text-shadow: 0 1px 1px color-mix(in srgb, #000000 42%, transparent);
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
+    z-index: 1;
+
+    &.activa {
+      background: color-mix(in srgb, var(--primary02) 74%, var(--primary03));
+      border-color: color-mix(in srgb, var(--primary06) 70%, var(--primary03));
+      color: var(--primary10);
+      box-shadow: 0 10px 18px -16px #000000d9;
+      font-weight: 800;
+      text-shadow: none;
     }
 
     &:hover {
-      filter: grayscale(10%);
-      transform: scale(1.05);
-      filter: contrast(-20%);
+      background: color-mix(in srgb, var(--primary09) 44%, var(--primary07));
+      border-color: color-mix(in srgb, #ffffff 28%, transparent);
+      color: #ffffff;
+      transform: translateY(-1px);
     }
+  }
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .menuButton {
+    color: color-mix(in srgb, #ffffff 80%, var(--primary03));
+  }
+
+  .iconFrame {
+    background: color-mix(in srgb, #ffffff 7%, transparent);
+  }
+
+  .menuButton:hover .iconFrame {
+    background: color-mix(in srgb, var(--primary07) 58%, var(--primary04));
+  }
+
+  .active .iconFrame {
+    background: color-mix(in srgb, var(--primary08) 64%, var(--primary05));
   }
 
   .subMenuFactura {
-    overflow: hidden;
-    max-height: 0;
-    transition: all 0.5s;
-    width: 100%;
-
-    &.subMenuFacturaA {
-      margin-top: 0.5rem;
-      max-height: 100rem;
-      background-color: var(--primary04);
-      color: white;
-    }
+    background: color-mix(in srgb, #000000 38%, var(--primary09));
+    border-color: color-mix(in srgb, #ffffff 14%, transparent);
 
     .opcion {
-      margin-bottom: 0;
-      font-size: 1rem;
-      padding: 0.5rem;
-      background-color: var(--primary04);
+      background: color-mix(in srgb, var(--primary09) 44%, #000000);
+      border-color: color-mix(in srgb, #ffffff 12%, transparent);
+
       &.activa {
-        background-color: var(--primary09) !important;
-      }
-      &:hover {
-        width: 100%;
-        filter: brightness(0.6);
-        cursor: pointer;
+        background: color-mix(in srgb, var(--primary07) 72%, var(--primary05));
+        border-color: color-mix(in srgb, var(--primary04) 58%, var(--primary08));
+        color: color-mix(in srgb, #ffffff 92%, var(--primary01));
+        font-weight: 800;
       }
     }
   }

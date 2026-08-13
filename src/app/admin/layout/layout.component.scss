@@ -74,28 +74,59 @@
 
     display: grid;
     grid-template-areas: 'menu content';
-    grid-template-columns: 7.5rem auto;
+    grid-template-columns: 7.35rem auto;
     overflow: hidden;
 
     .menu {
       grid-area: menu;
       display: grid;
       grid-template-areas: 'sideBar';
-      grid-template-rows: auto;
+      grid-template-rows: minmax(0, 1fr);
+      min-height: 0;
+      overflow: hidden;
       z-index: 1;
 
       .sideBar {
         grid-area: sideBar;
-        background-color: var(--primary02);
+        background:
+          linear-gradient(180deg, color-mix(in srgb, var(--primary09) 62%, var(--primary04)) 0%, var(--primary04) 44%, var(--primary09) 100%),
+          var(--primary04);
+        border-right: 1px solid color-mix(in srgb, var(--primary10) 34%, transparent);
+        box-shadow: inset -1px 0 0 color-mix(in srgb, #ffffff 8%, transparent);
+        height: 100%;
+        min-height: 0;
         position: relative;
         overflow: hidden auto;
+        scrollbar-color: color-mix(in srgb, var(--primary08) 72%, transparent) transparent;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+          width: 0.4rem;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: color-mix(in srgb, var(--primary08) 72%, transparent);
+          border-radius: 999px;
+        }
+
+        &::before {
+          background: linear-gradient(180deg, color-mix(in srgb, #ffffff 16%, transparent), transparent 36%);
+          content: '';
+          height: 7rem;
+          left: 0;
+          pointer-events: none;
+          position: absolute;
+          top: 0;
+          width: 100%;
+          z-index: 1;
+        }
 
         .menuContent {
-          position: absolute;
           display: grid;
-          gap: 0.5rem;
-
-          padding: 0.35rem 0 1.5rem;
+          gap: 0.55rem;
+          padding: 0.65rem 0 1.4rem;
+          position: relative;
+          z-index: 2;
         }
       }
     }
@@ -109,7 +140,9 @@
         'contenido'
         'footer';
 
-      grid-template-rows: min-content auto min-content;
+      grid-template-rows: 2rem minmax(0, 1fr) 2rem;
+      min-height: 0;
+      overflow: hidden;
 
       .navBar {
         grid-area: navBar;
@@ -130,7 +163,6 @@
         padding: 0.8rem 1rem;
         overflow-y: auto;
 
-        max-height: calc(100vh - 4rem);
         min-height: 0;
         position: relative;
 
