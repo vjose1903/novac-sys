@@ -58,7 +58,12 @@
 }
 
 .panel-dropdown-unidad {
-  min-width: 11rem !important;
+  min-width: 12rem !important;
+
+  .p-select-option {
+    text-wrap: nowrap !important;
+    white-space: nowrap !important;
+  }
 }
 
 .cuerpo-fact {

@@ -133,8 +133,6 @@ body {
   --app-input-hover-border: #98a5b2;
   --app-drawer-divider: var(--app-border);
   --app-hover: #efefef;
-  --app-select-option-selected-bg: #e9ecef;
-  --app-select-option-selected-text: var(--app-text);
   --app-selectbutton-active-bg: var(--primary07);
   --app-selectbutton-active-hover-bg: var(--primary08);
   --app-selectbutton-bg: #dedede;
@@ -320,12 +318,6 @@ textarea[disabled]::placeholder,
   color: var(--app-text) !important;
 }
 
-.p-select-option:not(.p-select-option-selected):hover,
-.p-multiselect-option:not(.p-multiselect-option-selected):hover,
-.p-select-option.p-focus:not(.p-select-option-selected),
-.p-multiselect-option.p-focus:not(.p-multiselect-option-selected),
-.p-select-option:not(.p-select-option-selected):focus,
-.p-multiselect-option:not(.p-multiselect-option-selected):focus,
 .p-datepicker-day:not(.p-datepicker-day-selected):hover,
 .p-datepicker-month:not(.p-datepicker-month-selected):hover,
 .p-datepicker-year:not(.p-datepicker-year-selected):hover {

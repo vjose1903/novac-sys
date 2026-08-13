@@ -174,8 +174,56 @@
           border-radius: 0.55rem;
           margin: 0.12rem 0.25rem;
           text-wrap: wrap;
+          transition:
+            background-color 160ms ease,
+            color 160ms ease,
+            box-shadow 160ms ease;
+
+          &.p-focus:not(.p-multiselect-option-selected) {
+            background-color: color-mix(in srgb, var(--app-text) 8%, var(--app-surface)) !important;
+            color: var(--app-text) !important;
+            box-shadow: none !important;
+          }
+
+          &.p-multiselect-option-selected {
+            background-color: var(--primary02) !important;
+            color: color-mix(in srgb, var(--primary08) 78%, var(--app-text)) !important;
+            box-shadow: inset 0.18rem 0 0 color-mix(in srgb, var(--primary08) 72%, var(--app-border)) !important;
+            font-weight: 600;
+          }
+
+          &.p-multiselect-option-selected.p-focus {
+            background-color: var(--primary03) !important;
+            box-shadow:
+              inset 0.18rem 0 0 color-mix(in srgb, var(--primary08) 72%, var(--app-border)),
+              inset 0 0 0 1px color-mix(in srgb, color-mix(in srgb, var(--primary08) 72%, var(--app-border)) 38%, transparent) !important;
+          }
         }
       }
+    }
+  }
+}
+
+.p-multiselect-overlay {
+  .p-multiselect-option {
+    &.p-focus:not(.p-multiselect-option-selected) {
+      background-color: color-mix(in srgb, var(--app-text) 8%, var(--app-surface)) !important;
+      color: var(--app-text) !important;
+      box-shadow: none !important;
+    }
+
+    &.p-multiselect-option-selected {
+      background-color: var(--primary02) !important;
+      color: color-mix(in srgb, var(--primary08) 78%, var(--app-text)) !important;
+      box-shadow: inset 0.18rem 0 0 color-mix(in srgb, var(--primary08) 72%, var(--app-border)) !important;
+      font-weight: 600;
+    }
+
+    &.p-multiselect-option-selected.p-focus {
+      background-color: var(--primary03) !important;
+      box-shadow:
+        inset 0.18rem 0 0 color-mix(in srgb, var(--primary08) 72%, var(--app-border)),
+        inset 0 0 0 1px color-mix(in srgb, color-mix(in srgb, var(--primary08) 72%, var(--app-border)) 38%, transparent) !important;
     }
   }
 }
