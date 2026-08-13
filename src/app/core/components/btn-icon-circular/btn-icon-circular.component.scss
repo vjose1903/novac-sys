@@ -1,24 +1,33 @@
 .btn-circle-icon {
-  background-color: var(--primary02);
-  border-radius: 50%;
-  box-shadow: var(--app-button-shadow);
-  color: var(--app-text);
   align-items: center;
+  background: var(--primary07);
+  border: 1px solid var(--primary07);
+  border-radius: 50%;
+  box-shadow: 0 10px 18px -13px color-mix(in srgb, var(--primary08) 78%, #000);
+  color: #ffffff;
+  cursor: pointer;
   display: flex;
   justify-content: center;
+  overflow: hidden;
   position: relative;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
   z-index: 1;
 
   &:hover {
-    filter: brightness(0.8);
-    cursor: pointer;
-    transform: scale(1.2);
+    background: var(--primary08);
+    border-color: var(--primary08);
+    box-shadow: 0 12px 22px -15px color-mix(in srgb, var(--primary08) 84%, #000);
+    transform: translateY(-1px) scale(1.04);
   }
 
   &:active {
-    filter: brightness(0.6);
     cursor: grabbing;
-    transform: scale(0.99);
+    transform: translateY(0) scale(0.98);
   }
 
   > i {
@@ -27,9 +36,12 @@
   }
 
   &.disable {
-    background: #7a7a7a2e;
-    color: #b1b1b1a4;
-
+    background: var(--app-surface-muted);
+    border-color: var(--app-border);
+    box-shadow: none;
+    color: var(--app-text-muted);
+    cursor: not-allowed;
+    opacity: 0.55;
     pointer-events: none;
   }
 
@@ -60,6 +72,14 @@
 
 :host-context(html[data-theme-mode='dark']) {
   .btn-circle-icon {
-    color: var(--app-text);
+    background: var(--primary07);
+    border-color: var(--primary07);
+    color: #ffffff;
+
+    &:hover {
+      background: var(--primary08);
+      border-color: var(--primary08);
+      color: #ffffff;
+    }
   }
 }
