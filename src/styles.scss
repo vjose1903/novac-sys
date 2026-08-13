@@ -170,7 +170,7 @@ body {
   --app-field-padding-y-md: 0.38rem;
   --app-field-padding-x-md: 0.72rem;
   --app-field-focus-border: var(--primary08);
-  --app-field-focus-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 20%, transparent);
+  --app-field-focus-shadow: none;
   --app-field-hover-shadow: 0 0.45rem 0.9rem -0.75rem #0000008a;
   --app-field-shadow: 0 0.25rem 0.65rem -0.55rem #00000073;
   --app-field-invalid-border: #dc3545;

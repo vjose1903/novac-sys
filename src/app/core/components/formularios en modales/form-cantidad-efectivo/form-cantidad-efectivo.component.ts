@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener, inject, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener, inject, Input, ViewChild } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
@@ -18,6 +18,8 @@ import { DivisaService } from '@admin/registros/divisa/divisa.service';
   standalone: false,
 })
 export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, IDynamicModal {
+  @ViewChild('formaPagoInput') formaPagoInput: any;
+
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
     event.stopPropagation();
@@ -104,9 +106,67 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     fun.enfocarInput('inputEfectivo');
   }
 
+  focusFormaPago(event?: Event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    (event?.target as HTMLElement | null)?.blur();
+    this.focusPrimeSelect(this.formaPagoInput);
+  }
+
+  handleFormaPagoEnter(event: Event) {
+    event.stopPropagation();
+    this.focusConfirmButton();
+  }
+
+  focusConfirmButton() {
+    fun.setTimeout(() => {
+      this.formaPagoInput?.hide?.();
+      const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.dynamic-modal-button[data-modal-button-id="btnConfirmar"]'));
+      const button = buttons.find(btn => btn.dataset['modalId'] === this.modalConfig.id && !btn.disabled) ?? buttons.find(btn => !btn.disabled);
+
+      button?.focus({ preventScroll: true });
+    }, 180);
+  }
+
+  private focusPrimeSelect(selectComponent: any): void {
+    fun.setTimeout(() => {
+      requestAnimationFrame(() => {
+        const combobox = document.getElementById('formaPago') as HTMLElement | null;
+
+        if (!selectComponent || selectComponent.$disabled?.()) {
+          combobox?.focus({ preventScroll: true });
+          this.openPrimeSelectFromCombobox(combobox);
+          return;
+        }
+
+        const focusInput = selectComponent.focusInputViewChild?.nativeElement as HTMLElement | undefined;
+        const selectedIndex = selectComponent.findSelectedOptionIndex?.();
+        const firstIndex = selectComponent.findFirstOptionIndex?.();
+        const optionIndex = selectedIndex !== -1 ? selectedIndex : firstIndex;
+
+        selectComponent.show?.(true);
+        selectComponent.focusedOptionIndex?.set?.(optionIndex ?? -1);
+        selectComponent.scrollInView?.();
+        (focusInput ?? combobox)?.focus({ preventScroll: true });
+        this.openPrimeSelectFromCombobox(focusInput ?? combobox);
+      });
+    }, 30);
+  }
+
+  private openPrimeSelectFromCombobox(combobox: HTMLElement | null | undefined): void {
+    combobox?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'ArrowDown',
+        code: 'ArrowDown',
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+  }
+
   saltar(campo, valor?) {
     if (campo === 'formaPago') {
-      fun.enfocarInput(campo);
+      this.focusFormaPago();
     }
     if (campo === 'send') {
       if (parseFloat(fun.desformatearStNumber(this.efectivo)) < fun.desformatearStNumber(this.total_factura)) {

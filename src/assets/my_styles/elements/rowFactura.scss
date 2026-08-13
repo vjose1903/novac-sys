@@ -19,9 +19,9 @@
 }
 
 @mixin entrada-focus {
-  border: 2px solid var(--primary08) !important;
+  border-color: var(--primary08) !important;
   box-shadow: none !important;
-  outline: none !important;
+  outline: 2px solid var(--primary08) !important;
   background-color: var(--app-input-focus-bg) !important;
   color: var(--app-text) !important;
 }

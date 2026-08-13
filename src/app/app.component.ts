@@ -81,6 +81,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   @HostListener('document:keydown', ['$event'])
   onDocumentKeyDown(event: KeyboardEvent): void {
     this.redirectPrimeSelectRootKeyboardEvent(event);
+    this.closePrimeSelectPanelOnEnter(event);
     this.closePrimeMultiSelectPanelOnEnter(event);
   }
 
@@ -265,51 +266,21 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
     }
 
     if (root.classList.contains('p-disabled') || root.classList.contains('p-select-open') || root.classList.contains('p-multiselect-open')) {
-      this.debugPrimeKeyboard('focus-ignored', {
-        target: this.getPrimeKeyboardElementInfo(target),
-        root: this.getPrimeKeyboardElementInfo(root),
-        reason: root.classList.contains('p-disabled') ? 'disabled' : 'already-open',
-      });
       return;
     }
 
     if (Date.now() - this.lastPointerDownAt < 250) {
-      this.debugPrimeKeyboard('focus-ignored', {
-        target: this.getPrimeKeyboardElementInfo(target),
-        root: this.getPrimeKeyboardElementInfo(root),
-        reason: 'pointer-focus',
-      });
       return;
     }
 
     const combobox = root.querySelector<HTMLElement>('[role="combobox"]');
 
     if (!combobox || target !== combobox) {
-      this.debugPrimeKeyboard('focus-ignored', {
-        target: this.getPrimeKeyboardElementInfo(target),
-        root: this.getPrimeKeyboardElementInfo(root),
-        combobox: this.getPrimeKeyboardElementInfo(combobox),
-        reason: 'target-is-not-combobox',
-      });
       return;
     }
 
-    this.debugPrimeKeyboard('focus-open-requested', {
-      target: this.getPrimeKeyboardElementInfo(target),
-      root: this.getPrimeKeyboardElementInfo(root),
-      activeElement: this.getPrimeKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
-
     requestAnimationFrame(() => {
       if (document.activeElement !== combobox || root.classList.contains('p-select-open') || root.classList.contains('p-multiselect-open')) {
-        this.debugPrimeKeyboard('focus-open-cancelled', {
-          target: this.getPrimeKeyboardElementInfo(target),
-          root: this.getPrimeKeyboardElementInfo(root),
-          combobox: this.getPrimeKeyboardElementInfo(combobox),
-          activeElement: this.getPrimeKeyboardElementInfo(document.activeElement as HTMLElement | null),
-          isSelectOpen: root.classList.contains('p-select-open'),
-          isMultiSelectOpen: root.classList.contains('p-multiselect-open'),
-        });
         return;
       }
 
@@ -321,19 +292,52 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
           cancelable: true,
         }),
       );
+    });
+  }
 
-      this.debugPrimeKeyboard('focus-open-arrowdown-dispatched', {
-        target: this.getPrimeKeyboardElementInfo(target),
-        root: this.getPrimeKeyboardElementInfo(root),
-        combobox: this.getPrimeKeyboardElementInfo(combobox),
-        activeElement: this.getPrimeKeyboardElementInfo(document.activeElement as HTMLElement | null),
+  private closePrimeSelectPanelOnEnter(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' && event.code !== 'NumpadEnter') {
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    const isSelectInteraction = Boolean(target?.closest('.p-select, .p-select-overlay'));
+
+    if (!isSelectInteraction) {
+      return;
+    }
+
+    const roots = new Set<HTMLElement>();
+    const targetRoot = target?.closest('.p-select') as HTMLElement | null;
+
+    if (targetRoot) roots.add(targetRoot);
+    document.querySelectorAll<HTMLElement>('.p-select.p-select-open').forEach(root => roots.add(root));
+
+    if (!roots.size) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      roots.forEach(root => {
+        if (!root.classList.contains('p-select-open')) {
+          return;
+        }
+
+        const combobox = root.querySelector<HTMLElement>('[role="combobox"]');
+
+        combobox?.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: 'Escape',
+            code: 'Escape',
+            bubbles: true,
+            cancelable: true,
+          }),
+        );
       });
     });
   }
 
   private closePrimeMultiSelectPanelOnEnter(event: KeyboardEvent): void {
-    this.debugPrimeKeyboardEvent(event, 'document-keydown');
-
     if (event.key !== 'Enter' && event.code !== 'NumpadEnter') {
       return;
     }
@@ -354,11 +358,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
 
     requestAnimationFrame(() => {
       if (!root.classList.contains('p-multiselect-open')) {
-        this.debugPrimeKeyboard('multiselect-enter-close-ignored', {
-          root: this.getPrimeKeyboardElementInfo(root),
-          combobox: this.getPrimeKeyboardElementInfo(combobox),
-          reason: 'not-open',
-        });
         return;
       }
 
@@ -370,11 +369,6 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
           cancelable: true,
         }),
       );
-
-      this.debugPrimeKeyboard('multiselect-enter-close-dispatched', {
-        root: this.getPrimeKeyboardElementInfo(root),
-        combobox: this.getPrimeKeyboardElementInfo(combobox),
-      });
     });
   }
 
@@ -404,52 +398,5 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
         cancelable: true,
       }),
     );
-
-    this.debugPrimeKeyboard('root-keyboard-redirected', {
-      key: event.key,
-      code: event.code,
-      root: this.getPrimeKeyboardElementInfo(root),
-      combobox: this.getPrimeKeyboardElementInfo(combobox),
-      activeElement: this.getPrimeKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
-  }
-
-  private debugPrimeKeyboardEvent(event: KeyboardEvent, message: string): void {
-    const target = event.target as HTMLElement | null;
-    const root = target?.closest('.p-select, .p-multiselect') as HTMLElement | null;
-    const overlay = target?.closest('.p-select-overlay, .p-multiselect-overlay') as HTMLElement | null;
-
-    if (!root && !overlay) {
-      return;
-    }
-
-    this.debugPrimeKeyboard(message, {
-      key: event.key,
-      code: event.code,
-      type: event.type,
-      defaultPrevented: event.defaultPrevented,
-      target: this.getPrimeKeyboardElementInfo(target),
-      root: this.getPrimeKeyboardElementInfo(root),
-      overlay: this.getPrimeKeyboardElementInfo(overlay),
-      activeElement: this.getPrimeKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
-  }
-
-  private debugPrimeKeyboard(message: string, data: Record<string, unknown>): void {
-    console.debug(JSON.stringify({ scope: 'prime-keyboard', message, ...data }));
-  }
-
-  private getPrimeKeyboardElementInfo(element: HTMLElement | null): Record<string, unknown> | null {
-    if (!element) return null;
-
-    return {
-      id: element.id,
-      tagName: element.tagName,
-      className: element.className,
-      role: element.getAttribute('role'),
-      ariaExpanded: element.getAttribute('aria-expanded'),
-      ariaLabel: element.getAttribute('aria-label'),
-      text: element.textContent?.trim().slice(0, 80),
-    };
   }
 }

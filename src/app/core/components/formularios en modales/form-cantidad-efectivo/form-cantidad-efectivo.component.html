@@ -21,7 +21,8 @@
             class="form-control inputEfectivo"
             (focus)="htmlServ.selectValue($event)"
             (keyup)="calcularDevueta()"
-            (keydown.enter)="saltar('formaPago')"
+            (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+            (keyup.enter)="focusFormaPago($event)"
             [(ngModel)]="efectivo"
             (ngModelChange)="validarForm('input')"
             (blur)="revisarPrecio($event.target)"
@@ -32,7 +33,9 @@
       <div class="cash-field">
         <label for="formaPago">Forma de pago</label>
         <p-select
+          #formaPagoInput
           inputId="formaPago"
+          styleClass="field-lg"
           [(ngModel)]="formaPago"
           [options]="[
             { label: 'Efectivo', value: 'Efectivo' },
@@ -43,7 +46,7 @@
           optionLabel="label"
           optionValue="value"
           appendTo="body"
-          (keydown.enter)="saltar('send')"></p-select>
+          (keyup.enter)="handleFormaPagoEnter($event)"></p-select>
       </div>
 
       <div class="cash-return-card">

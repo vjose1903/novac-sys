@@ -159,6 +159,14 @@ input[type='text'] {
     color-mix(in srgb, var(--app-surface-muted) 72%, var(--app-hover)),
     var(--app-input-hover-border)
   );
+
+  &.btn-sm {
+    border-radius: 0.55rem !important;
+    font-size: 0.8rem;
+    min-height: 1.9rem;
+    min-width: 3.5rem;
+    padding: 0.28rem 0.65rem !important;
+  }
 }
 
 .btn-light-grey,
@@ -235,9 +243,9 @@ img-viewer-edit .btn {
   .btn {
     padding: 0.48rem 0.85rem !important;
     &.btn-sm {
-      min-height: 2.35rem;
-      min-width: 4.5rem;
-      padding: 0.48rem 0.85rem !important;
+      min-height: 1.9rem;
+      min-width: 3.5rem;
+      padding: 0.28rem 0.65rem !important;
     }
   }
 }
@@ -249,9 +257,9 @@ img-viewer-edit .btn {
   .btn {
     padding: 0.48rem 0.85rem !important;
     &.btn-sm {
-      min-height: 2.35rem;
-      min-width: 4.5rem;
-      padding: 0.48rem 0.85rem !important;
+      min-height: 1.9rem;
+      min-width: 3.5rem;
+      padding: 0.28rem 0.65rem !important;
     }
   }
 }
@@ -264,9 +272,9 @@ img-viewer-edit .btn {
     border-radius: 0.65rem !important;
     padding: 0.48rem 0.85rem !important;
     &.btn-sm {
-      min-height: 2.35rem;
-      min-width: 4.5rem;
-      padding: 0.48rem 0.85rem !important;
+      min-height: 1.9rem;
+      min-width: 3.5rem;
+      padding: 0.28rem 0.65rem !important;
     }
   }
 }

@@ -98,7 +98,7 @@
   border-radius: 0.75rem;
   display: grid;
   grid-template-columns: min-content minmax(0, 1fr);
-  min-height: 3.15rem;
+  min-height: var(--app-field-height-lg, 3rem);
   overflow: hidden;
 
   &:hover:not(:focus-within) {
@@ -107,7 +107,8 @@
 
   &:focus-within {
     border-color: var(--primary07);
-    box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 20%, transparent);
+    box-shadow: none !important;
+    outline: 2px solid var(--primary08) !important;
   }
 
   span {
@@ -124,7 +125,7 @@
     box-shadow: none !important;
     font-size: 1.55rem;
     font-weight: 800;
-    min-height: 3.15rem;
+    min-height: calc(var(--app-field-height-lg, 3rem) - 2px);
     outline: 0 !important;
     padding: 0 0.85rem 0 0.5rem;
     text-align: end;

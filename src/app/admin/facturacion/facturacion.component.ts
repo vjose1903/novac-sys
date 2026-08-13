@@ -56,6 +56,7 @@ import { FacturacionStateService } from './services/facturacion-state.service';
 })
 export class FacturacionComponent extends FactsLocalStorage implements OnInit, OnChanges, OnDestroy, AfterViewInit, CanComponentDeactivate {
   @ViewChild(CuerpoFacturaComponent, { static: true }) cuerpo: CuerpoFacturaComponent;
+  @ViewChild('condicionInput') condicionInput: any;
   @ViewChild('ventaInput') ventaInput: any;
   @Input() tipo_documento: any;
   @Input() id_documento: any;
@@ -76,19 +77,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   @HostListener('window:keyup', ['$event'])
   handleKeyboardEvent(event: any) {
     const isNumpad = event.code.toLowerCase().includes('numpad');
-    const keyboardTarget = event.target as HTMLElement | null;
-
-    if (keyboardTarget?.closest('.p-select, .p-multiselect, .p-select-overlay, .p-multiselect-overlay')) {
-      this.debugFacturacionKeyboard('window-keyboard-event', {
-        type: event.type,
-        key: event.key,
-        code: event.code,
-        keyCode: event.keyCode,
-        defaultPrevented: event.defaultPrevented,
-        target: this.getFacturacionKeyboardElementInfo(keyboardTarget),
-        activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-      });
-    }
 
     event.stopPropagation();
     let key = event.keyCode;
@@ -728,23 +716,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let buscar = false;
 
-    this.debugFacturacionKeyboard('blur-check-start', {
-      sali_de,
-      valor,
-      condicion,
-      tipo_factura_referencia,
-      modo_factura: this.modo_factura,
-      activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
-
     fun.setTimeout(() => {
       if (sali_de == 'venta' && this.isPrimeSelectInteractionActive('venta')) {
-        this.debugFacturacionKeyboard('blur-check-ignored', {
-          sali_de,
-          valor,
-          reason: 'prime-select-interaction-active',
-          activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-        });
         return;
       }
 
@@ -765,16 +738,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         if (sali_de == 'fecha_vencimiento' && dont_have_propietario) buscar = true;
       }
 
-      this.debugFacturacionKeyboard('blur-check-result', {
-        sali_de,
-        valor,
-        voy_a,
-        condicion,
-        modo_factura: this.modo_factura,
-        dont_have_propietario,
-        buscar,
-      });
-
       if (buscar) this.abrirModalPropietario();
     }, 250);
   }
@@ -785,14 +748,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const activeElement = document.activeElement as HTMLElement | null;
 
     const isActive = Boolean(root?.classList.contains('p-select-open') || root?.classList.contains('p-multiselect-open') || activeElement?.closest('.p-select-overlay, .p-multiselect-overlay'));
-
-    this.debugFacturacionKeyboard('prime-interaction-active-check', {
-      inputId,
-      input: this.getFacturacionKeyboardElementInfo(input),
-      root: this.getFacturacionKeyboardElementInfo(root as HTMLElement | null),
-      activeElement: this.getFacturacionKeyboardElementInfo(activeElement),
-      isActive,
-    });
 
     return isActive;
   }
@@ -813,12 +768,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   cambiarCondicion(arg) {
-    this.debugFacturacionKeyboard('condition-change', {
-      value: arg,
-      condicion_fact_before: this.condicion_fact,
-      modo_factura_before: this.modo_factura,
-    });
-
     if (arg == 'Crédito') {
       this.modo_factura = 'normal';
       this.fecha_vencimiento = new Date();
@@ -829,13 +778,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     this.refreshModoFacturaOptions();
     this.validarClienteCasualPermitido();
-
-    this.debugFacturacionKeyboard('condition-change-result', {
-      value: arg,
-      condicion_fact_after: this.condicion_fact,
-      modo_factura_after: this.modo_factura,
-      modoFacturaOptions: this.modoFacturaOptions(),
-    });
   }
 
   async calcularPorcientoComprobante(): Promise<boolean> {
@@ -929,14 +871,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     let is_buscar_cliente = false;
 
-    this.debugFacturacionKeyboard('enter-flow-start', {
-      salioDe,
-      valor,
-      condicion_fact: this.condicion_fact,
-      modo_factura: this.modo_factura,
-      activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
-
     switch (salioDe) {
       case 'tipo':
         if (this.factServ.options_tipos_facturas.includes(valor)) {
@@ -1017,41 +951,24 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         break;
     }
 
-    this.debugFacturacionKeyboard('enter-flow-decision', {
-      salioDe,
-      valor,
-      siguiente_input,
-      is_enforcar,
-      is_enforcar_cuerpo,
-      is_buscar_cliente,
-      condicion_fact: this.condicion_fact,
-      modo_factura: this.modo_factura,
-      activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
+    if (salioDe === 'condicion') this.closePrimeSelect(this.condicionInput);
+    if (salioDe === 'venta') this.closePrimeSelect(this.ventaInput);
 
     if (is_enforcar) {
       fun.setTimeout(() => fun.enfocarInput(siguiente_input), 10);
     } else fun.desEnfocarInput(salioDe);
 
     if (is_buscar_cliente) this.abrirModalPropietario();
-    if (is_enforcar_cuerpo) this.cuerpo.seleccionarCampoEnTurno();
+    if (is_enforcar_cuerpo) {
+      this.closeFacturaPrimeSelects();
+      fun.setTimeout(() => this.cuerpo.seleccionarCampoEnTurno(), 20);
+    }
   }
 
   private focusPrimeSelect(selectComponent: any): void {
-    this.debugFacturacionKeyboard('prime-focus-requested', {
-      componentId: selectComponent?.inputId,
-      disabled: selectComponent?.$disabled?.(),
-      activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
-
     fun.setTimeout(() => {
       requestAnimationFrame(() => {
         if (!selectComponent || selectComponent.$disabled?.()) {
-          this.debugFacturacionKeyboard('prime-focus-cancelled', {
-            componentId: selectComponent?.inputId,
-            reason: !selectComponent ? 'no-component' : 'disabled',
-            activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-          });
           return;
         }
 
@@ -1060,46 +977,47 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         const firstIndex = selectComponent.findFirstOptionIndex?.();
         const optionIndex = selectedIndex !== -1 ? selectedIndex : firstIndex;
 
-        this.debugFacturacionKeyboard('prime-focus-before-open', {
-          componentId: selectComponent?.inputId,
-          focusInput: this.getFacturacionKeyboardElementInfo(focusInput ?? null),
-          selectedIndex,
-          firstIndex,
-          optionIndex,
-          activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-        });
-
         selectComponent.show?.(true);
         selectComponent.focusedOptionIndex?.set?.(optionIndex ?? -1);
         selectComponent.scrollInView?.();
         focusInput?.focus({ preventScroll: true });
 
-        this.debugFacturacionKeyboard('prime-focus-after-open', {
-          componentId: selectComponent?.inputId,
-          focusInput: this.getFacturacionKeyboardElementInfo(focusInput ?? null),
-          selectedIndex,
-          firstIndex,
-          optionIndex,
-          overlayVisible: selectComponent.overlayVisible,
-          focusedOptionIndex: selectComponent.focusedOptionIndex?.(),
-          activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-        });
-
         fun.setTimeout(() => {
           focusInput?.focus({ preventScroll: true });
-          this.debugFacturacionKeyboard('prime-focus-stabilized', {
-            componentId: selectComponent?.inputId,
-            focusInput: this.getFacturacionKeyboardElementInfo(focusInput ?? null),
-            overlayVisible: selectComponent.overlayVisible,
-            focusedOptionIndex: selectComponent.focusedOptionIndex?.(),
-            activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-          });
         }, 60);
       });
     }, 30);
   }
 
+  private closeFacturaPrimeSelects(): void {
+    this.closePrimeSelect(this.condicionInput);
+    this.closePrimeSelect(this.ventaInput);
+  }
+
+  private closePrimeSelect(selectComponent: any): void {
+    if (!selectComponent) return;
+
+    const close = () => {
+      selectComponent.hide?.();
+      const focusInput = selectComponent.focusInputViewChild?.nativeElement as HTMLElement | undefined;
+
+      focusInput?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Escape',
+          code: 'Escape',
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    };
+
+    close();
+    requestAnimationFrame(close);
+  }
+
   iniciarFactura() {
+    this.closeFacturaPrimeSelects();
+
     if (this.condicion_fact !== 'Crédito') {
       this.factServ.propietario_factura = this.formPropietario.getRawValue();
 
@@ -1754,13 +1672,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   selectModoFactura(arg) {
-    this.debugFacturacionKeyboard('sale-mode-change', {
-      value: arg,
-      modo_factura_before: this.modo_factura,
-      condicion_fact: this.condicion_fact,
-      activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
-
     // Resetear estados de modo de factura
     this.is_viaje = arg === 'viaje';
     this.is_adelantada = arg === 'adelantada';
@@ -1769,36 +1680,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.cuerpoStateServ.applyRetiradoState(this.cuerpoFactura, this.modo_factura === 'adelantada');
 
     this.validarClienteCasualPermitido();
-
-    this.debugFacturacionKeyboard('sale-mode-change-result', {
-      value: arg,
-      modo_factura_after: this.modo_factura,
-      is_viaje: this.is_viaje,
-      is_adelantada: this.is_adelantada,
-      activeElement: this.getFacturacionKeyboardElementInfo(document.activeElement as HTMLElement | null),
-    });
   }
 
   getCantidadArticulos() {
     return this.cuerpoFactura.filter(factura => fun.hasValue(factura.cantidad))?.length ?? 0;
-  }
-
-  private debugFacturacionKeyboard(message: string, data: Record<string, unknown>): void {
-    console.debug(JSON.stringify({ scope: 'facturacion-keyboard', message, ...data }));
-  }
-
-  private getFacturacionKeyboardElementInfo(element: HTMLElement | null): Record<string, unknown> | null {
-    if (!element) return null;
-
-    return {
-      id: element.id,
-      tagName: element.tagName,
-      className: element.className,
-      role: element.getAttribute('role'),
-      ariaExpanded: element.getAttribute('aria-expanded'),
-      ariaLabel: element.getAttribute('aria-label'),
-      text: element.textContent?.trim().slice(0, 80),
-    };
   }
 
   // =============================================

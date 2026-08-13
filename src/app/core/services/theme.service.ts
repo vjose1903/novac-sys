@@ -397,7 +397,7 @@ export class ThemeService {
       documentElement.setProperty('--primary05', '#3f7a49');
       documentElement.setProperty('--primary06', '#2e9a4585');
       documentElement.setProperty('--primary07', '#239128');
-      documentElement.setProperty('--primary08', '#1c761f');
+      documentElement.setProperty('--primary08', '#34a238');
       documentElement.setProperty('--primary09', '#1b5a17');
       documentElement.setProperty('--primary10', '#103c12');
 

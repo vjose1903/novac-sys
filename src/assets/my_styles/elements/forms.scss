@@ -4,10 +4,10 @@
 }
 
 @mixin primengFocus {
-  outline: 0 none;
+  outline: 2px solid var(--primary08) !important;
   outline-offset: 0;
   border-color: var(--app-field-focus-border, var(--primary08)) !important;
-  box-shadow: var(--app-field-focus-shadow, 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 20%, transparent)) !important;
+  box-shadow: none !important;
 }
 
 @mixin formField {
@@ -51,8 +51,8 @@
 @mixin formFieldFocus {
   color: var(--app-text) !important;
   border-color: var(--app-field-focus-border, var(--primary08)) !important;
-  box-shadow: var(--app-field-focus-shadow, 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 20%, transparent)) !important;
-  outline: 0 !important;
+  box-shadow: none !important;
+  outline: 2px solid var(--primary08) !important;
 }
 
 @mixin formFieldInvalid {
