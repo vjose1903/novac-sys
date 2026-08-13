@@ -48,10 +48,17 @@
 
       <div class="form-group">
         <label class="control-label">Razón: </label>
-        <select id="razon" (keydown.enter)="saltar('send')" formControlName="razon" class="form-control">
-          <option value="no_venta">Solo devolver</option>
-          <option value="producto_defectuoso">Producto defectuoso</option>
-        </select>
+        <p-select
+          inputId="razon"
+          formControlName="razon"
+          [options]="[
+            { label: 'Solo devolver', value: 'no_venta' },
+            { label: 'Producto defectuoso', value: 'producto_defectuoso' }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          (keydown.enter)="saltar('send')"></p-select>
       </div>
     </form>
   }

@@ -231,6 +231,32 @@
           color: var(--app-text) !important;
         }
 
+        :host ::ng-deep .p-select {
+          .p-select-label,
+          .p-select-label.p-inputtext,
+          .p-select-dropdown {
+            background: transparent !important;
+            border: 0 !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            outline: 0 !important;
+          }
+
+          &.p-focus,
+          &:focus-within,
+          &.p-select-open {
+            .p-select-label,
+            .p-select-label.p-inputtext,
+            .p-select-dropdown {
+              background: transparent !important;
+              border: 0 !important;
+              border-color: transparent !important;
+              box-shadow: none !important;
+              outline: 0 !important;
+            }
+          }
+        }
+
         .btn-tema {
           border-radius: 0.6rem !important;
           box-shadow: 0 0.35rem 0.7rem #00000021 !important;

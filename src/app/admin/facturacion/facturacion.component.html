@@ -58,7 +58,7 @@
 
   <div class="colCard">
     <div class="cardPrincipal cardFacturacion">
-      <div class="cabezaFactura">
+      <div class="cabezaFactura field-sm">
         <div class="row {{ factServ.isCotizacion() ? 'cotizacion-header-grid' : '' }}">
           @if (factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion) {
             <div class="col-3 divRight ps-0 invoice-document-panel">
@@ -91,19 +91,20 @@
                 <div class="{{ is_external ? 'col-12 ps-0' : factServ.isCompra() ? 'col-6' : 'col-9' }} p-0">
                   <!-- ================== CONDICION ================== -->
                   <span class="titulos"><strong>Condición:</strong></span>
-                  <select
+                  <p-select
                     #condicionInput
-                    id="condicion"
-                    (keydown.enter)="saltar(htmlServ.getId($event), condicionInput.value)"
-                    class="form-control inputE"
+                    inputId="condicion"
+                    styleClass="form-control inputE"
                     [(ngModel)]="condicion_fact"
-                    (change)="cambiarCondicion(htmlServ.getValue($event))"
+                    [options]="condiciones"
+                    optionLabel="nombre"
+                    optionValue="nombre"
+                    appendTo="body"
                     tabindex="-1"
                     [disabled]="is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
-                    [ngClass]="{ disabled: is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) }">
-                    <option value="Contado">Contado</option>
-                    <option value="Crédito">Crédito</option>
-                  </select>
+                    [ngClass]="{ disabled: is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) }"
+                    (keydown.enter)="saltar('condicion', condicion_fact)"
+                    (onChange)="cambiarCondicion($event.value)"></p-select>
                 </div>
 
                 @if (factServ.isCompra()) {
@@ -136,24 +137,22 @@
                 <div>
                   <!-- ================== VENTA ================== -->
                   <span class="me-2 mt-3 titulos"><strong>Venta: </strong></span>
-                  <select
+                  <p-select
                     #ventaInput
-                    id="venta"
-                    (keydown.enter)="saltar(htmlServ.getId($event), ventaInput.value)"
-                    (change)="selectModoFactura(htmlServ.getValue($event))"
-                    class="form-control inputE"
+                    inputId="venta"
+                    styleClass="form-control inputE"
                     [(ngModel)]="modo_factura"
-                    (blur)="checkCambiosModoyCondicionFactura({ elemento_html: $event.target })"
+                    [options]="modoFacturaOptions()"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Modo de venta"
+                    appendTo="body"
                     tabindex="-1"
                     [disabled]="is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante"
-                    [ngClass]="{ disabled: is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante }">
-                    <option value="" disabled selected>Modo de venta</option>
-                    <option value="normal">Normal</option>
-                    <option *ngxPermissionsOnly="permissions.factura_venta.seleccionar_camion_en_facturacion" value="viaje">Viaje</option>
-                    @if (condicion_fact == 'Contado') {
-                      <option value="adelantada">Adelantada</option>
-                    }
-                  </select>
+                    [ngClass]="{ disabled: is_external || (factServ.action == 'update' && fun.hasValue(factura_a_rellenar)) || errorComprobante }"
+                    (keydown.enter)="saltar('venta', modo_factura)"
+                    (onChange)="selectModoFactura($event.value)"
+                    (onBlur)="checkCambiosModoyCondicionFactura({ id: 'venta', value: modo_factura })"></p-select>
                 </div>
               }
               @if (modo_factura === 'viaje') {

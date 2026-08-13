@@ -18,12 +18,17 @@
               <div class="col-12 p-0">
                 <div class="form-group">
                   <label class="control-label">Tipo comprobante: <span style="color: red">*</span></label>
-                  <select (keydown.enter)="saltar('campoDesde')" id="tipo" [(ngModel)]="tipo_articulo_id" (change)="selectTipoFactura(htmlServ.getValue($event))" (blur)="checkTipoArticuloSelect()" class="form-control">
-                    <option value="{{ -1 }}" disabled>Tipo de comprobantes</option>
-                    @for (tipo of lista_tipos_facturas; track tipo.id) { @if (tipo.referencia) {
-                    <option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
-                    } }
-                  </select>
+                  <p-select
+                    inputId="tipo"
+                    [(ngModel)]="tipo_articulo_id"
+                    [options]="lista_tipos_facturas || []"
+                    optionLabel="descripcion"
+                    optionValue="id"
+                    placeholder="Tipo de comprobantes"
+                    appendTo="body"
+                    (keydown.enter)="saltar('campoDesde')"
+                    (onChange)="selectTipoFactura($event.value)"
+                    (onBlur)="checkTipoArticuloSelect()"></p-select>
                   @if (aletarTipoArticulo) {
                   <div class="alerta text-danger ms-1" style="font-size: 12px">Debe de seleccionar tipo de comprobante</div>
                   }
@@ -110,13 +115,16 @@
             <dinamic-table [cardTabla]="cardTabla" [(data)]="listaNCF" [seleccionado]="ncfSelected?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
 
             <div class="filtroNCF" style="top: 0.6rem; left: 1rem">
-              <select class="form-control select" [(ngModel)]="filtro" (change)="filtrarNCF()">
-                <option value="0" disabled>Filtrar por tipo</option>
-                <option value="todos">Todos</option>
-                @for (tipo of lista_tipos_facturas; track tipo.id) {
-                <option value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
-                }
-              </select>
+              <p-select
+                inputId="filtroNCF"
+                styleClass="form-control select field-sm"
+                [(ngModel)]="filtro"
+                [options]="ncfFiltroOptions()"
+                optionLabel="descripcion"
+                optionValue="id"
+                placeholder="Filtrar por tipo"
+                appendTo="body"
+                (onChange)="filtrarNCF()"></p-select>
             </div>
           </div>
         </div>

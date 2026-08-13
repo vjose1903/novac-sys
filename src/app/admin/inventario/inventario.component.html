@@ -21,13 +21,16 @@
       <dinamic-table [cardTabla]="cardTabla" [(data)]="listaArticulos" [(TablasComponent)]="tablaComponent" [config]="table_roles_config" (table_events)="handle_table_events($event)"></dinamic-table>
 
       <div class="divFiltro">
-        <select class="form-control filtroArticulos" [(ngModel)]="filtro" (change)="filtrarArticulos()">
-          <option value="0" disabled>Filtro por tipo de articulos</option>
-          <option value="todos">Todos</option>
-          @for (tipo of tipo_articulos; track tipo.id) {
-            <option value="{{ tipo.codigo }}">{{ tipo.descripcion }}</option>
-          }
-        </select>
+        <p-select
+          inputId="filtroArticulos"
+          styleClass="form-control filtroArticulos field-sm"
+          [(ngModel)]="filtro"
+          [options]="tipoArticuloFiltroOptions()"
+          optionLabel="descripcion"
+          optionValue="codigo"
+          placeholder="Filtro por tipo de articulos"
+          appendTo="body"
+          (onChange)="filtrarArticulos()"></p-select>
 
         <btn-icon-circular id="btnNota" icon="fas fa-print" size="size-lg" tooltip="Reporte de inventario" tooltipPosition="left" (clickFunction)="makeReporte()"> </btn-icon-circular>
 

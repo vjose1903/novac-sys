@@ -108,11 +108,19 @@
                   <div class="col-4 p-0 ps-2">
                     <div class="form-group">
                       <label class="control-label">Sexo: <span style="color: red">*</span></label>
-                      <select #selectSexo id="campoSexo" (keydown.enter)="saltar('campoFecha')" formControlName="sexo" class="form-control">
-                        <option value="" disabled selected hidden>Sexo</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Femenino</option>
-                      </select>
+                      <p-select
+                        #selectSexo
+                        inputId="campoSexo"
+                        formControlName="sexo"
+                        [options]="[
+                          { label: 'Masculino', value: 'M' },
+                          { label: 'Femenino', value: 'F' }
+                        ]"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sexo"
+                        appendTo="body"
+                        (keydown.enter)="saltar('campoFecha')"></p-select>
                       <form-error-msg [control]="form.get('sexo')" [fieldElement]="selectSexo"></form-error-msg>
                     </div>
                   </div>

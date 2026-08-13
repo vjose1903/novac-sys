@@ -73,6 +73,30 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     suplidor: request_factura_campo.suplidor_id,
   };
 
+  buscarPorOptions() {
+    const tipoDocumento = this.tipo_documento_selected();
+    const documentoLabel = tipoDocumento == tipoDocFacturacion.cotizacion ? 'cotización' : 'factura';
+    const ultimasLabel = tipoDocumento == tipoDocFacturacion.cotizacion ? 'cotizaciones' : 'facturas';
+    const options = [];
+
+    if (tipoDocumento != tipoDocFacturacion.compra) options.push({ label: 'Por cliente', value: this.campos.cliente });
+    if (tipoDocumento == tipoDocFacturacion.compra) options.push({ label: 'Por suplidor', value: this.campos.suplidor });
+    if (tipoDocumento != tipoDocFacturacion.cotizacion) options.push({ label: 'Por número comprobante', value: this.campos.numeroComprobante });
+
+    options.push({ label: `Por número ${documentoLabel}`, value: this.campos.numeroFactura });
+    options.push({ label: `Ultimas 50 ${ultimasLabel}`, value: this.campos.ultimas50 });
+
+    return options;
+  }
+
+  tipoFacturaOptions() {
+    return [
+      { label: 'Factura de consumo', value: '3' },
+      { label: 'Factura con Valor Fiscal', value: '2' },
+      { label: 'Todas', value: '0' },
+    ];
+  }
+
   facturasSerieOptions: seriesDgiiI[] = [];
   serieSelected = signal<serie>(serie.all);
 
@@ -557,7 +581,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
     const tipos_cero = [this.campos.numeroComprobante, this.campos.ultimas50, this.campos.numeroFactura, this.campos.cliente, this.campos.suplidor].map(item => `${item}`);
 
-    if (tipos_cero.includes(valor)) this.tipo_factura_id = '0';
+    if (tipos_cero.includes(`${valor}`)) this.tipo_factura_id = '0';
 
     if (valor == this.campos.ultimas50) this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
 

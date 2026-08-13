@@ -2,11 +2,93 @@
 
 .p-datepicker {
   width: 100% !important;
+
   .p-datepicker-input {
     @include formField;
+    padding: var(--app-field-padding-y-md, 0.38rem) var(--app-field-padding-x-md, 0.72rem) !important;
 
     &.minSize {
-      padding: 0.15rem 1rem;
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.p-disabled,
+  &:has(.p-datepicker-input:disabled),
+  &:has(.p-datepicker-input[disabled]) {
+    .p-datepicker-input {
+      @include formFieldDisabled;
+    }
+  }
+
+  .p-datepicker-input:disabled,
+  .p-datepicker-input[disabled] {
+    @include formFieldDisabled;
+  }
+
+  &:hover:not(.p-disabled):not(:has(.p-datepicker-input:disabled)):not(:has(.p-datepicker-input[disabled])):not(:focus-within) {
+    .p-datepicker-input {
+      border-color: var(--app-input-hover-border) !important;
+      box-shadow: var(--app-field-hover-shadow, 0 0.45rem 0.9rem -0.75rem #0000008a) !important;
+    }
+  }
+
+  &:focus-within {
+    .p-datepicker-input {
+      @include formFieldFocus;
+    }
+  }
+
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    .p-datepicker-input {
+      @include formFieldInvalid;
+    }
+  }
+
+  &.field-sm,
+  &.form-field-sm,
+  &.input-sm {
+    .p-datepicker-input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.field-lg,
+  &.form-field-lg,
+  &.input-lg {
+    .p-datepicker-input {
+      min-height: var(--app-field-height-lg, 3rem) !important;
+      padding: 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
+  }
+}
+
+.field-sm,
+.form-field-sm,
+.input-sm {
+  .p-datepicker {
+    .p-datepicker-input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+}
+
+.field-lg,
+.form-field-lg,
+.input-lg {
+  .p-datepicker {
+    .p-datepicker-input {
+      min-height: var(--app-field-height-lg, 3rem) !important;
+      padding: 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
     }
   }
 }
@@ -18,7 +100,9 @@
 .p-datepicker-panel {
   margin-top: 0.3rem !important;
   padding: 0rem !important;
-  border-radius: 0.4rem !important;
+  border-radius: var(--app-field-overlay-radius, 0.85rem) !important;
+  box-shadow: var(--app-overlay-shadow) !important;
+  overflow: hidden;
   z-index: 999999 !important;
 
   .p-datepicker-calendar-container {
@@ -26,7 +110,7 @@
       .p-datepicker-header {
         background: var(--primary02) !important;
         padding: 0.3rem !important;
-        border-radius: 0.3rem 0.3rem 0 0 !important;
+        border-radius: var(--app-field-overlay-radius, 0.85rem) var(--app-field-overlay-radius, 0.85rem) 0 0 !important;
 
         .p-datepicker-prev-button,
         .p-datepicker-next-button {

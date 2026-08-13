@@ -162,7 +162,21 @@ body {
   --app-input-bg: #ffffffe8;
   --app-input-focus-bg: var(--primary01);
   --app-input-disabled-bg: #e9ecef;
-  --app-input-disabled-text: #1d253b;
+  --app-field-placeholder: color-mix(in srgb, var(--app-text-muted) 30%, transparent);
+  --app-input-disabled-text: var(--app-field-placeholder);
+  --app-field-radius: 0.72rem;
+  --app-field-overlay-radius: 0.85rem;
+  --app-field-height-sm: 2.05rem;
+  --app-field-height-md: 2.45rem;
+  --app-field-height-lg: 3rem;
+  --app-field-padding-y-md: 0.38rem;
+  --app-field-padding-x-md: 0.72rem;
+  --app-field-focus-border: var(--primary08);
+  --app-field-focus-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 20%, transparent);
+  --app-field-hover-shadow: 0 0.45rem 0.9rem -0.75rem #0000008a;
+  --app-field-shadow: 0 0.25rem 0.65rem -0.55rem #00000073;
+  --app-field-invalid-border: #dc3545;
+  --app-field-invalid-shadow: 0 0 0 0.16rem color-mix(in srgb, #dc3545 18%, transparent);
   --app-shadow: 0 4px 14px -6px #000;
   --app-overlay-shadow: 0 5px 10px 0 #00000043;
   --app-button-shadow: 0 2px 3px 0 #a0a0a0;
@@ -221,9 +235,63 @@ input::placeholder,
 textarea::placeholder,
 .p-inputtext::placeholder,
 .p-inputnumber-input::placeholder,
-.p-inputmask input::placeholder {
-  color: var(--app-text-muted) !important;
-  opacity: 0.7 !important;
+.p-inputmask input::placeholder,
+.p-datepicker-input::placeholder {
+  color: var(--app-field-placeholder, var(--app-text-muted)) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--app-field-placeholder, var(--app-text-muted)) !important;
+}
+
+input:disabled:not(.entrada),
+input[disabled]:not(.entrada),
+textarea:disabled,
+textarea[disabled],
+.form-control.disabled:not(.entrada),
+.inputE.disabled:not(.entrada),
+.p-inputtext:disabled:not(.entrada),
+.p-inputtext[disabled]:not(.entrada),
+.p-inputnumber-input:disabled:not(.entrada),
+.p-inputnumber-input[disabled]:not(.entrada),
+.p-inputmask input:disabled,
+.p-inputmask input[disabled],
+.p-inputmask.p-disabled input,
+.p-inputmask.disabled input,
+.p-datepicker.p-disabled .p-datepicker-input,
+.p-datepicker:has(.p-datepicker-input:disabled) .p-datepicker-input,
+.p-select.p-disabled .p-select-label,
+.p-multiselect.p-disabled .p-multiselect-label,
+.p-autocomplete.p-disabled .p-autocomplete-input {
+  color: var(--app-input-disabled-text) !important;
+  -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+}
+
+input:disabled::placeholder,
+input[disabled]::placeholder,
+textarea:disabled::placeholder,
+textarea[disabled]::placeholder,
+.p-inputtext:disabled::placeholder,
+.p-inputtext[disabled]::placeholder,
+.p-inputnumber-input:disabled::placeholder,
+.p-inputnumber-input[disabled]::placeholder,
+.p-inputmask input:disabled::placeholder,
+.p-inputmask input[disabled]::placeholder,
+.p-inputmask.p-disabled input::placeholder,
+.p-inputmask.disabled input::placeholder,
+.p-datepicker.p-disabled .p-datepicker-input::placeholder,
+.p-datepicker:has(.p-datepicker-input:disabled) .p-datepicker-input::placeholder {
+  color: var(--app-field-placeholder, var(--app-text-muted)) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--app-field-placeholder, var(--app-text-muted)) !important;
+}
+
+.p-select.p-disabled .p-select-dropdown,
+.p-select.p-disabled .p-select-dropdown svg,
+.p-multiselect.p-disabled .p-multiselect-dropdown,
+.p-multiselect.p-disabled .p-multiselect-dropdown svg,
+.p-autocomplete.p-disabled .p-autocomplete-dropdown {
+  color: var(--app-input-disabled-text) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
 }
 
 .border,
@@ -285,6 +353,22 @@ select:not(:focus):hover,
 .p-inputnumber-input:not(:focus):hover,
 .p-inputmask input:not(:focus):hover {
   border-color: var(--app-input-hover-border) !important;
+}
+
+.p-select .p-select-label,
+.p-select .p-select-label.p-inputtext,
+.p-select .p-select-dropdown,
+.p-select.p-focus .p-select-label,
+.p-select.p-focus .p-select-label.p-inputtext,
+.p-select.p-focus .p-select-dropdown,
+.p-select:focus-within .p-select-label,
+.p-select:focus-within .p-select-label.p-inputtext,
+.p-select:focus-within .p-select-dropdown {
+  background: transparent !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
 }
 
 .table-cell-text {

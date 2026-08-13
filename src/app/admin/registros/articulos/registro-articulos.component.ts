@@ -68,6 +68,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     { backend: 'Galon', front: 'Galón' },
     { backend: 'Bolsa', front: 'Bolsa' },
   ];
+  compradoEnOptions = ['Quintal', 'Libra', 'Saco', 'Caja', 'Unidad', 'Galon', 'Bolsa'];
+  medidaHijoOptions = ['Unidad'];
 
   articuloClass = new ArticuloC();
   tipoArticuloClass = new TipoArticuloC();
@@ -118,6 +120,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
     this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then(result => {
       this.hasPermissionUpdateFormula = result;
+      this.syncTipoArticuloDisabled();
     });
 
     this.FORM = this.form.controls;
@@ -170,7 +173,29 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.listaTipoArticulos = [];
     this.tipoArticuloClass.getAll().then(res => {
       this.listaTipoArticulos = fun.deepCloning(res.data);
+      this.syncTipoArticuloDisabled();
     });
+  }
+
+  syncTipoArticuloDisabled() {
+    if (!this.listaTipoArticulos) return;
+
+    this.listaTipoArticulos = this.listaTipoArticulos.map(tipo => ({
+      ...tipo,
+      optionDisabled: tipo.codigo == 'producto_terminado' && !this.hasPermissionUpdateFormula,
+    }));
+  }
+
+  medidaContenidoPadreOptions() {
+    const medida = this.form?.controls?.['medida']?.value;
+    const options = [];
+
+    if (medida === 'Saco') options.push('Libra');
+    if (medida === 'Caja') options.push('Paquete');
+    if (medida === 'Caja' || medida === 'Producto' || medida === 'Bolsa') options.push('Unidad');
+    if (medida === 'Galon') options.push('Onza');
+
+    return options;
   }
 
   openModalConfig() {

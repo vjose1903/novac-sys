@@ -129,22 +129,36 @@
                   <div class="col-6 p-0 ps-2">
                     <div class="form-group" [appMsgError]="'sexo'" [form]="form">
                       <label class="control-label">Sexo: <span style="color: red">*</span></label>
-                      <select id="campoSexo" formControlName="sexo" class="form-control" (keydown.enter)="saltar('campoDias')">
-                        <option [value]="null" disabled>Sexo</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Femenino</option>
-                      </select>
+                      <p-select
+                        inputId="campoSexo"
+                        formControlName="sexo"
+                        [options]="[
+                          { label: 'Masculino', value: 'M' },
+                          { label: 'Femenino', value: 'F' }
+                        ]"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sexo"
+                        appendTo="body"
+                        (keydown.enter)="saltar('campoDias')"></p-select>
                       <span id="msgContainer_sexo"></span>
                     </div>
                   </div>
                   <div class="col-6 p-0 pe-2">
                     <div class="form-group" [appMsgError]="'limite_credito'" [form]="form">
                       <label class="control-label">Dias credito: <span style="color: red">*</span></label>
-                      <select id="campoDias" formControlName="limite_credito" class="form-control" (keydown.enter)="saltar('maximo_credito')">
-                        <option [value]="null" disabled>Seleccione</option>
-                        <option value="15">15 dias</option>
-                        <option value="30">30 dias</option>
-                      </select>
+                      <p-select
+                        inputId="campoDias"
+                        formControlName="limite_credito"
+                        [options]="[
+                          { label: '15 dias', value: 15 },
+                          { label: '30 dias', value: 30 }
+                        ]"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Seleccione"
+                        appendTo="body"
+                        (keydown.enter)="saltar('maximo_credito')"></p-select>
                       <span id="msgContainer_limite_credito"></span>
                     </div>
                   </div>
@@ -158,12 +172,18 @@
                   <div class="col-6 p-0 pe-2">
                     <div class="form-group" [appMsgError]="'vendedor_id'" [form]="form">
                       <label class="control-label">Vendedor: <span style="color: red">*</span></label>
-                      <select id="campoVendedor" formControlName="vendedor_id" class="form-control" (keydown.enter)="saltar('provincia_select')">
-                        <option [value]="null" disabled>Seleccione</option>
-                        @for (item of vendedores; track item.id) {
-                          <option value="{{ item.id }}">{{ item.nombre_completo }}</option>
-                        }
-                      </select>
+                      <p-select
+                        inputId="campoVendedor"
+                        formControlName="vendedor_id"
+                        [options]="vendedores || []"
+                        optionLabel="nombre_completo"
+                        optionValue="id"
+                        placeholder="Seleccione"
+                        appendTo="body"
+                        [filter]="true"
+                        filterBy="nombre_completo"
+                        [resetFilterOnHide]="true"
+                        (keydown.enter)="saltar('provincia_select')"></p-select>
                       <span id="msgContainer_vendedor_id"></span>
                     </div>
                   </div>

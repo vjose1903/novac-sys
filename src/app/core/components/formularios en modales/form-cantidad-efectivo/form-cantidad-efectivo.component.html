@@ -31,12 +31,19 @@
 
       <div class="cash-field">
         <label for="formaPago">Forma de pago</label>
-        <select [(ngModel)]="formaPago" id="formaPago" (keydown.enter)="saltar('send')" class="form-control">
-          <option value="Efectivo">Efectivo</option>
-          <option value="Tarjeta">Tarjeta</option>
-          <option value="Transferencia">Transferencia Bancaria</option>
-          <option value="Cheque">Cheque</option>
-        </select>
+        <p-select
+          inputId="formaPago"
+          [(ngModel)]="formaPago"
+          [options]="[
+            { label: 'Efectivo', value: 'Efectivo' },
+            { label: 'Tarjeta', value: 'Tarjeta' },
+            { label: 'Transferencia Bancaria', value: 'Transferencia' },
+            { label: 'Cheque', value: 'Cheque' }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          (keydown.enter)="saltar('send')"></p-select>
       </div>
 
       <div class="cash-return-card">

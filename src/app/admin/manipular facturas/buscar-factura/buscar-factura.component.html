@@ -28,19 +28,18 @@
             @if (buscarPara == 'solo_ver') {
               <div class="form-group flex-1">
                 <label class="control-label mb-0">Tipo: </label>
-                <select
-                  id="tipoI"
+                <p-select
+                  inputId="tipoI"
                   [ngModel]="tipo_documento_selected()"
                   (ngModelChange)="tipo_documento_selected.set($event)"
-                  class="form-control inputE"
-                  (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
-                  (change)="changeSelect('tipo_documento', htmlServ.getValue($event))"
-                  value="">
-                  <option [value]="null" selected disabled>Escoger tipo</option>
-                  @for (tipo of tipos_documentos; track $index) {
-                    <option [value]="tipo.value">{{ tipo.label }}</option>
-                  }
-                </select>
+                  styleClass="form-control inputE"
+                  [options]="tipos_documentos"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Escoger tipo"
+                  appendTo="body"
+                  (keydown.enter)="saltar('tipoI', tipo_documento_selected())"
+                  (onChange)="changeSelect('tipo_documento', $event.value)"></p-select>
               </div>
             }
 
@@ -48,27 +47,18 @@
             <div class="form-group flex-2">
               <label class="control-label mb-0">Buscar {{ tipo_documento_selected() == 'cotizacion' ? 'cotización' : 'factura' }} por : </label>
 
-              <select
-                id="buscarPorI"
+              <p-select
+                inputId="buscarPorI"
                 [(ngModel)]="buscar_por"
-                class="form-control inputE"
-                (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))"
-                (change)="changeSelect('buscar_por', htmlServ.getValue($event))"
-                value=""
-                [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected())">
-                <option [value]="null" selected disabled>Escoger tipo</option>
-                @if (tipo_documento_selected() != 'compra') {
-                  <option value="1">Por cliente</option>
-                }
-                @if (tipo_documento_selected() == 'compra') {
-                  <option value="5">Por suplidor</option>
-                }
-                @if (tipo_documento_selected() != 'cotizacion') {
-                  <option value="2">Por número comprobante</option>
-                }
-                <option value="3">Por número {{ tipo_documento_selected() == 'cotizacion' ? 'cotización' : 'factura' }}</option>
-                <option value="4">Ultimas 50 {{ tipo_documento_selected() == 'cotizacion' ? 'cotizaciones' : 'facturas' }}</option>
-              </select>
+                styleClass="form-control inputE"
+                [options]="buscarPorOptions()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Escoger tipo"
+                appendTo="body"
+                [disabled]="buscarPara == 'solo_ver' && fun.isEmpty(tipo_documento_selected())"
+                (keydown.enter)="saltar('buscarPorI', buscar_por)"
+                (onChange)="changeSelect('buscar_por', $event.value)"></p-select>
             </div>
 
           </div>
@@ -92,13 +82,7 @@
             @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected() != 'cotizacion') {
               <div class="form-group flex-1">
                 <label class="control-label mb-0">Tipo factura : </label>
-                <select id="campoTipoFact" [(ngModel)]="tipo_factura_id" class="form-control inputE" (keydown.enter)="saltar(htmlServ.getId($event), htmlServ.getValue($event))">
-                  <option [value]="null" selected disabled>Escoger tipo</option>
-                  <option value="3">Factura de consumo</option>
-                  <option value="2">Factura con Valor Fiscal</option>
-                  <!-- <option value="1">Factura sin comprobante</option> -->
-                  <option value="0">Todas</option>
-                </select>
+                <p-select inputId="campoTipoFact" [(ngModel)]="tipo_factura_id" styleClass="form-control inputE" [options]="tipoFacturaOptions()" optionLabel="label" optionValue="value" placeholder="Escoger tipo" appendTo="body" (keydown.enter)="saltar('campoTipoFact', tipo_factura_id)"></p-select>
               </div>
             }
 

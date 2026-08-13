@@ -3,53 +3,175 @@
 .p-select {
   display: flex !important;
   align-items: center !important;
+  overflow: hidden !important;
 
   @include formField;
 
-  .p-select-label {
+  .p-select-label,
+  .p-select-label.p-inputtext {
+    background: transparent !important;
+    border: 0 !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     color: var(--app-text) !important;
+    align-items: center;
+    display: flex !important;
+    min-height: calc(var(--app-field-height-md, 2.45rem) - 2px);
+    padding: var(--app-field-padding-y-md, 0.38rem) 0 var(--app-field-padding-y-md, 0.38rem) var(--app-field-padding-x-md, 0.72rem) !important;
 
     &.p-placeholder {
-      color: var(--app-text-muted) !important;
-      opacity: 0.7;
+      @include formFieldPlaceholder;
+    }
+
+    &:focus,
+    &:focus-visible,
+    &:hover {
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: 0 !important;
     }
   }
 
-  
-  &.p-focus,
-  &.p-select-open {
-    @include formFieldFocus;
-  }
-  
-  &.p-disabled {
-    @include formFieldDisabled;
-    
-    .p-select-label {
-      &.p-placeholder,
-      &::placeholder {
-        color: #717a82 !important;
-        opacity: 1;
-      }
+  .p-select-dropdown {
+    background: transparent !important;
+    border: 0 !important;
+    border-color: transparent !important;
+    border-left: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: var(--app-text-muted) !important;
+    width: 2.35rem !important;
+
+    &:focus,
+    &:focus-visible,
+    &:hover {
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: 0 !important;
+    }
+
+    svg {
+      color: var(--app-text-muted) !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
     }
   }
-  
+
+  &:hover:not(.p-disabled):not(.p-focus):not(.p-select-open) {
+    border-color: var(--app-input-hover-border) !important;
+    box-shadow: var(--app-field-hover-shadow, 0 0.45rem 0.9rem -0.75rem #0000008a) !important;
+  }
+
+  &.p-focus,
+  &.p-select-open,
+  &:focus-within {
+    @include formFieldFocus;
+
+    .p-select-label,
+    .p-select-label.p-inputtext,
+    .p-select-dropdown {
+      background: transparent !important;
+      border: 0 !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+      outline: 0 !important;
+    }
+  }
+
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    @include formFieldInvalid;
+  }
+
+  &.p-disabled {
+    @include formFieldDisabled;
+
+    .p-select-label {
+      color: var(--app-input-disabled-text) !important;
+      -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+
+      &.p-placeholder,
+      &::placeholder {
+        @include formFieldPlaceholder;
+      }
+    }
+
+    .p-select-dropdown,
+    .p-select-dropdown svg {
+      color: var(--app-input-disabled-text) !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+    }
+  }
+
   &.min {
     .p-select-label {
-      padding: 0 0.1rem 0 0.1rem !important;
+      min-height: calc(var(--app-field-height-sm, 2.05rem) - 2px);
+      padding: 0 0.1rem 0 0.45rem !important;
+    }
+  }
+
+  &.field-sm,
+  &.form-field-sm,
+  &.input-sm {
+    height: var(--app-field-height-sm, 2.05rem) !important;
+    min-height: var(--app-field-height-sm, 2.05rem) !important;
+
+    .p-select-label {
+      height: 100%;
+      min-height: 0;
+      padding: 0.18rem 0 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.field-lg,
+  &.form-field-lg,
+  &.input-lg {
+    min-height: var(--app-field-height-lg, 3rem) !important;
+
+    .p-select-label {
+      min-height: calc(var(--app-field-height-lg, 3rem) - 2px);
+      padding: 0.55rem 0 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
     }
   }
 
   .p-select-clear-icon {
     margin-right: 0.5rem !important;
   }
+}
 
-  .p-select-dropdown {
-    color: var(--app-text) !important;
+.field-sm,
+.form-field-sm,
+.input-sm {
+  .p-select {
+    height: var(--app-field-height-sm, 2.05rem) !important;
+    min-height: var(--app-field-height-sm, 2.05rem) !important;
 
-    svg {
-      color: var(--app-text) !important;
-      fill: currentColor !important;
-      stroke: currentColor !important;
+    .p-select-label {
+      height: 100%;
+      min-height: 0;
+      padding: 0.18rem 0 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+}
+
+.field-lg,
+.form-field-lg,
+.input-lg {
+  .p-select {
+    min-height: var(--app-field-height-lg, 3rem) !important;
+
+    .p-select-label {
+      min-height: calc(var(--app-field-height-lg, 3rem) - 2px);
+      padding: 0.55rem 0 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
     }
   }
 }
@@ -57,15 +179,29 @@
 .p-overlay:has(.p-overlay-content .p-select-overlay) {
   z-index: 999999999 !important;
   max-width: min-content !important;
+  background: transparent !important;
+
+  .p-overlay-content {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
   .p-select-overlay {
+    background: var(--app-surface) !important;
+    border: 1px solid var(--app-border) !important;
+    border-radius: var(--app-field-overlay-radius, 0.85rem) !important;
+    box-shadow: var(--app-overlay-shadow) !important;
+    overflow: hidden;
+
     .p-select-header {
-      padding: 0.2rem !important;
+      padding: 0.45rem !important;
 
       .p-select-filter {
-        background: var(--app-input-bg) !important;
-        border: 1px solid var(--app-border) !important;
-        color: var(--app-text) !important;
-        border-radius: 0.25rem !important;
+        @include formField;
+        min-height: var(--app-field-height-sm, 2.05rem) !important;
+        padding: 0.18rem 0.5rem !important;
 
         &:focus {
           @include formFieldFocus;
@@ -74,10 +210,17 @@
     }
 
     .p-select-list-container {
+      background: transparent !important;
+
       .p-select-list {
+        background: transparent !important;
+
         .p-select-option {
-          min-height: 2.2rem;
+          min-height: 2.25rem;
+          border-radius: 0.55rem;
+          margin: 0.12rem 0.25rem;
           text-wrap: wrap;
+
           &.p-select-option-selected {
             background-color: var(--app-select-option-selected-bg) !important;
             color: var(--app-select-option-selected-text) !important;

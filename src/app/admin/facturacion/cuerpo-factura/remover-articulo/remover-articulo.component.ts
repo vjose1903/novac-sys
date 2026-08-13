@@ -36,7 +36,7 @@ export class RemoverArticuloComponent implements OnInit, IDynamicModal {
     this.form = this.fb.group({
       all: [{ value: false, disabled: false }],
       cantidad: [{ value: 0, disabled: false }, Validators.required],
-      razon: [{ value: null, disabled: false }, Validators.required],
+      razon: [{ value: 'no_venta', disabled: false }, Validators.required],
     });
   }
 

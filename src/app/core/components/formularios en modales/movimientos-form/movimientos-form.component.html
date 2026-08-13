@@ -8,10 +8,18 @@
   <div class="col-12">
     <div class="form-group">
       <label class="control-label">Tipo movimiento: </label>
-      <select id="tipo_movimiento" (keydown.enter)="saltar(tipo_movimiento === 'entrada' ? 'medida' : 'tipo_salida')" [(ngModel)]="tipo_movimiento" class="form-control" (change)="selectTipoMov()">
-        <option value="entrada">Entrada</option>
-        <option value="salida">Salida</option>
-      </select>
+      <p-select
+        inputId="tipo_movimiento"
+        [(ngModel)]="tipo_movimiento"
+        [options]="[
+          { label: 'Entrada', value: 'entrada' },
+          { label: 'Salida', value: 'salida' }
+        ]"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        (keydown.enter)="saltar(tipo_movimiento === 'entrada' ? 'medida' : 'tipo_salida')"
+        (onChange)="selectTipoMov()"></p-select>
     </div>
   </div>
 
@@ -19,11 +27,18 @@
     <div class="col-12">
       <div class="form-group">
         <label class="control-label">Tipo de salida: </label>
-        <select id="tipo_salida" (keydown.enter)="saltar('medida')" [(ngModel)]="tipo_salida" class="form-control">
-          <option value="perdida">Perdida</option>
-          <option value="caduco">Caducó</option>
-          <option value="producto_defectuoso">Producto defectuoso</option>
-        </select>
+        <p-select
+          inputId="tipo_salida"
+          [(ngModel)]="tipo_salida"
+          [options]="[
+            { label: 'Perdida', value: 'perdida' },
+            { label: 'Caducó', value: 'caduco' },
+            { label: 'Producto defectuoso', value: 'producto_defectuoso' }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          (keydown.enter)="saltar('medida')"></p-select>
       </div>
     </div>
   }
@@ -31,11 +46,7 @@
   <div class="col-12">
     <div class="form-group">
       <label class="control-label {{ tipo_movimiento === 'salida' ? 'mt-3' : '' }}">Medida: </label>
-      <select id="medida" (keydown.enter)="saltar('cantidad')" [(ngModel)]="medida" class="form-control">
-        @for (item of medidas; track item) {
-          <option value="{{ item }}">{{ item }}</option>
-        }
-      </select>
+      <p-select inputId="medida" [(ngModel)]="medida" [options]="medidas || []" appendTo="body" (keydown.enter)="saltar('cantidad')"></p-select>
     </div>
   </div>
 

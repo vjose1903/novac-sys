@@ -150,12 +150,7 @@
       <div class="col-12 p-0">
         <div class="form-group">
           <label class="control-label mb-0">Condicion: <span style="color: red">*</span> </label>
-          <select formControlName="condicion" class="form-control" [attr.disabled]="is_external ? true : null">
-            <option disabled>Seleccione</option>
-            @for (condicion of condiciones; track condicion.id) {
-              <option [value]="condicion.id">{{ condicion.label }}</option>
-            }
-          </select>
+          <p-select formControlName="condicion" [options]="condiciones" optionLabel="label" optionValue="id" placeholder="Seleccione" appendTo="body" [disabled]="is_external"></p-select>
         </div>
       </div>
     }
@@ -165,12 +160,7 @@
       <div class="col-12 p-0">
         <div class="form-group">
           <label class="control-label mb-0">Tipo: <span style="color: red">*</span> </label>
-          <select formControlName="tipo" class="form-control" (change)="changeTipo()" [attr.disabled]="isTypeDisabled() ? true : null">
-            <option disabled>Seleccione</option>
-            @for (tipo of tipos; track tipo) {
-              <option [value]="tipo.id">{{ tipo.label }}</option>
-            }
-          </select>
+          <p-select formControlName="tipo" [options]="tipos || []" optionLabel="label" optionValue="id" placeholder="Seleccione" appendTo="body" [disabled]="isTypeDisabled()" (onChange)="changeTipo()"></p-select>
         </div>
       </div>
     }
@@ -180,12 +170,7 @@
       <div class="col-12 p-0">
         <div class="form-group">
           <label class="control-label mb-0">Tipo de factura: <span style="color: red">*</span> </label>
-          <select formControlName="tipo_factura_id" class="form-control" [attr.disabled]="is_external ? true : null">
-            <option disabled>Seleccione</option>
-            @for (tipo of tipos_facturas; track tipo) {
-              <option [value]="tipo.id">{{ tipo.label }}</option>
-            }
-          </select>
+          <p-select formControlName="tipo_factura_id" [options]="tipos_facturas || []" optionLabel="label" optionValue="id" placeholder="Seleccione" appendTo="body" [disabled]="is_external"></p-select>
         </div>
       </div>
     }

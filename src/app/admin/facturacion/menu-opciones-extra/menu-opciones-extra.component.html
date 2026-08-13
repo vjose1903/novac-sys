@@ -6,12 +6,7 @@
       </div>
       <div class="col-3 me-0">
         <div class="form-group">
-          <select id="filterKeyI" [(ngModel)]="filter_key" class="form-control inputE" (change)="selectFiltro()">
-            <option [value]="null" selected disabled>Escoger tipo</option>
-            @for (tipo of tipos_filtro; track $index) {
-              <option [value]="tipo.key">{{ tipo.label }}</option>
-            }
-          </select>
+          <p-select inputId="filterKeyI" [(ngModel)]="filter_key" styleClass="form-control inputE" [options]="tipos_filtro" optionLabel="label" optionValue="key" placeholder="Escoger tipo" appendTo="body" (onChange)="selectFiltro()"></p-select>
         </div>
       </div>
 

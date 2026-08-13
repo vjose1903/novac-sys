@@ -173,6 +173,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   condiciones = [{ nombre: 'Contado' }, { nombre: 'Crédito' }];
 
+  modoFacturaOptions() {
+    const options = [{ label: 'Normal', value: 'normal' }];
+
+    if (this.hasPermisoCamiones) options.push({ label: 'Viaje', value: 'viaje' });
+    if (this.condicion_fact == 'Contado') options.push({ label: 'Adelantada', value: 'adelantada' });
+
+    return options;
+  }
+
   articuloClass = new ArticuloC();
 
   ncfClass = new NcfC();

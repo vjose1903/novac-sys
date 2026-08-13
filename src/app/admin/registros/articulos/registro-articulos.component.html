@@ -74,18 +74,17 @@
                   <div class="col-6 p-0">
                     <div class="form-group">
                       <label class="control-label">Tipo: <span style="color: red">*</span></label>
-                      <select
-                        (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
-                        id="tipo"
+                      <p-select
+                        inputId="tipo"
                         formControlName="tipo_articulo_id"
-                        (change)="selectTipoArticulo(htmlServ.getValue($event))"
-                        class="form-control"
-                        value="">
-                        <option [value]="null" disabled>Tipo de articulo</option>
-                        @for (tipo of listaTipoArticulos; track tipo.id) {
-                          <option [disabled]="tipo.codigo == 'producto_terminado' ? !hasPermissionUpdateFormula : false" value="{{ tipo.id }}">{{ tipo.descripcion }}</option>
-                        }
-                      </select>
+                        [options]="listaTipoArticulos || []"
+                        optionLabel="descripcion"
+                        optionValue="id"
+                        optionDisabled="optionDisabled"
+                        placeholder="Tipo de articulo"
+                        appendTo="body"
+                        (keydown.enter)="saltar(!tipoArticuloSelected || tipoArticuloSelected?.descripcion !== 'Producto terminado' ? 'comprado' : 'vendido')"
+                        (onChange)="selectTipoArticulo($event.value)"></p-select>
                       @if (!form.controls['tipo_articulo_id'].valid && (form.controls['tipo_articulo_id'].dirty || form.controls['tipo_articulo_id'].touched)) {
                         <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione tipo de articulo</div>
                       }
@@ -95,12 +94,7 @@
                     <div class="col-6 pe-0">
                       <div class="form-group">
                         <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                        <select formControlName="vendido_en" (keydown.enter)="saltar('articulo_id', -1)" id="vendido" class="form-control" value="">
-                          <option [value]="null" disabled>Tipo</option>
-                          @for (item of vendidoEn; track item) {
-                            <option value="{{ item.backend }}">{{ item.front }}</option>
-                          }
-                        </select>
+                        <p-select inputId="vendido" formControlName="vendido_en" [options]="vendidoEn" optionLabel="front" optionValue="backend" placeholder="Tipo" appendTo="body" (keydown.enter)="saltar('articulo_id', -1)"></p-select>
                         @if (!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione una opcion</div>
                         }
@@ -136,16 +130,7 @@
                         <div class="form-group">
                           <label class="control-label">Comprado en: <span style="color: red">*</span></label>
                           <!-- (keydown.enter)="saltar(tipoArticuloSelected?.descripcion === 'Materia prima' ? 'vendido' : 'costo_principal')" -->
-                          <select formControlName="medida" (keydown.enter)="saltar('vendido')" id="comprado" class="form-control" (change)="resetCompradoEn(htmlServ.getValue($event))">
-                            <option [value]="null" disabled>Tipo</option>
-                            <option value="Quintal">Quintal</option>
-                            <option value="Libra">Libra</option>
-                            <option value="Saco">Saco</option>
-                            <option value="Caja">Caja</option>
-                            <option value="Unidad">Unidad</option>
-                            <option value="Galon">Galón</option>
-                            <option value="Bolsa">Bolsa</option>
-                          </select>
+                          <p-select inputId="comprado" formControlName="medida" [options]="compradoEnOptions" placeholder="Tipo" appendTo="body" (keydown.enter)="saltar('vendido')" (onChange)="resetCompradoEn($event.value)"></p-select>
                           @if (!form.controls['medida'].valid && (form.controls['medida'].dirty || form.controls['medida'].touched)) {
                             <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione una opcion</div>
                           }
@@ -157,12 +142,7 @@
                       <div class="col-6 pe-0">
                         <div class="form-group">
                           <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                          <select formControlName="vendido_en" (keydown.enter)="saltar('costo_principal')" id="vendido" class="form-control" value="">
-                            <option [value]="null" disabled>Tipo</option>
-                            @for (item of vendidoEn; track item) {
-                              <option value="{{ item.backend }}">{{ item.front }}</option>
-                            }
-                          </select>
+                          <p-select inputId="vendido" formControlName="vendido_en" [options]="vendidoEn" optionLabel="front" optionValue="backend" placeholder="Tipo" appendTo="body" (keydown.enter)="saltar('costo_principal')"></p-select>
                           @if (!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)) {
                             <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione una opcion</div>
                           }
@@ -230,12 +210,7 @@
                                 autocomplete="off" />
                             </div>
                             <div class="col-6 p-0">
-                              <select (keydown.enter)="saltar('in_medida_alerta')" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarContenidoCaja()" [ngClass]="{ badAlert: articulo_no_paquete }">
-                                <option [value]="null" disabled>Seleccione</option>
-                                @for (item of optionsAlerta; track item) {
-                                  <option value="{{ item }}">{{ item }}</option>
-                                }
-                              </select>
+                              <p-select inputId="medida_alerta" formControlName="medida_alerta" [options]="optionsAlerta || []" placeholder="Seleccione" appendTo="body" [ngClass]="{ badAlert: articulo_no_paquete }" (keydown.enter)="saltar('in_medida_alerta')" (onChange)="seleccionarContenidoCaja()"></p-select>
                             </div>
                           </div>
                           @if (!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)) {
@@ -422,12 +397,7 @@
                                 autocomplete="off" />
                             </div>
                             <div class="col-6 p-0">
-                              <select (keydown.enter)="saltar('in_medida_alerta')" class="form-control" formControlName="medida_alerta" id="medida_alerta" (change)="seleccionarContenidoCaja()" [ngClass]="{ badAlert: articulo_no_paquete }">
-                                <option [value]="null" disabled>Seleccione</option>
-                                @for (item of optionsAlerta; track item) {
-                                  <option value="{{ item }}">{{ item }}</option>
-                                }
-                              </select>
+                              <p-select inputId="medida_alerta" formControlName="medida_alerta" [options]="optionsAlerta || []" placeholder="Seleccione" appendTo="body" [ngClass]="{ badAlert: articulo_no_paquete }" (keydown.enter)="saltar('in_medida_alerta')" (onChange)="seleccionarContenidoCaja()"></p-select>
                             </div>
                           </div>
                           @if (!form.controls['aviso_existencia'].valid && (form.controls['aviso_existencia'].dirty || form.controls['aviso_existencia'].touched)) {
@@ -487,21 +457,7 @@
                     <div class="col-5">
                       <div class="form-group">
                         <label class="control-label text-transparent">medida </label>
-                        <select (keydown.enter)="saltar('precio_padre')" id="medidaPadre" formControlName="medida_contenido_padre" (change)="seleccionarContenidoCaja()" class="form-control" value="">
-                          <option [value]="null" disabled>Seleccione</option>
-                          @if (form.controls['medida'].value === 'Saco') {
-                            <option value="Libra">Libra</option>
-                          }
-                          @if (form.controls['medida'].value === 'Caja') {
-                            <option value="Paquete">Paquete</option>
-                          }
-                          @if (form.controls['medida'].value === 'Caja' || form.controls['medida'].value === 'Producto' || form.controls['medida'].value === 'Bolsa') {
-                            <option value="Unidad">Unidad</option>
-                          }
-                          @if (form.controls['medida'].value === 'Galon') {
-                            <option value="Onza">Onza</option>
-                          }
-                        </select>
+                        <p-select inputId="medidaPadre" formControlName="medida_contenido_padre" [options]="medidaContenidoPadreOptions()" placeholder="Seleccione" appendTo="body" (keydown.enter)="saltar('precio_padre')" (onChange)="seleccionarContenidoCaja()"></p-select>
                         @if (!form.controls['medida_contenido_padre'].valid && (form.controls['medida_contenido_padre'].dirty || form.controls['medida_contenido_padre'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                         }
@@ -559,10 +515,7 @@
                     <div class="col-5">
                       <div class="form-group">
                         <label class="control-label text-transparent">medida </label>
-                        <select (keydown.enter)="saltar('precio_hijo')" id="medidaHijo" formControlName="medida_contenido_hijo" class="form-control" value="">
-                          <option [value]="null" disabled>Seleccione</option>
-                          <option value="Unidad">Unidad</option>
-                        </select>
+                        <p-select inputId="medidaHijo" formControlName="medida_contenido_hijo" [options]="medidaHijoOptions" placeholder="Seleccione" appendTo="body" (keydown.enter)="saltar('precio_hijo')"></p-select>
                         @if (!form.controls['medida_contenido_hijo'].valid && (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                         }

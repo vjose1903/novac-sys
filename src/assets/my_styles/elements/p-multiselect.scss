@@ -3,21 +3,22 @@
 
 .p-multiselect {
   width: 100%;
-  border-radius: 0.25rem !important;
-  background-color: var(--app-input-bg) !important;
-  color: var(--app-text) !important;
-  background: var(--app-input-bg);
-  border: 1px solid var(--app-border) !important;
-  box-shadow: 1px 1px 4px 0px rgba(29, 37, 59, 0.2392156863) !important;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  @include formField;
 
-  &:hover {
+  &:hover:not(.p-disabled):not(.p-focus) {
     cursor: pointer;
+    border-color: var(--app-input-hover-border) !important;
+    box-shadow: var(--app-field-hover-shadow, 0 0.45rem 0.9rem -0.75rem #0000008a) !important;
   }
 
   .p-multiselect-label-container {
     .p-multiselect-label {
+      align-items: center;
+      color: var(--app-text) !important;
+      display: flex;
+      min-height: calc(var(--app-field-height-md, 2.45rem) - 2px);
       overflow: auto;
+      padding: var(--app-field-padding-y-md, 0.38rem) 0 var(--app-field-padding-y-md, 0.38rem) var(--app-field-padding-x-md, 0.72rem) !important;
       @include noScrollbar;
 
       .p-multiselect-chip-item {
@@ -26,6 +27,22 @@
           border-radius: 0.4rem !important;
         }
       }
+
+      &.p-placeholder {
+        @include formFieldPlaceholder;
+      }
+    }
+  }
+
+  .p-multiselect-dropdown {
+    color: var(--app-text-muted) !important;
+    width: 2.35rem !important;
+
+    svg,
+    .p-multiselect-dropdown-icon {
+      color: var(--app-text-muted) !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
     }
   }
 
@@ -47,24 +64,102 @@
     @include formFieldFocus;
   }
 
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    @include formFieldInvalid;
+  }
+
   &.p-disabled {
     @include formFieldDisabled;
+
+    .p-multiselect-label {
+      color: var(--app-input-disabled-text) !important;
+      -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+
+      &.p-placeholder {
+        @include formFieldPlaceholder;
+      }
+    }
+
+    .p-multiselect-dropdown,
+    .p-multiselect-dropdown svg,
+    .p-multiselect-dropdown .p-multiselect-dropdown-icon {
+      color: var(--app-input-disabled-text) !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+    }
+  }
+
+  &.field-sm,
+  &.form-field-sm,
+  &.input-sm {
+    min-height: var(--app-field-height-sm, 2.05rem) !important;
+
+    .p-multiselect-label-container .p-multiselect-label {
+      min-height: calc(var(--app-field-height-sm, 2.05rem) - 2px);
+      padding: 0.18rem 0 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.field-lg,
+  &.form-field-lg,
+  &.input-lg {
+    min-height: var(--app-field-height-lg, 3rem) !important;
+
+    .p-multiselect-label-container .p-multiselect-label {
+      min-height: calc(var(--app-field-height-lg, 3rem) - 2px);
+      padding: 0.55rem 0 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
+  }
+}
+
+.field-sm,
+.form-field-sm,
+.input-sm {
+  .p-multiselect {
+    min-height: var(--app-field-height-sm, 2.05rem) !important;
+
+    .p-multiselect-label-container .p-multiselect-label {
+      min-height: calc(var(--app-field-height-sm, 2.05rem) - 2px);
+      padding: 0.18rem 0 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+}
+
+.field-lg,
+.form-field-lg,
+.input-lg {
+  .p-multiselect {
+    min-height: var(--app-field-height-lg, 3rem) !important;
+
+    .p-multiselect-label-container .p-multiselect-label {
+      min-height: calc(var(--app-field-height-lg, 3rem) - 2px);
+      padding: 0.55rem 0 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
   }
 }
 
 .p-overlay:has(.p-overlay-content .p-multiselect-overlay) {
   max-width: min-content !important;
+
   .p-multiselect-overlay {
+    border-radius: var(--app-field-overlay-radius, 0.85rem) !important;
+    box-shadow: var(--app-overlay-shadow) !important;
+    overflow: hidden;
     z-index: 9999 !important;
 
     .p-multiselect-header {
-      padding: 0.2rem !important;
+      padding: 0.45rem !important;
 
       .p-multiselect-filter {
-        background: var(--app-input-bg) !important;
-        border: 1px solid var(--app-border) !important;
-        color: var(--app-text) !important;
-        border-radius: 0.25rem !important;
+        @include formField;
+        min-height: var(--app-field-height-sm, 2.05rem) !important;
+        padding: 0.18rem 0.5rem !important;
 
         &:focus {
           @include formFieldFocus;
@@ -75,7 +170,9 @@
     .p-multiselect-list-container {
       .p-multiselect-list {
         .p-multiselect-option {
-          min-height: 2.2rem;
+          min-height: 2.25rem;
+          border-radius: 0.55rem;
+          margin: 0.12rem 0.25rem;
           text-wrap: wrap;
         }
       }

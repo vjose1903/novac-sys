@@ -6,22 +6,26 @@
 @mixin primengFocus {
   outline: 0 none;
   outline-offset: 0;
-  border-color: transparent !important;
-  box-shadow: 0px 0px 6px var(--primary08) !important;
+  border-color: var(--app-field-focus-border, var(--primary08)) !important;
+  box-shadow: var(--app-field-focus-shadow, 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 20%, transparent)) !important;
 }
 
 @mixin formField {
   width: 100%;
+  min-height: var(--app-field-height-md, 2.45rem);
   background-color: var(--app-input-bg) !important;
   color: var(--app-text) !important;
-  box-shadow: 1px 1px 4px 0px #1d253b3d !important;
+  box-shadow: var(--app-field-shadow, 0 0.25rem 0.65rem -0.55rem #00000073) !important;
   border: 1px solid var(--app-border) !important;
-  border-radius: 0.25rem !important;
+  border-radius: var(--app-field-radius, 0.72rem) !important;
+  box-sizing: border-box !important;
+  caret-color: var(--primary08);
   transition:
-    background-color 0.2s,
-    color 0.2s,
-    border-color 0.2s,
-    box-shadow 0.2s;
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    outline-color 160ms ease;
 
   &:focus {
     @include formFieldFocus;
@@ -30,20 +34,43 @@
   &:hover {
     cursor: pointer;
     border-color: var(--app-input-hover-border) !important;
+    box-shadow: var(--app-field-hover-shadow, 0 0.45rem 0.9rem -0.75rem #0000008a) !important;
   }
 }
 
 @mixin formFieldDisabled {
-  background-color: #e9ecef !important;
   background-color: var(--app-input-disabled-bg) !important;
   opacity: 1 !important;
+  border-color: var(--app-border) !important;
+  box-shadow: none !important;
+  color: var(--app-input-disabled-text) !important;
+  cursor: not-allowed !important;
+  -webkit-text-fill-color: var(--app-input-disabled-text) !important;
 }
 
 @mixin formFieldFocus {
   color: var(--app-text) !important;
-  border-color: transparent !important;
-  box-shadow: 0px 0px 6px var(--primary08) !important;
-  outline: 2px solid var(--primary08) !important;
+  border-color: var(--app-field-focus-border, var(--primary08)) !important;
+  box-shadow: var(--app-field-focus-shadow, 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 20%, transparent)) !important;
+  outline: 0 !important;
+}
+
+@mixin formFieldInvalid {
+  border-color: var(--app-field-invalid-border, #dc3545) !important;
+  box-shadow: var(--app-field-invalid-shadow, 0 0 0 0.16rem color-mix(in srgb, #dc3545 18%, transparent)) !important;
+}
+
+@mixin formFieldPlaceholder {
+  color: var(--app-field-placeholder, var(--app-text-muted)) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--app-field-placeholder, var(--app-text-muted)) !important;
+}
+
+@mixin formFieldSize($height, $padding-y, $padding-x, $font-size) {
+  height: $height !important;
+  min-height: $height !important;
+  padding: $padding-y $padding-x !important;
+  font-size: $font-size !important;
 }
 
 .p-tag {
@@ -71,33 +98,27 @@
 
 textarea {
   width: 100% !important;
-  border-radius: 0.25rem !important;
   @include formField;
+  min-height: 5.8rem;
+  padding: 0.65rem 0.8rem !important;
+  resize: vertical;
+
   &:focus {
     @include formFieldFocus;
   }
 }
 
 .inputE {
-  height: calc(1.5em + 0.3rem + 2px) !important;
-  padding: 0.2rem 0.7rem !important;
+  min-height: var(--app-field-height-md, 2.45rem) !important;
+  padding: var(--app-field-padding-y-md, 0.38rem) var(--app-field-padding-x-md, 0.72rem) !important;
   width: 100%;
-  border: 1px solid #a6a6a6a6 !important;
-  border-radius: 0.25rem !important;
   @include formField;
 
   &.disabled,
   &:disabled {
-    background-color: var(--app-input-disabled-bg) !important;
-    border-color: var(--app-border) !important;
-    color: var(--app-input-disabled-text) !important;
-    opacity: 1 !important;
-    cursor: not-allowed !important;
+    @include formFieldDisabled;
     touch-action: none !important;
     pointer-events: none !important;
-    box-shadow: none !important;
-    outline: 0 !important;
-    -webkit-text-fill-color: var(--app-input-disabled-text) !important;
   }
 
   &.disabled:focus,
@@ -105,18 +126,16 @@ textarea {
   &.disabled.ng-invalid,
   &.disabled.ng-dirty,
   &.disabled.ng-touched {
-    background-color: var(--app-input-disabled-bg) !important;
-    border-color: var(--app-border) !important;
+    @include formFieldDisabled;
     box-shadow: none !important;
     outline: 0 !important;
-    color: var(--app-input-disabled-text) !important;
-    -webkit-text-fill-color: var(--app-input-disabled-text) !important;
   }
 }
 
 .form-control {
   width: 100%;
-  border-radius: 0.25rem !important;
+  min-height: var(--app-field-height-md, 2.45rem);
+  padding: var(--app-field-padding-y-md, 0.38rem) var(--app-field-padding-x-md, 0.72rem);
 
   &:hover {
     border-color: var(--app-input-hover-border) !important;
@@ -128,23 +147,14 @@ textarea {
 
   @include formField;
   &.min {
-    height: 2rem !important;
-    padding: 0.2rem !important;
+    @include formFieldSize(var(--app-field-height-sm, 2.05rem), 0.18rem, 0.45rem, 0.82rem);
   }
 
   &.disabled,
   &:disabled {
-    background-color: #e9ecef;
-    background-color: var(--app-input-disabled-bg) !important;
-    border-color: var(--app-border) !important;
-    color: var(--app-input-disabled-text) !important;
-    opacity: 1 !important;
-    cursor: not-allowed !important;
+    @include formFieldDisabled;
     touch-action: none !important;
     pointer-events: none !important;
-    box-shadow: none !important;
-    outline: 0 !important;
-    -webkit-text-fill-color: var(--app-input-disabled-text) !important;
   }
 
   &.disabled:focus,
@@ -152,12 +162,9 @@ textarea {
   &.disabled.ng-invalid,
   &.disabled.ng-dirty,
   &.disabled.ng-touched {
-    background-color: var(--app-input-disabled-bg) !important;
-    border-color: var(--app-border) !important;
+    @include formFieldDisabled;
     box-shadow: none !important;
     outline: 0 !important;
-    color: var(--app-input-disabled-text) !important;
-    -webkit-text-fill-color: var(--app-input-disabled-text) !important;
   }
 
   &.with-right-btn {
@@ -172,6 +179,7 @@ textarea {
     border-color: var(--app-border);
     color: var(--app-text);
     height: 100%;
+    border-radius: var(--app-field-radius, 0.72rem);
   }
 }
 
@@ -221,6 +229,263 @@ textarea {
   }
   &:hover {
     border-color: var(--app-input-hover-border) !important;
+  }
+}
+
+input.form-control:not(.entrada),
+input.inputE:not(.entrada),
+textarea.form-control,
+select.form-control:not(.entrada),
+select.inputE:not(.entrada),
+.p-inputtext:not(.entrada) {
+  &.ng-invalid.ng-touched:not(:disabled),
+  &.ng-invalid.ng-dirty:not(:disabled),
+  &.is-invalid:not(:disabled) {
+    &:not(.disabled) {
+      @include formFieldInvalid;
+    }
+  }
+}
+
+select.form-control:not(.entrada),
+select.inputE:not(.entrada) {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--app-text-muted) 50%),
+    linear-gradient(135deg, var(--app-text-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1rem) 50%,
+    calc(100% - 0.72rem) 50%;
+  background-repeat: no-repeat;
+  background-size:
+    0.32rem 0.32rem,
+    0.32rem 0.32rem;
+  padding-right: 2.1rem !important;
+}
+
+.form-field-sm,
+.field-sm,
+.input-sm {
+  &.form-control,
+  &.inputE,
+  &.p-inputtext {
+    @include formFieldSize(var(--app-field-height-sm, 2.05rem), 0.18rem, 0.5rem, 0.82rem);
+  }
+}
+
+.form-field-sm,
+.field-sm,
+.input-sm {
+  .form-control:not(.entrada),
+  .inputE:not(.entrada),
+  .p-inputtext:not(.entrada) {
+    @include formFieldSize(var(--app-field-height-sm, 2.05rem), 0.18rem, 0.5rem, 0.82rem);
+  }
+}
+
+.form-field-md,
+.field-md,
+.input-md {
+  &.form-control,
+  &.inputE,
+  &.p-inputtext {
+    @include formFieldSize(var(--app-field-height-md, 2.45rem), var(--app-field-padding-y-md, 0.38rem), var(--app-field-padding-x-md, 0.72rem), 0.95rem);
+  }
+}
+
+.form-field-md,
+.field-md,
+.input-md {
+  .form-control:not(.entrada),
+  .inputE:not(.entrada),
+  .p-inputtext:not(.entrada) {
+    @include formFieldSize(var(--app-field-height-md, 2.45rem), var(--app-field-padding-y-md, 0.38rem), var(--app-field-padding-x-md, 0.72rem), 0.95rem);
+  }
+}
+
+.form-field-lg,
+.field-lg,
+.input-lg {
+  &.form-control,
+  &.inputE,
+  &.p-inputtext {
+    @include formFieldSize(var(--app-field-height-lg, 3rem), 0.55rem, 0.9rem, 1.05rem);
+  }
+}
+
+.form-field-lg,
+.field-lg,
+.input-lg {
+  .form-control:not(.entrada),
+  .inputE:not(.entrada),
+  .p-inputtext:not(.entrada) {
+    @include formFieldSize(var(--app-field-height-lg, 3rem), 0.55rem, 0.9rem, 1.05rem);
+  }
+}
+
+.form-control-sm {
+  @include formFieldSize(var(--app-field-height-sm, 2.05rem), 0.18rem, 0.5rem, 0.82rem);
+}
+
+.form-control-lg {
+  @include formFieldSize(var(--app-field-height-lg, 3rem), 0.55rem, 0.9rem, 1.05rem);
+}
+
+.fake-input,
+.input-fake,
+.field-fake,
+.currency-input {
+  background: var(--app-input-bg) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: var(--app-field-radius, 0.72rem) !important;
+  box-shadow: var(--app-field-shadow, 0 0.25rem 0.65rem -0.55rem #00000073) !important;
+  color: var(--app-text) !important;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+
+  &:hover:not(:focus-within) {
+    border-color: var(--app-input-hover-border) !important;
+    box-shadow: var(--app-field-hover-shadow, 0 0.45rem 0.9rem -0.75rem #0000008a) !important;
+  }
+
+  &:focus-within {
+    @include formFieldFocus;
+  }
+
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    @include formFieldInvalid;
+  }
+}
+
+.p-inputnumber {
+  display: inline-flex;
+  width: 100%;
+
+  .p-inputnumber-input {
+    @include formField;
+  }
+
+  .p-inputnumber-button {
+    background: color-mix(in srgb, var(--primary06) 22%, var(--app-surface)) !important;
+    border-color: var(--app-border) !important;
+    color: var(--primary08) !important;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease;
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary06) 34%, var(--app-surface)) !important;
+      border-color: var(--app-input-hover-border) !important;
+    }
+  }
+
+  &.p-focus,
+  &:focus-within {
+    .p-inputnumber-input {
+      @include formFieldFocus;
+    }
+  }
+
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    .p-inputnumber-input {
+      @include formFieldInvalid;
+    }
+  }
+
+  &.field-sm,
+  &.form-field-sm,
+  &.input-sm {
+    .p-inputnumber-input {
+      @include formFieldSize(var(--app-field-height-sm, 2.05rem), 0.18rem, 0.5rem, 0.82rem);
+    }
+  }
+
+  &.field-lg,
+  &.form-field-lg,
+  &.input-lg {
+    .p-inputnumber-input {
+      @include formFieldSize(var(--app-field-height-lg, 3rem), 0.55rem, 0.9rem, 1.05rem);
+    }
+  }
+}
+
+.field-sm,
+.form-field-sm,
+.input-sm {
+  .p-inputnumber .p-inputnumber-input,
+  .p-autocomplete .p-autocomplete-input {
+    @include formFieldSize(var(--app-field-height-sm, 2.05rem), 0.18rem, 0.5rem, 0.82rem);
+  }
+}
+
+.field-lg,
+.form-field-lg,
+.input-lg {
+  .p-inputnumber .p-inputnumber-input,
+  .p-autocomplete .p-autocomplete-input {
+    @include formFieldSize(var(--app-field-height-lg, 3rem), 0.55rem, 0.9rem, 1.05rem);
+  }
+}
+
+.p-autocomplete {
+  width: 100%;
+
+  .p-autocomplete-input {
+    @include formField;
+  }
+
+  .p-autocomplete-dropdown {
+    border-radius: 0 var(--app-field-radius, 0.72rem) var(--app-field-radius, 0.72rem) 0 !important;
+  }
+
+  &.p-focus,
+  &:focus-within {
+    .p-autocomplete-input {
+      @include formFieldFocus;
+    }
+  }
+
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    .p-autocomplete-input {
+      @include formFieldInvalid;
+    }
+  }
+}
+
+.p-overlay:has(.p-overlay-content .p-autocomplete-overlay) {
+  z-index: 999999999 !important;
+
+  .p-autocomplete-overlay {
+    background: var(--app-surface) !important;
+    border: 1px solid var(--app-border) !important;
+    border-radius: var(--app-field-overlay-radius, 0.85rem) !important;
+    box-shadow: var(--app-overlay-shadow) !important;
+    color: var(--app-text) !important;
+    overflow: hidden;
+
+    .p-autocomplete-list {
+      .p-autocomplete-option {
+        border-radius: 0.55rem;
+        color: var(--app-text) !important;
+        margin: 0.12rem 0.25rem;
+        min-height: 2.25rem;
+
+        &:hover,
+        &.p-focus {
+          background: var(--app-hover) !important;
+          color: var(--app-text) !important;
+        }
+      }
+    }
   }
 }
 

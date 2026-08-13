@@ -6,7 +6,7 @@
   background-color: transparent;
   border: 0 !important;
   box-shadow: none !important;
-  border-radius: 0.25rem !important;
+  border-radius: var(--app-field-radius, 0.72rem) !important;
   overflow: hidden;
   padding: 0;
 
@@ -41,13 +41,23 @@
     }
   }
 
+  &:hover:not(:has(input:disabled)):not(:has(input[disabled])) {
+    input {
+      border-color: var(--app-input-hover-border) !important;
+      box-shadow: var(--app-field-hover-shadow, 0 0.45rem 0.9rem -0.75rem #0000008a) !important;
+    }
+  }
+
   &:focus {
     box-shadow: none;
   }
 
   &.min {
-    height: 2rem !important;
-    padding: 0.2rem !important;
+    input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
   }
 
   &.disabled,
@@ -66,6 +76,34 @@
     border-bottom-right-radius: 0 !important;
   }
 
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    input {
+      @include formFieldInvalid;
+    }
+  }
+
+  &.field-sm,
+  &.form-field-sm,
+  &.input-sm {
+    input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.field-lg,
+  &.form-field-lg,
+  &.input-lg {
+    input {
+      min-height: var(--app-field-height-lg, 3rem) !important;
+      padding: 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
+  }
+
   &:has(> .p-inputtext:disabled),
   &:has(> .p-inputtext[disabled]),
   &:has(> .p-inputtext.disabled) {
@@ -78,5 +116,29 @@
   &:has(input[disabled]),
   &:has(input.disabled) {
     cursor: not-allowed !important;
+  }
+}
+
+.field-sm,
+.form-field-sm,
+.input-sm {
+  .p-inputmask {
+    input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+}
+
+.field-lg,
+.form-field-lg,
+.input-lg {
+  .p-inputmask {
+    input {
+      min-height: var(--app-field-height-lg, 3rem) !important;
+      padding: 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
   }
 }

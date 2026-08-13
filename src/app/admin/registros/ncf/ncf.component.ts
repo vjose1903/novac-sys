@@ -78,6 +78,10 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   htmlServ = inject(HtmlElementsService);
   dynamicModalServ = inject(DynamicModalService);
+
+  ncfFiltroOptions() {
+    return [{ id: 'todos', descripcion: 'Todos' }, ...(this.lista_tipos_facturas || [])];
+  }
   private tServ = inject(TablasService);
 
   constructor() {

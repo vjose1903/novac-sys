@@ -56,12 +56,16 @@
                   </div>
 
                   <div class="col-8 pe-0">
-                    <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [class.production-select-placeholder]="!medida_producir" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
-                      <option value="" disabled>Medida</option>
-                      @for (item of optionsMedidas; track $index) {
-                        <option value="{{ item }}">{{ item }}</option>
-                      }
-                    </select>
+                    <p-select
+                      inputId="medida_producir"
+                      styleClass="form-control inputE"
+                      [class.production-select-placeholder]="!medida_producir"
+                      [(ngModel)]="medida_producir"
+                      [options]="optionsMedidas"
+                      placeholder="Medida"
+                      appendTo="body"
+                      (keydown.enter)="saltar('agregar')"
+                      (onChange)="calcularCantidadAProduccir()"></p-select>
                   </div>
                 </div>
               </div>
