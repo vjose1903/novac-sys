@@ -9,6 +9,7 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { tipoDocFacturacion } from '@admin/facturacion/factura';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
+import { DivisaService } from '@admin/registros/divisa/divisa.service';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
@@ -36,6 +37,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   configApp: ConfigI;
 
   tipoDocFacturacion = tipoDocFacturacion;
+  divisaPrincipalSimbolo = 'RD$';
 
   @Input() modalWrapper!: DynamicModalComponent;
   @Input() modalConfig!: IModalConfiguration;
@@ -48,6 +50,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   @Input() condicion_fact: string;
 
   htmlServ = inject(HtmlElementsService);
+  divisaServ = inject(DivisaService);
 
   constructor(private shServ: SharedService) {
     super();
@@ -56,6 +59,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   ngOnInit() {
     this.efectivo = fun.hasValue(this.efectivo) ? this.formatoNumero(this.efectivo) : '0.00';
     if (!this.cambios_articulos) this.cambiar_articulos = 'no';
+    this.setDivisaPrincipal();
+    this.cargarDivisaPrincipal();
   }
 
   ngAfterViewInit(): void {
@@ -79,6 +84,24 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     } else {
       this.is_print = this.documentos_a_imprimir.includes(this.metodo);
     }
+  }
+
+  async cargarDivisaPrincipal() {
+    try {
+      const divisas = await this.divisaServ.getDivisas();
+      this.setDivisaPrincipal(divisas);
+    } catch (error) {
+      this.setDivisaPrincipal();
+    }
+  }
+
+  setDivisaPrincipal(divisas = this.divisaServ.listaDivisas) {
+    const divisaPrincipal = divisas?.find(divisa => divisa.is_principal) || this.divisaServ.getDivisaPrincipalInfo();
+    this.divisaPrincipalSimbolo = divisaPrincipal?.simbolo || 'RD$';
+  }
+
+  focusInputEfectivo() {
+    fun.enfocarInput('inputEfectivo');
   }
 
   saltar(campo, valor?) {

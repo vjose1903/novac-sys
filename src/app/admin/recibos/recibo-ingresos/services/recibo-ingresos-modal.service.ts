@@ -36,9 +36,12 @@ export class ReciboIngresosModalService {
     cantidadEfectivoModalConfig.width = '35rem';
     cantidadEfectivoModalConfig.component = FormCantidadEfectivoComponent;
     cantidadEfectivoModalConfig.closableEsc = true;
+    cantidadEfectivoModalConfig.contentStyleClass = 'confirmation-modal-content';
+    cantidadEfectivoModalConfig.styleClass = 'confirmation-dialog';
+    cantidadEfectivoModalConfig.transitionOptions = '180ms cubic-bezier(0.23, 1, 0.32, 1)';
     cantidadEfectivoModalConfig.botones = [
-      { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
-      { id: 'btnConfirmar', clase: 'btn btn-verde', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
+      { clase: 'btn-light-grey', action: modalActionsE.close, label: 'Cancelar', disable: false },
+      { id: 'btnConfirmar', clase: 'btn-green', functionInOtherComponent: 'btn_aceptar', label: 'Confirmar', disable: true },
     ];
     cantidadEfectivoModalConfig.setCallback(callback);
 
