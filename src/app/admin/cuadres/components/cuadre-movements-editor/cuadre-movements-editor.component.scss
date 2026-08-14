@@ -23,8 +23,12 @@
 .cuadre-grid {
   display: grid;
   gap: 0.45rem;
-  grid-template-columns: minmax(7rem, 0.9fr) minmax(10rem, 1.3fr) minmax(8rem, 1fr) minmax(7rem, 1fr) 2.25rem;
+  grid-template-columns: minmax(6rem, 0.9fr) minmax(7rem, 1.3fr) minmax(6rem, 1fr) minmax(5.5rem, 1fr) 2.25rem;
   margin-top: 0.75rem;
+}
+
+.cuadre-grid > * {
+  min-width: 0;
 }
 
 .cuadre-grid strong {
