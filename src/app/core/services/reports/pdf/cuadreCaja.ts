@@ -270,26 +270,21 @@ function contenidoReporteDetallado(data) {
   const operationalTotal = getFirstValue(totals, ['operational_total', 'total'], toNumber(physicalCashTotal) + toNumber(otherPaymentMethodsTotal) + toNumber(additionalTransfersTotal));
   const systemIncomeTotal = getFirstValue(systemIncome, ['system_income_total'], getFirstValue(totals, ['system_income_total'], 0));
   const creditInvoicesTotal = getFirstValue(systemIncome, ['credit_invoices_total'], getFirstValue(totals, ['credit_invoices_total'], 0));
-  const openingCashFund = getFirstValue(totals, ['opening_cash_fund'], 0);
-  const expectedTotal = getFirstValue(totals, ['expected_total'], toNumber(systemIncomeTotal) + toNumber(openingCashFund));
-  const differenceAmount = getFirstValue(totals, ['difference_amount', 'difference'], toNumber(operationalTotal) - toNumber(expectedTotal));
+  const nextDayCashFund = getFirstValue(totals, ['next_day_cash_fund'], data.next_day_cash_fund || 0);
   const notes = String(data.notes || '').trim();
 
   return [
     makeCompactDenominationSection('BILLETES', bills, false),
     makeCompactDenominationSection('MONEDAS', coins, false),
     foreignCurrency.length ? makeCompactDenominationSection('DIVISAS', foreignCurrency, true) : emptyBlock(),
-    makeCompactTotalLine('TOTALES', physicalCashTotal),
     makeCompactMovementSection('TARJETAS, CHEQUES, DEPOSITOS Y TRANSFERENCIAS', otherPaymentMethods, otherPaymentMethodsTotal),
     makeCompactMovementSection('TRANSFERENCIAS ADICIONALES', additionalTransfers, additionalTransfersTotal),
+    makeCompactTotalLine('TOTAL EFECTIVO DEL DIA', operationalTotal),
     makeCompactTotalsSection({
       finalConsumerInvoicesTotal: getFirstValue(systemIncome, ['final_consumer_invoices_total'], getFirstValue(totals, ['final_consumer_invoices_total'], 0)),
       incomeReceiptsTotal: getFirstValue(systemIncome, ['income_receipts_total'], getFirstValue(totals, ['income_receipts_total'], 0)),
       systemIncomeTotal,
-      operationalTotal,
-      openingCashFund,
-      expectedTotal,
-      differenceAmount,
+      nextDayCashFund,
     }),
     makeInformativeCreditInvoicesSection(creditInvoicesTotal),
     makeSignatureSection(),
@@ -341,12 +336,12 @@ function makeCompactDenominationSection(title: string, rows: any[], showRate: bo
 
 function makeCompactTotalLine(label: string, total) {
   return {
-    margin: [0, -5, 0, 8],
+    margin: [0, 0, 0, 10],
     table: {
       widths: [160, '*', 105],
       body: [[{ text: label, bold: true, style: 'letra9', alignment: 'left', margin: [7, 3, 0, 3] }, {}, { text: formatAmount(total), bold: true, style: 'letra9', alignment: 'right', margin: [0, 3, 8, 3] }]],
     },
-    layout: totalBandLayout('#dcdcdc', false),
+    layout: totalBandLayout('#eeeeee', true),
   };
 }
 
@@ -390,13 +385,10 @@ function makeCompactMovementSection(title: string, rows: any[], total) {
 
 function makeCompactTotalsSection(values) {
   const rows = [
-    ['TOTAL EFECTIVO DEL DIA', values.operationalTotal, true],
     ['FACTURAS CONSUMIDOR FINAL:', values.finalConsumerInvoicesTotal, false],
     ['RECIBO DE INGRESOS', values.incomeReceiptsTotal, false],
     ['TOTAL SISTEMA', values.systemIncomeTotal, false],
-    ['FONDO INICIAL', values.openingCashFund, false],
-    ['TOTAL ESPERADO', values.expectedTotal, false],
-    ['DIFERENCIA', values.differenceAmount, true],
+    ['FONDO DE CAJA PARA EL SIGUIENTE DIA', values.nextDayCashFund, true],
   ];
 
   return {
@@ -511,7 +503,7 @@ function totalBandLayout(color = '#eeeeee', showTopLine = true) {
 
 function modernTotalsLayout() {
   return {
-    fillColor: rowIndex => (rowIndex === 0 || rowIndex === 6 ? '#dcdcdc' : null),
+    fillColor: (rowIndex, node) => (rowIndex === node.table.body.length - 1 ? '#dcdcdc' : null),
     hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 0.7 : 0.35),
     vLineWidth: () => 0,
     hLineColor: (i, node) => (i === 0 || i === node.table.body.length ? '#222222' : '#c9c9c9'),
