@@ -16,6 +16,16 @@
   padding-bottom: 0.55rem;
 }
 
+.summary .summary-divider {
+  border-bottom: 2px solid rgba(108, 117, 125, 0.8);
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .summary .summary-divider {
+    border-bottom-color: rgba(82, 96, 113, 0.8);
+  }
+}
+
 .summary > div:last-child {
   border-bottom: 0;
   padding-bottom: 0;

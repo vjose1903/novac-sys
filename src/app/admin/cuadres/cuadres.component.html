@@ -64,14 +64,6 @@
                         <span>Total sistema</span>
                         <strong>{{ formatAmount(systemIncome().system_income_total) }}</strong>
                       </div>
-                      <div>
-                        <span>Fondo inicial</span>
-                        <strong>{{ formatAmount(openingCashFund()) }}</strong>
-                      </div>
-                      <div>
-                        <span>Total esperado</span>
-                        <strong>{{ formatAmount(expectedTotal()) }}</strong>
-                      </div>
                       @for (method of systemPaymentMethods(); track method.label) {
                         <div>
                           <span>{{ method.label }}</span>
@@ -118,7 +110,6 @@
                       [physicalCashTotal]="physicalCashTotal()"
                       [otherPaymentMethodsTotal]="otherPaymentMethodsTotal()"
                       [additionalTransfersTotal]="additionalTransfersTotal()"
-                      [openingCashFund]="openingCashFund()"
                       [expectedTotal]="expectedTotal()"
                       [creditInvoicesTotal]="creditInvoicesTotal()"
                       [backendTotals]="summaryTotals()" />

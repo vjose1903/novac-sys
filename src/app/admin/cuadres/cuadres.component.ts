@@ -142,7 +142,6 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     final_consumer_invoices_total: this.systemIncome().final_consumer_invoices_total,
     income_receipts_total: this.systemIncome().income_receipts_total,
     credit_invoices_total: this.creditInvoicesTotal(),
-    opening_cash_fund: this.openingCashFund(),
     expected_total: this.expectedTotal(),
     difference_amount: this.differenceAmount(),
   }));

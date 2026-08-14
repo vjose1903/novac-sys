@@ -387,7 +387,7 @@ function makeCompactTotalsSection(values) {
   const rows = [
     ['FACTURAS CONSUMIDOR FINAL:', values.finalConsumerInvoicesTotal, false],
     ['RECIBO DE INGRESOS', values.incomeReceiptsTotal, false],
-    ['TOTAL SISTEMA', values.systemIncomeTotal, false],
+    ['TOTAL SISTEMA', values.systemIncomeTotal, true],
     ['FONDO DE CAJA PARA EL SIGUIENTE DIA', values.nextDayCashFund, true],
   ];
 

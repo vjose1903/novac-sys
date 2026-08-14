@@ -7,17 +7,9 @@
     <span>Recibo de ingresos</span>
     <strong>{{ formatAmount(backendTotals?.income_receipts_total || '0.00') }}</strong>
   </div>
-  <div>
+  <div class="summary-divider">
     <span>Total sistema</span>
     <strong>{{ formatAmount(systemIncomeTotal) }}</strong>
-  </div>
-  <div>
-    <span>Fondo inicial</span>
-    <strong>{{ formatAmount(openingCashFund || backendTotals?.opening_cash_fund || '0.00') }}</strong>
-  </div>
-  <div>
-    <span>Total esperado</span>
-    <strong>{{ formatAmount(expectedTotal || backendTotals?.expected_total || '0.00') }}</strong>
   </div>
   <div>
     <span>Efectivo físico</span>
