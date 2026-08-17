@@ -120,7 +120,7 @@
                         </label>
 
                         @if (!readOnly() && differenceAmount() !== '0.00') {
-                          <button type="button" class="btn btn-sm btn-text" (click)="applyDifferenceToFondo()">Aplicar diferencia</button>
+                          <button type="button" class="btn btn-xxs btn-text" (click)="applyDifferenceToFondo()">Aplicar diferencia</button>
                         }
                       </div>
                       <input class="form-control text-end" appNumeroFormato [value]="nextDayCashFund()" [readonly]="readOnly()" (input)="setNextDayCashFund($any($event.target).value || '0.00')" (appNumeroFormatoBlur)="setNextDayCashFund($event)" />

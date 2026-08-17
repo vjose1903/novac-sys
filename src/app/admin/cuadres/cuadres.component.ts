@@ -752,8 +752,6 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const suggested = (responseMovements.suggested_from_system || []).map(item => ({ ...item, movement_group: item.movement_group || 'other_payment_methods' }));
     const configTargetFondo = stored && stored?.totals?.next_day_cash_fund ? stored?.totals?.next_day_cash_fund : (this.configCuadre().target_fondo ?? 0);
 
-    console.log('stored ', stored);
-
     return {
       systemIncome: {
         ...this.emptySystemIncome(),
@@ -971,7 +969,6 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private restoreArchivedSnapshot(archived: ArchivedCuadreSnapshot) {
-    console.log('archived ', archived);
     const form = archived.form || {};
     this.resetForm();
     this.step.set(form.step || 1);
