@@ -152,13 +152,7 @@ input[type='text'] {
 
 .btn {
   @include appButtonBase;
-  @include appButtonState(
-    var(--app-surface-muted),
-    color-mix(in srgb, var(--app-border) 78%, transparent),
-    var(--app-text),
-    color-mix(in srgb, var(--app-surface-muted) 72%, var(--app-hover)),
-    var(--app-input-hover-border)
-  );
+  @include appButtonState(var(--app-surface-muted), color-mix(in srgb, var(--app-border) 78%, transparent), var(--app-text), color-mix(in srgb, var(--app-surface-muted) 72%, var(--app-hover)), var(--app-input-hover-border));
 
   &.btn-sm {
     border-radius: 0.55rem !important;
@@ -177,13 +171,7 @@ input[type='text'] {
 .btn-gris,
 .btn-blanco,
 #btn-blanco {
-  @include appButtonState(
-    var(--app-surface-muted),
-    color-mix(in srgb, var(--app-border) 78%, transparent),
-    var(--app-text),
-    color-mix(in srgb, var(--app-surface-muted) 72%, var(--app-hover)),
-    var(--app-input-hover-border)
-  );
+  @include appButtonState(var(--app-surface-muted), color-mix(in srgb, var(--app-border) 78%, transparent), var(--app-text), color-mix(in srgb, var(--app-surface-muted) 72%, var(--app-hover)), var(--app-input-hover-border));
 }
 
 .btn-verde,
@@ -213,6 +201,98 @@ input[type='text'] {
 #btn-danger {
   @include appButtonState(#dc3545, #dc3545, #ffffff, #c92f3e, #c92f3e);
   box-shadow: 0 10px 18px -13px color-mix(in srgb, #dc3545 78%, #000) !important;
+}
+
+.btn-text {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--primary08) !important;
+  box-shadow: none !important;
+
+  &:not(:disabled):hover {
+    background: var(--primary01) !important;
+    border-color: transparent !important;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--primary07) 24%, transparent) !important;
+    outline: 0;
+  }
+
+  &:disabled {
+    cursor: not-allowed !important;
+    filter: grayscale(18%);
+    opacity: 0.55;
+    transform: none;
+  }
+}
+
+.btn-text-success {
+  background: transparent !important;
+  color: #10b981 !important;
+  box-shadow: none !important;
+
+  &:not(:disabled):hover {
+    background: rgba(16, 185, 129, 0.1) !important;
+  }
+
+  &:disabled {
+    cursor: not-allowed !important;
+    filter: grayscale(18%);
+    opacity: 0.55;
+    transform: none;
+  }
+}
+
+.btn-text-danger {
+  background: transparent !important;
+  color: #dc3545 !important;
+  box-shadow: none !important;
+
+  &:not(:disabled):hover {
+    background: rgba(220, 53, 69, 0.1) !important;
+  }
+
+  &:disabled {
+    cursor: not-allowed !important;
+    filter: grayscale(18%);
+    opacity: 0.55;
+    transform: none;
+  }
+}
+
+.btn-text-warning {
+  background: transparent !important;
+  color: #f59e0b !important;
+  box-shadow: none !important;
+
+  &:not(:disabled):hover {
+    background: rgba(245, 158, 11, 0.1) !important;
+  }
+
+  &:disabled {
+    cursor: not-allowed !important;
+    filter: grayscale(18%);
+    opacity: 0.55;
+    transform: none;
+  }
+}
+
+.btn-text-primary {
+  background: transparent !important;
+  color: #3b82f6 !important;
+  box-shadow: none !important;
+
+  &:not(:disabled):hover {
+    background: rgba(59, 130, 246, 0.1) !important;
+  }
+
+  &:disabled {
+    cursor: not-allowed !important;
+    filter: grayscale(18%);
+    opacity: 0.55;
+    transform: none;
+  }
 }
 
 app-upload-img .btn,

@@ -391,7 +391,6 @@ select:not(:focus):hover,
   }
 }
 
-
 .scroll-container {
   display: flex;
   flex-direction: column;
@@ -1059,7 +1058,6 @@ select:not(:focus):hover,
                 padding-block: 0.68rem;
               }
             }
-
           }
         }
       }
@@ -1073,7 +1071,7 @@ select:not(:focus):hover,
         color: var(--app-text);
         display: block;
         font-weight: 600;
-        margin-bottom: 0.38rem !important;
+        margin-bottom: 0.38rem;
       }
     }
   }

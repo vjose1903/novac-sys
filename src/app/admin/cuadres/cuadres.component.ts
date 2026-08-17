@@ -570,6 +570,13 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.markDirty();
   }
 
+  applyDifferenceToFondo() {
+    const current = Number(fun.desformatearStNumber(this.nextDayCashFund()));
+    const diff = Number(fun.desformatearStNumber(this.differenceAmount()));
+    this.nextDayCashFund.set(this.formatAmount(current + diff));
+    this.markDirty();
+  }
+
   canArchiveCurrentForm() {
     return this.isCreando() && this.step() >= 3 && fun.hasValue(this.source()) && this.selectedIsNewFlow() && !this.readOnly() && !this.formPristine();
   }
