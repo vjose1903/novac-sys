@@ -1,5 +1,9 @@
 <section class="summary">
   <div>
+    <span>Fondo día anterior</span>
+    <strong>{{ formatAmount(openingCashFund) }}</strong>
+  </div>
+  <div>
     <span>Facturas consumidor final</span>
     <strong>{{ formatAmount(backendTotals?.final_consumer_invoices_total || '0.00') }}</strong>
   </div>
@@ -9,7 +13,7 @@
   </div>
   <div class="summary-divider">
     <span>Total sistema</span>
-    <strong>{{ formatAmount(systemIncomeTotal) }}</strong>
+    <strong>{{ formatAmount(expectedTotal) }}</strong>
   </div>
   <div>
     <span>Efectivo físico</span>

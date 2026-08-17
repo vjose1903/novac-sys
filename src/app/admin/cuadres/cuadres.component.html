@@ -58,6 +58,10 @@
                 @if (selectedIsNewFlow()) {
                   <section class="system-preview">
                     <div>
+                      <span>Fondo día anterior</span>
+                      <strong>{{ formatAmount(totals()?.opening_cash_fund || '0.00') }}</strong>
+                    </div>
+                    <div>
                       <span>Facturas consumidor final</span>
                       <strong>{{ formatAmount(systemIncome().final_consumer_invoices_total) }}</strong>
                     </div>
@@ -67,7 +71,7 @@
                     </div>
                     <div>
                       <span>Total sistema</span>
-                      <strong>{{ formatAmount(systemIncome().system_income_total) }}</strong>
+                      <strong>{{ formatAmount(totals()?.expected_total || '0.00') }}</strong>
                     </div>
                     @for (method of systemPaymentMethods(); track method.label) {
                       <div>
@@ -75,10 +79,6 @@
                         <strong>{{ method.value }}</strong>
                       </div>
                     }
-                    <div>
-                      <span>Fondo del día anterior</span>
-                      <strong>{{ formatAmount(totals()?.opening_cash_fund || '0.00') }}</strong>
-                    </div>
                   </section>
 
                   <div class="cuadre-form-grid">
@@ -119,8 +119,8 @@
                           <i class="fas fa-info-circle field-info" pTooltip="Monto de efectivo que se dejará como fondo inicial para el próximo cuadre. No se suma como ingreso." tooltipPosition="top"></i>
                         </label>
 
-                        @if (!readOnly() && differenceAmount() !== '0.00') {
-                          <button type="button" class="btn btn-xxs btn-text" (click)="applyDifferenceToFondo()">Aplicar diferencia</button>
+                        @if (!readOnly() && !autoApplyDifference() && differenceAmount() !== '0.00') {
+                          <button type="button" class="btn btn-sm btn-text" (click)="applyDifferenceToFondo()">Aplicar diferencia</button>
                         }
                       </div>
                       <input class="form-control text-end" appNumeroFormato [value]="nextDayCashFund()" [readonly]="readOnly()" (input)="setNextDayCashFund($any($event.target).value || '0.00')" (appNumeroFormatoBlur)="setNextDayCashFund($event)" />
@@ -128,14 +128,15 @@
                   </div>
 
                   <app-cuadre-summary
-                    [systemIncomeTotal]="systemIncome().system_income_total"
-                    [operationalTotal]="operationalTotal()"
-                    [physicalCashTotal]="physicalCashTotal()"
-                    [otherPaymentMethodsTotal]="otherPaymentMethodsTotal()"
-                    [additionalTransfersTotal]="additionalTransfersTotal()"
-                    [expectedTotal]="expectedTotal()"
-                    [creditInvoicesTotal]="creditInvoicesTotal()"
-                    [backendTotals]="summaryTotals()" />
+                      [systemIncomeTotal]="systemIncome().system_income_total"
+                      [operationalTotal]="operationalTotal()"
+                      [physicalCashTotal]="physicalCashTotal()"
+                      [otherPaymentMethodsTotal]="otherPaymentMethodsTotal()"
+                      [additionalTransfersTotal]="additionalTransfersTotal()"
+                      [expectedTotal]="expectedTotal()"
+                      [creditInvoicesTotal]="creditInvoicesTotal()"
+                      [backendTotals]="summaryTotals()"
+                      [openingCashFund]="openingCashFund()" />
                 } @else {
                   <section class="legacy-summary">
                     <div class="legacy-summary-header">

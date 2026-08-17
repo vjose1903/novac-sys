@@ -27,13 +27,17 @@ export class ConfigCuadresComponent implements OnInit, IDynamicModal {
 
     this.form = this.fb.group({
       target_fondo: [this.initialTargetFondo, Validators.required],
+      auto_apply_difference: [this.config_cuadre?.auto_apply_difference ?? false],
     });
 
     this.form.valueChanges.subscribe(() => {
       const targetFondo = fun.roundNumberToDecimal(this.form.get('target_fondo')?.value ?? 0);
 
-      if (targetFondo == this.initialTargetFondo) this.disableBtnConfirm(true);
-      else this.disableBtnConfirm(!this.form.valid);
+      if (targetFondo == this.initialTargetFondo && this.form.get('auto_apply_difference')?.value === (this.config_cuadre?.auto_apply_difference ?? false)) {
+        this.disableBtnConfirm(true);
+      } else {
+        this.disableBtnConfirm(!this.form.valid);
+      }
     });
   }
 
@@ -46,7 +50,7 @@ export class ConfigCuadresComponent implements OnInit, IDynamicModal {
     const value = this.form.getRawValue();
 
     this.configCuadresClass
-      .updateOne({ id: 1, config: { target_fondo: Number(fun.desformatearStNumber(value.target_fondo)) } })
+      .updateOne({ id: 1, config: { target_fondo: Number(fun.desformatearStNumber(value.target_fondo)), auto_apply_difference: value.auto_apply_difference } })
       .then(res => {
         this.modalConfig.close(res?.data?.config);
       })

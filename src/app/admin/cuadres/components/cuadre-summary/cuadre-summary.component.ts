@@ -16,6 +16,7 @@ export class CuadreSummaryComponent {
   @Input() expectedTotal = '0.00';
   @Input() creditInvoicesTotal = '0.00';
   @Input() backendTotals: Record<string, string> = {};
+  @Input() openingCashFund = '0.00';
 
   formatAmount(value: string | number) {
     return fun.roundNumberToDecimal(value || '0.00');

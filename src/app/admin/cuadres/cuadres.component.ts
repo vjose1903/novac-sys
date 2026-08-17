@@ -79,6 +79,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   archivedCuadreRestored = signal(false);
   formPristine = signal(true);
   configCuadre = signal<ConfigCuadreValues>({ target_fondo: 0 });
+  autoApplyDifference = signal(false);
 
   private configCuadresClass = new ConfigCuadresC();
 
@@ -259,6 +260,20 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     });
 
     effect(() => {
+      const autoApply = this.autoApplyDifference();
+      const diff = this.differenceAmount();
+      const readOnly = this.readOnly();
+      const openingFund = this.openingCashFund();
+      untracked(() => {
+        if (autoApply && !readOnly && this.isCreando() && this.step() >= 3) {
+          const opening = Number(fun.desformatearStNumber(openingFund));
+          const difference = Number(fun.desformatearStNumber(diff));
+          this.nextDayCashFund.set(fun.roundNumberToDecimal(opening + difference));
+        }
+      });
+    });
+
+    effect(() => {
       const status = this.prepareResource.status();
       const request = this.prepareClosingDate();
       const value = this.prepareResource.value();
@@ -321,7 +336,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       .getOne(1)
       .then(res => {
         const data = res?.data || res;
-        this.configCuadre.set({ target_fondo: data?.config?.target_fondo ?? 0 });
+        this.configCuadre.set({ target_fondo: data?.config?.target_fondo ?? 0, auto_apply_difference: data?.config?.auto_apply_difference ?? false });
+        this.autoApplyDifference.set(data?.config?.auto_apply_difference ?? false);
       })
       .catch(() => {});
   }
@@ -476,7 +492,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     if (arg.type == modalCloseType.onHide) return;
 
     const config = arg.data?.config || arg.data;
-    this.configCuadre.set({ target_fondo: config?.target_fondo ?? this.configCuadre().target_fondo });
+    this.configCuadre.set({ target_fondo: config?.target_fondo ?? this.configCuadre().target_fondo, auto_apply_difference: config?.auto_apply_difference ?? this.configCuadre().auto_apply_difference });
+    this.autoApplyDifference.set(config?.auto_apply_difference ?? this.autoApplyDifference());
   }
 
   runStateAction(action: string) {
