@@ -1,0 +1,17 @@
+.p-skeleton {
+  background: var(--app-surface-muted) !important;
+
+  &::after {
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--app-surface) 28%, transparent), transparent) !important;
+  }
+}
+
+:root[data-theme-mode='dark'] {
+  .p-skeleton {
+    background: var(--app-input-bg) !important;
+
+    &::after {
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--app-surface-muted) 28%, transparent), transparent) !important;
+    }
+  }
+}
