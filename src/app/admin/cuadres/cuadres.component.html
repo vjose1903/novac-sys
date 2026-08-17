@@ -73,6 +73,10 @@
                           <strong>{{ method.value }}</strong>
                         </div>
                       }
+                      <div>
+                        <span>Fondo del día anterior</span>
+                        <strong>{{ formatAmount(totals()?.opening_cash_fund || '0.00') }}</strong>
+                      </div>
                     </section>
 
                     <div class="cuadre-form-grid">
