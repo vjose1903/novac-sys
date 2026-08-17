@@ -123,6 +123,12 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   focusFormaPago(event?: Event) {
     event?.preventDefault();
     event?.stopPropagation();
+
+    if (this.validarForm()) {
+      fun.toastWarning('Efectivo no cubre el total del documento', 'AVISO');
+      return;
+    }
+
     (event?.target as HTMLElement | null)?.blur();
     this.focusPrimeSelect(this.formaPagoInput);
   }
