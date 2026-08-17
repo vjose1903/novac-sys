@@ -30,6 +30,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   element: any;
   devuelta = '0.00';
+  isLoaded = false;
   private hasUserTyped = false;
   @Output() getDevuelta = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
@@ -62,24 +63,34 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   ngOnInit() {
     this.efectivo = fun.hasValue(this.efectivo) ? this.formatoNumero(this.efectivo) : '0.00';
     if (!this.cambios_articulos) this.cambiar_articulos = 'no';
-    this.setDivisaPrincipal();
-    this.cargarDivisaPrincipal();
   }
 
   ngAfterViewInit(): void {
-    fun.setTimeout(() => {
-      this.configApp = Ss.configServ.config;
-      this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
-      this.handleDefaultSwitch();
-
-      if (this.metodo == tipoDocFacturacion.compra && !this.cambios_articulos) this.disableBtnConfirm(false);
-      this.validarForm('init');
-      this.calcularDevueta();
+    Promise.all([
+      this.cargarDivisaPrincipal(),
+      this.cargarConfig(),
+    ]).then(() => {
+      this.isLoaded = true;
 
       requestAnimationFrame(() => {
         if (this.metodo != tipoDocFacturacion.compra) fun.enfocarInput('inputEfectivo');
       });
-    }, 250);
+    });
+  }
+
+  private cargarConfig(): Promise<void> {
+    return new Promise(resolve => {
+      fun.setTimeout(() => {
+        this.configApp = Ss.configServ.config;
+        this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
+        this.handleDefaultSwitch();
+
+        if (this.metodo == tipoDocFacturacion.compra && !this.cambios_articulos) this.disableBtnConfirm(false);
+        this.validarForm('init');
+        this.calcularDevueta();
+        resolve();
+      }, 250);
+    });
   }
 
   handleDefaultSwitch() {

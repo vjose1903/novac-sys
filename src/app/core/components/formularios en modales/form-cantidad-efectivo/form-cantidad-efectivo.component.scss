@@ -4,6 +4,35 @@
   gap: 0.9rem;
 }
 
+.cash-skeleton {
+  display: grid;
+  gap: 0.9rem;
+
+  .skeleton-row {
+    align-items: center;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--primary06) 14%, transparent), transparent),
+      color-mix(in srgb, var(--primary06) 10%, var(--app-surface));
+    border: 1px solid color-mix(in srgb, var(--primary08) 24%, var(--app-card-border));
+    border-radius: 0.9rem;
+    display: flex;
+    gap: 0.85rem;
+    min-height: 5.4rem;
+    padding: 0.8rem;
+  }
+
+  .skeleton-text {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .skeleton-inputs {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr) minmax(11rem, 0.75fr);
+  }
+}
+
 .cash-total-card,
 .cash-return-card,
 .print-option-card,
