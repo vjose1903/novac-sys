@@ -115,6 +115,13 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   handleFormaPagoEnter(event: Event) {
     event.stopPropagation();
+
+    if (this.validarForm()) {
+      fun.toastWarning('Efectivo no cubre el total del documento', 'AVISO');
+      fun.enfocarInput('inputEfectivo');
+      return;
+    }
+
     this.focusConfirmButton();
   }
 
@@ -135,34 +142,23 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
         if (!selectComponent || selectComponent.$disabled?.()) {
           combobox?.focus({ preventScroll: true });
-          this.openPrimeSelectFromCombobox(combobox);
           return;
         }
 
         const focusInput = selectComponent.focusInputViewChild?.nativeElement as HTMLElement | undefined;
         const selectedIndex = selectComponent.findSelectedOptionIndex?.();
         const firstIndex = selectComponent.findFirstOptionIndex?.();
-        const optionIndex = selectedIndex !== -1 ? selectedIndex : firstIndex;
+        const optionIndex = selectedIndex !== -1 ? selectedIndex : (firstIndex ?? 0);
 
         selectComponent.show?.(true);
-        selectComponent.focusedOptionIndex?.set?.(optionIndex ?? -1);
+        selectComponent.focusedOptionIndex?.set?.(optionIndex);
         selectComponent.scrollInView?.();
         (focusInput ?? combobox)?.focus({ preventScroll: true });
-        this.openPrimeSelectFromCombobox(focusInput ?? combobox);
       });
     }, 30);
   }
 
-  private openPrimeSelectFromCombobox(combobox: HTMLElement | null | undefined): void {
-    combobox?.dispatchEvent(
-      new KeyboardEvent('keydown', {
-        key: 'ArrowDown',
-        code: 'ArrowDown',
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
-  }
+
 
   saltar(campo, valor?) {
     if (campo === 'formaPago') {
