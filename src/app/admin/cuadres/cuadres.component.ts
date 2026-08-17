@@ -12,9 +12,11 @@ import { DivisaService } from '@admin/registros/divisa/divisa.service';
 import { CuadreCajaSignalC, CuadreDenominacion, CuadreDivisa, CuadreListItem, CuadreMovimiento, CuadrePrepareResponse, CuadreSystemIncome } from './cuadre-caja.model';
 import { CuadreC } from './cuadres';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
-import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { confirmationButtons, modalActionsE, modalCloseType, ICallbackModal } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { CuadreDetailModalComponent } from './components/cuadre-detail-modal/cuadre-detail-modal.component';
+import { ConfigCuadresComponent } from './components/config-cuadres/config-cuadres.component';
+import { ConfigCuadresC, ConfigCuadreValues } from './config-cuadres.model';
 import { ArchivedCuadreSnapshot, CuadreArchiveStorageService } from './services/cuadre-archive-storage.service';
 
 interface CuadreListRequest {
@@ -76,6 +78,9 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   archivedCuadre = signal<ArchivedCuadreSnapshot | null>(null);
   archivedCuadreRestored = signal(false);
   formPristine = signal(true);
+  configCuadre = signal<ConfigCuadreValues>({ target_fondo: 0 });
+
+  private configCuadresClass = new ConfigCuadresC();
 
   table_config: table_config = {
     info: [
@@ -181,46 +186,70 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   readonly openingCashFund = computed(() => this.totals()?.opening_cash_fund || '0.00');
   readonly creditInvoicesTotal = computed(() => this.systemIncome().credit_invoices_total || this.totals()?.credit_invoices_total || '0.00');
   readonly expectedTotal = computed(() => this.totals()?.expected_total || this.formatAmount(Number(fun.desformatearStNumber(this.systemIncome().system_income_total || 0)) + Number(fun.desformatearStNumber(this.openingCashFund() || 0))));
-  readonly differenceAmount = computed(() => (this.useStoredTotals() ? this.formatAmount(this.totals()?.difference_amount || '0.00') : this.formatAmount(Number(fun.desformatearStNumber(this.operationalTotal() || 0)) - Number(fun.desformatearStNumber(this.expectedTotal() || 0)))));
+  readonly differenceAmount = computed(() =>
+    this.useStoredTotals() ? this.formatAmount(this.totals()?.difference_amount || '0.00') : this.formatAmount(Number(fun.desformatearStNumber(this.operationalTotal() || 0)) - Number(fun.desformatearStNumber(this.expectedTotal() || 0)))
+  );
 
-  listResource = httpResource<any>(() => {
-    const request = this.listRequest();
-    return this.cuadreApi.getAllRequest({
-      parameters: {
-        page: request.page,
-        per_page: request.per_page,
-        paginado: true,
-        search: request.search || ' ',
-      },
-      requestParams: [{ key: 'spinner', value: 'no_show' }],
-    });
-  }, { defaultValue: { data: [], total_registros: 0 } });
+  listResource = httpResource<any>(
+    () => {
+      const request = this.listRequest();
+      return this.cuadreApi.getAllRequest({
+        parameters: {
+          page: request.page,
+          per_page: request.per_page,
+          paginado: true,
+          search: request.search || ' ',
+        },
+        requestParams: [{ key: 'spinner', value: 'no_show' }],
+      });
+    },
+    { defaultValue: { data: [], total_registros: 0 } }
+  );
 
-  prepareResource = httpResource<CuadrePrepareResponse>(() => {
-    const date = this.prepareClosingDate();
-    if (!date) return undefined;
-    return this.cuadreApi.prepareRequest(date);
-  }, { defaultValue: null });
+  prepareResource = httpResource<CuadrePrepareResponse>(
+    () => {
+      const date = this.prepareClosingDate();
+      if (!date) return undefined;
+      return this.cuadreApi.prepareRequest(date);
+    },
+    { defaultValue: null }
+  );
 
-  saveResource = httpResource<any>(() => {
-    const request = this.saveRequest();
-    if (!request) return undefined;
-    return this.cuadreApi.customRequest(request.body);
-  }, { defaultValue: null });
+  saveResource = httpResource<any>(
+    () => {
+      const request = this.saveRequest();
+      if (!request) return undefined;
+      return this.cuadreApi.customRequest(request.body);
+    },
+    { defaultValue: null }
+  );
 
-  stateActionResource = httpResource<any>(() => {
-    const request = this.actionRequest();
-    if (!request) return undefined;
-    return this.cuadreApi.actionRequest(request.id, request.action, request.body || {});
-  }, { defaultValue: null });
+  stateActionResource = httpResource<any>(
+    () => {
+      const request = this.actionRequest();
+      if (!request) return undefined;
+      return this.cuadreApi.actionRequest(request.id, request.action, request.body || {});
+    },
+    { defaultValue: null }
+  );
 
-  constructor(private tServ: TablasService, private divisaServ: DivisaService, private route: ActivatedRoute, private dynamicModalServ: DynamicModalService, private archiveStorageServ: CuadreArchiveStorageService) {
+  constructor(
+    private tServ: TablasService,
+    private divisaServ: DivisaService,
+    private route: ActivatedRoute,
+    private dynamicModalServ: DynamicModalService,
+    private archiveStorageServ: CuadreArchiveStorageService
+  ) {
     super();
 
     effect(() => {
       const total = this.listaCuadresTotal();
       this.table_config.total_count = total;
       queueMicrotask(() => this.tablaComponent?.changeTableConfig([{ total_count: total }]));
+    });
+
+    effect(() => {
+      console.log('[DEBUG] configCuadre signal changed:', this.configCuadre());
     });
 
     effect(() => {
@@ -263,6 +292,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._init_mixin({ component: 'cuadres', is_routing: true });
     this.ensureDivisasLoaded();
+    this.loadConfigCuadre();
     this.loadArchivedCuadreOnEntry().catch(() => fun.toastWarning('No se pudo leer el cuadre archivado localmente.', 'AVISO'));
     if (this.route.snapshot.queryParamMap.get('nuevo') === 'true' && !this.isCreando()) this.nuevoRegistro();
   }
@@ -278,6 +308,16 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       search: params?.search || ' ',
       nonce: Date.now(),
     });
+  }
+
+  loadConfigCuadre() {
+    this.configCuadresClass
+      .getOne(1)
+      .then(res => {
+        const data = res?.data || res;
+        this.configCuadre.set({ target_fondo: data?.config?.target_fondo ?? 0 });
+      })
+      .catch(() => {});
   }
 
   nuevoRegistro() {
@@ -407,6 +447,30 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     });
 
     modalConfig.show();
+  }
+
+  openModalConfig() {
+    const modalConfig = new DynamicModalClass({
+      id: 'config_cuadres_caja',
+      header: 'Configuraciones de cuadres de caja',
+      component: ConfigCuadresComponent,
+      width: '40rem',
+      inputs: { config_cuadre: this.configCuadre() },
+      botones: [
+        { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+        { id: 'btnConfirmar', clase: 'btn btn-green', label: 'Guardar', disable: true },
+      ],
+    });
+
+    modalConfig.setCallback((arg: ICallbackModal) => this.processConfigCuadre(arg));
+    modalConfig.show();
+  }
+
+  processConfigCuadre(arg: ICallbackModal) {
+    if (arg.type == modalCloseType.onHide) return;
+
+    const config = arg.data?.config || arg.data;
+    this.configCuadre.set({ target_fondo: config?.target_fondo ?? this.configCuadre().target_fondo });
   }
 
   runStateAction(action: string) {
@@ -671,7 +735,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const systemIncome = stored && isNewFlow ? storedSystemIncome : response.system_income || this.emptySystemIncome();
     const totals = stored ? stored?.totals || {} : response.totals || {};
     const responseTotals = response.totals || {};
-    const reconciliationTolerance = stored && isNewFlow ? stored?.totals?.reconciliation_tolerance ?? responseTotals?.reconciliation_tolerance ?? '0.00' : '0.00';
+    const reconciliationTolerance = stored && isNewFlow ? (stored?.totals?.reconciliation_tolerance ?? responseTotals?.reconciliation_tolerance ?? '0.00') : '0.00';
     const suggested = (responseMovements.suggested_from_system || []).map(item => ({ ...item, movement_group: item.movement_group || 'other_payment_methods' }));
 
     return {
@@ -748,7 +812,9 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private normalizePaymentMethod(method: string) {
-    const value = String(method || '').trim().toLowerCase();
+    const value = String(method || '')
+      .trim()
+      .toLowerCase();
     if (value.includes('efect') || value === 'cash') return 'cash';
     if (value.includes('cheq') || value === 'check') return 'check';
     if (value.includes('tarj') || value === 'card') return 'card';
@@ -1068,16 +1134,12 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   private findDivisaByCurrencyCode(currencyCode: string) {
     if (!currencyCode) return undefined;
-    return [this.divisaPrincipal(), ...this.divisas(), ...this.divisaServ.listaDivisas]
-      .filter(item => !!item)
-      .find(divisa => [this.currencyCode(divisa), divisa?.code, divisa?.simbolo].includes(currencyCode));
+    return [this.divisaPrincipal(), ...this.divisas(), ...this.divisaServ.listaDivisas].filter(item => !!item).find(divisa => [this.currencyCode(divisa), divisa?.code, divisa?.simbolo].includes(currencyCode));
   }
 
   private exchangeRateForDenomination(item: CuadreDenominacion) {
     if (item.denomination_type !== 'foreign_currency') return 1;
-    const divisa = [this.divisaPrincipal(), ...this.divisas(), ...this.divisaServ.listaDivisas]
-      .filter(value => !!value)
-      .find(divisa => divisa.id == item.divisa_id);
+    const divisa = [this.divisaPrincipal(), ...this.divisas(), ...this.divisaServ.listaDivisas].filter(value => !!value).find(divisa => divisa.id == item.divisa_id);
     return Number(divisa?.current_tasa || 1);
   }
 

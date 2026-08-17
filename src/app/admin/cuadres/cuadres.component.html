@@ -2,7 +2,10 @@
   <div class="col-12 p-0 colTitulo">
     <div class="screen-title-block">
       <span class="screen-module-kicker">Operaciones</span>
-      <h4 class="negrita mb-0">Cuadres de caja</h4>
+      <div class="screen-title-row">
+        <h4 class="negrita mb-0 me-3">Cuadres de caja</h4>
+        <btn-icon-circular *ngxPermissionsOnly="permissions.cuadre_caja.configuracion_cuadre" [id]="'btnConfiguracionCuadre'" [icon_size]="'1rem'" [icon]="'fas fa-cog'" [size]="'size-md'" [tooltip]="'Configuraciones de cuadres de caja'" [tooltipPosition]="'right'" (clickFunction)="openModalConfig()"> </btn-icon-circular>
+      </div>
     </div>
     @if (archivedCuadre()) {
       <div class="cuadre-archive-tag">

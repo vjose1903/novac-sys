@@ -110,6 +110,7 @@ export const Permisos = {
     approve: 'cuadre_caja_approve',
     reject: 'cuadre_caja_reject',
     reopen: 'cuadre_caja_reopen',
+    configuracion_cuadre: 'cuadre_caja_configuracion_cuadre',
   },
   mantenimiento_articulo: {
     create: 'mantenimiento_articulo_create',

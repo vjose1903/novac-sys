@@ -25,6 +25,16 @@ Para cualquier cambio, aplica `docs/ai/01-workflow-rules.md`.
 - PDF, reportes, Excel, exportacion o impresion: lee `docs/ai/09-reports-printing-export.md`.
 - Contratos con backend, DGII, dashboard, divisas o cuadres: lee `docs/ai/10-backend-contracts.md`.
 
+## Navegacion de codigo con Serena (MCP)
+
+Cuando necesites entender, localizar o modificar codigo existente, usa las tools del MCP de Serena (`find_symbol`, `find_referencing_symbols`, `find_declaration`, `find_implementations`, `get_symbols_overview`, `get_diagnostics_for_symbol`, `rename_symbol`, `replace_symbol_body`, `read_file`/`list_dir`/`search_for_pattern` cuando no esten excluidas) en lugar de adivinar rutas, nombres o contenido.
+
+- Localizar un simbolo, ver sus referencias/declaraciones/implementaciones, o ver la estructura de un archivo: `find_symbol` o `get_symbols_overview` antes de leer archivos completos.
+- Renombrar o reemplazar el cuerpo de un simbolo: `rename_symbol` o `replace_symbol_body`, no edicion manual aproximada.
+- Al iniciar una sesion de codigo, si la tool esta disponible, llama `initial_instructions` una vez para conocer el manual de uso.
+- Preferi estas tools al uso de `grep`/`Glob` para busquedas simbolicas cuando el contexto lo permita.
+- Nunca inventes nombres de archivos, funciones o rutas: verificalos con Serena antes de editar.
+
 ## Reglas de implementacion
 
 - No ejecutes lint, tests, typecheck, formatters, builds ni validaciones automaticas salvo peticion explicita.
