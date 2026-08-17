@@ -53,6 +53,44 @@
   padding: 0.3rem 0.55rem;
 }
 
+.diff-negative strong {
+  background: #fde8e8;
+  border-color: #e57373;
+  color: #c62828;
+}
+
+.diff-zero strong {
+  background: #f0f0f0;
+  border-color: #bdbdbd;
+  color: #757575;
+}
+
+.diff-positive strong {
+  background: #e8f5e9;
+  border-color: #81c784;
+  color: #2e7d32;
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .diff-negative strong {
+    background: rgba(229, 115, 115, 0.15);
+    border-color: rgba(229, 115, 115, 0.5);
+    color: #ef5350;
+  }
+
+  .diff-zero strong {
+    background: rgba(150, 150, 150, 0.2);
+    border-color: rgba(150, 150, 150, 0.5);
+    color: #9e9e9e;
+  }
+
+  .diff-positive strong {
+    background: rgba(129, 199, 132, 0.15);
+    border-color: rgba(129, 199, 132, 0.5);
+    color: #66bb6a;
+  }
+}
+
 .summary-info {
   background: var(--app-bg);
   border: 1px solid var(--app-border);

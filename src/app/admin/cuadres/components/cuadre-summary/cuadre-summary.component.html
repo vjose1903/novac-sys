@@ -31,7 +31,7 @@
     <span>Total efectivo del día</span>
     <strong>{{ formatAmount(operationalTotal) }}</strong>
   </div>
-  <div class="summary-total">
+  <div class="summary-total" [ngClass]="differenceClass()">
     <span>Diferencia</span>
     <strong>{{ fondoCaja() }}</strong>
   </div>

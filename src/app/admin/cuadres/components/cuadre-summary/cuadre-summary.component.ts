@@ -26,6 +26,13 @@ export class CuadreSummaryComponent {
     return this.difference();
   }
 
+  differenceClass(): string {
+    const val = Number(fun.desformatearStNumber(this.difference()));
+    if (val < 0) return 'diff-negative';
+    if (val === 0) return 'diff-zero';
+    return 'diff-positive';
+  }
+
   difference() {
     const expected = this.expectedTotal || this.backendTotals?.expected_total || this.systemIncomeTotal || '0.00';
     return fun.roundNumberToDecimal(Number(fun.desformatearStNumber(this.operationalTotal || 0)) - Number(fun.desformatearStNumber(expected || 0)));
