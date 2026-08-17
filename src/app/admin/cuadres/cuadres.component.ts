@@ -249,7 +249,13 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     });
 
     effect(() => {
-      console.log('[DEBUG] configCuadre signal changed:', this.configCuadre());
+      const targetFondo = this.configCuadre().target_fondo;
+      const formatted = fun.roundNumberToDecimal(String(targetFondo ?? 0));
+      untracked(() => {
+        if (this.isCreando() && !this.existsCuadre() && !this.archivedCuadreRestored()) {
+          this.nextDayCashFund.set(formatted);
+        }
+      });
     });
 
     effect(() => {
@@ -737,6 +743,9 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const responseTotals = response.totals || {};
     const reconciliationTolerance = stored && isNewFlow ? (stored?.totals?.reconciliation_tolerance ?? responseTotals?.reconciliation_tolerance ?? '0.00') : '0.00';
     const suggested = (responseMovements.suggested_from_system || []).map(item => ({ ...item, movement_group: item.movement_group || 'other_payment_methods' }));
+    const configTargetFondo = stored && stored?.totals?.next_day_cash_fund ? stored?.totals?.next_day_cash_fund : (this.configCuadre().target_fondo ?? 0);
+
+    console.log('stored ', stored);
 
     return {
       systemIncome: {
@@ -750,7 +759,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       totals,
       notes: stored?.notes || '',
       reconciliationTolerance: fun.roundNumberToDecimal(reconciliationTolerance),
-      nextDayCashFund: fun.roundNumberToDecimal(totals.next_day_cash_fund || stored?.next_day_cash_fund || stored?.fondo_caja_siguiente || stored?.fondo_para_siguiente_dia || '0.00'),
+      nextDayCashFund: fun.roundNumberToDecimal(configTargetFondo),
       bills: isNewFlow ? this.normalizeDenominations([], denominaciones, 'bill', this.defaultBills()) : [],
       coins: isNewFlow ? this.normalizeDenominations([], denominaciones, 'coin', this.defaultCoins()) : [],
       foreignCurrency: isNewFlow ? this.normalizeDenominations([], denominaciones, 'foreign_currency', []) : [],
@@ -955,6 +964,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private restoreArchivedSnapshot(archived: ArchivedCuadreSnapshot) {
+    console.log('archived ', archived);
     const form = archived.form || {};
     this.resetForm();
     this.step.set(form.step || 1);
