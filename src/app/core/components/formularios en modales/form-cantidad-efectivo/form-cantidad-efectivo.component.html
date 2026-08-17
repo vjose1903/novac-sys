@@ -20,12 +20,13 @@
             type="text"
             class="form-control inputEfectivo"
             (focus)="htmlServ.selectValue($event)"
+            (input)="onEfectivoInput()"
             (keyup)="calcularDevueta()"
             (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
             (keyup.enter)="focusFormaPago($event)"
             [(ngModel)]="efectivo"
             (ngModelChange)="validarForm('input')"
-            (blur)="revisarPrecio($event.target)"
+            (blur)="onEfectivoBlur($event.target)"
             id="inputEfectivo" />
         </div>
       </div>
@@ -46,7 +47,7 @@
           optionLabel="label"
           optionValue="value"
           appendTo="body"
-          (keyup.enter)="handleFormaPagoEnter($event)"></p-select>
+          (keydown.enter)="handleFormaPagoEnter($event)"></p-select>
       </div>
 
       <div class="cash-return-card">

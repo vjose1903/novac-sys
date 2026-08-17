@@ -30,6 +30,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   element: any;
   devuelta = '0.00';
+  private hasUserTyped = false;
   @Output() getDevuelta = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
 
@@ -71,11 +72,13 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       this.documentos_a_imprimir = this.shServ.formatDocumentosAImprimir(this.configApp.documentos_a_imprimir);
       this.handleDefaultSwitch();
 
-      if (this.metodo != tipoDocFacturacion.compra) fun.enfocarInput('inputEfectivo');
-
       if (this.metodo == tipoDocFacturacion.compra && !this.cambios_articulos) this.disableBtnConfirm(false);
       this.validarForm('init');
       this.calcularDevueta();
+
+      requestAnimationFrame(() => {
+        if (this.metodo != tipoDocFacturacion.compra) fun.enfocarInput('inputEfectivo');
+      });
     }, 250);
   }
 
@@ -114,25 +117,26 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   handleFormaPagoEnter(event: Event) {
+    event.preventDefault();
     event.stopPropagation();
 
     if (this.validarForm()) {
       fun.toastWarning('Efectivo no cubre el total del documento', 'AVISO');
+      this.closePrimeSelect(this.formaPagoInput);
       fun.enfocarInput('inputEfectivo');
       return;
     }
 
+    this.closePrimeSelect(this.formaPagoInput);
     this.focusConfirmButton();
   }
 
   focusConfirmButton() {
     fun.setTimeout(() => {
-      this.formaPagoInput?.hide?.();
       const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.dynamic-modal-button[data-modal-button-id="btnConfirmar"]'));
       const button = buttons.find(btn => btn.dataset['modalId'] === this.modalConfig.id && !btn.disabled) ?? buttons.find(btn => !btn.disabled);
-
       button?.focus({ preventScroll: true });
-    }, 180);
+    }, 30);
   }
 
   private focusPrimeSelect(selectComponent: any): void {
@@ -158,7 +162,26 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     }, 30);
   }
 
+  private closePrimeSelect(selectComponent: any): void {
+    if (!selectComponent) return;
 
+    const close = () => {
+      selectComponent.hide?.();
+      const focusInput = selectComponent.focusInputViewChild?.nativeElement as HTMLElement | undefined;
+
+      focusInput?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: 'Escape',
+          code: 'Escape',
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    };
+
+    close();
+    requestAnimationFrame(close);
+  }
 
   saltar(campo, valor?) {
     if (campo === 'formaPago') {
@@ -178,9 +201,20 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     return fun.roundNumberToDecimal(num);
   }
 
-  revisarPrecio(input) {
+  onEfectivoInput() {
+    this.hasUserTyped = true;
+  }
+
+  onEfectivoBlur(input) {
+    if (!this.hasUserTyped) return;
+
     fun.revisarNumber(input, `inputEfectivo`).then(res => {
       if (!res.error) input.value = res.number;
+
+      if (this.validarForm()) {
+        fun.toastWarning('Efectivo no cubre el total del documento', 'AVISO');
+        fun.enfocarInput('inputEfectivo');
+      }
     });
   }
 
