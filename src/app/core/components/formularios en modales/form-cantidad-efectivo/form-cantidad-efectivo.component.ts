@@ -104,7 +104,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
   async cargarDivisaPrincipal() {
     try {
-      const divisas = await this.divisaServ.getDivisas();
+      const divisas = await this.divisaServ.getDivisas({ skipLoader: true });
       this.setDivisaPrincipal(divisas);
     } catch (error) {
       this.setDivisaPrincipal();

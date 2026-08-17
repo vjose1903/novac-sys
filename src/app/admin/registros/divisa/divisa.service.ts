@@ -12,10 +12,11 @@ export class DivisaService {
   divisaClass = new DivisaC();
   constructor() {}
 
-  async getDivisas() {
+  async getDivisas(options?: { skipLoader?: boolean }) {
     return new Promise<any>((resolve, reject) => {
       try {
-        const extra = { parameters: { cuenta_contable_id: true } };
+        const extra: any = { parameters: { cuenta_contable_id: true } };
+        if (options?.skipLoader) extra.requestParams = [{ key: 'spinner', value: 'no_show' }];
 
         this.listaDivisas.length = 0;
 
