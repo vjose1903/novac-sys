@@ -2,78 +2,93 @@ import { Ss } from './../../../core/services/singleton.service';
 import { fun } from './../../../core/services/functions.service';
 import { DivisaC, DivisaI } from './divisa.utils';
 import { Injectable } from '@angular/core';
+import { SharedResourceLoadOptions, SharedResourceState } from '@core/services/shared-resource-state.service';
+
+type DivisaLoadOptions = SharedResourceLoadOptions;
 
 @Injectable({
   providedIn: 'root',
 })
-export class DivisaService {
+export class DivisaService extends SharedResourceState<DivisaI[]> {
   listaDivisas: Array<DivisaI> = [];
   listaDivisasIndexada: { [id: number]: DivisaI } = {};
   divisaClass = new DivisaC();
-  constructor() {}
+  readonly divisas = this.data;
 
-  async getDivisas(options?: { skipLoader?: boolean }) {
-    return new Promise<any>((resolve, reject) => {
-      try {
-        const extra: any = { parameters: { cuenta_contable_id: true } };
-        if (options?.skipLoader) extra.requestParams = [{ key: 'spinner', value: 'no_show' }];
+  constructor() {
+    super();
+  }
 
-        this.listaDivisas.length = 0;
+  async getDivisas(options?: DivisaLoadOptions) {
+    try {
+      const divisas = await this.refresh(options);
+      return fun.deepCloning(divisas);
+    } catch (error) {
+      fun.toastError('Error buscando divisas registradas.', 'ERROR');
+      throw error;
+    }
+  }
 
-        this.divisaClass.getAll(extra).then((res) => {
-          res['data'].map((divisa: DivisaI) => {
-            divisa.img_divisa = Ss.imgServ.getImgUrlServer(divisa?.imagen?.file_name);
-            divisa.es_principal = divisa.is_principal ? 'P' : null;
-            divisa.tasa_actual = `$ ${divisa.current_tasa}`;
+  async ensureDivisas(options?: Omit<DivisaLoadOptions, 'force'>) {
+    if (this.listaDivisas.length) return fun.deepCloning(this.listaDivisas);
+    return this.getDivisas(options);
+  }
 
-            divisa.currency_change = 'fa-solid fa-coins';
-            divisa.currency_change_tooltip = divisa.estado ? 'Tasa de cambio' : 'No puede cambiar la tasa de cambio, por que está desactivada.';
+  protected async load(options: DivisaLoadOptions): Promise<DivisaI[]> {
+    const extra: any = { parameters: { cuenta_contable_id: true } };
+    if (options?.skipLoader) extra.requestParams = [{ key: 'spinner', value: 'no_show' }];
 
-            divisa.edit_divisa = 'fas fa-pencil-alt';
-            divisa.edit_divisa_tooltip = divisa.estado ? 'Editar divisa' : 'No puede editar la divisa, por que está desactivada.';
+    const res = await this.divisaClass.getAll(extra);
+    return (res['data'] || []).map((divisa: DivisaI) => this.parseDivisa(divisa));
+  }
 
-            divisa.deactivate_reactivate_divisa = divisa.estado ? 'fa-solid fa-ban' : 'fa-regular fa-circle-check';
-            divisa.deactivate_reactivate_divisa_tooltip = divisa.estado ? 'Desactivar Divisa' : 'Reactivar Divisa';
+  protected override setData(data: DivisaI[]): void {
+    this.listaDivisas = data;
+    this.listaDivisasIndexada = this.listaDivisas.reduce((acc, divisa) => {
+      acc[divisa.id] = divisa;
+      return acc;
+    }, {});
 
-            divisa.status = divisa.estado ? 'ACTIVA' : 'DESACTIVA';
-            divisa.status_tag_color = divisa.estado ? 'green' : 'red';
+    super.setData(data);
+  }
 
-            divisa.customStyles = {
-              es_principal: { padding: 0, width: '2rem' },
-              img_divisa: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '5rem' },
-              simbolo: { width: '10%' },
-              code: { width: '10%' },
-              nombre: { 'text-align': 'start', 'padding-left': '0.3rem' },
-              tasa_actual: { width: '8%' },
-              status: [
-                { key: 'status', isTd: true, estilos: 'width: 10% !important;' },
-                { key: 'status_cuenta', estilos: 'font-size: 1.1rem !important;' },
-              ],
-              actions: [
-                { key: 'actions', isTd: true, estilos: 'width: 7rem !important;' },
-                { key: 'edit_divisa', estilos: 'font-size: 1.1rem !important' },
-                { key: 'currency_change', estilos: 'font-size: 1.1rem !important' },
-                { key: 'deactivate_reactivate_divisa', estilos: 'font-size: 1.1rem !important' },
-              ],
-            };
-            return divisa;
-          });
+  private parseDivisa(divisa: DivisaI) {
+    divisa.img_divisa = Ss.imgServ.getImgUrlServer(divisa?.imagen?.file_name);
+    divisa.es_principal = divisa.is_principal ? 'P' : null;
+    divisa.tasa_actual = `$ ${divisa.current_tasa}`;
 
-          this.listaDivisas = res['data'];
-          fun.logGreen('this.listaDivisas ', this.listaDivisas);
+    divisa.currency_change = 'fa-solid fa-coins';
+    divisa.currency_change_tooltip = divisa.estado ? 'Tasa de cambio' : 'No puede cambiar la tasa de cambio, por que está desactivada.';
 
-          this.listaDivisasIndexada = this.listaDivisas.reduce((acc, divisa) => {
-            acc[divisa.id] = divisa;
-            return acc;
-          }, {});
+    divisa.edit_divisa = 'fas fa-pencil-alt';
+    divisa.edit_divisa_tooltip = divisa.estado ? 'Editar divisa' : 'No puede editar la divisa, por que está desactivada.';
 
-          resolve(fun.deepCloning(this.listaDivisas));
-        });
-      } catch (error) {
-        reject(error);
-        fun.toastError('Error buscando empleados registrados.', 'ERROR');
-      }
-    });
+    divisa.deactivate_reactivate_divisa = divisa.estado ? 'fa-solid fa-ban' : 'fa-regular fa-circle-check';
+    divisa.deactivate_reactivate_divisa_tooltip = divisa.estado ? 'Desactivar Divisa' : 'Reactivar Divisa';
+
+    divisa.status = divisa.estado ? 'ACTIVA' : 'DESACTIVA';
+    divisa.status_tag_color = divisa.estado ? 'green' : 'red';
+
+    divisa.customStyles = {
+      es_principal: { padding: 0, width: '2rem' },
+      img_divisa: { 'padding-left': '0.5rem', 'padding-right': '0.5rem', width: '5rem' },
+      simbolo: { width: '10%' },
+      code: { width: '10%' },
+      nombre: { 'text-align': 'start', 'padding-left': '0.3rem' },
+      tasa_actual: { width: '8%' },
+      status: [
+        { key: 'status', isTd: true, estilos: 'width: 10% !important;' },
+        { key: 'status_cuenta', estilos: 'font-size: 1.1rem !important;' },
+      ],
+      actions: [
+        { key: 'actions', isTd: true, estilos: 'width: 7rem !important;' },
+        { key: 'edit_divisa', estilos: 'font-size: 1.1rem !important' },
+        { key: 'currency_change', estilos: 'font-size: 1.1rem !important' },
+        { key: 'deactivate_reactivate_divisa', estilos: 'font-size: 1.1rem !important' },
+      ],
+    };
+
+    return divisa;
   }
 
   getDivisaInfoById(id: number) {

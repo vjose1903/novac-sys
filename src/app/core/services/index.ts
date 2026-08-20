@@ -5,3 +5,4 @@ export * from './electron/electron-browser.service';
 export * from './electron/electron-documents.service';
 export * from './electron/electron-update.service';
 export * from './electron/electron-window.service';
+export * from './shared-resource-state.service';

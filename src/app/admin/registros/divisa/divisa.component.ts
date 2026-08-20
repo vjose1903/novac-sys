@@ -219,7 +219,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   deactivateOrReactivateAccount(data) {
     this.divisaClass.updateOne({ id: data.id }, { afterPath: 'deactivate_or_reactivate', parameters: { status: !data.estado } }).then(res => {
-      this.divisaServ.getDivisas();
+      this.divisaServ.getDivisas({ force: true });
     });
   }
 
@@ -242,7 +242,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     }
 
     this.divisaClass.createUpdateOne(formValue).then(res => {
-      this.divisaServ.getDivisas();
+      this.divisaServ.getDivisas({ force: true });
       this.borrar();
     });
   }

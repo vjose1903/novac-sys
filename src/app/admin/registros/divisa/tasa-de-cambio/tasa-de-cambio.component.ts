@@ -3,7 +3,7 @@ import { tableCellType, table_config } from '@components/new_tablas/tabla-class'
 import { TasaDeCambioC, TasaDeCambioI } from './tasa_de_cambio.utils';
 import { fun } from '@core/services/functions.service';
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
-import { DivisaC, DivisaI } from '../divisa.utils';
+import { DivisaI } from '../divisa.utils';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { DivisaService } from '../divisa.service';
 import { DateUtils } from '@vjose1903/dateutils';
@@ -35,7 +35,6 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
   hastaMaxDate;
 
   tasaDeCambioClass = new TasaDeCambioC();
-  divisaClass = new DivisaC();
   listaHistorial = signal<TasaDeCambioI[]>([]);
   // listaHistorial: Array<TasaDeCambioI> = [];
 
@@ -110,9 +109,8 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
   }
 
   async getDivisaPrincipal() {
-    const extra = { afterPath: 'custom/get_principal' };
-    const res = await this.divisaClass.dynamic(extra);
-    this.divisaPrincipal = res['data'] as DivisaI;
+    await this.divisaServ.ensureDivisas();
+    this.divisaPrincipal = this.divisaServ.getDivisaPrincipalInfo();
   }
 
   btn_aceptar() {
@@ -122,7 +120,7 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
 
     this.tasaDeCambioClass.updateOne(dataToSend).then(res => {
       this.getHistorialCambiosTasas();
-      this.divisaServ.getDivisas();
+      this.divisaServ.getDivisas({ force: true });
 
       this.divisa.current_tasa = formValue.tasa;
     });

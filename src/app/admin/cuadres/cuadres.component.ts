@@ -1119,12 +1119,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   private ensureDivisasLoaded() {
-    if (this.divisaServ.listaDivisas.length) {
-      this.applyDefaultDivisas();
-      return;
-    }
-
-    this.divisaServ.getDivisas().then(() => this.applyDefaultDivisas());
+    this.divisaServ.ensureDivisas().then(() => this.applyDefaultDivisas());
   }
 
   private applyDefaultDivisas() {
