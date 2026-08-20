@@ -20,12 +20,12 @@ export class MarcaModeloCatalogService {
   private readonly modelosPorMarca = new Map<number, CatalogRequestState<any[]>>();
 
   getMarcas(options: CatalogOptions = {}) {
-    return this.getCatalog(this.marcasState, () => this.marcaClass.getAll(), options);
+    return this.getCatalog(this.marcasState, () => this.marcaClass.getAll().then(res => res as any[]), options);
   }
 
   getMarcasFiltro(options: CatalogOptions = {}) {
     const extra = { afterPath: `filtro/ `, parameters: { paginado: false, page: 1, per_page: 1 } };
-    return this.getCatalog(this.marcasFiltroState, () => this.marcaClass.getAll(extra), options);
+    return this.getCatalog(this.marcasFiltroState, () => this.marcaClass.getAll(extra).then(res => res as any[]), options);
   }
 
   getModelosPorMarca(marcaId: number, options: CatalogOptions = {}) {
@@ -35,7 +35,7 @@ export class MarcaModeloCatalogService {
       this.modelosPorMarca.set(marcaId, state);
     }
 
-    return this.getCatalog(state, () => this.modeloClass.getAll({ afterPath: `por_marca/${marcaId}` }), options);
+    return this.getCatalog(state, () => this.modeloClass.getAll({ afterPath: `por_marca/${marcaId}` }).then(res => res as any[]), options);
   }
 
   invalidateMarcas() {
