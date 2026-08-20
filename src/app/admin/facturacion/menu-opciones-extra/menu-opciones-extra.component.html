@@ -14,7 +14,7 @@
         <!-- ================ CLIENTE  ================ -->
 
         @if (filter_key == filter_options.cliente) {
-          <p-select
+          <p-select appendTo="body"
             #dropdownCliente
             inputId="valorI"
             [(ngModel)]="clienteSelected"

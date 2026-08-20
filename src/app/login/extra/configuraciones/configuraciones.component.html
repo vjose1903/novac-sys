@@ -100,7 +100,7 @@
                 <!-- <div class="col-6 mb-2">
                       <div [appMsgError]="'printer_caja_selected'" [form]="form">
                         <label class="control-label">Impresora facturación seleccionada: </label>
-                        <p-select [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
+                        <p-select appendTo="body" [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
                           <ng-template pTemplate="selectedItem">
                             <div class="d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value">
                               <div>{{ form.controls['printer_caja_selected'].value }}</div>
@@ -118,7 +118,7 @@
                     <div class="col-6 mb-2">
                       <div [appMsgError]="'printer_reportes_selected'" [form]="form">
                         <label class="control-label">Impresora reportes seleccionada: </label>
-                        <p-select [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
+                        <p-select appendTo="body" [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
                           <ng-template pTemplate="selectedItem">
                             <div class="d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value">
                               <div>{{ form.controls['printer_reportes_selected'].value }}</div>
@@ -277,7 +277,7 @@
                           <div class="box-body">
                             <div [appMsgError]="item.pageSizeFormControlName" [form]="form" class="mb-2">
                               <div class="mb-0">Tamaño del PDF</div>
-                              <p-select [options]="paper_sizes" [formControlName]="item.pageSizeFormControlName" placeholder="Seleccione una tamaño de papel">
+                              <p-select appendTo="body" [options]="paper_sizes" [formControlName]="item.pageSizeFormControlName" placeholder="Seleccione una tamaño de papel">
                                 <ng-template pTemplate="selectedItem">
                                   @if (form.controls[item.pageSizeFormControlName].value.label) {
                                     <div class="d-flex align-items-center">

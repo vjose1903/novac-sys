@@ -26,6 +26,7 @@
                         formControlName="user_id"
                         placeholder="Seleccione un propietario"
                         [filter]="true"
+                        appendTo="body"
                         filterBy="nombre_completo"
                         optionLabel="nombre_completo"
                         optionValue="id"
@@ -90,7 +91,7 @@
                     <div class="form-group">
                       <label class="control-label">Marca: <span style="color: red">*</span></label>
 
-                      <p-select
+                      <p-select appendTo="body"
                         inputId="marca"
                         [options]="listaMarcas"
                         formControlName="marca"
@@ -108,7 +109,7 @@
                     <div class="form-group">
                       <label class="control-label">Modelo: <span style="color: red">*</span></label>
 
-                      <p-select
+                      <p-select appendTo="body"
                         inputId="modelo"
                         [options]="listaModelos"
                         formControlName="modelo"
