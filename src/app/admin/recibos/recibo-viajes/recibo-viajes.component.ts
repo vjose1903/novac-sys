@@ -6,7 +6,7 @@ import moment from '../../../core/javascript/moment';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { EmpleadoCatalogService } from '@registros/registro-empleados/services/empleado-catalog.service';
-import { VehiculoC } from '@registros/registro-vehiculo/vehiculo';
+import { VehiculoCatalogService } from '@registros/registro-vehiculo/services/vehiculo-catalog.service';
 import { ReciboC } from '../recibos';
 import { FacturaC } from '../../facturacion/factura';
 import { fun } from '@core/services/functions.service';
@@ -107,13 +107,13 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   have_incidencia = false;
   incidencia = '';
   devuelta: any;
-  vehiculoClass = new VehiculoC();
   reciboClass = new ReciboC();
   facturaClass = new FacturaC();
 
   htmlServ = inject(HtmlElementsService);
   dynamicModalServ = inject(DynamicModalService);
   empleadoCatalogServ = inject(EmpleadoCatalogService);
+  vehiculoCatalogServ = inject(VehiculoCatalogService);
   tServ = inject(TablasService);
   fb = inject(UntypedFormBuilder);
   route = inject(ActivatedRoute);
@@ -174,12 +174,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async getCamiones() {
-    const extra = { afterPath: `filtro/ `, parameters: { paginado: false, info_vehiculo: true } };
-    this.vehiculoClass.getAll(extra).then(res => {
-      const config = this.config_viaje_selected.info.find(config => config.id == 'camion');
-      config.data = res['data'];
-      this.camiones = res['data'];
-    });
+    this.camiones = await this.vehiculoCatalogServ.getCamiones({ force: true });
+    const config = this.config_viaje_selected.info.find(config => config.id == 'camion');
+    config.data = this.camiones;
     fun.setTimeout(() => {}, 500);
   }
 

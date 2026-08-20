@@ -4,6 +4,7 @@ import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
+import { MarcaModeloCatalogService } from '@registros/registro-vehiculo/services/marca-modelo-catalog.service';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '../../new_tablas/tabla-class';
 import { Permisos } from '@core/typescript/permisos';
@@ -85,6 +86,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
+  private marcaModeloCatalogServ = inject(MarcaModeloCatalogService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
   private permissionsService = inject(NgxPermissionsService);
@@ -104,7 +106,6 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
           this.pedirNuevaData(actual_pagination);
           requestAnimationFrame(() => {
             fun.enfocarInput('descripcion-input');
-            console.log('ANDO AQUIII');
           });
         } else {
           fun.toastError('No tiene permisos para realizar esta acción', 'No Autorizado');
@@ -139,7 +140,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.formModelo.controls.descripcion.setValidators([Validators.required]);
     this.formModelo.controls.marca_id.setValidators([Validators.required]);
 
-    this.getMarcas({ paginado: false, search: ' ', page: 1, per_page: 1 });
+    this.getMarcas({ paginado: false, search: ' ', page: 1, per_page: 1, force: true });
 
     this.pedirNuevaData(this.tServ.obj_paginate.default);
 
@@ -158,20 +159,22 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     this.permissionsService.hasPermission([this.permissions.modelo.create, this.permissions.modelo.update]).then(result => (this.hasPermissionsModeloCreate = result));
   }
 
-  getMarcas(params) {
+  async getMarcas(params) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { paginado: params.paginado, page: params.page, per_page: params.per_page } };
+
+    if (!params.paginado) {
+      const marcas = await this.marcaModeloCatalogServ.getMarcasFiltro({ force: params.force });
+      this.listaMarcas.set(marcas);
+      return;
+    }
 
     this.listadoMarcas.set([]);
 
     this.marcasClass.getAll(extra).then(res => {
-      if (!params.paginado) this.listaMarcas.set(fun.deepCloning(res));
-
-      if (params.paginado) {
-        this.listadoMarcas.set(res.data);
-        this.table_marca_config.total_count = res.total_registros;
-        this.tablaMarcaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
-      }
+      this.listadoMarcas.set(res.data);
+      this.table_marca_config.total_count = res.total_registros;
+      this.tablaMarcaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     });
   }
 
@@ -255,6 +258,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
     const onYes = () => {
       const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
       clase.deleteOne(regisData.id).then(res => {
+        this.marcaModeloCatalogServ.invalidate();
         const actual_pagination = this.tServ.getPaginationById(this.componente[this.tabIndex()]);
         this.pedirNuevaData(actual_pagination);
       });
@@ -280,6 +284,7 @@ export class FormularioMarcaModeloComponent extends MixinClass implements OnInit
 
     const clase = this.isShowMarcas() ? this.marcasClass : this.modeloClass;
     await clase.createUpdateOne(formData);
+    this.marcaModeloCatalogServ.invalidate();
 
     this.onSuccess(metodo);
   }

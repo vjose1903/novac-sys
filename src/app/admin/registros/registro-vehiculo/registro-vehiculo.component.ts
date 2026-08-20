@@ -3,11 +3,12 @@ import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject, signal } from 
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
-import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { EmpleadoCatalogService } from '../registro-empleados/services/empleado-catalog.service';
 import { VehiculoC } from './vehiculo';
+import { MarcaModeloCatalogService } from './services/marca-modelo-catalog.service';
+import { VehiculoCatalogService } from './services/vehiculo-catalog.service';
 import { FormularioMarcaModeloComponent } from '@components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
@@ -41,8 +42,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   isCreando: boolean = false;
 
   vehiculosClass = new VehiculoC();
-  marcasClass = new MarcaC();
-  modeloClass = new ModeloC();
   permissions = Permisos;
   table_config: table_config = {
     info: [
@@ -71,6 +70,8 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   public dynamicModalServ = inject(DynamicModalService);
   private cdRef = inject(ChangeDetectorRef);
   private empleadoCatalogServ = inject(EmpleadoCatalogService);
+  private marcaModeloCatalogServ = inject(MarcaModeloCatalogService);
+  private vehiculoCatalogServ = inject(VehiculoCatalogService);
   private fb = inject(UntypedFormBuilder);
   private router = inject(Router);
   private tServ = inject(TablasService);
@@ -133,9 +134,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   async getMarcas() {
     try {
-      const res = (await this.marcasClass.getAll()) as any;
-
-      this.listaMarcas = res;
+      this.listaMarcas = await this.marcaModeloCatalogServ.getMarcas({ force: true });
     } catch (error) {
       fun.toastError('Error buscando marcas', 'ERROR');
     }
@@ -206,8 +205,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     return new Promise<void>(async (resolve, reject) => {
       const marca_selected_id = this.form.controls.marca.value;
       if (marca_selected_id) {
-        const res = await this.modeloClass.getAll({ afterPath: `por_marca/${marca_selected_id}` });
-        this.listaModelos = res;
+        this.listaModelos = await this.marcaModeloCatalogServ.getModelosPorMarca(marca_selected_id);
         if (fun.hasValue(this.form)) this.form.controls.modelo.reset();
         this.verificateMarcaIsSelected();
         resolve();
@@ -237,6 +235,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
     const onYes = () => {
       this.vehiculosClass.deleteOne(regisData.id).then(res => {
         fun.toastSuccess(`Camion: ${regisData.marca} ${regisData.modelo}  de: ${regisData.nombre_completo_propietario}` + ' borrado.', 'CORRECTO');
+        this.vehiculoCatalogServ.invalidate();
         const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
         this.getVehiculos(actualPagination);
         this.borrar();
@@ -300,7 +299,10 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   closeModalMarcaModelo(arg: ICallbackModal) {
-    if (arg.type == modalCloseType.onHide) this.getMarcas();
+    if (arg.type == modalCloseType.onHide) {
+      this.marcaModeloCatalogServ.invalidate();
+      this.getMarcas();
+    }
   }
   // =============================================
   //  Crear vehiculo
@@ -338,6 +340,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
         fun.toastSuccess('Vehiculo registrado con exito.', 'Correcto');
       }
       this.borrar();
+      this.vehiculoCatalogServ.invalidate();
       const actualPagination = this.tServ.getPaginationById('lista_vehiculos');
       this.getVehiculos(actualPagination);
     } catch (error) {
