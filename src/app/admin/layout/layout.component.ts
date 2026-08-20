@@ -142,10 +142,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.cdRef.detectChanges();
   }
 
-  ngAfterContentChecked() {
-    this.cdRef.detectChanges();
-  }
-
   ngOnDestroy() {
     document.body.classList.remove('crud-route-navigating');
     this._destroy_mixin();

@@ -61,6 +61,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   cantPagesView: number = 5;
   cantPagesViewTimeout;
   private destroy$ = new Subject<void>();
+  private quantityCellCache = new WeakMap<any, Map<string, { label: string; tooltip: string | null }>>();
 
   fun = fun;
 
@@ -541,6 +542,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
   ngOnChanges(change) {
     if (change.data && change.data.currentValue) {
+      this.quantityCellCache = new WeakMap<any, Map<string, { label: string; tooltip: string | null }>>();
       this.updateDataCopy(this.data);
 
       // ================================================
@@ -580,6 +582,31 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
 
     // Por defecto retorna cantidad-medida
     return `${cantidad} ${medida}`;
+  }
+
+  getRowTrack(rowData, index: number) {
+    if (this.config.track_key) return rowData?.[this.config.track_key];
+    return rowData?.id ?? rowData?.codigo ?? index;
+  }
+
+  getQuantityCell(rowData, column) {
+    let rowCache = this.quantityCellCache.get(rowData);
+    if (!rowCache) {
+      rowCache = new Map<string, { label: string; tooltip: string | null }>();
+      this.quantityCellCache.set(rowData, rowCache);
+    }
+
+    const cacheKey = column.key;
+    const cached = rowCache.get(cacheKey);
+    if (cached) return cached;
+
+    const cell = {
+      label: this.quantityLabel(rowData, column),
+      tooltip: this.quantityTooltip(rowData, column),
+    };
+
+    rowCache.set(cacheKey, cell);
+    return cell;
   }
 
   quantityTooltip(dato, column) {

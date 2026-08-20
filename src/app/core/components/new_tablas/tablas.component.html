@@ -57,7 +57,7 @@
             <div class="divBody">
               @if (data && data.length > 0) {
                 <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
-                  @for (rowData of data; track config.track_key ? rowData[config.track_key] : $index; let indexBody = $index) {
+                  @for (rowData of data; track getRowTrack(rowData, $index); let indexBody = $index) {
                     <tr
                       class="text-center"
                       id="row-{{ realIdTabla }}-{{ getIndex(indexBody) }}"
@@ -94,16 +94,17 @@
                                   </span>
                                 }
                                 @case (tableCellType.quantityTooltip) {
+                                  @let quantityCell = getQuantityCell(rowData, column);
                                   <ng-template #tooltipCantidades>
-                                    <div [innerHTML]="quantityTooltip(rowData, column)"></div>
+                                    <div [innerHTML]="quantityCell.tooltip"></div>
                                   </ng-template>
 
                                   <span
                                     id="{{ column.key }}-{{ getIndex(indexBody) }}"
-                                    [pTooltip]="quantityTooltip(rowData, column) && quantityTooltip(rowData, column).trim() !== '' ? tooltipCantidades : null"
+                                    [pTooltip]="quantityCell.tooltip && quantityCell.tooltip.trim() !== '' ? tooltipCantidades : null"
                                     [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'"
                                     style="width: 100%">
-                                    {{ quantityLabel(rowData, column) }}
+                                    {{ quantityCell.label }}
                                   </span>
                                 }
                                 @case (tableCellType.img) {
