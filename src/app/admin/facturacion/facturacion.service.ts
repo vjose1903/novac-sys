@@ -26,6 +26,7 @@ export class FacturacionService {
 
   tipoFacturaClass = new TiposFacturaC();
   serieType = signal(serie.electronica);
+  private tiposFacturasInflight: Promise<TipoFacturaI[]> | null = null;
 
   isCompra = computed(() => this.tipoDocumento() == tipoDocFacturacion.compra);
   isVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.venta);
@@ -181,20 +182,27 @@ export class FacturacionService {
     }
   }
 
-  async getTiposFacturas(): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
-      try {
-        const tiposFacturas = (await this.tipoFacturaClass.getAll()) as unknown as TipoFacturaI[];
+  async getTiposFacturas(options: { force?: boolean } = {}): Promise<void> {
+    try {
+      if (this.lista_tipos_facturas?.length && !options.force) return;
 
-        const tiposFacturasOrdenados = tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
-
-        this.lista_tipos_facturas = tiposFacturasOrdenados;
-        resolve();
-      } catch (error) {
-        fun.logRed('error: ', error);
-        reject(error);
+      if (!this.tiposFacturasInflight || options.force) {
+        this.tiposFacturasInflight = this.tipoFacturaClass
+          .getAll()
+          .then(res => {
+            const tiposFacturas = res as unknown as TipoFacturaI[];
+            return tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
+          })
+          .finally(() => {
+            this.tiposFacturasInflight = null;
+          });
       }
-    });
+
+      this.lista_tipos_facturas = await this.tiposFacturasInflight;
+    } catch (error) {
+      fun.logRed('error: ', error);
+      throw error;
+    }
   }
 
   getDetallesLlenos() {

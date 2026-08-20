@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import moment from '../../../core/javascript/moment';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
+import { FacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
@@ -51,7 +51,6 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   listaNCFBack = [];
 
   facturaClass = new FacturaC();
-  tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
   permissions = Permisos;
 
@@ -116,6 +115,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   async parseTiposFacturas() {
     try {
+      await Ss.factServ.getTiposFacturas();
       const temp_tipos_facturas = fun.deepCloning(Ss.factServ.lista_tipos_facturas);
 
       for (let index = 0; index < temp_tipos_facturas.length; index++) {
