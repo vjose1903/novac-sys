@@ -32,7 +32,7 @@
                   inputId="tipoI"
                   [ngModel]="tipo_documento_selected()"
                   (ngModelChange)="tipo_documento_selected.set($event)"
-                  styleClass="form-control inputE"
+                  styleClass="form-control inputE field-sm"
                   [options]="tipos_documentos"
                   optionLabel="label"
                   optionValue="value"
@@ -50,7 +50,7 @@
               <p-select
                 inputId="buscarPorI"
                 [(ngModel)]="buscar_por"
-                styleClass="form-control inputE"
+                styleClass="form-control inputE field-sm"
                 [options]="buscarPorOptions()"
                 optionLabel="label"
                 optionValue="value"
@@ -82,7 +82,7 @@
             @if (buscar_por && buscar_por != campos.numeroComprobante && buscar_por != campos.ultimas50 && tipo_documento_selected() != 'cotizacion') {
               <div class="form-group flex-1">
                 <label class="control-label mb-0">Tipo factura : </label>
-                <p-select inputId="campoTipoFact" [(ngModel)]="tipo_factura_id" styleClass="form-control inputE" [options]="tipoFacturaOptions()" optionLabel="label" optionValue="value" placeholder="Escoger tipo" appendTo="body" (keydown.enter)="saltar('campoTipoFact', tipo_factura_id)"></p-select>
+                <p-select inputId="campoTipoFact" [(ngModel)]="tipo_factura_id" styleClass="form-control inputE field-sm" [options]="tipoFacturaOptions()" optionLabel="label" optionValue="value" placeholder="Escoger tipo" appendTo="body" (keydown.enter)="saltar('campoTipoFact', tipo_factura_id)"></p-select>
               </div>
             }
 

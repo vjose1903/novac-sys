@@ -291,9 +291,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
       { condition: this.hasPermisoCotizacion, value: tipoDocFacturacion.cotizacion, label: 'Cotización' },
     ];
 
-    tipos.forEach(tipo => {
-      if (tipo.condition) this.tipos_documentos.push(tipo);
-    });
+    this.tipos_documentos = tipos.filter(tipo => tipo.condition);
   }
 
   onHideSide() {
