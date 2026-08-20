@@ -51,6 +51,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   htmlServ = inject(HtmlElementsService);
   dynamicModalServ = inject(DynamicModalService);
   private articuloCatalogServ = inject(ArticuloCatalogService);
+  private calcularProduccionRequestId = 0;
 
   constructor() {
     super();
@@ -113,14 +114,6 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     }
 
     return cantiTootip;
-  }
-
-  ingredientesScroll(arg) {
-    const divs = ['inventario_scroll', 'produccion_scroll'];
-    let div_opuesto_id = divs.find(item => item != arg.element_id);
-    const div_opuesto = document.getElementById(div_opuesto_id);
-
-    if (fun.hasValue(div_opuesto)) div_opuesto.scrollTop = arg.element.scrollTop;
   }
 
   existenciaConTooltip(objeto) {
@@ -201,15 +194,24 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
     return ingrediente?.articulo_combo_id ?? ingrediente?.articulo_combo?.id ?? ingrediente?.articulo_combo;
   }
 
+  getIngredienteParaProduccion(ingrediente) {
+    const articuloComboId = this.getIngredienteArticuloId(ingrediente);
+    return this.ingredientesParaProduccion.find(item => this.getIngredienteArticuloId(item) === articuloComboId);
+  }
+
   async calcularCantidadAProduccir() {
+    const requestId = ++this.calcularProduccionRequestId;
     this.ingredientesParaProduccion = [];
 
     if (!this.cantidad_producir || !this.medida_producir) return;
 
     const listaProduccion = this.lista_produccion();
     const tieneProduccionPrevia = listaProduccion.length > 0;
+    const ingredientesParaProduccion = [];
 
     for (const ingrediente of this.ingredientes) {
+      if (requestId !== this.calcularProduccionRequestId) return;
+
       const articuloComboId = this.getIngredienteArticuloId(ingrediente);
 
       if (!fun.hasValue(articuloComboId)) {
@@ -236,6 +238,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
 
       const parametrosVerificacion = { afterPath: `check_excede/${articuloComboId}`, parameters: { cantidad: cantidadCalculada } };
       const respuesta = await this.articuloClass.getAll(parametrosVerificacion);
+      if (requestId !== this.calcularProduccionRequestId) return;
+
       const excedeExistencia = respuesta['data'];
 
       if (excedeExistencia) {
@@ -246,7 +250,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
         return;
       }
 
-      this.ingredientesParaProduccion.push({
+      ingredientesParaProduccion.push({
         nombre: ingrediente.nombre,
         existencia: contenidoAProducir,
         articulo_id: ingrediente.articulo_id,
@@ -257,6 +261,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
         medida: ingrediente.medida,
       });
     }
+
+    if (requestId === this.calcularProduccionRequestId) this.ingredientesParaProduccion = ingredientesParaProduccion;
   }
 
   borrarForm() {

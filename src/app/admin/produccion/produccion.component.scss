@@ -211,6 +211,7 @@
   }
   .cuerpo {
     grid-area: cuerpo;
+    min-height: 0;
     overflow: hidden;
   }
 }
@@ -219,26 +220,29 @@
   grid-area: heading;
 }
 
-.bordes {
+.production-ingredients-table {
   border: 1px solid var(--app-table-border);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 22vh;
+  max-height: 22vh;
   overflow: hidden;
 }
 
-.cardIngredientes .cuerpo > .bordes:first-child {
-  border-radius: 0.75rem 0 0 0.75rem;
+.production-ingredients-headers,
+.production-ingredient-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
-.cardIngredientes .cuerpo > .bordes:last-child {
-  border-radius: 0 0.75rem 0.75rem 0;
+.production-ingredients-headers {
+  background-color: var(--primary01);
+  border-bottom: 1px solid var(--app-table-border);
+  box-sizing: border-box;
+  padding-right: 7px;
 }
 
-.cardIngredientes .cuerpo > .bordes:first-child .tituloIngre {
-  border-top-left-radius: 0.75rem;
-}
-
-.cardIngredientes .cuerpo > .bordes:last-child .tituloIngre {
-  border-top-right-radius: 0.75rem;
-}
 .fondoGris {
   background-color: var(--app-surface-muted);
 }
@@ -253,6 +257,11 @@
   border-bottom: 0.5px solid var(--app-table-border);
 }
 
+.production-ingredient-row .ingredientesList:first-child,
+.production-ingredients-headers .tituloIngre:first-child {
+  border-right: 1px solid var(--app-table-border);
+}
+
 .ingredientesList > div {
   flex: 0 0 auto;
   margin-left: auto;
@@ -262,7 +271,6 @@
 .tituloIngre {
   background-color: var(--primary01);
   color: var(--app-table-header-text);
-  border-bottom: 1px solid var(--app-table-border);
   padding: 0.35rem 0.5rem;
   font-size: 0.85rem;
   font-weight: 600;
@@ -281,26 +289,22 @@
   margin-right: 0.7rem;
 }
 
-.fondoGris,
-.fondoBlanco {
-  min-height: 22vh;
-  max-height: 22vh;
-  background-color: var(--app-table-row-bg);
-  color: var(--app-table-text);
-}
-
-.fondoGris {
-  background-color: var(--app-surface-muted);
-}
-
-.scroll-container-prod {
-  display: flex;
-  flex-direction: column;
-
-  max-height: calc(100% - 1.5rem) !important;
-
-  overflow: auto;
+.production-ingredients-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
+  background:
+    linear-gradient(
+      to right,
+      var(--app-surface-muted) 0,
+      var(--app-surface-muted) calc((100% - 7px) / 2),
+      var(--app-table-border) calc((100% - 7px) / 2),
+      var(--app-table-border) calc(((100% - 7px) / 2) + 1px),
+      var(--app-surface) calc(((100% - 7px) / 2) + 1px),
+      var(--app-surface) 100%
+    );
 }
 
 .medio .card-padding-1 {

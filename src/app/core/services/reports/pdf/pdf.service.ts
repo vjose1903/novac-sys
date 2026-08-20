@@ -9,10 +9,8 @@ import { ConfigI } from '../../../interface/config-interface';
 import { fun } from '../../functions.service';
 import { Injectable } from '@angular/core';
 
-import { vfs } from '../utils/vfs_fonts';
 import { fonts } from '../utils/pdfFonts';
 import { serie } from '@core/typescript/constantes';
-import pdfMake from 'pdfmake/build/pdfmake';
 
 type PrintErrorCode =
   | 'PRINT_PRINTER_NOT_CONFIGURED'
@@ -142,13 +140,16 @@ export class PdfService {
     });
   }
 
-  static createPdfFromBase64(docDefinition: any, file_: string, reimprimir_: boolean): Promise<any> {
+  static async createPdfFromBase64(docDefinition: any, file_: string, reimprimir_: boolean): Promise<any> {
+    const [{ default: pdfMake }, { vfs }] = await Promise.all([import('pdfmake/build/pdfmake'), import('../utils/vfs_fonts')]);
+
     return new Promise<any>((resolve, reject) => {
       try {
-        pdfMake.vfs = vfs;
-        pdfMake.fonts = fonts;
+        const pdfMaker = pdfMake as any;
+        pdfMaker.vfs = vfs;
+        pdfMaker.fonts = fonts;
 
-        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+        const pdfDocGenerator = pdfMaker.createPdf(docDefinition);
         pdfDocGenerator.getBase64((data: string) => {
           const respuesta = this.makeStatusObj({
             msg: 'Pdf Base64 correcto',

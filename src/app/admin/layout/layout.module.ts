@@ -1,4 +1,3 @@
-import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -10,22 +9,15 @@ import { DirectivesModule } from '@core/directive/directives.module';
 import { ValidateRayaAbajo } from '../../directives/validaciones';
 import { TablasModule } from '@components/new_tablas/tablas.module';
 
-import { HomeAdminComponent } from '../home/homeAdmin.component';
-import { DashboardFullscreenCardComponent } from '../home/dashboard-fullscreen-card.component';
-import { InventarioComponent } from '../inventario/inventario.component';
-import { ProduccionComponent } from '../produccion/produccion.component';
 import { TabsModule } from 'primeng/tabs';
-import { ReportesComponent } from '../reportes/reportes.component';
 import { NgxPermissionsModule } from 'ngx-permissions';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
 import { MenuItemComponent } from './components/menu-item/menu-item.component';
 import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
-import { NgxEchartsModule } from 'ngx-echarts';
-import * as echarts from 'echarts';
 @NgModule({
-  declarations: [LayoutComponent, HomeAdminComponent, DashboardFullscreenCardComponent, InventarioComponent, ValidateRayaAbajo, ProduccionComponent, ReportesComponent],
+  declarations: [LayoutComponent, ValidateRayaAbajo],
   imports: [
     CommonModule,
     LayoutRoutingModule,
@@ -37,8 +29,6 @@ import * as echarts from 'echarts';
     ReactiveFormsModule,
     NgxPermissionsModule.forChild(),
     BtnIconModule,
-    NgxExtendedPdfViewerModule,
-    NgxEchartsModule.forRoot({ echarts }),
     MenuItemComponent,
     FormErrorMsgComponent,
   ],

@@ -5,7 +5,6 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { ToastrModule } from 'ngx-toastr';
 import { InterceptorService } from './loader/interceptor.service';
 import { NgxPermissionsModule } from 'ngx-permissions';
-import { NgxExtendedPdfViewerModule, NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 import { primeNGLocales } from '@core/typescript/primeNG.locales';
 import Nora from '@primeuix/themes/nora';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -29,8 +28,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     importProvidersFrom(NgxPermissionsModule.forRoot()),
-    importProvidersFrom(NgxExtendedPdfViewerModule),
-    importProvidersFrom(NgxExtendedPdfViewerService),
     importProvidersFrom(ToastrModule.forRoot({ preventDuplicates: true })),
     provideRouter(
       routes,

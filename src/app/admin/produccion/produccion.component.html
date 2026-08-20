@@ -50,7 +50,7 @@
                       [(ngModel)]="cantidad_producir"
                       (focus)="htmlServ.selectValue($event)"
                       placeholder="Cantidad"
-                      class="form-control inputE input_cantidad"
+                      class="form-control inputE input_cantidad field-sm"
                       autocomplete="off"
                       (blur)="calcularCantidadAProduccir()" />
                   </div>
@@ -58,7 +58,7 @@
                   <div class="col-8 pe-0">
                     <p-select
                       inputId="medida_producir"
-                      styleClass="form-control inputE"
+                      styleClass="form-control inputE field-sm"
                       [class.production-select-placeholder]="!medida_producir"
                       [(ngModel)]="medida_producir"
                       [options]="optionsMedidas"
@@ -88,37 +88,38 @@
             <span class="production-panel-status">Inventario / producción</span>
           </div>
 
-          <div class="row h-100 cuerpo">
-            <div class="col-6 p-0 fondoGris bordes">
+          <div class="h-100 cuerpo production-ingredients-table">
+            <div class="production-ingredients-headers">
               <div class="text-center tituloIngre">Inventario</div>
+              <div class="text-center tituloIngre">Producción</div>
+            </div>
 
-              <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                @for (ingrediente of ingredientes; track ingrediente.id; let index = $index) {
-                  <div class="ingredientesList d-flex">
+            <div class="production-ingredients-scroll">
+              @for (ingrediente of ingredientes; track ingrediente.id; let index = $index) {
+                @let ingredienteProduccion = getIngredienteParaProduccion(ingrediente);
+                <div class="production-ingredient-row">
+                  <div class="ingredientesList fondoGris">
                     <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
-                    <div style="width: 100%">
+                    <div>
                       <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index != 0 ? 'top' : 'bottom'" [escape]="false">
                         {{ lookprincipal(ingrediente) }}
                       </span>
                     </div>
                   </div>
-                }
-              </div>
-            </div>
-            <div class="col-6 p-0 bordes fondoBlanco">
-              <div class="text-center tituloIngre">Producción</div>
-              @if (ingredientesParaProduccion.length > 0) {
-                <div id="produccion_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                  @for (ingrediente of ingredientesParaProduccion; track $index; let index_ingrediente = $index) {
-                    <div class="ingredientesList d-flex">
-                      <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
-                      <div class="" style="width: 100%">
-                        <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'" [escape]="false">
-                          {{ lookprincipal(ingrediente) }}
+
+                  <div class="ingredientesList fondoBlanco">
+                    <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
+                    <div>
+                      @if (ingredienteProduccion) {
+                        <span
+                          [pTooltip]="existenciaConTooltip(ingredienteProduccion) ? lookOters(ingredienteProduccion.existencia) : ''"
+                          [tooltipPosition]="index != 0 ? 'top' : 'bottom'"
+                          [escape]="false">
+                          {{ lookprincipal(ingredienteProduccion) }}
                         </span>
-                      </div>
+                      }
                     </div>
-                  }
+                  </div>
                 </div>
               }
             </div>

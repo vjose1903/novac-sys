@@ -1,13 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { HomeAdminComponent } from '../home/homeAdmin.component';
-import { InventarioComponent } from '../inventario/inventario.component';
-import { ProduccionComponent } from '../produccion/produccion.component';
-import { ReportesComponent } from '../reportes/reportes.component';
 import { LayoutComponent } from './layout.component';
-import { PermissionsGuardService } from '@core/guard/permissions.guard';
-import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
-import { Permisos } from '@core/typescript/permisos';
 const routes: Routes = [
   {
     path: 'admin',
@@ -20,8 +13,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        component: HomeAdminComponent,
-        canDeactivate: [CanDeactivateGuard],
+        loadChildren: () => import('../home/home.module').then(m => m.HomeModule),
       },
       {
         path: 'factura',
@@ -33,8 +25,7 @@ const routes: Routes = [
       },
       {
         path: 'produccion',
-        component: ProduccionComponent,
-        canDeactivate: [CanDeactivateGuard],
+        loadChildren: () => import('../produccion/produccion.module').then(m => m.ProduccionModule),
       },
       {
         path: 'registros',
@@ -50,8 +41,7 @@ const routes: Routes = [
       },
       {
         path: 'inventario',
-        component: InventarioComponent,
-        canDeactivate: [CanDeactivateGuard],
+        loadChildren: () => import('../inventario/inventario.module').then(m => m.InventarioModule),
       },
       {
         path: 'conduce',
@@ -59,9 +49,7 @@ const routes: Routes = [
       },
       {
         path: 'reportes',
-        component: ReportesComponent,
-        canActivate: [PermissionsGuardService.createPermissionGuard(Object.values(Permisos.reporte), 'admin/dashboard')],
-        canDeactivate: [CanDeactivateGuard],
+        loadChildren: () => import('../reportes/reportes.module').then(m => m.ReportesModule),
       },
       {
         path: 'cuadres',
