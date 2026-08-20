@@ -74,6 +74,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   private rolesCatalogServ = inject(RolesCatalogService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
+  private empleadosRequestId = 0;
 
   constructor() {
     super();
@@ -111,9 +112,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   async necesarioStart() {
-    await this.createForm();
-    await this.getEmpleados(this.tServ.obj_paginate.default);
-    await this.getRoles();
+    this.createForm();
+    await Promise.all([this.getEmpleados(this.tServ.obj_paginate.default), this.getRoles()]);
     fun.enfocarInput('cedula');
   }
 
@@ -122,24 +122,26 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
     campo.setValue(fun.capitalice(arg));
   }
   async getEmpleados(params?: { per_page?: number; page?: number; search?: string }) {
+    const requestId = ++this.empleadosRequestId;
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
       this.listaEmpleados.length = 0;
-      this.empleadosClass.getAll(extra).then(res => {
-        res['data'].map(empleado => {
-          const doc = _.find(empleado.documentos_de_identidad, { principal: true });
-          empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
+      const res = await this.empleadosClass.getAll(extra);
+      if (requestId !== this.empleadosRequestId) return;
 
-          return empleado;
-        });
+      res['data'].map(empleado => {
+        const doc = _.find(empleado.documentos_de_identidad, { principal: true });
+        empleado.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
 
-        this.listaEmpleados = res['data'];
-        this.table_config.total_count = res.total_registros;
-        this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
+        return empleado;
       });
+
+      this.listaEmpleados = res['data'];
+      this.table_config.total_count = res.total_registros;
+      this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       fun.toastError('Error buscando empleados registrados.', 'ERROR');
     }

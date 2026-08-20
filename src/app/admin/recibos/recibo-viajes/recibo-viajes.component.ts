@@ -118,6 +118,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   fb = inject(UntypedFormBuilder);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  private viajesRequestId = 0;
 
   fun = fun;
   constructor() {
@@ -133,10 +134,9 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this._destroy_mixin();
   }
 
-  necesarioStart() {
+  async necesarioStart() {
+    await Promise.all([this.getViajes(this.tServ.obj_paginate.default), this.getChoferes(), this.getCamiones()]);
     this.checkRoute();
-    this.getChoferes();
-    this.getCamiones();
 
     // this.createForm();
   }
@@ -145,89 +145,85 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   //   this.form = this.fb.group({ choferes_viajes: [null, Validators.required], camiones_viajes: [null, Validators.required] });
   // }
 
-  async checkRoute() {
-    this.getViajes(this.tServ.obj_paginate.default).then(async result => {
-      const id_documento = this.route.snapshot.params['id'];
+  checkRoute() {
+    const id_documento = this.route.snapshot.params['id'];
 
-      if (id_documento != '0') {
-        const factura = this.viajes.find(viaje => viaje.id == id_documento);
+    if (id_documento != '0') {
+      const factura = this.viajes.find(viaje => viaje.id == id_documento);
 
-        if (fun.isEmpty(factura)) {
-          const inputSearch = document.getElementById('search-lista_viajes') as any;
+      if (fun.isEmpty(factura)) {
+        const inputSearch = document.getElementById('search-lista_viajes') as any;
 
-          if (fun.hasValue(inputSearch)) {
-            inputSearch.value = factura?.cliente?.nombre;
-            fun.keyboardEvent(inputSearch, 'keyup', ['Shift']);
-          }
+        if (fun.hasValue(inputSearch)) {
+          inputSearch.value = factura?.cliente?.nombre;
+          fun.keyboardEvent(inputSearch, 'keyup', ['Shift']);
         }
-
-        this.verViaje(factura);
       }
-    });
+
+      this.verViaje(factura);
+    }
   }
 
   async getChoferes() {
     this.choferes = await this.empleadoCatalogServ.getChoferes({ force: true });
     const config = this.config_viaje_selected.info.find(config => config.id == 'chofer');
     config.data = this.choferes;
-    fun.setTimeout(() => {}, 500);
   }
 
   async getCamiones() {
     this.camiones = await this.vehiculoCatalogServ.getCamiones({ force: true });
     const config = this.config_viaje_selected.info.find(config => config.id == 'camion');
     config.data = this.camiones;
-    fun.setTimeout(() => {}, 500);
   }
 
   async getViajes(params?: { per_page: number; page: number; search: string }) {
-    return new Promise<any>(async (resolve, reject) => {
-      this.resetViajesSummary();
-      this.viajes.length = 0;
-      const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const requestId = ++this.viajesRequestId;
+    this.resetViajesSummary();
+    this.viajes.length = 0;
+    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
-      const res = await this.facturaClass.getAll({
-        afterPath: 'custom/viajes',
-        parameters: { page: params.page, per_page: params.per_page, paginado: true, movimientos_viaje: true, estado: true, palabra_a_buscar: palabra_a_buscar },
-      });
-
-      const fechaA = moment().format('YYYY-MM-DD');
-      res.data.forEach(viaje => {
-        const pago_a_tiempo = viaje.condicion == 'Contado' ? true : viaje.fecha_vencimiento > fechaA ? true : false;
-
-        viaje.is_active = viaje.fecha_completada ? 'fas fa-check' : viaje.pagos.length > 0 ? 'far fa-check-square' : 'far fa-square';
-        viaje.is_active_color = viaje.fecha_completada ? 'green' : viaje.pagos.length > 0 ? 'yellow' : 'red';
-        viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.pagos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
-        viaje.ver = 'far fa-eye';
-        viaje.make_recipt = 'fas fa-external-link-alt';
-        viaje.make_recipt_tooltip = fun.hasValue(viaje.fecha_completada) ? 'Pedido completado' : 'Realizar recibo de ingreso';
-
-        viaje.customStyles = {
-          estado: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
-
-          actions: [
-            { key: 'ver', estilos: 'font-size: 1rem !important' },
-            { key: 'make_recipt', estilos: 'font-size: 1rem !important' },
-          ],
-        };
-
-        viaje['pago_a_tiempo'] = pago_a_tiempo;
-
-        viaje.movimientos_viaje.map(movimiento_viaje => {
-          this.parseMovimientosViaje(movimiento_viaje);
-          return movimiento_viaje;
-        });
-
-        this.viajes.push(viaje);
-      });
-
-      this.applyViajesSummary((res as any).summary, res.total_registros);
-
-      this.table_config.total_count = res.total_registros;
-      this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
-
-      resolve(true);
+    const res = await this.facturaClass.getAll({
+      afterPath: 'custom/viajes',
+      parameters: { page: params.page, per_page: params.per_page, paginado: true, movimientos_viaje: true, estado: true, palabra_a_buscar: palabra_a_buscar },
     });
+    if (requestId !== this.viajesRequestId) return false;
+
+    const fechaA = moment().format('YYYY-MM-DD');
+    res.data.forEach(viaje => {
+      const pago_a_tiempo = viaje.condicion == 'Contado' ? true : viaje.fecha_vencimiento > fechaA ? true : false;
+
+      viaje.is_active = viaje.fecha_completada ? 'fas fa-check' : viaje.pagos.length > 0 ? 'far fa-check-square' : 'far fa-square';
+      viaje.is_active_color = viaje.fecha_completada ? 'green' : viaje.pagos.length > 0 ? 'yellow' : 'red';
+      viaje.is_active_tooltip = viaje.fecha_completada ? 'Pago completo' : viaje.pagos.length > 0 ? 'Viaje abonado' : 'Viaje pendiente';
+      viaje.ver = 'far fa-eye';
+      viaje.make_recipt = 'fas fa-external-link-alt';
+      viaje.make_recipt_tooltip = fun.hasValue(viaje.fecha_completada) ? 'Pedido completado' : 'Realizar recibo de ingreso';
+
+      viaje.customStyles = {
+        estado: [{ key: 'is_active', rowTooltip: 'is_active_tooltip', text_color: 'is_active_color' }],
+
+        actions: [
+          { key: 'ver', estilos: 'font-size: 1rem !important' },
+          { key: 'make_recipt', estilos: 'font-size: 1rem !important' },
+        ],
+      };
+
+      viaje['pago_a_tiempo'] = pago_a_tiempo;
+
+      viaje.movimientos_viaje.map(movimiento_viaje => {
+        this.parseMovimientosViaje(movimiento_viaje);
+        return movimiento_viaje;
+      });
+
+      this.viajes.push(viaje);
+    });
+
+    this.applyViajesSummary((res as any).summary, res.total_registros);
+
+    this.table_config.total_count = res.total_registros;
+    this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
+
+    return true;
   }
 
   resetViajesSummary() {

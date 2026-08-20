@@ -71,6 +71,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   private rolesCatalogServ = inject(RolesCatalogService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
+  private rolesRequestId = 0;
 
   constructor() {
     super();
@@ -78,8 +79,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._init_mixin({ component: 'reg_roles', is_routing: true });
-    this.necesarioStart();
     this.createForm();
+    this.necesarioStart();
 
     this.titulo = 'Registro de roles';
     this.boton = 'Registrar';
@@ -90,38 +91,38 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   async necesarioStart() {
-    this.getRoles(this.tServ.obj_paginate.default);
-    this.getPermisos();
+    await Promise.all([this.getRoles(this.tServ.obj_paginate.default), this.getPermisos()]);
   }
 
   async getRoles(params?: { per_page?: number; page?: number; search?: string }) {
+    const requestId = ++this.rolesRequestId;
     this.palabra_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
     const extra = { afterPath: `filtro/${this.palabra_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
 
     this.listaRoles.length = 0;
-    this.rolesClass
-      .getAll(extra)
-      .then(res => {
-        res['data'].map(role => {
-          role.estado_ = role.estado ? 'SI' : 'NO';
-          role.estado_tag = role.estado ? 'success' : 'danger';
+    try {
+      const res = await this.rolesClass.getAll(extra);
+      if (requestId !== this.rolesRequestId) return;
 
-          role.customStyles = { nombre: { width: '20%', 'text-align': 'left' }, descripcion: { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, estado_: { width: '10%' } };
-          return role;
-        });
+      res['data'].map(role => {
+        role.estado_ = role.estado ? 'SI' : 'NO';
+        role.estado_tag = role.estado ? 'success' : 'danger';
 
-        this.listaRoles = res['data'];
-        this.table_roles_config.total_count = res.total_registros;
-        this.tablaRolesComponent?.changeTableConfig([{ total_count: res.total_registros }]);
-      })
-      .catch(err => {
-        if (err.error.total_registros == 0) {
-          this.listaRoles = [];
-          this.table_roles_config.total_count = 0;
-          this.tablaRolesComponent?.changeTableConfig([{ total_count: 0 }]);
-        }
+        role.customStyles = { nombre: { width: '20%', 'text-align': 'left' }, descripcion: { width: '50%', 'text-align': 'left', 'padding-left': '0.5rem' }, estado_: { width: '10%' } };
+        return role;
       });
+
+      this.listaRoles = res['data'];
+      this.table_roles_config.total_count = res.total_registros;
+      this.tablaRolesComponent?.changeTableConfig([{ total_count: res.total_registros }]);
+    } catch (err: any) {
+      if (err.error.total_registros == 0) {
+        this.listaRoles = [];
+        this.table_roles_config.total_count = 0;
+        this.tablaRolesComponent?.changeTableConfig([{ total_count: 0 }]);
+      }
+    }
   }
 
   parsePermisos(params: { clean: boolean }) {
@@ -142,28 +143,28 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     this.permiso_selected = _.first(this.listaPermisos) || { acciones: [] };
   }
 
-  getPermisos() {
+  async getPermisos() {
     this.listaPermisos.length = 0;
 
-    this.rolesCatalogServ.getPermisosAcciones({ force: true }).then(permisos => {
-      this.listaPermisos = permisos.map(permiso => {
-        permiso.acciones = permiso.permisos_acciones.map(permiso_accion => {
-          const accion = {
-            nombre: this.my_capitalize(permiso_accion.accion.nombre),
-            selected: false,
-            id: permiso_accion.accion.id,
-            permiso_accion_id: permiso_accion.id,
-            customStyles: {
-              nombre: { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
-              selected: { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
-            },
-          };
+    const permisos = await this.rolesCatalogServ.getPermisosAcciones({ force: true });
 
-          return accion;
-        });
+    this.listaPermisos = permisos.map(permiso => {
+      permiso.acciones = permiso.permisos_acciones.map(permiso_accion => {
+        const accion = {
+          nombre: this.my_capitalize(permiso_accion.accion.nombre),
+          selected: false,
+          id: permiso_accion.accion.id,
+          permiso_accion_id: permiso_accion.id,
+          customStyles: {
+            nombre: { 'text-align': 'left', 'padding-left': '0.5rem', width: '75%' },
+            selected: { 'justify-content': 'center', 'align-items': 'center', display: 'flex', width: 'auto' },
+          },
+        };
 
-        return permiso;
+        return accion;
       });
+
+      return permiso;
     });
   }
 

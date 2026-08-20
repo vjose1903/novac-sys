@@ -58,6 +58,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   articuloClass = new ArticuloC();
   reporteClass = new ReporteC();
   private articuloCatalogServ = inject(ArticuloCatalogService);
+  private articulosRequestId = 0;
 
   constructor(
     private tServ: TablasService,
@@ -101,20 +102,23 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
   async getStock() {
     const extra = { afterPath: `custom/stock` };
-    this.articuloClass.getAll(extra).then((result: any) => (this.cant_inventario = result['data'].stock));
+    const result: any = await this.articuloClass.getAll(extra);
+    this.cant_inventario = result['data'].stock;
   }
 
   async getArticulos(params?: { per_page?: number; page?: number; search?: string }) {
+    const requestId = ++this.articulosRequestId;
     this.fechaFactura = this.formarFechaFactura(new Date())['FechaFactura'];
 
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
     this.palabra_buscar = palabra_a_buscar;
 
-    this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro, mode: 'list' }).then(res => {
-      this.listaArticulos = fun.deepCloning(res.data);
-      this.table_roles_config.total_count = res.total_registros;
-      this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
-    });
+    const res = await this.articuloClass.getArticulosFiltrado({ buscar: palabra_a_buscar, fecha: this.fechaFactura, page: params.page, per_page: params.per_page, paginado: true, is_compra: false, tipo: this.filtro, mode: 'list' });
+    if (requestId !== this.articulosRequestId) return;
+
+    this.listaArticulos = fun.deepCloning(res.data);
+    this.table_roles_config.total_count = res.total_registros;
+    this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
   }
 
   filtrarArticulos() {
