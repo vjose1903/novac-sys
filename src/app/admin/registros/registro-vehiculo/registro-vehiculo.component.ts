@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { MarcaC, ModeloC } from '@components/formularios en modales/formulario-marca-modelo/marca-modelo';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { EmpleadoC } from '../registro-empleados/empleado';
+import { EmpleadoCatalogService } from '../registro-empleados/services/empleado-catalog.service';
 import { VehiculoC } from './vehiculo';
 import { FormularioMarcaModeloComponent } from '@components/formularios en modales/formulario-marca-modelo/formulario-marca-modelo.component';
 import { fun } from '@core/services/functions.service';
@@ -42,7 +42,6 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
 
   vehiculosClass = new VehiculoC();
   marcasClass = new MarcaC();
-  empleadosClass = new EmpleadoC();
   modeloClass = new ModeloC();
   permissions = Permisos;
   table_config: table_config = {
@@ -71,6 +70,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
   private cdRef = inject(ChangeDetectorRef);
+  private empleadoCatalogServ = inject(EmpleadoCatalogService);
   private fb = inject(UntypedFormBuilder);
   private router = inject(Router);
   private tServ = inject(TablasService);
@@ -109,13 +109,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
   }
 
   async getPropietarios() {
-    this.empleadosClass.getAll({ parameters: { id: true } }).then(
-      res => {
-        res['data'].unshift({ id: -1, nombre_completo: 'No empleado' });
-        this.listaPropietarios = res['data'];
-      },
-      (err: any) => {}
-    );
+    this.listaPropietarios = await this.empleadoCatalogServ.getPropietarios({ includeNoEmpleado: true, force: true });
   }
 
   async getVehiculos(params?: { per_page?: number; page?: number; search?: string }) {

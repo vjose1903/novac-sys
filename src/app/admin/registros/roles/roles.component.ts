@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { AccionesC, PermisosC, RolesC } from './roles';
+import { AccionesC, RolesC } from './roles';
 import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
@@ -9,6 +9,7 @@ import { default_per_page, table_config } from '@components/new_tablas/tabla-cla
 import { Permisos } from '@core/typescript/permisos';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { RolesCatalogService } from './services/roles-catalog.service';
 
 @Component({
   selector: 'app-roles',
@@ -57,7 +58,6 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   boton: string;
 
   rolesClass = new RolesC();
-  permisosClass = new PermisosC();
   accionesClass = new AccionesC();
 
   roleSelected: any;
@@ -68,6 +68,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   palabra_buscar: any;
 
   public dynamicModalServ = inject(DynamicModalService);
+  private rolesCatalogServ = inject(RolesCatalogService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
 
@@ -144,8 +145,8 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
   getPermisos() {
     this.listaPermisos.length = 0;
 
-    this.permisosClass.getAll({ parameters: { permisos_acciones: true } }).then(res => {
-      this.listaPermisos = res.data.map(permiso => {
+    this.rolesCatalogServ.getPermisosAcciones({ force: true }).then(permisos => {
+      this.listaPermisos = permisos.map(permiso => {
         permiso.acciones = permiso.permisos_acciones.map(permiso_accion => {
           const accion = {
             nombre: this.my_capitalize(permiso_accion.accion.nombre),
@@ -264,6 +265,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
 
   eliminarRole(roleSelected) {
     this.rolesClass.deleteOne(roleSelected.id).then(() => {
+      this.rolesCatalogServ.invalidateRoles();
       const actualPagination = this.tServ.getPaginationById('lista_roles');
       actualPagination['searchText'] = this.palabra_buscar;
       this.getRoles(actualPagination);
@@ -279,6 +281,7 @@ export class RolesComponent extends MixinClass implements OnInit, OnDestroy {
     formulario['permisos_acciones'] = permiso_acciones_selected;
 
     this.rolesClass.createUpdateOne(formulario).then(res => {
+      this.rolesCatalogServ.invalidateRoles();
       this.isCreando = false;
       this.roleSelected = undefined;
       this.borrar();

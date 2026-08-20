@@ -10,7 +10,8 @@ import { TablasService } from '@components/new_tablas/tablas.service';
 import { EmpleadoC } from './empleado';
 import { ChangePasswordComponent } from '@components/formularios en modales/change-password/change-password.component';
 import { fun } from '@core/services/functions.service';
-import { RolesC } from '../roles/roles';
+import { EmpleadoCatalogService } from './services/empleado-catalog.service';
+import { RolesCatalogService } from '../roles/services/roles-catalog.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { DgiiConsultarPersonaService } from '@core/services/dgii-consultar-persona.service';
 
@@ -43,8 +44,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
 
   camposDisabled = true;
   empleadosClass = new EmpleadoC();
-  rolesClass = new RolesC();
-  listRoles: [];
+  listRoles = [];
   permissions = Permisos;
 
   table_config: table_config = {
@@ -70,6 +70,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
   private dgiiConsultarPersonaServ = inject(DgiiConsultarPersonaService);
+  private empleadoCatalogServ = inject(EmpleadoCatalogService);
+  private rolesCatalogServ = inject(RolesCatalogService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
 
@@ -144,14 +146,11 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   }
 
   async getRoles() {
-    await this.rolesClass.getAll().then(
-      res => {
-        this.listRoles = res.data;
-      },
-      error => {
-        console.error('Error obteniendo roles: ', error);
-      }
-    );
+    try {
+      this.listRoles = await this.rolesCatalogServ.getRoles({ force: true });
+    } catch (error) {
+      console.error('Error obteniendo roles: ', error);
+    }
   }
 
   async checkDocumento(tipo, e?) {
@@ -314,7 +313,10 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   eliminarReg(regisData) {
     const onYes = () => {
       const actualPagination = this.tServ.getPaginationById('lista_empleados');
-      this.empleadosClass.deleteOne(regisData.id).then(res => this.getEmpleados(actualPagination));
+      this.empleadosClass.deleteOne(regisData.id).then(res => {
+        this.empleadoCatalogServ.invalidate();
+        this.getEmpleados(actualPagination);
+      });
     };
 
     this.dynamicModalServ.confirmationModal({
@@ -371,6 +373,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
       fun.toastError('Contraseña no puede estar vacia !!!', 'ERROR');
     } else {
       this.empleadosClass.createUpdateOne(objSend).then(res => {
+        this.empleadoCatalogServ.invalidate();
         const actualPagination = this.tServ.getPaginationById('lista_empleados');
         this.getEmpleados(actualPagination);
         this.borrar();

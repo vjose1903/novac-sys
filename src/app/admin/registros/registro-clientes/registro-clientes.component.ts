@@ -5,7 +5,7 @@ import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { customValidators } from '@core/typescript/custom-validators';
 import { ClienteC } from './cliente';
-import { EmpleadoC } from '../registro-empleados/empleado';
+import { EmpleadoCatalogService } from '../registro-empleados/services/empleado-catalog.service';
 import { ProvinciaC } from '../../../core/typescript/classes/provincia.model';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
@@ -39,7 +39,6 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   myValidators = new customValidators();
   clienteSelected;
   clienteClass = new ClienteC();
-  empleadosClass = new EmpleadoC();
   provinciaClass = new ProvinciaC();
   clienteSortFields = ['nombre', 'apellido'];
   fun = fun;
@@ -88,6 +87,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   public htmlServ = inject(HtmlElementsService);
   public dynamicModalServ = inject(DynamicModalService);
   private dgiiConsultarPersonaServ = inject(DgiiConsultarPersonaService);
+  private empleadoCatalogServ = inject(EmpleadoCatalogService);
   private fb = inject(UntypedFormBuilder);
   private tServ = inject(TablasService);
 
@@ -170,13 +170,9 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.setDocumentoPrincipal(arg);
   }
 
-  getVendedores() {
-    const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'vendedor' } };
-    this.empleadosClass.getAll(extra).then(res => {
-      this.vendedores = res['data'];
-
-      this.form.controls.vendedor_id.setValue(this.vendedores[0].id);
-    });
+  async getVendedores() {
+    this.vendedores = await this.empleadoCatalogServ.getVendedores({ force: true });
+    if (this.vendedores.length) this.form.controls.vendedor_id.setValue(this.vendedores[0].id);
   }
 
   async getClientes(params?: { per_page?: number; page?: number; search?: string }) {
