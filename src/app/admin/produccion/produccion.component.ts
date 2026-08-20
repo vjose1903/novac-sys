@@ -1,7 +1,8 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ArticuloC, ArticuloI, tipos_articulos } from '@registros/articulos/articulo';
+import { ArticuloC, ArticuloI } from '@registros/articulos/articulo';
+import { ArticuloCatalogService } from '@registros/articulos/services/articulo-catalog.service';
 import { ProduccionC } from './produccion';
 import { fun } from '@core/services/functions.service';
 import { default_per_page, medidas, table_config } from '@components/new_tablas/tabla-class';
@@ -49,6 +50,7 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   enfocarInput = fun.enfocarInput;
   htmlServ = inject(HtmlElementsService);
   dynamicModalServ = inject(DynamicModalService);
+  private articuloCatalogServ = inject(ArticuloCatalogService);
 
   constructor() {
     super();
@@ -75,12 +77,8 @@ export class ProduccionComponent extends MixinClass implements OnInit, OnDestroy
   async getProductosTerminados() {
     const fechaActual = this.formarFechaFactura(new Date())['FechaFactura'];
 
-    this.articuloClass.getArticulosFiltrado({ buscar: ' ', fecha: fechaActual, paginado: false, tipo: tipos_articulos.producto_terminado, mode: 'formula' }).then(res => {
-      res['data'].map(producto_terminado => {
-        producto_terminado.optionDisabled = false;
-        this.listaProductos.update(prev => [...prev, producto_terminado]);
-      });
-    });
+    const productos = await this.articuloCatalogServ.getProductosTerminados(fechaActual, { force: true });
+    this.listaProductos.set(productos.map(producto_terminado => ({ ...producto_terminado, optionDisabled: false })));
   }
 
   async getIngredients() {

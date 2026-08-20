@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, ElementRef, inject } from '@angular/core';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { LoaderService } from '../../../app/loader/loader.service';
-import { ArticuloC, TipoArticuloC } from '@registros/articulos/articulo';
+import { ArticuloC } from '@registros/articulos/articulo';
+import { ArticuloCatalogService } from '@registros/articulos/services/articulo-catalog.service';
 import { ReporteC } from '../reportes/reporte';
 import { MovimientosFormComponent } from '@components/formularios en modales/movimientos-form/movimientos-form.component';
 import { fun } from '@core/services/functions.service';
@@ -55,8 +56,8 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   fechaFactura: string;
 
   articuloClass = new ArticuloC();
-  tipoArticuloClass = new TipoArticuloC();
   reporteClass = new ReporteC();
+  private articuloCatalogServ = inject(ArticuloCatalogService);
 
   constructor(
     private tServ: TablasService,
@@ -68,8 +69,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   async ngOnInit() {
     this._init_mixin({ component: 'inventario', is_routing: true });
     this.necesarioParaEmpezar();
-
-    this.tipoArticuloClass.getAll().then(res => (this.tipo_articulos = res.data));
   }
 
   ngOnDestroy() {
@@ -89,8 +88,11 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
   }
 
   async necesarioParaEmpezar() {
-    await this.getArticulos(this.tServ.obj_paginate.default);
-    await this.getStock();
+    await Promise.all([this.getTipoArticulos(), this.getArticulos(this.tServ.obj_paginate.default), this.getStock()]);
+  }
+
+  async getTipoArticulos() {
+    this.tipo_articulos = await this.articuloCatalogServ.getTipoArticulos({ force: true });
   }
 
   async makeReporte() {
@@ -131,7 +133,7 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
       }
     }
 
-    fun.setTimeout(() => this.getArticulos(actualPagination), 500);
+    this.getArticulos(actualPagination);
   }
 
   async movimientoInventario(arg) {
@@ -185,6 +187,6 @@ export class InventarioComponent extends MixinClass implements OnInit, OnDestroy
 
     const actualPagination = this.tServ.getPaginationById('lista_inventario');
     actualPagination['search'] = this.palabra_buscar;
-    this.getArticulos(actualPagination);
+    Promise.all([this.getArticulos(actualPagination), this.getStock()]);
   }
 }

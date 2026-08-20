@@ -692,11 +692,11 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     return res;
   }
 
-  async llenarConduce(detalles, conteo = 0) {
-    if (conteo >= detalles.length) return true;
+  async llenarConduce(detalles) {
+    if (!detalles?.length) return true;
 
-    await this.llenarFila(detalles[conteo], this.secuencia);
-    return this.llenarConduce(detalles, conteo + 1);
+    await Promise.all(detalles.map((detalle, index) => this.llenarFila(detalle, this.secuencia + index)));
+    return true;
   }
 
   verSiExcede(i) {
@@ -718,17 +718,7 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
     const multiplo = element.cantidad_en_unidades / element.cantidad;
     const cant_actual = cant_en_unidades_actual / multiplo;
 
-    // Obtener artículo filtrado
-    const result = await this.articuloClass.getArticulosFiltrado({
-      buscar: element.codigo,
-      fecha: this.fechaConduce,
-      tipo: 'todos',
-      mode: 'usable',
-      match: 'exact',
-      limit: 1,
-    });
-
-    const articulo = result['data'][0];
+    const articulo = await this.getArticuloParaDetalleConduce(element);
     const filaControl = this.filasDetalle.at(i) as any;
 
     // Configurar todos los valores de la fila
@@ -762,6 +752,39 @@ export class ConduceFormComponent extends MixinClass implements OnInit, OnDestro
       if (res) this.rowsExcede.push(i);
     });
     this.ajustarSecuencia();
+  }
+
+  private async getArticuloParaDetalleConduce(element) {
+    const articuloId = element.articulo_id || element.articulo?.id;
+
+    if (fun.hasValue(articuloId) && fun.hasValue(element.contenidos)) {
+      return {
+        ...(element.articulo || {}),
+        id: articuloId,
+        codigo: element.codigo,
+        nombre: element.descripcion || element.nombre || element.articulo?.nombre,
+        contenido: element.contenidos,
+        contenido_articulos: [],
+        is_detallable: false,
+        medida: element.unidad,
+        tipo_articulo: element.articulo?.tipo_articulo || { tipo: 'articulo' },
+        vendido_en: false,
+        calcular_saco: false,
+        precio_principal: 0,
+        costo_principal: 0,
+      };
+    }
+
+    const result = await this.articuloClass.getArticulosFiltrado({
+      buscar: element.codigo,
+      fecha: this.fechaConduce,
+      tipo: 'todos',
+      mode: 'usable',
+      match: 'exact',
+      limit: 1,
+    });
+
+    return result['data'][0];
   }
 
   excedeMaxCan(i) {
