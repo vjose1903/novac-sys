@@ -96,6 +96,16 @@
       display: grid;
       gap: 0.75rem;
       padding: 0.85rem !important;
+      position: relative;
+
+      .external-search-toggle {
+        height: 2rem;
+        position: absolute;
+        right: 0.85rem;
+        top: 0.75rem;
+        width: 2.35rem;
+        z-index: 1;
+      }
 
       .search-card-header {
         align-items: center;

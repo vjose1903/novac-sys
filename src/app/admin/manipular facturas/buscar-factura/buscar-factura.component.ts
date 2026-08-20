@@ -99,6 +99,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   facturasSerieOptions: seriesDgiiI[] = [];
   serieSelected = signal<serie>(serie.all);
+  solicitarFacturasExternas = signal(false);
 
   notasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
   notaSerieSelected = signal<serie>(serie.all);
@@ -225,6 +226,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   async loadFacturasChangingSerie() {
+    const actualPagination = await this.getActualPagination();
+    if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
+    this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
+  }
+
+  async activarBusquedaFacturasExternas() {
+    const listaVisible = this.mostrarListaFacturas();
+    this.solicitarFacturasExternas.set(!this.solicitarFacturasExternas());
+    if (!listaVisible) return;
+
     const actualPagination = await this.getActualPagination();
     if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
     this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
@@ -402,7 +413,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           paginado: true,
           tipo: this.tipo_documento_selected(),
           movimientos_viaje: true,
-          extra_params: { serie: this.serieSelected(), ...(use_for ? { use_for } : {}) },
+          extra_params: {
+            serie: this.serieSelected(),
+            ...(use_for ? { use_for } : {}),
+            ...(this.buscarPara === 'solo_ver' ? { is_externa: this.solicitarFacturasExternas() } : {}),
+          },
         };
 
         const res = await this.facturaClass.getFacturasByParams(args);
@@ -642,6 +657,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     if (tipo != 'salir' && input_valor) input_valor.value = null;
 
     this.tipo_documento_selected.set(tipoDocFacturacion.venta);
+    this.solicitarFacturasExternas.set(false);
     this.tipo_factura_id = null;
     this.buscar_por = null;
     fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');

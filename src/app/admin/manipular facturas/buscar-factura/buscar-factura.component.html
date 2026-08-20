@@ -15,6 +15,9 @@
     <div class="row search-layout {{ buscarPara.includes('nota') ? 'has-side-panel' : 'is-search-only' }}">
       <div class="col-7 search-main-col">
         <div class="card search-card">
+          @if (buscarPara == 'solo_ver' && configApp?.usa_facturas_externas) {
+            <div class="sin_comprobante_btn external-search-toggle" [ngClass]="{ active: solicitarFacturasExternas() }" (dblclick)="activarBusquedaFacturasExternas()"></div>
+          }
           <div class="search-card-header">
             <div class="search-card-title">
               <span class="search-card-icon">
