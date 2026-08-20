@@ -89,7 +89,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
   async necesarioStart() {
     await this.createForm();
-    await this.divisaServ.getDivisas().then(divisas => {
+    await this.divisaServ.ensureDivisas().then(divisas => {
       this.table_config.total_count = divisas.length;
       this.tablaComponent?.changeTableConfig([{ total_count: divisas.length }]);
     });

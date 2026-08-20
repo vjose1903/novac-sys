@@ -1,10 +1,9 @@
 import { actionFacturacion } from './../facturacion/factura';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, computed, inject, signal } from '@angular/core';
 
 import { Subject, takeUntil } from 'rxjs';
 import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { CuadreCajaC } from '@core/typescript/cuadre_caja';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { ClienteC } from '@registros/registro-clientes/cliente';
 import { SuplidorC } from '@registros/registro-suplidores/suplidores';
@@ -26,6 +25,7 @@ import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic
 import { Environment } from '@environments/environment';
 import { DesktopUpdateState } from '@electron/shared-electron-angular';
 import { DivisaService } from '@registros/divisa/divisa.service';
+import { CuadreTodayStateService } from '@admin/cuadres/services/cuadre-today-state.service';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
@@ -55,9 +55,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
+  cuadreTodayServ = inject(CuadreTodayStateService);
 
-  chequiando_cuadre = signal<boolean>(false);
-  cuadre_hoy = signal<boolean>(false);
+  chequiando_cuadre = this.cuadreTodayServ.loading;
+  cuadre_hoy = computed(() => this.cuadreTodayServ.data() ?? false);
   hasPermisosValidated: boolean;
   actionFacturacion = actionFacturacion;
   currentYear: number;
@@ -98,18 +99,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
         this.showLoading = false;
 
         if (this.initNavigate) {
-          fun.setTimeout(() => {
-            this.checkRouteActiva();
-          }, 250);
-
-          fun.setTimeout(() => {
-            const token = fun.getAuthToken();
-            if (token) {
-              this.checkCuadre();
-              this.divisaServ.getDivisas();
-            }
-          }, 500);
-
+          this.checkRouteActiva();
+          this.refreshNavigationContext();
           this.initNavigate = false;
         }
       }
@@ -168,7 +159,6 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.noServer = false;
     this.activeIndex = 0;
     this.currentYear = new Date().getFullYear();
-    this.cuadre_hoy.set(false);
     this.configApp = Ss.configServ.config;
     this.checkRouteActiva();
 
@@ -397,15 +387,15 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   }
 
   checkCuadre() {
-    if (!this.chequiando_cuadre()) {
-      let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [{ key: 'spinner', value: 'no_show' }] };
-      this.chequiando_cuadre.set(true);
-      new CuadreCajaC().getAll(extra).then(res => {
-        const existe_cuadre_hoy = res['data'].existe_cuadre_hoy;
-        this.cuadre_hoy.set(existe_cuadre_hoy);
-        this.chequiando_cuadre.set(false);
-      });
-    }
+    return this.cuadreTodayServ.refresh({ force: true, skipLoader: true }).catch(() => false);
+  }
+
+  private refreshNavigationContext() {
+    const token = fun.getAuthToken();
+    if (!token) return;
+
+    this.checkCuadre();
+    this.divisaServ.getDivisas({ force: true, skipLoader: true }).catch(() => []);
   }
 
   copyMachineId() {
