@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { ArticuloC, TipoArticuloC, tipos_articulos } from './articulo';
+import { ArticuloC, tipos_articulos } from './articulo';
 
 import { fun } from '@core/services/functions.service';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
@@ -19,6 +19,7 @@ import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import moment from '../../../core/javascript/moment';
+import { ArticuloCatalogService } from './services/articulo-catalog.service';
 
 @Component({
   selector: 'app-registro-articulos',
@@ -72,7 +73,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   medidaHijoOptions = ['Unidad'];
 
   articuloClass = new ArticuloC();
-  tipoArticuloClass = new TipoArticuloC();
   configArticuloClass = new ConfigArticuloC();
 
   fechaFactura: string;
@@ -107,6 +107,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   private router = inject(Router);
   private tServ = inject(TablasService);
   private permissionsService = inject(NgxPermissionsService);
+  private articuloCatalogServ = inject(ArticuloCatalogService);
 
   constructor() {
     super();
@@ -147,8 +148,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   getConfiguracionArticulo() {
-    this.configArticuloClass.getOne(1).then(config_articulos => {
-      this.config_articulos = config_articulos.data;
+    this.articuloCatalogServ.getConfigArticulo({ force: true }).then(config_articulos => {
+      this.config_articulos = config_articulos;
     });
   }
 
@@ -171,8 +172,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   getTipoArticulos() {
     this.listaTipoArticulos = [];
-    this.tipoArticuloClass.getAll().then(res => {
-      this.listaTipoArticulos = fun.deepCloning(res.data);
+    this.articuloCatalogServ.getTipoArticulos().then(tiposArticulos => {
+      this.listaTipoArticulos = tiposArticulos;
       this.syncTipoArticuloDisabled();
     });
   }
@@ -221,6 +222,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const { update_articulos, ...data } = arg.data;
 
     this.config_articulos = data;
+    this.articuloCatalogServ.setConfigArticulo(data);
 
     if (update_articulos) {
       const actualPagination = this.tServ.getPaginationById('lista_articulos');

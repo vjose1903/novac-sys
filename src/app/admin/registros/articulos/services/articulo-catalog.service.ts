@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ArticuloC, tipos_articulos, TipoArticuloC } from '../articulo';
 import { fun } from '@core/services/functions.service';
+import { ConfigArticuloC, ConfigArticuloI } from '../configuracion_articulos/articulos_configuracion';
 
 interface CatalogRequestState<T> {
   data: T | null;
@@ -15,7 +16,9 @@ interface CatalogOptions {
 export class ArticuloCatalogService {
   private readonly articuloClass = new ArticuloC();
   private readonly tipoArticuloClass = new TipoArticuloC();
+  private readonly configArticuloClass = new ConfigArticuloC();
   private readonly tipoArticulosState: CatalogRequestState<any[]> = { data: null, inflight: null };
+  private readonly configArticuloState: CatalogRequestState<ConfigArticuloI> = { data: null, inflight: null };
   private readonly productosTerminadosPorFecha = new Map<string, CatalogRequestState<any[]>>();
 
   getTipoArticulos(options: CatalogOptions = {}) {
@@ -36,6 +39,15 @@ export class ArticuloCatalogService {
     );
   }
 
+  getConfigArticulo(options: CatalogOptions = {}) {
+    return this.getCatalog(this.configArticuloState, () => this.configArticuloClass.getOne(1).then(res => res.data), options);
+  }
+
+  setConfigArticulo(configArticulo: ConfigArticuloI) {
+    this.configArticuloState.data = fun.deepCloning(configArticulo);
+    this.configArticuloState.inflight = null;
+  }
+
   invalidateProductosTerminados() {
     this.productosTerminadosPorFecha.clear();
   }
@@ -43,6 +55,11 @@ export class ArticuloCatalogService {
   invalidateTipoArticulos() {
     this.tipoArticulosState.data = null;
     this.tipoArticulosState.inflight = null;
+  }
+
+  invalidateConfigArticulo() {
+    this.configArticuloState.data = null;
+    this.configArticuloState.inflight = null;
   }
 
   private async getCatalog<T>(state: CatalogRequestState<T>, loader: () => Promise<T>, options: CatalogOptions) {
