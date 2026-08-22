@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'primeicons';
     font-display: block;
-src: url('assets/vendor/primeicons/primeicons.woff2') format('woff2');
+src: url('../assets/vendor/primeicons/primeicons.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
