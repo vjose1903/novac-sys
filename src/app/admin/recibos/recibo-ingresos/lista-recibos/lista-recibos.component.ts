@@ -5,7 +5,7 @@ import { MixinClass } from '@core/typescript/MixinClass';
 import { LoaderService } from '../../../../loader/loader.service';
 import { ReciboC } from '../../recibos';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
-import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
+import { loadPdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.loader';
 import { fun } from '@core/services/functions.service';
 import { Permisos } from '@core/typescript/permisos';
 import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
@@ -195,7 +195,7 @@ export class ListaRecibosComponent extends MixinClass implements OnInit, OnDestr
     reciboModalConf.header = 'Revisión de recibo de ingreso';
     reciboModalConf.width = '57rem';
     reciboModalConf.height = '40rem';
-    reciboModalConf.component = PdfViewerComponent;
+    reciboModalConf.loadComponent = loadPdfViewerComponent;
     reciboModalConf.closableEsc = true;
     reciboModalConf.botones = [
       { clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false },

@@ -1,4 +1,4 @@
-import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
+import { loadPdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.loader';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { LoaderService } from './../../../loader/loader.service';
 import { TablasService } from '@components/new_tablas/tablas.service';
@@ -177,7 +177,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         reciboModalConf.header = 'Revisión de conduce de mercancías';
         reciboModalConf.width = '57rem';
         reciboModalConf.height = '40rem';
-        reciboModalConf.component = PdfViewerComponent;
+        reciboModalConf.loadComponent = loadPdfViewerComponent;
         reciboModalConf.closableEsc = true;
 
         reciboModalConf.botones = [

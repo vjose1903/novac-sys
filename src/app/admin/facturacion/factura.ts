@@ -6,7 +6,7 @@ import { CrudG } from '@core/typescript/crud-g';
 import * as _ from 'lodash';
 import { fun } from '@core/services/functions.service';
 import moment from '../../core/javascript/moment';
-import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
+import { loadPdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.loader';
 import { DetalleFacturaComponent } from '../manipular facturas/detalle-factura/detalle-factura.component';
 import { ReporteC } from '../reportes/reporte';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
@@ -407,7 +407,7 @@ export class FacturaC extends CrudG<FacturasI> {
           viewPdfModalConf.header = dataModal?.header ?? 'MOSTRAR FACTURA';
           viewPdfModalConf.width = dataModal?.width ?? '57rem';
           viewPdfModalConf.height = dataModal?.height ?? '70vh';
-          viewPdfModalConf.component = PdfViewerComponent;
+          viewPdfModalConf.loadComponent = loadPdfViewerComponent;
           viewPdfModalConf.closableEsc = true;
           viewPdfModalConf.botones = botones_dinamicos ? botones_dinamicos : [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }];
           if (dataModal?.callback) viewPdfModalConf.setCallback(dataModal.callback);

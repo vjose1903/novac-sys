@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 import { viewerOptions } from './pdf-viewer';
 import { fun } from '@core/services/functions.service';
@@ -11,7 +13,8 @@ import { ThemeService } from '@core/services/theme.service';
   selector: 'app-pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
   styleUrls: ['./pdf-viewer.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, NgxExtendedPdfViewerModule],
 })
 export class PdfViewerComponent implements IDynamicModal, AfterViewInit {
   @Input() modalWrapper!: DynamicModalComponent;

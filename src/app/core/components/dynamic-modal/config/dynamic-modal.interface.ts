@@ -64,6 +64,7 @@ export interface IModalConfiguration {
   html?: string | undefined;
   position?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
   transitionOptions?: string;
+  loadComponent?: () => Promise<any>;
   contentStyleClass?: string;
   styleClass?: string;
   maximizable?: boolean;

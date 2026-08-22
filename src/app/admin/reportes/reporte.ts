@@ -4,7 +4,7 @@ import { Ss } from '@core/services/singleton.service';
 import { fun } from '@core/services/functions.service';
 import { CrudG } from '@core/typescript/crud-g';
 import { FormReportesComponent } from '@components/formularios en modales/form-reportes/form-reportes.component';
-import { PdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.component';
+import { loadPdfViewerComponent } from '@components/pdf-viewer/pdf-viewer.loader';
 import { ExportToExcelService } from '@core/services/reports/excel/export-to-excel.service';
 import { exportExcelConfigI } from '@core/interface/export-to-excel.interface';
 import { IModalConfiguration, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
@@ -87,7 +87,7 @@ export class ReporteC extends CrudG<any> {
       const { dd, file, msg, pageOrientation, requestResult, sBase64, sDd, status, titulo, ...inputs } = objPdfView;
 
       const modalViewReporte: IModalConfiguration = {
-        component: PdfViewerComponent,
+        loadComponent: loadPdfViewerComponent,
         inputs: inputs,
         id: 'reporte_view',
         header: objPdfView.titulo,

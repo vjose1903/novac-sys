@@ -9,6 +9,7 @@ export class DynamicModalClass {
   header: string | undefined;
   inputs: any;
   component: any;
+  loadComponent?: () => Promise<any>;
   componentInstance!: IDynamicModal;
   width: string | undefined;
   height: string | undefined;
@@ -49,6 +50,7 @@ export class DynamicModalClass {
   constructor(params?: IModalConfiguration) {
     this.id = params?.id;
     this.component = params && fun.objHas(params, 'component') ? params.component : undefined;
+    this.loadComponent = params && fun.objHas(params, 'loadComponent') ? params.loadComponent : undefined;
     this.width = params && fun.objHas(params, 'width') ? params.width : '50vw';
     this.height = params && fun.objHas(params, 'height') ? params.height : undefined;
     this.baseZIndex = params && fun.objHas(params, 'baseZIndex') ? params.baseZIndex : 10000;

@@ -133,12 +133,12 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
       const currentConfig: DynamicModalClass = Ss.dynamicModalService.findModalConfigById(config.id);
       currentConfig.modalWrapper = this;
 
-      if (!currentConfig.component) {
+      if (!currentConfig.component && !currentConfig.loadComponent) {
         resolve();
         return;
       }
 
-      const tryRender = (attempt = 0) => {
+      const tryRender = async (attempt = 0) => {
         this.cdRef.detectChanges();
         const currentReceptor = this.modalReceptor?.toArray().find((receptor: any) => receptor.modalReceptorId == config.id);
 
@@ -148,7 +148,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
             return;
           }
 
-          window.setTimeout(() => tryRender(attempt + 1), 25);
+          window.setTimeout(() => tryRender(attempt + 1).catch(reject), 25);
           return;
         }
 
@@ -156,8 +156,10 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
         viewContainerRef.clear();
         viewContainerRef.remove();
 
+        const component = currentConfig.loadComponent ? await currentConfig.loadComponent() : currentConfig.component;
+
         // Crear componente usando la nueva API
-        const componente = viewContainerRef.createComponent(currentConfig.component);
+        const componente = viewContainerRef.createComponent(component);
 
         // Configurar modalConfig
         this.setComponentInput(componente, 'modalConfig', currentConfig);
@@ -177,7 +179,7 @@ export class DynamicModalComponent implements OnInit, OnDestroy {
         resolve();
       };
 
-      window.setTimeout(() => tryRender(), 0);
+      window.setTimeout(() => tryRender().catch(reject), 0);
     });
   }
 
