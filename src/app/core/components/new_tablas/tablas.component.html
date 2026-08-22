@@ -56,11 +56,13 @@
             <!-- TBODY -->
             <div class="divBody">
               @if (data && data.length > 0) {
+                @let tablePagination = tServ.getPaginationById(realIdTabla);
                 <tbody id="body_{{ realIdTabla }}" class="tbody" ScrollShadow>
                   @for (rowData of data; track getRowTrack(rowData, $index); let indexBody = $index) {
+                    @let rowIndex = getIndex(indexBody);
                     <tr
                       class="text-center"
-                      id="row-{{ realIdTabla }}-{{ getIndex(indexBody) }}"
+                      id="row-{{ realIdTabla }}-{{ rowIndex }}"
                       [ngClass]="{
                         greenTd: checkBackgroundTr({ tipo: 'greenTd', dato: rowData }),
                         danger: checkBackgroundTr({ tipo: 'danger', dato: rowData }),
@@ -71,12 +73,13 @@
                       }"
                       [ngStyle]="{ 'background-color': changeBackGroundColor(rowData) }"
                       #RowElement
-                      (click)="clickROW(rowData, getIndex(indexBody))">
+                      (click)="clickROW(rowData, rowIndex)">
                       @for (column of config.info; track $index; let index_column = $index) {
+                        @let cellStyle = tServ.getStyle(rowData, column, rowIndex, realIdTabla);
                         <td
                           class="tableTD {{ config.table_size }} b-sizing {{ column.tipo == 'index' ? 'index' : '' }}"
-                          id="td-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
-                          [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                          id="td-{{ realIdTabla }}-{{ column.key }}-{{ rowIndex }}"
+                          [ngStyle]="cellStyle">
                           <span class="titulo_sm" [ngStyle]="column?.style ? column.style : {}"> {{ column?.titulo_sm }} </span>
                           <span [pTooltip]="column.tooltip ? column.tooltip : rowData[column.rowTooltip] ? rowData[column.rowTooltip] : ''" tooltipPosition="left">
                             <div class="d-flex w-100" [ngClass]="{ 'gap-2': fun.hasValue(column?.rowTransform) && column?.tipo != 'none' }">
@@ -90,7 +93,7 @@
                               @switch (column.tipo) {
                                 @case (tableCellType.index) {
                                   <span class="d-flex justify-content-center align-items-center">
-                                    <span class="text-w-600">{{ (tServ.getPaginationById(realIdTabla).page - 1) * tServ.getPaginationById(realIdTabla).per_page + (getIndex(indexBody) + 1) }}</span>
+                                    <span class="text-w-600">{{ (tablePagination.page - 1) * tablePagination.per_page + (rowIndex + 1) }}</span>
                                   </span>
                                 }
                                 @case (tableCellType.quantityTooltip) {
@@ -100,9 +103,9 @@
                                   </ng-template>
 
                                   <span
-                                    id="{{ column.key }}-{{ getIndex(indexBody) }}"
+                                    id="{{ column.key }}-{{ rowIndex }}"
                                     [pTooltip]="quantityCell.tooltip && quantityCell.tooltip.trim() !== '' ? tooltipCantidades : null"
-                                    [tooltipPosition]="getIndex(indexBody) != 0 ? 'top' : 'bottom'"
+                                    [tooltipPosition]="rowIndex != 0 ? 'top' : 'bottom'"
                                     style="width: 100%">
                                     {{ quantityCell.label }}
                                   </span>
@@ -120,7 +123,7 @@
                                     <icons-array
                                       [column]="column"
                                       [config]="config"
-                                      [indexBody]="getIndex(indexBody)"
+                                      [indexBody]="rowIndex"
                                       [realIdTabla]="realIdTabla"
                                       [seleccionado]="seleccionado"
                                       [rowData]="rowData"
@@ -129,7 +132,7 @@
                                   </span>
                                 }
                                 @case (tableCellType.tag) {
-                                  <div (click)="checkHasClickFuntion(column, rowData, getIndex(indexBody), $event)" class="d-flex justify-content-center align-items-center">
+                                  <div (click)="checkHasClickFuntion(column, rowData, rowIndex, $event)" class="d-flex justify-content-center align-items-center">
                                     @if (fun.hasValue(getValueForm(column, rowData))) {
                                       <ng-container *ngTemplateOutlet="tagTemplate; context: { dato: rowData, column: column }"></ng-container>
                                     }
@@ -146,7 +149,7 @@
                                 @case (tableCellType.switch) {
                                   <span class="d-flex justify-content-center align-items-center">
                                     @if (column.remplace && seleccionado != rowData?.id) {
-                                      <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                                      <span class="w-100" [ngStyle]="cellStyle">
                                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
                                       </span>
                                     }
@@ -156,9 +159,9 @@
                                           class="apple-switch"
                                           [ngClass]="{ disabled: disableInput(rowData, column) }"
                                           type="checkbox"
-                                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
-                                          (blur)="handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
-                                          (change)="changeValorCheck(rowData, column, getIndex(indexBody))"
+                                          (focus)="handleInputsEvents('focus', $event.target, column, rowIndex, rowData)"
+                                          (blur)="handleInputsEvents('blur', $event.target, column, rowIndex, rowData)"
+                                          (change)="changeValorCheck(rowData, column, rowIndex)"
                                           [checked]="getValueForm(column, rowData)" />
                                       </div>
                                     }
@@ -167,7 +170,7 @@
                                 @case (tableCellType.dropDown) {
                                   <span>
                                     @if (column.remplace && seleccionado != rowData?.id && !rowData?.is_editing) {
-                                      <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                                      <span class="w-100" [ngStyle]="cellStyle">
                                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
                                       </span>
                                     }
@@ -189,7 +192,7 @@
                                           styleClass="form-control min"
                                           appendTo="body"
                                           emptyFilterMessage="valor_buscado_no_se_encuentra"
-                                          (onChange)="changeValorInput($event, column, column.dropdown_key, getIndex(indexBody), dropdown.value, rowData)">
+                                          (onChange)="changeValorInput($event, column, column.dropdown_key, rowIndex, dropdown.value, rowData)">
                                         </p-select>
                                       </div>
                                     }
@@ -198,7 +201,7 @@
                                 @case (tableCellType.input) {
                                   <span>
                                     @if (column.remplace && seleccionado != rowData?.id && !rowData?.is_editing) {
-                                      <span class="w-100" [ngStyle]="tServ.getStyle(rowData, column, getIndex(indexBody), realIdTabla)">
+                                      <span class="w-100" [ngStyle]="cellStyle">
                                         <ng-container *ngTemplateOutlet="remplaceTemplate; context: { dato: rowData, column: column }"></ng-container>
                                       </span>
                                     }
@@ -208,7 +211,7 @@
                                           #inputTable
                                           [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
                                           class="form-control m-0 inputTabla p-1 {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
-                                          id="input-{{ realIdTabla }}-{{ column.key }}-{{ getIndex(indexBody) }}"
+                                          id="input-{{ realIdTabla }}-{{ column.key }}-{{ rowIndex }}"
                                           [min]="rowData.min_ ? rowData.min_ : 0"
                                           [max]="rowData.max_ ? rowData.max_ : null"
                                           type="{{ column.inputType ? column.inputType : 'text' }}"
@@ -216,9 +219,9 @@
                                           [disabled]="disableInput(rowData, column)"
                                           (mouseleave)="column.interactWithMouse ? inputTable.blur() : null"
                                           (mouseenter)="column.interactWithMouse ? inputTable.focus() : null"
-                                          (focus)="handleInputsEvents('focus', $event.target, column, getIndex(indexBody), rowData)"
-                                          (blur)="checkNumber($event.target, column, getIndex(indexBody)); handleInputsEvents('blur', $event.target, column, getIndex(indexBody), rowData)"
-                                          (keyup)="changeValorInput($event, column, column.key, getIndex(indexBody), htmlServ.getValue($event), rowData)" />
+                                          (focus)="handleInputsEvents('focus', $event.target, column, rowIndex, rowData)"
+                                          (blur)="checkNumber($event.target, column, rowIndex); handleInputsEvents('blur', $event.target, column, rowIndex, rowData)"
+                                          (keyup)="changeValorInput($event, column, column.key, rowIndex, htmlServ.getValue($event), rowData)" />
                                         @if (disableInput(rowData, column)) {
                                           <span class="table-input-disabled-overlay"></span>
                                         }
@@ -231,7 +234,7 @@
                                   </span>
                                 }
                                 @default {
-                                  <span id="{{ column.key }}-{{ getIndex(indexBody) }}" [ngClass]="rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'table-cell-text'" style="width: 100%">
+                                  <span id="{{ column.key }}-{{ rowIndex }}" [ngClass]="rowData[column.text_color] ? 'text-' + rowData[column.text_color] : 'table-cell-text'" style="width: 100%">
                                     {{ getValueForm(column, rowData) }}
                                     {{ column.alerta && config?.colores && rowData.danger ? '(Inactivo)' : '' }}
                                   </span>
@@ -243,10 +246,10 @@
                         </td>
                       }
                       @if (fun.hasValue(config.botones)) {
-                        <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" class="btnAccion tableTD" (click)="clickROW(rowData, getIndex(indexBody))" [ngStyle]="config?.botones?.styles">
+                        <td [ngClass]="{ 'd-none': fun.isEmpty(config.botones) }" class="btnAccion tableTD" (click)="clickROW(rowData, rowIndex)" [ngStyle]="config?.botones?.styles">
                           <span class="titulo_sm"> Acciones </span>
                           <app-btnacciones
-                            [index_body]="getIndex(indexBody)"
+                            [index_body]="rowIndex"
                             [id_tabla]="realIdTabla"
                             [dato]="rowData"
                             [data]="data"

@@ -36,16 +36,18 @@
 </div>
 
 <ng-template #kpiSectionBlock let-sectionState="sectionState">
+  @let sectionTitle = sectionState.data?.title || getBlockTitle(sectionState.id);
+  @let sectionFilterLabel = getBlockFilterLabel(sectionState.id);
   <section class="kpi-section dashboard-block" [ngClass]="sectionState.status">
     <div class="section-head">
       <div>
-        <h2>{{ sectionState.data?.title || getBlockTitle(sectionState.id) }}</h2>
+        <h2>{{ sectionTitle }}</h2>
         <p>{{ sectionState.data?.description || getBlockSubtitle(sectionState.id) }}</p>
       </div>
 
       <button class="btn btn-light-grey dashboard-filter-btn" type="button" (click)="resetDraftFilter(sectionState.id); kpiFilter.toggle($event)">
         <i class="fas fa-sliders"></i>
-        {{ getBlockFilterLabel(sectionState.id) }}
+        {{ sectionFilterLabel }}
       </button>
     </div>
 
@@ -74,19 +76,22 @@
           @for (row of getSalesKpiRows(sectionState); track $index) {
             <div class="kpi-grid" [class.three-cols]="row.length === 3">
               @for (card of row; track card.id) {
-                <article class="kpi-card" [ngClass]="getKpiTone(card.id, card.title)">
+                @let formattedValue = formatKpiValue(card);
+                @let cardTone = getKpiTone(card.id, card.title);
+                @let cardIcon = getKpiIcon(card.id, card.title);
+                <article class="kpi-card" [ngClass]="cardTone">
                   <div class="kpi-icon">
-                    <i class="fas" [ngClass]="getKpiIcon(card.id, card.title)"></i>
+                    <i class="fas" [ngClass]="cardIcon"></i>
                   </div>
 
                   <div class="kpi-content">
                     <span>{{ card.title }}</span>
                     <strong
                       #kpiValue
-                      [pTooltip]="formatKpiValue(card)"
+                      [pTooltip]="formattedValue"
                       tooltipPosition="top"
                       [tooltipDisabled]="!isTextOverflowing(kpiValue)"
-                    >{{ formatKpiValue(card) }}</strong>
+                    >{{ formattedValue }}</strong>
                     @if (shouldShowKpiSubtitle(card)) {
                       <p>{{ card.subtitle }}</p>
                     }
@@ -116,19 +121,22 @@
           <div class="empty-state">No hay datos</div>
         } @else {
           @for (card of getKpiCards(sectionState); track card.id) {
-            <article class="kpi-card" [ngClass]="getKpiTone(card.id, card.title)">
+            @let formattedValue = formatKpiValue(card);
+            @let cardTone = getKpiTone(card.id, card.title);
+            @let cardIcon = getKpiIcon(card.id, card.title);
+            <article class="kpi-card" [ngClass]="cardTone">
               <div class="kpi-icon">
-                <i class="fas" [ngClass]="getKpiIcon(card.id, card.title)"></i>
+                <i class="fas" [ngClass]="cardIcon"></i>
               </div>
 
               <div class="kpi-content">
                 <span>{{ card.title }}</span>
                 <strong
                   #kpiValue
-                  [pTooltip]="formatKpiValue(card)"
+                  [pTooltip]="formattedValue"
                   tooltipPosition="top"
                   [tooltipDisabled]="!isTextOverflowing(kpiValue)"
-                >{{ formatKpiValue(card) }}</strong>
+                >{{ formattedValue }}</strong>
                 @if (shouldShowKpiSubtitle(card)) {
                   <p>{{ card.subtitle }}</p>
                 }
@@ -140,12 +148,14 @@
     }
 
     <p-popover #kpiFilter styleClass="dashboard-filter-popover" appendTo="body">
-      <ng-container *ngTemplateOutlet="filterPopover; context: { popover: kpiFilter, blockId: sectionState.id, title: sectionState.data?.title || getBlockTitle(sectionState.id) }"></ng-container>
+      <ng-container *ngTemplateOutlet="filterPopover; context: { popover: kpiFilter, blockId: sectionState.id, title: sectionTitle }"></ng-container>
     </p-popover>
   </section>
 </ng-template>
 
 <ng-template #chartBlock let-chartState="chartState" let-featured="featured" let-fullscreen="fullscreen">
+  @let chartTitle = chartState.data?.title || getBlockTitle(chartState.id);
+  @let chartFilterLabel = getBlockFilterLabel(chartState.id);
   <article
     #chartViewport
     class="chart-block dashboard-block"
@@ -156,21 +166,21 @@
     [attr.data-chart-id]="chartState.id"
     [attr.tabindex]="fullscreen ? null : 0"
     [attr.role]="fullscreen ? null : 'button'"
-    [attr.aria-label]="fullscreen ? null : 'Ampliar gráfico ' + (chartState.data?.title || getBlockTitle(chartState.id))"
+    [attr.aria-label]="fullscreen ? null : 'Ampliar gráfico ' + chartTitle"
     (click)="!fullscreen && openExpandedChart($event, chartState)"
     (keydown.enter)="!fullscreen && openExpandedChart($event, chartState)"
     (keydown.space)="!fullscreen && openExpandedChart($event, chartState)"
   >
     <div class="section-head">
       <div>
-        <h2>{{ chartState.data?.title || getBlockTitle(chartState.id) }}</h2>
+        <h2>{{ chartTitle }}</h2>
         <p>{{ chartState.data?.subtitle || getBlockSubtitle(chartState.id) }}</p>
       </div>
 
       <div class="chart-actions">
         <button class="btn btn-light-grey dashboard-filter-btn" type="button" (click)="$event.stopPropagation(); resetDraftFilter(chartState.id); chartFilter.toggle($event)">
           <i class="fas fa-sliders"></i>
-          {{ getBlockFilterLabel(chartState.id) }}
+          {{ chartFilterLabel }}
         </button>
       </div>
     </div>
@@ -196,7 +206,7 @@
     </div>
 
     <p-popover #chartFilter styleClass="dashboard-filter-popover" appendTo="body">
-      <ng-container *ngTemplateOutlet="filterPopover; context: { popover: chartFilter, blockId: chartState.id, title: chartState.data?.title || getBlockTitle(chartState.id), chartState: chartState }"></ng-container>
+      <ng-container *ngTemplateOutlet="filterPopover; context: { popover: chartFilter, blockId: chartState.id, title: chartTitle, chartState: chartState }"></ng-container>
     </p-popover>
   </article>
 </ng-template>
