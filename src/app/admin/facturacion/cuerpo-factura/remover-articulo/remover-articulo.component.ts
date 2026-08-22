@@ -1,6 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, Input, OnInit, inject } from '@angular/core';
-import * as _ from 'lodash';
 import { UntypedFormBuilder, Validators } from '@angular/forms';
 import { fun } from '@core/services/functions.service';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';

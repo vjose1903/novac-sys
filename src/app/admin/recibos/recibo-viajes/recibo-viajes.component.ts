@@ -1,7 +1,6 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
 import { MovimientosC } from '@components/formularios en modales/movimientos-form/movimiento-model';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
-import * as _ from 'lodash';
 import moment from '../../../core/javascript/moment';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
@@ -433,7 +432,7 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.viaje_selected = data;
     this.monto_pendiente = this.viaje_selected.balance;
 
-    this.ultimo_pago = _.maxBy(this.viaje_selected.pagos, 'id');
+      this.ultimo_pago = fun.maxBy(this.viaje_selected.pagos || [], 'id');
 
     const index_viaje = this.viajes.findIndex(viaje => viaje.id == data.id);
 

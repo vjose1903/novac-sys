@@ -3,7 +3,6 @@ import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { CuadreCajaC } from '@core/typescript/cuadre_caja';
 import { fun } from '@core/services/functions.service';
 import { ReporteC } from '../reportes/reporte';
-import * as _ from 'lodash';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
@@ -37,7 +36,7 @@ export class CuadreC {
         const obj = { data: cuadre_parsed, type: 'cuadre_caja' };
 
         PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(async response => {
-          let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')) };
+          let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: fun.first(fun.split(response.file, '.')) };
           ReporteC.visualizarReporte(objPdfView);
           Ss.layServ.nextCheckCuadreToday(true);
         });
@@ -53,7 +52,7 @@ export class CuadreC {
         const obj = { data: { ...(cuadre_parsed as any), reimprimir }, type: 'cuadre_caja' };
 
         return PdfService.generatePdf({ oPdf: obj, imprimir: false }).then(response => {
-          const objPdfView = { ...response, titulo: 'Cuadre de caja', fileName: _.first(response.file.split('.')) };
+          const objPdfView = { ...response, titulo: 'Cuadre de caja', fileName: fun.first(fun.split(response.file, '.')) };
           ReporteC.visualizarReporte(objPdfView);
           Ss.layServ.nextCheckCuadreToday(true);
           return response;

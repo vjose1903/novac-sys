@@ -1,6 +1,4 @@
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import * as _ from 'lodash';
-import { Ss } from '../services/singleton.service';
 
 export function applyMixins(derivedCtor: any, constructors: any[]) {
   constructors.forEach((baseCtor) => {

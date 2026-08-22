@@ -12,7 +12,6 @@ import { MixinClass } from '@core/typescript/MixinClass';
 import { Router } from '@angular/router';
 import { ConduceC } from '../coduce';
 
-import * as _ from 'lodash';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
@@ -107,7 +106,7 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
 
   mapeoRecibos(data) {
     data.map(conduce => {
-      conduce['numero_conduce'] = _.padStart(conduce.numero_conduce, 8, '0');
+      conduce['numero_conduce'] = fun.padStart(conduce.numero_conduce, 8, '0');
       conduce['cantidad_productos'] = conduce.detalle_conduces.length;
 
       conduce['ver'] = 'far fa-eye';

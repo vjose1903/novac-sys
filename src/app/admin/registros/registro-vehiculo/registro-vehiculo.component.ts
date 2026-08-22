@@ -2,7 +2,6 @@ import { HtmlElementsService } from '@core/services/html-elements.service';
 import { Component, OnInit, ChangeDetectorRef, OnDestroy, inject, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import * as _ from 'lodash';
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { EmpleadoCatalogService } from '../registro-empleados/services/empleado-catalog.service';
@@ -125,7 +124,7 @@ export class RegistroVehiculoComponent extends MixinClass implements OnInit, OnD
       return val;
     });
 
-    const vehiculos = _.orderBy(res.data, ['id'], ['asc']);
+    const vehiculos = fun.orderBy(res.data, 'id', 'asc');
     this.listaVehiculos.set(vehiculos);
 
     this.table_config.total_count = res.total_registros;

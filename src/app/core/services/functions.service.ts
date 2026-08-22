@@ -940,10 +940,12 @@ export class fun {
   // LODASH
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  // __________________________________________________________________________________________________
-  // Nombre: pushAt
-  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
-  // _________________________________________________________________________________________________
+  /**
+   * Agrega un item en un indice especifico de un arreglo, mutando el arreglo original.
+   * @param arr Arreglo donde se insertara el item.
+   * @param index Indice donde se insertara el item.
+   * @param newItem Item que se insertara en el arreglo.
+   */
   static pushAt(arr, index, newItem) {
     const copyArr = fun.deepCloning(arr);
     arr.length = 0;
@@ -951,28 +953,179 @@ export class fun {
     newArr.forEach(item => arr.push(item));
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: pull
-  // Descripcion : Esta funcion remueve un item  de un arreglo
-  // _________________________________________________________________________________________________
+  /**
+   * Remueve del arreglo el primer item que sea equivalente al item indicado.
+   * @param array Arreglo que sera modificado.
+   * @param item_remove Item que se removera del arreglo.
+   */
   static pull(array, item_remove) {
     const index = array.findIndex(item => fun.isEqual(item, item_remove));
     array.splice(index, 1);
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: pullAt
-  // Descripcion : Esta funcion remueve un item en un indice especificado de un arreglo
-  // _________________________________________________________________________________________________
+  /**
+   * Remueve un item por indice, mutando el arreglo original.
+   * @param array Arreglo que sera modificado.
+   * @param index Indice del item que se removera.
+   */
   static pullAt(array, index) {
     array.splice(index, 1);
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: objHas
-  // Descripcion : Esta funcion retorna un valor booleano si el objeto evaluado contiene todas las propiedades evaluadas
-  // _________________________________________________________________________________________________
+  /**
+   * Retorna el primer elemento de un arreglo.
+   * @param array Arreglo a consultar.
+   * @returns Primer elemento del arreglo o undefined si no existe.
+   */
+  static first<T>(array: T[]): T | undefined {
+    return array?.[0];
+  }
 
+  /**
+   * Valida si un valor convertido a texto termina con el texto indicado.
+   * @param value Valor que se evaluara como texto.
+   * @param target Texto final esperado.
+   * @returns true si el valor termina con target.
+   */
+  static endsWith(value: any, target: string): boolean {
+    return String(value ?? '').endsWith(target);
+  }
+
+  /**
+   * Divide un valor convertido a texto usando el separador indicado.
+   * @param value Valor que se dividira como texto.
+   * @param separator Separador string o expresion regular.
+   * @returns Arreglo de partes resultantes.
+   */
+  static split(value: any, separator: string | RegExp): string[] {
+    return String(value ?? '').split(separator);
+  }
+
+  /**
+   * Une los elementos de un arreglo usando el separador indicado.
+   * @param array Arreglo de valores a unir.
+   * @param separator Separador entre valores. Por defecto usa coma.
+   * @returns Texto resultante.
+   */
+  static join(array: any[], separator = ','): string {
+    return (array || []).join(separator);
+  }
+
+  /**
+   * Completa un valor por la izquierda hasta alcanzar la longitud indicada.
+   * @param value Valor que se convertira a texto.
+   * @param targetLength Longitud final esperada.
+   * @param padString Texto usado para completar. Por defecto usa espacio.
+   * @returns Texto completado por la izquierda.
+   */
+  static padStart(value: any, targetLength: number, padString = ' '): string {
+    return String(value ?? '').padStart(targetLength, padString);
+  }
+
+  /**
+   * Convierte un valor a entero.
+   * @param value Valor a convertir.
+   * @param radix Base numerica opcional.
+   * @returns Numero entero resultante.
+   */
+  static parseInt(value: any, radix?: number): number {
+    return Number.parseInt(value, radix);
+  }
+
+  /**
+   * Reemplaza una coincidencia dentro de un valor convertido a texto.
+   * @param value Valor que se evaluara como texto.
+   * @param searchValue Texto o expresion regular a buscar.
+   * @param replaceValue Texto reemplazo.
+   * @returns Texto con el reemplazo aplicado.
+   */
+  static replace(value: any, searchValue: string | RegExp, replaceValue: string): string {
+    return String(value ?? '').replace(searchValue as any, replaceValue);
+  }
+
+  /**
+   * Busca el primer item de un arreglo que cumpla con el predicado indicado.
+   * @param array Arreglo donde se buscara.
+   * @param predicate Funcion evaluadora o objeto parcial con propiedades a comparar.
+   * @returns Primer item encontrado o undefined.
+   */
+  static find<T>(array: T[], predicate: Partial<T> | ((item: T) => boolean)): T | undefined {
+    if (!Array.isArray(array)) return undefined;
+    if (typeof predicate === 'function') return array.find(predicate);
+
+    return array.find(item => Object.keys(predicate).every(key => (item as any)?.[key] === (predicate as any)[key]));
+  }
+
+  /**
+   * Transforma cada item de un arreglo usando una funcion o leyendo una propiedad.
+   * @param array Arreglo que sera transformado.
+   * @param iteratee Funcion transformadora o nombre de propiedad a leer.
+   * @returns Nuevo arreglo con los valores transformados.
+   */
+  static map<T, R>(array: T[], iteratee: keyof T | ((item: T) => R)): R[] {
+    if (!Array.isArray(array)) return [];
+    if (typeof iteratee === 'function') return array.map(iteratee);
+
+    return array.map(item => (item as any)?.[iteratee] as R);
+  }
+
+  /**
+   * Retorna el item con el valor numerico mayor para una propiedad.
+   * @param array Arreglo a evaluar.
+   * @param key Propiedad a comparar. Soporta nesting, por ejemplo cliente.id.
+   * @returns Item con el valor mayor o undefined.
+   */
+  static maxBy<T>(array: T[], key: string): T | undefined {
+    if (!Array.isArray(array) || array.length === 0) return undefined;
+
+    return array.reduce((maxItem, item) => {
+      const currentValue = fun.getProperty(item, key);
+      const maxValue = fun.getProperty(maxItem, key);
+      return Number(currentValue || 0) > Number(maxValue || 0) ? item : maxItem;
+    }, array[0]);
+  }
+
+  /**
+   * Ordena un arreglo por una o varias propiedades sin mutar el arreglo original.
+   * @param array Arreglo a ordenar.
+   * @param keys Propiedad o propiedades para ordenar. Soporta nesting, por ejemplo cliente.id.
+   * @param orders Direccion o direcciones de ordenamiento: asc o desc.
+   * @returns Nuevo arreglo ordenado.
+   */
+  static orderBy<T>(array: T[], keys: string | string[], orders: 'asc' | 'desc' | Array<'asc' | 'desc'> = 'asc'): T[] {
+    if (!Array.isArray(array)) return [];
+
+    const sortKeys = Array.isArray(keys) ? keys : [keys];
+    const sortOrders = Array.isArray(orders) ? orders : [orders];
+
+    return [...array].sort((a, b) => {
+      for (let index = 0; index < sortKeys.length; index++) {
+        const key = sortKeys[index];
+        const order = sortOrders[index] || sortOrders[0] || 'asc';
+        const valueA = fun.getProperty(a, key);
+        const valueB = fun.getProperty(b, key);
+
+        if (valueA === valueB) continue;
+        if (fun.isEmpty(valueA)) return order === 'asc' ? 1 : -1;
+        if (fun.isEmpty(valueB)) return order === 'asc' ? -1 : 1;
+
+        const comparison = typeof valueA === 'string' || typeof valueB === 'string'
+          ? String(valueA).localeCompare(String(valueB), undefined, { numeric: true, sensitivity: 'base' })
+          : valueA > valueB ? 1 : -1;
+
+        return order === 'desc' ? comparison * -1 : comparison;
+      }
+
+      return 0;
+    });
+  }
+
+  /**
+   * Valida si un objeto contiene una propiedad, incluyendo rutas anidadas.
+   * @param obj Objeto a evaluar.
+   * @param props Ruta de propiedad a validar, por ejemplo cliente.id.
+   * @returns true si toda la ruta existe en el objeto.
+   */
   static objHas(obj, props) {
     let result = true;
     const props_split = props.split('.');
@@ -990,28 +1143,34 @@ export class fun {
     return result;
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: getProperty
-  // Descripcion : Esta funcion retorna el valor de una propiedad de un objeto
-  // _________________________________________________________________________________________________
+  /**
+   * Retorna el valor de una propiedad, incluyendo rutas anidadas.
+   * @param obj Objeto origen.
+   * @param prop Ruta de propiedad, por ejemplo cliente.id.
+   * @returns Valor encontrado o undefined.
+   */
   static getProperty(obj, prop) {
     return prop.split('.').reduce((objeto, property) => objeto?.[property], obj);
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: setProperty
-  // Descripcion : Esta funcion setea una propiedad a un objeto
-  // _________________________________________________________________________________________________
+  /**
+   * Asigna un valor a una propiedad, creando niveles anidados si hacen falta.
+   * @param obj Objeto que sera modificado.
+   * @param prop Ruta de propiedad, por ejemplo cliente.id.
+   * @param valor Valor a asignar.
+   */
   static setProperty(obj, prop, valor) {
     const props_split = prop.split('.');
 
     fun.createNestedObject(obj, [...props_split], valor);
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: pick
-  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
-  // _________________________________________________________________________________________________
+  /**
+   * Crea un nuevo objeto con solo las propiedades indicadas.
+   * @param obj Objeto origen.
+   * @param props Propiedades a copiar. Soporta nesting, por ejemplo cliente.id.
+   * @returns Nuevo objeto con las propiedades seleccionadas.
+   */
   static pick(obj: any, props: Array<string>): any {
     const result = {};
 
@@ -1026,10 +1185,12 @@ export class fun {
     return result;
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: omit
-  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades omitidas
-  // _________________________________________________________________________________________________
+  /**
+   * Elimina propiedades de un objeto y retorna el mismo objeto modificado.
+   * @param obj Objeto que sera modificado.
+   * @param props Propiedades a eliminar. Soporta nesting, por ejemplo cliente.id.
+   * @returns El mismo objeto sin las propiedades indicadas.
+   */
   static omit(obj, props) {
     for (let index = 0; index < props.length; index++) {
       const prop = props[index];
@@ -1051,6 +1212,14 @@ export class fun {
     return obj;
   }
 
+  /**
+   * Retorna el objeto correspondiente al nivel actual de una ruta anidada.
+   * @param mainObj Objeto base.
+   * @param props_split Ruta de propiedades separada en partes.
+   * @param actualIndex Nivel objetivo que se desea obtener.
+   * @param deepLevel Nivel actual de la recursion.
+   * @returns Objeto ubicado en el nivel solicitado.
+   */
   static getCurrentObjLevel(mainObj, props_split, actualIndex, deepLevel = 0) {
     let obj_en_turno = mainObj;
 
@@ -1065,28 +1234,75 @@ export class fun {
 
   toString = Object.prototype.toString;
 
+  /**
+   * Crea un objeto sin prototipo para usarlo como mapa simple.
+   * @returns Objeto sin prototipo.
+   */
   static createMap() {
     return Object.create(null);
   }
+
+  /**
+   * Valida si un objeto corresponde a window.
+   * @param obj Objeto a evaluar.
+   * @returns true si el objeto es window.
+   */
   static isWindow(obj) {
     return obj && obj.window === obj;
   }
+
+  /**
+   * Valida si un objeto parece ser un scope de AngularJS.
+   * @param obj Objeto a evaluar.
+   * @returns true si contiene metodos tipicos de scope.
+   */
   static isScope(obj) {
     return obj && obj.$evalAsync && obj.$watch;
   }
+
+  /**
+   * Valida si un valor es una expresion regular.
+   * @param value Valor a evaluar.
+   * @returns true si el valor es RegExp.
+   */
   static isRegExp(value) {
     return toString.call(value) === '[object RegExp]';
   }
+
+  /**
+   * Compara dos valores simples, considerando NaN como equivalente a NaN.
+   * @param a Primer valor.
+   * @param b Segundo valor.
+   * @returns true si los valores son equivalentes.
+   */
   static simpleCompare(a, b) {
     return a === b || (a !== a && b !== b);
   }
+
+  /**
+   * Valida si un valor es una fecha.
+   * @param value Valor a evaluar.
+   * @returns true si el valor es Date.
+   */
   static isDate(value) {
     return toString.call(value) === '[object Date]';
   }
+
+  /**
+   * Valida si un valor es un arreglo.
+   * @param arr Valor a evaluar.
+   * @returns true si el valor es Array.
+   */
   static isArray(arr) {
     return Array.isArray(arr) || arr instanceof Array;
   }
 
+  /**
+   * Compara dos valores de forma profunda.
+   * @param obj1 Primer valor a comparar.
+   * @param obj2 Segundo valor a comparar.
+   * @returns true si ambos valores son equivalentes.
+   */
   static isEqual(obj1, obj2) {
     if (obj1 === obj2) return true;
     if (obj1 === null || obj2 === null) return false;

@@ -2,7 +2,6 @@ import { CrudG } from '@core/typescript/crud-g';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '@core/services/functions.service';
 import { csvConfig as csvConfigSuplidorProd } from '@core/services/reports/excel/configs/report/suplidor_prod';
-import * as _ from 'lodash';
 import { ICallbackModal, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 
@@ -42,7 +41,7 @@ export class SuplidorC extends CrudG<any> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
     ReporteC.configCsv = csvConfigSuplidorProd;
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
-      let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')) };
+      let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: fun.first(fun.split(response.file, '.')) };
 
       ReporteC.visualizarReporte(objPdfView);
     });

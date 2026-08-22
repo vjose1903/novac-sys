@@ -7,7 +7,6 @@ import { FacturaC, FacturasI, request_factura_campo, tipoDocFacturacion } from '
 import { TablasService } from '@components/new_tablas/tablas.service';
 import { fun } from '@core/services/functions.service';
 import { Component, inject, ViewChild, ElementRef, Input, signal, AfterViewInit, OnInit } from '@angular/core';
-import * as _ from 'lodash';
 import { IButtonDynamic, IDynamicModal, IModalConfiguration, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 

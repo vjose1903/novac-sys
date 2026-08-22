@@ -3,7 +3,6 @@ import { Ss } from '@core/services/singleton.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LoaderService } from '../../loader/loader.service';
 import { MixinClass } from '@core/typescript/MixinClass';
-import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { ReporteC } from './reporte';
 import { ClienteC } from '@registros/registro-clientes/cliente';

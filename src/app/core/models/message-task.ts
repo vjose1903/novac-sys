@@ -1,5 +1,4 @@
 import { BehaviorSubject } from 'rxjs';
-import * as _ from 'lodash';
 import { fun } from '../services/functions.service';
 
 export class MessageTask {
@@ -17,7 +16,7 @@ export class MessageTask {
   }
 
   generateDataKey(arrRes: any, hash?: any): any {
-    return _.map(arrRes, (el: any) => {
+    return fun.map(arrRes, (el: any) => {
       if (el.data) {
         return { data: el.data, key: fun.generateKey() };
       } else {

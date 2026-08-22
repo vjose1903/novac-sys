@@ -1,6 +1,6 @@
 import { ReporteC } from '../reportes/reporte';
 import { csvConfig as csvConfigInventario } from '@core/services/reports/excel/configs/report/inventario';
-import * as _ from 'lodash';
+import { fun } from '@core/services/functions.service';
 
 export class InventarioC {
   constructor() {}
@@ -15,7 +15,7 @@ export class InventarioC {
       ReporteC.configCsv = csvConfigInventario;
 
       ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
-        let objPdfView = { ...response, titulo: titulo, fileName: _.first(response.file.split('.')) };
+        let objPdfView = { ...response, titulo: titulo, fileName: fun.first(fun.split(response.file, '.')) };
 
         ReporteC.visualizarReporte(objPdfView);
       });

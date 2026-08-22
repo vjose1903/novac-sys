@@ -2,7 +2,6 @@ import { Observable } from 'rxjs';
 
 import { Ss } from '../services/singleton.service';
 
-import * as _ from 'lodash';
 import { Environment } from '@environments/environment';
 import { ConfigI } from '../interface/config-interface';
 import { fun } from '../services/functions.service';

@@ -1,5 +1,4 @@
 import { CrudG } from '@core/typescript/crud-g';
-import * as _ from 'lodash';
 import { ReporteC } from '../../reportes/reporte';
 import { fun } from '@core/services/functions.service';
 import { csvConfig as ventas_producto_csvConfig } from '@core/services/reports/excel/configs/report/ventas_producto';
@@ -135,7 +134,7 @@ export class ArticuloC extends CrudG<ArticuloI> {
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
     ReporteC.requestReporteAndMakePdf(requestParams, 'reporte').then(response => {
-      let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: _.first(response.file.split('.')) };
+        let objPdfView = { ...response, titulo: pdfParams.titulo, fileName: fun.first(fun.split(response.file, '.')) };
 
       ReporteC.visualizarReporte(objPdfView);
     });

@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import * as _ from 'lodash';
 import { fun } from '@core/services/functions.service';
 import { botonesTableI } from '../tabla-class';
 
@@ -89,9 +88,9 @@ export class NewBTNACCIONESComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   getSpeedDial(arg) {
-    const speedDial_id = _.find(arg.originalEvent.path, (item) => item.id.includes('speedDial'))['id'];
-    const index = _.parseInt(_.replace(speedDial_id, 'speedDial-', ''));
-    return index;
+    const eventPath: any[] = arg.originalEvent.composedPath?.() || arg.originalEvent.path || [];
+    const speedDial = fun.find<any>(eventPath, item => item?.id?.includes('speedDial'));
+    return fun.parseInt(fun.replace(speedDial?.id || '', 'speedDial-', ''));
   }
 
   handleFunctionsBtnDinamic(event, btn_dinamic, dato) {

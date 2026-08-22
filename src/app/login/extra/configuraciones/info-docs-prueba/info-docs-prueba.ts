@@ -1,7 +1,6 @@
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { Injectable } from '@angular/core';
 import { facturaPrueba } from './8.5x5.5/factura';
-import * as _ from 'lodash';
 
 const documentos = {
   '8.5x5.5': {

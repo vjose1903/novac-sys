@@ -31,7 +31,7 @@ $font-variations: (
 
   @font-face {
     font-family: '#{$font-family-name}';
-    src: url('#{$font-path}/#{$font-directory}/#{$font-name}') format('truetype');
+    src: url('#{$font-path}/#{$font-directory}/#{$font-name}') format('woff2');
     font-display: swap;
     font-weight: $font-weight;
     font-style: $font-style;
