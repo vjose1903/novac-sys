@@ -3,11 +3,11 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { NgxEchartsModule } from 'ngx-echarts';
-import * as echarts from 'echarts';
 import { PrimengModule } from '../../modules/primeng.module';
 import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
 import { DashboardFullscreenCardComponent } from './dashboard-fullscreen-card.component';
 import { HomeAdminComponent } from './homeAdmin.component';
+import { dashboardEcharts } from './home-echarts';
 
 const routes: Routes = [
   {
@@ -19,6 +19,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [HomeAdminComponent, DashboardFullscreenCardComponent],
-  imports: [CommonModule, FormsModule, PrimengModule, RouterModule.forChild(routes), NgxEchartsModule.forRoot({ echarts })],
+  imports: [CommonModule, FormsModule, PrimengModule, RouterModule.forChild(routes), NgxEchartsModule.forRoot({ echarts: dashboardEcharts })],
 })
 export class HomeModule {}
