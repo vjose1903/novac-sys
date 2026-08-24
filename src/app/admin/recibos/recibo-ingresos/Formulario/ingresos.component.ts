@@ -422,7 +422,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   verDetalles(data) {
-    this.facturaClass.modalVerDetalles(data, 'recibo');
+    this.facturaClass.modalVerDetalles(data, 'factura');
   }
 
   selectAll() {
