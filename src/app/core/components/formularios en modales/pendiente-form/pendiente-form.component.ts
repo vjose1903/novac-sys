@@ -3,6 +3,8 @@ import moment from '../../../../core/javascript/moment';
 
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { CuadreCajaC } from '@core/typescript/cuadre_caja';
+import { fun } from '@services/functions.service';
 
 @Component({
   selector: 'app-pendiente-form',
@@ -11,35 +13,81 @@ import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-mod
   standalone: false,
 })
 export class PendienteFormComponent implements OnInit, IDynamicModal {
-  time = { hour: 13, minute: 30 };
-  hora;
-  minutos;
-  meridian = true;
-  fecha;
+  hora: string | null = null;
+  fecha: Date | null = null;
   maxDate = new Date();
+  checkingCuadre = false;
+  cuadreBlocked = false;
+  validationError = false;
+  private cuadreCajaClass = new CuadreCajaC();
+  private validationRequestId = 0;
+  private lastBlockedDateTimeToast = '';
 
   constructor() {}
 
   @Input() modalConfig!: IModalConfiguration;
   @Input() modalWrapper!: DynamicModalComponent;
 
-  ngOnInit() {
-    this.hora = moment().hour();
-    this.minutos = moment().minutes();
+  ngOnInit() {}
 
-    this.fecha = new Date();
-
-    this.time = { hour: this.hora, minute: this.minutos };
+  canSubmit() {
+    return fun.hasValue(this.fecha) && fun.hasValue(this.hora) && !this.checkingCuadre && !this.cuadreBlocked && !this.validationError;
   }
 
-  toggleMeridian() {
-    this.meridian = !this.meridian;
+  async validateSelectedDateTime() {
+    const requestId = ++this.validationRequestId;
+    const selectedDateTime = this.getSelectedDateTime();
+
+    this.cuadreBlocked = false;
+    this.validationError = false;
+
+    if (!selectedDateTime) {
+      this.checkingCuadre = false;
+      return;
+    }
+
+    this.checkingCuadre = true;
+
+    try {
+      const res = await this.cuadreCajaClass.getAll({
+        afterPath: 'check_datetime_cuadre',
+        parameters: { fecha_hora: selectedDateTime },
+      });
+
+      if (requestId !== this.validationRequestId) return;
+
+      const data = res?.data as any;
+      this.cuadreBlocked = data?.blocked === true;
+
+      if (this.cuadreBlocked && this.lastBlockedDateTimeToast !== selectedDateTime) {
+        this.lastBlockedDateTimeToast = selectedDateTime;
+        fun.toastWarning('Ya existe un cuadre realizado para ese día.', 'AVISO');
+      }
+    } catch (error) {
+      if (requestId !== this.validationRequestId) return;
+
+      this.validationError = true;
+      fun.toastError('No se pudo validar si existe un cuadre para la fecha indicada.', 'ERROR');
+    } finally {
+      if (requestId === this.validationRequestId) this.checkingCuadre = false;
+    }
   }
 
   submit() {
-    const fechaTemp = moment(this.fecha).format('YYYY-MM-DD');
-    const fecha = fechaTemp + ' ' + this.time.hour + ':' + this.time.minute;
+    if (!this.canSubmit()) return;
 
-    this.modalConfig.close({ fecha });
+    this.modalConfig.close({ fecha: this.getSelectedDateTime() });
+  }
+
+  private getSelectedDateTime() {
+    if (!this.fecha || !this.hora) return null;
+
+    const date = moment(this.fecha);
+    if (!date.isValid()) return null;
+
+    const time = moment(this.hora, 'HH:mm', true);
+    if (!time.isValid()) return null;
+
+    return `${date.format('YYYY-MM-DD')}T${time.format('HH:mm')}:00`;
   }
 }

@@ -15,10 +15,17 @@
   justify-content: flex-start;
   padding: 0.2rem 0.45rem;
   text-align: left;
+  user-select: none;
+  -webkit-appearance: none;
+  appearance: none;
 
   &:focus,
   &:focus-visible {
     @include formFieldFocus;
+  }
+
+  &::selection {
+    background: transparent;
   }
 }
 
@@ -31,6 +38,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  background: transparent !important;
+  user-select: none;
+
+  &::selection {
+    background: transparent;
+  }
 }
 
 .time-picker-value.placeholder {
@@ -61,6 +74,14 @@
   box-shadow: var(--app-overlay-shadow, 0 12px 28px rgba(15, 23, 42, 0.16));
   width: 100%;
   min-width: 330px;
+
+  &[hidden] {
+    display: none !important;
+  }
+}
+
+.time-picker-popover-body {
+  position: fixed;
 }
 
 .time-picker-column {

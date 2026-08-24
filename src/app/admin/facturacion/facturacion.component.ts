@@ -1731,7 +1731,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     modalConfig.botones = [
       { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
-      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
+      { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: { function: () => !(modalConfig.componentInstance as PendienteFormComponent)?.canSubmit() } },
     ];
 
     modalConfig.setCallback(this.processPendienteForm.bind(this));

@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Optional, Output, Self, SimpleChanges, ViewChild } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { AfterViewChecked, Component, ElementRef, EventEmitter, HostListener, Inject, Input, OnChanges, OnDestroy, OnInit, Optional, Output, Self, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule, NgControl } from '@angular/forms';
 import { customFormsElements } from '@core/typescript/custom-forms-elements/custom-forms-elements';
 
@@ -12,7 +12,7 @@ type TimePeriod = 'A.M' | 'P.M';
   standalone: true,
   imports: [CommonModule, FormsModule],
 })
-export class TimePickerInputComponent extends customFormsElements implements OnInit, OnChanges, OnDestroy {
+export class TimePickerInputComponent extends customFormsElements implements OnInit, OnChanges, AfterViewChecked, OnDestroy {
   @Input() name = '';
   @Input() inputId = '';
   @Input('id') set idInput(value: string) {
@@ -32,11 +32,13 @@ export class TimePickerInputComponent extends customFormsElements implements OnI
   @Input() placeholder = 'Selecciona hora';
   @Input('readonly') isReadonly = false;
   @Input() wrapperClass = '';
+  @Input() appendTo: 'self' | 'body' = 'self';
 
   @Output('onChange') changeEvent = new EventEmitter<string | null>();
   @Output() onChangeValue = new EventEmitter<string | null>();
 
   @ViewChild('triggerButton') triggerButton?: ElementRef<HTMLButtonElement>;
+  @ViewChild('popover') popover?: ElementRef<HTMLDivElement>;
 
   open = false;
   selectedHour = 9;
@@ -51,7 +53,8 @@ export class TimePickerInputComponent extends customFormsElements implements OnI
     @Optional()
     @Self()
     public override control: NgControl,
-    private elementRef: ElementRef<HTMLElement>
+    private elementRef: ElementRef<HTMLElement>,
+    @Inject(DOCUMENT) private document: Document
   ) {
     super(control);
   }
@@ -84,6 +87,11 @@ export class TimePickerInputComponent extends customFormsElements implements OnI
 
   ngOnDestroy(): void {
     this.detachScrollListener();
+    this.removePopoverFromBody();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.open && this.shouldAppendToBody) this.appendPopoverToBody();
   }
 
   get disabledField() {
@@ -124,7 +132,10 @@ export class TimePickerInputComponent extends customFormsElements implements OnI
 
     this.open = !this.open;
     if (this.open) {
-      requestAnimationFrame(() => this.positionPopover());
+      requestAnimationFrame(() => {
+        this.appendPopoverToBody();
+        this.positionPopover();
+      });
       this.attachScrollListener();
     } else {
       this.detachScrollListener();
@@ -161,7 +172,8 @@ export class TimePickerInputComponent extends customFormsElements implements OnI
     if (!this.open) return;
     const target = event.target as Node;
     const host = this.elementRef.nativeElement as HTMLElement;
-    if (host.contains(target)) return;
+    const popover = this.popover?.nativeElement;
+    if (host.contains(target) || popover?.contains(target)) return;
     this.closePicker();
   }
 
@@ -174,11 +186,15 @@ export class TimePickerInputComponent extends customFormsElements implements OnI
   @HostListener('window:resize')
   positionPopover() {
     if (!this.open || !this.triggerButton?.nativeElement) return;
+    if (!this.shouldAppendToBody) return;
 
     const rect = this.triggerButton.nativeElement.getBoundingClientRect();
+    const minWidth = 330;
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - minWidth - 8));
+
     this.popoverStyle = {
       top: `${rect.bottom + 2}px`,
-      left: `${rect.left}px`,
+      left: `${left}px`,
       width: `${rect.width}px`,
     };
   }
@@ -192,6 +208,24 @@ export class TimePickerInputComponent extends customFormsElements implements OnI
   private closePicker() {
     this.open = false;
     this.detachScrollListener();
+  }
+
+  private get shouldAppendToBody() {
+    return this.appendTo === 'body';
+  }
+
+  private appendPopoverToBody() {
+    if (!this.shouldAppendToBody || !this.popover?.nativeElement) return;
+
+    const popover = this.popover.nativeElement;
+    if (popover.parentElement === this.document.body) return;
+
+    this.document.body.appendChild(popover);
+  }
+
+  private removePopoverFromBody() {
+    const popover = this.popover?.nativeElement;
+    if (popover?.parentElement === this.document.body) this.document.body.removeChild(popover);
   }
 
   private setInternalValue(value: string | null, emitChange: boolean, normalizeInitial: boolean) {

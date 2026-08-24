@@ -16,11 +16,11 @@ import { BuscarArticuloComponent } from './buscar-articulo/buscar-articulo.compo
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmacionImprimirComponent } from './confirmacion-imprimir/confirmacion-imprimir.component';
 import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-error-msg.component';
 import { DirectivesModule } from '@core/directive/directives.module';
 import { SkeletonModule } from 'primeng/skeleton';
+import { TimePickerInputModule } from '@core/components/form-fields/time-picker-input/time-picker-input.module';
 
 const components = [
   FormCantidadEfectivoComponent,
@@ -38,7 +38,7 @@ const components = [
 
 @NgModule({
   declarations: components,
-  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabsModule, NgxPermissionsModule, SelectButtonModule, NgbTimepickerModule, FormErrorMsgComponent, DirectivesModule, SkeletonModule],
+  imports: [CommonModule, TablasModule, FormsModule, ReactiveFormsModule, PrimengModule, TabsModule, NgxPermissionsModule, SelectButtonModule, FormErrorMsgComponent, DirectivesModule, SkeletonModule, TimePickerInputModule],
   exports: components,
 })
 export class FormulariosEnModalesModule {}

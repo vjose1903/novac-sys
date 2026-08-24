@@ -21,9 +21,6 @@ import { FIRESTORE } from '@core/tokens/firebase.tokens';
 // Registrar el locale español
 registerLocaleData(localeEs);
 
-// Configuración para ng-bootstrap
-import { NgbConfig } from '@ng-bootstrap/ng-bootstrap';
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
@@ -40,13 +37,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimationsAsync(),
     provideAnimations(),
-    {
-      provide: NgbConfig,
-      useValue: {
-        animation: true,
-        placement: 'auto',
-      },
-    },
     providePrimeNG({
       theme: {
         preset: Nora,

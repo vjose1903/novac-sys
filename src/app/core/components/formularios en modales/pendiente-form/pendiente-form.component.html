@@ -1,9 +1,11 @@
 <h5 class="my-3">Introduzca fecha y hora de factura pendiente:</h5>
-<div class="row">
-  <div class="col-5 rowFecha">
-    <p-datepicker inputId="fecha" [(ngModel)]="fecha" [maxDate]="maxDate" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+<div class="row factura-pendiente-fields">
+  <div class="col-6 form-group">
+    <label class="control-label" for="fecha">Fecha:</label>
+    <p-datepicker inputId="fecha" [(ngModel)]="fecha" (ngModelChange)="validateSelectedDateTime()" [maxDate]="maxDate" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" inputStyleClass="form-control inputE"></p-datepicker>
   </div>
-  <div class="col-7">
-    <ngb-timepicker id="timepicker" [(ngModel)]="time" size="small" [meridian]="meridian"></ngb-timepicker>
+  <div class="col-6 form-group">
+    <label class="control-label" for="horaFacturaPendiente">Hora:</label>
+    <form-time-picker-input inputId="horaFacturaPendiente" name="horaFacturaPendiente" [(ngModel)]="hora" [minuteStep]="1" appendTo="body" placeholder="Seleccione hora" (onChangeValue)="validateSelectedDateTime()"></form-time-picker-input>
   </div>
 </div>

@@ -1,5 +1,13 @@
-.rowFecha {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
+.factura-pendiente-fields {
+  align-items: flex-start;
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  p-datepicker,
+  form-time-picker-input {
+    width: 100%;
+    display: block;
+  }
 }
