@@ -306,6 +306,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
 
       const movimientoPdfData = await this.getMovimientoPdfData(movimiento);
       this.prepareModalRestoreState();
+      await this.waitAfterPdfModalClose();
       await this.openMovimientoFacturaModal(movimiento, movimientoPdfData);
     } catch (error: any) {
       if (!error?.handled) {
@@ -371,20 +372,38 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   }
 
   async getReciboPdfData(pago) {
-    const reciboData = this.hasReciboPdfData(pago) ? pago : await this.getReciboByPago(pago);
+    const reciboData = await this.getReciboPdfSource(pago);
     const reciboParsed = await this.reciboClass.parseDataToPdf(reciboData);
 
     return { data: reciboParsed, type: 'recibo_ingreso', documento: 'recibo' };
+  }
+
+  async getReciboPdfSource(pago) {
+    const reciboId = this.getReciboId(pago);
+
+    if (fun.hasValue(reciboId)) {
+      try {
+        const reciboDb = await this.getReciboById(reciboId);
+        if (this.hasReciboPdfData(reciboDb)) return reciboDb;
+      } catch (error) {
+        if (!this.hasReciboPdfData(pago)) throw error;
+      }
+    }
+
+    if (this.hasReciboPdfData(pago)) return pago;
+
+    throw { error: { msg: 'No se encontró la información completa del recibo de ingreso' } };
   }
 
   hasReciboPdfData(recibo) {
     return Array.isArray(recibo?.detalle_recibos) && fun.hasValue(recibo?.cliente) && fun.hasValue(recibo?.user);
   }
 
-  async getReciboByPago(pago) {
-    const reciboId = pago?.recibos_ingreso_id ?? pago?.recibo?.id ?? pago?.recibo_id;
-    if (!fun.hasValue(reciboId)) throw { error: { msg: 'No se encontró el recibo de ingreso' } };
+  getReciboId(pago) {
+    return pago?.recibos_ingreso_id ?? pago?.recibo?.id ?? pago?.recibo_id;
+  }
 
+  async getReciboById(reciboId) {
     const res = await this.reciboClass.getOne(Number(reciboId));
     const reciboData = res?.data?.recibo ?? res?.data ?? res;
 
@@ -403,6 +422,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
 
       const facturaPdfData = await this.getFacturaPdfData(factura.facturaId);
       this.prepareModalRestoreState();
+      await this.waitAfterPdfModalClose();
       await this.openFacturaAfectadaModal(factura.facturaId, facturaPdfData);
     } catch (error: any) {
       if (!error?.handled) {
@@ -432,7 +452,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   }
 
   prepareModalRestoreState() {
-    const sourcePdfModalConfig = this.getSourcePdfModalConfig();
+    const sourcePdfModalConfig = this.getActiveSourcePdfModalConfig();
     const restoreSourcePdfModal = sourcePdfModalConfig ? this.closeModalById(sourcePdfModalConfig.id) : false;
     const restoreDetalle = this.closeModalById('detalle_factura');
 
@@ -448,6 +468,26 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
       restoreDetalle,
       sourcePdfModalConfig,
     };
+  }
+
+  getActiveSourcePdfModalConfig(): PdfModalRestoreConfig | null {
+    const sourcePdfModalConfig = this.getSourcePdfModalConfig();
+    if (!sourcePdfModalConfig) return null;
+
+    const modalIds = this.getSourcePdfModalIds(sourcePdfModalConfig);
+    const activeModalId = modalIds.find(modalId => this.modalExists(modalId));
+
+    return activeModalId ? { ...sourcePdfModalConfig, id: activeModalId } : sourcePdfModalConfig;
+  }
+
+  getSourcePdfModalIds(sourcePdfModalConfig: PdfModalRestoreConfig) {
+    if (sourcePdfModalConfig.documento == 'factura') return [sourcePdfModalConfig.id, 'mostrarFacturaIngreso', 'mostrarDocumento'];
+    return [sourcePdfModalConfig.id];
+  }
+
+  modalExists(modalId: string) {
+    const modalConfig = this.dynamicModalServ.findModalConfigById(modalId, false);
+    return modalConfig?.id == modalId;
   }
 
   getSourcePdfModalConfig(): PdfModalRestoreConfig | null {
@@ -500,6 +540,12 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
     return false;
   }
 
+  waitAfterPdfModalClose() {
+    if (!this.modalRestoreState?.restoreSourcePdfModal) return Promise.resolve();
+
+    return new Promise<void>(resolve => window.setTimeout(resolve, 150));
+  }
+
   openFacturaAfectadaModal(facturaId: number, facturaPdfData) {
     const dataModal = {
       id: `pdfViewer-modal-factura-afectada-${facturaId}-${Date.now()}`,
@@ -515,8 +561,8 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
 
   openMovimientoFacturaModal(movimiento: MovimientoFactura, movimientoPdfData) {
     const dataModal = {
-      id: `pdfViewer-modal-movimiento-${movimiento.tipo}-${movimiento.key}-${Date.now()}`,
-      header: movimiento.tipo == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR RECIBO',
+      id: movimiento.tipo == 'nota' ? `pdfViewer-modal-movimiento-${movimiento.tipo}-${movimiento.key}-${Date.now()}` : 'revision_recibo',
+      header: movimiento.tipo == 'nota' ? 'MOSTRAR NOTA' : 'Revisión de recibo de ingreso',
       show_estado: movimiento.tipo == 'nota',
       width: '57rem',
       height: movimiento.tipo == 'nota' ? '70vh' : '40rem',
@@ -530,6 +576,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
 
   async handleFacturaAfectadaModalCallback(args: ICallbackModal) {
     if (args.type != modalCloseType.onHide) return;
+    await this.waitAfterPdfModalClose();
     await this.restoreModalsAfterFacturaClose();
   }
 

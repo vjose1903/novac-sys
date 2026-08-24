@@ -704,9 +704,9 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
       const recibo = res['data'].recibo;
 
       const actualPagination = this.tServ.getPaginationById('listado_recibos');
+      this.resetVariables();
       await this.pedirFacturasPorCliente(this.clienteAdepositar().id, actualPagination);
 
-      this.resetVariables();
       const recibo_parsed = await this.reciboClass.parseDataToPdf(recibo);
       const obj_print = { data: recibo_parsed, type: 'recibo_ingreso' };
 
