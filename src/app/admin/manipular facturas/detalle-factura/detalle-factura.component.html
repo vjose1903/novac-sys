@@ -79,6 +79,78 @@
     </section>
   }
 
+  @if (showModificacionesRecibidasSection()) {
+    <section class="facturas-afectadas movimientos-detalle">
+      <div class="facturas-afectadas-header">
+        <div>
+          <p class="facturas-title mb-0">Modificaciones recibidas</p>
+          <small class="facturas-subtitle">Notas que modificaron esta factura</small>
+        </div>
+        <span class="facturas-count">{{ modificacionesRecibidas.length }}</span>
+      </div>
+
+      <div class="movimientos-list mt-3">
+        @for (movimiento of modificacionesRecibidas; track movimiento.key) {
+          <article class="movimiento-item" [class.loading]="movimientoLoadingKey == movimiento.key">
+            <div>
+              <span class="factura-item-label">{{ movimiento.label }}</span>
+              <strong class="factura-item-value">{{ movimiento.numero }}</strong>
+            </div>
+            <div class="movimiento-actions">
+              <div class="movimiento-meta">
+                <span>{{ movimiento.fecha }}</span>
+                <strong>RD$ {{ movimiento.monto }}</strong>
+              </div>
+              <button
+                type="button"
+                class="movimiento-eye-button"
+                aria-label="Ver nota"
+                (click)="verMovimientoFactura(movimiento)">
+                <i class="far fa-eye factura-eye-icon"></i>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  @if (showPagosRealizadosSection()) {
+    <section class="facturas-afectadas movimientos-detalle">
+      <div class="facturas-afectadas-header">
+        <div>
+          <p class="facturas-title mb-0">Pagos realizados</p>
+          <small class="facturas-subtitle">Recibos de ingreso aplicados a esta factura</small>
+        </div>
+        <span class="facturas-count">{{ pagosRealizados.length }}</span>
+      </div>
+
+      <div class="movimientos-list mt-3">
+        @for (movimiento of pagosRealizados; track movimiento.key) {
+          <article class="movimiento-item" [class.loading]="movimientoLoadingKey == movimiento.key">
+            <div>
+              <span class="factura-item-label">{{ movimiento.label }}</span>
+              <strong class="factura-item-value">#{{ movimiento.numero }}</strong>
+            </div>
+            <div class="movimiento-actions">
+              <div class="movimiento-meta">
+                <span>{{ movimiento.fecha }}</span>
+                <strong>RD$ {{ movimiento.monto }}</strong>
+              </div>
+              <button
+                type="button"
+                class="movimiento-eye-button"
+                aria-label="Ver recibo"
+                (click)="verMovimientoFactura(movimiento)">
+                <i class="far fa-eye factura-eye-icon"></i>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
   @if (data?.serie == serie.electronica) {
     @if (fun.hasValue(data?.dgii_message)) {
       <div class="ecf-message-card">

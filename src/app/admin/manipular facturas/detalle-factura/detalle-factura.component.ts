@@ -10,11 +10,22 @@ import { FacturaC, tipoDocFacturacion } from '@admin/facturacion/factura';
 import { LoaderService } from '../../../loader/loader.service';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { NotaC } from '../notas-cred-deb/notas';
+import { ReciboC } from '@admin/recibos/recibos';
 
 interface FacturaAfectada {
   key: string;
   facturaId: number | null;
   numero: string;
+}
+
+interface MovimientoFactura {
+  key: string;
+  label: string;
+  numero: string;
+  fecha: string;
+  monto: string;
+  tipo: 'nota' | 'recibo';
+  source: any;
 }
 
 interface PdfModalRestoreConfig {
@@ -51,7 +62,10 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   serie = serie;
   fun = fun;
   facturasAfectadas: FacturaAfectada[] = [];
+  modificacionesRecibidas: MovimientoFactura[] = [];
+  pagosRealizados: MovimientoFactura[] = [];
   facturaLoadingKey: string | null = null;
+  movimientoLoadingKey: string | null = null;
   detalles: ModalDetalleFacturaI[] = [
     { label: 'Forma de pago', key: 'forma_pago', tipo: 'string', div_clase: 'col-12 col-md-6 p-0 ' },
     { label: 'Fecha', key: 'fecha_equivalente', tipo: 'date', div_clase: 'col-12 col-md-6 p-0 ps-md-3' },
@@ -59,6 +73,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   ];
   facturaClass = new FacturaC();
   notaClass = new NotaC();
+  reciboClass = new ReciboC();
   _ipc = inject(IpcService);
   loadServ = inject(LoaderService);
   dynamicModalServ = inject(DynamicModalService);
@@ -70,6 +85,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
     this.validateDetails();
     this.validateElectronicInfoceDetails();
     this.loadFacturasAfectadas();
+    this.loadMovimientosFactura();
   }
 
   validateDetails() {
@@ -193,6 +209,188 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
     return 'nota';
   }
 
+  loadMovimientosFactura() {
+    if (this.documento != 'factura') return;
+
+    this.modificacionesRecibidas = this.getNotasFactura().map((nota, index) => this.mapNotaFactura(nota, index));
+    this.pagosRealizados = this.getPagosFactura().map((pago, index) => this.mapPagoFactura(pago, index));
+  }
+
+  getNotasFactura() {
+    return Array.isArray(this.data?.notas) ? this.data.notas.filter(nota => fun.hasValue(nota)) : [];
+  }
+
+  getPagosFactura() {
+    return Array.isArray(this.data?.pagos) ? this.data.pagos.filter(pago => fun.hasValue(pago)) : [];
+  }
+
+  showModificacionesRecibidasSection() {
+    return this.modificacionesRecibidas.length > 0;
+  }
+
+  showPagosRealizadosSection() {
+    return this.pagosRealizados.length > 0;
+  }
+
+  mapNotaFactura(nota, index): MovimientoFactura {
+    return {
+      key: `nota-${nota?.id ?? index}`,
+      label: this.getNotaMovimientoLabel(nota),
+      numero: this.getMovimientoNumero(nota, 'numero_comprobante'),
+      fecha: this.getMovimientoFecha(nota),
+      monto: this.getMovimientoMonto(nota, ['total', 'total_factura', 'bruto']),
+      tipo: 'nota',
+      source: nota,
+    };
+  }
+
+  mapPagoFactura(pago, index): MovimientoFactura {
+    return {
+      key: `pago-${pago?.id ?? pago?.recibos_ingreso_id ?? index}`,
+      label: 'Recibo de ingreso',
+      numero: this.getReciboNumero(pago),
+      fecha: this.getMovimientoFecha(pago),
+      monto: this.getMovimientoMonto(pago, ['total', 'deposito', 'monto']),
+      tipo: 'recibo',
+      source: pago,
+    };
+  }
+
+  getNotaMovimientoLabel(nota) {
+    const tipo = [nota?.tipo_label, nota?.tipo_factura, nota?.tipo, nota?.descripcion]
+      .filter(value => fun.hasValue(value))
+      .map(value => fun.normalizarTexto(`${value}`.toLowerCase()))
+      .join(' ');
+
+    if (tipo.includes('credito')) return 'Nota de crédito';
+    if (tipo.includes('debito')) return 'Nota de débito';
+    return 'Nota';
+  }
+
+  getMovimientoNumero(data, key: string) {
+    const numero = data?.[key] ?? data?.identificador ?? data?.numero_documento;
+    return fun.hasValue(numero) ? `${numero}` : '-';
+  }
+
+  getReciboNumero(pago) {
+    const numero = pago?.numero_recibo ?? pago?.recibo?.numero_recibo;
+    if (!fun.hasValue(numero)) return '-';
+
+    return `${numero}`.padStart(8, '0');
+  }
+
+  getMovimientoFecha(data) {
+    const fecha = data?.fecha_equivalente ?? data?.created_at ?? data?.updated_at;
+
+    if (!fun.hasValue(fecha) || !DateUtils.isValid(new Date(fecha))) return '-';
+
+    return DateUtils.format({ date: fecha, dateFormat: 'dd/MM/yyyy', include_hour: true, hourFormat: 'hh:mm a', separator: ' ' });
+  }
+
+  getMovimientoMonto(data, keys: string[]) {
+    if (data?.mora && keys.includes('deposito')) {
+      const totalPago = Number(data.deposito || 0) + Number(data.mora || 0);
+      return fun.roundNumberToDecimal(totalPago);
+    }
+
+    const key = keys.find(item => fun.hasValue(data?.[item]));
+    const monto = key ? data[key] : null;
+
+    return fun.hasValue(monto) ? fun.roundNumberToDecimal(Math.abs(fun.desformatearStNumber(monto))) : '-';
+  }
+
+  async verMovimientoFactura(movimiento: MovimientoFactura) {
+    try {
+      this.movimientoLoadingKey = movimiento.key;
+      this.loadServ.isLoading.next(true);
+
+      const movimientoPdfData = await this.getMovimientoPdfData(movimiento);
+      this.prepareModalRestoreState();
+      await this.openMovimientoFacturaModal(movimiento, movimientoPdfData);
+    } catch (error: any) {
+      if (!error?.handled) {
+        const msg = error?.error?.msg || 'No se pudo mostrar el documento';
+        fun.toastError(msg, 'ERROR');
+      }
+
+      await this.restoreModalsAfterFacturaClose();
+    } finally {
+      this.movimientoLoadingKey = null;
+      this.loadServ.isLoading.next(false);
+    }
+  }
+
+  async getMovimientoPdfData(movimiento: MovimientoFactura) {
+    if (movimiento.tipo == 'nota') return this.getNotaPdfData(movimiento.source);
+    return this.getReciboPdfData(movimiento.source);
+  }
+
+  async getNotaPdfData(nota) {
+    const notaData = await this.getNotaPdfSource(nota);
+    const notaParsed = await this.notaClass.parseDataToPdf(notaData);
+
+    return { data: notaParsed, type: 'nota', documento: 'nota' };
+  }
+
+  async getNotaPdfSource(nota) {
+    const notaId = this.getNotaId(nota);
+
+    if (fun.hasValue(notaId)) {
+      try {
+        const notaDb = await this.getNotaById(notaId);
+        if (this.hasNotaPdfData(notaDb)) return notaDb;
+      } catch (error) {
+        if (!this.hasNotaPdfData(nota)) throw error;
+      }
+    }
+
+    if (this.hasNotaPdfData(nota)) return nota;
+
+    throw { error: { msg: 'No se encontró la información completa de la nota' } };
+  }
+
+  hasNotaPdfData(nota) {
+    if (!Array.isArray(nota?.facturas_aplicadas) || nota.facturas_aplicadas.length == 0) return false;
+    if (!fun.hasValue(nota?.serie) || !fun.hasValue(nota?.tipo_factura)) return false;
+
+    return nota.facturas_aplicadas.every(facturaAplicada => {
+      const hasFactura = fun.hasValue(facturaAplicada?.cabecera_factura);
+      if (nota.serie != serie.electronica) return hasFactura;
+
+      return hasFactura && Array.isArray(facturaAplicada?.detalles_facturas_notas);
+    });
+  }
+
+  getNotaId(nota) {
+    return nota?.id ?? nota?.nota_id ?? nota?.nota_factura_id;
+  }
+
+  async getNotaById(notaId) {
+    const res = await this.notaClass.getOne(Number(notaId));
+    return res?.data ?? res;
+  }
+
+  async getReciboPdfData(pago) {
+    const reciboData = this.hasReciboPdfData(pago) ? pago : await this.getReciboByPago(pago);
+    const reciboParsed = await this.reciboClass.parseDataToPdf(reciboData);
+
+    return { data: reciboParsed, type: 'recibo_ingreso', documento: 'recibo' };
+  }
+
+  hasReciboPdfData(recibo) {
+    return Array.isArray(recibo?.detalle_recibos) && fun.hasValue(recibo?.cliente) && fun.hasValue(recibo?.user);
+  }
+
+  async getReciboByPago(pago) {
+    const reciboId = pago?.recibos_ingreso_id ?? pago?.recibo?.id ?? pago?.recibo_id;
+    if (!fun.hasValue(reciboId)) throw { error: { msg: 'No se encontró el recibo de ingreso' } };
+
+    const res = await this.reciboClass.getOne(Number(reciboId));
+    const reciboData = res?.data?.recibo ?? res?.data ?? res;
+
+    return reciboData;
+  }
+
   async verFacturaAfectada(factura: FacturaAfectada) {
     if (!factura.facturaId) {
       fun.toastError('No se encontró la factura afectada', 'ERROR');
@@ -277,6 +475,18 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
       };
     }
 
+    if (this.documento == 'factura') {
+      return {
+        id: 'pdfViewer-modal',
+        header: 'MOSTRAR FACTURA',
+        width: '57rem',
+        height: '70vh',
+        show_estado: true,
+        pdfType: this.getFacturaPdfType(this.data?.tipo),
+        documento: 'factura',
+      };
+    }
+
     return null;
   }
 
@@ -299,6 +509,21 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
     };
 
     return this.facturaClass.handleMostrarFactura(facturaPdfData, dataModal, [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }]).catch(error => {
+      throw { ...error, handled: true };
+    });
+  }
+
+  openMovimientoFacturaModal(movimiento: MovimientoFactura, movimientoPdfData) {
+    const dataModal = {
+      id: `pdfViewer-modal-movimiento-${movimiento.tipo}-${movimiento.key}-${Date.now()}`,
+      header: movimiento.tipo == 'nota' ? 'MOSTRAR NOTA' : 'MOSTRAR RECIBO',
+      show_estado: movimiento.tipo == 'nota',
+      width: '57rem',
+      height: movimiento.tipo == 'nota' ? '70vh' : '40rem',
+      callback: (args: ICallbackModal) => this.handleFacturaAfectadaModalCallback(args),
+    };
+
+    return this.facturaClass.handleMostrarFactura(movimientoPdfData, dataModal, [{ clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cerrar', disable: false }]).catch(error => {
       throw { ...error, handled: true };
     });
   }

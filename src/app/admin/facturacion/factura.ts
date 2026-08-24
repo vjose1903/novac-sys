@@ -330,6 +330,8 @@ export class FacturaC extends CrudG<FacturasI> {
         'is_ncf_modificado',
         'document_reference',
         'is_external',
+        'notas',
+        'pagos',
       ];
       const pick_factura = [...pick_factura1, ...pick_factura2];
 

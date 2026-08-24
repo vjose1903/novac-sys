@@ -16,7 +16,6 @@ export class InterceptorService implements HttpInterceptor {
     private zone: NgZone
   ) {}
   requestCount: number = 0;
-  private perfRequestId = 0;
 
   private startRequest(args?): void {
     if (this.requestCount <= 0 && args != 'no_show') this.loadServ.isLoading.next(true);
@@ -32,8 +31,6 @@ export class InterceptorService implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(false));
     const token = fun.getAuthToken();
-    const perfId = ++this.perfRequestId;
-    const perfStart = performance.now();
 
     let spinner = request.params.get('spinner');
 
@@ -55,25 +52,10 @@ export class InterceptorService implements HttpInterceptor {
       });
     }
 
-    this.logHttpPerf('request', {
-      id: perfId,
-      route: window?.location?.pathname,
-      method: request.method,
-      url: request.urlWithParams,
-      spinner: spinner || null,
-    });
 
     return next.handle(request).pipe(
       map(event => {
         if (event instanceof HttpResponse) {
-          this.logHttpPerf('response', {
-            id: perfId,
-            route: window?.location?.pathname,
-            method: request.method,
-            url: request.urlWithParams,
-            status: event.status,
-            duration_ms: Math.round(performance.now() - perfStart),
-          });
 
           if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
 
@@ -90,21 +72,10 @@ export class InterceptorService implements HttpInterceptor {
       }),
 
       catchError((response: HttpErrorResponse) => {
-        this.logHttpPerf('error', {
-          id: perfId,
-          route: window?.location?.pathname,
-          method: request.method,
-          url: request.urlWithParams,
-          status: response.status,
-          duration_ms: Math.round(performance.now() - perfStart),
-        });
 
-        console.log('%c response ', 'color: orange', response);
 
         if (response.status == 401) {
           const token = fun.getAuthToken();
-          console.log('ENREEEE 2');
-          console.log('token ', token);
 
           fun.logout();
 
@@ -113,27 +84,22 @@ export class InterceptorService implements HttpInterceptor {
             return;
           }
         }
-        // console.log('response', response);
         const errorDesconocido = () => fun.toastError('Error <strong>desconocido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR');
 
         if (fun.isEmpty(response.error)) {
           errorDesconocido();
         } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
-          console.log("@@@@@@@@@@@@@@@@@@@@@@@@@");
 
           fun.toastError(response.error.msg, 'ERROR');
           this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(false));
           fun.logout();
         } else {
           if (fun.objHas(response, 'status') && response.status == 404 && fun.hasValue(response?.error?.msg)) {
-            console.log('1');
 
             this.handler_msg(response.error.msg, 'warning');
           } else if (fun.objHas(response, 'error.msg')) {
-            console.log('2');
             this.handler_msg(response.error.msg, 'error');
           } else {
-            console.log('3');
             errorDesconocido();
           }
         }
@@ -146,20 +112,8 @@ export class InterceptorService implements HttpInterceptor {
     );
   }
 
-  private logHttpPerf(type: 'request' | 'response' | 'error', payload: any) {
-    console.log(
-      JSON.stringify({
-        tag: 'NOVAC_HTTP_PERF',
-        type,
-        timestamp: new Date().toISOString(),
-        ...payload,
-      })
-    );
-  }
 
   handler_msg(menssages, tipo_) {
-    // console.warn('MENSAJE DESDE EL INTERCEPTOR');
-    // console.warn('menssages ', menssages);
 
     if (menssages && Array.isArray(menssages)) {
       for (let i = 0; i < menssages.length; i++) {
