@@ -242,7 +242,7 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     this.resetRowFocus();
 
     if (fun.objHas(this.config, 'filtrar') && !this.config.filtrar.local) {
-      fun.awaitTyping(event).then(() => {
+      fun.awaitTyping(event, 250).then(() => {
         if (fun.objHas(this.config, 'padre_functions') && this.config.padre_functions?.data_request) {
           const actualPagination = this.getActualPagination();
           let page = actualPagination.page;
