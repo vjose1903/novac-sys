@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
@@ -38,6 +38,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
   documentoEnConsulta: string | null = null;
   ultimaConsultaDocumento: string | null = null;
   ultimaConsultaAt = 0;
+  consultandoDocumento = signal(false);
 
   isCreando: boolean = false;
 
@@ -232,6 +233,8 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
         this.ultimaConsultaDocumento = documentoNormalizado;
         this.ultimaConsultaAt = ahora;
 
+        this.consultandoDocumento.set(true);
+
         try {
           await fun
             .getPersonaByDocIdentidad({ documento: documento, tipo: tipo })
@@ -281,6 +284,7 @@ export class RegistroSuplidoresComponent extends MixinClass implements OnInit, O
           });
         } finally {
           this.documentoEnConsulta = null;
+          this.consultandoDocumento.set(false);
         }
       } else {
         if (!_.endsWith(documento, '_')) {
