@@ -173,13 +173,35 @@ textarea {
   }
 }
 
-.input-group-append {
-  .input-group-text {
-    background-color: var(--app-input-disabled-bg);
-    border-color: var(--app-border);
-    color: var(--app-text);
-    height: 100%;
-    border-radius: var(--app-field-radius, 0.72rem);
+.input-group {
+  .input-group-append {
+    .input-group-text {
+      background-color: var(--app-input-disabled-bg);
+      border-color: var(--app-border);
+      color: var(--app-text);
+      height: 100%;
+      border-radius: var(--app-field-radius, 0.72rem);
+
+      &.prefijo {
+        border-top-right-radius: 0rem !important;
+        border-bottom-right-radius: 0rem !important;
+      }
+
+      &.sufijo {
+        border-top-left-radius: 0rem !important;
+        border-bottom-left-radius: 0rem !important;
+      }
+    }
+  }
+
+  .with-right-btn {
+    border-top-right-radius: 0rem !important;
+    border-bottom-right-radius: 0rem !important;
+  }
+
+  .with-left-btn {
+    border-top-left-radius: 0rem !important;
+    border-bottom-left-radius: 0rem !important;
   }
 }
 
@@ -250,9 +272,7 @@ select.inputE:not(.entrada),
 select.form-control:not(.entrada),
 select.inputE:not(.entrada) {
   appearance: none;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--app-text-muted) 50%),
-    linear-gradient(135deg, var(--app-text-muted) 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, var(--app-text-muted) 50%), linear-gradient(135deg, var(--app-text-muted) 50%, transparent 50%);
   background-position:
     calc(100% - 1rem) 50%,
     calc(100% - 0.72rem) 50%;

@@ -128,7 +128,7 @@
                   <div class="col-6 p-0 pe-2">
                     <div class="form-group">
                       <label class="control-label">Fecha nacimiento: <span style="color: red">*</span> </label>
-                      <p-datepicker #inputFecha inputId="campoFecha" formControlName="fecha_nacimiento" dateFormat="dd/mm/yy" [maxDate]="maxDateBirth" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('campoRole')"></p-datepicker>
+                      <p-datepicker #inputFecha inputId="campoFecha" formControlName="fecha_nacimiento" dateFormat="dd/mm/yy" [maxDate]="maxDateBirth" placeholder="dd/mm/aaaa" (keydown.enter)="saltar('campoRole')" appendTo="body"></p-datepicker>
                       <form-error-msg [control]="form.get('fecha_nacimiento')" [fieldElement]="inputFecha"></form-error-msg>
                     </div>
                   </div>

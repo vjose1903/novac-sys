@@ -24,8 +24,7 @@
                       [value]="' Divisa Principal '"
                       [rounded]="true"
                       [severity]="'success'"
-                      [style]="{ 'white-space': 'nowrap', width: 'auto', overflow: 'hidden', 'text-overflow': 'ellipsis', display: 'inline-block' }"
-                    ></p-tag>
+                      [style]="{ 'white-space': 'nowrap', width: 'auto', overflow: 'hidden', 'text-overflow': 'ellipsis', display: 'inline-block' }"></p-tag>
                   </div>
                 </div>
                 <div class="col-5 p-0">
@@ -62,8 +61,10 @@
                         <label class="control-label">Tasa actual: <span style="color: red">*</span></label>
 
                         <div class="input-group">
-                          <span class="input-group-text prefijo" id="currency">$</span>
-                          <input type="Number" min="1" formControlName="current_tasa" id="campoNombre" class="form-control input_cantidad" autocomplete="off" aria-describedby="currency" />
+                          <div class="input-group-append">
+                            <span class="input-group-text prefijo" id="currency">$</span>
+                          </div>
+                          <input type="Number" min="1" formControlName="current_tasa" id="campoCurrency" class="form-control input_cantidad with-left-btn" autocomplete="off" aria-describedby="currency" />
                         </div>
 
                         <span id="msgContainer"></span>
@@ -74,7 +75,7 @@
               </div>
             </form>
             <div class="p-0 mt-5 d-flex justify-content-between">
-              <div>
+              <div class="d-flex gap-2">
                 <button (click)="borrar()" class="btn mr-2 btn-blanco" style="max-width: 6rem">Borrar</button>
 
                 <button [disabled]="formIsInvalid()" type="submit" (click)="requests()" class="btn ml-2 btn-verde" style="max-width: 6rem">{{ botonLabel }}</button>

@@ -2,7 +2,9 @@
   <div class="col-12 p-0">
     <h5>
       Divisa: <strong>{{ divisa.nombre }}</strong>
-      <span *ngIf="divisa.code" class="ms-2">Código: <strong>{{ divisa.code }}</strong></span>
+      <span *ngIf="divisa.code" class="ms-2"
+        >Código: <strong>{{ divisa.code }}</strong></span
+      >
     </h5>
     <div class="row">
       <div class="col-6 d-flex justify-content-center align-items-center">
@@ -13,10 +15,7 @@
           <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
             <div class="form-group mb-1">
               <label class="control-label">Tasa actual: </label>
-              <p-tag
-                class="tasa-actual-tag"
-                [rounded]="true"
-                [style]="{ 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block', 'font-size': '0.9rem' }">
+              <p-tag class="tasa-actual-tag" [rounded]="true" [style]="{ 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block', 'font-size': '0.9rem' }">
                 <p class="tasa-actual-value mb-0">{{ divisa.current_tasa }}</p>
               </p-tag>
             </div>
@@ -25,8 +24,10 @@
               <label class="control-label">Nueva tasa: <span style="color: red">*</span></label>
 
               <div class="input-group">
-                <span class="input-group-text prefijo" id="currency">$</span>
-                <input type="Number" min="1" formControlName="tasa" id="campoNombre" class="form-control input_cantidad" autocomplete="off" aria-describedby="currency" (focus)="htmlServ.selectValue($event)" />
+                <div class="input-group-append">
+                  <span class="input-group-text prefijo" id="currency">$</span>
+                </div>
+                <input type="Number" min="1" formControlName="tasa" id="campoCurrency" class="form-control input_cantidad with-left-btn" autocomplete="off" aria-describedby="currency" (focus)="htmlServ.selectValue($event)" />
               </div>
 
               <span id="msgContainer"></span>
