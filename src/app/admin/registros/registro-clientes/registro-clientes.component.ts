@@ -27,6 +27,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   FORM: any;
   isCreando: boolean = false;
   doc_is_cedula = true;
+  consultandoDocumento = signal(false);
 
   PhotoData: any;
   doc_principal = 'cedula';
@@ -300,6 +301,8 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
         this.ultimaConsultaDocumento = documentoNormalizado;
         this.ultimaConsultaAt = ahora;
 
+        this.consultandoDocumento.set(true);
+
         try {
           await fun
             .getPersonaByDocIdentidad({ documento: documento, tipo: tipo })
@@ -353,6 +356,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
             });
         } finally {
             this.documentoEnConsulta = null;
+            this.consultandoDocumento.set(false);
         }
       } else {
         if (!this.editando && documento?.endsWith('_')) {
