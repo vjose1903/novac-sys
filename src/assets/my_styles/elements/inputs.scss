@@ -1,3 +1,83 @@
+.input-icon {
+  position: relative;
+  display: block;
+  width: 100%;
+
+  > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+    color: var(--app-text-muted, var(--app-text));
+  }
+
+  &.accent {
+    > i {
+      color: var(--primary08);
+    }
+  }
+
+  &.success {
+    > i {
+      color: var(--bs-success, #28a745);
+    }
+  }
+
+  &.error {
+    > i {
+      color: var(--bs-danger, #dc3545);
+    }
+  }
+
+  &.info {
+    > i {
+      color: var(--bs-info, #0dcaf0);
+    }
+  }
+
+  &.warning {
+    > i {
+      color: var(--bs-warning, #ffc107);
+    }
+  }
+
+  &.muted {
+    > i {
+      color: var(--app-text-muted, #6c757d);
+    }
+  }
+
+  &.leading {
+    > i {
+      left: var(--app-field-padding-x-md, 0.72rem);
+    }
+
+    .form-control,
+    .inputE,
+    .p-inputtext,
+    .p-inputmask input {
+      padding-left: calc(var(--app-field-padding-x-md, 0.72rem) + 1.75rem) !important;
+    }
+  }
+
+  &.trailing {
+    > i {
+      right: var(--app-field-padding-x-md, 0.72rem);
+    }
+
+    .form-control,
+    .inputE,
+    .p-inputtext,
+    .p-inputmask input {
+      padding-right: calc(var(--app-field-padding-x-md, 0.72rem) + 1.75rem) !important;
+    }
+  }
+}
+
 @media (min-width: 992px) {
   // =====================================================================================================================================================================
   // PANTALLAS LG ========================================================================================================================================================

@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import * as _ from 'lodash';
 import moment from '../../../core/javascript/moment';
@@ -41,6 +41,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
   documentoEnConsulta: string | null = null;
   ultimaConsultaDocumento: string | null = null;
   ultimaConsultaAt = 0;
+  consultandoCedula = signal(false);
 
   camposDisabled = true;
   empleadosClass = new EmpleadoC();
@@ -176,6 +177,8 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
         this.ultimaConsultaDocumento = documentoNormalizado;
         this.ultimaConsultaAt = ahora;
 
+        this.consultandoCedula.set(true);
+
         try {
           await fun
             .getPersonaByDocIdentidad({ documento: cedula, tipo: 'cedula' })
@@ -221,6 +224,7 @@ export class RegistroEmpleadosComponent extends MixinClass implements OnInit, On
           });
         } finally {
           this.documentoEnConsulta = null;
+          this.consultandoCedula.set(false);
         }
       } else {
         if (!_.endsWith(cedula, '_')) {
