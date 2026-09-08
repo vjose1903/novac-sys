@@ -1,0 +1,197 @@
+@use './forms.scss' as *;
+
+:root {
+  --invoice-table-header-bg: #ffffff;
+  --invoice-table-header-text: #101820;
+  --invoice-table-header-border: var(--app-table-border);
+  --invoice-table-body-bg: var(--app-table-row-bg);
+  --invoice-table-body-text: var(--app-table-text);
+  --invoice-table-border: var(--app-table-border);
+  --invoice-table-input-bg: var(--app-input-bg);
+  --invoice-table-input-text: var(--app-table-text);
+  --invoice-table-input-disabled-bg: var(--app-surface-muted);
+  --invoice-table-input-disabled-text: var(--app-table-text);
+}
+
+:root[data-theme-mode='dark'] {
+  --invoice-table-header-bg: var(--app-table-header-bg);
+  --invoice-table-header-text: var(--app-table-header-text);
+}
+
+@mixin entrada-focus {
+  border-color: var(--primary08) !important;
+  box-shadow: none !important;
+  outline: 2px solid var(--primary08) !important;
+  background-color: var(--app-input-focus-bg) !important;
+  color: var(--app-text) !important;
+}
+
+.entrada {
+  border-radius: 0 !important;
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  min-height: 0 !important;
+  padding: 0rem 0.3rem 0rem 0.2rem !important;
+  box-shadow: none !important;
+  border: 1px solid var(--app-border) !important;
+
+  &:focus {
+    @include entrada-focus;
+  }
+
+  &.p-select {
+    padding: 0rem 0.1rem 0rem 0.2rem !important;
+
+    .p-select-label {
+      min-height: 0 !important;
+      padding: 0 !important;
+      font-size: 12px !important;
+    }
+
+    .p-select-dropdown {
+      width: auto !important;
+    }
+
+    &.p-focus {
+      @include entrada-focus;
+    }
+  }
+}
+
+.panel-dropdown-unidad {
+  min-width: 12rem !important;
+
+  .p-select-option {
+    text-wrap: nowrap !important;
+    white-space: nowrap !important;
+  }
+}
+
+.cuerpo-fact {
+  .titulos-fact {
+    background: var(--invoice-table-header-bg);
+    color: var(--invoice-table-header-text);
+    border-bottom: 1px solid var(--invoice-table-header-border);
+    margin-bottom: 0 !important;
+
+    th {
+      background: var(--invoice-table-header-bg);
+      color: var(--invoice-table-header-text);
+      border-color: var(--invoice-table-header-border);
+      border-bottom-color: var(--invoice-table-header-border);
+    }
+  }
+
+  .contenido-fact {
+    background: var(--invoice-table-body-bg);
+    color: var(--invoice-table-body-text);
+    border-top: 0;
+
+    .position-relative:has(> .entrada.disabled),
+    .div-row-codigo:has(> .entrada.disabled) {
+      cursor: not-allowed;
+    }
+
+    .table-cuerpo-factura {
+      margin-bottom: 0;
+      color: var(--invoice-table-body-text);
+      border-top: 0;
+
+      tr {
+        background: var(--invoice-table-body-bg);
+      }
+
+      td {
+        border-color: var(--invoice-table-border);
+      }
+
+      .iconArrow {
+        color: var(--app-text-muted);
+      }
+
+      .entrada {
+        background-color: var(--invoice-table-input-bg) !important;
+        color: var(--invoice-table-input-text) !important;
+        border-color: var(--invoice-table-border) !important;
+
+        &:focus,
+        &.p-focus {
+          background-color: var(--app-input-focus-bg) !important;
+          color: var(--app-text) !important;
+          border-color: var(--primary08) !important;
+        }
+
+        &::placeholder {
+          color: var(--app-text-muted);
+        }
+
+        &.disabled,
+        &:disabled {
+          background-color: var(--invoice-table-input-disabled-bg) !important;
+          color: var(--invoice-table-input-disabled-text) !important;
+        }
+      }
+    }
+  }
+}
+
+.layoutConduce .titles {
+  background: var(--invoice-table-header-bg);
+  color: var(--invoice-table-header-text);
+
+  th {
+    background: var(--invoice-table-header-bg);
+    color: var(--invoice-table-header-text);
+  }
+}
+
+[tabindex='-1']:focus:not(:focus-visible):not(.entrada):not(.p-select-label):not(.p-select-dropdown) {
+  @include formFieldFocus;
+}
+
+.div-row-codigo {
+  display: grid;
+  grid-template-columns: 0px 1fr;
+
+  &:not(.started) {
+    grid-template-columns: 1fr;
+
+    .btnConfig {
+      display: none;
+    }
+  }
+
+  &.started {
+    grid-template-columns: min-content 1fr !important;
+  }
+}
+
+.btnConfig {
+  width: 0.6rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(1.5em + 0.3rem + 2px) !important;
+  border-bottom: 1px solid var(--invoice-table-border) !important;
+  color: var(--app-row-action-text);
+  padding: 3px;
+  cursor: default;
+
+  background-color: var(--app-row-action-bg);
+
+  &:not(.disabled):hover {
+    color: var(--app-row-action-active-text) !important;
+    background-color: var(--app-row-action-hover-bg);
+    cursor: pointer;
+  }
+
+  &:not(.disabled) {
+    color: var(--app-row-action-active-text) !important;
+  }
+
+  &.disabled {
+    color: var(--app-row-action-disabled-text) !important;
+    &:hover {
+      cursor: not-allowed !important;
+    }
+  }
+}

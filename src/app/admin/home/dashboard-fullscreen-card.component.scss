@@ -1,0 +1,134 @@
+.dashboard-fullscreen-backdrop {
+  background: rgba(8, 12, 20, 0.58);
+  backdrop-filter: blur(0.28rem);
+  inset: 0;
+  opacity: 0;
+  position: fixed;
+  z-index: 99999800;
+}
+
+.dashboard-fullscreen-panel {
+  background: var(--app-surface);
+  border: 1px solid color-mix(in srgb, var(--app-border) 72%, transparent);
+  border-radius: 1.15rem;
+  box-shadow: 0 2rem 5rem -2.5rem rgba(0, 0, 0, 0.75);
+  color: var(--app-text);
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  left: var(--final-left, 3.5vw);
+  max-height: var(--final-height, 78vh);
+  overflow: hidden;
+  padding: 0.7rem;
+  position: fixed;
+  top: var(--final-top, 4.5vh);
+  transform:
+    translate3d(var(--origin-x, 0), var(--origin-y, 0), 0)
+    scale(var(--origin-scale-x, 0.96), var(--origin-scale-y, 0.96));
+  transform-origin: top left;
+  will-change: transform, border-radius;
+  width: var(--final-width, 93vw);
+}
+
+.dashboard-fullscreen-backdrop.ready {
+  opacity: 1;
+}
+
+.dashboard-fullscreen-panel.ready {
+  transform: translate3d(0, 0, 0) scale(1, 1);
+}
+
+.dashboard-fullscreen-close {
+  align-items: center;
+  background: color-mix(in srgb, var(--app-surface) 86%, var(--app-bg-soft));
+  border: 1px solid color-mix(in srgb, var(--app-border) 72%, transparent);
+  border-radius: 999px;
+  color: var(--app-text);
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  position: absolute;
+  right: 0.85rem;
+  top: 0.85rem;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+  width: 2rem;
+  z-index: 3;
+}
+
+.dashboard-fullscreen-close:hover {
+  border-color: var(--primary07);
+  box-shadow: 0 12px 28px -22px color-mix(in srgb, var(--primary07) 70%, #000);
+  transform: translateY(-1px);
+}
+
+.dashboard-fullscreen-panel.closing .dashboard-fullscreen-close {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms ease;
+}
+
+:host ::ng-deep .dashboard-fullscreen-panel .chart-block {
+  border: 0;
+  box-shadow: none;
+  flex: 1 1 auto;
+  height: auto;
+  margin: 0;
+  min-height: 0;
+  padding: 0.95rem 1rem 1rem;
+}
+
+:host ::ng-deep .dashboard-fullscreen-panel .section-head {
+  padding-right: 2.35rem;
+}
+
+:host ::ng-deep .dashboard-fullscreen-panel .chart-body,
+:host ::ng-deep .dashboard-fullscreen-panel .echart,
+:host ::ng-deep .dashboard-fullscreen-panel .chart-reveal-placeholder {
+  min-height: 0;
+}
+
+:host ::ng-deep .dashboard-fullscreen-panel .chart-body {
+  flex: 1 1 auto;
+  height: min(70vh, calc(var(--final-height, 78vh) - 4.8rem));
+  min-height: 0;
+}
+
+:host ::ng-deep .dashboard-fullscreen-panel .echart,
+:host ::ng-deep .dashboard-fullscreen-panel .chart-skeleton,
+:host ::ng-deep .dashboard-fullscreen-panel .empty-state {
+  height: 100%;
+  min-height: min(70vh, calc(var(--final-height, 78vh) - 4.8rem));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-fullscreen-panel {
+    will-change: auto;
+  }
+
+  .dashboard-fullscreen-backdrop {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-fullscreen-panel {
+    left: 0.8rem;
+    max-height: calc(100vh - 1.6rem);
+    top: 0.8rem;
+    width: calc(100vw - 1.6rem);
+  }
+
+  :host ::ng-deep .dashboard-fullscreen-panel .chart-body {
+    height: calc(100vh - 7rem);
+  }
+
+  :host ::ng-deep .dashboard-fullscreen-panel .echart,
+  :host ::ng-deep .dashboard-fullscreen-panel .chart-skeleton,
+  :host ::ng-deep .dashboard-fullscreen-panel .empty-state {
+    min-height: calc(100vh - 8rem);
+  }
+}

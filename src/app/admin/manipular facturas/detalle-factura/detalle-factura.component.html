@@ -1,28 +1,163 @@
-<div class="mainContainer">
-  <div class="d-flex info">
-    <div class="d-flex">
-      <b class="mr-2">Cliente: </b>
-      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-        <p class="text-black mb-0">{{ inputs.data.cliente.nombre }}</p>
-      </p-tag>
-    </div>
+<div class="mainContainer detalle-shell">
+  <section class="cliente-card">
+    <span class="cliente-label">Cliente</span>
+    <div class="cliente-pill">{{ data?.cliente?.nombre_completo || 'Sin cliente' }}</div>
+  </section>
 
-    <div *ngIf="inputs?.data?.numero_comprobante" class="d-flex ml-3">
-      <b class="mr-2">Comprobante: </b>
-      <p-tag [rounded]="true" [style]="{ background: '#bfbfbf', 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block' }">
-        <p class="text-black mb-0">{{ inputs.data.numero_comprobante }}</p></p-tag
-      >
-    </div>
-  </div>
-  <hr class="rayaTop" />
-  <div class="row">
-    <div class="col-6 pl-0" *ngFor="let item of detalles; let i = index">
-      <ng-container class="d-flex">
-        <p>
-          <strong>{{ item.label }}</strong
-          >: {{ getValue(item) }}
-        </p>
-      </ng-container>
-    </div>
-  </div>
+  <section class="detalle-info-grid row g-2">
+    @for (item of detalles; track item.key) {
+      <div [ngClass]="item.div_clase">
+        <article class="detalle-info-item" [class.ecf-detail-item]="item.key == 'is_aceptada' && data?.serie == serie.electronica">
+          <p class="detalle-info-label mb-1">{{ item.label }}</p>
+
+          @switch (item.tipo) {
+            @case ('tag') {
+              @if (item.key == 'is_aceptada' && data?.serie == serie.electronica) {
+                <div class="ecf-status-row">
+                  <span class="detalle-tag-value" [ngStyle]="{ background: item.bg_tag }">
+                    <span [ngClass]="item.clase_string">{{ getValue(item) }}</span>
+                  </span>
+
+                  <button class="btn-ecf-status-inline" (click)="openBrowser()">
+                    <span class="d-flex align-items-center gap-2">
+                      <img src="assets/img/dgii_logo.png" alt="dgii logo" class="dgii-logo" />
+                      Verificar Estado Ecf
+                    </span>
+                    <i class="pi pi-external-link"></i>
+                  </button>
+                </div>
+              } @else {
+                <span class="detalle-tag-value" [ngStyle]="{ background: item.bg_tag }">
+                  <span [ngClass]="item.clase_string">{{ getValue(item) }}</span>
+                </span>
+              }
+            }
+            @default {
+              <span class="detalle-text-value">{{ getValue(item) }}</span>
+            }
+          }
+        </article>
+      </div>
+    }
+  </section>
+
+  @if (showFacturasAfectadasSection()) {
+    <section class="facturas-afectadas">
+      <div class="facturas-afectadas-header">
+        <div>
+          <p class="facturas-title mb-0">Facturas afectadas</p>
+          <small class="facturas-subtitle">{{ getFacturasAfectadasSubtitle() }}</small>
+        </div>
+        @if (showFacturasCount()) {
+          <span class="facturas-count">{{ facturasAfectadas.length }}</span>
+        }
+      </div>
+
+      @if (facturasAfectadas.length > 0) {
+        <div class="facturas-grid-scroll mt-3">
+          <div class="facturas-grid">
+            @for (factura of facturasAfectadas; track factura.key) {
+              <article
+                class="factura-item"
+                [class.loading]="facturaLoadingKey == factura.key"
+                (click)="verFacturaAfectada(factura)"
+                (keydown.enter)="verFacturaAfectada(factura)"
+                (keydown.space)="verFacturaAfectada(factura); $event.preventDefault()"
+                tabindex="0">
+                <span class="factura-item-label">Factura</span>
+                <div class="factura-item-footer">
+                  <strong class="factura-item-value">{{ factura.numero }}</strong>
+                  <i class="far fa-eye factura-eye-icon"></i>
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="facturas-empty mt-3">{{ getFacturasAfectadasEmptyMessage() }}</div>
+      }
+    </section>
+  }
+
+  @if (showModificacionesRecibidasSection()) {
+    <section class="facturas-afectadas movimientos-detalle">
+      <div class="facturas-afectadas-header">
+        <div>
+          <p class="facturas-title mb-0">Modificaciones recibidas</p>
+          <small class="facturas-subtitle">Notas que modificaron esta factura</small>
+        </div>
+        <span class="facturas-count">{{ modificacionesRecibidas.length }}</span>
+      </div>
+
+      <div class="movimientos-list mt-3">
+        @for (movimiento of modificacionesRecibidas; track movimiento.key) {
+          <article class="movimiento-item" [class.loading]="movimientoLoadingKey == movimiento.key">
+            <div>
+              <span class="factura-item-label">{{ movimiento.label }}</span>
+              <strong class="factura-item-value">{{ movimiento.numero }}</strong>
+            </div>
+            <div class="movimiento-actions">
+              <div class="movimiento-meta">
+                <span>{{ movimiento.fecha }}</span>
+                <strong>RD$ {{ movimiento.monto }}</strong>
+              </div>
+              <button
+                type="button"
+                class="movimiento-eye-button"
+                aria-label="Ver nota"
+                (click)="verMovimientoFactura(movimiento)">
+                <i class="far fa-eye factura-eye-icon"></i>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  @if (showPagosRealizadosSection()) {
+    <section class="facturas-afectadas movimientos-detalle">
+      <div class="facturas-afectadas-header">
+        <div>
+          <p class="facturas-title mb-0">Pagos realizados</p>
+          <small class="facturas-subtitle">Recibos de ingreso aplicados a esta factura</small>
+        </div>
+        <span class="facturas-count">{{ pagosRealizados.length }}</span>
+      </div>
+
+      <div class="movimientos-list mt-3">
+        @for (movimiento of pagosRealizados; track movimiento.key) {
+          <article class="movimiento-item" [class.loading]="movimientoLoadingKey == movimiento.key">
+            <div>
+              <span class="factura-item-label">{{ movimiento.label }}</span>
+              <strong class="factura-item-value">#{{ movimiento.numero }}</strong>
+            </div>
+            <div class="movimiento-actions">
+              <div class="movimiento-meta">
+                <span>{{ movimiento.fecha }}</span>
+                <strong>RD$ {{ movimiento.monto }}</strong>
+              </div>
+              <button
+                type="button"
+                class="movimiento-eye-button"
+                aria-label="Ver recibo"
+                (click)="verMovimientoFactura(movimiento)">
+                <i class="far fa-eye factura-eye-icon"></i>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  @if (data?.serie == serie.electronica) {
+    @if (fun.hasValue(data?.dgii_message)) {
+      <div class="ecf-message-card">
+        <span [ngClass]="{ 'text-danger': data?.is_aceptada == TrackStatusEnum.REJECTED, 'text-warning': data?.is_aceptada == TrackStatusEnum.CONDITIONAL_ACCEPTED }">
+          {{ data?.dgii_message }}
+        </span>
+      </div>
+    }
+  }
 </div>

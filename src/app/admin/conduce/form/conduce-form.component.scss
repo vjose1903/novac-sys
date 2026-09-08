@@ -1,36 +1,62 @@
 .layoutConduce {
   display: grid;
   grid-template-areas:
+    "titulo"
     "arriba"
     "abajo";
-  grid-template-rows: min-content auto;
+  grid-template-rows: min-content min-content minmax(0, 1fr);
+  min-height: 0;
+  row-gap: 0.75rem;
+
+  .titulo {
+    grid-area: titulo;
+    padding: 0 0.25rem;
+
+    .screen-module-kicker {
+      color: var(--app-text-muted);
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      margin-bottom: 0.18rem;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      color: var(--app-text);
+      font-size: 1.65rem;
+      font-weight: 800 !important;
+      letter-spacing: 0;
+      line-height: 1.12;
+      margin: 0;
+    }
+  }
+
   .arriba {
     grid-area: arriba;
 
-    .gridSelecClient {
+    .conduce-top-grid {
       display: grid;
-      grid-template-areas:
-        "titulo"
-        "colCard";
-      grid-template-rows: min-content auto;
-
-      .titulo {
-        grid-area: titulo;
-      }
-      .colCard {
-        grid-area: colCard;
-      }
+      gap: 0.75rem;
+      grid-template-columns: minmax(19rem, 0.42fr) minmax(0, 0.58fr);
     }
   }
   .abajo {
     grid-area: abajo;
+    min-height: 0;
 
     .cardConduce {
+      background: var(--app-surface) !important;
+      border: 1px solid var(--app-card-border) !important;
+      border-radius: 1rem !important;
+      box-shadow: var(--app-overlay-shadow) !important;
       display: grid;
       grid-template-areas:
         "cuerpo"
         "botones";
-      grid-template-rows: auto min-content;
+      grid-template-rows: minmax(0, 1fr) min-content;
+      min-height: 0;
 
       .cuerpo {
         grid-area: cuerpo;
@@ -41,7 +67,6 @@
           width: 100%;
           height: 100%;
           overflow: hidden;
-
           display: grid;
           grid-template-areas:
             "titles"
@@ -49,19 +74,247 @@
           grid-template-rows: min-content auto;
 
           .titles {
+            background: var(--app-table-header-bg) !important;
+            border-bottom: 1px solid var(--app-table-border);
+            color: var(--app-table-header-text);
             grid-area: titles;
+            overflow: hidden;
+
+            thead th {
+              background: transparent !important;
+              border: 0 !important;
+              color: inherit;
+              font-weight: 800;
+              padding: 0.7rem 0.5rem;
+            }
           }
           .body {
             grid-area: body;
             overflow: auto;
+            padding-bottom: 0.5rem;
+
+            table {
+              border-color: var(--app-table-border);
+            }
+
+            .entrada {
+              background: var(--app-surface-soft);
+              border-color: var(--app-card-border);
+              color: var(--app-text);
+            }
+
+            .btnConfig {
+              color: var(--app-text-muted);
+            }
           }
         }
       }
       .botones {
+        align-items: stretch;
+        background: var(--app-surface-soft);
+        border-top: 1px solid var(--app-card-border);
+        display: grid;
+        gap: 0.5rem;
         grid-area: botones;
-        border-top: 2px solid #c7c9ca;
+        grid-template-areas:
+          "summary"
+          "actions";
+        grid-template-rows: min-content minmax(0, 1fr);
+        min-height: 9.25rem;
+        padding: 0.85rem 1rem 0.6rem;
+
+        .conduce-footer-summary {
+          align-items: center;
+          color: var(--app-text);
+          display: flex;
+          grid-area: summary;
+          justify-content: flex-start;
+
+          .titulos {
+            align-items: center;
+            background: color-mix(in srgb, var(--primary06) 12%, var(--app-surface));
+            border: 1px solid color-mix(in srgb, var(--primary08) 34%, var(--app-card-border));
+            border-radius: 0.75rem;
+            color: var(--app-text);
+            display: inline-flex;
+            gap: 0.5rem;
+            min-height: 2.35rem;
+            padding: 0.2rem 0.5rem;
+
+            i {
+              color: var(--primary08);
+            }
+
+            span {
+              font-weight: 400;
+            }
+
+            strong {
+              font-weight: 800;
+            }
+          }
+        }
+
+        .conduce-footer-actions {
+          align-items: center;
+          display: flex;
+          gap: 3.5rem;
+          grid-area: actions;
+          justify-content: flex-start;
+          min-height: 6rem;
+          overflow: visible;
+          padding-left: 0;
+
+          app-btncircular {
+            display: block;
+            flex: 0 0 6.35rem;
+            height: 6.35rem;
+            position: relative;
+            width: 6.35rem;
+          }
+
+          ::ng-deep .contenedor {
+            height: 6.35rem;
+            overflow: visible;
+            position: relative;
+          }
+
+          ::ng-deep .imgBtn {
+            left: 50%;
+            transform: translateX(-50%);
+          }
+
+          ::ng-deep .labelBtn {
+            color: var(--app-text);
+            font-size: 0.82rem;
+            left: 50%;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            top: 5.35rem;
+            transform: translateX(-50%) translateY(0.35rem) scale(0.96);
+            transition:
+              opacity 180ms cubic-bezier(0.23, 1, 0.32, 1),
+              transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+            white-space: nowrap;
+            width: max-content;
+          }
+
+          @media (hover: hover) and (pointer: fine) {
+            ::ng-deep .imgBtn.active {
+              transition:
+                filter 160ms ease,
+                transform 160ms ease;
+            }
+
+            ::ng-deep .imgBtn.active:hover {
+              transform: translateX(-50%) translateY(-0.2rem) scale(1.03);
+            }
+
+            ::ng-deep .imgBtn:hover ~ .labelBtn {
+              opacity: 1;
+              transform: translateX(-50%) translateY(0) scale(1);
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            ::ng-deep .imgBtn.active,
+            ::ng-deep .imgBtn.active:hover,
+            ::ng-deep .labelBtn,
+            ::ng-deep .imgBtn:hover ~ .labelBtn {
+              transform: translateX(-50%);
+              transition: opacity 180ms ease;
+            }
+
+            ::ng-deep .imgBtn:hover ~ .labelBtn {
+              opacity: 1;
+            }
+          }
+        }
       }
     }
+  }
+}
+
+.client-search-card {
+  min-height: 0;
+
+  .card {
+    background: var(--app-surface) !important;
+    border: 1px solid var(--app-card-border) !important;
+    border-radius: 1rem !important;
+    box-shadow: var(--app-overlay-shadow) !important;
+    overflow: hidden;
+    padding: 0 !important;
+  }
+
+  .widget {
+    display: grid;
+    grid-template-rows: auto min-content;
+    min-height: 11rem;
+  }
+
+  .widget-content {
+    align-content: start;
+    display: grid;
+    padding: 1rem;
+
+    .client-filter-title {
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  .control-label {
+    color: var(--app-text);
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+  }
+
+  .form-control {
+    background: var(--app-surface-soft);
+    border-color: var(--app-card-border);
+    color: var(--app-text);
+    margin-bottom: 0 !important;
+    min-height: 2.4rem;
+  }
+
+  .widget-footer {
+    align-items: center;
+    background: var(--app-surface-soft);
+    border-top: 1px solid var(--app-card-border);
+    display: flex;
+    gap: 0.65rem;
+    justify-content: flex-start;
+    padding: 0.75rem 1rem;
+  }
+}
+
+.future-sales-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-card-border);
+  border-radius: 1rem;
+  box-shadow: var(--app-overlay-shadow);
+  display: grid;
+  grid-template-rows: min-content minmax(0, 1fr);
+  min-height: 11rem;
+  overflow: hidden;
+
+  .future-sales-title {
+    border-bottom: 1px solid var(--app-card-border);
+    padding: 0.7rem 0.9rem;
+
+    h3 {
+      color: var(--app-text);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.15;
+      margin: 0;
+    }
+  }
+
+  .future-sales-table {
+    min-height: 0;
+    position: relative;
   }
 }
 
@@ -89,19 +342,19 @@
 // TAMAÑO DE LOS TITULOS
 // ====================================================
 
-.tiCOD_ {
+.column-codigo_ {
   width: 17%;
 }
 
-.tiCAN_ {
+.column-cantidad_ {
   width: 8.5%;
 }
 
-.tiUNI_ {
+.column-unidad_ {
   width: 16%;
 }
 
-.tiDES_ {
+.column-descripcion_ {
   width: 58.5%;
 }
 
@@ -128,18 +381,7 @@
 //   overflow-x: hidden;
 // }
 
-.conFlow {
-  overflow: auto !important;
-}
 
-.sinFLow {
-  overflow: hidden !important;
-}
-
-
-.btnBorrar {
-  transition: all 0.3s;
-}
 
 // ======================================================
 // ======================================================
@@ -149,6 +391,23 @@
 }
 
 .factAdelantadas {
-  height: 11rem;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   display: flex;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .layoutConduce {
+    .arriba .conduce-top-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .abajo .cardConduce .botones .conduce-footer-actions {
+      padding-left: 0;
+    }
+  }
 }

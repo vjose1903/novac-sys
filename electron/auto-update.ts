@@ -1,137 +1,365 @@
-const { autoUpdater } = require('electron-updater');
+import { autoUpdater, type AppUpdater, type UpdateDownloadedEvent, type UpdateInfo } from 'electron-updater';
+import { PublishConfiguration } from 'builder-util-runtime';
+import { BrowserWindow } from 'electron';
+import * as fs from 'fs';
+import * as path from 'path';
 
-
-import SharedElectronAngular, {
-  ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE,
-  ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS,
-  ELECTRON_EVENT_UPDATE_ERROR,
-  ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE,
-  ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED,
-  ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE
+import {
+  createIdleUpdateState,
+  DESKTOP_EVENT_UPDATE_STATE,
+  DesktopUpdateCheckSource,
+  DesktopUpdateState,
+  sendDesktopEvent,
 } from './shared-electron-angular';
 
-import { puts } from '../main';
+import { writeLogs } from '../main';
+import { sharedState } from './shared-state';
 
-export default class AppUpdater {
-  constructor(win) {
-    puts(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
+export default class AppUpdate {
+  private win: BrowserWindow | null = null;
+  private readonly serve_: boolean;
+  private readonly autoUpdater: AppUpdater;
+  private readonly app: Electron.App;
+  private updateConfig: PublishConfiguration | null = null;
+  private state: DesktopUpdateState = createIdleUpdateState();
+  private isInitialized = false;
+  private isChecking = false;
+  private isDownloading = false;
+  private isInstalling = false;
+  private activeCheck: Promise<DesktopUpdateState> | null = null;
+  private initializationPromise: Promise<void> | null = null;
 
-    const log = require('electron-log');
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-
-    // this.checkUpdates(win);
-    this.checkForUpdates(win);
+  constructor(app: Electron.App, serve_: boolean) {
+    this.app = app;
+    this.serve_ = serve_;
+    this.autoUpdater = autoUpdater;
   }
 
-  async checkUpdates(win) {
-    try {
-      puts(' . ');
-      puts('-=-=-=-=- checkUpdates -=-=-=-=-');
-      puts(' . ');
+  attachWindow(win: BrowserWindow) {
+    this.win = win;
+    this.emitState();
+  }
 
-      autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-vasquez', token: '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', private: true, autoDownload: false, autoUpdate: true });
-      puts(autoUpdater, 'autoUpdater >>>>>>>>>>>>');
-      const updateInfo = await autoUpdater.checkForUpdatesPromise();
+  init() {
+    if (this.serve_ || this.isInitialized) return;
 
-      if (updateInfo.updateAvailable) {
-        puts(updateInfo, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
+    this.isInitialized = true;
+    writeLogs(' -------- INICIALIZANDO EL SERVICIO DE ACTUALIZACIONES --------');
 
-        autoUpdater.downloadUpdate();
-        SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, info: updateInfo });
+    const log = require('electron-log');
+    log.transports.file.level = 'warn';
+    log.transports.console.level = 'warn';
+    this.autoUpdater.logger = log;
+    this.autoUpdater.autoDownload = false;
 
-        puts('FINAL - ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
-      } else {
-        puts(updateInfo, 'ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
+    this.configureUpdateEvents();
 
-        SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info: { msg: 'Actualizacion no disponible...', body: updateInfo } });
+    this.initializationPromise = this.getUpdateConfig().then(config => {
+      this.updateConfig = config;
+      this.autoUpdater.setFeedURL(config);
+    });
 
-        puts(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
+    this.initializationPromise
+      .then(() => {
+        this.checkForUpdates('auto').catch(error => {
+          writeLogs(error, 'ERROR en auto-check de actualizaciones');
+        });
+      })
+      .catch(error => {
+        this.setState({
+          status: 'error',
+          source: 'auto',
+          message: 'No se pudo cargar la configuración de actualizaciones',
+          error: this.normalizeError(error),
+        });
+      });
+  }
+
+  async checkForUpdates(source: DesktopUpdateCheckSource = 'manual') {
+    if (this.serve_) {
+      if (source !== 'manual' || this.isChecking) {
+        return this.getState();
       }
-    } catch (error) {
-      puts(error, 'ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
 
-      SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_ERROR, info: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
+      this.isChecking = true;
+      this.setState({
+        status: 'checking',
+        source: 'manual',
+        message: 'Verificando actualizaciones...',
+        error: null,
+        checkedAt: new Date().toISOString(),
+      });
 
-      puts('FINAL - ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
+      try {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        this.setState({
+          status: 'not-available',
+          source: 'manual',
+          updateInfo: { version: this.app.getVersion() },
+          progress: null,
+          checkedAt: new Date().toISOString(),
+          message: 'No hay actualizaciones disponibles',
+          error: null,
+        });
+        return this.getState();
+      } finally {
+        this.isChecking = false;
+      }
+    }
+
+    if (!this.updateConfig && this.initializationPromise) {
+      await this.initializationPromise;
+    }
+
+    if (!this.updateConfig) throw new Error('Update feed no configurado');
+    if (this.isDownloading || this.state.status === 'installing') return this.getState();
+    if (this.isChecking) {
+      if (source === 'manual' && this.state.status === 'checking') {
+        this.setState({ ...this.state, source: 'manual' });
+      }
+
+      return this.activeCheck ?? this.getState();
+    }
+
+    this.isChecking = true;
+    this.setState({
+      status: 'checking',
+      source,
+      message: 'Verificando actualizaciones...',
+      error: null,
+      checkedAt: new Date().toISOString(),
+    });
+
+    this.activeCheck = (async () => {
+      try {
+        await this.autoUpdater.checkForUpdates();
+        return this.getState();
+      } catch (error) {
+        this.setState({
+          status: 'error',
+          source: this.state.source ?? source,
+          message: 'Error verificando actualizaciones',
+          error: this.normalizeError(error),
+        });
+        throw error;
+      }
+    })();
+
+    try {
+      return await this.activeCheck;
+    } finally {
+      this.isChecking = false;
+      this.activeCheck = null;
     }
   }
 
-  async checkForUpdates(win) {
-    autoUpdater.setFeedURL({ provider: 'github', owner: 'vjose1903', repo: 'novac-system-vasquez', token: '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', private: true, autoDownload: false, autoUpdate: true });
-    autoUpdater.checkForUpdatesAndNotify();
+  async downloadUpdate() {
+    if (this.serve_) return { started: false, status: this.state.status, message: 'Updater deshabilitado en desarrollo' };
+    if (this.isDownloading) return { started: true, status: this.state.status, message: 'La descarga ya está en progreso' };
+    if (this.state.status !== 'available') return { started: false, status: this.state.status, message: 'No hay una actualización lista para descargar' };
 
-    puts('-=-=-=-=- handleUpdateEvents -=-=-=-=-');
-    SharedElectronAngular.sendEventToAngular(win, { event_name: 'init', info: { msg: '-=-=-=-=- handleUpdateEvents -=-=-=-=-' } });
+    this.isDownloading = true;
+    writeLogs(`El usuario aceptó instalar la versión ${this.state.updateInfo?.version ?? 'disponible'}`, 'ACTUALIZACION ACEPTADA');
+    this.setState({
+      ...this.state,
+      status: 'downloading',
+      message: 'Iniciando descarga de actualización...',
+      progress: null,
+      error: null,
+    });
+    writeLogs('Iniciando descarga de actualización', 'INICIANDO DESCARGA');
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // AUTO UPDATE EVENTS
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    try {
+      this.autoUpdater.downloadUpdate().catch(error => {
+        this.isDownloading = false;
+        this.setState({
+          ...this.state,
+          status: 'error',
+          message: 'Error durante la descarga de la actualización',
+          error: this.normalizeError(error),
+        });
+      });
 
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, (info) => {
-      puts(info, 'ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
-      SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE, info: { msg: 'Actualizacion no disponible...', body: info } });
-      puts(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_NOT_AVAILABLE >>>>>>>>>>>>');
+      return { started: true, status: 'downloading' as const, message: 'Descarga iniciada correctamente' };
+    } catch (error) {
+      this.isDownloading = false;
+      this.setState({
+        ...this.state,
+        status: 'error',
+        message: 'Error iniciando la descarga',
+        error: this.normalizeError(error),
+      });
+      throw error;
+    }
+  }
+
+  getState() {
+    return {
+      ...this.state,
+      progress: this.state.progress ? { ...this.state.progress } : null,
+      error: this.state.error ? { ...this.state.error } : null,
+    };
+  }
+
+  private getUpdateConfig() {
+    return new Promise<PublishConfiguration>((resolve, reject) => {
+      try {
+        const configPath = path.join(__dirname, 'update-config.json');
+
+        if (!fs.existsSync(configPath)) {
+          reject(new Error('No se encuentra el archivo de configuración de actualizaciones'));
+          return;
+        }
+
+        const configData = fs.readFileSync(configPath, 'utf-8');
+        resolve(JSON.parse(configData));
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  private configureUpdateEvents() {
+    this.autoUpdater.on('checking-for-update', () => {
+      this.setState({
+        ...this.state,
+        status: 'checking',
+        message: 'Verificando actualizaciones...',
+      });
     });
 
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, (info: any) => {
-      puts(info, 'ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
+    this.autoUpdater.on('update-available', (info: UpdateInfo) => {
+      writeLogs(`Versión disponible: ${info.version}`, 'ACTUALIZACION ENCONTRADA');
+      this.setState({
+        status: 'available',
+        source: this.state.source,
+        updateInfo: info,
+        progress: null,
+        checkedAt: new Date().toISOString(),
+        message: `Actualización disponible: ${info.version}`,
+        error: null,
+      });
+    });
 
-      // TODO: hacer que esto sea decidido por el usuario
-      // Iniciar la descarga de la actualización
-      autoUpdater.downloadUpdate();
+    this.autoUpdater.on('update-not-available', info => {
+      this.setState({
+        status: 'not-available',
+        source: this.state.source,
+        updateInfo: info,
+        progress: null,
+        checkedAt: new Date().toISOString(),
+        message: 'No hay actualizaciones disponibles',
+        error: null,
+      });
+    });
 
-      SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE, info: info });
+    this.autoUpdater.on('download-progress', progress => {
+      if (!Number.isFinite(progress.total) || progress.total <= 0) return;
 
-      const dialogOpts = {
-        type: 'info',
-        buttons: ['ok'],
-        title: 'Actualización disponible',
-        message: 'Novac System presenta una nueva actualizacion se empezará a descargar ahora.',
-        detail: `Version a descargar: ${info.version}`,
+      this.setState({
+        ...this.state,
+        status: 'downloading',
+        progress: {
+          transferred: progress.transferred,
+          total: progress.total,
+          percent: progress.percent,
+          bytesPerSecond: progress.bytesPerSecond,
+        },
+        message: 'Descargando actualización...',
+        error: null,
+      });
+    });
+
+    this.autoUpdater.on('update-downloaded', (event: UpdateDownloadedEvent) => {
+      this.isDownloading = false;
+      this.setState({
+        ...this.state,
+        status: 'downloaded',
+        message: 'Descarga completada. Preparando instalación...',
+        updateInfo: event,
+      });
+
+      this.installDownloadedUpdate();
+    });
+
+    this.autoUpdater.on('error', error => {
+      this.isChecking = false;
+      this.isDownloading = false;
+      this.setState({
+        ...this.state,
+        status: 'error',
+        message: 'Error en el proceso de actualización',
+        error: this.normalizeError(error),
+      });
+      writeLogs(error, 'ELECTRON_EVENT_UPDATE_ERROR');
+    });
+  }
+
+  private installDownloadedUpdate() {
+    if (this.isInstalling) return;
+
+    this.isInstalling = true;
+    sharedState.closingReason = 'update-install';
+    this.setState({
+      ...this.state,
+      status: 'installing',
+      message: 'Cerrando aplicación para instalar actualización...',
+    });
+
+    if (this.win && !this.win.isDestroyed()) {
+      this.win.setClosable(true);
+    }
+
+    setTimeout(() => {
+      try {
+        BrowserWindow.getAllWindows().forEach(window => {
+          if (!window.isDestroyed()) window.destroy();
+        });
+        this.win = null;
+
+        const silentInstall = process.platform === 'win32';
+        this.autoUpdater.quitAndInstall(silentInstall, true);
+
+        if (silentInstall) {
+          // NSIS is already detached; force the Electron main process out if app.quit() stalls.
+          setTimeout(() => this.app.exit(0), 1000);
+        }
+      } catch (error) {
+        writeLogs(error, 'ERROR ejecutando quitAndInstall');
+        this.app.exit(1);
+      }
+    }, 300);
+  }
+
+  private setState(state: DesktopUpdateState) {
+    this.state = {
+      ...state,
+      progress: state.progress ?? null,
+      checkedAt: state.checkedAt ?? this.state.checkedAt ?? null,
+      error: state.error ?? null,
+    };
+    this.emitState();
+  }
+
+  private emitState() {
+    sendDesktopEvent(this.win, {
+      eventName: DESKTOP_EVENT_UPDATE_STATE,
+      payload: this.getState(),
+    });
+  }
+
+  private normalizeError(error: any) {
+    if (error instanceof Error) {
+      return {
+        message: error.message,
+        stack: error.stack || null,
       };
+    }
 
-      puts('FINAL - ELECTRON_EVENT_UPDATE_UPDATE_AVAILABLE >>>>>>>>>>>>');
-    });
-
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, (event, releaseNotes, releaseName) => {
-      puts(ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, 'ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
-
-      const dialogOpts = {
-        type: 'info',
-        buttons: ['Reiniciar'],
-        title: 'Actualizacion descargada',
-        message: process.platform == 'win32' ? releaseNotes : releaseName,
-        detail: 'Para que las actualizaciones sean efectivas debe de reiniciar la aplicacion.',
-      };
-
-      SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, info: { msg: 'descarga finalizada...' } });
-      autoUpdater.quitAndInstall();
-
-      // dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      //   SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED, info: { msg: 'descarga finalizada...', body: returnValue } });
-      //   if (returnValue.response == 0) autoUpdater.quitAndInstall();
-      // });
-
-      puts(' FINAL - ELECTRON_EVENT_UPDATE_UPDATE_DOWNLOADED >>>>>>>>>>>>');
-    });
-
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, () => {
-      puts(ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, 'ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE >>>>>>>>>>>>');
-      SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE, info: { msg: 'verificando actualizacion...', url: autoUpdater.getFeedURL() } });
-      puts(' FINAL - ELECTRON_EVENT_UPDATE_CHECKING_FOR_UPDATE >>>>>>>>>>>>');
-    });
-
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, (progress) => {
-      puts(progress, ' ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS >>>>>>>>>>>>');
-      SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS, info: { msg: 'descarga porciento...', body: progress } });
-      puts('FINAL -  ELECTRON_EVENT_UPDATE_DOWNLOAD_PROGRESS >>>>>>>>>>>>');
-    });
-
-    autoUpdater.on(ELECTRON_EVENT_UPDATE_ERROR, (error) => {
-      puts(error, 'ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
-      SharedElectronAngular.sendEventToAngular(win, { event_name: ELECTRON_EVENT_UPDATE_ERROR, info: { msg: 'Actualizacion no disponible...', body: { msg: 'Error descargando actualizacion...', body: error } } });
-      puts('FINAL - ELECTRON_EVENT_UPDATE_ERROR >>>>>>>>>>>>');
-    });
+    return {
+      message: typeof error === 'string' ? error : JSON.stringify(error),
+      stack: null,
+    };
   }
 }

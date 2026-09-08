@@ -1,97 +1,154 @@
 <div class="row IngresosRow">
   <div class="col-12 titulo">
-    <h3 class="negrita mb-0">Realizar recibo de ingreso</h3>
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Recibos</span>
+      <h3 class="negrita mb-0">Realizar recibo de ingreso</h3>
+    </div>
   </div>
   <div class="col-12 p-0 arriba">
-    <div class="row">
-      <div class="col-4">
-        <div class="card card-padding sombra">
-          <div class="form-group">
-            <label class="control-label">Cliente: </label>
-            <input
-              type="text"
-              id="clienteI"
-              (keydown.enter)="abrirModalFiltro($event.target.value)"
-              (focus)="$event.target.select()"
-              placeholder="Nombre Cliente"
-              class="form-control mb-4"
-              autocomplete="off"
-              [ngClass]="{ disabled: !!clienteAdepositar }"
-            />
-            <button class="btn btn-gris" routerLink="/admin/recibos/lista_ingresos">Atras</button>
-            <button [disabled]="!clienteAdepositar" class="btn btn-gris ml-2" (click)="cancelarIgreso()">Nueva Busqueda</button>
+    <div class="receipt-top-grid">
+      <div class="client-search-card">
+        <div class="card card-padding h-100">
+          <div class="widget h-100">
+            <div class="widget-content">
+              <div class="filter-card-title client-filter-title">
+                <span class="filter-card-icon">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <span>Filtros</span>
+              </div>
+              <label class="control-label">Cliente: </label>
+
+              <input
+                type="text"
+                id="clienteI"
+                (keydown.enter)="abrirModalFiltro(htmlServ.getValue($event))"
+                (focus)="htmlServ.selectValue($event)"
+                placeholder="Nombre Cliente"
+                class="form-control mb-4"
+                autocomplete="off"
+                [disabled]="!!clienteAdepositar()"
+                [ngClass]="{ disabled: !!clienteAdepositar() }" />
+            </div>
+            <div class="widget-footer">
+              <button class="btn btn-blanco" (click)="goBack()">Atrás</button>
+              <button [disabled]="!clienteAdepositar()" class="btn btn-gris" (click)="abrirModalDinamicText('nuevo')">Nueva Búsqueda</button>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-8 pl-0">
-        <div *ngIf="clienteAdepositar" class="clienteAdepositar">
-          <div class="nombre_cliente">
-            <h3 class="negrita mb-0">{{ clienteAdepositar.nombre + ' ' + clienteAdepositar.apellido }}</h3>
-          </div>
-          <div class="cuerpo">
-            <div class="cajas">
-              <div class="centro">
-                <span class="w-100 detalleBalance badge text-shadow bg-secondary text-white mb-2">
-                  <span>Total Facturado:</span> <span>RD$ {{ formatoNumero(totalFacturado) }}</span>
-                </span>
-              </div>
-              <div class="izquierda pr-2">
-                <span class="w-100 detalleBalance badge bg-info mb-2">
-                  <span>Total abonado:</span> <span>RD$ {{ formatoNumero(totalPagado) }}</span>
-                </span>
-                <span *ngIf="facturasSelected.length" class="w-100 detalleBalance badge text-shadow bg-green text-white mb-2">
-                  <span>Recibiendo:</span> <span>RD$ {{ formatoNumero(recibiendo) }}</span>
-                </span>
 
-                <span *ngIf="facturasSelected.length" class="w-100 detalleBalance badge bg-warning mb-2">
-                  <span>Faltando:</span> <span>RD$ {{ formatoNumero(restando) }}</span>
-                </span>
-              </div>
+      <div class="client-summary-card">
+        @if (clienteAdepositar()) {
+          <div class="clienteAdepositar">
+            <div class="nombre_cliente">
+              <h3 class="negrita mb-0">{{ clienteAdepositar().nombre + ' ' + clienteAdepositar().apellido }}</h3>
+            </div>
+            <div class="cuerpo">
+              <div class="cajas">
+                <div class="izquierda">
+                  <span class="detalleBalance metric-card metric-neutral">
+                    <span class="metric-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                    <span class="metric-label">Total Facturado:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(totalFacturado) }}</span>
+                  </span>
 
-              <div class="derecha pl-2">
-                <span class="w-100 detalleBalance badge blue text-shadow text-white mb-2">
-                  <span>Total notas débito:</span> <span>RD$ {{ formatoNumero(totalNotasDebito) }}</span>
-                </span>
-                <span class="w-100 detalleBalance badge text-shadow bg-primary text-white mb-2">
-                  <span>Total notas crédito:</span> <span>RD$ {{ formatoNumero(totalNotasCredito) }}</span>
-                </span>
-                <span class="w-100 detalleBalance badge text-shadow bg-danger text-white mb-2">
-                  <span> Debiendo:</span> <span>RD$ {{ formatoNumero(totalFacturado + totalNotasDebito - totalPagado - totalNotasCredito) }}</span>
-                </span>
+                  <span class="detalleBalance metric-card metric-info">
+                    <span class="metric-icon"><i class="fas fa-hand-holding-usd"></i></span>
+                    <span class="metric-label">Total abonado:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(totalPagado) }}</span>
+                  </span>
+                  @if (facturasSelected().length) {
+                    <span class="detalleBalance metric-card metric-success">
+                      <span class="metric-icon"><i class="fas fa-cash-register"></i></span>
+                      <span class="metric-label">Recibiendo:</span>
+                      <span class="metric-value">RD$ {{ formatoNumero(recibiendo()) }}</span>
+                    </span>
+                  }
+                  @if (facturasSelected().length) {
+                    <span class="detalleBalance metric-card metric-warning">
+                      <span class="metric-icon"><i class="fas fa-hourglass-half"></i></span>
+                      <span class="metric-label">Faltando:</span>
+                      <span class="metric-value">RD$ {{ formatoNumero(restando()) }}</span>
+                    </span>
+                  }
+                </div>
+                <div class="derecha">
+                  <span class="detalleBalance metric-card metric-orange">
+                    <span class="metric-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                    <span class="metric-label">Mora:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(mora_general()) }}</span>
+                  </span>
+
+                  <span class="detalleBalance metric-card metric-blue">
+                    <span class="metric-icon"><i class="fas fa-arrow-trend-up"></i></span>
+                    <span class="metric-label">Total notas débito:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(totalNotasDebito) }}</span>
+                  </span>
+                  <span class="detalleBalance metric-card metric-primary">
+                    <span class="metric-icon"><i class="fas fa-arrow-trend-down"></i></span>
+                    <span class="metric-label">Total notas crédito:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(totalNotasCredito) }}</span>
+                  </span>
+                  <span class="detalleBalance metric-card metric-danger">
+                    <span class="metric-icon"><i class="fas fa-circle-exclamation"></i></span>
+                    <span class="metric-label">Debiendo:</span>
+                    <span class="metric-value">RD$ {{ formatoNumero(debiendo_con_mora()) }} </span>
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="porcentaje">
-            <div *ngIf="clienteAdepositar" class="d-flex justify-content-between">
-              <span class="negrita">Porcentaje de pago</span>
+            <div class="porcentaje">
+              @if (clienteAdepositar()) {
+                <div class="d-flex justify-content-between">
+                  <span class="negrita">Porcentaje de pago</span>
+                </div>
+              }
+              <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
             </div>
-            <p-progressBar [value]="totalPagadoPorciento"></p-progressBar>
           </div>
-        </div>
+        }
       </div>
     </div>
   </div>
   <div class="col-12 medio">
-    <div *ngIf="facturas && facturas?.length" class="card sombra cardFacturas br-1">
-      <div class="bonton_select_all">
-        <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
-      </div>
+    @if (facturas && facturas?.length) {
+      <div class="card cardFacturas">
+        <div class="header">
+          <div class="receipt-table-actions">
+            @if (this.all_facturas().length > this.tablaComponent?.config.obj_paginate.per_page) {
+              <div class="more-pages animated flash slower infinite"><strong class="me-2">Atención: </strong> Existen múltiples páginas</div>
+            }
 
-      <div class="divFantasma">
-        <div #cardTabla id="cardTabla" class="tablaIngresos">
-          <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+            <div class="mora-general-control">
+              <span>Mora General</span>
+              <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" [(porcentajeSelected)]="porcentajeSelected" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
+            </div>
+
+            @if (areAllSelected()) {
+              <input class="apple-switch" type="checkbox" (change)="selectAllPagoTotal()" [checked]="areAllSelectedPagoTotal()" pTooltip="{{ areAllSelectedPagoTotal() ? 'Deseleccionar pago total' : 'Marcar pago total' }}" tooltipPosition="left" />
+            }
+
+            <i pTooltip="{{ getIcon().tooltip }}" tooltipPosition="left" (click)="selectAll()" class="far {{ getIcon().icon }}  btnSelect"></i>
+          </div>
         </div>
-
-        <span class="w-90 facturas-seleccionadas">
-          Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ totalRegistros }}</strong>
-        </span>
+        <div class="divFantasma">
+          <div #cardTabla id="cardTabla" class="tablaIngresos">
+            <dinamic-table [cardTabla]="cardTabla" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
+          <span class="w-90 facturas-seleccionadas">
+            Facturas seleccionadas: <strong> {{ getCantidadArticulos() }}</strong> / <strong> {{ this.all_facturas().length }}</strong>
+          </span>
+        </div>
       </div>
-    </div>
+    }
   </div>
   <div class="col-12 abajo">
-    <div *ngIf="facturas && facturas?.length" class="d-flex justify-content-end">
-      <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-      <input [disabled]="!isOneFacturaWithMonto()" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
-    </div>
+    @if (facturas && facturas?.length) {
+      <div class="receipt-actions">
+        <input (click)="abrirModalDinamicText('cancelar')" type="submit" class="btn btn-blanco" value="Cancelar" />
+        <input [disabled]="!isOneFacturaWithMonto() || isSubmitting" (click)="confirmarIgreso()" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+      </div>
+    }
   </div>
 </div>

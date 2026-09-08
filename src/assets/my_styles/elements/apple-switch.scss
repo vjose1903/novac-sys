@@ -1,0 +1,86 @@
+/* ====================================================== */
+/* CHECK APPLE */
+/* ====================================================== */
+
+input.apple-switch {
+  position: relative;
+  appearance: none;
+  outline: none;
+  width: 35px;
+  min-width: 35px;
+  height: 23px;
+  background-color: var(--app-switch-off-bg);
+  border: 1px solid var(--app-switch-off-border);
+  border-radius: 50px;
+  box-shadow: inset -13px 0 0 0 var(--app-switch-off-shadow);
+  transition-duration: 500ms;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 17.5px;
+    height: 16.2px;
+    background-color: var(--app-switch-knob-bg);
+    border-radius: 50%;
+    box-shadow: 1px 1px 6px var(--app-switch-knob-shadow);
+    transition-duration: 500ms;
+  }
+
+  &:checked {
+    border-color: var(--primary07);
+    box-shadow: inset 13px 0px 0 0 var(--primary07);
+
+    &:after {
+      left: 14px;
+      box-shadow: 1px 4px 1px #0000000f;
+    }
+  }
+
+  &.size-sm {
+    width: 30px;
+    height: 19px;
+    min-width: 30px;
+    box-shadow: inset -12px 0 0 0 var(--app-switch-off-shadow);
+
+    &:after {
+      width: 15.5px;
+      height: 13.5px;
+    }
+
+    &:checked {
+      box-shadow: inset 12px 0px 0 0 var(--primary07);
+
+      &:after {
+        left: 12px;
+      }
+    }
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: var(--app-switch-disabled-bg) !important;
+    border-color: var(--app-switch-disabled-border) !important;
+    box-shadow: inset -13px 0 0 0 var(--app-switch-disabled-shadow) !important;
+    pointer-events: none !important;
+
+    &:after {
+      background-color: var(--app-switch-disabled-knob);
+      box-shadow: 1px 1px 6px #0000001f;
+    }
+
+    &:checked {
+      border-color: var(--primary07) !important;
+      box-shadow: inset 13px 0 0 0 var(--primary07) !important;
+    }
+
+    &.size-sm {
+      box-shadow: inset -12px 0 0 0 var(--app-switch-disabled-shadow) !important;
+
+      &:checked {
+        box-shadow: inset 12px 0 0 0 var(--primary07) !important;
+      }
+    }
+  }
+}

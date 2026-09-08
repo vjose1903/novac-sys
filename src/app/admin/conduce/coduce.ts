@@ -1,6 +1,6 @@
-import { fun } from './../../core/services/functions.service';
-import { CrudG } from '../../core/typescript/crud-g';
-import * as _ from 'lodash';
+import { fun } from '@core/services/functions.service';
+import { CrudG } from '@core/typescript/crud-g';
+import { unidadAbrev } from '@core/typescript/constantes';
 
 export class ConduceC extends CrudG<any> {
   constructor() {
@@ -8,7 +8,7 @@ export class ConduceC extends CrudG<any> {
   }
 
   parseDataToPdf(data) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const data_parsed = fun.remplaceKeyFromJson(data, [
         { old_key: 'numero_conduce', new_key: 'identificador' },
         { old_key: 'detalle_conduces', new_key: 'contenido_reporte' },
@@ -18,11 +18,11 @@ export class ConduceC extends CrudG<any> {
       data_parsed['numero_documento'] = data_parsed['identificador'];
       data_parsed['usuario'] = data.user.nombre_completo;
 
-      const documento = _.find(data.cliente.documentos_de_identidad, { principal: true });
-      data_parsed['cliente']['rnc'] = documento ? documento.documento : '----------';
+      const documento = data?.cliente?.documentos_de_identidad?.find(documento => documento.principal);
+      data_parsed['cliente']['rnc'] = documento ? documento.documento : data?.cliente?.rnc ?? data?.NoCliente_rnc ?? '----------';
 
-      data_parsed['contenido_reporte'].map((detalle) => {
-        detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${detalle.unidad}`;
+      data_parsed['contenido_reporte'].map(detalle => {
+        detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${unidadAbrev[fun.normalizarTexto(detalle.unidad)]}.`;
       });
 
       resolve(data_parsed);

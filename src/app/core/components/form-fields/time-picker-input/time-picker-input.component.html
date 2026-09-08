@@ -1,0 +1,41 @@
+<div class="time-picker {{ wrapperClass }}" [class.time-picker-open]="open" [class.time-picker-disabled]="disabledField">
+  <input type="hidden" [attr.name]="fieldNameValue" [attr.id]="fieldId + '-value'" [value]="valueSignal() || ''" [required]="required" />
+
+  <button
+    #triggerButton
+    type="button"
+    class="time-picker-trigger {{ getControlClass() }}"
+    [attr.id]="fieldId"
+    [disabled]="disabledField"
+    [attr.aria-expanded]="open"
+    aria-haspopup="listbox"
+    (click)="togglePicker($event)">
+    <span class="time-picker-value" [class.placeholder]="!displayValue">{{ displayValue || placeholder }}</span>
+  </button>
+
+  <div #popover class="time-picker-popover" [class.time-picker-popover-body]="appendTo === 'body'" [hidden]="!open" [ngStyle]="appendTo === 'body' ? popoverStyle : null" (click)="$event.stopPropagation()">
+    <div class="time-picker-column" role="listbox" aria-label="Horas">
+      @for (hour of hours; track hour) {
+        <button type="button" role="option" class="time-picker-option" [class.selected]="selectedHour === hour" [disabled]="optionDisabled(hour)" [attr.aria-selected]="selectedHour === hour" (click)="selectHour(hour)">
+          {{ formatOption(hour) }}
+        </button>
+      }
+    </div>
+
+    <div class="time-picker-column" role="listbox" aria-label="Minutos">
+      @for (minute of minutes; track minute) {
+        <button type="button" role="option" class="time-picker-option" [class.selected]="selectedMinute === minute" [disabled]="optionDisabled(selectedHour, minute)" [attr.aria-selected]="selectedMinute === minute" (click)="selectMinute(minute)">
+          {{ formatOption(minute) }}
+        </button>
+      }
+    </div>
+
+    <div class="time-picker-column period-column" role="listbox" aria-label="Periodo">
+      @for (period of periods; track period) {
+        <button type="button" role="option" class="time-picker-option" [class.selected]="selectedPeriod === period" [disabled]="optionDisabled(selectedHour, selectedMinute, period)" [attr.aria-selected]="selectedPeriod === period" (click)="selectPeriod(period)">
+          {{ period }}
+        </button>
+      }
+    </div>
+  </div>
+</div>

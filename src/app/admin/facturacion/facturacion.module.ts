@@ -7,17 +7,20 @@ import { RemoverArticuloComponent } from './cuerpo-factura/remover-articulo/remo
 import { FacturacionRoutingModule } from './facturacion.routing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxPermissionsModule } from 'ngx-permissions';
-import { DirectivesModule } from '../../core/directive/directives.module';
+import { DirectivesModule } from '@core/directive/directives.module';
 import { PrimengModule } from '../../modules/primeng.module';
-import { TablasModule } from '../components/new_tablas/tablas.module';
+import { TablasModule } from '@components/new_tablas/tablas.module';
 import { DetalleFacturaModule } from '../manipular facturas/detalle-factura/detalle-factura.module';
-import { BtncircularModule } from '../components/btncircular/btncircular.module';
-import { NgxBootstrapModule } from '../../modules/ngx-bootstrap.module';
-import { BtnIconModule } from '../components/btn-icon-circular/btn-icon-circular.module';
+import { BtncircularModule } from '@components/btncircular/btncircular.module';
+import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
 import { RetornarDevueltoComponent } from './cuerpo-factura/retornar-devuelto/retornar-devuelto.component';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { CanDeactivateGuard } from '@core/guard/can-deactivate.guard';
+import { FindCasualCustomerComponent } from './find-casual-customer/find-casual-customer.component';
 
 @NgModule({
-  declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent, MenuOpcionesExtraComponent, RetornarDevueltoComponent],
-  imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, NgxBootstrapModule, BtnIconModule],
+  declarations: [FacturacionComponent, CuerpoFacturaComponent, RemoverArticuloComponent, MenuOpcionesExtraComponent, RetornarDevueltoComponent, FindCasualCustomerComponent],
+  imports: [CommonModule, FacturacionRoutingModule, FormsModule, ReactiveFormsModule, PrimengModule, DirectivesModule, TablasModule, NgxPermissionsModule.forChild(), DetalleFacturaModule, BtncircularModule, BtnIconModule, SelectButtonModule],
+  providers: [CanDeactivateGuard]
 })
 export class FacturacionModule {}

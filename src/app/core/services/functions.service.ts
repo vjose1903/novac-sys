@@ -1,12 +1,13 @@
-import * as moment from '../javascript/moment';
+import { SpanishInflector } from './../typescript/spanish-inflector';
+import moment from '../javascript/moment';
 import { DocumentosC } from '../typescript/documentos_de_identidad';
 import * as _ from 'lodash';
 
-import { ConfigI } from '../typescript/config-interface';
+import { ConfigI } from '../interface/config-interface';
 import { Ss } from './singleton.service';
 import { BehaviorSubject } from 'rxjs';
-import { KEYWORD_ELECTRON_RELOAD } from '../../../../electron/shared-electron-angular';
-import { MessageTask } from '../models/message-task';
+import { RetryOptions } from '../interface/retry-until';
+import { TitleCasePipe } from '@angular/common';
 
 export const windowSize = new BehaviorSubject<any>(undefined);
 export class fun {
@@ -20,33 +21,12 @@ export class fun {
 
   getWindowSize = windowSize.asObservable();
 
-  static getFacturasguardadas() {
-    return JSON.parse(localStorage.getItem('facturas_guardadas')) || [];
-  }
-
-  static setFacturasGuardadas(facturas) {
-    localStorage.removeItem('facturas_guardadas');
-    localStorage.setItem('facturas_guardadas', JSON.stringify(facturas));
-
-    const btn_side = document.getElementById('btn_side_facturas');
-
-    if (btn_side) {
-      if (facturas.length.length > 0) btn_side.setAttribute('data-cant-facturas', facturas.length);
-      else btn_side.removeAttribute('data-cant-facturas');
-    }
-  }
-
   // __________________________________________________________________________________________________
   // Nombre: reloadElectron
   // Descripcion : Esta funcion recarga el electron
   // _________________________________________________________________________________________________
   static reloadElectron() {
-    const task = new MessageTask(KEYWORD_ELECTRON_RELOAD);
-
-    Ss._ipc
-      .sendTask(task)
-      .then((res) => {})
-      .catch((err) => console.error(err));
+    Ss._ipc.reloadApp().catch(err => console.error(err));
   }
   // __________________________________________________________________________________________________
   // Nombre: removerDuplicados
@@ -76,6 +56,26 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
+  // Nombre: to_plural
+  // Descripcion : Esta funcion convierte una palabra a plural
+  // _________________________________________________________________________________________________
+  static to_plural(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.pluralize(normalWord);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: to_singular
+  // Descripcion : Esta funcion convierte una palabra a singular
+  // _________________________________________________________________________________________________
+  static to_singular(word: string) {
+    const normalWord = word.trim();
+    if (fun.isEmpty(normalWord)) return word;
+    return SpanishInflector.singularize(normalWord);
+  }
+
+  // __________________________________________________________________________________________________
   // Nombre: date_formater
   // Descripcion : Esta funcion formatea una fecha con los parametros establecidos
   // _________________________________________________________________________________________________
@@ -85,11 +85,11 @@ export class fun {
     return fecha;
   }
   // __________________________________________________________________________________________________
-  // Nombre: duplicarJson
+  // Nombre: deepCloning
   // Descripcion : Esta funcion retorna un objeto igual al especificado sin la referencia al original
   // _________________________________________________________________________________________________
 
-  static duplicarJson(obj: Object | Array<any>) {
+  static deepCloning(obj: Object | Array<any>) {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
@@ -102,7 +102,7 @@ export class fun {
     Object.getOwnPropertyNames(obj).forEach(function (key) {
       let descriptor = Object.getOwnPropertyDescriptor(obj, key);
       if (descriptor.value && typeof descriptor.value === 'object') {
-        descriptor.value = fun.duplicarJson(descriptor.value);
+        descriptor.value = fun.deepCloning(descriptor.value);
       }
       Object.defineProperty(copy, key, descriptor);
     });
@@ -124,12 +124,12 @@ export class fun {
       return array_string;
     }
 
-    const promise = new Promise((resolve) => {
-      fun.awaitTyping().then((res) => {
+    const promise = new Promise(resolve => {
+      fun.awaitTyping().then(res => {
         if (typeof searchText == 'number') searchText = `${searchText}`;
         if (fun.isEmpty(searchText)) resolve(copyData);
 
-        const data_filtered = fun.duplicarJson(copyData).filter((obj) => {
+        const data_filtered = fun.deepCloning(copyData).filter(obj => {
           const obj_picked = _.pick(obj, targets);
           const array_picked = pick_object(obj_picked);
 
@@ -146,7 +146,7 @@ export class fun {
   }
 
   static revisarNumber(input, id): any {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const precioTEMPO = input.value;
 
       const res = { number: null, error: true };
@@ -157,11 +157,10 @@ export class fun {
         if (isNaN(Number(fun.desformatearStNumber(newNumber)))) {
           fun.toastError('Valor introducido es invalido', 'ERROR');
           if (document.getElementById(id)) document.getElementById(id).focus();
-          return;
+        } else {
+          res.number = newNumber;
+          res.error = false;
         }
-
-        res.number = newNumber;
-        res.error = false;
       }
 
       resolve(res);
@@ -172,25 +171,29 @@ export class fun {
   // Nombre: redondearNum
   // Descripcion : Esta funcion redondea a 2 decimales
   // _________________________________________________________________________________________________
+  static redondearNum(numero, decimales = 2) {
+    const factor = Math.pow(10, decimales);
+    const numberRounded = Math.round((numero + Number.EPSILON) * factor) / factor;
+    return numberRounded.toFixed(decimales);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: roundNumberToDecimal
+  // Descripcion : Esta funcion redondea a 2 decimales
+  // _________________________________________________________________________________________________
 
   static roundNumberToDecimal(number, cant = 2): string {
-    if (fun.isEmpty(number)) {
-      this.logRed('No se puede redondear una variable vacia');
-      return number;
-    }
-    if (typeof number == 'string') number = parseFloat(fun.desformatearStNumber(number));
+    if (fun.isEmpty(number)) return number;
 
-    if (isNaN(number)) {
-      this.logRed('No es un numero valido.');
-      return number;
-    }
-    const numerRounded = number.toFixed(cant);
+    if (typeof number == 'string' || isNaN(number)) number = parseFloat(fun.desformatearStNumber(number));
+
+    const numerRounded = fun.redondearNum(number, cant);
 
     // Formateamos el número con comas para separar millares
     const partes = numerRounded.split('.');
     const enteros = partes[0];
     const decimales = partes[1];
-    const numeroFormateado = enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + decimales;
+    const numeroFormateado = `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}${cant >= 1 ? `.${decimales}` : ''}`;
 
     return numeroFormateado;
   }
@@ -245,7 +248,19 @@ export class fun {
   // Descripcion : Esta funcion retorna un id unico
   // _________________________________________________________________________________________________
   static generateKey(): string {
-    return moment().unix() + '' + Math.round(Math.random() * 10000);
+    return `${moment().unix()}${Math.round(Math.random() * 10000)}`;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: identifyObject
+  // Descripcion : Esta funcion le agrega una propiedad id a un objeto
+  // _________________________________________________________________________________________________
+  static identifyObject(object: any | Array<any>, key = 'id') {
+    if (Array.isArray(object)) {
+      object.map(item => (item[key] = fun.generateKey()));
+    } else {
+      object[key] = fun.generateKey();
+    }
   }
 
   // __________________________________________________________________________________________________
@@ -266,21 +281,34 @@ export class fun {
     return new Promise((resolve, reject) => {
       let extra = { afterPath: 'persona', parameters: {} };
 
-      extra['parameters'] = { all: true, documentos_de_identidad: true, filter_key: 'cedula', filter_value: params.documento };
+      extra['parameters'] = { all: true, documentos_de_identidad: true, filter_key: params.tipo, filter_value: params.documento };
 
       new DocumentosC()
         .getAll(extra)
-        .then((res) => {
+        .then(res => {
           for (const persona of res.data) {
-            persona.persona.documentos_de_identidad.map((doc) => {
+            persona.persona.documentos_de_identidad.map(doc => {
               doc.id = null;
               return doc;
             });
           }
           resolve(res);
         })
-        .catch((err) => reject(err));
+        .catch(err => reject(err));
     });
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: normalizarTexto
+  // Descripcion : Esta funcion normaliza un texto para que no tenga acentos
+  // _________________________________________________________________________________________________
+
+  static normalizarTexto(texto: string): string {
+    const textoMinusculas = texto.toLowerCase();
+
+    const textoSinAcentos = textoMinusculas.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    return textoSinAcentos;
   }
 
   // __________________________________________________________________________________________________
@@ -362,9 +390,15 @@ export class fun {
   // Nombre: Capitalice
   // Descripcion : Esta capitaliza un string
   // _________________________________________________________________________________________________
-  static Capitalice(str) {
-    const ultimosCaractes = fun.hasValue(str) ? str.length + 1 : null;
-    return fun.hasValue(str) ? _.upperCase(str.substr(0, 1)) + str.substr(1, ultimosCaractes) : str;
+  static capitalice(str) {
+    if (!fun.hasValue(str)) return str;
+
+    const upperCaseText = str
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    return upperCaseText;
   }
 
   // __________________________________________________________________________________________________
@@ -432,14 +466,14 @@ export class fun {
   // _________________________________________________________________________________________________
 
   static timeout;
-  static awaitTyping(event?, waitingTime = 700) {
-    const promise = new Promise((resolve) => {
-      clearTimeout(fun.timeout);
-      fun.timeout = setTimeout(() => {
-        if (!event || event.keyCode != 13) resolve(event);
-      }, waitingTime);
+  static awaitTyping(event?: KeyboardEvent, waitingTime = 700): Promise<void> {
+    return new Promise(resolve => {
+      if (fun.timeout) clearTimeout(fun.timeout);
+
+      if (event?.key === 'Enter' || event?.keyCode === 13) return resolve();
+
+      fun.timeout = fun.setTimeout(resolve, waitingTime);
     });
-    return promise;
   }
 
   // __________________________________________________________________________________________________
@@ -454,24 +488,26 @@ export class fun {
   }
 
   // __________________________________________________________________________________________________
-  // Nombre: isEmpty
-  // Descripcion : Esta funcion valida que si una variable esta vacia
-  // __________________________________________________________________________________________________
+  /**
+   * Nombre: isEmpty
+   * Descripción: Esta función valida si una variable está vacía.
+   * @param value La variable a evaluar.
+   * @returns true si la variable está vacía, false en caso contrario.
+   * @example fun.isEmpty(variable)
+   */
 
-  static isEmpty(value) {
-    return (
-      // es null o indefinido
-      value === null ||
-      value === undefined ||
-      // es una fecha invalida
-      (value instanceof Date && isNaN(value.getTime())) ||
-      // si tiene longitud 0
-      (value.hasOwnProperty('length') && value.length == 0) ||
-      // si es un string vacio o con lleno de espacios
-      (typeof value == 'string' && value.trim().length == 0) ||
-      // si es un objeto y no tiene propiedades
-      (value.constructor == Object && Object.keys(value).length == 0)
-    );
+  static isEmpty(value: any) {
+    if (value == null) return true;
+
+    if (typeof value === 'string') return value.trim().length === 0;
+
+    if (Array.isArray(value)) return value.length === 0;
+
+    if (value instanceof Date) return isNaN(value.getTime());
+
+    if (typeof value === 'object') return Object.keys(value).length === 0;
+
+    return false;
   }
 
   // __________________________________________________________________________________________________
@@ -524,23 +560,26 @@ export class fun {
   // __________________________________________________________________________________________________
   static clickInput(arg) {
     const element = document.getElementById(arg) as HTMLElement;
+
     if (element) element.click();
   }
 
   // __________________________________________________________________________________________________
   // Nombre: enfocarInput
   // Descripcion : Esta funcion enfoca un elemento html
-  // __________________________________________________________________________________________________
-  static enfocarInput(arg) {
-    const element = document.getElementById(arg) as HTMLElement;
+  // _________________________________________________________________________________________________
+  static enfocarInput(arg, element?) {
+    element ??= document.getElementById(arg) as HTMLElement;
 
-    if (element) element.focus();
+    if (element) {
+      requestAnimationFrame(() => element.focus());
+    }
   }
 
   // __________________________________________________________________________________________________
   // Nombre: desEnfocarInput
   // Descripcion : Esta funcion desenfoca un elemento html
-  // __________________________________________________________________________________________________
+  // _________________________________________________________________________________________________
   static desEnfocarInput(inputId?: string) {
     const element = document.getElementById('input_fantasma');
     if (element) element.click();
@@ -549,6 +588,15 @@ export class fun {
       const input = document.getElementById(inputId);
       if (input) input.blur();
     }
+  }
+  // __________________________________________________________________________________________________
+  // Nombre: clickInputFantasma
+  // Descripcion : Esta funcion clickea el input fantasma
+  // __________________________________________________________________________________________________
+  static clickInputFantasma() {
+    const element = document.getElementById('input_fantasma');
+
+    if (element) element.click();
   }
 
   // __________________________________________________________________________________________________
@@ -575,7 +623,35 @@ export class fun {
   // __________________________________________________________________________________________________
   static enfocarAndSelectInput(arg) {
     fun.enfocarInput(arg);
-    setTimeout(() => this.selectContenido(arg), 10);
+    fun.setTimeout(() => {
+      this.selectContenido(arg);
+    }, 10);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setTimeOut
+  // Descripcion : Esta funcion ejecuta una funcion despues de un tiempo
+  // __________________________________________________________________________________________________
+  static setTimeout(callback: () => void, time: number, markForCheck = true) {
+    const timeout = setTimeout(() => {
+      callback();
+      if (markForCheck) Ss.cdRef.markForCheck();
+    }, time);
+
+    return timeout;
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: setInterval
+  // Descripcion : Esta funcion ejecuta una funcion en un intervalo de tiempo
+  // __________________________________________________________________________________________________
+  static setInterval(callback: () => void, time: number) {
+    const interval = setInterval(() => {
+      callback();
+      Ss.cdRef.markForCheck();
+    }, time);
+
+    return interval;
   }
 
   // __________________________________________________________________________________________________
@@ -583,7 +659,7 @@ export class fun {
   // Descripcion : Esta funcion simula un evento de teclado
   // __________________________________________________________________________________________________
   static keyboardEvent(element: any, event: 'keyup' | 'keydown', keysArray: Array<string>): any {
-    keysArray.forEach((key) => {
+    keysArray.forEach(key => {
       element.dispatchEvent(new KeyboardEvent(event, { key: key }));
     });
   }
@@ -593,7 +669,78 @@ export class fun {
   // Descripcion : Esta funcion retorna el key de un objeto buscando por su valor
   // __________________________________________________________________________________________________
   static getKeyByValue(object, value): any {
-    return Object.keys(object).find((key) => object[key] == value);
+    return Object.keys(object).find(key => object[key] == value);
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: retryUntil
+  // Descripcion : Esta funcion recibe una tarea y la repite hasta que las condiciones establecidas se cumplan
+  // _________________________________________________________________________________________________
+
+  static async retryUntil<T>(params: { task: () => Promise<T>; retryWhen: (response: T) => boolean; actionAfterRetry: (response: T) => void; actionIfNoSuccess: () => void; options?: RetryOptions }): Promise<void> {
+    const { task, retryWhen, actionAfterRetry, actionIfNoSuccess, options = {} } = params;
+    const { delayBetweenRetries = 500, retryMax = 20, logError = false } = options;
+
+    let retryCount = 0;
+
+    const executeTask = async (): Promise<void> => {
+      try {
+        const response = await task();
+        const shouldRetry = retryWhen(response);
+        const hasRetries = retryCount < retryMax;
+
+        if (shouldRetry && hasRetries) {
+          retryCount++;
+          await new Promise<void>(resolve => {
+            fun.setTimeout(resolve, delayBetweenRetries);
+          });
+          return executeTask();
+        }
+
+        if (shouldRetry && !hasRetries) {
+          if (logError) {
+            console.error(`Max number of retries (${retryMax}) reached`);
+          }
+          Ss.zone.run(() => actionIfNoSuccess());
+        } else {
+          Ss.zone.run(() => actionAfterRetry(response));
+        }
+      } catch (error) {
+        if (logError) {
+          console.error('Task execution failed:', error);
+        }
+        Ss.zone.run(() => actionIfNoSuccess());
+      }
+    };
+
+    Ss.zone.runOutsideAngular(() => executeTask());
+  }
+
+  // __________________________________________________________________________________________________
+  // Nombre: compare
+  // Descripcion : Esta funcion se utiliza para ordenar un arreglo
+  // __________________________________________________________________________________________________
+  static compare(a: any, b: any, keys: Array<string> | string, order: 'asc' | 'desc' = 'asc') {
+    if (typeof keys == 'string') keys = [keys];
+
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
+
+      if (typeof a === 'object' && typeof b === 'object') {
+        const valueA = a[key];
+        const valueB = b[key];
+
+        if (valueA < valueB) return order === 'asc' ? -1 : 1;
+        if (valueA > valueB) return order === 'asc' ? 1 : -1;
+      } else {
+        if (a === b) continue;
+        if (typeof a === 'number' && typeof b === 'number') return order === 'asc' ? a - b : b - a;
+        if (typeof a === 'string' && typeof b === 'string') return order === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+        if (a instanceof Date && b instanceof Date) return order === 'asc' ? a.getTime() - b.getTime() : b.getTime() - a.getTime();
+      }
+    }
+
+    return 0;
   }
 
   // __________________________________________________________________________________________________
@@ -609,14 +756,50 @@ export class fun {
     return base;
   }
 
+  /**
+   * Nombre: toTitleCase
+   * Descripcion : Esta funcion retorna un string en formato titleCase
+   * @param string El string a convertir
+   * @returns El string convertido a titleCase
+   */
+  static toTitleCase(string: string) {
+    const titleCasePipe = new TitleCasePipe();
+    return titleCasePipe.transform(string);
+  }
+
+  /**
+   * Nombre: encriptar
+   * Descripcion : Esta funcion encripta un string
+   * @param arg El string a encriptar
+   * @returns El string encriptado
+   */
+  static encriptar(arg: string): string {
+    return btoa(unescape(encodeURIComponent(arg)));
+  }
+
+  /**
+   * Nombre: desEncriptar
+   * Descripcion : Esta funcion desencripta un string
+   * @param arg El string a desencriptar
+   * @returns El string desencriptado
+   */
+  static desEncriptar(arg: string): { object: string; error?: boolean } {
+    try {
+      const decodedString = decodeURIComponent(escape(atob(arg)));
+      return { object: decodedString, error: false };
+    } catch (error) {
+      console.error('Error al desencriptar:', error);
+      return { object: '', error: true };
+    }
+  }
+
   static getAuthToken() {
     return fun.hasValue(localStorage.getItem('access-token')) ? localStorage.getItem('access-token') : undefined;
   }
 
   static async logout() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       try {
-        localStorage.removeItem('facturas_guardadas');
         localStorage.removeItem('access-token');
         localStorage.removeItem('client');
         localStorage.removeItem('content-type');
@@ -624,20 +807,29 @@ export class fun {
         localStorage.removeItem('token-type');
         localStorage.removeItem('uid');
 
-        Ss.layServ.nextLogOut(undefined);
+        // Resetear el estado del guard y limpiar cache
+        const authGuard = fun.getAuthGuardInstance();
+        const currentUserService = fun.getCurrentUserServiceInstance();
+        console.log('1');
+
+        if (authGuard) authGuard.resetValidation();
+        if (currentUserService) currentUserService.clearValidationCache();
+
+        console.log('2');
+
+        Ss.layServ.nextLogOut({ bool: true });
         resolve(true);
       } catch (error) {
         resolve(false);
       }
     });
-
-    // this.router.navigateByUrl('/auth/login');
   }
 
   static decryptConfigPassword(str) {
-    const str_remplace = btoa(str);
-    const config: ConfigI = Ss.configServ.getConfig({ isPromise: false });
-    return str_remplace == _.replace(config.config_password, 'VMj$pt30r=', '=');
+    const str_remplace = fun.encriptar(str);
+
+    const config: ConfigI = Ss.configServ.config;
+    return str_remplace == config.config_password.replace('VMj$pt30r=', '=');
   }
   // ----------------------------------------------------------------------------------------------------------
 
@@ -713,61 +905,227 @@ export class fun {
   // =====================================================================
 
   static toastInfo(msg?, titulo = 'INFORMACION') {
-    if (Ss.sharedServ.canToast) Ss.toastr.info(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.info(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastSuccess(msg?, titulo = 'CORRECTO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.success(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.success(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastError(msg?, titulo = 'ERROR') {
-    if (Ss.sharedServ.canToast) Ss.toastr.error(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.error(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   static toastWarning(msg?, titulo = 'AVISO') {
-    if (Ss.sharedServ.canToast) Ss.toastr.warning(msg || '', titulo || '');
+    if (Ss.sharedServ.canToast) {
+      fun.setTimeout(() => {
+        Ss.toastr.warning(msg || '', titulo || '', { enableHtml: true });
+      }, 0);
+    }
   }
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // LODASH
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  // __________________________________________________________________________________________________
-  // Nombre: pushAt
-  // Descripcion : Esta funcion agrega un item en un indice especificado de un arreglo
-  // _________________________________________________________________________________________________
+  /**
+   * Agrega un item en un indice especifico de un arreglo, mutando el arreglo original.
+   * @param arr Arreglo donde se insertara el item.
+   * @param index Indice donde se insertara el item.
+   * @param newItem Item que se insertara en el arreglo.
+   */
   static pushAt(arr, index, newItem) {
-    const copyArr = fun.duplicarJson(arr);
+    const copyArr = fun.deepCloning(arr);
     arr.length = 0;
     const newArr = [...copyArr.slice(0, index), newItem, ...copyArr.slice(index)];
-    newArr.forEach((item) => arr.push(item));
+    newArr.forEach(item => arr.push(item));
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: pull
-  // Descripcion : Esta funcion remueve un item  de un arreglo
-  // _________________________________________________________________________________________________
+  /**
+   * Remueve del arreglo el primer item que sea equivalente al item indicado.
+   * @param array Arreglo que sera modificado.
+   * @param item_remove Item que se removera del arreglo.
+   */
   static pull(array, item_remove) {
-    console.log('item_remove ', item_remove);
-    console.log('array ', array);
-
-    const index = array.findIndex((item) => fun.isEqual(item, item_remove));
+    const index = array.findIndex(item => fun.isEqual(item, item_remove));
     array.splice(index, 1);
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: pullAt
-  // Descripcion : Esta funcion remueve un item en un indice especificado de un arreglo
-  // _________________________________________________________________________________________________
+  /**
+   * Remueve un item por indice, mutando el arreglo original.
+   * @param array Arreglo que sera modificado.
+   * @param index Indice del item que se removera.
+   */
   static pullAt(array, index) {
     array.splice(index, 1);
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: objHas
-  // Descripcion : Esta funcion retorna un valor booleano si el objeto evaluado contiene todas las propiedades evaluadas
-  // _________________________________________________________________________________________________
+  /**
+   * Retorna el primer elemento de un arreglo.
+   * @param array Arreglo a consultar.
+   * @returns Primer elemento del arreglo o undefined si no existe.
+   */
+  static first<T>(array: T[]): T | undefined {
+    return array?.[0];
+  }
 
+  /**
+   * Valida si un valor convertido a texto termina con el texto indicado.
+   * @param value Valor que se evaluara como texto.
+   * @param target Texto final esperado.
+   * @returns true si el valor termina con target.
+   */
+  static endsWith(value: any, target: string): boolean {
+    return String(value ?? '').endsWith(target);
+  }
+
+  /**
+   * Divide un valor convertido a texto usando el separador indicado.
+   * @param value Valor que se dividira como texto.
+   * @param separator Separador string o expresion regular.
+   * @returns Arreglo de partes resultantes.
+   */
+  static split(value: any, separator: string | RegExp): string[] {
+    return String(value ?? '').split(separator);
+  }
+
+  /**
+   * Une los elementos de un arreglo usando el separador indicado.
+   * @param array Arreglo de valores a unir.
+   * @param separator Separador entre valores. Por defecto usa coma.
+   * @returns Texto resultante.
+   */
+  static join(array: any[], separator = ','): string {
+    return (array || []).join(separator);
+  }
+
+  /**
+   * Completa un valor por la izquierda hasta alcanzar la longitud indicada.
+   * @param value Valor que se convertira a texto.
+   * @param targetLength Longitud final esperada.
+   * @param padString Texto usado para completar. Por defecto usa espacio.
+   * @returns Texto completado por la izquierda.
+   */
+  static padStart(value: any, targetLength: number, padString = ' '): string {
+    return String(value ?? '').padStart(targetLength, padString);
+  }
+
+  /**
+   * Convierte un valor a entero.
+   * @param value Valor a convertir.
+   * @param radix Base numerica opcional.
+   * @returns Numero entero resultante.
+   */
+  static parseInt(value: any, radix?: number): number {
+    return Number.parseInt(value, radix);
+  }
+
+  /**
+   * Reemplaza una coincidencia dentro de un valor convertido a texto.
+   * @param value Valor que se evaluara como texto.
+   * @param searchValue Texto o expresion regular a buscar.
+   * @param replaceValue Texto reemplazo.
+   * @returns Texto con el reemplazo aplicado.
+   */
+  static replace(value: any, searchValue: string | RegExp, replaceValue: string): string {
+    return String(value ?? '').replace(searchValue as any, replaceValue);
+  }
+
+  /**
+   * Busca el primer item de un arreglo que cumpla con el predicado indicado.
+   * @param array Arreglo donde se buscara.
+   * @param predicate Funcion evaluadora o objeto parcial con propiedades a comparar.
+   * @returns Primer item encontrado o undefined.
+   */
+  static find<T>(array: T[], predicate: Partial<T> | ((item: T) => boolean)): T | undefined {
+    if (!Array.isArray(array)) return undefined;
+    if (typeof predicate === 'function') return array.find(predicate);
+
+    return array.find(item => Object.keys(predicate).every(key => (item as any)?.[key] === (predicate as any)[key]));
+  }
+
+  /**
+   * Transforma cada item de un arreglo usando una funcion o leyendo una propiedad.
+   * @param array Arreglo que sera transformado.
+   * @param iteratee Funcion transformadora o nombre de propiedad a leer.
+   * @returns Nuevo arreglo con los valores transformados.
+   */
+  static map<T, R>(array: T[], iteratee: keyof T | ((item: T) => R)): R[] {
+    if (!Array.isArray(array)) return [];
+    if (typeof iteratee === 'function') return array.map(iteratee);
+
+    return array.map(item => (item as any)?.[iteratee] as R);
+  }
+
+  /**
+   * Retorna el item con el valor numerico mayor para una propiedad.
+   * @param array Arreglo a evaluar.
+   * @param key Propiedad a comparar. Soporta nesting, por ejemplo cliente.id.
+   * @returns Item con el valor mayor o undefined.
+   */
+  static maxBy<T>(array: T[], key: string): T | undefined {
+    if (!Array.isArray(array) || array.length === 0) return undefined;
+
+    return array.reduce((maxItem, item) => {
+      const currentValue = fun.getProperty(item, key);
+      const maxValue = fun.getProperty(maxItem, key);
+      return Number(currentValue || 0) > Number(maxValue || 0) ? item : maxItem;
+    }, array[0]);
+  }
+
+  /**
+   * Ordena un arreglo por una o varias propiedades sin mutar el arreglo original.
+   * @param array Arreglo a ordenar.
+   * @param keys Propiedad o propiedades para ordenar. Soporta nesting, por ejemplo cliente.id.
+   * @param orders Direccion o direcciones de ordenamiento: asc o desc.
+   * @returns Nuevo arreglo ordenado.
+   */
+  static orderBy<T>(array: T[], keys: string | string[], orders: 'asc' | 'desc' | Array<'asc' | 'desc'> = 'asc'): T[] {
+    if (!Array.isArray(array)) return [];
+
+    const sortKeys = Array.isArray(keys) ? keys : [keys];
+    const sortOrders = Array.isArray(orders) ? orders : [orders];
+
+    return [...array].sort((a, b) => {
+      for (let index = 0; index < sortKeys.length; index++) {
+        const key = sortKeys[index];
+        const order = sortOrders[index] || sortOrders[0] || 'asc';
+        const valueA = fun.getProperty(a, key);
+        const valueB = fun.getProperty(b, key);
+
+        if (valueA === valueB) continue;
+        if (fun.isEmpty(valueA)) return order === 'asc' ? 1 : -1;
+        if (fun.isEmpty(valueB)) return order === 'asc' ? -1 : 1;
+
+        const comparison = typeof valueA === 'string' || typeof valueB === 'string'
+          ? String(valueA).localeCompare(String(valueB), undefined, { numeric: true, sensitivity: 'base' })
+          : valueA > valueB ? 1 : -1;
+
+        return order === 'desc' ? comparison * -1 : comparison;
+      }
+
+      return 0;
+    });
+  }
+
+  /**
+   * Valida si un objeto contiene una propiedad, incluyendo rutas anidadas.
+   * @param obj Objeto a evaluar.
+   * @param props Ruta de propiedad a validar, por ejemplo cliente.id.
+   * @returns true si toda la ruta existe en el objeto.
+   */
   static objHas(obj, props) {
     let result = true;
     const props_split = props.split('.');
@@ -785,30 +1143,35 @@ export class fun {
     return result;
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: getProperty
-  // Descripcion : Esta funcion retorna el valor de una propiedad de un objeto
-  // _________________________________________________________________________________________________
+  /**
+   * Retorna el valor de una propiedad, incluyendo rutas anidadas.
+   * @param obj Objeto origen.
+   * @param prop Ruta de propiedad, por ejemplo cliente.id.
+   * @returns Valor encontrado o undefined.
+   */
   static getProperty(obj, prop) {
-    const props_split = prop.split('.');
-    return props_split.reduce((objeto, property) => (typeof objeto == 'undefined' || objeto === null ? objeto : objeto[property]), obj);
+    return prop.split('.').reduce((objeto, property) => objeto?.[property], obj);
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: setProperty
-  // Descripcion : Esta funcion setea una propiedad a un objeto
-  // _________________________________________________________________________________________________
+  /**
+   * Asigna un valor a una propiedad, creando niveles anidados si hacen falta.
+   * @param obj Objeto que sera modificado.
+   * @param prop Ruta de propiedad, por ejemplo cliente.id.
+   * @param valor Valor a asignar.
+   */
   static setProperty(obj, prop, valor) {
     const props_split = prop.split('.');
 
     fun.createNestedObject(obj, [...props_split], valor);
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: pick
-  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades requeridas
-  // _________________________________________________________________________________________________
-  static pick(obj, props): any {
+  /**
+   * Crea un nuevo objeto con solo las propiedades indicadas.
+   * @param obj Objeto origen.
+   * @param props Propiedades a copiar. Soporta nesting, por ejemplo cliente.id.
+   * @returns Nuevo objeto con las propiedades seleccionadas.
+   */
+  static pick(obj: any, props: Array<string>): any {
     const result = {};
 
     for (let index = 0; index < props.length; index++) {
@@ -822,10 +1185,12 @@ export class fun {
     return result;
   }
 
-  // __________________________________________________________________________________________________
-  // Nombre: omit
-  // Descripcion : Esta funcion retorna un nuevo objeto con las propiedades omitidas
-  // _________________________________________________________________________________________________
+  /**
+   * Elimina propiedades de un objeto y retorna el mismo objeto modificado.
+   * @param obj Objeto que sera modificado.
+   * @param props Propiedades a eliminar. Soporta nesting, por ejemplo cliente.id.
+   * @returns El mismo objeto sin las propiedades indicadas.
+   */
   static omit(obj, props) {
     for (let index = 0; index < props.length; index++) {
       const prop = props[index];
@@ -847,6 +1212,14 @@ export class fun {
     return obj;
   }
 
+  /**
+   * Retorna el objeto correspondiente al nivel actual de una ruta anidada.
+   * @param mainObj Objeto base.
+   * @param props_split Ruta de propiedades separada en partes.
+   * @param actualIndex Nivel objetivo que se desea obtener.
+   * @param deepLevel Nivel actual de la recursion.
+   * @returns Objeto ubicado en el nivel solicitado.
+   */
   static getCurrentObjLevel(mainObj, props_split, actualIndex, deepLevel = 0) {
     let obj_en_turno = mainObj;
 
@@ -861,28 +1234,75 @@ export class fun {
 
   toString = Object.prototype.toString;
 
+  /**
+   * Crea un objeto sin prototipo para usarlo como mapa simple.
+   * @returns Objeto sin prototipo.
+   */
   static createMap() {
     return Object.create(null);
   }
+
+  /**
+   * Valida si un objeto corresponde a window.
+   * @param obj Objeto a evaluar.
+   * @returns true si el objeto es window.
+   */
   static isWindow(obj) {
     return obj && obj.window === obj;
   }
+
+  /**
+   * Valida si un objeto parece ser un scope de AngularJS.
+   * @param obj Objeto a evaluar.
+   * @returns true si contiene metodos tipicos de scope.
+   */
   static isScope(obj) {
     return obj && obj.$evalAsync && obj.$watch;
   }
+
+  /**
+   * Valida si un valor es una expresion regular.
+   * @param value Valor a evaluar.
+   * @returns true si el valor es RegExp.
+   */
   static isRegExp(value) {
     return toString.call(value) === '[object RegExp]';
   }
+
+  /**
+   * Compara dos valores simples, considerando NaN como equivalente a NaN.
+   * @param a Primer valor.
+   * @param b Segundo valor.
+   * @returns true si los valores son equivalentes.
+   */
   static simpleCompare(a, b) {
     return a === b || (a !== a && b !== b);
   }
+
+  /**
+   * Valida si un valor es una fecha.
+   * @param value Valor a evaluar.
+   * @returns true si el valor es Date.
+   */
   static isDate(value) {
     return toString.call(value) === '[object Date]';
   }
+
+  /**
+   * Valida si un valor es un arreglo.
+   * @param arr Valor a evaluar.
+   * @returns true si el valor es Array.
+   */
   static isArray(arr) {
     return Array.isArray(arr) || arr instanceof Array;
   }
 
+  /**
+   * Compara dos valores de forma profunda.
+   * @param obj1 Primer valor a comparar.
+   * @param obj2 Segundo valor a comparar.
+   * @returns true si ambos valores son equivalentes.
+   */
   static isEqual(obj1, obj2) {
     if (obj1 === obj2) return true;
     if (obj1 === null || obj2 === null) return false;
@@ -922,5 +1342,25 @@ export class fun {
       }
     }
     return false;
+  }
+
+  // Métodos helper para obtener instancias de servicios
+  private static authGuardInstance: any = null;
+  private static currentUserServiceInstance: any = null;
+
+  static setAuthGuardInstance(instance: any) {
+    fun.authGuardInstance = instance;
+  }
+
+  static getAuthGuardInstance() {
+    return fun.authGuardInstance;
+  }
+
+  static setCurrentUserServiceInstance(instance: any) {
+    fun.currentUserServiceInstance = instance;
+  }
+
+  static getCurrentUserServiceInstance() {
+    return fun.currentUserServiceInstance;
   }
 }

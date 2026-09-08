@@ -2,9 +2,8 @@ import { Observable } from 'rxjs';
 
 import { Ss } from '../services/singleton.service';
 
-import * as _ from 'lodash';
-import { AppConfig } from '../../../environments/environment';
-import { ConfigI } from './config-interface';
+import { Environment } from '@environments/environment';
+import { ConfigI } from '../interface/config-interface';
 import { fun } from '../services/functions.service';
 
 export interface extraArgs {
@@ -18,7 +17,7 @@ export interface responseModel<T> {
   msg: any[];
   total_paginas?: number;
   total_registros?: number;
-} // TODO: <================================================================ PARA DESPUES`
+} // NOTE: <================================================================ PARA DESPUES`
 
 export class CrudG<T> {
   constructor(private path: string) {}
@@ -29,10 +28,10 @@ export class CrudG<T> {
     return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
   }
 
-  async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
+  async getAll(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend'): Promise<responseModel<T>> {
     let url = this.makeUrl(tipo, arg);
 
-    return (await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise()) as T;
+    return await this.request(url, 'get', null, tipo, arg?.requestParams).toPromise();
   }
 
   async getOne(id: number, arg: extraArgs = null, tipo: 'backend' | 'externo' = 'backend') {
@@ -51,13 +50,13 @@ export class CrudG<T> {
 
       if (fun.objHas(data, 'id') && data.id !== 0) {
         this.updateOne(data, arg, tipo).then(
-          (res) => resolve(res),
-          (err) => reject(err),
+          res => resolve(res),
+          err => reject(err)
         );
       } else {
         this.createOne(data, arg, tipo).then(
-          (res) => resolve(res),
-          (err) => reject(err),
+          res => resolve(res),
+          err => reject(err)
         );
       }
     });
@@ -75,38 +74,32 @@ export class CrudG<T> {
   }
 
   private parseParams(arg) {
-    let params = '';
+    if (!arg || Object.keys(arg).length === 0) return '';
+
+    const params = new URLSearchParams();
 
     for (const key in arg) {
       if (Object.prototype.hasOwnProperty.call(arg, key)) {
         const value = arg[key];
 
-        if (params.length == 0) params += '?';
-
         if (fun.hasValue(value)) {
-          if (typeof value == 'object') {
-            params += `&${key}={`;
-            let inner_object = '';
-            for (const inner_key in value) {
-              const inner_value = value[inner_key];
-
-              if (inner_object.length > 0) inner_object += ',';
-              params += `${inner_key}:${inner_value}`;
-            }
-            params += `}`;
+          if (typeof value === 'object') {
+            // Para objetos, los convertimos a JSON string
+            params.append(key, JSON.stringify(value));
           } else {
-            params += `&${key}=${value}`;
+            params.append(key, value.toString());
           }
         }
       }
     }
-    return params;
+
+    return `?${params.toString()}`;
   }
 
   private getUrlInUse() {
-    const configApp: ConfigI = Ss.configServ.getConfig({ isPromise: false });
+    const configApp: ConfigI = Ss.configServ.config;
+    const url = !Environment.production ? Environment[configApp.machineId] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
 
-    const url = configApp.is_development ? AppConfig[configApp.gitUser] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     // const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
     return url;
   }

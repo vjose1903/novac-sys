@@ -1,0 +1,82 @@
+.print-confirmation {
+  color: var(--app-text);
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: min-content minmax(0, 1fr);
+}
+
+.print-confirmation-icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--primary06) 18%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--primary08) 30%, transparent);
+  border-radius: 0.9rem;
+  color: var(--primary08);
+  display: inline-flex;
+  font-size: 1.3rem;
+  height: 3rem;
+  justify-content: center;
+  width: 3rem;
+}
+
+.print-confirmation-copy {
+  align-self: center;
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+
+  span {
+    color: var(--app-text-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  strong {
+    color: var(--app-text);
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+}
+
+.print-confirmation-option {
+  align-items: center;
+  background: color-mix(in srgb, var(--primary06) 10%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--primary08) 22%, var(--app-card-border));
+  border-radius: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  min-height: 3.15rem;
+  padding: 0.65rem 0.75rem;
+
+  span {
+    align-items: center;
+    color: var(--app-text);
+    display: inline-flex;
+    font-size: 0.9rem;
+    font-weight: 800;
+    gap: 0.55rem;
+
+    i {
+      color: var(--primary08);
+    }
+  }
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .print-confirmation-icon {
+    background: color-mix(in srgb, var(--primary06) 18%, var(--app-surface));
+    border-color: color-mix(in srgb, var(--primary08) 36%, transparent);
+    color: #86efac;
+  }
+
+  .print-confirmation-option {
+    background: color-mix(in srgb, var(--primary06) 14%, var(--app-surface));
+
+    span i {
+      color: #86efac;
+    }
+  }
+}

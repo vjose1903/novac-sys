@@ -1,0 +1,344 @@
+.alert_msg {
+  color: #8080806b;
+  margin-right: 0.2rem;
+  cursor: help !important;
+}
+
+.index {
+  background: var(--app-table-row-bg) !important;
+}
+
+.show_color {
+  min-height: 1.5rem;
+  min-width: 1.5rem;
+  width: 1.5rem;
+  border-radius: 3px;
+  margin: auto;
+
+  &.sm {
+    min-height: 1rem !important;
+    min-width: 1rem !important;
+    width: 1rem !important;
+  }
+}
+
+.dinamicTable {
+  display: grid !important;
+  column-gap: 0rem;
+  row-gap: 0;
+  grid-template-rows: [filter-start] min-content [filter-end fantasma-start] auto [fantasma-end];
+  grid-template-columns: [filter-start fantasma-start] auto [filter-end fantasma-end];
+
+  &.has-filter {
+    row-gap: 0.75rem;
+  }
+
+  .searchDiv {
+    // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;
+    grid-area: filter-start / filter-start / filter-end / filter-end;
+  }
+
+  .divTableFantasma {
+    // ------- grid-row-start / grid-column-start / grid-row-end / grid-column-end | itemname;
+    grid-area: fantasma-start / fantasma-start / fantasma-end / fantasma-end;
+
+    position: relative;
+
+    .divTable {
+      overflow: auto;
+      position: absolute;
+      box-shadow: var(--app-shadow);
+      color: var(--app-text);
+      &.redondo {
+        border-radius: 13px;
+        .myTable {
+          border-radius: 10px;
+        }
+        .thead {
+          border-radius: 10px 10px 0px 0px;
+        }
+      }
+
+      .myTable {
+        border-radius: 10px;
+
+        display: grid !important;
+        height: 100% !important;
+
+        grid-template-areas:
+          'table-scroll'
+          'tfoot';
+
+        grid-template-rows: [scroll-start] auto [scroll-end] min-content [foot-end];
+
+        .tableScrollArea {
+          grid-area: table-scroll;
+          display: grid;
+          grid-template-areas:
+            'thead'
+            'tbody';
+          grid-template-rows: [head-start] min-content [body-start] auto [body-end];
+          min-height: 0;
+          overflow: hidden;
+        }
+
+        .thead {
+          grid-area: thead;
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+
+          &.colorTitulo {
+            background: var(--app-table-header-bg);
+            color: var(--app-table-header-text);
+          }
+
+          &.noColorTitulo {
+            background: var(--app-surface-muted);
+          }
+
+          .thHead {
+            &:first-child {
+              padding-left: 0.7rem;
+            }
+            &:last-child {
+              padding-right: 0.7rem;
+            }
+            padding: 0.6rem 0rem;
+            &.sm {
+              padding: 0.3rem 0rem;
+            }
+
+            .titulo {
+              cursor: default;
+              user-select: none;
+            }
+          }
+        }
+        .divBody {
+          grid-area: tbody;
+          grid-row: body-start / body-end;
+          overflow-y: auto;
+
+          .tbody {
+            overflow: auto;
+            height: 100%;
+            > tr {
+              display: table;
+              width: 100%;
+              table-layout: fixed;
+              background: var(--app-table-row-bg);
+              color: var(--app-table-text);
+
+              &.bg-selected {
+                background: var(--app-table-row-selected-bg) !important;
+              }
+
+              &.danger {
+                background-color: #ff7e7e8d !important;
+                &:hover {
+                  background-color: #ce4d4da1 !important;
+                }
+              }
+
+              &.greenTd {
+                background-color: #7eff988d !important;
+                &:hover {
+                  background-color: #4dce76a1 !important;
+                }
+              }
+
+              &.bg-light {
+                background-color: var(--app-surface-muted) !important;
+              }
+
+              &.bg-more-light {
+                background-color: var(--app-surface-soft) !important;
+              }
+
+              &:hover {
+                background-color: var(--app-table-row-hover-bg) !important;
+              }
+
+              > td {
+                text-align: center;
+                border-top: 0px solid transparent !important;
+                border-bottom: 0.5px solid var(--app-table-border);
+                vertical-align: middle !important;
+                color: inherit;
+
+                padding: 0.6rem 0rem;
+                &:first-child {
+                  padding-left: 0.7rem;
+                }
+                &:last-child {
+                  padding-right: 0.7rem;
+                }
+
+                &.sm {
+                  padding: 0.2rem 0rem;
+                }
+
+                .table_input {
+                  position: relative;
+                  display: flex;
+                  align-items: center;
+                  .inputTabla {
+                    &.refresh {
+                      padding-right: 2rem;
+                    }
+                  }
+                  .icon {
+                    cursor: pointer;
+                    position: absolute;
+                    right: 0.5rem;
+                    &:hover {
+                      transform: scale(1.2);
+                    }
+                  }
+                }
+
+                &.btnAccion {
+                }
+              }
+            }
+
+            .table-cell-text {
+              color: inherit !important;
+            }
+          }
+        }
+
+        .tfoot {
+          grid-area: tfoot;
+          .pieTabla {
+            background: var(--app-surface-soft) !important;
+            border-top: 1px solid var(--app-table-border);
+            padding: 0.25rem 0.55rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            h6 {
+              color: var(--app-text);
+              font-size: 0.9rem;
+              font-weight: 700;
+            }
+
+            .pagination-total {
+              white-space: nowrap;
+            }
+
+            .pagination-controls {
+              flex: 1;
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin speeddial-icons {
+  height: 35px !important;
+  width: 35px !important;
+}
+
+::ng-deep {
+  .btn-table-cellphone {
+    > button {
+      background: var(--primary05) !important;
+      border-color: var(--primary05) !important;
+      box-shadow:
+        0 4px 6px rgba(50, 50, 93, 0.11),
+        0 1px 3px rgba(0, 0, 0, 0.08) !important;
+
+      @include speeddial-icons;
+      &:hover {
+        filter: brightness(0.6);
+      }
+    }
+    position: inherit !important;
+  }
+
+  .p-speeddial-item {
+    z-index: 999 !important;
+    box-shadow: 0px 0px 11px 3px #00000082;
+    border-radius: 50%;
+  }
+
+  .p-speeddial-action {
+    background: #495057eb !important;
+    @include speeddial-icons;
+    &:hover {
+      background: #1a1c1feb !important;
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+
+  .titulo_sm {
+    display: none;
+  }
+
+  .divTable thead,
+  .divTable tbody {
+    font-size: 0.8rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .titulo_sm {
+    display: none;
+  }
+
+  .divTable thead,
+  .divTable tbody {
+    font-size: 0.65rem !important;
+  }
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+  .titulosHeader {
+    display: none !important;
+  }
+
+  .titulo_sm {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem !important;
+    font-weight: 600;
+  }
+
+  .divTable thead,
+  .divTable tbody {
+    font-size: 0.9rem !important;
+  }
+
+  .tableTD {
+    display: flex !important;
+    justify-content: space-between;
+    width: 100% !important ;
+    float: right !important;
+    clear: left !important;
+  }
+
+  .tfoot {
+    padding-top: 0.2rem !important;
+  }
+}

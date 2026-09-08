@@ -1,0 +1,82 @@
+<div class="row tasa-cambio-modal">
+  <div class="col-12 p-0">
+    <h5>
+      Divisa: <strong>{{ divisa.nombre }}</strong>
+      <span *ngIf="divisa.code" class="ms-2"
+        >Código: <strong>{{ divisa.code }}</strong></span
+      >
+    </h5>
+    <div class="row">
+      <div class="col-6 d-flex justify-content-center align-items-center">
+        <img-component class="imgDivisa" [imagenSrc]="divisa.img_divisa"></img-component>
+      </div>
+      <div class="col-6 p-0">
+        <div class="d-flex justify-content-center align-items-center w-100 h-100">
+          <form [formGroup]="form" (keydown.enter)="$event.stopPropagation()">
+            <div class="form-group mb-1">
+              <label class="control-label">Tasa actual: </label>
+              <p-tag class="tasa-actual-tag" [rounded]="true" [style]="{ 'white-space': 'nowrap', width: '-webkit-fill-available', overflow: 'hidden', display: 'inline-block', 'font-size': '0.9rem' }">
+                <p class="tasa-actual-value mb-0">{{ divisa.current_tasa }}</p>
+              </p-tag>
+            </div>
+
+            <div class="form-group" appMsgError="tasa" [form]="form">
+              <label class="control-label">Nueva tasa: <span style="color: red">*</span></label>
+
+              <div class="input-group">
+                <div class="input-group-append">
+                  <span class="input-group-text prefijo" id="currency">$</span>
+                </div>
+                <input type="Number" min="1" formControlName="tasa" id="campoCurrency" class="form-control input_cantidad with-left-btn" autocomplete="off" aria-describedby="currency" (focus)="htmlServ.selectValue($event)" />
+              </div>
+
+              <span id="msgContainer"></span>
+            </div>
+
+            <div class="w-100 d-flex justify-content-end align-items-center">
+              <div [pTooltip]="divisa.is_principal ? 'No puede cambiar la tasa de cambio de la divisa principal.' : verificateChangeOfCurrency() ? 'El valor de la nueva tasa no puede ser el mismo actual.' : ''" tooltipPosition="left">
+                <button [disabled]="divisa.is_principal || verificateChangeOfCurrency()" type="submit" (click)="btn_aceptar()" class="btn ml-2 btn-verde">Actualizar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="!divisa.is_principal" class="col-12 p-0 mt-5">
+    <div class="card sombra-light">
+      <div class="card-header position-relative d-flex align-items-center p-2">
+        <div class="d-flex justify-content-between align-items-center w-100">
+          <h5 class="title margin mb-0">Historial de cambios</h5>
+        </div>
+      </div>
+
+      <div class="card-body p-1">
+        <div class="row">
+          <div class="col-5">
+            <label class="control-label mb-0 mt-2">Desde: <span style="color: red">*</span> </label>
+
+            <p-datepicker #inputFechaDesde inputId="fecha_desde" [(ngModel)]="desde" dateFormat="dd/mm/yy" appendTo="body" inputStyleClass="minSize" placeholder="dd/mm/aaaa"></p-datepicker>
+          </div>
+          <div class="col-5">
+            <label class="control-label mb-0 mt-2">Hasta: <span style="color: red">*</span> </label>
+            <p-datepicker #inputFechaHasta inputId="fecha_hasta" [(ngModel)]="hasta" dateFormat="dd/mm/yy" appendTo="body" inputStyleClass="minSize" [maxDate]="hastaMaxDate" placeholder="dd/mm/aaaa"></p-datepicker>
+          </div>
+          <div class="col-1">
+            <div class="h-100 d-flex align-items-end pb-1">
+              <btn-icon-circular [id]="'btnBuscarHistorial'" [icon]="'fas fa-search'" [size]="'size-md'" [icon_size]="'1rem'" [tooltip]="'Buscar Historial'" [tooltipPosition]="'right'" (clickFunction)="getHistorialCambiosTasas()">
+              </btn-icon-circular>
+            </div>
+          </div>
+          <div class="col-12 mt-3 mb-2">
+            <div class="divContainerHistorial">
+              <div #cardTabla class="fantasma_historial">
+                <dinamic-table [cardTabla]="cardTabla" [data]="listaHistorial()" (dataChange)="listaHistorial.set($event)" [config]="table_config"></dinamic-table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

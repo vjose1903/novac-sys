@@ -1,0 +1,45 @@
+<section class="cuadre-section">
+  <div class="cuadre-section-header">
+    <h5>{{ title }}</h5>
+    @if (!fixedRows) {
+      <button type="button" class="btn btn-sm btn-tema" (click)="addItem()" [disabled]="readonly"><i class="fas fa-plus"></i></button>
+    }
+  </div>
+
+  <div class="cuadre-grid cuadre-grid-denominations" [class.fixed-rows]="fixedRows">
+    <strong>Moneda</strong>
+    <strong>Denominación</strong>
+    <strong>Cantidad</strong>
+    @if (type === 'foreign_currency') {
+      <strong>Tasa</strong>
+    }
+    <strong>Total</strong>
+    @if (!fixedRows) {
+      <span></span>
+    }
+
+    @for (item of items; track $index) {
+      <form-divisa-input [showLabel]="false" [selectedCodeVariant]="true" [options]="availableDivisas()" [ngModel]="selectedDivisaId(item)" (ngModelChange)="changeDivisa($index, $event)" [isDisabled]="readonly || fixedRows"></form-divisa-input>
+      @if (fixedRows) {
+        <span class="cuadre-denomination-value">{{ denominationLabel(item) }}</span>
+      } @else {
+        <input class="form-control form-control-sm text-end" appNumeroFormato [decimals]="2" [value]="item.denomination_value" [readonly]="readonly" (input)="patchItem($index, 'denomination_value', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'denomination_value', $event)" />
+      }
+      <input class="form-control form-control-sm text-end" appNumeroFormato [decimals]="0" [value]="item.quantity" [readonly]="readonly" (input)="patchItem($index, 'quantity', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'quantity', $event)" />
+      @if (type === 'foreign_currency') {
+        <span class="cuadre-denomination-value">{{ exchangeRateLabel(item) }}</span>
+      }
+      <span class="cuadre-line-total">{{ lineTotal(item) }}</span>
+      @if (!fixedRows) {
+        <button type="button" class="btn btn-sm cuadre-icon-btn cuadre-remove-btn" (click)="removeItem($index)" [disabled]="readonly"><i class="fas fa-trash"></i></button>
+      }
+    } @empty {
+      <span class="cuadre-empty">Sin líneas registradas.</span>
+    }
+  </div>
+
+  <div class="cuadre-section-total">
+    <span>Total</span>
+    <strong>{{ sectionTotal() }}</strong>
+  </div>
+</section>

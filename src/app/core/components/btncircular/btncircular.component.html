@@ -1,0 +1,11 @@
+<div class="contenedor" (click)="click()">
+  <img
+    class="imgBtn my-1 mx-auto {{ disabled ? 'disabled' : 'active' }}"
+    src="assets/img/{{ nombreImg }}.png"
+    alt="boton-{{ accion }}"
+    id="btn-{{ accion }}"
+  />
+  <h5 class="labelBtn text-center">
+    {{ accion }}
+  </h5>
+</div>

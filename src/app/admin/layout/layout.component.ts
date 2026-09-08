@@ -1,79 +1,106 @@
-import { TiposFacturaC } from './../facturacion/factura';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterContentChecked, AfterViewInit, ElementRef } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
-import * as _ from 'lodash';
-import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event } from '@angular/router';
-import { MixinClass } from '../../core/typescript/MixinClass';
-import { CuadreCajaC } from '../../core/typescript/cuadre_caja';
-import { CurrentUserService } from '../../core/services/current-user.service';
-import { ClienteC } from '../registros/registro-clientes/cliente';
-import { SuplidorC } from '../registros/registro-suplidores/suplidores';
-import { RequestC } from '../../core/typescript/requests';
-import { Ss } from '../../core/services/singleton.service';
-import { ConfigI } from '../../core/typescript/config-interface';
-import { fun } from '../../core/services/functions.service';
+import { actionFacturacion } from './../facturacion/factura';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, AfterViewInit, computed, inject, signal } from '@angular/core';
 
+import { Subject, takeUntil } from 'rxjs';
+import { Router, NavigationCancel, NavigationEnd, NavigationStart, NavigationError, Event, RouterEvent } from '@angular/router';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { CurrentUserService } from '@core/services/current-user.service';
+import { ClienteC } from '@registros/registro-clientes/cliente';
+import { SuplidorC } from '@registros/registro-suplidores/suplidores';
+import { RequestC } from '@core/typescript/requests';
+import { Ss } from '@core/services/singleton.service';
+import { ConfigI } from '@core/interface/config-interface';
+import type { ThemeMode } from '@core/typescript/theme.types';
+import { fun } from '@core/services/functions.service';
+import { FactsLocalStorage } from '../facturacion/factsLocalStorage';
+import { serie } from '@core/typescript/constantes';
+import { IpcService } from '@core/services/ipc.service';
+import { ThemeService } from '@core/services/theme.service';
+import { CopyToClipboardService } from '@core/services/copy-to-clipboard.service';
+import { NavigationService } from '@core/services/navigation.service';
+import { ModalPasswordConfigComponent } from '../../login/extra/modal-password-config/modal-password-config.component';
+import { ConfiguracionesComponent } from '../../login/extra/configuraciones/configuraciones.component';
+import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
+import { Environment } from '@environments/environment';
+import { DesktopUpdateState } from '@electron/shared-electron-angular';
+import { DivisaService } from '@registros/divisa/divisa.service';
+import { CuadreTodayStateService } from '@admin/cuadres/services/cuadre-today-state.service';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss'],
+  standalone: false,
 })
 export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, AfterViewInit {
-  actualPath;
-  actualRuta;
-  actualModule;
+  actualPath = signal<string>('');
+  actualRuta = signal<string>('');
+  nextModule = signal<string>('');
 
   showLoading;
 
   usuario;
 
   imgUser;
-  versionApp: any;
+  configApp: ConfigI;
   noServer;
-  subCheckCuadreToday: Subscription;
-  subLogOut: Subscription;
-  subRouter: Subscription;
-  subCurrentUser: Subscription;
 
-  ready;
+  ready = signal<boolean>(false);
   // facturas_localStorage: any;
-  isHandset$: Observable<boolean>;
   activeIndex;
   initNavigate = true;
-  cuadre_hoy;
   ant_event_change_visibility;
 
   configServ = Ss.configServ;
   clienteClass = new ClienteC();
   suplidorClass = new SuplidorC();
   requestClass = new RequestC();
-  tipoFacturaClass = new TiposFacturaC();
+  cuadreTodayServ = inject(CuadreTodayStateService);
 
-  chequiando_cuadre: boolean;
+  chequiando_cuadre = this.cuadreTodayServ.loading;
+  cuadre_hoy = computed(() => this.cuadreTodayServ.data() ?? false);
   hasPermisosValidated: boolean;
+  actionFacturacion = actionFacturacion;
+  currentYear: number;
+  fun = fun;
 
-  constructor(private breakpointObserver: BreakpointObserver, private router: Router, private cdRef: ChangeDetectorRef, private currentUserServ: CurrentUserService) {
+  my_capitalize = fun.capitalice;
+
+  copyToClipboardServ = inject(CopyToClipboardService);
+  themeServ = inject(ThemeService);
+  divisaServ = inject(DivisaService);
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private router: Router,
+    private cdRef: ChangeDetectorRef,
+    private currentUserServ: CurrentUserService,
+    private navigationService: NavigationService,
+    public _ipc: IpcService
+  ) {
     super();
 
-    this.subRouter = this.router.events.subscribe((routerEvent: Event) => {
+    this.router.events.pipe(takeUntil(this.destroy$)).subscribe((routerEvent: Event | RouterEvent) => {
       if (routerEvent instanceof NavigationStart) {
+        document.body.classList.add('crud-route-navigating');
         this.showLoading = true;
         this.initNavigate = true;
       }
 
-      if (routerEvent instanceof NavigationEnd || routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
+      if (routerEvent instanceof NavigationCancel || routerEvent instanceof NavigationError) {
+        document.body.classList.remove('crud-route-navigating');
+        this.showLoading = false;
+        this.initNavigate = false;
+        return;
+      }
+
+      if (routerEvent instanceof NavigationEnd) {
+        document.body.classList.remove('crud-route-navigating');
         this.showLoading = false;
 
         if (this.initNavigate) {
-          setTimeout(() => this.checkRouteActiva(), 250);
-
-          setTimeout(() => {
-            const token = fun.getAuthToken();
-            if (token) this.checkCuadre();
-          }, 500);
-
+          this.checkRouteActiva();
+          this.refreshNavigationContext();
           this.initNavigate = false;
         }
       }
@@ -84,120 +111,333 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     this.initVariables();
     this._init_mixin({ component: 'layout', is_routing: false });
 
-    this.subCheckCuadreToday = this.layServ.CHECKCUADRETODAY.subscribe((res) => {
+    this.layServ.CHECKCUADRETODAY.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
         this.checkCuadre();
         this.layServ.nextCheckCuadreToday(false);
       }
     });
 
-    this.subLogOut = this.layServ.LOGOUT.subscribe((res) => {
-      if (res && res.bool) this.logOut();
-      else {
-        if (fun.hasValue(res)) this.layServ.nextLogOut(undefined);
+    this.layServ.LOGOUT.pipe(takeUntil(this.destroy$)).subscribe(res => {
+      console.log('%c ANDO POR AQUIII', 'color: yellow', res);
+
+      if (res && res.bool) {
+        this.logOut();
+        this.layServ.nextLogOut(undefined);
       }
     });
 
-    this.subCurrentUser = this.currentUserServ.CURENTUSER.subscribe((res) => {
-      if (res) this.setUser(res);
-    });
+    this.currentUserServ.currentUser$.pipe(takeUntil(this.destroy$)).subscribe(usuario => {
+      if (usuario) {
+        this.usuario = usuario;
 
-    this.configServ.getConfig().then((config: ConfigI) => {
-      fun.logYellow('config ', config);
-      this.versionApp = config.app_version;
+        if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
+        else this.imgUser = 'assets/img/userM.png';
+      }
     });
   }
 
   ngAfterViewInit() {
-    this.ready = true;
-    this.parseMenu();
-    this.checkRouteActiva();
+    this.checkFacturasArchivadas();
     this.cdRef.detectChanges();
-
-    this.validateUserAndLoadPermisos().then((result) => {
-      this.getTiposFacturas().then((res) => {
-        this.hasPermisosValidated = result;
-      });
-    });
   }
 
-  getTiposFacturas() {
-    return new Promise(async (resolve, reject) => {
-      await this.tipoFacturaClass
-        .getAll()
-        .then((tiposFacturas) => {
-          tiposFacturas = _.orderBy(tiposFacturas, ['id'], ['asc']);
-          Ss.factServ.lista_tipos_facturas = tiposFacturas;
-
-          resolve(Ss.factServ.lista_tipos_facturas);
-        })
-        .catch((error) => {
-          fun.logBlue('error: ', error);
-          if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
-          reject(error);
-        });
-    });
-  }
-
-  validateUserAndLoadPermisos() {
-    return new Promise<any>(async (resolve, reject) => {
-      await this.currentUserServ
-        .validateUser()
-        .then((result) => resolve(true))
-        .catch((error) => {
-          fun.logBlue('error: ', error);
-          if (error.razon == 'sesion_expired' || error.razon == 'no_token') this.logOut();
-          reject(error);
-        });
-    });
+  ngOnDestroy() {
+    document.body.classList.remove('crud-route-navigating');
+    this._destroy_mixin();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   initVariables() {
     this.showLoading = true;
     this.imgUser = 'assets/img/transparente.png';
     this.noServer = false;
-    this.isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset).pipe(map((result) => result.matches));
     this.activeIndex = 0;
+    this.currentYear = new Date().getFullYear();
+    this.configApp = Ss.configServ.config;
+    this.checkRouteActiva();
 
-    this.cuadre_hoy = false;
+    this.verifyIsReady();
   }
 
-  ngOnDestroy() {
-    this._destroy_mixin();
-    if (this.subCheckCuadreToday) this.subCheckCuadreToday.unsubscribe();
-    if (this.subLogOut) this.subLogOut.unsubscribe();
-    if (this.subRouter) this.subRouter.unsubscribe();
+  async verifyIsReady() {
+    const validateAppReady = (): boolean => {
+      return fun.hasValue(this.configApp) && fun.hasValue(this.actualPath()) && fun.hasValue(this.actualRuta()) && Ss.factServ.lista_tipos_facturas?.length > 0;
+    };
+
+    const setReadyState = (isReady: boolean) => {
+      fun.setTimeout(() => {
+        this.ready.set(isReady);
+        if (!isReady) {
+          fun.toastError('No se pudo cargar la aplicación, por favor intente nuevamente, si el problema persiste, contacte al soporte de<br/><strong>Novac System</strong>', 'ERROR');
+        }
+      }, 0);
+    };
+
+    fun.retryUntil({
+      task: () => Promise.resolve(validateAppReady()),
+      retryWhen: isReady => !isReady,
+      actionAfterRetry: () => setReadyState(true),
+      actionIfNoSuccess: () => setReadyState(false),
+    });
+  }
+
+  changeSerieDefault() {
+    const new_config = { ...this.configApp, serie_default: this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica };
+
+    this._ipc
+      .setAppConfig(new_config)
+      .then(res => this.refreshPage())
+      .catch(err => {
+        console.error(err);
+        if (err.msg) fun.toastError(err.msg, 'ERROR');
+        else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
+      });
+  }
+
+  changeThemeMode() {
+    const previous_config = { ...this.configApp };
+    const mode_app: ThemeMode = this.configApp.mode_app === 'dark' ? 'light' : 'dark';
+    const new_config = { ...this.configApp, mode_app };
+
+    this.themeServ.applyTheme(new_config.color_app, mode_app);
+    this.configServ.config = new_config;
+
+    this._ipc.setAppConfig(new_config).catch(err => {
+      this.themeServ.applyTheme(previous_config.color_app, previous_config.mode_app);
+      this.configServ.config = previous_config;
+      console.error(err);
+      if (err.msg) fun.toastError(err.msg, 'ERROR');
+      else fun.toastError('Error al cambiar el tema de la aplicación', 'ERROR');
+    });
+  }
+
+  verificarActualizaciones() {
+    const updateModalConf = this.crear_modal_verificando_actualizacion();
+    updateModalConf.show();
+
+    this._ipc
+      .checkForUpdates()
+      .then(state => {
+        Ss.zone.run(() => this.actualizar_modal_verificacion(updateModalConf, state));
+      })
+      .catch(() => {
+        Ss.zone.run(() => this.mostrar_error_verificacion(updateModalConf));
+      });
+  }
+
+  private crear_modal_verificando_actualizacion(): DynamicModalClass {
+    const updateModalConf = new DynamicModalClass();
+    updateModalConf.id = 'actualizar_app';
+    updateModalConf.header = 'VERIFICANDO ACTUALIZACIÓN';
+    updateModalConf.width = '40rem';
+    updateModalConf.html = `
+      <div class="d-flex align-items-center justify-content-center gap-2 px-3 py-4 bg-body-tertiary text-secondary rounded-3">
+        <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+        <span>Verificando actualizaciones...</span>
+      </div>
+    `;
+    updateModalConf.closable = false;
+    updateModalConf.closableEsc = false;
+    updateModalConf.botones = [{ id: 'hiddenUpdateFooterBtn', clase: 'd-none', label: '', disable: true }];
+    return updateModalConf;
+  }
+
+  private actualizar_modal_verificacion(updateModalConf: DynamicModalClass, state: DesktopUpdateState): void {
+    if (state.status === 'available' && state.updateInfo) {
+      this.mostrar_actualizacion_disponible(updateModalConf, state.updateInfo);
+      return;
+    }
+
+    if (state.status === 'not-available') {
+      updateModalConf.header = 'NOVAC SYSTEM ESTÁ ACTUALIZADO';
+      updateModalConf.html = `
+        <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary rounded-3">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-success-subtle text-success" style="width: 3rem; height: 3rem">
+            <i class="pi pi-check" aria-hidden="true"></i>
+          </div>
+          <div>
+            <h5 class="mb-1 text-secondary">Ya estás en la última versión disponible</h5>
+            <p class="mb-2 text-body-secondary">No hay nuevas actualizaciones para instalar.</p>
+            <span class="d-inline-flex align-items-center px-3 py-1 rounded-pill bg-success-subtle text-success border border-success-subtle" style="font-size: 0.8rem; font-weight: 500">
+              <span>Versión actual: <strong>${this.configApp.app_version}</strong></span>
+            </span>
+          </div>
+        </div>
+      `;
+      updateModalConf.closable = true;
+      updateModalConf.closableEsc = true;
+      updateModalConf.botones = [
+        ...(!Environment.production
+          ? [
+              {
+                id: 'simulateUpdateBtn',
+                clase: 'btn btn-blanco',
+                label: 'Simular actualización',
+                disable: false,
+                function: () => this.mostrar_actualizacion_disponible(updateModalConf, { version: this.obtener_version_simulada() }),
+              },
+            ]
+          : []),
+        { id: 'closeUpdateBtn', clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
+      ];
+      this.refrescar_modal_actualizacion(updateModalConf);
+    }
+  }
+
+  private obtener_version_simulada(): string {
+    const currentVersion = String(this.configApp.app_version);
+    const versionSegments = currentVersion.split('.');
+    const lastSegment = Number(versionSegments.at(-1));
+
+    if (!Number.isInteger(lastSegment)) return `${currentVersion}.1`;
+
+    versionSegments[versionSegments.length - 1] = String(lastSegment + 1);
+    return versionSegments.join('.');
+  }
+
+  private mostrar_actualizacion_disponible(updateModalConf: DynamicModalClass, info: any): void {
+    updateModalConf.header = 'ACTUALIZACIÓN DISPONIBLE';
+    updateModalConf.html = `
+      <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary rounded-3">
+        <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-primary-subtle text-primary" style="width: 3rem; height: 3rem">
+          <i class="pi pi-download" aria-hidden="true"></i>
+        </div>
+        <div>
+          <h5 class="mb-1 text-secondary">Nueva versión disponible</h5>
+          <p class="mb-2 text-body-secondary">Hay una actualización de Novac System lista para descargar e instalar.</p>
+          <span class="d-inline-flex align-items-center px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.8rem; font-weight: 500">
+            <span>Versión disponible: <strong>${info.version}</strong></span>
+          </span>
+        </div>
+      </div>
+    `;
+    updateModalConf.closable = true;
+    updateModalConf.closableEsc = true;
+    updateModalConf.botones = [
+      ...(!Environment.production
+        ? [
+            {
+              id: 'simulateDownloadBtn',
+              clase: 'btn btn-primary',
+              label: 'Simular descarga',
+              disable: false,
+              function: instance => {
+                instance.close();
+                this._ipc.simulateUpdateDownload();
+              },
+            },
+          ]
+        : []),
+      { id: 'cancelUpdateBtn', clase: 'btn btn-blanco', action: modalActionsE.close, label: 'Cancelar', disable: false },
+      { id: 'updateBtn', clase: 'btn btn-verde', label: 'Actualizar', disable: false, function: instance => this.iniciar_descarga_actualizacion(instance, updateModalConf), showProcess: true },
+    ];
+    updateModalConf.disableAllButtonsIfAnyProcessing = true;
+    this.refrescar_modal_actualizacion(updateModalConf);
+  }
+
+  private mostrar_error_verificacion(updateModalConf: DynamicModalClass): void {
+    updateModalConf.header = 'ERROR DE ACTUALIZACIÓN';
+    updateModalConf.html = '<p class="mb-0">No se pudo verificar si existen actualizaciones.</p>';
+    updateModalConf.closable = true;
+    updateModalConf.closableEsc = true;
+    updateModalConf.botones = [{ id: 'closeUpdateBtn', clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false }];
+    this.refrescar_modal_actualizacion(updateModalConf);
+  }
+
+  private refrescar_modal_actualizacion(updateModalConf: DynamicModalClass): void {
+    if (!updateModalConf.id || !updateModalConf.modalWrapper) return;
+
+    updateModalConf.modalWrapper.changeModalConfig(
+      {
+        header: updateModalConf.header,
+        html: updateModalConf.html,
+        closable: updateModalConf.closable,
+        closableEsc: updateModalConf.closableEsc,
+        botones: updateModalConf.botones,
+        disableAllButtonsIfAnyProcessing: updateModalConf.disableAllButtonsIfAnyProcessing,
+      },
+      updateModalConf.id
+    );
+  }
+
+  private iniciar_descarga_actualizacion(modalInstance: DynamicModalClass, updateModalConf: DynamicModalClass): void {
+    const updateBtn = updateModalConf.botones.find(btn => btn.id === 'updateBtn');
+
+    this._ipc
+      .downloadUpdate()
+      .then(res => {
+        if (res.started) {
+          modalInstance.close();
+        } else {
+          fun.toastInfo(res.message, 'INFORMACIÓN');
+        }
+
+        if (updateBtn) updateBtn.processing = false;
+      })
+      .catch(error => {
+        if (updateBtn) updateBtn.processing = false;
+        fun.toastError(error?.message || 'No se pudo iniciar la descarga de la actualización', 'ERROR');
+      });
   }
 
   checkCuadre() {
-    if (!this.chequiando_cuadre) {
-      let extra = { afterPath: 'check_today_cuadre', parameters: {}, requestParams: [{ key: 'spinner', value: 'no_show' }] };
-      this.chequiando_cuadre = true;
-      new CuadreCajaC().getAll(extra).then((res) => {
-        this.cuadre_hoy = res['data'].existe_cuadre_hoy;
-        this.chequiando_cuadre = false;
-      });
+    return this.cuadreTodayServ.refresh({ force: true, skipLoader: true }).catch(() => false);
+  }
+
+  private refreshNavigationContext() {
+    const token = fun.getAuthToken();
+    if (!token) return;
+
+    this.checkCuadre();
+    this.divisaServ.getDivisas({ force: true, skipLoader: true }).catch(() => []);
+  }
+
+  copyMachineId() {
+    this.copyToClipboardServ.copyText(this.configApp.machineId).then(() => {
+      fun.toastInfo('ID de la máquina copiado al portapapeles', 'COPIADO');
+    });
+  }
+
+  openConfigurationModal() {
+    const passwordConfirmCallback = (args: ICallbackModal) => {
+      if (args.type === modalCloseType.returnData && args.data && !args.data.error) this.openConfiguracionesModal();
+    };
+
+    if (!Environment.production) {
+      passwordConfirmCallback({ data: { error: false }, type: modalCloseType.returnData });
+      return;
     }
+
+    const passwordConfigModal = new DynamicModalClass();
+
+    passwordConfigModal.id = 'passwordConfigForm';
+    passwordConfigModal.inputs = { from: 'layout' };
+    passwordConfigModal.header = 'Configuraciones';
+    passwordConfigModal.width = '30rem';
+    passwordConfigModal.component = ModalPasswordConfigComponent;
+
+    passwordConfigModal.botones = [
+      { id: 'cerrarBtn', label: 'Cerrar', clase: 'btn-danger', action: modalActionsE.close },
+      { id: 'aceptarBtn', label: 'Aceptar', clase: 'btn-success' },
+    ];
+
+    passwordConfigModal.setCallback(passwordConfirmCallback);
+    passwordConfigModal.show();
   }
 
-  ngAfterContentChecked() {
-    this.cdRef.detectChanges();
-  }
+  openConfiguracionesModal() {
+    const passwordConfigModal = new DynamicModalClass();
+    passwordConfigModal.id = 'configuracionesForm';
+    passwordConfigModal.width = '90vw';
+    passwordConfigModal.header = 'Configuraciones del sistema';
+    passwordConfigModal.height = 'calc(100vh - 10rem)';
+    passwordConfigModal.padding = '0rem';
+    passwordConfigModal.component = ConfiguracionesComponent;
+    passwordConfigModal.inputs = { is_on_modal: true };
 
-  setUser(usuario) {
-    this.usuario = usuario;
-
-    if (this.usuario.sexo === 'm') this.imgUser = 'assets/img/userH.png';
-    else this.imgUser = 'assets/img/userM.png';
-  }
-
-  parseMenu() {
-    for (const keyFather in this.menuPermissionsObj) {
-      for (const keyChild in this.menuPermissionsObj[keyFather]) {
-        const subMenuProp = this.menuPermissionsObj[keyFather][keyChild];
-        this.menuPermissionsObj[keyFather].flatt = _.union(this.menuPermissionsObj[keyFather].flatt, subMenuProp);
-      }
-    }
+    passwordConfigModal.show();
   }
 
   // =================================================================================
@@ -211,23 +451,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // CERRAR SESION
   // =================================================================================
   logOut() {
-    fun.logout().then(() => {
-      this._destroy_layout(true);
-      this.noServer = false;
-      this.router.navigateByUrl('/');
-    });
-  }
-
-  // =================================================================================
-  // CHECK LAYOUT ACTIVE ROUTE
-  // =================================================================================
-
-  getLayoutActiveRoute(module, paths?) {
-    if (fun.hasValue(paths) || paths?.length > 0) {
-      return paths.some((path) => this.actualPath.includes(`/${module}/${path}`));
-    } else {
-      return this.actualPath.includes(`/${module}`);
-    }
+    this.noServer = false;
+    this.router.navigateByUrl('/');
   }
 
   // =================================================================================
@@ -235,57 +460,42 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   // =================================================================================
 
   checkRouteActiva() {
-    this.actualPath = fun.getActualPath();
+    this.actualPath.set(fun.getActualPath());
 
-    const pathSplit = _.pullAll(this.actualPath.split('/'), ['']);
+    const pathSplit = this.actualPath()
+      .split('/')
+      .filter(item => fun.hasValue(item.trim()));
 
-    if (pathSplit.length >= 3) {
-      this.actualModule = pathSplit[1];
-      this.actualRuta = _.join(pathSplit.slice(2, pathSplit.length), '/');
-    } else {
-      this.actualModule = undefined;
-      this.actualRuta = _.join(pathSplit.slice(1, pathSplit.length), '/');
-    }
+    this.nextModule.set(undefined);
+    this.actualRuta.set(pathSplit.join('/').replace('/admin/', ''));
+  }
 
-    this.ready = true;
+  // =================================================================================
+  // CHECK FACTURAS ARCHIVADAS
+  // =================================================================================
+
+  checkFacturasArchivadas() {
+    FactsLocalStorage.verificateFacturasGuardadas();
   }
 
   // =================================================================================
   // NAVEGAR
   // =================================================================================
-  isVistaActual(arg) {
-    let res = false;
 
-    if ((fun.hasValue(this.actualModule) && arg == this.actualModule) || (fun.hasValue(this.actualPath) && this.actualPath.includes(arg)) || (fun.hasValue(this.actualRuta) && this.actualRuta.includes(arg))) {
-      res = true;
+  async cambiarMenu(args: { url: string; navigate: boolean; event: any }) {
+    if (!args.navigate) {
+      this.nextModule.set(args.url);
+      return;
     }
-    return res;
-  }
 
-  cambiarMenu(args: { url; navigate }) {
-    let next_cambio_menu = '';
+    const nextCambioMenu = `/admin/${args.url}`;
 
-    if (args.navigate) {
-      next_cambio_menu = `/admin/${args.url}`;
+    // Usar el nuevo servicio de navegación
+    const success = await this.navigationService.navigateTo(nextCambioMenu);
 
-      if (this.actualPath !== next_cambio_menu) {
-        this.runRouterNavigate({ bool: true, ruta: next_cambio_menu });
-      } else {
-        fun.toastWarning('Ya se encuentra en esta módulo.', 'AVISO');
-      }
-    } else {
-      this.actualModule = args.url;
-    }
-  }
-
-  finalizarCambioMenu(arg) {
-    if (arg.bool && arg.verificar) this.ready = false;
-
-    if (arg.bool) {
-      this.actualModule = undefined;
-      this.router.navigateByUrl(arg.ruta);
-    } else {
-      this.checkRouteActiva();
+    if (success) {
+      this.nextModule.set(undefined);
+      fun.enfocarInput(null, args.event.target);
     }
   }
 

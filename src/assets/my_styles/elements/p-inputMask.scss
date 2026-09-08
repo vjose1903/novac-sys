@@ -1,0 +1,144 @@
+@use './forms.scss' as *;
+
+.p-inputmask {
+  display: block;
+  width: 100%;
+  background-color: transparent;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: var(--app-field-radius, 0.72rem) !important;
+  overflow: visible;
+  padding: 0;
+
+  input {
+    @include formField;
+
+    &:disabled,
+    &[disabled],
+    &.disabled {
+      background-color: var(--app-input-disabled-bg) !important;
+      border: 1px solid var(--app-border) !important;
+      box-shadow: none !important;
+      opacity: 1 !important;
+      color: var(--app-input-disabled-text) !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+    }
+
+    &:disabled:focus,
+    &[disabled]:focus,
+    &.disabled:focus,
+    &.disabled.ng-invalid,
+    &.disabled.ng-dirty,
+    &.disabled.ng-touched {
+      background-color: var(--app-input-disabled-bg) !important;
+      border-color: var(--app-border) !important;
+      box-shadow: none !important;
+      outline: 0 !important;
+      color: var(--app-input-disabled-text) !important;
+      -webkit-text-fill-color: var(--app-input-disabled-text) !important;
+    }
+  }
+
+  &:hover:not(:has(input:disabled)):not(:has(input[disabled])) {
+    input {
+      border-color: var(--app-input-hover-border) !important;
+      box-shadow: var(--app-field-hover-shadow, 0 0.45rem 0.9rem -0.75rem #0000008a) !important;
+    }
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  &.min {
+    input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.disabled,
+  &:disabled {
+    background-color: transparent !important;
+
+    input {
+      @include formFieldDisabled;
+      border-color: var(--app-border) !important;
+      box-shadow: none !important;
+    }
+  }
+
+  &.with-right-btn {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    input {
+      @include formFieldInvalid;
+    }
+  }
+
+  &.field-sm,
+  &.form-field-sm,
+  &.input-sm {
+    input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.field-lg,
+  &.form-field-lg,
+  &.input-lg {
+    input {
+      min-height: var(--app-field-height-lg, 3rem) !important;
+      padding: 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
+  }
+
+  &:has(> .p-inputtext:disabled),
+  &:has(> .p-inputtext[disabled]),
+  &:has(> .p-inputtext.disabled) {
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+  &:has(input:disabled),
+  &:has(input[disabled]),
+  &:has(input.disabled) {
+    cursor: not-allowed !important;
+  }
+}
+
+.field-sm,
+.form-field-sm,
+.input-sm {
+  .p-inputmask {
+    input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+}
+
+.field-lg,
+.form-field-lg,
+.input-lg {
+  .p-inputmask {
+    input {
+      min-height: var(--app-field-height-lg, 3rem) !important;
+      padding: 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
+  }
+}

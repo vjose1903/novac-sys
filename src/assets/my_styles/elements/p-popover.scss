@@ -1,0 +1,123 @@
+.p-popover {
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0.4rem !important;
+  background: var(--app-surface) !important;
+  background-clip: padding-box !important;
+  overflow: hidden !important;
+  box-shadow: var(--app-overlay-shadow) !important;
+
+  .p-popover-content {
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
+    padding: 0 !important;
+  }
+
+  .popover-cuenta .popover-header {
+    h3,
+    h4 {
+      color: var(--app-popover-account-name) !important;
+    }
+
+    p {
+      color: var(--app-popover-account-email) !important;
+    }
+  }
+
+  .popover-cuenta .popover-item,
+  .popover-cuenta .popover-item:hover {
+    text-decoration: none !important;
+  }
+
+  .hoverlable,
+  .dropRowMenu li,
+  .overlayExtra li,
+  .ulMovimientoViaje li {
+    color: var(--app-text) !important;
+
+    &:hover,
+    &.indicador:hover,
+    &.selected:hover {
+      background: var(--app-hover) !important;
+      color: var(--app-text) !important;
+    }
+
+    > *,
+    a,
+    span,
+    p,
+    strong,
+    i {
+      color: inherit !important;
+    }
+  }
+
+  &::before,
+  &::after {
+    display: none !important;
+    border-color: transparent !important;
+  }
+
+  &.no-carret {
+    &::before,
+    &::after {
+      border-bottom-color: transparent !important;
+    }
+  }
+
+  &.padding-sm {
+    .p-popover-content {
+      padding: 0.5rem !important;
+    }
+  }
+
+  &.padding-md {
+    .p-popover-content {
+      padding: 1rem !important;
+    }
+  }
+
+  &.padding-lg {
+    .p-popover-content {
+      padding: 1.5rem !important;
+    }
+  }
+}
+
+.p-popover-close {
+  background: var(--primary09) !important;
+  border-radius: 50%;
+}
+
+.filterOverlay {
+  position: relative;
+  display: flex;
+  align-items: center;
+  input {
+    padding-right: 2.3rem;
+  }
+  i {
+    position: absolute;
+    right: 0.8rem;
+    color: var(--app-text-muted);
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}

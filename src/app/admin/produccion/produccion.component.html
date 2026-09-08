@@ -1,30 +1,39 @@
 <div class="row ProductionRow">
+  <div class="col-12 p-0 production-hero">
+    <div>
+      <div class="production-section-kicker">Operaciones</div>
+      <h2>Producción</h2>
+    </div>
+    <span class="production-hero-state">Nueva elaboración</span>
+  </div>
   <div class="col-12 p-0 arriba">
     <div class="row">
-      <div class="col-4">
-        <div #cardFormulario class="card card-padding-1 sombra h-100">
+      <div class="col-4 p-0">
+        <div #cardFormulario class="card card-padding-1 sombra h-100 production-form-card">
+          <div class="production-section-kicker">Nueva producción</div>
           <h5>Seleccione el producto a elaborar:</h5>
           <div class="row">
             <div class="col-12 p-0">
               <div class="form-group">
                 <label class="control-label mt-1 mb-0">Nombre producto: <span style="color: red">*</span></label>
                 <div>
-                  <p-dropdown
+                  <p-select
+                    onElementReady
+                    (elementReady)="enfocarInput('articulo_id')"
                     [placeholder]="'Seleccione producto'"
-                    [options]="listaProductos"
+                    [options]="listaProductos()"
                     [(ngModel)]="producto_terminado_en_turno"
                     optionLabel="nombre"
                     [filter]="true"
+                    appendTo="body"
                     optionDisabled="optionDisabled"
                     filterBy="nombre"
                     (onHide)="saltar('cantidad_producir')"
                     (keydown.enter)="saltar('cantidad_producir')"
                     (onChange)="getIngredients()"
-                    styleClass="form-control min"
-                    [virtualScroll]="true"
-                    [itemSize]="30"
-                    id="articulo_id"
-                  ></p-dropdown>
+                    class="form-control min"
+                    inputId="articulo_id">
+                  </p-select>
                 </div>
               </div>
             </div>
@@ -39,64 +48,80 @@
                       (keydown.enter)="saltar('medida_producir')"
                       id="cantidad_producir"
                       [(ngModel)]="cantidad_producir"
-                      (focus)="$event.target.select()"
-                      placeholder="Cantidad a producir"
-                      class="form-control inputE input_cantidad"
+                      (focus)="htmlServ.selectValue($event)"
+                      placeholder="Cantidad"
+                      class="form-control inputE input_cantidad field-sm"
                       autocomplete="off"
-                      (blur)="calcularCantidadAProduccir()"
-                    />
+                      (blur)="calcularCantidadAProduccir()" />
                   </div>
 
-                  <div class="col-8 pr-0">
-                    <select (keydown.enter)="saltar('agregar')" class="form-control inputE" [(ngModel)]="medida_producir" id="medida_producir" (change)="calcularCantidadAProduccir()">
-                      <option [value]="null" disabled></option>
-                      <option *ngFor="let item of optionsMedidas" value="{{ item }}">{{ item }}</option>
-                    </select>
+                  <div class="col-8 pe-0">
+                    <p-select
+                      inputId="medida_producir"
+                      styleClass="form-control inputE field-sm"
+                      [class.production-select-placeholder]="!medida_producir"
+                      [(ngModel)]="medida_producir"
+                      [options]="optionsMedidas"
+                      placeholder="Medida"
+                      appendTo="body"
+                      (keydown.enter)="saltar('agregar')"
+                      (onChange)="calcularCantidadAProduccir()"></p-select>
                   </div>
                 </div>
               </div>
             </div>
 
             <div class="col-12 p-0 mt-2">
-              <a class="btn mr-2 btn-blanco" (click)="borrarForm()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
+              <a class="btn me-2 btn-blanco" (click)="borrarForm()">{{ articuloEditando ? 'Cancelar' : 'Borrar' }}</a>
               <input [disabled]="formIsInvalid()" (click)="agregarAlista()" type="submit" class="btn btn-verde" value="{{ articuloEditando ? 'Actualizar' : 'Agregar' }}" />
             </div>
           </div>
         </div>
       </div>
-      <div class="col-8 pl-0">
-        <div class="card card-padding-1 sombra cardIngredientes" [ngStyle]="{ 'max-height': cardFormulario.offsetHeight + 'px' }">
-          <h4 class="titulo">Ingredientes</h4>
-
-          <div class="row h-100 cuerpo">
-            <div class="col-6 p-0 fondoGris bordes">
-              <div class="text-center tituloIngre">Inventario</div>
-
-              <div id="inventario_scroll" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                <div *ngFor="let ingrediente of ingredientes; let i = index" class="ingredientesList d-flex">
-                  <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
-
-                  <div style="width: 100%">
-                    <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="i != 0 ? 'top' : 'bottom'" [escape]="false">
-                      {{ lookprincipal(ingrediente) }}
-                    </span>
-                  </div>
-                </div>
-              </div>
+      <div class="col-8 p-0">
+        <div class="card card-padding-1 sombra cardIngredientes production-ingredients-card" [ngStyle]="{ 'max-height': cardFormulario.offsetHeight + 'px' }">
+          <div class="production-panel-heading">
+            <div>
+              <div class="production-section-kicker">Composición del producto</div>
+              <h4 class="titulo">Ingredientes</h4>
             </div>
-            <div class="col-6 p-0 bordes fondoBlanco">
-              <div class="text-center tituloIngre">Producción</div>
-              <div id="produccion_scroll" *ngIf="ingredientesParaProduccion.length > 0" class="scroll-container-prod" appOnScroll (scrolling)="ingredientesScroll($event)">
-                <div *ngFor="let ingrediente of ingredientesParaProduccion; let index_ingrediente = index" class="ingredientesList d-flex">
-                  <div class="Nombreingre">{{ ingrediente.nombre + ': ' }}</div>
+            <span class="production-panel-status">Inventario / producción</span>
+          </div>
 
-                  <div class="" style="width: 100%">
-                    <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index_ingrediente != 0 ? 'top' : 'bottom'" [escape]="false">
-                      {{ lookprincipal(ingrediente) }}
-                    </span>
+          <div class="h-100 cuerpo production-ingredients-table">
+            <div class="production-ingredients-headers">
+              <div class="text-center tituloIngre">Inventario</div>
+              <div class="text-center tituloIngre">Producción</div>
+            </div>
+
+            <div class="production-ingredients-scroll">
+              @for (ingrediente of ingredientes; track ingrediente.id; let index = $index) {
+                @let ingredienteProduccion = getIngredienteParaProduccion(ingrediente);
+                <div class="production-ingredient-row">
+                  <div class="ingredientesList fondoGris">
+                    <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
+                    <div>
+                      <span [pTooltip]="existenciaConTooltip(ingrediente) ? lookOters(ingrediente.existencia) : ''" [tooltipPosition]="index != 0 ? 'top' : 'bottom'" [escape]="false">
+                        {{ lookprincipal(ingrediente) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="ingredientesList fondoBlanco">
+                    <small class="Nombreingre">{{ ingrediente.nombre + ': ' }}</small>
+                    <div>
+                      @if (ingredienteProduccion) {
+                        <span
+                          [pTooltip]="existenciaConTooltip(ingredienteProduccion) ? lookOters(ingredienteProduccion.existencia) : ''"
+                          [tooltipPosition]="index != 0 ? 'top' : 'bottom'"
+                          [escape]="false">
+                          {{ lookprincipal(ingredienteProduccion) }}
+                        </span>
+                      }
+                    </div>
                   </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
         </div>
@@ -104,19 +129,35 @@
     </div>
   </div>
 
-  <div class="col-12 medio">
-    <div id="cardTabla" class="card card-padding-1 sombra h-100">
+  <div class="col-12 medio p-0">
+    <div id="cardTabla" class="card card-padding-1 sombra h-100 production-table-card">
       <div #cardTablaProd class="divProducciones">
+        <div class="production-table-heading">
+          <div>
+            <div class="production-section-kicker">Orden de elaboración</div>
+            <h3>Detalle de producción</h3>
+          </div>
+          <span class="production-table-count">Productos agregados</span>
+        </div>
         <div class="divTabla">
-          <dinamic-table [cardTabla]="cardTablaProd" [seleccionado]="articuloEditando?.id" [(data)]="lista_produccion" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          <dinamic-table
+            onElementReady
+            (elementReady)="tableIsInitialized.set(true)"
+            [cardTabla]="cardTablaProd"
+            [seleccionado]="articuloEditando?.id"
+            [data]="lista_produccion()"
+            (dataChange)="lista_produccion.set($event)"
+            [(TablasComponent)]="tablaComponent"
+            [config]="table_config"
+            (table_events)="handle_table_events($event)"></dinamic-table>
         </div>
       </div>
     </div>
   </div>
   <div class="col-12 abajo">
-    <div class="d-flex justify-content-end w-100">
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP', 'Seguro de que desea cancelar la produccion.', null)" type="submit" class="btn btn-blanco mr-2" value="Cancelar" />
-      <input [disabled]="abilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar', 'Seguro de que desea confirmar la produccion.', null)" type="submit" class="btn" value="Confirmar" id="btn-verde" />
+    <div class="d-flex justify-content-end w-100 gap-3">
+      <button [disabled]="habilitarBtnConfirmar()" (click)="abrirModalDinamicText('cancelarP' )" type="submit" class="btn btn-gray">Cancelar</button>
+      <button [disabled]="habilitarBtnConfirmar()" (click)="abrirModalDinamicText('confirmar' )" type="submit" class="btn btn-verde">Confirmar</button>
     </div>
   </div>
 </div>

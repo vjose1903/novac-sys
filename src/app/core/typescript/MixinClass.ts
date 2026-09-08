@@ -1,7 +1,7 @@
-import * as moment from '../javascript/moment';
-import { ModalClass } from '../../admin/components/modal/modal-class';
+import moment from '../javascript/moment';
 import { Ss } from '../services/singleton.service';
 import { fun } from '../services/functions.service';
+import { TablaClass } from '@core/components/new_tablas/tabla-class';
 
 interface mixinInit {
   component?: String;
@@ -13,7 +13,7 @@ interface fechaFactura {
   FechaFacturaMostrar?: string;
 }
 
-export class MixinClass extends ModalClass {
+export class MixinClass extends TablaClass {
   constructor() {
     super();
   }
@@ -23,12 +23,10 @@ export class MixinClass extends ModalClass {
 
   _init_mixin(arg?: mixinInit) {
     this.arg_mixin = arg;
-
-    this._init_layout(arg);
   }
 
   _destroy_mixin(algo?) {
-    this._destroy_layout();
+    // Método vacío para compatibilidad
   }
 
   // =========================================================================================================
@@ -74,45 +72,18 @@ export class MixinClass extends ModalClass {
 
   // =========================================================================================================
   logBlue(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #5580da', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logYellow(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #dada55', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logRed(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? fun.duplicarJson(body) : '');
+    console.log(`%c ${text}`, 'background: #00000000; color: #da555f', body !== undefined ? fun.deepCloning(body) : '');
   }
 
   logGreen(text: any, body?) {
-    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.duplicarJson(body) : '');
-  }
-
-  eliminarRegistro(obj) {
-    const noFunction = (instance: any) => {
-      instance.closeModal('borrar', 'cancelar');
-    };
-    this.openNewModal({
-      id: 'borrar',
-      header: 'Confirmar',
-      width: '510px',
-      html: `<p> ${obj?.texto} </p>`,
-      botones: {
-        ...fun.duplicarJson(ModalClass.noShowAceptarCancelarButtons),
-        dinamico: [
-          { clase: 'btn btn-blanco mr-2', function: (instance) => noFunction(instance), label: 'NO', disable: false },
-          {
-            clase: 'btn btn-verde',
-            function: (instance) => {
-              obj.siFunction();
-              instance.closeModal('borrar', 'cancelar');
-            },
-            label: 'SI',
-            disable: false,
-          },
-        ],
-      },
-    });
+    console.log(`%c ${text}`, 'background: #00000000; color: #55da56', body !== undefined ? fun.deepCloning(body) : '');
   }
 }

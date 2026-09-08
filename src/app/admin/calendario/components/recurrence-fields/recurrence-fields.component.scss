@@ -1,0 +1,67 @@
+.calendar-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+:host ::ng-deep {
+  .calendar-compact-select.p-select {
+    height: 2.625rem !important;
+    min-height: 2.625rem !important;
+    padding: 0 !important;
+  }
+
+  .calendar-compact-select .p-select-label,
+  .calendar-compact-select .p-select-dropdown {
+    display: flex;
+    align-items: center;
+  }
+
+  .calendar-compact-select .p-select-label {
+    height: 100%;
+    padding: 0.2rem 0.75rem !important;
+  }
+}
+
+.week-days {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  font-size: 13px;
+  font-weight: 800;
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  button {
+    width: 34px;
+    height: 30px;
+    border: 1px solid var(--app-border);
+    border-radius: 7px;
+    background: var(--app-surface);
+    color: var(--app-text);
+    font-weight: 800;
+  }
+
+  button.active {
+    border-color: var(--app-selectbutton-active-bg);
+    background: var(--app-selectbutton-active-bg);
+    color: var(--app-selectbutton-active-text);
+  }
+}
+
+@media (max-width: 720px) {
+  .calendar-recurrence {
+    .col-6,
+    .col-12 {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      width: 100%;
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+}

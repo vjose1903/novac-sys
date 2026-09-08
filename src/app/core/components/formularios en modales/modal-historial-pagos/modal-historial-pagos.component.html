@@ -1,0 +1,24 @@
+<div style="height: 100%">
+  <p-tabs [(value)]="activeIndex" styleClass="my_tabView">
+    <p-tablist>
+      <p-tab [value]="0" [disabled]="arrayHasData('abonos').disable"> Abonos {{ !arrayHasData('abonos').disable ? '(' + arrayHasData('abonos').cant + ')' : '' }} </p-tab>
+      <p-tab [value]="1" [disabled]="arrayHasData('notas').disable"> Notas {{ !arrayHasData('notas').disable ? '(' + arrayHasData('notas').cant + ')' : '' }} </p-tab>
+    </p-tablist>
+
+    @if (show) {
+      <p-tabpanels>
+        <p-tabpanel [value]="0">
+          <div class="d-flex h-100 w-100" #cardTablaPagos id="cardTabla">
+            <dinamic-table [cardTabla]="cardTablaPagos" [(data)]="abonos" [(TablasComponent)]="tablaPagosComponent" [config]="table_pagos_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel [value]="1">
+          <div class="d-flex h-100 w-100" #cardTablaNota id="cardTablaNota">
+            <dinamic-table [cardTabla]="cardTablaNota" [(data)]="notas" [(TablasComponent)]="tablaNotasComponent" [config]="table_notas_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    }
+  </p-tabs>
+</div>

@@ -1,0 +1,42 @@
+<section class="summary">
+  <div>
+    <span>Fondo día anterior</span>
+    <strong>{{ formatAmount(openingCashFund) }}</strong>
+  </div>
+  <div>
+    <span>Facturas consumidor final</span>
+    <strong>{{ formatAmount(backendTotals?.final_consumer_invoices_total || '0.00') }}</strong>
+  </div>
+  <div>
+    <span>Recibo de ingresos</span>
+    <strong>{{ formatAmount(backendTotals?.income_receipts_total || '0.00') }}</strong>
+  </div>
+  <div class="summary-divider">
+    <span>Total sistema</span>
+    <strong>{{ formatAmount(expectedTotal) }}</strong>
+  </div>
+  <div>
+    <span>Efectivo físico</span>
+    <strong>{{ formatAmount(physicalCashTotal) }}</strong>
+  </div>
+  <div>
+    <span>Otros métodos</span>
+    <strong>{{ formatAmount(otherPaymentMethodsTotal) }}</strong>
+  </div>
+  <div>
+    <span>Transferencias adicionales</span>
+    <strong>{{ formatAmount(additionalTransfersTotal) }}</strong>
+  </div>
+  <div class="summary-total">
+    <span>Total efectivo del día</span>
+    <strong>{{ formatAmount(operationalTotal) }}</strong>
+  </div>
+  <div class="summary-total" [ngClass]="differenceClass()">
+    <span>Diferencia</span>
+    <strong>{{ fondoCaja() }}</strong>
+  </div>
+  <div class="summary-info">
+    <span>Facturas a crédito</span>
+    <strong>{{ formatAmount(creditInvoicesTotal || backendTotals?.credit_invoices_total || '0.00') }}</strong>
+  </div>
+</section>

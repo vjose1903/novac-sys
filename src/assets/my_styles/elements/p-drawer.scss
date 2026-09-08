@@ -1,0 +1,134 @@
+@use './forms.scss' as *;
+
+.p-drawer {
+  .p-drawer-close-button {
+    .p-button:hover {
+      background: var(--app-hover) !important;
+      color: var(--app-text) !important;
+    }
+  }
+
+  &.sideFact {
+    z-index: 999 !important;
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
+    border-color: var(--app-border) !important;
+
+    .p-drawer-content {
+      height: 100%;
+      padding: 1rem !important;
+      background: var(--app-surface) !important;
+      color: var(--app-text) !important;
+    }
+
+    .p-drawer-header {
+      background: var(--app-surface) !important;
+      color: var(--app-text) !important;
+      border-color: var(--app-drawer-divider) !important;
+    }
+  }
+
+  &.my_sidebar {
+    z-index: 999 !important;
+    opacity: 1 !important;
+    box-shadow: -13px 0px 20px 0 #00000029 !important;
+    flex-direction: inherit !important;
+    display: block !important;
+    border: 0 solid transparent !important;
+
+    &.large {
+      width: 30rem !important;
+    }
+    &.x-large {
+      width: 40rem !important;
+    }
+    .p-drawer-content {
+      overflow: visible;
+      padding: 0 !important;
+      background: var(--app-surface) !important;
+      color: var(--app-text) !important;
+
+      .contendioSidebar {
+        overflow: hidden;
+        display: grid;
+        background: var(--app-surface);
+        color: var(--app-text);
+
+        grid-template-areas:
+          'head'
+          'cuerpoContenidoSidar';
+        grid-template-rows: min-content auto;
+
+        > .head {
+          grid-area: head;
+          width: 100%;
+          border-bottom: 1px solid var(--app-drawer-divider) !important;
+          padding: 1rem 0.5rem;
+
+          > .tituloSidebar {
+            font-size: 1.4rem;
+            color: var(--app-text);
+            padding: 0;
+            font-weight: 500;
+          }
+        }
+
+        > .cuerpoContenidoSidar {
+          grid-area: cuerpoContenidoSidar;
+          background: var(--app-surface);
+          color: var(--app-text);
+
+          overflow: hidden;
+          > .no_fact {
+            font-weight: 400;
+            color: var(--app-text);
+          }
+
+          .factura_guardada .info_fact {
+            background: var(--app-surface-soft);
+            border-color: var(--app-border);
+            box-shadow: var(--app-shadow);
+            color: var(--app-text);
+
+            &.activa {
+              background: var(--transparente05) !important;
+              border-color: var(--primary07) !important;
+              box-shadow: 0 0 5.4px var(--primary07) !important;
+
+              &:hover {
+                background: var(--transparente04) !important;
+              }
+            }
+
+            .tipoFactura,
+            .iconFacturaGuardada,
+            .btn_borrar_factura_gurdada {
+              color: var(--app-text);
+            }
+          }
+        }
+      }
+    }
+
+    .p-drawer-header {
+      display: none;
+    }
+
+    &.side_open {
+      .p-drawer-content {
+        > .btn_side_bar_facturas {
+          transform: translate(-1rem, 49vh);
+          > #triangualo {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+}
+
+.p-drawer-mask {
+  &.p-overlay-mask {
+    z-index: 997 !important;
+  }
+}

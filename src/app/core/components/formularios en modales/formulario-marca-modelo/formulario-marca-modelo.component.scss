@@ -1,0 +1,128 @@
+.marca-modelo-modal {
+  color: var(--app-text);
+}
+
+.marca-modelo-modal p-tabs,
+.marca-modelo-modal p-tabpanels,
+.marca-modelo-modal p-tabpanel {
+  height: 100%;
+  min-height: 0;
+}
+
+.marca-modelo-grid {
+  --bs-gutter-x: 1.25rem;
+  --bs-gutter-y: 1.25rem;
+  align-items: stretch;
+}
+
+.marca-modelo-form-col,
+.marca-modelo-list-col {
+  display: grid;
+  grid-template-rows: 1.85rem minmax(0, 1fr);
+  min-height: 0;
+  padding: 0 !important;
+}
+
+.marca-modelo-form-col {
+  padding-right: 0.625rem !important;
+}
+
+.marca-modelo-list-col {
+  padding-left: 0.625rem !important;
+}
+
+.marca-modelo-section-title {
+  align-items: end;
+  color: var(--app-text);
+  display: flex;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.15;
+  padding: 0 0.35rem 0.2rem;
+}
+
+.marca-modelo-form-card {
+  background: var(--app-surface) !important;
+  border: 1px solid var(--app-card-border) !important;
+  border-left: 0.35rem solid var(--primary06) !important;
+  border-radius: 1rem !important;
+  box-shadow: var(--app-overlay-shadow) !important;
+  height: min-content;
+  padding: 1.15rem !important;
+}
+
+.marca-modelo-form-card .control-label {
+  color: var(--app-text);
+  font-weight: 600 !important;
+  margin-bottom: 0.38rem !important;
+}
+
+.marca-modelo-form-card .btn {
+  border-radius: 0.55rem !important;
+  box-shadow: 0 0.35rem 0.7rem #00000021 !important;
+  font-weight: 600;
+  min-height: 2.45rem;
+  padding-inline: 0.95rem;
+}
+
+.marca-modelo-list-panel {
+  background: var(--app-surface) !important;
+  border: 1px solid var(--app-card-border) !important;
+  border-radius: 0.95rem !important;
+  box-shadow: var(--app-overlay-shadow) !important;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0.85rem;
+}
+
+.marca-modelo-table-shell {
+  height: 100%;
+  min-height: 0;
+}
+
+:host ::ng-deep .marca-modelo-table-shell .dinamicTable {
+  background: var(--app-surface) !important;
+  display: grid !important;
+  gap: 0.85rem;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .marca-modelo-table-shell .searchDiv {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+:host ::ng-deep .marca-modelo-table-shell .search-label {
+  color: var(--app-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0.5rem 0 0 !important;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .marca-modelo-table-shell .search-input {
+  background: var(--app-surface) !important;
+  border-radius: 0.45rem !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep .marca-modelo-table-shell .divTable {
+  border: 1px solid var(--app-table-border);
+  border-radius: 0.75rem;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+:host ::ng-deep .marca-modelo-table-shell .thead.colorTitulo,
+:host ::ng-deep .marca-modelo-table-shell .thead.colorTitulo > tr > .thHead,
+:host ::ng-deep .marca-modelo-table-shell .thead.colorTitulo > tr > .thHead:first-child {
+  background: var(--app-table-header-bg) !important;
+  color: var(--app-table-header-text) !important;
+}
+
+:host ::ng-deep .marca-modelo-table-shell .thead .thHead {
+  border-bottom: 1px solid var(--app-table-border) !important;
+  font-weight: 700;
+}

@@ -1,0 +1,46 @@
+.canceladaContent {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+
+  .canceladaInfo {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 4rem;
+
+    .canceladaTitle {
+      height: 0;
+      font-size: 5.5rem;
+      color: red;
+      z-index: 9999;
+      font-weight: 510;
+      transform: rotate(15deg);
+      text-shadow: 2px 2px 12px #585858eb;
+    }
+
+    .canceladaDescription {
+      height: 0;
+      font-size: 2.3rem;
+      color: #a80202;
+      z-index: 9999;
+      font-weight: 510;
+      transform: rotate(15deg) translateY(110px);
+      text-shadow: 2px 2px 5px #585858eb;
+      white-space: nowrap;
+    }
+  }
+}
+
+::ng-deep {
+  ngx-extended-pdf-viewer .zoom {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+  }
+}

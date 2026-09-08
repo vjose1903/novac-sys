@@ -1,29 +1,33 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { UntypedFormGroup, FormArray, UntypedFormBuilder, Validators } from '@angular/forms';
-import * as _ from 'lodash';
-import { GLOBAL } from '../../../core/typescript/GLOBAL';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { customValidators } from '../../../core/typescript/custom-validators';
+import { Component, OnInit, OnDestroy, inject, resource, computed, signal } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { customValidators } from '@core/typescript/custom-validators';
 import { ClienteC } from './cliente';
-import { EmpleadoC } from '../registro-empleados/empleado';
-import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
+import { EmpleadoCatalogService } from '../registro-empleados/services/empleado-catalog.service';
+import { ProvinciaC } from '../../../core/typescript/classes/provincia.model';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
 import { Permisos } from '../../../core/typescript/permisos';
-
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
+import { DgiiConsultarPersonaService } from '@core/services/dgii-consultar-persona.service';
 @Component({
   selector: 'app-registro-clientes',
   templateUrl: './registro-clientes.component.html',
   styleUrls: ['./registro-clientes.component.scss'],
+  standalone: false,
 })
 export class RegistroClientesComponent extends MixinClass implements OnInit, OnDestroy {
   boton = '';
   form: UntypedFormGroup;
 
-  listaClientes = [];
+  listaClientes: any;
   FORM: any;
   isCreando: boolean = false;
   doc_is_cedula = true;
+  consultandoDocumento = signal(false);
 
   PhotoData: any;
   doc_principal = 'cedula';
@@ -36,28 +40,59 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   myValidators = new customValidators();
   clienteSelected;
   clienteClass = new ClienteC();
-  empleadosClass = new EmpleadoC();
+  provinciaClass = new ProvinciaC();
+  clienteSortFields = ['nombre', 'apellido'];
+  fun = fun;
   permissions = Permisos;
   formPermissions = [Permisos.cliente.create, Permisos.cliente.update];
 
   table_config: table_config = {
     info: [
-      { titulo: 'Nombre', tipo: 'text', key: 'nombre' },
-      { titulo: 'Apellido', tipo: 'text', key: 'apellido' },
+      { titulo: 'Nombre', tipo: 'text', key: 'nombre', sort: { key: 'nombre', order: null } },
+      { titulo: 'Apellido', tipo: 'text', key: 'apellido', sort: { key: 'apellido', order: null } },
       { titulo: 'Telefono', tipo: 'text', key: 'telefono' },
       { titulo: 'Doc. identidad', tipo: 'text', key: 'documento_identidad' },
     ],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_clientes',
-    padre_functions: { data_request: (params) => this.getClientes(params) },
+    padre_functions: { data_request: params => this.getClientes(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.cliente.update }, borrar: { show: true, permiso: this.permissions.cliente.destroy } },
   };
   tablaComponent;
 
-  constructor(private fb: UntypedFormBuilder, private tServ: TablasService) {
+  provincia_id = signal<number | null>(null);
+  documento_identidad = signal<string | null>(null);
+  private documentoEnConsulta: string | null = null;
+  private ultimaConsultaDocumento: string | null = null;
+  private ultimaConsultaAt = 0;
+
+  readonly provincias = resource({
+    loader: () => {
+      return this.provinciaClass.getAllProvincias();
+    },
+  });
+
+  readonly municipios = computed(() => {
+    if (this.provincias.value() == undefined || fun.isEmpty(this.provincia_id())) return [];
+
+    const municipios = this.provincias.value().find(prov => {
+      return prov.id == this.provincia_id();
+    }).municipios;
+
+    return municipios;
+  });
+
+  public htmlServ = inject(HtmlElementsService);
+  public dynamicModalServ = inject(DynamicModalService);
+  private dgiiConsultarPersonaServ = inject(DgiiConsultarPersonaService);
+  private empleadoCatalogServ = inject(EmpleadoCatalogService);
+  private fb = inject(UntypedFormBuilder);
+  private tServ = inject(TablasService);
+
+  constructor() {
     super();
   }
 
@@ -65,33 +100,53 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this._init_mixin({ component: 'reg_cliente', is_routing: true });
     this.boton = 'Guardar';
 
-    this.createForm();
+    this.createForm().then(() => {
+      this.watchChanges();
+    });
 
     this.necesarioStart();
   }
 
   createForm() {
-    this.form = this.fb.group({
-      id: [null],
-      rnc: [{ value: null, disabled: false }],
-      cedula: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.cedulaValidator(), this.myValidators.ValidateRayaAbajo()])],
+    return new Promise<void>(resolve => {
+      this.form = this.fb.group({
+        id: [null],
+        rnc: [{ value: null, disabled: false }],
+        cedula: [{ value: null, disabled: false }, Validators.compose([Validators.required, this.myValidators.cedulaValidator(), this.myValidators.ValidateRayaAbajo()])],
 
-      nombre: [{ value: null, disabled: true }, Validators.required],
-      apellido: [{ value: null, disabled: true }, Validators.required],
-      direccion: [{ value: null, disabled: true }, Validators.required],
-      sexo: [{ value: null, disabled: true }, Validators.required],
-      telefono: [{ value: null, disabled: true }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
-      limite_credito: [{ value: null, disabled: true }, Validators.required],
-      maximo_credito: [{ value: null, disabled: true }, Validators.required],
-      vendedor_id: [{ value: null, disabled: true }, Validators.required],
+        nombre: [{ value: null, disabled: true }, Validators.required],
+        apellido: [{ value: null, disabled: true }, Validators.required],
+        direccion: [{ value: null, disabled: true }, Validators.required],
+        sexo: [{ value: null, disabled: true }, Validators.required],
+        telefono: [{ value: null, disabled: true }, Validators.compose([Validators.required, this.myValidators.ValidateRayaAbajo()])],
+        limite_credito: [{ value: 30, disabled: true }, Validators.required],
+        maximo_credito: [{ value: null, disabled: true }, Validators.required],
+        vendedor_id: [{ value: null, disabled: true }, Validators.required],
+        provincia_id: [{ value: null, disabled: true }],
+        municipio_id: [{ value: null, disabled: true }, Validators.required],
+      });
+
+      // this.form.valueChanges.subscribe(val => {
+      //   p(' ');
+      //   console.log('val ', val);
+      //   console.log('this.form ', this.form);
+      // });
+
+      resolve();
     });
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
+  watchChanges() {
+    this.form.controls.provincia_id.valueChanges.subscribe(prov => {
+      this.provincia_id.set(prov);
+
+      const func = fun.hasValue(prov) ? 'enable' : 'disable';
+      this.form.controls.municipio_id[func]();
+    });
+
+    this.form.valueChanges.subscribe(val => {
+      this.documento_identidad.set(val.cedula || val.rnc);
+    });
   }
 
   ngOnDestroy() {
@@ -105,7 +160,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   capitalice(control, arg) {
     const campo = this.form.get(control);
-    campo.setValue(fun.Capitalice(arg));
+    campo.setValue(fun.capitalice(arg));
   }
 
   marcarCheck(arg) {
@@ -116,27 +171,48 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
     this.setDocumentoPrincipal(arg);
   }
 
-  getVendedores() {
-    const extra = { parameters: { id: true, filter_key: 'role', filter_value: 'vendedor' } };
-    this.empleadosClass.getAll(extra).then((res) => (this.vendedores = res['data']));
+  async getVendedores() {
+    this.vendedores = await this.empleadoCatalogServ.getVendedores({ force: true });
+    if (this.vendedores.length) this.form.controls.vendedor_id.setValue(this.vendedores[0].id);
   }
 
   async getClientes(params?: { per_page?: number; page?: number; search?: string }) {
     const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const sort = this.getClientesSortParams();
 
-    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true } };
-    this.listaClientes.length = 0;
-    this.clienteClass.getAll(extra).then((res) => {
-      res['data'].map((cliente) => {
-        const doc = _.find(cliente.documentos_de_identidad, { principal: true });
+    const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, ...sort } };
+
+    this.clienteClass.getAll(extra).then(res => {
+      res['data'].map(cliente => {
+        const doc = cliente.documentos_de_identidad.find(doc => doc.principal);
         cliente.documento_identidad = fun.hasValue(doc) ? doc.documento : '----------';
         return cliente;
       });
 
       this.listaClientes = res['data'];
 
-      this.tablaComponent.changeTableConfig([{ total_count: res.total_registros }]);
+      this.table_config.total_count = res.total_registros;
+      this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     });
+  }
+
+  getClientesSortParams() {
+    const sort = this.tServ.parseSort(this.table_config);
+    if (!fun.hasValue(sort.order_by)) return {};
+
+    const orderBy = sort.order_by
+      .split(',')
+      .map(item => {
+        const [campo, direccion = 'asc'] = item.split(':');
+        if (!this.clienteSortFields.includes(campo)) return null;
+        return `${campo}:${direccion == 'desc' ? 'desc' : 'asc'}`;
+      })
+      .filter(item => fun.hasValue(item));
+
+    if (orderBy.length == 1 && orderBy[0].startsWith('nombre:')) orderBy.push('apellido:asc');
+    if (orderBy.length == 1 && orderBy[0].startsWith('apellido:')) orderBy.push('nombre:asc');
+
+    return orderBy.length ? { order_by: orderBy.join(',') } : {};
   }
 
   getPhotoData(img) {
@@ -149,14 +225,14 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   editarItem(data) {
-    this.documentos_de_identidad = data.documentos_de_identidad;
+    this.documentos_de_identidad = data.documentos_de_identidad ?? [];
 
     this.form.patchValue(data);
 
     this.patchDocumentos(data.documentos_de_identidad);
 
     this.form.controls.maximo_credito.setValue(fun.roundNumberToDecimal(data.maximo_credito));
-    this.clienteSelected = fun.duplicarJson(data);
+    this.clienteSelected = fun.deepCloning(data);
 
     this.boton = 'Editar';
     this.editando = true;
@@ -164,96 +240,127 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   }
 
   eliminarReg(regisData) {
-    const objToSend = {
-      data: regisData,
-      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
-      siFunction: () => {
-        const actualPagination = this.tServ.getPaginationById('lista_clientes');
-        this.clienteClass.deleteOne(regisData.id).then((res) => this.getClientes(actualPagination));
-      },
+    const onYes = () => {
+      const actualPagination = this.tServ.getPaginationById('lista_clientes');
+      this.clienteClass.deleteOne(regisData.id).then(res => this.getClientes(actualPagination));
     };
 
-    this.eliminarRegistro(objToSend);
+    this.dynamicModalServ.confirmationModal({
+      id: 'cancelar_ingreso',
+      texto: `¿Está seguro que desea eliminar el/la cliente <b>${regisData.nombre_completo}</b>?`,
+      btnKind: confirmationButtons.cancelarEliminar,
+      onYes: onYes.bind(this),
+    });
   }
 
   patchDocumentos(documentos) {
     if (documentos.length) {
-      documentos.forEach((doc) => {
+      documentos.forEach(doc => {
         if (doc.descripcion === 'rnc') this.form.controls.rnc.setValue(doc.documento);
         else this.form.controls.cedula.setValue(doc.documento);
       });
 
-      const doc_principal = _.find(documentos, (doc) => doc.principal);
+      const doc_principal = documentos.find(doc => doc.principal);
 
-      setTimeout(() => this.marcarCheck(doc_principal['descripcion']), 1);
+      fun.setTimeout(() => {
+        this.marcarCheck(doc_principal.descripcion);
+      }, 1);
     }
   }
 
   changeStateCampos(enable = false) {
-    const actual_state = this.form.controls.nombre.status;
-
-    ['nombre', 'apellido', 'direccion', 'sexo', 'telefono', 'limite_credito', 'maximo_credito', 'vendedor_id'].forEach((campo) => {
+    ['nombre', 'apellido', 'direccion', 'sexo', 'telefono', 'limite_credito', 'maximo_credito', 'vendedor_id', 'provincia_id', 'municipio_id'].forEach(campo => {
       enable ? this.form.controls[campo].enable() : this.form.controls[campo].disable();
       if (!enable && fun.hasValue(this.form.controls[campo])) this.form.controls[campo].reset();
 
       this.camposDisabled = !enable;
     });
+
+    const func = fun.hasValue(this.form.controls.provincia_id.value) ? 'enable' : 'disable';
+    this.form.controls.municipio_id[func]();
   }
 
   async checkDocumento(tipo, e?) {
     if (e.key != 'Enter') {
-      const documento = this.form.controls[tipo].value;
+      const documento = this.form.controls[tipo].value ?? '';
+      const documentoNormalizado = documento.replace(/\s+/g, '');
+      const ahora = Date.now();
+
+      if (this.documentoEnConsulta === documentoNormalizado) return;
+      if (this.ultimaConsultaDocumento === documentoNormalizado && ahora - this.ultimaConsultaAt < 1000) return;
 
       let enable_campos = false;
 
       if (this.form.controls[tipo].valid) {
-        if (this.editando && this.documentos_de_identidad.some((doc) => doc.documento === documento)) {
+        if (this.editando && this.documentos_de_identidad.some(doc => doc.documento === documento)) {
           enable_campos = true;
           return;
         }
 
-        await fun
-          .getPersonaByDocIdentidad({ documento: this.form.controls[tipo].value, tipo: tipo })
-          .then((res) => {
+        this.documentoEnConsulta = documentoNormalizado;
+        this.ultimaConsultaDocumento = documentoNormalizado;
+        this.ultimaConsultaAt = ahora;
+
+        this.consultandoDocumento.set(true);
+
+        try {
+          await fun
+            .getPersonaByDocIdentidad({ documento: documento, tipo: tipo })
+            .then(async (res: any) => {
             if (res['data'].length) {
-              const is_cliente = _.find(res['data'], (item) => item.persona_is === 'Cliente');
+              const is_cliente = res.data.find(item => item.persona_is.toLowerCase() == 'cliente');
               const id_anterior = this.form.getRawValue().id;
 
               if (fun.hasValue(is_cliente) && is_cliente?.persona?.estado) {
-                fun.toastError(`${_.capitalize(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
+                fun.toastError(`${fun.capitalice(tipo)} pertenece a un cliente ya existente. << ${is_cliente.persona.nombre} ${is_cliente.persona.apellido} >>`, 'ERROR');
                 if (!this.editando) enable_campos = false;
                 return;
               }
 
-              const persona = fun.hasValue(is_cliente) ? is_cliente?.persona : _.head(res['data']).persona;
+              const persona = fun.hasValue(is_cliente) ? is_cliente?.persona : res['data'][0].persona;
               persona.id = id_anterior;
 
-              const documento_persona = _.find(persona.documentos_de_identidad, (item) => item.principal);
+              const documento_persona = persona.documentos_de_identidad.find(item => item.principal);
 
               if (fun.hasValue(documento_persona)) {
                 this.doc_is_cedula = documento_persona.descripcion == 'cedula' ? true : false;
                 this.form.controls[documento_persona.descripcion].setValue(documento_persona.documento);
               }
 
-              this.form.patchValue(persona);
+              const default_values = this.getFormDefaultValues();
+              this.form.patchValue({ ...persona, ...default_values });
 
               this.patchDocumentos(persona.documentos_de_identidad);
 
               if (this.camposDisabled) enable_campos = true;
 
-              this.documentos_de_identidad = persona.documentos_de_identidad;
+              this.documentos_de_identidad = persona.documentos_de_identidad ?? [];
             } else {
+              const dgiiPersona = await this.dgiiConsultarPersonaServ.consultarPersona(documento);
+
+              if (dgiiPersona) {
+                this.form.controls.nombre.setValue(dgiiPersona.nombre);
+                this.form.controls.apellido.setValue(dgiiPersona.apellido);
+              } else {
+                this.form.controls.nombre.reset();
+                this.form.controls.apellido.reset();
+              }
+
               enable_campos = true;
             }
 
             if (enable_campos) this.changeStateCampos(true);
           })
-          .catch((err) => {
+            .catch(err => {
             console.error('err ', err);
-          });
+            });
+        } finally {
+            this.documentoEnConsulta = null;
+            this.consultandoDocumento.set(false);
+        }
       } else {
-        if (!this.editando && _.endsWith(documento, '_')) {
-          this.documentos_de_identidad = undefined;
+        if (!this.editando && documento?.endsWith('_')) {
+          this.documentos_de_identidad = [];
           // this.camposDisabled = true;
           this.changeStateCampos(false);
         }
@@ -266,15 +373,23 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
     if (campo != 'send') {
       if (campo == 'campoNombre') {
-        if (!_.endsWith(formulario[this.doc_principal], '_')) {
-          const docSinGuiones = _.join(_.split(formulario[this.doc_principal], '-'), '');
+        const documentoPrincipal = formulario[this.doc_principal] ?? '';
+
+        if (!documentoPrincipal.endsWith('_')) {
+          const docSinGuiones = documentoPrincipal.split('-').join('');
           if (this.doc_principal == 'cedula') {
             if (fun.ValidaCedula(docSinGuiones)) fun.enfocarInput(campo);
           } else fun.enfocarInput(campo);
         }
+      } else if (campo == 'municipio_select') {
+        if (fun.hasValue(formulario.provincia_id)) fun.enfocarInput(campo);
       } else fun.enfocarInput(campo);
+    } else if (campo == 'campoDir') {
+      if (fun.hasValue(formulario.municipio_id)) fun.enfocarInput(campo);
     } else {
-      if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
+      if (!this.formIsInvalid()) {
+        fun.setTimeout(() => this.submit(), 250);
+      }
     }
   }
 
@@ -292,7 +407,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
 
   revisarPrecio(id) {
     const input = this.form.controls[id];
-    fun.revisarNumber(input, id).then((res) => {
+    fun.revisarNumber(input, id).then(res => {
       if (!res.error) input.setValue(res.number);
     });
   }
@@ -307,25 +422,24 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       { documento: formulario.rnc, descripcion: 'rnc' },
     ];
 
-    documentos_identidad.map((element) => {
-      const doc_backend = _.find(this.documentos_de_identidad, (doc) => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
+    const documentos_registrados = this.documentos_de_identidad ?? [];
+    documentos_identidad.map(element => {
+      const doc_backend = documentos_registrados.find(doc => doc.descripcion.toLowerCase() == element.descripcion.toLowerCase());
 
       element['id'] = doc_backend ? doc_backend.id : null;
       element['principal'] = element.descripcion === this.doc_principal ? true : false;
       return element;
     });
 
-    formulario.documentos_de_identidad = _.filter(documentos_identidad, (doc) => fun.hasValue(doc.documento));
+    formulario.documentos_de_identidad = documentos_identidad.filter(doc => fun.hasValue(doc.documento));
 
     if (!this.form.controls[this.doc_principal].value) {
       fun.toastError('Debe de ingresar el documento marcado como principal', 'ERROR');
-
-      // paso todas las validaciones
     } else {
+      // paso todas las validaciones
       formulario.documentos_de_identidad = documentos_identidad;
 
       if (this.PhotoData !== undefined) {
-        formulario.imagen_attributes = null;
         formulario.imagen_attributes = this.PhotoData;
       }
 
@@ -334,7 +448,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
       formulario['balance'] = 0;
       formulario.maximo_credito = fun.desformatearStNumber(formulario.maximo_credito);
 
-      this.clienteClass.createUpdateOne(formulario).then((res) => {
+      this.clienteClass.createUpdateOne(formulario).then(res => {
         const actualPagination = this.tServ.getPaginationById('lista_clientes');
         this.getClientes(actualPagination);
         this.borrar();
@@ -346,23 +460,32 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   nuevoRegistro() {
     this.isCreando = true;
 
-    setTimeout(() => {
+    fun.setTimeout(() => {
       this.marcarCheck('cedula');
       fun.enfocarInput('cedula');
     }, 200);
   }
 
+  getFormDefaultValues() {
+    return { limite_credito: 30, vendedor_id: this.vendedores[0].id };
+  }
+
   borrar() {
     if (fun.hasValue(this.form)) this.form.reset();
     this.doc_is_cedula = true;
-    this.documentos_de_identidad = undefined;
+    this.documentos_de_identidad = [];
     this.boton = 'Guardar';
     this.editando = false;
     this.changeStateCampos(false);
     this.clienteSelected = undefined;
     this.isCreando = true;
 
-    setTimeout(() => {
+    // valores por defecto formulario
+    const default_values = this.getFormDefaultValues();
+
+    this.form.patchValue(default_values);
+
+    fun.setTimeout(() => {
       fun.enfocarInput('cedula');
       this.marcarCheck('cedula');
     }, 2);
@@ -385,4 +508,7 @@ export class RegistroClientesComponent extends MixinClass implements OnInit, OnD
   setDocumentoPrincipal(doc) {
     this.doc_principal = doc;
   }
+}
+function Signal<T>(arg0: null) {
+  throw new Error('Function not implemented.');
 }

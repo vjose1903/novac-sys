@@ -1,8 +1,6 @@
-import { PdfService } from './../../../../core/services/pdf/pdf.service';
-import { fun } from '../../../../core/services/functions.service';
+import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import { Injectable } from '@angular/core';
 import { facturaPrueba } from './8.5x5.5/factura';
-import * as _ from 'lodash';
 
 const documentos = {
   '8.5x5.5': {
@@ -14,7 +12,5 @@ const documentos = {
 };
 
 export function printTestPdf(params: { paper_size: string; documento: string }): any {
-  console.log('params ', params);
-
-  PdfService.generatePdf({ oPdf: documentos[params.paper_size][params.documento], imprimir: true }).then(async (res) => {});
+  PdfService.generatePdf({ oPdf: documentos[params.paper_size][params.documento], imprimir: true }).catch(() => {});
 }

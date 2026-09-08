@@ -1,18 +1,19 @@
 import { NgModule } from '@angular/core';
-import { SidebarModule } from 'primeng/sidebar';
+import { DrawerModule } from 'primeng/drawer';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { InputMaskModule } from 'primeng/inputmask';
 import { TagModule } from 'primeng/tag';
-import { TabViewModule } from 'primeng/tabview';
+import { TabsModule } from 'primeng/tabs';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { CalendarModule } from 'primeng/calendar';
+import { PopoverModule } from 'primeng/popover';
+import { DatePickerModule } from 'primeng/datepicker';
+import { AccordionModule } from 'primeng/accordion';
 
-const modulos = [DialogModule, ProgressBarModule, SidebarModule, TooltipModule, DropdownModule, InputMaskModule, TagModule, TabViewModule, MultiSelectModule, OverlayPanelModule, CalendarModule];
+const modulos = [DialogModule, ProgressBarModule, DrawerModule, TooltipModule, SelectModule, InputMaskModule, TagModule, TabsModule, MultiSelectModule, PopoverModule, DatePickerModule, AccordionModule];
 
 @NgModule({
   declarations: [],

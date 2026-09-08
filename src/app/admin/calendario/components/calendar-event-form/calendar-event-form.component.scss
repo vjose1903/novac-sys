@@ -1,0 +1,151 @@
+.event-form {
+  max-height: calc(100vh - 230px);
+  min-height: 0;
+  overflow: auto;
+  background: var(--app-surface);
+  color: var(--app-text);
+  padding: 14px 14px 24px;
+}
+
+.event-form textarea.form-control {
+  resize: vertical;
+  min-height: 88px;
+}
+
+:host ::ng-deep {
+  .event-type-select,
+  .event-type-select .p-select {
+    width: 100%;
+  }
+
+  .event-type-select .p-select {
+    height: 2rem !important;
+    min-height: 2rem !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+  }
+
+  .event-type-select .p-select:not(.p-disabled).p-focus {
+    border-color: var(--app-input-hover-border) !important;
+    box-shadow: none;
+  }
+
+  .event-type-select .p-select-label,
+  .event-type-select .p-select-dropdown {
+    display: flex;
+    align-items: center;
+    color: var(--app-text);
+  }
+
+  .event-type-select .p-select-label {
+    height: 100%;
+    padding: 0.2rem 0.45rem !important;
+    line-height: 1;
+  }
+
+  .event-type-select .p-select-dropdown {
+    width: 2rem;
+  }
+
+  .calendar-compact-select.p-select {
+    height: 2.625rem !important;
+    min-height: 2.625rem !important;
+    padding: 0 !important;
+  }
+
+  .calendar-compact-select .p-select-label,
+  .calendar-compact-select .p-select-dropdown {
+    display: flex;
+    align-items: center;
+  }
+
+  .calendar-compact-select .p-select-label {
+    height: 100%;
+    padding: 0.2rem 0.75rem !important;
+  }
+}
+
+.event-type-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: var(--app-text);
+  font-weight: 700;
+}
+
+.event-type-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 999px;
+}
+
+.calendar-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.switch-label {
+  cursor: pointer;
+}
+
+.link-results {
+  display: grid;
+  gap: 6px;
+  max-width: 420px;
+
+  button {
+    border: 1px solid var(--app-border);
+    border-radius: 8px;
+    background: var(--app-surface);
+    color: var(--app-text);
+    padding: 8px 10px;
+    text-align: left;
+    display: grid;
+    gap: 2px;
+  }
+
+  small {
+    color: var(--app-text-muted);
+  }
+}
+
+.selected-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    background: var(--app-surface-muted);
+    color: var(--app-text);
+    padding: 5px 8px 5px 10px;
+    font-size: 12px;
+  }
+
+  button {
+    border: 0;
+    background: transparent;
+    color: var(--app-text-muted);
+  }
+}
+
+@media (max-width: 720px) {
+  .event-form {
+    .col-6,
+    .col-12 {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      width: 100%;
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+}

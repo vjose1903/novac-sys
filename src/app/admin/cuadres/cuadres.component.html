@@ -1,1 +1,215 @@
-<p>cuadres works!</p>
+<div class="row rowResgitro cuadres-page">
+  <div class="col-12 p-0 colTitulo">
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Operaciones</span>
+      <div class="screen-title-row">
+        <h4 class="negrita mb-0 me-3">Cuadres de caja</h4>
+        <btn-icon-circular
+          *ngxPermissionsOnly="permissions.cuadre_caja.configuracion_cuadre"
+          [id]="'btnConfiguracionCuadre'"
+          [icon_size]="'1rem'"
+          [icon]="'fas fa-cog'"
+          [size]="'size-md'"
+          [tooltip]="'Configuraciones de cuadres de caja'"
+          [tooltipPosition]="'right'"
+          (clickFunction)="openModalConfig()">
+        </btn-icon-circular>
+      </div>
+    </div>
+    @if (archivedCuadre()) {
+      <div class="cuadre-archive-tag">
+        <button type="button" class="cuadre-archive-tag-main" (click)="restoreArchivedCuadre()" [disabled]="archivedCuadreRestored()">
+          <i class="fas fa-box-archive"></i>
+          <span>{{ archivedCuadreRestored() ? 'Continuando cuadre archivado' : 'Hay un cuadre almacenado' }}</span>
+          <small>{{ formatArchivedAt(archivedCuadre()?.archivedAt) }}</small>
+        </button>
+        <button type="button" class="cuadre-archive-delete" (click)="confirmDeleteArchivedCuadre($event)" pTooltip="Borrar cuadre archivado" tooltipPosition="top">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="col-12 p-0 colFormularioListado">
+    <div class="d-flex h-100">
+      <ng-container *ngxPermissionsOnly="formPermissions">
+        <div class="form {{ isCreando() ? 'showForm' : 'hideForm' }} cuadres-form" appEnterNavegacion>
+          <div class="tituloFormClass">
+            <h4 class="mb-0">Cuadre de caja</h4>
+          </div>
+
+          <div class="card cardFormClass cuadre-card">
+            <div class="cuadre-card-scroll">
+              <div class="steps">
+                <span [class.active]="step() >= 1">1. Fecha</span>
+                <span [class.active]="step() >= 2">2. Captura</span>
+                <span [class.active]="step() >= 4">3. Resumen</span>
+              </div>
+
+              <section class="cuadre-section date-section">
+                <div>
+                  <label class="control-label">Fecha de cierre</label>
+                  <p-datepicker inputId="closingDate" [ngModel]="closingDateValue()" (ngModelChange)="setClosingDate($event)" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa" inputStyleClass="form-control"></p-datepicker>
+                </div>
+                <button type="button" class="btn btn-tema" (click)="prepare()" [disabled]="!closingDate() || prepareResource.isLoading()">Consultar</button>
+              </section>
+
+              @if (step() >= 3) {
+                @if (selectedIsNewFlow()) {
+                  <section class="system-preview">
+                    <div>
+                      <span>Fondo día anterior</span>
+                      <strong>{{ formatAmount(totals()?.opening_cash_fund || '0.00') }}</strong>
+                    </div>
+                    <div>
+                      <span>Facturas consumidor final</span>
+                      <strong>{{ formatAmount(systemIncome().final_consumer_invoices_total) }}</strong>
+                    </div>
+                    <div>
+                      <span>Recibo de ingresos</span>
+                      <strong>{{ formatAmount(systemIncome().income_receipts_total) }}</strong>
+                    </div>
+                    <div>
+                      <span>Total sistema</span>
+                      <strong>{{ formatAmount(totals()?.expected_total || '0.00') }}</strong>
+                    </div>
+                    @for (method of systemPaymentMethods(); track method.label) {
+                      <div>
+                        <span>{{ method.label }}</span>
+                        <strong>{{ method.value }}</strong>
+                      </div>
+                    }
+                  </section>
+
+                  <div class="cuadre-form-grid">
+                    <app-cuadre-denomination-input title="Billetes" type="bill" [items]="bills()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setBills($event)" />
+                    <app-cuadre-denomination-input title="Monedas" type="coin" [items]="coins()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setCoins($event)" />
+                    <app-cuadre-denomination-input class="foreign-currency" title="Divisas" type="foreign_currency" [items]="foreignCurrency()" [divisas]="foreignDivisaOptions()" [readonly]="readOnly()" (itemsChange)="setForeignCurrency($event)" />
+                    <app-cuadre-movements-editor title="Tarjetas, cheques, depósitos y transferencias" group="other_payment_methods" [items]="otherPaymentMethods()" [readonly]="readOnly()" (itemsChange)="setOtherPaymentMethods($event)" />
+                    <app-cuadre-movements-editor title="Transferencias adicionales" group="additional_transfers" [items]="additionalTransfers()" [readonly]="readOnly()" (itemsChange)="setAdditionalTransfers($event)" />
+                  </div>
+
+                  <div class="notes-grid">
+                    <div class="form-group notes-observations">
+                      <label class="control-label">
+                        Observaciones
+                        <i class="fas fa-info-circle field-info" pTooltip="Comentario opcional para documentar cualquier detalle del cuadre." tooltipPosition="top"></i>
+                      </label>
+                      <textarea class="form-control" rows="3" [value]="notes()" [readonly]="readOnly()" (input)="setNotes($any($event.target).value)"></textarea>
+                    </div>
+                    <div class="form-group">
+                      <div class="mb-1">
+                        <label class="control-label">
+                          Tolerancia
+                          <i class="fas fa-info-circle field-info" pTooltip="Margen permitido para considerar el cuadre balanceado cuando exista una diferencia mínima." tooltipPosition="top"></i>
+                        </label>
+                      </div>
+                      <input
+                        class="form-control text-end"
+                        appNumeroFormato
+                        [value]="reconciliationTolerance()"
+                        [readonly]="readOnly()"
+                        (input)="setReconciliationTolerance($any($event.target).value)"
+                        (appNumeroFormatoBlur)="setReconciliationTolerance($event)" />
+                    </div>
+                    <div class="form-group">
+                      <div class="d-flex align-items-center justify-content-between mb-1">
+                        <label class="control-label mb-0">
+                          Fondo próximo día
+                          <i class="fas fa-info-circle field-info" pTooltip="Monto de efectivo que se dejará como fondo inicial para el próximo cuadre. No se suma como ingreso." tooltipPosition="top"></i>
+                        </label>
+
+                        @if (!readOnly() && !autoApplyDifference() && differenceAmount() !== '0.00') {
+                          <button type="button" class="btn btn-sm btn-text" (click)="applyDifferenceToFondo()">Aplicar diferencia</button>
+                        }
+                      </div>
+                      <input class="form-control text-end" appNumeroFormato [value]="nextDayCashFund()" [readonly]="readOnly()" (input)="setNextDayCashFund($any($event.target).value || '0.00')" (appNumeroFormatoBlur)="setNextDayCashFund($event)" />
+                    </div>
+                  </div>
+
+                  <app-cuadre-summary
+                      [systemIncomeTotal]="systemIncome().system_income_total"
+                      [operationalTotal]="operationalTotal()"
+                      [physicalCashTotal]="physicalCashTotal()"
+                      [otherPaymentMethodsTotal]="otherPaymentMethodsTotal()"
+                      [additionalTransfersTotal]="additionalTransfersTotal()"
+                      [expectedTotal]="expectedTotal()"
+                      [creditInvoicesTotal]="creditInvoicesTotal()"
+                      [backendTotals]="summaryTotals()"
+                      [openingCashFund]="openingCashFund()" />
+                } @else {
+                  <section class="legacy-summary">
+                    <div class="legacy-summary-header">
+                      <i class="fas fa-history"></i>
+                      <span>Realizado con el modelo antiguo</span>
+                    </div>
+                    <div class="legacy-summary-grid">
+                      @for (row of legacySummaryRows(); track row.label) {
+                        <div>
+                          <span>{{ row.label }}</span>
+                          <strong>{{ formatAmount(row.value) }}</strong>
+                        </div>
+                      }
+                    </div>
+                  </section>
+                }
+              }
+            </div>
+
+            <div class="form-footer-actions">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm me-2" id="btn-blanco" (click)="clearForm()" style="max-width: 6rem">Borrar</button>
+
+                @if (step() >= 3 && !existsCuadre() && !readOnly()) {
+                  <button type="button" class="btn btn-sm btn-tema" (click)="saveCuadre()" [disabled]="saveResource.isLoading()">Guardar</button>
+                }
+
+                @if (canArchiveCurrentForm()) {
+                  <button type="button" class="btn btn-sm btn-secondary" (click)="confirmArchiveCuadre()">Archivar</button>
+                }
+
+                @if (step() >= 3 && existsCuadre()) {
+                  <button type="button" class="btn btn-sm btn-warning text-dark" (click)="printCuadre()">{{ savedInCurrentForm() ? 'Imprimir' : 'Reimprimir' }}</button>
+                }
+
+                @if (step() >= 3 && existsCuadre() && selectedIsNewFlow()) {
+                  <button type="button" class="btn btn-sm btn-gris" (click)="openDetailsModal()">Detalles</button>
+                }
+
+                @if (step() >= 3 && existsCuadre()) {
+                  <div class="state-actions">
+                    @if (canSubmit()) {
+                      <button type="button" class="btn btn-sm btn-light" (click)="runStateAction('submit')">Enviar</button>
+                    }
+                    @if (canApproveReject()) {
+                      <button type="button" class="btn btn-sm btn-success" (click)="runStateAction('approve')">Aprobar</button>
+                      <button type="button" class="btn btn-sm btn-danger" (click)="runStateAction('reject')">Rechazar</button>
+                    }
+                    @if (canReopen()) {
+                      <button type="button" class="btn btn-sm btn-primary" (click)="runStateAction('reopen')">Reabrir</button>
+                    }
+                  </div>
+                }
+              </div>
+              <div>
+                <button type="button" class="btn btn-sm ms-2" id="btn-blanco" (click)="closeForm()" style="max-width: 6rem">Cerrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="list {{ isCreando() ? 'FormList' : 'onlyList' }}">
+        <div class="tituloCardClass d-flex justify-content-between align-items-center mb-2">
+          <h4 class="mb-0">Listado cuadres</h4>
+          <button *ngxPermissionsOnly="permissions.cuadre_caja.create" [disabled]="isCreando()" (click)="nuevoRegistro()" class="btn btn-tema">Nuevo</button>
+        </div>
+        <div #cardTabla id="cardTabla" class="card cardContentClass">
+          <div class="divTabla">
+            <dinamic-table [cardTabla]="cardTabla" [data]="listaCuadres()" [seleccionado]="selectedCuadre()?.id" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

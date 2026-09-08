@@ -3,7 +3,8 @@
 .logoLoading {
   height: 14rem;
   position: absolute;
-  z-index: 99999;
+  z-index: 9999999;
+  
 }
 
 .gris {
@@ -17,8 +18,6 @@
   color: w;
   margin: 21rem -1rem 0rem 0rem;
 }
-
-$font: "Poppins", sans-serif;
 
 ::selection {
   background-color: #c3cfe2;
@@ -50,4 +49,37 @@ body {
   font-size: 2.5rem;
   text-shadow: 5px 4px 6px black;
   text-transform: uppercase;
+}
+
+:host ::ng-deep .update-download-progress {
+  height: 0.7rem;
+  border-radius: 999px;
+  overflow: hidden;
+
+  .p-progressbar-value {
+    transition: width 150ms linear;
+  }
+}
+
+:host ::ng-deep .update-download-dialog .p-dialog-content {
+  padding-top: 1rem !important;
+}
+
+:host ::ng-deep .update-download-percent {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 4.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  justify-content: center;
+  width: 4.25rem;
+}
+
+.update-download-note {
+  border-left: 0.25rem solid var(--bs-danger);
+  padding: 0.5rem 0.75rem;
+}
+
+:host ::ng-deep .update-download-progress-value {
+  background: #0d6efd !important;
 }

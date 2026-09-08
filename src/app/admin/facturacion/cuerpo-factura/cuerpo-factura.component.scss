@@ -2,14 +2,15 @@
   display: grid;
   height: 100%;
   grid-template-areas:
-    "titulos-fact"
-    "contenido-fact";
+    'titulos-fact'
+    'contenido-fact';
 
   grid-template-rows: min-content auto;
 
   .titulos-fact {
     grid-area: titulos-fact;
   }
+
   .contenido-fact {
     grid-area: contenido-fact;
     display: flex;
@@ -17,121 +18,62 @@
     height: 100%;
     overflow: auto;
     overflow-x: hidden;
-  }
-}
 
-.filaFact {
-  padding: 0rem 0.9rem;
-  width: 100vw;
-}
+    .table-cuerpo-factura {
+      .precio-div {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        align-items: center;
 
-::ng-deep .p-dropdown-option {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  align-items: center;
-  display: flex;
-  padding-left: 0.5rem;
-}
+        .iconArrow {
+          position: absolute;
+          margin: 0.4rem;
+        }
 
-// ====================================================
-// TAMAÑO DE LOS TITULOS
-// ====================================================
+        .form-control {
+          box-shadow: none !important;
+        }
+      }
 
-.tiCOD {
-  width: 9%;
-}
-.tiCAN {
-  width: 8%;
-}
-.tiUNI {
-  width: 10%;
-  overflow: hidden;
-  text-align: left;
-}
-
-.tiDESC {
-  width: 8%;
-}
-
-.tiPRE {
-  width: 12%;
-}
-
-.tiITBIS {
-  width: 9%;
-}
-
-.tiTOT {
-  width: 13%;
-}
-
-.inDES,
-.inPRE,
-.inTOT {
-  &:hover {
-    cursor: default;
-  }
-}
-
-.inDES:active,
-.inPRE:active,
-.inITBIS.active,
-.inTOT.active,
-.inDES:focus,
-.inPRE:focus,
-.inITBIS:focus,
-.inTOT:focus {
-  outline: 0px;
-  border-color: #d4d4d4 !important;
-  box-shadow: 1px 1px #d4d4d4 !important;
-}
-
-.conFlow {
-  overflow: auto !important;
-}
-
-.sinFLow {
-  overflow: hidden !important;
-}
-
-.precio-div {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  align-items: center;
-
-  .iconArrow {
-    position: absolute;
-    margin: 0.4rem;
-    color: #0000004a;
-  }
-
-  .form-control {
-    box-shadow: none !important;
-  }
-}
-
-.btnConfig {
-  transition: all 0.3s;
-}
-
-.input-unidad {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-::ng-deep {
-  .dropdown-unidad {
-    .p-dropdown-label {
-      font-size: 11px !important;
+      .input-unidad {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
     }
   }
 
-  .panel-dropdown-unidad {
-    min-width: 11rem;
+  // ====================================================
+  // TAMAÑO DE LAS COLUMNAS
+  // ====================================================
+
+  .column-codigo {
+    width: 9%;
+  }
+  .column-cantidad {
+    width: 8%;
+  }
+  .column-unidad {
+    width: 10%;
+    overflow: hidden;
+    text-align: left;
+    max-width: 2rem;
+  }
+
+  .column-descuento {
+    width: 8%;
+  }
+
+  .column-precio {
+    width: 12%;
+  }
+
+  .column-itbis {
+    width: 9%;
+  }
+
+  .column-total {
+    width: 13%;
   }
 }

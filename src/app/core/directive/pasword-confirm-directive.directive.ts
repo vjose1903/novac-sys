@@ -11,8 +11,9 @@ import { Subscription } from 'rxjs';
       multi: true,
     },
   ],
+  standalone: false,
 })
-export class PaswordConfirmDirective {
+export class PaswordConfirmDirective implements Validator {
   @Input('compare') appConfirmPassword: string;
 
   validate(control: AbstractControl): ValidationErrors | null {

@@ -1,0 +1,179 @@
+.text-wrap-pretty {
+  text-wrap: pretty;
+}
+
+/* ------ text color ------ */
+
+.text-c-danger {
+  color: red !important;
+}
+
+.text-c-white {
+  color: white !important;
+}
+
+.text-c-white-20 {
+  color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.text-c-white-50 {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.text-c-white-70 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.text-c-white-90 {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.text-c-black-20 {
+  color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.text-c-black-30 {
+  color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.text-c-black-50 {
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.text-c-black-60 {
+  color: var(--app-empty-text) !important;
+}
+
+.text-c-black-70 {
+  color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.text-c-black-90 {
+  color: rgba(0, 0, 0, 0.9) !important;
+}
+
+.text-c-black {
+  color: rgba(0, 0, 0) !important;
+}
+
+/* ----- text-weight -----  */
+
+.text-w-normal {
+  font-weight: normal !important;
+}
+
+.text-w-100 {
+  font-weight: 100 !important;
+}
+
+.text-w-200 {
+  font-weight: 200 !important;
+}
+
+.text-w-300 {
+  font-weight: 300 !important;
+}
+
+.text-w-400 {
+  font-weight: 400 !important;
+}
+
+.text-w-500 {
+  font-weight: 500 !important;
+}
+
+.text-w-600 {
+  font-weight: 600 !important;
+}
+
+/* ----- text-size -----  */
+
+.text-s-small {
+  font-size: small;
+}
+
+.text-s-8 {
+  font-size: 8px !important;
+}
+
+.text-s-9 {
+  font-size: 9px !important;
+}
+
+.text-s-10 {
+  font-size: 10px !important;
+}
+
+.text-s-12 {
+  font-size: 12px !important;
+}
+
+.text-s-13 {
+  font-size: 13px !important;
+}
+
+.text-s-14 {
+  font-size: 14px !important;
+}
+
+.text-s-15 {
+  font-size: 15px !important;
+}
+
+.text-s-16 {
+  font-size: 16px !important;
+}
+
+.text-s-18 {
+  font-size: 18px !important;
+}
+
+.text-s-20 {
+  font-size: 20px !important;
+}
+
+.text-s-23 {
+  font-size: 23px !important;
+}
+
+.text-s-30 {
+  font-size: 30px !important;
+}
+
+/* ----- text extra -----  */
+.white-space-nowrap {
+  white-space: nowrap !important;
+}
+
+.text-italic {
+  font-style: italic !important;
+}
+
+.text-balance {
+  text-wrap: balance !important;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ellipsis-container {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+
+  & span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    &:first-child {
+      flex: 1;
+      min-width: 0;
+    }
+    &:last-child {
+      flex-shrink: 0;
+    }
+  }
+}

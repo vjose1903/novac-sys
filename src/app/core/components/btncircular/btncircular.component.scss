@@ -1,0 +1,71 @@
+.contenedor {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  height: 140px;
+  justify-content: center;
+  overflow: visible;
+  position: relative;
+}
+
+.labelBtn {
+  background: color-mix(in srgb, var(--app-surface) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-border) 72%, transparent);
+  border-radius: 0.55rem;
+  box-shadow: 0 12px 24px -18px #000000bf;
+  color: var(--app-text);
+  font-size: 0.76rem;
+  font-weight: 600;
+  left: 50%;
+  line-height: 1.1;
+  margin: 0;
+  max-width: max-content;
+  opacity: 0;
+  padding: 0.34rem 0.55rem;
+  pointer-events: none;
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  transform: translate(-50%, -0.25rem) scale(0.96);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+  white-space: nowrap;
+  z-index: 4;
+}
+
+.imgBtn {
+  border-radius: 50%;
+  box-shadow: 0 12px 24px -18px #000000d1;
+  cursor: not-allowed;
+  filter: grayscale(50%);
+  height: 100px;
+  position: absolute;
+  transition:
+    filter 160ms ease,
+    transform 160ms ease;
+
+  &:hover {
+    ~ .labelBtn {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+  }
+
+  &.active:hover {
+    cursor: pointer !important;
+    filter: grayscale(0%);
+    transform: translateY(-2px) scale(1.04);
+  }
+
+  &.disabled {
+    filter: grayscale(79%) brightness(79%)!important;
+    opacity: 0.55;
+  }
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .labelBtn {
+    background: color-mix(in srgb, var(--app-surface) 82%, #000);
+    border-color: color-mix(in srgb, var(--primary08) 22%, var(--app-border));
+  }
+}

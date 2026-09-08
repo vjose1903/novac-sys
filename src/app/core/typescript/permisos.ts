@@ -104,6 +104,13 @@ export const Permisos = {
     update: 'cuadre_caja_update',
     destroy: 'cuadre_caja_destroy',
     check_today_cuadre: 'cuadre_caja_check_today_cuadre',
+    prepare: 'cuadre_caja_prepare',
+    system_income_preview: 'cuadre_caja_system_income_preview',
+    submit: 'cuadre_caja_submit',
+    approve: 'cuadre_caja_approve',
+    reject: 'cuadre_caja_reject',
+    reopen: 'cuadre_caja_reopen',
+    configuracion_cuadre: 'cuadre_caja_configuracion_cuadre',
   },
   mantenimiento_articulo: {
     create: 'mantenimiento_articulo_create',
@@ -237,6 +244,13 @@ export const Permisos = {
   device: {
     login: 'device_login',
   },
+  pre_venta: {
+    create: 'pre_venta_create',
+    read_all: 'pre_venta_read_all',
+    read_one: 'pre_venta_read_one',
+    update: 'pre_venta_update',
+    comprobar_serial: 'pre_venta_comprobar_serial',
+  },
   cotizacion: {
     create: 'cotizacion_create',
     read_all: 'cotizacion_read_all',
@@ -244,11 +258,38 @@ export const Permisos = {
     update: 'cotizacion_update',
     destroy: 'cotizacion_destroy',
   },
-  pre_venta: {
-    create: 'pre_venta_create',
-    read_all: 'pre_venta_read_all',
-    read_one: 'pre_venta_read_one',
-    update: 'pre_venta_update',
-    comprobar_serial: 'pre_venta_comprobar_serial',
+  ecf_reception: {
+    read_all: 'ecf_reception_read_all',
+    read_one: 'ecf_reception_read_one',
+    response_receive: 'ecf_reception_response_receive',
+  },
+  commertial_approval_reception: {
+    read_all: 'commertial_approval_reception_read_all',
+    read_one: 'commertial_approval_reception_read_one',
+  },
+  divisa: {
+    create: 'divisa_create',
+    read_all: 'divisa_read_all',
+    read_one: 'divisa_read_one',
+    update: 'divisa_update',
+    destroy: 'divisa_destroy',
+  },
+  tasa_cambio: {
+    read_all: 'tasa_cambio_read_all',
+    read_one: 'tasa_cambio_read_one',
+    update: 'tasa_cambio_update',
+    get_history_changes: 'tasa_cambio_get_history_changes',
+  },
+  calendario: {
+    create: 'calendario_create',
+    read_all: 'calendario_read_all',
+    read_one: 'calendario_read_one',
+    update: 'calendario_update',
+    destroy: 'calendario_destroy',
+    read_event_types: 'calendario_read_event_types',
+    create_event_type: 'calendario_create_event_type',
+    update_event_type: 'calendario_update_event_type',
+    destroy_event_type: 'calendario_destroy_event_type',
+    search_linkables: 'calendario_search_linkables',
   },
 };

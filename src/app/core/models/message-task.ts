@@ -1,12 +1,11 @@
-import * as moment from '../javascript/moment';
 import { BehaviorSubject } from 'rxjs';
-import * as _ from 'lodash';
 import { fun } from '../services/functions.service';
 
 export class MessageTask {
   id: string;
   eventName: string;
   data: any;
+  error: boolean;
 
   fn = new BehaviorSubject<any>({});
 
@@ -17,7 +16,7 @@ export class MessageTask {
   }
 
   generateDataKey(arrRes: any, hash?: any): any {
-    return _.map(arrRes, (el: any) => {
+    return fun.map(arrRes, (el: any) => {
       if (el.data) {
         return { data: el.data, key: fun.generateKey() };
       } else {
@@ -26,10 +25,8 @@ export class MessageTask {
     });
   }
 
-
-
   asJson(): any {
-    return { id: this.id, eventName: this.eventName, data: this.data };
+    return { id: this.id, eventName: this.eventName, data: this.data, error: this.error };
   }
 
   serialize(): string {
