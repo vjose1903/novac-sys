@@ -68,10 +68,20 @@ export class AppUpdateUiService {
         case 'error':
           this.resetProgress();
           this.visible.set(false);
-          fun.toastError(state.error?.message || state.message || 'Error en la actualización', 'ERROR');
+          fun.toastError(this.getFriendlyErrorMessage(state), 'ERROR');
           break;
       }
     });
+  }
+
+  private getFriendlyErrorMessage(state: DesktopUpdateState): string {
+    const rawMessage = state.error?.message || state.message || '';
+
+    if (/releases\.atom/i.test(rawMessage) && /404|not found/i.test(rawMessage)) {
+      return 'No se pudieron verificar las actualizaciones porque el repositorio de actualizaciones es privado y la aplicación no tiene acceso. Contacte a soporte para habilitar el acceso.';
+    }
+
+    return rawMessage || 'No se pudieron verificar las actualizaciones. Inténtelo nuevamente.';
   }
 
   private showAvailableUpdateModal(info: any): void {
