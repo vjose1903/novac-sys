@@ -2,8 +2,8 @@
   <svg-background class="svg-background" style="position: absolute"></svg-background>
   <div class="col-3 d-flex justify-content-center">
     <div class="card card-padding sombra w-100 card-login">
-      <div class="view view-cascade waves-light d-flex justify-content-center">
-        <img [src]="imgLogo()" class="img-fluid" style="max-width: 25rem" draggable="false" />
+      <div class="view view-cascade waves-light d-flex justify-content-center login-logo-view">
+        <img [src]="imgLogo()" class="login-logo" draggable="false" />
       </div>
       @if (form) {
         <form [formGroup]="form" class="" (keydown.enter)="$event.stopPropagation()">

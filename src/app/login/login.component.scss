@@ -14,6 +14,20 @@
 
   .card-login {
     max-width: 25rem;
+
+    .login-logo-view {
+      max-height: 14rem;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .login-logo {
+      display: block;
+      height: 14rem;
+      max-width: 100%;
+      object-fit: contain;
+      width: 100%;
+    }
     .version {
       color: #b3b3b3;
       font-size: 0.8rem;
@@ -53,6 +67,16 @@
     &:hover {
       opacity: 1;
       background-color: #0000002a;
+    }
+  }
+}
+
+@media (max-width: 575px) {
+  .home .card-login {
+    .login-logo-view,
+    .login-logo {
+      height: 11rem;
+      max-height: 11rem;
     }
   }
 }
